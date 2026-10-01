@@ -25,6 +25,13 @@ Ağdaki "ping" burada **I2C taraması** (33. ders): adreste biri cevap veriyor. 
 | 3. Protokol (kimlik) | Cevap veren, **doğru** cihaz mı? | Kimlik yazmacını (WHO_AM_I) oku, beklenenle karşılaştır |
 | 4. Veri mantığı | Okunan değer **makul** mü? | Aralık kontrolü |
 
+### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
+| Parça | Bağlantı |
+|---|---|
+| MPU6050 | VCC → **5V**, GND → **GND**, SDA → **A4**, SCL → **A5** |
+
 MPU6050'de (58. derste gördüğün ivmeölçer, adres 0x68) kimlik yazmacı 0x75'tir ve veri sayfasına göre `0x68` döner. Hareketsiz durumda ivmenin toplam büyüklüğü yaklaşık 1 g (yerçekimi) olmalıdır. Bu sketch dört katmanı sırayla dener ve **ilk hata veren katmanı** söyler:
 
 ```cpp
@@ -129,6 +136,22 @@ void loop() {
 5. `ilkHataKatmani()` alttan üste sırayla dener ve ilk hatada durur. Alt katman bozukken üsttekini sormanın anlamı yoktur. Kök neden, **en alttaki** başarısız katmandır.
 6. Sonuç iki ölçüm arasında değişirse `DEGISTI` yazar. Vakadaki "arada düzeliyor" ipucunun kodudur.
 
+### Sensör hata modlarını laboratuvarda üretmek
+Katmanların hepsi laboratuvarda üretilemez. Hangisini üretebildiğini, hangisini yalnızca gerçek devrede göreceğini bil:
+
+| Hata modu | Hangi katman | Laboratuvarda nasıl üretilir |
+|---|---|---|
+| SDA ya da SCL kablosu yok | 2 | Kabloyu sil (devre durmuşken), ▶ |
+| Besleme yok | 2 | MPU6050'nin VCC kablosunu sil |
+| Adres farklı | 2 | Parçayı seç, **I2C adresi** özelliğini `0x69` yap (devre durmuşken); kod hâlâ `0x68`'i arar |
+| Veri sıfır (donmuş sensör) | 4 | Çalışırken `ax`, `ay` ve `az` özelliklerini 0 yap |
+| Veri doymuş ya da sallanma | 4 | Çalışırken `ax`, `ay` ve `az` özelliklerini 1,9 yap |
+| "Arada düzeliyor" | `DEGISTI` | `az`'yi çalışırken 0 yap, sonra 1'e geri al |
+| SDA hattı LOW'a takılı (kısa devre) | 1 | Uno'nun **A4** pinini bir kabloyla **GND**'ye bağla (devre durmuşken), ▶ |
+| Adreste yanlış cihaz | 3 | **Üretilemez.** Laboratuvarda beklenen adreste başka bir cihaz çıkaramazsın; MPU6050 yalnızca `0x68` ya da `0x69` olur. |
+
+Katman 3 kodda durur ama laboratuvar bu hatayı üretemediği için onu laboratuvarda sınamış olmazsın. Gerçek devrede bu satırın beklediğin gibi çalıştığını ayrıca doğrulaman gerekir.
+
 ### Çerçeve ve checksum
 Bir katman daha var: veri uzun bir mesajın parçasıysa, bozulup bozulmadığını anlamak için **checksum** kullanılır. Hyvex vakasında gimbal'ın UDP komut çerçevesinde checksum, belirli baytların **XOR**'udur. Çerçeve; sync (başlangıç), uzunluk, komut, parametre, checksum ve footer parçalarından oluşur. Alıcı checksum'ı yeniden hesaplamazsa, bozuk bir çerçeveyi geçerli sanır.
 
@@ -195,10 +218,11 @@ void loop() {
 Bu tasarımda checksum tutmazsa çerçeve **yok sayılır**: LED değişmez. Hyvex'teki cihazın tutmayan çerçevede ne yaptığı kaynakta yazılı değil; sana düşen soru da bu: bir cihaz bozuk komutu uygulasaydı ne olurdu?
 
 ### Dene
-- Sensörü sallarken `katman_testi`'ni çalıştır. Hangi katman hata veriyor? Neden?
+- `katman_testi` çalışırken `ax` özelliğini 0,8 yap (sensör yana doğru hızlanıyormuş gibi). Toplam büyüklük yaklaşık 1,28 g olur: hangi katman hata veriyor? Neden bu bir sensör arızası değil?
 - `MIN_G` ve `MAKS_G` değerlerini daralt ve geniş tut: hangisi yanlış alarm, hangisi kaçırılmış hata üretir?
-- `xor_cerceve` için `AA 02 01 01 02` çerçevesinin geçerli olduğunu elle XOR'layarak doğrula (`02 ^ 01 ^ 01 = 02`). Sonra son baytı değiştir.
+- `xor_cerceve` için `AA 02 01 01 02` çerçevesinin geçerli olduğunu kendin XOR'layarak doğrula (`02 ^ 01 ^ 01 = 02`). Sonra son baytı değiştir.
 - Bir cihazı kullanmadan önce her açılışta bu katmanları kendi sketch'ine ekle.
+- `az` özelliğini 0 ile 1 arasında hızlıca değiştirip `DEGISTI` mesajının ne zaman çıktığına bak.
 
 ### Sık yapılan hatalar
 - "Ping (tarama) cevap veriyor, demek ki cihaz çalışıyor" demek. Adres cevabı kimlik ve veri doğruluğu demek değildir.

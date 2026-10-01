@@ -2,7 +2,7 @@
 süre: 35
 
 ## Merak
-Sınıfta ışıklar boş odada yanık kalır, fan kimse yokken döner. Akıllı bir oda ise sana sormaz: kimse yoksa tasarruf eder, biri girince ve hava karanlıksa ışığı yakar, ısınınca fanı açar. Bu, modülün bitirme projesi: öğrendiğin sensörleri tek bir durum makinesinde birleştireceksin ve simülatörde olan şeyin gerçekte de olacağı yerleri bileceksin.
+Sınıfta ışıklar boş odada yanık kalır, fan kimse yokken döner. Akıllı bir oda ise sana sormaz: kimse yoksa tasarruf eder, biri girince ve hava karanlıksa ışığı yakar, ısınınca fanı açar. Bu, modülün bitirme projesi: öğrendiğin sensörleri tek bir durum makinesinde birleştireceksin ve laboratuvarda gördüğünün gerçek devrede nerede farklı olacağını bileceksin.
 
 ## Etkinlik
 ### Ne yapacağız?
@@ -12,22 +12,28 @@ Bu proje öğrendiklerini birleştirir:
 - **Hafta 4:** LDR ile ışık ölçümü ve histerezis (A1).
 - **Hafta 5 ve Modül 3:** Röleyle fan kontrolü (D7), histerezis.
 - **Hafta 6 ve Modül 3:** `millis()` ile bloklamayan kod, durum makinesi, I2C LCD.
-- **Hafta 8:** Gerçek dünyada sıçrama (buton, D3), gürültü (eşik histerezisi) ve arıza durumunda güvenli davranış (fail-safe).
+- **Hafta 8:** Gerçek dünya etkilerine karşı savunma: buton sıçraması için bekleme payı (D3), gürültü için eşik histerezisi, sensör arızasında güvenli davranış (fail-safe) ve PIR ısınması.
 
 ### Devre
-**Güvenlik:** Röleyi yalnızca düşük gerilimle (5 V) kullan; fan yerine küçük bir 5 V fan ya da "fan simgesi" olarak LED kullan. Şebeke gerilimiyle (220 V) devre kurma. Motor çeken fan gibi parçaları kartın 5 V pininden değil ayrı güç kaynağından besle ve GND'leri ortak yap (71. ders).
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. "Fan" için küçük bir motor yerine ikinci bir LED kullanıyoruz.
 
 | Parça | Bağlantı |
 |---|---|
-| PIR sensörü | OUT → **D2**, VCC → 5 V, GND → GND |
-| DHT22 | Veri → **D5**, VCC → 5 V, GND → GND (modüle göre çekme direnci gerekir; veri sayfasına bak) |
-| LDR | Bir ucu 5 V, öbür ucu **A1**; A1 ile GND arasında 10 kΩ direnç (aydınlıkta A1 yükselir) |
-| Röle modülü IN | **D7** (VCC → 5 V, GND → GND); COM → 5 V, NO → fan (ya da 330 Ω + LED "fan") → GND |
-| Lamba yerine LED | **D13** → 330 Ω → LED → GND |
-| Buton | Bir ucu **D3**, öbür ucu GND (`INPUT_PULLUP`) |
-| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND (adres 0x27) |
+| PIR | VCC → **5V**, GND → **GND**, OUT → **D2** |
+| DHT22 | VCC → **5V**, GND → **GND**, DATA → **D5** (Tür özelliği DHT22) |
+| LDR | 1 → **5V**, 2 → **A1** |
+| Direnç (10 kΩ) | 1 → **A1**, 2 → **GND** (aydınlıkta A1 yükselir) |
+| Röle | VCC → **5V**, GND → **GND**, IN → **D7**; COM → **5V**, NO → fan direncinin 1 ucu |
+| Direnç (330 Ω, fan) | 1 → rölenin NO ucu, 2 → "fan" LED'inin A ucu |
+| LED ("fan") | A → fan direncinin 2 ucu, K → **GND** |
+| Direnç (330 Ω, lamba) | 1 → **D13**, 2 → "lamba" LED'inin A ucu |
+| LED ("lamba") | A → lamba direncinin 2 ucu, K → **GND** |
+| Buton | A → **D3**, B → **GND** (`INPUT_PULLUP`) |
+| I2C LCD 16x2 | GND → **GND**, VCC → **5V**, SDA → **A4**, SCL → **A5** (adres 0x27) |
 
-PIR çıkışı hareket varken HIGH olur ve bir süre HIGH kalır; kendi sensörünün bekleme süresi ve ısınma süresi modele göre değişir (41. ders). DHT22 okumaları arası en az 2 saniye bırakılmalıdır (46. ders).
+Laboratuvarda 5V hattı ideal olduğu için fanı karttan beslemek sorun çıkarmaz (73. ders); gerçek devrede çıkarırdı. Güvenlik: bu projede şebeke gerilimiyle (220 V) hiçbir devre kurulmaz; röle yalnızca düşük gerilimli "fan" yükünü anahtarlar.
+
+PIR çıkışı hareket varken HIGH olur ve hareket bittikten sonra bir süre HIGH kalır; laboratuvarda ısınma 2 sn, bekleme 3 sn'dir (41. ders). Gerçek modüllerde bu süreler modele göre değişir. DHT22 okumaları arası en az 2 saniye bırakılmalıdır (46. ders).
 
 ### Durum makinesi
 | Durum | Lamba | Fan | LCD ışığı | Durumdan çıkış |
@@ -37,10 +43,10 @@ PIR çıkışı hareket varken HIGH olur ve bir süre HIGH kalır; kendi sensör
 | DOLU | Karanlıksa açık | Sıcaksa açık | Açık | Son hareketten `BOS_SURESI` sonra BOS |
 | KAPALI | Kapalı | Kapalı | Açık | Buton: KAPALI ile BOS arasında geçiş |
 
-- **Işık:** Yalnızca oda DOLU iken ve karanlıkken yanar. Karanlık/aydınlık kararı **histerezisle** verilir: ADC değeri 300'ün altına inince karanlık, 400'ün üstüne çıkınca aydınlık. İkisi arasında önceki karar korunur (71. ders; eşikleri kendi ortamına göre kalibre et).
+- **Işık:** Yalnızca oda DOLU iken ve karanlıkken yanar. Karanlık/aydınlık kararı **histerezisle** verilir: ADC değeri 300'ün altına inince karanlık, 400'ün üstüne çıkınca aydınlık. İkisi arasında önceki karar korunur (71. ders). Laboratuvarda eşikleri LDR'nin **Işık** özelliğiyle denersin; gerçek odada eşikleri o ortamın ışığına göre kalibre etmen gerekir (73. ders).
 - **Fan:** Yalnızca DOLU iken ve sıcaklık 28 °C'a ulaşınca açılır, 26 °C'a inince kapanır.
 - **Güvenli varsayılan:** DHT22 okunamıyorsa ya da değer makul aralığın dışındaysa (74. ders) fan **kapalı** kalır ve LCD `DHT HATA` yazar. Bilinmeyen sıcaklıkta fanı açık tutmak yerine kapatmak, Hyvex vakasındaki "kontrol kopunca ne olur?" sorusunun bu projedeki karşılığıdır: tehlikeli ya da masraflı çıkış varsayılan olarak kapalı olur.
-- **Süreler:** Derste hızlı denemek için `ISINMA_SURESI` 3 sn, `BOS_SURESI` 8 sn alındı. Gerçekte PIR ısınması çok daha uzundur ve boş oda süresi dakikalarla ölçülür.
+- **Süreler:** Derste hızlı denemek için `ISINMA_SURESI` 3 sn, `BOS_SURESI` 8 sn alındı. Laboratuvarın PIR ısınması 2 sn'dir, `ISINMA_SURESI` bunun üstünde olmalıdır. Gerçek modülde ısınma çok daha uzundur ve boş oda süresi dakikalarla ölçülür.
 
 ### Program
 ```cpp
@@ -208,14 +214,14 @@ void loop() {
 6. LCD arka ışığı yalnızca durum değiştiğinde güncellenir; böylece I2C hattı gereksiz meşgul edilmez.
 
 ### Uçtan uca denemek
-Bu bölümde simülatörde sırayla şunları dene; her adımda ne beklediğini önce kendin tahmin et:
-1. Başlangıçta 3 sn boyunca PIR'ı tetikle: durum ISINMA kalmalı, lamba sönük.
-2. 3 sn sonra odayı karanlık yap (LDR gerilimini düşür), PIR'ı kısa tetikle: DOLU, lamba yanmalı.
-3. Odayı aydınlat: lamba sönmeli. Işığı eşik arasına (ne karanlık ne aydınlık) getir: lamba önceki kararda kalmalı.
-4. Sıcaklığı 29 °C yap: fan açılmalı. 27 °C'ye indir: açık kalmalı. 25 °C: kapanmalı.
-5. 8 sn hareket olmasın: BOS; lamba ve fan kapanmalı, LCD ışığı sönmeli.
-6. Butona bas: KAPALI; PIR'ı tetikle, hiçbir şey olmamalı. Bir daha bas: BOS.
-7. DHT22'yi çıkar: fan kapalı, LCD `DHT HATA` yazmalı; lamba çalışmaya devam eder.
+Bu bölümde laboratuvarda sırayla şunları dene; her adımda ne beklediğini önce kendin tahmin et. Parça özelliklerini çalışırken sağ panelden değiştirirsin:
+1. ▶'e bas ve ilk 2 sn içinde PIR'ın **Hareket** özelliğini aç-kapa: ısınma sırasında PIR çıkışı parazitli oynar ama durum ISINMA kalmalı, lamba sönük. LCD'nin alt satırı `ISINMA` yazar.
+2. 3 sn sonra LDR'nin **Işık** özelliğini 0,2 yap (karanlık). PIR'ın **Hareket** özelliğini aç-kapa: durum DOLU olmalı, lamba yanmalı.
+3. **Işık** özelliğini 0,9 yap: lamba sönmeli. Sonra yaklaşık 0,46 yap (ne karanlık ne aydınlık): lamba önceki kararda kalmalı.
+4. DHT22'nin **Sıcaklık** özelliğini 29 °C yap: fan LED'i (röle) 2 sn içinde yanmalı. 27 °C'ye indir: açık kalmalı. 25 °C'de kapanmalı. (DHT22 en çok 2 sn'de bir okunur; tepki gecikmesi laboratuvarda da vardır.)
+5. 8 sn hareket olmasın: durum BOS; lamba ve fan kapanmalı, LCD arka ışığı sönmeli.
+6. Butona bas: KAPALI; PIR'ı tetikle, hiçbir şey olmamalı. Bir daha bas: BOS. (Laboratuvarın butonu sıçramaz; koddaki 50 ms'lik pay bu yüzden denenmemiş kalır.)
+7. ■ ile durdur, DHT22'nin DATA kablosunu sil, ▶ ile yeniden başlat. 3 sn sonra PIR'ı tetikle: fan kapalı, LCD `DHT HATA` yazmalı; lamba çalışmaya devam eder.
 
 ### Dene
 - `FAN_ACIK` ile `FAN_KAPAT` farkını 0,5 °C yap: fan ne sıklıkla açılıp kapanıyor?
@@ -229,8 +235,8 @@ Bu bölümde simülatörde sırayla şunları dene; her adımda ne beklediğini 
 - Tek eşik kullanıp lambanın titremesine izin vermek.
 - DHT22'yi iki saniyeden sık okumak.
 - Sensör geçersizken fanı açık bırakmak.
-- Röleyle şebeke gerilimi kullanmak: bu projede kesinlikle yapma.
-- Fanı kartın 5 V pininden beslemek: kart sıfırlanabilir (71. ders).
+- Röleyle şebeke gerilimi kullanmak: bu projede kesinlikle yapılmaz.
+- Fanı kartın 5 V pininden beslemek: gerçek devrede kart sıfırlanabilir; laboratuvar bunu göstermez (73. ders).
 
 ## Konuşalım
-Bu proje simülatörde mükemmel çalışsa bile gerçek odaya taşıdığında hangi üç şey seni şaşırtır? (Aklına gelsin: sıçrama, gürültü, güç, toprak ve PIR'ın ısınması.) Odayı gerçekten bırakıp çıkmadan önce hangi güvenlik önlemini eklerdin?
+Bu proje laboratuvarda mükemmel çalışsa bile gerçek odaya taşıdığında hangi üç şey seni şaşırtır? (Aklına gelsin: buton sıçraması, analog gürültü, besleme gerilimi ve PIR'ın gerçek ısınma süresi.) Odayı gerçekten bırakıp çıkmadan önce hangi güvenlik önlemini eklerdin?

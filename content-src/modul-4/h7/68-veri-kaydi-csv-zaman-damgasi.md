@@ -6,13 +6,14 @@ Bir hafta boyunca odanın sıcaklığını kaydettin. Şimdi bunun grafiğini ç
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| DHT22 | Veri → **D5** (46. dersteki gibi), VCC → 5 V, GND → GND |
-| RTC modülü (DS3231) | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND |
-| SD kart modülü | CS → **D10**, MOSI → **D11**, MISO → **D12**, SCK → **D13** (yalnız son program) |
+| DHT22 (Tür: DHT22) | **DATA** → Uno **D5** (46. dersteki gibi), **VCC** → **5V**, **GND** → **GND** |
+| RTC | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → **5V**, **GND** → **GND** |
 
-Yalnız Serial'e yazan programlarda SD modülü bağlamana gerek yok.
+Bu dersin programları yalnız Serial'e yazar, SD kart gerekmez. Son program (`csv_sd`) SD karta da yazar; laboratuvarda SD kart modülü parçası yok, o programı okuma örneği olarak incele (aşağıda not var).
 
 ### CSV ve zaman damgası
 **CSV** (Comma-Separated Values, virgülle ayrılmış değerler) düz bir metin dosyasıdır. Her satır bir kayıttır, sütunlar virgülle ayrılır. İlk satır sütun adlarını taşır:
@@ -92,7 +93,7 @@ zaman,sicaklik_C,nem_yuzde
 Üçüncü satırda sensör okunamamış gibi davranıldı (`NAN`, sayı değil). Zaman damgası yazılır, sensör sütunları boş bırakılır. Boş alan CSV'de "değer yok" demektir ve sütunlar kaymaz.
 
 ### Canlı veri: RTC + DHT22
-Şimdi fonksiyonu gerçek donanıma bağlayalım. Her 5 saniyede bir RTC'den zamanı, DHT22'den sıcaklık ve nemi okuyup satırı Serial'e yazıyoruz. DHT22'yi iki okuma arasında en az yaklaşık 2 saniye beklemelisin; 5 saniye rahat bir aralıktır.
+Şimdi fonksiyonu sensörlere bağlayalım. Her 5 saniyede bir RTC'den zamanı, DHT22'den sıcaklık ve nemi okuyup satırı Serial'e yazıyoruz. DHT22'yi iki okuma arasında en az yaklaşık 2 saniye beklemelisin; 5 saniye rahat bir aralıktır. Laboratuvarın RTC'si 2026-01-01 00:00:00'dan başladığı için satırların tarihi `2026-01-01 00:00:00`, `2026-01-01 00:00:05` ... diye akar; DHT'yi seçip sağ panelden sıcaklığı ve nemi çalışırken değiştirebilirsin.
 
 ```cpp
 // sketch: csv_satir
@@ -159,7 +160,7 @@ void loop() {
 }
 ```
 
-`satirOlustur` aynen aynı kaldı; yalnızca `loop()` ona gerçek değerleri veriyor. Serial Monitor'daki satırları kopyalayıp `VERI.CSV` adıyla kaydedersen tablo programlarında açabilirsin.
+`satirOlustur` aynen aynı kaldı; yalnızca `loop()` ona sensörlerden okunan değerleri veriyor. İstersen seri monitördeki satırları kopyalayıp bilgisayarındaki bir metin dosyasına `VERI.CSV` adıyla yapıştırarak tablo programında açabilirsin; bu kısım laboratuvarın dışındadır.
 
 ### Ondalık ayırıcı ve Excel
 CSV'de virgül sütunları ayırır. Peki ondalık sayıyı da virgülle (`23,5`) yazarsan? Satır `...,23,5,55,0` olur ve bir program onu 5 sütun sanır. Ondalık ayırıcı ülkeden ülkeye değişir: bizde virgül, birçok ülkede nokta. Bilgisayarının dil ayarına göre tablo programı da farklı bekler. Genel kural:
@@ -223,7 +224,7 @@ void loop() {
 ```
 
 ### Aynı satırı SD karta yaz
-Son adımda satırı hem Serial'e hem SD karta yazıyoruz. 67. derste öğrendiğin gibi her satırda dosyayı açıp yazıp kapatıyoruz. Dosya yeniyse (`SD.exists` ile kontrol) önce başlık satırını yazıyoruz. SD kart takılı değilse program durmuyor, yalnız Serial'e yazmaya devam ediyor.
+Son adımda satırı hem Serial'e hem SD karta yazıyoruz. Laboratuvarda SD kart modülü yok ve `SD.begin` kart bulamayınca takılıp kalır; bu yüzden bu programı laboratuvarda çalıştırınca hiçbir şey yazmaz. Gerçek bir kartta çalışan bir kayıt örneği olarak oku. 67. derste öğrendiğin gibi her satırda dosyayı açıp yazıp kapatıyoruz. Dosya yeniyse (`SD.exists` ile kontrol) önce başlık satırını yazıyoruz. SD kart takılı değilse program durmuyor, yalnız Serial'e yazmaya devam ediyor.
 
 ```cpp
 // sketch: csv_sd
@@ -322,7 +323,8 @@ void loop() {
 ### Dene
 - `csv_fonksiyon` programına dördüncü bir test satırı ekle: sıcaklığı 0.0, saniyesi 5 olan bir zaman. Çıktıda `0.0` ve `05` doğru yazılıyor mu?
 - `csv_satir` programında `OLCUM_ARALIGI`'ni 2000 yap. Satırlar arası zamana bak. Neden 2 saniyenin altına inmemelisin?
-- Serial Monitor çıktısını kopyalayıp `VERI.CSV` olarak kaydet ve tablo programında aç. Sütunlar doğru ayrıldı mı? Değilse `csv_tr` biçimini dene.
+- İstersen seri monitör çıktısını kopyalayıp bilgisayarındaki bir tablo programına aktar. Sütunlar doğru ayrıldı mı? Değilse `csv_tr` biçimini dene.
+- `csv_satir` çalışırken DHT'nin sıcaklığını -5 °C yap. Satırda eksi işareti ve bir ondalık basamak görüyor musun? Sonra ■ ile durdurup DHT'nin DATA kablosunu kaldır ve yeniden ▶'e bas: satırlarda sensör sütunları nasıl görünüyor?
 - `satirOlustur` fonksiyonuna üçüncü bir sensör sütunu ekle: Fahrenheit cinsinden sıcaklık (`sicak * 9 / 5 + 32`). Başlık satırını da güncellemeyi unutma.
 
 ### Sık yapılan hatalar

@@ -24,19 +24,24 @@ Sistemin davranışı:
 Bip aralığı mesafeye bağlıdır: 100 cm'de 800 ms, 20 cm'de 100 ms. Arası `map()` ile orantılı hesaplanır. Her bip 40 ms sürer.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| HC-SR04 VCC / GND | 5 V / GND |
-| HC-SR04 TRIG | **D9** |
-| HC-SR04 ECHO | **D10** |
-| Aktif buzzer + | **D8** |
-| Aktif buzzer − | GND |
-| Yeşil LED + 330 Ω direnç | **D11** → direnç → LED anodu; katot → GND |
-| Sarı LED + 330 Ω direnç | **D12** → direnç → LED anodu; katot → GND |
-| Kırmızı LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
-| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND (adres 0x27) |
+| HC-SR04 VCC | Uno **5V** |
+| HC-SR04 GND | Uno **GND** |
+| HC-SR04 TRIG | Uno **D9** |
+| HC-SR04 ECHO | Uno **D10** |
+| Buzzer **+** | Uno **D8** |
+| Buzzer **-** | Uno **GND** |
+| Yeşil LED + 330 Ω direnç | Uno **D11** → direnç **1**; direnç **2** → LED **A**; LED **K** → Uno **GND** |
+| Sarı LED + 330 Ω direnç | Uno **D12** → direnç **1**; direnç **2** → LED **A**; LED **K** → Uno **GND** |
+| Kırmızı LED + 330 Ω direnç | Uno **D13** → direnç **1**; direnç **2** → LED **A**; LED **K** → Uno **GND** |
+| I2C LCD 16x2 | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → Uno **5V**, **GND** → Uno **GND** |
 
-Aktif buzzer'ın içinde kendi osilatörü vardır: pine HIGH verince öter, LOW verince susar. Pasif buzzer kullanıyorsan `digitalWrite` yerine `tone()` gerekir (18. ders). LCD adresi 0x27 değilse 33. dersteki adres tarama programıyla bul. Buzzer'ın akımı pinin sınırlarına yakın olabilir; modül gibi sürücülü bir parça ya da veri sayfasına uygun bir direnç kullan.
+Buzzer'ı seçip sağ panelden **Tür**'ü **Aktif** yap (varsayılan "Pasif"tir ve `tone()` ister). LED'lerin renklerini de özellik panelinden ayarla (yeşil, sarı, kırmızı). LCD'nin I2C adresi panelde yazar; kodla aynı olmalı (0x27).
+
+Aktif buzzer'ın içinde kendi osilatörü vardır: pine HIGH verince öter, LOW verince susar. Pasif buzzer kullanıyorsan `digitalWrite` yerine `tone()` gerekir (18. ders). Bilgi notu: gerçek bir buzzer'ın akımı pinin sınırlarına yakın olabilir; sürücülü bir modül ya da veri sayfasına uygun bir direnç kullanılır.
 
 ### Program
 Sistem beş iş yapar ve hiçbirinde uzun `delay` yoktur:
@@ -207,7 +212,8 @@ Tepki süresi: medyan filtre yüzünden mesafe aniden değişirse sistem 3 ölç
 ### Dene
 - `BIP_SURESI` değerini 100 ms yap. 20 cm civarında bipler birbirine karışıyor mu?
 - Sarı ve kırmızı sınırlarda LED titrerse (ölçüm 19,9 ile 20,1 arasında gidip geliyorsa) ne olur? Termostattaki histerezis fikrini buraya uygula: kırmızıya geçiş 20 cm'de, kırmızıdan çıkış 25 cm'de olsun.
-- 13. dersteki NTC'yi A2'ye bağla ve ses hızını sıcaklığa göre düzelt (36. dersteki formül). Soğuk bir ortamda fark etkisini hesapla.
+- 13. dersteki NTC devresini kur (10 kΩ ve NTC, orta nokta A2) ve ses hızını sıcaklığa göre düzelt (36. dersteki formül). NTC'nin Sıcaklık özelliğini 0 °C ve 35 °C yaparak düzeltilmiş mesafeyi seri monitörde yazdır. Laboratuvardaki HC-SR04 sabit bir ses hızıyla çalışır; bu düzeltme asıl olarak gerçek sensörde fark yaratır, burada yalnızca hesabı denersin.
+- Mesafe özelliğini 150 cm'den 15 cm'e doğru yavaşça kaydır. LED renkleri, bip sıklığı ve LCD yazısı hangi mesafelerde değişiyor? Tabloyla uyuşuyor mu?
 - Pasif buzzer için `digitalWrite(BUZZER, HIGH)` yerine `tone(BUZZER, 2000)`, susturmak için `noTone(BUZZER)` kullan.
 
 ### Sık yapılan hatalar
@@ -216,8 +222,8 @@ Tepki süresi: medyan filtre yüzünden mesafe aniden değişirse sistem 3 ölç
 - LCD satırını tam 16 karaktere tamamlamamak: "100.0 cm"den "45.3 cm"e inince eski karakterler ekranda kalır.
 - Filtre olmadan ham ölçümle karar vermek: tek bir aykırı değer kısa bir sessizlik ya da yanlış renk getirir.
 - Yankı yok durumunu (`0`) mesafe sanmak: sistem "0 cm" diyerek sürekli öter. Biz bunu 400 cm yaparak sessiz bıraktık; ama gerçek bir araçta "sensör ölçemiyor" diye ayrıca uyarı vermek daha güvenlidir.
-- Sensörü arabaya takarken çok yakın duran bir kablo ya da yüzey (2 cm'den yakın) nedeniyle sürekli yanlış ölçüm alması.
-- Hareketli servo, motor ya da fan gibi yükleri sensörle aynı güç hattından beslemek: gerilim çökmeleri ölçümü bozar. Ayrı besle, GND'leri ortak yap.
+- Buzzer'ın Tür özelliğini "Aktif" yapmamak: pasif buzzer `digitalWrite` ile ses vermez.
+- Bilgi notu: gerçek bir araçta sensörün 2 cm'den yakınındaki bir yüzey (tampon, kablo) sürekli yanlış ölçüme yol açar. Ayrıca servo, motor ya da fan gibi yükleri sensörle aynı güç hattından beslemek gerilim çökmeleriyle ölçümü bozar; ayrı beslenir, GND'ler ortak yapılır.
 
 ## Konuşalım
 Gerçek bir arabada sensör arka tamponda yan yana dört tane olurdu. Sensörler aynı anda ölçerse birbirinin sesini duyabilir. Bunu nasıl önlerdin? Sensörleri sırayla ölçmenin bedeli ne olurdu?

@@ -15,19 +15,21 @@ Bu proje öğrendiklerini birleştirir:
 Sistem şöyle çalışır: Her 2 saniyede bir DHT22, BMP280 ve toprak nemi okunur. LCD üç sayfayı 3 saniyede bir değiştirerek gösterir. Toprak nemi **%30'un altına** inince sulama uyarısı başlar: LED yanar, buzzer her 2 saniyede bir kısa öter ve seri porta bir satır yazılır. Uyarı, toprak **%40'a** çıkınca biter. İki ayrı eşik kullanırız (35. dersteki histerezis); böylece nem %30 civarında dalgalanırken uyarı açılıp kapanıp durmaz.
 
 ### Devre
-**Güvenlik:** Bu projede pompa ya da vana bağlamıyoruz; yalnızca LED ve buzzer var. İleride gerçek bir sulama pompası eklersen 22. ve 24. derslerdeki gibi transistör ya da röle kullan, pompaya harici güç ver ve GND'leri ortak yap. Şebeke gerilimiyle (220 V) hiçbir devre kurma. Elektronik parçaları sudan uzak tut; yalnızca sensörün toprağa girmesi gereken kısmını toprağa batır.
+Bu projede pompa ya da vana yok; yalnızca LED ve buzzer var. Bilgi notu: gerçek bir sulama pompası eklenecekse 22. ve 24. derslerdeki gibi transistör ya da röle ve ayrı bir güç kaynağı gerekir; şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.
+
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
 
 | Parça | Bağlantı |
 |---|---|
-| DHT22 | DATA → **D5**, VCC → 5 V, GND → GND |
-| BMP280 | SDA → **A4**, SCL → **A5**, VCC (modülün gerilim aralığına bak), GND; adres 0x76 |
-| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND; adres 0x27 |
-| Toprak nemi sensörü | analog çıkış → **A2**, VCC, GND |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
-| Pasif buzzer | **D8** → buzzer (+), buzzer (−) → GND |
-| Buton "sonraki sayfa" | **D2** ile GND arası (`INPUT_PULLUP`) |
+| DHT (DHT22) | DATA → **D5**, VCC → 5V, GND → GND |
+| BMP280 (adres 0x76) | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND |
+| I2C LCD (adres 0x27) | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND |
+| Toprak nemi modülü | AO → **A2**, VCC → 5V, GND → GND |
+| LED + 330 Ω direnç | **D13** → direncin 1 ucu; direncin 2 ucu → LED A (anot); LED K (katot) → GND |
+| Pasif buzzer | **D8** → buzzer +, buzzer − → GND (Tür özelliği Pasif) |
+| Buton "sonraki sayfa" | A → **D2**, B → GND (`INPUT_PULLUP`) |
 
-LCD ve BMP280 aynı iki kabloyu (SDA, SCL) paylaşır; adresleri farklı olduğu (0x27, 0x76) için karışmazlar. Toprak nemi sensörünün kuru ve ıslak uçlarını 48. dersteki gibi kendin ölç; aşağıdaki program `KURU = 800` ve `ISLAK = 350` varsayar.
+LCD ve BMP280 aynı iki kabloyu (SDA, SCL) paylaşır; adresleri farklı olduğu (0x27, 0x76) için karışmazlar. Toprak nemi için 48. dersteki sayılar geçerlidir: **Toprak nemi** kaydırıcısı 0 iken ham değer yaklaşık 921, 1 iken yaklaşık 307 çıkar; aşağıdaki program `KURU = 800` ve `ISLAK = 350` varsayar. Bu durumda kaydırıcı yaklaşık 0,41 ve altında uyarı (%29 ve altı) başlar, 0,5 ve üstünde (%41) uyarı biter.
 
 ### Uyarı mantığı
 | Durum | Koşul | Eylem |
@@ -251,24 +253,24 @@ void loop() {
 5. Uyarı varken LCD'nin her sayfasının sağ alt köşesinde `!` görünür; sayfa 3'te ise "SULAMA GEREKLI" yazar. Böylece kullanıcı hangi sayfada olursa olsun uyarıyı görür.
 6. Dört iş (buton, ölçüm, sayfa, buzzer) kendi saatiyle çalışır; `loop()` içinde `delay` yoktur.
 
-### Benzetimde doğruladıklarımız
-- Toprak %60 iken LED söner, buzzer susar, seri portta yalnız durum satırları akar (`T=24.6 N=48.3 P=990.0 R=195 Toprak=%60 Uyari=0`). LCD sayfaları 3 saniyede bir `1/3`, `2/3`, `3/3` olarak döner. LCD ve BMP280 aynı I2C hattında çalışır.
-- Toprak %24'e düşünce 2 saniye içinde LED yanar, seri porta tek bir `UYARI: toprak nemi %24 - sulama gerekli` satırı yazılır, buzzer 1 kHz'de yaklaşık 200 ms'lik bipleri 2 saniye arayla çalar. Sayfa 3 "SULAMA GEREKLI" gösterir.
-- Nem %35'e çıkınca (30-40 arası) uyarı sürer. %45'e çıkınca LED söner, buzzer susar ve seri porta "normale dondu" satırı yazılır.
-- Eşik tam sınırda: %30'da uyarı çıkmaz, %29'da çıkar.
-- DHT ve BMP280 bağlı değilken program çökmez: ekranda `--` ve "BMP280 yok", seri portta `--` görünür ve toprak uyarısı yine çalışır.
+### Laboratuvarda doğruladıklarımız
+- Toprak nemi kaydırıcısı 0,6 iken (%55) LED söner, buzzer susar, seri portta yalnız durum satırları akar (`T=25.0 N=50.0 P=990.0 R=195 Toprak=%55 Uyari=0`; BMP280 kaydırıcısı 990 hPa, DHT 25 °C ve 50 % iken). LCD sayfaları 3 saniyede bir `1/3`, `2/3`, `3/3` olarak döner. LCD ve BMP280 aynı I2C hattında çalışır.
+- Kaydırıcıyı 0,1'e çekince (%0) 2 saniye içinde LED yanar, seri porta tek bir `UYARI: toprak nemi %0 - sulama gerekli` satırı yazılır, buzzer 1 kHz'de yaklaşık 200 ms'lik bipleri 2 saniye arayla çalar. Sayfa 3 "SULAMA GEREKLI" gösterir.
+- Kaydırıcıyı 0,45'e (%34, 30-40 arası) çıkarınca uyarı sürer. 0,5'e (%41) çıkarınca LED söner, buzzer susar ve seri porta "normale dondu" satırı yazılır.
+- Eşik tam sınırda: kaydırıcı 0,42 iken (%30) uyarı çıkmaz, 0,41 iken (%29) çıkar.
+- DHT ve BMP280 devrede yokken (bu iki parçayı tuvale hiç eklemeden) program çökmez: ekranda `--` ve "BMP280 yok", seri portta `--` görünür ve toprak uyarısı yine çalışır.
 
 ### Dene
-- `ESIK_ALT` ve `ESIK_UST` değerlerini %30 ve %32 yap. Toprak nemi %31 civarında dalgalanınca uyarı kaç kez açılıp kapanıyor? Neden iki eşik daha iyi?
+- `ESIK_ALT` ve `ESIK_UST` değerlerini %30 ve %32 yap. Toprak nemi kaydırıcısını 0,42 ile 0,44 arasında (yaklaşık %30-%33) ileri geri oynat: uyarı kaç kez açılıp kapanıyor? Neden iki eşik daha iyi?
 - D3'e ikinci bir buton ekle: basınca buzzer'ı 10 dakikalığına sustursun, LED yanık kalsın. Bunun için hangi değişkenlere ihtiyacın var?
-- Yağmur sensörünü (48. ders, A0) ekle: yağmur varken toprak kuru olsa bile sulama uyarısı verme. Koşulu nereye yazarsın?
+- 48. dersteki gibi yağmur yerine ikinci bir Toprak nemi modülünü A0'a bağla: ıslak olduğunda (yağmur var) toprak kuru olsa bile sulama uyarısı verme. Koşulu nereye yazarsın?
 
 ### Sık yapılan hatalar
 - Tek eşik kullanmak: nem eşik civarında dalgalanınca LED ve buzzer hızlıca açılıp kapanır, seri port satırlarla dolar.
 - Seri uyarıyı her turda yazmak: durum değişimini yakalamak yerine sürekli aynı mesajı basarsın.
 - `delay` ile buzzer çaldırmak: sayfa değişimi, buton ve ölçüm durur.
 - DHT'yi 2 saniyeden sık okumak.
-- Toprak sensörünün kuru/ıslak uçlarını kendi sensörüne göre ölçmemek: yüzde hesabı yanlış olur.
+- Toprak sensörünün kuru/ıslak uçlarını kullandığın sensöre göre ölçmemek: yüzde hesabı yanlış olur.
 - DHT22'ye `NaN` dönmesine hazırlıksız olmak: ekranda `nan` görünür, eşik karşılaştırmaları şaşar.
 
 ## Konuşalım

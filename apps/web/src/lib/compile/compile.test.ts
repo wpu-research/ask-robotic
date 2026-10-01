@@ -15,8 +15,15 @@ function cliInstalled() {
 }
 const HAS_CLI = cliInstalled()
 
+// Başka test dosyaları paralel derleme yapar; global /tmp taraması onlara takılmasın diye bu dosya kendi TMPDIR'ini kullanır.
+const ORIG_TMPDIR = process.env.TMPDIR
 const scratch = mkdtempSync(path.join(os.tmpdir(), 'compiletest-'))
-afterAll(() => rmSync(scratch, { recursive: true, force: true }))
+process.env.TMPDIR = scratch
+afterAll(() => {
+  if (ORIG_TMPDIR === undefined) delete process.env.TMPDIR
+  else process.env.TMPDIR = ORIG_TMPDIR
+  rmSync(scratch, { recursive: true, force: true })
+})
 
 function script(name: string, body: string) {
   const p = path.join(scratch, name)

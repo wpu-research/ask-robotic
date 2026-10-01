@@ -6,15 +6,17 @@ Apartman kapısındaki tuş takımında 16 tuş var, ama kablo sayısı 16 deği
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Keypad 4x4 (membran) | Satırlar R1..R4 → **D9, D8, D7, D6**; sütunlar C1..C4 → **D5, D4, D3, D2** |
-| LED (yeşil) | 330 Ω direnç üzerinden **D13** → GND |
-| LED (kırmızı) | 330 Ω direnç üzerinden **D12** → GND |
+| Keypad 4x4 | Satırlar R1..R4 → **D9, D8, D7, D6**; sütunlar C1..C4 → **D5, D4, D3, D2** |
+| LED (yeşil) | **D13** → direnç (330 Ω) 1; direnç 2 → LED **A**; LED **K** → **GND** |
+| LED (kırmızı) | **D12** → direnç (330 Ω) 1; direnç 2 → LED **A**; LED **K** → **GND** |
 
 Bu hafta D2-D9 pinlerinin hepsi tuş takımına gider. Önceki haftalarda butonlar için kullandığın D2, D3 ve servo için kullandığın D6 bu hafta boştur; haftanın projesinde bu yüzden servo başka bir pine taşınacak.
 
-Membran tuş takımının 8 telli şeridinde hangi telin satır, hangisinin sütun olduğu üreticiye göre değişir. Takımın arkasındaki yazıya bak ya da bir tuşa basarak multimetreyle süreklilik ölç.
+Laboratuvarda tuş takımını seçince sağ paneldeki **Basılı tuş** listesinden bir tuş seçersin: seçtiğin tuş basılı sayılır, **Yok** dersen bırakılmış olur. Tuş takımı aynı anda yalnız bir tuş basılı tutabilir. Gerçek bir membran tuş takımının 8 telli şeridinde hangi telin satır, hangisinin sütun olduğu üreticiye göre değişir; laboratuvardaki parçada pinler R1-R4 ve C1-C4 olarak yazılıdır.
 
 ### Matris nasıl okunur?
 16 tuşu 16 telle okumak yerine tuşları 4 satır × 4 sütunluk bir ızgaraya dizeriz. Her tuş bir satır ile bir sütunu bastığında birleştirir. Okuma şöyle yapılır:
@@ -24,7 +26,7 @@ Membran tuş takımının 8 telli şeridinde hangi telin satır, hangisinin süt
 3. Basılı bir tuşun sütunu LOW olduğunda, o tuşun satırı da LOW okunur.
 4. Hangi sütun LOW iken hangi satır LOW okunduysa, tuş o satır ile sütunun kesiştiği tuştur.
 
-8 tel ile 4 × 4 = 16 tuş okunur. `Keypad` kütüphanesi bu taramayı ve sıçrama önlemeyi (debounce) senin yerine yapar. Aynı anda birden çok tuşa basılırsa matriste bazı tuşlar yanlış algılanabilir (diyotsuz matrislerin bilinen sınırı); şifre girişinde tuşlara tek tek basıldığı için sorun olmaz.
+8 tel ile 4 × 4 = 16 tuş okunur. `Keypad` kütüphanesi bu taramayı ve sıçrama önlemeyi (debounce) senin yerine yapar. Gerçek tuş takımında aynı anda birden çok tuşa basılırsa matriste bazı tuşlar yanlış algılanabilir (diyotsuz matrislerin bilinen sınırı); şifre girişinde tuşlara tek tek basıldığı için sorun olmaz. Laboratuvarda zaten aynı anda tek tuş seçilebilir.
 
 ### Program 1: Tuşu oku
 `Keypad` nesnesini kurarken tuşların harf haritasını, satır ve sütun pinlerini veririz. `makeKeymap` iki boyutlu diziyi kütüphanenin istediği biçime çevirir.
@@ -59,7 +61,7 @@ void loop() {
 }
 ```
 
-`getKey()` her basışta **bir kez** o tuşu döndürür; tuşu basılı tutsan bile tekrar etmez. Basış yoksa `0` (`'\0'`) döner, bu da `if (tus)` ile "yanlış" sayılır.
+`getKey()` her basışta **bir kez** o tuşu döndürür; tuşu basılı tutsan bile tekrar etmez (laboratuvarda bir tuşu listede seçili bırakmak, basılı tutmak demektir). Basış yoksa `0` (`'\0'`) döner, bu da `if (tus)` ile "yanlış" sayılır.
 
 ### Program 2: PIN girişi
 Şimdi bir kapı kilidinin ilk yarısını yazalım: 4 haneli PIN. Kurallar:
@@ -186,11 +188,11 @@ void loop() {
 - `AZAMI_YANLIS` değerini 5 yap. Başka bir yeri değiştirmen gerekti mi?
 
 ### Sık yapılan hatalar
-- Satır ve sütun pinlerini ters yazmak: tuşlar yanlış harfleri verir (örneğin `1` yerine `A`). Bir tuşa basıp seri monitörde ne yazdığına bak.
+- Satır ve sütun pinlerini sketch'te ya da kablolarda ters yazmak: tuşlar algılanmaz ya da yanlış harf verir. Her tuşu sırayla seçip seri monitörde ne yazdığına bak.
 - `getKey()` döndürdüğü değeri kontrol etmeden kullanmak. Basış yoksa `'\0'` döner.
 - `girilen` dizisine yer ayırırken sondaki `'\0'` için +1 bırakmamak.
 - PIN'i `==` ile karşılaştırmak. Karakter dizilerinde `==` adresleri karşılaştırır; içerik için `strcmp` kullan.
 - `delay()` ile LED'i tutmak: bu sırada basılan tuşlar kaçırılabilir.
 
 ## Konuşalım
-PIN'i program kodunun içine yazmak güvenli mi? Kartı biri bilgisayara bağlayıp programı okuyabilseydi ne olurdu? Bir sonraki derslerde PIN'i neden başka bir yerde tutmak isteyeceğiz?
+PIN'i program kodunun içine yazmak güvenli mi? Programın kodunu okuyabilen biri olsaydı ne olurdu? Bir sonraki derslerde PIN'i neden başka bir yerde tutmak isteyeceğiz?

@@ -5,19 +5,29 @@ süre: 30
 Bir yangın alarmı "var" ya da "yok" demekle yetinmez. Önce küçük bir uyarı verir ("bir şey ısınıyor, bak"), durum kötüleşirse tehlike alarmına geçer, durum düzelince de önce tehlikeden uyarıya, sonra normale döner. Bu derste alev sensörünü tanıyacak, üç seviyeli (NORMAL, UYARI, TEHLIKE) bir karar mekanizması yazacak ve aynı kodu birden fazla sensörde tekrar kullanmayı öğreneceksin.
 
 ## Etkinlik
-### Güvenlik
-Bu derste **gerçek alev kullanma**. Alevi simülasyonda gerilimle taklit edeceğiz. Gerçek devrede deneme yapacaksan bunu yalnızca yetişkin gözetiminde, güvenli bir yerde ve küçük bir kaynakla yap.
+### Güvenlik notu
+Bu derste alev yoktur: alevi laboratuvarda alev sensörünün **Alev şiddeti** özelliğiyle taklit edeceksin. Gerçek alevle deney yapmak tehlikelidir.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Alev sensörü modülü | VCC → 5 V, GND → GND, analog çıkış (AO) → **A1** |
-| MQ-2 gaz sensörü modülü (son sketch için) | VCC → 5 V, GND → GND, AO → **A3** |
-| Sarı LED (uyarı) + 330 Ω direnç | **D12** → direnç → LED anodu; katot → GND |
-| Kırmızı LED (tehlike) + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
-| Aktif buzzer | **D8** (+), diğer ucu GND |
+| Alev sensörü modülü | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A1** (**DO** boş kalır) |
+| MQ-2 gaz sensörü modülü (son sketch için) | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A3** |
+| Direnç (330 Ω) + LED (uyarı; rengi özellik panelinden sarı yap) | **D12** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
+| Direnç (330 Ω) + LED (tehlike; rengi kırmızı) | **D13** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
+| Buzzer (özellik panelinden **Tür: Aktif**) | **+** → **D8**, **-** → **GND** |
 
-A1 pinini bu hafta 51. derste LDR için kullandık; burada LDR'nin yerine alev sensörü bağlıdır. Alev sensörleri alevin yaydığı **kızılötesi (IR) ışığa** duyarlıdır. Birçok modülde güçlü bir IR kaynağı yaklaşınca analog değer **düşer**, ama bu modüle göre değişir; ters olabilir. Güneş ışığı ve bazı lambalar da IR yayar, bu yüzden yanlış alarm olabilir. Sensörün görüş açısı ve menzili sınırlıdır; kendi modülünün belgesine bak.
+A1 pinini bu hafta 51. derste LDR için kullandık; burada LDR'nin yerine alev sensörü bağlıdır (LDR'yi ve ona bağlı direnci tuvalden silebilirsin). Alev sensörleri alevin yaydığı **kızılötesi (IR) ışığa** duyarlıdır. Birçok modülde güçlü bir IR kaynağı yaklaşınca analog değer **düşer**, ama bu modüle göre değişir; ters olabilir. Güneş ışığı ve bazı lambalar da IR yayar, bu yüzden yanlış alarm olabilir. Sensörün görüş açısı ve menzili sınırlıdır.
+
+Laboratuvardaki alev modülünde alev arttıkça AO **düşer** (AO = 5 V × (1 − 0,95 × şiddet)); yani `ALEVDE_DUSER = true` doğrudur. **Alev şiddeti** 0 iken `analogRead` 1023 okur (şiddet değeri 0). Bu derstekiyle karşılaştırma tablosu:
+
+| Alev şiddeti | 0 | 0,31 | 0,4 | 0,62 | 0,8 |
+|---|---|---|---|---|---|
+| `siddet()` | 0 | yaklaşık 300 (UYARI eşiği) | yaklaşık 389 | yaklaşık 600 (TEHLIKE eşiği) | yaklaşık 777 |
+
+MQ-2 için temiz havada (Gaz düzeyi 0) `analogRead(A3)` yaklaşık 102'dir; yani `gazBaz` yaklaşık 102 olur. UYARI için yaklaşık 153'ü, TEHLIKE için yaklaşık 255'i geçmek gerekir: Gaz düzeyi 0,06 UYARI, 0,3 TEHLIKE verir.
 
 ### Yön farkını tek yerde çöz
 Modülün değeri alevde düşüyor ya da yükseliyor olabilir. Bu farkı programın her yerinde düşünmek yerine, ham okumayı **şiddet** adlı tek bir sayıya çevirirsin: şiddet ne kadar büyükse alev o kadar güçlüdür.
@@ -241,8 +251,8 @@ void loop() {
 5. Çıkışlar (LED, buzzer) her turda seviyeden türetilir. Böylece çıkışlar ile seviye hiç ayrışmaz.
 
 ### Dene
-- `uyariKapat` değerini `uyariAc` ile aynı yap. Değer eşiğin yanında oynarsa seviye titriyor mu?
-- Üçüncü bir sensör ekle (örneğin A2'deki NTC için sıcaklığı tam sayı olarak ver). `seviyeBul` fonksiyonunu değiştirmeden çalışıyor mu?
+- `uyariKapat` değerini `uyariAc` ile aynı yap. **Alev şiddeti**ni eşiğin iki yanında (örneğin 0,29 ile 0,33) birkaç kez değiştir: seviye titriyor mu? Eski değerlerle (300 ve 250) aynı hareket seviyeyi değiştiriyor mu?
+- Üçüncü bir sensör ekle (örneğin A2'deki NTC için sıcaklığı tam sayı olarak ver; NTC ve 10 kΩ direnci 13. dersteki gibi bağla). `seviyeBul` fonksiyonunu değiştirmeden çalışıyor mu?
 - Alev sensörün değeri alevde yükseliyorsa hangi satırı değiştirirsin? Programın başka hiçbir yerine dokunman gerekiyor mu?
 
 ### Sık yapılan hatalar
@@ -250,7 +260,7 @@ void loop() {
 - `ALEVDE_DUSER` değerini kontrol etmemek: alarm hep ya da hiç çalmaz.
 - Aynı mantığı iki kez kopyalamak: bir yerde düzeltilen hata öbüründe kalır.
 - `NORMAL`, `UYARI`, `TEHLIKE` yerine sayılar kullanmak (`0`, `1`, `2`): kod okunmaz.
-- Güneş ışığına doğrudan bakan sensör: IR yanlış alarmı verebilir.
+- Gerçek devrede güneş ışığına doğrudan bakan sensör: IR yanlış alarmı verebilir (laboratuvar bunu modellemez).
 
 ## Konuşalım
 "UYARI" seviyesi neden var? Doğrudan NORMAL ve TEHLIKE olsa ne kaybederdik? Üç seviyeyi ne zaman fazla bulursun?

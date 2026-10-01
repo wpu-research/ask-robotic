@@ -2,7 +2,7 @@
 süre: 35
 
 ## Merak
-Evin kapısına bir sensör, odaya bir sensör koyup alarmı kurdun ve kapıyı kapatıp çıktın. Alarm hemen öter mi? Kendi evine girince şifreyi girene kadar sus mu? Susturulmuş bir alarm yine de "bir şey oldu" diye hatırlıyor mu? Bu sorulara cevap veren şey sensörlerden çok **durumlar** ve aralarındaki **geçişlerdir**.
+Evin kapısına bir sensör, odaya bir sensör koyup alarmı kurdun ve kapıyı kapatıp çıkacaksın. Alarm hemen öter mi? Kendi evine girince şifreyi girene kadar sus mu? Susturulmuş bir alarm yine de "bir şey oldu" diye hatırlıyor mu? Bu sorulara cevap veren şey sensörlerden çok **durumlar** ve aralarındaki **geçişlerdir**.
 
 ## Etkinlik
 ### Ne yapacağız?
@@ -21,20 +21,22 @@ Alarm dört durumlu çalışır:
 | ALARM | İhlal oldu | Hızlı yanıp söner | Sirenli ses |
 | SUSTURULDU | Alarm susturuldu ama olay hatırlanıyor | Yavaş yanıp söner | Sessiz |
 
-Kurma sırasında 5 saniyelik **çıkış gecikmesi** vardır: butona basarsın, LED hızlı yanıp söner, bu sürede evden çıkıp kapıyı kapatırsın. Bu süre bitince sistem HAZIR olur. Çıkış gecikmesi ayrı bir durum değildir; DEVRE_DISI içinde bir bayrakla izlenir.
+Kurma sırasında 5 saniyelik **çıkış gecikmesi** vardır: butona basarsın, LED hızlı yanıp söner; gerçek bir evde bu sürede evden çıkıp kapıyı kapatırdın. Süre bitince sistem HAZIR olur. Çıkış gecikmesi ayrı bir durum değildir; DEVRE_DISI içinde bir bayrakla izlenir.
 
-**Güvenlik:** Bu projede yalnız düşük gerilimle (5 V) çalış. Şebeke gerilimiyle (220 V) hiçbir devre kurma. Gerçek bir siren bağlamak istiyorsan yetişkin ve uzman gözetimi şart.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| PIR modülü | VCC → 5 V (modülün belgesine bak), GND → GND, OUT → **D2** |
-| Buton "kur / şifre" | **D3** ile GND arası (`INPUT_PULLUP`) |
-| Reed anahtarı (+ mıknatıs) | **D4** ile GND arası (`INPUT_PULLUP`); mıknatıs kapıda, reed çerçevede |
-| Buzzer | **D8** ile GND arası (pasif buzzer; 18. dersteki bağlantıyla aynı) |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| PIR | VCC → 5V, GND → GND, OUT → **D2** |
+| Buton "kur / şifre" | A → **D3**, B → GND (`INPUT_PULLUP`) |
+| Reed | A → **D4**, B → GND (`INPUT_PULLUP`) |
+| Buzzer (Tür: Pasif) | + → **D8**, − → GND (18. dersteki bağlantıyla aynı) |
+| Direnç (330 Ω) | 1 → **D13**, 2 → LED A |
+| LED | A → direncin 2 ucu, K → GND |
 
-Bu projede 42. dersteki IR engel sensörü kullanılmaz; D3'ü şifre butonu için kullanıyoruz. Reed, kapı kapalıyken mıknatıs yakın olacak şekilde yerleştirilir: kapalı kapıda D4 `LOW`, açık kapıda `HIGH` okunur (43. ders).
+Bu projede 42. dersteki IR engel sensörü kullanılmaz; D3'ü şifre butonu için kullanıyoruz. Reed'in **Mıknatıs yakın** kutusu kapıyı temsil eder: işaretliyse kapı kapalıdır ve D4 `LOW`, işaretsizse kapı açıktır ve D4 `HIGH` okunur (43. ders). Kutu başlangıçta işaretsizdir, yani kapı açıktır; kurmadan önce işaretle. **Şifre** için 3 saniye içinde butona üç kez bas ve bırak.
 
 ### Kurma ve şifre
 - **Kurma:** DEVRE_DISI durumunda butona **bir kez** bas. Kapı açıksa sistem kurulmaz ve "Kapi acik" mesajı yazar. Kapı kapalıysa 5 saniye çıkış gecikmesi başlar.
@@ -207,9 +209,10 @@ void loop() {
 3. `yeniBasis()` buton basışını **kenar** ve **debounce** ile bir kez bildirir (8. ders). `sifreTamam()` bu basışları sayar. İlk basıştan 3 saniye geçmişse sayaç yeniden başlar.
 4. HAZIR durumunda `ihlalVar()` PIR'ın HIGH olmasına ya da reed'in HIGH olmasına (kapı açıldı) bakar. İkisinden biri yeter. Alarm başlayınca bir **mandal** gibi çalışır: PIR tekrar LOW olsa ve kapı kapansa bile ALARM, süre dolana ya da şifre girilene kadar sürer.
 5. SUSTURULDU durumunda sensörlere hiç bakılmaz. Yani susturulmuş alarm yeni hareketle yeniden çalmaz; yalnız yavaş LED, olayın olduğunu hatırlatır. Sistemi yeniden kurmak için önce şifreyle DEVRE_DISI'ya, sonra yine butonla kurmak gerekir.
-6. PIR hareketten sonra bir süre HIGH kalabilir (41. ders). Çıkış gecikmesinin bir amacı da PIR'ın sakinleşmesine zaman tanımaktır. Gerçek bir PIR modülüyle bu süreyi kendin ölç ve gerekirse `CIKIS_GECIKMESI` değerini uzat.
+6. PIR hareketten sonra bir süre HIGH kalabilir (41. ders). Laboratuvardaki PIR bu süreyi 3 saniye tutar. Çıkış gecikmesinin bir amacı da PIR'ın sakinleşmesine zaman tanımaktır: **Hareket** kutusunu kurma butonuna bastıktan 3 saniye sonra kaldırırsan çıkış 6. saniyeye kadar HIGH kalır ve sistem HAZIR olur olmaz alarm çalar. Gerçek bir PIR modülünün tutma süresi modüle göre değişir; gerekirse `CIKIS_GECIKMESI` değerini uzat.
 
 ### Dene
+- Kurma, ihlal, susturma ve şifre ile kapatma sırasını laboratuvarda dene: reed'in ve PIR'ın kutularını değiştirerek her durumun LED ve buzzer desenini izle.
 - **Giriş gecikmesi ekle:** Kapı açılınca hemen alarm yerine 10 saniye şifre girme fırsatı ver. Bunun için yeni bir durum mu eklersin, yoksa bir bayrak mı?
 - Alarm sırasında LED'i buzzer ile aynı ritimde yanıp söndür. Hangi fonksiyonu değiştirirsin?
 - 42. dersteki IR engel sensörünü (D3) kullanmak istersen şifre butonunu hangi pine taşırsın? Standart bağlantılar tablosunda boş pin var mı?
@@ -221,7 +224,6 @@ void loop() {
 - PIR'ı çıkış gecikmesinden hemen sonra HIGH bulmak: çıkarken sensörün önünden geçtin. Sensörü kapının dışından değil, çıkış yolunun dışına yerleştir.
 - Şifre sayacını durum değişince sıfırlamamak: bir önceki durumdaki basışlar yenisini bozar.
 - `delay()` kullanmak: şifre basışları ve sensörler kaçırılır.
-- Gerçek siren bağlayıp şebeke gerilimiyle çalışmak: bu projede kesinlikle yapma.
 
 ## Konuşalım
 Bu alarmın zayıf noktaları neler? Biri PIR'ı kapatırsa, mıknatısı kapı çerçevesine yapıştırırsa ya da kabloları keserse ne olur? Gerçek bir alarm bu durumlara karşı ne yapardı?

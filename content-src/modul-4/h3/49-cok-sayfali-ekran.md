@@ -6,15 +6,17 @@ Küçük bir hava istasyonunun ekranı 16 karakter ve 2 satırdır. Oysa göster
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| I2C LCD 16x2 (adres 0x27) | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND |
-| BMP280 | SDA → **A4**, SCL → **A5** (LCD ile aynı hat), VCC → 5 V (modülün gerilim aralığına bak), GND → GND; adres 0x76 |
-| DHT22 | DATA → **D5**, VCC → 5 V, GND → GND |
-| Toprak nemi sensörü | analog çıkış → **A2** |
-| Buton "sonraki sayfa" | **D2** ile GND arası (`INPUT_PULLUP`) |
+| I2C LCD (adres 0x27) | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND |
+| BMP280 (adres 0x76) | SDA → **A4**, SCL → **A5** (LCD ile aynı hat), VCC → 5V, GND → GND |
+| DHT (DHT22) | DATA → **D5**, VCC → 5V, GND → GND |
+| Toprak nemi modülü | AO → **A2**, VCC → 5V, GND → GND |
+| Buton "sonraki sayfa" | A → **D2**, B → GND (`INPUT_PULLUP`) |
 
-LCD (0x27) ve BMP280 (0x76) farklı adreslerde oldukları için aynı iki kabloyu (SDA, SCL) paylaşırlar (33. ders).
+LCD (0x27) ve BMP280 (0x76) farklı adreslerde oldukları için aynı iki kabloyu (SDA, SCL) paylaşırlar (33. ders). A4 ve A5 pinlerine iki ayrı kablo çekebilirsin ya da ikinci cihazın SDA/SCL ucunu birinci cihazın aynı ucuna bağlayabilirsin. Çalışırken sensörlerin kaydırıcılarını oynatabilir, Buton parçasına basılı tutarak basabilirsin.
 
 ### Fikir: sayfa numarası ve zamanlayıcı
 Bir `sayfa` değişkeni hangi sayfanın gösterildiğini tutar. Süre dolunca değişken bir artar, sonuna gelince başa döner:
@@ -28,7 +30,7 @@ sayfa = (sayfa + 1) % SAYFA_SAYISI;   // 0, 1, 2, 0, 1, 2, ...
 ### Ekranı titretmeden güncelleme
 Her güncellemede `lcd.clear()` çağırırsan ekran bir an boşalır ve titrer. Daha iyi yöntem: her satırı **her zaman 16 karaktere tamamlayarak** yaz. Yeni yazı eskisinden kısaysa kalan boşluklar eski karakterlerin üstünü örter. Bu iş için küçük bir yardımcı yazarız. Ayrıca iki yeni araç kullanacağız:
 
-- **`snprintf(tampon, boyut, biçim, ...)`:** Biçimlenmiş bir yazıyı bir karakter dizisine (tampon) yazar. `%s` metin, `%d` tam sayı, `%-16s` "sola yaslı, 16 karakter genişliğinde metin" demektir. `%%` ise yüzde işaretini yazdırır. Arduino Uno'da `snprintf` ondalıklı sayıyı (`%f`) yazdırmaz; benzetimde `%f` yazdırmayı denedik ve sayı yerine `?` çıktı.
+- **`snprintf(tampon, boyut, biçim, ...)`:** Biçimlenmiş bir yazıyı bir karakter dizisine (tampon) yazar. `%s` metin, `%d` tam sayı, `%-16s` "sola yaslı, 16 karakter genişliğinde metin" demektir. `%%` ise yüzde işaretini yazdırır. Arduino Uno'da `snprintf` ondalıklı sayıyı (`%f`) yazdırmaz; sayı yerine `?` çıkar.
 - **`dtostrf(sayi, genislik, basamak, tampon)`:** Ondalıklı sayıyı metne çevirir. `dtostrf(23.4, 1, 1, tampon)` tampona `"23.4"` yazar. Böylece ondalıklı sayıyı `snprintf` içine metin olarak koyarız.
 
 ### Program: 3 sayfalı hava ekranı
@@ -180,14 +182,16 @@ void loop() {
 4. `setup` sonunda `sonSayfa = millis()` yazdık. Bunu yapmasaydık `millis()` açılıştan beri saydığı için, `setup` içindeki 1,5 saniyelik `delay` ve LCD başlatma süresi sayfa süresinden yenmiş olur, ilk sayfa çok kısa görünürdü.
 5. Sayfa 2'de BMP280 yoksa ekran "BMP280 yok" der; program yine çalışır.
 
-Benzetimde ölçtüğümüz davranış: ekran 3 saniyede bir `1/3`, `2/3`, `3/3`, `1/3` sırasıyla değişti (aralık 3000 ms'ye çok yakın). Sıcaklık 23,4 ve nem 55,2 iken ilk sayfada `Sic: 23.4 C` ve `Nem: 55.2 %` göründü. Buton sayfayı hemen çevirdi ve sonraki otomatik değişim butondan 3 saniye sonra oldu. LCD ve BMP280 aynı I2C hattında birlikte çalıştı.
+Laboratuvarda gördüğümüz davranış: ekran 3 saniyede bir `1/3`, `2/3`, `3/3`, `1/3` sırasıyla değişti (aralık 3000 ms'ye çok yakın). DHT'nin sıcaklığı 25 °C ve nemi 50 % iken ilk sayfada `Sic: 25.0 C` ve `Nem: 50.0 %` göründü. Buton sayfayı hemen çevirdi ve sonraki otomatik değişim butondan 3 saniye sonra oldu. LCD ve BMP280 aynı I2C hattında birlikte çalıştı. Sıcaklık kaydırıcısını çalışırken değiştirince ilk sayfa en geç 2 saniye içinde yeni değeri gösterdi. Toprak nemi modülünün **Toprak nemi** kaydırıcısı 0,5 iken üçüncü sayfa `Toprak: %41` ve `Ham: 614` gösterir (48. dersteki ölçüm).
 
 ### OLED ekran (kısa tanıtım)
+**Laboratuvarda OLED parçası yok**; bu bölüm okuyarak öğrenmen içindir, etkinlikte yalnız LCD kullanılır.
+
 OLED, her piksel kendi ışığını üreten küçük ekrandır. Yaygın modüller 128x64 pikseldir ve I2C ile bağlanır (adres genellikle 0x3C; etiketine bak). LCD'den farkı: karakter değil **piksel** çizersin, yazı boyutu seçebilirsin, çizgi ve şekil de çizebilirsin. Kütüphane olarak Adafruit SSD1306 ve Adafruit GFX kullanılır.
 
 Dikkat: 128x64 bir ekranın görüntü tamponu 1024 bayttır. Bu, Uno'nun 2048 baytlık SRAM'ının yarısıdır (34. ders). Büyük metin dizileri ve diğer kütüphanelerle birlikte belleğin dolmamasına dikkat et.
 
-Aşağıdaki örnek aynı sayfa mantığını OLED'e uygular. Bu sketch yalnızca derlenerek denendi; ekran davranışını burada doğrulamadık. Kütüphanenin kullanımı için kendi kütüphane belgelerine ve örneklerine bak.
+Aşağıdaki örnek aynı sayfa mantığını OLED'e uygular. Bu sketch yalnızca derlenerek denendi; laboratuvarda OLED olmadığı için ekran davranışı doğrulanmadı. Kütüphanenin kullanımı için Adafruit SSD1306 ve GFX belgelerine ve örneklerine bak.
 
 ```cpp
 // sketch: oled_sayfalar
@@ -246,12 +250,12 @@ void loop() {
 }
 ```
 
-OLED'de çizdiklerin `oled.display()` çağrılana kadar ekrana gitmez; önce tampona çizersin, sonra tek seferde gönderirsin. Gerçek bir modülde adres 0x3C değilse `begin` içindeki adresi değiştir.
+OLED'de çizdiklerin `oled.display()` çağrılana kadar ekrana gitmez; önce tampona çizersin, sonra tek seferde gönderirsin. Gerçek modüllerde adres 0x3C değilse `begin` içindeki adresi değiştirmek gerekir.
 
 ### Dene
 - `SAYFA_SURESI` değerini 1500 yap. Yazıları okuyabiliyor musun? Hangi süre sence okumak için yeterli?
 - Dördüncü bir sayfa ekle (örneğin `millis() / 1000` ile programın kaç saniyedir çalıştığı). `SAYFA_SAYISI` ve `sayfaCiz` içinde nelerin değişmesi gerekiyor?
-- `satirYaz` içindeki dolguyu kaldır, yerine `lcd.print` yap. Sayfa değiştirince ekranda eski yazının artıkları kalıyor mu?
+- `satirYaz` içindeki dolguyu kaldır, yerine doğrudan `lcd.print(metin)` yaz. Sayfa değiştirince ekranda eski yazının artıkları kalıyor mu?
 
 ### Sık yapılan hatalar
 - Sayfayı `delay(3000)` ile bekletmek: butona basışı kaçırırsın ve sensörler durur.

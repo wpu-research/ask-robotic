@@ -8,16 +8,21 @@ Bir fabrikada koli bandı üzerinden geçen kutuları kim sayıyor? Ya da otomat
 ### IR engel sensörü nedir?
 IR engel (obstacle avoidance) modülü, kızılötesi ışık yollar ve yansıyan ışığı alıcıyla yakalar. Önünde bir cisim varsa ışık geri döner ve modül çıkışını değiştirir. 36. dersteki ultrasonik sensör mesafeyi **santimetre olarak** ölçüyordu; bu modül ise yalnız "engel var / yok" der.
 
-Modülün üzerinde küçük bir ayar vidası (trimpot) vardır. Bu vida, **ne kadar yansımanın "engel" sayılacağını** belirler, yani eşiği donanımda ayarlar. Algılama mesafesi vidaya, ortama ve cismin rengine ve yüzeyine bağlıdır; açık renkli, mat yüzeyler genelde daha kolay algılanır, koyu ve parlak yüzeyler zor olabilir. Kesin değerler **modüle göre değişir**.
+Gerçek modülün üzerinde küçük bir ayar vidası (trimpot) vardır. Bu vida, **ne kadar yansımanın "engel" sayılacağını** belirler, yani eşiği donanımda ayarlar. Algılama mesafesi vidaya, ortama ve cismin rengine ve yüzeyine bağlıdır; açık renkli, mat yüzeyler genelde daha kolay algılanır, koyu ve parlak yüzeyler zor olabilir. Kesin değerler **modüle göre değişir**.
 
-**Çıkış seviyesi:** Yaygın modüllerde engel varken çıkış LOW olur, yokken HIGH. Ama bu **modülüne göre değişebilir**: bazı modüller tersini yapar. O yüzden kodda seviyeyi bir sabite koyacağız ve kendi modülünde deneyerek doğrulayacaksın. Çoğu modülde çıkışın durumunu gösteren küçük bir LED de vardır; ona bakmak işi kolaylaştırır.
+Laboratuvardaki IR engel parçasında mesafe yerine iki kaydırıcı vardır: **Yakınlık** (0-1, cismin ne kadar yansıma verdiği; büyüdükçe AO gerilimi artar) ve **Eşik (ayar vidası)** (0-1). Yakınlık eşiğe ulaşınca ya da geçince engel algılanır. Eşiği büyütmek, vidayı "daha az duyarlı" yapmaktır.
+
+**Çıkış seviyesi:** Yaygın modüllerde engel varken çıkış LOW olur, yokken HIGH. Ama bu **modüle göre değişebilir**: bazı modüller tersini yapar. O yüzden kodda seviyeyi bir sabite koyacağız. Laboratuvardaki parça yaygın düzeni izler: engel varken OUT LOW, yokken HIGH.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| IR engel modülü | VCC → 5 V (belgesine bak), GND → GND, OUT → **D3** |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
-| (İsteğe bağlı) analog çıkışlı modül | AO (varsa) → **A0** |
+| IR engel | VCC → 5V, GND → GND, OUT → **D3** |
+| Direnç (330 Ω) | 1 → **D13**, 2 → LED A |
+| LED | A → direncin 2 ucu, K → GND |
+| (Analog program için) IR engel | AO → **A0** |
 
 Çıkışı modül kendisi sürdüğü için `INPUT` kullanıyoruz.
 
@@ -80,7 +85,7 @@ void loop() {
 }
 ```
 
-Bazı modüllerde dijital çıkışa ek olarak **analog çıkış (AO)** da bulunur. O zaman eşiği yazılımda kendin seçersin. Hangi yönde değiştiği (engel varken değerin artması mı azalması mı) modüle göre değişir. Aşağıdaki örnekte "değer yüksek = engel yakın" varsayıldı; kendi modülünde `Serial.println(analogRead(A0))` ile bakıp ters ise koşulları çevir. İki ayrı eşik kullanıyoruz (**histerezis**, 35. dersteki termostat gibi): değer eşik civarında dalgalansa da çıktı titremez.
+Bazı modüllerde dijital çıkışa ek olarak **analog çıkış (AO)** da bulunur. O zaman eşiği yazılımda kendin seçersin. Hangi yönde değiştiği (engel varken değerin artması mı azalması mı) modüle göre değişir. Aşağıdaki örnekte "değer yüksek = engel yakın" varsayıldı; laboratuvardaki parça da böyle çalışır. Gerçek bir modülde `Serial.println(analogRead(A0))` ile bakıp ters ise koşulları çevirmek gerekir. İki ayrı eşik kullanıyoruz (**histerezis**, 35. dersteki termostat gibi): değer eşik civarında dalgalansa da çıktı titremez.
 
 ```cpp
 // sketch: ir_analog_esik
@@ -117,16 +122,17 @@ void loop() {
 4. Donanım vidası ile yazılım eşiği iki ayrı yerdir. Dijital çıkışta eşik vidada, analog çıkışta kodda ayarlanır.
 
 ### Dene
-- `ir_engel` programını çalıştırırken elini sensöre yaklaştır. Serial Monitor ile modülün üzerindeki küçük LED aynı anda mı değişiyor?
-- Vidayı çevirerek algılama mesafesini değiştir. Beyaz kâğıt ile siyah kâğıt aynı mesafede mi algılanıyor?
-- `ir_sayac_kararli` içindeki `KARARLI_MS` değerini 0 yap. Elini yavaşça yaklaştırırken sayaç şaşıyor mu?
+- `ir_engel` programını çalıştırırken IR engel parçasını seç ve **Yakınlık** kaydırıcısını 0'dan 1'e doğru yavaşça çek. LED ve seri monitör hangi değerde değişiyor? Bu değer **Eşik** değerine eşit mi?
+- Yakınlığı 0,6 yap, sonra **Eşik (ayar vidası)** değerini 0,8'e çıkar. Engel yok sayılıyor mu? Parlak siyah bir yüzey de gerçekte böyle, az yansıma verdiği için eşiği geçemeyebilir.
+- `ir_analog_esik` ile yakınlığı 0,3 - 0,5 - 0,7 yap. 0,5'te durum ne oluyor? Önce 0,7'den 0,5'e, sonra 0,3'ten 0,5'e git ve sonucu karşılaştır; bu histerezistir.
+- `ir_sayac_kararli` içindeki `KARARLI_MS` değerini 0 yap. Laboratuvar modeli titreşim üretmediği için sayaç şaşmaz. Gerçek modülde şaşabilirdi; neden bu bekleme süresi gerçek devre için yine de gereklidir, kendi cümlenle yaz.
 
 ### Sık yapılan hatalar
-- "Engel varken çıkış LOW olur" bilgisini her modül için doğru sanmak: önce kendi modülünde dene.
-- Sensörü doğrudan güneş ışığına ya da güçlü lamba ışığına çevirmek: ortam ışığındaki kızılötesi ölçümü bozabilir.
+- "Engel varken çıkış LOW olur" bilgisini her modül için doğru sanmak: gerçek modülün belgesine bak.
+- Gerçek donanımda sensörü doğrudan güneş ışığına ya da güçlü lamba ışığına çevirmek: ortam ışığındaki kızılötesi ölçümü bozabilir (laboratuvar bunu modellemez).
 - Analog eşikte tek eşik kullanmak: değer eşik civarında dalgalanınca çıktı sürekli değişir.
 - Sayım yaparken kenar yerine seviyeyi saymak: duran cisim sürekli sayılır.
-- Tek vidayla hem mesafeyi hem rengi çözmeyi beklemek: IR sensör cisim rengine ve yüzeyine duyarlıdır.
+- Tek eşikle hem mesafeyi hem rengi çözmeyi beklemek: IR sensör cisim rengine ve yüzeyine duyarlıdır.
 
 ## Konuşalım
 Koli bandında sayım yaparken iki kutu birbirine çok yakın geçerse sensör bunları tek kutu sayar. Bunu hangi yöntemlerle çözebilirsin: yazılımla mı, sensörün yerini değiştirerek mi?

@@ -6,15 +6,21 @@ Telefonunu yan çevirdiğinde ekran kendiliğinden döner. Cihazın içinde "yuk
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| MPU6050 modülü (GY-521 gibi) VCC | 5 V (modülün üzerindeki yazıya bak; çoğunda regülatör vardır) |
+| MPU6050 VCC | 5V |
 | MPU6050 GND | GND |
 | MPU6050 SDA | **A4** |
 | MPU6050 SCL | **A5** |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| Direnç (330 Ω) 1 | **D13** |
+| Direnç 2 | LED **A** (anot) |
+| LED **K** (katot) | GND |
 
-I2C'yi 33. derste öğrendin: iki hat (SDA, SCL) üzerinde birçok cihaz, her birinin bir adresi var. MPU6050'nin adresi **0x68**'dir; modüldeki AD0 pinini 5 V'a bağlarsan 0x69 olur. DS3231 saat modülü de 0x68 kullanır, bu yüzden bu haftanın devresinde saat modülü bulunmasın.
+I2C'yi 33. derste öğrendin: iki hat (SDA, SCL) üzerinde birçok cihaz, her birinin bir adresi var. MPU6050'nin adresi **0x68**'dir; gerçek modüldeki AD0 pini 5 V'a bağlanırsa adres 0x69 olur. Laboratuvarda bu, MPU6050'nin **I2C adresi (AD0)** özelliğidir; 0x69 seçersen koddaki `MPU` sabitini de 0x69 yapmalısın. RTC (DS3231) modülü de 0x68 kullanır, bu yüzden bu haftanın devresine RTC parçası ekleme.
+
+MPU6050'yi seçince sağ panelde **İvme X, Y, Z** (g cinsinden) ve **Jiroskop X, Y, Z** (°/s cinsinden) özellikleri çıkar. Bunlar çipin "ölçtüğü" değerlerdir ve program çalışırken de değiştirilebilir; çipi elle çevirmek yerine bu sayıları değiştirirsin. Laboratuvar çipinin sıcaklığı 25 °C'de sabittir.
 
 ### Yazmaçlar: kütüphanesiz okuma
 Bu derste hazır bir kütüphane kullanmayacağız; çipin kendisiyle konuşacağız. Böylece 33. derste gördüğün `Wire` komutlarının gerçekte ne işe yaradığını görürsün. MPU6050'nin içi **yazmaç** (register) denen numaralı hücrelerden oluşur. İşimize yarayanlar:
@@ -22,7 +28,7 @@ Bu derste hazır bir kütüphane kullanmayacağız; çipin kendisiyle konuşaca�
 | Yazmaç | Anlamı |
 |---|---|
 | 0x6B | Güç yönetimi. Çip açılışta uyku modundadır. Buraya 0 yazınca uyanır. |
-| 0x3B'den başlayan 14 bayt | Ivme X, Y, Z (2'şer bayt) · sıcaklık (2 bayt) · jiroskop X, Y, Z (2'şer bayt) |
+| 0x3B'den başlayan 14 bayt | İvme X, Y, Z (2'şer bayt) · sıcaklık (2 bayt) · jiroskop X, Y, Z (2'şer bayt) |
 
 Her ölçüm **16 bitlik işaretli** bir sayıdır ve önce yüksek bayt gelir. Yani iki baytı `(yuksek << 8) | dusuk` ile birleştirip `int16_t` olarak tutmak gerekir.
 
@@ -95,7 +101,7 @@ void loop() {
   delay(500);
 }
 ```
-Çipi masaya düz koy: `az` yaklaşık 1,00 g çıkmalı, `ax` ve `ay` sıfıra yakın olmalı. Çipi bir kenarı üstüne dikince 1 g başka bir eksene geçer. Elinle döndürürken `gx`, `gy`, `gz` değişir; durunca sıfıra yakın döner (tam sıfır değil, bir sonraki ders bunu anlatıyor).
+Düz duran bir çip için özellik panelinde **İvme X = 0, İvme Y = 0, İvme Z = 1** olmalı (bunlar varsayılan değerlerdir). ▶'e bas: `az` yaklaşık 1,00 g çıkar, `ax` ve `ay` sıfıra yakın olur. Şimdi çipi bir kenarı üstüne diktiğini düşün: **İvme X = 1** ve **İvme Z = 0** yap. 1 g başka bir eksene geçer ve ham `ax` 16384 olur. Çipin döndüğünü taklit etmek için **Jiroskop X**'i 20 yap: `gx` yaklaşık 20 °/s okunur; 0'a getirince sıfıra döner. Gerçek bir çip durağanken jiroskopta tam sıfır göstermez (bir sonraki ders bunu anlatıyor); laboratuvar çipi ise ideal olduğu için sıfır gösterir.
 
 ### Eğim açısı
 Çip durağanken ölçtüğü tek şey yer çekimidir: yaklaşık 1 g'lik bir **vektör**. Çipi eğdikçe bu vektör eksenlere farklı oranlarda dağılır. X ekseni yukarı kalkınca `ax` artar, `az` küçülür. Üçgeni düşün: yatay kenar `az`, dikey kenar `ax`. Açı, bu iki kenarın arctanjantıdır:
@@ -106,7 +112,7 @@ roll  = atan2(ay, az) * 180.0 / PI;   // yana eğim
 ```
 `atan2(y, x)` iki kenardan açıyı **radyan** olarak verir. 180/π ile çarpınca derece olur. Örnek: `ax = 0,5`, `az = 0,866` ise `atan2(0,5; 0,866) = 30°` (0,5 = sin 30°, 0,866 = cos 30°).
 
-Pitch ve roll'un hangi yöne artı olduğu, çipi kartına nasıl yerleştirdiğine bağlıdır. Modülün üzerinde basılı X ve Y oklarına bak. Bu derste tek eksende eğim varsayıyoruz; iki eksen aynı anda çok eğilirse bu basit formüller birbirini biraz etkiler.
+Pitch ve roll'un hangi yöne artı olduğu, gerçek çipin kartına nasıl yerleştirildiğine bağlıdır (modülün üzerinde basılı X ve Y okları yönü gösterir). Laboratuvarda İvme X arttıkça pitch artar, İvme Y arttıkça roll artar. Bu derste tek eksende eğim varsayıyoruz; iki eksen aynı anda çok eğilirse bu basit formüller birbirini biraz etkiler.
 
 ### Program 2: Pitch, roll ve su terazisi
 ```cpp
@@ -168,8 +174,8 @@ void loop() {
 6. LED, iki açı da ±2° içindeyse yanar: dijital bir su terazisi.
 
 ### Dene
-- Çipi masaya koy. `pitch`, `roll` ne çıkıyor? Tam 0,0 çıkmıyorsa bu hata mı? (Yanıt: çipin lehimlenme açısı ve ölçüm hatası yüzünden küçük bir kayma normaldir.)
-- Çipi hızla salla. Açı nasıl davranıyor? Çip hareket ediyorken ölçtüğü şey yalnız yer çekimi mi?
+- İvme X ve Y'yi 0, İvme Z'yi 1 bırak. `pitch`, `roll` ne çıkıyor? Laboratuvarda tam 0,0 çıkar. Gerçek bir çipte tam 0,0 çıkmıyorsa bu hata mı? (Yanıt: çipin kart üzerindeki montaj açısı ve ölçüm hatası yüzünden küçük bir kayma normaldir.) Bunu taklit etmek için İvme X'i 0,02 yap ve pitch'in kaç derece olduğuna bak.
+- Çipi eğmeden yalnız **İvme X**'i 0,3 yap (çip yatay yönde hızlanıyormuş gibi). `pitch` kaç oluyor? Çip eğilmedi, yine de açı değişti: çip hareket ediyorken ölçtüğü şey yalnız yer çekimi mi?
 - LED'in yanma aralığını ±5° yap, sonra ±0,5° yap. Hangisi daha kullanışlı?
 
 ### Sık yapılan hatalar
@@ -178,7 +184,7 @@ void loop() {
 - `ax / 16384` yazmak: iki tam sayının bölümü tam sayıdır. `16384.0` yaz.
 - `atan2` sonucunu dereceye çevirmeyi unutmak: sonuç radyandır.
 - Çipin hareketli olduğu an ölçülen açıya güvenmek: ivmeölçer yer çekimini ve çipin kendi hızlanmasını ayıramaz. Çipi yatay yönde hızlandırırsan (örneğin `ax = 0,3 g`, `az = 1 g` olacak şekilde) `atan2` yaklaşık 16,7° verir, oysa çip eğilmemiştir.
-- MPU6050 ile DS3231'i aynı hatta bağlamak: ikisi de 0x68 adresini kullanır.
+- MPU6050 ile RTC (DS3231) modülünü aynı hatta kullanmak: ikisi de 0x68 adresini kullanır.
 
 ## Konuşalım
-Telefonun yatay ve dikey durumunu ivmeölçerle anlıyor. Peki bir bisikletin viraj açısını ya da bir drone'un eğimini yalnız ivmeölçerle ölçmek neden sorun çıkarır? Sallanan bir tren vagonunda yer çekimi vektörüne ne olur?
+Telefon yatay ve dikey durumunu ivmeölçerle anlıyor. Peki bir bisikletin viraj açısını ya da bir drone'un eğimini yalnız ivmeölçerle ölçmek neden sorun çıkarır? Sallanan bir tren vagonunda yer çekimi vektörüne ne olur?

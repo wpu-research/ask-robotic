@@ -8,27 +8,30 @@ Evdeki pencere alarmının iki küçük parçası vardır: biri çerçeveye, bir
 ### İki anahtar, aynı mantık
 **Reed anahtarı:** cam bir tüpün içinde iki ince metal dil. Yanına mıknatıs gelince dillerin kontağı **kapanır**, mıknatıs uzaklaşınca açılır. Elektrik bakımından bir butondur; basan şey parmak yerine mıknatıstır.
 
-**Limit anahtarı (mikro şalter):** küçük bir kol ya da düğmeye mekanik olarak basılınca kontağı değişen anahtar. Hareketli bir parça uç noktaya gelince kola çarpar. Bu da elektrik bakımından bir butondur.
+**Limit anahtarı (mikro şalter):** küçük bir kol ya da düğmeye mekanik olarak basılınca kontağı değişen anahtar. Hareketli bir parça uç noktaya gelince kola çarpar. Bu da elektrik bakımından bir butondur. Laboratuvarda ayrı bir limit anahtarı parçası yok; limit anahtarı yerine **buton** parçasını kullan. **Basılı** kutusu "kola basıldı" demektir.
 
 İkisi de 6. dersteki butonla aynı yöntemle okunur: bir ucu pine, öbür ucu GND'ye, pin `INPUT_PULLUP`. Kontak kapanınca pin GND'ye bağlanır ve `LOW` okunur, kontak açıkken `HIGH`.
 
-| Anahtar | Kontak kapalı (LOW) olduğunda |
-|---|---|
-| Reed | Mıknatıs yakın (kapı kapalı, mıknatıs ve reed karşı karşıya) |
-| Limit | Kola basılı |
+| Anahtar | Kontak kapalı (LOW) olduğunda | Laboratuvarda |
+|---|---|---|
+| Reed | Mıknatıs yakın (kapı kapalı, mıknatıs ve reed karşı karşıya) | **Mıknatıs yakın** kutusu işaretli |
+| Limit | Kola basılı | Butonun **Basılı** kutusu işaretli |
 
-Limit anahtarlarında genelde üç uç vardır: ortak (COM), normalde açık (NO) ve normalde kapalı (NC). NO ucunu kullanırsan basınca kontak kapanır, yukarıdaki gibi. **NC ucunu** kullanırsan tersi olur: basılmayınca kontak kapalıdır, basınca açılır. Güvenlik uygulamalarında NC bağlantı tercih edilebilir, çünkü kablo kopsa bile pin HIGH olur ve sistem bunu "kontak açıldı" diye algılar. Yani arıza sessiz kalmaz. Ama bu mantığı kodda tersine çevirmek gerekir.
+Gerçek limit anahtarlarında genelde üç uç vardır: ortak (COM), normalde açık (NO) ve normalde kapalı (NC). NO ucunu kullanırsan basınca kontak kapanır, yukarıdaki gibi. **NC ucunu** kullanırsan tersi olur: basılmayınca kontak kapalıdır, basınca açılır. Laboratuvardaki buton yalnız NO gibi çalışır. Güvenlik uygulamalarında NC bağlantı tercih edilebilir, çünkü kablo kopsa bile pin HIGH olur ve sistem bunu "kontak açıldı" diye algılar. Yani arıza sessiz kalmaz. Ama bu mantığı kodda tersine çevirmek gerekir.
 
-**Debounce hatırlatması:** 8. derste öğrendiğin gibi mekanik kontaklar kapanırken kısa süre titrer (bounce). Reed anahtarının dilleri ve limit anahtarının kolu da titrer. Titreşimi bir değişiklik sanıp olay üretirsek yalancı alarm çıkar. O yüzden değişimi ancak kısa bir süre kararlı kalırsa kabul ederiz.
+**Debounce hatırlatması:** 8. derste öğrendiğin gibi gerçek mekanik kontaklar kapanırken kısa süre titrer (bounce). Reed anahtarının dilleri ve limit anahtarının kolu da titrer. Titreşimi bir değişiklik sanıp olay üretirsek yalancı alarm çıkar. O yüzden değişimi ancak kısa bir süre kararlı kalırsa kabul ederiz. Laboratuvardaki reed ve buton temiz değişir, titreşim üretmez; kodun debounce kısmı yine de gerçek devre için doğru alışkanlıktır.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Reed anahtarı (+ mıknatıs) | Bir ucu **D4**, öbür ucu GND (`INPUT_PULLUP`) |
-| Limit anahtarı (NO ucu) | COM → GND, NO → **D3** (`INPUT_PULLUP`) |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| Reed | A → **D4**, B → GND (`INPUT_PULLUP`) |
+| Buton (limit anahtarı yerine) | A → **D3**, B → GND (`INPUT_PULLUP`) |
+| Direnç (330 Ω) | 1 → **D13**, 2 → LED A |
+| LED | A → direncin 2 ucu, K → GND |
 
-Reed modülü hazır kartta satılıyorsa üzerinde kendi direnci ve çıkışı olabilir; çıplak reed için yukarıdaki gibi bağla. Mıknatısı gerçek kapıya yapıştırırken yalnız düşük gerilimli devre kur.
+Gerçek hazır reed modüllerinin üzerinde kendi direnci ve çıkışı olabilir; laboratuvardaki reed çıplak reed gibidir, bu yüzden `INPUT_PULLUP` şarttır.
 
 ### Program
 ```cpp
@@ -110,15 +113,16 @@ void loop() {
 4. `kontak_debounce` aynı mantığı dizilerle çoğaltır. Yeni bir anahtar eklemek için `PINLER` dizisine pin yazman ve `PIN_SAYISI`ni artırman yeter.
 
 ### Dene
-- Reed anahtarına mıknatısı yavaşça yaklaştır ve uzaklaştır. Hangi mesafede kontak kapanıyor? Mıknatısı ters çevirmek sonucu değiştiriyor mu?
-- `KARARLI_MS` değerini 0 yap ve mıknatısı sensöre yavaşça yaklaştır. Birden fazla mesaj geliyor mu?
-- Limit anahtarını NC ucuna bağla. Kodda hangi satırı değiştirmen gerekir?
+- `reed_kapi` çalışırken reed parçasını seç ve **Mıknatıs yakın** kutusunu işaretle, sonra kaldır. LED ve seri monitör nasıl değişiyor? Not: sade bir reed anahtarı mıknatısın hangi kutbunun yaklaştığına bakmaz, ikisinde de kapanır.
+- Çalışırken reed'i seçince sağ panelde **Sanal ölçüm** ile uçlarındaki gerilimi oku. Kontak açıkken kaç volt, kapalıyken kaç volt görüyorsun? Bu değerleri `INPUT_PULLUP` ile açıkla.
+- `kontak_debounce` ile butonu (limit) ve reed'i sırayla çalıştır. Mesajlar birbirine karışıyor mu?
+- Limit anahtarını NC ucuna bağlasaydın kodda hangi satırı değiştirmen gerekirdi? Laboratuvarda NC yok; cevabı kodu inceleyerek yaz.
 
 ### Sık yapılan hatalar
 - Reed anahtarını `INPUT_PULLUP` olmadan bağlamak: kontak açıkken pin havada kalır, rastgele okuma verir.
 - "Mıknatıs yakın = HIGH" sanmak: `INPUT_PULLUP` ile kontak kapanınca pin LOW olur.
-- Debounce koymamak: kapı sallanınca ya da kol titreşince yalancı olaylar çıkar.
-- Reed'in cam tüpünü bükmek ya da ucunu lehim yaparken çok yakından bükmek: cam kolay kırılır.
+- Debounce koymamak: gerçek devrede kapı sallanınca ya da kol titreşince yalancı olaylar çıkar.
+- Reed'in ikinci ucunu GND'ye bağlamayı unutmak: kontak kapansa bile pin LOW olmaz, "Kapi kapali" hiç yazmaz.
 - NO ile NC'yi karıştırmak: devre tersine çalışır.
 
 ## Konuşalım

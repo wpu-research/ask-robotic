@@ -2,15 +2,19 @@
 süre: 25
 
 ## Merak
-Hava durumu uygulaması "sıcaklık 24 derece, nem yüzde 60" der. Odanın havası kuru mu, bunaltıcı mı, bunu sıcaklık tek başına söylemez; nem de lazımdır. Tek bir küçük sensör ikisini birden ölçebilir. Üstelik tek bir veri kablosuyla. Bu derste DHT sensörünü okuyacak, iki modeli ölçümle karşılaştıracak ve sensör bağlı değilken programın çökmemesini öğreneceksin.
+Hava durumu uygulaması "sıcaklık 24 derece, nem yüzde 60" der. Odanın havası kuru mu, bunaltıcı mı, bunu sıcaklık tek başına söylemez; nem de lazımdır. Tek bir küçük sensör ikisini birden ölçebilir. Üstelik tek bir veri kablosuyla. Bu derste DHT sensörünü okuyacak, iki modeli ölçümle karşılaştıracak ve sensör cevap vermediğinde programın çökmemesini öğreneceksin.
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| DHT22 (ya da DHT11) modülü | VCC → 5 V, GND → GND, DATA (veri) → **D5** |
+| DHT sensörü | VCC → 5V, GND → GND, DATA (veri) → **D5** |
 
-3 bacaklı modüllerde veri hattı için gereken yükseltme (pull-up) direnci kartın üzerindedir. Çıplak 4 bacaklı sensör kullanıyorsan veri ile VCC arasına bir direnç koyman gerekir; değerini sensörün veri sayfasına bakarak seç.
+DHT parçasının sağ paneldeki **Tür** özelliği DHT22 ya da DHT11 olur; **Sıcaklık** ve **Nem** kaydırıcıları sensörün "ölçtüğü" havayı belirler ve program çalışırken de değiştirilebilir. Laboratuvardaki parça 3 bacaklı modüldür; veri hattı için gereken yükseltme (pull-up) direnci modülün üzerinde sayılır.
+
+Bilgi notu: Piyasada çıplak 4 bacaklı DHT sensörleri de vardır; onlarda veri ile VCC arasına bir direnç gerekir (değeri veri sayfasında yazar). Laboratuvardaki modülde buna gerek yok.
 
 ### Yeni kavramlar
 - **Bağıl nem:** Havanın o sıcaklıkta taşıyabileceği en çok su buharının yüzde kaçını taşıdığını söyler. % 0 çok kuru, % 100 doyma demektir.
@@ -54,17 +58,17 @@ void loop() {
 1. `DHT dht(DHT_PIN, DHT_TIP)` sensörün hangi pinde ve hangi modelde olduğunu söyler. Model yanlışsa değerler anlamsız çıkar.
 2. `delay(2000)` rastgele konmadı. DHT sensörleri yavaştır: iki okuma arasında en az 2 saniye beklemelisin. Daha sık sorarsan kütüphane çoğu zaman bir önceki değeri tekrar verir.
 3. `readHumidity()` nemi yüzde, `readTemperature()` sıcaklığı santigrat olarak döndürür.
-4. `if (isnan(...))` hata yolunu kurar. Kablo çıkmışsa ya da sensör cevap vermiyorsa program "Okuma hatasi" yazar ve bir sonraki tura geçer.
+4. `if (isnan(...))` hata yolunu kurar. DATA kablosu bağlı değilse ya da sensör cevap vermiyorsa program "Okuma hatasi" yazar ve bir sonraki tura geçer.
 
 ### DHT11 ile DHT22 farkını ölç
-Programdaki tek satırı değiştir: `#define DHT_TIP DHT11`. Sensör 23,4 derece ve yüzde 55,2 nem gösterirken benzetimde şunu okuduk:
+Programdaki tek satırı değiştir: `#define DHT_TIP DHT11`. Sensör parçasının **Tür** özelliğini de DHT11 yap (önce ■ ile durdur). Sıcaklık kaydırıcısını 23,5 °C, Nem kaydırıcısını 55 % yaparak laboratuvarda şunu okuduk:
 
 | Model | Seri çıktı |
 |---|---|
-| DHT22 | `Sicaklik: 23.4 C  Nem: 55.2 %` |
-| DHT11 | `Sicaklik: 23.0 C  Nem: 55.0 %` |
+| DHT22 | `Sicaklik: 23.5 C  Nem: 55.0 %` |
+| DHT11 | `Sicaklik: 24.0 C  Nem: 55.0 %` |
 
-DHT22 virgülden sonra bir basamak verir, DHT11 yalnızca tam sayı verir. Ama dikkat: ekranda ondalık görmek **doğru ölçtüğü** anlamına gelmez. İki modelin ne kadar doğru ölçtüğü, hangi aralıkta çalıştığı ve ölçüm hızı için kendi sensörünün veri sayfasına bak.
+DHT22 virgülden sonra bir basamak verir, DHT11 yalnızca tam sayı verir (23,5 değeri 24'e yuvarlandı). Ama dikkat: ekranda ondalık görmek **doğru ölçtüğü** anlamına gelmez. İki modelin ne kadar doğru ölçtüğü, hangi aralıkta çalıştığı ve ölçüm hızı için gerçek sensörlerin veri sayfalarına bak.
 
 ### Program 2: bloklamayan okuma ve sensör yokken davranış
 `delay(2000)` tüm programı 2 saniye durdurur. 27. derste öğrendiğin `millis()` ile okumayı zamanlayalım. Bu sürümde ayrıca üst üste 3 hata olursa eski değeri göstermeyi bırakıp "SENSOR YOK" der; çünkü saatlerce eski bir sıcaklığı güncelmiş gibi göstermek yanıltıcıdır.
@@ -122,19 +126,19 @@ void loop() {
 }
 ```
 
-Bu programı DHT bağlı **değilken** de çalıştırdık. Henüz hiç geçerli okuma olmadığı için ilk turdan itibaren `SENSOR YOK  Ardisik hata: 1`, `... 2`, `... 3` satırları çıktı; program çökmedi, `loop()` çalışmaya devam etti. Sensör 5 saniye sonra takılınca bir sonraki turda `T=20.0 N=50.0` satırları başladı. Sensör bir süre sağlıklı okuduktan sonra koparsa, kod ilk iki hatada son geçerli değeri göstermeyi sürdürür, üçüncüde bırakır.
+Bu programı DATA kablosu **olmadan** da çalıştırdık (kabloyu silmek için önce ■'e bas, kabloyu seç, **Delete**'e bas). Laboratuvar "DHT DATA ucu bağlı değil: sensör çalışmaz." uyarısını verir. Henüz hiç geçerli okuma olmadığı için ilk turdan itibaren `SENSOR YOK  Ardisik hata: 1`, `... 2`, `... 3` satırları çıktı; program çökmedi, `loop()` çalışmaya devam etti. DATA kablosunu yeniden çekip ▶'e basınca `T=...  N=...` satırları başlar. Sensör bir süre sağlıklı okuduktan sonra cevap vermezse, kod ilk iki hatada son geçerli değeri göstermeyi sürdürür, üçüncüde bırakır.
 
 ### Dene
-- `dht_oku` programında `DHT_TIP` satırını DHT11 yap, tabloyla karşılaştır. Sıcaklığı değiştirdiğinde DHT11 çıktısı nasıl adım adım değişiyor?
+- `dht_oku` programında `DHT_TIP` satırını DHT11 yap, sensörün **Tür** özelliğini de DHT11 yap ve tabloyla karşılaştır. Çalışırken sıcaklık kaydırıcısını yavaşça oynat: DHT11 çıktısı nasıl adım adım değişiyor?
 - `delay(2000)` değerini 500 yap. Seri çıktıdaki değerler her tur değişiyor mu, yoksa aynı değer birkaç kez mi tekrarlanıyor?
-- `dht_millis` programında DATA kablosunu çek. Kaçıncı satırda "SENSOR YOK" görüyorsun? Kabloyu takınca ne oluyor?
+- `dht_millis` programında ■ ile durdurup DATA kablosunu sil, ▶'e bas. Kaçıncı satırda "SENSOR YOK" görüyorsun? Kabloyu yeniden çekince ne oluyor?
 
 ### Sık yapılan hatalar
 - `isnan` denetimi koymamak: okuma başarısızsa `NaN` ile hesap yaparsın ve ekranda `nan` görürsün.
 - Modeli yanlış yazmak (DHT11 sensöre `DHT22` demek): değerler tuhaf çıkar.
 - Okumayı 2 saniyeden sık denemek.
-- Güç vermeden hemen sonra okumak: sensöre açıldıktan sonra biraz zaman tanı; süre için veri sayfasına bak.
-- DATA pinini ya da yükseltme direncini unutmak: sürekli `Okuma hatasi` görürsün.
+- Güç vermeden hemen sonra okumak: sensöre açıldıktan sonra biraz zaman tanı (gerçek sensörlerde süre için veri sayfasına bak).
+- DATA kablosunu ya da (çıplak sensörde) yükseltme direncini unutmak: sürekli `Okuma hatasi` görürsün.
 
 ## Konuşalım
 DHT22 virgülden sonraki basamağı gösteriyor, DHT11 göstermiyor. Peki fazla basamak göstermek ölçümün daha doğru olduğunu kanıtlar mı? Bir bilgisayarın ya da ekranın "çok basamak göstermesi" ile "doğru göstermesi" arasındaki farkı örnekle anlat.

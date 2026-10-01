@@ -14,27 +14,28 @@ Bu proje öğrendiklerini birleştirir:
 
 Panel üç sensörden gelen seviyelerin **en kötüsünü** genel durum yapar. Genel durum üç şeyi sürer: LED'ler, buzzer ve ekran. Röle ayrıca gaz seviyesine bağlıdır.
 
-### Güvenlik
-- Röleyi yalnızca **düşük gerilimle** (5 V) kullan. Şebeke gerilimi (220 V) ile devre kurma. Havalandırma fanı bu projede bir LED ya da küçük bir 5 V fan ile simgelenir.
-- Gerçek gaz ve alev kullanma. Gerçek can ve mal güvenliği için sertifikalı alarm cihazları kullan; bu proje eğitim amaçlıdır.
-- MQ-2 ısıtıcısı sıcaktır, dokunma.
+### Güvenlik notu
+- Gerçek bir rölede şebeke gerilimi (220 V) ile devre kurulmaz. Bu projede röle yalnızca 5 V'luk bir LED'i sürer; havalandırma fanını bu LED simgeler.
+- Bu derste gerçek gaz ve alev yoktur; sensör değerlerini özellik panelinden verirsin. Gerçek can ve mal güvenliği için sertifikalı alarm cihazları kullanılır; bu proje eğitim amaçlıdır.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| MQ-2 gaz sensörü modülü | VCC → 5 V, GND → GND, AO → **A3** |
-| Alev sensörü modülü | VCC → 5 V, GND → GND, AO → **A1** |
-| 10 kΩ NTC termistör (isteğe bağlı) | Bir ucu **A2**, öbür ucu GND |
-| 10 kΩ sabit direnç (NTC için) | Bir ucu 5 V, öbür ucu **A2** |
-| Yeşil LED (normal) + 330 Ω | **D11** → direnç → LED anodu; katot → GND |
-| Sarı LED (uyarı) + 330 Ω | **D12** → direnç → LED anodu; katot → GND |
-| Kırmızı LED (tehlike) + 330 Ω | **D13** → direnç → LED anodu; katot → GND |
-| Aktif buzzer | **D8** (+), diğer ucu GND |
-| Röle modülü IN | **D7** (VCC → 5 V, GND → GND) |
-| Havalandırma fanı yerine LED | Röle COM → 5 V; röle NO → 330 Ω direnç → LED → GND |
-| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND (adres 0x27) |
+| MQ-2 gaz sensörü modülü | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A3** |
+| Alev sensörü modülü | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A1** |
+| NTC termistör (isteğe bağlı) | Uç **1** → **A2**, uç **2** → **GND** |
+| Direnç (10000 Ω; NTC için) | Uç **1** → **5V**, uç **2** → **A2** |
+| Direnç (330 Ω) + LED (normal; rengi yeşil) | **D11** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
+| Direnç (330 Ω) + LED (uyarı; rengi sarı) | **D12** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
+| Direnç (330 Ω) + LED (tehlike; rengi kırmızı) | **D13** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
+| Buzzer (özellik panelinden **Tür: Aktif**) | **+** → **D8**, **-** → **GND** |
+| Röle modülü | **VCC** → **5V**, **GND** → **GND**, **IN** → **D7** |
+| Havalandırma fanı yerine direnç (330 Ω) + LED | Röle **COM** → **5V**; röle **NO** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
+| I2C LCD 16x2 | **SDA** → **A4**, **SCL** → **A5**, **VCC** → **5V**, **GND** → **GND** (adres 0x27) |
 
-NTC bağlı değilse programda `ISI_VAR = false` yap; A2 boş kalırsa rastgele değerler okunur. Alev sensörünün yönü farklıysa 54. dersteki gibi `ALEVDE_DUSER` değerini değiştir. Röle ters çalışıyorsa `HIGH` ile `LOW` yerlerini değiştir.
+NTC'yi tuvale eklemeyeceksen programda `ISI_VAR = false` yap; A2 boş kalırsa rastgele değerler okunur ve laboratuvar "boşta giriş" uyarısı verir. Alev sensörünün yönü farklıysa 54. dersteki gibi `ALEVDE_DUSER` değerini değiştir; laboratuvardaki alev modülünde alevde değer düşer, yani `true` doğrudur. Röle ters çalışıyorsa `HIGH` ile `LOW` yerlerini değiştir ya da rölenin **Tetik** özelliğine bak.
 
 ### Seviyeler ve çıkışlar
 | Genel durum | LED | Buzzer (D8) | Röle (D7, fan) | Ekran satırı |
@@ -53,7 +54,17 @@ NTC bağlı değilse programda `ISI_VAR = false` yap; A2 boş kalırsa rastgele 
 
 Röle gaz seviyesine bağlıdır: gaz temiz havaya dönene kadar (gaz seviyesi NORMAL olana kadar) fan çalışır. Röle ayrı bir histerezis gerektirmez; çünkü gaz seviyesinin kendisi zaten histerezislidir.
 
-Panel açılınca önce **ısınma** yapar (ekranda "ISINMA"), sonra temiz havada gaz baz değerini ölçer. Simülasyonda ısınmayı kısa tuttuk (4 saniye); gerçek MQ-2 için çok daha uzun bir süre kullan.
+Panel açılınca önce **ısınma** yapar (ekranda "ISINMA"), sonra temiz havada gaz baz değerini ölçer. Laboratuvarda ısınmayı kısa tuttuk (4 saniye); gerçek MQ-2 için çok daha uzun bir süre kullan. Isınma ve baz ölçümü bitene kadar (yaklaşık 5 saniye) **Gaz düzeyi** 0'da kalmalı; bu durumda `gazBaz` yaklaşık 102 olur.
+
+Paneli denemek için ısınma bittikten sonra özellik panelinden şu değerleri ver:
+
+| Ne yapmak istiyorsun | Değer |
+|---|---|
+| Gaz UYARI | MQ-2 **Gaz düzeyi** 0,1 (okuma yaklaşık 194; eşik yaklaşık 153) |
+| Gaz TEHLIKE | MQ-2 **Gaz düzeyi** 0,3 (okuma yaklaşık 379; eşik yaklaşık 255) |
+| Alev UYARI | Alev sensörü **Alev şiddeti** 0,4 (şiddet yaklaşık 389; eşik 300) |
+| Alev TEHLIKE | Alev sensörü **Alev şiddeti** 0,8 (şiddet yaklaşık 777; eşik 600) |
+| Isı UYARI / TEHLIKE | NTC **Sıcaklık** 50 °C / 70 °C |
 
 ### Program
 ```cpp
@@ -285,10 +296,10 @@ void loop() {
 9. Seri monitör yalnızca seviye değişince yazar; olay günlüğü gibi okunur.
 
 ### Dene
-- `ISI_VAR = false` yap ve NTC'yi çıkar. Panel yalnız gaz ve alevle çalışıyor mu? Ekranın ikinci satırında ne görüyorsun?
+- `ISI_VAR = false` yap ve NTC'yi (ile direncini) tuvalden sil. Panel yalnız gaz ve alevle çalışıyor mu? Ekranın ikinci satırında ne görüyorsun?
 - Alev sensörünün yönünü bozup `ALEVDE_DUSER = false` yap. Normal ortamda panel nasıl davranır?
 - UYARI için buzzer desenini değiştir: 100 ms çalsın, 400 ms sussun (`simdi % 500 < 100`). TEHLIKE için "iki kısa bip, bir boşluk" deseni yazabilir misin?
-- Sıcaklık sensörü koparsa ne olur? (İpucu: `adc` değerinin uç değerlerini kontrol et.) Panele "SENSOR HATASI" seviyesi ekler misin?
+- NTC'nin A2 kablosunu silersen ne olur? (İpucu: `adc` değerinin uç değerlerini kontrol et.) Panele "SENSOR HATASI" seviyesi ekler misin?
 
 ### Sık yapılan hatalar
 - Isınmayı ve bazı atlamak: panel ya sürekli alarm verir ya da hiç vermez.
@@ -297,7 +308,7 @@ void loop() {
 - `NORMAL` ve `UYARI` için aynı çıkışı kullanıp birini diğerinden ayırt edememek.
 - Röleyi şebeke gerilimiyle kullanmak: bu projede kesinlikle yapma.
 - Çıkışları (LED, buzzer, röle) farklı yerlerden sürmek: seviye ile çıkışlar birbirinden kopar.
-- Sensörü doğrudan güneş ışığına ya da ısıtıcıya bakacak şekilde yerleştirmek: yanlış alarm verir.
+- Gerçek devrede sensörü doğrudan güneş ışığına ya da ısıtıcıya bakacak şekilde yerleştirmek: yanlış alarm verir (laboratuvar bunu modellemez).
 
 ## Konuşalım
 Gaz algılandığında fanı çalıştırmak mantıklı, ama yangın varken (alev TEHLIKE) fan aynı davranmalı mı? Gerçek bir panoda hangi kuralları kim belirler? Bu sorulara cevap vermeden önce hangi bilgilere ihtiyacın var?

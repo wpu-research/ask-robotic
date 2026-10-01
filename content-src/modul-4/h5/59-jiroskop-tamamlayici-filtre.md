@@ -2,11 +2,18 @@
 süre: 30
 
 ## Merak
-58. derste ivmeölçerle eğim açısını bulduk. Ama çipi elinde sallayınca açı çıldırdı. Jiroskop ise "ne kadar hızlı dönüyorum" der ve hareket anında harika çalışır. İki sensör var, ikisi de kusurlu. Birini diğerinin eksiğini kapatacak şekilde birleştirebilir miyiz?
+58. derste ivmeölçerle eğim açısını bulduk. Ama çip sarsılınca (58. dersteki `ax = 0,3 g` deneyi) açı çıldırdı. Jiroskop ise "ne kadar hızlı dönüyorum" der ve hareket anında harika çalışır. İki sensör var, ikisi de kusurlu. Birini diğerinin eksiğini kapatacak şekilde birleştirebilir miyiz?
 
 ## Etkinlik
 ### Devre
-Devre 58. dersle aynı. MPU6050'yi I2C hattına bağla: SDA → **A4**, SCL → **A5**, VCC → 5 V (modül yazısına bak), GND → GND. Bu derste LED gerekmez.
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Devre 58. dersin MPU6050 bölümüyle aynı; LED gerekmez.
+
+| Parça | Bağlantı |
+|---|---|
+| MPU6050 VCC | 5V |
+| MPU6050 GND | GND |
+| MPU6050 SDA | **A4** |
+| MPU6050 SCL | **A5** |
 
 ### Jiroskop ne ölçer?
 İvmeölçer açıyı doğrudan verir. Jiroskop ise **dönüş hızını** (°/s) verir. Açıyı bulmak için hızı zamanla toplarız: bir saniye boyunca 10 °/s dönüyorsan 10° dönmüşsün demektir. Bunu küçük adımlarla yaparız:
@@ -16,10 +23,14 @@ aci = aci + hiz * dt;     // hiz: °/s, dt: son ölçümden bu yana geçen saniy
 ```
 Buna **integral** almak denir. Bu hafta pitch (öne-arkaya eğim) çipin Y ekseni etrafındaki dönüşüdür. Bu yüzden jiroskoptan `gy` değerini kullanacağız.
 
-### Sapma (bias): durağanken sıfır değil
-Çip masada hareketsiz dururken `gy` tam sıfır olmalı, değil mi? Değil. Gerçek çipler küçük bir sabit değer gösterir (birkaç °/s'yi geçmemesi beklenir; kesin sınır için veri sayfasına bak). Buna **sapma** (bias) denir. Değeri çipten çipe değişir, sıcaklıkla da kayabilir.
+Not: Gerçek MPU6050'de +Y etrafındaki bir dönüş, 58. dersteki `atan2(ax, az)` açısını genelde azaltır; yani iki işaret ters çıkabilir. O durumda `gy`'nin işaretini çevirirsin (aşağıdaki "Sık yapılan hatalar"a bak). Laboratuvarda ivme ve jiroskop özellikleri birbirinden bağımsızdır; tutarlı değerleri sen seçersin.
 
-Sapmayı bulmak kolaydır: çipi **kıpırdatmadan** yüzlerce ölçüm al ve ortalamasını hesapla. O ortalama sapmadır. Sonra her ölçümden sapmayı çıkar.
+### Sapma (bias): durağanken sıfır değil
+Çip hareketsiz dururken `gy` tam sıfır olmalı, değil mi? Değil. Gerçek çipler küçük bir sabit değer gösterir (tipik olarak birkaç °/s; veri sayfası başlangıç sapması için ±20 °/s'ye kadar tolerans verir, kesin değer için çipinin veri sayfasına bak). Buna **sapma** (bias) denir. Değeri çipten çipe değişir, sıcaklıkla da kayabilir.
+
+Sapmayı bulmak kolaydır: çip **kıpırdamıyorken** yüzlerce ölçüm al ve ortalamasını hesapla. O ortalama sapmadır. Sonra her ölçümden sapmayı çıkar.
+
+Laboratuvardaki sanal çipin jiroskop özellikleri varsayılan olarak 0'dır, yani sapması yoktur. Gerçek bir çipin sapmasını taklit etmek için ▶'e basmadan önce MPU6050'nin **Jiroskop Y** özelliğini 2 yap.
 
 ### Program 1: Sapmayı ölç ve çıkar
 ```cpp
@@ -70,7 +81,7 @@ void loop() {
   delay(500);
 }
 ```
-Kartı açarken çipi masaya koy ve ilk bir saniye dokunma. Sonra çipi çevirince `duzeltilmis` değeri gerçek dönüş hızını gösterir; durunca sıfıra yakın döner.
+▶'e bastıktan sonra ilk bir saniye (sapma ölçülürken) özellikleri değiştirme. Önce `Sapma gy = 2.00` satırını görürsün. Sonra **Jiroskop Y**'yi 32 yap (30 °/s'lik gerçek dönüş + 2 °/s sapma): `duzeltilmis` yaklaşık 30 gösterir. 2'ye geri döndüğünde `duzeltilmis` sıfıra yakın olur.
 
 ### Açıyı jiroskopla toplarsak: sapma birikir
 Şimdi bir deney yapalım. Çip sabit duruyor; ama jiroskop 2 °/s gibi küçük bir sapma gösteriyor olsun. Açıyı integral ile bulursak:
@@ -167,10 +178,10 @@ void loop() {
   delay(10);
 }
 ```
-Çipi sabit tut ve Seri Ekran'a bak. `acc` hep aynı kalır (biraz titreyebilir). `ham` zamanla yürür gider. `duz` ise sapma çıkarıldığı için çok daha yavaş kayar.
+Çipi eğik ve sabit tutmak için ▶'e basmadan önce **Jiroskop Y = 2**, **İvme X = 0,17**, **İvme Z = 0,98** yap (yaklaşık 10°). Seri monitöre bak: `acc` hep aynı kalır (laboratuvar sensörü gürültüsüzdür). `ham` zamanla yürür gider. `duz` ise sapma çıkarıldığı için sabit kalır; sapma sonradan değişirse (aşağıdaki Dene'de göreceksin) yalnızca kalan küçük hata kadar kayar.
 
 ### İvmeölçerin sorunu: gürültü ve titreşim
-İvmeölçer kaymaz. Çip aynı eğimde duruyorsa sonsuza kadar aynı açıyı söyler. Ama yer çekimi dışındaki her ivmeyi de ölçer: motor titreşimi, elin sarsıntısı, yürüyen bir robotun sekmesi. 58. dersteki gibi `ax`'e fazladan 0,3 g eklenirse açı 16,7° sapar. Yani ivmeölçer:
+İvmeölçer kaymaz. Çip aynı eğimde duruyorsa sonsuza kadar aynı açıyı söyler. Ama yer çekimi dışındaki her ivmeyi de ölçer: motor titreşimi, elin sarsıntısı, yürüyen bir robotun sekmesi. (Laboratuvar çipi bu gürültüyü kendiliğinden üretmez; titreşimi, İvme X'i hızlıca değiştirerek sen yaparsın.) 58. dersteki gibi `ax`'e fazladan 0,3 g eklenirse açı 16,7° sapar. Yani ivmeölçer:
 
 - **Uzun vadede doğru** (kaymaz), **kısa vadede gürültülü**.
 
@@ -286,18 +297,19 @@ void loop() {
 2. Başlangıç açısı ivmeölçerden alınır, çünkü integral yalnız **değişimi** bilir, başlangıç açısını bilmez.
 3. `loop` her turda `dt`'yi `micros()` farkından hesaplar. Sabit 0,01 yazmak yerine gerçek geçen süreyi kullanmak, `delay` ve I2C süreleri değişse bile doğru integral verir.
 4. `saf` yalnız jiroskopu toplar. `aci` ise formülü uygular. Seri Ekran'da ikisini yan yana görürsün.
-5. Sabit tutulan çipte: `acc` biraz titrer, `saf` yavaşça kayar (sapmayı çıkardıktan sonra kalan küçük hata yüzünden), `filtre` sakin ve doğru kalır.
-6. Çipi hızlıca çevirdiğinde `filtre` jiroskop sayesinde hemen tepki verir, ivmeölçerin sallantı gürültüsünden ise etkilenmez.
+5. Sabit eğimde ve sapma sonradan değiştiğinde (örneğin çalışırken Jiroskop Y'yi 2'den 4'e çıkardın): `acc` sabit kalır, `saf` yavaşça kayar (sapmayı çıkardıktan sonra kalan küçük hata yüzünden), `filtre` ise sakin ve doğru kalır.
+6. İvme özelliklerini hızlıca oynatıp titreşim yaparsan `acc` zıplar, `filtre` ise jiroskop ağırlıklı olduğu için çok az oynar. Gerçek bir dönüşte (ivme ve jiroskop birlikte değişince) `filtre` jiroskop sayesinde hemen tepki verir.
 
 Filtrenin tam doğru olmadığına da dikkat et. Jiroskopta ölçtüğünle gerçek arasında hâlâ küçük bir hata kalırsa (sapma değiştiyse), `filtre` doğru değerin birazcık yanında durur. Hata `α · hata · dt / (1 − α)` kadardır. Örneğin kalan hata 2 °/s, `dt = 0,01 s`, `α = 0,98` ise yaklaşık 1° olur. Yalnız jiroskop kullansan aynı hata 10 saniyede 20° olurdu.
 
 ### Dene
-- `ALFA` değerini 0,90 yap. Titreşim azalıyor mu artıyor mu? Hızlı hareketi daha iyi mi yakalıyor?
-- `ALFA` değerini 0,999 yap. Filtrenin doğru açıya oturması neden çok yavaşlıyor?
-- Çipi başlatırken eğik tut (kartı açarken), sonra düzelt. Filtre ve `saf` birbirinden nasıl ayrılıyor?
+- `ALFA` değerini 0,90 yap. İvme X'i hızlıca 0,17 ile 0,35 arasında oynat: `filtre` daha çok mu, daha az mı oynuyor? Hızlı hareketi daha iyi mi yakalıyor?
+- `ALFA` değerini 0,999 yap. Filtrenin doğru açıya oturması neden çok yavaşlıyor? (Zaman sabiti yaklaşık 0,999 · 0,01 / 0,001 ≈ 10 saniyedir.)
+- Çip eğikken başlat: ▶'e basmadan önce İvme X = 0,5, İvme Z = 0,87 (yaklaşık 30°). Çalışırken İvme X'i 0, İvme Z'yi 1 yap. `filtre` ve `saf` birbirinden nasıl ayrılıyor? (`saf` yalnız jiroskopa bakar, ivmeölçerin yeni durumunu görmez.)
+- Sapma sonradan değişsin: çalışırken Jiroskop Y'yi 2'den 4'e çıkar. `saf` ile `filtre` 10 saniyede ne kadar kayıyor?
 
 ### Sık yapılan hatalar
-- Sapmayı ölçerken çipi tutmak ya da masaya vurmak: sapma yanlış ölçülür, her şey kayar.
+- Sapmayı ölçerken (programın ilk saniyesinde) çip hareket ediyormuş gibi özellikleri değiştirmek, ya da gerçek bir çipi tutmak/masaya vurmak: sapma yanlış ölçülür, her şey kayar.
 - Sapmayı hiç çıkarmamak: `saf` ve hatta `filtre` küçük bir sabit hata taşır.
 - `dt` değerini sabit yazıp gerçek süreyi kullanmamak: `delay` ya da yazdırma süresi değişince integral yanlış çıkar.
 - Birimleri karıştırmak: `gy` °/s, `dt` saniye olmalı. Milisaniye yazarsan 1000 kat büyük kayma görürsün.

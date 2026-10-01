@@ -40,7 +40,7 @@ function Field({ def, value, disabled, onChange, partId }: { def: PropDef; value
     )
   }
   const n = typeof value === 'number' ? value : Number(def.default)
-  const log = def.max !== undefined && def.min !== undefined && def.max / Math.max(1, def.min) >= 1000
+  const log = def.max !== undefined && def.min !== undefined && def.min > 0 && def.max / def.min >= 1000
   // Çok geniş aralıklı değerler (direnç) için kaydırıcı logaritmiktir.
   const toSlider = (v: number) => (log ? Math.log10(Math.max(def.min!, v)) : v)
   const fromSlider = (s: number) => (log ? Math.round(10 ** s) : s)

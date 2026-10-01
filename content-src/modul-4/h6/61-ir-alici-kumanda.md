@@ -2,17 +2,29 @@
 süre: 30
 
 ## Merak
-Televizyon kumandasının ucundaki ışığı göremezsin, ama telefonunun kamerasından bakınca yanıp söndüğünü görebilirsin. Kumanda her tuşta ışıkla bir mesaj yollar. TV bu mesajı nasıl "ses aç" ya da "kanal değiştir" diye anlıyor? Bu derste mesajın içini açacak, kendi çözücünü yazacaksın.
+Televizyon kumandasının ucundaki ışığı gözle göremezsin, ama bir telefon kamerasından bakınca yanıp söndüğünü görebilirsin. Kumanda her tuşta ışıkla bir mesaj yollar. TV bu mesajı nasıl "ses aç" ya da "kanal değiştir" diye anlıyor? Bu derste mesajın içini açacak, kendi çözücünü yazacaksın.
 
 ## Etkinlik
 ### Devre
+Laboratuvarda IR alıcı ve kumanda parçası yok. Bu yüzden önce gerçek devreyi tanı, sonra aynı fikri bir butonla laboratuvarda dene.
+
+Gerçek devrede (bilgi):
+
 | Parça | Bağlantı |
 |---|---|
 | IR alıcı modül (VS1838B türü, 38 kHz) | OUT → **D2**, VCC → 5 V, GND → GND |
-| Herhangi bir IR kumanda | Pil takılı, alıcıya doğrultulmuş |
-| LED | Kartın üstündeki dahili LED (**D13**) yeter |
+| IR kumanda | Alıcıya doğrultulur, tuşa basınca mesaj gönderir |
 
-Modüllerin bacak sırası değişir. Üzerindeki yazıyı (OUT, GND, VCC) oku; ters bağlama alıcıyı bozabilir.
+Modüllerin bacak sırası değişir; üzerindeki yazıya (OUT, GND, VCC) bakmak gerekir.
+
+Laboratuvardaki deney için parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
+| Parça | Bağlantı |
+|---|---|
+| Buton (alıcının OUT çıkışının yerine) | A → **D2**, B → **GND** |
+| LED | Uno'nun dahili LED'i (**D13**) yeter; parça eklemene gerek yok |
+
+Butona basılmamışken D2 `INPUT_PULLUP` sayesinde HIGH okur (boşta); butonu basılı tutunca LOW okur (darbe). IR alıcı modülün çıkışı da aynı şekilde çalışır: boşta HIGH, taşıyıcı varken LOW. Butonun basılı kaldığı süreyi `pulseIn` ile ölçersen, bir IR darbesinin süresini nasıl ölçeceğinin provasını yapmış olursun. Fark şu: kumanda darbeleri milisaniye ve mikrosaniye düzeyindedir, tıklayarak bu kadar hızlı basamazsın.
 
 ### Kumanda ne gönderiyor?
 Kumandanın ucundaki IR LED, saniyede 38.000 kez yanıp sönerek bir "taşıyıcı" üretir. Alıcı modül yalnızca bu 38 kHz'i tanır; gün ışığı gibi yavaş değişen ışıkları eler. Modülün çıkışı **ters** çalışır:
@@ -64,7 +76,7 @@ void loop() {
 }
 ```
 
-Bir tuşa bas: ön darbe 9000 µs civarında, ilk bit darbesi 560 µs civarında çıkar. Değerler birkaç yüz mikrosaniye oynayabilir; kumandanın zamanlaması pil durumuna ve üretime göre değişir.
+Gerçek bir kumandada bir tuşa basınca ön darbe 9000 µs civarında, ilk bit darbesi 560 µs civarında çıkar. Gerçek kumandalarda değerler birkaç yüz mikrosaniye oynayabilir; zamanlama pil durumuna ve üretime göre değişir. Laboratuvarda IR kaynağı olmadığı için bu sketch derlenir ama D2'ye NEC darbeleri gelmediği sürece çıktı vermez.
 
 ### Program 2: NEC çözücüyü kendin yaz
 Şimdi 32 biti oku ve komutu bul. Önemli bir ayrıntı: `pulseIn(HIGH)` çağrıldığında pin zaten LOW ise hemen bir sonraki HIGH'ı bekler ve onu ölçer. Boşluğun ardından LOW darbe geldiği için, `pulseIn(IR_PIN, HIGH)` çağrılarını **peş peşe** yaptığında her çağrı bir sonraki boşluğu ölçer. İlk çağrı ön boşluğu (4,5 ms), sonraki 32 çağrı 32 bitin boşluklarını verir.
@@ -170,21 +182,22 @@ void loop() {
 }
 ```
 
-Bu kütüphane sketch'i derlenir; davranışını gerçek kartta kumandanla sen denemelisin. Kütüphanenin içinde bir zamanlayıcı kullanılır; aynı zamanlayıcıyı kullanan başka kütüphanelerle (örneğin `tone()`) çakışabilir. Kullandığın sürümün belgesine bak.
+Bu kütüphane sketch'i laboratuvarda yalnız derlenir; IR alıcı parçası olmadığı için çıktı vermez. Kütüphanenin içinde bir zamanlayıcı kullanılır; aynı zamanlayıcıyı kullanan başka kütüphanelerle (örneğin `tone()`) çakışabilir. Kullandığın sürümün belgesine bak.
 
 `decode()` mesaj varsa `true` döner, sonuç `decodedIRData` içindedir. İşin bitince `resume()` demezsen kütüphane yeni mesaj almaz.
 
 ### Dene
-- `nec_zamanlari` ile farklı tuşlara bas. Ön darbe hep 9 ms mi? Hangi değerler değişiyor?
-- `nec_cozucu`yu yükle, her tuşun komut kodunu yaz. Kendi kumandanın "aç" ve "kapat" tuşlarının kodlarını `KOMUT_AC` ve `KOMUT_KAPAT` yerine koy.
-- Bir tuşa basılı tut. Seri monitörde kaç kez "tekrar" yazıyor? Satırlar arası süre yaklaşık 108 ms mi (`millis()` ile ölç)?
+- Laboratuvarda butonu D2'ye bağla (`INPUT_PULLUP`) ve `pulseIn(2, LOW, 3000000)` ile basılı kaldığı süreyi mikrosaniye olarak yazdır. Kısa ve uzun basışta ölçümün nasıl değiştiğine bak.
+- NEC'te ön darbe hep 9 ms, ön boşluk 4,5 ms'dir. Peki bir mesaj komut 0x00 iken mi, 0xFF iken mi daha uzun sürer? Dersteki bit sürelerinden hesapla (ipucu: ters kopya yüzünden kaç bit 1 olur?).
+- Bir tuşa basılı tutulursa tekrar mesajları yaklaşık 108 ms'de bir gelir. 2 saniyede kaç tekrar mesajı beklersin?
 
 ### Sık yapılan hatalar
-- Modülün bacaklarını ters bağlamak. Bacak sırası modüle göre değişir.
+- Gerçek modülün bacaklarını ters bağlamak: modül bozulabilir. Bacak sırası modüle göre değişir.
 - Kodları başka kumandadan alıp kendi kumandanda çalışmasını beklemek: her kumandanın adresi ve komutları farklıdır.
 - `pulseIn(LOW)` ve `pulseIn(HIGH)` çağrılarını karıştırmak. Boşta pin HIGH'tır; ön darbe LOW'dur.
+- Butonla denerken `INPUT_PULLUP` yazmayı unutmak: D2 boşta kalır, ölçüm anlamsızlaşır (IR modülde bu pull-up modülün içindedir).
 - `1 << i` yerine `int` kullanıp 16. bitten sonrasını kaybetmek: 32 bit için `uint32_t` ve `(uint32_t)1 << i` gerekir.
-- IR alıcıyı doğrudan güneş ya da parlak lamba ışığına bakacak şekilde koymak: alıcı sürekli tetiklenebilir.
+- Gerçek devrede IR alıcıyı doğrudan güneş ya da parlak lamba ışığına bakacak şekilde koymak: alıcı sürekli tetiklenebilir.
 
 ## Konuşalım
 Aynı odada iki farklı cihazın kumandasını aynı anda kullansan karışırlar mı? NEC mesajındaki adres alanı bu sorunu nasıl çözüyor? Ters kopyaların amacı sence nedir?

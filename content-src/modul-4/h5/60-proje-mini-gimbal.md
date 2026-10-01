@@ -12,22 +12,35 @@ Bu proje öğrendiklerini birleştirir:
 - **Modül 3, Hafta 7 (32-33. dersler):** LCD ve I2C ile açıyı gösterme.
 - **Bu hafta (58-59. dersler):** MPU6050 ile ham veri, pitch hesabı, jiroskop sapması ve tamamlayıcı filtre.
 
-MPU6050 pitch açısını ölçer, tamamlayıcı filtre bunu sakinleştirir. Servo, pitch kadar **ters** yönde döner: pitch +20° ise servo 90 − 20 = 70°'ye gider. Servo kolunun üstüne hafif bir platform (karton, küçük bir bayrak ya da hafif bir kamera maketi) yerleştirirsen, taban eğilince platform yatay kalmaya çalışır.
+MPU6050 pitch açısını ölçer, tamamlayıcı filtre bunu sakinleştirir. Servo, pitch kadar **ters** yönde döner: pitch +20° ise servo 90 − 20 = 70°'ye gider. Servo koluna bir platform takılı olsaydı, taban eğilince platform yatay kalmaya çalışırdı. Laboratuvarda tabanı MPU6050'nin İvme X ve İvme Z özellikleriyle eğersin, platformun açısını da servonun kol açısından izlersin.
 
-Düğme (D2) o anki eğimi "sıfır" kabul eder: masa tam yatay olmasa bile "şu an yatay" diyebilirsin.
+Düğme (D2) o anki eğimi "sıfır" kabul eder: taban tam yatay olmasa bile "şu an yatay" diyebilirsin.
 
 ### Devre
-**Güvenlik:** Bu projede yalnızca düşük gerilim (5 V) kullan. Küçük bir servo kısa süreli testte kartın 5 V pininden çalışabilir, ama motor yük bindirince voltaj düşer ve MPU/LCD hatalı çalışabilir. Kalıcı kurulumda servoyu **harici 5 V güç kaynağından** besle ve harici kaynağın GND'sini kartın GND'siyle birleştir (ortak GND). Pil kullanıyorsan kutupları ters bağlama ve uçlarını birbirine değdirme.
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Laboratuvarda servoyu Uno'nun 5V pininden beslersin.
 
 | Parça | Bağlantı |
 |---|---|
-| MPU6050 (GY-521) | VCC → 5 V, GND → GND, SDA → **A4**, SCL → **A5** (adres 0x68) |
-| I2C LCD 16x2 | VCC → 5 V, GND → GND, SDA → **A4**, SCL → **A5** (adres 0x27) |
-| Servo | Sinyal → **D6**; kırmızı → 5 V (tercihen harici); kahverengi/siyah → GND (ortak) |
-| Buton "sıfırla" | **D2** ile GND arası (`INPUT_PULLUP`) |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND ("servo sınırda" ışığı) |
+| MPU6050 VCC | 5V |
+| MPU6050 GND | GND |
+| MPU6050 SDA | **A4** (adres 0x68) |
+| MPU6050 SCL | **A5** |
+| I2C LCD VCC | 5V |
+| I2C LCD GND | GND |
+| I2C LCD SDA | **A4** (adres 0x27) |
+| I2C LCD SCL | **A5** |
+| Servo SIG | **D6** |
+| Servo VCC | 5V |
+| Servo GND | GND |
+| Buton "sıfırla" A | **D2** (`INPUT_PULLUP`) |
+| Buton B | GND |
+| Direnç (330 Ω) 1 | **D13** |
+| Direnç 2 | LED **A** (anot) |
+| LED **K** (katot) | GND ("servo sınırda" ışığı) |
 
-MPU6050 (0x68) ile LCD (0x27) aynı iki telde yan yana çalışır, çünkü adresleri farklı (33. ders). Devrede DS3231 saat modülü bulunmasın; o da 0x68 kullanır.
+MPU6050 (0x68) ile LCD (0x27) aynı iki telde yan yana çalışır, çünkü adresleri farklı (33. ders). Devrede RTC (DS3231) parçası bulunmasın; o da 0x68 kullanır.
+
+Gerçek donanımda ise servo yük bindirince 5 V düşebilir ve MPU/LCD hatalı çalışabilir; bu yüzden gerçek kurulumda servo ayrı bir 5 V kaynaktan beslenir ve kaynakların GND'leri ortak yapılır. Laboratuvar bu gerilim düşmesini modellemez.
 
 ### Tasarım
 - **Pitch:** `atan2(ax, az)` (58. ders).
@@ -174,7 +187,7 @@ void loop() {
 ```
 
 ### Nasıl çalışıyor?
-1. `setup` servoyu ortaya (90°) alır, MPU'yu uyandırır ve 100 ölçümün ortalamasıyla jiroskop sapmasını bulur (59. ders). Bu sırada tabanı kıpırdatma.
+1. `setup` servoyu ortaya (90°) alır, MPU'yu uyandırır ve 100 ölçümün ortalamasıyla jiroskop sapmasını bulur (59. ders). ▶'e basınca ilk yarım saniye (bu ölçüm sürerken) MPU6050'nin özelliklerini değiştirme.
 2. `mpuOku` 14 baytı tek seferde okur (58. ders) ama yalnız işimize yarayanları saklar: `ax`, `az` ve `gy`.
 3. Her 10 ms'de bir tamamlayıcı filtre çalışır. `dt`, `micros()` farkından hesaplanır; döngünün süresi biraz oynasa bile integral doğru kalır.
 4. `egim = aci − ofset`: düğmeye basınca o anki açı sıfır olur.
@@ -185,15 +198,15 @@ void loop() {
 Platform ters yönde dönüyorsa (servo montajına göre olabilir), `SERVO_MERKEZ - ...` ifadesini `SERVO_MERKEZ + ...` yap.
 
 ### Dene
-- `ALFA` değerini 0,90 yap. Elinle tabanı titret; servo ne kadar titriyor? 0,99 yap; servo ne kadar geç tepki veriyor?
+- `ALFA` değerini 0,90 yap. Titreşimi taklit et: İvme X'i hızlıca 0 ile 0,2 arasında değiştir. Servo ne kadar titriyor? `ALFA` 0,99 iken servo ne kadar geç tepki veriyor?
 - `SERVO_MIN` ve `SERVO_MAX` değerlerini 45 ve 135 yap. Sınırda LED ne zaman yanıyor?
 - Roll eksenini de ekle: ikinci bir servoyu D9'a bağla ve `roll = atan2(ay, az)` açısıyla sür. İki eksenli gimbal olur (`ay` değerini `mpuOku` içinde saklaman gerekir).
-- Kamera maketi yerine hafif bir bayrak tak ve tabanı elinle eğ. Bayrak yatay kalıyor mu? Hata varsa nereden geliyor olabilir?
+- Sapma sonradan değişsin: çalışırken Jiroskop Y'yi 0'dan 3'e çıkar. Servo yavaşça kayıyor mu, yoksa filtre onu tutuyor mu? Kalan hatayı 59. dersteki formülle (`α · hata · dt / (1 − α)`) hesapla.
 
 ### Sık yapılan hatalar
-- Servoyu kartın 5 V pininden beslemek ve servo yük bindirince MPU ya da LCD'nin donmasına şaşırmak. Harici güç ve ortak GND kullan.
-- Sapma ölçerken tabanı tutmak ya da hareket ettirmek: platform sürekli kayar.
-- MPU6050 ile aynı hatta DS3231 (aynı 0x68 adresi) bağlamak.
+- Gerçek donanımda servoyu kartın 5 V pininden beslemek ve servo yük bindirince MPU ya da LCD'nin donmasına şaşırmak. Gerçek kurulumda harici güç ve ortak GND kullan.
+- Sapma ölçülürken (programın ilk yarım saniyesinde) tabanı oynatmak: sapma yanlış ölçülür ve servo sürekli kayar.
+- MPU6050 ile aynı hatta RTC (DS3231, aynı 0x68 adresi) kullanmak.
 - `dt` yerine sabit 0,01 yazmak: döngü süresi değişince filtre bozulur.
 - Servo açısını sınırlamamak: servo mekanik ucuna dayanıp zorlanır, ses çıkarır, ısınır.
 - `delay` kullanmak: butona basışı kaçırır ve filtre `dt`'sini bozar.

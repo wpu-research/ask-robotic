@@ -21,11 +21,8 @@ const dipRow = (names: (string | null)[], y: number): Record<string, Pt> =>
 const PINS_LCD = ['VSS', 'VDD', 'V0', 'RS', 'RW', 'E', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'A', 'K']
 const LCD_X = (i: number) => 36 + i * 14
 
-/** GEÇİCİ (Aşama C): çizimi henüz yazılmamış modüller için basit kutu; pinler alt kenarda 16 px aralıkla. Gerçek geometri/çizim sonra. */
-const stub = (name: string, pinNames: string[], w?: number): PartDef => {
-  const width = w ?? Math.max(60, pinNames.length * 16 + 12)
-  return { name, w: width, h: 64, pins: row(pinNames, (width - (pinNames.length - 1) * 16) / 2, 16, 60), ownLabels: true }
-}
+/** Başlık (header) pinleri: `names` ortalanmış, `step` aralıklı, alt kenara yakın (y). */
+const hdr = (names: string[], w: number, y: number, step = 16): Record<string, Pt> => row(names, (w - (names.length - 1) * step) / 2, step, y)
 
 export const PART_DEFS: Record<PartType, PartDef> = {
   uno: {
@@ -81,22 +78,22 @@ export const PART_DEFS: Record<PartType, PartDef> = {
     name: 'LCD 16x2 (I2C)', w: 282, h: 170, ownLabels: true,
     pins: { GND: { x: 117, y: 166 }, VCC: { x: 133, y: 166 }, SDA: { x: 149, y: 166 }, SCL: { x: 165, y: 166 } },
   },
-  // Aşama C (Modül 4) — STUB: yalnız tür denetimi için; sözleşme pinleriyle birebir, çizim yok
-  hcsr04: stub('HC-SR04', ['VCC', 'TRIG', 'ECHO', 'GND']),
-  dht: stub('DHT11/DHT22', ['VCC', 'DATA', 'GND']),
-  pir: stub('PIR', ['VCC', 'OUT', 'GND']),
-  irobstacle: stub('IR engel', ['VCC', 'OUT', 'GND', 'AO']),
+  // Aşama C (Modül 4): sensör modülleri. Pinler sözleşmeyle (PINS) birebir; çizim part-art-c.tsx'te. Hepsi pinleri kendi çizer (ownLabels).
+  hcsr04: { name: 'HC-SR04', w: 120, h: 70, ownLabels: true, pins: hdr(['VCC', 'TRIG', 'ECHO', 'GND'], 120, 66) },
+  dht: { name: 'DHT11/DHT22', w: 56, h: 80, ownLabels: true, pins: hdr(['VCC', 'DATA', 'GND'], 56, 76) },
+  pir: { name: 'PIR hareket', w: 72, h: 84, ownLabels: true, pins: hdr(['VCC', 'OUT', 'GND'], 72, 80) },
+  irobstacle: { name: 'IR engel', w: 84, h: 72, ownLabels: true, pins: hdr(['VCC', 'OUT', 'GND', 'AO'], 84, 68) },
   reed: { name: 'Reed anahtarı', w: 80, h: 24, pins: { A: { x: 4, y: 12 }, B: { x: 76, y: 12 } } },
-  bmp280: stub('BMP280', ['VCC', 'GND', 'SDA', 'SCL']),
-  mpu6050: stub('MPU6050', ['VCC', 'GND', 'SDA', 'SCL']),
-  joystick: stub('Joystick', ['VCC', 'GND', 'VRX', 'VRY', 'SW']),
-  encoder: stub('Döner enkoder', ['CLK', 'DT', 'SW', 'VCC', 'GND']),
-  keypad: stub('Keypad 4x4', ['R1', 'R2', 'R3', 'R4', 'C1', 'C2', 'C3', 'C4']),
-  rtc: stub('RTC DS3231', ['VCC', 'GND', 'SDA', 'SCL']),
-  mq2: stub('MQ-2 gaz', ['VCC', 'GND', 'AO', 'DO']),
-  flame: stub('Alev sensörü', ['VCC', 'GND', 'AO', 'DO']),
-  sound: stub('Ses sensörü', ['VCC', 'GND', 'AO', 'DO']),
-  soil: stub('Toprak nemi', ['VCC', 'GND', 'AO', 'DO']),
+  bmp280: { name: 'BMP280', w: 68, h: 62, ownLabels: true, pins: hdr(['VCC', 'GND', 'SDA', 'SCL'], 68, 58) },
+  mpu6050: { name: 'MPU6050', w: 68, h: 76, ownLabels: true, pins: hdr(['VCC', 'GND', 'SDA', 'SCL'], 68, 72) },
+  joystick: { name: 'Joystick', w: 100, h: 100, ownLabels: true, pins: hdr(['VCC', 'GND', 'VRX', 'VRY', 'SW'], 100, 96) },
+  encoder: { name: 'Döner enkoder', w: 100, h: 92, ownLabels: true, pins: hdr(['CLK', 'DT', 'SW', 'VCC', 'GND'], 100, 88) },
+  keypad: { name: 'Keypad 4x4', w: 132, h: 156, ownLabels: true, pins: hdr(['R1', 'R2', 'R3', 'R4', 'C1', 'C2', 'C3', 'C4'], 132, 152, 14) },
+  rtc: { name: 'RTC DS3231', w: 100, h: 76, ownLabels: true, pins: hdr(['VCC', 'GND', 'SDA', 'SCL'], 100, 72) },
+  mq2: { name: 'MQ-2 gaz', w: 76, h: 96, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 92) },
+  flame: { name: 'Alev sensörü', w: 76, h: 88, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 84) },
+  sound: { name: 'Ses sensörü', w: 76, h: 88, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 84) },
+  soil: { name: 'Toprak nemi', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
 }
 
 export type Rotation = PartInstance['rotation']

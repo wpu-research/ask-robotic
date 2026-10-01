@@ -211,7 +211,7 @@ export default {
     }
 
     // 1) Tek alkış: bir şey olmaz
-    darbe(sim, ALKIS_VOLT, 40); ortam(sim, 1500)
+    darbe(sim, ALKIS_VOLT, 40); ortam(sim, 3500)   // ARALIK (3000) geçsin: bu alkış unutulur
     assert.equal(led(), false, 'tek alkış LED\'i değiştirmemeli')
 
     // 2) İki alkış 450 ms arayla: LED yanar
@@ -226,10 +226,10 @@ export default {
     assert.ok(/LED kapali/.test(sim.serial))
     ortam(sim, 1500)
 
-    // 4) Alkışlar 1500 ms arayla: toggle yok; ikincisi yeni "ilk alkış" olur
-    darbe(sim, ALKIS_VOLT, 40); ortam(sim, 1460)
+    // 4) Alkışlar 3500 ms arayla (ARALIK = 3000): toggle yok; ikincisi yeni "ilk alkış" olur
+    darbe(sim, ALKIS_VOLT, 40); ortam(sim, 3460)
     darbe(sim, ALKIS_VOLT, 40); ortam(sim, 150)
-    assert.equal(led(), false, '1,5 sn arayla iki alkış sayılmamalı')
+    assert.equal(led(), false, '3,5 sn arayla iki alkış sayılmamalı')
     //    hemen ardından bir alkış daha: son ikisi 450 ms arayla -> LED yanar
     ortam(sim, 260)
     darbe(sim, ALKIS_VOLT, 40); ortam(sim, 150)
@@ -241,7 +241,7 @@ export default {
     darbe(sim, ALKIS_VOLT, 600); ortam(sim, 100)
     darbe(sim, ALKIS_VOLT, 40); ortam(sim, 200)
     assert.equal(led(), true, 'uzun sesten sonra bu alkış yalnızca ilk alkış: LED değişmemeli')
-    ortam(sim, 1500)
+    ortam(sim, 3500)
 
     // 6) Zayıf sesler (0,4 V) ve kısa parazitler (1 ms) alkış sayılmaz
     darbe(sim, 0.4, 40); ortam(sim, 300); darbe(sim, 0.4, 40); ortam(sim, 200)

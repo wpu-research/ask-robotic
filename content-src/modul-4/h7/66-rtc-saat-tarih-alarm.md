@@ -2,19 +2,23 @@
 süre: 25
 
 ## Merak
-`millis()` kart açılınca sıfırdan saymaya başlar, fişi çekince her şeyi unutur. "Dün gece saat kaçta sıcaklık yükseldi?" sorusuna bununla cevap veremezsin. Duvar saati gibi fişsiz de akan, tarihi ve saati bilen bir saat gerekir. Bu işi **RTC** (Real Time Clock, gerçek zaman saati) modülü yapar. Bu derste onu Arduino'ya bağlayıp saati okuyacak, ayarlayacak ve kendi alarmını yazacaksın.
+`millis()` kart açılınca sıfırdan saymaya başlar, fişi çekince her şeyi unutur. "Dün gece saat kaçta sıcaklık yükseldi?" sorusuna bununla cevap veremezsin. Duvar saati gibi fişsiz de akan, tarihi ve saati bilen bir saat gerekir. Bu işi **RTC** (Real Time Clock, gerçek zaman saati) modülü yapar. Bu derste onu laboratuvarda Arduino'ya bağlayıp saati okuyacak, ayarlayacak ve kendi alarmını yazacaksın.
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| RTC modülü (DS3231) | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND (yalnız alarm programı) |
-| Pasif buzzer | Artı (+) bacak → **D8**; eksi bacak → GND (yalnız alarm programı) |
+| RTC | SDA → Uno **A4**, SCL → Uno **A5**, VCC → **5V**, GND → **GND** |
+| Direnç (özellik panelinden 330 Ω) + LED | Uno **D13** → direnç **1**; direnç **2** → LED **A**; LED **K** → **GND** (yalnız alarm programı) |
+| Buzzer (Tür: Pasif) | **+** → Uno **D8**; **-** → **GND** (yalnız alarm programı) |
 
-RTC modülü I2C ile konuşur (33. ders) ve adresi **0x68**'dir. Modüllerin gerilim aralığı farklı olabilir; kullandığın modülün belgesine bak. Modülün üzerinde bir **yedek pil yuvası** vardır. Ana güç kesilince saati bu pil çalıştırmaya devam eder. Pil yoksa ya da bittiyse güç kesilince saat unutulur ve yeniden ayarlaman gerekir. Pili ters takma, uçlarını birbirine değdirme; pil türü ve değiştirme için modülün belgesine bak.
+RTC modülü I2C ile konuşur (33. ders) ve adresi **0x68**'dir. Laboratuvarda RTC'yi 5V'a bağlıyoruz; gerçek modüllerin besleme aralığı model modele değişir, kullanılan modülün veri sayfasına bakılır.
 
-Dikkat: MPU6050 ivme sensörü de 0x68 adresini kullanır. Aynı I2C hattına ikisini birden bağlama.
+**Bilgi notu:** Gerçek modülde bir **yedek pil yuvası** vardır. Ana güç kesilince saati bu pil çalıştırmaya devam eder; pil yoksa ya da bittiyse güç kesilince saat unutulur ve yeniden ayarlanması gerekir. Laboratuvar pili ve güç kesintisini modellemez: her ▶'e bastığında (ya da ↺ Sıfırla'dan sonra) RTC **2026-01-01 00:00:00**'dan başlar ve `rtc.lostPower()` her zaman `false` döner. Saati istediğin değere `rtc.adjust()` ile kurarsın (aşağıda).
+
+Dikkat: MPU6050 ivme sensörü de varsayılan olarak 0x68 adresini kullanır. Aynı I2C hattına ikisini birden bağlarsan çakışırlar. (MPU6050'nin AD0 ucu 5V'a bağlanırsa adresi 0x69 olur ve çakışma biter; laboratuvarda parçanın "I2C adresi" özelliği bunu seçtirir.) Bu kursta MPU6050 ile RTC'yi aynı devrede kullanmayacağız.
 
 ### Program: saati oku
 Kütüphane olarak **RTClib** kullanıyoruz. DS3231 için sınıfın adı `RTC_DS3231`.
@@ -57,7 +61,7 @@ void loop() {
 
 `rtc.now()` o anki zamanı bir `DateTime` nesnesi olarak verir. `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()` ile parçalarını alırsın. Tek haneli sayıların başına 0 koyan `iki()` fonksiyonu "8:5:3" yerine "08:05:03" yazdırır.
 
-`rtc.lostPower()` çipin tuttuğu bir bayrağı okur: osilatör durmuşsa bayrak kalkar. O zaman saati `DateTime(F(__DATE__), F(__TIME__))` ile ayarlıyoruz. `__DATE__` ve `__TIME__` programı **derlediğin** anın tarihi ve saatidir. Yükleme birkaç saniye sürdüğü için kurulan saat o kadar geride olur.
+`rtc.lostPower()` çipin tuttuğu bir bayrağı okur: osilatör durmuşsa bayrak kalkar. O zaman saati `DateTime(F(__DATE__), F(__TIME__))` ile ayarlıyoruz. `__DATE__` ve `__TIME__` programı **derlediğin** anın tarihi ve saatidir. Gerçek kartta yükleme birkaç saniye sürdüğü için kurulan saat o kadar geride olur. Laboratuvarda `lostPower()` hep `false` olduğundan bu satır çalışmaz; saat 2026-01-01 00:00:00'dan başlar ve çıktın `2026-01-01 00:00:01`, `2026-01-01 00:00:02` ... diye akar.
 
 ### Program: saati kendin ayarla
 Saati istediğin değere `rtc.adjust()` ile kurarsın. Aşağıdaki program önce saati okur, sonra gece yarısından 5 saniye öncesine ayarlar, sonra tekrar okur. Gün değişimini ve haftanın gününü de görürsün.
@@ -105,7 +109,7 @@ void loop() {
 }
 ```
 
-Çıktının başı şuna benzer: `Once:` satırında RTC'nin eski değeri, `Sonra:` satırında `2026-03-14 23:59:55 Cumartesi` görürsün. Birkaç saniye sonra saat 23:59:59'dan `2026-03-15 00:00:00`'a geçer ve gün adı Pazar olur. RTC takvimi de bilir: ay sonlarında günü kendisi değiştirir. Yaz saati uygulamasını ya da saat dilimini bilmez; yalnızca senin verdiğin sayıları sayar.
+Çıktının başı şuna benzer: `Once:` satırında RTC'nin eski değeri (laboratuvarda `2026-01-01 00:00:00 Persembe`), `Sonra:` satırında `2026-03-14 23:59:55 Cumartesi` görürsün. Birkaç saniye sonra saat 23:59:59'dan `2026-03-15 00:00:00`'a geçer ve gün adı Pazar olur. RTC takvimi de bilir: ay sonlarında günü kendisi değiştirir. Yaz saati uygulamasını ya da saat dilimini bilmez; yalnızca senin verdiğin sayıları sayar.
 
 ### Program: kendi alarmımız
 Bazı RTC çiplerinde donanım alarmı vardır, ama DS1307'de yoktur. Biz her iki çipte de çalışacak yolu seçiyoruz: saati düzenli aralıkla oku, alarm saatiyle karşılaştır. Okumayı `millis()` ile çeyrek saniyede bir yapıyoruz (27. ders); `delay` yok, böylece `loop()` başka işlere de bakabilir.
@@ -161,10 +165,10 @@ void loop() {
 }
 ```
 
-Program başlarken saati 07:29:55'e kuruyor, böylece alarmı 5 saniye sonra duyarsın. Gerçek bir alarmda `setup()` içindeki `rtc.adjust` satırını silersin.
+Program başlarken saati 07:29:55'e kuruyor, böylece alarm 5 saniye sonra çalışır: LED yanar, buzzer pininde (D8) 1000 Hz'lik ton başlar ve seri monitörde `ALARM 07:30` yazar. Gerçek bir alarmda `setup()` içindeki `rtc.adjust` satırını silersin.
 
 ### DS1307 ile fark
-Piyasada iki yaygın RTC çipi var. İkisi de I2C'de **0x68** adresini kullanır ve RTClib ile aynı biçimde okunur.
+Piyasada iki yaygın RTC çipi var. İkisi de I2C'de **0x68** adresini kullanır ve RTClib ile aynı biçimde okunur. Laboratuvardaki RTC parçası tek türdür; DS1307 kodunu da bu parçayla çalıştırabilirsin.
 
 | | DS3231 | DS1307 |
 |---|---|---|
@@ -209,16 +213,16 @@ void loop() {
 4. Alarm, RTC'den okunan saat ile hedef saatin karşılaştırmasıdır. `sonTetikGunu` alarmın aynı dakika boyunca tekrar tekrar çalmasını engeller ve ertesi gün yine çalmasına izin verir.
 
 ### Dene
-- `rtc_ayarla` programında tarihi `DateTime(2027, 2, 28, 23, 59, 55)` yap. Gece yarısından sonra hangi tarih ve gün adı çıkıyor? Neden?
+- `rtc_ayarla` programında tarihi `DateTime(2027, 2, 28, 23, 59, 55)` yap. Gece yarısından sonra hangi tarih ve gün adı çıkıyor? Neden? (2027 artık yıl değildir.)
 - `rtc_alarm` programında alarm süresini 2 saniyeye düşür, sonra alarmı yalnız hafta içi (Pazartesi-Cuma) çalacak biçimde değiştir. İpucu: `t.dayOfTheWeek()` 1 ile 5 arasında olmalı.
-- `rtc_saat` programını yükle, USB'yi çek, bir dakika bekle, tekrar tak. Saat kaç gösteriyor? Pil takılıyken ve takılı değilken sonucu karşılaştır.
+- `rtc_saat` programını çalıştır, 10 saniye bekle, ■ ile durdurup yeniden ▶'e bas. Saat nereden başlıyor? Gerçek modülde yedek pil takılıyken sonuç ne olurdu, pil yokken ne olurdu?
 
 ### Sık yapılan hatalar
 - `rtc.adjust(DateTime(F(__DATE__), F(__TIME__)))` satırını koşulsuz `setup()` içine koymak: kart her açıldığında saat derleme anına geri döner. Yalnızca `lostPower()` doğruysa ayarla.
 - MPU6050 ile RTC'yi aynı hatta bağlamak: ikisi de 0x68 kullanır.
 - Saati `millis()` ile tutmaya çalışıp RTC'yi gereksiz saymak: `millis()` güç kesilince sıfırlanır, RTC kalır.
-- Yedek pili ters takmak ya da uçlarını kısa devre yapmak.
 - Alarmı `t.second() == 0` kontrolüyle yazıp RTC'yi seyrek okumak: o saniyeyi kaçırırsın. Okuma aralığını 1 saniyeden kısa tut ve "bugün çaldı mı?" bayrağı kullan.
+- SDA ile SCL'yi ters bağlamak ya da VCC/GND'yi eksik bırakmak: program "RTC bulunamadi" yazar.
 
 ## Konuşalım
 Okul zili ya da ilaç hatırlatıcı yapsan alarmı Arduino'nun `millis()` saatine mi, RTC'ye mi bağlarsın? Elektrik kesilip geldiğinde ikisi ne yapar?

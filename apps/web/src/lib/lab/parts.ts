@@ -6,13 +6,10 @@ import { PART_DEFS } from './geometry'
 export const STAGE_A_PARTS: PartType[] = ['led', 'resistor', 'button', 'pot', 'ldr', 'ntc', 'buzzer', 'rgbled', 'servo']
 /** Aşama B (Modül 3, H5-H7). */
 export const STAGE_B_PARTS: PartType[] = ['diode', 'npn', 'mosfet', 'dcmotor', 'l293d', 'relay', 'sevenseg', 'sr595', 'lcd1602', 'lcdI2c']
-/**
- * Aşama C (Modül 4). GEÇİCİ: parça çizimi (part-art) yazılana kadar DEFAULT_PARTS'a EKLENMEZ; etkinlikler `allowedParts` ile
- * açıkça isteyebilir ancak çizim henüz yok.
- */
+/** Aşama C (Modül 4): sensörler ve girdi cihazları. */
 export const STAGE_C_PARTS: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil']
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
-export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS]
+export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS]
 
 export interface PartCategory { title: string; types: PartType[] }
 export const PICKER_CATEGORIES: PartCategory[] = [
@@ -24,6 +21,7 @@ export const PICKER_CATEGORIES: PartCategory[] = [
 
 export const SHORT_NAME: Partial<Record<PartType, string>> = {
   ldr: 'LDR', ntc: 'NTC', pot: 'Potansiyometre', lcd1602: 'LCD 16x2', lcdI2c: 'LCD I2C', npn: 'NPN', sevenseg: '7-segment', relay: 'Röle',
+  dht: 'DHT11/22', irobstacle: 'IR engel', reed: 'Reed', encoder: 'Enkoder', keypad: 'Keypad 4x4', rtc: 'RTC DS3231', mq2: 'MQ-2 gaz', soil: 'Toprak nemi',
 }
 
 export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
@@ -32,6 +30,21 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   diode: 'diyot 1n4007 geri tepme flyback doğrultucu', npn: 'transistör 2n2222 bc547 anahtar bjt', mosfet: 'transistör fet irlz44n anahtar',
   dcmotor: 'motor fırçalı dönen pervane', l293d: 'motor sürücü h köprü entegre çip', relay: 'röle anahtar kontak com no nc',
   sevenseg: 'yedi segment rakam hane display gösterge', sr595: 'kaydırmalı yazmaç shift register entegre çip 74hc595 portu genişlet',
+  hcsr04: 'mesafe uzaklık ultrasonik sonar ölçer hc-sr04 yankı echo trig',
+  dht: 'sıcaklık nem sensörü dht11 dht22 hava nemölçer',
+  pir: 'hareket sensörü kızılötesi insan algılama pir',
+  irobstacle: 'engel kızılötesi ir yakınlık algılayıcı çizgi izleyici',
+  reed: 'mıknatıs manyetik kapı pencere anahtar reed',
+  bmp280: 'basınç barometre rakım yükseklik sıcaklık sensörü i2c',
+  mpu6050: 'ivme ivmeölçer jiroskop gyro eğim denge hareket sensörü i2c',
+  joystick: 'analog kol oyun kumandası xy eksen ky-023',
+  encoder: 'döner enkoder ky-040 çevirmeli düğme knob dönüş',
+  keypad: 'tuş takımı 4x4 matris klavye şifre tuş',
+  rtc: 'saat gerçek zamanlı ds3231 tarih zaman pil i2c',
+  mq2: 'gaz duman sensörü lpg yanıcı mq-2 kaçak',
+  flame: 'alev yangın ateş sensörü kızılötesi',
+  sound: 'ses mikrofon sensörü gürültü alkış',
+  soil: 'toprak nem sensörü bitki sulama kapasitif',
   lcd1602: 'ekran lcd 16x2 hd44780 yazı display paralel', lcdI2c: 'ekran lcd 16x2 i2c pcf8574 yazı display',
 }
 

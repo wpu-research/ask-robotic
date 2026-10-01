@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PINS, type PartType } from './contract'
 import { PART_DEFS, localToWorld, partBounds, pinWorld } from './geometry'
 import { currentArrow, formatMeasurement, formatMilliamps, formatPinBalloon, formatVolts } from './measure'
-import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, pickerGroups } from './parts'
+import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups } from './parts'
 import { WARNING_META, warningMeta } from './warnings'
 
 const ALL = Object.keys(PINS) as PartType[]
@@ -45,14 +45,45 @@ describe('geometri: Aşama B', () => {
   })
 })
 
+describe('geometri: Aşama C', () => {
+  for (const t of STAGE_C_PARTS) {
+    it(`${t}: pinler sözleşmeyle birebir, sınır içinde, >= 10 px aralıklı, kendi etiketini çizer`, () => {
+      const d = PART_DEFS[t]
+      expect(Object.keys(d.pins).sort()).toEqual([...PINS[t]].sort())
+      expect(d.w).toBeGreaterThan(40)
+      const pts = Object.entries(d.pins)
+      for (const [n, p] of pts) {
+        expect(p.x, n).toBeGreaterThanOrEqual(0); expect(p.x, n).toBeLessThanOrEqual(d.w)
+        expect(p.y, n).toBeGreaterThanOrEqual(0); expect(p.y, n).toBeLessThanOrEqual(d.h)
+      }
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+        expect(Math.hypot(pts[i][1].x - pts[j][1].x, pts[i][1].y - pts[j][1].y), `${pts[i][0]}-${pts[j][0]}`).toBeGreaterThanOrEqual(10)
+      }
+      if (t !== 'reed') expect(d.ownLabels).toBe(true)
+    })
+  }
+  it('döndürme: Aşama C pinleri sınır kutusunda kalır', () => {
+    for (const t of STAGE_C_PARTS) for (const rotation of [0, 90, 180, 270] as const) {
+      const part = { type: t, x: 100, y: 50, rotation }
+      const b = partBounds(part)
+      for (const n of PINS[t]) {
+        const w = pinWorld(part, n)!
+        expect(w.x).toBeGreaterThanOrEqual(b.x - 0.001); expect(w.x).toBeLessThanOrEqual(b.x + b.w + 0.001)
+        expect(w.y).toBeGreaterThanOrEqual(b.y - 0.001); expect(w.y).toBeLessThanOrEqual(b.y + b.h + 0.001)
+      }
+    }
+  })
+})
+
 describe('palet', () => {
-  it('varsayılan = A + B', () => {
-    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS])
+  it('varsayılan = A + B + C', () => {
+    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS])
     expect(new Set(DEFAULT_PARTS).size).toBe(DEFAULT_PARTS.length)
   })
-  it('kategoriler: çıkış, giriş, aktif devre elemanları', () => {
+  it('kategoriler: çıkış, giriş, aktif devre elemanları, sensörler', () => {
     const g = pickerGroups(DEFAULT_PARTS, '')
-    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları'])
+    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler'])
+    expect(g[3].types).toEqual(STAGE_C_PARTS)
     expect(g[0].types).toContain('relay'); expect(g[1].types).toEqual(['button', 'pot', 'ldr', 'ntc']); expect(g[2].types).toContain('l293d')
     expect(g.flatMap((x) => x.types).sort()).toEqual([...DEFAULT_PARTS].sort())
   })
@@ -68,6 +99,21 @@ describe('palet', () => {
     expect(t('lcd').sort()).toEqual(['lcd1602', 'lcdI2c'])
     expect(t('Işık')).toContain('ldr')
     expect(t('xyz')).toEqual([])
+  })
+  it('arama: Aşama C Türkçe anahtar sözcükler', () => {
+    const t = (q: string) => pickerGroups(DEFAULT_PARTS, q).flatMap((x) => x.types)
+    expect(t('mesafe')).toEqual(['hcsr04'])
+    expect(t('Nem').sort()).toEqual(['dht', 'soil'])
+    expect(t('hareket')).toEqual(expect.arrayContaining(['pir', 'mpu6050']))
+    expect(t('mıknatıs')).toEqual(['reed'])
+    expect(t('Şifre')).toEqual(['keypad'])
+    expect(t('gaz')).toEqual(['mq2'])
+    expect(t('jiroskop')).toEqual(['mpu6050'])
+    expect(t('toprak')).toEqual(['soil'])
+    expect(t('saat')).toEqual(['rtc'])
+    expect(t('alev')).toEqual(['flame'])
+    expect(t('mikrofon')).toEqual(['sound'])
+    expect(t('enkoder')).toEqual(['encoder'])
   })
   it('Diğer: kategorisiz izinli tür görünür', () => {
     expect(pickerGroups(['uno', 'led'], '').map((x) => x.title)).toEqual(['Çıkış', 'Diğer'])

@@ -11,16 +11,19 @@ Bu proje öğrendiklerini birleştirir:
 - **Modül 3:** `millis()` ile bloklamayan kod (27. ders), butonla kenar algılama ve sıçrama önleme (8. ders), I2C LCD ekran (32. ve 33. dersler).
 - **Bu hafta:** RTC ile zaman (66), SD kart (67), CSV satırı ve zaman damgası (68), UART/I2C/SPI (69).
 
-Kayıt cihazı RTC'nin saniyesi 10'a bölünen her an bir satır üretir: 08:30:10, 08:30:20, 08:30:30 ... Bu satırlar Serial'e gider. Butona (D2) basınca kayıt durur, tekrar basınca devam eder. Ekranda üstte son ölçüm, altta saat ve kayıt durumu görünür. SD karta yazan sürüm, projenin ayrı bir kopyasıdır.
+Kayıt cihazı RTC'nin saniyesi 10'a bölünen her an bir satır üretir: 08:30:10, 08:30:20, 08:30:30 ... Bu satırlar Serial'e gider. Butona (D2) basınca kayıt durur, tekrar basınca devam eder. Ekranda üstte son ölçüm, altta saat ve kayıt durumu görünür. SD karta yazan sürüm, projenin ayrı bir kopyasıdır; laboratuvarda SD kart modülü olmadığı için onu okuma örneği olarak incelersin.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| DHT22 | Veri → **D5**, VCC → 5 V, GND → GND |
-| RTC modülü (DS3231, adres 0x68) | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND |
-| I2C LCD 16x2 (adres 0x27) | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND |
-| Buton "kayıt aç/kapat" | Bir ucu **D2**, öbür ucu GND (`INPUT_PULLUP`) |
-| SD kart modülü (yalnız SD sürümü) | CS → **D10**, MOSI → **D11**, MISO → **D12**, SCK → **D13**, VCC → 5 V (modül belgesine bak), GND → GND |
+| DHT22 (Tür: DHT22) | **DATA** → Uno **D5**, **VCC** → **5V**, **GND** → **GND** |
+| RTC (adres 0x68) | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → **5V**, **GND** → **GND** |
+| I2C LCD 16x2 (I2C adresi özelliği 0x27) | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → **5V**, **GND** → **GND** |
+| Buton "kayıt aç/kapat" | **A** → Uno **D2**, **B** → **GND** (`INPUT_PULLUP`) |
+
+SD kart modülü yalnız SD sürümü için gerekir (gerçek modülde CS → D10, MOSI → D11, MISO → D12, SCK → D13). Laboratuvarda SD parçası yok, bu yüzden devreye eklenmez.
 
 RTC ve LCD aynı iki kabloyu (SDA, SCL) paylaşır; adresleri (0x68 ve 0x27) farklı olduğu için karışmazlar (69. ders). Bu hafta D11, D12, D13 SD kart içindir; bu projede o pinlere LED bağlama. Bu devrede MPU6050 yok, 0x68 yalnız RTC'nin.
 
@@ -145,7 +148,7 @@ void loop() {
 }
 ```
 
-Serial Monitor'de şuna benzer bir çıktı görürsün:
+Seri monitörde şuna benzer bir çıktı görürsün (laboratuvarın RTC'si 2026-01-01 00:00:00'dan başladığı için satırlar `2026-01-01 00:00:10`, `2026-01-01 00:00:20` ... diye akar):
 
 ```
 zaman,sicaklik_C,nem_yuzde
@@ -302,7 +305,9 @@ void loop() {
 }
 ```
 
-SD kütüphanesi Uno için ucuz değildir. Bu dersin yazıldığı sırada, aynı programın derleme çıktısı SD'siz sürümde yaklaşık 570 bayt, SD'li sürümde yaklaşık 1290 bayt global değişken (RAM) kullandığını gösterdi. Uno'da toplam 2048 bayt SRAM var (34. ders). Flash kullanımı da yaklaşık 13 KB'dan 21 KB'a çıktı. Sayılar kütüphane ve derleyici sürümüne göre değişir; kendi derleme çıktına bak.
+SD kütüphanesi Uno için ucuz değildir. Aynı programın derleme çıktısı SD'siz sürümde yaklaşık 570 bayt, SD'li sürümde yaklaşık 1290 bayt global değişken (RAM) kullandığını gösterdi. Uno'da toplam 2048 bayt SRAM var (34. ders). Flash kullanımı da yaklaşık 13 KB'dan 21 KB'a çıktı. Sayılar kütüphane ve derleyici sürümüne göre değişir.
+
+Laboratuvarda SD modülü olmadığı için bu sürümü çalıştırırsan `SD.begin` kart bulamayıp takılır; başlık satırından sonra ekran ve kayıt ilerlemez. Gerçek bir kartta `SD.begin` `false` döner ve program yalnız uyarı yazıp çalışmayı sürdürür.
 
 ### Nasıl çalışıyor?
 1. `loop()` hiç `delay` kullanmaz (27. ders). Buton her turda, RTC ise 200 ms'de bir okunur.
@@ -317,18 +322,19 @@ Bir not: ekran ve kayıt için RTC'yi aynı turda tek kez okuyoruz (`t`). Bu yü
 ### Dene
 - `KAYIT_ARALIGI`'nı 30 yap. Satırlar hangi saniyelerde çıkıyor? 7 yaparsan satırlar saniyenin kaçında çıkıyor? 60'ı tam bölen değerlerde satırlar dakikanın hep aynı saniyelerine denk gelir; 7'de neden gelmez?
 - Ekranın alt satırına saati değil tarihi (`14.03`) yazdır. Hangi satırı değiştireceksin?
-- DHT22 okuması başarısız olduğunda (sensör kablosunu çıkar) ekranda ve CSV'de ne görüyorsun?
-- `veri_kaydedici_sd` içinde `DOSYA_ADI`'nı 8.3 kuralına uymayan bir adla değiştir. Program ne yapıyor? Sonucu Serial'de gör.
-- Sıcaklık 30 dereceyi geçince buzzer'ı (D8) çalan bir uyarı ekle. Hangi değişkeni kontrol edeceksin?
+- DHT22 okuması başarısız olduğunda ne olur? Programı ■ ile durdur, DHT'nin DATA kablosunu kaldır, yeniden ▶'e bas. Ekranda ve CSV'de ne görüyorsun?
+- `veri_kaydedici_sd` içinde `DOSYA_ADI`'nı 8.3 kuralına uymayan bir adla değiştirsen (gerçek kartta) `sdyeYaz` ne döndürür ve program Serial'e hangi uyarıyı yazar? Kodu okuyarak bul.
+- Sıcaklık 30 dereceyi geçince çalan bir buzzer uyarısı (D8) ekle: laboratuvara bir buzzer ekle, kodu yaz, DHT'nin sıcaklığını canlı olarak 31 °C yap. Hangi değişkeni kontrol edeceksin?
+- Butona basıp kaydı durdur, 30 saniye bekle, tekrar bas. Ekranın alt satırı ve CSV'deki zaman damgaları ne gösteriyor?
 
 ### Sık yapılan hatalar
 - `delay(10000)` ile 10 saniye beklemek: buton ve ekran 10 saniye boyunca donar. Bunun yerine RTC ya da `millis()` kullan.
 - RTC'yi `loop()`'un her turunda okumak ya da hiç okumamak: çok sık okumak I2C hattını gereksiz meşgul eder, çok seyrek okumak saniyeyi kaçırır.
 - Aynı saniyede satırı birden çok kez yazmak: `u != sonKayit` kontrolünü unutursan 200 ms'lik her turda bir satır çıkar.
-- RTC saatini ayarlamayı unutmak: satırlardaki zaman yanlış çıkar. 66. dersteki `lostPower()` kontrolünü ekle.
-- SD'ye yazarken dosyayı kapatmamak ya da kartı yazma sırasında çıkarmak (67. ders).
-- D11, D12, D13 pinlerine LED bağlayıp SD kartı da bağlamak: bu pinler SPI hatlarıdır.
-- LCD adresinin 0x27 olduğunu varsaymak: çalışmazsa adres tarama programıyla (33. ders) bul.
+- RTC saatini ayarlamayı unutmak: satırlardaki zaman yanlış çıkar. Gerçek modülde 66. dersteki `lostPower()` kontrolünü ekle; laboratuvarda saat 2026-01-01'den başlar, istersen `rtc.adjust` ile kur.
+- SD'ye yazarken dosyayı kapatmamak ya da (gerçek cihazda) kartı yazma sırasında çıkarmak (67. ders).
+- D11, D12, D13 pinlerine LED bağlayıp SD kartı da kullanmak: bu pinler SPI hatlarıdır.
+- LCD adresinin 0x27 olduğunu varsaymak: çalışmazsa adres tarama programıyla (33. ders) bul; laboratuvarda LCD'nin "I2C adresi" özelliği 0x27 mi diye bak.
 - DHT22'yi iki saniyeden sık okumak.
 
 ## Konuşalım

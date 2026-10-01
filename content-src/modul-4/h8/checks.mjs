@@ -3,161 +3,185 @@ import { createSim } from '../../../tools/sim/harness.mjs'
 
 // --- Yardımcılar -----------------------------------------------------------
 
-/** Tek bir basışı sıçramalı olarak üretir: [LOW, HIGH, LOW, HIGH, LOW] küçük aralıklarla, sonra kararlı LOW. */
-function siciramaliBas(sim, pin, aralikMs = [0.3, 0.4, 0.2, 0.3]) {
-  let seviye = false
-  sim.drive(pin, seviye)
-  for (const a of aralikMs) {
-    sim.run(a)
-    seviye = !seviye
-    sim.drive(pin, seviye)
-  }
-  assert.equal(seviye, false, 'sıçrama dizisi LOW ile bitmeli (basılı)')
-  sim.run(60)              // kararlı basılı
-  sim.drive(pin, true)     // bırak
-  sim.run(60)
-}
-
-/** Deterministik "gürültü": aynı sayı dizisi her çalıştırmada aynı çıkar (doğrusal eşleşik üreteç). */
-function gurultu(tohum = 12345) {
-  let s = tohum
-  return () => {
-    s = (s * 1103515245 + 12345) & 0x7fffffff
-    return (s / 0x7fffffff) * 2 - 1       // -1 ... +1
-  }
-}
+/** Seri çıktıdan "anahtar=değer" ya da "anahtar: değer" biçimindeki tam sayıları sırayla toplar. */
+const sayilar = (serial, anahtar) => [...serial.matchAll(new RegExp(`${anahtar}[=:]\\s*(-?\\d+)`, 'g'))].map((m) => Number(m[1]))
 
 /** Pin 13'ün (LED) değişim sayısı. */
-const gecisSayisi = (sim, pin = 13) => sim.pinEdges(pin, 1).length   // açılıştaki ilk LOW kaydını sayma
+const gecisSayisi = (sim, pin = 13) => sim.pinEdges(pin, 1).length   // açılıştaki ilk kaydı sayma
 
-/** Yavaşça yükselen bir gerilimi gürültüyle uygular: baslangic -> bitis V, adim sayısı kadar. */
-function rampaGurultulu(sim, kanal, baslangic, bitis, adim, genlik) {
-  const r = gurultu()
+/** Gerilimi yavaşça başlangiç -> bitis V arasında değiştirir (gürültüyü kodun kendisi ekler). */
+function rampa(sim, kanal, baslangic, bitis, adim, beklemeMs = 5) {
   for (let i = 0; i <= adim; i++) {
-    const v = baslangic + ((bitis - baslangic) * i) / adim + genlik * r()
-    sim.analog(kanal, v)
-    sim.run(4)
+    sim.analog(kanal, baslangic + ((bitis - baslangic) * i) / adim)
+    sim.run(beklemeMs)
   }
+}
+
+/** Butonu (INPUT_PULLUP, D2) basıp bırakır. */
+function bas(sim, tutMs = 100, sonraMs = 100) {
+  sim.drive(2, false)
+  sim.run(tutMs)
+  sim.drive(2, true)
+  sim.run(sonraMs)
 }
 
 // --- Kontroller ------------------------------------------------------------
 
 export default {
-  // Debouncesiz sayaç: tek fiziksel basış, sıçrama yüzünden birden çok kez sayılır.
-  sayac_ham(sim) {
-    sim.run(100)
-    siciramaliBas(sim, 2)
-    const sayilar = [...sim.serial.matchAll(/Sayac: (\d+)/g)].map((m) => Number(m[1]))
-    assert.equal(sayilar.length, 3, `5 kenarlı sıçrama dizisi 3 düşen kenar = 3 sayım bekleniyordu, çıktı: ${JSON.stringify(sim.serial)}`)
-  },
-
-  // Debounce'lu sayaç: aynı sıçramalı basış tam 1 kez sayılır; sonraki temiz basış 2.
-  sayac_temiz(sim) {
-    sim.run(100)
-    siciramaliBas(sim, 2)
-    assert.equal((sim.serial.match(/Sayac:/g) || []).length, 1, `tek basış = tek sayım, çıktı: ${JSON.stringify(sim.serial)}`)
-    assert.match(sim.serial, /Sayac: 1/)
-    // temiz ikinci basış
-    sim.drive(2, false); sim.run(80); sim.drive(2, true); sim.run(80)
-    assert.match(sim.serial, /Sayac: 2/)
-    // 5 ms'lik gerçek (çok kısa) bir parazit: 20 ms dolmadan bırakıldı, sayılmamalı
-    sim.drive(2, false); sim.run(5); sim.drive(2, true); sim.run(80)
-    assert.equal((sim.serial.match(/Sayac:/g) || []).length, 2, '5 ms\'lik parazit sayılmamalı')
-  },
-
-  // Tek eşik: gürültülü yükselen sinyalde LED eşik civarında birden çok kez gider gelir.
-  esik_ham(sim) {
-    sim.analog(0, 2.3)
-    sim.run(20)
-    rampaGurultulu(sim, 0, 2.3, 2.7, 200, 0.03)
-    sim.run(10)
-    const g = gecisSayisi(sim)
-    assert.ok(g >= 3, `gürültü eşik titremesi yaratmalı (>=3 geçiş), ${g} geçiş`)
-    assert.equal(sim.read(13), true, 'rampa sonunda LED yanık olmalı')
-  },
-
-  // Histerezis: aynı gürültülü rampada LED tam bir kez yanar.
-  esik_histerezis(sim) {
-    sim.analog(0, 2.3)
-    sim.run(20)
-    rampaGurultulu(sim, 0, 2.3, 2.7, 200, 0.03)
-    sim.run(10)
-    assert.equal(gecisSayisi(sim), 1, `histerezisle tek geçiş bekleniyordu, ${gecisSayisi(sim)}`)
-    assert.equal(sim.read(13), true)
-    // geri inerken de tek geçiş
-    rampaGurultulu(sim, 0, 2.7, 2.3, 200, 0.03)
-    sim.run(10)
-    assert.equal(gecisSayisi(sim), 2, 'inerken de tek geçiş (toplam 2)')
-    assert.equal(sim.read(13), false)
-  },
-
-  // EEPROM'daki sayaç: ilk açılış 1; EEPROM'u taşıyan ikinci "açılış" 2.
-  acilis_sayaci(sim, kaynak) {
-    sim.run(200)
-    assert.match(sim.serial, /Acilis no: 1/)
-    const hafiza = new Uint8Array(sim.eeprom.backend.memory)
-    assert.equal(hafiza[0], 1)
-    // kart yeniden başlıyor: aynı EEPROM ile yeni benzetim
-    const yeni = createSim(kaynak, { name: 'acilis_sayaci' })
-    yeni.eeprom.backend.memory.set(hafiza)
-    yeni.run(200)
-    assert.match(yeni.serial, /Acilis no: 2/)
-  },
-
-  // Yükleme doğrulaması: 1 Hz yanıp sönme, açılış mesajı ve tur sayacı.
-  yukleme_dogrulama(sim) {
-    sim.run(3100)
-    assert.match(sim.serial, /^Kart hazir\r?\n/)
-    const w = sim.wave(13, 0, 3100)
-    assert.ok(Math.abs(w.hz - 1) < 0.05 && Math.abs(w.duty - 0.5) < 0.05, `1 Hz %50 bekleniyordu: ${w.hz.toFixed(2)} Hz, duty ${w.duty.toFixed(2)}`)
-    assert.match(sim.serial, /Tur: 3\r?\n/)
-    assert.doesNotMatch(sim.serial, /Tur: 4/)
-  },
-
-  // ADC -> volt dönüşümü: uygulanan gerilimle yazılan değer tutarlı.
-  adc_voltmetre(sim) {
-    sim.analog(0, 3.3)
+  // ADC basamağı: 2,5 V -> 512 (yuvarlama), 5 V -> 1023, mV hesabı basamak hatası içerir.
+  adc_basamak(sim) {
+    sim.analog(0, 2.5)
     sim.run(1200)
-    const s = [...sim.serial.matchAll(/ADC=(\d+) V=([\d.]+)/g)].map((m) => ({ adc: Number(m[1]), v: Number(m[2]) }))
-    assert.ok(s.length >= 2, `en az 2 satır bekleniyordu: ${JSON.stringify(sim.serial)}`)
-    const son = s.at(-1)
-    assert.ok(Math.abs(son.v - 3.3) < 0.03, `3,3 V bekleniyordu, ${son.v}`)
-    assert.ok(Math.abs(son.adc - 675) <= 2, `ADC ~675 bekleniyordu, ${son.adc}`)
+    assert.match(sim.serial, /ADC=512 mV=2502\.4\r?\n/, JSON.stringify(sim.serial))
+    // iki basamak arası: 2,505 V bir üst basamağa geçer
+    sim.analog(0, 2.505)
+    sim.run(700)
+    assert.match(sim.serial, /ADC=513 mV=2507\.3\r?\n/)
     sim.analog(0, 0)
     sim.run(700)
-    assert.match(sim.serial, /ADC=0 V=0\.00\s*$/)
+    assert.match(sim.serial, /ADC=0 mV=0\.0\r?\n$/)
+    sim.analog(0, 5)
+    sim.run(700)
+    assert.match(sim.serial, /ADC=1023 mV=5000\.0\r?\n$/)
   },
 
-  // Satır protokolü: bayt arası bekleyerek komut gönder, cevap ve pin durumunu doğrula.
-  komut_ayristirici(sim) {
+  // Sahte gürültü: tek okuma ±8 oynar, 16'lık ortalama çok daha az.
+  gurultu_ortalama(sim) {
+    sim.analog(0, 2.5)                         // ADC 512, laboratuvarda sabit
+    sim.run(9000)
+    const tek = sayilar(sim.serial, 'Tek')
+    const ort = sayilar(sim.serial, 'Ort16')
+    assert.ok(tek.length >= 25 && ort.length === tek.length, `satır sayısı: ${tek.length}/${ort.length}`)
+    assert.ok(tek.every((v) => v >= 504 && v <= 520), `tek okuma 504-520 olmalı: ${tek}`)
+    const yayilim = (a) => Math.max(...a) - Math.min(...a)
+    assert.ok(yayilim(tek) >= 12, `tek okuma gerçekten oynamalı (yayılım ${yayilim(tek)})`)
+    assert.ok(ort.every((v) => v >= 508 && v <= 516), `ortalama 508-516 olmalı: ${ort}`)
+    assert.ok(yayilim(ort) <= yayilim(tek) / 2, `ortalama en az yarı kadar sakin olmalı: tek ${yayilim(tek)}, ort ${yayilim(ort)}`)
+  },
+
+  // Tek eşik: eşik değerinde (512) sabit sinyalde bile LED titrer.
+  esik_ham(sim) {
+    sim.analog(0, 2.5)
+    sim.run(2000)
+    const g = gecisSayisi(sim)
+    assert.ok(g >= 40, `gürültü eşik titremesi yaratmalı (>=40 geçiş), ${g} geçiş`)
+  },
+
+  // Histerezis: sabit 512'de hiç geçiş yok; yükselen rampada tek, inen rampada tek geçiş.
+  esik_histerezis(sim) {
+    sim.analog(0, 2.5)
+    sim.run(2000)
+    assert.equal(gecisSayisi(sim), 0, 'eşik bandının içinde LED hiç değişmemeli')
+    assert.equal(sim.read(13), false)
+    rampa(sim, 0, 2.5, 3.0, 300)
+    sim.run(50)
+    assert.equal(gecisSayisi(sim), 1, `yükselirken tek geçiş bekleniyordu, ${gecisSayisi(sim)}`)
+    assert.equal(sim.read(13), true)
+    rampa(sim, 0, 3.0, 2.5, 300)
+    sim.run(50)
+    assert.equal(gecisSayisi(sim), 1, 'band içine inince LED yanık kalmalı (histerezis)')
+    rampa(sim, 0, 2.5, 2.0, 300)
+    sim.run(50)
+    assert.equal(gecisSayisi(sim), 2, 'bandın altına inince tek geçişle sönmeli')
+    assert.equal(sim.read(13), false)
+  },
+
+  // Sıçramalı buton: tek basış + bırakış = 3 + 2 sahte sayım; LED tek sayıda değişim = yanık.
+  sayac_ham(sim) {
     sim.run(100)
-    const gonder = (metin) => { for (const c of metin) { sim.sendSerial(c); sim.run(3) } sim.run(20) }
-    gonder('LED:1\n')
-    assert.equal(sim.read(13), true, 'LED:1 sonrası D13 HIGH')
-    assert.match(sim.serial, /OK LED=1\r?\n/)
-    gonder('DURUM?\r\n')                   // Windows satır sonu da kabul
-    assert.match(sim.serial, /LED=1\r?\n(?!.*OK)/s)
-    gonder('LED:0\n')
+    bas(sim)
+    const s = sayilar(sim.serial, 'Sayac')
+    assert.deepEqual(s, [1, 2, 3, 4, 5], `tek basış+bırakış 5 sayım bekleniyordu: ${JSON.stringify(sim.serial)}`)
+    assert.equal(sim.read(13), true, '5 sayım = tek sayıda LED değişimi: yanık')
+  },
+
+  // Debounce: aynı sahte sıçrama tek sayım olur; sonraki basış 2; 20 ms'ten kısa gerçek basış sayılmaz (bekleme süresinin bedeli).
+  sayac_temiz(sim) {
+    sim.run(100)
+    bas(sim)
+    assert.deepEqual(sayilar(sim.serial, 'Sayac'), [1], `tek basış tek sayım: ${JSON.stringify(sim.serial)}`)
+    assert.equal(sim.read(13), true)
+    bas(sim)
+    assert.deepEqual(sayilar(sim.serial, 'Sayac'), [1, 2])
+    assert.equal(sim.read(13), false, 'ikinci sayımda LED söner')
+    // 10 ms'lik gerçek basış (20 ms'ten kısa) sayılmaz: bekleme süresinin bedeli
+    bas(sim, 10, 100)
+    assert.deepEqual(sayilar(sim.serial, 'Sayac'), [1, 2], '20 ms dolmadan bırakılan basış sayılmamalı')
+    // 30 ms'lik basış sayılır
+    bas(sim, 30, 100)
+    assert.deepEqual(sayilar(sim.serial, 'Sayac'), [1, 2, 3])
+  },
+
+  // delay(500) içinde kısa basış kaçar; uzun basış en çok 500 ms gecikmeyle görülür.
+  tepki_delay(sim) {
+    sim.run(50)                                  // loop ilk turunu bitirdi, delay'e girdi
+    bas(sim, 100, 700)                           // 100 ms'lik basış delay içinde kalır
+    assert.doesNotMatch(sim.serial, /BASILDI/, 'kısa basış delay yüzünden kaçmalı')
     assert.equal(sim.read(13), false)
-    assert.match(sim.serial, /OK LED=0\r?\n/)
-    gonder('DURUM?\n')
-    assert.match(sim.serial, /LED=0\r?\n$/)
-    // Tanınmayan komut LED'e dokunmaz
-    gonder('LED:7\n')
-    assert.match(sim.serial, /HATA: LED:7\r?\n/)
+    sim.drive(2, false)                          // uzun basış
+    sim.run(600)
+    assert.match(sim.serial, /BASILDI/, 'uzun basış en geç 500 ms içinde görülmeli')
+    sim.drive(2, true)
+    sim.run(600)
+  },
+
+  // millis ile: aynı kısa basış anında görülür, LED hemen tepki verir; yavaş iş de çalışır.
+  tepki_millis(sim) {
+    sim.run(50)
+    sim.drive(2, false)
+    sim.run(5)
+    assert.equal(sim.read(13), true, 'LED butona ms içinde tepki vermeli')
+    sim.run(95)
+    sim.drive(2, true)
+    sim.run(5)
     assert.equal(sim.read(13), false)
-    // Yarım gelen satır işlenmez: sadece "LED:" gönder, sonra tamamla
-    gonder('LED:')
+    assert.match(sim.serial, /BASILDI/)
+    sim.run(1200)
+    const tik = (sim.serial.match(/tik/g) || []).length
+    assert.ok(tik >= 2, `yavaş iş de 500 ms'de bir çalışmalı (tik: ${tik})`)
+  },
+
+  // İki nokta kalibrasyonu: kuru 4,5 V -> %0, ıslak 1,5 V -> %100, ortası %50; uçlar kırpılır.
+  nem_kalibrasyon(sim) {
+    const son = () => sim.serial.trim().split(/\r?\n/).at(-1)
+    sim.analog(0, 4.5)                           // nem 0
+    sim.run(1100)
+    assert.match(son(), /^Ham=921 Nem: 0%$/, son())
+    sim.analog(0, 1.5)                           // nem 1
+    sim.run(700)
+    assert.match(son(), /^Ham=307 Nem: 100%$/, son())
+    sim.analog(0, 3.0)                           // nem 0,5
+    sim.run(700)
+    assert.match(son(), /^Ham=614 Nem: 50%$/, son())
+    // uçların dışı kırpılır (constrain)
+    sim.analog(0, 5)
+    sim.run(700)
+    assert.match(son(), /Nem: 0%$/)
+    sim.analog(0, 0.5)
+    sim.run(700)
+    assert.match(son(), /Nem: 100%$/)
+    // 3V3 beslemede aynı toprak (nem 0,5 -> AO 1,98 V) yanlış yüzde verir
+    sim.analog(0, 1.98)
+    sim.run(700)
+    const yanlis = Number(son().match(/Nem: (\d+)%/)[1])
+    assert.ok(yanlis >= 83 && yanlis <= 85, `3V3'te eski kalibrasyon ~%84 demeli, ${yanlis}`)
+  },
+
+  // Fail-safe: yankı yoksa "YOK" ve LED kapalı; 15 cm'de LED yanar; 100 cm'de söner.
+  mesafe_veya_yok(sim) {
+    const u = sim.hcsr04({ trig: 9, echo: 10, cm: 100 })
+    const son = () => sim.serial.trim().split(/\r?\n/).at(-1)
+    sim.run(500)
+    assert.match(son(), /^(99|100)\.\d cm$/, son())
     assert.equal(sim.read(13), false)
-    gonder('1\n')
-    assert.equal(sim.read(13), true, 'parçalı gelen satır tamamlanınca işlenmeli')
-    // Tampondan uzun satır: HATA, LED değişmez
-    gonder('LED:0' + 'X'.repeat(30) + '\n')
-    assert.match(sim.serial, /HATA: satir cok uzun/)
-    assert.equal(sim.read(13), true, 'uzun satır komut sayılmamalı')
-    // Taşmadan sonra protokol normale döner
-    gonder('LED:0\n')
-    assert.equal(sim.read(13), false)
+    u.cm = 15
+    sim.run(400)
+    assert.match(son(), /^1[45]\.\d cm$/, son())
+    assert.equal(sim.read(13), true, '20 cm altında LED yanmalı')
+    u.cm = 450                                   // menzil dışı = beslenmeyen sensörle aynı: echo yok
+    sim.run(500)
+    assert.equal(son(), 'YOK')
+    assert.equal(sim.read(13), false, 'sensör sessizken LED kapalı (güvenli)')
   },
 
   // Katman katman doğrulama: cihazı bağlayıp/bağlamayarak ve değeri bozarak hangi katmanın hata verdiğini ölç.

@@ -6,16 +6,21 @@ Denizaltı filmlerinde "bip... bip..." diye ekranda dönen bir sonar vardır. So
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| HC-SR04 VCC / GND | 5 V / GND |
-| HC-SR04 TRIG | **D9** |
-| HC-SR04 ECHO | **D10** |
-| Servo sinyal (turuncu/sarı) | **D6** |
-| Servo + (kırmızı) | **Harici 5 V** (ayrı güç kaynağı ya da pil kutusu) |
-| Servo − (kahverengi/siyah) | GND ve **Arduino GND'siyle ortak** |
+| HC-SR04 VCC | Uno **5V** |
+| HC-SR04 GND | Uno **GND** |
+| HC-SR04 TRIG | Uno **D9** |
+| HC-SR04 ECHO | Uno **D10** |
+| Servo SIG | Uno **D6** |
+| Servo VCC | Uno **5V** |
+| Servo GND | Uno **GND** |
 
-**Güç uyarısı (21. dersten):** servo hareket ederken ani akım çeker. Uno'nun 5 V pininden beslersen kart sıfırlanabilir ya da sensör ölçümleri bozulur. Servoyu ayrı bir 5 V kaynaktan besle ve kaynağın GND'sini Arduino GND'sine bağla. Pil kullanıyorsan uç kısa devre olmasın ve kutuplar ters bağlanmasın. HC-SR04'ü servonun koluna sabitle (çift taraflı bant ya da küçük bir parça yeter). Kablolar servo dönerken gerilmesin.
+Bilgi notu (21. dersten): servo hareket ederken ani akım çeker. Gerçek bir devrede bu akım Uno'nun 5 V hattını çökertip kartı sıfırlayabilir ya da sensör ölçümlerini bozabilir; bu yüzden gerçek projelerde servo ayrı bir 5 V kaynaktan beslenir ve GND'ler ortak yapılır. Laboratuvarda harici güç kaynağı yoktur, servoyu Uno'nun 5V ve GND pinlerine bağlarsın.
+
+**Laboratuvarda sensör servoyla birlikte dönmez.** Gerçek sonarda HC-SR04, servonun koluna sabitlidir ve servo döndükçe farklı yönlere bakar. Laboratuvarda sensörün tek bir **Mesafe** değeri vardır. Farklı yönlerde farklı nesneler olduğunu taklit etmek için program çalışırken Mesafe'yi kendin değiştirirsin. Örneğin servo 120° civarındayken Mesafe'yi 35 cm yap, sonra 200 cm'ye geri getir. Seri monitörde `120:35.0` satırını görürsün.
 
 ### Fikir
 Servo açısını 0°'den 180°'ye 30°'lik adımlarla artırırız. Her adımda:
@@ -197,11 +202,12 @@ Burada tarama bir fonksiyona taşındı: `enYakinAciBul()` açıyı döndürür.
 ### Dene
 - `ADIM` değerini 15 ve 10 yap. Tarama kaç saniye sürüyor? Çözünürlük arttıkça ne kaybediyorsun? (Hesapla: adım sayısı × yaklaşık 400 ms.)
 - Taramayı geri dönerken de yap (180°'den 0°'ye) ve iki yönün sonuçlarını karşılaştır. Aynı mı çıkıyor?
-- `sonar_tarama` çıktısını bir sayfaya çiz: açı yatay eksen, mesafe dikey eksen. Nesne nerede "çukur" olarak görünüyor?
+- `sonar_tarama` çıktısını bir tablo programına yapıştırıp grafik çiz: açı yatay eksen, mesafe dikey eksen. Nesne nerede "çukur" olarak görünüyor?
 
 ### Sık yapılan hatalar
-- Servoyu Uno'nun 5 V'una bağlamak ve ortak GND'yi unutmak: kart sıfırlanır, sensör saçmalar.
-- Servo kolunu zorla çevirmek: dişliler bozulur. Yalnızca kodla döndür.
+- Servonun VCC ya da GND kablosunu çekmeyi unutmak: servo hiç hareket etmez, laboratuvar "beslenmemiş" uyarısı verir.
+- `servo.attach(SERVO_PIN)` satırını unutmak: `servo.write` çağrıları servoyu oynatmaz.
+- Gerçek devrede servoyu ve sensörü aynı zayıf 5 V hattından beslemek ve ortak GND'yi unutmak: kart sıfırlanır, sensör saçmalar.
 - Hareket bitmeden ölçmek: açı ile mesafe eşleşmez. `delay(300)` bunun içindir.
 - Sensörün ışın genişliğini unutmak: veri sayfasında ölçüm açısı tipik olarak yaklaşık 15° civarında verilir, yani sensör tek bir çizgiye değil bir koniye bakar. 30°'lik adımlar bazı nesneleri iki komşu açıda birden gösterebilir ya da hiç göstermeyebilir.
 - `enYakin` değerini çok büyük başlatmamak (0 ile başlamak gibi): hiçbir ölçüm "daha küçük" olamaz.

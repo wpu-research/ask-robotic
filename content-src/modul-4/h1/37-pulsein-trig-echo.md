@@ -6,13 +6,17 @@ Geçen derste sensörün bize mesafeyi değil bir süre verdiğini öğrendin: E
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| HC-SR04 VCC | 5 V |
-| HC-SR04 TRIG | **D9** |
-| HC-SR04 ECHO | **D10** |
-| HC-SR04 GND | GND |
-| LED + 330 Ω direnç (ikinci program) | **D13** → direnç → LED anodu; katot → GND |
+| HC-SR04 VCC | Uno **5V** |
+| HC-SR04 TRIG | Uno **D9** |
+| HC-SR04 ECHO | Uno **D10** |
+| HC-SR04 GND | Uno **GND** |
+| LED + 330 Ω direnç (ikinci program) | Uno **D13** → direnç **1**; direnç **2** → LED **A**; LED **K** → Uno **GND** |
+
+Sensörü seçip sağ paneldeki **Mesafe** değerini değiştirerek "nesneyi" yaklaştırıp uzaklaştırabilirsin; bunu program çalışırken de yapabilirsin.
 
 ### Ölçümün üç adımı
 1. **Tetikle:** TRIG'i 2 µs LOW tut (temiz başlangıç), sonra 10 µs HIGH yap, sonra tekrar LOW. 10 µs'lik bu darbe sensöre "ölç" der. Mikrosaniye bekleme için `delayMicroseconds()` kullanılır (`delay` milisaniyedir).
@@ -134,11 +138,12 @@ void loop() {
 }
 ```
 
-NewPing'in `ping_cm()` fonksiyonu doğrudan tam santimetre verir; kendi içindeki sabit 1 cm için 57 µs aldığından sonucu bizim 0,0343 formülümüzden birkaç yüzde farklı çıkabilir (benzetimde 100 cm'lik bir mesafe için `ping_cm()` 102 verdi). Bu modülde `pulseIn` ile devam edeceğiz, çünkü süre, tetik ve çeviri adımlarını görmek asıl amaç. Kütüphane işi kısaltır ama içinde ne olduğunu bilmek senin işin.
+NewPing'in `ping_cm()` fonksiyonu doğrudan tam santimetre verir; kendi içindeki sabit 1 cm için 57 µs aldığından sonucu bizim 0,0343 formülümüzden birkaç yüzde farklı çıkabilir (laboratuvarda 100 cm'lik bir mesafe için `ping_cm()` 102 verdi). Bu modülde `pulseIn` ile devam edeceğiz, çünkü süre, tetik ve çeviri adımlarını görmek asıl amaç. Kütüphane işi kısaltır ama içinde ne olduğunu bilmek senin işin.
 
 ### Dene
-- `mesafe_pulsein` programında elini sensöre 5 cm yaklaştır, sonra 1 cm'ye. 1 cm'de ne yazıyor? Neden?
-- `delay(200)` yerine `delay(20)` yaz. Ölçüm kararlı kalıyor mu? Gerçek devrede çok yakın ölçümlerin arasında bu süre neden önemlidir?
+- `mesafe_pulsein` programı çalışırken özellik panelinden Mesafe'yi önce 5 cm, sonra en düşük değer olan 2 cm yap. Okuma doğru mu? Veri sayfasına göre 2 cm'den yakın nesneler ölçülemez; panel de zaten 2 cm'nin altına inmez.
+- "Yansıma yok" durumunu görmek için programı ■ ile durdur, ECHO kablosunu sil ve yeniden ▶'e bas. Ne yazıyor? Zaman aşımı olmasaydı ne olurdu?
+- `delay(200)` yerine `delay(20)` yaz. Laboratuvarda ölçüm değişiyor mu? Gerçek sensörde ölçümler arasındaki bekleme neden önemlidir? (Önceki ölçümün yankısı sönmeden yenisi başlarsa ikisi karışabilir.)
 - `mesafe_fonksiyon_led` programında LED'in yanma eşiğini 15 cm yap. Sonra eşiği dışarıdan değiştirebilmek için bir sabit olarak yaz.
 
 ### Sık yapılan hatalar

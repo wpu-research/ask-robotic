@@ -8,22 +8,27 @@ Mağaza girişinde kapıya yaklaşınca kendiliğinden açılan ışıkları, ko
 ### PIR nedir?
 PIR (pasif kızılötesi) sensör, çevredeki **kızılötesi (ısı) ışınımının değişimini** algılar. Sıcak bir cisim (insan, hayvan) sensörün görüş alanında hareket edince ışınım değişir ve sensör çıkışını HIGH yapar. Duran bir cisim ya da yavaş yavaş değişen ortam sıcaklığı bu değişimi yaratmaz. "Pasif" demek, kendisi ışık göndermez, yalnız dinler demektir (36. dersteki ultrasonik sensör ise ses gönderip dönmesini bekliyordu).
 
-PIR modülünün üç ucu vardır: VCC, OUT, GND. Besleme gerilimi modüle göre değişir; veri sayfasına bak. OUT ucu Arduino için basit bir dijital girişten ibarettir: hareket varken HIGH, yokken LOW.
+PIR modülünün üç ucu vardır: VCC, OUT, GND. Gerçek modüllerde besleme gerilimi modüle göre değişir (veri sayfasına bakılır); laboratuvardaki PIR 5 V ile çalışır. OUT ucu Arduino için basit bir dijital girişten ibarettir: hareket varken HIGH, yokken LOW.
 
-Birçok modülde üzerinde iki ayar vidası ve bir atlama pimi bulunur. Vidalar genelde algılama hassasiyetini ve çıkışın HIGH kalma süresini ayarlar; atlama pimi ise hareket sürerken çıkışın uzamasını ("yeniden tetikleme") açıp kapatır. Hangi vidanın ne yaptığı ve değer aralıkları **modüle göre değişir**; kendi modülünün belgesine bak.
+Gerçek modüllerin çoğunda iki ayar vidası ve bir atlama pimi bulunur. Vidalar genelde algılama hassasiyetini ve çıkışın HIGH kalma süresini ayarlar; atlama pimi ise hareket sürerken çıkışın uzamasını ("yeniden tetikleme") açıp kapatır. Hangi vidanın ne yaptığı **modüle göre değişir**. Laboratuvardaki PIR'da vida yoktur; hareket bittikten sonra çıkışı **3 saniye** HIGH tutar.
 
-**Isınma süresi:** PIR açıldığında kendini çevreye alıştırmak için bir süre bekler. Bu sırada çıkışı gelişigüzel HIGH-LOW yapabilir. Gerçek modüllerde bu süre genelde yarım dakika ile bir dakika civarındadır, ama **modüle göre değişir**. Bu yüzden alarm gibi uygulamalarda açılıştan sonra bir süre PIR'ı yok sayarız.
+**Isınma süresi:** PIR açıldığında kendini çevreye alıştırmak için bir süre bekler. Bu sırada çıkışı gelişigüzel HIGH-LOW yapabilir. Gerçek modüllerde bu süre genelde yarım dakika ile bir dakika civarındadır, ama **modüle göre değişir**. Laboratuvar dersi hızlandırmak için bunu **2 saniyeye** kısaltır: ▶'e bastıktan sonraki ilk 2 saniyede çıkış parazitli oynar ve **Hareket** kutusu yok sayılır. Bu yüzden alarm gibi uygulamalarda açılıştan sonra bir süre PIR'ı yok sayarız.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| PIR modülü | VCC → 5 V (modülün belgesine bak), GND → GND, OUT → **D2** |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| PIR | VCC → 5V, GND → GND, OUT → **D2** |
+| Direnç (330 Ω) | 1 → **D13**, 2 → LED A |
+| LED | A → direncin 2 ucu, K → GND |
+
+PIR'a hareket vermek için parçayı seç ve özellik panelinden **Hareket** kutusunu işaretle; kutuyu kaldırınca hareket biter. Çalışırken de değiştirebilirsin.
 
 PIR'ın OUT ucu kendi gerilimini taşıdığı için `INPUT_PULLUP` kullanmıyoruz; düz `INPUT` yeter.
 
 ### Program
-Önce ısınma, sonra kenar algılama (6. ve 8. derslerdeki "değişimi yakala" fikri aynen geçerli). Dersin sketch'inde ısınmayı 5 saniye tuttuk ki denemesi kolay olsun. Gerçek modül için bu süreyi uzatmak sana kalmış.
+Önce ısınma, sonra kenar algılama (6. ve 8. derslerdeki "değişimi yakala" fikri aynen geçerli). Dersin sketch'inde ısınmayı 5 saniye tuttuk; laboratuvarın kendi ısınması 2 saniye olduğu için sketch'in beklemesi yeterlidir. Gerçek modülde bu süreyi uzatman gerekir.
 
 ```cpp
 // sketch: pir_isinma
@@ -102,16 +107,17 @@ void loop() {
 4. Süre karşılaştırmasında çıkarma kullanıldı (`simdi - sonHareket`). Nedenini 27. derste görmüştün.
 
 ### Dene
-- `pir_isinma` ile ısınma sırasında önünden geç. Sonuç yazdırılıyor mu? Isınma bitince geç, şimdi ne oluyor?
-- `BOS_SURE` değerini 1 saniye ve 10 saniye yap. Hangi değer bir odada oturan, az kıpırdayan birine daha uygun?
-- Modülün üzerindeki ayar vidalarını (varsa) çevir ve çıkışın ne kadar HIGH kaldığını `Serial.println(millis())` ile ölç. Hareketin başladığı ve bittiği anların farkını hesapla.
+- `pir_isinma` ile ▶'e bastıktan sonra ilk 5 saniye içinde **Hareket** kutusunu işaretle. Sonuç yazdırılıyor mu? Isınma bitince işaretle, şimdi ne oluyor?
+- `pir_isinma` içindeki ısınma bekleme döngüsünü sil ve ilk 2 saniyede seri monitörü izle. Hareket yokken bile "Hareket var" yazdığını görürsün; bu, ısınma parazitidir.
+- `BOS_SURE` değerini 1 saniye ve 10 saniye yap. Laboratuvardaki PIR hareket bittikten sonra çıkışı zaten 3 saniye HIGH tuttuğu için `BOS_SURE` bunun **üstüne** biner. Hangi değer bir odada oturan, az kıpırdayan birine daha uygun?
+- Kutuyu kaldırdığın an ile "Hareket bitti" mesajının geldiği an arasındaki farkı `Serial.println(millis())` ile ölç. Kaç saniye çıkıyor?
 
 ### Sık yapılan hatalar
 - Isınmayı beklememek: açılıştan hemen sonra gelen yalancı HIGH'lar alarm çaldırır.
 - PIR'ı `INPUT_PULLUP` ile okumak ya da mantığı ters yazmak: PIR'da hareket varken çıkış HIGH'tır, butondaki gibi LOW değil.
 - Her turda mesaj yazdırmak: kenar kontrolü olmadan Serial Monitor dolup taşar.
 - Sensörü güneş alan pencereye, kalorifer ya da klima önüne yerleştirmek: ısı değişimleri hareket gibi görünebilir.
-- Modülün besleme gerilimine bakmamak: PIR modülleri aynı değildir; belgesine bak.
+- PIR'ın VCC ya da GND ucunu bağlamamak: modül beslenmez, çıkışı hep LOW kalır ve laboratuvar "beslenmemiş" uyarısı verir.
 
 ## Konuşalım
 Odasında hiç kıpırdamadan uyuyan biri PIR için "orada kimse yok" demek midir? PIR'ın göremediği başka hangi durumlar olabilir, bir alarm sistemi bunu nasıl telafi eder?

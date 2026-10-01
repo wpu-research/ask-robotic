@@ -6,18 +6,24 @@ Oyun kolunu tuttuğunda parmağın hem sağa-sola hem yukarı-aşağı gidebilir
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Joystick modülü VCC | 5 V |
-| Joystick modülü GND | GND |
-| Joystick VRx (X ekseni) | **A0** |
-| Joystick VRy (Y ekseni) | **A1** |
+| Joystick VCC | 5V |
+| Joystick GND | GND |
+| Joystick VRX (X ekseni) | **A0** |
+| Joystick VRY (Y ekseni) | **A1** |
 | Joystick SW (düğme) | **D2** (`INPUT_PULLUP`) |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| Direnç (330 Ω) 1 | **D13** |
+| Direnç 2 | LED **A** (anot) |
+| LED **K** (katot) | GND |
+
+Joystick'i seçince sağ panelde **X ekseni**, **Y ekseni** (0 ile 1 arası) ve **Düğme basılı** özellikleri çıkar; bunları program çalışırken de değiştirebilirsin. Direncin değerini özellik panelinden 330 Ω yap.
 
 Joystick aslında birbirine dik iki **potansiyometredir** (11. ders) ve basılabilen bir düğmedir. Kol ortadayken her potansiyometrenin silgisi yaklaşık yarıda durur, yani `analogRead` yaklaşık 512 verir. Kolu ucuna kadar itince değer 0'a ya da 1023'e yaklaşır. SW düğmesi basılınca GND'ye bağlanır; `INPUT_PULLUP` (6. ders) kullandığımız için basılı düğme `LOW` okunur.
 
-Modülün üzerindeki yön yazıları üreticiye göre değişir. Hangi yönün artı, hangisinin eksi olduğunu aşağıdaki ilk programla kendin bul.
+Gerçek modüllerde yön yazıları üreticiye göre değişir; hangi yönün artı olduğunu ilk programla denerek bulursun. Laboratuvarda X (ya da Y) özelliği büyüdükçe `analogRead` değeri de büyür.
 
 ### Program 1: Ham değerleri oku
 ```cpp
@@ -41,12 +47,14 @@ void loop() {
   delay(200);
 }
 ```
-Seri Ekran'ı aç, kolu bırak, sonra her yöne it. Değerlerin 0 ile 1023 arasında gezindiğini görürsün. Kol bırakılmışken X ve Y büyük olasılıkla tam 512 olmayacak; örneğin 497 ya da 530 çıkabilir. Bu normaldir: iki potansiyometre de kusursuz yarıda durmaz.
+▶'e bas ve seri monitörü izle. Joystick'in **X ekseni** özelliği 0,5 iken `X` yaklaşık 512 çıkar (0,5 × 5 V = 2,5 V). X'i 0'a çek: değer 0'a düşer; 1'e çek: 1023'e çıkar. Y için de aynısını dene. **Düğme basılı** kutusunu işaretlersen `BUTON=1` olur.
+
+Gerçek bir modülde kol bırakılmışken X ve Y tam 512 olmaz; örneğin 497 ya da 530 çıkar, çünkü iki potansiyometre de kusursuz yarıda durmaz. Bunu laboratuvarda taklit edebilirsin: X ekseni özelliğini 0,52 yap, değer yaklaşık 532 olur.
 
 ### Orta nokta kalibrasyonu ve ölü bölge
 14. derste kalibrasyonu öğrendin. Joystick için iki iş yapılır:
 
-1. **Orta noktayı ölç.** Program açılırken kol bırakılmış varsayılır. 16 okumanın ortalaması "merkez" olarak saklanır.
+1. **Orta noktayı ölç.** Program açılırken kolun bırakılmış olduğu varsayılır. 16 okumanın ortalaması "merkez" olarak saklanır.
 2. **Ölü bölge ekle.** Merkezin etrafında küçük bir aralıkta (burada ±40) değer sıfır sayılır. Böylece elin titremesi ya da potansiyometrenin küçük kayması robotu ya da servoyu oynatmaz.
 
 Merkezden uzaklığı `-100 ... +100` aralığına `map` ile (14. ders) çeviririz. Ölü bölge dışı kısım yeniden ölçeklenir; böylece değer ölü bölgenin hemen dışında 0'dan başlar, aniden 40'a sıçramaz.
@@ -130,20 +138,20 @@ void loop() {
 2. `eksen` önce merkezden farkı bulur. Fark ölü bölgenin içindeyse 0 döner.
 3. Fark pozitifse `map` ile `OLU_BOLGE ... (1023 − merkez)` aralığı `0 ... 100` aralığına çevrilir. Negatifse `-OLU_BOLGE ... -merkez` aralığı `0 ... -100` olur. Merkez 512 değilse iki yarı farklı uzunlukta olur; böyle yapınca iki uçta da tam ±100'e ulaşırsın.
 4. `constrain` hesaptaki küçük taşmaları keser.
-5. `yonAdi` hangi eksen daha büyükse onu seçer. Y ekseninin artı yönü modülden modüle değişir; "YUKARI" ve "ASAGI" etiketlerini kendi modülüne göre değiştirebilirsin.
+5. `yonAdi` hangi eksen daha büyükse onu seçer. Gerçek modüllerde Y ekseninin artı yönü modülden modüle değişir; laboratuvarda Y büyüdükçe "YUKARI" yazar. Başka bir modülde ters çıkarsa etiketleri değiştirirsin.
 6. Düğme için 8. dersteki kenar algılama kullanıldı: yalnızca basıldığı an bir kez çalışır, basılı tutmak LED'i yanıp söndürmez.
 
 ### Dene
-- `OLU_BOLGE` değerini 10 yap, sonra 120 yap. Kolu bırakmışken değer sıfırda kalıyor mu? Kolu itince ne zaman tepki veriyor?
-- `joystick_kalibre` programını kol itilmiş halde başlat (yani merkezi yanlış ölç). Ne olur? Neden?
-- X eksenine göre D13'teki LED'in parlaklığını değiştir (16. ders): kol sağa gittikçe LED parlasın, sola gidince sönük kalsın.
+- `OLU_BOLGE` değerini 10 yap, sonra 120 yap. X ekseni özelliğini 0,5'ten başlayıp yavaşça artır: değer hangi noktada sıfırdan ayrılıyor?
+- X ekseni özelliğini 0,8 yap ve **sonra** ▶'e bas (merkez yanlış ölçülür). Ardından X'i 0,5'e getir. Ne olur? Neden?
+- X eksenine göre bir LED'in parlaklığını değiştir (16. ders): kol sağa gittikçe LED parlasın, sola gidince sönük kalsın. D13 bir PWM pini değildir; LED'i D11'e taşı (PWM pinleri 3, 5, 6, 9, 10, 11).
 
 ### Sık yapılan hatalar
 - Merkezi sabit 512 yazmak: bir modülde işe yarar, ötekinde robot kol bırakılmışken kayar.
 - Ölü bölge koymamak: kol bırakılmışken değer 510, 514, 509 diye dalgalanır; servo ya da motor titrer.
-- Kolu itili tutarken kartı açmak: merkez yanlış ölçülür.
+- Kol itilmiş durumdayken (X ya da Y 0,5'ten uzakken) ▶'e basmak: merkez yanlış ölçülür.
 - SW pinini `INPUT_PULLUP` yapmamak: düğme bırakılmışken pin havada kalır, rastgele basış okunur (6. ders).
-- Modülün 5 V yerine 3,3 V ile beslenmesi: ucu 1023 yerine daha küçük bir değere ulaşır. 5 V kartta modülü 5 V'ta besle.
+- Modülün VCC'sini 5V yerine 3V3'e bağlamak: uç değer 1023 yerine yaklaşık 675 olur (3,3 / 5 × 1023), çünkü ADC 5 V'a göre ölçer. Laboratuvarda dene.
 
 ## Konuşalım
 Bir drone kumandasında iki joystick vardır ve hiçbiri tam ortada "sıfır" vermez. Üretici bu kusuru nasıl çözüyor olabilir? Ölü bölgeyi çok büyük yaparsak kumandanın hissi nasıl değişir?

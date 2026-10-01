@@ -6,16 +6,16 @@ Bu hafta Arduino'na üç farklı yolla konuştun: bilgisayarla Serial üzerinden
 
 ## Etkinlik
 ### Devre
-Bu derste ek parça gerekmiyor; programlar yalnız Arduino'nun kendisini kullanıyor. Programlar **D4**'ü bir "ölçüm penceresi" olarak kullanır: ölçülen işin başında D4'ü HIGH, sonunda LOW yapar. Gerçek kartta D4'e bir osiloskop ya da lojik analizör probu bağlarsan pencerenin süresini kendin görürsün.
+Bu derste ek parça gerekmiyor; laboratuvarda yalnız Uno'yu kullanıyoruz ve programları düzenleyiciye yazıp ▶'e basıyorsun. Programlar **D4**'ü bir "ölçüm penceresi" olarak kullanır: ölçülen işin başında D4'ü HIGH, sonunda LOW yapar. Süreyi program içinde `micros()` ile ölçeriz. (Bilgi notu: gerçek bir devrede D4'e bir osiloskop ya da lojik analizör bağlansa aynı pencerenin süresini dışarıdan görürdük.) Laboratuvarda arka arkaya gelen pencerelerin arasındaki boşluk çok kısa olduğundan D4 tek uzun bir HIGH gibi görünebilir; aralarına `delay(20)` koyarsan ayrı pencereler görürsün.
 
 | Pin | Görevi |
 |---|---|
-| D4 | Ölçüm penceresi (isteğe bağlı prob) |
+| D4 | Ölçüm penceresi |
 | D0 (RX), D1 (TX) | UART |
 | A4 (SDA), A5 (SCL) | I2C |
 | D11 (MOSI), D12 (MISO), D13 (SCK), D10 (CS) | SPI |
 
-D0 ve D1 aynı zamanda USB üzerinden bilgisayarla konuşmak için kullanılır. Bu pinlere başka bir cihaz bağlıysa program yüklemekte ya da Serial Monitor'de sorun çıkabilir.
+D0 ve D1 gerçek kartta aynı zamanda USB üzerinden bilgisayarla konuşmak için kullanılır. Bu pinlere başka bir cihaz bağlıysa program yüklemekte ya da Serial Monitor'de sorun çıkabilir. Bu yüzden D0 ve D1'i başka iş için kullanmaktan kaçın.
 
 ### UART: iki kablo, ortak hız
 **UART** (Serial) iki hatla çalışır: bir uçtan TX (gönder), karşı uçtan RX (al). Ortak bir saat hattı yoktur. Bu yüzden iki tarafın **baud hızını** (saniyede bit sayısı) önceden aynı seçmesi gerekir. Bir bayt şöyle gönderilir: 1 başlangıç biti, 8 veri biti, 1 bitiş biti. Yani bir bayt **10 bit** sürer. Bir bitin süresi `1 / baud` olur.
@@ -60,7 +60,7 @@ void loop() {
 }
 ```
 
-Serial Monitor 9600'dayken 19200 ve 38400 bölümlerinde ekranda anlamsız karakterler görebilirsin: gönderen ve alan hızlar aynı değildi. Bu UART'ın doğası: hız önceden anlaşılır. Sonda ölçüm tablosu 9600'de yazdırılır.
+Gerçek bir bilgisayarda terminal 9600'dayken 19200 ve 38400 bölümlerinde ekranda anlamsız karakterler görürdün: gönderen ve alan hızlar aynı değildi. Bu UART'ın doğasıdır: hız önceden anlaşılır. Laboratuvarın seri monitörü hız farkını modellemez; 100 tane `U` hep düzgün görünür. Sonda ölçüm tablosu 9600'de yazdırılır.
 
 Ölçüm sonucu:
 
@@ -125,7 +125,7 @@ Sonuç:
 | `setClock(100000)` | 72 | 100 kHz | 180 µs |
 | `setClock(400000)` | 12 | 400 kHz | 45 µs |
 
-Süreye başlangıç ve bitiş koşulları dahil değildir; gerçek aktarım biraz daha uzun sürer. Bu değerler yazmaçtan okunan ayarlardan **hesaplandı**; gerçek devrede SCL hattını osiloskopla ya da lojik analizörle görerek doğrulayabilirsin. 400 kHz hızı kullanmak için hattaki bütün cihazların bunu desteklemesi gerekir; cihazın veri sayfasına bak.
+Süreye başlangıç ve bitiş koşulları dahil değildir; gerçek aktarım biraz daha uzun sürer. Bu değerler yazmaçtan okunan ayarlardan **hesaplandı**; gerçek bir devrede SCL hattını osiloskopla ya da lojik analizörle ölçerek doğrulamak gerekirdi. 400 kHz hızı kullanmak için hattaki bütün cihazların bunu desteklemesi gerekir; cihazın veri sayfasına bak.
 
 ### SPI: dört kablo, çok hızlı
 **SPI**'da ortak üç hat (SCK, MOSI, MISO) ve her cihaz için bir **CS** hattı vardır (67. ders). Saat hattı olduğu için hız serbesttir ve I2C'den çok yüksektir. Uno'da en yüksek SCK, işlemci saatinin yarısıdır: 16 MHz ÷ 2 = 8 MHz. Hızı iki yolla seçersin: eski `SPI.setClockDivider(...)` ya da yeni `SPISettings(hız, bitSırası, mod)`. Program her ayarda SPI yazmaçlarından (`SPCR`, `SPSR`) gerçek SCK frekansını hesaplar.
@@ -216,12 +216,12 @@ Aşağıdaki tablo bu derste okuduğun sayılarla genel bilgiyi birleştirir.
 Veri kaydedicin üçünü birden kullanacak: **UART** ile bilgisayara satır yazar, **I2C** ile RTC ve LCD'yi okur/yazar, **SPI** ile SD karta dosya yazar. Her iş için doğru yol farklıdır: saat ve ekran az veri taşır, I2C'nin iki kablosu yeter. SD kart çok veri taşır, SPI'nin hızı gerekir. Bilgisayarla konuşmak için ise zaten UART vardır.
 
 ### Dene
-- `uart_hiz` programında `BAYT` değerini 200 yap. Bit süresi değişiyor mu? Neden değişmemeli?
-- `i2c_hiz` programında `ISTENEN` dizisindeki 100000 değerini 50000 yap. `TWBR` kaç oluyor, 2 baytlık aktarım kaç µs sürüyor?
+- `uart_hiz` programında `BAYT` değerini 200 yap. Bit süresi değişiyor mu? Neden değişmemeli? D4 penceresinin süresi nasıl değişir?
+- `i2c_hiz` programında `ISTENEN` dizisindeki 100000 değerini 50000 yap. `TWBR` kaç oluyor, 2 baytlık aktarım kaç µs sürüyor? (Önce formülle hesapla, sonra ▶ ile karşılaştır.)
 - `spi_hiz` programındaki `istenen` dizisinde 250000 yerine 500000 yaz. Hangi SCK hızı çıkıyor? 16 MHz'in kaça bölünmüş hali olduğunu hesapla.
 
 ### Sık yapılan hatalar
-- UART'ta iki ucun baud hızını farklı seçmek: ekranda anlamsız karakterler çıkar.
+- UART'ta iki ucun baud hızını farklı seçmek: gerçek bağlantıda ekranda anlamsız karakterler çıkar.
 - UART bağlantısında TX'i TX'e bağlamak: bir ucun TX'i diğer ucun RX'ine gitmeli.
 - I2C'de iki cihazın aynı adresi kullanması (örneğin RTC ve MPU6050, ikisi de 0x68).
 - I2C hattında hızı artırıp bütün cihazların bunu desteklediğini kontrol etmemek.

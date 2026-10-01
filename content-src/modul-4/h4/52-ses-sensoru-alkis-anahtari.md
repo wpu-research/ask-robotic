@@ -6,17 +6,21 @@ süre: 30
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Ses sensörü modülü | VCC → 5 V, GND → GND, analog çıkış (AO) → **A0** |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| Ses sensörü modülü | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A0** (**DO** boş kalır) |
+| Direnç (330 Ω) + LED | **D13** → direncin ucu **1**; direncin ucu **2** → LED **A**; LED **K** → **GND** |
 
-Modülde bir mikrofon ve bir yükselteç vardır. Analog çıkış ortam sessizken belli bir **baz seviyede** durur, ses gelince bu seviyenin üstünde ve altında salınır. Baz seviye ve ses hassasiyeti modülden modüle farklıdır (çoğunda bir ayar vidası bulunur); kendi modülünün belgesine bak. Biz bu yüzden baz seviyeyi sabit bir sayı olarak yazmayız, **ölçeriz**.
+Gerçek modülde bir mikrofon ve bir yükselteç vardır. Analog çıkış ortam sessizken belli bir **baz seviyede** durur, ses gelince bu seviyenin üstünde ve altında salınır. Baz seviye ve ses hassasiyeti modülden modüle farklıdır (çoğunda bir ayar vidası bulunur). Biz bu yüzden baz seviyeyi sabit bir sayı olarak yazmayız, **ölçeriz**.
 
-Bu derste ses dalgası yerine zaman içinde değişen gerilimle çalışıyoruz. Alkış çok kısa bir olaydır: baz seviyeden birdenbire uzaklaşır, bir an kalır ve geri döner.
+Laboratuvardaki modülde mikrofon yoktur; sesi sağ paneldeki **Ses şiddeti** özelliğiyle (0-1) sen verirsin. Bu modülde sessizken (şiddet 0) AO yaklaşık 1,25 V verir, yani `analogRead` yaklaşık **256** okur (512 değil). Şiddet arttıkça AO yükselir: 0,1 için yaklaşık 327, 0,5 için yaklaşık 614, 0,8 için yaklaşık 829. Laboratuvardaki değer yalnızca yukarı çıkar; gerçek mikrofon baz seviyenin hem üstüne hem altına salınır, `abs()` ikisini de karşılar.
+
+Alkış çok kısa bir olaydır: baz seviyeden birdenbire uzaklaşır, bir an kalır ve geri döner. Laboratuvarda bunu şöyle taklit edersin: program çalışırken **Ses şiddeti**ni 0,8 yap, hemen 0'a döndür. Elle yaptığın bu hareket en hızlı halinde bile gerçek bir alkıştan çok daha uzun sürer; bu yüzden aşağıdaki programlarda süre üst sınırını (`SURE_MAX`) 500 ms, iki alkış arası payını (`ARALIK`) 3000 ms seçtik. Gerçek bir devrede bu değerler çok daha küçük olurdu.
 
 ### Program 1: baz seviye ve tepe
-Önce ortamı ölç. Sketch açılışta yarım saniye boyunca ortalama alıp baz seviyeyi bulur. Sonra her yarım saniyede, baz seviyeden **en büyük sapmayı** (tepe) yazar.
+Önce ortamı ölç. Sketch açılışta yaklaşık üçte bir saniye boyunca (64 ölçüm, aralarında 5 ms) ortalama alıp baz seviyeyi bulur. Sonra her yarım saniyede, baz seviyeden **en büyük sapmayı** (tepe) yazar.
 
 ```cpp
 // sketch: ses_baz_tepe
@@ -55,7 +59,7 @@ void loop() {
 }
 ```
 
-Kurulumdaki `delay` kabul edilebilir: ölçüm yalnızca bir kez, kart açılırken yapılır. Ölçüm sırasında sessiz ol.
+Kurulumdaki `delay` kabul edilebilir: ölçüm yalnızca bir kez, program açılırken yapılır. Ölçüm sırasında **Ses şiddeti** 0'da kalsın.
 
 ### Program 2: alkış tanıma
 Bir ses olayı üç adımda tanınır:
@@ -68,7 +72,7 @@ Bir ses olayı üç adımda tanınır:
 const int SES = A0;
 const int TEPE_ESIK = 150;          // baz seviyeden en az bu kadar sapma
 const unsigned long SURE_MIN = 10;  // ms: bundan kısa = parazit
-const unsigned long SURE_MAX = 150; // ms: bundan uzun = alkış değil
+const unsigned long SURE_MAX = 500; // ms: bundan uzun = alkış değil
 const unsigned long SESSIZ_PAY = 20; // ms
 
 int baz;
@@ -135,7 +139,7 @@ void loop() {
 `olayOku()` bir **durum** tutar (`sesVar`). Fonksiyon her `loop()` turunda çağrılır, çoğu turda `0` döner ve çok hızlı biter. 27. dersteki bloklamayan kod mantığıdır.
 
 ### Program 3: iki alkışta LED aç/kapat
-Alkış anahtarı iki alkışın arasındaki süreye bakar. İki alkışın **başlangıçları** arasında en çok 1 saniye varsa LED'in durumu tersine çevrilir. Tek alkış bir şey yapmaz ama "ilk alkış" olarak hatırlanır. Uzun bir ses araya girerse hafıza silinir.
+Alkış anahtarı iki alkışın arasındaki süreye bakar. İki alkışın **başlangıçları** arasında en çok `ARALIK` (burada 3 saniye) varsa LED'in durumu tersine çevrilir. Tek alkış bir şey yapmaz ama "ilk alkış" olarak hatırlanır. Uzun bir ses araya girerse hafıza silinir.
 
 ```cpp
 // sketch: alkis_anahtar
@@ -143,9 +147,9 @@ const int SES = A0;
 const int LED = 13;
 const int TEPE_ESIK = 150;
 const unsigned long SURE_MIN = 10;
-const unsigned long SURE_MAX = 150;
+const unsigned long SURE_MAX = 500;
 const unsigned long SESSIZ_PAY = 20;
-const unsigned long ARALIK = 1000;   // iki alkış arası en çok
+const unsigned long ARALIK = 3000;   // iki alkış arası en çok
 
 int baz;
 bool sesVar = false;
@@ -221,20 +225,20 @@ void loop() {
 2. `abs(analogRead(SES) - baz)` baz seviyenin üstündeki ve altındaki salınımı aynı şekilde sayar.
 3. Olay başlayınca `baslangic` kaydedilir, her yüksek örnekte `sonYuksek` yenilenir. Süre `sonYuksek - baslangic` olur.
 4. Tek yüksek ses bir alkıştır ama tek başına LED'i değiştirmez: `alkisSay` 1 olur ve ikinci alkış beklenir.
-5. İkinci alkış 1 saniyeden geç gelirse, o alkış yeni bir "ilk alkış" olur.
+5. İkinci alkış `ARALIK`tan (3 saniye) geç gelirse, o alkış yeni bir "ilk alkış" olur.
 6. Sesler çok zayıfsa (`TEPE_ESIK` altı), çok kısaysa ya da çok uzunsa hiç alkış sayılmaz.
 
 ### Dene
-- `TEPE_ESIK` değerini 50 yap. Konuşma da alkış sayılıyor mu? Sonra 400 yap: hangi alkışlar kaçıyor?
-- Alkışları daha yakın tut: `ARALIK = 500` ile iki alkış arası 700 ms olursa ne olur?
-- Üçüncü bir alkış ekle: üç alkışta buzzer'ı (D8) kısa çaldır. `alkisSay` değişkeni nasıl değişmeli?
+- Konuşmayı **Ses şiddeti = 0,1** ile taklit et (sapma yaklaşık 71). `TEPE_ESIK` 150 iken olay sayılıyor mu? 50 yapınca? Sonra 400 yap ve şiddeti 0,5 (sapma yaklaşık 358) ile 0,8 (yaklaşık 573) dene: hangi alkışlar kaçıyor?
+- `ARALIK = 1000` yap ve iki alkış arasında yaklaşık 2 saniye bekle. Ne olur?
+- Üçüncü bir alkış ekle: üç alkışta aktif buzzer'ı (D8) kısa çaldır. Buzzer'ı **Parça ekle** menüsünden seçip özellik panelinden **Tür**ünü **Aktif** yap. `alkisSay` değişkeni nasıl değişmeli?
 
 ### Sık yapılan hatalar
-- Baz seviyeyi 512 sanmak: modülün baz seviyesi farklı olabilir. Her zaman ölç.
-- Baz seviyeyi ölçerken gürültü yapmak: baz yanlış çıkar ve alkış hep tanınır ya da hiç tanınmaz.
+- Baz seviyeyi 512 sanmak: modülün baz seviyesi farklıdır (laboratuvardaki modülde yaklaşık 256). Her zaman ölç.
+- Baz seviyeyi **Ses şiddeti** 0 değilken ölçmek: baz yanlış çıkar ve alkış hep tanınır ya da hiç tanınmaz.
 - Olayı tek örnekle bitirmek: salınan sinyal ara sıra baz seviyeden geçer, bir alkış iki olay gibi görünür. Sessizlik payı bunu çözer.
 - Sadece tepe yüksekliğine bakmak: çok yüksek bir kapı çarpması da alkışa benzer. Süreyi de kontrol et.
-- Gevşek bağlantılı ya da sallanan kablolar: gerçek devrede kablo hareketi de sinyali oynatabilir ve sahte olay üretir.
+- Gerçek devrede gevşek ya da sallanan kablolar da sinyali oynatır ve sahte olay üretir (laboratuvar bunu modellemez, ama aklında olsun).
 
 ## Konuşalım
 Alkış anahtarı kalabalık bir odada neden zorlanır? Süre ve yükseklik kontrollerine başka hangi kontrolü ekleyerek (örneğin iki alkış arasındaki süreyi sınırlamak gibi) yanlış tetikleri azaltırdın?

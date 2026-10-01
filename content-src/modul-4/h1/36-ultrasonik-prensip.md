@@ -28,14 +28,18 @@ Ses nesneye gider ve geri gelir. Ölçtüğümüz süre **gidiş + dönüş** s�
 Kısa yol: 1 cm'lik mesafe gidiş dönüş yaklaşık 58 µs sürer. Süreyi 58'e bölersen de santimetreyi bulursun.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| HC-SR04 VCC | 5 V |
-| HC-SR04 TRIG | **D9** |
-| HC-SR04 ECHO | **D10** |
-| HC-SR04 GND | GND |
+| HC-SR04 VCC | Uno **5V** |
+| HC-SR04 TRIG | Uno **D9** |
+| HC-SR04 ECHO | Uno **D10** |
+| HC-SR04 GND | Uno **GND** |
 
-Bu dersteki programlar sensöre henüz dokunmaz, yalnızca hesap yapar. Bağlantıyı şimdiden kur; 37. derste kullanacaksın. Modülün veri sayfasındaki tipik ölçüm aralığı 2 cm ile 400 cm arasındadır. Bu aralığın dışında ya da ses sensöre geri dönmeyecek şekilde yansıyorsa ECHO hiç HIGH olmaz.
+Bu dersteki programlar sensöre henüz dokunmaz, yalnızca hesap yapar. Bağlantıyı şimdiden kur; 37. derste kullanacaksın. HC-SR04'ü seçince sağ panelde **Mesafe** özelliği çıkar (2-400 cm). Bu değeri devre çalışırken de değiştirebilirsin; sensör "önündeki nesnenin" uzaklığını buna göre ölçer. Modülün veri sayfasındaki tipik ölçüm aralığı 2 cm ile 400 cm arasındadır. Bu aralığın dışında ya da ses sensöre geri dönmeyecek şekilde yansıyorsa geçerli bir ölçüm elde edilmez.
+
+Bilgi notu: ECHO'nun yankı yokken tam olarak ne yaptığı modülden modüle değişir. Bazı modüller yankı gelmezse ECHO'yu yaklaşık 38 ms boyunca HIGH tutar. 37. derste göreceğimiz 30 ms'lik zaman aşımı her iki durumu da aynı şekilde "ölçüm yok" (0) yapar.
 
 ### Program 1: süreden mesafeye
 Beş farklı süre için formülü uygulayalım.
@@ -105,14 +109,15 @@ Sayılarla doğrulayalım: 20 °C'de c = 331,3 + 0,606 × 20 = 343,42 m/s; bu 34
 4. `sesHizi` fonksiyonu sıcaklığı alıp c değerini m/s olarak döndürür. `okunan = 100 × 343 / c` oranı, sensörün yanlış varsayımının sonucudur.
 
 ### Dene
-- 2 metre uzaktaki bir nesne için ECHO kaç µs HIGH kalır? Önce kâğıtta hesapla, sonra `sureler` dizisine yazıp programla karşılaştır.
+- 2 metre uzaktaki bir nesne için ECHO kaç µs HIGH kalır? Önce kendin hesapla, sonra `sureler` dizisine yazıp programla karşılaştır.
 - `sicakliklar` dizisine 35 koy. Gerçek 100 cm kaç santimetre okunur?
+- Laboratuvarda `ses_mesafe_tablosu` programını yaz ve çalıştır; seri monitörde 583, 5830 ve 23 320 µs için çıkan santimetreleri formülle karşılaştır.
 - Aynı sıcaklık hesabını 250 cm'lik bir mesafe için yap. Hata santimetre olarak büyür mü, küçülür mü?
 
 ### Sık yapılan hatalar
 - `/ 2` bölmesini unutmak: mesafe iki katı çıkar, çünkü ses gidip geri gelmiştir.
 - Birimleri karıştırmak: 343 m/s değerini 343 olarak cm/µs formülüne koymak. Önce aynı birime çevir.
-- Sıcaklığın etkisini hiç bilmemek: bir gün sınıfta doğru çalışan park sensörü, soğuk garajda birkaç santimetre kayabilir.
+- Sıcaklığın etkisini hiç bilmemek: sıcak bir günde doğru çalışan park sensörü, soğuk bir garajda birkaç santimetre kayabilir. (Laboratuvardaki HC-SR04 sabit bir ses hızıyla (yaklaşık 58 µs/cm) çalışır; bu kayma yalnızca gerçek sensörde görülür.)
 - `100 * 343 / c` yerine tam sayılarla bölmek: sonuç küsuratsız çıkar. Ondalıklı yaz (`100.0`).
 
 ## Konuşalım

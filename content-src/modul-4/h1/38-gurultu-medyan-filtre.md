@@ -77,13 +77,16 @@ void loop() {
 ### Canlı sensörle kayan medyan
 Gerçek sistemde okumalar tek seferde gelmez; sürekli akar. Son 5 okumayı bir **kayan pencerede** tutarız: yeni okuma gelince en eskisi çıkar. Her seferinde pencerenin ortalamasını ve medyanını hesaplarız.
 
-Devre (hafta boyunca aynı):
+Devre (hafta boyunca aynı). Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
 
 | Parça | Bağlantı |
 |---|---|
-| HC-SR04 VCC / GND | 5 V / GND |
-| HC-SR04 TRIG | **D9** |
-| HC-SR04 ECHO | **D10** |
+| HC-SR04 VCC | Uno **5V** |
+| HC-SR04 GND | Uno **GND** |
+| HC-SR04 TRIG | Uno **D9** |
+| HC-SR04 ECHO | Uno **D10** |
+
+Laboratuvardaki sensör kusursuz ölçer: Mesafe özelliğine ne yazarsan onu okur. Aykırı değeri sen üretirsin: program çalışırken Mesafe değerini kısa süre 350 cm yapıp geri alırsın. Program 55 ms'de bir ölçtüğü için bu kadar kısa bir sıçrama üretmek zordur; denemek için `delay(50)` değerini geçici olarak `delay(400)` yap. Sıçramayı yarım saniyeden kısa tutarsan pencereye yalnız 1-2 yanlış ölçüm girer.
 
 ```cpp
 // sketch: medyan_kayan
@@ -164,7 +167,8 @@ NewPing kütüphanesi de aynı fikri sunar: `sonar.ping_median(5)` beş ölçüm
 
 ### Dene
 - `medyan_kayan` programında `N = 3` ve `N = 7` dene. Aykırı değer atma gücü ve gecikme nasıl değişiyor? Önce tahmin yaz, sonra hesapla.
-- `ortalama_medyan_dizi` dizilerine kendi ölçümlerini yaz. Hangi dizide ortalama ile medyan en çok ayrılıyor?
+- `ortalama_medyan_dizi` dizilerine kendi uydurduğun değerleri yaz. Hangi dizide ortalama ile medyan en çok ayrılıyor?
+- `medyan_kayan` içinde `delay(50)` yerine `delay(400)` yaz. Çalışırken Mesafe'yi yarım saniyeliğine 350 cm yapıp geri al, sonra 100 cm'den 50 cm'e kalıcı olarak indir. Seri monitörde `ort` ve `med` sütunları iki durumda nasıl davranıyor?
 - Ortalamanın da işe yaradığı bir durum düşün: okumalar 100 ± 1 cm gibi küçük dalgalanmalarsa hangisi daha pürüzsüz çıkar? Dizileri deneyerek bak.
 
 ### Sık yapılan hatalar

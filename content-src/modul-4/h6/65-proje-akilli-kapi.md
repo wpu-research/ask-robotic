@@ -18,21 +18,21 @@ Kural şöyle:
 - Her olay ekranda gösterilir ve buzzerle sese dökülür.
 
 ### Devre
-**Güvenlik:** Bu projede kilit olarak yalnızca küçük bir servo kullan. Şebeke gerilimiyle (220 V) çalışan elektrikli kapı kilidi, mıknatıs ya da röle bağlama. Servoyu Arduino'nun 5 V pininden besleme; servo motor kalkışta fazla akım çekebilir ve kart yeniden başlayabilir. Servo için **harici bir 5 V besleme** kullan ve harici besleme ile Arduino'nun **GND**'lerini birleştir (ortak GND).
+Bu projede kilit yalnızca bir servodur. Laboratuvarda servonun VCC ucunu Uno'nun 5V pinine bağlaman yeterlidir. Gerçek bir devrede küçük bir servo bile kalkışta fazla akım çekebilir; bu yüzden gerçek kapı projelerinde servo ayrı bir 5 V kaynaktan beslenir ve kaynağın GND'si Arduino'nun GND'siyle birleştirilir (ortak GND). Bu, laboratuvarda yapman gereken bir şey değil, gerçek dünya bilgisidir.
 
-Bu haftanın pinleri Modül 4'ün standart tablosundan farklıdır, çünkü keypad D2-D9'un hepsini alır:
+Bu haftanın pinleri Modül 4'ün standart tablosundan farklıdır, çünkü keypad D2-D9'un hepsini alır. Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla:
 
 | Parça | Bağlantı |
 |---|---|
 | Keypad 4x4 | Satırlar R1..R4 → **D9, D8, D7, D6**; sütunlar C1..C4 → **D5, D4, D3, D2** |
-| Servo (kilit mandalı) | Sinyal → **D10**; kırmızı (+) → harici 5 V; kahverengi ya da siyah (-) → harici GND **ve** Arduino GND |
-| Buzzer (pasif) | **D11** → buzzer → GND |
-| Kırmızı LED ("kilitli") | **D12** → 330 Ω direnç → LED → GND |
-| Yeşil LED ("açık") | **D13** → 330 Ω direnç → LED → GND |
-| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND (adres 0x27) |
+| Servo (kilit mandalı) | SIG → **D10**; VCC → **5V**; GND → **GND** |
+| Buzzer (pasif) | **+** → **D11**; **-** → **GND** |
+| Kırmızı LED ("kilitli") | **D12** → direnç (330 Ω) 1; direnç 2 → LED **A**; LED **K** → **GND** |
+| Yeşil LED ("açık") | **D13** → direnç (330 Ω) 1; direnç 2 → LED **A**; LED **K** → **GND** |
+| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → **5V**, GND → **GND** (adres 0x27) |
 | Kart okuyucu | **Yok:** kart, seri monitörden `KART:AABBCCDD` yazılarak taklit edilir |
 
-Kart okuyucu bu projede yoktur çünkü RC522 ile keypad ve diğer parçaların pinleri çakışır (63. dersteki çakışma tablosu). Seri taklit, **kart okuyucu yokken test için** kullanılan bir yöntemdir; gerçek RC522 değildir. Okuyucu ekleneceği gün `rc522_oku` programının yazdığı `KART:...` satırı, burada seri porttan gelen satırın yerini alır.
+Buzzerin **Tür** özelliği "Pasif" olmalı (`tone()` pasif buzzerle çalışır). Kart okuyucu bu projede yoktur çünkü hepsi birden Uno'nun pinlerine sığmaz: RC522 ile keypad, servo, buzzer, iki LED toplam 17 pin ister, Uno'da 16 pin kullanılabilir (63. dersteki hesap). Seri taklit, **kart okuyucu yokken test için** kullanılan bir yöntemdir; gerçek RC522 değildir. Okuyucu ekleneceği gün `rc522_oku` programının yazdığı `KART:...` satırı, burada seri porttan gelen satırın yerini alır.
 
 ### Durum makinesi
 | Durum | Servo | LED | Çıkış koşulu |
@@ -507,7 +507,7 @@ void loop() {
 9. **EEPROM** 64. dersteki harita ve işlemlerle aynıdır. Açılışta kayıtlı kart ve PIN korunur, yalnızca ilk kurulumda fabrika ayarı yazılır.
 
 ### Deneme senaryosu
-Seri monitörde 9600 baud ve "Yeni satır" ayarıyla sırayla dene:
+▶ ile programı çalıştır ve sırayla dene. Komutları seri monitörün kutusuna yazıp **Gönder**'e bas. Keypad tuşları için tuş takımını seç ve sağ paneldeki **Basılı tuş** listesinden sırayla her tuşu seç; her tuştan sonra listeyi **Yok**'a al (bir tuşu seçili bırakmak, onu basılı tutmak demektir). LCD'deki yazıyı ve servonun açısını tuvalde izle.
 
 | Adım | Ne yap? | Ne olmalı? |
 |---|---|---|
@@ -525,7 +525,7 @@ Seri monitörde 9600 baud ve "Yeni satır" ayarıyla sırayla dene:
 - Kapı açıkken yeşil LED'i saniyede bir yanıp söndür. Hangi fonksiyona yazacaksın?
 
 ### Sık yapılan hatalar
-- Servoyu Arduino'nun 5 V pininden beslemek: kart sürekli yeniden başlar ya da LCD bozulur. Harici besleme ve ortak GND kullan.
+- Gerçek devrede servoyu Arduino'nun 5 V pininden beslemek: kart sürekli yeniden başlayabilir ya da LCD bozulabilir. Gerçek projede ayrı besleme ve ortak GND kullanılır. Laboratuvarda ise servonun VCC ve GND uçlarını bağlamayı unutma: bağlamazsan servo hareket etmez.
 - Servoyu D6'da bırakmak: D6 bu hafta keypad'in satır pinidir. Tuşlar yanlış okunur, servo titrer.
 - `delay(5000)` ile kapıyı açık tutmak: bu sırada tuşlar ve seri komutlar kaçırılır, bloke mantığı da çalışmaz.
 - Yanlış sayacını PIN ve kart için ayrı tutmak: saldırgan her yoldan ayrı ayrı 3 deneme yapabilir.

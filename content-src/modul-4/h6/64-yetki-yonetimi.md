@@ -11,7 +11,7 @@ Bir apartmanda yeni bir kiracı taşındığında yönetici kapının programın
 - Master PIN (yönetim PIN'i; kart eklemek, silmek ve kullanıcı PIN'ini değiştirmek için)
 - Yetkili kart UID listesi (en çok 8 kart)
 
-Kart okuyucu ve keypad pinleri çakıştığı için (63. ders) kartları ve PIN girişini **seri komutlarla taklit** ediyoruz. Bu derste gerçek donanım yok; yalnızca kartın kendisi ve Serial Monitor (9600 baud, satır sonu: "Yeni satır") gerekir.
+Kart okuyucu, keypad ve diğer parçalar birlikte Uno'nun pinlerine sığmadığı için (63. ders) kartları ve PIN girişini **seri komutlarla taklit** ediyoruz. Bu derste devre kurmazsın; laboratuvarda yalnız Uno ve seri monitör yeterlidir. Komutu seri monitörün altındaki kutuya yaz ve **Gönder**'e bas (program çalışıyor olmalı); laboratuvar satır sonunu kendisi ekler.
 
 ### Komutlar
 | Komut | Ne yapar? |
@@ -276,7 +276,7 @@ void loop() {
 ### Dene
 - `EKLE:9999:AABBCCDD`, sonra `LISTE`, sonra kartı tekrar `EKLE`. İkincisinde ne yazıyor? EEPROM'a yazıldı mı? (Cevap: yazılmadı, çünkü `kartBul` kartı buldu.)
 - Üç kart ekle, ortadakini `SIL` ile sil, `LISTE` ile sırayı gör. Son kart nereye geldi?
-- Kartın fişini çekip tak. `LISTE` aynı kartları gösteriyor mu? `PINDEGIS` ile değiştirdiğin PIN hâlâ geçerli mi?
+- Bir kart ekle ve `PINDEGIS` ile PIN'i değiştir. Sonra ■ ile durdurup ▶ ile yeniden başlat ve `LISTE` yaz. Ne görüyorsun? Laboratuvardaki EEPROM çalıştırmalar arasında saklanmaz: liste boşalır ve açılışta yine `Fabrika ayari yazildi` çıkar. Gerçek bir Arduino'da veriler güç kesilse bile EEPROM'da kalırdı.
 
 ### Sık yapılan hatalar
 - Kurulum işareti koymamak: boş EEPROM'daki `255` değerlerini PIN sanırsın.

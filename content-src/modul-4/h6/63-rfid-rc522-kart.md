@@ -23,12 +23,20 @@ RC522 Arduino ile **SPI** üzerinden konuşur. SPI, dört telli hızlı bir habe
 Bunlara ek olarak RC522'nin **RST** (sıfırlama) bacağı vardır. SCK, MOSI ve MISO pinleri Uno'da donanım tarafından belirlidir ve değiştirilemez. SS ve RST ise istediğin bir pine bağlanabilir.
 
 ### Devre
+Laboratuvarda RC522 parçası ve kart yok. Gerçek modülün bağlantısı şöyledir (bilgi):
+
 | Parça | Bağlantı |
 |---|---|
 | RC522 modül | SDA(SS) → **D10**, SCK → **D13**, MOSI → **D11**, MISO → **D12**, RST → **D9**, GND → GND, 3.3V → **3,3 V** |
-| MIFARE kart veya anahtarlık | Modülün üstüne yaklaştır |
 
-**Güç uyarısı:** RC522 bir **3,3 V** modüldür. 3.3V bacağını Uno'nun 5 V çıkışına bağlama; modül zarar görebilir. Ayrıca modülün veri bacakları da 3,3 V'a göre tasarlıdır. Uno 5 V'luk sinyal verir; birçok kişi modülü doğrudan bağlasa da güvenli yol bir seviye dönüştürücü ya da direnç bölücü kullanmaktır. Modülün veri sayfasına bak.
+**Güç uyarısı (gerçek modül için):** RC522 bir **3,3 V** modüldür. 3.3V bacağını Uno'nun 5 V çıkışına bağlama; modül zarar görebilir. Ayrıca modülün veri bacakları da 3,3 V'a göre tasarlıdır. Uno 5 V'luk sinyal verir; birçok kişi modülü doğrudan bağlasa da güvenli yol bir seviye dönüştürücü ya da direnç bölücü kullanmaktır. Modülün veri sayfasına bak.
+
+Laboratuvarda kartı seri monitörden taklit edeceğiz. Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla:
+
+| Parça | Bağlantı |
+|---|---|
+| LED (yeşil) | **D13** → direnç (330 Ω) 1; direnç 2 → LED **A**; LED **K** → **GND** |
+| LED (kırmızı) | **D12** → direnç (330 Ω) 1; direnç 2 → LED **A**; LED **K** → **GND** |
 
 ### Program 1: Kartı oku
 `MFRC522` kütüphanesi ile kartın UID'sini seri porta yazan program:
@@ -64,7 +72,7 @@ void loop() {
 }
 ```
 
-Bu sketch kütüphane kullanır; derlenir, ama davranışını gerçek bir RC522 ile kendin denemelisin. `PICC_IsNewCardPresent()` alanda yeni bir kart varsa `true` döner, `PICC_ReadCardSerial()` UID'yi `okuyucu.uid` içine doldurur. Çıktıyı bilerek `KART:AABBCCDD` biçiminde yazdırıyoruz; birazdan bu satırı programa "kart gelmiş gibi" göndereceğiz.
+Bu sketch kütüphane kullanır; laboratuvarda derlenir, ama RC522 parçası olmadığı için çalışırken hiç kart bulamaz ve çıktı vermez. `PICC_IsNewCardPresent()` alanda yeni bir kart varsa `true` döner, `PICC_ReadCardSerial()` UID'yi `okuyucu.uid` içine doldurur. Çıktıyı bilerek `KART:AABBCCDD` biçiminde yazdırıyoruz; birazdan bu satırı programa "kart gelmiş gibi" göndereceğiz.
 
 ### Dürüst bir sorun: pinler çakışıyor
 Bu haftanın projesinde keypad, servo, buzzer, LED'ler ve LCD bir arada olacak. Pinleri yan yana koy:
@@ -77,12 +85,12 @@ Bu haftanın projesinde keypad, servo, buzzer, LED'ler ve LCD bir arada olacak. 
 | D12 | yok | MISO (sabit) | kırmızı LED |
 | D13 | yok | SCK (sabit) | yeşil LED |
 
-Yani keypad ve RC522 aynı kartta bir arada çalışmaz: D9 çakışır; üstelik SPI'nin üç sabit pini projedeki buzzer ve LED'lerin pinleridir. Gerçek bir ürün yapacak olsan şu yollardan birini seçerdin:
+Tablodaki D9 çakışması, RST'yi D9'a bağlamayı seçtiğimiz için çıkıyor; SS ve RST herhangi bir pine bağlanabilir. Asıl sorun toplam pin sayısıdır. Projede şunlar gerekir: keypad 8, RC522'nin üç sabit SPI pini 3, SS ile RST 2, servo 1, buzzer 1, iki LED 2; toplam **17 pin**. Uno'da D2-D13 (12 pin) ve A0-A3 (4 pin) kullanılabilir (A4 ve A5'i I2C LCD alır): toplam **16 pin**. Üstelik SPI'nin D11, D12 ve D13 pinleri sabittir ve projede buzzer ile LED'lere ayrılmıştır. Keypad ile RC522 tek başlarına Uno'ya sığar (8 + 5 = 13 pin), ama hepsi birden sığmaz. Gerçek bir ürün yapacak olsan şu yollardan birini seçerdin:
 - Daha çok pini olan bir kart (örneğin Arduino Mega).
 - Keypad'i daha az pinle okuyan bir yol (örneğin bir I2C genişletici modül).
-- LED ve buzzeri A0-A3 pinlerine taşımak (analog pinler dijital çıkış olarak da kullanılabilir). Kâğıt üzerinde sığıyor gibi görünür, ama bunu bu derste denemedik.
+- LED ve buzzeri A0-A3 pinlerine taşımak (analog pinler dijital çıkış olarak da kullanılabilir). Bu da yetmez, çünkü 17 pin 16'ya sığmaz; ayrıca bu derste denemedik.
 
-Biz bu hafta farklı bir yol seçiyoruz: **projede kartı seri porttan taklit edeceğiz**. Okuyucu yerine sen seri monitöre `KART:AABBCCDD` yazacaksın; program bunu kartın okunması sayacak. Bu, **kart okuyucu yokken test için seri taklit**tir; gerçek RC522 değildir. Üstelik `rc522_oku` programı da aynı satırı yazdığı için, ileride okuyucuyu eklersen kart verisinin geldiği yer değişir, yetki mantığı aynen kalır.
+Biz bu hafta farklı bir yol seçiyoruz: **projede kartı seri porttan taklit edeceğiz**. Okuyucu yerine sen laboratuvarın seri monitörüne `KART:AABBCCDD` yazacaksın; program bunu kartın okunması sayacak. Bu, **kart okuyucu yokken test için seri taklit**tir; gerçek RC522 değildir. Üstelik `rc522_oku` programı da aynı satırı yazdığı için, ileride okuyucuyu eklersen kart verisinin geldiği yer değişir, yetki mantığı aynen kalır.
 
 ### Program 2: Seri taklit ile kart testi
 Bu program seri porttan bir satır okur. Satır `KART:` ile başlıyor ve ardından 8 onaltılık rakam (4 bayt) geliyorsa UID'yi çözer ve yetkili listesiyle karşılaştırır. `delay` ya da `readStringUntil` kullanmıyoruz: satırı karakter karakter biriktiriyoruz, böylece program beklerken başka iş yapabilir.
@@ -179,7 +187,7 @@ void loop() {
 }
 ```
 
-Seri monitörün satır sonu ayarını "Yeni satır" (newline) yap, `KART:AABBCCDD` yaz ve gönder.
+Önce ▶ ile programı çalıştır. Sonra seri monitörün altındaki kutuya `KART:AABBCCDD` yaz ve **Gönder**'e bas. Laboratuvar satır sonunu (`\n`) kendisi ekler; ayrıca bir ayar yapman gerekmez.
 
 ### Nasıl çalışıyor?
 1. `satirOku()` her turda gelen karakterleri `satir` dizisine ekler. `\n` gelince satırı bitirir. Yarım gelen satır bir sonraki turda devam eder; program hiçbir yerde beklemez.
@@ -189,14 +197,15 @@ Seri monitörün satır sonu ayarını "Yeni satır" (newline) yap, `KART:AABBCC
 5. Biçimi bozuk satırlar (`KART:AABB`, `KART:ZZZZZZZZ`, `MERHABA`) "Gecersiz satir" olarak reddedilir; kapıyı açan taraf hiç çalışmaz.
 
 ### Dene
-- `YETKILI_UID` yerine kendi kartının UID'sini yaz. (Gerçek okuyucun varsa `rc522_oku` ile öğren; yoksa uydurma bir değer kullan.)
+- `YETKILI_UID` yerine başka bir değer yaz (örneğin `{0x01, 0x02, 0x03, 0x04}`), programı yeniden çalıştır ve yeni UID'yi gönder. Eski UID artık yetkisiz mi?
 - Yanlış UID gönder: kırmızı LED yanıyor mu?
 - Büyük ve küçük harfli UID gönder (`AABBCCDD` ve `aabbccdd`). İkisi de aynı sonucu veriyor mu?
 
 ### Sık yapılan hatalar
-- RC522'yi 5 V ile beslemek.
-- SS ve RST pinlerini sketch'te bir yere, devrede başka yere bağlamak.
-- Seri monitörde satır sonu ayarını "Yeni satır yok" bırakmak: program satırın bittiğini anlamaz.
+- Gerçek RC522'yi 5 V ile beslemek.
+- Gerçek devrede SS ve RST pinlerini sketch'te bir yere, kabloda başka yere bağlamak.
+- Program çalışmıyorken (▶'e basmadan) satır göndermeye çalışmak: kutu kapalıdır ve "Önce başlat" yazar.
+- `KART:` önekini ya da 8 onaltılık rakamı eksik yazmak: program `Gecersiz satir` der.
 - UID'yi tek başına güvenli sanmak: UID okunabilir ve bazı kartlarla taklit edilebilir.
 - Aynı pinleri iki cihaza birden vermek (bu dersin çakışma tablosu).
 
