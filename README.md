@@ -23,3 +23,18 @@ Taslak aşaması. Müfredat: [docs/mufredat-taslak.md](docs/mufredat-taslak.md)
 
 ## Teknoloji (Kipay ile aynı çizgi)
 pnpm monorepo + Turborepo · Next.js (apps/web) · Postgres + Drizzle (packages/db) · Docker + Railway.
+
+## Geliştirme
+```
+pnpm install
+pnpm build          # db + web
+pnpm test           # PGlite ile (Docker/Postgres gerekmez)
+DATABASE_URL=... pnpm db:migrate
+DATABASE_URL=... pnpm --filter @ask/db seed:dev   # ders içeriğini veritabanına yazar (tekrar çalıştırılabilir)
+```
+Ders içeriği: `packages/db/src/content/`. Seed, mevcut içeriği günceller; kaldırılan dersleri silmez.
+
+## Doğrulama bekleyenler
+- Modül 1 dersleri ScratchJr blok renk/adlarına atıf yapıyor (sarı başlatma, mavi hareket, mor görünüm, yeşil ses, turuncu kontrol, kırmızı bitiş). Türkçe arayüzdeki gerçek adlar uygulamadan kontrol edilmeli.
+- ScratchJr bir tablet/telefon uygulaması; tarayıcıda gömülü çalıştırma doğrulanmadı. Modül 1 şu an cihazda uygulama gerektiriyor.
+- Gerçek bir Postgres'e karşı uçtan uca HTTP denemesi yapılmadı (yalnızca PGlite testleri).
