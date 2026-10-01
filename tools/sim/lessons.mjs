@@ -47,10 +47,10 @@ export function extractSketches(contentMd) {
 export function loadWeek(moduleDir, weekDir) {
   const dir = join(SRC, moduleDir, weekDir)
   return readdirSync(dir)
-    .filter((f) => /^\d{2}-.+\.md$/.test(f))
-    .sort()
+    .filter((f) => /^\d{2,3}-.+\.md$/.test(f))
+    .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
     .map((f) => {
       const lesson = parseLesson(readFileSync(join(dir, f), 'utf8'), `${moduleDir}/${weekDir}/${f}`)
-      return { file: f, number: Number(f.slice(0, 2)), ...lesson, sketches: extractSketches(lesson.contentMd) }
+      return { file: f, number: parseInt(f, 10), ...lesson, sketches: extractSketches(lesson.contentMd) }
     })
 }

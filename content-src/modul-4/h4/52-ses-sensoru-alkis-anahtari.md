@@ -1,0 +1,240 @@
+# Ses sensörü: alkış anahtarı
+süre: 30
+
+## Merak
+"Alkışla yanan lamba" bir klasiktir: iki kez alkışla, yansın; iki kez daha alkışla, sönsün. Peki lamba kapı çarpınca, birinin yüksek sesle gülmesiyle ya da uzun süren bir müzikle de yanarsa? Güvenilir bir alkış anahtarı sesin sadece "var" ya da "yok" olduğuna bakmaz; ne kadar **yüksek** ve ne kadar **uzun** olduğuna da bakar.
+
+## Etkinlik
+### Devre
+| Parça | Bağlantı |
+|---|---|
+| Ses sensörü modülü | VCC → 5 V, GND → GND, analog çıkış (AO) → **A0** |
+| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+
+Modülde bir mikrofon ve bir yükselteç vardır. Analog çıkış ortam sessizken belli bir **baz seviyede** durur, ses gelince bu seviyenin üstünde ve altında salınır. Baz seviye ve ses hassasiyeti modülden modüle farklıdır (çoğunda bir ayar vidası bulunur); kendi modülünün belgesine bak. Biz bu yüzden baz seviyeyi sabit bir sayı olarak yazmayız, **ölçeriz**.
+
+Bu derste ses dalgası yerine zaman içinde değişen gerilimle çalışıyoruz. Alkış çok kısa bir olaydır: baz seviyeden birdenbire uzaklaşır, bir an kalır ve geri döner.
+
+### Program 1: baz seviye ve tepe
+Önce ortamı ölç. Sketch açılışta yarım saniye boyunca ortalama alıp baz seviyeyi bulur. Sonra her yarım saniyede, baz seviyeden **en büyük sapmayı** (tepe) yazar.
+
+```cpp
+// sketch: ses_baz_tepe
+const int SES = A0;
+
+int baz;
+int tepe = 0;
+unsigned long sonYazma = 0;
+
+int bazOlc() {
+  long toplam = 0;
+  for (int i = 0; i < 64; i++) {
+    toplam += analogRead(SES);
+    delay(5);
+  }
+  return toplam / 64;
+}
+
+void setup() {
+  Serial.begin(9600);
+  baz = bazOlc();
+  Serial.print("baz=");
+  Serial.println(baz);
+}
+
+void loop() {
+  int fark = abs(analogRead(SES) - baz);
+  if (fark > tepe) tepe = fark;
+
+  if (millis() - sonYazma >= 500) {
+    sonYazma = millis();
+    Serial.print("tepe=");
+    Serial.println(tepe);
+    tepe = 0;
+  }
+}
+```
+
+Kurulumdaki `delay` kabul edilebilir: ölçüm yalnızca bir kez, kart açılırken yapılır. Ölçüm sırasında sessiz ol.
+
+### Program 2: alkış tanıma
+Bir ses olayı üç adımda tanınır:
+1. **Tepe yüksekliği:** sapma `TEPE_ESIK` değerini aşarsa bir olay başlar. Daha zayıf sesler (konuşma, fısıltı) sayılmaz.
+2. **Süre:** olay, sapma `SESSIZ_PAY` kadar süre eşiğin altında kalınca biter. Süre, olayın başı ile son yüksek örnek arasındadır. Mikrofon sinyali salındığı için sapma ara sıra sıfıra yakın olur; bu yüzden olayı hemen bitirmeyip kısa bir "sessizlik payı" bekleriz.
+3. **Sınıflandırma:** süre çok kısaysa parazit, çok uzunsa (müzik, bağırış, bir motor) alkış değildir. Alkış ikisinin arasındadır.
+
+```cpp
+// sketch: alkis_tani
+const int SES = A0;
+const int TEPE_ESIK = 150;          // baz seviyeden en az bu kadar sapma
+const unsigned long SURE_MIN = 10;  // ms: bundan kısa = parazit
+const unsigned long SURE_MAX = 150; // ms: bundan uzun = alkış değil
+const unsigned long SESSIZ_PAY = 20; // ms
+
+int baz;
+bool sesVar = false;
+unsigned long baslangic = 0;
+unsigned long sonYuksek = 0;
+int tepe = 0;
+unsigned long sure = 0;
+
+int bazOlc() {
+  long toplam = 0;
+  for (int i = 0; i < 64; i++) {
+    toplam += analogRead(SES);
+    delay(5);
+  }
+  return toplam / 64;
+}
+
+// Olay bittiğinde türünü döndürür: 'A' alkış, 'U' uzun ses, 'K' kısa parazit.
+// Olay yoksa ya da sürüyorsa 0 döner.
+char olayOku() {
+  unsigned long simdi = millis();
+  int fark = abs(analogRead(SES) - baz);
+
+  if (fark >= TEPE_ESIK) {
+    if (!sesVar) {
+      sesVar = true;
+      baslangic = simdi;
+      tepe = 0;
+    }
+    sonYuksek = simdi;
+    if (fark > tepe) tepe = fark;
+  } else if (sesVar && simdi - sonYuksek >= SESSIZ_PAY) {
+    sesVar = false;
+    sure = sonYuksek - baslangic;
+    if (sure < SURE_MIN) return 'K';
+    if (sure > SURE_MAX) return 'U';
+    return 'A';
+  }
+  return 0;
+}
+
+void setup() {
+  Serial.begin(9600);
+  baz = bazOlc();
+  Serial.print("baz=");
+  Serial.println(baz);
+}
+
+void loop() {
+  char olay = olayOku();
+  if (olay == 0) return;
+
+  if (olay == 'A') Serial.print("ALKIS");
+  if (olay == 'U') Serial.print("UZUN");
+  if (olay == 'K') Serial.print("KISA");
+  Serial.print(" sure=");
+  Serial.print(sure);
+  Serial.print(" tepe=");
+  Serial.println(tepe);
+}
+```
+
+`olayOku()` bir **durum** tutar (`sesVar`). Fonksiyon her `loop()` turunda çağrılır, çoğu turda `0` döner ve çok hızlı biter. 27. dersteki bloklamayan kod mantığıdır.
+
+### Program 3: iki alkışta LED aç/kapat
+Alkış anahtarı iki alkışın arasındaki süreye bakar. İki alkışın **başlangıçları** arasında en çok 1 saniye varsa LED'in durumu tersine çevrilir. Tek alkış bir şey yapmaz ama "ilk alkış" olarak hatırlanır. Uzun bir ses araya girerse hafıza silinir.
+
+```cpp
+// sketch: alkis_anahtar
+const int SES = A0;
+const int LED = 13;
+const int TEPE_ESIK = 150;
+const unsigned long SURE_MIN = 10;
+const unsigned long SURE_MAX = 150;
+const unsigned long SESSIZ_PAY = 20;
+const unsigned long ARALIK = 1000;   // iki alkış arası en çok
+
+int baz;
+bool sesVar = false;
+unsigned long baslangic = 0;
+unsigned long sonYuksek = 0;
+int tepe = 0;
+unsigned long sure = 0;
+
+bool ledAcik = false;
+int alkisSay = 0;
+unsigned long ilkAlkis = 0;
+
+int bazOlc() {
+  long toplam = 0;
+  for (int i = 0; i < 64; i++) {
+    toplam += analogRead(SES);
+    delay(5);
+  }
+  return toplam / 64;
+}
+
+char olayOku() {
+  unsigned long simdi = millis();
+  int fark = abs(analogRead(SES) - baz);
+
+  if (fark >= TEPE_ESIK) {
+    if (!sesVar) {
+      sesVar = true;
+      baslangic = simdi;
+      tepe = 0;
+    }
+    sonYuksek = simdi;
+    if (fark > tepe) tepe = fark;
+  } else if (sesVar && simdi - sonYuksek >= SESSIZ_PAY) {
+    sesVar = false;
+    sure = sonYuksek - baslangic;
+    if (sure < SURE_MIN) return 'K';
+    if (sure > SURE_MAX) return 'U';
+    return 'A';
+  }
+  return 0;
+}
+
+void setup() {
+  pinMode(LED, OUTPUT);
+  Serial.begin(9600);
+  baz = bazOlc();
+  Serial.print("baz=");
+  Serial.println(baz);
+}
+
+void loop() {
+  char olay = olayOku();
+
+  if (olay == 'A') {
+    if (alkisSay == 1 && baslangic - ilkAlkis <= ARALIK) {
+      ledAcik = !ledAcik;
+      digitalWrite(LED, ledAcik);
+      alkisSay = 0;
+      Serial.println(ledAcik ? "LED acik" : "LED kapali");
+    } else {
+      alkisSay = 1;
+      ilkAlkis = baslangic;
+    }
+  } else if (olay == 'U') {
+    alkisSay = 0;              // uzun ses: alkış dizisini sıfırla
+  }
+}
+```
+
+### Nasıl çalışıyor?
+1. `bazOlc()` sessiz ortamın ortalamasını bulur. Bütün sapmalar bu değere göre hesaplanır.
+2. `abs(analogRead(SES) - baz)` baz seviyenin üstündeki ve altındaki salınımı aynı şekilde sayar.
+3. Olay başlayınca `baslangic` kaydedilir, her yüksek örnekte `sonYuksek` yenilenir. Süre `sonYuksek - baslangic` olur.
+4. Tek yüksek ses bir alkıştır ama tek başına LED'i değiştirmez: `alkisSay` 1 olur ve ikinci alkış beklenir.
+5. İkinci alkış 1 saniyeden geç gelirse, o alkış yeni bir "ilk alkış" olur.
+6. Sesler çok zayıfsa (`TEPE_ESIK` altı), çok kısaysa ya da çok uzunsa hiç alkış sayılmaz.
+
+### Dene
+- `TEPE_ESIK` değerini 50 yap. Konuşma da alkış sayılıyor mu? Sonra 400 yap: hangi alkışlar kaçıyor?
+- Alkışları daha yakın tut: `ARALIK = 500` ile iki alkış arası 700 ms olursa ne olur?
+- Üçüncü bir alkış ekle: üç alkışta buzzer'ı (D8) kısa çaldır. `alkisSay` değişkeni nasıl değişmeli?
+
+### Sık yapılan hatalar
+- Baz seviyeyi 512 sanmak: modülün baz seviyesi farklı olabilir. Her zaman ölç.
+- Baz seviyeyi ölçerken gürültü yapmak: baz yanlış çıkar ve alkış hep tanınır ya da hiç tanınmaz.
+- Olayı tek örnekle bitirmek: salınan sinyal ara sıra baz seviyeden geçer, bir alkış iki olay gibi görünür. Sessizlik payı bunu çözer.
+- Sadece tepe yüksekliğine bakmak: çok yüksek bir kapı çarpması da alkışa benzer. Süreyi de kontrol et.
+- Gevşek bağlantılı ya da sallanan kablolar: gerçek devrede kablo hareketi de sinyali oynatabilir ve sahte olay üretir.
+
+## Konuşalım
+Alkış anahtarı kalabalık bir odada neden zorlanır? Süre ve yükseklik kontrollerine başka hangi kontrolü ekleyerek (örneğin iki alkış arasındaki süreyi sınırlamak gibi) yanlış tetikleri azaltırdın?

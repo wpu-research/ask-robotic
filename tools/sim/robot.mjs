@@ -64,7 +64,8 @@ function servoAngle(sim, pin) {
  * Diferansiyel sürüşlü gezgin robot (L298N/TB6612 benzeri sürücü).
  * cfg: { arena, pose:{x,y,theta}, motors:{left:{en,in1,in2}, right:{en,in1,in2}}, encoders:{left,right},
  *   ultrasonic:{trig,echo,servo?}, lineSensors:[{pin, kind:'analog'|'digital', y}], bumpers:{left,right},
- *   gain:{left,right}, deadband, wheelBase, wheelRadius, maxOmega, tau, slots, noiseCm, seed }
+ *   gain:{left,right}, deadband, wheelBase, wheelRadius, maxOmega, tau, slots, noiseCm, seed,
+ *   imu:true, gyroBiasDps, gyroNoiseDps }
  */
 export function attachRover(sim, cfg) {
   const arena = cfg.arena ?? Arena.box(2, 2)
@@ -90,6 +91,8 @@ export function attachRover(sim, cfg) {
     if (!dir || d < p.deadband) return 0
     return dir * ((d - p.deadband) / (1 - p.deadband)) * p.maxOmega * gain[m]
   }
+  // İsteğe bağlı IMU (MPU6050 0x68): gz = yaw hızı (°/s) + sabit sapma (gyroBiasDps) + gürültü (gyroNoiseDps)
+  const imu = p.imu ? sim.mpu6050({}) : null
   const us = p.ultrasonic ? sim.hcsr04({ trig: p.ultrasonic.trig, echo: p.ultrasonic.echo, cm: 400 }) : null
   const encLevel = { left: false, right: false }
   for (const m of ['left', 'right']) if (p.encoders?.[m] !== undefined) sim.drive(p.encoders[m], false)
@@ -114,6 +117,10 @@ export function attachRover(sim, cfg) {
       const pin = p.encoders?.[m]; if (pin === undefined) continue
       const level = Math.floor(ang / half) % 2 !== 0
       if (level !== encLevel[m]) { encLevel[m] = level; sim.drive(pin, level); if (level) s[m === 'left' ? 'ticksL' : 'ticksR'] += ang >= 0 ? 1 : 0 }
+    }
+    if (imu) {
+      imu.gz = (om * 180) / Math.PI + (p.gyroBiasDps ?? 0) + (p.gyroNoiseDps ? gauss(rnd) * p.gyroNoiseDps : 0)
+      imu.ax = 0; imu.ay = 0; imu.az = 1; imu.gx = 0; imu.gy = 0
     }
     // ultrasonik
     if (us) {
@@ -149,7 +156,7 @@ export function attachRover(sim, cfg) {
   const loop = () => { step(0.001); sim.cpu.addClockEvent(loop, CYCLES_PER_MS) }
   sim.cpu.addClockEvent(loop, CYCLES_PER_MS)
   step(0.001) // başlangıç sensör değerleri
-  return { state: s, arena, params: p, get headingDeg() { return ((s.theta * 180) / Math.PI) % 360 } }
+  return { state: s, arena, params: p, imu, get headingDeg() { return ((s.theta * 180) / Math.PI) % 360 } }
 }
 
 /**

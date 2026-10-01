@@ -42,6 +42,14 @@ describe('içerik verisi', () => {
     expect(withSketch.length).toBeGreaterThanOrEqual(30)
     expect(m.track).toBe('maker')
   })
+  it('Modül 4: 8 hafta, 40 ders, her proje dersinde sketch', () => {
+    const m = allModules.find((x) => x.slug === 'sensorler-ve-projeler')!
+    expect(m.weeks).toHaveLength(8)
+    const lessons = m.weeks.flatMap((w) => w.lessons)
+    expect(lessons).toHaveLength(40)
+    expect(lessons.filter((l) => l.contentMd.includes('// sketch:')).length).toBeGreaterThanOrEqual(38)
+    for (const w of m.weeks) expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Bitirme/)
+  })
   it('modül konumları ve slug\'lar benzersiz', () => {
     expect(new Set(allModules.map((m) => m.slug)).size).toBe(allModules.length)
     expect(new Set(allModules.map((m) => m.position)).size).toBe(allModules.length)
@@ -63,7 +71,7 @@ describe('seed', () => {
     const before = await count()
     await seedContent(db)
     expect(await count()).toEqual(before)
-    expect(before).toEqual([3, 20, 61])
+    expect(before).toEqual([4, 28, 101])
   })
   it('içerik değişince günceller', async () => {
     const changed = structuredClone(allModules)
