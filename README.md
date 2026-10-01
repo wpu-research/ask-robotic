@@ -36,5 +36,6 @@ Ders içeriği: `packages/db/src/content/`. Seed, mevcut içeriği günceller; k
 
 ## Doğrulama bekleyenler
 - Modül 1 dersleri ScratchJr blok renk/adlarına atıf yapıyor (sarı başlatma, mavi hareket, mor görünüm, yeşil ses, turuncu kontrol, kırmızı bitiş). Türkçe arayüzdeki gerçek adlar uygulamadan kontrol edilmeli.
+- Modül 2 (Scratch 3) blok kategorilerini renkle anıyor (olaylar sarı, hareket mavi, görünüm mor, ses pembe, kontrol turuncu, algılama açık mavi, işlemler yeşil, değişkenler turuncu-kırmızı, bloklarım pembe). Türkçe arayüzdeki gerçek kategori ve blok adları kontrol edilmeli.
 - ScratchJr bir tablet/telefon uygulaması; tarayıcıda gömülü çalıştırma doğrulanmadı. Modül 1 şu an cihazda uygulama gerektiriyor.
 - Gerçek bir Postgres'e karşı uçtan uca HTTP denemesi yapılmadı (yalnızca PGlite testleri).

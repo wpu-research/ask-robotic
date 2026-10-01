@@ -23,8 +23,18 @@ describe('içerik verisi', () => {
           expect(l.contentMd.length, `${l.title} içerik`).toBeGreaterThan(100)
           expect(l.question.length, `${l.title} soru`).toBeGreaterThan(10)
           expect(l.durationMin).toBeGreaterThanOrEqual(15)
-          expect(l.durationMin).toBeLessThanOrEqual(40)
+          expect(l.durationMin).toBeLessThanOrEqual(60)
         }
+  })
+  it('Modül 2: 8 hafta, 16 ders', () => {
+    const m = allModules.find((x) => x.slug === 'scratch')!
+    expect(m.weeks).toHaveLength(8)
+    expect(m.weeks.flatMap((w) => w.lessons)).toHaveLength(16)
+    expect(m.minAge).toBe(8)
+  })
+  it('modül konumları ve slug\'lar benzersiz', () => {
+    expect(new Set(allModules.map((m) => m.slug)).size).toBe(allModules.length)
+    expect(new Set(allModules.map((m) => m.position)).size).toBe(allModules.length)
   })
   it('Modül 1: 5 hafta, 10 ders', () => {
     const m = allModules.find((x) => x.slug === 'scratchjr')!
@@ -43,7 +53,7 @@ describe('seed', () => {
     const before = await count()
     await seedContent(db)
     expect(await count()).toEqual(before)
-    expect(before).toEqual([1, 5, 10])
+    expect(before).toEqual([2, 13, 26])
   })
   it('içerik değişince günceller', async () => {
     const changed = structuredClone(allModules)
