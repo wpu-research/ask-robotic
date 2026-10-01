@@ -13,20 +13,25 @@ Sistemin görevi:
 - Sıcaklığı seri monitöre yaz.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| NTC termistör (10 kΩ) | Bir ucu **A2**, öbür ucu GND |
-| 10 kΩ direnç | Bir ucu 5 V, öbür ucu **A2** |
-| NPN transistör (2N2222) | Emitör → GND; kolektör → fan eksi ucu |
-| 1 kΩ direnç | **D6** ile transistör bazı arası |
-| Küçük 5 V fan ya da DC motor | Artı ucu harici 5 V kaynağın artısına; eksi ucu transistör kolektörüne |
-| 1N4007 diyot | Fan uçlarına paralel; çizgili uç fan artısına |
-| Servo | Sinyal → **D9**; kırmızı → 5 V; kahverengi/siyah → GND |
-| Harici kaynak | Eksi ucu Arduino GND ile ortak |
+| NTC termistör | **1** ucu **A2**, **2** ucu GND |
+| 10 kΩ direnç | **1** ucu 5V, **2** ucu **A2** |
+| NPN transistör | **E** → GND; **C** → fan motorunun **M2** ucu |
+| 1 kΩ direnç | **1** ucu **D6**, **2** ucu transistörün **B** ucu |
+| DC motor (fan) | **M1** → 5V; **M2** → transistör **C** |
+| Diyot | **A** → transistör **C**; **K** (çizgili uç) → 5V (fan artısı) |
+| Servo | **SIG** → **D9**; **VCC** → 5V; **GND** → GND |
 
 Bu devre 13. dersteki ile aynıdır: NTC altta, sabit direnç üstte. Isındıkça NTC'nin direnci düşer ve A2'deki gerilim de düşer. Sıcaklık hesabını orada işledik: önce ADC değerinden NTC direncini, sonra Beta denklemiyle sıcaklığı buluruz.
 
-Fan veya servo zayıf kaynaktan kartı sıfırlıyorsa harici 5 V kaynak kullan ve GND'leri birleştir.
+Laboratuvarda fan ve servo Uno'nun 5V ucundan beslenir; ayrı bir kaynak ya da ortak GND bağlantısı gerekmez. Gerçek devrede fan ve servo aynı zayıf kaynaktan beslenince kart sıfırlanabilir; orada ayrı 5 V kaynak kullanılır ve GND'ler birleştirilir.
+
+**Ortamı ısıtmak:** NTC parçasını seç ve sağ paneldeki **Sıcaklık** özelliğini değiştir. Bu özellik çalışırken de değişir. Varsayılan 25 °C'dir: fan kapalı, servo 90 derecede park olmalıdır. Sıcaklığı 45 °C yapınca fan dönmeli ve servo taramaya başlamalıdır. Sonra 29 °C'ye indir: histerezis nedeniyle fan hâlâ açık kalmalıdır. 27 °C'de kapanmalıdır.
+
+**Sanal ölçüm:** Çalışırken NTC'yi, 10 kΩ direnci ve fan motorunu seç. NTC üzerindeki gerilim sıcaklıkla düşer; motor hızı da seçtiğin sıcaklığa göre artar.
 
 ### Program
 ```cpp
@@ -109,20 +114,20 @@ void loop() {
 ### Nasıl çalışıyor?
 1. `sicaklikOku()` fonksiyonu A2'yi okur, NTC direncini ve sıcaklığı hesaplar. `constrain(adc, 1, 1022)` ADC sıfır ya da 1023 iken bölme hatasını engeller.
 2. Fan kararı iki eşiklidir: 30 °C'de açılır, 28 °C'nin altında kapanır. 29 °C'de olduğu durumda kalır.
-3. Hız, `map` ile 30-50 °C aralığından 90-255 PWM aralığına çevrilir. 90'ın altına inmeyiz, çünkü küçük motorlar düşük PWM'de dönmeye başlamaz.
+3. Hız, `map` ile 30-50 °C aralığından 90-255 PWM aralığına çevrilir. 90'ın altına inmeyiz, çünkü gerçek küçük motorlar düşük PWM'de dönmeye başlamaz.
 4. Servo taramayı `loop` her döndüğünde yalnızca 2 derece ilerleterek yapar. Böylece sıcaklık her adımda yeniden okunur ve tarama sırasında bile fan kararı güncel kalır.
-5. Fan kapanınca servo 90 dereceye park eder; kullandığımız `delay(20)` hem servoya zaman verir hem de seri yazımı seyreltir.
+5. Fan kapanınca servo 90 dereceye park eder; kullandığımız `delay(20)` servoya hareket için zaman verir. Seri yazımı ise `sayac` seyreltir: her 25 turda bir (yaklaşık yarım saniyede bir) yazılır.
 
 ### Dene
-- Eşikleri 26 ve 24 °C yap. Parmağınla NTC'yi ısıtarak sistemi tetikle.
+- Eşikleri 26 ve 24 °C yap. Sıcaklık özelliğini 25 °C civarında oynatarak sistemi tetikle.
 - Servo tarama aralığını 60-120 dereceye daralt.
-- Sıcaklık 60 °C'yi geçince yalnızca seriye "UYARI" yazan bir koşul ekle.
+- Sıcaklık 60 °C'yi geçince yalnızca seriye "UYARI" yazan bir koşul ekle. (Sıcaklık özelliği 120 °C'ye kadar çıkar.)
 
 ### Sık yapılan hatalar
 - NTC ve sabit direnç yerleşimine uygun olmayan formülü kullanmak: sıcaklık ters ya da anlamsız çıkar.
-- Fanı doğrudan D6'ya bağlamak: transistör ve diyot gerekir.
-- Harici kaynağın GND'sini Arduino ile birleştirmemek.
-- Servo ve fan aynı zayıf kaynaktan beslenince kartın sıfırlanması: ayrı 5 V kaynak kullan.
+- Fanı doğrudan D6'ya bağlamak: transistör ve diyot gerekir. Laboratuvar eksik diyotu "flyback" uyarısıyla, eksik baz direncini "taban akımı" uyarısıyla bildirir.
+- NTC ve sabit direncin yerlerini değiştirmek: A2 hattının davranışı ters olur, kodun formülü de buna göre değişmelidir.
+- Servoyu 5V ya da GND'ye bağlamayı unutmak: servo hiç hareket etmez.
 - Histerezis koymamak: sıcaklık eşik civarındayken fan sürekli açılıp kapanır.
 - Servo kullanırken D9 ve D10'dan `analogWrite` beklemek: Servo kütüphanesi bu iki pinin PWM'ini kapatır. Bu yüzden fan D6'dadır.
 

@@ -36,6 +36,8 @@ LED bir direnç değildir. Yanarken uçlarında yaklaşık sabit bir gerilim dü
 
 Besleme 5 V, LED gerilimi 2 V ise direncin üzerinde 5 − 2 = 3 V kalır.
 
+Bu hesap pinin ve LED'in iç dirençlerini yok sayan idealleştirilmiş bir hesaptır:
+
 - 330 Ω için akım: I = 3 / 330 ≈ 0,0091 A ≈ **9 mA**. LED güvenle yanar.
 - 150 Ω için akım: I = 3 / 150 = 0,02 A = **20 mA**. Daha parlak olur, ama sınıra yakındır.
 - 100 Ω için akım: I = 3 / 100 = **30 mA**. Bu fazladır; LED ve pin zarar görebilir.
@@ -45,7 +47,7 @@ Arduino Uno'nun bir pini için önerilen en yüksek akım yaklaşık 20 mA'dir; 
 ### Sanal ölçüm: akımı ve gerilimi oku
 Gerçek devrelerde bu değerleri multimetre ölçer. Laboratuvarda bunun karşılığı **sanal ölçümdür**. Devre çalışırken tuvalde bir parçayı (örneğin direnci ya da LED'i) seç. Parçanın uçları arasındaki **gerilim** ve içinden geçen **akım** özellik panelinde görünür. Önce ▶ ile devreyi çalıştırman gerekir; çalışmayan devrede ölçülecek bir şey yoktur.
 
-Ohm yasasını bununla sınayabilirsin: D13'ü 330 Ω'luk bir dirençle LED'e bağla, kod D13'ü HIGH yapsın. Direnci seçince yaklaşık 3 V ve 9 mA görmelisin. Hesabımız: (5 − 2) / 330 ≈ 9 mA. Sonra ■ ile durdur, direnci özellik panelinden 1000 Ω yap ve yeniden çalıştırıp ölç: akım yaklaşık 3 mA'e düşmelidir.
+Ohm yasasını bununla sınayabilirsin: D13'ü 330 Ω'luk bir dirençle LED'e bağla, kod D13'ü HIGH yapsın. Direnci seçince yaklaşık 2,8 V ve 8,6 mA görmelisin. Hesabımız 3 V ve 9 mA demişti; küçük fark normaldir, çünkü laboratuvar Uno pininin iç direncini (yaklaşık 25 Ω) ve LED'in iç direncini de modeller. Bu iki direnç de gerilimden pay alır, o yüzden seri dirence 3 V'un tamamı düşmez. Fark küçük direnç değerlerinde büyür: 150 Ω'da akım 20 mA değil yaklaşık 17 mA, 100 Ω'da 30 mA değil yaklaşık 24 mA ölçülür. Sonra ■ ile durdur, direnci özellik panelinden 1000 Ω yap ve yeniden çalıştırıp ölç: akım yaklaşık 3 mA'e düşmelidir (gerilim de 3 V'a yaklaşır, çünkü akım azalınca pinde ve LED'de kaybolan pay küçülür).
 
 ### Dirençte renk kodu
 Gerçek dirençlerin üzerindeki renkli halkalar değeri verir. Laboratuvarda değeri özellik panelinden yazarsın, ama gerçek dirençleri okumak için kodu bilmek yararlıdır. 330 Ω için sıra: turuncu, turuncu, kahverengi. İlk iki halka rakamdır (3 ve 3), üçüncü halka çarpandır (kahverengi = ×10), yani 33 × 10 = 330 Ω.
@@ -54,7 +56,7 @@ Gerçek dirençlerin üzerindeki renkli halkalar değeri verir. Laboratuvarda de
 - 5 V'a bağlı 220 Ω'luk bir dirençten ne kadar akım geçer? (Cevap: yaklaşık 22,7 mA)
 - Aynı 5 V ile 10 mA akım geçirmek istiyorsan hangi direnç gerekir? (Cevap: 500 Ω)
 - Kırmızı LED (2 V) ve 5 V besleme ile 330 Ω yerine 1 kΩ kullanırsan akım ne olur? LED nasıl görünür? (Cevap: 3 mA; sönük yanar)
-- Laboratuvarda bu devreyi kur, direnç değerini değiştir ve sanal ölçümle akımı oku. Hesabınla ölçülen değer uyuşuyor mu?
+- Laboratuvarda bu devreyi kur, direnç değerini değiştir ve sanal ölçümle akımı oku. Hesabınla ölçülen değer uyuşuyor mu? Küçük farkın nedenini kendi cümlelerinle açıkla.
 
 ### Sık yapılan hatalar
 - mA ile A'yı karıştırmak: 20 mA = 0,02 A'dir. Formülde önce ampere çevir.

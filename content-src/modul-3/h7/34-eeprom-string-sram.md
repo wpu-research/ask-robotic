@@ -2,7 +2,7 @@
 süre: 25
 
 ## Merak
-Kartın fişini çekip taktığında tüm değişkenlerin sıfırlanır. Termostatın "hedef sıcaklık 24 derece" ayarını nasıl hatırlayacak? Üstelik Uno'nun belleği çok küçük: bir telefon fotoğrafı bile ona sığmaz. Bu küçük belleği nasıl akıllıca kullanırız?
+Bir cihazın gücü kesilip yeniden verildiğinde tüm değişkenlerinin değerleri sıfırlanır. Termostatın "hedef sıcaklık 24 derece" ayarını nasıl hatırlayacak? Üstelik Uno'nun belleği çok küçük: bir telefon fotoğrafı bile ona sığmaz. Bu küçük belleği nasıl akıllıca kullanırız?
 
 ## Etkinlik
 ### Üç bellek
@@ -17,7 +17,9 @@ Arduino Uno'nun (ATmega328P) üç ayrı belleği vardır:
 `int`, `float`, `String` gibi değişkenlerin hepsi SRAM'dedir. Kalıcı olmasını istediğin veriyi **EEPROM**'a yazarsın.
 
 ### Devre
-Bu derste yalnızca kartın kendisi gerekir; ek parça yok. Sonuçları Serial Monitor'de (9600 baud) okuyacaksın.
+Bu derste devre kurmayacaksın: laboratuvardaki Uno yeterli, ek parça yok. Sonuçları **Seri monitörde** (9600 baud) okuyacaksın.
+
+**Laboratuvar notu:** ▶ ile her çalıştırmada Uno'nun EEPROM'u boş (her hücrede 255) başlar; laboratuvar bellek içeriğini çalıştırmalar arasında saklamaz. Gerçek bir Uno'da EEPROM, güç kesilse de içeriğini korurdu. Bu yüzden bu derste "kalıcılığı" kodun mantığından ve yazma sayısından anlarsın, çalıştırmalar arasında değil.
 
 ### Program: açılış sayacı
 Her açılışta EEPROM'daki sayıyı bir artıran program. Hiç yazılmamış bir EEPROM hücresinde `255` bulunur; bunu "boş" kabul ediyoruz.
@@ -40,7 +42,7 @@ void loop() {
 }
 ```
 
-Kartı kapatıp açtıkça sayı 1, 2, 3 diye artar.
+Gerçek bir kartta güç kesilip yeniden verildikçe sayı 1, 2, 3 diye artar. Laboratuvarda ise EEPROM her çalıştırmada boş başladığı için ▶'e her bastığında "Acilis sayisi: 1" görürsün; kod doğrudur, yalnızca bellek saklanmıyor.
 
 ### Yıpranma: write mi, update mi?
 EEPROM hücreleri sonsuza kadar yazılamaz. Üretici her hücre için yaklaşık **100.000 yazma** garanti eder. Bundan sonra hücre bozulabilir. Okumak ise hücreyi yıpratmaz.
@@ -149,13 +151,13 @@ Bu hafta üç kütüphane gördün: `LiquidCrystal`, `Wire`, `EEPROM`. Hepsi ayn
 2. Gerekiyorsa bir **nesne** oluştur: `LiquidCrystal lcd(...)`. (`EEPROM` ve `Wire` için nesne hazırdır.)
 3. `nesne.komut()` biçiminde komutlarını çağır: `lcd.print()`, `Wire.begin()`, `EEPROM.read()`.
 
-Yeni bir kütüphane kullanmak istediğinde Arduino IDE'de **Taslak > Kütüphane Ekle > Kütüphaneleri Yönet** menüsünden ara ve kur. Kütüphanenin **Dosya > Örnekler** altındaki hazır örnekleri, nasıl kullanılacağını gösteren en iyi kaynaktır.
+Laboratuvarda bu kütüphaneler (`LiquidCrystal`, `LiquidCrystal_I2C`, `Wire`, `EEPROM`, `Servo`) hazırdır; programın başına `#include` yazman yeter, ayrıca kurulum gerekmez. Gerçek Arduino IDE'de yeni bir kütüphaneyi **Taslak > Kütüphane Ekle > Kütüphaneleri Yönet** menüsünden kurarsın; kütüphanenin **Dosya > Örnekler** altındaki hazır örnekleri, nasıl kullanılacağını gösteren en iyi kaynaktır.
 
 ### Dene
-- `eeprom_sayac` programını kartta çalıştır, kartı çıkarıp tak. Sayı artmaya devam ediyor mu?
+- `eeprom_sayac` programını çalıştır, ■ ile durdurup yeniden ▶'e bas. Sayı neden hep 1? (İpucu: laboratuvar EEPROM'u her çalıştırmada boş başlatır.) Gerçek kartta sonuç ne olurdu?
 - `eeprom_yipranma` içinde `update` döngüsünü 1000 kez döndür. Sonuç neden hâlâ 7?
 - `sram_string` programında `String` uzunluğunu 200 karaktere çıkar. `Sonra` değeri ne kadar azalıyor?
-- Pot ile ayarlanan bir değeri butona basıldığında EEPROM'a kaydet. Her döngüde kaydetsen ne olurdu?
+- Laboratuvara bir potansiyometre ve bir buton ekle. Pot ile ayarlanan değeri butona basıldığında EEPROM'a kaydet. Her döngüde kaydetsen ne olurdu?
 
 ### Sık yapılan hatalar
 - EEPROM'a her `loop` turunda yazmak: hücre kısa sürede yıpranır. Yalnızca değer değiştiğinde yaz; `update` kullan.

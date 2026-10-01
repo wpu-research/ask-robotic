@@ -83,6 +83,85 @@ const ledsToGnd = ({ circuit, analysis }: { circuit: Circuit; analysis: CircuitA
   return leds.length > 0 && leds.every((l) => UNO_GNDS.some((g) => analysis.sameNet(pin(l.id, 'K'), pin('uno', g))))
 }
 
+const OHM_CODE = `// D13'ü sürekli HIGH (5 V) yap; akımı devre ve direnç belirler.
+void setup() {
+  // 13. pini çıkış yap
+  // 13. pini HIGH yap
+}
+
+void loop() {
+  // burada yapacak bir şey yok
+}
+`
+
+/** Direnç parçalarından biri: LED yanarken ölçülen akım (mA, mutlak) aralıkta mı. */
+const resistorCurrentIn = (lo: number, hi: number) => ({ circuit, lab }: { circuit: Circuit; lab: { parts: Record<string, { meas?: { currentMa: number } }> } | null }) =>
+  !!lab && partsOf(circuit, 'resistor').some((r) => {
+    const mA = lab.parts[r.id]?.meas?.currentMa
+    return mA !== undefined && Math.abs(mA) >= lo && Math.abs(mA) <= hi
+  })
+
+/** Modül 3, hafta 1, ders 2: Ohm yasası. Anahtar "arduino-temelleri:1:2". */
+const ohmYasasi: LabActivity = {
+  intro: 'D13’ü bir dirençle LED’e bağla, sonra sanal ölçümle direnç akımını oku. Direnç değerini değiştirerek akımı 5-12 mA aralığına getir.',
+  starter: () => ({ circuit: unoOnly(), code: OHM_CODE }),
+  allowedParts: ['led', 'resistor'],
+  goals: [
+    {
+      id: 'd13-direnc-led',
+      text: 'D13 pinini bir direnç üzerinden LED’in uzun bacağına (A) bağla.',
+      hint: 'D13 → direncin 1. ucu, direncin 2. ucu → LED’in A ucu. D13’ü LED’e doğrudan bağlama.',
+      check: pinsThroughResistor([13]),
+    },
+    {
+      id: 'katot-gnd',
+      text: 'LED’in kısa bacağını (K) GND’ye bağla.',
+      hint: 'Uno’daki herhangi bir GND pini olur.',
+      check: ledsToGnd,
+    },
+    {
+      id: 'kod-high',
+      text: 'Kodda D13’ü çıkış yap ve HIGH ver.',
+      hint: 'setup() içine pinMode(13, OUTPUT); ve digitalWrite(13, HIGH); yaz.',
+      check: ({ code }) => {
+        const c = stripComments(code)
+        return /pinMode\s*\(\s*13\s*,\s*OUTPUT\s*\)/.test(c) && /digitalWrite\s*\(\s*13\s*,\s*HIGH\s*\)/.test(c)
+      },
+    },
+    {
+      id: 'led-yaniyor',
+      text: 'Programı çalıştır: LED yansın.',
+      hint: '“Derle ve çalıştır”a bas. LED yanmıyorsa kabloları ve kodu kontrol et.',
+      behavior: true,
+      check: ({ lab }) => Object.values(lab?.parts ?? {}).some((p) => p.led?.on && !p.led.burnt),
+    },
+    {
+      id: 'akim-5-12',
+      text: 'Direnci seçip sanal ölçümle akımını oku: 5 ile 12 mA arasında olsun.',
+      hint: 'Devre çalışırken direnci seç. Akım 12 mA’den büyükse direnci büyüt, 5 mA’den küçükse küçült (■ ile durdurup değeri değiştir; 330 Ω yaklaşık 8,6 mA verir).',
+      behavior: true,
+      check: resistorCurrentIn(5, 12),
+    },
+  ],
+  solution: () => {
+    const circuit = unoOnly()
+    circuit.parts.push(part('r1', 'resistor', 360, 60, { ohms: 330 }), part('led1', 'led', 480, 60, { color: 'red' }))
+    circuit.wires.push(wire(pin('uno', 'D13'), pin('r1', '1')), wire(pin('r1', '2'), pin('led1', 'A')), wire(pin('led1', 'K'), pin('uno', 'GND')))
+    return {
+      circuit,
+      code: `void setup() {
+  pinMode(13, OUTPUT);
+  digitalWrite(13, HIGH);
+}
+
+void loop() {
+}
+`,
+    }
+  },
+  scenario: (s) => s.advance(500),
+}
+
 const BLINK_CODE = `// Burayı sen yaz: LED'i yakıp söndüren programı oluştur.
 void setup() {
   // 13. pini çıkış yap
@@ -307,6 +386,7 @@ void loop() {
 
 export const M3_H1_ACTIVITIES: Record<string, LabActivity> = {
   'arduino-temelleri:1:1': mikrodenetleyici,
+  'arduino-temelleri:1:2': ohmYasasi,
   'arduino-temelleri:1:3': blink,
   'arduino-temelleri:1:4': cokluLed,
   'arduino-temelleri:1:5': trafikIsigi,

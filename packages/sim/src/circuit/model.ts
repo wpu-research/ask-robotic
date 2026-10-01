@@ -70,7 +70,41 @@ export const MODEL = {
   lcdBlVf: 3,
   lcdBlOhms: 15,
   lcdBlOnA: 0.001,
+  // ---- Aşama C ----
+  /** 3,3 V ile de çalışan modüller (DHT, BMP280, MPU6050, RTC, IR, analog modüller) için beslenmiş sayılma eşiği (V). */
+  powerMin3v3: 3,
+  /** PIR (HC-SR501 benzeri): ısınma süresi (gerçek modülde 30-60 sn; sanal laboratuvarda kısaltıldı) ve OUT'un HIGH kalma süresi. */
+  pirWarmupMs: 2000,
+  pirHoldMs: 3000,
+  /** Dijital çıkışlı modüllerin (PIR, IR, analog modül DO) çıkış seri direnci. */
+  moduleOutOhms: 100,
+  /** Enkoder/joystick: kontak (kapalı) direnci, kartın pull-up direnci. */
+  encoderContactOhms: 100,
+  modulePullupOhms: 10_000,
+  /** Enkoder: bir tık = dört durum geçişi (11 → 01 → 00 → 10 → 11, saat yönü). */
+  encoderPhasesPerClick: 4,
+  /** Joystick ve analog modüllerin AO bölücüsünün toplam direnci. */
+  dividerOhms: 10_000,
+  /** HC-SR04 menzili (cm); dışında echo yok. */
+  hcsr04MinCm: 2,
+  hcsr04MaxCm: 400,
+  /** RTC'nin açılış zamanı (UTC). */
+  rtcStartIso: '2026-01-01T00:00:00.000Z',
 } as const
+
+/**
+ * Analog çıkışlı modüller: AO = VCC · clamp(base + span · seviye). `prop` seviyenin özellik anahtarı (0-1).
+ * Yönler derslerdeki varsayımlarla uyumludur: MQ-2 gazda yükselir, alev düşer, ses yükselir, kapasitif toprak nemi ıslakta düşer.
+ * DO çıkışı, seviye ≥ eşik olduğunda LOW'dur (LM393 karşılaştırıcılı modüller).
+ */
+export const ANALOG_MODULES = {
+  mq2: { prop: 'gas', base: 0.1, span: 0.9, minVolts: 4 },
+  flame: { prop: 'flame', base: 1, span: -0.95, minVolts: 3 },
+  sound: { prop: 'sound', base: 0.25, span: 0.7, minVolts: 3 },
+  soil: { prop: 'moisture', base: 0.9, span: -0.6, minVolts: 3 },
+} as const
+export type AnalogModuleType = keyof typeof ANALOG_MODULES
+export const isAnalogModule = (t: string): t is AnalogModuleType => t in ANALOG_MODULES
 
 const LED_VF: Record<string, number> = { red: 1.9, yellow: 2.0, green: 2.2, blue: 3.0, white: 3.0 }
 export function ledVf(color: unknown): number { return LED_VF[String(color)] ?? LED_VF.red }

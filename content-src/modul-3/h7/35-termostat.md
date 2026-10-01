@@ -15,21 +15,21 @@ Bu proje öğrendiklerini birleştirir:
 Kullanıcı iki butonla hedef sıcaklığı ayarlar. Ölçülen sıcaklık hedefin altına düşünce röle ısıtıcıyı açar, hedefe ulaşınca kapatır. Hedef sıcaklık EEPROM'da saklanır.
 
 ### Devre
-**Güvenlik:** Bu projede röleyi yalnızca düşük gerilimle (5 V) kullan. Şebeke gerilimiyle (220 V) devre kurma. Gerçek bir ısıtıcıyı bağlamak yetişkin ve uzman gözetimi gerektirir.
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Gereken parçalar: NTC (`ntc`), iki direnç (10 kΩ ve 330 Ω), iki buton, bir röle (`relay`), bir LED ve bir I2C LCD (`lcdI2c`).
 
 | Parça | Bağlantı |
 |---|---|
-| 10 kΩ NTC termistör | Bir ucu **A2**, öbür ucu GND |
-| 10 kΩ sabit direnç | Bir ucu 5 V, öbür ucu **A2** |
-| Buton "artır" | Bir ucu **D2**, öbür ucu GND |
-| Buton "azalt" | Bir ucu **D3**, öbür ucu GND |
-| Röle modülü IN | **D7** (VCC → 5 V, GND → GND) |
-| "Isıtıcı" yerine LED | Röle COM → 5 V; röle NO → 330 Ω direnç → LED → GND |
-| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5 V, GND → GND (adres 0x27) |
+| NTC termistör | 1 ucu **A2**, 2 ucu GND |
+| 10 kΩ direnç (sabit) | 1 ucu 5V, 2 ucu **A2** |
+| Buton "artır" | A ucu **D2**, B ucu GND |
+| Buton "azalt" | A ucu **D3**, B ucu GND |
+| Röle IN | **D7** (röle VCC → 5V, röle GND → GND) |
+| "Isıtıcı" yerine LED | Röle COM → 5V; röle NO → 330 Ω direnç → LED A; LED K → GND |
+| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND (adres 0x27) |
 
-Isıtıcı yerine LED kullanıyoruz: LED yanıyorsa "ısıtıcı açık" demektir. Butonlar `INPUT_PULLUP` olduğu için basılı buton `LOW` okunur. LCD adresin 0x27 değilse önceki derste öğrendiğin tarama programıyla bul. Röle modülün ters çalışıyorsa (IN'e LOW verince çekiyorsa) `HIGH` ile `LOW` yerlerini değiştir.
+Isıtıcı yerine LED kullanıyoruz: LED yanıyorsa "ısıtıcı açık" demektir. Butonlar `INPUT_PULLUP` olduğu için basılı buton `LOW` okunur. NTC'nin direnci 10 kΩ'dur (25 °C'de) ve β değeri 3950'dir; sıcaklığı NTC'yi seçip sağ panelden değiştirirsin (çalışırken de olur). Röle özelliklerinde **Tetik** "HIGH ile çeker" olmalı (varsayılan); "LOW ile çeker" seçersen programdaki `HIGH` ve `LOW` yerlerini değiştirmen gerekir. LCD adresi 0x27'den farklıysa, önceki derste öğrendiğin tarama programıyla bul. LCD, `lcd.init()` içindeki bekleme yüzünden ▶'ten yaklaşık 1,5 saniye sonra yazı gösterir.
 
-NTC ve sabit direnç bir **gerilim bölücü** oluşturur: sıcaklık arttıkça NTC'nin direnci düşer ve A2'deki gerilim azalır. NTC direncini `R = 10000 × ADC / (1023 − ADC)` formülüyle buluruz. Sıcaklığı ise β = 3950 değerli Steinhart-Hart (beta) formülüyle hesaplarız. Kendi termistörünün β değeri farklıysa sabiti değiştir.
+NTC ve sabit direnç bir **gerilim bölücü** oluşturur: sıcaklık arttıkça NTC'nin direnci düşer ve A2'deki gerilim azalır. NTC direncini `R = 10000 × ADC / (1023 − ADC)` formülüyle buluruz. Sıcaklığı ise β = 3950 değerli Steinhart-Hart (beta) formülüyle hesaplarız. Gerçek bir termistörün β değeri farklıysa sabiti değiştirirsin; laboratuvarın NTC'si 3950 kullanır.
 
 ### Durum makinesi
 Termostatın üç durumu var:
@@ -194,17 +194,16 @@ void loop() {
 
 ### Dene
 - `HISTEREZIS` değerini 0,2 ve 2 yap. Röle ne kadar sık açılıp kapanıyor?
-- Hedefi sıcaklığın üstüne çıkarıp elinle NTC'yi ısıt. Röle hangi sıcaklıkta kapanıyor?
-- Kartın fişini çekip tak. Hedef sıcaklık korunuyor mu?
-- Yeni bir özellik ekle: sıcaklık hedefin 5 dereceden fazla altındaysa buzzer'ı (D8) çaldır. Hangi duruma ekleyeceksin?
+- Hedefi sıcaklığın üstüne çıkar, sonra NTC'nin **Sıcaklık** özelliğini adım adım yükselt. Röle hangi sıcaklıkta kapanıyor?
+- ■ ile durdurup yeniden ▶'e bas. Hedef sıcaklık ilk değerine (22) dönüyor mu? Neden? (Laboratuvar EEPROM'u çalıştırmalar arasında saklamaz; gerçek kartta hedef korunurdu.)
+- Yeni bir özellik ekle: laboratuvara bir buzzer ekle (+ ucu D8, - ucu GND). Sıcaklık hedefin 5 dereceden fazla altındaysa çaldır. Hangi duruma ekleyeceksin?
 
 ### Sık yapılan hatalar
-- NTC ile sabit direnci ters yerleştirmek: sıcaklık arttıkça ölçüm düşer ya da tersine çalışır. Direnç bölücüsünü gerilim formülüyle yeniden hesapla.
+- NTC ile sabit direnci ters yerleştirmek (NTC'yi 5V'a, sabit direnci GND'ye bağlamak): sıcaklık arttıkça ölçüm düşer ya da tersine çalışır. Direnç bölücüsünü gerilim formülüyle yeniden hesapla.
 - Histerezis olmadan tek eşik kullanmak: sıcaklık eşik civarında dalgalanınca röle çok hızlı açılıp kapanır, röle bozulur.
 - EEPROM'a her buton basışında yazmak: art arda basışlar gereksiz yazma harcar. Yazmayı ayar bittikten sonra yap.
 - Hedef değerini sınırlamamak: negatif ya da çok yüksek hedefler ısıtıcıyı sürekli açık bırakabilir.
 - 255 olarak okunan boş EEPROM'u geçerli hedef sanmak.
-- Röleyle şebeke gerilimi kullanmak: bu projede kesinlikle yapma.
 
 ## Konuşalım
 Sıcaklık sensörü koptuysa ya da yanlış bağlandıysa termostatın ne yaptığını düşün: ısıtıcı sonsuza kadar açık kalır mı? Bu projeye bir güvenlik önlemi eklemek istesen ne eklerdin?

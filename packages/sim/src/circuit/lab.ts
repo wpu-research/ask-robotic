@@ -1,14 +1,15 @@
 // Sanal devre laboratuvarı: Sim (avr8js) + netlist + DC çözücü. Tarayıcı ve Node uyumlu.
-import { HD44780, type I2CDevice, type LCDI2C } from '../devices.js'
+import { HD44780, type BMP280, type DHT, type HCSR04, type I2CDevice, type Keypad, type LCDI2C, type MPU6050, type RTC } from '../devices.js'
 import { Sim, type Pin, type PinStateName } from '../sim.js'
 import { staticWarnings } from './analysis.js'
 import type {
   Circuit, LabApi, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
 import { PINS } from './contract.js'
-import { MODEL, SEGMENTS, ldrOhms, ledSpecs, ntcOhms, num, type LedSpec } from './model.js'
+import { ANALOG_MODULES, MODEL, SEGMENTS, isAnalogModule, ldrOhms, ledSpecs, ntcOhms, num, type LedSpec } from './model.js'
 import { buildNetlist, type Netlist } from './netlist.js'
 import { Sr595Chip, attachSr595, buildSr595, simPin, wiredUno } from './peripherals.js'
+import { EncoderModel, PirModel } from './sensors.js'
 import { solve, type SolverInput, type SolverResult } from './solver.js'
 
 const UNO_PINS: readonly string[] = PINS.uno.filter((n) => /^(D\d+|A\d)$/.test(n))
@@ -70,11 +71,16 @@ interface SrcMeta { kind: 'rail' | 'pin'; name: string; volts: number }
 interface Compiled { input: SolverInput; src: SrcMeta[]; leds: LedSpec[]; npnIds: string[] }
 interface Sol { res: SolverResult; comp: Compiled }
 interface I2cEntry { lcd: LCDI2C; dev: I2CDevice | undefined; reg: number | null }
+/** Aşama C I2C sensörü: cihaz veri yoluna yalnız bağlı ve beslenmişse girer (syncI2c). */
+interface I2cSensor { dev: I2CDevice | undefined; reg: number | null; model: BMP280 | MPU6050 | RTC }
 
+const DEFAULT_ADDR: Partial<Record<string, number>> = { lcdI2c: 0x27, bmp280: 0x76, mpu6050: 0x68, rtc: 0x68 }
 const parseAddr = (p: PartInstance): number => {
-  const n = Number(String(p.props.address ?? '0x27'))
-  return Number.isFinite(n) ? n : 0x27
+  const def = DEFAULT_ADDR[p.type] ?? 0x27
+  const n = Number(String(p.props.address ?? def))
+  return Number.isFinite(n) ? n : def
 }
+const ADC_FRACTION = (base: number, span: number, level: number): number => clamp01(base + span * clamp01(level))
 
 class LabImpl implements LabApi {
   private readonly circuit: Circuit
@@ -94,6 +100,15 @@ class LabImpl implements LabApi {
   private chipById = new Map<string, Sr595Chip>()
   private lcds = new Map<string, HD44780>()
   private i2cLcds = new Map<string, I2cEntry>()
+  // Aşama C
+  private hcs = new Map<string, HCSR04>()
+  private dhts = new Map<string, DHT>()
+  private i2cSensors = new Map<string, I2cSensor>()
+  private keypads = new Map<string, { dev: Keypad; pressed: string | null }>()
+  private pirs = new Map<string, PirModel>()
+  private encs = new Map<string, EncoderModel>()
+  /** Sim cihaz modellerinin doğrudan sürdüğü Uno pinleri (ECHO, DHT DATA, keypad satırları): düğüm gerilimi bunlara yazılmaz. */
+  private devOwned = new Set<string>()
 
   private modes: Record<string, PinStateName> = {}
   private version = 0
@@ -216,6 +231,85 @@ class LabImpl implements LabApi {
         this.i2cLcds.set(p.id, { lcd, dev, reg: null })
       }
     }
+    this.attachSensors()
+  }
+
+  /** Aşama C: Sim cihaz modellerini (HC-SR04, DHT, BMP280, MPU6050, RTC, keypad) ve durum modellerini (PIR, enkoder) kurar. */
+  private attachSensors(): void {
+    this.hcs.clear(); this.dhts.clear(); this.i2cSensors.clear(); this.keypads.clear(); this.pirs.clear(); this.encs.clear(); this.devOwned.clear()
+    const u = (p: PartInstance, pin: string): { name: string; pin: Pin } | undefined => wiredUno(this.nl, p.id, pin)
+    for (const p of this.circuit.parts) {
+      switch (p.type) {
+        case 'hcsr04': {
+          const trig = u(p, 'TRIG'), echo = u(p, 'ECHO')
+          if (trig && echo) { this.hcs.set(p.id, this.sim.hcsr04({ trig: trig.pin, echo: echo.pin, cm: num(p, 'distanceCm', 100) })); this.devOwned.add(echo.name) }
+          break
+        }
+        case 'dht': {
+          const data = u(p, 'DATA')
+          if (data) {
+            this.dhts.set(p.id, this.sim.dht({ pin: data.pin, type: p.props.type === 'dht11' ? 'DHT11' : 'DHT22', tempC: num(p, 'tempC', 25), humidity: num(p, 'humidity', 50) }))
+            this.devOwned.add(data.name)
+          }
+          break
+        }
+        case 'bmp280': case 'mpu6050': case 'rtc': {
+          const addr = parseAddr(p)
+          const model = p.type === 'bmp280' ? this.sim.bmp280({ address: addr })
+            : p.type === 'mpu6050' ? this.sim.mpu6050({ address: addr })
+              : this.sim.rtc({ address: addr, start: new Date(MODEL.rtcStartIso) })
+          const dev = this.sim.i2c.devices.get(addr)
+          this.sim.i2c.devices.delete(addr) // veri yoluna yalnız bağlı ve beslenmişse girer (syncI2c)
+          this.i2cSensors.set(p.id, { dev, reg: null, model })
+          break
+        }
+        case 'keypad': {
+          const rows = ['R1', 'R2', 'R3', 'R4'].map((n) => u(p, n)), cols = ['C1', 'C2', 'C3', 'C4'].map((n) => u(p, n))
+          if (rows.every((x) => x) && cols.every((x) => x)) {
+            this.keypads.set(p.id, { dev: this.sim.keypad({ rows: rows.map((r) => r!.pin), cols: cols.map((c) => c!.pin) }), pressed: null })
+            for (const r of rows) this.devOwned.add(r!.name)
+          }
+          break
+        }
+        case 'pir': this.pirs.set(p.id, new PirModel()); break
+        case 'encoder': this.encs.set(p.id, new EncoderModel(Math.round(num(p, 'position', 0)))); break
+        default: break
+      }
+    }
+    for (const p of this.circuit.parts) this.applyProps(p)
+  }
+
+  /** Canlı özellikleri (mesafe, sıcaklık, ivme, tuş…) Sim cihaz modellerine yazar. */
+  private applyProps(p: PartInstance): void {
+    switch (p.type) {
+      case 'hcsr04': { const d = this.hcs.get(p.id); if (d) d.cm = num(p, 'distanceCm', 100); break }
+      case 'dht': {
+        const d = this.dhts.get(p.id)
+        if (d) { d.tempC = num(p, 'tempC', 25); d.humidity = num(p, 'humidity', 50); d.type = p.props.type === 'dht11' ? 'DHT11' : 'DHT22' }
+        break
+      }
+      case 'bmp280': {
+        const m = this.i2cSensors.get(p.id)?.model as BMP280 | undefined
+        if (m) { m.tempC = num(p, 'tempC', 25); m.pressurePa = num(p, 'pressureHpa', 1013.25) * 100 }
+        break
+      }
+      case 'mpu6050': {
+        const m = this.i2cSensors.get(p.id)?.model as MPU6050 | undefined
+        if (m) { m.ax = num(p, 'ax', 0); m.ay = num(p, 'ay', 0); m.az = num(p, 'az', 1); m.gx = num(p, 'gx', 0); m.gy = num(p, 'gy', 0); m.gz = num(p, 'gz', 0) }
+        break
+      }
+      case 'keypad': {
+        const k = this.keypads.get(p.id)
+        if (!k) break
+        const want = typeof p.props.key === 'string' && p.props.key !== '' ? p.props.key : null
+        if (want === k.pressed) break
+        k.dev.release()
+        if (want !== null) { try { k.dev.press(want) } catch { /* bilinmeyen tuş: yok say */ } }
+        k.pressed = want
+        break
+      }
+      default: break
+    }
   }
 
   // ---- LabApi ----
@@ -228,7 +322,10 @@ class LabImpl implements LabApi {
       const mode: PinSnapshot['mode'] = st === 'High' || st === 'Low' ? 'out' : st === 'InputPullUp' ? 'pullup' : 'in'
       let volts: number, high: boolean
       const wired = this.wiredPins.includes(n)
-      if (wired && this.unoId !== undefined) {
+      if (wired && this.devOwned.has(n) && mode !== 'out') {
+        high = this.sim.read(sp) // sürücü bir Sim cihaz modeli (ECHO, DHT DATA, keypad satırı)
+        volts = high ? MODEL.vcc : 0
+      } else if (wired && this.unoId !== undefined) {
         const nd = this.node({ part: this.unoId, pin: n })
         volts = sol.res.floating[nd] ? 0 : sol.res.volts[nd]
         high = mode === 'out' ? st === 'High' : sol.res.floating[nd] ? this.sim.read(sp) : volts > MODEL.digitalThreshold
@@ -254,6 +351,8 @@ class LabImpl implements LabApi {
     const part = this.circuit.parts.find((p) => p.id === partId)
     if (!part) return
     part.props[key] = value
+    if (part.type === 'encoder' && key === 'position' && typeof value === 'number' && Number.isFinite(value)) this.encs.get(partId)?.setTarget(value)
+    this.applyProps(part)
     this.version++
     this.refreshStatic()
     this.update(true)
@@ -290,8 +389,15 @@ class LabImpl implements LabApi {
   }
 
   /** `vcc` ucu kablolu, toprak tamam ve gerilim ≥ powerMinVolts. */
-  private supplyOk(p: PartInstance, vcc: string, gnd: string, v: Float64Array): boolean {
-    return this.gndOk(p, gnd) && this.nl.isWired(this.ref(p, vcc)) && v[this.node(this.ref(p, vcc))] > MODEL.powerMinVolts
+  private supplyOk(p: PartInstance, vcc: string, gnd: string, v: Float64Array, minVolts: number = MODEL.powerMinVolts): boolean {
+    return this.gndOk(p, gnd) && this.nl.isWired(this.ref(p, vcc)) && v[this.node(this.ref(p, vcc))] > minVolts
+  }
+
+  /** Aşama C modüllerinin beslenmesi (3,3 V ile çalışanlar için eşik düşük). */
+  private modPowered(p: PartInstance, v: Float64Array): boolean {
+    const min = isAnalogModule(p.type) ? ANALOG_MODULES[p.type].minVolts
+      : ['dht', 'irobstacle', 'bmp280', 'mpu6050', 'rtc', 'joystick'].includes(p.type) ? MODEL.powerMin3v3 : MODEL.powerMinVolts
+    return this.supplyOk(p, 'VCC', 'GND', v, min)
   }
 
   /** Giriş ucu kablolu, sürülüyor (yüzmüyor) ve eşiğin üstünde mi. */
@@ -325,7 +431,8 @@ class LabImpl implements LabApi {
       const s = this.modes[n]
       return s === 'High' ? 'H' : s === 'Low' ? 'L' : s === 'InputPullUp' ? 'P' : 'I'
     }).join('')
-    return `${m}|${this.version}|${[...this.burnt].sort().join(',')}|${this.chips.map((c) => c.signature()).join(',')}`
+    const c = [...this.pirs.values()].map((x) => x.signature()).join('') + '/' + [...this.encs.values()].map((x) => x.signature()).join('')
+    return `${m}|${this.version}|${[...this.burnt].sort().join(',')}|${this.chips.map((x) => x.signature()).join(',')}|${c}`
   }
 
   private compile(override?: { pin: string; high: boolean }): Compiled {
@@ -341,6 +448,52 @@ class LabImpl implements LabApi {
         case 'ldr': R(ref(p, '1'), ref(p, '2'), ldrOhms(num(p, 'light', 0.5))); break
         case 'ntc': R(ref(p, '1'), ref(p, '2'), ntcOhms(num(p, 'tempC', 25))); break
         case 'button': if (p.props.pressed === true) R(ref(p, 'A'), ref(p, 'B'), MODEL.buttonOnOhms); break
+        case 'reed': if (p.props.magnet === true) R(ref(p, 'A'), ref(p, 'B'), MODEL.buttonOnOhms); break
+        case 'joystick': {
+          const tot = MODEL.dividerOhms
+          for (const [pin, key] of [['VRX', 'x'], ['VRY', 'y']] as const) {
+            const pos = clamp01(num(p, key, 0.5))
+            R(ref(p, 'VCC'), ref(p, pin), Math.max((1 - pos) * tot, 0.01))
+            R(ref(p, pin), ref(p, 'GND'), Math.max(pos * tot, 0.01))
+          }
+          if (nl.isWired(ref(p, 'VCC'))) R(ref(p, 'VCC'), ref(p, 'SW'), MODEL.modulePullupOhms)
+          if (p.props.pressed === true) R(ref(p, 'SW'), ref(p, 'GND'), MODEL.encoderContactOhms)
+          break
+        }
+        case 'encoder': {
+          const e = this.encs.get(p.id)
+          // Kartın pull-up'ları '+' ucuna bağlıdır; '+' bağlı değilse devre dışı sayılır (kod INPUT_PULLUP kullanır)
+          if (nl.isWired(ref(p, 'VCC'))) for (const pin of ['CLK', 'DT', 'SW']) R(ref(p, 'VCC'), ref(p, pin), MODEL.modulePullupOhms)
+          if (e && !e.clk) R(ref(p, 'CLK'), ref(p, 'GND'), MODEL.encoderContactOhms)
+          if (e && !e.dt) R(ref(p, 'DT'), ref(p, 'GND'), MODEL.encoderContactOhms)
+          if (p.props.pressed === true) R(ref(p, 'SW'), ref(p, 'GND'), MODEL.encoderContactOhms)
+          break
+        }
+        case 'pir': {
+          const m = this.pirs.get(p.id)
+          const vcc = this.node(ref(p, 'VCC'))
+          input.logic!.push({ node: this.node(ref(p, 'OUT')), ohms: MODEL.moduleOutOhms, drive: (v) => (m && this.modPowered(p, v) && m.level ? v[vcc] : 0) })
+          break
+        }
+        case 'irobstacle': {
+          const prox = clamp01(num(p, 'proximity', 0)), thr = clamp01(num(p, 'threshold', 0.5))
+          const f = 0.05 + 0.9 * prox
+          R(ref(p, 'VCC'), ref(p, 'AO'), Math.max((1 - f) * MODEL.dividerOhms, 0.01))
+          R(ref(p, 'AO'), ref(p, 'GND'), Math.max(f * MODEL.dividerOhms, 0.01))
+          const vcc = this.node(ref(p, 'VCC'))
+          input.logic!.push({ node: this.node(ref(p, 'OUT')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) && !(prox >= thr) ? v[vcc] : 0) })
+          break
+        }
+        case 'mq2': case 'flame': case 'sound': case 'soil': {
+          const cfg = ANALOG_MODULES[p.type]
+          const level = clamp01(num(p, cfg.prop, 0)), thr = clamp01(num(p, 'threshold', 0.5))
+          const f = ADC_FRACTION(cfg.base, cfg.span, level)
+          R(ref(p, 'VCC'), ref(p, 'AO'), Math.max((1 - f) * MODEL.dividerOhms, 0.01))
+          R(ref(p, 'AO'), ref(p, 'GND'), Math.max(f * MODEL.dividerOhms, 0.01))
+          const vcc = this.node(ref(p, 'VCC'))
+          input.logic!.push({ node: this.node(ref(p, 'DO')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) && !(level >= thr) ? v[vcc] : 0) })
+          break
+        }
         case 'buzzer': R(ref(p, '+'), ref(p, '-'), MODEL.buzzerOhms); break
         case 'dcmotor': R(ref(p, 'M1'), ref(p, 'M2'), MODEL.motorOhms); break
         case 'pot': {
@@ -506,7 +659,7 @@ class LabImpl implements LabApi {
       const v = floating ? 0 : res.volts[nd]
       if (n[0] === 'A') this.sim.analog(n, Math.min(MODEL.vcc, Math.max(0, v)))
       const st = this.modes[n]
-      if ((st === 'Input' || st === 'InputPullUp') && !floating) this.sim.drive(simPin(n), v > MODEL.digitalThreshold)
+      if ((st === 'Input' || st === 'InputPullUp') && !floating && !this.devOwned.has(n)) this.sim.drive(simPin(n), v > MODEL.digitalThreshold)
     }
   }
 
@@ -552,12 +705,23 @@ class LabImpl implements LabApi {
   private update(force: boolean): void {
     const now = this.sim.nowMs()
     for (const t of this.trackers.values()) t.trim(now)
+    this.stepModels(now)
     this.ensureSolved(force)
     for (let g = 0; g < 3; g++) {
       const burntBefore = this.burnt.size
       this.computeRuntime(now)
       if (this.burnt.size === burntBefore) break
       this.ensureSolved(true)
+    }
+  }
+
+  /** Zamana bağlı sensör modellerini (PIR ısınma/tutma, enkoder dönüşü) bir adım ilerletir; son çözümdeki beslemeyi kullanır. */
+  private stepModels(now: number): void {
+    if (!this.base) return
+    const v = this.base.res.volts
+    for (const p of this.circuit.parts) {
+      if (p.type === 'pir') this.pirs.get(p.id)?.step(now, this.modPowered(p, v), p.props.motion === true)
+      else if (p.type === 'encoder') this.encs.get(p.id)?.step()
     }
   }
 
@@ -594,11 +758,11 @@ class LabImpl implements LabApi {
   private i2cPresent(p: PartInstance, v: Float64Array): boolean {
     const sda = this.nl.netOf(this.ref(p, 'SDA')), scl = this.nl.netOf(this.ref(p, 'SCL'))
     if (sda === undefined || scl === undefined) return false
-    return this.supplyOk(p, 'VCC', 'GND', v) && this.nl.unoPinsOnNet(sda).includes('A4') && this.nl.unoPinsOnNet(scl).includes('A5')
+    return this.modPowered(p, v) && this.nl.unoPinsOnNet(sda).includes('A4') && this.nl.unoPinsOnNet(scl).includes('A5')
   }
 
   private syncI2c(p: PartInstance, present: boolean): void {
-    const e = this.i2cLcds.get(p.id)
+    const e = this.i2cLcds.get(p.id) ?? this.i2cSensors.get(p.id)
     if (!e) return
     const want = present ? parseAddr(p) : null
     if (e.reg === want) return
@@ -618,6 +782,7 @@ class LabImpl implements LabApi {
       case 'ldr': return via('1', '2', ldrOhms(num(p, 'light', 0.5)))
       case 'ntc': return via('1', '2', ntcOhms(num(p, 'tempC', 25)))
       case 'button': return via('A', 'B', p.props.pressed === true ? MODEL.buttonOnOhms : null)
+      case 'reed': return via('A', 'B', p.props.magnet === true ? MODEL.buttonOnOhms : null)
       case 'buzzer': return via('+', '-', MODEL.buzzerOhms)
       case 'dcmotor': return via('M1', 'M2', MODEL.motorOhms)
       case 'pot': return via('VCC', 'SIG', Math.max((1 - clamp01(num(p, 'position', 0.5))) * Math.max(num(p, 'ohms', 10_000), 1), 0.01))
@@ -626,6 +791,68 @@ class LabImpl implements LabApi {
         return { vAcross: this.blend((s) => v(s, 'A') - v(s, 'K'), now), currentMa: this.ledMa(i, now) }
       }
       default: return undefined
+    }
+  }
+
+  /** Aşama C parçalarının çalışma zamanı durumu ve cihaz modeli güç denetimi; parça Aşama C ise true. */
+  private sensorRuntime(p: PartInstance, out: PartRuntime, now: number): boolean {
+    void now
+    const v = this.base.res.volts
+    const volts = (pin: string): number => v[this.node(this.ref(p, pin))]
+    switch (p.type) {
+      case 'hcsr04': {
+        const dev = this.hcs.get(p.id)
+        const powered = this.modPowered(p, v)
+        if (dev) dev.enabled = powered
+        const cm = num(p, 'distanceCm', 100)
+        out.hcsr04 = { powered, distanceCm: cm, inRange: cm >= MODEL.hcsr04MinCm && cm <= MODEL.hcsr04MaxCm, pings: dev?.pings ?? 0 }
+        return true
+      }
+      case 'dht': {
+        const dev = this.dhts.get(p.id)
+        const powered = this.modPowered(p, v)
+        if (dev) dev.enabled = powered
+        out.dht = { powered, type: p.props.type === 'dht11' ? 'dht11' : 'dht22', tempC: num(p, 'tempC', 25), humidity: num(p, 'humidity', 50), reads: dev?.reads ?? 0 }
+        return true
+      }
+      case 'pir': {
+        const m = this.pirs.get(p.id)
+        out.pir = { powered: this.modPowered(p, v), out: m?.level ?? false, warmingUp: m?.warmingUp ?? false }
+        return true
+      }
+      case 'irobstacle': {
+        const detected = num(p, 'proximity', 0) >= num(p, 'threshold', 0.5)
+        const powered = this.modPowered(p, v)
+        out.irobstacle = { powered, out: powered && !detected, detected, aoVolts: volts('AO') }
+        return true
+      }
+      case 'reed': out.reed = { closed: p.props.magnet === true }; return true
+      case 'bmp280': case 'mpu6050': case 'rtc': {
+        const present = this.i2cPresent(p, v)
+        this.syncI2c(p, present)
+        const powered = this.modPowered(p, v)
+        const e = this.i2cSensors.get(p.id)
+        if (p.type === 'bmp280') out.bmp280 = { powered, present, tempC: num(p, 'tempC', 25), pressureHpa: num(p, 'pressureHpa', 1013.25) }
+        else if (p.type === 'mpu6050') {
+          out.mpu6050 = { powered, present, ax: num(p, 'ax', 0), ay: num(p, 'ay', 0), az: num(p, 'az', 1), gx: num(p, 'gx', 0), gy: num(p, 'gy', 0), gz: num(p, 'gz', 0) }
+        } else out.rtc = { powered, present, time: (e?.model as RTC | undefined)?.now().toISOString() ?? MODEL.rtcStartIso }
+        return true
+      }
+      case 'joystick':
+        out.joystick = { powered: this.modPowered(p, v), x: clamp01(num(p, 'x', 0.5)), y: clamp01(num(p, 'y', 0.5)), pressed: p.props.pressed === true, vrxVolts: volts('VRX'), vryVolts: volts('VRY') }
+        return true
+      case 'encoder': {
+        const e = this.encs.get(p.id)
+        out.encoder = { position: e?.position ?? 0, moving: e?.moving ?? false, clk: e?.clk ?? true, dt: e?.dt ?? true, pressed: p.props.pressed === true }
+        return true
+      }
+      case 'keypad': out.keypad = { key: this.keypads.get(p.id)?.pressed ?? null }; return true
+      case 'mq2': case 'flame': case 'sound': case 'soil': {
+        const level = clamp01(num(p, ANALOG_MODULES[p.type].prop, 0))
+        out.analogModule = { powered: this.modPowered(p, v), level, aoVolts: volts('AO'), doHigh: volts('DO') > MODEL.digitalThreshold }
+        return true
+      }
+      default: return false
     }
   }
 
@@ -682,6 +909,8 @@ class LabImpl implements LabApi {
           backlight: present && !!e && e.lcd.backlight,
           poweredOn: this.supplyOk(p, 'VCC', 'GND', v),
         }
+      } else if (this.sensorRuntime(p, out, now)) {
+        /* Aşama C parçası dolduruldu */
       } else if (p.type === 'buzzer') {
         const v = volts({ part: p.id, pin: '+' }) - volts({ part: p.id, pin: '-' })
         if (Math.abs(v) > MODEL.buzzerOnVolts) this.overSince.set(p.id, now)

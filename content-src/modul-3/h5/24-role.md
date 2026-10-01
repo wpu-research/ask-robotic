@@ -5,29 +5,33 @@ süre: 20
 Transistör küçük motorları sürdü, ama bazen daha büyük bir yükü ya da Arduino'dan tamamen ayrı bir devreyi açıp kapatmak gerekir. "Tık" sesi çıkaran küçük bir kutu bunu yapar: röle. İçinde ne olduğunu ve neden bu kadar dikkat gerektirdiğini birlikte öğrenelim.
 
 ## Güvenlik uyarısı
-Bu derste yalnızca **düşük gerilimli** devreler kurulur: Arduino'nun 5 V'u, 4 x AA pil kutusu ya da en çok 12 V'luk bir DC kaynak. **Şebeke gerilimi (220 V) ile ASLA devre kurma.** Prize bağlanan bir cihazı röleyle açıp kapatmaya çalışmak ölümcül olabilir. Röle modülünün üzerindeki yüksek gerilim yazıları senin kuracağın devre için geçerli değildir. Röle ile ilgili her deneyi bir yetişkinin gözetiminde yap.
+Sanal laboratuvarda yalnızca **düşük gerilimli** devreler kurulur: Uno'nun 5 V'u yeterlidir ve laboratuvar şebeke gerilimi sunmaz. Gerçek hayatta **şebeke gerilimi (220 V)** ölümcüldür; röleyle prize bağlı bir cihazı açıp kapatmak, bu işin eğitimini almış ve gerekli donanıma sahip bir uzmana aittir. Bir röle modülünün üzerinde "250 V" yazması, onu kendi başına güvenle kullanabileceğin anlamına gelmez. Burada öğrendiğin mantık (COM, NO, NC, aktif-LOW) düşük gerilimde de aynıdır.
 
 ## Etkinlik
 Röle, bir **elektromıknatıs** ile çalışan anahtardır. Bobine akım verince mıknatıs bir metal kolu çeker ve kontaklar kapanır. Arduino ile açıp kapattığın devre (kontak tarafı) bobin devresinden elektriksel olarak ayrıdır. Kontak tarafı kendi gerilimini taşımayan, yalnız bir anahtar gibi davranan bir devredir; buna **kuru kontak** denir.
 
-Röle modülünde bobini süren transistör, diyot ve genelde bir LED hazır gelir. Üç pini vardır: VCC (5 V), GND ve IN (sinyal). Kontak tarafında üç vida klemensi bulunur:
+Röle modülünde bobini süren transistör, diyot ve genelde bir LED hazır gelir. Modülün üç giriş pini vardır: VCC (5 V), GND ve IN (sinyal). Kontak tarafında üç uç bulunur:
 
 - **COM**: ortak uç
 - **NO** (normalde açık): röle çekilmeyince açık, çekilince COM'a bağlanır
 - **NC** (normalde kapalı): röle çekilmeyince COM'a bağlı, çekilince açılır
 
-Çoğu modül **LOW ile çeker**: IN pinine `LOW` verince röle çeker, `HIGH` verince bırakır. Bazı modüller tersidir; modülünün yazısına bak ya da kısa bir denemeyle öğren. Bu derste LOW ile çeken modül varsayıyoruz.
+Piyasadaki modüllerin çoğu (özellikle optokuplörlü olanlar) **LOW ile çeker**: IN pinine `LOW` verince röle çeker, `HIGH` verince bırakır. Bazı modüller tersidir; gerçek modülde yazısına bakar ya da kısa bir denemeyle öğrenirsin. Laboratuvardaki röle parçasında bu, **Tetik** özelliğidir: "HIGH ile çeker" (varsayılan) ya da "LOW ile çeker (aktif-LOW)". Bu derste LOW ile çeken modül varsayıyoruz; bu yüzden röleyi ekledikten sonra Tetik'i **LOW ile çeker** yap. Röle modülü çalışmak için VCC'sinde 4 V'tan fazla gerilim ister; VCC ya da GND bağlı değilse röle hiç çekmez.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Röle modülü | VCC → 5 V, GND → GND, IN → **D7** |
-| Kontak tarafı: pil kutusu (+) | Röle COM ucuna |
-| Küçük yük (5 V LED + 330 Ω direnç ya da küçük 5 V fan) | Bir ucu röle NO ucuna, öbür ucu pil kutusunun eksisine |
-| Buton | **D2** ile GND arası |
-| Potansiyometre (ikinci sketch) | Orta bacak → **A0** |
+| Röle modülü | **VCC** → 5V, **GND** → GND, **IN** → **D7**; özelliklerde Tetik: LOW ile çeker |
+| Kontak tarafı | Röle **COM** ucu → Uno 5V |
+| Küçük yük: 330 Ω direnç + LED | Röle **NO** ucu → direncin **1** ucu; direncin **2** ucu → LED **A**; LED **K** → GND |
+| Buton | **A** ucu **D2**, **B** ucu GND |
+| Potansiyometre (ikinci sketch) | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |
 
-Kontak tarafında yalnızca 4 x AA pil gibi düşük gerilimli bir kaynak kullan. Yük akımı, rölenin üzerinde yazan kontak akım değerinin çok altında kalmalı; biz en çok birkaç yüz mA'lik küçük yüklerle çalışıyoruz.
+Laboratuvarda kontak tarafındaki gerilim de Uno'nun 5V ucundan gelir. Kontak tarafı ile bobin tarafı elektriksel olarak ayrı olsa da bu kolaylık için aynı 5V hattını kullanıyoruz. Gerçek devrede yük akımı, rölenin üzerinde yazan kontak akım değerinin çok altında kalmalıdır; biz burada en çok birkaç yüz mA'lik küçük yüklerle çalışıyoruz (LED yaklaşık 9 mA çeker).
+
+**Sanal ölçüm:** ▶'e bas, rölenin çekip bıraktığı sırada direnci ya da LED'i seç. Röle çekmişken LED'den yaklaşık 9 mA geçtiğini, bırakınca akımın sıfıra indiğini görürsün.
 
 ### Program
 İlk sketch butona her basışta röleyi değiştirir. Röle modülü LOW ile çektiği için "kapalı" durumu `HIGH`'tır. Pini çıkış yapmadan önce `HIGH` yazarak açılışta rölenin bir anlığına tıklamasını önleriz.
@@ -97,16 +101,18 @@ void loop() {
 5. Röle bir mekanik parçadır ve ömrü sınırlıdır. Saniyede onlarca kez açıp kapatma, PWM gibi hızlı anahtarlama için kullanma. Hız ayarı gereken yerde transistör ya da MOSFET kullan.
 
 ### Dene
-- `role_esik` içinde eşikleri 520 ve 480 yap. Histerezis aralığı daralınca ne değişir?
+- `role_esik` içinde eşikleri 520 ve 480 yap. Histerezis aralığı daralınca ne değişir? Potansiyometrenin Konum özelliğini yavaşça değiştirerek röleyi izle.
 - `role_buton` programını, röle açıkken seri monitöre "ACIK", kapalıyken "KAPALI" yazdıracak şekilde genişlet.
-- Röleyi NC ucuna bağladığında yük hangi durumda çalışır? Dene ve not al.
+- Yükü NO yerine NC ucuna bağla. Yük hangi durumda çalışıyor? Dene ve not al.
+- Tetik özelliğini "HIGH ile çeker" yap ve `role_buton` ile ▶'e bas. Ne oluyor? Neden?
 
 ### Sık yapılan hatalar
-- Şebeke gerilimi (220 V) bağlamak: yapma. Yalnız düşük gerilim ve yetişkin gözetimi.
-- Röle modülünün LOW/HIGH mantığını bilmemek: röle açılışta çekili kalabilir. `pinMode`'dan önce `HIGH` yazmak bu durumu azaltır.
+- Şebeke gerilimi (220 V) ile röle denemeye kalkmak: asla. Bu iş yalnız eğitimli bir uzmana aittir; laboratuvarda 5 V yeter.
+- Röle modülünün LOW/HIGH mantığını bilmemek: röle açılışta çekili kalabilir. `pinMode`'dan önce `HIGH` yazmak bu durumu azaltır. Laboratuvarda Tetik özelliğinin yanlış olması aynı karışıklığı doğurur.
 - Röleyi çıplak (modülsüz) doğrudan pine bağlamak: bobin akımı pin için fazladır ve diyotsuz sıçrama pine zarar verir.
 - COM, NO ve NC uçlarını karıştırmak: yük ters mantıkla çalışır.
-- Kontak devresinde yük akımını kontak değerinin üstüne çıkarmak: kontaklar yapışır ya da yanar.
+- Röle modülünün VCC ya da GND'sini bağlamamak: röle çekmez, "röle modülü beslenmemiş" uyarısı çıkar.
+- Gerçek devrede kontak akımını kontak değerinin üstüne çıkarmak: kontaklar yapışır ya da yanar.
 
 ## Konuşalım
 Rölenin kontak tarafı Arduino'dan elektriksel olarak ayrıdır. Bu ayrılığın sana hangi güvenliği sağladığını ve hangisini sağlamadığını düşün. Şebeke gerilimi kullanmak için bir kişinin hangi bilgi ve ekipmana sahip olması gerekir?

@@ -6,22 +6,27 @@ Hesap makinesindeki rakamlar nasıl çiziliyor? Aslında yedi küçük çubuk LE
 
 ## Etkinlik
 ### Devre
-7-segment ekran, "a" ile "g" arasında adlandırılmış yedi çubuktan ve bir de nokta (dp) LED'inden oluşur. Bu derste **ortak katotlu** (tüm LED'lerin eksi uçları birleşik) bir ekran kullanıyoruz. Yedi çubuğu tek tek pinlere bağlamak yerine bir **74HC595 kaydırmalı yazmaç** kullanacağız. Kart ona bitleri sırayla yollar, çip de sekiz çıkışı birden değiştirir.
+7-segment ekran, "a" ile "g" arasında adlandırılmış yedi çubuktan ve bir de nokta (dp) LED'inden oluşur. Bu derste **ortak katotlu** (tüm LED'lerin eksi uçları birleşik) bir ekran kullanıyoruz; laboratuvarda parçanın **Ortak uç** özelliği varsayılan olarak "Ortak katot"tur. Yedi çubuğu tek tek pinlere bağlamak yerine bir **74HC595 kaydırmalı yazmaç** kullanacağız. Uno ona bitleri sırayla yollar, çip de sekiz çıkışı birden değiştirir.
+
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Gereken parçalar: 74HC595 (`sr595`), 7-segment ekran (`sevenseg`) ve 7 direnç.
 
 | Parça | Bağlantı |
 |---|---|
-| 74HC595 pin 16 (VCC) ve pin 10 (SRCLR) | 5 V |
-| 74HC595 pin 8 (GND) ve pin 13 (OE) | GND |
-| 74HC595 pin 14 (DS, veri) | **D4** |
-| 74HC595 pin 11 (SH_CP, saat) | **D6** |
-| 74HC595 pin 12 (ST_CP, mandal) | **D5** |
-| 74HC595 çıkışları QA...QG (pin 15, 1, 2, 3, 4, 5, 6) | Her biri 330 Ω dirençle ekranın a, b, c, d, e, f, g çubuğuna |
-| 7-segment ortak ucu (katot) | GND |
+| 74HC595 VCC ve SRCLR | 5V |
+| 74HC595 GND ve OE | GND |
+| 74HC595 SER (veri) | **D4** |
+| 74HC595 SRCLK (saat) | **D6** |
+| 74HC595 RCLK (mandal) | **D5** |
+| 74HC595 QA, QB, QC, QD, QE, QF, QG | Her biri bir 330 Ω dirençten geçip ekranın sırasıyla a, b, c, d, e, f, g ucuna |
+| 74HC595 QH (isteğe bağlı) | 330 Ω direnç üzerinden ekranın dp ucuna (Dene bölümünde kullanılacak) |
+| 7-segment COM | GND |
 
-Dirençleri unutma: her çubuk için bir tane. Çubuk numaraları ekranın üstündeki yazıya göre değişebilir; kullandığın ekranın bacak şemasına bak.
+Direnç değerini direnci seçip sağ paneldeki özelliklerden ayarla (varsayılan 330 Ω uygundur). Her çubuk için ayrı bir direnç gerekir. Gerçek çipte bu uçların numaraları VCC için 16, GND için 8, SER için 14, SRCLK için 11, RCLK için 12, OE için 13 ve SRCLR için 10'dur; ama laboratuvarda pinleri adlarıyla seçersin.
+
+Laboratuvar 74HC595'in iki önemli ucunu da modeller: **OE** (çıkış etkin) 5V'a bağlıysa ya da boş bırakılmışsa çıkışlar kapalıdır; **SRCLR** (yazmaç temizle) GND'ye bağlıysa ya da boş bırakılmışsa yazmaç sürekli temizlenir. İkisi için de boş bıraktığında "bağlı olmayan giriş" uyarısı görürsün.
 
 ### Program
-Her rakam bir **bayt**tır (8 bit). Bit 0 "a" çubuğunu, bit 1 "b" çubuğunu, ... bit 6 "g" çubuğunu, bit 7 nokta LED'ini yönetir. Örneğin 1 rakamı için yalnız b ve c yanar: `0b00000110`, yani 0x06.
+Her rakam bir **bayt**tır (8 bit). Bit 0 "a" çubuğunu, bit 1 "b" çubuğunu, ... bit 6 "g" çubuğunu, bit 7 nokta LED'ini yönetir (bit 0 QA'ya, bit 7 QH'ye gider). Örneğin 1 rakamı için yalnız b ve c yanar: `0b00000110`, yani 0x06.
 
 ```cpp
 // sketch: yedi_segment_sayac
@@ -62,7 +67,7 @@ void loop() {
 4. Çip zincirlenebilir: iki 74HC595 arka arkaya bağlanırsa `shiftOut`'u iki kez çağırarak 16 çıkışı üç pinle yönetirsin.
 5. Hesap: ekranı doğrudan sürseydin 8 pin gerekirdi. 74HC595 ile 3 pin yetiyor; bir zincire her çip eklediğinde pin sayısı yine 3 kalıyor.
 
-Aynı çipi ekran yerine 8 LED'e bağlayabilirsin. Aşağıdaki program tek bir LED'i soldan sağa kaydırır. `1 << i` ifadesi, yalnızca i numaralı biti 1 yapar.
+Aynı çipi ekran yerine 8 LED'e (her biri bir dirençle) bağlayabilirsin. Aşağıdaki program tek bir LED'i soldan sağa kaydırır. `1 << i` ifadesi, yalnızca i numaralı biti 1 yapar.
 
 ```cpp
 // sketch: led_seridi
@@ -87,15 +92,18 @@ void loop() {
 ```
 
 ### Dene
+- ▶ ile programı çalıştır, ekranda 0'dan 9'a sayımı izle. Çalışırken bir direnci seç: **Sanal ölçüm** o çubuğun akımını gösterir (yaklaşık 8 mA). Direnci 1 kΩ yapıp çubuğun nasıl sönükleştiğine bak.
 - `RAKAM` dizisindeki desenlerden birini elle bozup ekranda neyin değiştiğini gözle (örneğin 0x3F yerine 0x7F yaz).
-- Nokta LED'ini yakmak için bayta 0x80 ekle: `yaz(RAKAM[i] | 0x80)`. Her rakamın yanında nokta yanar mı?
+- Nokta LED'ini yakmak için bayta 0x80 ekle: `yaz(RAKAM[i] | 0x80)`. Bunun için QH'nin dp'ye bağlı olması gerekir. Her rakamın yanında nokta yanar mı?
+- Ekranı seçip **Ortak uç** özelliğini "Ortak anot" yap. COM'u GND yerine 5V'a bağla ve desenin tersini gönder (`~RAKAM[i]`).
 - Geriye doğru sayan bir program yaz: 9'dan 0'a.
 
 ### Sık yapılan hatalar
-- Mandal pinini hiç kullanmamak: çıkışlar sürekli titreyerek kayar, ekran okunamaz.
-- Ortak anotlu ekranı ortak katotluymuş gibi kullanmak: rakamlar tersine görünür (yanan çubuklar sönük, sönükler yanık). Ortak anotlu ekranda desen bayt ters çevrilir: `~RAKAM[i]`.
-- Dirençsiz bağlamak: çubuklar ve çip zarar görebilir.
-- 74HC595'in pin 10 (SRCLR) ve pin 13 (OE) uçlarını bağlamamak: çip çıkış vermez ya da rastgele davranır.
+- Mandal pinini hiç kullanmamak: bitler çipin içine kayar ama çıkışlar hiç değişmez, ekran boş kalır.
+- Ortak anotlu ekranı ortak katotluymuş gibi kullanmak: rakamlar tersine görünür (yanan çubuklar sönük, sönükler yanık). Ortak anotlu ekranda COM'u 5V'a bağlarsın ve desen bayt ters çevrilir: `~RAKAM[i]`.
+- Dirençsiz bağlamak: laboratuvar "LED'in seri direnci yok" uyarısı verir ve çubuk yanar (74HC595 çıkışının iç direnci yalnızca yaklaşık 50 Ω'dur). Gerçek çubuklarda da aşırı akım çubuğa ve çipe zarar verir.
+- 74HC595'in OE ve SRCLR uçlarını yanlış bağlamak ya da boş bırakmak: çip çıkış vermez ya da yazmacı sürekli temizler.
+- Besleme (VCC ve GND) kablolarını unutmak: laboratuvar "beslenmemiş" uyarısı verir, çıkış olmaz.
 
 ## Konuşalım
 Sekiz LED'i üç pinle yönetmek harika, ama bir bedeli de var. Sence bu bedel ne olabilir? (İpucu: bir LED'in durumunu değiştirmek için kaç bayt göndermen gerekiyor?)

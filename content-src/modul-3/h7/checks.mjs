@@ -83,6 +83,18 @@ export default {
     assert.ok(kareler.length >= 8)
   },
 
+  // HD44780'de createChar imleci CGRAM'e taşır; clear()/setCursor() çağrılmazsa print yazısı CGRAM'e gider, ekran boş kalır.
+  // (Lab testi packages/sim/src/circuit/lab-b.test.ts bu davranışı doğrular.) Burada ders kodunda createChar'dan sonra
+  // ilk print/write'tan önce clear ya da setCursor bulunduğunu denetliyoruz.
+  lcd_derece(sim, kaynak) {
+    const sonra = kaynak.split('createChar')[1]
+    assert.ok(sonra, 'createChar çağrısı yok')
+    const ilkYazi = sonra.search(/lcd\.(print|write)\s*\(/)
+    const ilkKonum = sonra.search(/lcd\.(clear|setCursor)\s*\(/)
+    assert.ok(ilkYazi >= 0, 'createChar sonrası yazı yok')
+    assert.ok(ilkKonum >= 0 && ilkKonum < ilkYazi, 'createChar sonrası, ilk print/write öncesi lcd.clear() ya da lcd.setCursor() çağrılmalı')
+  },
+
   eeprom_sayac(sim, kaynak) {
     sim.run(300)
     assert.match(sim.serial, /Acilis sayisi: 1\b/)

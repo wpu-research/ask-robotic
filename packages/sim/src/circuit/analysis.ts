@@ -5,19 +5,44 @@ import { ledSpecs } from './model.js'
 import { buildNetlist, internalPaths, type Netlist } from './netlist.js'
 
 const RESISTIVE: ReadonlySet<PartType> = new Set<PartType>(['resistor', 'pot', 'ldr', 'ntc', 'buzzer', 'dcmotor'])
-const PASSIVE: readonly PartType[] = ['resistor', 'button', 'pot', 'ldr', 'ntc', 'buzzer', 'led', 'rgbled', 'diode', 'dcmotor', 'sevenseg']
+const PASSIVE: readonly PartType[] = ['resistor', 'button', 'reed', 'pot', 'ldr', 'ntc', 'buzzer', 'led', 'rgbled', 'diode', 'dcmotor', 'sevenseg']
 
 /** Pinleri sinyal girişi/çıkışı olan etkin parçalar: bu parçalara bağlı hat "yüzen" sayılmaz. */
-const ACTIVE: readonly PartType[] = ['npn', 'mosfet', 'l293d', 'relay', 'sr595', 'lcd1602', 'lcdI2c']
+const ACTIVE: readonly PartType[] = [
+  'npn', 'mosfet', 'l293d', 'relay', 'sr595', 'lcd1602', 'lcdI2c',
+  'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil',
+]
 
 /** Besleme pinleri (modül/entegre): VCC 5 V hattında (ya da bir Uno pininde), GND toprakta olmalı. */
-const POWER: Partial<Record<PartType, { vcc: string[]; gnd: string; name: string }>> = {
+const POWER: Partial<Record<PartType, { vcc: string[]; gnd: string; name: string; v33?: boolean }>> = {
   l293d: { vcc: ['VCC1', 'VCC2'], gnd: 'GND', name: 'L293D' },
   relay: { vcc: ['VCC'], gnd: 'GND', name: 'Röle modülü' },
   sr595: { vcc: ['VCC'], gnd: 'GND', name: '74HC595' },
   lcd1602: { vcc: ['VDD'], gnd: 'VSS', name: 'LCD' },
   lcdI2c: { vcc: ['VCC'], gnd: 'GND', name: 'I2C LCD' },
+  // Aşama C (v33: 3,3 V ile de beslenebilir)
+  hcsr04: { vcc: ['VCC'], gnd: 'GND', name: 'HC-SR04' },
+  dht: { vcc: ['VCC'], gnd: 'GND', name: 'DHT sensörü', v33: true },
+  pir: { vcc: ['VCC'], gnd: 'GND', name: 'PIR modülü' },
+  irobstacle: { vcc: ['VCC'], gnd: 'GND', name: 'IR engel modülü', v33: true },
+  bmp280: { vcc: ['VCC'], gnd: 'GND', name: 'BMP280', v33: true },
+  mpu6050: { vcc: ['VCC'], gnd: 'GND', name: 'MPU6050', v33: true },
+  rtc: { vcc: ['VCC'], gnd: 'GND', name: 'RTC modülü', v33: true },
+  joystick: { vcc: ['VCC'], gnd: 'GND', name: 'Joystick', v33: true },
+  mq2: { vcc: ['VCC'], gnd: 'GND', name: 'MQ-2 modülü' },
+  flame: { vcc: ['VCC'], gnd: 'GND', name: 'Alev modülü', v33: true },
+  sound: { vcc: ['VCC'], gnd: 'GND', name: 'Ses modülü', v33: true },
+  soil: { vcc: ['VCC'], gnd: 'GND', name: 'Toprak nemi modülü', v33: true },
 }
+
+/** Doğrudan bir Uno pinine bağlanması gereken sinyal uçları (Sim cihaz modelleri bu pinleri kullanır). */
+const DIRECT_PINS: Partial<Record<PartType, { pins: string[]; name: string }>> = {
+  hcsr04: { pins: ['TRIG', 'ECHO'], name: 'HC-SR04' },
+  dht: { pins: ['DATA'], name: 'DHT' },
+  keypad: { pins: ['R1', 'R2', 'R3', 'R4', 'C1', 'C2', 'C3', 'C4'], name: 'Keypad' },
+}
+/** I2C sensörleri: SDA A4'e, SCL A5'e bağlı olmalı. */
+const I2C_PARTS: readonly PartType[] = ['bmp280', 'mpu6050', 'rtc']
 
 interface Ends { gnd: boolean; rail: boolean; pin: boolean; freeSrc: Set<number>; freeSink: Set<number> }
 
@@ -114,15 +139,31 @@ export function staticWarnings(circuit: Circuit, nl: Netlist = buildNetlist(circ
 /** Aşama B parçalarının statik uyarıları: besleme, flyback diyodu, taban direnci, yüzen giriş. */
 function staticPartWarnings(circuit: Circuit, nl: Netlist, out: LabWarning[]): void {
   const ref = (part: string, pin: string): PinRef => ({ part, pin })
-  const isSupply = (net: number | undefined): boolean => net !== undefined && (net === nl.rail5 || nl.unoPinsOnNet(net).length > 0)
+  const isSupply = (net: number | undefined, v33 = false): boolean => net !== undefined && (net === nl.rail5 || (v33 && net === nl.rail3) || nl.unoPinsOnNet(net).length > 0)
   for (const p of circuit.parts) {
     const pw = POWER[p.type]
     if (pw) {
       const missing: string[] = []
-      for (const v of pw.vcc) if (!nl.isWired(ref(p.id, v)) || !isSupply(nl.netOf(ref(p.id, v)))) missing.push(v === 'VCC2' ? 'VCC2 (motor beslemesi)' : v)
+      for (const v of pw.vcc) if (!nl.isWired(ref(p.id, v)) || !isSupply(nl.netOf(ref(p.id, v)), pw.v33)) missing.push(v === 'VCC2' ? 'VCC2 (motor beslemesi)' : v)
       const g = nl.netOf(ref(p.id, pw.gnd))
       if (!nl.isWired(ref(p.id, pw.gnd)) || g === undefined || g !== nl.ground) missing.push(pw.gnd)
       if (missing.length) out.push({ kind: 'unpowered', partId: p.id, message: `${pw.name} beslenmemiş: ${missing.join(', ')} 5 V / GND hattına bağlı değil.` })
+    }
+    const direct = DIRECT_PINS[p.type]
+    if (direct) {
+      for (const pin of direct.pins) {
+        const r = ref(p.id, pin)
+        if (!nl.isWired(r)) out.push({ kind: 'floating-input', partId: p.id, message: `${direct.name} ${pin} ucu bağlı değil: sensör çalışmaz.` })
+        else if (nl.unoPinOf(r) === undefined) out.push({ kind: 'floating-input', partId: p.id, message: `${direct.name} ${pin} ucu doğrudan bir Arduino pinine bağlı olmalı (araya direnç/parça koyma).` })
+      }
+    }
+    if (I2C_PARTS.includes(p.type)) {
+      for (const [pin, uno] of [['SDA', 'A4'], ['SCL', 'A5']] as const) {
+        const n = nl.netOf(ref(p.id, pin))
+        if (!nl.isWired(ref(p.id, pin)) || n === undefined || !nl.unoPinsOnNet(n).includes(uno)) {
+          out.push({ kind: 'floating-input', partId: p.id, message: `${POWER[p.type]?.name ?? p.type} ${pin} ucu ${uno} pinine bağlı değil: I2C cihazı veri yolunda görünmez.` })
+        }
+      }
     }
     if (p.type === 'sr595') {
       for (const pin of ['SER', 'SRCLK', 'RCLK', 'OE', 'SRCLR']) {

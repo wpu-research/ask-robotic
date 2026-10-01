@@ -6,6 +6,11 @@ import { PART_DEFS } from './geometry'
 export const STAGE_A_PARTS: PartType[] = ['led', 'resistor', 'button', 'pot', 'ldr', 'ntc', 'buzzer', 'rgbled', 'servo']
 /** Aşama B (Modül 3, H5-H7). */
 export const STAGE_B_PARTS: PartType[] = ['diode', 'npn', 'mosfet', 'dcmotor', 'l293d', 'relay', 'sevenseg', 'sr595', 'lcd1602', 'lcdI2c']
+/**
+ * Aşama C (Modül 4). GEÇİCİ: parça çizimi (part-art) yazılana kadar DEFAULT_PARTS'a EKLENMEZ; etkinlikler `allowedParts` ile
+ * açıkça isteyebilir ancak çizim henüz yok.
+ */
+export const STAGE_C_PARTS: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil']
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
 export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS]
 
@@ -14,6 +19,7 @@ export const PICKER_CATEGORIES: PartCategory[] = [
   { title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', 'dcmotor', 'servo', 'relay'] },
   { title: 'Giriş', types: ['button', 'pot', 'ldr', 'ntc'] },
   { title: 'Aktif devre elemanları', types: ['resistor', 'diode', 'npn', 'mosfet', 'l293d', 'sr595'] },
+  { title: 'Sensörler', types: [...STAGE_C_PARTS] },
 ]
 
 export const SHORT_NAME: Partial<Record<PartType, string>> = {

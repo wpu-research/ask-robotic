@@ -6,15 +6,18 @@ const US = 16 // 1 µs = 16 çevrim (16 MHz)
 
 // ---- HC-SR04 ----
 export interface HCSR04Options { trig: Pin; echo: Pin; cm?: number }
-export interface HCSR04 { cm: number }
+/** `enabled=false`: modül beslenmemiş, tetiklemeye cevap vermez. `pings`: cevap verilen ölçüm sayısı. */
+export interface HCSR04 { cm: number; enabled: boolean; pings: number }
 
 /** HC-SR04: trig'in düşen kenarından ~450 µs sonra echo'yu mesafeyle orantılı süre HIGH yapar (58,2 µs/cm). */
 export function attachHCSR04(sim: Sim, { trig, echo, cm = 100 }: HCSR04Options): HCSR04 {
-  const dev: HCSR04 = { cm }
+  const dev: HCSR04 = { cm, enabled: true, pings: 0 }
   sim.drive(echo, false) // echo boşta LOW
   sim.onPin(trig, (high) => {
     if (high) return
+    if (!dev.enabled) return
     if (dev.cm < 2 || dev.cm > 400) return // menzil dışı: echo yok (pulseIn zaman aşımı)
+    dev.pings++
     const widthUs = dev.cm * 58.2
     sim.cpu.addClockEvent(() => {
       sim.drive(echo, true)
@@ -26,11 +29,12 @@ export function attachHCSR04(sim: Sim, { trig, echo, cm = 100 }: HCSR04Options):
 
 // ---- DHT11 / DHT22 ----
 export interface DHTOptions { pin: Pin; type?: 'DHT22' | 'DHT11'; tempC?: number; humidity?: number }
-export interface DHT { tempC: number; humidity: number; type: 'DHT22' | 'DHT11'; reads: number }
+/** `enabled=false`: sensör beslenmemiş, başlangıç darbesine cevap vermez. */
+export interface DHT { tempC: number; humidity: number; type: 'DHT22' | 'DHT11'; reads: number; enabled: boolean }
 
 /** DHT11/DHT22 tek-kablo protokolü. Alanlar canlı değiştirilebilir: dev.tempC, dev.humidity. */
 export function attachDHT(sim: Sim, { pin, type = 'DHT22', tempC = 25, humidity = 50 }: DHTOptions): DHT {
-  const dev: DHT = { tempC, humidity, type, reads: 0 }
+  const dev: DHT = { tempC, humidity, type, reads: 0, enabled: true }
   sim.drive(pin, true)
   let lowSinceMs: number | null = null
   let responding = false
@@ -62,7 +66,7 @@ export function attachDHT(sim: Sim, { pin, type = 'DHT22', tempC = 25, humidity 
     if (lowSinceMs !== null) {
       const lowMs = sim.nowMs() - lowSinceMs
       lowSinceMs = null
-      if (lowMs >= 0.4) { // geçerli başlangıç darbesi (DHT22 ≥ 1 ms, DHT11 ≥ 18 ms; kütüphane bunlara uyar)
+      if (lowMs >= 0.4 && dev.enabled) { // geçerli başlangıç darbesi (DHT22 ≥ 1 ms, DHT11 ≥ 18 ms; kütüphane bunlara uyar)
         responding = true
         dev.reads++
         const bytes = frame()

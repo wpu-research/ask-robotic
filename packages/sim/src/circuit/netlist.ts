@@ -15,7 +15,7 @@ export function internalPaths(part: PartInstance): InternalPath[] {
       const anode = part.props.common === 'anode'
       return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'dp'].map((c) => (anode ? { from: 'COM', to: c, directed: true } : { from: c, to: 'COM', directed: true }))
     }
-    case 'button': return [{ from: 'A', to: 'B' }]
+    case 'button': case 'reed': return [{ from: 'A', to: 'B' }]
     case 'pot': return [{ from: 'VCC', to: 'SIG' }, { from: 'SIG', to: 'GND' }]
     case 'buzzer': return [{ from: '+', to: '-' }]
     case 'rgbled': {

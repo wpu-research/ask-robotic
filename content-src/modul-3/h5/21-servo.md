@@ -2,7 +2,7 @@
 süre: 20
 
 ## Merak
-Robot kolların, kamera tutucuların ve radar tarayıcıların ortak bir parçası var: servo. Bir servoya "tam 37 dereceye git" dersin, gider ve orada durur. Peki sıradan bir motor bunu neden yapamaz ve servo hangi açıya gideceğini kablodan nasıl öğrenir?
+Robot kolların, kamera tutucuların ve radar tarayıcıların ortak bir parçası var: servo. Bir servoya "tam 37 dereceye git" dersin, gider ve orada durur. Peki sıradan bir motor bunu neden yapamaz ve servo hangi açıya gideceğini sinyal telinden nasıl öğrenir?
 
 ## Etkinlik
 Servonun içinde küçük bir motor, dişliler ve konumu ölçen bir sensör vardır. Servo, üç telinden biriyle gelen **darbe genişliğine** bakar. Darbe 20 ms'de bir tekrarlanır:
@@ -14,17 +14,21 @@ Servonun içinde küçük bir motor, dişliler ve konumu ölçen bir sensör var
 `Servo` kütüphanesi bu darbeleri senin yerine üretir. Sen yalnızca açıyı söylersin.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Küçük servo (SG90 gibi) | Kahverengi/siyah tel → GND |
-| | Kırmızı tel → 5 V |
-| | Turuncu/sarı tel (sinyal) → **D9** |
-| Potansiyometre (ikinci sketch için) | Orta bacak → **A0**, kenar bacaklar → 5 V ve GND |
+| Servo | **GND** pini → Uno GND |
+| | **VCC** pini → Uno 5V |
+| | **SIG** (sinyal) pini → **D9** |
+| Potansiyometre (ikinci sketch için) | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |
 
-Servo yük altında fazla akım çekebilir. Küçük bir servoyu denemek için kartın 5 V ucu yeterlidir, ama servo titriyor ya da kart sürekli sıfırlanıyorsa servoyu ayrı bir 5 V kaynaktan besle ve kaynağın GND'sini Arduino GND'sine bağla.
+Laboratuvarda servo, Uno'nun 5V ucundan beslenir; servo gücü için ayrı bir kaynak gerekmez. Servo 4 V'un altında beslenirse ya da VCC/GND bağlı değilse hareket etmez, açısı değişmez. Gerçek bir devrede küçük servolar yük altında kartın 5 V hattını zorlayabilir; laboratuvar bu etkiyi modellemez.
+
+Çalışırken tuvaldeki servo kolunun açısını izleyebilirsin. Servo için Sanal ölçüm göstermez; ölçüm direnç, LED, motor gibi iki uçlu parçalar içindir.
 
 ### Program
-İlk sketch servoyu üç konuma götürür.
+İlk sketch servoyu üç konuma götürür. Kodu düzenleyiciye yaz (ya da aşağıdaki bloğu **Kopyala**), sonra ▶'e bas.
 
 ```cpp
 // sketch: servo_uc_nokta
@@ -46,7 +50,7 @@ void loop() {
 }
 ```
 
-İkinci sketch açıyı potansiyometreyle ayarlar. `map` ile 0-1023 aralığı 0-180 dereceye çevrilir.
+İkinci sketch açıyı potansiyometreyle ayarlar. `map` ile 0-1023 aralığı 0-180 dereceye çevrilir. Potansiyometrenin **Konum** özelliğini sağ panelden (çalışırken de) değiştirebilirsin.
 
 ```cpp
 // sketch: servo_pot
@@ -100,14 +104,13 @@ void loop() {
 ### Dene
 - `servo_tarama` içinde `delay(15)` değerini 5 ve sonra 40 yap. Tarama hızı nasıl değişiyor?
 - Taramayı yalnızca 30 ile 150 derece arasında yap.
-- `servo_pot` sketch'inde potansiyometre ortadayken servo 90 dereceye gidiyor mu? Gitmiyorsa potansiyometrenin uçlarını kontrol et.
+- `servo_pot` sketch'inde potansiyometrenin konumunu ortaya getir. Servo 90 dereceye gidiyor mu? Gitmiyorsa potansiyometrenin SIG, VCC ve GND kablolarını kontrol et.
 
 ### Sık yapılan hatalar
-- Servo gücünü D9'dan almaya çalışmak: pin yalnız sinyal verir. Güç 5 V ve GND uçlarından gelir.
-- Servo tellerini ters takmak: kahverengi/siyah GND, kırmızı 5 V olmalı.
-- Servo ve kart GND'lerini birleştirmemek (ayrı kaynak kullanırken): sinyal anlaşılmaz, servo titrer.
+- Servo gücünü D9'dan almaya çalışmak: pin yalnız sinyal verir. Güç 5V ve GND uçlarından gelir. Laboratuvarda VCC ya da GND kablosu eksikse servo hiç hareket etmez.
+- SIG ile VCC kablolarını karıştırmak: sinyal 5V hattına giderse servo komut alamaz.
 - `attach` yazmayı unutmak: servo hiç hareket etmez.
-- Servoyu mekanik sınırının ötesine zorlamak: dişliler uğultu yapar, zarar görebilir. Böyle bir ses duyarsan açıyı daralt.
+- Servoyu mekanik sınırının ötesine zorlamak: gerçek servoda dişliler uğultu yapar ve zarar görebilir. Bu yüzden `write` ile 0-180 aralığının dışına çıkma, tarama aralığını gerekirse daralt.
 
 ## Konuşalım
 Servo neden her zaman 0 ile 180 derece arasında döner de bir DC motor gibi sürekli dönmez? Hangi projelerde "sürekli dönen" motor, hangilerinde "istediğin açıya giden" servo daha doğru olur?
