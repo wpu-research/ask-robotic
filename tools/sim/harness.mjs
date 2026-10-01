@@ -10,6 +10,8 @@ import {
   PinState, adcConfig, avrInstruction, eepromConfig, portBConfig, portCConfig, portDConfig,
   timer0Config, timer1Config, timer2Config, twiConfig, usart0Config,
 } from 'avr8js'
+import * as dev from './devices.mjs'
+import * as robot from './robot.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const CACHE = join(HERE, '.cache')
@@ -72,6 +74,9 @@ export class Sim {
     this.adc = new AVRADC(this.cpu, adcConfig)
     this.eeprom = new AVREEPROM(this.cpu, new EEPROMMemoryBackend(1024), eepromConfig)
     this.twi = new AVRTWI(this.cpu, twiConfig, CPU_HZ)
+    this.i2c = new dev.I2CBus(this.twi)
+    this._pinCbs = {}
+    this._changeCbs = []
     this.usart = new AVRUSART(this.cpu, usart0Config, CPU_HZ)
     this.serial = ''
     this.usart.onByteTransmit = (b) => { this.serial += String.fromCharCode(b) }
@@ -85,9 +90,12 @@ export class Sim {
           const k = letter + bit
           if (this._last[k] !== high) {
             this._last[k] = high
-            this.edges.push({ pin: this._arduinoPin(letter, bit), value: high, t: this.nowMs() })
+            const pin = this._arduinoPin(letter, bit)
+            this.edges.push({ pin, value: high, t: this.nowMs() })
+            for (const cb of this._pinCbs[pin] ?? []) cb(high)
           }
         }
+        for (const cb of this._changeCbs) cb()
       })
     }
   }
@@ -97,6 +105,25 @@ export class Sim {
     if (letter === 'B') return bit + 8
     return `A${bit}`
   }
+
+  /** Pin çıkış değiştirince (HIGH/LOW kenarı) çağrılır. */
+  onPin(pin, cb) { (this._pinCbs[pin] ??= []).push(cb) }
+  /** Herhangi bir port yazmacı (PORT/DDR) değişince çağrılır. */
+  onChange(cb) { this._changeCbs.push(cb) }
+  /** 'High' | 'Low' (çıkış) ya da 'Input' | 'InputPullUp'. */
+  state(pin) { const { port, bit } = this._port(pin); return PinState[port.pinState(bit)] }
+
+  // ---- sanal cihazlar (devices.mjs) ----
+  hcsr04(o) { return dev.attachHCSR04(this, o) }
+  dht(o) { return dev.attachDHT(this, o) }
+  bmp280(o) { return dev.attachBMP280(this, o) }
+  mpu6050(o) { return dev.attachMPU6050(this, o) }
+  rtc(o) { return dev.attachRTC(this, o) }
+  lcd(o) { return dev.attachLCD(this, o) }
+  lcdI2C(o) { return dev.attachLCDI2C(this, o) }
+  keypad(o) { return dev.attachKeypad(this, o) }
+  rover(o) { return robot.attachRover(this, o) }
+  balancer(o) { return robot.attachBalancer(this, o) }
 
   nowMs() { return (this.cpu.cycles / CPU_HZ) * 1000 }
 
@@ -158,3 +185,5 @@ export function createSim(source, opts) { return new Sim(compileSketch(source, o
 
 /** Yalnızca derleme denemesi (davranış kontrolü yok). */
 export function assertCompiles(source, opts) { compileSketch(source, opts); return true }
+
+export { Arena } from './robot.mjs'

@@ -1,0 +1,57 @@
+{
+  "slug": "robotik",
+  "title": "Robotik",
+  "track": "maker",
+  "position": 5,
+  "minAge": 13,
+  "weeks": [
+    {
+      "dir": "h1",
+      "title": "Hareket temelleri",
+      "project": "Komutlu araba",
+      "lessons": 5
+    },
+    {
+      "dir": "h2",
+      "title": "Engel",
+      "project": "Engelden kaçan robot",
+      "lessons": 5
+    },
+    {
+      "dir": "h3",
+      "title": "Çizgi",
+      "project": "Çizgi izleyen robot",
+      "lessons": 5
+    },
+    {
+      "dir": "h4",
+      "title": "Enkoder ve odometri",
+      "project": "Kare çizen robot",
+      "lessons": 5
+    },
+    {
+      "dir": "h5",
+      "title": "PID",
+      "project": "PID çizgi izleyen ve duvar takipçisi",
+      "lessons": 5
+    },
+    {
+      "dir": "h6",
+      "title": "IMU ve denge",
+      "project": "Dengelenen robot",
+      "lessons": 5
+    },
+    {
+      "dir": "h7",
+      "title": "Davranış ve robot kol",
+      "project": "Gezgin robot",
+      "lessons": 5
+    },
+    {
+      "dir": "h8",
+      "title": "Bitirme robotu",
+      "project": "Bitirme robotu",
+      "lessons": 5
+    }
+  ]
+}

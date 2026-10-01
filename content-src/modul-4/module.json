@@ -1,0 +1,57 @@
+{
+  "slug": "sensorler-ve-projeler",
+  "title": "Sensörler ve Projeler",
+  "track": "maker",
+  "position": 4,
+  "minAge": 12,
+  "weeks": [
+    {
+      "dir": "h1",
+      "title": "Mesafe",
+      "project": "Park sensörü",
+      "lessons": 5
+    },
+    {
+      "dir": "h2",
+      "title": "Varlık ve engel",
+      "project": "Hırsız alarmı",
+      "lessons": 5
+    },
+    {
+      "dir": "h3",
+      "title": "Ortam",
+      "project": "Hava istasyonu",
+      "lessons": 5
+    },
+    {
+      "dir": "h4",
+      "title": "Işık, ses, gaz",
+      "project": "Yangın ve gaz alarmı",
+      "lessons": 5
+    },
+    {
+      "dir": "h5",
+      "title": "Hareket ve yön",
+      "project": "Eğimle kontrol edilen servo",
+      "lessons": 5
+    },
+    {
+      "dir": "h6",
+      "title": "Girdi cihazları",
+      "project": "Akıllı kapı",
+      "lessons": 5
+    },
+    {
+      "dir": "h7",
+      "title": "Zaman ve veri",
+      "project": "Veri kaydedici",
+      "lessons": 5
+    },
+    {
+      "dir": "h8",
+      "title": "Simülasyondan gerçeğe",
+      "project": "Akıllı oda",
+      "lessons": 5
+    }
+  ]
+}
