@@ -8,10 +8,18 @@ export interface PartDef {
   h: number
   /** Parça-yerel pin koordinatları (döndürülmemiş). */
   pins: Record<string, Pt>
+  /** true: parça çizimi pin etiketlerini kendisi çizer (sık yerleşimli çipler); tuval ayrıca etiket çizmez. */
+  ownLabels?: boolean
 }
 
 const row = (names: string[], x0: number, step: number, y: number): Record<string, Pt> =>
   Object.fromEntries(names.map((n, i) => [n, { x: x0 + i * step, y }]))
+
+const DIP_X = (i: number) => 14 + i * 16 // 16 bacaklı DIP: üst/alt sıra, 8'er bacak, 16 px aralık
+const dipRow = (names: (string | null)[], y: number): Record<string, Pt> =>
+  Object.fromEntries(names.flatMap((n, i) => (n ? [[n, { x: DIP_X(i), y }]] : [])))
+const PINS_LCD = ['VSS', 'VDD', 'V0', 'RS', 'RW', 'E', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'A', 'K']
+const LCD_X = (i: number) => 36 + i * 14
 
 export const PART_DEFS: Record<PartType, PartDef> = {
   uno: {
@@ -33,6 +41,40 @@ export const PART_DEFS: Record<PartType, PartDef> = {
   buzzer: { name: 'Buzzer', w: 50, h: 64, pins: { '+': { x: 14, y: 60 }, '-': { x: 36, y: 60 } } },
   rgbled: { name: 'RGB LED', w: 62, h: 70, pins: { R: { x: 10, y: 66 }, G: { x: 24, y: 66 }, B: { x: 38, y: 66 }, COM: { x: 52, y: 66 } } },
   servo: { name: 'Servo', w: 100, h: 64, pins: { SIG: { x: 4, y: 16 }, VCC: { x: 4, y: 32 }, GND: { x: 4, y: 48 } } },
+  diode: { name: 'Diyot', w: 80, h: 24, pins: { A: { x: 4, y: 12 }, K: { x: 76, y: 12 } } },
+  npn: { name: 'NPN transistör', w: 54, h: 76, pins: { B: { x: 12, y: 72 }, C: { x: 27, y: 72 }, E: { x: 42, y: 72 } } },
+  mosfet: { name: 'MOSFET', w: 70, h: 100, pins: { G: { x: 17, y: 96 }, D: { x: 35, y: 96 }, S: { x: 53, y: 96 } } },
+  dcmotor: { name: 'DC motor', w: 130, h: 64, pins: { M1: { x: 6, y: 22 }, M2: { x: 6, y: 42 } } },
+  // L293D (DIP-16, çentik solda; bacak 1 sol altta). Alt: EN12 IN1 OUT1 GND (GND) OUT2 IN2 VCC2; üst: VCC1 IN4 OUT4 (GND) (GND) OUT3 IN3 EN34.
+  // Dört GND bacağından yalnız alttaki 4. bacak bağlanabilir (sözleşmede tek 'GND'); diğerleri çizimde sönük gösterilir.
+  l293d: {
+    name: 'L293D', w: 140, h: 76, ownLabels: true,
+    pins: { ...dipRow(['VCC1', 'IN4', 'OUT4', null, null, 'OUT3', 'IN3', 'EN34'], 3), ...dipRow(['EN12', 'IN1', 'OUT1', 'GND', null, 'OUT2', 'IN2', 'VCC2'], 73) },
+  },
+  relay: {
+    name: 'Röle modülü', w: 150, h: 96,
+    pins: { VCC: { x: 5, y: 24 }, GND: { x: 5, y: 44 }, IN: { x: 5, y: 64 }, NO: { x: 144, y: 24 }, COM: { x: 144, y: 48 }, NC: { x: 144, y: 72 } },
+  },
+  sevenseg: {
+    name: '7-segment', w: 88, h: 110, ownLabels: true,
+    pins: {
+      e: { x: 12, y: 107 }, d: { x: 28, y: 107 }, COM: { x: 44, y: 107 }, c: { x: 60, y: 107 }, dp: { x: 76, y: 107 },
+      g: { x: 12, y: 3 }, f: { x: 28, y: 3 }, a: { x: 60, y: 3 }, b: { x: 76, y: 3 },
+    },
+  },
+  // 74HC595 (DIP-16, çentik solda). Alt: QB QC QD QE QF QG QH GND; üst: VCC QA SER OE RCLK SRCLK SRCLR QH'.
+  sr595: {
+    name: '74HC595', w: 140, h: 100, ownLabels: true,
+    pins: { ...dipRow(['VCC', 'QA', 'SER', 'OE', 'RCLK', 'SRCLK', 'SRCLR', 'QH_'], 3), ...dipRow(['QB', 'QC', 'QD', 'QE', 'QF', 'QG', 'QH', 'GND'], 97) },
+  },
+  lcd1602: {
+    name: 'LCD 16x2', w: 282, h: 128, ownLabels: true,
+    pins: Object.fromEntries(PINS_LCD.map((n, i) => [n, { x: LCD_X(i), y: 5 }])),
+  },
+  lcdI2c: {
+    name: 'LCD 16x2 (I2C)', w: 282, h: 170, ownLabels: true,
+    pins: { GND: { x: 117, y: 166 }, VCC: { x: 133, y: 166 }, SDA: { x: 149, y: 166 }, SCL: { x: 165, y: 166 } },
+  },
 }
 
 export type Rotation = PartInstance['rotation']

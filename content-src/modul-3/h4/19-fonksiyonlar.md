@@ -6,11 +6,13 @@ Bir melodide aynı üç satırı (nota çal, bekle, sustur) onlarca kez yazarsan
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Pasif buzzer | Artı (+) bacak → **D8**; eksi bacak → GND |
+| Pasif buzzer | **+** ucu → **D8**; **-** ucu → GND |
 
-Son sketch (kapsam) için devre gerekmez, Serial Monitor yeter.
+Son sketch (kapsam) için devre gerekmez, **Seri monitör** yeter.
 
 ### Fonksiyon nedir?
 `setup()` ve `loop()` aslında birer fonksiyondur. Kendi fonksiyonunu da yazabilirsin:

@@ -12,7 +12,7 @@ Her kavşakta ışıklar belli bir düzenle yanar: kırmızıda dur, yeşilde ge
 | Sarı LED | Anot → 330 Ω → **D12**; katot → GND |
 | Yeşil LED | Anot → 330 Ω → **D11**; katot → GND |
 
-Her LED'in kendi direnci olmalı. Devreyi simülatörde ya da kendi kartında kurabilirsin. Kırmızı LED için 330 Ω, 5 V'ta yaklaşık 9 mA akım verir (2. dersteki hesap gibi). Sarı ve yeşil LED'lerin gerilim düşümü biraz farklı olabilir; yine de bu direnç güvenli bir seçimdir.
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. LED'lerin renklerini özellik panelinden kırmızı, sarı ve yeşil yap. Her LED'in kendi direnci olmalı. Kırmızı LED için 330 Ω, 5 V'ta yaklaşık 9 mA akım verir (2. dersteki hesap gibi). Sarı ve yeşil LED'lerin gerilim düşümü biraz farklı olabilir; yine de bu direnç güvenli bir seçimdir.
 
 ### Plan
 Önce ışığın sırasını bir tabloya yaz. Programı yazmadan önce planı yapmak hatayı azaltır.

@@ -2,29 +2,31 @@
 süre: 20
 
 ## Merak
-Şimdiye kadar kart hep konuştu: LED'i yaktı, söndürdü. Peki kart seni nasıl dinler? Bir butona bastığını ya da bir kutuyu eğdiğini nereden anlar? Bu derste kartın "kulağı" olan `digitalRead` ile tanışacaksın. Küçük bir sürpriz de var: butona basınca pin neden LOW olur?
+Şimdiye kadar kart hep konuştu: LED'i yaktı, söndürdü. Peki kart seni nasıl dinler? Bir butona bastığını nereden anlar? Bu derste kartın "kulağı" olan `digitalRead` ile tanışacaksın. Küçük bir sürpriz de var: butona basınca pin neden LOW olur?
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
 | Buton | Bir ucu **D2**, öbür ucu **GND** |
-| Eğim anahtarı (butonmuş gibi bağla) | Bir ucu **D3**, öbür ucu **GND** |
+| İkinci buton | Bir ucu **D3**, öbür ucu **GND** |
 | LED (kırmızı) + 330 Ω direnç | Direncin bir ucu **D13**, öbür ucu LED anodu; LED katodu GND |
 | LED (sarı) + 330 Ω direnç | Direncin bir ucu **D12**, öbür ucu LED anodu; LED katodu GND |
 
-Butonların dışarıya dört bacağı olabilir. Bu bacakların ikişerli çifti içeriden birbirine bağlıdır. Butonu çapraz iki bacağından bağlarsan basınca devre kesin kapanır.
+Laboratuvardaki butonun iki ucu vardır (A ve B). Butonu seçip sağ panelden **Basılı** özelliğini açarsan basılmış olur; butona basılı tutarak da basabilirsin. Çalışırken de değiştirebilirsin.
 
-Eğim anahtarı, içinde küçük bir top olan bir anahtardır. Belli bir yöne yatırınca iç temas kapanır, düz tutunca açılır. Bizim için tıpkı bir buton gibidir: iki ucu vardır, kapanınca iki ucu birleşir. Hangi yönde kapanacağı parçanın duruşuna bağlıdır.
+Bazı gerçek butonlar ve eğim anahtarları da aynı mantıkla çalışır: iki ucu vardır, kapanınca iki ucu birleşir. Kart hepsini aynı görür. Bu derste D3'teki ikinci giriş için laboratuvardaki ikinci butonu kullan. Kodda "eğim anahtarı" diye geçen D3 girişi senin için bu ikinci butondur.
 
-Devreyi simülatörde ya da kendi kartında kur.
+Laboratuvar etkinliğini bu sayfanın altındaki bölümde yapacaksın; ▶'e basınca program çalışır.
 
 ### Dijital giriş nedir?
 Bir pin iki şekilde çalışabilir:
 - `OUTPUT`: Kart pini kendisi sürer. `digitalWrite` ile HIGH ya da LOW yazarsın.
 - `INPUT`: Kart pini sadece dinler. `digitalRead` ile okursun; sonuç `HIGH` ya da `LOW` gelir.
 
-Buton basılınca pini GND'ye bağlar. Peki basılmamışken pin neyle bağlıdır? Hiçbir şeyle. Boşta kalan bir giriş pini (yüzen giriş) çevreden elektrik gürültüsü toplar ve rastgele HIGH, LOW okunur. Bunu önlemek için pini bir gerilime "çekmek" gerekir.
+Buton basılınca pini GND'ye bağlar. Peki basılmamışken pin neyle bağlıdır? Hiçbir şeyle. Boşta kalan bir giriş pini (yüzen giriş) gerçek devrede çevreden elektrik gürültüsü toplar ve rastgele HIGH, LOW okunur. Laboratuvar bunu modeller: bağlantısız bir giriş için uyarı çıkar. Bunu önlemek için pini bir gerilime "çekmek" gerekir.
 
 ### INPUT_PULLUP
 Arduino'nun her giriş pininin içinde, istersen devreye alabileceğin bir direnç vardır (yaklaşık 20-50 kΩ). Bu direnç pini 5 V'a doğru çeker. Buna **pull-up** (yukarı çekme) denir.
@@ -39,7 +41,7 @@ Sonuç şöyle olur:
 | Basılı değil | İç direnç 5 V'a çeker | `HIGH` (1) |
 | Basılı | Buton pini GND'ye bağlar | `LOW` (0) |
 
-Yani **basılı = LOW**. Ters gibi görünür ama bu kitapta bütün butonlar böyle çalışır. Dışarıdan ek direnç gerekmez, tek tek kablo tasarrufu sağlar.
+Yani **basılı = LOW**. Ters gibi görünür ama bu derste bütün butonlar böyle çalışır. Dışarıdan ek direnç gerekmez, devre sade kalır.
 
 ### Program
 Önce okuduğun değeri doğrudan LED'e yazalım.
@@ -57,7 +59,7 @@ void loop() {
 }
 ```
 
-Çalıştır ve dikkat et: LED butona basmadan yanık, basınca sönüyor. Beklediğinin tersi! Sebebi yukarıdaki tablo: basılı değilken pin HIGH, LED'e HIGH yazıyoruz.
+▶'e bas ve dikkat et: LED butona basmadan yanık, basınca sönüyor. Beklediğinin tersi! Sebebi yukarıdaki tablo: basılı değilken pin HIGH, LED'e HIGH yazıyoruz.
 
 Düzeltmek için değeri ters çevirelim. `HIGH` 1'e, `LOW` 0'a eşittir. `1 - durum` işlemi 1'i 0, 0'ı 1 yapar:
 
@@ -76,7 +78,7 @@ void loop() {
 
 Artık basınca LED yanar. Bir sonraki derste bunu `if` ile çok daha okunaklı yazacaksın.
 
-İki girişi birden okuyalım: D2'deki buton kırmızı LED'i, D3'teki eğim anahtarı sarı LED'i yaksın.
+İki girişi birden okuyalım: D2'deki buton kırmızı LED'i, D3'teki ikinci buton sarı LED'i yaksın.
 
 ```cpp
 // sketch: iki_giris
@@ -97,18 +99,18 @@ void loop() {
 1. `pinMode(2, INPUT_PULLUP)` pini giriş yapar ve iç pull-up direncini açar.
 2. `digitalRead(2)` pindeki gerilime bakar: yaklaşık 5 V ise `HIGH`, yaklaşık 0 V ise `LOW` verir.
 3. `loop()` saniyede binlerce kez döner; yani kart butonu sürekli kontrol eder.
-4. Eğim anahtarı kapanınca aynı butondaki gibi pini GND'ye bağlar; kart ikisini ayırt edemez ve etmesine gerek de yoktur.
+4. İkinci buton da aynı şekilde pini GND'ye bağlar; kart iki butonu ayırt edemez ve etmesine gerek de yoktur.
 
 ### Dene
 - `1 - durum` yerine `durum` yaz, sonra tekrar düzelt. Hangisinde LED basılı tutarken yanıyor?
-- Eğim anahtarını yatır, düzelt, ters çevir. Hangi duruşta sarı LED yanıyor?
-- `INPUT_PULLUP` yerine `INPUT` yazıp butona basmadan LED'e bak. Ne olur? (Bu bir deneydir, zarar vermez. Sonra eski haline getir.)
+- İkinci butonun **Basılı** özelliğini aç ve kapat. Hangi durumda sarı LED yanıyor?
+- `INPUT_PULLUP` yerine `INPUT` yazıp butona basmadan LED'e bak. Ne olur? (Bu bir deneydir, laboratuvarda zarar vermez. Sonra eski haline getir.)
 
 ### Sık yapılan hatalar
 - `pinMode`'u yazmamak ya da `INPUT` yazıp bırakmak: pin yüzer, LED rastgele titreşir.
-- Butonu pin ile 5 V arasına bağlamak: bu kitapta buton her zaman pin ile **GND** arasındadır.
+- Butonu pin ile 5 V arasına bağlamak: bu derste buton her zaman pin ile **GND** arasındadır.
 - "Basılı = HIGH" sanmak: `INPUT_PULLUP` ile basılı olan LOW'dur.
-- Butonun aynı taraftaki iki bacağını bağlamak: bu bacaklar zaten içeriden bağlıdır, buton hiçbir şeyi değiştirmez.
+- Butonun iki ucunu aynı düğüme (örneğin ikisini de GND'ye) bağlamak: buton hiçbir şeyi değiştirmez. Bir ucu pine, öbür ucu GND'ye gitmeli.
 
 ## Konuşalım
 Boşta kalan bir pin neden rastgele değer okur? Gündelik hayattan benzer bir durum bulabilir misin (ör. kimse konuşmazken bile mikrofonda çıkan hışırtı)?

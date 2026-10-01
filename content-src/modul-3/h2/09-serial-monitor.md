@@ -6,15 +6,17 @@ süre: 25
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
 | Buton | Bir ucu **D2**, öbür ucu **GND** |
 | LED (kırmızı) + 330 Ω direnç | **D13** → direnç → LED anodu; katot GND |
 
-Kart, USB kablosuyla bilgisayara bağlıyken aynı kablo üzerinden konuşur. Arduino IDE'de **Serial Monitor** (Seri Port Ekranı) kartın yazdıklarını gösterir ve senin yazdıklarını karta gönderir. Devreyi simülatörde ya da kendi kartında kur.
+Gerçek bir kart USB kablosuyla bilgisayara bağlıyken aynı kablo üzerinden konuşur. Laboratuvarda bu bağlantı hazırdır: alttaki **Seri monitör** kartın yazdıklarını gösterir ve senin yazdıklarını karta gönderir. ▶'e bas, program çalışırken seri monitörün giriş kutusuna yazıp gönder.
 
 ### Seri iletişim
-Kart ile bilgisayar, bitleri sırayla (seri) göndererek haberleşir. İki tarafın aynı hızda konuşması gerekir. Bu hıza **baud** denir. Biz hep 9600 baud kullanacağız. Serial Monitor'da da aynı hızı seçmelisin.
+Kart ile bilgisayar, bitleri sırayla (seri) göndererek haberleşir. İki tarafın aynı hızda konuşması gerekir. Bu hıza **baud** denir. Biz hep 9600 baud kullanacağız. Laboratuvar bunu kendisi ayarlar; gerçek bir Serial Monitor'da da aynı hızı seçmek gerekir.
 
 ```cpp
 Serial.begin(9600);        // setup() içinde bir kez
@@ -23,7 +25,7 @@ Serial.println("dunya");   // yazar ve alt satıra geçer
 Serial.println(42);        // sayı da yazabilir
 ```
 
-Not: Türkçe harfler (ç, ğ, ı, ö, ş, ü) Serial Monitor'da bozuk görünebilir. Bu yüzden yazdırdığımız metinlerde bu harfleri kullanmıyoruz.
+Not: Türkçe harfler (ç, ğ, ı, ö, ş, ü) seri monitörde bozuk görünebilir. Bu yüzden yazdırdığımız metinlerde bu harfleri kullanmıyoruz.
 
 ### Yazdır
 Buton durumunu yarım saniyede bir yazdıran bir program:
@@ -44,7 +46,7 @@ void loop() {
 }
 ```
 
-Serial Monitor'da `D2 = 1` satırları akar. Butona basınca `D2 = 0` olur. Basılı = LOW = 0 olduğunu artık gözünle görüyorsun.
+Seri monitörde `D2 = 1` satırları akar. Butonun **Basılı** özelliğini açınca ya da butona basılı tutunca `D2 = 0` olur. Basılı = LOW = 0 olduğunu artık gözünle görüyorsun.
 
 Hata ayıklamanın en kolay yolu budur: "Kod şu noktaya geldi mi? Değişken ne değerde?" sorularına `Serial.print` ile cevap ararsın.
 
@@ -75,7 +77,7 @@ void loop() {
 }
 ```
 
-Serial Monitor'ın giriş kutusuna `A` yazıp gönder: LED yanar. `K` gönder: söner. `char`, tek bir karakter tutan değişkendir ve tek tırnakla yazılır: `'A'`.
+Seri monitörün giriş kutusuna `A` yazıp gönder: LED yanar. `K` gönder: söner. `char`, tek bir karakter tutan değişkendir ve tek tırnakla yazılır: `'A'`.
 
 ### Ayrıştır
 Bazen gelen veri "komut + sayı" biçimindedir, örneğin `B3`: "3 kez yanıp sön". Veriyi parçalara ayırmaya **ayrıştırma** denir. `Serial.parseInt()` seri porttan gelen sıradaki sayıyı okur ve bir `int` olarak verir.
@@ -106,7 +108,7 @@ void loop() {
 }
 ```
 
-Serial Monitor'da `B3` yazıp gönder: LED 3 kez yanıp söner. Serial Monitor'ın alt kısmındaki satır sonu ayarı "Yeni satır" (Newline) ise gönderdiğin yazının sonuna bir satır sonu karakteri eklenir. Program bu karakteri okur ve `B` olmadığı için yok sayar.
+Seri monitörde `B3` yazıp gönder: LED 3 kez yanıp söner. Gerçek bir Serial Monitor'da satır sonu ayarı "Yeni satır" (Newline) ise gönderdiğin yazının sonuna bir satır sonu karakteri eklenir. Program bu karakteri okur ve `B` olmadığı için yok sayar.
 
 Birden fazla sayıyı da arka arkaya okuyabilirsin. Boşlukla ayrılmış iki sayıyı toplayalım:
 
@@ -128,7 +130,7 @@ void loop() {
 ```
 
 ### Nasıl çalışıyor?
-1. `Serial.begin(9600)` seri portu açar. Serial Monitor'ın hızı da 9600 olmalı; yoksa ekranda anlamsız karakterler görürsün.
+1. `Serial.begin(9600)` seri portu açar. Gerçek bir Serial Monitor'ın hızı da 9600 olmalı; yoksa ekranda anlamsız karakterler görürsün. Laboratuvar bunu kendisi eşler.
 2. `Serial.print` yazar, `Serial.println` yazıp satırı bitirir.
 3. `Serial.available()` okunmayı bekleyen bayt sayısını verir. `read()` her çağrıda bir bayt tüketir.
 4. `parseInt()` rakam olmayan karakterleri atlar, sayı bitene kadar okur. Sayıdan sonra veri gelmezse yaklaşık bir saniye bekleyip vazgeçer. Satır sonu göndermek bu beklemeyi kısaltır.
@@ -141,7 +143,7 @@ void loop() {
 
 ### Sık yapılan hatalar
 - `Serial.begin` yazmamak: hiçbir şey görünmez.
-- Serial Monitor hızını 9600 yapmamak: ekran anlamsız karakterlerle dolar.
+- `Serial.begin`'e farklı bir hız yazmak: gerçek bir Serial Monitor'da ekran anlamsız karakterlerle dolar.
 - `if (Serial.available())` yerine doğrudan `read()` çağırmak: veri yokken `-1` döner.
 - `'A'` yerine `"A"` yazmak: çift tırnak metin, tek tırnak tek karakterdir. `char` ile tek tırnak kullan.
 - Çok sık ve çok uzun yazdırmak: yazma yavaştır, programı yavaşlatır.

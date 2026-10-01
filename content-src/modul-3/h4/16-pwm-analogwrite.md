@@ -6,13 +6,15 @@ Uno'nun pinleri yalnızca iki durum bilir: 0 V ve 5 V. Peki bir LED'i "yarım pa
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| LED (kırmızı) | Uzun bacak (anot) → direncin bir ucu; kısa bacak (katot) → GND |
-| 330 Ω direnç | Bir ucu **D9**, öbür ucu LED anodu |
-| Potansiyometre (yalnız son program) | Orta bacak → **A0**, yan bacaklardan biri 5 V, öbürü GND |
+| LED (kırmızı) | **A** (anot) ucu → direncin 2 ucu; **K** (katot) ucu → GND |
+| 330 Ω direnç | 1 ucu **D9**, 2 ucu LED'in A ucu |
+| Potansiyometre (yalnız son program) | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |
 
-D9, "PWM yapabilen" pinlerden biridir. Uno'da bu pinlerin yanında `~` işareti vardır: D3, D5, D6, D9, D10, D11.
+D9, "PWM yapabilen" pinlerden biridir. Uno'da bu pinlerin yanında `~` işareti vardır: D3, D5, D6, D9, D10, D11. Programı kod düzenleyiciye yazıp ▶ ile çalıştır; LED'in parlaklığını tuvalde izle.
 
 ### PWM nedir?
 PWM (darbe genişlik modülasyonu), pini çok hızlı biçimde açıp kapatmaktır. Açık kalma süresinin tüm periyoda oranına **doluluk oranı** denir.
@@ -92,12 +94,12 @@ void loop() {
 ### Dene
 - Program 2'de `delay(5)` değerini 2 ve 15 yap. Nefes hızı nasıl değişiyor?
 - Program 2'de `analogWrite(9, p * p / 255)` dene. Parlaklık artışı daha doğal görünüyor mu? Göz, parlaklığı doğrusal algılamaz; karanlıkta küçük değişimleri daha iyi fark eder.
-- LED'i D13'e taşı ve `analogWrite(13, 128)` yaz. Ne olur? (İpucu: D13'ün yanında `~` yok.)
+- Direncin D9 ucundaki kabloyu D13'e taşı ve `analogWrite(13, 128)` yaz. Ne olur? (İpucu: D13'ün yanında `~` yok.)
 
 ### Sık yapılan hatalar
 - PWM yapamayan bir pine `analogWrite` yazmak: o pin yalnızca LOW ya da HIGH olur, yarım parlaklık çıkmaz. Pinin yanında `~` olduğundan emin ol.
 - Değeri 255'ten büyük yazmak (ör. 1023): `analogWrite` yalnızca 0-255 bekler. Potansiyometre değerini önce `map` ile çevir.
-- LED'e direnç koymamak: PWM akımı sınırlamaz, direnç yine gerekir.
+- LED'e direnç koymamak: PWM akımı sınırlamaz, direnç yine gerekir. Laboratuvar bunu modeller: dirençsiz LED için uyarı çıkar.
 - LED'in yarım parlak görünmesini "gerilim düştü" diye yorumlamak: aslında pin hızlıca açılıp kapanıyor, ortalama düşüyor.
 
 ## Konuşalım

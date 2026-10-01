@@ -47,7 +47,7 @@ void loop() {
 ```
 
 ### LDR
-LDR (ışığa duyarlı direnç) üzerine düşen ışık arttıkça direnci azalır. Değerler parçadan parçaya değişir; kabaca karanlıkta yüzlerce kΩ, parlak ışıkta birkaç yüz Ω ile birkaç kΩ arasındadır. Kendi parçanın değerini aşağıdaki sketch ile ölçebilirsin.
+LDR (ışığa duyarlı direnç) üzerine düşen ışık arttıkça direnci azalır. Değerler parçadan parçaya değişir; kabaca karanlıkta yüzlerce kΩ, parlak ışıkta birkaç yüz Ω ile birkaç kΩ arasındadır. Laboratuvardaki LDR'nin değerini aşağıdaki sketch ile okuyabilirsin: ışık kaydırıcısını oynatınca direnç değişir.
 
 LDR'yi bölücünün üst direnci (R1) yaparsak, sabit 10 kΩ direnç R2 olur:
 
@@ -61,12 +61,14 @@ LDR'yi bölücünün üst direnci (R1) yaparsak, sabit 10 kΩ direnç R2 olur:
 ADC değeriyle yazarsak: `R_ldr = 10000 × (1024 − ham) / ham`.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. LDR ve direnci seçince özellik panelinden LDR'nin **Işık** kaydırıcısını ve direncin değerini (10000 Ω) ayarlayabilirsin.
+
 | Parça | Bağlantı |
 |---|---|
-| LDR | Bir bacağı → 5 V; öbür bacağı → **A1** |
-| 10 kΩ direnç | Bir ucu **A1**, öbür ucu GND |
-| LED (kırmızı) | Uzun bacak → 330 Ω direncin ucu; kısa bacak → GND |
-| 330 Ω direnç | Bir ucu **D13**, öbür ucu LED anodu |
+| LDR | 1. ucu → 5V; 2. ucu → **A1** |
+| 10 kΩ direnç | 1. ucu **A1**, 2. ucu GND |
+| LED (kırmızı) | **A** (anot) → 330 Ω direncin 2. ucu; **K** (katot) → GND |
+| 330 Ω direnç | 1. ucu **D13**, 2. ucu LED'in **A** ucu |
 
 ### Program
 Önce ışığı ve LDR'nin direncini yazdıralım.
@@ -120,9 +122,9 @@ void loop() {
 4. Sabit direnç LDR'nin orta değerine yakın seçilirse (burada 10 kΩ) ölçüm aralığı en geniş olur.
 
 ### Dene
-- Elinle LDR'yi kapat. `ham` ne kadar düşüyor? Telefon el fenerini yaklaştır. En yüksek değer kaç?
-- `isik_oku` ile ölçtüğün karanlık ve aydınlık değerlerine göre 250 ve 350 eşiklerini kendi odana uyarla.
-- LDR ile 10 kΩ direncin yerini değiştir. Işık arttıkça `ham` nasıl değişir? Neden?
+- LDR'nin **Işık** kaydırıcısını en sola çek (karanlık). `ham` ne kadar düşüyor? Sonra en sağa çek (aydınlık). En yüksek değer kaç?
+- `isik_oku` ile okuduğun karanlık ve aydınlık değerlerine göre 250 ve 350 eşiklerini kendin uyarla.
+- Devrede LDR ile 10 kΩ direncin yerini değiştir. Işık arttıkça `ham` nasıl değişir? Neden?
 
 ### Sık yapılan hatalar
 - Sabit direnci unutmak: LDR doğrudan 5 V ile A1 arasında kalır, pin "havada" olur ve ölçüm anlamsızlaşır.

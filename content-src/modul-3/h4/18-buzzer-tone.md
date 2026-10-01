@@ -6,11 +6,13 @@ Müzik aletlerinin hepsi aynı şeyi yapar: havayı belli bir hızda titretir. T
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Pasif buzzer | Artı (+) bacak → **D8**; eksi bacak → GND |
+| Pasif buzzer | **+** ucu → **D8**; **-** ucu → GND |
 
-Buzzer iki türdür. **Aktif** buzzer içinde kendi osilatörü vardır: 5 V verince tek bir sabit ses çıkarır. **Pasif** buzzer ise sadece bir hoparlör gibidir; sesin perdesini senin üreteceğin titreşim belirler. Bu derste pasif buzzer kullanıyoruz. Pasif buzzerın artı bacağı genellikle işaretlidir. İstersen araya 100 Ω direnç koyarak sesi biraz kısabilirsin.
+Buzzer iki türdür. **Aktif** buzzer içinde kendi osilatörü vardır: 5 V verince tek bir sabit ses çıkarır. **Pasif** buzzer ise sadece bir hoparlör gibidir; sesin perdesini senin üreteceğin titreşim belirler. Bu derste pasif buzzer kullanıyoruz. Parça eklerken özellik panelinde **Tür: Pasif (tone ile)** seçili olsun (varsayılan budur). Sesi duymak için üstteki ses düğmesini aç.
 
 ### Frekans ve nota
 Frekans, saniyedeki titreşim sayısıdır; birimi hertz (Hz). Frekans arttıkça ses incelir.
@@ -104,10 +106,10 @@ RGB LED'imizin kırmızısı D9'da, yeşili D10'da, mavisi D11'de. Proje dersind
 - Frekansı 20 Hz gibi çok düşük ya da 10000 Hz gibi çok yüksek yapmayı dene. Buzzer neden artık "nota" gibi çalmıyor? (İpucu: buzzerların rahat çaldığı bir aralık vardır.)
 
 ### Sık yapılan hatalar
-- Aktif buzzer ile `tone` denemek: aktif buzzer her frekansta aynı sesi çıkarır. Notaları duyamıyorsan buzzerın türünü kontrol et.
+- Aktif buzzer ile `tone` denemek: aktif buzzer her frekansta aynı sesi çıkarır. Notaları duyamıyorsan özellik panelinden buzzerın türünü kontrol et.
 - Notadan sonra `delay` koymamak: `tone` beklemez, bir sonraki `tone` öncekini hemen keser. Sadece son nota duyulur.
 - `tone` çalarken D3 veya D11'de `analogWrite` ile parlaklık ayarı beklemek: bu pinlerde PWM bozulur (yukarıya bak).
-- Buzzerı yanlış pine bağlamak: kodda `tone(8, ...)` yazdıysan buzzerın artısı D8'de olmalı.
+- Buzzerı yanlış pine bağlamak: kodda `tone(8, ...)` yazdıysan buzzerın **+** ucu D8'e kablolanmış olmalı.
 
 ## Konuşalım
 Aynı La notasını bir gitar ve bir flüt çaldığında neden farklı duyarız? Buzzerın sesi neden hep "bip bip" gibi, enstrüman gibi değil?

@@ -22,7 +22,7 @@ Sıcaklık artınca NTC direnci düşer, A2'deki gerilim de düşer.
 En yaygın yöntem **beta** formülüdür. Parçanın iki sayısına ihtiyaç var, ikisi de veri sayfasında yazar:
 
 - R0: referans sıcaklıktaki direnç (bizde 25 °C'de 10 000 Ω)
-- B: parçanın beta katsayısı (çok satılan 10k NTC'lerde sıklıkla 3950; **kendi parçanın değerini veri sayfasından kontrol et**, 3435 gibi başka değerler de var)
+- B: parçanın beta katsayısı (çok satılan 10k NTC'lerde sıklıkla 3950, ama 3435 gibi başka değerler de var; gerçek bir parçada değeri veri sayfasından okursun. Laboratuvardaki NTC 10 kΩ ve B = 3950 olarak modellenmiştir)
 
 Sıcaklık Kelvin cinsinden T, T0 = 25 + 273,15 = 298,15 K olmak üzere:
 
@@ -39,7 +39,7 @@ R0 = 10 kΩ, B = 3950 için formülün verdiği değerler:
 | 50 °C | ≈ 3,59 kΩ |
 | 100 °C | ≈ 0,70 kΩ |
 
-Gerçek parçalarda bu değerler birkaç yüzde sapabilir; beta formülü yaklaşık bir modeldir ve en doğru olduğu yer 25 °C civarıdır.
+Gerçek parçalarda bu değerler birkaç yüzde sapabilir; beta formülü yaklaşık bir modeldir ve en doğru olduğu yer 25 °C civarıdır. Laboratuvardaki NTC doğrudan bu beta modeliyle çalışır.
 
 ### Steinhart-Hart denklemi
 Daha doğru model **Steinhart-Hart** denklemidir:
@@ -49,10 +49,12 @@ Daha doğru model **Steinhart-Hart** denklemidir:
 A, B, C parçaya özgü üç sayıdır. Üreticinin verdiği direnç-sıcaklık tablosundan üç nokta seçip üç bilinmeyenli denklemi çözerek bulunur. Aşağıdaki ikinci sketch bunu `setup()` içinde senin yerine yapar. Örnek olarak 0, 25 ve 50 °C noktalarını kullanır (burada R değerleri yukarıdaki tablodan alındı; gerçek bir parça için kendi veri sayfandaki üç değeri yazarsın).
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. NTC'yi seçince özellik panelinde **Sıcaklık** kaydırıcısı çıkar (-20 ile 120 °C).
+
 | Parça | Bağlantı |
 |---|---|
-| NTC termistör (10 kΩ) | Bir bacağı → **A2**; öbür bacağı → GND |
-| 10 kΩ direnç | Bir ucu 5 V; öbür ucu **A2** |
+| NTC termistör (10 kΩ) | 1. ucu → **A2**; 2. ucu → GND |
+| 10 kΩ direnç | 1. ucu → 5V; 2. ucu → **A2** |
 
 ### Program
 ```cpp
@@ -116,7 +118,7 @@ void loop() {
 ### Nasıl çalışıyor?
 1. `ham` değerinden NTC'nin direncini hesaplarız (gerilim bölücü formülünün tersi).
 2. Beta formülü dirençten Kelvin sıcaklığı verir; 273,15 çıkarıp Celsius'a çeviririz.
-3. `ham` 0 ya da 1023 ise bölme sıfıra gider ya da sonuç anlamsızlaşır. Bu hâller kopuk kablo ya da kısa devre demektir; sketch bunu `sensor hatasi` diye bildirir.
+3. `ham` 0 ya da 1023 ise bölme sıfıra gider ya da sonuç anlamsızlaşır. Bu hâller kopuk bağlantı ya da kısa devre demektir; sketch bunu `sensor hatasi` diye bildirir.
 4. Steinhart-Hart sürümü, verdiğimiz üç noktadan geçen eğriyi kurar. Üç noktanın arasında beta ile aynı sonucu verir; uçlara gittikçe ikisi birbirinden ayrılabilir. Hangisinin daha doğru olduğunu parçanın veri sayfası belirler.
 
 Gerilimlere göre beklenen sıcaklıklar (beta formülü, B = 3950):
@@ -131,15 +133,14 @@ Gerilimlere göre beklenen sıcaklıklar (beta formülü, B = 3950):
 | 4,0 V | 819 | ≈ −3,2 °C |
 
 ### Dene
-- Parmağınla NTC'yi sık. Sıcaklık hangi yönde, kaç saniyede değişiyor?
-- Sabit direnci 10 kΩ yerine 4,7 kΩ yap. Sketch'te hangi sayıyı değiştirmelisin? Oda sıcaklığında sonuç doğru çıkıyor mu?
+- NTC'nin **Sıcaklık** kaydırıcısını 25 °C'den 45 °C'ye çek. Seri monitördeki sıcaklık hangi yönde değişiyor? A2'deki gerilim (sanal ölçüm) nasıl değişiyor?
+- Sabit direncin değerini özellik panelinden 10 kΩ yerine 4,7 kΩ yap. Sketch'te hangi sayıyı değiştirmelisin? Oda sıcaklığında sonuç doğru çıkıyor mu?
 - Sıcaklık 30 °C'yi aşınca D13'teki LED'i yakacak bir `if` ekle.
 
 ### Sık yapılan hatalar
 - Kelvin ile Celsius'u karıştırmak: formül Kelvin verir, 273,15 çıkarmayı unutursan 298 gibi sayılar görürsün.
 - `log` yerine `log10` kullanmak: formül doğal logaritma ister.
-- Sabit direncin gerçek değerini kodda farklı yazmak: kodda 10000 yazıp devrede 4,7 kΩ takarsan sonuç kayar.
-- Sensörü çok sıcak şeylere (havya ucu, kaynar su) dokundurmak: parça ve kablo yalıtımı zarar görür, kendin de yanabilirsin. Parmak sıcaklığı ve ılık su gibi güvenli kaynaklarla dene.
+- Sabit direncin gerçek değerini kodda farklı yazmak: kodda 10000 yazıp devrede 4,7 kΩ kullanırsan sonuç kayar.
 - `10000 * ham` yazmak: `int` taşar. `10000.0 *` yazarak ondalıklı hesap yap.
 
 ## Konuşalım

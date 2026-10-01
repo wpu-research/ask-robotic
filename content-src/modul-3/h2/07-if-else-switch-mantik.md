@@ -6,17 +6,17 @@ Kapıda zil çalınca ne olur? Biri butona basarsa ışık yanar. Ama ya kimse y
 
 ## Etkinlik
 ### Devre
-Geçen dersteki devrenin aynısı; yalnız bir LED daha ekliyoruz.
+Geçen dersteki devrenin aynısı; yalnız bir LED daha ekliyoruz. Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
 
 | Parça | Bağlantı |
 |---|---|
 | Buton | Bir ucu **D2**, öbür ucu **GND** |
-| Eğim anahtarı (buton gibi) | Bir ucu **D3**, öbür ucu **GND** |
+| İkinci buton | Bir ucu **D3**, öbür ucu **GND** |
 | LED (kırmızı) + 330 Ω direnç | **D13** → direnç → LED anodu; katot GND |
 | LED (sarı) + 330 Ω direnç | **D12** → direnç → LED anodu; katot GND |
 | LED (yeşil) + 330 Ω direnç | **D11** → direnç → LED anodu; katot GND |
 
-Devreyi simülatörde ya da kendi kartında kur.
+D3'teki ikinci buton, kodda "eğim anahtarı" diye geçen girişi temsil eder; laboratuvarda eğim anahtarı olmadığı için butonla çalışırız. Kart için fark yoktur.
 
 ### if ve else
 `if` bir koşula bakar. Koşul doğruysa süslü parantez içindeki kodu çalıştırır. `else` ise koşul doğru değilse çalışır.
@@ -47,7 +47,7 @@ Birden fazla ihtimal varsa `else if` ekleyebilirsin:
 if (digitalRead(2) == LOW) {
   // buton basılı
 } else if (digitalRead(3) == LOW) {
-  // buton basılı değil ama eğim anahtarı kapalı
+  // buton basılı değil ama ikinci buton basılı
 } else {
   // ikisi de açık
 }
@@ -96,7 +96,7 @@ void loop() {
 `bool` iki değerli bir değişkendir: `true` (doğru) ya da `false` (yanlış). `digitalWrite`, `true`'yu HIGH, `false`'u LOW olarak anlar.
 
 ### switch
-Bir sayıya göre birçok yola ayrılacaksan `switch` daha derli toplu olur. Aşağıda butonla eğim anahtarının durumunu tek bir sayıya çeviriyoruz: buton 1, eğim anahtarı 2 puan veriyor.
+Bir sayıya göre birçok yola ayrılacaksan `switch` daha derli toplu olur. Aşağıda iki butonun durumunu tek bir sayıya çeviriyoruz: birinci buton 1, ikinci buton 2 puan veriyor.
 
 ```cpp
 // sketch: switch_durum

@@ -13,7 +13,7 @@ Dört LED'i sırayla yakmak için aynı satırları dört kez yazmak gerekir. Pe
 | LED 3 (yeşil) | Anot → 330 Ω → **D11**; katot → GND |
 | LED 4 (mavi) | Anot → 330 Ω → **D10**; katot → GND |
 
-Her LED'in kendi direnci olur. Dört katodu ortak GND hattına bağlayabilirsin.
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Her LED'in kendi direnci olur. Dört K ucunu Uno'nun GND pinlerinden birine bağlayabilirsin. LED'in rengini özellik panelinden seçersin.
 
 ### for döngüsü
 `for` döngüsü bir işi belirli sayıda tekrar eder. Üç parçası vardır:
@@ -98,7 +98,7 @@ void loop() {
 4. Her LED 200 ms yanar, sonra söner. Bir tam tur 6 × 200 = 1200 ms sürer.
 
 ### Dene
-- `delay` değerlerini 50 ms yap. Işık hâlâ ayrı ayrı görülebiliyor mu?
+- `delay` değerlerini 50 ms yap ve yeniden ▶'e bas. Işık hâlâ ayrı ayrı görülebiliyor mu?
 - `ledler` dizisine yeni bir pin ekle (ör. D9) ve döngü sınırlarını buna göre değiştir.
 - Önce hepsini birlikte yakıp sonra hepsini birlikte söndüren bir program yaz.
 

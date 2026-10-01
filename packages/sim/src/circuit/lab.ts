@@ -1,16 +1,18 @@
 // Sanal devre laboratuvarı: Sim (avr8js) + netlist + DC çözücü. Tarayıcı ve Node uyumlu.
+import { HD44780, type I2CDevice, type LCDI2C } from '../devices.js'
 import { Sim, type Pin, type PinStateName } from '../sim.js'
 import { staticWarnings } from './analysis.js'
 import type {
-  Circuit, LabApi, LabState, LabWarning, LedState, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
+  Circuit, LabApi, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
 import { PINS } from './contract.js'
-import { MODEL, ldrOhms, ledSpecs, ntcOhms, num, type LedSpec } from './model.js'
+import { MODEL, SEGMENTS, ldrOhms, ledSpecs, ntcOhms, num, type LedSpec } from './model.js'
 import { buildNetlist, type Netlist } from './netlist.js'
+import { Sr595Chip, attachSr595, buildSr595, simPin, wiredUno } from './peripherals.js'
 import { solve, type SolverInput, type SolverResult } from './solver.js'
 
 const UNO_PINS: readonly string[] = PINS.uno.filter((n) => /^(D\d+|A\d)$/.test(n))
-const simPin = (name: string): Pin => (name[0] === 'D' ? Number(name.slice(1)) : name)
+const BLANK_LINES = (): string[] => [' '.repeat(16), ' '.repeat(16)]
 const clamp01 = (x: number): number => Math.min(1, Math.max(0, x))
 
 /** Bir Uno pininin kenar geçmişi: doluluk oranı, frekans ve servo darbe genişliği. */
@@ -65,8 +67,14 @@ class PinTracker {
 }
 
 interface SrcMeta { kind: 'rail' | 'pin'; name: string; volts: number }
-interface Compiled { input: SolverInput; src: SrcMeta[]; leds: LedSpec[] }
+interface Compiled { input: SolverInput; src: SrcMeta[]; leds: LedSpec[]; npnIds: string[] }
 interface Sol { res: SolverResult; comp: Compiled }
+interface I2cEntry { lcd: LCDI2C; dev: I2CDevice | undefined; reg: number | null }
+
+const parseAddr = (p: PartInstance): number => {
+  const n = Number(String(p.props.address ?? '0x27'))
+  return Number.isFinite(n) ? n : 0x27
+}
 
 class LabImpl implements LabApi {
   private readonly circuit: Circuit
@@ -80,13 +88,19 @@ class LabImpl implements LabApi {
   private nodeCount = 1
   private readonly specs: LedSpec[]
   private readonly specIndex = new Map<string, number>()
-  private readonly drivers = new Map<string, string[]>() // anahtar (LED / buzzer) -> sürücü Uno pinleri
+  private readonly drivers = new Map<string, string[]>() // buzzer / servo -> sürücü Uno pinleri
+
+  private chips: Sr595Chip[] = []
+  private chipById = new Map<string, Sr595Chip>()
+  private lcds = new Map<string, HD44780>()
+  private i2cLcds = new Map<string, I2cEntry>()
 
   private modes: Record<string, PinStateName> = {}
   private version = 0
   private key = ''
   private base!: Sol
   private forced = new Map<string, { hi: Sol; lo: Sol }>()
+  private pwmCache: { now: number; list: Array<{ name: string; duty: number }> } | null = null
   private burnt = new Set<string>()
   private dynWarnings = new Map<string, LabWarning>()
   private staticW: LabWarning[] = []
@@ -156,7 +170,6 @@ class LabImpl implements LabApi {
   }
 
   private computeDrivers(): void {
-    for (const s of this.specs) this.drivers.set(s.key, this.drivingPins(s.a, s.k))
     for (const p of this.circuit.parts) {
       if (p.type === 'buzzer') this.drivers.set(p.id, this.drivingPins({ part: p.id, pin: '+' }, { part: p.id, pin: '-' }))
       if (p.type === 'servo') this.drivers.set(p.id, this.nl.unoPinsOnNet(this.nl.netOf({ part: p.id, pin: 'SIG' }) ?? -1))
@@ -165,18 +178,44 @@ class LabImpl implements LabApi {
 
   private refreshStatic(): void {
     this.nl = buildNetlist(this.circuit)
-    this.staticW = staticWarnings(this.circuit, this.nl).filter((w) => w.kind !== 'floating-input')
+    // Uno pinlerinin statik "yüzen" tespiti çalışma zamanında geçersiz (kod pini sürebilir); parça uyarıları kalır.
+    this.staticW = staticWarnings(this.circuit, this.nl).filter((w) => !(w.kind === 'floating-input' && w.partId === this.unoId))
   }
 
   private boot(): void {
     this.sim = new Sim(this.hex)
     this.trackers.clear()
     for (const n of this.wiredPins) this.trackers.set(n, new PinTracker(this.sim, simPin(n)))
+    this.attachDevices()
     this.modes = {}
     this.key = ''
     this.forced.clear()
+    this.pwmCache = null
     this.servoAngle.clear(); this.servoPulses.clear(); this.overSince.clear()
     this.update(true)
+  }
+
+  /** Davranışsal aygıtları (74HC595, LCD'ler) yeni Sim'e bağlar. */
+  private attachDevices(): void {
+    this.chips = buildSr595(this.circuit, this.nl)
+    this.chipById = new Map(this.chips.map((c) => [c.id, c] as const))
+    attachSr595(this.sim, this.chips)
+    this.lcds.clear(); this.i2cLcds.clear()
+    for (const p of this.circuit.parts) {
+      if (p.type === 'lcd1602') {
+        const u = (pin: string): Pin | undefined => wiredUno(this.nl, p.id, pin)?.pin
+        const rs = u('RS'), en = u('E'), d4 = u('D4'), d5 = u('D5'), d6 = u('D6'), d7 = u('D7')
+        this.lcds.set(p.id, rs !== undefined && en !== undefined && d4 !== undefined && d5 !== undefined && d6 !== undefined && d7 !== undefined
+          ? this.sim.lcd({ rs, en, d4, d5, d6, d7 })
+          : new HD44780(16, 2))
+      } else if (p.type === 'lcdI2c') {
+        const addr = parseAddr(p)
+        const lcd = this.sim.lcdI2C({ address: addr })
+        const dev = this.sim.i2c.devices.get(addr)
+        this.sim.i2c.devices.delete(addr) // veri yoluna yalnız bağlı ve beslenmişse girer (syncI2c)
+        this.i2cLcds.set(p.id, { lcd, dev, reg: null })
+      }
+    }
   }
 
   // ---- LabApi ----
@@ -200,14 +239,7 @@ class LabImpl implements LabApi {
       pins[n] = { mode, high, volts }
     }
     const parts: Record<string, PartRuntime> = {}
-    for (const [id, r] of Object.entries(this.runtime)) {
-      parts[id] = {
-        ...(r.led && { led: { ...r.led } }),
-        ...(r.buzzer && { buzzer: { ...r.buzzer } }),
-        ...(r.servo && { servo: { ...r.servo } }),
-        ...(r.rgbled && { rgbled: { ...r.rgbled } }),
-      }
-    }
+    for (const [id, r] of Object.entries(this.runtime)) parts[id] = JSON.parse(JSON.stringify(r)) as PartRuntime
     return {
       timeMs: this.sim.nowMs(),
       running: !this.disposed,
@@ -249,19 +281,58 @@ class LabImpl implements LabApi {
 
   dispose(): void { this.disposed = true }
 
+  // ---- parça mantığı (düğüm gerilimlerinden) ----
+  private ref(p: PartInstance, pin: string): PinRef { return { part: p.id, pin } }
+
+  /** GND ucu kablolu ve Uno toprağıyla aynı düğümde mi. */
+  private gndOk(p: PartInstance, pin: string): boolean {
+    return this.nl.ground !== undefined && this.nl.isWired(this.ref(p, pin)) && this.nl.netOf(this.ref(p, pin)) === this.nl.ground
+  }
+
+  /** `vcc` ucu kablolu, toprak tamam ve gerilim ≥ powerMinVolts. */
+  private supplyOk(p: PartInstance, vcc: string, gnd: string, v: Float64Array): boolean {
+    return this.gndOk(p, gnd) && this.nl.isWired(this.ref(p, vcc)) && v[this.node(this.ref(p, vcc))] > MODEL.powerMinVolts
+  }
+
+  /** Giriş ucu kablolu, sürülüyor (yüzmüyor) ve eşiğin üstünde mi. */
+  private inHigh(p: PartInstance, pin: string, v: Float64Array, fl: boolean[]): boolean {
+    const r = this.ref(p, pin)
+    if (!this.nl.isWired(r)) return false
+    const n = this.node(r)
+    return !fl[n] && v[n] > MODEL.digitalThreshold
+  }
+
+  private inLow(p: PartInstance, pin: string, v: Float64Array, fl: boolean[]): boolean {
+    const r = this.ref(p, pin)
+    if (!this.nl.isWired(r)) return false
+    const n = this.node(r)
+    return !fl[n] && v[n] < MODEL.digitalThreshold
+  }
+
+  private relayOn(p: PartInstance, v: Float64Array, fl: boolean[]): boolean {
+    if (!this.supplyOk(p, 'VCC', 'GND', v)) return false
+    return p.props.trigger === 'low' ? this.inLow(p, 'IN', v, fl) : this.inHigh(p, 'IN', v, fl)
+  }
+
+  /** 74HC595 çıkışları etkin mi: beslenmiş ve OE (aktif-LOW) sürülüyor ve düşük. */
+  private chipOutputsOn(p: PartInstance, v: Float64Array, fl: boolean[]): boolean {
+    return this.supplyOk(p, 'VCC', 'GND', v) && this.inLow(p, 'OE', v, fl)
+  }
+
   // ---- çözüm ----
   private makeKey(): string {
     const m = this.wiredPins.map((n) => {
       const s = this.modes[n]
       return s === 'High' ? 'H' : s === 'Low' ? 'L' : s === 'InputPullUp' ? 'P' : 'I'
     }).join('')
-    return `${m}|${this.version}|${[...this.burnt].sort().join(',')}`
+    return `${m}|${this.version}|${[...this.burnt].sort().join(',')}|${this.chips.map((c) => c.signature()).join(',')}`
   }
 
   private compile(override?: { pin: string; high: boolean }): Compiled {
     const nl = this.nl
-    const input: SolverInput = { nodes: this.nodeCount, resistors: [], sources: [], leds: [] }
+    const input: SolverInput = { nodes: this.nodeCount, resistors: [], sources: [], leds: [], npns: [], switches: [], logic: [] }
     const src: SrcMeta[] = []
+    const npnIds: string[] = []
     const R = (a: PinRef, b: PinRef, ohms: number): void => { input.resistors.push({ a: this.node(a), b: this.node(b), ohms }) }
     const ref = (p: PartInstance, pin: string): PinRef => ({ part: p.id, pin })
     for (const p of this.circuit.parts) {
@@ -271,10 +342,61 @@ class LabImpl implements LabApi {
         case 'ntc': R(ref(p, '1'), ref(p, '2'), ntcOhms(num(p, 'tempC', 25))); break
         case 'button': if (p.props.pressed === true) R(ref(p, 'A'), ref(p, 'B'), MODEL.buttonOnOhms); break
         case 'buzzer': R(ref(p, '+'), ref(p, '-'), MODEL.buzzerOhms); break
+        case 'dcmotor': R(ref(p, 'M1'), ref(p, 'M2'), MODEL.motorOhms); break
         case 'pot': {
           const total = Math.max(num(p, 'ohms', 10_000), 1), pos = clamp01(num(p, 'position', 0.5))
           R(ref(p, 'VCC'), ref(p, 'SIG'), Math.max((1 - pos) * total, 0.01))
           R(ref(p, 'SIG'), ref(p, 'GND'), Math.max(pos * total, 0.01))
+          break
+        }
+        case 'npn':
+          input.npns!.push({
+            b: this.node(ref(p, 'B')), c: this.node(ref(p, 'C')), e: this.node(ref(p, 'E')),
+            beta: MODEL.npnBeta, vbe: MODEL.npnVbe, rbe: MODEL.npnRbe, vsat: MODEL.npnVsat, rsat: MODEL.npnRsat,
+          })
+          npnIds.push(p.id)
+          break
+        case 'mosfet': {
+          const g = this.node(ref(p, 'G')), s = this.node(ref(p, 'S'))
+          input.switches!.push({ a: this.node(ref(p, 'D')), b: s, ohms: MODEL.mosfetRon, closed: (v) => v[g] - v[s] > MODEL.mosfetVth })
+          break
+        }
+        case 'relay': {
+          const com = this.node(ref(p, 'COM'))
+          input.switches!.push({ a: com, b: this.node(ref(p, 'NO')), ohms: MODEL.relayContactOhms, closed: (v, fl) => this.relayOn(p, v, fl) })
+          input.switches!.push({ a: com, b: this.node(ref(p, 'NC')), ohms: MODEL.relayContactOhms, closed: (v, fl) => !this.relayOn(p, v, fl) })
+          break
+        }
+        case 'l293d': {
+          const vcc2 = this.node(ref(p, 'VCC2'))
+          const channel = (en: string, inp: string, out: string): void => {
+            input.logic!.push({
+              node: this.node(ref(p, out)), ohms: MODEL.l293dOutOhms,
+              drive: (v, fl) => {
+                if (!this.supplyOk(p, 'VCC1', 'GND', v) || !this.supplyOk(p, 'VCC2', 'GND', v)) return null
+                if (!this.inHigh(p, en, v, fl)) return null
+                return this.inHigh(p, inp, v, fl) ? v[vcc2] - MODEL.l293dDrop : MODEL.l293dLowV
+              },
+            })
+          }
+          channel('EN12', 'IN1', 'OUT1'); channel('EN12', 'IN2', 'OUT2')
+          channel('EN34', 'IN3', 'OUT3'); channel('EN34', 'IN4', 'OUT4')
+          break
+        }
+        case 'sr595': {
+          const chip = this.chipById.get(p.id)
+          if (!chip) break
+          const vcc = this.node(ref(p, 'VCC'))
+          ;['QA', 'QB', 'QC', 'QD', 'QE', 'QF', 'QG', 'QH'].forEach((q, i) => {
+            input.logic!.push({
+              node: this.node(ref(p, q)), ohms: MODEL.sr595OutOhms,
+              drive: (v, fl) => (this.chipOutputsOn(p, v, fl) ? (chip.lat[i] ? v[vcc] : 0) : null),
+            })
+          })
+          input.logic!.push({
+            node: this.node(ref(p, 'QH_')), ohms: MODEL.sr595OutOhms,
+            drive: (v) => (this.supplyOk(p, 'VCC', 'GND', v) ? (chip.sh[7] ? v[vcc] : 0) : null),
+          })
           break
         }
         default: break
@@ -305,9 +427,9 @@ class LabImpl implements LabApi {
       }
     }
     for (const s of this.specs) {
-      input.leds.push({ a: this.node(s.a), k: this.node(s.k), vf: s.vf, rs: MODEL.ledSeriesOhms, disabled: this.burnt.has(s.key) })
+      input.leds.push({ a: this.node(s.a), k: this.node(s.k), vf: s.vf, rs: s.rs, disabled: this.burnt.has(s.key) })
     }
-    return { input, src, leds: this.specs }
+    return { input, src, leds: this.specs, npnIds }
   }
 
   private runSolve(override?: { pin: string; high: boolean }): Sol {
@@ -324,12 +446,16 @@ class LabImpl implements LabApi {
   private scan(sol: Sol): void {
     const { res, comp } = sol
     comp.leds.forEach((s, i) => {
+      if (!s.burnable) return
       const a = res.ledAmps[i]
       if (a > MODEL.ledNoResistorA) this.warn('led-no-resistor', s.partId, 'LED\'in seri direnci yok ya da çok küçük: akım güvenli sınırı aştı.')
       if (a > MODEL.ledBurnA && !this.burnt.has(s.key)) {
         this.burnt.add(s.key)
         this.warn('led-burnt', s.partId, `LED yandı (${(a * 1000).toFixed(0)} mA). Sıfırlayınca düzelir; seri direnç ekle.`)
       }
+    })
+    comp.npnIds.forEach((id, i) => {
+      if (res.npnIb[i] > MODEL.baseOverA) this.warn('base-overcurrent', id, `Taban akımı ${(res.npnIb[i] * 1000).toFixed(0)} mA: çok yüksek. Tabana seri direnç (örn. 1 kΩ) ekle.`)
     })
     comp.input.sources.forEach((s, i) => {
       const m = comp.src[i]
@@ -360,6 +486,7 @@ class LabImpl implements LabApi {
     for (let g = 0; g < 4; g++) {
       this.key = key
       this.forced.clear()
+      this.pwmCache = null
       this.base = this.runSolve()
       const before = this.burnt.size
       this.scan(this.base)
@@ -395,6 +522,32 @@ class LabImpl implements LabApi {
 
   private isOut(pin: string): boolean { const s = this.modes[pin]; return s === 'High' || s === 'Low' }
 
+  /** Şu an PWM yapan (doluluk 0,02-0,98) bağlı çıkış pinleri. */
+  private pwmPins(now: number): Array<{ name: string; duty: number }> {
+    if (this.pwmCache && this.pwmCache.now === now) return this.pwmCache.list
+    const list: Array<{ name: string; duty: number }> = []
+    for (const n of this.wiredPins) {
+      if (!this.isOut(n)) continue
+      const d = this.trackers.get(n)!.duty(now, MODEL.dutyWindowMs)
+      if (d > 0.02 && d < 0.98) list.push({ name: n, duty: d })
+    }
+    this.pwmCache = { now, list }
+    return list
+  }
+
+  /**
+   * Bir büyüklüğün (f) zaman ortalaması: ilgili PWM pini varsa doluluğa göre yüksek/alçak çözümlerin karışımı,
+   * yoksa anlık çözüm. Doluluk sıfır/bir uçlarında anlık değer geçerlidir.
+   */
+  private blend(f: (s: Sol) => number, now: number): number {
+    for (const pin of this.pwmPins(now)) {
+      const fo = this.getForced(pin.name)
+      const h = f(fo.hi), l = f(fo.lo)
+      if (Math.abs(h - l) > 1e-6) return pin.duty * h + (1 - pin.duty) * l
+    }
+    return f(this.base)
+  }
+
   // ---- her ms ----
   private update(force: boolean): void {
     const now = this.sim.nowMs()
@@ -408,37 +561,127 @@ class LabImpl implements LabApi {
     }
   }
 
-  private ledAmps(i: number, now: number): number {
+  private ledMa(i: number, now: number): number {
     const s = this.specs[i]
     if (this.burnt.has(s.key)) return 0
-    for (const p of this.drivers.get(s.key) ?? []) {
-      if (!this.isOut(p)) continue
-      const d = this.trackers.get(p)!.duty(now, MODEL.dutyWindowMs)
-      if (d > 0.02 && d < 0.98) {
-        const f = this.getForced(p)
-        return d * f.hi.res.ledAmps[i] + (1 - d) * f.lo.res.ledAmps[i]
-      }
-    }
-    return this.base.res.ledAmps[i]
+    return this.blend((sol) => sol.res.ledAmps[i] * 1000, now)
   }
 
   private ledState(i: number, now: number): LedState {
     const s = this.specs[i]
     if (this.burnt.has(s.key)) return { on: false, brightness: 0, currentMa: 0, burnt: true }
-    const amps = this.ledAmps(i, now)
-    const brightness = clamp01(amps / MODEL.ledRefA)
-    return { on: brightness > 0.01, brightness, currentMa: amps * 1000, burnt: false }
+    const ma = this.ledMa(i, now)
+    const brightness = clamp01(ma / 1000 / MODEL.ledRefA)
+    return { on: brightness > 0.01, brightness, currentMa: ma, burnt: false }
+  }
+
+  /** Güç/sinyal durumu çözümden çip nesnelerine (kenar geri çağırmaları bunları okur). */
+  private updateChips(): void {
+    const { volts, floating } = this.base.res
+    for (const p of this.circuit.parts) {
+      if (p.type !== 'sr595') continue
+      const chip = this.chipById.get(p.id)
+      if (!chip) continue
+      chip.powered = this.supplyOk(p, 'VCC', 'GND', volts)
+      const srclrHigh = this.inHigh(p, 'SRCLR', volts, floating)
+      chip.active = chip.powered && srclrHigh
+      if (!chip.powered) chip.reset()
+      else if (!srclrHigh) chip.clearShift()
+    }
+  }
+
+  /** I2C LCD'leri veri yoluna ekler/çıkarır: beslenmiş ve SDA→A4, SCL→A5 kablolu ise adreste cevap verir. */
+  private i2cPresent(p: PartInstance, v: Float64Array): boolean {
+    const sda = this.nl.netOf(this.ref(p, 'SDA')), scl = this.nl.netOf(this.ref(p, 'SCL'))
+    if (sda === undefined || scl === undefined) return false
+    return this.supplyOk(p, 'VCC', 'GND', v) && this.nl.unoPinsOnNet(sda).includes('A4') && this.nl.unoPinsOnNet(scl).includes('A5')
+  }
+
+  private syncI2c(p: PartInstance, present: boolean): void {
+    const e = this.i2cLcds.get(p.id)
+    if (!e) return
+    const want = present ? parseAddr(p) : null
+    if (e.reg === want) return
+    if (e.reg !== null) this.sim.i2c.devices.delete(e.reg)
+    if (want !== null && e.dev) { e.dev.address = want; this.sim.i2c.devices.set(want, e.dev) }
+    e.reg = want
+  }
+
+  private measure(p: PartInstance, now: number): Measurement | undefined {
+    const v = (sol: Sol, pin: string): number => sol.res.volts[this.node(this.ref(p, pin))]
+    const via = (a: string, b: string, ohms: number | null): Measurement => ({
+      vAcross: this.blend((s) => v(s, a) - v(s, b), now),
+      currentMa: ohms === null ? 0 : this.blend((s) => ((v(s, a) - v(s, b)) / ohms) * 1000, now),
+    })
+    switch (p.type) {
+      case 'resistor': return via('1', '2', Math.max(num(p, 'ohms', 330), 0.01))
+      case 'ldr': return via('1', '2', ldrOhms(num(p, 'light', 0.5)))
+      case 'ntc': return via('1', '2', ntcOhms(num(p, 'tempC', 25)))
+      case 'button': return via('A', 'B', p.props.pressed === true ? MODEL.buttonOnOhms : null)
+      case 'buzzer': return via('+', '-', MODEL.buzzerOhms)
+      case 'dcmotor': return via('M1', 'M2', MODEL.motorOhms)
+      case 'pot': return via('VCC', 'SIG', Math.max((1 - clamp01(num(p, 'position', 0.5))) * Math.max(num(p, 'ohms', 10_000), 1), 0.01))
+      case 'led': case 'diode': {
+        const i = this.specIndex.get(p.id)!
+        return { vAcross: this.blend((s) => v(s, 'A') - v(s, 'K'), now), currentMa: this.ledMa(i, now) }
+      }
+      default: return undefined
+    }
   }
 
   private computeRuntime(now: number): void {
+    this.updateChips()
     const volts = (ref: PinRef): number => this.base.res.volts[this.node(ref)]
     const rt: Record<string, PartRuntime> = {}
     for (const p of this.circuit.parts) {
+      const meas = this.measure(p, now)
+      const out: PartRuntime = meas ? { meas } : {}
+      rt[p.id] = out
       if (p.type === 'led') {
-        rt[p.id] = { led: this.ledState(this.specIndex.get(p.id)!, now) }
+        out.led = this.ledState(this.specIndex.get(p.id)!, now)
       } else if (p.type === 'rgbled') {
         const b = (c: string): number => this.ledState(this.specIndex.get(`${p.id}.${c}`)!, now).brightness
-        rt[p.id] = { rgbled: { r: b('R'), g: b('G'), b: b('B') } }
+        out.rgbled = { r: b('R'), g: b('G'), b: b('B') }
+      } else if (p.type === 'sevenseg') {
+        const segs = {} as Record<(typeof SEGMENTS)[number], number>
+        for (const c of SEGMENTS) segs[c] = this.ledState(this.specIndex.get(`${p.id}.${c}`)!, now).brightness
+        out.sevenseg = { segments: segs }
+      } else if (p.type === 'dcmotor') {
+        const speed = this.blend((s) => {
+          const d = s.res.volts[this.node(this.ref(p, 'M1'))] - s.res.volts[this.node(this.ref(p, 'M2'))]
+          return Math.min(1, Math.max(-1, d / MODEL.motorRatedV))
+        }, now)
+        out.dcmotor = { speed: Math.abs(speed) < 1e-4 ? 0 : speed }
+      } else if (p.type === 'relay') {
+        out.relay = { energized: this.relayOn(p, this.base.res.volts, this.base.res.floating) }
+      } else if (p.type === 'sr595') {
+        const chip = this.chipById.get(p.id)
+        const on = this.chipOutputsOn(p, this.base.res.volts, this.base.res.floating)
+        out.sr595 = { outputs: chip ? chip.lat.map((b) => on && b) : new Array(8).fill(false) }
+      } else if (p.type === 'lcd1602') {
+        const dev = this.lcds.get(p.id)
+        const v = this.base.res.volts
+        const powered = this.supplyOk(p, 'VDD', 'VSS', v)
+        const rwOk = this.gndOk(p, 'RW')
+        const v0Wired = this.nl.isWired(this.ref(p, 'V0'))
+        const contrastOk = !v0Wired || volts(this.ref(p, 'V0')) <= MODEL.lcdV0Max
+        const visible = powered && rwOk && contrastOk && !!dev && dev.displayOn
+        const bl = this.specIndex.get(`${p.id}.bl`)
+        out.lcd = {
+          lines: visible && dev ? dev.lines() : BLANK_LINES(),
+          backlight: powered && bl !== undefined && this.ledMa(bl, now) / 1000 > MODEL.lcdBlOnA,
+          poweredOn: powered,
+        }
+      } else if (p.type === 'lcdI2c') {
+        const e = this.i2cLcds.get(p.id)
+        const v = this.base.res.volts
+        const present = this.i2cPresent(p, v)
+        this.syncI2c(p, present)
+        out.lcd = {
+          lines: present && e && e.lcd.displayOn ? e.lcd.lines() : BLANK_LINES(),
+          backlight: present && !!e && e.lcd.backlight,
+          poweredOn: this.supplyOk(p, 'VCC', 'GND', v),
+        }
       } else if (p.type === 'buzzer') {
         const v = volts({ part: p.id, pin: '+' }) - volts({ part: p.id, pin: '-' })
         if (Math.abs(v) > MODEL.buzzerOnVolts) this.overSince.set(p.id, now)
@@ -447,12 +690,12 @@ class LabImpl implements LabApi {
         if (p.props.kind === 'active') {
           const pwm = pins.some((n) => this.isOut(n) && this.trackers.get(n)!.duty(now, MODEL.dutyWindowMs) > 0.1)
           const on = (v > MODEL.buzzerOnVolts) || (powered && pwm)
-          rt[p.id] = { buzzer: { on, freqHz: on ? MODEL.activeBuzzerHz : 0 } }
+          out.buzzer = { on, freqHz: on ? MODEL.activeBuzzerHz : 0 }
         } else {
           let hz = 0
           for (const n of pins) hz = Math.max(hz, this.trackers.get(n)!.freq(now, MODEL.waveWindowMs))
           const on = hz > 0 && powered
-          rt[p.id] = { buzzer: { on, freqHz: on ? hz : 0 } }
+          out.buzzer = { on, freqHz: on ? hz : 0 }
         }
       } else if (p.type === 'servo') {
         const pins = this.drivers.get(p.id) ?? []
@@ -470,7 +713,7 @@ class LabImpl implements LabApi {
           if (powered) this.servoPulses.set(`${p.id}.${n}`, t.pulses)
         }
         this.servoAngle.set(p.id, angle)
-        rt[p.id] = { servo: { angleDeg: angle, attached } }
+        out.servo = { angleDeg: angle, attached }
       }
     }
     this.runtime = rt
@@ -480,7 +723,7 @@ class LabImpl implements LabApi {
     const seen = new Set<string>()
     const out: LabWarning[] = []
     for (const w of [...this.staticW, ...this.dynWarnings.values()]) {
-      const k = `${w.kind}|${w.partId ?? ''}|${w.partId === this.unoId ? w.message : ''}`
+      const k = `${w.kind}|${w.partId ?? ''}|${(w.partId === this.unoId || w.kind === 'floating-input') ? w.message : ''}`
       if (seen.has(k)) continue
       seen.add(k)
       out.push({ ...w })

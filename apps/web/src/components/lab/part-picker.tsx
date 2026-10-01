@@ -2,19 +2,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PartType } from '@/lib/lab/contract'
 import { PART_DEFS } from '@/lib/lab/geometry'
+import { pickerGroups, SHORT_NAME } from '@/lib/lab/parts'
 import { PartIcon } from './part-art'
-
-const SHORT_NAME: Partial<Record<PartType, string>> = { ldr: 'LDR', ntc: 'NTC', pot: 'Potansiyometre' }
-const CATEGORIES: { title: string; types: PartType[] }[] = [
-  { title: 'Temel', types: ['resistor'] },
-  { title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'servo'] },
-  { title: 'Giriş ve sensör', types: ['button', 'pot', 'ldr', 'ntc'] },
-]
-const KEYWORDS: Partial<Record<PartType, string>> = {
-  led: 'ışık diyot lamba', rgbled: 'renkli ışık led', buzzer: 'ses zil hoparlör', servo: 'motor kol açı', button: 'düğme anahtar tuş',
-  pot: 'ayarlı direnç knob', ldr: 'ışık sensörü foto', ntc: 'sıcaklık sensörü termistör', resistor: 'ohm',
-}
-const norm = (s: string) => s.toLocaleLowerCase('tr-TR')
 
 interface Props {
   types: PartType[]
@@ -65,13 +54,7 @@ export function PartPicker({ types, disabled, onDrop, onAdd }: Props) {
     return () => { document.removeEventListener('pointerdown', onDoc); document.removeEventListener('keydown', onKey) }
   }, [open])
 
-  const groups = useMemo(() => {
-    const needle = norm(q.trim())
-    const match = (t: PartType) => !needle || norm(`${PART_DEFS[t].name} ${KEYWORDS[t] ?? ''}`).includes(needle)
-    const known = new Set(CATEGORIES.flatMap((c) => c.types))
-    const cats = [...CATEGORIES, { title: 'Diğer', types: types.filter((t) => !known.has(t)) }]
-    return cats.map((c) => ({ title: c.title, types: c.types.filter((t) => types.includes(t) && match(t)) })).filter((c) => c.types.length)
-  }, [q, types])
+  const groups = useMemo(() => pickerGroups(types, q), [q, types])
 
   return (
     <div className="lab-picker" ref={root}>

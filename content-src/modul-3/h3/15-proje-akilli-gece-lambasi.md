@@ -2,7 +2,7 @@
 süre: 35
 
 ## Merak
-Odanın ışığı kapanınca gece lambası kendiliğinden yansa, sabah güneş doğunca sönse ve üstelik ısınırsa kendini kapatsa nasıl olurdu? Bu haftanın üç sensörünü tek bir akıllı cihazda birleştireceğiz.
+Oda ışığı kapanınca gece lambası kendiliğinden yansa, sabah güneş doğunca sönse ve üstelik ısınırsa kendini kapatsa nasıl olurdu? Bu haftanın üç sensörünü tek bir akıllı cihazda birleştireceğiz.
 
 ## Etkinlik
 ### Hedef
@@ -12,22 +12,24 @@ Odanın ışığı kapanınca gece lambası kendiliğinden yansa, sabah güneş 
 - **Seri monitör:** her turda ışık, parlaklık ve sıcaklık yazılır.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Potansiyometre (10 kΩ) | Dış bacaklar → 5 V ve GND; orta bacak → **A0** |
-| LDR | Bir bacağı → 5 V; öbür bacağı → **A1** |
-| 10 kΩ direnç (LDR için) | Bir ucu **A1**, öbür ucu GND |
-| NTC termistör (10 kΩ) | Bir bacağı → **A2**; öbür bacağı → GND |
-| 10 kΩ direnç (NTC için) | Bir ucu 5 V, öbür ucu **A2** |
-| LED (sarı ya da beyaz) = lamba | Anot → 330 Ω direnç → **D11**; katot → GND |
-| LED (kırmızı) = uyarı | Anot → 330 Ω direnç → **D13**; katot → GND |
+| Potansiyometre (10 kΩ) | **VCC** → 5V; **GND** → GND; **SIG** → **A0** |
+| LDR | 1. ucu → 5V; 2. ucu → **A1** |
+| 10 kΩ direnç (LDR için) | 1. ucu **A1**, 2. ucu GND |
+| NTC termistör (10 kΩ) | 1. ucu → **A2**; 2. ucu → GND |
+| 10 kΩ direnç (NTC için) | 1. ucu 5V, 2. ucu **A2** |
+| LED (sarı ya da beyaz) = lamba | **D11** → 330 Ω direnç → LED **A**; LED **K** → GND |
+| LED (kırmızı) = uyarı | **D13** → 330 Ω direnç → LED **A**; LED **K** → GND |
 
-LED'in rengine göre direnç değeri değişebilir; 330 Ω kırmızı LED içindir. Sarı ve beyaz LED'lerde de 330 Ω genelde güvenli bir başlangıçtır.
+LED'in rengine göre direnç değeri değişebilir; 330 Ω kırmızı LED içindir. Sarı ve beyaz LED'lerde de 330 Ω genelde güvenli bir başlangıçtır (laboratuvar akım sınırı aşılırsa uyarı verir). Beyaz LED, sarıya göre biraz daha az parlak görünür; bu, LED'in ileri geriliminin farklı olmasındandır.
 
 ### Aşama 1: Işığa göre parlaklık
 Önce yalnızca LDR ve lamba. Karanlıkta (`ham` küçükken) parlaklık yüksek olmalı. `map`'in çıkış aralığını ters yazarak (255'ten 0'a) bunu sağlarız. Aralığın dışına taşmaması için `constrain` ekliyoruz.
 
-`KARANLIK` ve `AYDINLIK` değerlerini 14. dersteki gibi kendi odana göre ölç.
+`KARANLIK` ve `AYDINLIK` değerlerini 14. dersteki gibi, LDR'nin ışık kaydırıcısını en uçlara götürüp seri monitörden okuyarak belirleyebilirsin.
 
 ```cpp
 // sketch: lamba_adim1
@@ -116,7 +118,7 @@ void loop() {
 1. `analogRead(A0) / 4` potansiyometreyi 0-255 arasına indirir, `analogWrite`'ın istediği aralık budur.
 2. `map(isik, KARANLIK, AYDINLIK, enYuksek, 0)`: karanlıkta `enYuksek`, aydınlıkta 0, arada orantılı değer verir. Çıkış aralığını ters yazmak `map`'te serbesttir.
 3. `constrain` ışık `KARANLIK`'tan daha karanlıksa ya da `AYDINLIK`'tan daha aydınlıksa parlaklığı sınırda tutar.
-4. Sıcaklık `-99` iken (sensör kopuk) uyarı çıkmaz. Bu seçim bilinçlidir: kopuk sensör yüzünden lambanın hiç yanmaması, daha kötü bir sürpriz olurdu. Seri monitörde `sicaklik=-99.0` görürsen bağlantıyı kontrol et.
+4. Sıcaklık `-99` iken (sensör kopuk) uyarı çıkmaz. Bu seçim bilinçlidir: kopuk sensör yüzünden lambanın hiç yanmaması, daha kötü bir sürpriz olurdu. Seri monitörde `sicaklik=-99.0` görürsen NTC bağlantısını kontrol et.
 5. Her turda `delay` toplamı yaklaşık 224 ms olduğu için lamba, ışık değişimlerine hızlı yanıt verir.
 
 Beklenen davranış (örnek):
@@ -129,17 +131,17 @@ Beklenen davranış (örnek):
 | NTC 40 °C'nin üstünde | Lamba söner, D13 yanar |
 
 ### Dene
-- Potansiyometreyi çevir; karanlıkta lambanın en yüksek parlaklığı değişiyor mu?
-- Elini LDR'nin üzerinde yavaş yavaş kapat. Lamba kademeli mi parlaklaşıyor?
-- `SICAK_SINIR`'ı oda sıcaklığının biraz altına çek ve uyarının geldiğini gör (güvenli test: NTC'yi parmağınla ısıt).
-- `AYDINLIK` değerini kendi odana göre ayarla. Lamba hangi ışıkta tamamen sönüyor?
+- Potansiyometrenin **Konum** kaydırıcısını oynat; karanlıkta lambanın en yüksek parlaklığı değişiyor mu?
+- LDR'nin **Işık** kaydırıcısını yavaş yavaş sola çek. Lamba kademeli mi parlaklaşıyor?
+- `SICAK_SINIR`'ı oda sıcaklığının biraz altına çek ve uyarının geldiğini gör (ya da NTC'nin **Sıcaklık** kaydırıcısını 45 °C'ye çek).
+- `AYDINLIK` değerini ayarla. Lamba hangi ışıkta tamamen sönüyor?
 - Zor görev: sabit `KARANLIK` ve `AYDINLIK` yerine 14. dersteki kalibrasyonu `setup()` içine ekle.
 
 ### Sık yapılan hatalar
 - LDR ve direncin yerini ters bağlamak: lamba karanlıkta söner, aydınlıkta yanar. `map`'in çıkış aralığını ters çevirerek ya da bağlantıyı düzelterek çöz.
 - `constrain`'i unutmak: `map` aralık dışında negatif ya da 255'ten büyük sayı üretir, `analogWrite` bunu beklemediğin bir parlaklığa çevirir.
 - NTC'nin sabit direncini 10 kΩ yerine başka bir değerle bağlayıp koddaki `10000.0` sayısını değiştirmemek: sıcaklık hep yanlış çıkar.
-- Lambayı LDR'ye çok yaklaştırmak: lamba yanınca LDR kendi ışığını görür ve lamba sönüp yanmaya başlar. LDR'yi lambadan uzak ya da arkası dönük koy.
+- Gerçek bir gece lambasında lambayı LDR'ye çok yaklaştırmak: lamba yanınca LDR kendi ışığını görür ve lamba sönüp yanmaya başlar. Laboratuvarda LDR'nin ışığı yalnız kaydırıcıdan gelir, bu etkiyi modellemez; ama "Konuşalım"daki soru bu yüzden önemli.
 - Potansiyometreyi en sola çevirip "lamba bozuk" sanmak: `enYuksek` 0 ise lamba hiç yanmaz.
 
 ## Konuşalım

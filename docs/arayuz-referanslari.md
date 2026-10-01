@@ -46,3 +46,19 @@ Gördüklerimiz (ürünün iç işleyişi hakkında bilgi içermez):
 Diğer ekran görüntüleri (LiteWing, Wokwi, Tinkercad, Virtual Breadboard) önceki maddelerin aynısıdır. Bir dosya (16-04-41) konuyla ilgisiz bir görseldi, kullanılmadı.
 
 → **Modül 2 editörü için sonuçlar:** Blockly (zelos) altı şeklin hepsini destekler (rapor = `output` bağlantısı, koşul = `Boolean` çıkış, altıgen). Palet "kategoriye kaydır" davranışı için flyout tek liste ayarlanabilir. Kostüm ve ses sekmeleri Modül 1'de kapsam dışıdır (çizim aracı yok); Modül 2 için "Kostümler" (hazır kostüm seçimi ve basit vektör çizim) ve "Sesler" (hazır sesler + basit efektler) ayrı bir iş olarak planlanmalı.
+
+## 7. Cirkit Designer arayüzü ve örnek proje galerisi (kullanıcı, 2026-10-01; 20 ekran görüntüsü)
+Ekran görüntüleri incelendi (canlı site açılmadı); ürünün iç işleyişi hakkında bilgi içermez.
+- **Dört mod:** Tasarım | Kod | Simüle et | Yükle. (Bizde "Yükle" yok: fiziksel kart yok.)
+- **Parça kitaplığı:** arama kutusu, "Diyagram parçaları / Simülasyon parçaları" sekmeleri, küçük resimli ızgara; 80+ parça (Uno, Mega, Pico, ESP32, röle, LCD'ler, 7-segment, 74HC595, keypad, DHT11/22, DS1307/DS3231, joystick, transistör, adım motoru, nem, gaz sensörleri…).
+- **Sağ üstte "Bileşen özellikleri" paneli**, tuvalde yüzen "Kodu düzenle" ve "Yapay zekâyla kablola" düğmeleri; araç çubuğunda metin, kablo, ızgara, döndür, sığdır, yakınlaştır, sil.
+- **Alt ortada yüzen yapay zekâ sohbet çubuğu:** "Devreyi değiştir / Kod yaz / Hata ayıkla" kipleri, "Proje hedefleri ekle".
+- **Kod sekmesi:** mikrodenetleyici seçici, Doğrula, `sketch.ino` + `documentation.txt` sekmeleri, kitaplıklar, "Yapay zekâ araç kutusu" (otomatik kod üret, hata ayıkla, kodu gözden geçir, kod hakkında soru sor), alt kısımda doğrulama çıktısı.
+- **Simüle sekmesi:** Başlat ve Hata ayıkla düğmeleri, "Simülasyon konsolu".
+- **Öne çıkan simülasyon projeleri galerisi:** hazır, kablolanmış çalışan devreler (Hotel Safe, Pong/OLED, DHT11 + LCD, DS1307 saat + LCD, 74HC595, L298N'li robot, röle, RGB PWM, HC-SR04, PIR, MPU6050, joystick, keypad, 7-segment, RC522…). "Projeyi aç" ile incelenir, çalıştırılır, uyarlanır.
+
+→ **Uygulama notları**
+1. **"Hazır devre / çözümü incele"**: derslerde, öğrenci denedikten sonra çalışan çözümü laboratuvarda açıp inceleyebilsin (çözülmüş örnek etkisi). Etkinlik `solution()` verisi zaten var.
+2. **Yapay zekâ öğretmen yardımı** (Claude tabanlı) — "ipucu iste" (hazır cevap vermeden), "kodumu gözden geçir", "bu hatayı açıkla". Cirkit'in AI araç kutusuna benzer; AI hattı ve Modül 7 ile bağlanır. Maliyet, güvenlik ve çocuk verisi (KVKK) kararları ayrıca verilmeli.
+3. **Sanal ölçüm** (multimetre karşılığı): parçaya tıklayınca uç gerilimi/akımı. Çekirdek sözleşmesine `PartRuntime.meas` eklendi.
+4. Galerideki proje adları (Hotel Safe, DHT11 + LCD, DS1307 saat, L298N robot) müfredattaki proje dersleriyle örtüşüyor; kapsam makul.

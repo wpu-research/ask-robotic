@@ -5,6 +5,8 @@ import { PROPS, type Circuit, type LabApi, type PartType, type PropValue } from 
 import { PART_DEFS } from '@/lib/lab/geometry'
 import { evaluateLabGoals, type LabGoal, type LabGoalResult } from '@/lib/lab/goals'
 import { addPart, hasParts, isCircuit, normalizeCircuit, removePart, removeWire, rotatePart, setProp } from '@/lib/lab/ops'
+import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS } from '@/lib/lab/parts'
+import { warningMeta } from '@/lib/lab/warnings'
 import { StatsTracker } from '@/lib/lab/stats'
 import { analyze, createRuntime } from '@/lib/lab/runtime'
 import { isBuzzerMuted, setBuzzer, setBuzzerMuted, unlockAudio } from '@/lib/lab/sound'
@@ -15,7 +17,7 @@ import { PartPicker } from './part-picker'
 import { PropsPanel } from './props-panel'
 import { SerialMonitor } from './serial-monitor'
 
-export const STAGE_A_PARTS: PartType[] = ['led', 'resistor', 'button', 'pot', 'ldr', 'ntc', 'buzzer', 'rgbled', 'servo']
+export { STAGE_A_PARTS, STAGE_B_PARTS, DEFAULT_PARTS }
 
 export interface LabEditorProps {
   initial: Circuit
@@ -40,7 +42,7 @@ type CompileView =
 const FLASH_MAX = 32256, RAM_MAX = 2048
 const pct = (n: number, max: number) => `%${((n / max) * 100).toFixed(1).replace('.', ',')}`
 
-export function LabEditor({ initial, initialCode, allowedParts = STAGE_A_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact }: LabEditorProps) {
+export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact }: LabEditorProps) {
   const locked = useMemo(() => new Set(lockedPartIds ?? initial.parts.filter((p) => p.type === 'uno').map((p) => p.id)), [lockedPartIds, initial])
   const [circuit, setCircuit] = useState<Circuit>(initial)
   const [code, setCode] = useState(initialCode)
@@ -341,14 +343,15 @@ export function LabEditor({ initial, initialCode, allowedParts = STAGE_A_PARTS, 
             <ul className="lab-warnings" role="alert" aria-label="Uyarılar" data-testid="lab-warnings">
               {warnings.map((w, i) => (
                 <li key={`${w.kind}-${w.partId ?? ''}-${i}`} data-warning={w.kind}>
-                  <span aria-hidden="true">⚠</span>
-                  {w.partId ? <button type="button" onClick={() => setSelection({ kind: 'part', id: w.partId! })}>{w.message}</button> : <span>{w.message}</span>}
+                  <span aria-hidden="true" className="lab-warn-icon">{warningMeta(w.kind).icon}</span>
+                  <b className="lab-warn-title">{warningMeta(w.kind).title}</b>
+                  {w.partId ? <button type="button" title="İlgili parçayı seç" onClick={() => setSelection({ kind: 'part', id: w.partId! })}>{w.message}</button> : <span>{w.message}</span>}
                 </li>
               ))}
             </ul>
           )}
           <PropsPanel
-            selection={selection} part={selectedPart} wireInfo={wireInfo} running={running} locked={!!selectedPart && locked.has(selectedPart.id)}
+            selection={selection} part={selectedPart} runtime={selectedPart ? state?.parts[selectedPart.id] : undefined} wireInfo={wireInfo} running={running} locked={!!selectedPart && locked.has(selectedPart.id)}
             latched={!!selectedPart && latched.has(selectedPart.id)}
             onLatch={(v) => selectedPart && setLatched((s) => { const n = new Set(s); if (v) n.add(selectedPart.id); else n.delete(selectedPart.id); return n })}
             onProp={(k, v) => selectedPart && changeProp(selectedPart.id, k, v)}

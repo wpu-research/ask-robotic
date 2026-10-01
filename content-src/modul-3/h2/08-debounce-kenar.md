@@ -6,17 +6,19 @@ Bir butona bir kez bastın ama kart iki, üç kez bastığını sandı. Ya da hi
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
 | Buton | Bir ucu **D2**, öbür ucu **GND** |
 | LED (kırmızı) + 330 Ω direnç | **D13** → direnç → LED anodu; katot GND |
 
-Eğim anahtarını (D3) da aynı mantıkla kullanabilirsin. İçindeki top sallanırken temas kısa süre açılıp kapanır, yani o da sıçrar.
+**Önemli:** Laboratuvardaki buton mükemmel temiz bir sinyal verir; sıçrama modellenmez. Yani bu derste sıçrama sorununu ekranda göremeyeceksin. Aşağıdaki sıçrama anlatımı gerçek butonlar için bir bilgi notudur. Yine de debounce'lu programın laboratuvarda da doğru çalıştığını göreceksin: hedef, "tek basış, tek işlem" davranışıdır.
 
-Devreyi simülatörde ya da kendi kartında kur.
+Etkinliği bu sayfanın altındaki bölümde yaparsın.
 
 ### Sıçrama (bounce) nedir?
-Bir buton kapanırken iki metal parça birbirine çarpar. Parçalar yaylanır; temas birkaç milisaniye boyunca açılıp kapanır. Gözümüz bunu göremez ama kart saniyede binlerce kez okuma yaptığı için görür. Gerçekte basış şöyle görünür (soldan sağa zamanla):
+Bir buton kapanırken iki metal parça birbirine çarpar. Parçalar yaylanır; temas birkaç milisaniye boyunca açılıp kapanır. Gözümüz bunu göremez ama kart saniyede binlerce kez okuma yaptığı için görür. Gerçek bir butonda basış şöyle görünür (soldan sağa zamanla):
 
 | | Pindeki değerler |
 |---|---|
@@ -24,7 +26,7 @@ Bir buton kapanırken iki metal parça birbirine çarpar. Parçalar yaylanır; t
 | Gerçek | HIGH, HIGH, **LOW, HIGH, LOW, HIGH**, LOW, LOW, LOW |
 
 
-Yani tek bir basış, pinde `HIGH, LOW, HIGH, LOW, ...` gibi kısa bir dizi üretir. Butonun bırakılırken de aynı şey olur. Bu sıçrama genellikle birkaç milisaniye sürer; buton kalitesine göre değişir.
+Yani tek bir basış, pinde `HIGH, LOW, HIGH, LOW, ...` gibi kısa bir dizi üretir. Butonun bırakılırken de aynı şey olur. Bu sıçrama genellikle birkaç milisaniye sürer; buton kalitesine göre değişir. Eğim anahtarındaki top sallanırken de temas böyle açılıp kapanır.
 
 ### Kenar (edge) nedir?
 Buton bir durumdan öbürüne geçerken **kenar** oluşur:
@@ -59,7 +61,7 @@ void loop() {
 }
 ```
 
-Mantık doğru görünüyor. Ama sıçrama yüzünden bir basış bazen iki düşen kenar üretir. LED iki kez ters döner ve sanki hiç basılmamış gibi eski durumunda kalır. Bazen de üç kenar olur ve her şey yolunda gözükür. Sonuç tahmin edilemez.
+Mantık doğru görünüyor. Laboratuvarda bu program temiz sinyalle düzgün çalışır. Ama gerçek bir butonda sıçrama yüzünden bir basış bazen iki düşen kenar üretir. LED iki kez ters döner ve sanki hiç basılmamış gibi eski durumunda kalır. Bazen de üç kenar olur ve her şey yolunda gözükür. Sonuç tahmin edilemez.
 
 ### Çözüm: debounce
 Debounce (sıçrama giderme), "değişimi gördüm ama bir süre bekleyip tekrar bakayım, gerçekten değişmiş mi?" demektir. En basit yol `delay` ile beklemektir.
@@ -99,10 +101,11 @@ void loop() {
 5. Butonu basılı tutsan bile `simdi == onceki` olduğu için tekrar tekrar sayılmaz: bir basış, bir işlem.
 6. Bırakırken oluşan sıçrama da aynı kontrolden geçer.
 
-20 ms çoğu buton için yeterlidir. Daha yaylı bir buton kullanıyorsan 30-50 ms'ye çıkarabilirsin. Çok uzun yaparsan hızlı basışları kaçırırsın.
+20 ms çoğu buton için yeterlidir. Daha kötü bir buton için 30-50 ms'ye çıkarmak gerekebilir. Çok uzun yaparsan hızlı basışları kaçırırsın.
 
 ### Dene
-- `delay(20)` satırını sil ve sicrama_var gibi davranıp davranmadığını gözle. Gerçek bir buton kullanıyorsan yirmi kez bas ve LED'in kaç kez beklediğin gibi tepki verdiğini say.
+- `delay(20)` satırını sil ve laboratuvarda yirmi kez bas. Laboratuvarın butonu temiz olduğu için fark görmezsin; gerçek butonlarda farkın neden çıkacağını kendi cümlelerinle anlat.
+- Butonu uzun süre basılı tut. LED'in yalnız bir kez değiştiğini doğrula (kenar algılama).
 - Debounce süresini 1 ms yap, sonra 200 ms yap. İkisinde ne bozuluyor?
 - Programı "bırakıldığında" ters çevirecek şekilde değiştir (yükselen kenar).
 

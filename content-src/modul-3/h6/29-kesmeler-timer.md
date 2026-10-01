@@ -6,10 +6,12 @@ Telefon çalınca ne yaparsın? Ne yapıyor olursan ol, işi bırakıp açarsın
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Buton | **D2** ile GND arası (`INPUT_PULLUP`) |
-| LED + 330 Ω direnç | **D13** → direnç → LED anodu; katot → GND |
+| Buton | **A** ucu **D2**, **B** ucu GND (`INPUT_PULLUP`) |
+| LED + 330 Ω direnç | **D13** → direnç → LED **A**; **K** → GND |
 
 Arduino Uno'da yalnızca iki pin dış kesme alabilir: **D2 (INT0)** ve **D3 (INT1)**. Bu yüzden butonlarımız bu pinlerde.
 

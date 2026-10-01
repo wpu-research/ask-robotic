@@ -6,12 +6,14 @@ süre: 20
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| LED (kırmızı) + 330 Ω direnç | Direncin bir ucu **D13**, öbür ucu LED anodu; LED katodu → GND |
-| Buton | Bir bacağı **D2**, öbür bacağı GND (`INPUT_PULLUP`, basılı = LOW) |
+| LED (kırmızı) + 330 Ω direnç | Direnç 1 ucu **D13**, direnç 2 ucu LED **A**; LED **K** → GND |
+| Buton | **A** ucu **D2**, **B** ucu GND (`INPUT_PULLUP`, basılı = LOW) |
 
-Devreyi simülatörde ya da kendi kartında kur.
+Sonra kodu `sketch.ino`'ya yazıp ▶'e bas. Direnci seçip özellik panelinden 330 Ω yap.
 
 ### Program
 Aşağıdaki program LED'i 1 saniye yakıp 1 saniye söndürür. Her turun sonunda butona bakar; basılıysa sayacı artırır ve yazdırır.
@@ -40,7 +42,7 @@ void loop() {
 }
 ```
 
-Şimdi butona kısa bir an (0,1 saniye) bas. Büyük olasılıkla Serial Monitor'de hiçbir şey çıkmaz. Butonu 2 saniyeden uzun basılı tutarsan ise sayılır.
+Şimdi LED yanarken devre tuvalindeki butona kısa bir an (0,1 saniye) tıkla; tuşa basılı tutmak için fare düğmesini bırakmadan bekle. Büyük olasılıkla Seri monitörde hiçbir şey çıkmaz. Butonu 2 saniyeden uzun basılı tutarsan ise sayılır. Laboratuvarda bunu sen yapmadan da görebilirsin: etkinlik hedefleri bu davranışı kontrol eder.
 
 ### Nasıl çalışıyor?
 1. `delay(1000)` çalışırken işlemci başka hiçbir satıra geçmez; sadece sayar. Buna **bloklayan** kod denir.
@@ -75,7 +77,7 @@ void loop() {
 - Bir LED'i her 1000 ms'de, ikinci LED'i her 300 ms'de yanıp söndürmeyi yalnızca `delay` ile yapmaya çalış. Neden zor olduğunu açıkla.
 
 ### Sık yapılan hatalar
-- "Buton bozuk" sanmak: Buton sağlam; program basışı görmüyor.
+- "Buton bozuk" sanmak: Buton parçası sağlam; program basışı görmüyor.
 - Çözümü `delay` süresini küçültmekte aramak: Basışlar biraz daha sık yakalanır ama sorun bitmez, LED'in zamanlaması da bozulur.
 - Seri porta çok yazı yazdırıp `delay` ile yavaşlatmak: Bu da kartı bloklar.
 

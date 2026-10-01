@@ -3,6 +3,7 @@ import { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, 
 import type { Circuit, LabState, PinRef } from '@/lib/lab/contract'
 import { PART_DEFS, WORLD, partBounds, pinDir, pinWorld, snap, wireCurve, wirePreview, type Pt } from '@/lib/lab/geometry'
 import { addWire, canAddWire, formatOhms, movePart, removePart, removeWire, rotatePart, wireColor } from '@/lib/lab/ops'
+import { formatPinBalloon } from '@/lib/lab/measure'
 import { PartArt } from './part-art'
 
 export type Selection = { kind: 'part'; id: string } | { kind: 'wire'; id: string } | null
@@ -49,6 +50,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
   const viewRef = useRef(view)
   viewRef.current = view
   const [draft, setDraft] = useState<{ from: PinRef; x: number; y: number; target: PinRef | null } | null>(null)
+  const [hoverPin, setHoverPin] = useState<PinRef | null>(null)
   const gesture = useRef<Gesture | null>(null)
   const pointers = useRef(new Map<number, Pt>())
   const circuitRef = useRef(circuit)
@@ -264,6 +266,8 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
       >
         <defs>
           <filter id="lab-glow" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="9" /></filter>
+          <filter id="lab-glow-s" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="2.4" /></filter>
+          <pattern id="lab-lcd-dots" width={2.7} height={3.1} patternUnits="userSpaceOnUse"><path d="M0 0 H2.7 M0 0 V3.1" stroke="#000" strokeOpacity={0.35} strokeWidth={0.55} fill="none" /></pattern>
           <pattern id="lab-grid" width={20} height={20} patternUnits="userSpaceOnUse"><circle cx={1} cy={1} r={1} className="lab-grid-dot" /></pattern>
         </defs>
         <g transform={`translate(${view.tx} ${view.ty}) scale(${view.k})`}>
@@ -337,14 +341,36 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
               const lx = horiz ? Math.sign(dx) * 11 : 0, ly = horiz ? 3 : Math.sign(dy) * 12
               const cls = `lab-pin${connected.has(`${p.id}:${pin}`) ? ' wired' : ''}${isTarget ? ' target' : ''}${isFrom ? ' from' : ''}`
               return (
-                <g key={`${p.id}:${pin}`} className={cls} data-pin-part={p.id} data-pin-name={pin} transform={`translate(${pt.x} ${pt.y})`} role="button" aria-label={`${PART_DEFS[p.type].name} ${p.id}, pin ${pin}`}>
+                <g
+                  key={`${p.id}:${pin}`} className={cls} data-pin-part={p.id} data-pin-name={pin} transform={`translate(${pt.x} ${pt.y})`} role="button" aria-label={`${PART_DEFS[p.type].name} ${p.id}, pin ${pin}`}
+                  onPointerEnter={p.type === 'uno' ? () => setHoverPin({ part: p.id, pin }) : undefined}
+                  onPointerLeave={p.type === 'uno' ? () => setHoverPin((h) => (h && h.part === p.id && h.pin === pin ? null : h)) : undefined}
+                >
                   <circle r={9} fill="transparent" className="lab-pin-hit" />
                   <circle r={3.6} className="lab-pin-dot" />
-                  {p.type !== 'uno' && <text x={lx} y={ly} textAnchor={horiz ? (dx < 0 ? 'end' : 'start') : 'middle'} className="lab-pin-label" pointerEvents="none">{pin}</text>}
+                  {p.type !== 'uno' && !PART_DEFS[p.type].ownLabels && <text x={lx} y={ly} textAnchor={horiz ? (dx < 0 ? 'end' : 'start') : 'middle'} className="lab-pin-label" pointerEvents="none">{pin}</text>}
                 </g>
               )
             }))}
           </g>
+
+          {(() => {
+            if (!hoverPin || draft) return null
+            const snap = runtime?.pins[hoverPin.pin]
+            const pt = pinPos(hoverPin)
+            if (!snap || !pt) return null
+            const text = formatPinBalloon(hoverPin.pin, snap)
+            const bw = text.length * 5.6 + 14
+            const below = pt.y < 40
+            const by = below ? pt.y + 14 : pt.y - 34
+            return (
+              <g pointerEvents="none" data-pin-balloon={hoverPin.pin} className="lab-balloon">
+                <rect x={pt.x - bw / 2} y={by} width={bw} height={20} rx={5} />
+                <path d={below ? `M${pt.x - 5} ${by} L${pt.x} ${by - 6} L${pt.x + 5} ${by} Z` : `M${pt.x - 5} ${by + 20} L${pt.x} ${by + 26} L${pt.x + 5} ${by + 20} Z`} />
+                <text x={pt.x} y={by + 14} textAnchor="middle">{text}</text>
+              </g>
+            )
+          })()}
 
           {draft && (() => {
             const a = pinPos(draft.from)

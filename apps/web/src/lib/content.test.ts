@@ -50,6 +50,14 @@ describe('içerik verisi', () => {
     expect(lessons.filter((l) => l.contentMd.includes('// sketch:')).length).toBeGreaterThanOrEqual(38)
     for (const w of m.weeks) expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Bitirme/)
   })
+  it('Modül 5: 8 hafta, 40 ders, her hafta proje/sergi dersiyle biter', () => {
+    const m = allModules.find((x) => x.slug === 'robotik')!
+    expect(m.weeks).toHaveLength(8)
+    const lessons = m.weeks.flatMap((w) => w.lessons)
+    expect(lessons).toHaveLength(40)
+    expect(lessons.filter((l) => l.contentMd.includes('// sketch:')).length).toBeGreaterThanOrEqual(35)
+    for (const w of m.weeks) expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Bitirme|Sergi/)
+  })
   it('modül konumları ve slug\'lar benzersiz', () => {
     expect(new Set(allModules.map((m) => m.slug)).size).toBe(allModules.length)
     expect(new Set(allModules.map((m) => m.position)).size).toBe(allModules.length)
@@ -71,7 +79,7 @@ describe('seed', () => {
     const before = await count()
     await seedContent(db)
     expect(await count()).toEqual(before)
-    expect(before).toEqual([4, 28, 101])
+    expect(before).toEqual([5, 36, 141])
   })
   it('içerik değişince günceller', async () => {
     const changed = structuredClone(allModules)

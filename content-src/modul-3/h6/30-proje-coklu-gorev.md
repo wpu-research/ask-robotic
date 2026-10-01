@@ -6,13 +6,15 @@ Bir arabanın panelinde aynı anda gösterge ışığı yanıp söner, sürücü
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| LED 1 (nabız, yeşil) + 330 Ω | **D13** → direnç → LED anodu; katot → GND |
-| LED 2 (alarm, kırmızı) + 330 Ω | **D12** → direnç → LED anodu; katot → GND |
-| Buzzer (pasif) | Artı bacağı **D8**, öbür bacağı GND |
-| Buton 1 (MOD) | **D2** ile GND arası (`INPUT_PULLUP`) |
-| Buton 2 (SUSTUR) | **D3** ile GND arası (`INPUT_PULLUP`) |
+| LED 1 (nabız, yeşil) + 330 Ω | **D13** → direnç → LED **A**; **K** → GND |
+| LED 2 (alarm, kırmızı) + 330 Ω | **D12** → direnç → LED **A**; **K** → GND |
+| Buzzer (pasif; özellik panelinden Tür = Pasif) | **+** ucu **D8**, **-** ucu GND |
+| Buton 1 (MOD) | **A** ucu **D2**, **B** ucu GND (`INPUT_PULLUP`) |
+| Buton 2 (SUSTUR) | **A** ucu **D3**, **B** ucu GND (`INPUT_PULLUP`) |
 
 ### Görevler
 Panel üç iş yapar ve hepsi aynı anda sürer:
@@ -175,7 +177,7 @@ void loop() {
   }
 }
 ```
-Gerçek bir motoru D7'ye doğrudan bağlama; transistör ya da sürücü (22. ve 23. dersler) kullan. Röle ile yalnızca düşük gerilim ve yetişkin gözetiminde çalış.
+Gerçek bir motor Uno pininden doğrudan beslenemez; transistör ya da sürücü gerekir (22. ve 23. dersler). Laboratuvarda D7 çıkışını bir LED ile izleyebilirsin.
 
 ### Dene
 - CALISIR modunda bip süresini 50 ms yap. Bip hâlâ duyuluyor mu?

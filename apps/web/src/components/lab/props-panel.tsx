@@ -1,11 +1,14 @@
 'use client'
-import { PROPS, type PartInstance, type PropDef, type PropValue } from '@/lib/lab/contract'
+import { PINS, PROPS, type PartInstance, type PartRuntime, type PropDef, type PropValue } from '@/lib/lab/contract'
+import { MEASURE_HINT, MEASURE_IDLE, MEASURE_NONE, formatMeasurement } from '@/lib/lab/measure'
 import { PART_DEFS } from '@/lib/lab/geometry'
 import type { Selection } from './canvas'
 
 interface Props {
   selection: Selection
   part: PartInstance | null
+  /** Seçili parçanın çalışma zamanı durumu (yalnız çalışırken). */
+  runtime?: PartRuntime | null
   wireInfo: string | null
   running: boolean
   locked: boolean
@@ -65,7 +68,33 @@ function Field({ def, value, disabled, onChange, partId }: { def: PropDef; value
   )
 }
 
-export function PropsPanel({ selection, part, wireInfo, running, locked, latched, onLatch, onProp, onRotate, onDelete }: Props) {
+/** Sanal ölçüm kutusu (multimetre karşılığı): uçlar arası gerilim ve parçadan geçen akım. */
+export function MeasureBox({ part, runtime, running }: { part: PartInstance; runtime?: PartRuntime | null; running: boolean }) {
+  const [p1, p2] = PINS[part.type]
+  if (part.type === 'uno') {
+    return (
+      <div className="lab-measure" data-testid="lab-measure" data-state={running ? 'hint' : 'idle'}>
+        <b>Sanal ölçüm</b>
+        <p className="lab-measure-note">{running ? 'Bir pinin üstüne gelince gerilimi görürsün.' : MEASURE_IDLE}</p>
+      </div>
+    )
+  }
+  const text = running ? formatMeasurement(runtime?.meas) : null
+  return (
+    <div className="lab-measure" data-testid="lab-measure" data-state={!running ? 'idle' : text ? 'value' : 'none'}>
+      <b>Sanal ölçüm</b>
+      {!running && <p className="lab-measure-note">{MEASURE_IDLE}</p>}
+      {running && (
+        <>
+          <p className={`lab-measure-val${text ? '' : ' none'}`} data-testid="lab-measure-value" aria-live="polite">{text ?? MEASURE_NONE}</p>
+          <p className="lab-measure-note" title={`1. uç: ${p1}, 2. uç: ${p2}`}>{MEASURE_HINT} <span>({p1} → {p2})</span></p>
+        </>
+      )}
+    </div>
+  )
+}
+
+export function PropsPanel({ selection, part, runtime, wireInfo, running, locked, latched, onLatch, onProp, onRotate, onDelete }: Props) {
   if (!selection) {
     return <section className="lab-props" aria-label="Özellikler"><p className="jr-empty">Bir parçaya ya da kabloya tıkla; özellikleri burada görünür.</p></section>
   }
@@ -83,6 +112,7 @@ export function PropsPanel({ selection, part, wireInfo, running, locked, latched
   return (
     <section className="lab-props" aria-label="Özellikler" data-props-for={part.id}>
       <div className="lab-props-head"><b>{PART_DEFS[part.type].name}</b><small>{part.id}{locked ? ' · kilitli' : ''}</small></div>
+      <MeasureBox part={part} runtime={runtime} running={running} />
       {defs.length === 0 && <p className="lab-hint">Bu parçanın ayarlanabilir özelliği yok.</p>}
       {defs.map((d) => (
         <Field

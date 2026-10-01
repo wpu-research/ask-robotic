@@ -6,7 +6,7 @@ Bir butonun iki hâli vardır: basılı ya da değil. Peki bir ses düğmesinin,
 
 ## Etkinlik
 ### Analog ve dijital
-`digitalRead` pindeki gerilimi yalnızca iki sınıfa ayırır: HIGH ya da LOW. Gerçek dünyada ise gerilim 0 V ile 5 V arasında her değeri alabilir. Buna **analog** sinyal denir.
+`digitalRead` pindeki gerilimi yalnızca iki sınıfa ayırır: HIGH ya da LOW. Gerçek dünyada (ve laboratuvarda) gerilim 0 V ile 5 V arasında her değeri alabilir. Buna **analog** sinyal denir.
 
 Arduino Uno'nun içinde bir **ADC** (Analog-Dijital Çevirici) vardır. ADC, pindeki gerilimi ölçer ve bir sayıya çevirir:
 
@@ -29,14 +29,16 @@ Sayıyı gerilime çevirmek için:
 Analog girişler **A0-A5** pinleridir. `pinMode` yazmana gerek yoktur; `analogRead(A0)` yeterlidir.
 
 ### Potansiyometre
-Potansiyometre, üç bacaklı, döndürülen bir dirençtir. Dış iki bacak 5 V ve GND'ye bağlanır. Orta bacak, düğmeyi çevirdikçe 0 V ile 5 V arasında gezinir. Orta bacağı A0'a bağlarsan düğmenin konumunu sayı olarak okursun.
+Potansiyometre, üç uçlu, konumu değişen bir dirençtir. Laboratuvardaki pot parçasının uçları **VCC**, **SIG** ve **GND**'dir: VCC'yi 5V'a, GND'yi GND'ye bağlarsın. Orta uç **SIG**, kaydırıcıyı sürükledikçe 0 V ile 5 V arasında gezinir. SIG'i A0'a bağlarsan kaydırıcının konumunu sayı olarak okursun.
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Potansiyometre (10 kΩ) | Bir dış bacak → 5 V; öbür dış bacak → GND; orta bacak → **A0** |
-| LED (kırmızı) | Uzun bacak → 330 Ω direncin ucu; kısa bacak → GND |
-| 330 Ω direnç | Bir ucu **D11**, öbür ucu LED anodu |
+| Potansiyometre (10 kΩ) | **VCC** → 5V; **GND** → GND; **SIG** → **A0** |
+| LED (kırmızı) | **A** (anot) → 330 Ω direncin 2. ucu; **K** (katot) → GND |
+| 330 Ω direnç | 1. ucu **D11**, 2. ucu LED'in **A** ucu |
 
 D11'i seçtik çünkü bu pin parlaklık ayarını (PWM) destekler. D13 desteklemez.
 
@@ -80,16 +82,16 @@ void loop() {
 1. `analogRead(A0)` A0'daki gerilimi ölçer ve 0-1023 arası bir tam sayı verir.
 2. `ham * 5.0 / 1024.0` işleminde `5.0` yazdık, çünkü tam sayı bölmesi virgülden sonrasını atar. Ondalıklı bir sayı katınca sonuç ondalıklı olur.
 3. `ham / 4` tam sayı bölmesidir. 1023 / 4 = 255 çıkar, yani 255'i aşmaz.
-4. Düğme sona çevrilince LED en parlak, başa çevrilince söner.
+4. Kaydırıcı sona çekilince LED en parlak, başa çekilince söner.
 
 ### Dene
-- `delay(500)` değerini 50 yap. Seri monitördeki sayılar düğmeyi çevirdikçe akıcı değişiyor mu?
-- Düğmeyi hiç oynatmadan sayıya bak. Hep aynı sayı mı, yoksa 1-2 birim oynuyor mu? Neden olabilir?
+- `delay(500)` değerini 50 yap. Seri monitördeki sayılar kaydırıcıyı sürükledikçe akıcı değişiyor mu?
+- Kaydırıcıyı tam ortaya (0,5) getir. Sayı yaklaşık 512 mi? Gerçek devrelerde pot hiç oynamasa bile sayı 1-2 birim titreyebilir (gürültü); bunu 14. derste yumuşatma ile ele alacağız. Sence neden olur?
 - `ham / 4` yerine `255 - ham / 4` yaz. LED'in davranışı nasıl değişir?
 
 ### Sık yapılan hatalar
-- Potansiyometrenin orta bacağı yerine dış bacağı A0'a bağlamak: sayı hiç değişmez.
-- Dış bacaklardan birini 5 V yerine boşta bırakmak: ölçüm rastgele oynar.
+- Potansiyometrenin SIG ucu yerine VCC ya da GND ucunu A0'a bağlamak: sayı hiç değişmez.
+- VCC ya da GND ucunu boşta bırakmak: ölçüm anlamsızlaşır (laboratuvarda pin "havada" kalır).
 - Analog pini `digitalRead` ile okumaya çalışmak: yalnızca 0 ya da 1 görürsün.
 - `ham * 5 / 1024` yazmak: iki tarafta da tam sayı olduğu için sonuç 0, 1, 2... gibi yuvarlanır. `5.0` yazarak ondalıklı hesap yap.
 

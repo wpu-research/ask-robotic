@@ -6,17 +6,19 @@ Müzik kutularında bir kolu çevirirsin, melodi çalar. Senin müzik kutun bir 
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Pasif buzzer | Artı (+) bacak → **D8**; eksi bacak → GND |
-| RGB LED (ortak katot) | Ortak (en uzun) bacak → GND |
-| 330 Ω direnç (kırmızı) | **D9** → RGB LED kırmızı bacak |
-| 330 Ω direnç (yeşil) | **D10** → RGB LED yeşil bacak |
-| 330 Ω direnç (mavi) | **D11** → RGB LED mavi bacak |
-| Buton | Bir bacağı **D2**, öbür bacağı GND (`INPUT_PULLUP`) |
-| Potansiyometre | Orta bacak → **A0**; yan bacaklar 5 V ve GND |
+| Pasif buzzer | **+** ucu → **D8**; **-** ucu → GND |
+| RGB LED (ortak katot) | **COM** → GND |
+| 330 Ω direnç (kırmızı) | **D9** → direncin 1 ucu; 2 ucu → RGB LED **R** ucu |
+| 330 Ω direnç (yeşil) | **D10** → direncin 1 ucu; 2 ucu → RGB LED **G** ucu |
+| 330 Ω direnç (mavi) | **D11** → direncin 1 ucu; 2 ucu → RGB LED **B** ucu |
+| Buton | **A** ucu → **D2**, **B** ucu → GND (`INPUT_PULLUP`) |
+| Potansiyometre | **SIG** → **A0**; **VCC** → 5V, **GND** → GND |
 
-Devreyi simülatörde ya da kendi kartında kur. Hepsi düşük gerilimli parçalardır.
+Devre çalışırken butona basmak için buton parçasına basılı tut; tempoyu potansiyometrenin **Konum** özelliğinden değiştir.
 
 ### Tasarım
 - **Bekleme:** Mavi LED yavaşça parlayıp söner (Ders 16'daki nefes).

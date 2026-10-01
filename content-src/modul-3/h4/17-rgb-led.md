@@ -2,20 +2,22 @@
 süre: 25
 
 ## Merak
-Bir ekrana yakından bakarsan her noktanın kırmızı, yeşil ve mavi üç küçük ışıktan oluştuğunu görürsün. Sadece bu üç renkle sarıyı, moru, hatta beyazı nasıl elde ediyorlar? Bugün bunu kendi LED'inde dene.
+Bir ekrana yakından bakarsan her noktanın kırmızı, yeşil ve mavi üç küçük ışıktan oluştuğunu görürsün. Sadece bu üç renkle sarıyı, moru, hatta beyazı nasıl elde ediyorlar? Bugün bunu laboratuvardaki RGB LED'de dene.
 
 ## Etkinlik
 ### Devre
-Ortak katotlu RGB LED, tek kılıfın içinde kırmızı, yeşil ve mavi üç LED barındırır ve dört bacağı vardır. Üç LED'in katotları (eksi uçları) tek bacakta birleşir. Ortak ucun bacağı diğerlerinden uzundur.
+Ortak katotlu RGB LED, tek kılıfın içinde kırmızı, yeşil ve mavi üç LED barındırır ve dört bacağı vardır. Üç LED'in katotları (eksi uçları) tek ortak uçta birleşir; laboratuvarda bu uç **COM** adını taşır. Parçanın özellik panelinde **Ortak uç: Ortak katot** seçili olmalıdır (varsayılan budur).
+
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
 
 | Parça | Bağlantı |
 |---|---|
-| RGB LED (ortak katot) | Ortak (en uzun) bacak → GND |
-| 330 Ω direnç (kırmızı için) | Bir ucu **D9**, öbür ucu RGB LED'in kırmızı bacağı |
-| 330 Ω direnç (yeşil için) | Bir ucu **D10**, öbür ucu RGB LED'in yeşil bacağı |
-| 330 Ω direnç (mavi için) | Bir ucu **D11**, öbür ucu RGB LED'in mavi bacağı |
+| RGB LED (ortak katot) | **COM** → GND |
+| 330 Ω direnç (kırmızı için) | 1 ucu **D9**, 2 ucu RGB LED'in **R** ucu |
+| 330 Ω direnç (yeşil için) | 1 ucu **D10**, 2 ucu RGB LED'in **G** ucu |
+| 330 Ω direnç (mavi için) | 1 ucu **D11**, 2 ucu RGB LED'in **B** ucu |
 
-Her renk bacağının kendi direnci olmalıdır. Üç pin de PWM yapabilir (D9, D10, D11), böylece her rengin parlaklığını 0-255 arasında ayrı ayrı ayarlarsın.
+Her renk ucunun kendi direnci olmalıdır. Üç pin de PWM yapabilir (D9, D10, D11), böylece her rengin parlaklığını 0-255 arasında ayrı ayrı ayarlarsın.
 
 ### Renkler nasıl karışır?
 Işık karışımında renkler **toplanır**:
@@ -28,7 +30,7 @@ Işık karışımında renkler **toplanır**:
 | Kırmızı + yeşil + mavi | Beyaz |
 | Hepsi sönük | Siyah (LED sönük) |
 
-Her kanalın değeri 0-255 olduğundan 256 × 256 × 256 yaklaşık 16,7 milyon renk tanımlanabilir. Gerçek LED'lerde üç rengin ışık şiddeti birbirine eşit olmadığı için "beyaz" biraz renkli görünebilir; bu normaldir.
+Her kanalın değeri 0-255 olduğundan 256 × 256 × 256 yaklaşık 16,7 milyon renk tanımlanabilir. Laboratuvar da bunu modeller: mavi LED'in eşik gerilimi daha yüksek olduğundan aynı dirençle mavi kanal kırmızıdan daha sönük yanar ve "beyaz" biraz renkli görünür; bu normaldir.
 
 ### Program 1: Renk paleti
 ```cpp
@@ -94,7 +96,7 @@ void loop() {
 ```
 
 ### Program 3: Rengi seri monitörden seç
-Seri monitöre üç sayı yaz, örneğin `255 128 0` (turuncu), ve Enter'a bas.
+Altta **Seri monitör**'ün gönderme kutusuna üç sayı yaz, örneğin `255 128 0` (turuncu), ve Enter'a bas.
 ```cpp
 // sketch: rgb_serial
 void setup() {
@@ -130,7 +132,7 @@ void loop() {
 ```
 
 ### Nasıl çalışıyor?
-1. Her renk bacağı kendi PWM pininden gelir. `analogWrite(9, 255)` kırmızıyı tam açar, `analogWrite(10, 0)` yeşili kapatır.
+1. Her renk ucu kendi PWM pininden gelir. `analogWrite(9, 255)` kırmızıyı tam açar, `analogWrite(10, 0)` yeşili kapatır.
 2. Program 1'de üç dizi aynı sıra numarasıyla okunur: `kirmizi[3]`, `yesil[3]`, `mavi[3]` birlikte sarıyı verir.
 3. Program 2'de her aşama 256 adımdır. Toplam parlaklık yaklaşık sabit kalır, çünkü biri azalırken öbürü artar.
 4. Program 3'te `parseInt` seri tampondan bir sayı okur. `constrain` kullanıcı 300 yazsa bile değeri 255'te tutar. `parseInt` sonucunu önce bir değişkene alıyoruz; çünkü `constrain` içine doğrudan yazılan ifade birden fazla kez çalışabilir ve seriden fazladan sayı okur. Satır sonu karakterini atmasaydık sonraki `parseInt` boş yere bekler ve 0 döndürürdü.
@@ -141,10 +143,10 @@ void loop() {
 - Program 3'te `128 0 128` yaz. Hangi renk çıkar? Aynı rengi `64 0 64` ile karşılaştır.
 
 ### Sık yapılan hatalar
-- Ortak ucu 5 V'a bağlamak: bu bağlantı ortak **anotlu** LED içindir. Ortak katotlu LED'de ortak uç GND'ye gider.
-- Ortak anotlu bir LED varsa mantık tersine döner: `analogWrite(pin, 255 - değer)` yazman gerekir.
-- Üç renk için tek direnç kullanmak: renkler birbirinin parlaklığını etkiler. Her bacağın kendi direnci olsun.
-- Kırmızı, yeşil ve mavi bacakları karıştırmak: bacak sırası LED modeline göre değişir. Renkler beklediğinden farklı çıkıyorsa kabloları yer değiştir.
+- COM ucunu 5V'a bağlamak: bu bağlantı ortak **anotlu** LED içindir. Ortak katotlu LED'de COM, GND'ye gider.
+- Özellik panelinden **Ortak uç**'u "Ortak anot" yaparsan mantık tersine döner: COM'u 5V'a bağlamalı ve `analogWrite(pin, 255 - değer)` yazmalısın.
+- Üç renk için tek direnç kullanmak: renkler birbirinin parlaklığını etkiler. Her ucun kendi direnci olsun.
+- R, G ve B uçlarını karıştırmak: renkler beklediğinden farklı çıkıyorsa kabloların doğru uca (R, G, B) gittiğini kontrol et.
 
 ## Konuşalım
 Bir ekranda "beyaz" gördüğünde aslında ne yanıyor? Işıkta renkler toplanırken, boyada renkler neden karıştıkça koyulaşıyor?

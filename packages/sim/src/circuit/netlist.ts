@@ -9,7 +9,12 @@ export interface InternalPath { from: string; to: string; directed?: boolean }
 export function internalPaths(part: PartInstance): InternalPath[] {
   switch (part.type) {
     case 'resistor': case 'ldr': case 'ntc': return [{ from: '1', to: '2' }]
-    case 'led': return [{ from: 'A', to: 'K', directed: true }]
+    case 'led': case 'diode': return [{ from: 'A', to: 'K', directed: true }]
+    case 'dcmotor': return [{ from: 'M1', to: 'M2' }]
+    case 'sevenseg': {
+      const anode = part.props.common === 'anode'
+      return ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'dp'].map((c) => (anode ? { from: 'COM', to: c, directed: true } : { from: c, to: 'COM', directed: true }))
+    }
     case 'button': return [{ from: 'A', to: 'B' }]
     case 'pot': return [{ from: 'VCC', to: 'SIG' }, { from: 'SIG', to: 'GND' }]
     case 'buzzer': return [{ from: '+', to: '-' }]
@@ -41,6 +46,8 @@ export interface Netlist {
   reachable(net: number, via: readonly PartType[]): Set<number>
   /** Düğümdeki Uno dijital/analog pin adları ('D13', 'A0'). */
   unoPinsOnNet(net: number): string[]
+  /** Parça pininin doğrudan (kablolarla) bağlı olduğu ilk Uno dijital/analog pini ('D6', 'A4'); yoksa undefined. */
+  unoPinOf(ref: PinRef): string | undefined
   readonly partById: Map<string, PartInstance>
 }
 
@@ -120,6 +127,7 @@ export function buildNetlist(circuit: Circuit): Netlist {
       return seen
     },
     unoPinsOnNet: (net) => unoByNet.get(net) ?? [],
+    unoPinOf: (ref) => { const n = netOf(ref); return n === undefined ? undefined : unoByNet.get(n)?.[0] },
     partById,
   }
 }

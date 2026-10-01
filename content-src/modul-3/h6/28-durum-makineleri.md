@@ -6,14 +6,16 @@ Asansör "kapı açık", "yukarı çıkıyor", "bekliyor" gibi belirli hâllerde
 
 ## Etkinlik
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
 | LED 1 (kırmızı) + 330 Ω | **D13** |
 | LED 2 (sarı) + 330 Ω | **D12** |
 | LED 3 (yeşil) + 330 Ω | **D11** |
-| Buton | **D2** ile GND arası (`INPUT_PULLUP`) |
+| Buton | **A** ucu **D2**, **B** ucu GND (`INPUT_PULLUP`) |
 
-Her LED'in katodu GND'ye gider.
+Her LED'in **A** ucu direncine, **K** ucu GND'ye gider.
 
 ### Program 1: Butonla mod değiştiren LED
 Üç mod var: **KAPALI**, **YAVAS** (1000 ms'de bir değişir), **HIZLI** (250 ms'de bir değişir). Butona her basışta bir sonraki moda geçilir. `enum`, sayılara isim verir: KAPALI = 0, YAVAS = 1, HIZLI = 2.
@@ -107,7 +109,7 @@ void loop() {
 4. Hâl değişirken zaman sayacını (`durumBasi`) yeniden başlatmayı unutma.
 5. Hiçbir yerde `delay` yok; bu yüzden program butona ve zamana aynı anda bakabilir.
 
-Bir FSM çizerken önce hâlleri daire, geçişleri ok olarak kâğıda çiz. Sonra kodu çizime bakarak yaz.
+Bir FSM çizerken önce hâlleri daire, geçişleri ok olarak bir taslağa (not defterine ya da tahtaya) çiz. Sonra kodu çizime bakarak yaz.
 
 ### Dene
 - `fsm_mod` programına dördüncü bir mod ekle: KAPALI → YAVAS → HIZLI → SABIT (LED sürekli yanık). `% 3` ifadesini de güncellemeyi unutma.
@@ -121,4 +123,4 @@ Bir FSM çizerken önce hâlleri daire, geçişleri ok olarak kâğıda çiz. So
 - `enum` isimlerini ve sayı kullanımını karıştırmak: durumlara hep isimle başvur.
 
 ## Konuşalım
-Ev aletlerinden (çamaşır makinesi, mikrodalga fırın) birini seç. Hangi hâllerde olabilir, hâller arasında hangi olaylar geçiş yaptırır? Bunu kâğıda çizebilir misin?
+Ev aletlerinden (çamaşır makinesi, mikrodalga fırın) birini seç. Hangi hâllerde olabilir, hâller arasında hangi olaylar geçiş yaptırır? Bunu bir şema olarak çizebilir misin?

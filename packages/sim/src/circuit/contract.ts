@@ -7,8 +7,9 @@ export type PropValue = number | string | boolean
 /** Aşama A parça türleri (Modül 3, H1-H4). Sonraki aşamalar bu birleşime eklenir. */
 export type PartType =
   | 'uno' | 'led' | 'resistor' | 'button' | 'pot' | 'ldr' | 'ntc' | 'buzzer' | 'rgbled'
-  // Aşama B (sonra): 'servo' | 'lcdI2c' | 'lcd16x2' | 'npn' | 'diode' | 'motor' | 'relay' | ...
   | 'servo'
+  // Aşama B (Modül 3, H5-H7)
+  | 'diode' | 'npn' | 'mosfet' | 'dcmotor' | 'l293d' | 'relay' | 'sevenseg' | 'sr595' | 'lcd1602' | 'lcdI2c'
 
 /**
  * Parça pin kimlikleri (devrede kablo uçları böyle adlandırılır). `Record<PartType, readonly string[]>`
@@ -25,6 +26,17 @@ export const PINS: Record<PartType, readonly string[]> = {
   buzzer: ['+', '-'],
   rgbled: ['R', 'G', 'B', 'COM'], // ortak uç COM; 'common' özelliği 'cathode' | 'anode'
   servo: ['SIG', 'VCC', 'GND'],
+  diode: ['A', 'K'], // anot, katot (flyback/doğrultucu diyot; ileri gerilim ≈ 0,7 V)
+  npn: ['B', 'C', 'E'], // 2N2222/BC547 tipi NPN; taban akımı ≈ 0,7 V üstünde iletir
+  mosfet: ['G', 'D', 'S'], // N kanal, mantık seviyeli (eşik ≈ 2 V)
+  dcmotor: ['M1', 'M2'], // küçük fırçalı DC motor
+  // L293D (basitleştirilmiş): dört GND ucu tek 'GND'; VCC1 mantık (5 V), VCC2 motor beslemesi
+  l293d: ['VCC1', 'VCC2', 'GND', 'EN12', 'IN1', 'IN2', 'OUT1', 'OUT2', 'EN34', 'IN3', 'IN4', 'OUT3', 'OUT4'],
+  relay: ['VCC', 'GND', 'IN', 'COM', 'NO', 'NC'], // 5 V röle modülü (kuru kontak)
+  sevenseg: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'dp', 'COM'], // tek haneli; her segment ayrı LED
+  sr595: ['QA', 'QB', 'QC', 'QD', 'QE', 'QF', 'QG', 'QH', 'SER', 'SRCLK', 'RCLK', 'OE', 'SRCLR', 'QH_', 'VCC', 'GND'], // QH_ = seri çıkış (QH')
+  lcd1602: ['VSS', 'VDD', 'V0', 'RS', 'RW', 'E', 'D0', 'D1', 'D2', 'D3', 'D4', 'D5', 'D6', 'D7', 'A', 'K'], // HD44780 paralel, 4-bit kullanılır (D4-D7)
+  lcdI2c: ['GND', 'VCC', 'SDA', 'SCL'], // PCF8574 arka paketli 16x2
 }
 
 export interface PropDef {
@@ -55,6 +67,16 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
   buzzer: [{ key: 'kind', label: 'Tür', kind: 'select', default: 'passive', options: [{ value: 'active', label: 'Aktif (kendi sesi var)' }, { value: 'passive', label: 'Pasif (tone ile)' }] }],
   rgbled: [{ key: 'common', label: 'Ortak uç', kind: 'select', default: 'cathode', options: [{ value: 'cathode', label: 'Ortak katot' }, { value: 'anode', label: 'Ortak anot' }] }],
   servo: [],
+  diode: [],
+  npn: [],
+  mosfet: [],
+  dcmotor: [],
+  l293d: [],
+  relay: [{ key: 'trigger', label: 'Tetik', kind: 'select', default: 'high', options: [{ value: 'high', label: 'HIGH ile çeker' }, { value: 'low', label: 'LOW ile çeker (aktif-LOW)' }] }],
+  sevenseg: [{ key: 'common', label: 'Ortak uç', kind: 'select', default: 'cathode', options: [{ value: 'cathode', label: 'Ortak katot' }, { value: 'anode', label: 'Ortak anot' }] }],
+  sr595: [],
+  lcd1602: [],
+  lcdI2c: [{ key: 'address', label: 'I2C adresi', kind: 'select', default: '0x27', options: [{ value: '0x27', label: '0x27' }, { value: '0x3F', label: '0x3F' }] }],
 }
 
 export interface PartInstance {
@@ -82,11 +104,29 @@ export interface LedState {
   burnt: boolean
 }
 
+/** Sanal ölçüm (sanal multimetre): iki uçlu parçalarda uçlar arası gerilim ve parçadan geçen akım. */
+export interface Measurement {
+  /** Birinci uca göre ikinci uçtaki gerilim farkı değil: |V(pin1) − V(pin2)| değil, işaretli V(pin1) − V(pin2) (V). */
+  vAcross: number
+  /** Birinci uçtan ikinciye doğru akım, mA (işaretli). */
+  currentMa: number
+}
+
 export interface PartRuntime {
+  /** Mümkün olan her parça için doldurulur (direnç, LED, diyot, buton, pot kolları, motor, buzzer…). */
+  meas?: Measurement
   led?: LedState
   buzzer?: { on: boolean; freqHz: number }
   servo?: { angleDeg: number; attached: boolean }
   rgbled?: { r: number; g: number; b: number } // 0-1
+  dcmotor?: { speed: number } // -1 (tam geri) … +1 (tam ileri); 0 durur
+  relay?: { energized: boolean }
+  /** Segmentler a-g ve dp; parlaklık 0-1 (akıma göre). */
+  sevenseg?: { segments: Record<'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'dp', number> }
+  /** Mandal (çıkış) kaydı: QA..QH. */
+  sr595?: { outputs: boolean[] }
+  /** LCD/I2C LCD ekran içeriği (satırlar 16 karakter, boşluk dolgulu). */
+  lcd?: { lines: string[]; backlight: boolean; poweredOn: boolean }
 }
 
 export interface PinSnapshot {
@@ -96,7 +136,7 @@ export interface PinSnapshot {
   volts: number
 }
 
-export type WarningKind = 'short-circuit' | 'led-no-resistor' | 'led-burnt' | 'floating-input' | 'reversed-polarity' | 'pin-overcurrent'
+export type WarningKind = 'short-circuit' | 'led-no-resistor' | 'led-burnt' | 'floating-input' | 'reversed-polarity' | 'pin-overcurrent' | 'flyback-missing' | 'unpowered' | 'base-overcurrent'
 export interface LabWarning { kind: WarningKind; partId?: string; message: string }
 
 export interface LabState {

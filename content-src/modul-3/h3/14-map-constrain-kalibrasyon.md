@@ -2,7 +2,7 @@
 süre: 25
 
 ## Merak
-Sensörün verdiği sayılar hiç "temiz" değildir: LDR'n senin odanda 120 ile 880 arasında, arkadaşının odasında 60 ile 950 arasında oynar. Üstelik sayı sürekli titrer. Programın bu karmaşada nasıl kararlı davranır?
+Sensörün verdiği sayılar hiç "temiz" değildir: LDR'n bir ortamda 120 ile 880 arasında, başka bir ortamda 60 ile 950 arasında oynayabilir. Üstelik sayı sürekli titrer. Programın bu karmaşada nasıl kararlı davranır?
 
 ## Etkinlik
 ### map ve constrain
@@ -24,11 +24,13 @@ yuzde = constrain(yuzde, 0, 100);         // 0-100 arasında tut
 ```
 
 ### Devre
+Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla.
+
 | Parça | Bağlantı |
 |---|---|
-| Potansiyometre (10 kΩ) | Dış bacaklar → 5 V ve GND; orta bacak → **A0** |
-| LDR + 10 kΩ direnç | 5 V → LDR → **A1** → 10 kΩ → GND (12. dersteki gibi) |
-| LED (kırmızı) + 330 Ω | **D13** → 330 Ω → LED anodu; LED katodu → GND |
+| Potansiyometre (10 kΩ) | **VCC** → 5V; **GND** → GND; **SIG** → **A0** |
+| LDR + 10 kΩ direnç | 5V → LDR → **A1** → 10 kΩ → GND (12. dersteki gibi) |
+| LED (kırmızı) + 330 Ω | **D13** → 330 Ω → LED **A** (anot); LED **K** (katot) → GND |
 
 ### Program 1: map ve constrain
 Potansiyometrenin 200-800 arasını yüzdeye çevirelim; uçlarda sonuç taşabilir.
@@ -53,10 +55,10 @@ void loop() {
 }
 ```
 
-Düğmeyi tamamen sola çevirince `p` negatif, sağa çevirince 100'ün üstüne çıkacak; `k` ise 0 ve 100'de kalacak.
+Kaydırıcıyı tamamen sola çekince `p` negatif, sağa çekince 100'ün üstüne çıkacak; `k` ise 0 ve 100'de kalacak.
 
 ### Kalibrasyon
-Sensörün gerçek en küçük ve en büyük değeri her ortamda farklıdır. **Kalibrasyon**, bu aralığı program açılırken ölçmektir. Aşağıdaki sketch ilk 3 saniye boyunca (D13 yanıkken) LDR'yi izler. Bu sürede LDR'nin üzerini kapat, sonra ışığa tut. Sonra ölçtüğü en küçük ve en büyük değeri aralık yapıp ışığı 0-100 arası yüzde olarak bildirir.
+Sensörün gerçek en küçük ve en büyük değeri her ortamda farklıdır. **Kalibrasyon**, bu aralığı program açılırken ölçmektir. Aşağıdaki sketch ilk 3 saniye boyunca (D13 yanıkken) LDR'yi izler. Bu sürede LDR'nin **Işık** kaydırıcısını önce en sola (karanlık), sonra en sağa (aydınlık) çek. Sonra ölçtüğü en küçük ve en büyük değeri aralık yapıp ışığı 0-100 arası yüzde olarak bildirir.
 
 ```cpp
 // sketch: kalibrasyon
@@ -133,14 +135,14 @@ duzgun = duzgun * 0.9 + ham * 0.1;   // duzgun bir float değişkendir
 
 ### Dene
 - `map_constrain` sketch'inde `constrain` satırını silip uçlarda ne olduğunu gör.
-- `kalibrasyon` açılırken LDR'yi hiç hareket ettirme. Ne oluyor? Alttaki 50'lik koruma satırı ne işe yarıyor?
+- `kalibrasyon` çalışırken ışık kaydırıcısını hiç oynatma. Ne oluyor? Alttaki 50'lik koruma satırı ne işe yarıyor?
 - `yumusatma` içinde 16'yı 4 yap. `ort` ne kadar oynak olur? 64 yaparsan okuma süresi ne olur?
 
 ### Sık yapılan hatalar
 - `map`'i ondalıklı sonuç bekleyerek kullanmak: `map(5, 0, 10, 0, 3)` 1 verir, 1,5 değil.
 - `map` sonucunu kırpmadan `analogWrite`'a vermek: negatif ya da 255'ten büyük değer beklenmedik parlaklık verir.
 - `enAz`'ı 0 ile, `enCok`'u 1023 ile başlatmak: ölçümler hiçbir zaman bu uçlara varmaz, aralık hiç daralmaz.
-- Kalibrasyon sırasında LDR'yi kapatıp açmayı unutmak: aralık dar kalır.
+- Kalibrasyon sırasında ışık kaydırıcısını uçlara götürmeyi unutmak: aralık dar kalır.
 - `toplam`'ı sıfırlamayı unutmak: ortalama sürekli büyür.
 
 ## Konuşalım
