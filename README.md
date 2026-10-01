@@ -1,4 +1,4 @@
-# AI Robotics Academy
+# ASK Robotic
 
 "0'dan AI Robotik Mühendisliğine" — modüler öğrenme platformu.
 
@@ -20,3 +20,6 @@ Taslak aşaması. Müfredat: [docs/mufredat-taslak.md](docs/mufredat-taslak.md)
 - Kendi simülatör (avr8js + rp2040js + Blockly); Velxio/Wokwi yedek.
 - Her bölüm sonunda 3D robot (fizik 2D, 3D yalnız görüntüleme).
 - Lisans konusu en sona bırakıldı.
+
+## Teknoloji (Kipay ile aynı çizgi)
+pnpm monorepo + Turborepo · Next.js (apps/web) · Postgres + Drizzle (packages/db) · Docker + Railway.
