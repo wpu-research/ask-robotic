@@ -100,6 +100,17 @@ describe('palet', () => {
     expect(t('Işık')).toContain('ldr')
     expect(t('xyz')).toEqual([])
   })
+  it('arama: aksansız yazım, tire/boşluk ve çok sözcüklü sorgu', () => {
+    const t = (q: string) => pickerGroups(DEFAULT_PARTS, q).flatMap((x) => x.types)
+    expect(t('ROLE')).toEqual(['relay'])
+    expect(t('rele')).toEqual(['relay'])
+    expect(t('transistor').sort()).toEqual(['mosfet', 'npn'])
+    expect(t('7 segment')).toEqual(['sevenseg'])
+    expect(t('lcd i2c')).toEqual(['lcdI2c'])
+    expect(t('servo motor')).toEqual(['servo'])
+    expect(t('encoder')).toEqual(['encoder'])
+    expect(t('sicaklik').sort()).toEqual(['bmp280', 'dht', 'ntc'])
+  })
   it('arama: Aşama C Türkçe anahtar sözcükler', () => {
     const t = (q: string) => pickerGroups(DEFAULT_PARTS, q).flatMap((x) => x.types)
     expect(t('mesafe')).toEqual(['hcsr04'])

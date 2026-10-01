@@ -18,6 +18,7 @@ export function SiteHeader() {
           <Link href="/moduller">Modüller</Link>
           <Link href="/atolye">Blok atölyesi</Link>
           <Link href="/laboratuvar">Devre laboratuvarı</Link>
+          <Link href="/arena">Robot arenası</Link>
           {authEnabled() && <Link href="/giris">Giriş</Link>}
           <ThemeToggle />
         </nav>

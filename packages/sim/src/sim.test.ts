@@ -34,6 +34,16 @@ describe('Sim (önceden derlenmiş hex)', () => {
     expect(sim.serial).toContain('got:x')
   })
 
+  it('tek çağrıda gönderilen çok baytlı seri giriş eksiksiz ulaşır', () => {
+    const sim = new Sim(SERIAL_HEX)
+    sim.run(100)
+    sim.sendSerial('abc')
+    sim.run(300)
+    expect(sim.serial).toContain('got:a')
+    expect(sim.serial).toContain('got:b')
+    expect(sim.serial).toContain('got:c')
+  })
+
   it('INPUT_PULLUP buton', () => {
     const sim = new Sim(BUTTON_HEX)
     sim.run(20)

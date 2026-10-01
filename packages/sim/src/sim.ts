@@ -133,6 +133,8 @@ export class Sim {
     while (this.cpu.cycles < target) {
       avrInstruction(this.cpu)
       this.cpu.tick()
+      // avr8js tek baytlık alma tamponuna sahiptir; kuyruktaki baytlar alıcı boşaldıkça teslim edilir.
+      if (this.rxQueue.length > 0 && this.usart.writeByte(this.rxQueue[0])) this.rxQueue.shift()
     }
     return this
   }
@@ -155,7 +157,8 @@ export class Sim {
   }
 
   /** Seri porta bayt gönderir. */
-  sendSerial(text: string): void { for (const c of text) this.usart.writeByte(c.charCodeAt(0)) }
+  sendSerial(text: string): void { for (const c of text) this.rxQueue.push(c.charCodeAt(0)) }
+  private rxQueue: number[] = []
 
   /** Pinin [fromMs, toMs] aralığındaki değişimleri. */
   pinEdges(pin: Pin, fromMs = 0, toMs = Infinity): PinEdge[] {

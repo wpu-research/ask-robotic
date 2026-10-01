@@ -29,9 +29,9 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ca
     callout: 'Programlar sanal sensör modelleriyle sınandı (HC-SR04, DHT, BMP280, MPU6050 vb.). Bazı parçalar (RC522, SD kart, VL53L0X) yalnız derleme düzeyinde doğrulandı; derslerde belirtilir.',
   },
   robotik: {
-    tagline: 'Sürüş, engel, çizgi, enkoder, PID ve denge. Bitirmede kendi robotunu seç.',
+    tagline: 'Sanal arenada sürüş, engel, çizgi, enkoder, PID ve denge. Bitirmede kendi robotunu seç.',
     audience: 'Sensörler ve Projeler\'i bitirenler',
-    callout: 'Robotlar 2B bir benzetimde sınandı. Gerçek robotta kazançlar ve zamanlamalar farklı olabilir; dersler bunu belirtir.',
+    callout: 'Her dersin etkinliği tarayıcıdaki sanal robot arenasında yapılır: Arduino C++ kodunu yazarsın, derlenir ve robot üstten görünüşlü 2B arenada hareket eder. Sensör ışınları, çizgi sensörü değerleri, enkoder ve odometri canlı görünür; hedefler robotun gerçek konumu ve ölçümleriyle denetlenir. Hiçbir fiziksel parça gerekmez. Gerçek robotta kazançlar ve zamanlamalar farklı olabilir; dersler bunu belirtir.',
   },
 }
 

@@ -28,7 +28,7 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   led: 'ışık diyot lamba', rgbled: 'renkli ışık led', buzzer: 'ses zil hoparlör', servo: 'motor kol açı', button: 'düğme anahtar tuş',
   pot: 'ayarlı direnç knob', ldr: 'ışık sensörü foto', ntc: 'sıcaklık sensörü termistör', resistor: 'ohm',
   diode: 'diyot 1n4007 geri tepme flyback doğrultucu', npn: 'transistör 2n2222 bc547 anahtar bjt', mosfet: 'transistör fet irlz44n anahtar',
-  dcmotor: 'motor fırçalı dönen pervane', l293d: 'motor sürücü h köprü entegre çip', relay: 'röle anahtar kontak com no nc',
+  dcmotor: 'motor fırçalı dönen pervane', l293d: 'motor sürücü h köprü entegre çip', relay: 'röle rele anahtar kontak com no nc',
   sevenseg: 'yedi segment rakam hane display gösterge', sr595: 'kaydırmalı yazmaç shift register entegre çip 74hc595 portu genişlet',
   hcsr04: 'mesafe uzaklık ultrasonik sonar ölçer hc-sr04 yankı echo trig',
   dht: 'sıcaklık nem sensörü dht11 dht22 hava nemölçer',
@@ -38,7 +38,7 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   bmp280: 'basınç barometre rakım yükseklik sıcaklık sensörü i2c',
   mpu6050: 'ivme ivmeölçer jiroskop gyro eğim denge hareket sensörü i2c',
   joystick: 'analog kol oyun kumandası xy eksen ky-023',
-  encoder: 'döner enkoder ky-040 çevirmeli düğme knob dönüş',
+  encoder: 'döner enkoder encoder ky-040 çevirmeli düğme knob dönüş',
   keypad: 'tuş takımı 4x4 matris klavye şifre tuş',
   rtc: 'saat gerçek zamanlı ds3231 tarih zaman pil i2c',
   mq2: 'gaz duman sensörü lpg yanıcı mq-2 kaçak',
@@ -48,14 +48,19 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   lcd1602: 'ekran lcd 16x2 hd44780 yazı display paralel', lcdI2c: 'ekran lcd 16x2 i2c pcf8574 yazı display',
 }
 
-const norm = (s: string) => s.toLocaleLowerCase('tr-TR')
+/** Küçük harfe indirir, Türkçe aksanları (ö→o, ı→i…) ve tireyi sadeleştirir: "ROLE", "rele", "transistor", "7 segment" bulunur. */
+const norm = (s: string) => s.toLocaleLowerCase('tr-TR').replace(/[ıöüşçğ]/g, (c) => ({ ı: 'i', ö: 'o', ü: 'u', ş: 's', ç: 'c', ğ: 'g' })[c]!).replace(/[-_/]+/g, ' ')
 
 export interface PartGroup { title: string; types: PartType[] }
 
 /** İzinli parçaları kategorilere böler; `query` ad ve anahtar sözcüklerde aranır (Türkçe büyük/küçük harf duyarsız). */
 export function pickerGroups(allowed: readonly PartType[], query: string): PartGroup[] {
-  const needle = norm(query.trim())
-  const match = (t: PartType) => !needle || norm(`${PART_DEFS[t].name} ${SHORT_NAME[t] ?? ''} ${PART_KEYWORDS[t] ?? ''}`).includes(needle)
+  const words = norm(query.trim()).split(/\s+/).filter(Boolean)
+  const match = (t: PartType) => {
+    if (!words.length) return true
+    const hay = norm(`${PART_DEFS[t].name} ${SHORT_NAME[t] ?? ''} ${PART_KEYWORDS[t] ?? ''}`)
+    return words.every((w) => hay.includes(w))
+  }
   const known = new Set(PICKER_CATEGORIES.flatMap((c) => c.types))
   const cats: PartCategory[] = [...PICKER_CATEGORIES, { title: 'Diğer', types: allowed.filter((t) => !known.has(t)) }]
   return cats.map((c) => ({ title: c.title, types: c.types.filter((t) => allowed.includes(t) && match(t)) })).filter((c) => c.types.length)

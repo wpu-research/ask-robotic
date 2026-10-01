@@ -3,8 +3,10 @@
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { JrEditor } from '@/components/jr/jr-editor'
+import { ArenaEditor } from '@/components/arena/arena-editor'
 import { LabEditor } from '@/components/lab/lab-editor'
 import { getActivity } from '@/lib/jr/activity'
+import { getArenaActivity } from '@/lib/arena/activity'
 import { getLabActivity } from '@/lib/lab/activity'
 import { markDone, unmarkDone, useDoneIds } from '@/lib/progress-store'
 import { LessonMarkdown } from './lesson-markdown'
@@ -37,6 +39,8 @@ export function LessonPlayer(p: Props) {
   const starter = useMemo(() => activity?.starter(), [activity])
   const labActivity = useMemo(() => getLabActivity(p.activityKey), [p.activityKey])
   const labStarter = useMemo(() => labActivity?.starter(), [labActivity])
+  const arenaActivity = useMemo(() => getArenaActivity(p.activityKey), [p.activityKey])
+  const arenaCode = useMemo(() => arenaActivity?.starter(), [arenaActivity])
   const done = doneIds.has(p.lesson.id)
 
   // Giriş açıkken sunucudaki ilerleme tarayıcıdakiyle birleştirilir
@@ -65,7 +69,7 @@ export function LessonPlayer(p: Props) {
   }
 
   return (
-    <div className={`container ${(activity || labActivity) && step === 1 ? 'container-wide' : 'container-narrow'} ${p.trackClass}`}>
+    <div className={`container ${(activity || labActivity || arenaActivity) && step === 1 ? 'container-wide' : 'container-narrow'} ${p.trackClass}`}>
       <div className="player-top">
         <p className="crumbs">
           <Link href="/moduller">Modüller</Link> / <Link href={`/moduller/${p.moduleSlug}`}>{p.moduleTitle}</Link> / {p.weekLabel}
@@ -91,7 +95,7 @@ export function LessonPlayer(p: Props) {
       <section className="stage" aria-live="polite">
         {step === 0 && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
         {step === 1 && (
-          <div className={activity ? 'lesson-split' : labActivity ? 'lesson-stack' : undefined}>
+          <div className={activity ? 'lesson-split' : labActivity || arenaActivity ? 'lesson-stack' : undefined}>
             <div>
               {p.callout && (
                 <details className="callout" style={{ marginTop: 0 }}>
@@ -110,6 +114,20 @@ export function LessonPlayer(p: Props) {
                   allowedParts={labActivity.allowedParts}
                   goals={labActivity.goals}
                   storageKey={`ask:lab:lesson:${p.lesson.id}`}
+                  onGoalsComplete={() => setGoalsDone(true)}
+                />
+              </div>
+            )}
+            {arenaActivity && arenaCode !== undefined && (
+              <div className="lesson-lab lesson-arena" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+                {arenaActivity.intro && <p className="lesson-app-intro">{arenaActivity.intro}</p>}
+                <ArenaEditor
+                  key={p.lesson.id}
+                  scene={arenaActivity.scene}
+                  initialCode={arenaCode}
+                  goals={arenaActivity.goals}
+                  quickSend={arenaActivity.quickSend}
+                  storageKey={`ask:arena:lesson:${p.lesson.id}`}
                   onGoalsComplete={() => setGoalsDone(true)}
                 />
               </div>
@@ -148,7 +166,7 @@ export function LessonPlayer(p: Props) {
             ) : (
               <>
                 <h2>Etkinliği bitirdin mi?</h2>
-                {(activity || labActivity) && (
+                {(activity || labActivity || arenaActivity) && (
                   <p className="muted">{goalsDone ? 'Uygulamadaki tüm hedefleri tamamladın.' : 'Uygulamadaki hedeflerin hepsi henüz tamamlanmadı; yine de devam edebilirsin.'}</p>
                 )}
                 <p className="muted">Tamamladığında ilerlemene işlenir.</p>

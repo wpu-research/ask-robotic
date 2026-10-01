@@ -311,10 +311,11 @@ const dipX = (i: number) => 14 + i * 16
 function DipChip({ w, h, top, bottom, title, notchY, children }: { w: number; h: number; top: (DipSlot | null)[]; bottom: (DipSlot | null)[]; title: string; notchY?: number; children?: React.ReactNode }) {
   const y0 = 16, y1 = h - 16
   const leg = (slots: (DipSlot | null)[], isTop: boolean) => slots.map((s, i) => s && (
-    <g key={`${isTop ? 't' : 'b'}${i}`}>
-      <rect x={dipX(i) - 2} y={isTop ? 2 : y1 - 1} width={4} height={isTop ? y0 - 1 : h - y1 - 1} rx={1} fill={METAL} stroke="#6b7684" strokeWidth={0.5} opacity={s.dummy ? 0.55 : 1} />
-      <text x={dipX(i)} y={isTop ? y0 + 9 : y1 - 4} textAnchor="middle" fontSize={5.4} fontWeight={700} fill="#e2e8f0" opacity={s.dummy ? 0.45 : 0.95}>{s.n === 'QH_' ? "QH'" : s.n}</text>
-    </g>
+    <rect key={`${isTop ? 't' : 'b'}${i}`} x={dipX(i) - 2} y={isTop ? 2 : y1 - 1} width={4} height={isTop ? y0 - 1 : h - y1 - 1} rx={1} fill={METAL} stroke="#6b7684" strokeWidth={0.5} opacity={s.dummy ? 0.55 : 1} />
+  ))
+  // Bacak adları çip gövdesinin ÜSTÜNE çizilir (gövdeden önce çizilirse örtülür).
+  const names = (slots: (DipSlot | null)[], isTop: boolean) => slots.map((s, i) => s && (
+    <text key={`n${isTop ? 't' : 'b'}${i}`} x={dipX(i)} y={isTop ? y0 + 9 : y1 - 4} textAnchor="middle" fontSize={4.8} fontWeight={700} fill="#e2e8f0" opacity={s.dummy ? 0.45 : 0.95}>{s.n === 'QH_' ? "QH'" : s.n}</text>
   ))
   const m = notchY ?? (y0 + y1) / 2
   return (
@@ -324,6 +325,7 @@ function DipChip({ w, h, top, bottom, title, notchY, children }: { w: number; h:
       <rect x={6} y={y0 + 1.5} width={w - 12} height={3} rx={1.5} fill="#fff" opacity={0.1} />
       <path d={`M4 ${m - 5} a5 5 0 0 1 0 10 Z`} fill="#030712" />
       <circle cx={13} cy={y1 - 11} r={1.6} fill="#374151" />
+      {names(top, true)}{names(bottom, false)}
       <text x={w / 2} y={(y0 + y1) / 2 - (children ? 10 : -2)} textAnchor="middle" fontSize={9} fontWeight={800} fill="#94a3b8" letterSpacing={0.5}>{title}</text>
       {children}
     </g>
