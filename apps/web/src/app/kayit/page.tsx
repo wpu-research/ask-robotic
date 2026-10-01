@@ -1,11 +1,16 @@
+import { notFound } from 'next/navigation'
+import { authEnabled } from '@/lib/flags'
 import { AuthForm } from '../auth-form'
 
-export default function Kayit() {
+export default function Sayfa() {
+  if (!authEnabled()) notFound() // giriş şimdilik kapalı
   return (
-    <main style={{ maxWidth: 420, margin: '10vh auto', padding: '0 16px' }}>
-      <h1>Kayıt ol</h1>
-      <AuthForm mode="register" />
-      <p>Zaten hesabın var mı? <a href="/giris">Giriş yap</a></p>
-    </main>
+    <div className="container">
+      <div className="card form-card">
+        <h1 style={{ fontSize: '1.6rem' }}>Kayıt ol</h1>
+        <AuthForm mode="register" />
+        <p className="muted">Zaten hesabın var mı? <a href="/giris">Giriş yap</a></p>
+      </div>
+    </div>
   )
 }

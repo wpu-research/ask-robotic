@@ -1,23 +1,42 @@
+import type { Metadata } from 'next'
 import { getDb } from '@/lib/db'
-import { listModules } from '@/lib/content'
+import { getModuleSummaries } from '@/lib/summaries'
+import { TRACKS, UPCOMING, type TrackKey } from '@/lib/module-meta'
+import { ModuleCard } from '@/components/module-card'
 
 export const dynamic = 'force-dynamic'
+export const metadata: Metadata = { title: 'Modüller' }
 
 export default async function Moduller() {
-  const mods = await listModules(getDb())
+  const mods = await getModuleSummaries(getDb()).catch(() => [])
+  const tracks = (['cocuk', 'maker', 'ai'] as TrackKey[])
   return (
-    <main style={{ maxWidth: 720, margin: '8vh auto', padding: '0 16px' }}>
-      <h1>Modüller</h1>
-      {mods.length === 0 && <p>Henüz yayınlanmış modül yok.</p>}
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        {mods.map((m) => (
-          <li key={m.id} style={{ border: '1px solid #ddd', borderRadius: 8, padding: 16, marginBottom: 12 }}>
-            <a href={`/moduller/${m.slug}`} style={{ fontSize: 18, fontWeight: 600 }}>{m.title}</a>
-            {m.minAge ? <div style={{ color: '#666' }}>{m.minAge}+ yaş</div> : null}
-          </li>
-        ))}
-      </ul>
-      <p><a href="/">← Ana sayfa</a></p>
-    </main>
+    <div className="container">
+      <div className="page-head">
+        <p className="eyebrow">Müfredat</p>
+        <h1>Modüller</h1>
+        <p className="muted">İstediğin modülden başlayabilirsin. İlerlemen bu tarayıcıda saklanır.</p>
+      </div>
+      {tracks.map((t) => {
+        const own = mods.filter((m) => m.track === t)
+        const soon = UPCOMING.filter((u) => u.track === t && !mods.some((m) => m.slug === u.slug))
+        if (!own.length && !soon.length) return null
+        return (
+          <section key={t} className="section" style={{ paddingTop: 24 }}>
+            <h2>{TRACKS[t].label}</h2>
+            <p className="muted">{TRACKS[t].hint}</p>
+            <div className="grid" style={{ marginTop: 16 }}>
+              {own.map((m) => <ModuleCard key={m.id} m={m} />)}
+              {soon.map((u) => (
+                <div key={u.slug} className={`card card-soon track-${u.track}`}>
+                  <div className="card-top"><span className="step-no">YAKINDA</span><span className="chip">{u.status}</span></div>
+                  <h3>{u.title}</h3>
+                </div>
+              ))}
+            </div>
+          </section>
+        )
+      })}
+    </div>
   )
 }

@@ -49,3 +49,15 @@ Gereksinim: `arduino-cli`, `arduino:avr` çekirdeği ve kütüphaneler (listesi 
 - Modül 2 (Scratch 3) blok kategorilerini renkle anıyor (olaylar sarı, hareket mavi, görünüm mor, ses pembe, kontrol turuncu, algılama açık mavi, işlemler yeşil, değişkenler turuncu-kırmızı, bloklarım pembe). Türkçe arayüzdeki gerçek kategori ve blok adları kontrol edilmeli.
 - ScratchJr bir tablet/telefon uygulaması; tarayıcıda gömülü çalıştırma doğrulanmadı. Modül 1 şu an cihazda uygulama gerektiriyor.
 - Gerçek bir Postgres'e karşı uçtan uca HTTP denemesi yapılmadı (yalnızca PGlite testleri).
+
+## Yerelde çalıştırma
+```
+# özel bir Postgres kümesi (Docker gerekmez), proje içinde .dev/ altında
+/usr/lib/postgresql/14/bin/initdb -D .dev/pg -U wpu --auth=trust
+/usr/lib/postgresql/14/bin/pg_ctl -D .dev/pg -o "-p 54329 -k $PWD/.dev -c listen_addresses=127.0.0.1" -l .dev/pg.log start
+createdb -h 127.0.0.1 -p 54329 -U wpu ask_robotic
+export DATABASE_URL=postgres://wpu@127.0.0.1:54329/ask_robotic
+pnpm db:migrate && (cd packages/db && node dist/seed.js)
+pnpm build && pnpm --filter web start      # http://localhost:3000
+```
+**Giriş şimdilik kapalı.** Ders sayfaları girişsiz açılır, ilerleme tarayıcıda (`localStorage`) tutulur. Girişi açmak için `AUTH_ENABLED=true` ver: kayıt/giriş sayfaları, `/api/auth/*` ve sunucu tarafı ilerleme yerinde duruyor.

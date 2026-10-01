@@ -28,30 +28,29 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
     setBusy(false)
   }
 
-  const field = { display: 'block', width: '100%', padding: 8, margin: '4px 0 12px', boxSizing: 'border-box' as const }
-  return (
+    return (
     <form onSubmit={onSubmit}>
       {mode === 'register' && (
-        <label>Ad<input name="name" required maxLength={80} style={field} /></label>
+        <label className="field">Ad<input name="name" required maxLength={80} /></label>
       )}
-      <label>E-posta<input name="email" type="email" required autoComplete="email" style={field} /></label>
-      <label>
+      <label className="field">E-posta<input name="email" type="email" required autoComplete="email" /></label>
+      <label className="field">
         Parola
         <input name="password" type="password" required minLength={mode === 'register' ? 10 : 1}
-          autoComplete={mode === 'login' ? 'current-password' : 'new-password'} style={field} />
+          autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
       </label>
       {mode === 'register' && (
         <>
-          <label>Hesap türü
-            <select name="role" style={field}><option value="student">Öğrenci</option><option value="parent">Ebeveyn</option></select>
+          <label className="field">Hesap türü
+            <select name="role"><option value="student">Öğrenci</option><option value="parent">Ebeveyn</option></select>
           </label>
           <label style={{ display: 'block', marginBottom: 12 }}>
             <input name="adult" type="checkbox" required /> 16 yaşından büyüğüm
           </label>
         </>
       )}
-      {error && <p role="alert" style={{ color: '#b00020' }}>{error}</p>}
-      <button disabled={busy} style={{ padding: '8px 16px' }}>{mode === 'login' ? 'Giriş yap' : 'Kayıt ol'}</button>
+      {error && <p role="alert" className="error">{error}</p>}
+      <button className="btn btn-primary" disabled={busy}>{mode === 'login' ? 'Giriş yap' : 'Kayıt ol'}</button>
     </form>
   )
 }

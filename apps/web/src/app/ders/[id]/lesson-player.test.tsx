@@ -8,23 +8,35 @@ const props = {
   lesson: { id: 1, title: l.title, durationMin: l.durationMin, problem: l.problem, contentMd: l.contentMd, question: l.question },
   moduleTitle: allModules[0].title,
   moduleSlug: 'scratchjr',
-  weekLabel: '1. Hafta: Komut ver, robot yapsın',
+  trackClass: 'track-cocuk',
+  weekLabel: '1. hafta: Komut ver, robot yapsın',
   position: { index: 1, total: 10 },
+  prevLessonId: null as number | null,
   nextLessonId: 2,
-  alreadyDone: false,
+  serverSync: false,
+  serverDone: [] as number[],
 }
+const html = (p = props) => renderToString(<LessonPlayer {...p} />).replaceAll('&quot;', '"').replaceAll('<!-- -->', '')
 
 describe('LessonPlayer', () => {
   it('ilk adımda başlığı, merak sorusunu ve 4 adımı gösterir', () => {
-    const html = renderToString(<LessonPlayer {...props} />).replaceAll('&quot;', '"').replaceAll('<!-- -->', '')
-    expect(html).toContain(l.title)
-    expect(html).toContain(l.problem)
-    for (const s of ['Merak', 'Etkinlik', 'Konuşalım', 'Bitti']) expect(html).toContain(s)
-    expect(html).toContain('Ders 1/10')
-    // etkinlik metni henüz görünmez
-    expect(html).not.toContain('Hazırlık')
+    const h = html()
+    expect(h).toContain(l.title)
+    expect(h).toContain(l.problem)
+    for (const s of ['Merak', 'Etkinlik', 'Konuşalım', 'Bitti']) expect(h).toContain(s)
+    expect(h).toContain('Ders 1 / 10')
+    expect(h).not.toContain('Hazırlık') // etkinlik metni henüz görünmez
   })
-  it('geri düğmesi ilk adımda devre dışı', () => {
-    expect(renderToString(<LessonPlayer {...props} />)).toMatch(/<button[^>]*disabled[^>]*>← Geri/)
+  it('ilk dersin ilk adımında "Geri" yerine hiçbir şey yoktur; önceki ders varsa bağlantı gösterir', () => {
+    expect(html()).not.toContain('Önceki ders')
+    expect(html({ ...props, prevLessonId: 5 })).toContain('/ders/5')
+  })
+  it('ilk adım "aria-current" ile işaretlenir ve klavye ipucu görünür', () => {
+    const h = html()
+    expect(h).toContain('aria-current="step"')
+    expect(h).toContain('← → tuşlarıyla')
+  })
+  it('breadcrumb modül sayfasına bağlanır', () => {
+    expect(html()).toContain('href="/moduller/scratchjr"')
   })
 })

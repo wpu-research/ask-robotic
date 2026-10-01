@@ -1,24 +1,24 @@
 import type { ReactNode } from 'react'
+import './globals.css'
+import { SiteFooter, SiteHeader } from '@/components/site-header'
 
 export const metadata = {
-  title: 'ASK Robotic',
-  description: "0'dan AI Robotik Mühendisliğine",
+  title: { default: 'ASK Robotic', template: '%s · ASK Robotic' },
+  description: "0'dan AI robotik mühendisliğine: Scratch'ten Arduino'ya, sensörlerden robotlara adım adım dersler.",
 }
+
+// Tema tercihi boyamadan önce uygulanır (yanıp sönmeyi önler)
+const themeScript = `try{var t=localStorage.getItem('ask:theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}`
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="tr">
-      <head>
-        <style>{`
-          .lesson-md pre { background: #f4f4f5; padding: 12px; overflow-x: auto; border-radius: 6px; font-size: 15px; line-height: 1.45; }
-          .lesson-md code { font-family: ui-monospace, monospace; }
-          .lesson-md :not(pre) > code { background: #f4f4f5; padding: 1px 4px; border-radius: 4px; }
-          .lesson-md table { border-collapse: collapse; margin: 12px 0; display: block; overflow-x: auto; }
-          .lesson-md th, .lesson-md td { border: 1px solid #d4d4d8; padding: 6px 10px; text-align: left; }
-          .lesson-md th { background: #fafafa; }
-        `}</style>
-      </head>
-      <body style={{ fontFamily: 'system-ui, sans-serif', margin: 0 }}>{children}</body>
+    <html lang="tr" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <body>
+        <SiteHeader />
+        <main>{children}</main>
+        <SiteFooter />
+      </body>
     </html>
   )
 }
