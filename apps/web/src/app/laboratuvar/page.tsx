@@ -21,15 +21,14 @@ const START: Circuit = { parts: [{ id: 'uno', type: 'uno', x: 40, y: 40, rotatio
 
 export default function Laboratuvar() {
   return (
-    <div className="container" style={{ maxWidth: 1280 }}>
-      <div className="page-head">
-        <p className="eyebrow">Serbest çalışma</p>
+    <div className="page page-tool">
+      <header className="page-title">
         <h1>Laboratuvar</h1>
-        <p className="muted" style={{ maxWidth: '64ch' }}>
+        <p className="muted">
           Sanal Arduino Uno ile devre kur, kodu yaz, derle ve çalıştır. Parçaları paletten tuvale sürükle, pinlerden kablo çek. Çalışman bu tarayıcıda saklanır.
         </p>
-      </div>
-      <div style={{ paddingBottom: 56 }}>
+      </header>
+      <div className="tool-body">
         <LabEditor initial={START} initialCode={BLINK} storageKey="ask:lab:sandbox" />
       </div>
     </div>

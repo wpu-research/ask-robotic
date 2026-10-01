@@ -9,6 +9,11 @@ import { getActivity } from '@/lib/jr/activity'
 import { getArenaActivity } from '@/lib/arena/activity'
 import { getLabActivity } from '@/lib/lab/activity'
 import { markDone, unmarkDone, useDoneIds } from '@/lib/progress-store'
+import { recordFinished, recordGoals, recordOpen } from '@/lib/activity-store'
+import { countDone } from '@/lib/dashboard'
+import { Icon } from '@/components/shell/icons'
+import { LessonKindBadge } from '@/components/badges'
+import type { LessonKind } from '@/lib/module-meta'
 import { LessonMarkdown } from './lesson-markdown'
 
 interface Props {
@@ -20,6 +25,10 @@ interface Props {
   position: { index: number; total: number }
   prevLessonId: number | null
   nextLessonId: number | null
+  prevTitle?: string | null
+  nextTitle?: string | null
+  /** Modüldeki tüm ders kimlikleri (yan özet için). */
+  moduleLessonIds?: number[]
   callout?: string
   /** Bu derste yazının yanında açılan uygulama etkinliği (yoksa null). */
   activityKey?: string | null
@@ -42,6 +51,14 @@ export function LessonPlayer(p: Props) {
   const arenaActivity = useMemo(() => getArenaActivity(p.activityKey), [p.activityKey])
   const arenaCode = useMemo(() => arenaActivity?.starter(), [arenaActivity])
   const done = doneIds.has(p.lesson.id)
+  const hasApp = !!(activity || labActivity || arenaActivity)
+  const kind: LessonKind = arenaActivity ? 'arena' : labActivity ? 'devre' : activity ? 'blok' : 'metin'
+  const goalTexts: string[] = (arenaActivity?.goals ?? labActivity?.goals ?? activity?.goals ?? []).map((g) => g.text)
+  const modCount = countDone(p.moduleLessonIds ?? [], doneIds)
+
+  // Son açılan ders kaydı (panelde "kaldığın yerden devam et" için)
+  useEffect(() => { recordOpen(p.lesson.id) }, [p.lesson.id])
+  const onGoals = useCallback(() => { setGoalsDone(true); recordGoals(p.lesson.id) }, [p.lesson.id])
 
   // Giriş açıkken sunucudaki ilerleme tarayıcıdakiyle birleştirilir
   useEffect(() => { p.serverDone.forEach(markDone) }, [p.serverDone])
@@ -60,6 +77,7 @@ export function LessonPlayer(p: Props) {
   async function finish() {
     setError('')
     markDone(p.lesson.id)
+    recordFinished(p.lesson.id)
     if (p.serverSync) {
       const res = await fetch('/api/progress', {
         method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lessonId: p.lesson.id }),
@@ -68,31 +86,39 @@ export function LessonPlayer(p: Props) {
     }
   }
 
+  const wide = hasApp && step === 1
   return (
-    <div className={`container ${(activity || labActivity || arenaActivity) && step === 1 ? 'container-wide' : 'container-narrow'} ${p.trackClass}`}>
-      <div className="player-top">
-        <p className="crumbs">
-          <Link href="/moduller">Modüller</Link> / <Link href={`/moduller/${p.moduleSlug}`}>{p.moduleTitle}</Link> / {p.weekLabel}
-        </p>
-        <h1 style={{ marginBottom: 8 }}>{p.lesson.title}</h1>
-        <div className="meta">
-          <span>Ders {p.position.index} / {p.position.total}</span>
-          <span>~{p.lesson.durationMin} dakika</span>
-          {done && <span className="chip chip-ok">Tamamlandı</span>}
-        </div>
-      </div>
+    <div className={`page page-lesson ${hasApp ? 'has-app' : ''} ${wide ? 'wide-step' : ''} ${p.trackClass}`}>
+      <nav aria-label="Konum" className="crumbs">
+        <Link href="/moduller">Modüller</Link><Icon name="chevronRight" size={14} />
+        <Link href={`/moduller/${p.moduleSlug}`}>{p.moduleTitle}</Link><Icon name="chevronRight" size={14} />
+        <span>{p.weekLabel}</span><Icon name="chevronRight" size={14} />
+        <span aria-current="page" className="crumb-now">{p.lesson.title}</span>
+      </nav>
 
-      <ol className="stepper" aria-label="Ders adımları">
-        {STEPS.map((s, i) => (
-          <li key={s}>
-            <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined} className={i < step ? 'done' : undefined}>
-              <span className="n">{i + 1}</span><span className="label">{s}</span>
-            </button>
-          </li>
-        ))}
-      </ol>
+      <div className="lesson-layout">
+        <div className="lesson-main">
+          <header className="player-top">
+            <h1>{p.lesson.title}</h1>
+            <div className="meta">
+              <LessonKindBadge kind={kind} />
+              <span className="meta-i"><Icon name="clock" size={16} />~{p.lesson.durationMin} dakika</span>
+              <span>Ders {p.position.index} / {p.position.total}</span>
+              {done && <span className="chip chip-ok">Tamamlandı</span>}
+            </div>
+          </header>
 
-      <section className="stage" aria-live="polite">
+          <ol className="stepper" aria-label="Ders adımları">
+            {STEPS.map((s, i) => (
+              <li key={s}>
+                <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined} className={i < step ? 'done' : undefined}>
+                  <span className="n">{i < step ? <Icon name="check" size={13} /> : i + 1}</span><span className="label">{s}</span>
+                </button>
+              </li>
+            ))}
+          </ol>
+
+      <section className={`stage${wide ? '' : ' stage-read'}`} aria-live="polite">
         {step === 0 && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
         {step === 1 && (
           <div className={activity ? 'lesson-split' : labActivity || arenaActivity ? 'lesson-stack' : undefined}>
@@ -114,7 +140,7 @@ export function LessonPlayer(p: Props) {
                   allowedParts={labActivity.allowedParts}
                   goals={labActivity.goals}
                   storageKey={`ask:lab:lesson:${p.lesson.id}`}
-                  onGoalsComplete={() => setGoalsDone(true)}
+                  onGoalsComplete={onGoals}
                 />
               </div>
             )}
@@ -128,7 +154,7 @@ export function LessonPlayer(p: Props) {
                   goals={arenaActivity.goals}
                   quickSend={arenaActivity.quickSend}
                   storageKey={`ask:arena:lesson:${p.lesson.id}`}
-                  onGoalsComplete={() => setGoalsDone(true)}
+                  onGoalsComplete={onGoals}
                 />
               </div>
             )}
@@ -142,7 +168,7 @@ export function LessonPlayer(p: Props) {
                   allowPages={activity.allowPages}
                   allowSprites={activity.allowSprites}
                   goals={activity.goals}
-                  onGoalsComplete={() => setGoalsDone(true)}
+                  onGoalsComplete={onGoals}
                 />
               </div>
             )}
@@ -177,15 +203,48 @@ export function LessonPlayer(p: Props) {
         )}
       </section>
 
-      <div className="player-nav">
-        {step > 0
-          ? <button type="button" className="btn btn-ghost" onClick={() => go(step - 1)}>← Geri</button>
-          : p.prevLessonId ? <Link className="btn btn-ghost" href={`/ders/${p.prevLessonId}`}>← Önceki ders</Link> : <span />}
-        {step < STEPS.length - 1
-          ? <button type="button" className="btn btn-primary" onClick={() => go(step + 1)}>İleri →</button>
-          : <span />}
+          <div className="player-nav">
+            {step > 0
+              ? <button type="button" className="btn btn-ghost" onClick={() => go(step - 1)}><Icon name="arrowLeft" size={18} />Geri</button>
+              : p.prevLessonId ? <Link className="btn btn-ghost" href={`/ders/${p.prevLessonId}`}><Icon name="arrowLeft" size={18} />Önceki ders</Link> : <span />}
+            {step < STEPS.length - 1
+              ? <button type="button" className="btn btn-primary" onClick={() => go(step + 1)}>İleri<Icon name="arrowRight" size={18} /></button>
+              : <span />}
+          </div>
+          <p className="kbd-hint">Klavyede ← → tuşlarıyla adımlar arasında gezebilirsin.</p>
+        </div>
+
+        <aside className="lesson-aside" aria-labelledby="bu-derste">
+          <h2 id="bu-derste">Bu derste</h2>
+          <ol className="aside-steps">
+            {STEPS.map((s, i) => (
+              <li key={s} data-state={i === step ? 'now' : i < step ? 'done' : 'todo'}>
+                <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined}>
+                  <span className="n" aria-hidden="true">{i < step ? <Icon name="check" size={12} /> : i + 1}</span>{s}
+                </button>
+              </li>
+            ))}
+          </ol>
+          {goalTexts.length > 0 && (
+            <>
+              <h3>Hedefler</h3>
+              <ul className="aside-goals">
+                {goalTexts.map((t) => <li key={t} data-done={goalsDone}><span className="g" aria-hidden="true">{goalsDone ? <Icon name="check" size={12} /> : null}</span>{t}</li>)}
+              </ul>
+              <p className="aside-note">{goalsDone ? 'Tüm hedefler tamam.' : 'Hedeflerin durumunu Etkinlik adımında canlı görürsün.'}</p>
+            </>
+          )}
+          <h3>Modülde</h3>
+          <div className="progress">
+            <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={modCount.total} aria-valuenow={modCount.done} aria-label="Modül ilerlemesi"><div className="progress-fill" style={{ width: `${modCount.pct}%` }} /></div>
+            <span className="progress-label">{modCount.done} / {modCount.total}</span>
+          </div>
+          <div className="aside-nav">
+            {p.prevLessonId && <Link href={`/ders/${p.prevLessonId}`}><small>Önceki ders</small>{p.prevTitle}</Link>}
+            {p.nextLessonId && <Link href={`/ders/${p.nextLessonId}`}><small>Sonraki ders</small>{p.nextTitle}</Link>}
+          </div>
+        </aside>
       </div>
-      <p className="kbd-hint">Klavyede ← → tuşlarıyla adımlar arasında gezebilirsin.</p>
     </div>
   )
 }

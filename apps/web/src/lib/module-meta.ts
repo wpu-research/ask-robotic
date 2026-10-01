@@ -7,15 +7,17 @@ export const TRACKS: Record<TrackKey, { label: string; hint: string }> = {
 }
 
 /** Modül başına kısa tanıtım. Veritabanında olmayan, sunuma yönelik metinler. */
-export const MODULE_META: Record<string, { tagline: string; audience: string; callout?: string }> = {
+export const MODULE_META: Record<string, { tagline: string; audience: string; ages?: string; callout?: string }> = {
   scratchjr: {
     tagline: 'Blokları sürükle, karakteri programla: sıra, tekrar, olay ve hikâye.',
     audience: '5-7 yaş, yanında bir yetişkinle',
+    ages: '5-7 yaş',
     callout: 'Bütün etkinlikler platformun kendi blok uygulamasında, dersin yanında yapılır. Kurulum ya da ek bir şey gerekmez; tarayıcı yeterli.',
   },
   scratch: {
     tagline: 'Animasyon, hikâye ve oyun yap. Değişken, mesajlaşma, klon ve liste öğren.',
     audience: '8-12 yaş',
+    ages: '8-12 yaş',
     callout: 'Dersler tarayıcıda çalışan Scratch 3 ile yapılır. Hesap açmadan da kullanılabilir.',
   },
   'arduino-temelleri': {
@@ -35,9 +37,38 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ca
   },
 }
 
-/** Henüz veritabanında olmayan modüller (sunum amaçlı). */
+/** Modül türü rozeti: Blok / Devre / Robot. */
+export type ModuleKind = 'blok' | 'devre' | 'robot'
+export const KIND_LABEL: Record<ModuleKind, string> = { blok: 'Blok', devre: 'Devre', robot: 'Robot' }
+export const MODULE_KIND: Record<string, ModuleKind> = {
+  scratchjr: 'blok',
+  scratch: 'blok',
+  'arduino-temelleri': 'devre',
+  'sensorler-ve-projeler': 'devre',
+  robotik: 'robot',
+}
+export const moduleKind = (slug: string): ModuleKind => MODULE_KIND[slug] ?? 'devre'
+
+/** Ders türü rozeti: dersin etkinlik alanında ne açıldığı. */
+export type LessonKind = 'metin' | 'blok' | 'devre' | 'arena'
+export const LESSON_KIND_LABEL: Record<LessonKind, string> = { metin: 'Metin', blok: 'Blok', devre: 'Devre', arena: 'Arena' }
+
+/**
+ * Panelde "Yakında" kartı olarak görünen modüller (veritabanında yok).
+ * Modül 6 (Diğer Kartlar) hiç gösterilmez; Modül 8 ve 9 şimdilik gizlidir (docs/plan-moduller.md).
+ * Açıklama docs/plan-moduller.md'deki modül listesinden alınmıştır; ayrıntı uydurulmaz.
+ */
 export const UPCOMING = [
-  { slug: 'robotik', title: 'Robotik', track: 'maker' as TrackKey, status: 'Yazılıyor' },
-  { slug: 'diger-kartlar', title: 'Diğer Kartlar (ESP32, RP2040, Raspberry Pi)', track: 'maker' as TrackKey, status: 'Planlandı' },
-  { slug: 'ai-engineering', title: 'AI Engineering + Claude', track: 'ai' as TrackKey, status: 'Planlandı' },
+  {
+    slug: 'ai-engineering',
+    position: 7,
+    title: 'AI Engineering + Claude',
+    track: 'ai' as TrackKey,
+    status: 'Planlandı',
+    description: 'Yapay zekâ mühendisliği hattı: AI Engineering ve Claude ile çalışma. Planlandı; içerik henüz yazılmadı.',
+  },
 ]
+
+/** Yaş aralığı etiketi: önce elle girilmiş aralık, yoksa veritabanındaki en küçük yaş. */
+export const ageLabel = (slug: string, minAge: number | null): string | null =>
+  MODULE_META[slug]?.ages ?? (minAge ? `${minAge}+ yaş` : null)

@@ -26,12 +26,10 @@ export default async function Ders({ params }: { params: Promise<{ id: string }>
 
   const ctx = await getLessonContext(db, lessonId)
   if (!ctx) notFound()
+  const tree = await getModuleTree(db, ctx.module.slug)
+  const ids = tree?.weeks.flatMap((w) => w.lessons.map((l) => l.id)) ?? []
   let serverDone: number[] = []
-  if (user) {
-    const tree = await getModuleTree(db, ctx.module.slug)
-    const ids = tree?.weeks.flatMap((w) => w.lessons.map((l) => l.id)) ?? []
-    serverDone = [...(await getCompletedLessonIds(db, user.id, ids))]
-  }
+  if (user) serverDone = [...(await getCompletedLessonIds(db, user.id, ids))]
 
   return (
     <LessonPlayer
@@ -50,6 +48,9 @@ export default async function Ders({ params }: { params: Promise<{ id: string }>
       position={{ index: ctx.index, total: ctx.total }}
       prevLessonId={ctx.prev?.id ?? null}
       nextLessonId={ctx.next?.id ?? null}
+      prevTitle={ctx.prev?.title ?? null}
+      nextTitle={ctx.next?.title ?? null}
+      moduleLessonIds={ids}
       activityKey={activityKey(ctx.module.slug, ctx.week.position, ctx.lesson.position)}
       callout={MODULE_META[ctx.module.slug]?.callout}
       serverSync={!!user}

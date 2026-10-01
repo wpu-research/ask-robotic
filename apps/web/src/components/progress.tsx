@@ -7,8 +7,10 @@ export function ProgressBar({ ids, label = true }: { ids: number[]; label?: bool
   const n = ids.filter((i) => done.has(i)).length
   const pct = ids.length ? Math.round((n / ids.length) * 100) : 0
   return (
-    <div className="progress" aria-label={`${n} / ${ids.length} ders tamamlandı`}>
-      <div className="progress-track"><div className="progress-fill" style={{ width: `${pct}%` }} /></div>
+    <div className="progress">
+      <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={ids.length} aria-valuenow={n} aria-label={`${n} / ${ids.length} ders tamamlandı`}>
+        <div className="progress-fill" style={{ width: `${pct}%` }} />
+      </div>
       {label && <span className="progress-label">{n} / {ids.length}</span>}
     </div>
   )

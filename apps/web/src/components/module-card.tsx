@@ -1,23 +1,62 @@
+'use client'
 import Link from 'next/link'
-import { MODULE_META, TRACKS } from '@/lib/module-meta'
-import { hours, type ModuleSummary } from '@/lib/summaries'
-import { ProgressBar } from './progress'
+import type { CatalogModule } from '@/lib/catalog'
+import { moduleLessonIds, countDone, moduleState } from '@/lib/dashboard'
+import { ageLabel, TRACKS, UPCOMING } from '@/lib/module-meta'
+import { hoursLabel } from '@/lib/format'
+import { useActivity } from '@/lib/activity-store'
+import { useDoneIds } from '@/lib/progress-store'
+import { Icon } from './shell/icons'
+import { KindBadge, StatusPill } from './badges'
 
-export function ModuleCard({ m }: { m: ModuleSummary }) {
-  const meta = MODULE_META[m.slug]
+export function ModuleCard({ m }: { m: CatalogModule }) {
+  const done = useDoneIds()
+  const act = useActivity()
+  const ids = moduleLessonIds(m)
+  const c = countDone(ids, done)
+  const state = moduleState(ids, done, act.opened)
+  const minutes = m.weeks.reduce((n, w) => n + w.lessons.reduce((k, l) => k + l.durationMin, 0), 0)
+  const age = ageLabel(m.slug, m.minAge)
   return (
-    <Link href={`/moduller/${m.slug}`} className={`card card-link track-${m.track}`}>
-      <div className="card-top">
-        <span className="step-no">MODÜL {m.position}</span>
-        <span className="chip chip-track">{TRACKS[m.track].label}</span>
+    <Link href={`/moduller/${m.slug}`} className={`mcard track-${m.track}`}>
+      <div className="mcard-top">
+        <span className="mcard-no">Modül {m.position}</span>
+        <KindBadge kind={m.kind} />
       </div>
       <h3>{m.title}</h3>
-      <p>{meta?.tagline}</p>
-      <div className="meta">
-        <span>{m.lessons} ders</span><span>{m.weeks} hafta</span><span>~{hours(m.minutes)}</span>
-        {m.minAge ? <span>{m.minAge}+ yaş</span> : null}
+      <p className="mcard-desc">{m.tagline}</p>
+      <ul className="facts" aria-label="Modül bilgisi">
+        <li>{ids.length} ders</li>
+        <li>{m.weeks.length} hafta</li>
+        <li>~{hoursLabel(minutes)}</li>
+        {age && <li>{age}</li>}
+      </ul>
+      <div className="mcard-foot">
+        <div className="progress">
+          <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={ids.length} aria-valuenow={c.done} aria-label={`Modül ${m.position} ilerleme`}>
+            <div className="progress-fill" style={{ width: `${c.pct}%` }} />
+          </div>
+          <span className="progress-label">{c.done} / {ids.length}</span>
+        </div>
+        <div className="mcard-state">
+          <StatusPill status={state} />
+          <span className="mcard-go">{state === 'yok' ? 'Başla' : state === 'bitti' ? 'Gözden geçir' : 'Devam et'}<Icon name="arrowRight" size={16} /></span>
+        </div>
       </div>
-      <div className="card-foot"><ProgressBar ids={m.lessonIds} /></div>
     </Link>
+  )
+}
+
+export function SoonCard({ u }: { u: (typeof UPCOMING)[number] }) {
+  return (
+    <div className={`mcard mcard-soon track-${u.track}`} aria-disabled="true">
+      <div className="mcard-top">
+        <span className="mcard-no">Modül {u.position}</span>
+        <span className="badge-soon"><Icon name="lock" size={12} />Yakında</span>
+      </div>
+      <h3>{u.title}</h3>
+      <p className="mcard-desc">{u.description}</p>
+      <ul className="facts"><li>{TRACKS[u.track].label}</li><li>{u.status}</li></ul>
+    </div>
   )
 }

@@ -1,23 +1,22 @@
 import type { ReactNode } from 'react'
 import './globals.css'
-import { SiteFooter, SiteHeader } from '@/components/site-header'
+import { AppShell } from '@/components/shell/app-shell'
+import { authEnabled } from '@/lib/flags'
 
 export const metadata = {
   title: { default: 'ASK Robotic', template: '%s · ASK Robotic' },
   description: "0'dan AI robotik mühendisliğine: Scratch'ten Arduino'ya, sensörlerden robotlara adım adım dersler.",
 }
 
-// Tema tercihi boyamadan önce uygulanır (yanıp sönmeyi önler)
-const themeScript = `try{var t=localStorage.getItem('ask:theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t}catch(e){}`
+// Tema ve kenar çubuğu tercihi boyamadan önce uygulanır (yanıp sönmeyi önler)
+const bootScript = `try{var d=document.documentElement,t=localStorage.getItem('ask:theme');if(t==='dark'||t==='light')d.dataset.theme=t;if(localStorage.getItem('ask:sidebar')==='1')d.dataset.sb='1'}catch(e){}`
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="tr" suppressHydrationWarning>
-      <head><script dangerouslySetInnerHTML={{ __html: themeScript }} /></head>
+      <head><script dangerouslySetInnerHTML={{ __html: bootScript }} /></head>
       <body>
-        <SiteHeader />
-        <main>{children}</main>
-        <SiteFooter />
+        <AppShell authOn={authEnabled()}>{children}</AppShell>
       </body>
     </html>
   )
