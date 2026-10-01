@@ -1,0 +1,16 @@
+{
+  "slug": "arduino-temelleri",
+  "title": "Arduino Temelleri",
+  "track": "maker",
+  "position": 3,
+  "minAge": 12,
+  "weeks": [
+    { "dir": "h1", "title": "Temeller", "project": "Trafik ışığı", "lessons": 5 },
+    { "dir": "h2", "title": "Girdi ve mantık", "project": "Kapı zili ve sayaç", "lessons": 5 },
+    { "dir": "h3", "title": "Analog dünya", "project": "Akıllı gece lambası", "lessons": 5 },
+    { "dir": "h4", "title": "PWM, renk, ses", "project": "Işıklı müzik kutusu", "lessons": 5 },
+    { "dir": "h5", "title": "Motorlar", "project": "Otomatik fan ve servo tarayıcı", "lessons": 5 },
+    { "dir": "h6", "title": "Zamanlama", "project": "Çoklu görev paneli", "lessons": 5 },
+    { "dir": "h7", "title": "Ekranlar ve veri", "project": "Termostat", "lessons": 5 }
+  ]
+}

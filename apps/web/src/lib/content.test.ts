@@ -32,6 +32,16 @@ describe('içerik verisi', () => {
     expect(m.weeks.flatMap((w) => w.lessons)).toHaveLength(16)
     expect(m.minAge).toBe(8)
   })
+  it('Modül 3: 7 hafta, 35 ders, her derste en az bir sketch', () => {
+    const m = allModules.find((x) => x.slug === 'arduino-temelleri')!
+    expect(m.weeks).toHaveLength(7)
+    const lessons = m.weeks.flatMap((w) => w.lessons)
+    expect(lessons).toHaveLength(35)
+    // 01 ve 02 saf kavram dersleri: sketch zorunlu değil
+    const withSketch = lessons.filter((l) => l.contentMd.includes('// sketch:'))
+    expect(withSketch.length).toBeGreaterThanOrEqual(30)
+    expect(m.track).toBe('maker')
+  })
   it('modül konumları ve slug\'lar benzersiz', () => {
     expect(new Set(allModules.map((m) => m.slug)).size).toBe(allModules.length)
     expect(new Set(allModules.map((m) => m.position)).size).toBe(allModules.length)
@@ -53,7 +63,7 @@ describe('seed', () => {
     const before = await count()
     await seedContent(db)
     expect(await count()).toEqual(before)
-    expect(before).toEqual([2, 13, 26])
+    expect(before).toEqual([3, 20, 61])
   })
   it('içerik değişince günceller', async () => {
     const changed = structuredClone(allModules)

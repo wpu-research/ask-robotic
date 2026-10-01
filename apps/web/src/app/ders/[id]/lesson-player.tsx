@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
+import { LessonMarkdown } from './lesson-markdown'
 
 interface Props {
   lesson: { id: number; title: string; durationMin: number; problem: string; contentMd: string; question: string }
@@ -58,7 +58,7 @@ export function LessonPlayer(p: Props) {
 
       <section style={{ minHeight: 200, fontSize: 18, lineHeight: 1.6 }}>
         {step === 0 && <p style={{ fontSize: 22 }}>{p.lesson.problem}</p>}
-        {step === 1 && <ReactMarkdown>{p.lesson.contentMd}</ReactMarkdown>}
+        {step === 1 && <LessonMarkdown>{p.lesson.contentMd}</LessonMarkdown>}
         {step === 2 && (
           <>
             <p style={{ color: '#666' }}>Birlikte konuşun:</p>

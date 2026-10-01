@@ -9,7 +9,9 @@
     "clean": "turbo clean",
     "db:generate": "turbo db:generate --filter=@ask/db",
     "db:migrate": "turbo db:migrate --filter=@ask/db",
-    "test": "turbo test"
+    "test": "turbo test",
+    "content:build": "node tools/content/build.mjs modul-3",
+    "content:check": "node tools/sim/check.mjs modul-3"
   },
   "devDependencies": {
     "turbo": "^2.5.0",
