@@ -4,6 +4,7 @@ import { getDb } from '@/lib/db'
 import { authEnabled } from '@/lib/flags'
 import { getCurrentUser } from '@/lib/auth/current'
 import { getCompletedLessonIds, getLessonContext, getModuleTree } from '@/lib/content'
+import { activityKey } from '@/lib/jr/activity'
 import { MODULE_META } from '@/lib/module-meta'
 import { LessonPlayer } from './lesson-player'
 
@@ -49,6 +50,7 @@ export default async function Ders({ params }: { params: Promise<{ id: string }>
       position={{ index: ctx.index, total: ctx.total }}
       prevLessonId={ctx.prev?.id ?? null}
       nextLessonId={ctx.next?.id ?? null}
+      activityKey={activityKey(ctx.module.slug, ctx.week.position, ctx.lesson.position)}
       callout={MODULE_META[ctx.module.slug]?.callout}
       serverSync={!!user}
       serverDone={serverDone}

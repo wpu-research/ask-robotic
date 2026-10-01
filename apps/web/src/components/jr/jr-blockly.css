@@ -1,0 +1,62 @@
+/* ASK Jr — Blockly (zelos) editörü. Yerleşim: geniş konteynerde solda blok alanı, sağda sahne (Scratch 3 gibi). */
+.jrb { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); grid-template-areas: 'stage' 'main' 'extras'; font-size: 15px; }
+.jrb-stagecol { grid-area: stage; display: flex; flex-direction: column; gap: 10px; min-width: 0; width: 100%; max-width: 400px; justify-self: center; }
+.jrb-main { grid-area: main; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+.jrb-extras { grid-area: extras; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+/* Üst çubuk: yeşil bayrak + kırmızı dur */
+.jrb-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.jrb-spacer { flex: 1; }
+.jrb-flag, .jrb-stop { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 18px 6px 12px; border-radius: 999px; border: 0; font: inherit; font-size: 1.05rem; color: #fff; cursor: pointer; box-shadow: 0 3px 0 rgba(0, 0, 0, .22); }
+.jrb-flag span, .jrb-stop span { font-size: 1.5rem; line-height: 1; }
+.jrb-flag { background: #1fa855; }
+.jrb-flag:hover { background: #178a45; }
+.jrb-stop { background: #e5484d; }
+.jrb-stop:hover:not(:disabled) { background: #c93a3f; }
+.jrb-stop:disabled { opacity: .4; cursor: not-allowed; box-shadow: none; }
+.jrb-flag:active, .jrb-stop:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 rgba(0, 0, 0, .22); }
+.jrb[data-running='true'] .jrb-flag { outline: 3px solid #86e3a8; outline-offset: 2px; }
+
+/* Karakter bilgi paneli */
+.jrb-info { display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; padding: 8px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--border); font-size: .88rem; color: var(--muted); }
+.jrb-info b { color: var(--text); font-variant-numeric: tabular-nums; }
+.jrb-info-name { font-size: 1rem; color: var(--text); margin-right: 4px; }
+.jrb-info-vis[data-visible='false'] { color: #b45309; }
+.jrb-footer { display: flex; justify-content: flex-end; }
+
+/* Çalışma alanı kabı */
+.jrb-ws { position: relative; height: 460px; min-height: 360px; border: 2px solid var(--border); border-radius: 14px; overflow: hidden; background: #f3f6fc; touch-action: none; }
+.jrb-host { position: absolute; inset: 0; }
+.jrb-hint { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5; pointer-events: none; padding: 12px 20px; border-radius: 16px; background: rgba(255, 255, 255, .85); color: #6b7488; font-weight: 800; font-size: 1.05rem; text-align: center; max-width: 80%; box-shadow: 0 2px 10px rgba(0, 0, 0, .08); }
+.jrb-fail { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; color: #b91c1c; font-weight: 700; }
+
+/* Araç kutusu: Scratch gibi dikey kategori sütunu (renkli yuvarlak simge + altında etiket) */
+.jrb-ws .blocklyToolbox { width: 78px; padding: 6px 0; background: #fff; border-right: 1px solid #d5dbe8; overflow-y: auto; }
+.jrb-ws .blocklyToolboxCategory { height: auto !important; margin: 0 4px 2px; padding: 6px 0 5px !important; border-left: 0 !important; border-radius: 12px; cursor: pointer; }
+.jrb-ws .blocklyTreeRowContentContainer { display: flex; flex-direction: column; align-items: center; gap: 3px; }
+.jrb-ws [class*='jrb-ic-'] { display: grid !important; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--jrb-c, #888); box-shadow: 0 2px 0 rgba(0, 0, 0, .18); }
+.jrb-ws [class*='jrb-ic-']::after { font-size: 22px; line-height: 1; }
+.jrb-ws .jrb-ic-start::after { content: '🏁'; }
+.jrb-ws .jrb-ic-motion::after { content: '🏃'; }
+.jrb-ws .jrb-ic-looks::after { content: '👀'; }
+.jrb-ws .jrb-ic-sound::after { content: '🔊'; }
+.jrb-ws .jrb-ic-control::after { content: '🔁'; }
+.jrb-ws .jrb-ic-end::after { content: '🛑'; }
+.jrb-ws .blocklyToolboxCategoryLabel { margin: 0 !important; padding: 0 !important; font-size: 12px; font-weight: 800; color: #575e75; line-height: 1.1; text-align: center; }
+.jrb-ws .blocklyToolboxCategory.blocklyToolboxSelected { background: color-mix(in srgb, var(--jrb-c, #4c97ff) 16%, #fff) !important; box-shadow: inset 0 0 0 2px var(--jrb-c, #4c97ff); }
+.jrb-ws .blocklyToolboxSelected .blocklyToolboxCategoryLabel { color: #1f2540 !important; }
+@media (max-width: 520px) { .jrb-ws .blocklyToolbox { width: 66px; } .jrb-ws [class*='jrb-ic-'] { width: 38px; height: 38px; } .jrb-ws [class*='jrb-ic-']::after { font-size: 19px; } .jrb-ws .blocklyToolboxCategoryLabel { font-size: 11px; } }
+
+/* Yetim yığın soluk, çalışan yığın parlar */
+.jrb-ws .jrb-orphan { opacity: .62; }
+.jrb-ws .jrb-running { filter: drop-shadow(0 0 7px #ffd23f) drop-shadow(0 0 3px #fff3b0); }
+.jrb-ws .blocklyFlyoutBackground { fill: #e6edf7; }
+.blocklyDropDownDiv, .blocklyWidgetDiv { z-index: 1000; }
+.jrb-ws .blocklyHtmlInput { font-size: 17px; font-weight: 700; }
+
+@container (min-width: 880px) {
+  .jrb { grid-template-columns: minmax(0, 1fr) minmax(340px, 460px); grid-template-areas: 'main stage' 'main extras'; align-items: start; }
+  .jrb-stagecol { max-width: none; justify-self: stretch; }
+  .jrb-main { align-self: stretch; }
+  .jrb-ws { height: 100%; min-height: 560px; }
+}

@@ -95,7 +95,7 @@ describe('sorgular', () => {
     const t = (await getModuleTree(db, 'scratchjr'))!
     expect(t.weeks.map((w) => w.position)).toEqual([1, 2, 3, 4, 5])
     expect(t.weeks[0].lessons.map((l) => l.position)).toEqual([1, 2])
-    expect(t.weeks[0].lessons[0].title).toBe('Robot oyunu (ekransız)')
+    expect(t.weeks[0].lessons[0].title).toBe('Robot oyunu')
   })
   it('olmayan modül null döner', async () => {
     expect(await getModuleTree(db, 'yok')).toBeNull()

@@ -16,6 +16,8 @@ export function SiteHeader() {
         </Link>
         <nav className="nav" aria-label="Ana menü">
           <Link href="/moduller">Modüller</Link>
+          <Link href="/atolye">Blok atölyesi</Link>
+          <Link href="/laboratuvar">Devre laboratuvarı</Link>
           {authEnabled() && <Link href="/giris">Giriş</Link>}
           <ThemeToggle />
         </nav>

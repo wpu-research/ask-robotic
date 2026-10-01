@@ -10,12 +10,16 @@
 5. Robotik (40 ders)
 6. Diğer Kartlar (ESP32, RP2040, Pi)
 7. AI Engineering + Claude
+8. Endüstriyel robot kolu (KUKA tarzı)
+9. Drone
+
+**Portal tamamen sanaldır:** hiçbir fiziki malzeme kullanılmaz. Ayrıntı ve modül planı: [docs/plan-moduller.md](docs/plan-moduller.md).
 
 ## Durum
 Modül 1-4 içeriği yazıldı (Modül 3-4: 75 ders, sketch'ler simülasyonda doğrulandı). Modül 5 yazılıyor; plan (115 ders): [docs/modul-3-4-5-plan.md](docs/modul-3-4-5-plan.md). Araştırma kaydı: [docs/mufredat-taslak.md](docs/mufredat-taslak.md)
 
 ## Kararlar
-- Kit satılmaz; her ders önce tarayıcı simülasyonunda çalışır.
+- Portal tamamen sanal: kit, kart, kâğıt, fiziki hiçbir şey yok. Her etkinlik tarayıcıda, kendi araçlarımızla yapılır (karar: 2026-10-01).
 - Önce platform omurgası, modüller sırayla.
 - Kendi simülatör (avr8js + rp2040js + Blockly); Velxio/Wokwi yedek.
 - Her bölüm sonunda 3D robot (fizik 2D, 3D yalnız görüntüleme).

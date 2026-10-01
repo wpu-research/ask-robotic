@@ -13,6 +13,7 @@ const props = {
   position: { index: 1, total: 10 },
   prevLessonId: null as number | null,
   nextLessonId: 2,
+  activityKey: null as string | null,
   serverSync: false,
   serverDone: [] as number[],
 }

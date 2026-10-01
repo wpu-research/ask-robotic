@@ -1,5 +1,5 @@
 {
-  "name": "@ask/sim",
+  "name": "@ask/lesson-checker",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -7,6 +7,7 @@
     "check": "node check.mjs"
   },
   "dependencies": {
+    "@ask/sim": "workspace:*",
     "avr8js": "^0.20.0"
   }
 }

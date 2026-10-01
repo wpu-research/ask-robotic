@@ -9,9 +9,9 @@ export const TRACKS: Record<TrackKey, { label: string; hint: string }> = {
 /** Modül başına kısa tanıtım. Veritabanında olmayan, sunuma yönelik metinler. */
 export const MODULE_META: Record<string, { tagline: string; audience: string; callout?: string }> = {
   scratchjr: {
-    tagline: 'Ekranlı ve ekransız etkinliklerle ilk algoritmalar: sıra, tekrar, olay.',
+    tagline: 'Blokları sürükle, karakteri programla: sıra, tekrar, olay ve hikâye.',
     audience: '5-7 yaş, yanında bir yetişkinle',
-    callout: 'Bu modül ScratchJr uygulamasını (tablet veya telefon) gerektirir. Ücretsizdir; ekransız etkinlikler için cihaz gerekmez.',
+    callout: 'Bütün etkinlikler platformun kendi blok uygulamasında, dersin yanında yapılır. Kurulum ya da ek bir şey gerekmez; tarayıcı yeterli.',
   },
   scratch: {
     tagline: 'Animasyon, hikâye ve oyun yap. Değişken, mesajlaşma, klon ve liste öğren.',
@@ -21,7 +21,7 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ca
   'arduino-temelleri': {
     tagline: 'LED\'den termostata: giriş/çıkış, analog, PWM, motor, zamanlama ve ekran.',
     audience: '12 yaş ve üzeri, sıfırdan başlayanlar',
-    callout: 'Her ders bir devre ve çalışan bir Arduino programı içerir; programlar bir Arduino Uno benzetiminde derlenip çalıştırılarak doğrulandı. Platformun kendi devre simülatörü henüz yok: devreleri kendi kartında ya da Wokwi, Tinkercad gibi bir simülatörde kurabilirsin.',
+    callout: 'Her ders bir devre ve çalışan bir Arduino programı içerir; programlar bir Arduino Uno benzetiminde derlenip çalıştırılarak doğrulandı. Platformun kendi devre simülatörü geliştirme aşamasında; o gelene kadar devreleri kendi kartında ya da Wokwi, Tinkercad gibi bir simülatörde kurabilirsin.',
   },
   'sensorler-ve-projeler': {
     tagline: 'Mesafe, hareket, ortam, ses, gaz ve kimlik sensörleri. Her hafta bir proje.',

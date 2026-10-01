@@ -1,7 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { JrEditor } from '@/components/jr/jr-editor'
+import { LabEditor } from '@/components/lab/lab-editor'
+import { getActivity } from '@/lib/jr/activity'
+import { getLabActivity } from '@/lib/lab/activity'
 import { markDone, unmarkDone, useDoneIds } from '@/lib/progress-store'
 import { LessonMarkdown } from './lesson-markdown'
 
@@ -15,6 +19,8 @@ interface Props {
   prevLessonId: number | null
   nextLessonId: number | null
   callout?: string
+  /** Bu derste yazının yanında açılan uygulama etkinliği (yoksa null). */
+  activityKey?: string | null
   serverSync: boolean
   serverDone: number[]
 }
@@ -25,7 +31,12 @@ const STEPS = ['Merak', 'Etkinlik', 'Konuşalım', 'Bitti'] as const
 export function LessonPlayer(p: Props) {
   const [step, setStep] = useState(0)
   const [error, setError] = useState('')
+  const [goalsDone, setGoalsDone] = useState(false)
   const doneIds = useDoneIds()
+  const activity = useMemo(() => getActivity(p.activityKey), [p.activityKey])
+  const starter = useMemo(() => activity?.starter(), [activity])
+  const labActivity = useMemo(() => getLabActivity(p.activityKey), [p.activityKey])
+  const labStarter = useMemo(() => labActivity?.starter(), [labActivity])
   const done = doneIds.has(p.lesson.id)
 
   // Giriş açıkken sunucudaki ilerleme tarayıcıdakiyle birleştirilir
@@ -54,7 +65,7 @@ export function LessonPlayer(p: Props) {
   }
 
   return (
-    <div className={`container container-narrow ${p.trackClass}`}>
+    <div className={`container ${(activity || labActivity) && step === 1 ? 'container-wide' : 'container-narrow'} ${p.trackClass}`}>
       <div className="player-top">
         <p className="crumbs">
           <Link href="/moduller">Modüller</Link> / <Link href={`/moduller/${p.moduleSlug}`}>{p.moduleTitle}</Link> / {p.weekLabel}
@@ -80,15 +91,44 @@ export function LessonPlayer(p: Props) {
       <section className="stage" aria-live="polite">
         {step === 0 && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
         {step === 1 && (
-          <>
-            {p.callout && (
-              <details className="callout" style={{ marginTop: 0 }}>
-                <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Bu ders hakkında bilmen gerekenler</summary>
-                <p style={{ margin: '8px 0 0' }}>{p.callout}</p>
-              </details>
+          <div className={activity ? 'lesson-split' : labActivity ? 'lesson-stack' : undefined}>
+            <div>
+              {p.callout && (
+                <details className="callout" style={{ marginTop: 0 }}>
+                  <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Bu ders hakkında bilmen gerekenler</summary>
+                  <p style={{ margin: '8px 0 0' }}>{p.callout}</p>
+                </details>
+              )}
+              <LessonMarkdown>{p.lesson.contentMd}</LessonMarkdown>
+            </div>
+            {labActivity && labStarter && (
+              <div className="lesson-lab" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+                {labActivity.intro && <p className="lesson-app-intro">{labActivity.intro}</p>}
+                <LabEditor
+                  initial={labStarter.circuit}
+                  initialCode={labStarter.code}
+                  allowedParts={labActivity.allowedParts}
+                  goals={labActivity.goals}
+                  storageKey={`ask:lab:lesson:${p.lesson.id}`}
+                  onGoalsComplete={() => setGoalsDone(true)}
+                />
+              </div>
             )}
-            <LessonMarkdown>{p.lesson.contentMd}</LessonMarkdown>
-          </>
+            {activity && starter && (
+              <div className="lesson-app" data-activity={p.activityKey}>
+                {activity.intro && <p className="lesson-app-intro">{activity.intro}</p>}
+                <JrEditor
+                  initial={starter}
+                  storageKey={`ask:jr:lesson:${p.lesson.id}`}
+                  allowedBlocks={activity.allowedBlocks}
+                  allowPages={activity.allowPages}
+                  allowSprites={activity.allowSprites}
+                  goals={activity.goals}
+                  onGoalsComplete={() => setGoalsDone(true)}
+                />
+              </div>
+            )}
+          </div>
         )}
         {step === 2 && (<><div className="stage-label">Birlikte konuşun</div><p className="stage-big">{p.lesson.question}</p></>)}
         {step === 3 && (
@@ -108,6 +148,9 @@ export function LessonPlayer(p: Props) {
             ) : (
               <>
                 <h2>Etkinliği bitirdin mi?</h2>
+                {(activity || labActivity) && (
+                  <p className="muted">{goalsDone ? 'Uygulamadaki tüm hedefleri tamamladın.' : 'Uygulamadaki hedeflerin hepsi henüz tamamlanmadı; yine de devam edebilirsin.'}</p>
+                )}
                 <p className="muted">Tamamladığında ilerlemene işlenir.</p>
                 <button type="button" className="btn btn-primary btn-lg" onClick={finish}>Dersi tamamladım</button>
               </>

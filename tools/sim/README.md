@@ -44,7 +44,7 @@ LCD, I2C cihazları, sıcaklık/ışık gibi gerçek sensörler yok: LCD/I2C ske
 
 ---
 
-# Cihaz modelleri (Modül 4) — `tools/sim/devices.mjs`
+# Cihaz modelleri (Modül 4) — `packages/sim/src/devices.ts` (`@ask/sim`)
 Gerçek Arduino kütüphaneleriyle doğrulandı. `createSim` sonrası, `sim.run()` ÖNCESİ bağla.
 
 | Çağrı | Ne yapar |
@@ -58,7 +58,7 @@ Gerçek Arduino kütüphaneleriyle doğrulandı. `createSim` sonrası, `sim.run(
 | `const lcd = sim.lcdI2C({address:0x27})` | LiquidCrystal_I2C. `lcd.text`, `lcd.backlight`. NOT: kütüphane başlangıçta ~1 sn bekler, ≥1500 ms çalıştır |
 | `const k = sim.keypad({rows:[..], cols:[..]})` | Keypad kütüphanesiyle (sütunlar taranır, satırlar okunur). `k.press('5')`, `k.release()` |
 | `sim.state(pin)` | 'High' \| 'Low' (çıkış) ya da 'Input' \| 'InputPullUp' |
-| `sim.i2c.add({address, write(v), read()})` | Özel I2C cihazı. `registerDevice` (devices.mjs) yazmaç göstergeli cihazlar içindir |
+| `sim.i2c.add({address, write(v), read()})` | Özel I2C cihazı. `registerDevice` (packages/sim/src/devices.ts) yazmaç göstergeli cihazlar içindir |
 
 Basit sensörler (PIR, IR engel, reed, buton, joystick, enkoder, flame/MQ-2/toprak nemi/ses) için model GEREKMEZ: `sim.drive(pin, high)` ve `sim.analog(kanal, volt)` yeterli. Döner enkoder: CLK/DT pinlerini `drive` ile 90° faz farklı sür.
 
@@ -66,7 +66,7 @@ Basit sensörler (PIR, IR engel, reed, buton, joystick, enkoder, flame/MQ-2/topr
 
 Kurulu kütüphaneler: Servo, LiquidCrystal, LiquidCrystal_I2C, Wire, EEPROM, SPI, SoftwareSerial, DHT sensor library, Adafruit Unified Sensor, Adafruit BMP280, Adafruit BusIO, RTClib, Keypad, NewPing, MFRC522, IRremote, SD, VL53L0X, Adafruit SSD1306, Adafruit GFX.
 
-# Robot benzetimi (Modül 5) — `tools/sim/robot.mjs`
+# Robot benzetimi (Modül 5) — `@ask/sim` (`packages/sim/src/robot.ts`; `tools/sim/robot.mjs` yeniden-export eder)
 ```js
 import { Arena, STD_MOTORS, STD_ENCODERS, STD_ULTRASONIC } from '../../../tools/sim/robot.mjs'   // checks.mjs içinden
 const arena = Arena.box(2, 2).line([[0.2,1],[1.8,1]]).wall(x1,y1,x2,y2)   // metre; çizgi genişliği arena.lineWidth (0,02)
