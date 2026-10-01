@@ -59,3 +59,12 @@ export const progress = pgTable('progress', {
   status: progressStatus('status').notNull().default('started'),
   completedAt: timestamp('completed_at', { withTimezone: true }),
 }, (t) => [uniqueIndex('progress_pk').on(t.userId, t.lessonId)])
+
+export const sessions = pgTable('sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  // Çerezdeki ham token tutulmaz; yalnızca SHA-256 özeti saklanır
+  tokenHash: text('token_hash').notNull().unique(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+})
