@@ -1,3 +1,5 @@
+> **Not (2026-10-01):** Modül 3-5 bölümleri [modul-3-4-5-plan.md](modul-3-4-5-plan.md) ile değiştirildi (115 ders). Burada kalanlar araştırma kaydıdır.
+
 # Modül 3-5 Müfredat Taslağı — Arduino · Gerçek Kart · Robotik ve Sensörler
 
 Durum: taslak v0 (2026-10-01). Kit satılmıyor; her ders önce tarayıcı simülasyonunda çalışır.

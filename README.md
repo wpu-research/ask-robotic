@@ -5,14 +5,14 @@
 ## Modüller
 1. ScratchJr (5-7 yaş)
 2. Scratch 3 (8-12 yaş)
-3. Arduino Simülasyon
-4. Simülasyondan Gerçeğe
-5. Robotik ve Sensörler
+3. Arduino Temelleri (35 ders)
+4. Sensörler ve Projeler (40 ders)
+5. Robotik (40 ders)
 6. Diğer Kartlar (ESP32, RP2040, Pi)
 7. AI Engineering + Claude
 
 ## Durum
-Taslak aşaması. Müfredat: [docs/mufredat-taslak.md](docs/mufredat-taslak.md)
+Modül 1-2 içeriği yazıldı. Modül 3-5 planı (115 ders): [docs/modul-3-4-5-plan.md](docs/modul-3-4-5-plan.md). Araştırma kaydı: [docs/mufredat-taslak.md](docs/mufredat-taslak.md)
 
 ## Kararlar
 - Kit satılmaz; her ders önce tarayıcı simülasyonunda çalışır.
