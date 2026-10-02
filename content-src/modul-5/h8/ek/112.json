@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Ölü bölge",
+      "definition": "Motorun hiç dönmediği düşük PWM aralığı; bu robotta PWM'in %20'si (51).",
+      "example": "`map(abs(hiz), 1, 255, 51, 255)` ile komut 128 olunca çıkış 153 olur.",
+      "pitfall": "Düşük PWM verip motorun \"çalışmıyor\" olduğunu sanmak."
+    },
+    {
+      "term": "Yankı süresinden mesafe",
+      "definition": "HC-SR04 mesafeyi değil süreyi verir; yaklaşık 58 µs = 1 cm.",
+      "example": "`pulseIn` 1160 µs verirse mesafe 1160 / 58 = 20 cm.",
+      "pitfall": "Yankı gelmeyen 0 sonucunu 0 cm sanmak; kodda \"çok uzak\" (400) olarak ele alınır."
+    },
+    {
+      "term": "Servo darbe genişliği",
+      "definition": "Açıyı mikrosaniyeye çeviren doğrusal bağıntı: us = 544 + açı × 1856 / 180.",
+      "example": "45° için 1008 µs; 90° için 1472 µs.",
+      "pitfall": "`write()` içine derece yerine mikrosaniye ya da radyan yazmak."
+    },
+    {
+      "term": "Gidiş-dönüş sınaması",
+      "definition": "Ters kinematikle bulunan açıları ileri kinematiğe geri sokup hedefe dönülüp dönülmediğine bakmak.",
+      "example": "`g 12 4` için omuz 69,20° ve dirsek 101,54° bulunur; ileri kinematik `12.00, 4.00` verir.",
+      "pitfall": "Servoyu ters takıp formülü suçlamak: açı düzenini fiziksel kolla da karşılaştır."
+    },
+    {
+      "term": "Ortanca (medyan) filtre",
+      "definition": "Son üç ölçümün ortadaki değerini kullanan filtre; tek bir kötü okumayı eler.",
+      "example": "20, 90, 21 cm ölçümlerinde sonuç 21 cm.",
+      "pitfall": "Filtresiz ölçümü PID'in türev terimine vermek: gürültüyü büyütür."
+    },
+    {
+      "term": "Windup sınırı",
+      "definition": "PID integralinin üst-alt sınırla tutulması ve çıkış doyunca büyütülmemesi.",
+      "example": "`constrain(integral + hata * dt, -40, 40)`",
+      "pitfall": "Integral sınırlamamak: robot uzun süre ulaşamazsa integral şişer ve hedefi aşar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d2-q1",
+      "kind": "numeric",
+      "prompt": "Servo sürücüde `dereceyiUsYap(45)` çağrılıyor (0° = 544 µs, 180° = 2400 µs, doğrusal). Darbe genişliği kaç µs olur?",
+      "answer": 1008,
+      "tolerance": 1,
+      "unit": "µs",
+      "explanation": "544 + 45 × (2400 - 544) / 180 = 544 + 464 = 1008 µs. Doğruluk kontrolü: 0° için 544 µs, 90° için 1472 µs; 45° bu ikisinin tam ortasıdır: (544 + 1472) / 2 = 1008.",
+      "skills": [
+        "rob-servo-pulse"
+      ]
+    },
+    {
+      "id": "m5h8d2-q2",
+      "kind": "predict-output",
+      "prompt": "Ortanca filtre üç değeri sıralıyor. Bu kod ne yazar?\n```\nfloat a = 20, b = 90, c = 21;\nif (a > b) { float t = a; a = b; b = t; }\nif (b > c) { float t = b; b = c; c = t; }\nif (a > b) { float t = a; a = b; b = t; }\nSerial.println(b);\n```",
+      "options": [
+        "20.00",
+        "90.00",
+        "21.00",
+        "131.00"
+      ],
+      "answer": 2,
+      "explanation": "Birinci kıyas takas yapmaz (20 > 90 yanlış). İkincisi 90 > 21 olduğu için b ile c'yi değiştirir: b = 21, c = 90. Üçüncüsü (20 > 21) yanlıştır. Ortadaki değer b = 21 yazar; `println` float'ı iki ondalıkla yazar. 90 bir aykırı ölçümdü ve elendi.",
+      "skills": [
+        "rob-median",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d2-q3",
+      "kind": "numeric",
+      "prompt": "Her bölümü 10 cm olan iki eksenli kol, ucu (10; 10) cm noktasına götürülüyor. Ters kinematik hangi omuz açısını (derece) verir?",
+      "answer": 90,
+      "tolerance": 0.5,
+      "unit": "°",
+      "explanation": "c = (100 + 100 - 100 - 100) / 200 = 0, dolayısıyla dirsek = acos(0) = 90°. Omuz = atan2(10, 10) + atan2(10 sin 90°, 10 + 10 cos 90°) = 45° + 45° = 90°. Gidiş-dönüş: x = 10 cos 90° + 10 cos 0° = 10, y = 10 sin 90° + 0 = 10.",
+      "skills": [
+        "rob-ik-check"
+      ]
+    },
+    {
+      "id": "m5h8d2-q4",
+      "kind": "find-bug",
+      "prompt": "Çizgi konumu A0 (en sol) için +2, A4 (en sağ) için -2 olmalı. Kodda tek hata var; hangisi?\n```\nfloat cizgiKonum(int &sayi) {\n  float toplam = 0;\n  sayi = 0;\n  for (int i = 0; i < 5; i++) {\n    if (analogRead(CIZGI[i]) > 512) {\n      toplam += i - 2;\n      sayi++;\n    }\n  }\n  return sayi ? toplam / sayi : 0;\n}\n```",
+      "options": [
+        "Döngü `i < 5` yerine `i <= 5` olmalı",
+        "`toplam += i - 2;` yerine `toplam += 2 - i;` olmalı; işaret ters olduğu için robot çizgiden kaçar",
+        "Eşik 512 yerine 1023 olmalı",
+        "`sayi` referans olmamalı"
+      ],
+      "answer": 1,
+      "explanation": "Konum A0 için +2 olmalı: 2 - 0 = +2. Kod i - 2 = -2 verir; konum işareti ters çıkar ve çizgi izleyen robot çizgiden uzaklaşır. `i <= 5` diziden taşar (A5 yok). Eşik 512 ölçülen 164-860 aralığının ortasıdır.",
+      "skills": [
+        "bit-subsystems",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d2-q5",
+      "kind": "mcq",
+      "prompt": "Yol C alt sistemi hedef birden kaybolunca yaklaşık 38 cm ileri koştu. Asıl neden hangisidir?",
+      "options": [
+        "Alt sistemde \"hedef yok\" kararı yok; 400 cm ölçümü \"çok uzakta, git\" diye yorumlanıyor",
+        "PID katsayıları yanlış ayarlandı",
+        "HC-SR04 bozuk",
+        "Motorların ölü bölgesi var"
+      ],
+      "answer": 0,
+      "explanation": "PID kendi işini doğru yaptı: hata büyük, hız büyük. Eksik olan karar katmanıdır (durum makinesi). Çözüm ders 113'te: hedef yoksa hemen dur. KP'yi ya da sensörü değiştirmek belirtiyi gizlerdi, nedeni değil.",
+      "skills": [
+        "bit-subsystems",
+        "rob-failsafe"
+      ]
+    }
+  ]
+}

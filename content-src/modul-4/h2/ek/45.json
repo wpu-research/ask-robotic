@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Durum makinesi",
+      "definition": "Sistemi birkaç adlandırılmış durum ve aralarındaki geçiş kurallarıyla anlatan tasarım.",
+      "example": "Alarm: DEVRE_DISI, HAZIR, ALARM ve SUSTURULDU durumları.",
+      "pitfall": "Durumları bayraklarla karıştırmak: hangi durumda olunduğu belirsizleşir."
+    },
+    {
+      "term": "Çıkış gecikmesi",
+      "definition": "Alarmı kurduktan sonra sensörlerin bir süre dinlenmediği, kullanıcının evden çıkabildiği süre.",
+      "example": "Projede kur butonundan sonra 5 saniye sensörler yok sayılır; kapı hâlâ açıksa kurma iptal olur.",
+      "pitfall": "Gecikmeyi atlamak: kurulur kurulmaz alarm çalar."
+    },
+    {
+      "term": "Mandal",
+      "definition": "Bir ihlal olduktan sonra tetikleyen koşul bitse bile durumun korunması.",
+      "example": "PIR LOW'a dönse ve kapı kapansa bile ALARM şifre ya da süre dolana kadar sürer.",
+      "pitfall": "ALARM'ı doğrudan sensör seviyesine bağlamak: hırsız çıkınca alarm kendiliğinden susar."
+    },
+    {
+      "term": "Şifre penceresi",
+      "definition": "Şifrenin belirli bir süre içinde (ilk basıştan itibaren) girilmesi koşulu.",
+      "example": "3 saniye içinde 3 basış. İlk basıştan 3 saniye geçerse sayaç yeniden başlar.",
+      "pitfall": "Pencereyi son basıştan saymak; kazara basışlar birikir."
+    },
+    {
+      "term": "Bloklamayan zamanlama",
+      "definition": "delay() yerine millis() ile geçen süreyi ölçmek; böylece loop() her turda çalışır.",
+      "example": "Alarm süresi simdi - alarmBasla >= ALARM_SURESI ile ölçülür.",
+      "pitfall": "delay() koymak: buton ve sensörler o sürede kaçırılır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d5-q1",
+      "kind": "mcq",
+      "prompt": "hirsiz_alarmi ALARM durumunda. Hırsız PIR'ın önünden çekilip kapıyı geri kapatıyor (PIR LOW, reed LOW). Alarm ne yapar?",
+      "options": [
+        "Hemen HAZIR'a döner",
+        "Hemen DEVRE_DISI'ya geçer",
+        "Şifre ya da süre dolana kadar çalmaya devam eder",
+        "Sirenin frekansını düşürür"
+      ],
+      "answer": 2,
+      "explanation": "ALARM mandal gibi çalışır: bir kez başlayınca sensörler normale dönse bile şifre girilene ya da ALARM_SURESI (10 s) dolana kadar sürer. Bu, hırsızın kaçıp kapıyı kapatmasıyla alarmın sessizce kapanmasını önler.",
+      "skills": [
+        "prog-state-machine",
+        "design-failsafe"
+      ]
+    },
+    {
+      "id": "m4h2d5-q2",
+      "kind": "numeric",
+      "prompt": "Kapı kapalı (Mıknatıs yakın işaretli) ve program çalışıyor. Kur butonuna bastıktan 1 s sonra Hareket kutusunu işaretleyip butondan 3 s sonra kaldırıyorsun (laboratuvar PIR'ı hareket bitince OUT'u 3 s HIGH tutar; ısınma bitmiştir). Butona basıldıktan kaç saniye sonra ALARM durumuna geçilir?",
+      "answer": 5,
+      "tolerance": 0.2,
+      "unit": "s",
+      "explanation": "Çıkış gecikmesi 5 s sürer ve bu sürede PIR yok sayılır. Hareket kutusu butondan 3 s sonra kalkar; OUT 6 s'ye kadar HIGH kalır. 5. saniyede sistem HAZIR olur, ihlalVar() PIR HIGH'ı hemen görür ve ALARM başlar: 5 saniye.",
+      "skills": [
+        "prog-state-machine",
+        "sensor-pir",
+        "prog-millis"
+      ]
+    },
+    {
+      "id": "m4h2d5-q3",
+      "kind": "predict-output",
+      "prompt": "Şifre penceresi 3000 ms ve şifre 3 basış. Basışlar t = 0, 1500, 3200, 3500 ve 4000 ms'de geliyor ve her biri için tamam() çağrılıyor. Çıktı ne olur?\n\n```\nconst unsigned long PENCERE = 3000;\nint basis = 0;\nunsigned long ilk = 0;\n\nbool tamam(unsigned long t) {\n  if (basis == 0 || t - ilk > PENCERE) {\n    basis = 1;\n    ilk = t;\n  } else {\n    basis++;\n  }\n  return basis >= 3;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long zamanlar[] = {0, 1500, 3200, 3500, 4000};\n  for (int i = 0; i < 5; i++) {\n    Serial.print(tamam(zamanlar[i]) ? \"E \" : \"H \");\n  }\n  Serial.println();\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "H H E H H",
+        "E E E E E",
+        "H H H H E",
+        "H H H E E"
+      ],
+      "answer": 2,
+      "explanation": "t = 0: basis 1. t = 1500: basis 2. t = 3200: 3200 − 0 > 3000, pencere dışı, sayaç 1'den başlar (ilk = 3200). t = 3500: basis 2. t = 4000: 4000 − 3200 = 800 < 3000, basis 3 ve E. Çıktı \"H H H H E\". Üçüncü basışta E beklemek, pencerenin ilk basıştan sayıldığını unutmaktır.",
+      "skills": [
+        "prog-state-machine",
+        "prog-millis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d5-q4",
+      "kind": "find-bug",
+      "prompt": "Alarm, kapı kapalıyken ve kimse hareket etmezken bile HAZIR olur olmaz çalıyor. Hatalı satır hangisi?\n\n```\nbool ihlalVar() {\n  bool hareket = (digitalRead(PIR) == HIGH);\n  bool kapiAcik = (digitalRead(REED) == LOW);\n  return hareket || kapiAcik;\n}\n```",
+      "options": [
+        "bool hareket = (digitalRead(PIR) == HIGH);",
+        "bool kapiAcik = (digitalRead(REED) == LOW);",
+        "return hareket || kapiAcik;",
+        "bool ihlalVar() {"
+      ],
+      "answer": 1,
+      "explanation": "Reed INPUT_PULLUP ile bağlıdır: kapı kapalıyken (mıknatıs yakın) kontak kapalıdır ve LOW okunur. `== LOW` kapıyı kapalıyken \"açık\" sayar. Doğrusu `kapiAcik = (digitalRead(REED) == HIGH)`. PIR satırı ve `||` doğrudur: iki ihlalden biri yeter.",
+      "skills": [
+        "sensor-contact",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d5-q5",
+      "kind": "mcq",
+      "prompt": "ALARM_SURESI dolunca sistem neden doğrudan DEVRE_DISI'ya değil SUSTURULDU'ya geçer?",
+      "options": [
+        "Buzzer'ı korumak için",
+        "Olayın izini LED ile hatırlatmak için",
+        "Şifre sayacını sıfırlamak için",
+        "delay() kullanmamak için"
+      ],
+      "answer": 1,
+      "explanation": "SUSTURULDU'da ses susar ama yavaş yanıp sönen LED ev sahibine bir olay olduğunu hatırlatır. Doğrudan DEVRE_DISI'ya geçilseydi olayın izi kaybolur ve ev sahibi gece neler olduğunu bilemezdi. Sensörlere bakılmadığı için yeni hareket alarmı yeniden çalmaz.",
+      "skills": [
+        "prog-state-machine",
+        "design-failsafe"
+      ]
+    }
+  ]
+}

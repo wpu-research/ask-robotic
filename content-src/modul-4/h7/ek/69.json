@@ -1,0 +1,50 @@
+{
+  "concepts": [
+    { "term": "UART ve baud hızı", "definition": "İki hatlı (RX, TX), saat hattı olmayan seri haberleşme; iki ucun baud hızı önceden aynı seçilmelidir.", "example": "9600 baud'da bir bit yaklaşık 104 µs, bir bayt (10 bit) yaklaşık 1,04 ms sürer.", "pitfall": "İki ucun baud hızını farklı seçmek; ekranda anlamsız karakterler çıkar." },
+    { "term": "I2C: SDA, SCL ve adres", "definition": "İki hatlı, saat hattı olan protokol; aynı hattaki cihazlar adresle seçilir.", "example": "RTC (0x68) ve I2C LCD (0x27) aynı SDA ve SCL kablolarını paylaşır.", "pitfall": "İki cihazın aynı adresi kullanması (RTC ile MPU6050 gibi)." },
+    { "term": "SPI ve CS hattı", "definition": "Üç ortak hat (SCK, MOSI, MISO) ve her cihaz için bir CS (seç) hattı kullanan, hızlı protokol.", "example": "SD kartın CS hattı D10'dur; CS'i LOW olan cihaz dinler.", "pitfall": "CS hattını unutmak ya da aynı anda iki cihazın CS'ini LOW yapmak." },
+    { "term": "Bit süresi ve aktarım süresi", "definition": "Bir bitin süresi 1/hız; aktarım süresi = bit sayısı ÷ hız.", "example": "100 bayt × 10 bit ÷ 9600 baud ≈ 104 ms.", "pitfall": "Bayt başına 8 bit saymak; UART'ta başlangıç ve bitiş bitleriyle 10 bit eder." },
+    { "term": "SPI hız bölücüsü", "definition": "Uno'da SCK, 16 MHz'in 2, 4, 8 ... katına bölünmüşüdür; SPISettings istenen hızı aşmayan en yüksek değeri seçer.", "example": "3 MHz istenince 2 MHz kullanılır.", "pitfall": "Ayarlanan hızı, istenen hızın aynısı sanmak." },
+    { "term": "Wire.setClock()", "definition": "I2C saat hattının hızını (100 kHz, 400 kHz) belirler.", "example": "400 kHz'de adres + 1 veri baytı yaklaşık 45 µs sürer.", "pitfall": "Hızı artırıp hattaki bütün cihazların bunu desteklediğini kontrol etmemek." }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d69-q1", "kind": "numeric",
+      "prompt": "UART 19200 baud'da, her bayt 10 bit sürerse 100 bayt göndermek yaklaşık kaç milisaniye sürer?",
+      "answer": 52.1, "tolerance": 0.3, "unit": "ms",
+      "explanation": "Toplam bit sayısı 100 × 10 = 1000. Süre = 1000 ÷ 19200 s ≈ 0,0521 s ≈ 52,1 ms. 8 bit varsaysaydın 41,7 ms bulurdun; bu yanlıştır, çünkü başlangıç ve bitiş bitleri de zamana girer.",
+      "skills": ["serial-protocols"]
+    },
+    {
+      "id": "m4h7d69-q2", "kind": "numeric",
+      "prompt": "I2C hızı 400 kHz. Bir adres baytı ve 4 veri baytı gönderiliyor. Her bayt 9 saat darbesi sürerse, başlangıç ve bitiş koşulları sayılmadan aktarım kaç mikrosaniye sürer?",
+      "answer": 112.5, "tolerance": 0.5, "unit": "µs",
+      "explanation": "Toplam bayt 1 + 4 = 5; saat darbesi 5 × 9 = 45. Bir darbe 1 ÷ 400000 s = 2,5 µs sürer. 45 × 2,5 = 112,5 µs.",
+      "skills": ["serial-protocols"]
+    },
+    {
+      "id": "m4h7d69-q3", "kind": "predict-output",
+      "prompt": "Uno'da (16 MHz) bu kod çalışınca SCK yaklaşık kaç Hz olur?\n\n```\nSPI.begin();\nSPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE0));\n```",
+      "options": ["5000000 Hz", "8000000 Hz", "4000000 Hz", "2500000 Hz"],
+      "answer": 2,
+      "explanation": "Uno'da SCK yalnızca 8, 4, 2, 1 MHz ... gibi değerler alabilir. SPISettings, istenen hızı aşmayan en yüksek değeri seçer: 5 MHz aşılmadan 4 MHz'e inilir. 8 MHz istenenden büyüktür; 5 MHz ve 2,5 MHz bu bölme dizisinde yoktur.",
+      "skills": ["serial-protocols"]
+    },
+    {
+      "id": "m4h7d69-q4", "kind": "find-bug",
+      "prompt": "Bilgisayardaki terminal 115200 baud'a ayarlı. Arduino'da aşağıdaki kod çalışıyor ve terminalde anlamsız karakterler görünüyor. Sorun nerede?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"Merhaba\");\n}\n```",
+      "options": ["println yerine print kullanılmalı", "Baud hızı terminalle aynı değil; Serial.begin(115200) olmalı ya da terminal 9600'e ayarlanmalı", "setup() yerine loop() kullanılmalı", "Metin Türkçe olduğu için"],
+      "answer": 1,
+      "explanation": "UART'ta saat hattı yoktur; iki taraf bit süresini baud hızından bilir. Arduino 9600, terminal 115200 beklerse bitleri yanlış zamanlarda örnekler ve anlamsız karakterler görürsün. print/println farkı yalnız satır sonudur.",
+      "skills": ["serial-protocols", "prog-debug"]
+    },
+    {
+      "id": "m4h7d69-q5", "kind": "mcq",
+      "prompt": "Veri kaydedicide RTC'den saat okunacak, bir LCD'ye yazılacak ve SD karta çok satır kaydedilecek. Hangi eşleştirme en mantıklıdır?",
+      "options": ["RTC ve LCD için I2C (iki kablo, adresle), SD kart için SPI (hızlı)", "Üçü için de UART", "RTC için SPI, SD kart için I2C", "Hepsi için aynı CS hattı"],
+      "answer": 0,
+      "explanation": "RTC ve LCD az veri taşır ve farklı adreslerle aynı iki kabloyu paylaşabilir; I2C uygundur. SD kart çok veri taşır, SPI'nın yüksek hızı gerekir. UART birebir bağlantı içindir; aynı CS hattını kullanan iki SPI cihaz birbirine karışır.",
+      "skills": ["serial-protocols", "circuit-wiring"]
+    }
+  ]
+}

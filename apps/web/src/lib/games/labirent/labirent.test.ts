@@ -90,4 +90,17 @@ describe('Labirent: ek denetimler', () => {
     expect(level(5).maxBlocks!).toBeLessThanOrEqual(level(7).maxBlocks!)
     expect(level(1).toolbox).toEqual(['labirent_ileri'])
   })
+
+  it('10. seviye çözümü varsayılan hızda 60 sn altında oynar', async () => {
+    const { runProgram } = await import('../interpreter')
+    const lv = level(10)
+    const gr = game.engine.createRun(lv, { seed: 1 })
+    let ms = 0
+    await runProgram(lv.solution, gr.api, {
+      seed: 1,
+      maxSteps: 20000,
+      onStep: (i) => { if (i.wait) ms += (gr.stepDelay?.(i) ?? game.stepDelay ?? 450) / (game.speed?.default ?? 1) },
+    })
+    expect(ms).toBeLessThan(60000)
+  })
 })

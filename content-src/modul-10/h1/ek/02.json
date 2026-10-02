@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "x ve y",
+      "definition": "Bir LED'in adresi: x soldan sağa sütun, y yukarıdan aşağıya satır numarasıdır; (x, y) diye yazılır.",
+      "example": "Sağ üst köşe (4, 0), sol alt köşe (0, 4) adresindedir.",
+      "pitfall": "x ile y'yi karıştırmak: (4, 0) sağ üst köşedir, sol alt değil."
+    },
+    {
+      "term": "0'dan sayım",
+      "definition": "Sayma 1'den değil 0'dan başlar; bu yüzden 5 sütunun numaraları 0, 1, 2, 3, 4'tür.",
+      "example": "Tam ortadaki LED (2, 2) adresindedir.",
+      "pitfall": "En sağ sütuna 5 demek; en büyük adres 4'tür."
+    },
+    {
+      "term": "LED yak / LED söndür",
+      "definition": "Verilen adresteki tek ışığı yakar ya da söndürür.",
+      "example": "LED yak x 0 y 0 sol üst köşeyi yakar.",
+      "pitfall": "Aynı adresi hem yakıp hem söndürüp gözle ayırt edilebilir bir sonuç beklemek; arada bekleme gerekir."
+    },
+    {
+      "term": "Ekranı temizle",
+      "definition": "Bütün LED'leri tek blokla birden söndürür.",
+      "example": "Çapraz çizgiden sonra ekranı temizle koyunca köşeleri boş bir ekrana çizebilirsin.",
+      "pitfall": "Temizlemeyi unutmak: önceki çizimin ışıkları yanık kalır ve yeni çizimle karışır."
+    },
+    {
+      "term": "bekle (ms)",
+      "definition": "Programı verilen milisaniye kadar durdurur; 1000 ms bir saniyedir. LED blokları kendiliğinden beklemez.",
+      "example": "bekle 1000 ms koyarsan çizim bir saniye görünür.",
+      "pitfall": "bekle koymadan çizip hemen temizlemek: çizim gözle görülmeyecek kadar kısa kalır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d2-q1",
+      "kind": "mcq",
+      "prompt": "(4, 0) adresi ekranın hangi yerindedir?",
+      "options": [
+        "Sol üst köşe",
+        "Sol alt köşe",
+        "Sağ alt köşe",
+        "Sağ üst köşe"
+      ],
+      "answer": 3,
+      "explanation": "x = 4 en sağ sütundur, y = 0 en üst satırdır; bu sağ üst köşedir. Önce x (yatay), sonra y (dikey) yazılır. Sol alt köşe (0, 4), sağ alt köşe (4, 4) olurdu.",
+      "skills": [
+        "mk-coords"
+      ]
+    },
+    {
+      "id": "m10h1d2-q2",
+      "kind": "numeric",
+      "prompt": "Ekranın en dıştaki sıralarında (üst ve alt satır, sol ve sağ sütun) yer alan çerçevede kaç LED vardır? İpucu: içte kalan 3 x 3 bölgeyi çıkar.",
+      "answer": 16,
+      "unit": "LED",
+      "explanation": "Ekran 5 x 5 = 25 LED taşır. Çerçevenin içinde kalan bölge 3 x 3 = 9 LED'dir. Çerçeve 25 - 9 = 16 LED eder. Kenar sayısını 4 x 5 = 20 diye toplamak yanlıştır; köşeler iki kez sayılmış olur.",
+      "skills": [
+        "mk-coords"
+      ]
+    },
+    {
+      "id": "m10h1d2-q3",
+      "kind": "predict-output",
+      "prompt": "Program bittikten sonra ekranda hangi LED'ler yanık kalır?\n\n```\ncard.onStart(() => {\n  screen.plot(1, 3);\n  screen.plot(3, 1);\n  wait(500);\n  screen.clear();\n  screen.plot(2, 4);\n});\n```",
+      "options": [
+        "Alt satırın ortasındaki tek LED",
+        "Üst satırın ortasındaki tek LED",
+        "(1, 3), (3, 1) ve (2, 4) olmak üzere üç LED",
+        "Hiçbiri; ekran boştur"
+      ],
+      "answer": 0,
+      "explanation": "Önce (1, 3) ve (3, 1) yanar, yarım saniye sonra ekranı temizle hepsini söndürür. Son olarak (2, 4) yanar: x = 2 ortadaki sütun, y = 4 en alt satırdır. Yani alt satırın ortası yanık kalır. İlk iki LED temizlendiği için artık yanmaz.",
+      "skills": [
+        "mk-coords",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d2-q4",
+      "kind": "find-bug",
+      "prompt": "Deniz dört köşeyi yakmak istiyor ama sağ üst köşe yanmıyor. Hiçbir hata mesajı da yok.\n\n```\n1  screen.plot(0, 0);\n2  screen.plot(5, 0);\n3  screen.plot(0, 4);\n4  screen.plot(4, 4);\n```\n\nHata hangi satırdadır ve neden?",
+      "options": [
+        "1. satır: sol üst köşe 1, 1 olmalıdır",
+        "3. satır: y en çok 3 olabilir",
+        "2. satır: x en çok 4 olabilir; 5 ekranın dışındadır ve sessizce yok sayılır",
+        "4. satır: LED yak yerine LED söndür gerekir"
+      ],
+      "answer": 2,
+      "explanation": "Sütun numaraları 0'dan 4'e gider; x = 5 ekranın dışında kalır. Kart ekran dışı adresi hata vermeden yok sayar, bu yüzden uyarı görmezsin. Sağ üst köşe (4, 0) olmalıydı. Öbür satırlardaki adresler köşelerin doğru adresleridir.",
+      "skills": [
+        "mk-coords",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d2-q5",
+      "kind": "mcq",
+      "prompt": "Bir öğrenci beş LED yak bloğunun hemen ardından ekranı temizle bloğunu koyuyor, arada bekle yok. Ekranda ne görür?",
+      "options": [
+        "Beş LED bir saniye yanar",
+        "Çizimi göremez; LED blokları beklemediği için her şey hemen silinir",
+        "Beş LED sırayla yanar",
+        "Kart hata verir"
+      ],
+      "answer": 1,
+      "explanation": "LED blokları beklemez; çizim ve temizleme neredeyse aynı anda olur ve çizim gözle görülmez. Çizimin görünmesi için aralarına bekle bloğu koymak gerekir. Işıkların sırayla yanması da ancak bloklar arasına bekle konursa olur. Kart hata vermez, çünkü program geçerlidir.",
+      "skills": [
+        "mk-timing",
+        "mk-flow"
+      ]
+    }
+  ]
+}

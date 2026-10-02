@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Karoya dokununca olayı",
+      "definition": "Belirli türden bir sprite belirli bir karoya değdiğinde içindeki blokları çalıştıran olay bloğu.",
+      "example": "`bir [Oyuncu] sprite'ı [Kapı] karosuna dokununca` bloğu kedi kapıya değince çalışır.",
+      "pitfall": "Olayda karo seçmeyi unutmak ya da yanlış karoyu seçmek: yanlış karo için bekler."
+    },
+    {
+      "term": "Bir kez tetiklenme",
+      "definition": "Olay, sprite karoya ilk değdiği anda bir kez çalışır; üstünde durmak tekrar çalıştırmaz.",
+      "example": "Kapıda 3 saniye beklesen de `skoru 100 değiştir` yalnız bir kez çalışır.",
+      "pitfall": "Bekleyince puanın artacağını sanmak."
+    },
+    {
+      "term": "Oyunu bitir",
+      "definition": "Oyunu kazandı ya da kaybetti diye sonlandıran blok.",
+      "example": "Kapı olayının sonuna `oyunu bitir: kazandın` konur.",
+      "pitfall": "Bu bloğu unutmak: mesaj çıkar, melodi çalar ama oyun devam eder."
+    },
+    {
+      "term": "Geçilebilir kapı karosu",
+      "definition": "Çıkış karosunun duvar kutusu işaretsizdir; böylece kedi karoya girebilir.",
+      "example": "Karo takımında tuğla duvar işaretli, kapı işaretsizdir.",
+      "pitfall": "Kapı karosunu duvar yapmak: kedi kapıya giremez."
+    },
+    {
+      "term": "Çözülebilir labirent",
+      "definition": "Başlangıçtan çıkışa en az bir açık yolu olan labirent.",
+      "example": "Yeni duvar çizdikten sonra labirenti kendin baştan sona yürüyerek denersin.",
+      "pitfall": "Yolu tamamen kapatmak: çıkışa hiç ulaşılamaz ve oyun kazanılamaz."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d12-q1",
+      "kind": "mcq",
+      "prompt": "`bir [Oyuncu] sprite'ı [Kapı] karosuna dokununca` olayı ne zaman çalışır?",
+      "options": [
+        "Oyun başlar başlamaz",
+        "Oyuncu kapının üstünde durduğu sürece sürekli",
+        "Yalnız oyun bittiğinde",
+        "Oyuncu kapı karosuna ilk değdiği anda, bir kez"
+      ],
+      "answer": 3,
+      "explanation": "Karo olayı sprite karoya girdiği anda bir kez çalışır. Üstünde durmak tekrar tetiklemez; çıkıp yeniden girmek tetikler. Başlangıçta çalışan şey `oyun başlayınca` bloğudur.",
+      "skills": [
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h3d12-q2",
+      "kind": "predict-output",
+      "prompt": "Skor 0 iken oyuncu kapı karosuna girip 3 saniye orada bekliyor, sonra oyunu kapatıyorsun.\n\n```\nbir [Oyuncu] sprite'ı [Kapı] karosuna dokununca\n    skoru [100] değiştir\n```\n\nSkor kaç olur?",
+      "options": [
+        "100",
+        "0",
+        "300",
+        "18000"
+      ],
+      "answer": 0,
+      "explanation": "Olay ilk değme anında bir kez çalışır: 0 + 100 = 100. Beklemek olayı tekrarlamaz, yani 300 ya da 18000 olmaz. 0 olması için olayın hiç çalışmaması gerekirdi.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d12-q3",
+      "kind": "find-bug",
+      "prompt": "Kedi kapıya girince mesaj çıkıyor ve zafer melodisi çalıyor, ama oyun bitmiyor, kedi yürümeye devam ediyor.\n\n```\n1  bir [Oyuncu] sprite'ı [Kapı] karosuna dokununca\n2      ekranda [Çıkışı buldun!] yaz, [2] saniye\n3      [zafer] melodisini çal\n```\n\nHangisi hatadır?",
+      "options": [
+        "Satır 1'de yanlış sprite türü seçilmiş",
+        "Mesajın süresi 2 saniye olmamalı",
+        "Olayın sonunda `oyunu bitir: kazandın` bloğu eksik",
+        "Melodi adı `zafer` olmamalı"
+      ],
+      "answer": 2,
+      "explanation": "Mesaj ve melodi çalıştığına göre olay tetikleniyor; yani tür ve karo doğru. Oyunu sonlandıran tek blok `oyunu bitir`dir ve eksik. Süre ve melodi adı oyunun bitip bitmemesini etkilemez.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d12-q4",
+      "kind": "numeric",
+      "prompt": "Labirent haritası 12 sütun ve 9 satırdır. En dış sıradaki (çevre) duvar karolarının sayısı kaçtır? (Köşeleri bir kez say.)",
+      "answer": 38,
+      "unit": "karo",
+      "explanation": "Üst ve alt satırlarda 12 + 12 = 24 karo vardır. Sol ve sağ sütunlarda köşeler hariç 7 + 7 = 14 karo kalır. Toplam 24 + 14 = 38. Dört kenarı 12 + 12 + 9 + 9 = 42 diye toplarsan köşeleri iki kez saymış olursun.",
+      "skills": [
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d12-q5",
+      "kind": "mcq",
+      "prompt": "Labirenti düzenlerken yeni duvarlar çizdin. Oyunun hâlâ kazanılabilir olduğundan nasıl emin olursun?",
+      "options": [
+        "Duvar sayısını sayarım",
+        "Labirenti başlangıçtan çıkışa kendim yürüyerek denerim",
+        "Kapı olayını silerim",
+        "Kedinin hızını artırırım"
+      ],
+      "answer": 1,
+      "explanation": "Çıkışa açık bir yol olup olmadığını en güvenilir gösteren şey labirenti gerçekten yürümektir. Duvar sayısı yolun açık olduğunu söylemez; olayı silmek ya da hızı artırmak kapalı bir yolu açmaz.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-karo-duvar"
+      ]
+    }
+  ]
+}

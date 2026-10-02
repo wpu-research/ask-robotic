@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Durum makinesi",
+      "definition": "Cihazın her an tek bir durumda olduğu ve olayların onu başka duruma geçirdiği düşünce biçimi.",
+      "example": "Alarm: kapalı, kurulu, çalıyor. A kurar, sallanış çaldırır, A+B kapatır.",
+      "pitfall": "Bir olayın her durumda etki edeceğini sanmak: kurulu değilken sallanış bir şey yapmaz."
+    },
+    {
+      "term": "Durum değişkeni",
+      "definition": "Cihazın durumunu 0 ya da 1 olarak hatırlayan değişken.",
+      "example": "kurulu = 1 ve alarm = 1 olması \"çalıyor\" durumudur.",
+      "pitfall": "Değişkenleri karıştırmak: sallanınca alarm 1 olur, kurulu değil."
+    },
+    {
+      "term": "sonsuza kadar",
+      "definition": "İçindeki blokları bitmeden tekrar tekrar çalıştıran döngü.",
+      "example": "İçine \"alarm = 1 ise ezgiyi çal\" koyarsan alarm açıkken ses sürekli yinelenir.",
+      "pitfall": "İçine bekle koymamak: kuru kafa yanıp sönmesi neredeyse görünmez olur."
+    },
+    {
+      "term": "Uzun basış",
+      "definition": "Bir düğmeye 1 saniyeden uzun basmak. Kazara yapılması zordur.",
+      "example": "A+B'ye 1,2 saniye basılı tutunca alarm kapanır.",
+      "pitfall": "Kısa basmak: uzun basış başlığı hiç çalışmaz."
+    },
+    {
+      "term": "Tam kapatma",
+      "definition": "Alarmı kapatırken sesi durdurmak ve durum değişkenlerini sıfırlamak.",
+      "example": "Kapatma başlığı kurulu ve alarm değerini 0 yapar, sesi durdurur.",
+      "pitfall": "Yalnız sesi durdurmak: alarm hâlâ 1 olduğundan sonsuza kadar ezgiyi yeniden başlatır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d28-q1",
+      "kind": "mcq",
+      "prompt": "Alarm kurulmamışken (kurulu = 0) kart sallanırsa ne olur?",
+      "options": [
+        "Alarm çalmaya başlar",
+        "Hiçbir şey olmaz, çünkü sallanış başlığı önce kurulu = 1 mi diye bakar",
+        "Kart otomatik kurulur",
+        "Kart hata verir"
+      ],
+      "answer": 1,
+      "explanation": "Sallanış başlığındaki eğer, kurulu = 1 olmasını bekler. kurulu 0 ise alarm değişkeni değişmez ve ses başlamaz. Alarmın çalması için önce A ile kurulması gerekir.",
+      "skills": [
+        "mk-state",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d28-q2",
+      "kind": "find-bug",
+      "prompt": "A+B'ye uzun basınca ses duruyor ama bir süre sonra alarm yeniden çalıyor. Hata hangisi?\n\n```\ndüğme [A+B] uzun basılınca:\n  sesi durdur\n  simgeyi göster [mutlu yüz]\n\nsonsuza kadar:\n  eğer alarm = 1 ise:\n    simgeyi göster [kuru kafa]\n    ezgiyi çal [Alarm]\n    ekranı temizle\n    bekle 200 ms\n```",
+      "options": [
+        "alarm değişkeni 0 yapılmıyor; sonsuza kadar bir sonraki turda alarm = 1 görüp ezgiyi yeniden çalıyor",
+        "Mutlu yüz yanlış simge",
+        "Bekleme süresi çok kısa",
+        "sonsuza kadar bloğu hiç kullanılmamalı"
+      ],
+      "answer": 0,
+      "explanation": "Durum değişkenini sıfırlamadan kapatma yarım kalır. Kapatma başlığı alarm (ve kurulu) değerini 0 yapmalıdır. Diğer seçenekler alarmın yeniden çalmasına yol açmaz.",
+      "skills": [
+        "mk-debug",
+        "mk-state"
+      ]
+    },
+    {
+      "id": "m10h6d28-q3",
+      "kind": "predict-output",
+      "prompt": "Aşağıdaki program çalışıyor. Olaylar sırayla gelir: sallan, A, sallan, A+B uzun, sallan. alarm değişkeni ne zaman 1'dir?\n\n```\nbaşlangıçta: kurulu = 0, alarm = 0\nA basılınca: kurulu = 1\nsallandığında: eğer kurulu = 1 ise alarm = 1\nA+B uzun basılınca: kurulu = 0, alarm = 0\n```",
+      "options": [
+        "Birinci sallanıştan itibaren sürekli",
+        "Her sallanışta",
+        "Yalnız ikinci sallanıştan A+B uzun basışa kadar",
+        "Hiçbir zaman"
+      ],
+      "answer": 2,
+      "explanation": "Birinci sallanışta kurulu 0 olduğundan alarm 0 kalır. A kurar, ikinci sallanış alarmı 1 yapar. A+B uzun basış ikisini 0 yapar. Üçüncü sallanış kurulu 0 olduğu için etkisizdir.",
+      "skills": [
+        "mk-state",
+        "mk-events"
+      ]
+    },
+    {
+      "id": "m10h6d28-q4",
+      "kind": "numeric",
+      "prompt": "Alarm ezgisi 3,25 vuruştur ve tempo 120'dir (bir vuruş 500 ms). Sonsuza kadar içinde ezgiden sonra 200 ms bekleniyor. Sistemin küçük döngü payını sayma. Bir tur kaç ms sürer?",
+      "answer": 1825,
+      "unit": "ms",
+      "explanation": "3,25 x 500 = 1625 ms ezgi. Üstüne 200 ms bekleme eklenince 1825 ms olur. Sanal kartta ölçülen tur 1845 ms çıkar; aradaki 20 ms sistemin her tur sonunda eklediği paydır.",
+      "skills": [
+        "mk-concurrency"
+      ]
+    },
+    {
+      "id": "m10h6d28-q5",
+      "kind": "mcq",
+      "prompt": "Alarm iki değişkenle tutuluyor: kurulu ve alarm. kurulu = 1 ve alarm = 1 hangi durumdur?",
+      "options": [
+        "Kapalı",
+        "Kurulu ama çalmıyor",
+        "Böyle bir durum olmamalı",
+        "Çalıyor"
+      ],
+      "answer": 3,
+      "explanation": "Alarm yalnızca kurulu iken 1 olur. İkisi de 1 ise cihaz çalıyordur. Kapalı durumda ikisi 0, kurulu durumda kurulu 1 ve alarm 0'dır.",
+      "skills": [
+        "mk-state",
+        "mk-variables"
+      ]
+    }
+  ]
+}

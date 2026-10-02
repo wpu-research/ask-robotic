@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Şiddet (yönden bağımsız değer)",
+      "definition": "Ham okumayı \"büyük sayı = güçlü alev\" olacak biçimde çeviren değer.",
+      "example": "Alevde değer düşen modülde siddet(ham) = 1023 - ham verir; ham 700 ise şiddet 323'tür.",
+      "pitfall": "ALEVDE_DUSER değerini kontrol etmemek: alarm hep ya da hiç çalar."
+    },
+    {
+      "term": "Seviye (enum)",
+      "definition": "Durumu NORMAL, UYARI, TEHLIKE gibi adlarla tutan sıralı bir tür.",
+      "example": "enum Seviye { NORMAL, UYARI, TEHLIKE }; değerleri sırayla 0, 1, 2'dir.",
+      "pitfall": "Seviyeler için 0, 1, 2 gibi çıplak sayılar kullanmak: kod okunmaz ve hata yapmak kolaylaşır."
+    },
+    {
+      "term": "Çoklu eşik",
+      "definition": "Üç seviye için dört eşik: UYARI açma/kapama ve TEHLIKE açma/kapama.",
+      "example": "Alev için 300 / 250 ve 600 / 500 çiftleri kullanılır.",
+      "pitfall": "Kapama eşiğini açma eşiğinden büyük yazmak: seviye hiç düşmez ya da sürekli salınır."
+    },
+    {
+      "term": "Parametreli fonksiyon ile yeniden kullanım",
+      "definition": "Aynı karar mantığını bir fonksiyona koyup eşikleri parametre olarak vermek.",
+      "example": "seviyeBul alev için sabit sayılarla, gaz için bazın katlarıyla çağrılır.",
+      "pitfall": "Aynı mantığı iki sensör için kopyalayıp yapıştırmak: bir yerde düzeltilen hata öbüründe kalır."
+    },
+    {
+      "term": "En kötü seviye (enKotu)",
+      "definition": "Birden çok sensörün seviyelerinden en yüksek olanı genel durum yapmak.",
+      "example": "Gaz UYARI, alev TEHLIKE ise genel durum TEHLIKE olur.",
+      "pitfall": "Yalnızca son okunan sensörü genel durum yapmak: önceki sensörün tehlikesi kaybolur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d4-q1",
+      "kind": "numeric",
+      "prompt": "Sanal alev modülü alevde değer düşürür ve siddet(ham) = 1023 - ham kullanılır. Ham okuma 700 iken şiddet kaçtır?",
+      "answer": 323,
+      "tolerance": 0,
+      "explanation": "1023 - 700 = 323. Bu değer UYARI açma eşiğini (300) aşar; alev yok sayılmaz. Modülün yönü tersse ALEVDE_DUSER false yapılır ve şiddet doğrudan 700 olur.",
+      "skills": [
+        "sens-direction"
+      ]
+    },
+    {
+      "id": "m4h4d4-q2",
+      "kind": "predict-output",
+      "prompt": "seviyeBul eşikleri 300 / 250 / 600 / 500 ile çağrılıyor. Seviye başta NORMAL. Altı ölçüm sırayla geliyor ve her adımdan sonra yeni seviyenin harfi (N, U ya da T) yazılıyor. Bu kod ne yazar?\n\n```\nenum Seviye { NORMAL, UYARI, TEHLIKE };\n\nSeviye seviyeBul(Seviye simdiki, int deger,\n                 int uyariAc, int uyariKapat,\n                 int tehlikeAc, int tehlikeKapat) {\n  if (simdiki == NORMAL) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger >= uyariAc) return UYARI;\n    return NORMAL;\n  }\n  if (simdiki == UYARI) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger < uyariKapat) return NORMAL;\n    return UYARI;\n  }\n  if (deger < tehlikeKapat) {\n    return (deger >= uyariKapat) ? UYARI : NORMAL;\n  }\n  return TEHLIKE;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  int olcum[] = {320, 280, 240, 650, 520, 480};\n  Seviye s = NORMAL;\n  for (int i = 0; i < 6; i++) {\n    s = seviyeBul(s, olcum[i], 300, 250, 600, 500);\n    Serial.print(s == NORMAL ? 'N' : (s == UYARI ? 'U' : 'T'));\n  }\n}\n```",
+      "options": [
+        "UNNTUU",
+        "UUUTTT",
+        "UUNTTU",
+        "UUNTTN"
+      ],
+      "answer": 2,
+      "explanation": "320 NORMAL'den UYARI yapar (U). 280, 250'nin altına inmediği için UYARI'da kalır (U). 240 < 250 olduğundan NORMAL (N). 650 doğrudan TEHLIKE (T). 520 ≥ 500 olduğu için TEHLIKE sürer (T). 480 < 500 ve ≥ 250 olduğundan UYARI'ya iner (U). İlk seçenek histerezissiz tek eşik gibi davranır, ikincisi seviyenin hiç düşmediğini varsayar, dördüncüsü TEHLIKE'den doğrudan NORMAL'e indirir.",
+      "skills": [
+        "sens-levels",
+        "sens-hysteresis"
+      ]
+    },
+    {
+      "id": "m4h4d4-q3",
+      "kind": "find-bug",
+      "prompt": "Alev şiddeti 320'de sabit duruyor ama sarı UYARI LED'i çok hızlı yanıp sönüyor. Hata hangisinde?\n\n```\nSeviye yeni = seviyeBul(seviye, s, 300, 350, 600, 500);\n```\n(Argüman sırası: uyariAc, uyariKapat, tehlikeAc, tehlikeKapat.)",
+      "options": [
+        "uyariAc (300) çok küçük",
+        "uyariKapat (350), uyariAc'tan (300) büyük yazılmış",
+        "tehlikeKapat (500), tehlikeAc'tan (600) küçük olmamalı",
+        "seviye değişkeni global olmamalı"
+      ],
+      "answer": 1,
+      "explanation": "NORMAL'dayken 320 ≥ 300 olduğu için UYARI'ya geçilir. UYARI'dayken 320 < 350 olduğundan hemen NORMAL'e dönülür ve bu böyle sürer: LED her turda değişir. Kapama eşiği açma eşiğinden küçük olmalıdır (örneğin 250). tehlikeKapat < tehlikeAc doğru yazılmıştır, uyariAc de sorun değildir.",
+      "skills": [
+        "sens-levels",
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d4-q4",
+      "kind": "mcq",
+      "prompt": "Elindeki başka marka bir alev modülü, alev yaklaşınca değeri YÜKSELTİYOR. Derstekiyle aynı programı kullanmak için hangi değişiklik yeterlidir?",
+      "options": [
+        "Yalnızca ALEVDE_DUSER sabitini false yapmak",
+        "seviyeBul fonksiyonunu baştan yazmak",
+        "Bütün eşikleri tek tek ters çevirmek",
+        "Alev ve gaz için ayrı iki program yazmak"
+      ],
+      "answer": 0,
+      "explanation": "Yön farkı siddet() içinde tek bir yerde çözülür. ALEVDE_DUSER false olunca şiddet = ham olur ve geri kalan kod (seviyeBul, eşikler, çıkışlar) aynen çalışır. Yönü her karşılaştırmada ayrı düşünmek hem hata hem de tekrar demektir.",
+      "skills": [
+        "sens-direction",
+        "prog-reuse-functions"
+      ]
+    },
+    {
+      "id": "m4h4d4-q5",
+      "kind": "mcq",
+      "prompt": "Gaz seviyesi UYARI, alev seviyesi TEHLIKE. enum Seviye { NORMAL, UYARI, TEHLIKE } ve enKotu(a, b) \"büyük olanı\" döndürüyor. Genel durum ne olur?",
+      "options": [
+        "NORMAL",
+        "UYARI",
+        "Hata verir, çünkü enum karşılaştırılamaz",
+        "TEHLIKE"
+      ],
+      "answer": 3,
+      "explanation": "enum değerleri sırayla 0, 1, 2'dir; TEHLIKE (2), UYARI'dan (1) büyüktür, bu yüzden enKotu TEHLIKE döndürür. Sensörlerden biri tehlikedeyse sistem tehlikededir. enum değerleri sayı gibi karşılaştırılır; derleme hatası olmaz.",
+      "skills": [
+        "sens-levels"
+      ]
+    }
+  ]
+}

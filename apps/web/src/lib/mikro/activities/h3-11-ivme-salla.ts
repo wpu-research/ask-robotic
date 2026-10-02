@@ -16,8 +16,8 @@ export const h3d1: MikroActivity = {
     usesBlocks('hareket', "'kart ... ' hareket bloklarını kullan", ['mk_on_gesture']),
     usesBlocks('yazitura', "'yazı tura' bloğunu 'eğer' ile kullan", ['mk_random_bool', 'controls_if']),
     afterInput('salla', 'Kartı salla: ekranda "evet" ya da "hayır" simgesi çıksın', 'gesture:shake', (e) => e.kind === 'icon' && (e.icon === 'yes' || e.icon === 'no'), { hint: "'eğer yazı tura ise' kalıbında 'değilse' kolunu da aç: biri evet, biri hayır." }),
-    afterInputPattern('sol', 'Sola yatırınca sol ok görünsün', 'gesture:tiltLeft', ICON_ROWS('arrowLeft')),
-    afterInputPattern('sag', 'Sağa yatırınca sağ ok görünsün', 'gesture:tiltRight', ICON_ROWS('arrowRight')),
+    afterInputPattern('sol', 'Sola yatırınca sol ok görünsün', 'gesture:tiltLeft', ICON_ROWS('arrowLeft'), { hint: "Sanal kartı sola yatır (eğim kaydırıcısı ya da 'sola yat' hareketi)." }),
+    afterInputPattern('sag', 'Sağa yatırınca sağ ok görünsün', 'gesture:tiltRight', ICON_ROWS('arrowRight'), { hint: "Sanal kartı sağa yatır (eğim kaydırıcısı ya da 'sağa yat' hareketi)." }),
   ],
   solution: () => project('Sihirli top', [
     hatBlock('mk_on_gesture', [ifThen(b('mk_random_bool'), [icon('yes')], [icon('no')])], { G: 'shake' }),

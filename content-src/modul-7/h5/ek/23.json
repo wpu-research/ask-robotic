@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "RAG",
+      "definition": "Getirmeyle desteklenmiş üretim: önce ilgili parçalar bulunur, sonra model bu bağlama dayanarak cevap yazar.",
+      "example": "Kulüp rehberinden \"teslim tarihi\" parçası bulunup prompt'a konur.",
+      "pitfall": "RAG'ı modelin kendisi sanmak; model yalnız son adımdır, öncesi arama hattıdır."
+    },
+    {
+      "term": "Parça (chunk)",
+      "definition": "Uzun belgenin getirme için ayrı ayrı vektörleştirilen küçük bölümü.",
+      "example": "130 kelimelik rehber 20'şer kelimelik parçalara bölünür.",
+      "pitfall": "Parçayı hep cümle sanmak; atölyede sabit kelime sayısıyla kesilir ve cümle ortasında bitebilir."
+    },
+    {
+      "term": "Parça boyu",
+      "definition": "Bir parçadaki kelime sayısı; küçülünce odak artar, büyüyünce bağlam sulanır.",
+      "example": "Boy 20 iken teslim cümlesi tek parçada kalır.",
+      "pitfall": "Boyu çok küçültmek: cevap iki parçaya bölünür ve hiçbirinde tam görünmez."
+    },
+    {
+      "term": "Örtüşme",
+      "definition": "Ardışık parçaların paylaştığı kelime sayısı; sınırdaki cevabı korur.",
+      "example": "Boy 20, örtüşme 5 ise her parça 15 kelime ilerler.",
+      "pitfall": "Örtüşmeyi boya eşit ya da büyük seçmek: pencere ilerlemez, parça sayısı patlar ya da döngü bitmez."
+    },
+    {
+      "term": "Adım",
+      "definition": "Boy eksi örtüşme; her yeni parçanın başladığı yer arasındaki kelime sayısı.",
+      "example": "100 kelime, boy 20, örtüşme 5: adım 15, toplam 7 parça.",
+      "pitfall": "Parça sayısını 100 / 20 = 5 diye hesaplamak; örtüşme sayıyı artırır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d23-q1",
+      "kind": "numeric",
+      "prompt": "100 kelimelik bir belge, 20 kelimelik parçalara bölünüyor ve ardışık parçalar 5 kelime örtüşüyor. Son parça kısa kalsa da sayılır. Kaç parça oluşur?",
+      "answer": 7,
+      "unit": "parça",
+      "explanation": "Adım 20 − 5 = 15. Başlangıçlar 0, 15, 30, 45, 60, 75, 90 olur; 90'da başlayan parça 100'de belgeyi bitirir. Toplam 7 parça. Örtüşmesiz 5 parça olurdu; 100 / 15 yaklaşık 6,7 diye yuvarlayıp 6 demek de son kısa parçayı atlar.",
+      "skills": [
+        "ai-chunking"
+      ]
+    },
+    {
+      "id": "m7h5d23-q2",
+      "kind": "mcq",
+      "prompt": "Parçalar arasında örtüşme bırakmanın asıl amacı nedir?",
+      "options": [
+        "Parça sayısını azaltmak",
+        "Cevap iki parçanın sınırına denk gelirse en az bir parçada bütün hâlde bulunmasını sağlamak",
+        "Benzerlik hesabını hızlandırmak",
+        "Modelin bağlam penceresini büyütmek"
+      ],
+      "answer": 1,
+      "explanation": "Örtüşme sınırdaki cümlenin iki parçada birden görünmesini sağlar. Parça sayısını artırır, azaltmaz; hesabı hızlandırmaz ve modelin penceresini değiştirmez.",
+      "skills": [
+        "ai-chunking"
+      ]
+    },
+    {
+      "id": "m7h5d23-q3",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca ne yazdırır?\n\n```\nk = list(\"abcdefgh\")\nboy, ortus = 4, 1\nfor bas in range(0, len(k), boy - ortus):\n    print(\"\".join(k[bas:bas + boy]))\n```",
+      "options": [
+        "abcd, defg, gh",
+        "abcd, efgh",
+        "abcd, bcde, cdef",
+        "abcd, defg, ghh"
+      ],
+      "answer": 0,
+      "explanation": "Adım 4 − 1 = 3; başlangıçlar 0, 3, 6. 0'dan abcd, 3'ten defg (\"d\" ortak), 6'dan yalnız gh (belge biter). abcd, efgh örtüşmesiz olurdu; bcde ise adımın 1 olduğu durumdur. Dilim belge sonunu aşmaz, bu yüzden \"ghh\" çıkmaz.",
+      "skills": [
+        "ai-chunking"
+      ]
+    },
+    {
+      "id": "m7h5d23-q4",
+      "kind": "find-bug",
+      "prompt": "Bu parçalama fonksiyonu boy 20, örtüşme 5 için her parçada 15 kelimelik bir örtüşme yapıyor ve parça sayısı şişiyor.\n\n```\ndef parcala(kelimeler, boy, ortusme):\n    parcalar = []\n    bas = 0\n    while bas < len(kelimeler):\n        parcalar.append(kelimeler[bas:bas + boy])\n        bas = bas + ortusme\n    return parcalar\n```\n\nHata nedir?",
+      "options": [
+        "Dilim sınırı yanlış",
+        "İlerleme adımı ortusme; olması gereken boy - ortusme",
+        "while yerine for kullanılmalı",
+        "parcalar listesi sıfırlanmıyor"
+      ],
+      "answer": 1,
+      "explanation": "Pencere her turda ortusme (5) kelime ilerliyor; sonuçta ardışık parçalar 15 kelime çakışıyor. Doğru ilerleme boy − ortusme = 15'tir. Örtüşme 0 olsaydı bas hiç ilerlemez ve döngü bitmezdi. Dilim ve while doğru, liste başta bir kez sıfırlanır.",
+      "skills": [
+        "ai-chunking",
+        "ai-rag-pipeline"
+      ]
+    },
+    {
+      "id": "m7h5d23-q5",
+      "kind": "mcq",
+      "prompt": "Tek cümlelik bir cevabı olan soru için parça boyu 300 kelime seçilirse ne olması beklenir?",
+      "options": [
+        "Cevap kesinlikle bulunamaz",
+        "Cevap parçada olur ama bağlama ilgisiz metin de girer ve benzerlik sulanır",
+        "Örtüşme otomatik artar",
+        "Model bağlamı hiç kullanamaz"
+      ],
+      "answer": 1,
+      "explanation": "Büyük parça cevabı içerebilir ama soruyla ilgisiz çok kelime taşır; benzerlik düşer ve prompt gereksiz uzar. Cevabın kesinlikle kaybolması küçük parçaların riskidir. Örtüşme kendiliğinden değişmez.",
+      "skills": [
+        "ai-chunking",
+        "ai-rag-pipeline"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "RAG hattı",
+      "definition": "Parçala, vektörleştir, getir, yerleştir ve sentezle adımlarından oluşan uçtan uca akış.",
+      "example": "Kulüp rehberi için boy 20, örtüşme 5, K = 2 ayarıyla \"iki proje\" cümlesi getirilir.",
+      "pitfall": "Hattı tek parça sanmak; hata adımlardan birinde olur ve o adımı bulmak gerekir."
+    },
+    {
+      "term": "Getirme isabeti",
+      "definition": "Doğru parçanın ilk K içinde olduğu soruların oranı.",
+      "example": "20 sorunun 14'ünde doğru parça geldiyse isabet %70'tir.",
+      "pitfall": "Yalnız cevabın doğruluğuna bakmak; model şanslı da olabilir, getirme yine kötü olabilir."
+    },
+    {
+      "term": "Sadakat (groundedness)",
+      "definition": "Cevabın yalnız getirilen bağlama dayanması, bağlamda olmayan bilgi eklememesi.",
+      "example": "Bağlamda \"iki gün\" yazarken cevabın \"bir saat\" demesi sadakat hatasıdır.",
+      "pitfall": "Sadakati doğrulukla karıştırmak; kaynak yanlışsa sadık cevap da yanlış olur."
+    },
+    {
+      "term": "Eval seti",
+      "definition": "Hattı ölçmek için hazırladığın soru ve beklenen cevap listesi.",
+      "example": "Üç grup: cevabı bir parçada olan, iki parçaya yayılan ve belgede olmayan sorular.",
+      "pitfall": "Yalnız kolay sorulardan oluşturmak; \"belgede yok\" vakası olmazsa \"bilmiyorum\" hiç sınanmaz."
+    },
+    {
+      "term": "Kaynak kalitesi",
+      "definition": "RAG'ın dayandığı belgenin doğruluğu ve güncelliği.",
+      "example": "Rehberde eski teslim tarihi varsa hat onu doğru bulup getirir.",
+      "pitfall": "RAG'ın yanlış bilgiyi düzelteceğini sanmak; yalnız kaynaktakini getirir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d25-q1",
+      "kind": "mcq",
+      "prompt": "Bir testte doğru parça bağlama geldi ama cevap, bağlamda olmayan bir sayı içeriyor. Hata hangi ölçümle yakalanır?",
+      "options": [
+        "Getirme isabeti",
+        "Sadakat (cevabın bağlama dayanması)",
+        "Parça sayısı",
+        "Örtüşme oranı"
+      ],
+      "answer": 1,
+      "explanation": "Getirme doğru çalıştı: doğru parça bağlamda. Sorun, cevabın bağlamda olmayan bir şey eklemesidir; bu sadakat sorunudur. Parça sayısı ve örtüşme getirme öncesi ayarlardır ve burada hatayı göstermez.",
+      "skills": [
+        "ai-rag-eval",
+        "ai-rag-grounding"
+      ]
+    },
+    {
+      "id": "m7h5d25-q2",
+      "kind": "numeric",
+      "prompt": "Eval setinde 20 soru var. 14 soruda doğru parça ilk K içinde geliyor. Getirme isabeti yüzde kaçtır?",
+      "answer": 70,
+      "unit": "%",
+      "explanation": "14 / 20 = 0,70, yani %70. Geri kalan 6 soruda doğru parça gelmediği için model doğru bilgiyi göremez. Bu oran cevabın doğruluğuyla aynı değildir; sadakat ayrı ölçülür.",
+      "skills": [
+        "ai-rag-eval",
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d25-q3",
+      "kind": "predict-output",
+      "prompt": "Her parça için sorudaki kaç kelimenin parçada geçtiği sayılıyor. Bu kod çalışınca ne yazdırır?\n\n```\nrehber = [\"Bronz rozet için iki proje gerekir.\", \"Altın rozet için sunum gerekir.\"]\nsoru = \"altın rozet için ne gerekir\"\nsayac = [len(set(p.lower().replace(\".\", \"\").split()) & set(soru.split())) for p in rehber]\nprint(sayac)\n```",
+      "options": [
+        "[3, 4]",
+        "[4, 3]",
+        "[2, 2]",
+        "[5, 5]"
+      ],
+      "answer": 0,
+      "explanation": "İlk parçanın kelimeleri soruyla rozet, için, gerekir kelimelerini paylaşır: 3 (altın yok). İkinci parçada altın da vardır: altın, rozet, için, gerekir yani 4. Sonuç [3, 4]; \"Altın rozet\" sorusunda ikinci parça öne geçer. \"ne\" hiçbir parçada yoktur.",
+      "skills": [
+        "ai-retrieval",
+        "ai-rag-pipeline"
+      ]
+    },
+    {
+      "id": "m7h5d25-q4",
+      "kind": "find-bug",
+      "prompt": "Bu kod en benzer K parçayı seçmek istiyor ama alakasız parçalar geliyor.\n\n```\ndef en_iyi(parcalar, k):\n    sirali = sorted(parcalar, key=lambda p: p.skor)\n    return sirali[:k]\n```\n\nHata nedir?",
+      "options": [
+        "sorted artan sıralıyor; en yüksek skor için reverse=True gerekir",
+        "Dilim sınırı yanlış",
+        "lambda yerine sayı verilmeli",
+        "k negatif olmalı"
+      ],
+      "answer": 0,
+      "explanation": "sorted varsayılan olarak küçükten büyüğe sıralar; sirali[:k] bu durumda en düşük skorlu k parçayı verir. Doğrusu reverse=True. Dilim [:k] ilk k elemanı doğru alır; lambda skoru doğru seçer.",
+      "skills": [
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d25-q5",
+      "kind": "mcq",
+      "prompt": "Kulüp rehberinde teslim tarihi yanlış yazılmış. RAG hattı mükemmel çalışırsa ne olur?",
+      "options": [
+        "Hat yanlışı fark edip düzeltir",
+        "Hat \"bilmiyorum\" der",
+        "Doğru parçayı getirir ve cevap yine yanlış çıkar, çünkü kaynak yanlıştır",
+        "Hat tarihi internetten doğrular"
+      ],
+      "answer": 2,
+      "explanation": "RAG yalnız verilen belgedeki bilgiyi getirir. Kaynak yanlışsa mükemmel getirme de yanlışı taşır; cevap kaynağa sadık olsa bile yanlıştır. Atölyede dış kaynak, internet ya da doğrulama yoktur; her şey yerel çalışır.",
+      "skills": [
+        "ai-rag-grounding",
+        "ai-rag-eval"
+      ]
+    }
+  ]
+}

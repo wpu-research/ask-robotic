@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Eval raporu",
+      "definition": "Sonuçları, hataları ve güvenilirlik sınırlarını açıkça yazan kısa metin.",
+      "example": "Doğruluk, etiket başına sonuçlar, yanlış vakalar, bir iyileştirme fikri ve ne kadar güvenilebileceği yazılır.",
+      "pitfall": "Yalnız \"doğruluk %80\" yazıp hataları ve sınırları atlamak."
+    },
+    {
+      "term": "Örneklem büyüklüğü",
+      "definition": "Sonuca güvenmek için gereken vaka sayısı; azaldıkça sonuç oynak olur.",
+      "example": "10 vakalık sette tek bir vaka doğruluğu 10 puan oynatır.",
+      "pitfall": "Küçük bir setin sonucunu kesin sanmak."
+    },
+    {
+      "term": "Zor vaka",
+      "definition": "Sistemin yanılma ihtimalinin yüksek olduğu ve zayıf noktayı açığa çıkaran vaka.",
+      "example": "\"Hata yok\" cümlesinde \"hata\" olumsuz listedeki bir sözcüktür; sistem olumsuz der.",
+      "pitfall": "Zor vakadan kaçınıp sistemi iyi göstermeye çalışmak."
+    },
+    {
+      "term": "Gerileme (regresyon) testi",
+      "definition": "Sistemi değiştirdikten sonra eval'ı yeniden çalıştırıp eski başarının korunduğunu görmek.",
+      "example": "Yeni bir sözcük eklediğinde eski vakaların hâlâ geçip geçmediğine bakarsın.",
+      "pitfall": "Düzeltmeden sonra eval'ı yeniden çalıştırmamak; bir hatayı çözerken başkasını bozabilirsin."
+    },
+    {
+      "term": "Ayar seti ve ölçüm seti",
+      "definition": "Sistemi geliştirmek için kullanılan vakalar ile son başarıyı ölçmek için ayrılan vakalar.",
+      "example": "İlk 10 vakayla kuralı düzeltir, ayrı 10 vakayla son doğruluğu raporlarsın.",
+      "pitfall": "İkisini aynı tutmak; ölçüm iyimser çıkar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d20-q1",
+      "kind": "numeric",
+      "prompt": "10 vakalık bir sette sistem %80 doğruluk gösteriyor. Sette bir vaka daha yanlış çıksaydı doğruluk kaç yüzde puan düşerdi?",
+      "answer": 10,
+      "tolerance": 0,
+      "unit": "puan",
+      "explanation": "10 vakada her vaka %10'a karşılık gelir: 8/10 = %80, 7/10 = %70. Tek vaka 10 puan oynatır. 100 vakalık sette aynı fark 1 puan olurdu; küçük setlerin sonucuna bu yüzden temkinli bakılır.",
+      "skills": [
+        "eval-method",
+        "eval-metrics"
+      ]
+    },
+    {
+      "id": "m7h4d20-q2",
+      "kind": "mcq",
+      "prompt": "Aşağıdaki rapor cümlelerinden hangisi en dürüst olanıdır?",
+      "options": [
+        "Sistem mükemmel çalışıyor, doğruluk %90.",
+        "12 vakada %75 doğruluk aldım; set küçük, bu yüzden sonuç kesin değil. Hatalar alay içeren cümlelerde yoğunlaşıyor.",
+        "Zor vakaları çıkardım, böylece doğruluk %100 oldu.",
+        "Sistem çalışıyor, test etmeye gerek yok."
+      ],
+      "answer": 1,
+      "explanation": "İyi rapor sayıyı, setin boyutunu ve hataların nerede yoğunlaştığını birlikte söyler. Zor vakaları çıkarmak ölçümü sahte biçimde iyileştirir; \"mükemmel\" demek de tek sayıyla desteklenemez.",
+      "skills": [
+        "eval-method",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d20-q3",
+      "kind": "predict-output",
+      "prompt": "Duygu sınıflandırıcısı sözcük listelerine bakar; \"hata\" ve \"kullanışsız\" olumsuz, \"hızlı\" olumlu listededir, \"yok\" hiçbir listede yoktur. \"değil\" önceki puanı ters çevirir, puan 0 ise \"belirsiz\". Altı vakalık set çalıştırılıyor:\n\n```\n(\"Çok iyi\"                 , olumlu)\n(\"Kolay değil\"             , olumsuz)\n(\"Toplantı saat beşte\"     , belirsiz)\n(\"Süper ama zor\"           , belirsiz)\n(\"Hızlı ve kullanışsız\"    , olumsuz)\n(\"Hata yok\"                , olumlu)\n```\n\nHangi vakalar yanlış bulunur?",
+      "options": [
+        "Hiçbiri; 6/6 doğru",
+        "Yalnız \"Hata yok\"",
+        "\"Hızlı ve kullanışsız\" ve \"Hata yok\"; doğruluk 4/6",
+        "\"Süper ama zor\" ve \"Kolay değil\"; doğruluk 4/6"
+      ],
+      "answer": 2,
+      "explanation": "\"Hızlı ve kullanışsız\": +1 ve -1 toplamı 0, sistem belirsiz der; beklenen olumsuz. \"Hata yok\": \"hata\" -1, \"yok\" listede yok, sistem olumsuz der; beklenen olumlu. Diğer dört vaka doğrudur (\"Süper ama zor\": +1 ve -1, belirsiz; \"Kolay değil\": olumsuz). Doğruluk 4/6, yaklaşık %67.",
+      "skills": [
+        "eval-basics",
+        "eval-cases",
+        "eval-metrics"
+      ]
+    },
+    {
+      "id": "m7h4d20-q4",
+      "kind": "find-bug",
+      "prompt": "Bir öğrenci sistemini aşağıdaki adımlarla ölçüyor. Ölçümü iyimser yapan hata hangi satırdadır?\n\n```\n1: vakalar = yaz(10)\n2: kurali_ayarla(vakalar)      # kuralı bu vakalara göre düzelt\n3: skor = olc(vakalar)         # aynı vakalarla ölç\n4: rapor_yaz(skor)\n```",
+      "options": [
+        "1. satır: vaka yazmak gereksiz",
+        "3. satır: ayar için kullanılan vakalarla ölçüm yapılıyor; ayrı bir set gerekir",
+        "2. satır: kural hiç ayarlanmamalı",
+        "4. satır: rapor yazılmamalı"
+      ],
+      "answer": 1,
+      "explanation": "Kural 2. satırda bu vakalara uydurulduğu için 3. satırdaki skor olduğundan iyi çıkar (veri sızıntısı). Çözüm, ayar için ve ölçüm için ayrı setler tutmaktır. Kuralı ayarlamak ve rapor yazmak yanlış değildir.",
+      "skills": [
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d20-q5",
+      "kind": "mcq",
+      "prompt": "Sistemi her değiştirdiğinde eval'ı neden yeniden çalıştırırsın?",
+      "options": [
+        "Bir düzeltme başka vakaları bozmuş mu diye görmek için",
+        "Doğruluğun hep aynı kalması için",
+        "Test setini silmek için",
+        "Eval kendiliğinden çalıştığı için gerekmez"
+      ],
+      "answer": 0,
+      "explanation": "Bir sözcük eklemek bir hatayı çözerken başka bir vakayı bozabilir. Eval'ı her değişiklikten sonra çalıştırmak (gerileme testi) bunu hemen gösterir. Doğruluğun sabit kalması amaç değil; amaç gerçeği ölçmektir.",
+      "skills": [
+        "eval-method",
+        "eval-basics"
+      ]
+    }
+  ]
+}

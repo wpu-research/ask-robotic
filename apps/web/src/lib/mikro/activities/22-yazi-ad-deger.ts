@@ -11,8 +11,8 @@ export const ders22: MikroActivity = {
   starter: () => project('Yazı ve değer', [onStart(), onButton('A', []), onButton('B', []), onRadio([])]),
   goals: [
     usesBlocks('bloklar', "'radyoyla yazı gönder', 'radyoyla … = … gönder' ve 'alınan ad' bloklarını kullan", ['mk_radio_send_text', 'mk_radio_send_value', 'mk_radio_recv'], { hint: 'Hepsi Radyo kategorisinde.' }),
-    radioSent('yazi', "Kart 1: A ile 'selam' yazısını gönder", { kind: 'str', card: 0, where: (m) => m.str === 'selam' }),
-    radioSent('cift', "Kart 1: B ile 'sicak' adıyla sıcaklığı gönder", { kind: 'kv', card: 0, where: (m) => m.name === 'sicak' }),
+    radioSent('yazi', "Kart 1: A ile 'selam' yazısını gönder", { kind: 'str', card: 0, where: (m) => m.str === 'selam', hint: "Kart 1'de A düğmesine kısa bas." }),
+    radioSent('cift', "Kart 1: B ile 'sicak' adıyla sıcaklığı gönder", { kind: 'kv', card: 0, where: (m) => m.name === 'sicak', hint: "Kart 1'de B düğmesine kısa bas." }),
     showsText('selam', "Kart 2 ekranında 'selam' yazısı kaysın", 'selam', { card: 1 }),
     showsNumber('sicak', 'Kart 2, gelen sıcaklığı (28) sayı olarak göstersin', 28, { card: 1, hint: "Karttaki 'Sıcaklık' kaydırıcısını 28 yapıp B'ye bas." }),
   ],

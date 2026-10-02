@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Süzülme",
+      "definition": "Sensörün 0° dediği nokta gerçek denge noktası olmadığında robotun düşmeden ama yavaşça aynı yöne gitmesi.",
+      "example": "Sensör 4° kaymışsa yalnız açı PD'li robot 15 saniyede yaklaşık 16,6 cm süzüldü.",
+      "pitfall": "Süzülmeyi PD'nin hatası sanmak: kayma olmayınca aynı kod yerinde duruyor."
+    },
+    {
+      "term": "Kaskad kontrol",
+      "definition": "İki kontrolcüyü zincirlemek: dış döngünün çıkışı iç döngünün hedefi olur.",
+      "example": "Dış döngü konumdan hedef açı üretir, iç döngü o açıyı motor komutuna çevirir.",
+      "pitfall": "Dış döngünün motoru doğrudan sürmesini beklemek: o yalnız hedef açıyı belirler."
+    },
+    {
+      "term": "Hedef açı",
+      "definition": "Dış döngünün ürettiği, iç döngünün tutmaya çalıştığı açı. Komut = KP·(açı − hedefAçı) + KD·açıHızı.",
+      "example": "Robot ileri süzülüyorsa hedef açı negatif olur ve robot geri yatıp geri döner.",
+      "pitfall": "Hedefi hesaplayıp iç döngüde kullanmamak: kaskad etkisiz kalır."
+    },
+    {
+      "term": "Dış döngünün hızı",
+      "definition": "Dış döngü, iç döngüden yaklaşık 5-10 kat yavaş çalışmalıdır ki iç döngü hedefe oturabilsin.",
+      "example": "5 ms iç döngü, 20 ms dış döngü (DIS_ORAN = 4).",
+      "pitfall": "Dış döngüyü iç döngüyle aynı hızda çalıştırmak: ikisi birbirini kovalar ve robot sallanır."
+    },
+    {
+      "term": "Hedef açı sınırı",
+      "definition": "Dış döngünün çıkışını ±6° gibi bir aralıkla kısıtlamak, iç döngünün toparlayamayacağı yatışı önler.",
+      "example": "KX·konum + KV·hız = -9° ise sınır onu -6°'ye indirir.",
+      "pitfall": "Hedefi sınırlamamak ya da sınırı çok geniş seçmek: sensör kayması büyükse robot gereğinden çok yatar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d4-q1",
+      "kind": "mcq",
+      "prompt": "Kaskad denge kontrolünde dış döngünün çıkışı nedir?",
+      "options": [
+        "Motorlara giden PWM değeri",
+        "Jiroskop sapması",
+        "Hedef açı; iç döngü bu açıyı tutmaya çalışır",
+        "Dış döngünün kendi periyodu"
+      ],
+      "answer": 2,
+      "explanation": "Dış döngü konum ve hıza bakıp hedef açıyı belirler, iç döngü o açıyı motor komutuna çevirir. Motor PWM'ini iç döngü üretir; dış döngü motorla doğrudan konuşmaz.",
+      "skills": [
+        "ctrl-cascade"
+      ]
+    },
+    {
+      "id": "m5h6d4-q2",
+      "kind": "predict-output",
+      "prompt": "İç döngünün bir turu çalışıyor. Bu kod ne yazar?\n\n```\nfloat KP = 0.15, KD = 0.02;\nfloat aci = 2.0, hedefAci = -1.0, hiz = 10.0;\nfloat komut = KP * (aci - hedefAci) + KD * hiz;\nSerial.println(komut, 2);\n```",
+      "options": [
+        "0.35",
+        "0.45",
+        "0.50",
+        "0.65"
+      ],
+      "answer": 3,
+      "explanation": "aci - hedefAci = 2 - (-1) = 3 ve KP·3 = 0,45. KD·hiz = 0,02·10 = 0,20. Toplam 0,65. 0.35 hedef açının işaretini yanlış almak, 0.50 hedef açıyı hiç kullanmamak (0,15·2 + 0,20), 0.45 ise KD terimini unutmak olurdu.",
+      "skills": [
+        "ctrl-cascade"
+      ]
+    },
+    {
+      "id": "m5h6d4-q3",
+      "kind": "numeric",
+      "prompt": "KX = -60 derece/metre, KV = -150 derece/(m/s), HEDEF_SINIR = 6°. Konum 0,05 m ve hız 0,04 m/s iken dış döngü hedef açıyı kaç derece verir?",
+      "answer": -6,
+      "tolerance": 0,
+      "unit": "°",
+      "explanation": "KX·konum = -3° ve KV·hız = -6°; toplam -9°. Bu değer ±6° sınırını aştığı için constrain onu -6°'ye kısar. Sınır olmasaydı iç döngü toparlayamayacağı kadar büyük bir yatış isteyecekti.",
+      "skills": [
+        "ctrl-cascade",
+        "robot-tuning"
+      ]
+    },
+    {
+      "id": "m5h6d4-q4",
+      "kind": "find-bug",
+      "prompt": "Dış döngü hedef açıyı hesaplıyor ama robot süzülmeye devam ediyor. Hangi satır hatalı?\n\n```\n1  hedefAci = constrain(KX * konumTahmin + KV * hizTahmin, -HEDEF_SINIR, HEDEF_SINIR);\n2  sonKomut = KP * aci + KD * hiz;\n3  motorSur(sonKomut);\n```",
+      "options": [
+        "1. satır: constrain kaldırılmalı",
+        "2. satır: hedefAci iç döngüde kullanılmıyor; KP * (aci - hedefAci) olmalı",
+        "3. satır: motorSur çağrılmamalı",
+        "1. satır: KX pozitif olmalı"
+      ],
+      "answer": 1,
+      "explanation": "Hedef açı hesaplanıyor ama komuta girmiyor; iç döngü hâlâ sıfır dereceyi hedefliyor ve kaskad etkisiz. İç döngü KP * (aci - hedefAci) kullanmalı. constrain güvenlik için gereklidir; KX negatif olması doğrudur.",
+      "skills": [
+        "ctrl-cascade",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d4-q5",
+      "kind": "mcq",
+      "prompt": "Dış döngüyü iç döngüyle aynı hızda (her 5 ms'de) çalıştırırsan ne beklersin?",
+      "options": [
+        "İki döngü birbirini kovalar; robot ayakta kalabilir ama sürekli sallanır",
+        "Robot daha hızlı oturur ve süzülme tamamen biter",
+        "Hiçbir fark olmaz",
+        "Robot anında düşer, çünkü hedef açı hep sınırda kalır"
+      ],
+      "answer": 0,
+      "explanation": "İç döngü yeni hedefe oturamadan hedef yeniden değişir. Benzetimde bu durumda robot düşmedi ama açı salınımı 2,14° RMS oldu; 4 kat yavaş dış döngüyle 0,30° idi. Dış döngü bu yüzden iç döngüden yavaş olmalıdır.",
+      "skills": [
+        "ctrl-cascade",
+        "robot-tuning"
+      ]
+    }
+  ]
+}

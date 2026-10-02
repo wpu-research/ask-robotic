@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Geri çağırma (recall)",
+      "definition": "Bir etiketin gerçekten bulunduğu vakalardan kaçının doğru bulunduğunu gösteren oran.",
+      "example": "4 olumsuz vakadan 3'ü doğru bulunduysa olumsuz için geri çağırma 3/4'tür.",
+      "pitfall": "Paydaya tüm vakaları koymak; payda yalnız o etiketin vaka sayısıdır."
+    },
+    {
+      "term": "Dengesiz veri",
+      "definition": "Etiketlerden birinin sette çok daha fazla bulunması.",
+      "example": "100 yorumun 90'ı olumluysa set olumlu etiketine doğru kaymıştır.",
+      "pitfall": "Dengesizliği fark etmeden tek bir doğruluk sayısına güvenmek."
+    },
+    {
+      "term": "Etiket başına sonuç",
+      "definition": "Her etiket için ayrı hesaplanan başarı; zayıf noktayı gösterir.",
+      "example": "Olumlu etiketi %100, olumsuz %50 çıkarsa sorun olumsuz vakalardadır.",
+      "pitfall": "Toplam doğruluğa bakıp etiket başına tabloyu hiç açmamak."
+    },
+    {
+      "term": "Hata gruplama",
+      "definition": "Yanlış bulunan vakaları ortak nedene göre sınıflamak.",
+      "example": "Alay içeren üç hata ve bilinmeyen sözcük içeren iki hata iki grup oluşturur.",
+      "pitfall": "Her hatayı ayrı ayrı yamamaya çalışmak; ortak neden bulunursa tek düzeltme birçok hatayı çözer."
+    },
+    {
+      "term": "Hata türünün maliyeti",
+      "definition": "Her yanlışın aynı bedeli olmadığı fikri: bazı hatalar diğerlerinden daha ağırdır.",
+      "example": "Robotun engele \"devam\" demesi, gereksiz \"dur\" demesinden çok daha tehlikelidir.",
+      "pitfall": "Tüm hataları eşit saymak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d18-q1",
+      "kind": "numeric",
+      "prompt": "50 vakalık bir sette 45 vaka olumlu, 5 vaka olumsuz. Sistem olumlu vakaların 44'ünü, olumsuz vakaların yalnız 2'sini doğru buluyor. Olumsuz etiketi için geri çağırma yüzde kaçtır?",
+      "answer": 40,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Geri çağırma = o etiketten doğru bulunan / o etiketin tüm vakaları = 2 / 5 = %40. Toplam doğruluk (44 + 2) / 50 = %92 olduğu için iyi görünür; zayıflık yalnız etiket başına bakınca anlaşılır.",
+      "skills": [
+        "eval-metrics"
+      ]
+    },
+    {
+      "id": "m7h4d18-q2",
+      "kind": "mcq",
+      "prompt": "Verinin %95'i olumlu olan bir sette, hep \"olumlu\" diyen sistem için ne söylenebilir?",
+      "options": [
+        "Doğruluk %95 çıkar ama olumsuz vakaların hiçbiri bulunmaz; sistem aslında bir şey öğrenmemiştir",
+        "Sistem harika, doğruluğu %95",
+        "Doğruluk %50 çıkar",
+        "Sistem hata verir"
+      ],
+      "answer": 0,
+      "explanation": "Hep aynı etiketi söylemek, o etiket çoğunluktayken yüksek doğruluk verir. Olumsuz için geri çağırma %0'dır; bu sistem pratikte işe yaramaz. Dengesiz veride tek sayı yanıltır.",
+      "skills": [
+        "eval-metrics",
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d18-q3",
+      "kind": "predict-output",
+      "prompt": "Duygu sınıflandırıcısı sözcük listelerine bakar (\"fena\" ve \"bozuldu\" hiçbir listede yok; \"değil\" önceki puanı ters çevirir; puan 0 ise \"belirsiz\"). Beş vakalık set çalıştırılıyor:\n\n```\n(\"Berbat bir ders\"       , olumsuz)\n(\"Harika, yine bozuldu\"  , olumsuz)\n(\"Çok yavaş\"             , olumsuz)\n(\"Fena değil\"            , olumlu)\n(\"Güzel\"                 , olumlu)\n```\n\nRapor hangisidir?",
+      "options": [
+        "Doğruluk 5/5; tüm etiketler %100",
+        "Doğruluk 3/5; olumlu geri çağırma 1/2, olumsuz geri çağırma 2/3",
+        "Doğruluk 3/5; olumlu geri çağırma 2/2, olumsuz geri çağırma 1/3",
+        "Doğruluk 2/5; olumlu geri çağırma 1/2, olumsuz geri çağırma 1/3"
+      ],
+      "answer": 1,
+      "explanation": "\"Berbat bir ders\" olumsuz, doğru. \"Harika, yine bozuldu\": harika +1, sistem olumlu der, yanlış. \"Çok yavaş\" olumsuz, doğru. \"Fena değil\": fena listede yok, puan 0, sistem belirsiz der, yanlış. \"Güzel\" olumlu, doğru. Olumsuz etiketi 3 vakadan 2'sini, olumlu 2 vakadan 1'ini bulur; toplam 3/5.",
+      "skills": [
+        "eval-metrics",
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d18-q4",
+      "kind": "find-bug",
+      "prompt": "Bir etiket için geri çağırmayı hesaplayan kodda tek hata var. Hangi satır?\n\n```\n1: n  = say(vakalar, beklenen == etiket)\n2: ok = say(vakalar, beklenen == etiket ve cikti == etiket)\n3: toplam = say(vakalar)\n4: geri_cagirma = ok / toplam\n```",
+      "options": [
+        "1. satır: n hesaplanmamalı",
+        "2. satır: ok için cikti kontrolü gereksiz",
+        "3. satır: toplam hesaplanmamalı",
+        "4. satır: ok, n'ye bölünmeli; toplam vaka sayısına değil"
+      ],
+      "answer": 3,
+      "explanation": "Geri çağırmanın paydası o etiketin vaka sayısıdır (n). Toplam vakaya bölmek her etiketin geri çağırmasını olduğundan düşük gösterir. 1. ve 2. satırlar payı ve paydayı doğru sayar.",
+      "skills": [
+        "eval-metrics",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d18-q5",
+      "kind": "mcq",
+      "prompt": "Yanlış bulunan vakaları nedenlerine göre gruplamanın en büyük faydası nedir?",
+      "options": [
+        "Doğruluk sayısını yükseltir",
+        "Test setini kısaltır",
+        "Hataları görünmez yapar",
+        "Aynı nedenin yol açtığı hataları tek bir düzeltmeyle çözmeyi sağlar"
+      ],
+      "answer": 3,
+      "explanation": "Hataları gruplamak ortak kök nedeni bulmaya yardım eder (örneğin alay tanıyamamak). Tek bir düzeltme birçok vakayı birden kurtarabilir. Gruplamak doğruluğu kendiliğinden değiştirmez.",
+      "skills": [
+        "eval-metrics",
+        "eval-method"
+      ]
+    }
+  ]
+}

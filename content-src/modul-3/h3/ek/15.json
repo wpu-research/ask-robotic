@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Ters map",
+      "definition": "map'in çıkış aralığını büyükten küçüğe yazarak girdi arttıkça çıktıyı azaltmak.",
+      "example": "map(isik, 150, 700, 200, 0): karanlıkta 200, aydınlıkta 0.",
+      "pitfall": "Aralığı ters yazmayı unutmak: lamba karanlıkta söner, aydınlıkta yanar."
+    },
+    {
+      "term": "const",
+      "definition": "Değeri hiç değişmeyen bir sayı tanımlar; ayar sayılarını başa koymak için kullanılır.",
+      "example": "const int KARANLIK = 150;",
+      "pitfall": "Aynı sayıyı kodun birçok yerine yazmak: sonradan hepsini bulup değiştirmek zorlaşır."
+    },
+    {
+      "term": "Aşamalı geliştirme",
+      "definition": "Önce küçük bir sürümü çalıştırıp sonra özellik eklemek.",
+      "example": "Önce yalnız LDR ile lamba, sonra potansiyometre ve NTC.",
+      "pitfall": "Her şeyi tek seferde yazmak: hata çıkınca nedenini bulmak zorlaşır."
+    },
+    {
+      "term": "Güvenlik önceliği",
+      "definition": "Güvenlik koşulunu normal hesaptan sonra kontrol edip sonucu ezmesine izin vermek.",
+      "example": "Sıcaklık 40 °C'yi aşarsa parlaklık, hesaplanan değerden bağımsız olarak 0 yapılır.",
+      "pitfall": "Güvenlik kontrolünü en başa yazıp sonra parlaklığı yeniden hesaplamak: güvenlik ezilir."
+    },
+    {
+      "term": "Geçersiz ölçüm işareti",
+      "definition": "Ölçüm yapılamadığında sıcaklığa -99 gibi imkansız bir değer vermek.",
+      "example": "Seri monitörde sicaklik=-99.0 görürsen NTC bağlantısını kontrol et.",
+      "pitfall": "-99 değerini gerçek sıcaklık sanmak ya da bu değerle karar vermek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d15-q1",
+      "kind": "numeric",
+      "prompt": "KARANLIK = 150, AYDINLIK = 700, enYuksek = 200. isik = 425 iken map(isik, KARANLIK, AYDINLIK, enYuksek, 0) kaç döndürür?",
+      "answer": 100,
+      "tolerance": 0,
+      "explanation": "(425 − 150) × (0 − 200) / (700 − 150) + 200 = 275 × (−200) / 550 + 200 = −100 + 200 = 100. 425 aralığın tam ortasıdır, bu yüzden çıkış da 200 ile 0'ın ortasıdır.",
+      "skills": [
+        "map-constrain",
+        "analog-adc"
+      ]
+    },
+    {
+      "id": "m3h3d15-q2",
+      "kind": "find-bug",
+      "prompt": "Gece lambası aydınlıkta yanıyor, karanlıkta sönük kalıyor. Bağlantılar doğru (LDR üstte, 10 kΩ altta). Hata hangi satırda?\n\n```\nint isik = analogRead(A1);\nint parlaklik = map(isik, KARANLIK, AYDINLIK, 0, 255);\nparlaklik = constrain(parlaklik, 0, 255);\nanalogWrite(11, parlaklik);\n```",
+      "options": [
+        "int isik = analogRead(A1);",
+        "map(isik, KARANLIK, AYDINLIK, 0, 255)",
+        "constrain(parlaklik, 0, 255)",
+        "analogWrite(11, parlaklik);"
+      ],
+      "answer": 1,
+      "explanation": "Işık arttıkça isik büyür; çıkış aralığı 0'dan 255'e yazıldığı için parlaklık da artar. Karanlıkta parlak istediğimiz için aralık ters yazılmalıdır: map(isik, KARANLIK, AYDINLIK, 255, 0).",
+      "skills": [
+        "map-constrain",
+        "sensor-ldr",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d15-q3",
+      "kind": "predict-output",
+      "prompt": "SICAK_SINIR = 40.0, sicaklik = 42.5 ve hesaplanan parlaklik = 120. Bu kod çalışınca lamba (D11) ve uyarı LED'i (D13) ne yapar?\n\n```\nif (sicaklik > SICAK_SINIR) {\n  parlaklik = 0;\n  digitalWrite(13, HIGH);\n} else {\n  digitalWrite(13, LOW);\n}\nanalogWrite(11, parlaklik);\n```",
+      "options": [
+        "Lamba söner, uyarı da söner",
+        "Lamba 120 parlaklıkla yanar, uyarı söner",
+        "Lamba 120 parlaklıkla yanar, uyarı da yanar",
+        "Lamba söner, uyarı yanar"
+      ],
+      "answer": 3,
+      "explanation": "42,5 > 40 olduğu için if dalı çalışır: parlaklik 0 olur ve D13 yanar. analogWrite(11, 0) lambayı söndürür. Güvenlik koşulu, önceden hesaplanan 120'yi ezmiştir.",
+      "skills": [
+        "prog-debug",
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m3h3d15-q4",
+      "kind": "numeric",
+      "prompt": "Döngüde 8 ölçümlük ortalamanın içinde delay(3), tur sonunda delay(200) var. Yalnız delay'lerin toplamına göre bir tur kaç milisaniye sürer?",
+      "answer": 224,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "8 × 3 = 24 ms ölçüm beklemesi, artı 200 ms tur sonu beklemesi: 224 ms. Gerçekte hesap süresi biraz ekler ama delay'ler baskındır. Yaklaşık 4,5 tur/saniye lambanın ışığa yeterince hızlı yanıt vermesini sağlar.",
+      "skills": [
+        "prog-timing",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m3h3d15-q5",
+      "kind": "mcq",
+      "prompt": "Gece lambası projesinde potansiyometre en sola çevrildi (enYuksek = 0) ve oda karanlık. Lamba ne yapar?",
+      "options": [
+        "Tam parlak yanar",
+        "Yarı parlaklıkla yanar",
+        "Hiç yanmaz",
+        "Yanıp söner"
+      ],
+      "answer": 2,
+      "explanation": "map çıkış aralığı 0'dan 0'a gider, constrain da 0 ile 0 arasında tutar; parlaklık 0 olur. Potansiyometre lambanın üst sınırını belirler, o 0 ise lamba bozuk değildir, sadece izin verilen en yüksek parlaklık sıfırdır.",
+      "skills": [
+        "analog-adc",
+        "map-constrain"
+      ]
+    }
+  ]
+}

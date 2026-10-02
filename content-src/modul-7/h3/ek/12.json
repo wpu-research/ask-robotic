@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "JSON",
+      "definition": "Anahtar-değer çiftlerinden oluşan, çift tırnaklı ve virgülle ayrılan düzenli veri biçimi.",
+      "example": "{\"duygu\": \"olumlu\", \"konu\": \"robot dersi\"}",
+      "pitfall": "Tek tırnak kullanmak ya da son öğeden sonra virgül bırakmak; ikisi de geçersiz JSON üretir."
+    },
+    {
+      "term": "Yapılandırılmış çıktı",
+      "definition": "Modelden serbest cümle yerine bir programın okuyabileceği düzenli biçimde cevap istemek.",
+      "example": "Yorumdan duygu ve konuyu JSON olarak çıkarttırmak.",
+      "pitfall": "Biçimi hiç söylememek; model her seferinde farklı bir biçim seçebilir."
+    },
+    {
+      "term": "Anahtar adı tutarlılığı",
+      "definition": "Talimatta, örnekte ve doğrulama kodunda aynı anahtar adlarını kullanmak.",
+      "example": "Hepsinde \"duygu\" ve \"konu\" yazmak.",
+      "pitfall": "Talimatta \"duygu\", örnekte \"his\" yazmak; model hangisini seçeceğini bilemez."
+    },
+    {
+      "term": "Doğrulama (validation)",
+      "definition": "Gelen çıktının geçerli JSON olduğunu ve beklenen anahtarları taşıdığını kontrol etmek.",
+      "example": "JSON.parse ile ayrıştırmak, sonra \"duygu\" ve \"konu\" var mı diye bakmak.",
+      "pitfall": "Doğrulamayı atlayıp çıktının hep düzgün geleceğini varsaymak."
+    },
+    {
+      "term": "Yeniden deneme",
+      "definition": "Doğrulama başarısız olunca isteği tekrar göndermek ya da hata vermek.",
+      "example": "Üç denemede de geçersizse kullanıcıya \"şimdi cevap veremiyorum\" demek.",
+      "pitfall": "Sonsuz tekrar denemek; deneme sayısına sınır koymak gerekir."
+    },
+    {
+      "term": "Ek yazı yasağı",
+      "definition": "Prompt'a \"JSON dışında hiçbir şey yazma\" demek.",
+      "example": "\"İşte sonuç:\" gibi giriş cümlelerini azaltmak için yazılan kısıt.",
+      "pitfall": "Kısıtı garanti saymak; model yine de açıklama ekleyebilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d12-q1",
+      "kind": "mcq",
+      "prompt": "Model JSON istendiğinde çoğunlukla düzgün cevap veriyor. Çıktıyı neden yine de doğrulaman gerekir?",
+      "options": [
+        "Çünkü JSON yalnız tek bir anahtar taşıyabilir",
+        "Çünkü JSON.parse hiç hata vermez",
+        "Çünkü doğrulama modeli daha akıllı yapar",
+        "Çünkü model bazen geçersiz JSON ya da eksik anahtar üretebilir ve bunu garanti edemez"
+      ],
+      "answer": 3,
+      "explanation": "Model olasılıkla yazar; çoğu zaman düzgündür ama garanti yoktur. Önüne açıklama ekleyebilir, tırnağı atlayabilir ya da bir anahtarı unutabilir. Doğrulama modeli değiştirmez; yalnız hatayı yakalar. JSON.parse geçersiz metinde hata fırlatır.",
+      "skills": [
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d12-q2",
+      "kind": "predict-output",
+      "prompt": "Model şu cevabı verdi. Bu kod çalışınca ne olur?\n\n```\nconst yanit = 'İşte sonuç: {\"duygu\": \"olumlu\"}'\nconst veri = JSON.parse(yanit)\nconsole.log(veri.duygu)\n```",
+      "options": [
+        "olumlu yazdırılır",
+        "undefined yazdırılır",
+        "JSON.parse hata fırlatır, hiçbir şey yazdırılmaz",
+        "İşte sonuç: olumlu yazdırılır"
+      ],
+      "answer": 2,
+      "explanation": "Metin geçerli JSON değildir: başında \"İşte sonuç:\" vardır ve JSON metnin tamamı olmalıdır. JSON.parse bu durumda SyntaxError fırlatır; console.log satırına hiç gelinmez. Bu yüzden \"yalnızca JSON ver\" kısıtı ve doğrulama birlikte kullanılır.",
+      "skills": [
+        "ai-output-validate",
+        "ai-structured-output"
+      ]
+    },
+    {
+      "id": "m7h3d12-q3",
+      "kind": "find-bug",
+      "prompt": "Bir modelin ürettiği aşağıdaki çıktı JSON.parse ile ayrıştırılamıyor. Sorun nedir?\n\n```\n{\"duygu\": \"olumlu\", \"konu\": \"robot dersi\",}\n```",
+      "options": [
+        "\"duygu\" anahtarı Türkçe karakter içeriyor",
+        "Son öğeden sonra fazladan bir virgül var",
+        "Değerler çift tırnak içinde yazılmış",
+        "Nesnede iki anahtar var"
+      ],
+      "answer": 1,
+      "explanation": "JSON son öğeden sonra virgüle izin vermez. Türkçe harfli anahtarlar ve çift tırnaklı değerler geçerlidir; iki anahtar da sorun değildir. Düzeltme: sondaki virgülü sil.",
+      "skills": [
+        "ai-structured-output",
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d12-q4",
+      "kind": "numeric",
+      "prompt": "Bir uygulama modelden 50 yanıt aldı ve 3'ü JSON.parse ile ayrıştırılamadı. Yanıtların yüzde kaçı geçerli JSON?",
+      "answer": 94,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "50 − 3 = 47 geçerli yanıt vardır. 47 / 50 × 100 = 94. Yüzde 6 oranındaki hata küçük görünebilir; ama uygulama bunu yeniden deneme ya da hata ile karşılamak zorundadır.",
+      "skills": [
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d12-q5",
+      "kind": "mcq",
+      "prompt": "Yanıt geçerli JSON, ama beklediğin \"konu\" anahtarı yok. Uygulama ne yapmalı?",
+      "options": [
+        "\"konu\" eksikliğini fark edip yeniden denemeli ya da hata vermeli",
+        "JSON.parse başarılı olduğu için veriyi aynen kullanmalı",
+        "Yanıtı sessizce silmeli",
+        "Prompt denetleyicinin puanına bakmalı"
+      ],
+      "answer": 0,
+      "explanation": "Doğrulama iki katmanlıdır: geçerli JSON mu, beklenen anahtarlar var mı. Eksik anahtar varsa yeniden dene ya da hata ver. Sessizce silmek hatayı gizler. Atölyedeki denetleyici yalnız prompt'u değerlendirir; modelin yanıtını doğrulamaz.",
+      "skills": [
+        "ai-output-validate",
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

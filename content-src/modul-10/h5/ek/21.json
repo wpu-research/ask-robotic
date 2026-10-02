@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Radyo grubu",
+      "definition": "Kartların hangi kanalda konuştuğunu belirleyen 0-255 arası sayı. Aynı gruptaki kartlar birbirini duyar.",
+      "example": "Her iki kart da grup 1'deyse Kart 1'in gönderdiği sayı Kart 2'ye ulaşır.",
+      "pitfall": "İki kartı farklı gruba koymak: mesaj hiç ulaşmaz ve hata mesajı da çıkmaz."
+    },
+    {
+      "term": "radyoyla sayı gönder",
+      "definition": "Gruptaki öteki karta bir sayı yollayan blok.",
+      "example": "A düğmesinin içine 1, B düğmesinin içine 2 gönderen blok koyarsan iki farklı komut yollarsın.",
+      "pitfall": "Gönderen kartın kendi mesajını alacağını sanmak; gönderen kart kendi mesajını almaz."
+    },
+    {
+      "term": "radyo mesajı alınınca",
+      "definition": "Gruptan bir mesaj ulaştığında kendiliğinden çalışan başlık.",
+      "example": "Başlığın içine eğer bloğu koyup gelen sayıya göre simge gösterebilirsin.",
+      "pitfall": "Başlığı boş bırakmak: gönderen çalışsa bile alan kart hiçbir şey yapmaz."
+    },
+    {
+      "term": "alınan [sayı]",
+      "definition": "Alma başlığının içinde, o an gelen mesajdaki sayıyı veren blok.",
+      "example": "alınan sayı = 1 karşılaştırması, 1 numaralı komut gelip gelmediğini sorar.",
+      "pitfall": "Bu bloğu alma başlığının dışında kullanmak; orada anlamlı bir mesaj yoktur."
+    },
+    {
+      "term": "Komut sayısı",
+      "definition": "Bir sayıya önceden kararlaştırılmış bir anlam yüklemek: 1 = kalp, 2 = mutlu yüz gibi.",
+      "example": "Kart 1 sayı 2 yollar, Kart 2 sayıyı görünce mutlu yüz gösterir.",
+      "pitfall": "Karşılaştırma işaretini yanlış seçmek; eşitlik için = kullanılır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d21-q1",
+      "kind": "mcq",
+      "prompt": "Kart 1'in grubu 3, Kart 2'nin grubu 4. Kart 1 radyoyla sayı gönderiyor. Ne olur?",
+      "options": [
+        "Kart 2 mesajı alır",
+        "Radyo hata mesajı gösterir",
+        "Kart 2 mesajı almaz ve hata mesajı çıkmaz",
+        "Kart 1 mesajı kendi ekranında gösterir"
+      ],
+      "answer": 2,
+      "explanation": "Mesaj yalnızca aynı gruptaki kartlara gider. Gruplar farklı olduğu için Kart 2 mesajı almaz. Kart bunu bilemediğinden hata mesajı da çıkmaz; bu yüzden yanıt \"hata verir\" yanlıştır.",
+      "skills": [
+        "mk-radio-group",
+        "mk-message-flow"
+      ]
+    },
+    {
+      "id": "m10h5d21-q2",
+      "kind": "predict-output",
+      "prompt": "İki kart da aynı programı çalıştırıyor ve ikisi de grup 1'de. Kart 1'de A düğmesine basılıyor.\n\n```\nbaşlangıçta: radyo grubunu 1 yap\n\ndüğme A basılınca:\n    radyoyla sayı gönder 1\n    simgeyi göster kalp\n\nradyo mesajı alınınca:\n    eğer alınan sayı = 1 ise\n        simgeyi göster mutlu yüz\n```\n\nİki ekranda ne görünür?",
+      "options": [
+        "Kart 1: kalp, Kart 2: kalp",
+        "Kart 1: kalp, Kart 2: mutlu yüz",
+        "Kart 1: mutlu yüz, Kart 2: mutlu yüz",
+        "Kart 1: kalp, Kart 2: boş"
+      ],
+      "answer": 1,
+      "explanation": "Kart 1, A'nın içinde kalbi kendisi gösterir ve mesajı yollar. Gönderen kendi mesajını almadığı için Kart 1'in alma başlığı çalışmaz; kalp kalır. Kart 2 mesajı alır, sayı 1 olduğundan mutlu yüz gösterir. Kart 2'de kalp görünmez, çünkü kalbi gösteren blok düğmenin içindedir ve düğmeye yalnız Kart 1'de basıldı.",
+      "skills": [
+        "mk-message-flow",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h5d21-q3",
+      "kind": "find-bug",
+      "prompt": "Kart 1'deki A düğmesine basınca Kart 2 hiçbir şey yapmıyor. İki kart da grup 1'de. Hatayı bul.\n\n```\nbaşlangıçta: radyo grubunu 1 yap\n\ndüğme A basılınca:\n    radyoyla sayı gönder 1\n\nradyo mesajı alınınca:\n    (boş)\n```",
+      "options": [
+        "Radyo grubu 1 olamaz",
+        "Gönderme bloğu düğmenin içinde olmamalı",
+        "Sayı 1 yerine 0 olmalı",
+        "Alma başlığının içi boş, mesajı işleyen blok yok"
+      ],
+      "answer": 3,
+      "explanation": "Mesaj Kart 2'ye ulaşıyor, ama alma başlığının içi boş olduğundan Kart 2 ona tepki vermiyor. Grup numaraları aynı (1) olduğu için grup hatası yoktur; gönderme bloğu da doğru yerdedir.",
+      "skills": [
+        "mk-message-flow",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d21-q4",
+      "kind": "numeric",
+      "prompt": "Radyo grubu 0 ile 255 arasında bir sayıdır (0 ve 255 dahil). Kaç farklı grup vardır?",
+      "answer": 256,
+      "tolerance": 0,
+      "unit": "grup",
+      "explanation": "0'dan 255'e kadar 256 sayı vardır; saymaya 0'dan başlandığı için son numara (255) ile grup sayısı (256) farklıdır.",
+      "skills": [
+        "mk-radio-group"
+      ]
+    },
+    {
+      "id": "m10h5d21-q5",
+      "kind": "mcq",
+      "prompt": "alınan [sayı] bloğu en doğru nerede kullanılır?",
+      "options": [
+        "radyo mesajı alınınca başlığının içinde",
+        "başlangıçta içinde, program açılırken",
+        "Yalnız düğme başlıklarının içinde",
+        "Gönderme bloğundan önce, her yerde"
+      ],
+      "answer": 0,
+      "explanation": "Gelen mesaj alma başlığının içinde bulunur; blok oradan okur. Düğme başlığında ya da başlangıçta henüz alınmış mesaj olmayabilir, bu yüzden orada beklenen sayıyı vermez.",
+      "skills": [
+        "mk-message-flow",
+        "mk-conditions"
+      ]
+    }
+  ]
+}

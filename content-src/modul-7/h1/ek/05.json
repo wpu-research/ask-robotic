@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Çözümleme",
+      "definition": "Üretilen metni derlemle karşılaştırıp garipliğin nedenini bulma işi.",
+      "example": "Üretilen cümledeki her kelime çiftini derlemde arayıp var mı yok mu not etmek.",
+      "pitfall": "Yalnız \"saçma\" demekle yetinmek; nedeni (kopya, birleştirme, bağlam) yazılmalıdır."
+    },
+    {
+      "term": "Birebir kopya",
+      "definition": "Modelin derlemde bulunan bir cümleyi aynen üretmesi.",
+      "example": "\"öğretmen öğrenciye yardım eder .\" mini derlemde de aynen geçer.",
+      "pitfall": "Kopyayı \"model anladı ve yeni cümle kurdu\" diye yorumlamak."
+    },
+    {
+      "term": "Yeniden birleştirme",
+      "definition": "Derlemde ayrı ayrı bulunan parçaların, derlemde olmayan yeni bir sırayla art arda gelmesi.",
+      "example": "\"ileri gider ve\" ile \"ve engeli görür\" ayrı ayrı vardır; model bunları birleştirebilir.",
+      "pitfall": "Her kelime çifti derlemde var diye cümlenin anlamlı olacağını sanmak."
+    },
+    {
+      "term": "Bağlam sınırı",
+      "definition": "Modelin yalnız son birkaç kelimeye bakması; cümlenin başını ve bütününü görememesi.",
+      "example": "İki kelimelik bağlam, nokta sonrasında önceki cümleyi unutur.",
+      "pitfall": "Garipliği \"model hata yaptı\" diye düşünmek; sınır tasarımın doğal sonucudur."
+    },
+    {
+      "term": "Bağlam uzatmanın bedeli",
+      "definition": "Daha uzun bağlam tutarlılığı artırır ama o bağlamın derlemde yeterince geçmesini, yani daha çok veri gerektirir.",
+      "example": "Üç kelimelik bağlamlar küçük derlemde çoğu zaman bulunamaz ve model geri çekilir.",
+      "pitfall": "Bağlamı uzatmanın her zaman bedava iyileşme olduğunu sanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d5-q1",
+      "kind": "mcq",
+      "prompt": "Mini modelin ürettiği bir cümlede her komşu kelime çifti derlemde var ama cümle anlamsız. En olası neden hangisi?",
+      "options": [
+        "Derlemde yazım hatası var",
+        "Model doğru çiftleri bütünün anlamına bakmadan art arda sıraladı",
+        "Tohum çok büyük",
+        "Araç gerçek bir modele sorup yanlış cevap aldı"
+      ],
+      "answer": 1,
+      "explanation": "Model her adımda yalnız son kelimeye (ya da ikisine) bakar; çiftler doğru olsa da bütünün anlamı denetlenmez. Tohum sonucu seçer ama anlamsızlığı açıklamaz; araç da dışarıdaki bir modele soru göndermez.",
+      "skills": [
+        "ai-model-limits",
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d5-q2",
+      "kind": "predict-output",
+      "prompt": "Çözümleme yaparken aşağıdaki kontrolü yazdın. Çalışınca ne yazar?\n\n```\nconst derlem = [\"robot sağa döner .\", \"sensör sağa gider .\"]\nconst uretilen = \"robot sağa gider .\"\nconst tam = derlem.includes(uretilen)\nconst k = uretilen.split(\" \")\nconst ciftler = k.slice(0, -1).map((x, i) => x + \" \" + k[i + 1])\nconst hepsiVar = ciftler.every((c) => derlem.some((s) => s.includes(c)))\nconsole.log(tam, hepsiVar)\n```",
+      "options": [
+        "true true",
+        "false false",
+        "true false",
+        "false true"
+      ],
+      "answer": 3,
+      "explanation": "Üretilen cümle derlem listesinde yok, bu yüzden tam false. Ama \"robot sağa\", \"sağa gider\" ve \"gider .\" çiftlerinin üçü de derlemdeki cümlelerden birinde geçiyor, bu yüzden hepsiVar true. Bu, yeniden birleştirmenin tipik izidir.",
+      "skills": [
+        "ai-model-limits",
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d5-q3",
+      "kind": "numeric",
+      "prompt": "Başlangıç kelimesi \"robot\" ve araçtan 10 kelime ürettirdin. Nokta da bir kelime sayılıyor. Çıktıda 2 nokta var. Ekrandaki metinde, başlangıç dahil, noktalar hariç kaç kelime vardır?",
+      "answer": 9,
+      "unit": "kelime",
+      "explanation": "Başlangıç \"robot\" 1 kelime; araç 10 adım üretti ve bunların 2'si noktadır, yani 8'i kelimedir. Noktalar hariç toplam 1 + 8 = 9. Noktayı da sayarsan 11 bulursunuz.",
+      "skills": [
+        "ai-next-token",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d5-q4",
+      "kind": "mcq",
+      "prompt": "Üç kelimelik bağlam kullanmanın en önemli bedeli nedir?",
+      "options": [
+        "Daha çok veri gerekir; yoksa bağlam bulunamaz ve model geri çekilir",
+        "Model daha yavaş okur",
+        "Cümleler hep kısa olur",
+        "Tohum işe yaramaz"
+      ],
+      "answer": 0,
+      "explanation": "Uzun bağlam derlemde birebir geçmiş olmalıdır; küçük bir derlemde çoğu zaman geçmemiştir ve model kısa bağlama geri çekilir. Hız ya da cümle uzunluğu asıl bedel değildir; tohum yine çalışır.",
+      "skills": [
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d5-q5",
+      "kind": "mcq",
+      "prompt": "Projede \"robot\" ile üç farklı tohum kullanıp üç farklı cümle aldın. Bu üç cümlenin farklı olmasının nedeni nedir?",
+      "options": [
+        "Her tohum derlemi değiştirir",
+        "Tohum, olasılıklara göre yapılan rastgele seçimin gidişatını değiştirir",
+        "Araç her seferinde yeni bir model indirir",
+        "Üç cümle de aynı çıkmalıydı"
+      ],
+      "answer": 1,
+      "explanation": "Olasılıklar aynıdır; tohum, hangi adayın seçileceğini belirleyen rastgele dizinin başlangıcıdır. Derlem değişmez ve araç dışarıdan hiçbir şey indirmez. Aynı tohum aynı cümleyi verirdi, farklı tohum farklı yol açar.",
+      "skills": [
+        "ai-next-token",
+        "ai-simulation-literacy"
+      ]
+    }
+  ]
+}

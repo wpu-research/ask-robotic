@@ -204,19 +204,20 @@ describe('sunucu: /api/events ve depolama', () => {
     const pilot = rows.filter((r) => r.mod === 'arduino-temelleri' && r.wp === 1)
     expect(pilot).toHaveLength(5)
     for (const r of pilot) { expect(r.e).toBeTruthy(); expect(r.c!.length).toBeGreaterThanOrEqual(3); expect(r.q!.length).toBeGreaterThanOrEqual(3) }
-    expect(rows.filter((r) => r.q !== null)).toHaveLength(5)
+    expect(rows.filter((r) => r.q !== null).length).toBeGreaterThanOrEqual(215)
     const w = await db.select({ g: weeks.guideMd, p: weeks.position, m: modules.slug }).from(weeks).innerJoin(modules, eq(modules.id, weeks.moduleId))
-    expect(w.filter((x) => x.g)).toHaveLength(1)
-    expect(w.find((x) => x.g)).toMatchObject({ p: 1, m: 'arduino-temelleri' })
+    expect(w.filter((x) => x.g).length).toBeGreaterThanOrEqual(43)
+    expect(w.find((x) => x.g && x.m === 'arduino-temelleri' && x.p === 1)).toBeTruthy()
     // seed tekrar çalışınca (idempotent) hata vermez ve sonuç değişmez
     await seedContent(db)
-    expect(await listQuizLessons(db)).toHaveLength(5)
+    expect((await listQuizLessons(db)).length).toBeGreaterThanOrEqual(215)
   })
 
   it('listQuizLessons ve resolveLessonKeys', async () => {
     const ql = await listQuizLessons(db)
-    expect(ql).toHaveLength(5)
-    expect(ql.every((l) => l.total >= 3 && l.weekLabel.includes('Arduino Temelleri'))).toBe(true)
+    expect(ql.length).toBeGreaterThanOrEqual(215)
+    expect(ql.every((l) => l.total >= 3)).toBe(true)
+    expect(ql.filter((l) => l.weekLabel.includes('Arduino Temelleri')).length).toBeGreaterThanOrEqual(35)
     const r = await resolveLessonKeys(db, ['arduino-temelleri:1:3', 'arduino-temelleri:9:9', 'kötü anahtar', 'yok:1:1'])
     expect(r).toHaveLength(1)
     expect(r[0].title).toBe('İlk program: Blink')

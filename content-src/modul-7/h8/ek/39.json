@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "İnsan döngüde",
+      "definition": "Modelin öneri yaptığı, son kararı insanın onayladığı tasarım.",
+      "example": "Model mesajı hazırlar, sen göndermeden önce okursun.",
+      "pitfall": "İnsanın onayı 'tamam'a basmaktan ibaret bırakıp çıktıyı okumamak."
+    },
+    {
+      "term": "Güvenli varsayılan",
+      "definition": "Sistem emin değilken durur ya da insana sorar.",
+      "example": "Güven 0,55, eşik 0,80 ise 'insana sor'.",
+      "pitfall": "Emin olmadığında da otomatik uygulamak."
+    },
+    {
+      "term": "Denetim izi",
+      "definition": "Neyin neden yapıldığının kaydı; sonradan incelenebilir.",
+      "example": "Robot her durma kararını sebebiyle birlikte yazar.",
+      "pitfall": "Yalnız sonucu kaydedip nedenini yazmamak."
+    },
+    {
+      "term": "Geri alınabilirlik",
+      "definition": "Yanlış kararın kolayca düzeltilebilmesi.",
+      "example": "Müzik önerisi yanlışsa bir sonrakine geçersin.",
+      "pitfall": "Her karar geri alınabilir sanıp fren gibi geri alınamaz kararları otomatiğe bırakmak."
+    },
+    {
+      "term": "Sorumluluk",
+      "definition": "Sonuçlara katlanma yükümlülüğü; model değil, onu kullanan ve kuran insanlar taşır.",
+      "example": "Ekip, hatalı çıktının sorumluluğunu 'model öyle dedi' diyerek devredemez.",
+      "pitfall": "'Model öyle dedi' demek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d4-q1",
+      "kind": "mcq",
+      "prompt": "'İnsan döngüde' tasarımına hangisi örnektir?",
+      "options": [
+        "Model cevabı doğrudan herkese gönderir",
+        "Model e-posta taslağını yazar, sen okuyup gönder'e basarsın",
+        "Model kararı verir, kimse kayıt tutmaz",
+        "İnsan hiçbir aşamada çıktıyı görmez"
+      ],
+      "answer": 1,
+      "explanation": "Model taslağı hazırlar, insan okur ve onaylar. İnsan döngüde tasarımda son karar insandadır. Modelin kararı doğrudan uygulaması ya da insanın hiç görmemesi bu tasarımın tersidir.",
+      "skills": [
+        "ai-human-oversight"
+      ]
+    },
+    {
+      "id": "m7h8d4-q2",
+      "kind": "numeric",
+      "prompt": "Bir sistem günde 500 karar veriyor ve eval'da hata oranı %2 çıktı. Günde beklenen yanlış karar sayısı kaç?",
+      "answer": 10,
+      "tolerance": 0,
+      "unit": "karar",
+      "explanation": "500 x 0,02 = 10. Yüzde küçük görünse de günlük yanlış karar sayısı, zararı büyük işlerde kabul edilemeyebilir.",
+      "skills": [
+        "ai-risk-assess",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d4-q3",
+      "kind": "mcq",
+      "prompt": "Aşağıdaki kararlardan hangisi en çok insan denetimi ister?",
+      "options": [
+        "Müzik listesi önerisi",
+        "Arka plan resmi önerisi",
+        "Robot kolunun bir insanın yanında hareket etmesi",
+        "Bir uygulamanın renk teması"
+      ],
+      "answer": 2,
+      "explanation": "Robot kolunun insanın yanında hareket kararı hem geri alınamaz zarar riski taşır hem de başkasını etkiler. Müzik listesi, renk seçimi ve arka plan resmi önerisi hatalı olsa kolayca düzeltilebilir.",
+      "skills": [
+        "ai-risk-assess",
+        "ai-human-oversight"
+      ]
+    },
+    {
+      "id": "m7h8d4-q4",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca ne yazdırır?\n\n```\nguven = 0.55\nesik = 0.80\nif guven >= esik:\n    print(\"otomatik uygula\")\nelse:\n    print(\"insana sor\")\n```",
+      "options": [
+        "otomatik uygula",
+        "insana sor",
+        "0.55",
+        "Hata verir"
+      ],
+      "answer": 1,
+      "explanation": "0.55 >= 0.80 yanlıştır, bu yüzden else dalı çalışır ve 'insana sor' yazılır. Güven eşiğin altındaysa güvenli varsayılan insana sormaktır.",
+      "skills": [
+        "ai-human-oversight",
+        "ai-safety-layer"
+      ]
+    },
+    {
+      "id": "m7h8d4-q5",
+      "kind": "find-bug",
+      "prompt": "Bu fonksiyon hızı 30'u aşmayacak şekilde sınırlamalı ama print 80 yazdırıyor. Hatalı satır hangisi?\n\n```\ndef hiz_ayarla(model_hizi):\n    # güvenli üst sınır: 30\n    return model_hizi\nprint(hiz_ayarla(80))\n```",
+      "options": [
+        "def hiz_ayarla(model_hizi):",
+        "# güvenli üst sınır: 30",
+        "return model_hizi",
+        "print(hiz_ayarla(80))"
+      ],
+      "answer": 2,
+      "explanation": "Sınır yalnız yorum satırında yazıyor, kodda uygulanmıyor. return min(model_hizi, 30) olmalıydı. Sert sınır, modelin çıktısından bağımsız uygulanmalıdır.",
+      "skills": [
+        "ai-safety-layer",
+        "prog-debug"
+      ]
+    }
+  ]
+}

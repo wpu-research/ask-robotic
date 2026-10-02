@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "SPI hatları (SCK, MOSI, MISO, CS)",
+      "definition": "SPI dört hatla çalışır: saat (SCK), Arduino'dan veri (MOSI), cihazdan veri (MISO) ve cihazı seçen CS.",
+      "example": "Uno'da SCK D13, MISO D12, MOSI D11'dir; SD kartın CS hattını bu derste D10'a bağlarız.",
+      "pitfall": "SPI pinleri olan D11-D13'e LED bağlayıp aynı anda SD kart kullanmak."
+    },
+    {
+      "term": "SD.begin(CS)",
+      "definition": "SPI'yı başlatır ve kartla konuşmaya çalışır; başarılıysa true, değilse false döner.",
+      "example": "if (!SD.begin(10)) { Serial.println(\"kart yok\"); } kart bulunamazsa uyarı verir.",
+      "pitfall": "CS pinini modülün gerçek bağlantısından farklı yazmak; begin false döner."
+    },
+    {
+      "term": "FILE_WRITE",
+      "definition": "Dosyayı yazmak için açar; dosya yoksa oluşturur, varsa yazıyı sonuna ekler.",
+      "example": "Programı iki kez çalıştırırsan ikinci çalıştırmanın satırları ilkinin altına eklenir.",
+      "pitfall": "FILE_WRITE'ın dosyayı baştan yazıp eski veriyi sildiğini sanmak."
+    },
+    {
+      "term": "8.3 dosya adı",
+      "definition": "En çok 8 karakterlik ad, nokta ve en çok 3 karakterlik uzantı; Türkçe karakter ve boşluk kullanılmaz.",
+      "example": "VERI.CSV ve LOG0001.TXT geçerli adlardır.",
+      "pitfall": "sicaklik_kaydi.csv gibi uzun bir ad kullanmak; dosya açılamaz ve if (dosya) bunu yakalar."
+    },
+    {
+      "term": "close() ve flush()",
+      "definition": "Tamponda bekleyen veriyi karta fiziksel olarak yazan iki komuttur; close dosyayı da kapatır.",
+      "example": "Aç-yaz-kapat yönteminde her yazıdan sonra close() çağrıldığı için güç kesilse bile veri güvendedir.",
+      "pitfall": "close() ya da flush() çağırmadan kartı çıkarmak ya da gücü kesmek; son satırlar kaybolur."
+    },
+    {
+      "term": "3,3 V mantığı",
+      "definition": "SD kartlar 3,3 V ile çalışır; hazır modüllerde gerilim düzenleyici ve seviye dönüştürücü bulunur.",
+      "example": "Modül belgesi 5 V Arduino ile kullanılabileceğini söylüyorsa seviye dönüştürücü içindedir.",
+      "pitfall": "Çıplak bir SD kart yuvasını Arduino'nun 5 V pinlerine doğrudan bağlamak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d67-q1",
+      "kind": "mcq",
+      "prompt": "Arduino Uno'da SPI için SCK, MISO ve MOSI hatları hangi pinlerdedir?",
+      "options": [
+        "SCK D11, MISO D12, MOSI D13",
+        "SCK D13, MISO D12, MOSI D11",
+        "SCK D10, MISO D11, MOSI D12",
+        "SCK A5, MISO A4, MOSI A3"
+      ],
+      "answer": 1,
+      "explanation": "Uno'da SCK D13, MISO D12, MOSI D11'dir; bu pinler sabittir. D10 bu derste CS için seçildi, SPI hattı değildir. A4 ve A5 ise I2C hatlarıdır (SDA, SCL).",
+      "skills": [
+        "sd-storage",
+        "serial-protocols"
+      ]
+    },
+    {
+      "id": "m4h7d67-q2",
+      "kind": "numeric",
+      "prompt": "Bir program her çalıştırıldığında TEST.TXT dosyasını FILE_WRITE ile açıp iki satır (println) yazar ve kapatır. Dosya başlangıçta yok. Program üç kez çalıştırılırsa dosyada kaç satır olur?",
+      "answer": 6,
+      "unit": "satır",
+      "explanation": "FILE_WRITE dosyanın sonuna ekler, eski içeriği silmez. Her çalıştırma 2 satır ekler; 3 × 2 = 6 satır olur. Dosyanın baştan yazıldığını varsaysaydın 2 bulurdun; bu yanlıştır.",
+      "skills": [
+        "sd-storage"
+      ]
+    },
+    {
+      "id": "m4h7d67-q3",
+      "kind": "find-bug",
+      "prompt": "Kayıt cihazı bir saat çalıştıktan sonra güç kablosu bir anda çekiliyor ve dosyada son satırlar yok. Kodda tek hata var. Hangisi?\n\n```\nFile dosya = SD.open(\"VERI.CSV\", FILE_WRITE);\nif (dosya) {\n  dosya.println(\"23.5\");\n}\n```",
+      "options": [
+        "Dosya adı 8.3 kuralına uymuyor",
+        "FILE_WRITE yerine FILE_READ kullanılmalı",
+        "close() ya da flush() yok; veri tamponda kalıp karta yazılmıyor",
+        "println yerine print kullanılmalı"
+      ],
+      "answer": 2,
+      "explanation": "VERI.CSV 8.3 kuralına uygundur (4 harf, nokta, 3 harf). Veri önce RAM'deki tamponda bekler; close() ya da flush() olmadan karta yazılmayabilir. print ile println arasındaki fark yalnız satır sonudur, kayıp sebebi bu değildir.",
+      "skills": [
+        "sd-storage",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d67-q4",
+      "kind": "mcq",
+      "prompt": "Elindeki çıplak bir SD kart yuvasının VCC ve veri pinlerini Uno'nun 5 V'una doğrudan bağlamak istiyorsun. Ne yapmalısın?",
+      "options": [
+        "Sorun yok, SD kartlar 5 V ile çalışır",
+        "Yalnızca GND'yi bağla",
+        "CS pinini 5 V'a bağla",
+        "Bunu yapma; kart 3,3 V mantığıyla çalışır. Gerilim düzenleyicili ve seviye dönüştürücülü hazır bir modül kullan"
+      ],
+      "answer": 3,
+      "explanation": "SD kartlar 3,3 V mantığıyla çalışır. Hazır modüllerde gerilim düzenleyici ve seviye dönüştürücü bulunur; çıplak yuva Arduino'nun 5 V'una doğrudan bağlanmaz. Modülün 5 V'a uygun olduğunu belgesinden doğrula.",
+      "skills": [
+        "sd-storage",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m4h7d67-q5",
+      "kind": "mcq",
+      "prompt": "\"Aç-yaz-kapat\" yöntemi \"açık tut ve flush et\" yöntemine göre neden güç kesintisine karşı en güvenli sayılır?",
+      "options": [
+        "Çünkü her yazıdan sonra dosya kapalıdır, yani tamponda bekleyen veri kalmaz",
+        "Çünkü dosya hiç RAM kullanmaz",
+        "Çünkü kartın hızı artar",
+        "Çünkü 8.3 kuralı gevşer"
+      ],
+      "answer": 0,
+      "explanation": "Aç-yaz-kapat yönteminde her satırın ardından close() çağrılır; tamponda yazılmamış veri kalmaz. Açık tut ve flush et yönteminde de veri flush ile gönderilir; fark, dosyanın açık kalmasıdır. Hız ya da dosya adı kuralıyla ilgisi yoktur.",
+      "skills": [
+        "sd-storage"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "H-köprüsü",
+      "definition": "Dört anahtarla motorun uçlarına gelen gerilimin yönünü değiştiren devre; şekli H harfine benzer.",
+      "example": "L293D içinde iki H-köprüsü vardır, bu yüzden iki motoru ayrı ayrı yönetir.",
+      "pitfall": "Dört anahtarı aynı anda kapatmak: gerçek köprüde kısa devre yapabilir; L293D bunu giriş mantığıyla önler."
+    },
+    {
+      "term": "IN1 ve IN2",
+      "definition": "Motorun yönünü belirleyen iki giriş; farklılarsa motor döner, aynıysa durur.",
+      "example": "IN1 = HIGH ve IN2 = LOW iken motor ileri döner.",
+      "pitfall": "İkisini de HIGH ya da LOW yapıp motorun döneceğini sanmak."
+    },
+    {
+      "term": "EN12",
+      "definition": "L293D'nin birinci kanalını açıp kapatan pin; PWM verilirse hızı ayarlar.",
+      "example": "analogWrite(6, 200) yaklaşık %78 doluluk, yani yaklaşık %78 hız verir.",
+      "pitfall": "EN'i bağlamamak ya da LOW bırakmak: çıkışlar boşta kalır, motor durur."
+    },
+    {
+      "term": "VCC1 ve VCC2",
+      "definition": "VCC1 çipin mantık gücüdür (5 V); VCC2 motorun gücünü taşır.",
+      "example": "Laboratuvarda ikisi de 5V'a bağlanır.",
+      "pitfall": "Motor kaynağını VCC1'e bağlamak: motor gerilimi 5 V'u aşarsa mantık tarafı zarar görür."
+    },
+    {
+      "term": "Çıkış gerilim kaybı",
+      "definition": "L293D yüksek çıkışta yaklaşık 1,4 V kaybeder; VCC2 = 5 V ise yaklaşık 3,6 V görülür.",
+      "example": "Motor uçlarında yaklaşık 3,3 V kalır ve transistörlü devreden daha yavaş döner.",
+      "pitfall": "Motorun 5 V alacağını beklemek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d23-q1",
+      "kind": "numeric",
+      "prompt": "L293D'nin VCC2'si 5 V. Yüksek çıkışta 1,4 V, düşük çıkışta 0,2 V kaybolur gibi düşün (yüksek çıkış 5 − 1,4 = 3,6 V, düşük çıkış 0,2 V). Motorun iki ucu arasında yaklaşık kaç volt kalır? (Küçük direnç kayıplarını yok say.)",
+      "answer": 3.3,
+      "tolerance": 0.15,
+      "unit": "V",
+      "explanation": "Yüksek uç 3,6 V, düşük uç 0,2 V; fark 3,4 V. Çıkış dirençlerinde ufak bir kayıp daha olduğundan laboratuvarda yaklaşık 3,3 V okunur. 5 V sanmak çipin kaybını unutmaktır.",
+      "skills": [
+        "h-bridge"
+      ]
+    },
+    {
+      "id": "m3h5d23-q2",
+      "kind": "numeric",
+      "prompt": "EN12 pinine analogWrite(EN, 200) yazıldı. PWM doluluk oranı yüzde kaçtır? (Tam sayıya yuvarla.)",
+      "answer": 78,
+      "tolerance": 1,
+      "unit": "%",
+      "explanation": "analogWrite 0-255 aralığındadır: 200 / 255 ≈ 0,784, yani yaklaşık %78. Motorun hızı bu oranla ortalama gerilimi değiştirir.",
+      "skills": [
+        "motor-pwm-speed"
+      ]
+    },
+    {
+      "id": "m3h5d23-q3",
+      "kind": "predict-output",
+      "prompt": "EN12 D6'ya, IN1 D7'ye, IN2 D5'e bağlı. Bu kod çalışınca motor ne yapar?\n\n```\ndigitalWrite(7, LOW);\ndigitalWrite(5, HIGH);\nanalogWrite(6, 200);\n```",
+      "options": [
+        "İleri döner",
+        "Durur",
+        "Geri döner, yaklaşık %78 güçle",
+        "Geri döner, tam hızla"
+      ],
+      "answer": 2,
+      "explanation": "IN1 = LOW ve IN2 = HIGH geri yönüdür. EN'e 200 / 255 ≈ %78 doluluk verildiği için tam hız değil. İleri için IN1 HIGH, IN2 LOW olmalıdır.",
+      "skills": [
+        "h-bridge",
+        "motor-pwm-speed"
+      ]
+    },
+    {
+      "id": "m3h5d23-q4",
+      "kind": "find-bug",
+      "prompt": "ileri() fonksiyonu çağrılıyor ama motor hiç dönmüyor. Hatalı satır hangisi?\n\n```\nvoid ileri(int hiz) {\n  digitalWrite(IN1, HIGH);\n  digitalWrite(IN2, HIGH);\n  analogWrite(EN, hiz);\n}\n```",
+      "options": [
+        "void ileri(int hiz) {",
+        "digitalWrite(IN1, HIGH);",
+        "digitalWrite(IN2, HIGH);",
+        "analogWrite(EN, hiz);"
+      ],
+      "answer": 2,
+      "explanation": "IN1 ve IN2 ikisi de HIGH olunca motor durur. İleri için IN2 LOW olmalıdır. IN1'in HIGH olması doğrudur; EN satırı da sorun değildir.",
+      "skills": [
+        "h-bridge",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d23-q5",
+      "kind": "mcq",
+      "prompt": "Gerçek bir devrede motor 9 V ile çalışacak. 9 V kaynağın artısı L293D'nin hangi pinine bağlanır?",
+      "options": [
+        "VCC1",
+        "EN12",
+        "IN1",
+        "VCC2"
+      ],
+      "answer": 3,
+      "explanation": "Motor gücü VCC2'den gelir. VCC1 çipin 5 V mantık gücüdür; 9 V verilirse mantık tarafı zarar görebilir. EN12 ve IN1 sinyal girişleridir. Kaynağın GND'si Arduino GND'siyle birleştirilmelidir.",
+      "skills": [
+        "h-bridge",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

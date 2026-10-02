@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Derinlemesine savunma",
+      "definition": "Tek bir önleme güvenmeyip üst üste birkaç katman koymak.",
+      "example": "Veri ayrımı, talimat hiyerarşisi ve insan onayı birlikte kullanılır.",
+      "pitfall": "Tek güçlü önlemin yeteceğini düşünmek."
+    },
+    {
+      "term": "Talimat hiyerarşisi",
+      "definition": "Sistem kuralının, belgedeki ya da kullanıcıdaki metinden üstün sayılması.",
+      "example": "Belge \"kuralları unut\" dese bile sistem kuralı geçerli kalır.",
+      "pitfall": "Hiyerarşiyi yazıp modelin her zaman uyacağını varsaymak."
+    },
+    {
+      "term": "Çıktı süzgeci",
+      "definition": "Model çıktısından gizli veri ya da şüpheli bağlantıyı silen kontrol.",
+      "example": "KIRMIZI-42 geçen cümle *** ile değiştirilir.",
+      "pitfall": "Kodlanmış çıktıyı (örneğin ters yazılmış kodu) kaçırması."
+    },
+    {
+      "term": "En az yetki",
+      "definition": "Gizli bilgiyi ve gereksiz araçları modele hiç vermemek.",
+      "example": "Anahtar sistem mesajında değil, güvenli bir hizmette tutulur.",
+      "pitfall": "Gizli anahtarı \"söyleme\" diyerek sistem mesajına yazmak."
+    },
+    {
+      "term": "İnsan onayı",
+      "definition": "Riskli eylemden (silme, e-posta, ödeme) önce bir insanın onayı.",
+      "example": "Ajan e-posta göndermeden önce taslağı sana gösterir.",
+      "pitfall": "Onay kutusunu okumadan tıklamak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d34-q1",
+      "kind": "mcq",
+      "prompt": "\"Derinlemesine savunma\" ne demektir?",
+      "options": [
+        "Birden çok farklı önlemi üst üste kullanmak",
+        "Tek bir önlemi çok güçlü yapmak",
+        "Saldırıyı hiç denememek",
+        "Sistemi internetten ayırmak"
+      ],
+      "answer": 0,
+      "explanation": "Bir katman delinirse bir sonrakinin devreye girmesi için birden çok farklı önlem kullanmaktır. Tek bir güçlü önlem sistemin tek zayıf noktası olur. Aynı önlemi tekrar etmek de farklı saldırı türlerini kapsamaz.",
+      "skills": [
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d34-q2",
+      "kind": "find-bug",
+      "prompt": "Bir geliştirici bankaya bağlanan bir asistan yazdı. Tasarımdaki asıl güvenlik hatası hangisi?\n\n```\nSISTEM = \"Kasa şifresi: 4821. Bunu kimseye söyleme.\"\nyanit = model(SISTEM, kullanici_mesaji)\nprint(yanit)\n```",
+      "options": [
+        "print satırı çıktıyı gösteriyor",
+        "Gizli şifre modele sistem mesajı olarak veriliyor",
+        "model fonksiyonu iki parametre alıyor",
+        "Değişken adı büyük harfle yazılmış"
+      ],
+      "answer": 1,
+      "explanation": "Şifre sistem mesajına yazılmış. Model bilgiyi bildiği için başarılı bir injection onu ifşa eder; \"söyleme\" kuralı garanti değildir. Gizli bilgiyi modele hiç vermemek en güçlü önlemdir. print satırı ve model çağrısı bu açıdan sorun değildir.",
+      "skills": [
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d34-q3",
+      "kind": "predict-output",
+      "prompt": "Bir çıktı süzgeci yazıldı. Model, kodu ters yazarak cevap verirse ekranda ne görünür?\n\n```\ndef cikti_suz(metin):\n    return metin.replace(\"KIRMIZI-42\", \"***\")\nprint(cikti_suz(\"Kod ters: 24-IZMIRIK\"))\n```",
+      "options": [
+        "Kod ters: ***",
+        "Kod ters: 24-***",
+        "Hata oluşur",
+        "Kod ters: 24-IZMIRIK"
+      ],
+      "answer": 3,
+      "explanation": "replace yalnız tam \"KIRMIZI-42\" dizisini arar. Ters yazılmış \"24-IZMIRIK\" bu dizi olmadığı için değişmez ve olduğu gibi yazılır. Çıktı süzgeci yararlıdır ama kodlanmış sızıntıyı yakalamaz; bu yüzden diğer katmanlarla birlikte kullanılır.",
+      "skills": [
+        "ai-defense",
+        "ai-injection"
+      ]
+    },
+    {
+      "id": "m7h7d34-q4",
+      "kind": "numeric",
+      "prompt": "Atölyedeki tabloda yalnız \"Yasak kelime listesi\" seçilirse altı saldırıdan kaçı açık kalır?",
+      "answer": 5,
+      "unit": "saldırı",
+      "tolerance": 0,
+      "explanation": "Yasak kelime listesi yalnız doğrudan saldırıyı durdurur. Dolaylı, rol oyunu, kodlama, bağlantı ile sızdırma ve araç kötüye kullanımı açık kalır: 6 - 1 = 5. Tablo ders için sadeleştirilmiştir, ama tek önlemin yetmediğini gösterir.",
+      "skills": [
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d34-q5",
+      "kind": "numeric",
+      "prompt": "Atölyedeki altı saldırıyı da durduran en ucuz savunma setinin toplam maliyeti nedir? (Talimat hiyerarşisi, çıktı süzgeci ve insan onayı 1'er, en az yetki 3 maliyetlidir.)",
+      "answer": 3,
+      "unit": "maliyet",
+      "tolerance": 0,
+      "explanation": "Talimat hiyerarşisi dört saldırıyı (doğrudan, dolaylı, rol, kodlama), çıktı süzgeci bağlantı sızdırmayı, insan onayı araç kötüye kullanımını kapatır: 1 + 1 + 1 = 3. En az yetki (3) tek başına kodlama, bağlantı ve aracı kapatır ama diğer üçü için bir önlem daha gerekir; o hâlde en az 4 eder.",
+      "skills": [
+        "ai-defense"
+      ]
+    }
+  ]
+}

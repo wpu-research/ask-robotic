@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Ölü bölge",
+      "definition": "Motorun sürtünmeyi yenemediği için dönmediği düşük PWM aralığı. Benzetimdeki robotta yaklaşık 51 ve altı.",
+      "example": "PWM 40'ta motor vızıldar ama tekerlek kıpırdamaz.",
+      "pitfall": "128'in yarım hız olduğunu sanmak; hız PWM'e değil, PWM − ölü bölge farkına orantılıdır."
+    },
+    {
+      "term": "Azami hız (V_MAX)",
+      "definition": "PWM 255'te tekerleğin ulaştığı en yüksek hız; derslerin robotunda 0,396 m/s.",
+      "example": "Ölçülen eğimden: 0,194 cm/s × (255 − 51) yaklaşık 39,6 cm/s.",
+      "pitfall": "V_MAX'ı başka bir robotun ya da boşalmış bir pilin değeriyle kullanmak."
+    },
+    {
+      "term": "Ölçerek kalibrasyon",
+      "definition": "İki iyi ölçülebilen noktadan düz bir doğru geçirip eğimi, ölü bölge sonunu ve azami hızı bulmak.",
+      "example": "PWM 100'de 9,4 cm/s ve PWM 200'de 28,8 cm/s ölçülürse hız sıfırı yaklaşık PWM 51'de keser.",
+      "pitfall": "Gözle fark ettiğin ilk PWM'i (57) ölü bölge sonu sanmak; gerçek sonu hız doğrusunun sıfırı kestiği yerdir."
+    },
+    {
+      "term": "hizdanPwm()",
+      "definition": "İstenen hızı PWM'e çeviren fonksiyon: PWM = OLU_PWM + (255 − OLU_PWM) · v / V_MAX. Çok küçük isteklerde 0 döner.",
+      "example": "20 cm/s isteyince fonksiyon 154 verir; robot gerçekten yaklaşık 20 cm/s gider.",
+      "pitfall": "Ölü bölgeyi unutup PWM = 255 · v / V_MAX yazmak; yavaş hızlarda PWM ölü bölgede kalır."
+    },
+    {
+      "term": "Kalibrasyonu yenilemek",
+      "definition": "Pil, zemin, tekerlek ya da motor değişince OLU_PWM ve V_MAX'ın yeniden ölçülmesi.",
+      "example": "Halıdan parkeye geçince ölü bölge değişir; sayıları yeniden ölçersin.",
+      "pitfall": "Boş pille kalibre edip dolu pille sürmek; hızlar tutmaz."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d78-q1",
+      "kind": "numeric",
+      "prompt": "Kalibrasyon: OLU_PWM = 51, V_MAX = 0,396 m/s. hizdanPwm(0.25) (0,25 m/s için, yuvarlamalı) kaç döndürür?\n\nFormül: 51 + (int)(204 * v / V_MAX + 0.5)",
+      "answer": 180,
+      "tolerance": 1,
+      "explanation": "204 · 0,25 / 0,396 yaklaşık 128,8; +0,5 ile 129,3 ve int'e kesilince 129 olur. 51 + 129 = 180. Ölü bölgeyi (51) eklemeyi unutmak 129 verir; bu değer 0,25 m/s'nin çok altında bir hızdır.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d78-q2",
+      "kind": "numeric",
+      "prompt": "Bir robotta PWM 100'de 10 cm/s, PWM 200'de 30 cm/s ölçüldü. Hız doğrusal artıyorsa ölü bölgenin sonu (hızın sıfır olduğu PWM) kaçtır?",
+      "answer": 50,
+      "tolerance": 0,
+      "explanation": "Eğim = (30 − 10) / (200 − 100) = 0,2 cm/s her PWM birimi için. Sıfır noktası = 100 − 10 / 0,2 = 50. Doğrunun PWM ekseni ile kesişimini aramak gerekir; 10 ya da 100 gibi ölçüm noktalarını cevap saymak yanlıştır.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d78-q3",
+      "kind": "predict-output",
+      "prompt": "Bu kod ne yazdırır?\n\n```\nint hizdanPwm(float v) {\n  if (v < 0.005) return 0;\n  if (v > 0.396) v = 0.396;\n  return 51 + (int)(204 * v / 0.396 + 0.5);\n}\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(hizdanPwm(0.003));\n  Serial.println(hizdanPwm(0.5));\n}\nvoid loop() {}\n```",
+      "options": [
+        "0 ve 303",
+        "0 ve 255",
+        "51 ve 255",
+        "3 ve 255"
+      ],
+      "answer": 1,
+      "explanation": "0,003 m/s, 0,005'in altında olduğu için fonksiyon 0 döndürür (ölü bölgenin hemen üstünde ölçülemeyecek kadar yavaş dolaşmamak için). 0,5 m/s azami hıza (0,396) sınırlanır ve 51 + 204 = 255 olur. 303 sınırlama yapılmazsa çıkardı ve analogWrite'a taşardı.",
+      "skills": [
+        "prog-structure",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d78-q4",
+      "kind": "find-bug",
+      "prompt": "Robot 20 cm/s ve üstü hızlarda iyi gidiyor ama 5 cm/s istenince hiç kıpırdamıyor. Ölü bölge sonu 51, V_MAX = 0,396. Hata nerede?\n\n```\nint hizdanPwm(float v) {\n  return (int)(255 * v / V_MAX);\n}\n```",
+      "options": [
+        "return satırı: ölü bölge eklenmemiş, 5 cm/s için PWM 32 çıkıyor ve ölü bölgede kalıyor",
+        "V_MAX çok büyük",
+        "float yerine int kullanılmalı",
+        "255 yerine 256 yazılmalı"
+      ],
+      "answer": 0,
+      "explanation": "255 · 0,05 / 0,396 yaklaşık 32 olur ve bu 51'in altındadır, yani motor dönmez. Doğru eşleme 51 + 204 · v / V_MAX biçiminde ölü bölgenin üstünden başlar. Diğer seçenekler hatanın nedeni değildir.",
+      "skills": [
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d78-q5",
+      "kind": "mcq",
+      "prompt": "Robot dolu pille kalibre edildi. Bir hafta sonra pil yarı yarıya boşalmış. 20 cm/s isteyen robot nasıl davranır?",
+      "options": [
+        "Yine tam 20 cm/s gider, kalibrasyon kalıcıdır",
+        "Daha hızlı gider",
+        "Hiç hareket etmez",
+        "Daha yavaş gider, çünkü azami hız pil boşaldıkça düşer"
+      ],
+      "answer": 3,
+      "explanation": "Pil boşaldıkça motorlara giden gerilim düşer ve aynı PWM'de hız azalır; sabit bir V_MAX ile yapılan eşleme artık tutmaz. Bu yüzden kalibrasyon pil doluyken yapılır ve zamanla yenilenir.",
+      "skills": [
+        "prog-planning"
+      ]
+    }
+  ]
+}

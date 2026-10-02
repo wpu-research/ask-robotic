@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Röle",
+      "definition": "Elektromıknatısla çalışan, kontak tarafı kumanda tarafından elektriksel olarak ayrı bir anahtar.",
+      "example": "Arduino bir röleyi sürer, röle de ayrı bir devredeki LED ya da yükü açar.",
+      "pitfall": "Röleyi çıplak doğrudan pine bağlamak: bobin akımı pin için fazladır ve sıçrama pine zarar verir."
+    },
+    {
+      "term": "COM, NO ve NC",
+      "definition": "COM ortak uçtur; NO çekilince COM'a bağlanır, NC çekilmeyince COM'a bağlıdır.",
+      "example": "Yük NO ile COM arasındaysa yük yalnız röle çekilince çalışır.",
+      "pitfall": "NO ile NC'yi karıştırmak: yük ters mantıkla çalışır."
+    },
+    {
+      "term": "Aktif-LOW",
+      "definition": "IN pinine LOW verilince çeken, HIGH verilince bırakan röle modülü.",
+      "example": "digitalWrite(7, LOW) röleyi çeker, HIGH bırakır.",
+      "pitfall": "Mantığı bilmemek: röle açılışta çekili kalabilir; pinMode'dan önce HIGH yazmak bunu önler."
+    },
+    {
+      "term": "Histerezis",
+      "definition": "Açma ve kapama için iki ayrı eşik kullanmak; aradaki bölgede durum korunur.",
+      "example": "600'ün üstünde çek, 500'ün altında bırak.",
+      "pitfall": "Tek eşik kullanmak: değer eşik civarında titreyince röle sürekli tıklar ve kontaklar yıpranır."
+    },
+    {
+      "term": "Şebeke gerilimi",
+      "definition": "Prizdeki 220 V; ölümcüldür ve röleyle kontrolü yalnız eğitimli bir uzmana aittir.",
+      "example": "Bu portalda yalnız 5 V'luk sanal devreler kurulur.",
+      "pitfall": "Modül üzerindeki 250 V yazısını güvenli sanmak ve prizle denemek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d24-q1",
+      "kind": "numeric",
+      "prompt": "Röle çekmişken COM 5V'a, NO ucu 330 Ω direnç üzerinden kırmızı LED'e (Vf = 1,9 V) bağlı. LED'den geçen akım yaklaşık kaç mA'dir? (Röle ve kablo dirençlerini yok say.)",
+      "answer": 9.3,
+      "tolerance": 0.3,
+      "unit": "mA",
+      "explanation": "Dirence düşen gerilim 5 − 1,9 = 3,1 V. I = 3,1 / 330 ≈ 0,0094 A ≈ 9,4 mA. Röle bırakınca devre açılır ve akım sıfır olur.",
+      "skills": [
+        "relay-logic",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h5d24-q2",
+      "kind": "predict-output",
+      "prompt": "Röle modülü LOW ile çekiyor ve başta bırakılmış. analogRead sırayla 650, 550, 480 döndürüyor. Her okumadan sonra röle durumu ne olur?\n\n```\nif (!acik && deger > 600) {\n  acik = true;\n  digitalWrite(7, LOW);\n} else if (acik && deger < 500) {\n  acik = false;\n  digitalWrite(7, HIGH);\n}\n```",
+      "options": [
+        "Çeker, bırakır, bırakır",
+        "Çeker, çeker, bırakır",
+        "Çeker, çeker, çeker",
+        "Bırakır, çeker, bırakır"
+      ],
+      "answer": 1,
+      "explanation": "650 > 600 olduğundan röle çeker. 550 iki eşiğin arasındadır, durum korunur ve röle çekili kalır. 480 < 500 olunca bırakır. Bu, histerezisin görevidir.",
+      "skills": [
+        "hysteresis",
+        "relay-logic"
+      ]
+    },
+    {
+      "id": "m3h5d24-q3",
+      "kind": "find-bug",
+      "prompt": "Eşik aşılınca röle çekiyor ama hemen bırakıp yeniden çekiyor ve sürekli tıklıyor. Hatalı satır hangisi?\n\n```\nif (!acik && deger > ACMA) {\n  acik = true;\n  digitalWrite(ROLE, LOW);\n} else if (acik && deger > KAPAMA) {\n  acik = false;\n  digitalWrite(ROLE, HIGH);\n}\n```\n(ACMA = 600, KAPAMA = 500)",
+      "options": [
+        "if (!acik && deger > ACMA) {",
+        "digitalWrite(ROLE, LOW);",
+        "} else if (acik && deger > KAPAMA) {",
+        "digitalWrite(ROLE, HIGH);"
+      ],
+      "answer": 2,
+      "explanation": "Kapama koşulu deger < KAPAMA olmalıydı. > yazılınca röle çektikten hemen sonra (deger hâlâ 500'ün üstünde) bırakılır ve döngü tekrarlanır. LOW ile çekme ve HIGH ile bırakma doğrudur.",
+      "skills": [
+        "hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d24-q4",
+      "kind": "mcq",
+      "prompt": "Yük COM ile NO ucu arasına bağlı. Röle çekilince ne olur?",
+      "options": [
+        "NO, COM'a bağlanır ve yük çalışır",
+        "NO, COM'dan ayrılır ve yük durur",
+        "Yük her zaman çalışır",
+        "Yük GND'ye bağlanır"
+      ],
+      "answer": 0,
+      "explanation": "NO normalde açıktır: röle çekmediğinde COM'dan ayrıdır, çekince COM'a bağlanır. Yük NC ucuna bağlı olsaydı tam tersi olurdu.",
+      "skills": [
+        "relay-logic"
+      ]
+    },
+    {
+      "id": "m3h5d24-q5",
+      "kind": "numeric",
+      "prompt": "Açma eşiği 600, kapama eşiği 500. Histerezis aralığı 5 V / 1024 ölçeğinde yaklaşık kaç volttur?",
+      "answer": 0.49,
+      "tolerance": 0.02,
+      "unit": "V",
+      "explanation": "Aralık 600 − 500 = 100 birimdir. Bir birim 5 / 1024 ≈ 4,88 mV olduğundan 100 × 4,88 mV ≈ 0,49 V.",
+      "skills": [
+        "hysteresis",
+        "elec-ohm"
+      ]
+    }
+  ]
+}

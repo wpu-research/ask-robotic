@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "BPE (bayt çifti kodlaması)",
+      "definition": "Derlemde en sık yan yana gelen iki parçayı tekrar tekrar birleştirerek parça listesi öğrenen yöntem.",
+      "example": "Küçük Türkçe derlemde ilk birleştirmeler e+r, r+o, o+t gibi çiftlerdir.",
+      "pitfall": "BPE'nin anlam bildiğini sanmak; yalnızca yan yana gelme sıklığını sayar."
+    },
+    {
+      "term": "Birleştirme (merge)",
+      "definition": "İki parçanın tek yeni parçaya dönüştürüldüğü ve listeye yazıldığı bir adım.",
+      "example": "o + t birleştirilince \"ot\" yeni bir parça olur.",
+      "pitfall": "Birleştirmenin bir kelimeyi bütün olarak sözlüğe eklediğini sanmak; adım adım, çift çift ilerler."
+    },
+    {
+      "term": "Birleştirme sırası",
+      "definition": "Birleştirmelerin öğrenildiği sıra; yeni metne aynı sırayla uygulanır.",
+      "example": "b + ot ancak o + t yapıldıktan sonra mümkündür.",
+      "pitfall": "Listeyi karıştırıp ya da ters sırayla uygulamak; farklı ve çoğu zaman bozuk parçalar çıkar."
+    },
+    {
+      "term": "Çift sıklığı",
+      "definition": "Bir çiftin derlemde (kelime sıklığı da hesaba katılarak) kaç kez yan yana geldiği.",
+      "example": "Bir kelime derlemde 3 kez geçiyor ve içinde \"ur\" bir kez varsa bu kelime çifte 3 katkı yapar.",
+      "pitfall": "Kelimenin kaç farklı biçimi olduğuna bakıp kaç kez geçtiğini unutmak."
+    },
+    {
+      "term": "Görülmemiş kelime",
+      "definition": "Derlemde hiç geçmeyen kelime; birleştirmeler işe yaramadığı için küçük parçalara bölünür.",
+      "example": "\"kalemlik\" robot derleminde geçmediğinden harf harf ya da çok küçük parçalarla temsil edilir.",
+      "pitfall": "Modelin bilmediği kelimede hata vereceğini sanmak; parçalayıcı her metni bölebilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d3-q1",
+      "kind": "numeric",
+      "prompt": "Küçük bir derlemde \"dur\" kelimesi 3 kez, \"durur\" kelimesi 2 kez geçiyor. Kelimeler harflerine bölünmüş. \"u\" ile \"r\" harflerinin yan yana geldiği çift, derlemde toplam kaç kez sayılır?",
+      "answer": 7,
+      "unit": "kez",
+      "explanation": "\"dur\" içinde (u, r) çifti bir kez vardır: 3 geçiş x 1 = 3. \"durur\" içinde iki kez vardır (d-u-r-u-r): 2 geçiş x 2 = 4. Toplam 3 + 4 = 7. Kelimenin kaç kez geçtiği ve içinde kaç çift olduğu birlikte hesaba girer.",
+      "skills": [
+        "ai-bpe"
+      ]
+    },
+    {
+      "id": "m7h1d3-q2",
+      "kind": "predict-output",
+      "prompt": "\"u + r -> ur\" birleştirmesini uygulayan bu kod çalışınca ne yazar?\n\n```\nfunction birlestir(parcalar) {\n  const sonuc = []\n  for (let i = 0; i < parcalar.length; i++) {\n    if (parcalar[i] === \"u\" && parcalar[i + 1] === \"r\") {\n      sonuc.push(\"ur\")\n      i++\n    } else {\n      sonuc.push(parcalar[i])\n    }\n  }\n  return sonuc\n}\nconsole.log(birlestir([\"d\",\"u\",\"r\",\"u\",\"r\"]).join(\" \"))\n```",
+      "options": [
+        "d u r u r",
+        "d ur ur",
+        "d ur r ur r",
+        "dur ur"
+      ],
+      "answer": 1,
+      "explanation": "Kod soldan sağa gider: d olduğu gibi kalır, ilk u r çiftinde ur yazılır ve i++ ile r atlanır; aynısı ikinci çiftte de olur. Sonuç d ur ur. Atlama olmasaydı r ayrıca da yazılırdı (üçüncü seçenek).",
+      "skills": [
+        "ai-bpe"
+      ]
+    },
+    {
+      "id": "m7h1d3-q3",
+      "kind": "find-bug",
+      "prompt": "Bu kod \"u + r\" birleştirmesini uygulamak istiyor ama [\"d\",\"u\",\"r\",\"u\",\"r\"] için \"d ur r ur r\" üretiyor. Tek hata hangisi?\n\n```\nfunction hatali(parcalar) {\n  const sonuc = []\n  for (let i = 0; i < parcalar.length; i++) {\n    if (parcalar[i] === \"u\" && parcalar[i + 1] === \"r\") {\n      sonuc.push(\"ur\")\n    } else {\n      sonuc.push(parcalar[i])\n    }\n  }\n  return sonuc\n}\n```",
+      "options": [
+        "Birleştirilen çiftin ikinci parçası atlanmıyor (i++ eksik)",
+        "sonuc dizisi boş başlıyor",
+        "Koşulda && yerine || olmalı",
+        "push yerine pop kullanılmalı"
+      ],
+      "answer": 0,
+      "explanation": "Çift birleştirilince r zaten ur içine girdi, ama döngü sonraki turda r'yi yeniden okuyup ayrıca ekliyor. Çözüm, birleştirme dalında i++ yazmak. Boş başlangıç doğrudur; || yazılsaydı tek bir u bile birleşirdi.",
+      "skills": [
+        "ai-bpe",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d3-q4",
+      "kind": "mcq",
+      "prompt": "Parçalayıcı derlemde hiç geçmeyen \"kalemlik\" kelimesiyle karşılaşınca ne olur?",
+      "options": [
+        "Hata verir ve durur",
+        "Kelimeyi atlar",
+        "Birleştirmelerin işe yaramadığı kısımları küçük parçalara, gerekirse harflere böler",
+        "Kelimeyi en yakın robot kelimesiyle değiştirir"
+      ],
+      "answer": 2,
+      "explanation": "Öğrenilmiş birleştirmeler yalnız derlemde sık görülen çiftlere uyar. Görülmemiş kelimede çoğu çift yoktur ve kelime küçük parçalara dağılır; böylece her metin yine de temsil edilir. Kelime atlanmaz ya da başka kelimeyle değiştirilmez.",
+      "skills": [
+        "ai-bpe",
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d3-q5",
+      "kind": "mcq",
+      "prompt": "BPE'nin sık çifti birleştirme kuralı, uzun vadede parçaları nasıl etkiler?",
+      "options": [
+        "Tüm kelimeler eşit uzunlukta parçalara bölünür",
+        "Sık geçen kelimeler tek token'a yaklaşır, nadir kelimeler daha çok parçaya bölünür",
+        "Yalnız en uzun kelimeler birleşir",
+        "Parçalar her çalıştırmada rastgele seçilir"
+      ],
+      "answer": 1,
+      "explanation": "Sık çiftler öncelikle birleştiği için sık kelimeler birkaç adımda tek token olur; nadir kelimelerin çiftleri yeterince sık görülmediğinden parçalı kalır. Algoritma rastgele değildir: aynı derlem her seferinde aynı listeyi verir.",
+      "skills": [
+        "ai-bpe"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Kumanda ve araç",
+      "definition": "Kumanda komut yollar, araç komutu uygular; aralarında yalnız radyo mesajı akar.",
+      "example": "Kart 1'i yatırınca Kart 2 ok gösterir ve servo döner.",
+      "pitfall": "Kumanda ile araç tablosunu karıştırmak; gönderen 1 yollar, alan 1'i başka anlar."
+    },
+    {
+      "term": "Komut tablosu",
+      "definition": "Her komut sayısının hangi harekete, ekrana ve servo açısına karşılık geldiğini yazan plan.",
+      "example": "1 = sol ok ve servo 45°, 2 = sağ ok ve servo 135°.",
+      "pitfall": "Kodu tablosuz yazmak; iki taraf farklı anlaşmayla yazılır."
+    },
+    {
+      "term": "Duruş olayı",
+      "definition": "Kart yatırılınca ivmeölçer yeni bir duruş algılar ve başlık çalışır. Olay duruş değişince doğar.",
+      "example": "kart [sola yatınca] başlığı içinde radyoyla sayı gönder 1.",
+      "pitfall": "Aynı yöne tekrar yatırmayı yeni komut sanmak; duruş değişmedikçe olay çıkmaz."
+    },
+    {
+      "term": "Servo açısı",
+      "definition": "P0 pinindeki servonun 0-180 derece arasındaki konumu. 90 ortadır.",
+      "example": "45° bir yana, 135° öbür yana 45 derece sapar.",
+      "pitfall": "180'in dışında açı vermek; açı 0-180 aralığına çekilir."
+    },
+    {
+      "term": "Güvenli son kol",
+      "definition": "Eğer zincirinin son değilse kolu bilinmeyen komutta da araç durdurur.",
+      "example": "Komut 9 gelirse araç \"hayır\" simgesini gösterir ve servo 90° olur.",
+      "pitfall": "Son kolu boş bırakmak; tanınmayan komutta araç önceki durumunda kalır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d25-q1",
+      "kind": "numeric",
+      "prompt": "Komut tablosuna göre sola yatırınca servo 45°, sağa yatırınca 135° olur. Servo bir uçtan öbür uca kaç derece döner?",
+      "answer": 90,
+      "tolerance": 0,
+      "unit": "derece",
+      "explanation": "135 − 45 = 90 derece. Orta nokta 90° olduğundan her iki yan da ortadan 45° uzaktır.",
+      "skills": [
+        "mk-servo-tilt"
+      ]
+    },
+    {
+      "id": "m10h5d25-q2",
+      "kind": "predict-output",
+      "prompt": "Araç tarafının programı aşağıdadır. Kumandadan komut 9 geliyor (elle gönderildi). Araç ne yapar?\n\n```\nradyo mesajı alınınca:\n    komut değerini alınan sayı yap\n    eğer komut = 1 ise: sol ok, servo 45\n    değilse eğer komut = 2 ise: sağ ok, servo 135\n    değilse eğer komut = 3 ise: yukarı ok, servo 90\n    değilse eğer komut = 4 ise: aşağı ok, servo 90\n    değilse: \"hayır\" simgesi, servo 90\n```",
+      "options": [
+        "Aşağı ok gösterir, servo 90",
+        "Hata verir ve program durur",
+        "\"hayır\" simgesi gösterir, servo 90",
+        "Hiçbir şey yapmaz, önceki ok kalır"
+      ],
+      "answer": 2,
+      "explanation": "9 hiçbir koşula uymaz, son değilse kolu çalışır: \"hayır\" simgesi ve servo 90°. Bilinmeyen komutta aracın durması istenen bir davranıştır. Hata mesajı çıkmaz.",
+      "skills": [
+        "mk-protocol",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h5d25-q3",
+      "kind": "find-bug",
+      "prompt": "Kumanda sağa yatırılınca araç sol ok gösteriyor. Araç tarafı tabloyla uyumlu. Hatayı bul.\n\n```\nkart sola yatınca:  radyoyla sayı gönder 1\nkart sağa yatınca:  radyoyla sayı gönder 1\n```",
+      "options": [
+        "Araç tarafındaki zincirin sırası yanlış",
+        "Sağa yatınca başlığı 2 yerine 1 gönderiyor",
+        "Servo açısı 180'i aşıyor",
+        "Radyo grupları farklı"
+      ],
+      "answer": 1,
+      "explanation": "Sağa yatınca tablodaki komut 2'dir. Burada 1 gönderildiği için araç sol ok gösterir. Alan taraftaki zincir doğru olduğundan hata gönderen tarafta, yanlış sayıdadır.",
+      "skills": [
+        "mk-protocol",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d25-q4",
+      "kind": "mcq",
+      "prompt": "Kumanda kartı zaten sola yatık. Öğrenci kartı tekrar sola yatırmaya çalışıyor. Ne olur?",
+      "options": [
+        "Yeni olay doğmaz, komut gönderilmez",
+        "Komut tekrar gönderilir",
+        "Servo 0°'ye gider",
+        "Araç durur"
+      ],
+      "answer": 0,
+      "explanation": "Olay duruş değiştiğinde doğar. Duruş zaten \"sola yatık\" olduğundan yeni olay çıkmaz ve yeni komut gitmez. Önce kartı \"yüzü yukarı\" gibi başka bir duruşa getirmek gerekir.",
+      "skills": [
+        "mk-servo-tilt",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d25-q5",
+      "kind": "mcq",
+      "prompt": "Uzaktan kumanda projesine başlarken en doğru ilk adım hangisidir?",
+      "options": [
+        "Servoyu rastgele açılara çevirmek",
+        "İlk çalışan bloğu yazıp sayıları sonra düşünmek",
+        "Yalnız kumanda tarafını yazıp aracı sonra tasarlamak",
+        "Her komutun neyi tetiklediğini yazan bir komut tablosu çıkarmak"
+      ],
+      "answer": 3,
+      "explanation": "Önce komut tablosunu yazarsın, çünkü kumanda ile araç aynı anlaşmayı paylaşmalıdır. Tablo olmadan gönderen ve alan taraf farklı sayılar kullanabilir. Servo bağlamak ya da rastgele sayılar denemek sonraya kalır.",
+      "skills": [
+        "prog-planning",
+        "mk-protocol"
+      ]
+    }
+  ]
+}

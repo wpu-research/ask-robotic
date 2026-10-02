@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Baz seviye",
+      "definition": "Ortam sessizken ses modülünün analog çıkışında okunan sabit değer.",
+      "example": "Sanal modülde sessizken analogRead yaklaşık 256 verir; bunu açılışta ortalama alarak ölçersin.",
+      "pitfall": "Baz seviyeyi 512 sanmak ya da Ses şiddeti 0 değilken ölçmek: bütün sapmalar yanlış hesaplanır."
+    },
+    {
+      "term": "Sapma ve abs()",
+      "definition": "Okumanın baz seviyeden uzaklığı; abs() bu uzaklığı yönden bağımsız pozitif sayıya çevirir.",
+      "example": "abs(614 - 256) 358 verir; abs(100 - 256) 156 verir.",
+      "pitfall": "abs() kullanmamak: gerçek mikrofon baz seviyenin altına da salındığı için bazı sesler kaçar."
+    },
+    {
+      "term": "Tepe (tepe değer)",
+      "definition": "Bir olay süresince görülen en büyük sapma.",
+      "example": "Alkışta tepe yaklaşık 348 çıkabilir; fısıltıda 20-30 civarında kalır.",
+      "pitfall": "Sadece tepeye bakmak: çok yüksek bir kapı çarpması da alkışa benzer, süre de kontrol edilmelidir."
+    },
+    {
+      "term": "Olay süresi ve sınıflandırma",
+      "definition": "Olayın başlangıcı ile son yüksek örnek arasındaki süreye göre sesi kısa parazit, alkış ya da uzun ses diye ayırmak.",
+      "example": "5 ms kısa parazittir, 40 ms alkıştır, 800 ms uzun sestir.",
+      "pitfall": "Süre sınırlarını gerçek donanıma bakmadan sabit sanmak; sınırlar modüle ve ortama göre ayarlanır."
+    },
+    {
+      "term": "Sessizlik payı",
+      "definition": "Olayı bitirmeden önce sapmanın kısa bir süre eşiğin altında kalmasını beklemek.",
+      "example": "SESSIZ_PAY = 20 ms: sinyal 20 ms boyunca sakin kalırsa olay biter.",
+      "pitfall": "Olayı tek örnekle bitirmek: salınan sinyal baz seviyeden geçince tek alkış iki olay gibi görünür."
+    },
+    {
+      "term": "Durum değişkeni (sesVar)",
+      "definition": "Programın olayın ortasında olup olmadığını hatırlamasını sağlayan değişken.",
+      "example": "sesVar true iken fonksiyon yeni olay başlatmaz, mevcut olayı sürdürür.",
+      "pitfall": "Durumu yerel değişkende tutmak: fonksiyon her çağrıldığında sıfırlanır ve olay hiç bitmez."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d2-q1",
+      "kind": "numeric",
+      "prompt": "Sanal ses modülünde AO = 5 V × (0,25 + 0,7 × Ses şiddeti) olur ve analogRead = AO / 5 × 1023 kadardır. Sessizken baz 256 ölçüldü. Ses şiddeti 0,5 iken abs(analogRead - baz) yaklaşık kaç çıkar?",
+      "answer": 358,
+      "tolerance": 2,
+      "explanation": "Şiddet 0,5 için AO = 5 × (0,25 + 0,35) = 3,0 V, yani analogRead yaklaşık 614 olur. Sapma 614 - 256 = 358'dir. TEPE_ESIK 150 ise bu ses olay sayılır; şiddet 0,1 olsaydı sapma yaklaşık 71 olurdu ve sayılmazdı.",
+      "skills": [
+        "sens-noise",
+        "sens-event-detect"
+      ]
+    },
+    {
+      "id": "m4h4d2-q2",
+      "kind": "predict-output",
+      "prompt": "Üç ses olayının süreleri 5 ms, 40 ms ve 800 ms. Kısa parazit için 'K', alkış için 'A', uzun ses için 'U' harfi yazdırılıyor. Bu kod ne yazar?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long sureler[] = {5, 40, 800};\n  for (int i = 0; i < 3; i++) {\n    char tur;\n    if (sureler[i] < 10) tur = 'K';\n    else if (sureler[i] > 500) tur = 'U';\n    else tur = 'A';\n    Serial.print(tur);\n  }\n}\n```",
+      "options": [
+        "AAU",
+        "KAU",
+        "KAA",
+        "UAK"
+      ],
+      "answer": 1,
+      "explanation": "5 ms, 10 ms'den kısa olduğu için 'K'; 40 ms arada kaldığı için 'A'; 800 ms, 500 ms'den uzun olduğu için 'U'. Çıktı KAU olur. İlk seçenek 5 ms'yi alkış sayar, üçüncüsü 800 ms'yi alkış sayar, dördüncüsü sırayı ters okur.",
+      "skills": [
+        "sens-event-detect"
+      ]
+    },
+    {
+      "id": "m4h4d2-q3",
+      "kind": "find-bug",
+      "prompt": "Her alkış seri monitörde 'KISA sure=0' diye yazılıyor. Süre sonlandırılırken sure = sonYuksek - baslangic hesaplanıyor. Olay yakalama kodunda tek hata var. Nerede?\n\n```\nif (fark >= TEPE_ESIK) {\n  if (!sesVar) {\n    sesVar = true;\n    baslangic = simdi;\n    sonYuksek = simdi;\n  }\n  if (fark > tepe) tepe = fark;\n}\n```",
+      "options": [
+        "TEPE_ESIK çok küçük seçilmiş",
+        "abs() eksik olduğu için sapma negatif çıkıyor",
+        "sonYuksek yalnız olay başlarken ayarlanıyor; her yüksek örnekte yenilenmediği için süre hep 0",
+        "SURE_MAX çok büyük seçilmiş"
+      ],
+      "answer": 2,
+      "explanation": "Süre, son yüksek örnekle başlangıç arasındaki farktır. sonYuksek yalnızca olay başlarken ayarlanırsa sonYuksek ile baslangic hep aynı kalır ve fark 0 olur; 10 ms'den kısa olduğu için hepsi KISA yazılır. Çözüm sonYuksek = simdi satırını sesVar kontrolünün dışına, her yüksek örnekte çalışacak yere almaktır.",
+      "skills": [
+        "sens-event-detect",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d2-q4",
+      "kind": "mcq",
+      "prompt": "İki alkış anahtarında ARALIK 3000 ms. İlk alkıştan 5 saniye sonra ikinci alkış geliyor. Ne olur?",
+      "options": [
+        "LED değişmez; ikinci alkış yeni bir 'ilk alkış' sayılır",
+        "LED durumunu değiştirir",
+        "LED değişmez ve ikinci alkış tamamen unutulur",
+        "Program hata verir"
+      ],
+      "answer": 0,
+      "explanation": "Başlangıçlar arası süre 5000 ms, ARALIK'tan (3000) uzun olduğu için LED değişmez. Ama ikinci alkış da bir alkıştır: ilkAlkis olarak kaydedilir ve arkasından 3 saniye içinde gelecek bir alkışla çift oluşturabilir.",
+      "skills": [
+        "sens-event-detect",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h4d2-q5",
+      "kind": "mcq",
+      "prompt": "Alkış tanıma kodundan sessizlik payı (SESSIZ_PAY) kaldırılırsa ve olay sapma eşiğin altına inen ilk örnekte bitirilirse gerçek bir mikrofonla ne olabilir?",
+      "options": [
+        "Hiçbir alkış algılanmaz",
+        "LED sürekli yanık kalır",
+        "Baz seviye kayar",
+        "Salınan sinyal baz seviyeden geçerken tek alkış birden çok kısa olaya bölünebilir"
+      ],
+      "answer": 3,
+      "explanation": "Gerçek mikrofon sinyali baz seviyenin iki yanına salınır; baz seviyeden geçerken sapma bir an sıfıra yaklaşır. Olay hemen bitirilirse tek alkış birkaç kısa olay gibi görünür ve süre/yükseklik kontrolü bozulur. Sessizlik payı bu kısa boşlukları yok sayar. Diğer seçeneklerin kodla ilgisi yoktur.",
+      "skills": [
+        "sens-event-detect",
+        "sens-noise"
+      ]
+    }
+  ]
+}

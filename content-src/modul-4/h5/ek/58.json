@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Yazmaç (register)",
+      "definition": "Çipin içindeki numaralı hücre. I2C ile hangi yazmaçtan okunacağı ya da yazılacağı söylenir.",
+      "example": "0x6B güç yönetimi, 0x3B ölçümlerin başladığı yazmaçtır.",
+      "pitfall": "Yazmaç numarasını yanlış yazmak: rastgele ya da anlamsız veri gelir."
+    },
+    {
+      "term": "Uyku modu",
+      "definition": "MPU6050 açılışta uykudadır; 0x6B yazmacına 0 yazılınca ölçüme başlar.",
+      "example": "Wire.write(0x6B); Wire.write(0); çipi uyandırır.",
+      "pitfall": "Uyandırmayı unutmak: sensör anlamlı veri vermez."
+    },
+    {
+      "term": "Ham değer ve g",
+      "definition": "Çip 16 bitlik işaretli ham sayı verir; ±2 g aralığında g = ham / 16384.0.",
+      "example": "Ham 8192 ise 0,5 g'dir.",
+      "pitfall": "ax / 16384 yazmak: tam sayı bölmesi 0 verir; 16384.0 yazılmalı."
+    },
+    {
+      "term": "int16_t",
+      "definition": "İşaretli 16 bitlik tam sayı türü. İki baytı birleştirince negatif değerleri doğru yorumlar.",
+      "example": "(int16_t)((yuksek << 8) | dusuk)",
+      "pitfall": "İşaretsiz tür kullanmak: negatif eğim 65000 gibi bir sayıya döner."
+    },
+    {
+      "term": "atan2 ile eğim",
+      "definition": "İki kenardan açıyı radyan olarak verir; 180/PI ile derece olur. Pitch = atan2(ax, az).",
+      "example": "ax = 0,5 ve az = 0,866 için açı 30 derecedir.",
+      "pitfall": "Radyanı dereceye çevirmeyi unutmak ya da çip hızlanırken açıya güvenmek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d58-q1",
+      "kind": "numeric",
+      "prompt": "MPU6050'nin İvme Z özelliğini 0,25 g yaptın. Varsayılan ±2 g aralığında ham az değeri kaç okunur?",
+      "answer": 4096,
+      "tolerance": 1,
+      "explanation": "Ham = g x 16384 = 0,25 x 16384 = 4096. Tersi de doğrudur: ham 4096 / 16384,0 = 0,25 g.",
+      "skills": [
+        "accel-angle",
+        "i2c-registers"
+      ]
+    },
+    {
+      "id": "m4h5d58-q2",
+      "kind": "mcq",
+      "prompt": "Devreye MPU6050 (varsayılan adres) ile bir DS3231 RTC modülü eklediğinde ikisi de çalışmıyor. En olası neden nedir?",
+      "options": [
+        "İkisi de aynı I2C adresini (0x68) kullanır",
+        "RTC SDA pinine ihtiyaç duymaz",
+        "I2C aynı anda en çok bir cihaz destekler",
+        "MPU6050 yalnız 3,3 V ile çalışır"
+      ],
+      "answer": 0,
+      "explanation": "MPU6050 ve DS3231 varsayılan olarak 0x68 adresindedir; aynı hatta iki cihaz aynı adresi kullanamaz. MPU6050'nin AD0 pini 5 V'a bağlanırsa adres 0x69 olur. I2C birçok cihazı destekler, yeter ki adresler farklı olsun.",
+      "skills": [
+        "i2c-registers"
+      ]
+    },
+    {
+      "id": "m4h5d58-q3",
+      "kind": "find-bug",
+      "prompt": "Çip düz dururken ax ham değeri 8192 (0,5 g) ama ekranda 0.00 yazıyor. Hatalı satır hangisi?\n\n```\nint16_t ax = oku16();\nfloat g = ax / 16384;\nSerial.println(g, 2);\n```",
+      "options": [
+        "int16_t ax = oku16();",
+        "float g = ax / 16384;",
+        "Serial.println(g, 2);",
+        "Hata yok, 0.00 doğru"
+      ],
+      "answer": 1,
+      "explanation": "ax ve 16384 tam sayıdır; 8192 / 16384 tam sayı bölmesinde 0 olur ve float'a atanınca 0.00 yazılır. 16384.0 yazılmalıdır. int16_t doğru türdür.",
+      "skills": [
+        "i2c-registers",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h5d58-q4",
+      "kind": "predict-output",
+      "prompt": "Çip eğilmeden yatay yönde hızlanıyor: ax = 0,3 g ve az = 1,0 g okunuyor. Bu kod ne yazar?\n\n```\nfloat pitch = atan2(0.3, 1.0) * 180.0 / PI;\nSerial.println(pitch, 1);\n```",
+      "options": [
+        "0.0",
+        "30.0",
+        "73.3",
+        "16.7"
+      ],
+      "answer": 3,
+      "explanation": "atan2(0,3; 1) yaklaşık 0,2915 radyandır; x 180/PI = 16,7 derece. Çip eğilmediği hâlde açı çıktı, çünkü ivmeölçer yer çekimi ile çipin kendi hızlanmasını ayıramaz.",
+      "skills": [
+        "accel-angle"
+      ]
+    },
+    {
+      "id": "m4h5d58-q5",
+      "kind": "numeric",
+      "prompt": "İvme X = 0,26 g ve İvme Z = 0,97 g okunuyor. pitch = atan2(ax, az) x 180 / PI kaç derecedir?",
+      "answer": 15,
+      "tolerance": 0.5,
+      "unit": "derece",
+      "explanation": "ax / az = 0,268 ve arctan(0,268) yaklaşık 15,0 derecedir (tan 15 = 0,268). Sonuç radyan değil derece cinsindendir çünkü 180/PI ile çarptık.",
+      "skills": [
+        "accel-angle"
+      ]
+    }
+  ]
+}

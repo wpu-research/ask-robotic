@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "PIR sensör",
+      "definition": "Görüş alanındaki kızılötesi (ısı) ışınımının değişimini algılayan, kendisi ışık göndermeyen pasif sensör.",
+      "example": "Koridorda yürüyen birinin ışığı yakan sensör: yürüyen kişi ışınımı bir yarıdan ötekine kaydırır.",
+      "pitfall": "Hareketsiz duran birini de göreceğini sanmak; ışınım değişmediği için PIR onu fark etmeyebilir."
+    },
+    {
+      "term": "OUT ucu ve INPUT",
+      "definition": "PIR'ın OUT ucu hareket varken HIGH, yokken LOW olur; modül kendi gerilimini sürdüğü için pin düz INPUT yapılır.",
+      "example": "pinMode(2, INPUT); digitalRead(2) == HIGH ise hareket vardır.",
+      "pitfall": "INPUT_PULLUP kullanmak ya da butondaki gibi LOW'u hareket saymak; mantık ters kurulur."
+    },
+    {
+      "term": "Isınma süresi",
+      "definition": "PIR açıldıktan sonra çevreye alışırken çıkışının güvenilmez olduğu bekleme süresi.",
+      "example": "Laboratuvardaki PIR'da ilk 2 saniye çıkış rastgele HIGH-LOW oynar; gerçek modüllerde yarım dakika ile bir dakika civarıdır.",
+      "pitfall": "Isınmayı beklemeden okumaya başlamak: açılışta yalancı HIGH gelir ve alarm yersiz çalar."
+    },
+    {
+      "term": "Tutma süresi",
+      "definition": "Hareket bittikten sonra PIR'ın OUT ucunu HIGH tutmaya devam ettiği süre.",
+      "example": "Laboratuvar PIR'ı hareket bitince çıkışı 3 saniye daha HIGH tutar.",
+      "pitfall": "Hareket kutusunu kaldırdığın anda OUT'un LOW olacağını beklemek."
+    },
+    {
+      "term": "Son hareket zamanı",
+      "definition": "Her HIGH görüşte millis() değerini saklayıp yeterince sessizlik geçince \"boş\" demek.",
+      "example": "sonHareket = millis(); ... if (millis() - sonHareket >= BOS_SURE) oda boş.",
+      "pitfall": "Sensör çıkışını doğrudan oda dolu bilgisi saymak; kıpırdamadan oturan biri \"yok\" sayılabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d1-q1",
+      "kind": "mcq",
+      "prompt": "PIR sensörü neyi algılar?",
+      "options": [
+        "Ses dalgası gönderip yankısının dönme süresini",
+        "Görüş alanındaki kızılötesi ışınımın değişimini",
+        "Cismin rengini ve parlaklığını",
+        "Yakındaki mıknatısın alanını"
+      ],
+      "answer": 1,
+      "explanation": "PIR pasiftir: kendisi bir şey göndermez, yalnız görüş alanındaki kızılötesi ışınımın değişimini dinler. Ses gönderip yankı bekleyen sensör HC-SR04'tür; PIR rengi ya da mıknatısı algılamaz.",
+      "skills": [
+        "sensor-pir"
+      ]
+    },
+    {
+      "id": "m4h2d1-q2",
+      "kind": "mcq",
+      "prompt": "Alarm kartı prize takılınca PIR ilk saniyelerde rastgele HIGH-LOW veriyor ve siren yersiz çalıyor. Doğru önlem hangisidir?",
+      "options": [
+        "Pini INPUT_PULLUP yapmak",
+        "Sirenin süresini kısaltmak",
+        "Isınma süresi dolana kadar PIR okumasını yok saymak",
+        "Her turda delay(1000) koymak"
+      ],
+      "answer": 2,
+      "explanation": "Isınma sırasında PIR'ın çıkışı güvenilir değildir. Program, ısınma süresi dolana kadar PIR'ı okumaz (ya da okumayı yok sayar). INPUT_PULLUP pini etkilemez; çıkışı modül sürer. Her tura delay(1000) koymak sorunu çözmez, yalnız programı bloklar.",
+      "skills": [
+        "sensor-pir",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h2d1-q3",
+      "kind": "numeric",
+      "prompt": "pir_oda_dolu sketch'inde BOS_SURE = 5000 ms yapıldı. Laboratuvardaki PIR'da Hareket kutusunu t = 20 s'de işaretleyip t = 23 s'de kaldırıyorsun. OUT, hareket bittikten sonra 3 s daha HIGH kalıyor. Sketch kaçıncı saniyede \"Oda bos\" der?",
+      "answer": 31,
+      "tolerance": 0.2,
+      "unit": "s",
+      "explanation": "Kutu t = 23 s'de kaldırılır; OUT 3 s daha HIGH kalır, yani t = 26 s'ye kadar sonHareket yenilenir. Oda bundan sonra 5 s sessizlik gerekir: 26 + 5 = 31 s. Sensörün kendi tutma süresi, yazılımdaki BOS_SURE'nin üstüne biner.",
+      "skills": [
+        "sensor-pir",
+        "prog-millis",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h2d1-q4",
+      "kind": "predict-output",
+      "prompt": "PIR OUT ucu, her turda okunmak üzere sırasıyla LOW, HIGH, HIGH, HIGH, LOW, LOW oluyor. Bu kod çalışınca seri monitörde ne yazar?\n\n```\nbool onceki = false;\n\nvoid setup() {\n  pinMode(2, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool h = (digitalRead(2) == HIGH);\n  if (h && !onceki) Serial.println(\"A\");\n  if (!h && onceki) Serial.println(\"B\");\n  onceki = h;\n}\n```",
+      "options": [
+        "A, A, A, B (HIGH kaldığı her tur için A)",
+        "A ve B, birer kez",
+        "B ve A, birer kez",
+        "Hiçbir şey yazmaz"
+      ],
+      "answer": 1,
+      "explanation": "Kod yalnız değişimleri (kenarları) yazar. LOW'dan HIGH'a geçişte bir kez \"A\", HIGH'dan LOW'a geçişte bir kez \"B\" yazılır. HIGH'ın üç tur sürmesi üç satır üretmez; seviye değil, kenar yazdırılır.",
+      "skills": [
+        "prog-edge-detect",
+        "sensor-pir"
+      ]
+    },
+    {
+      "id": "m4h2d1-q5",
+      "kind": "find-bug",
+      "prompt": "Hareket varken LED yansın istiyoruz. PIR modülü doğru bağlı; ama Hareket kutusu işaretliyken LED sönük, işaretsizken yanıyor. Hatalı satır hangisi?\n\n```\nconst int PIR = 2;\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, digitalRead(PIR) == LOW);\n}\n```",
+      "options": [
+        "const int PIR = 2;",
+        "pinMode(PIR, INPUT);",
+        "pinMode(13, OUTPUT);",
+        "digitalWrite(13, digitalRead(PIR) == LOW);"
+      ],
+      "answer": 3,
+      "explanation": "PIR hareket varken HIGH verir; kodda LOW ile karşılaştırılınca LED hareket yokken yanar. Doğrusu `digitalRead(PIR) == HIGH`. pinMode(PIR, INPUT) doğrudur: OUT'u modül sürdüğü için pull-up gerekmez.",
+      "skills": [
+        "sensor-pir",
+        "prog-debug"
+      ]
+    }
+  ]
+}

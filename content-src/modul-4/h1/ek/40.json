@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Eşik ve bölge",
+      "definition": "Bir ölçümü sınır değerlerle bölgelere ayırıp her bölgeye ayrı davranış bağlamak.",
+      "example": "20 cm altı kırmızı, 20-50 cm sarı, 50 cm üstü yeşil.",
+      "pitfall": "Sınır değerini belirsiz bırakmak: tam 20 cm hangi bölgede olduğuna karar verilmemiş olur."
+    },
+    {
+      "term": "map()",
+      "definition": "Bir aralıktaki sayıyı başka bir aralığa doğrusal çevirir; tam sayılarla çalışır ve küsuratı atar.",
+      "example": "map(60, 20, 100, 100, 800) 450 verir: 60 cm'de bip aralığı 450 ms.",
+      "pitfall": "Küsuratlı mesafeyi (long) ile çevirmeden vermek ya da sonucu ondalıklı beklemek."
+    },
+    {
+      "term": "Bloklamayan çok görev",
+      "definition": "Ölçüm, bip ve ekranın millis() ile kendi saatlerine göre çalışması; hiçbiri diğerini beklemez.",
+      "example": "Ölçüm 60 ms, ekran 250 ms aralıkla yapılır.",
+      "pitfall": "Bip için delay() kullanmak: o süre boyunca ölçüm ve ekran durur."
+    },
+    {
+      "term": "Histerezis",
+      "definition": "Bir duruma giriş ve çıkış eşiğini farklı seçerek sınırdaki titremeyi önleme.",
+      "example": "Kırmızıya 20 cm'de geç, kırmızıdan 25 cm'de çık.",
+      "pitfall": "Tek eşik kullanmak: ölçüm sınırda gidip gelince renk sürekli değişir."
+    },
+    {
+      "term": "Ekran satırını tamamlamak",
+      "definition": "LCD'ye her seferinde satırı tam 16 karakterle yazmak; kısa yazı eski harfleri silmez.",
+      "example": "lcd.print(\"DUR!            \"); satırı boşlukla 16 karaktere tamamlar.",
+      "pitfall": "Kısa metin yazıp eski karakterlerin ekranda kaldığını görmek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d40-q1",
+      "kind": "numeric",
+      "prompt": "Park sensöründe bip aralığı map((long)mesafe, 20, 100, 100, 800) ile hesaplanıyor. Mesafe 75 cm iken bip aralığı kaç milisaniyedir? (map tam sayılarla çalışır ve küsuratı atar.)",
+      "answer": 581,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "map = (75 − 20) × (800 − 100) / (100 − 20) + 100. İşlem sırası: 55 × 700 = 38500; 38500 / 80 = 481 (küsurat atılır); 481 + 100 = 581 ms.",
+      "skills": [
+        "sens-thresholds"
+      ]
+    },
+    {
+      "id": "m4h1d40-q2",
+      "kind": "mcq",
+      "prompt": "Park sensöründe bip, buzzer pinini 40 ms HIGH tutup susturarak delay(40) ile yapılırsa ne olur?",
+      "options": [
+        "Hiçbir şey değişmez",
+        "Her bip sırasında program durur; ölçüm ve ekran güncellemesi geciker",
+        "Buzzer sürekli öter",
+        "Ölçüm daha doğru olur"
+      ],
+      "answer": 1,
+      "explanation": "delay() programı bloklar. Bip sırasında ölçüm ve ekran çalışamaz, bip sıklaştıkça program neredeyse sürekli beklemede kalır. Çözüm, bipin başlangıç zamanını tutup millis() farkına bakmaktır (ders 27).",
+      "skills": [
+        "prog-nonblocking"
+      ]
+    },
+    {
+      "id": "m4h1d40-q3",
+      "kind": "find-bug",
+      "prompt": "Park sensöründe sarı LED, mesafe ne olursa olsun hep yanıyor. Hatalı satır hangisi?\n\n```\nvoid ledGuncelle() {\n  digitalWrite(LED_YESIL,   mesafe >= 50);\n  digitalWrite(LED_SARI,    mesafe >= 20 || mesafe < 50);\n  digitalWrite(LED_KIRMIZI, mesafe < 20);\n}\n```",
+      "options": [
+        "digitalWrite(LED_YESIL,   mesafe >= 50);",
+        "digitalWrite(LED_KIRMIZI, mesafe < 20);",
+        "digitalWrite(LED_SARI,    mesafe >= 20 || mesafe < 50);"
+      ],
+      "answer": 2,
+      "explanation": "Sarı için iki koşul aynı anda sağlanmalı: 20 cm ve üstü VE 50 cm altı. || (\"ya da\") kullanılınca her sayı en az birini sağlar, koşul hep doğru olur. Doğrusu && olmalı. Diğer iki satır tablodaki yeşil ve kırmızı bölgelerle uyuşur.",
+      "skills": [
+        "sens-thresholds",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h1d40-q4",
+      "kind": "numeric",
+      "prompt": "Ölçüm 60 ms'de bir yapılıyor ve filtre 7 elemanlı medyan. Mesafe bir ölçümden hemen sonra aniden değişirse filtre çıkışı yeni değeri en erken kaç milisaniye sonra verir?",
+      "answer": 240,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "7 elemanlı pencerede yeni değerin ortanca olması için 4 yeni okuma (çoğunluk) gerekir. 4 × 60 = 240 ms. 5 elemanlı pencerede bu 3 × 60 = 180 ms olurdu; pencere büyüdükçe tepki yavaşlar.",
+      "skills": [
+        "sens-filter",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h1d40-q5",
+      "kind": "predict-output",
+      "prompt": "LCD'nin ikinci satırına önce \"YAKLASIYOR\", sonra aynı konumdan başlayarak \"DUR!\" yazılıyor. Ekranda ne görünür?\n\n```\nlcd.setCursor(0, 1);\nlcd.print(\"YAKLASIYOR\");\nlcd.setCursor(0, 1);\nlcd.print(\"DUR!\");\n```",
+      "options": [
+        "DUR!",
+        "DUR!ASIYOR",
+        "YAKLASIYOR",
+        "DUR!KLASIYOR"
+      ],
+      "answer": 1,
+      "explanation": "LCD yazılan karakterlerin üstüne yazar; kalan karakterleri silmez. \"DUR!\" ilk dört harfi (YAKL) ezer, geri kalan \"ASIYOR\" ekranda durur: DUR!ASIYOR. Çözüm satırı boşlukla 16 karaktere tamamlamaktır.",
+      "skills": [
+        "sens-thresholds",
+        "prog-debug"
+      ]
+    }
+  ]
+}

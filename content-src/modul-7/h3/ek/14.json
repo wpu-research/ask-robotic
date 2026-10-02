@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Yineleme döngüsü",
+      "definition": "Yaz, dene, değerlendir, tek şeyi değiştir, yeniden dene döngüsü.",
+      "example": "v1 yaz, sonucu hedefe göre bak, v2'de tek cümle ekle.",
+      "pitfall": "İlk denemede \"bitti\" demek; gerçek sonuç görülmeden prompt olgunlaşmaz."
+    },
+    {
+      "term": "Tek değişiklik kuralı",
+      "definition": "Her turda yalnız bir şeyi değiştirmek, böylece sonucun nedeni anlaşılır.",
+      "example": "Önce yalnız biçim cümlesi, sonra yalnız rol eklemek.",
+      "pitfall": "Aynı anda beş şeyi değiştirmek; hangisinin işe yaradığını bilememek."
+    },
+    {
+      "term": "Sürüm kaydı",
+      "definition": "Her prompt sürümünü, yapılan değişikliği ve sonucu yazmak.",
+      "example": "v1: 20 puan; v2: biçim cümlesi eklendi, 50 puan.",
+      "pitfall": "Eski sürümü silmek; kötüleşince geri dönemezsin."
+    },
+    {
+      "term": "Kontrol listesi puanı",
+      "definition": "Atölye denetleyicisinin parçaların varlığına göre verdiği sayı; model değildir.",
+      "example": "\"En fazla 3 madde\" yazmak biçim ve kısıt kutularını doldurur.",
+      "pitfall": "Puanı kalite sanmak; denetleyici anlamı anlamaz, sözcük ve kalıp arar."
+    },
+    {
+      "term": "Gerçek başarı oranı",
+      "definition": "Prompt'u örnek girdilerle denedikten sonra doğru çıkan cevapların oranı.",
+      "example": "8 denemenin 5'i doğruysa yüzde 62,5.",
+      "pitfall": "Çok az örnekle (örneğin 1-2) sonuca varmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d14-q1",
+      "kind": "mcq",
+      "prompt": "Prompt geliştirirken her turda neden yalnız bir şeyi değiştirmelisin?",
+      "options": [
+        "Çünkü sonucun hangi değişiklikten geldiğini ancak böyle anlarsın",
+        "Çünkü model birden fazla değişikliği okuyamaz",
+        "Çünkü puan yalnız tek değişiklikte yükselir",
+        "Çünkü sürüm kaydı tutmak yasaktır"
+      ],
+      "answer": 0,
+      "explanation": "Tek değişiklikte neden-sonuç görünür; işe yaramazsa geri alırsın. Model birden çok değişikliği okuyabilir; sorun, sonucu açıklayamamandır. Sürüm kaydı tutmak tersine önerilir.",
+      "skills": [
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d14-q2",
+      "kind": "predict-output",
+      "prompt": "Bir prompt'u 8 örnekte denedin; sonuçları true (doğru) ve false (yanlış) olarak listeledin. Kod çalışınca ne yazdırır?\n\n```\nconst sonuclar = [true, false, false, true, true, false, true, true]\nconst dogru = sonuclar.filter((s) => s).length\nconsole.log(dogru / sonuclar.length * 100)\n```",
+      "options": [
+        "5",
+        "37.5",
+        "62.5",
+        "8"
+      ],
+      "answer": 2,
+      "explanation": "filter yalnız true olanları bırakır: 5 tane. length 8 verir. 5 / 8 × 100 = 62.5. 37.5, yanlışların oranıdır (3 / 8); 5 ise yalnız doğru sayısıdır.",
+      "skills": [
+        "ai-prompt-iterate",
+        "ai-honest-measure"
+      ]
+    },
+    {
+      "id": "m7h3d14-q3",
+      "kind": "numeric",
+      "prompt": "v1 prompt'u 10 gerçek örnekte denedin: 5 doğru. v2'yi aynı 10 örnekte denedin: 7 doğru. Doğru oranı kaç yüzde puan arttı?",
+      "answer": 20,
+      "unit": "yüzde puan",
+      "explanation": "v1: 5 / 10 = %50, v2: 7 / 10 = %70. Fark 20 yüzde puandır. Aynı örnek setinde karşılaştırdığın için sonucun nedeni prompt değişikliğidir; farklı örneklerle karşılaştırsaydın sonuç yanıltıcı olurdu.",
+      "skills": [
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d14-q4",
+      "kind": "mcq",
+      "prompt": "Atölyede kontrol puanı 50'den 80'e çıktı, ama gerçek bir modelde cevaplar kötüleşti. Bu nasıl olabilir?",
+      "options": [
+        "Denetleyici de bir dil modelidir ve yanılmıştır",
+        "Denetleyici anahtar sözcüklere bakar; sözcükler eklenince puan artar ama anlamı ve model davranışını ölçmez",
+        "Puan hiçbir zaman değişmez",
+        "Gerçek model her zaman puanı izler"
+      ],
+      "answer": 1,
+      "explanation": "Denetleyici kural tabanlıdır, model değildir. Parça sözcüklerini görünce puan verir; talimatların birbiriyle çelişmesi ya da cevabın kötüleşmesi onu etkilemez. Kanıt için gerçek örneklerde ölçüm gerekir.",
+      "skills": [
+        "ai-honest-measure",
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d14-q5",
+      "kind": "mcq",
+      "prompt": "v1'den v2'ye geçerken rol, biçim ve kısıt cümlelerini birlikte ekledin; başarı yüzde 40'tan 80'e çıktı. Ne söyleyebilirsin?",
+      "options": [
+        "Rol cümlesi işe yaradı",
+        "Biçim cümlesi işe yaradı",
+        "Üç değişiklikten hangisinin etkili olduğunu bilemezsin",
+        "Kısıt cümlesi zarar verdi"
+      ],
+      "answer": 2,
+      "explanation": "Üç şey birlikte değiştiği için etkiyi ayıramazsın. Tek tek eklemek ya da geri almak hangisinin işe yaradığını gösterirdi. Üç değişiklik birlikte iyi olmuş olabilir; ama hangisinin katkısı büyük, bilinmez.",
+      "skills": [
+        "ai-prompt-iterate"
+      ]
+    }
+  ]
+}

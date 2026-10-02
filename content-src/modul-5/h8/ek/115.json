@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Sonuç tablosu",
+      "definition": "Her ölçüt için ne istendiği, nasıl ölçüldüğü, ne ölçüldüğü ve sonucun yazıldığı tablo.",
+      "example": "C yolu: \"20 ± 3 cm\", \"simülatörün bildiği mesafe\", \"18,3-22,0 cm\", \"GEÇTİ\".",
+      "pitfall": "Başarısız testi tablodan çıkarmak: başarısız test raporun en değerli satırlarındandır."
+    },
+    {
+      "term": "Kapsam sınırı",
+      "definition": "Ölçümün neyi kapsayıp neyi kapsamadığının sonuçla birlikte yazılması.",
+      "example": "Kol için \"GEÇTİ (kapsam sınırlı)\": komut edilen konum ölçüldü, dişli boşluğu ölçülmedi.",
+      "pitfall": "Simülatör ölçümünü gerçek robotun sonucu gibi sunmak."
+    },
+    {
+      "term": "Belirti ve kök neden",
+      "definition": "Belirti gördüğündür; kök neden belirtiyi üreten ilk katmandır.",
+      "example": "\"Robot duvar ucunda takıldı\" belirti; \"YAN_MS yetersiz\" kök nedendir.",
+      "pitfall": "Belirtiyi tedavi etmek (örneğin ENGEL_CM'yi büyütmek): hata başka parkurda geri gelir."
+    },
+    {
+      "term": "Katman incelemesi",
+      "definition": "Hatayı karar, dönüş, hareket gibi katmanlarda tek tek ölçüp sağlam olanları elemek.",
+      "example": "Karar ve dönüş sağlam çıktı; yana gitme marjı yalnız 8 mm'ydi.",
+      "pitfall": "Tahminle ilerlemek ve aynı anda birkaç şeyi değiştirmek."
+    },
+    {
+      "term": "Debounce aralığı (çarpma sayacı)",
+      "definition": "Aynı tamponun titreşimlerini tek çarpma saymak için tanınan bekleme süresi.",
+      "example": "500 ms içindeki ikinci basış sayılmaz.",
+      "pitfall": "Aralığı unutmak: tek çarpma birkaç çarpma olarak sayılır."
+    },
+    {
+      "term": "Günlük rapor",
+      "definition": "Hedef, yapılan iş, ölçümler, sorun-kök neden-düzeltme ve kararın nedenini içeren kısa günlük kayıt.",
+      "example": "\"Süreyi artırdım, engel eşiğini değiştirmedim: eşik algılamayı etkiliyor, yana gitmeyi değil.\"",
+      "pitfall": "Raporu \"yarın yazarım\" diye ertelemek: nedeni birkaç günde unutulur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d5-q1",
+      "kind": "mcq",
+      "prompt": "Hata raporunda hangisi bir KÖK NEDEN ifadesidir?",
+      "options": [
+        "Robot duvar ucunda takıldı",
+        "Yana gitme süresi robotu duvar ucunu yarıçap kadar aşacak yere götürmüyor (marj yok)",
+        "Robot çarptı",
+        "Simülatör yanlış çalışıyor"
+      ],
+      "answer": 1,
+      "explanation": "\"Takıldı\" ve \"çarptı\" belirtidir, ölçüp gördüğündür. Kök neden, belirtiyi üreten ilk katmandır ve ölçümle desteklenir: yana gitme marjı. \"Simülatör yanlış\" ise ölçmeden atılan bir bahanedir.",
+      "skills": [
+        "rep-root-cause"
+      ]
+    },
+    {
+      "id": "m5h8d5-q2",
+      "kind": "numeric",
+      "prompt": "Skor sketch'i çizgi hatasını `|konum| × 20 mm` olarak biriktiriyor. Dört ölçümde konum değerleri 0, 0,5, -1 ve 0,5 ise ortalama hata kaç mm'dir?",
+      "answer": 10,
+      "tolerance": 0.05,
+      "unit": "mm",
+      "explanation": "Mutlak değerler 0, 0,5, 1, 0,5; ortalaması 2 / 4 = 0,5 sensör aralığı. 0,5 × 20 mm = 10 mm. İşaretli ortalama 0,0 olurdu (0 + 0,5 - 1 + 0,5 = 0).",
+      "skills": [
+        "rob-error-stats",
+        "rep-honest-results"
+      ]
+    },
+    {
+      "id": "m5h8d5-q3",
+      "kind": "predict-output",
+      "prompt": "Çarpma sayacı 500 ms'den sık basışları tek sayar. Tampon basış anları (ms) 1000, 1200, 1900 ve 2500'dür. Bu kod ne yazar?\n```\nunsigned long basis[] = {1000, 1200, 1900, 2500};\nunsigned long son = 0;\nint carpma = 0;\nfor (int i = 0; i < 4; i++) {\n  if (basis[i] - son > 500) { carpma++; son = basis[i]; }\n}\nSerial.println(carpma);\n```",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 2,
+      "explanation": "1000: önceki 0'dan 1000 ms geçti, sayılır (1), son = 1000. 1200: 200 ms geçti, sayılmaz. 1900: 900 ms geçti, sayılır (2), son = 1900. 2500: 600 ms geçti, sayılır (3). Toplam 3. 1200 ms'deki basış titreşim sayıldığı için elendi.",
+      "skills": [
+        "prog-timing",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d5-q4",
+      "kind": "find-bug",
+      "prompt": "Çizgi izleyen robotun skor tablosu ortalama hatayı hep sıfıra yakın veriyor. Kodda tek hata var; hangisi?\n```\nif (sayi > 0) {\n  sonCizgi = simdi;\n  hataToplamMm += konum * SENSOR_ARALIK_MM;\n  olcumSayisi++;\n}\n```",
+      "options": [
+        "`olcumSayisi++` olmamalı",
+        "`konum` yerine `fabs(konum)` toplanmalı; işaretli değerler birbirini götürüyor",
+        "SENSOR_ARALIK_MM ile çarpılmamalı",
+        "`sonCizgi = simdi` silinmeli"
+      ],
+      "answer": 1,
+      "explanation": "Çizginin soluna ve sağına sapmalar işaret farkıyla birbirini götürür; robot yanlış gidiyorken ortalama sıfıra yaklaşır. Hata büyüklüğü `fabs` ile alınmalı. `olcumSayisi` ortalamanın bölenidir; `sonCizgi` çizginin bitişini algılamak için gerekir.",
+      "skills": [
+        "rob-error-stats",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d5-q5",
+      "kind": "mcq",
+      "prompt": "Robot kol simülatörde komut edilen konumda 0,09 mm hata ölçtü (dişli boşluğu ve eğilme modellenmiyor). Sonuç tablosuna ne yazılmalıdır?",
+      "options": [
+        "GEÇTİ: kol 0,09 mm doğrulukla çalışıyor",
+        "KALDI: çünkü gerçek kol ölçülmedi",
+        "Satır tablodan çıkarılır",
+        "GEÇTİ (kapsam sınırlı): komut edilen konum, simülatör; mekanik hata ölçülmedi"
+      ],
+      "answer": 3,
+      "explanation": "Sonuç doğrudur ama kapsamı sınırlıdır. Neyin ölçüldüğünü ve neyin ölçülmediğini yazmak, sayıyı gerçek robotun sonucu gibi sunmaktan kaçınmak demektir. Satırı çıkarmak ya da gerçeğe uymayan bir kesinlik iddia etmek dürüst değildir.",
+      "skills": [
+        "rep-honest-results"
+      ]
+    }
+  ]
+}

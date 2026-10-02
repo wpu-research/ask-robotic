@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Yapay zekâ",
+      "definition": "Zekâ gerektirdiği düşünülen işleri yapan sistemlerin geniş adı; elle yazılmış kurallar da buna girer.",
+      "example": "\"Mesafe 10 cm'den azsa dur\" diyen kural listesi basit bir yapay zekâ sayılabilir.",
+      "pitfall": "Yapay zekâ ile makine öğrenmesini aynı şey sanmak; ikincisi birincisinin içindeki bir yöntem ailesidir."
+    },
+    {
+      "term": "Makine öğrenmesi",
+      "definition": "Kuralları elle yazmak yerine örneklerden örüntü öğrenen yöntemler.",
+      "example": "Yüzlerce \"olumlu\" ve \"olumsuz\" yorum gösterip sınıflandırmayı sistemin bulmasını sağlamak.",
+      "pitfall": "Sistemin her şeyi kendi başına bildiğini sanmak; yalnız gördüğü örneklerden öğrenir."
+    },
+    {
+      "term": "Dil modeli",
+      "definition": "Metin üzerinde öğrenen ve o ana kadar yazılanlara bakıp sonraki parçayı tahmin eden model.",
+      "example": "\"robot sağa\" yazıldığında \"döner\" kelimesine yüksek olasılık veren bir model.",
+      "pitfall": "Onu bir kural listesi ya da bilgi ansiklopedisi sanmak; olasılıkları metinlerden öğrenilmiştir."
+    },
+    {
+      "term": "Token",
+      "definition": "Modelin metni işlerken kullandığı parça; kelime, kelime parçası ya da noktalama olabilir.",
+      "example": "\"robotlar\" bir modelde \"robot\" ve \"lar\" gibi iki parçaya bölünebilir.",
+      "pitfall": "Token ile kelimeyi eş saymak; token çoğu zaman kelimeden küçüktür."
+    },
+    {
+      "term": "Tahmin döngüsü",
+      "definition": "Modelin her adımda bir olasılık listesi çıkarıp tek parça seçmesi ve bunu metne ekleyerek tekrarlaması.",
+      "example": "Beş parçalık bir cevap, beş ardışık tahminle üretilir.",
+      "pitfall": "Modelin cevabı baştan sona hazır bildiğini sanmak; metin parça parça oluşur."
+    },
+    {
+      "term": "Simülasyon etiketi",
+      "definition": "Portalda, gerçek bir modelin yerini tutan elle yazılmış ya da betikli adımı işaretleyen uyarı.",
+      "example": "Ajan etkinliğindeki \"model adımı\" gerçek Claude değil, betikli bir örnektir.",
+      "pitfall": "Etiketli adımın çıktısını gerçek bir modelin cevabı sanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d1-q1",
+      "kind": "mcq",
+      "prompt": "Kuralları elle yazmak yerine, verilen örneklerden örüntüyü kendisi bulan yöntemlere ne denir?",
+      "options": [
+        "Derleme",
+        "Ağ yönlendirme",
+        "Makine öğrenmesi",
+        "Şifreleme"
+      ],
+      "answer": 2,
+      "explanation": "Makine öğrenmesinde kuralı sen yazmazsın; örnek verirsin ve sistem örüntüyü çıkarır. Diğer seçenekler başka işlerin adıdır.",
+      "skills": [
+        "ai-concepts"
+      ]
+    },
+    {
+      "id": "m7h1d1-q2",
+      "kind": "mcq",
+      "prompt": "Bir dil modelinin temel görevi hangisidir?",
+      "options": [
+        "Her sorunun doğru cevabını veritabanından bulmak",
+        "Yazılanlara bakıp sonraki parçayı tahmin etmek",
+        "Yalnız çeviri yapmak",
+        "Yazım hatalarını silmek"
+      ],
+      "answer": 1,
+      "explanation": "Temel görev sonraki parçanın olasılığını hesaplayıp seçmektir; çeviri, özet ve sohbet bu görevin üzerine kurulur. Cevabı veritabanından aramak model işi değildir.",
+      "skills": [
+        "ai-concepts",
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d1-q3",
+      "kind": "predict-output",
+      "prompt": "Üretim döngüsünü taklit eden bu kod çalışınca ekrana ne yazar?\n\n```\nlet metin = \"robot\"\nconst tahmin = [\"sağa\", \"döner\", \".\"]\nfor (const parca of tahmin) {\n  metin = metin + \" \" + parca\n}\nconsole.log(metin)\n```",
+      "options": [
+        "robot",
+        "sağa döner .",
+        "robot sağa döner .",
+        "robot sağa"
+      ],
+      "answer": 2,
+      "explanation": "Her tur metne bir parça ekler: robot, robot sağa, robot sağa döner, robot sağa döner . Başlangıç kelimesi silinmez, yalnız yeni parçalar eklenir.",
+      "skills": [
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d1-q4",
+      "kind": "numeric",
+      "prompt": "Bağlama yalnız \"robot\" yazdın (1 parça) ve modelden 6 parça daha üretmesini istedin. Her adımda tek parça eklenir. Üretim bitince metin toplam kaç parçadır?",
+      "answer": 7,
+      "unit": "parça",
+      "explanation": "Başlangıçtaki 1 parçaya 6 ayrı tahminle 6 parça eklenir: 1 + 6 = 7. Altı tahmin altı parça üretir; başlangıç kelimesi de metnin parçasıdır.",
+      "skills": [
+        "ai-next-token",
+        "ai-concepts"
+      ]
+    },
+    {
+      "id": "m7h1d1-q5",
+      "kind": "mcq",
+      "prompt": "Portalda bir adımın yanında \"simülasyon\" etiketi görüyorsun. Bunun anlamı nedir?",
+      "options": [
+        "Gerçek Claude'a soru gönderilmiştir",
+        "Adım, büyük bir modelin yerini tutan elle yazılmış ya da betikli bir örnektir",
+        "Adım hata vermiştir",
+        "Sonuç her zaman doğrudur"
+      ],
+      "answer": 1,
+      "explanation": "Etiket, o adımın gerçek bir model çıktısı olmadığını söyler: büyük modelin yerini tutan bir şablon ya da betiktir. Bu portalda gerçek bir model çağrısı yoktur; etiket ayrıca doğruluk garantisi de vermez.",
+      "skills": [
+        "ai-simulation-literacy"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Kural tablosu",
+      "definition": "Tetik, sonuç ve blokları satır satır yazan plan.",
+      "example": "Altın: oyuncu + altın karosu, karo boşalır, skor +1.",
+      "pitfall": "Plansız başlamak: bir kuralı unutur ya da çakışan olaylar yazarsın."
+    },
+    {
+      "term": "Harita boyutu",
+      "definition": "Harita boyutu karo sayısı x 16 pikseldir.",
+      "example": "24 x 8 karo = 384 x 128 piksel.",
+      "pitfall": "Karo ile pikseli karıştırmak: 24 karo 24 piksel değildir."
+    },
+    {
+      "term": "Kamera",
+      "definition": "Harita ekrandan büyükse kahramanı izleyerek ekranda görünen bölgeyi kaydırır.",
+      "example": "Harita 384, ekran 160 piksel; 224 piksel kamerayla görülür.",
+      "pitfall": "Kamerayı kurmamak: haritanın sağ tarafı hiç görünmez."
+    },
+    {
+      "term": "Kazanma koşulu",
+      "definition": "Oyunun nasıl kazanıldığını belirleyen kural (kapıya varmak, yeterli skor).",
+      "example": "Kapı olayında `oyunu bitir: kazandın` çalışır.",
+      "pitfall": "Kazanma yerine kaybetme seçmek: kapıya varınca kaybetme ekranı çıkar."
+    },
+    {
+      "term": "Seviye dengesi",
+      "definition": "Zorluğun kolaydan zora doğru artması.",
+      "example": "İlk diken uzakta, sonrakiler birbirine yakın.",
+      "pitfall": "İlk engeli zor yapmak: oyuncu daha başta sıkılır."
+    },
+    {
+      "term": "Sınama",
+      "definition": "Oyunu oynayıp her kuralı tek tek denemek.",
+      "example": "Her altına, dikene, balçığa ve kapıya dokunup sonucu kontrol edersin.",
+      "pitfall": "Yalnız bir kez denemek: diğer kuralların bozulduğunu fark etmezsin."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h5d25-q1",
+      "kind": "numeric",
+      "prompt": "Platform atlayıcı haritası 24 karo genişliğinde, karo 16 piksel, ekran 160 piksel genişliğinde. Harita ekrandan kaç piksel fazla geniştir (kamerayla kaydırılan miktar)?",
+      "answer": 224,
+      "tolerance": 0,
+      "unit": "piksel",
+      "explanation": "Harita genişliği 24 x 16 = 384 piksel. Ekran 160 piksel olduğundan 384 - 160 = 224 piksel dışarıda kalır; kamera bu kısmı kahramanı izleyerek gösterir.",
+      "skills": [
+        "oyun-harita-olcu"
+      ]
+    },
+    {
+      "id": "m11h5d25-q2",
+      "kind": "mcq",
+      "prompt": "Kapı olayına \"skor en az 10 olsun\" şartı koydun. Altın 5 puan, ezilen balçık da 5 puan veriyor; haritada 2 altın var. Bu kuralın hangi açığı vardır?",
+      "options": [
+        "Hiçbir açığı yoktur",
+        "Oyuncu bir altın ve bir balçıkla 10 puana ulaşıp ikinci altını almadan kazanabilir",
+        "Kapı hiç açılmaz",
+        "Altın puanı 10 olunca skor negatif olur"
+      ],
+      "answer": 1,
+      "explanation": "Skor hem altından hem ezmeden geldiği için oyuncu bir altın ve bir balçıkla 5 + 5 = 10 puana ulaşıp ikinci altını toplamadan kazanabilir. Bu açık altınları toplatma amacını bozar. Çözüm ölçütü değiştirmek ya da puanları ayarlamaktır.",
+      "skills": [
+        "oyun-seviye-tasarimi",
+        "oyun-mantik-kosul"
+      ]
+    },
+    {
+      "id": "m11h5d25-q3",
+      "kind": "find-bug",
+      "prompt": "Kapıya skor 10'dan az gelen oyuncuya yalnızca uyarı gösterilmesi, oyunun sürmesi gerekiyor. Ama şu an oyuncu uyarı yerine oyunu kaybediyor. Hatalı satır hangisi?\n\n```\n1  bir [Oyuncu] sprite'ı [Kapı] karosuna dokununca:\n2    eğer skor >= 10 ise:\n3      oyunu bitir: [kazandın]\n4    değilse:\n5      oyunu bitir: [kaybettin]\n```",
+      "options": [
+        "Satır 2: skor >= 10 koşulu",
+        "Satır 3: kazanma",
+        "Satır 5: değilse kolunda oyunu bitirmek",
+        "Satır 1: olay türü"
+      ],
+      "answer": 2,
+      "explanation": "5. satırdaki `oyunu bitir: kaybettin` oyunu bitirir. Uyarı için orada `ekranda [Önce altınları topla!] yaz, 2 saniye` olmalı. 2. ve 3. satırlar kazanma kuralını doğru kuruyor.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-seviye-tasarimi"
+      ]
+    },
+    {
+      "id": "m11h5d25-q4",
+      "kind": "numeric",
+      "prompt": "Altın 1 puan, ezilen balçık 5 puan, dikene değmek skoru değiştirmiyor (yalnız can azaltıyor). Oyuncu 2 altın topladı, 2 balçık ezdi ve bir kez dikene değdi. Skor kaç olur?",
+      "answer": 12,
+      "tolerance": 0,
+      "unit": "puan",
+      "explanation": "Altınlardan 2 x 1 = 2, balçıklardan 2 x 5 = 10. Diken yalnız canı etkiler, skoru etkilemez. Toplam 2 + 10 = 12.",
+      "skills": [
+        "oyun-seviye-tasarimi"
+      ]
+    },
+    {
+      "id": "m11h5d25-q5",
+      "kind": "mcq",
+      "prompt": "Arkadaşın oyunu denedi ve ilk dikende üç canının üçünü de kaybetti. Seviyeyi daha dengeli yapmak için en iyi değişiklik hangisi?",
+      "options": [
+        "Canı 99 yapmak",
+        "İlk dikeni daha dar yapıp öncesine güvenli zemin bırakmak",
+        "Zıplamayı kapatmak",
+        "Kapıyı kaldırmak"
+      ],
+      "answer": 1,
+      "explanation": "İyi bir seviye kolaydan zora gider. İlk dikeni daha dar yapıp öncesine güvenli bir zemin bırakmak oyuncuya öğrenme fırsatı verir. Canı çok artırmak sorunu gizler, zıplamayı kapatmak oyunu bozar, kapıyı kaldırmak oyunu bitirilemez yapar.",
+      "skills": [
+        "oyun-seviye-tasarimi",
+        "oyun-ziplama"
+      ]
+    }
+  ]
+}

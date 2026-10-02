@@ -14,9 +14,9 @@ export const ders30: MikroActivity = {
   starter: () => project('Akıllı saksı', [onStart(), every(2000, []), onButton('A', []), onRadio([])]),
   goals: [
     usesBlocks('bloklar', "'her … ms'de', radyo 'ad = değer' gönderimi, 'eşle' ve 'çubuk grafik' bloklarını kullan", ['mk_every', 'mk_radio_send_value', 'mk_on_radio', 'mk_map', 'mk_show_bar', 'mk_pin_aread']),
-    radioSent('gonder', "Kart 1 nemini 'nem' adıyla radyoyla göndersin", { kind: 'kv', card: 0, where: (m) => m.name === 'nem' && m.value === 50 }),
+    radioSent('gonder', "Kart 1 nemini 'nem' adıyla radyoyla göndersin", { kind: 'kv', card: 0, where: (m) => m.name === 'nem' && m.value === 50, hint: "Kart 1'in nem kaydırıcısını 50 yap; her 2 saniyede kendiliğinden gönderir." }),
     custom('cubuk', 'Kart 2, nem 50 gelince 13 LED yanan çubuk grafik göstersin', (c) => !!c.sim && c.sim.cards[1].device.frames.some((f) => [...f.s].filter((ch) => ch === '1').length === 13), { hint: "'çubuk grafik alınan değer / en çok 100'." }),
-    ledPattern('uzgun', "Kart 1, nem 10 olan komşusunu görünce üzgün yüz göstersin", ICON_BY_ID.sad.rows, { card: 0 }),
+    ledPattern('uzgun', "Kart 1, nem 10 olan komşusunu görünce üzgün yüz göstersin", ICON_BY_ID.sad.rows, { card: 0, hint: "Kart 2'nin nem kaydırıcısını 10 yap; Kart 1 radyodan duyar." }),
     playsSound('ezgi', 'Üzgün ezgi çalsın', { melody: 'sad' }),
     showsNumber('kendi', "A'ya basınca Kart 1 kendi nemini (50) göstersin", 50, { card: 0 }),
   ],

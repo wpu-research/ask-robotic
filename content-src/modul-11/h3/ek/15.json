@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Kural tablosu",
+      "definition": "Her karo için dokununca ne olacağını yazdığın plan.",
+      "example": "Anahtar: anahtar ve kapı silinir. Elmas: skor +1. Lav: can -1 ve başa dön. Sandık: oyunu kazan.",
+      "pitfall": "Plansız bloklara başlamak: bir kuralı unutur ya da çakıştırırsın."
+    },
+    {
+      "term": "Anahtar-kapı sistemi",
+      "definition": "Bir karoya dokunmak başka bir yerdeki karoyu silerek yeni yol açar.",
+      "example": "Anahtara dokununca sütun 10 satır 5 karosu (kapı) boşalır.",
+      "pitfall": "Kapının sütun ve satırını yanlış yazmak: kapı açılmaz ya da başka bir karo silinir."
+    },
+    {
+      "term": "Kapı karosu",
+      "definition": "Duvar kutusu işaretli bir karo; silinince duvar da kalkar ve geçit açılır.",
+      "example": "Adanın ortasındaki duvarda tek geçit kapıdır.",
+      "pitfall": "Kapıyı hiç silmemek: sandığın bulunduğu yarıya geçilemez."
+    },
+    {
+      "term": "Mesaja skor katmak",
+      "definition": "`birleştir` bloğu metin ile skor bloğunu tek mesajda birleştirir.",
+      "example": "`Hazineyi buldun! Skor: ` + skor, skor 3 ise `Hazineyi buldun! Skor: 3` yazar.",
+      "pitfall": "Birleştir bloğunun yuvalarını doldurmamak: mesaj eksik çıkar."
+    },
+    {
+      "term": "Karo kuralları",
+      "definition": "Oyunun kuralları haritadaki karoların olaylarında yaşar; yeni kural için yeni karo ve olay eklenir.",
+      "example": "Haritaya yeni bir lav karosu çizmek tehlikeyi artırır; yeni olay gerekmez, mevcut lav olayı yeterlidir.",
+      "pitfall": "Yeni bir karo türü çizip ona ait bir olay yazmamak: karo hiçbir şey yapmaz."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d15-q1",
+      "kind": "numeric",
+      "prompt": "Hazine adası haritası 20 x 10 karodur (karo 16 piksel). Ekran 160 x 120 piksel. Kameranın x değeri en çok kaç olabilir?",
+      "answer": 160,
+      "unit": "piksel",
+      "explanation": "Dünya genişliği 20 x 16 = 320 piksel. Kamera en çok dünya eksi ekran kadar kayar: 320 - 160 = 160. 320 yazarsan kameranın dünyanın dışına çıkmasına izin vermiş olursun.",
+      "skills": [
+        "oyun-kamera",
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d15-q2",
+      "kind": "find-bug",
+      "prompt": "Kahraman anahtarı alıyor, anahtar kayboluyor ama kapı açılmıyor. Kapı sütun 10, satır 5 karosunda.\n\n```\n1  bir [Oyuncu] sprite'ı [Anahtar] karosuna dokununca\n2      sütun [olay karosunun sütunu] satır [olay karosunun satırı] karosunu boşalt\n3      sütun [5] satır [10] karosunu boşalt\n4      ekranda [Kapı açıldı!] yaz, [2] saniye\n```\n\nHatalı satır hangisidir?",
+      "options": [
+        "Satır 1",
+        "Satır 2",
+        "Satır 3: sütun ile satır yer değiştirmiş",
+        "Satır 4"
+      ],
+      "answer": 2,
+      "explanation": "Kapı sütun 10, satır 5'tir ama satır 3'te sütun 5, satır 10 yazılmış. Ada 10 satırlıdır (0-9), bu yüzden satır 10 haritanın dışındadır ve hiçbir karo silinmez. Anahtarın silinmesi satır 2'nin doğru çalıştığını gösterir.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-olay-karosu"
+      ]
+    },
+    {
+      "id": "m11h3d15-q3",
+      "kind": "mcq",
+      "prompt": "Anahtar alınca kapının açılmasını en iyi hangisi açıklar?",
+      "options": [
+        "Kahraman daha hızlı yürüdüğü için",
+        "Kapı, duvar kutusu işaretsiz olduğu için kendiliğinden açılır",
+        "Kamera kapıyı gizler",
+        "Anahtar olayı kapı karosunu haritadan siler; duvar kutusu işaretli karo silinince duvar da kalkar"
+      ],
+      "answer": 3,
+      "explanation": "Kapı duvar olarak çizilmiştir ve ancak karo silinince yol açılır. Kapı baştan geçilebilir olsaydı kilit anlamsız olurdu. Hız ve kamera kapının açılmasıyla ilgili değildir.",
+      "skills": [
+        "oyun-olay-karosu",
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h3d15-q4",
+      "kind": "numeric",
+      "prompt": "Elmas olayını `skoru [2] değiştir` yaptın. Kahraman üç elmasın hepsini topladı, lava hiç dokunmadı ve sandığa ulaştı. Sandık mesajı `Hazineyi buldun! Skor: ` ve skor bloğunu birleştiriyor. Mesajdaki skor kaçtır?",
+      "answer": 6,
+      "unit": "puan",
+      "explanation": "Üç elmas x 2 puan = 6. Mesaj skoru kendisi okur, o yüzden olayı değiştirince mesaj kendiliğinden güncellenir. Elmas değerini unutup 3 yazmak eski kuralı kullanmaktır.",
+      "skills": [
+        "oyun-kural-planlama",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d15-q5",
+      "kind": "predict-output",
+      "prompt": "Adada üç lav karosu var. Lav olayı `canı -1 değiştir` yapar ve kahramanı başlangıç karosuna (sütun 1, satır 1) gönderir. Başlangıçta can 3. Kahraman sırayla üç farklı lav karosuna dokunuyor. Başka hiçbir blok yazılmadı. Ne olur?",
+      "options": [
+        "Can 0 olur ve oyun kaybedilir",
+        "Can 3 kalır",
+        "Can -3 olur ve oyun devam eder",
+        "Oyun kazanılır"
+      ],
+      "answer": 0,
+      "explanation": "Her lavda can 1 azalır: 3 - 3 = 0. Can 0 olunca, `can bitince` olayı yazılmamışsa oyun kendiliğinden kaybedilir. Canın sıfırın altına inmesi ve oyunun devam etmesi beklenmez; kazanma için sandığa ulaşmak gerekir.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-kazanma-kosulu"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Tasarım kartı",
+      "definition": "Bir oyuna başlamadan önce beş soruyu cevaplayan kısa not: oyuncu, hedef, tehlike, kazanma, kaybetme.",
+      "example": "Kedi ve elmalar oyununda kart: oyuncu kedi, hedef elma, kazanma skor 3, kaybetme can 0.",
+      "pitfall": "Kartı atlayıp doğrudan blok koymak; oyunun nasıl biteceği belli olmadığı için oyun yarım kalır."
+    },
+    {
+      "term": "Skor ve can",
+      "definition": "Oyunun kendi sayaçlarıdır; skor başarıyı, can kalan hakkı sayar ve oyun başlarken değerleri ayarlanır.",
+      "example": "Oyun başlayınca skoru 0, canı 3 yaparsın; elma yenince skor 1 artar.",
+      "pitfall": "Başlangıç değerlerini yazmamak; oyun yine çalışır ama programı okuyan başlangıcın ne olduğunu göremez."
+    },
+    {
+      "term": "Kazanma kuralı",
+      "definition": "Oyunu hangi koşulda kazandığını söyleyen olay ve koşul birleşimi.",
+      "example": "Elma yenince `eğer skor ≥ 3 ise oyunu bitir: kazandın` kuralı sorulur.",
+      "pitfall": "Kontrolü çarpışma olayının dışına koymak; skor değişse bile kural hiç sorulmaz ve oyun bitmez."
+    },
+    {
+      "term": "Kaybetme kuralı",
+      "definition": "Can 0 olunca oyunun kendiliğinden kaybedilerek bitmesi; istersen `can bitince` olayıyla özelleştirilir.",
+      "example": "Düşmana çarpınca can 1 azalır; 3 çarpışmadan sonra oyun kaybedilir.",
+      "pitfall": "Kaybetmenin hiç mümkün olmadığını sanmak; tehlike hiç can azaltmıyorsa oyun meydan okumaz."
+    },
+    {
+      "term": "≥ ile = farkı",
+      "definition": "`skor ≥ 3` skor 3 ya da daha büyük olunca doğrudur; `skor = 3` yalnız tam 3 iken doğrudur.",
+      "example": "Her elma 2 puan verirken skor 2, 4, 6 olur; `skor ≥ 5` 6'da tetiklenir.",
+      "pitfall": "Skor atlayabilirken `=` kullanmak; sayı hedefi atlarsa kazanma hiç tetiklenmez."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h6d26-q1",
+      "kind": "mcq",
+      "prompt": "Hangisi iyi bir kazanma kuralı olamaz? (Bir kural, oyunun ölçebildiği bir şeye bakmalıdır.)",
+      "options": [
+        "Skor 10 olunca",
+        "Süre dolduğunda hâlâ canın varsa",
+        "Oyun güzel olunca",
+        "Anahtarla kapıya ulaşınca"
+      ],
+      "answer": 2,
+      "explanation": "Oyun skoru, canı, süreyi, konumu ve sprite türlerini ölçebilir; \"güzel olmayı\" ölçemez. Diğer üç seçenek bir sayıya ya da bir olaya bağlıdır.",
+      "skills": [
+        "oyun-iskelet",
+        "oyun-tasarim"
+      ]
+    },
+    {
+      "id": "m11h6d26-q2",
+      "kind": "mcq",
+      "prompt": "Kaybetme kuralı için hiçbir blok yazmadın. Kedi düşmana çarpıp canı 3'ten 0'a düşünce ne olur?",
+      "options": [
+        "Oyun kendiliğinden kaybedilerek biter",
+        "Hiçbir şey olmaz, oyun sonsuza kadar sürer",
+        "Oyun kazanılır",
+        "Skor sıfırlanır ama oyun sürer"
+      ],
+      "answer": 0,
+      "explanation": "Can 0 olunca, `can bitince` olayı yazılmamışsa oyun kendiliğinden kaybedilir. Kaybetme için ayrı kural yazmak zorunlu değildir; kazanma kuralını ise sen yazarsın.",
+      "skills": [
+        "oyun-iskelet"
+      ]
+    },
+    {
+      "id": "m11h6d26-q3",
+      "kind": "numeric",
+      "prompt": "Her elma 5 puan veriyor ve kazanma kuralı `skor ≥ 12`. Oyunu kazanmak için en az kaç elma toplamalısın?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "elma",
+      "explanation": "Skorlar 5, 10, 15 diye gider. 10 < 12 olduğu için ikinci elma yetmez, üçüncüde 15 ≥ 12 olur. Hesap: 12 ÷ 5 = 2,4 ve yukarı yuvarlanır, 3 çıkar. 2 elma yazmak yuvarlamayı aşağı yapmak olur.",
+      "skills": [
+        "oyun-iskelet",
+        "oyun-kosul"
+      ]
+    },
+    {
+      "id": "m11h6d26-q4",
+      "kind": "predict-output",
+      "prompt": "Her elma 2 puan veriyor, skor 0'dan başlıyor ve toplam 4 elma var. Kural aşağıdaki gibi yazıldı. Kedi dört elmanın hepsini toplarsa ne olur?\n\n```\nOyuncu, Yiyecek'e çarpınca:\n  skoru 2 değiştir\n  diğer sprite'ı sil\n  eğer skor = 5 ise:\n    oyunu bitir: kazandın\n```",
+      "options": [
+        "Beşinci puanda kazanılır",
+        "Skor 2, 4, 6, 8 olur; 5'e eşit olmadığı için kazanma hiç tetiklenmez",
+        "Skor 8 olunca oyun kazanılır",
+        "Derleme hatası olur"
+      ],
+      "answer": 1,
+      "explanation": "Skor yalnızca çift sayılardan geçer, 5'e hiç denk gelmez; `=` koşulu hiç doğru olmaz. Doğrusu `skor ≥ 5` yazmaktır: 6'da kazanılır. Oyunun derleme hatası vermesi için blok eksik olması gerekir; burada bloklar geçerlidir.",
+      "skills": [
+        "oyun-kosul",
+        "oyun-hata"
+      ]
+    },
+    {
+      "id": "m11h6d26-q5",
+      "kind": "find-bug",
+      "prompt": "Üç elmayı da topluyorsun ama oyun hiç kazanılmıyor. Programın hatası nedir?\n\n```\noyun başlayınca:\n  skoru 0 yap\n  canı 3 yap\n  eğer skor ≥ 3 ise: oyunu bitir: kazandın\n\nOyuncu, Yiyecek'e çarpınca:\n  skoru 1 değiştir\n  diğer sprite'ı sil\n```",
+      "options": [
+        "Kazanma kontrolü yalnız oyun başlarken, skor 0 iken bir kez sorulur",
+        "Skor 0 yerine 1'den başlamalı",
+        "`≥` yerine `≤` yazılmalı",
+        "Elmayı silmek oyunu kilitler"
+      ],
+      "answer": 0,
+      "explanation": "Koşul sadece çalıştığı anda sorulur. Başlangıçta skor 0 olduğu için sonuç \"hayır\" çıkar ve bir daha sorulmaz. Kontrol skorun değiştiği olayın içine taşınmalıdır. `≥` doğrudur; `≤` yazmak başlangıçta bile kazandırırdı. Elmayı silmek hatalı değildir.",
+      "skills": [
+        "oyun-kosul",
+        "oyun-olay",
+        "oyun-hata"
+      ]
+    }
+  ]
+}

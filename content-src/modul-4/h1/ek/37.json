@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Tetik darbesi",
+      "definition": "TRIG bacağına verilen kısa HIGH darbesi (10 µs); sensöre ölçüme başlamasını söyler.",
+      "example": "LOW (2 µs), HIGH (10 µs), LOW sırası sensörü tetikler.",
+      "pitfall": "Darbeyi çok kısa ya da yanlış bacağa vermek: sensör ölçmez ve hep 0 okursun."
+    },
+    {
+      "term": "delayMicroseconds()",
+      "definition": "Programı verilen mikrosaniye kadar bekletir; delay() ise milisaniyeyle çalışır.",
+      "example": "delayMicroseconds(10); tam 10 µs bekler.",
+      "pitfall": "delay(10) yazıp 10 µs sanmak: bu 10 milisaniyedir, bin kat uzundur."
+    },
+    {
+      "term": "pulseIn()",
+      "definition": "Bir pinin HIGH (ya da LOW) kaldığı süreyi mikrosaniye olarak ölçer ve döndürür.",
+      "example": "pulseIn(ECHO, HIGH, 30000) ECHO'nun HIGH kalma süresini verir.",
+      "pitfall": "Dönen sayıyı santimetre sanmak: bu bir süredir, formülle çevrilmelidir."
+    },
+    {
+      "term": "Zaman aşımı",
+      "definition": "pulseIn'in en çok ne kadar bekleyeceğini belirleyen üçüncü parametre; darbe bu sürede bitmezse 0 döner.",
+      "example": "30000 µs yaklaşık 514 cm'ye karşılık gelir; 400 cm sınırını kapsar.",
+      "pitfall": "Zaman aşımı yazmamak: varsayılan 1 saniyedir, yankı yoksa program takılmış gibi görünür."
+    },
+    {
+      "term": "Geçersiz ölçüm (0)",
+      "definition": "pulseIn 0 döndürdüyse yankı gelmemiştir; bu 0 cm demek değildir.",
+      "example": "sure == 0 ise mesafeOku() -1 döndürür ve LED yanmaz.",
+      "pitfall": "0'ı formüle sokmak: mesafe 0 cm çıkar, LED ya da buzzer yanlış davranır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d37-q1",
+      "kind": "mcq",
+      "prompt": "pulseIn(ECHO, HIGH, 30000) çağrısında 30 ms dolduğu halde ECHO hiç HIGH olup bitmediyse fonksiyon ne döndürür?",
+      "options": [
+        "30000",
+        "-1",
+        "0",
+        "Program sonsuza kadar bekler"
+      ],
+      "answer": 2,
+      "explanation": "Zaman aşımı dolunca pulseIn 0 döndürür; bu \"ölçüm yok\" demektir. 30000 değildir, -1 de değildir. Program sonsuza kadar da beklemez; zaman aşımının amacı zaten bunu önlemektir.",
+      "skills": [
+        "sens-pulsein"
+      ]
+    },
+    {
+      "id": "m4h1d37-q2",
+      "kind": "numeric",
+      "prompt": "pulseIn için 30000 µs zaman aşımı seçildi. Sesin 0,0343 cm/µs hızıyla gidip dönebileceği en uzak mesafe yaklaşık kaç santimetredir?",
+      "answer": 514.5,
+      "tolerance": 5,
+      "unit": "cm",
+      "explanation": "Gidiş-dönüş süresi 30000 µs ise tek yön mesafe = 30000 × 0,0343 / 2 = 514,5 cm. Bu, sensörün 400 cm sınırının üstündedir; böylece geçerli bütün ölçümler zaman aşımına takılmaz.",
+      "skills": [
+        "sens-pulsein",
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d37-q3",
+      "kind": "find-bug",
+      "prompt": "Bu kod, nesne 30 cm'den yakınsa LED'i yakıyor. Sensörün önü boşken (yankı yokken) LED yanıyor. Neden?\n\n```\nunsigned long sure = pulseIn(ECHO, HIGH, 30000);\nfloat cm = sure * 0.0343 / 2.0;\ndigitalWrite(LED, cm < 30);\n```",
+      "options": [
+        "Zaman aşımı olan 30000 çok küçük",
+        "sure 0 olunca cm de 0 çıkar ve 0 < 30 doğru sayılır; yankı yok durumu denetlenmiyor",
+        "LED pini çıkış yapılmamış olmalı",
+        "0.0343 yerine 0.343 yazılmalı"
+      ],
+      "answer": 1,
+      "explanation": "Yankı gelmezse pulseIn 0 döndürür. Formül 0 cm üretir ve cm < 30 koşulu doğru olur. Çözüm: sure == 0 durumunu ayrı ele almak. Zaman aşımı değeri yeterlidir; sorun sabitte ya da LED pininde değil.",
+      "skills": [
+        "sens-pulsein",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h1d37-q4",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca Serial Monitor'a ne yazılır?\n\n```\nunsigned long sure = 4372;   // µs\nSerial.println(sure * 0.0343 / 2.0, 1);\n```",
+      "options": [
+        "150.0",
+        "37.5",
+        "74.9",
+        "75.0"
+      ],
+      "answer": 3,
+      "explanation": "4372 × 0,0343 = 149,96; ikiye bölünce 74,98. println bir ondalık basamağa yuvarlar: 75.0. 150.0 ikiye bölmeyi unutmaktır. 74.9 yuvarlamak yerine kesmek olurdu; Arduino yuvarlar.",
+      "skills": [
+        "sens-pulsein",
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d37-q5",
+      "kind": "numeric",
+      "prompt": "Bir program her 100 ms'de bir ölçüm yapıyor. Önünde nesne olmadığı için pulseIn zaman aşımına (30 ms) kadar bekliyor. Bu 100 ms'lik turun yüzde kaçında program ölçüm beklemekle meşgul?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "pulseIn bloklayıcıdır: 30 ms boyunca program başka iş yapamaz. 30 / 100 = %30. Bu yüzden ölçümler millis() ile seyrek yapılır ve çok iş varsa süre bilinçle seçilir.",
+      "skills": [
+        "prog-nonblocking",
+        "sens-pulsein"
+      ]
+    }
+  ]
+}

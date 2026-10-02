@@ -179,6 +179,12 @@ const TOOLS: { href: string; icon: IconName; title: string; text: string }[] = [
   { href: '/atolye', icon: 'atolye', title: 'Blok atölyesi', text: 'Blokları sürükle, karakterini programla.' },
   { href: '/laboratuvar', icon: 'laboratuvar', title: 'Devre laboratuvarı', text: 'Sanal Arduino ile devre kur, kod yaz, çalıştır.' },
   { href: '/arena', icon: 'arena', title: 'Robot arenası', text: 'Kodunla sanal robotu pistte sür.' },
+  { href: '/oyunlar', icon: 'oyun', title: 'Oyunlar', text: 'Bloklarla çöz: labirent, kuş, bulmaca ve daha fazlası.' },
+  { href: '/mikro-kart', icon: 'mikro', title: 'Mikro Kart', text: 'Sanal mikro kartı bloklarla programla.' },
+  { href: '/oyun-atolyesi', icon: 'oyun', title: 'Oyun atölyesi', text: 'Kendi oyununu tasarla ve çiz.' },
+  { href: '/sahne-atolyesi', icon: 'sahne', title: 'Sahne atölyesi', text: 'Sahneyi kur, karakterleri hareket ettir.' },
+  { href: '/ai-atolyesi', icon: 'ai', title: 'AI atölyesi', text: 'Yapay zekâyı dene ve eğit.' },
+  { href: '/parcalar', icon: 'parcalar', title: 'Parçalar', text: 'Elektronik parçaları ve özelliklerini incele.' },
 ]
 
 function QuickTools() {

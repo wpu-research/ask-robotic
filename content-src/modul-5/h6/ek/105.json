@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Durum makinesi (DENGE, KONTROLSUZ, DUSTU)",
+      "definition": "Programın her an tek bir durumda olduğu yapı. DENGE'de kontrol çalışır; diğer durumlarda motorlar kapalıdır.",
+      "example": "Açı eşiği aşınca program DUSTU durumuna geçer, LED yanar, motorlar kesilir.",
+      "pitfall": "DUSTU durumundan hiç çıkmayacağını unutmak: robotu kaldırdıktan sonra yeniden başlatmak gerekir."
+    },
+    {
+      "term": "Düşme eşiği",
+      "definition": "Açının mutlak değeri bu sınırı aşarsa robot düşmüş sayılır ve motorlar kesilir.",
+      "example": "Benzetimde 40° eşik seçildi; robot 45°'de düşmüş sayılıyor.",
+      "pitfall": "Yalnız bir yönü kontrol etmek (aci > eşik): robot geriye düşünce algılanmaz."
+    },
+    {
+      "term": "En büyük eğim",
+      "definition": "İtmeden sonra robotun ulaştığı en büyük sapma. Kontrolün tepkisinin ne kadar sert olduğunu gösterir.",
+      "example": "+200 °/s itmede gerçek en büyük eğim 4,96° ölçüldü.",
+      "pitfall": "Robotun raporunu gerçek değerle birebir aynı beklemek: robot süzülmüş açıyı görür, küçük farklar olur."
+    },
+    {
+      "term": "Oturma süresi",
+      "definition": "İtmeden sonra eğimin eşiğin (burada 1°) altına inip orada kalması için geçen süre.",
+      "example": "Eğim 1°'yi son kez itmeden 177 ms sonra aştıysa oturma süresi 177 ms'dir.",
+      "pitfall": "Eşiğe ilk kez inilen anı oturma saymak: robot eşiği yeniden aşabilir."
+    },
+    {
+      "term": "Kazanç ayarı",
+      "definition": "KP, KD, KX ve KV robota özeldir. Gerçek robotta küçük değerlerle başlayıp önce KP, sonra KD, en son dış döngü ayarlanır.",
+      "example": "Benzetimdeki KP = 0,15 gerçek bir robotta ya yetersiz kalır ya da titretir.",
+      "pitfall": "Benzetim kazançlarını gerçek robota kopyalamak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d5-q1",
+      "kind": "mcq",
+      "prompt": "Jiroskop sapmasını açılışta ölçüp çıkarmazsan, dengeleyen robot ne yapar?",
+      "options": [
+        "Hemen düşer, çünkü hata sonsuza gider",
+        "Dengede kalır ama kalıcı bir eğim hatası taşır",
+        "Hiçbir fark olmaz",
+        "Yalnız dış döngü çalışmaz"
+      ],
+      "answer": 1,
+      "explanation": "Tamamlayıcı filtre sapmanın birikmesini sınırlar, bu yüzden robot düşmez; ama tahmin sapma çarpı zaman sabiti kadar kayar ve robot kalıcı olarak hafif eğik durur. Benzetimde 1 °/s sapma yaklaşık -1,05° eğime yol açtı ve oturma eşiğini aştı.",
+      "skills": [
+        "imu-gyro",
+        "ctrl-state-safety"
+      ]
+    },
+    {
+      "id": "m5h6d5-q2",
+      "kind": "predict-output",
+      "prompt": "Durum makinesi (DENGE, KONTROLSUZ, DUSTU) tanımlı. Açı 45° iken bu kod ne yazar?\n\n```\nDurum durum = DENGE;\nfloat aci = 45.0;\nif (durum != DUSTU && fabs(aci) > 40.0) {\n  durum = DUSTU;\n  Serial.println(\"DUSTU\");\n}\nif (durum == DENGE) Serial.println(\"KONTROL\");\nelse Serial.println(\"MOTOR KAPALI\");\n```",
+      "options": [
+        "Yalnız KONTROL",
+        "DUSTU, sonra KONTROL",
+        "DUSTU, sonra MOTOR KAPALI",
+        "Yalnız MOTOR KAPALI"
+      ],
+      "answer": 2,
+      "explanation": "Açı 40° eşiğini aşıyor ve durum DUSTU değil; ilk blok çalışır, durum DUSTU olur ve \"DUSTU\" yazılır. Sonraki if artık DENGE olmadığı için else dalına girer: \"MOTOR KAPALI\". Durum güncellemesi kontrol kararından önce olduğu için aynı turda motorlar kapanır.",
+      "skills": [
+        "ctrl-state-safety"
+      ]
+    },
+    {
+      "id": "m5h6d5-q3",
+      "kind": "find-bug",
+      "prompt": "Robot öne düşünce motorlar kesiliyor ama geriye düşünce kesilmiyor. Hangi satır hatalı?\n\n```\nif (durum != DUSTU && aci > DUSME_ACISI) {\n  durum = DUSTU;\n}\n```",
+      "options": [
+        "durum != DUSTU koşulu kaldırılmalı",
+        "aci > DUSME_ACISI yalnız ileri düşmeyi yakalar; fabs(aci) kullanılmalı",
+        "DUSME_ACISI sıfır olmalı",
+        "durum = DUSTU yerine durum = DENGE yazılmalı"
+      ],
+      "answer": 1,
+      "explanation": "Geriye düşen robotun açısı negatiftir ve negatif sayı hiçbir zaman pozitif eşikten büyük olmaz. fabs(aci) her iki yönü de yakalar. durum != DUSTU koşulu gereksiz yere yazı yazmayı önler, doğrudur.",
+      "skills": [
+        "ctrl-state-safety",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d5-q4",
+      "kind": "numeric",
+      "prompt": "Projede açı 1°'nin altında 1000 ms'den uzun kalırsa (ms - sonDisariMs > 1000) rapor yazılıyor. Eğim 1°'yi son kez 3185 ms'de aştıysa RAPOR satırı yaklaşık hangi ms'de yazılır? (Döngü 5 ms'de bir çalışır.)",
+      "answer": 4188,
+      "tolerance": 5,
+      "unit": "ms",
+      "explanation": "Koşul ms - 3185 > 1000 olunca sağlanır, yani ms 4185'i geçince; 5 ms'lik turlar nedeniyle bu yaklaşık 4186-4190 ms'dir. Raporlanan oturma süresi ise rapor anı değil, eğimin 1°'yi son aştığı ana kadar geçen süredir: itme 3010 ms ise 3185 - 3010 = 175 ms.",
+      "skills": [
+        "ctrl-state-safety"
+      ]
+    },
+    {
+      "id": "m5h6d5-q5",
+      "kind": "mcq",
+      "prompt": "Benzetimde çalışan KP, KD, KX ve KV değerlerini aynen gerçek bir robota yazarsan ne olur?",
+      "options": [
+        "Büyük olasılıkla robot ya ayakta durmaz ya titrer; kazançlar küçükten başlayarak yeniden ayarlanır",
+        "Aynı sonuç çıkar, çünkü kod aynıdır",
+        "Yalnız KX ve KV değişir, KP ve KD aynı kalır",
+        "Robot sadece biraz daha yavaş tepki verir"
+      ],
+      "answer": 0,
+      "explanation": "Motor gücü, tekerlek çapı, kütle, yükseklik ve pil farklıdır; kazançlar robota özeldir. Programın yapısı (ölçme, filtre, sabit döngü, kaskad) aynı kalır, sayılar değişir. Güvenli yol: önce yalnız KP, sonra KD, en sonda dış döngü; robotu ilk denemede havada tutarak.",
+      "skills": [
+        "robot-tuning",
+        "ctrl-cascade"
+      ]
+    }
+  ]
+}

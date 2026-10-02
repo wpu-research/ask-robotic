@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Portföy",
+      "definition": "Yaptığın işleri kanıtlarıyla gösteren kısa derleme.",
+      "example": "Eval, RAG ve ajan bölümlerini sayı ve ekran görüntüsüyle anlatmak.",
+      "pitfall": "Kanıtsız 'yapay zekâ biliyorum' demek."
+    },
+    {
+      "term": "Kanıt",
+      "definition": "Bir iddiayı destekleyen sayı, ekran görüntüsü ya da prompt.",
+      "example": "'25 vakada %88 doğruluk.'",
+      "pitfall": "Yalnız yüzdeyi yazıp kaç vakaya dayandığını söylememek."
+    },
+    {
+      "term": "Gerçek hesap ve simülasyon farkı",
+      "definition": "Portal araçlarında gerçekten hesaplanan kısımlar (token'lama, getirme, eval) ile simüle edilen kısımları ayırmak.",
+      "example": "RAG sentezinin şablon, getirmenin gerçek olduğunu yazmak.",
+      "pitfall": "Simülasyonu gerçek bir modelin cevabıymış gibi anlatmak."
+    },
+    {
+      "term": "Yapay zekâ yardımını belirtmek",
+      "definition": "Portföyde yapay zekâdan yardım aldığın yeri açıkça yazmak.",
+      "example": "'Hata ayıklamada yardım aldım, düzeltmeyi kendim yaptım.'",
+      "pitfall": "Yardımı gizleyip her şeyi kendi yaptığını söylemek."
+    },
+    {
+      "term": "Eksikleri yazmak",
+      "definition": "Denemediğin ya da gerçek modelle sınayamadığın kısmı açıkça belirtmek.",
+      "example": "'Bu bölüm gerçek bir modelle denenmedi.'",
+      "pitfall": "Eksik bölümü bir şeyler yazarak doldurmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d5-q1",
+      "kind": "mcq",
+      "prompt": "Portföyünde RAG bölümünü yazarken hangi ifade dürüsttür?",
+      "options": [
+        "Aracım gerçek bir modelin cevabını gösteriyor",
+        "Getirme gerçek hesap; sentez adımı şablon (simülasyon)",
+        "Portal gerçek bir modelle aynı sonucu verir",
+        "Simülasyon olduğunu yazmaya gerek yok"
+      ],
+      "answer": 1,
+      "explanation": "Getirmenin gerçek hesap, sentez adımının şablon olduğunu söylemek dürüsttür. Portal araçları küçük örneklerdir ve gerçek bir modelin davranışını temsil etmez.",
+      "skills": [
+        "ai-portfolio",
+        "ai-honesty"
+      ]
+    },
+    {
+      "id": "m7h8d5-q2",
+      "kind": "numeric",
+      "prompt": "İlk eval turunda 25 vakadan 20'sini doğru yaptın; prompt'u düzelttikten sonra 22'sini doğru yaptın. Doğruluk kaç yüzde puan arttı?",
+      "answer": 8,
+      "tolerance": 0,
+      "unit": "puan",
+      "explanation": "İlk tur 20 / 25 = %80, ikinci tur 22 / 25 = %88. Artış 88 - 80 = 8 puandır. Aynı 25 vaka kullanıldığı için karşılaştırma adildir.",
+      "skills": [
+        "ai-portfolio",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d5-q3",
+      "kind": "mcq",
+      "prompt": "Hangi portföy cümlesi en güçlü kanıta sahiptir?",
+      "options": [
+        "Prompt'um harika çalışıyor.",
+        "Eval setinde 25 vakada doğruluk %80'den %88'e çıktı; hatalı iki vakayı inceledim.",
+        "Model çok akıllı olduğu için sonuçlar iyi.",
+        "Herkes bu prompt'u beğendi."
+      ],
+      "answer": 1,
+      "explanation": "Vaka sayısı, doğruluk ve karşılaştırma içeren cümle ölçülebilir ve kontrol edilebilirdir. 'Çok iyi çalışıyor' ya da 'harika bir prompt' gibi ifadeler kanıtsızdır.",
+      "skills": [
+        "ai-portfolio"
+      ]
+    },
+    {
+      "id": "m7h8d5-q4",
+      "kind": "predict-output",
+      "prompt": "Portföy tablosunda doğruluğu hesaplayan bu kod ne yazdırır?\n\n```\ndogru = 22\ntoplam = 25\nprint(round(dogru / toplam * 100))\n```",
+      "options": [
+        "0.88",
+        "22",
+        "88",
+        "88%"
+      ],
+      "answer": 2,
+      "explanation": "22 / 25 = 0,88; 100 ile çarpınca 88; round tam sayıya yuvarlar. Çıktı 88 olur. Yüzde işareti kodda yoktur; yalnız sayı yazdırılır.",
+      "skills": [
+        "ai-portfolio",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d5-q5",
+      "kind": "mcq",
+      "prompt": "Gerçek bir model olmadan deneyemediğin bir bölümü portföyde ne yapmalısın?",
+      "options": [
+        "Sonuçları tahminle doldurmak",
+        "Bölümü hiç yazmamak ve bir şey demeden geçmek",
+        "'Bunu gerçek bir modelle denemedim' diye açıkça belirtmek",
+        "Simülasyon çıktısını gerçek model çıktısı diye sunmak"
+      ],
+      "answer": 2,
+      "explanation": "Eksik kalan bölümü açıkça yazmak güven kazandırır. Simülasyonu gerçek sonuçmuş gibi sunmak ya da boşluğu uydurma bilgiyle doldurmak dürüstlük sorunudur.",
+      "skills": [
+        "ai-honesty"
+      ]
+    }
+  ]
+}

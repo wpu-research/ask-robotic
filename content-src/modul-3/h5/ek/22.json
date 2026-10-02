@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "NPN transistör",
+      "definition": "Baz-emitör arası yaklaşık 0,7 V'u aşınca küçük baz akımıyla büyük kolektör akımını geçiren anahtar.",
+      "example": "D6, 1 kΩ üzerinden bazı sürerek motoru açıp kapatır; kazanç yaklaşık 100'dür.",
+      "pitfall": "Baz direncini koymamak: baz akımı sınırsız kalır ve uyarı çıkar."
+    },
+    {
+      "term": "Baz direnci",
+      "definition": "Bazdan geçen akımı sınırlayan seri direnç.",
+      "example": "5 V, 0,7 V ve 1 kΩ ile baz akımı (5 − 0,7) / 1000 = 4,3 mA olur.",
+      "pitfall": "Pini doğrudan bazın üzerine bağlamak: taban akımı 30 mA'yı aşabilir."
+    },
+    {
+      "term": "Mantık seviyeli MOSFET",
+      "definition": "Geçit gerilimi yaklaşık 2 V'u aşınca iletmeye başlayan, neredeyse akım çekmeyen anahtar.",
+      "example": "G ucu D6'ya, S ucu GND'ye, D ucu motora bağlanır.",
+      "pitfall": "Her MOSFET'in 5 V ile tam açıldığını sanmak: logic level olmayan ısınır ve motor güçsüz kalır."
+    },
+    {
+      "term": "Flyback diyot",
+      "definition": "Motor akımı kesilince oluşan ters gerilim sıçraması için yol açan, motora ters yönde bağlı diyot.",
+      "example": "Diyotun A ucu transistörün C ucuna, çizgili K ucu 5V'a bağlanır.",
+      "pitfall": "Diyotu atlamak ya da ters bağlamak: laboratuvar flyback uyarısı verir, gerçekte transistör bozulur."
+    },
+    {
+      "term": "analogWrite ile motor hızı",
+      "definition": "PWM doluluğu motora giden ortalama gerilimi, yani hızı değiştirir.",
+      "example": "analogWrite(6, 128) yaklaşık %50 doluluk verir.",
+      "pitfall": "0-255 dışında değer vermek: okuma / 4 yerine okuma * 4 yazılırsa çoğu konumda tam hız olur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d22-q1",
+      "kind": "mcq",
+      "prompt": "Motor neden doğrudan Arduino pinine değil de bir transistörün arkasına bağlanır?",
+      "options": [
+        "Pin 5 V'tan düşük gerilim verdiği için",
+        "Pin yalnız birkaç on mA verebilir; motor gücü ayrı yoldan gelir, pin yalnız anahtarı yönetir",
+        "Transistör motoru daha hızlı döndürdüğü için",
+        "Motorun yönü transistörle değiştiği için"
+      ],
+      "answer": 1,
+      "explanation": "Pin yaklaşık 20 mA ile rahat çalışır, 40 mA'yı aşmamalıdır; motor yüzlerce mA çeker. Transistör küçük baz akımıyla büyük akımı geçirir. Hız ya da yön için değil, akım kapasitesi için kullanılır.",
+      "skills": [
+        "transistor-switching"
+      ]
+    },
+    {
+      "id": "m3h5d22-q2",
+      "kind": "numeric",
+      "prompt": "D6 5 V veriyor; baz direnci 1 kΩ, baz-emitör eşiği 0,7 V. Baz akımı kaç mA olur? (Pinin iç direncini yok say.)",
+      "answer": 4.3,
+      "tolerance": 0.1,
+      "unit": "mA",
+      "explanation": "Dirence düşen gerilim 5 − 0,7 = 4,3 V. I = V / R = 4,3 / 1000 = 0,0043 A = 4,3 mA. Kazanç 100 olduğundan bu akım yaklaşık 430 mA'e kadar yük akımına yeter.",
+      "skills": [
+        "transistor-switching",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h5d22-q3",
+      "kind": "predict-output",
+      "prompt": "Potansiyometre 600 okuyor. D6'daki PWM doluluk oranı yaklaşık ne olur?\n\n```\nint okuma = 600;\nint hiz = okuma / 4;\nanalogWrite(6, hiz);\n```",
+      "options": [
+        "%25",
+        "%50",
+        "%59",
+        "%100"
+      ],
+      "answer": 2,
+      "explanation": "600 / 4 = 150. Doluluk 150 / 255 ≈ 0,59, yani %59. %50 okuma 512 civarındayken olur; %100 için hız 255 olmalıdır.",
+      "skills": [
+        "motor-pwm-speed"
+      ]
+    },
+    {
+      "id": "m3h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "Pot ile motor hızı ayarlanacak, ama motor potun orta konumundan önce zaten tam hızda dönüyor. Hatalı satır hangisi?\n\n```\nconst int MOTOR = 6;\nvoid setup() { pinMode(MOTOR, OUTPUT); }\n\nvoid loop() {\n  int okuma = analogRead(A0);\n  int hiz = okuma * 4;\n  analogWrite(MOTOR, hiz);\n  delay(10);\n}\n```",
+      "options": [
+        "pinMode(MOTOR, OUTPUT);",
+        "int hiz = okuma * 4;",
+        "analogWrite(MOTOR, hiz);",
+        "delay(10);"
+      ],
+      "answer": 1,
+      "explanation": "analogRead 0-1023, analogWrite 0-255 ister. Dönüştürmek için 4'e bölmek gerekir. 4 ile çarpınca okuma 64'ten sonra değer 255'i aşar ve çıkış sürekli HIGH kalır. Diğer satırlar doğrudur.",
+      "skills": [
+        "motor-pwm-speed",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d22-q5",
+      "kind": "mcq",
+      "prompt": "Motor 5V'a ve transistörün kolektörüne bağlı. Flyback diyotun çizgili ucu (katot) nereye bağlanır?",
+      "options": [
+        "Transistörün emitörüne",
+        "GND'ye",
+        "D6 pinine",
+        "Motorun artı tarafına (5V)"
+      ],
+      "answer": 3,
+      "explanation": "Normal çalışmada diyot ters yönde olmalı ve akım iletmemeli: K ucu artı tarafa (5V), A ucu kolektöre gider. Ters bağlanırsa sıçrama için yol açmaz ve laboratuvar uyarı verir.",
+      "skills": [
+        "transistor-switching",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Beklenen çıktı (etiket)",
+      "definition": "Bir vaka için doğru kabul ettiğin cevap; sistemin cevabı buna karşı ölçülür.",
+      "example": "\"Kolay ve eğlenceli\" için beklenen etiket \"olumlu\"dur.",
+      "pitfall": "Etiketi sistemin verdiği cevaba bakarak yazmak; etiket önce, çalıştırma sonra gelir."
+    },
+    {
+      "term": "Belirsiz (nötr) etiketi",
+      "definition": "Ne olumlu ne olumsuz olan metinler için ayrılmış üçüncü etiket.",
+      "example": "\"Toplantı saat beşte\" cümlesi duygu taşımaz, etiketi belirsizdir.",
+      "pitfall": "Her cümleyi zorla olumlu ya da olumsuz saymak; sistem de test seti de çarpıtılmış olur."
+    },
+    {
+      "term": "Vaka çeşitliliği",
+      "definition": "Setin kolay, zor, sınırdaki ve her etiketten örnekler içermesi.",
+      "example": "Her etiket için bir kolay, bir de zor vaka yazarsın.",
+      "pitfall": "Aynı kalıbı küçük değişikliklerle tekrarlayıp çeşitli olduğunu sanmak."
+    },
+    {
+      "term": "Yinelenen vaka",
+      "definition": "Aynı girdinin sette birden çok kez bulunması.",
+      "example": "\"Güzel\" üç kez yazılırsa sistem bir kolay vakadan üç puan toplar.",
+      "pitfall": "Yinelemeyi ölçümü sağlamlaştırır sanmak; yalnızca doğruluğu şişirir ya da çarpıtır."
+    },
+    {
+      "term": "Etiketleyiciler arası uyum",
+      "definition": "İki kişinin aynı vakaya aynı etiketi koyma durumu.",
+      "example": "İlk beş vakanı arkadaşına ver; etiketleriniz farklıysa vaka belirsizdir.",
+      "pitfall": "Anlaşılamayan vakayı olduğu gibi bırakmak; ya düzeltilmeli ya da çıkarılmalıdır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d17-q1",
+      "kind": "mcq",
+      "prompt": "İyi bir test vakasının en temel özelliği hangisidir?",
+      "options": [
+        "Cümlenin çok uzun olması",
+        "Sistemin kesinlikle yanılacağı bir vaka olması",
+        "İki kişinin aynı beklenen etiketi koyabileceği kadar net olması",
+        "Sadece olumlu etiketli olması"
+      ],
+      "answer": 2,
+      "explanation": "Beklenen çıktı net değilse sistemin \"yanıldığını\" söylemek anlamsızdır. Uzunluk ya da yanılma garantisi kalite ölçüsü değildir; set ayrıca etiketler arasında dengeli olmalıdır.",
+      "skills": [
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d17-q2",
+      "kind": "numeric",
+      "prompt": "10 vakalık bir sette \"Güzel\" 3 kez, \"Berbat\" 2 kez yazılmış; kalan 5 vaka birbirinden farklı. Sette kaç benzersiz vaka vardır?",
+      "answer": 7,
+      "tolerance": 0,
+      "unit": "vaka",
+      "explanation": "Güzel için 1, Berbat için 1 ve kalan 5 farklı vaka: 1 + 1 + 5 = 7 benzersiz vaka. Fazladan yazılan 3 kopya (2 + 1) ölçüme yeni bilgi katmaz, yalnız doğruluğu yanıltır.",
+      "skills": [
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d17-q3",
+      "kind": "predict-output",
+      "prompt": "Duygu sınıflandırıcısı olumlu ve olumsuz sözcüklere bakar; \"değil\" bir önceki sözcüğün puanını ters çevirir; puan 0 ise \"belirsiz\" der. Aşağıdaki set çalıştırılıyor:\n\n```\n(\"Toplantı saat beşte\"     , belirsiz)\n(\"Kolay değil\"             , olumsuz)\n(\"Güzel\"                   , olumlu)\n(\"Hızlı ve kullanışsız\"    , olumsuz)\n```\n\nRapor ne söyler?",
+      "options": [
+        "4 vakanın 4'ü doğru",
+        "3 doğru; yanlış olan vaka \"Hızlı ve kullanışsız\" (sistem belirsiz der)",
+        "3 doğru; yanlış olan vaka \"Kolay değil\" (sistem olumlu der)",
+        "2 doğru, 2 yanlış"
+      ],
+      "answer": 1,
+      "explanation": "\"Toplantı saat beşte\" hiçbir listede yok: belirsiz. \"Kolay değil\": kolay +1, \"değil\" ters çevirir: -1, olumsuz. \"Güzel\": olumlu. \"Hızlı ve kullanışsız\": hızlı +1, kullanışsız -1, toplam 0 ve sistem belirsiz der; beklenen olumsuz olduğu için bu vaka yanlıştır. Doğruluk 3/4.",
+      "skills": [
+        "eval-basics",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d17-q4",
+      "kind": "find-bug",
+      "prompt": "Aşağıdaki test setinde tek bir vakanın beklenen etiketi yanlış yazılmış. Hangisi?\n\n```\n1: (\"Kullanışsız bir araç\"   , olumsuz)\n2: (\"Süper ve eğlenceli\"      , olumsuz)\n3: (\"Ders salı günü\"          , belirsiz)\n4: (\"Harika bir proje\"        , olumlu)\n```",
+      "options": [
+        "2. satır: olumlu olmalı",
+        "1. satır: olumlu olmalı",
+        "3. satır: olumsuz olmalı",
+        "4. satır: belirsiz olmalı"
+      ],
+      "answer": 0,
+      "explanation": "\"Süper ve eğlenceli\" açıkça olumludur; etiketi \"olumsuz\" yazmak sistemi haksız yere yanıltır. Eval'da etiket hatası, sistem hatası gibi görünür; bu yüzden etiketleri başka biriyle de kontrol etmek gerekir. Diğer üç satır doğru etiketlidir.",
+      "skills": [
+        "eval-cases",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d17-q5",
+      "kind": "mcq",
+      "prompt": "Test setine neden \"belirsiz\" etiketli vakalar eklenir?",
+      "options": [
+        "Sistem her cümleye mutlaka olumlu ya da olumsuz demelidir",
+        "Set büyüsün diye",
+        "Belirsiz vakalar hep doğru çıkar",
+        "Duygu taşımayan metinleri doğru ayırt edip etmediğini sınamak için"
+      ],
+      "answer": 3,
+      "explanation": "Gerçek metinlerin çoğu duygu taşımaz; sistemin bunlara olumlu ya da olumsuz demesi bir hatadır ve ancak belirsiz etiketli vakalarla yakalanır. Yalnız büyütmek için eklenen vaka bilgi katmaz.",
+      "skills": [
+        "eval-cases"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Sıfır örnekli (zero-shot) istem",
+      "definition": "Yalnız talimat içeren, hiç örnek göstermeyen prompt.",
+      "example": "Yorumu olumlu ya da olumsuz diye sınıflandır.",
+      "pitfall": "Biçim ya da etiket yazımı önemliyse tek başına yetmeyebilir; model beklenmedik bir üslup seçebilir."
+    },
+    {
+      "term": "Az örnekli (few-shot) istem",
+      "definition": "Talimatın yanında birkaç girdi-çıktı örneği gösteren prompt.",
+      "example": "İki Girdi/Çıktı çifti ekleyerek etiketlerin adını ve biçimini netleştirmek.",
+      "pitfall": "Örnek vermeyi modeli eğitmek sanmak; örnekler her istekte yeniden okunur ve bağlamda yer tutar."
+    },
+    {
+      "term": "Girdi-çıktı çifti",
+      "definition": "Modele \"şu girdiye şu çıktı verilir\" diyen tek bir örnek.",
+      "example": "Girdi: Dersi çok sevdim. Çıktı: olumlu",
+      "pitfall": "Çifti yanlış etiketlemek; model yanlış kalıbı sürdürür."
+    },
+    {
+      "term": "Dengeli etiket",
+      "definition": "Örneklerin her etiketten en az bir tane içermesi.",
+      "example": "Bir olumlu ve bir olumsuz örnek.",
+      "pitfall": "Tüm örnekleri aynı etiketle yazmak; model her şeye o etiketi verme eğilimine girebilir."
+    },
+    {
+      "term": "İnce ayar (fine-tuning)",
+      "definition": "Modelin ağırlıklarını ek veriyle yeniden eğitmek.",
+      "example": "Şirketin kendi destek yazışmalarıyla modeli yeniden eğitmek.",
+      "pitfall": "Few-shot ile karıştırmak; few-shot ağırlıkları değiştirmez, yalnız bağlama örnek ekler."
+    },
+    {
+      "term": "Denetleyicinin sınırı",
+      "definition": "Atölyedeki Prompt denetleyici kalıpları sayar, örneğin kalitesini ya da modelin cevabını bilemez.",
+      "example": "İki Girdi/Çıktı çifti yazınca ilgili hedef yeşile döner.",
+      "pitfall": "Yeşil hedefi \"örneklerim iyi\" kanıtı saymak; bu yalnız biçimin bulunduğunu söyler."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d11-q1",
+      "kind": "mcq",
+      "prompt": "Az örnekli (few-shot) istem için hangisi doğrudur?",
+      "options": [
+        "Modelin ağırlıklarını yeni verilerle yeniden eğitir",
+        "Talimatla birlikte birkaç girdi-çıktı örneği vermektir; örnekler her istekte bağlama girer",
+        "Yalnız talimat yazıp örnek vermemektir",
+        "Yalnız JSON çıktısı isteyen bir prompt türüdür"
+      ],
+      "answer": 1,
+      "explanation": "Few-shot, örnekleri prompt içinde göstermektir. Model bunları o istek için okur. Ağırlıkları yeniden eğitmek ince ayardır. Yalnız talimat vermek sıfır örnekli istemdir.",
+      "skills": [
+        "ai-fewshot"
+      ]
+    },
+    {
+      "id": "m7h3d11-q2",
+      "kind": "find-bug",
+      "prompt": "Bir yorum sınıflandırma prompt'unda hangi satır hatalıdır?\n\n```\n1 Yorumu sınıflandır: olumlu ya da olumsuz.\n2 Girdi: Robot dersini çok sevdim.\n3 Çıktı: olumlu\n4 Girdi: Kitap çok sıkıcıydı, hiç anlamadım.\n5 Çıktı: olumlu\n6 Girdi: Devre çalışmadı, çok sinirlendim.\n7 Çıktı: olumsuz\n```",
+      "options": [
+        "2. satır: Girdi çok kısa olmalı",
+        "3. satır: etiket olumsuz olmalı",
+        "5. satır: sıkıcı ve anlaşılmamış bir yorum \"olumsuz\" etiketlenmeli",
+        "7. satır: son örnek etiketlenmemeli"
+      ],
+      "answer": 2,
+      "explanation": "Dördüncü satırdaki yorum olumsuzdur, ama beşinci satır \"olumlu\" diyor. Yanlış etiketli örnek modele yanlış kalıp öğretir. Diğer satırlar tutarlıdır: sevgi belirten yorum olumlu, çalışmayan devre olumsuzdur.",
+      "skills": [
+        "ai-fewshot"
+      ]
+    },
+    {
+      "id": "m7h3d11-q3",
+      "kind": "numeric",
+      "prompt": "Bir few-shot prompt'ta talimat 30 token, üç örnek (her biri 25 token) ve sonda sınıflandırılacak yeni yorum 15 token tutuyor. Bağlam penceresi 200 token. Cevap için en fazla kaç token yer kalır?",
+      "answer": 80,
+      "unit": "token",
+      "explanation": "Prompt: 30 + 3 × 25 + 15 = 120 token. Pencere 200 olduğundan kalan 200 − 120 = 80 token. Örnekler bağlamdan yer yer; çok örnek eklemek cevaba kalan alanı azaltır.",
+      "skills": [
+        "ai-fewshot",
+        "ai-prompt-parts"
+      ]
+    },
+    {
+      "id": "m7h3d11-q4",
+      "kind": "mcq",
+      "prompt": "Bir yorum sınıflandırıcıda üç örneğin üçü de \"olumlu\" etiketli. Bu durumda en olası sorun hangisidir?",
+      "options": [
+        "Model her yeni yoruma \"olumlu\" deme eğilimi gösterebilir",
+        "Örnek sayısı çok olduğu için prompt çalışmaz",
+        "Model JSON üretmeyi bırakır",
+        "Model ince ayar yapılmış sayılır"
+      ],
+      "answer": 0,
+      "explanation": "Dengesiz örnekler kalıbı yanlış öğretebilir: model \"çıktı hep olumlu\" izlenimi edinir. Bu bir garanti değil, bir risktir. Örnek sayısı üç, normal bir sayıdır; ince ayar ise örneklerle yapılmaz.",
+      "skills": [
+        "ai-fewshot"
+      ]
+    },
+    {
+      "id": "m7h3d11-q5",
+      "kind": "mcq",
+      "prompt": "Prompt denetleyicide iki \"Girdi:\" ve iki \"Çıktı:\" yazınca ilgili hedef yeşile döndü. Bu neyi gösterir?",
+      "options": [
+        "Örneklerin kaliteli olduğunu",
+        "Modelin doğru etiketi vereceğini",
+        "Örneklerin dengeli olduğunu",
+        "Yalnızca aracın o kalıpları bulduğunu"
+      ],
+      "answer": 3,
+      "explanation": "Denetleyici kural tabanlıdır ve kalıpları sayar. Örneğin doğru, dengeli ya da kaliteli olduğunu bilemez; atölyede model cevabı da yoktur. Kaliteyi gerçek bir modelde ve ölçümle (4. hafta) sınarsın.",
+      "skills": [
+        "ai-fewshot",
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

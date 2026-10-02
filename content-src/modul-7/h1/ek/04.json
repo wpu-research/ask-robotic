@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "N-gram modeli",
+      "definition": "Son bir (ikili) ya da iki (üçlü) kelimeye bakıp sonraki kelimenin olasılığını derlemden sayarak bulan model.",
+      "example": "\"robot sağa\" bağlamından sonra derlemde hep \"döner\" geldiyse \"döner\" olasılığı 1'dir.",
+      "pitfall": "Bu modeli sinir ağı sanmak; yalnızca sayım tablosudur."
+    },
+    {
+      "term": "Olasılık (sayımdan)",
+      "definition": "Bir kelimenin, bağlamdan sonra gelme sayısının bağlamdan sonra gelen tüm kelimelerin sayısına oranı.",
+      "example": "Bir bağlamdan sonra 4 kez \"durur\" ve 1 kez \"sağa\" geldiyse \"durur\" olasılığı 4/5'tir.",
+      "pitfall": "Payı yalnız kelimenin kendi sayısıyla, paydayı da aynı sayıyla almak; payda tüm adayların toplamıdır."
+    },
+    {
+      "term": "İkili ve üçlü model",
+      "definition": "İkili model son kelimeye, üçlü model son iki kelimeye bakar.",
+      "example": "\"görür ve\" üçlü bağlamdır; \"ve\" ise ikili bağlamdır.",
+      "pitfall": "Daha uzun bağlamın her zaman daha iyi olduğunu sanmak; yeterli veri yoksa bağlam derlemde bulunmaz."
+    },
+    {
+      "term": "Geri çekilme",
+      "definition": "Bağlam derlemde yoksa modelin daha kısa bağlama, o da yoksa genel kelime sıklıklarına bakması.",
+      "example": "Üç kelimelik bağlam bulunamazsa araç son kelimeye bakar ve kullandığı düzeyi yazar.",
+      "pitfall": "Modelin bilmediği bağlamda hata vereceğini sanmak; geri çekilir ve yine tahmin eder."
+    },
+    {
+      "term": "Tohum (seed)",
+      "definition": "Rastgele seçimi başlatan sayı; aynı tohum aynı seçimleri verir.",
+      "example": "Tohum 1 ile üretilen cümle her çalıştırmada aynıdır; tohum 2 başka bir cümle verir.",
+      "pitfall": "Rastgele üretimin her seferinde kontrolsüz değiştiğini sanmak; tohumla tekrarlanabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d4-q1",
+      "kind": "numeric",
+      "prompt": "Bir bağlamdan sonra derlemde 6 kez \"gider\", 2 kez \"döner\" ve 2 kez \"durur\" gelmiş. \"döner\" kelimesinin olasılığı yüzde kaçtır?",
+      "answer": 20,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Toplam 6 + 2 + 2 = 10 geçiş vardır. \"döner\" 2 kez geldiği için olasılık 2/10 = %20. Payda yalnız \"gider\"in sayısı ya da yalnız \"döner\"in sayısı değil, tüm adayların toplamıdır.",
+      "skills": [
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d4-q2",
+      "kind": "predict-output",
+      "prompt": "Bu kod, \"robot\" kelimesinden sonra gelenleri sayıyor. Çalışınca sayac nedir?\n\n```\nconst metin = \"robot sağa döner . robot sağa döner . robot sola döner .\"\nconst kelimeler = metin.split(\" \")\nconst sayac = {}\nfor (let i = 0; i < kelimeler.length - 1; i++) {\n  if (kelimeler[i] === \"robot\") {\n    const sonraki = kelimeler[i + 1]\n    sayac[sonraki] = (sayac[sonraki] || 0) + 1\n  }\n}\nconsole.log(sayac)\n```",
+      "options": [
+        "sağa için 1, sola için 1",
+        "sağa için 3",
+        "sağa için 2, sola için 1",
+        "sağa için 2, sola için 1, döner için 3"
+      ],
+      "answer": 2,
+      "explanation": "\"robot\" üç kez geçiyor; ikisinden sonra \"sağa\", birinden sonra \"sola\" geliyor. Döngü yalnız \"robot\"un hemen ardındaki kelimeyi sayar, \"döner\" robot'un hemen ardında olmadığı için sayılmaz.",
+      "skills": [
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d4-q3",
+      "kind": "find-bug",
+      "prompt": "Kod \"durur\" için olasılık hesaplıyor; beklenen 0,8 ama ekrana 1 yazıyor. Tek hata hangisi?\n\n```\nconst sayim = { durur: 4, sağa: 1 }\nconst toplam = sayim.durur\nconsole.log(sayim.durur / toplam)\n```",
+      "options": [
+        "sayim bir nesne olmamalı",
+        "toplam yalnız \"durur\"un sayısı; tüm adayların toplamı alınmalı",
+        "console.log kullanılamaz",
+        "Bölme yerine çarpma gerekir"
+      ],
+      "answer": 1,
+      "explanation": "Olasılığın paydası bağlamdan sonra gelen tüm kelimelerin toplamıdır: 4 + 1 = 5. Kodda toplam yalnız 4 olduğundan 4/4 = 1 çıkıyor. Doğrusu 4/5 = 0,8.",
+      "skills": [
+        "ai-next-token",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d4-q4",
+      "kind": "mcq",
+      "prompt": "Üçlü model, son iki kelimelik bağlamı derlemde bulamadı. Araç ne yapar?",
+      "options": [
+        "Son bir kelimeye bakan daha kısa bağlama geri çekilir, o da yoksa genel kelime sıklıklarına döner",
+        "Hata verip durur",
+        "Bağlamı siler ve rastgele harf üretir",
+        "Gerçek bir dil modeline sorar"
+      ],
+      "answer": 0,
+      "explanation": "Araç boş kalmamak için bağlamı kısaltır ve hangi düzeyi kullandığını ekranda yazar. Bu portalda gerçek bir modele soru gönderilmez; her şey derlemden sayılan tabloyla yapılır.",
+      "skills": [
+        "ai-next-token",
+        "ai-simulation-literacy"
+      ]
+    },
+    {
+      "id": "m7h1d4-q5",
+      "kind": "mcq",
+      "prompt": "Aynı bağlam, aynı ayar ve aynı tohumla iki kez kelime ürettirirsen ne olur?",
+      "options": [
+        "Her seferinde farklı cümle çıkar",
+        "Önce aynı, sonra farklı cümle çıkar",
+        "Aynı cümle çıkar",
+        "Araç hata verir"
+      ],
+      "answer": 2,
+      "explanation": "Rastgele seçim tohumlu bir üreteçten gelir; aynı tohum aynı seçim dizisini üretir, o yüzden sonuç tekrarlanabilir. Farklı cümle için tohumu değiştirmek gerekir.",
+      "skills": [
+        "ai-next-token"
+      ]
+    }
+  ]
+}

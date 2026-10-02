@@ -1,0 +1,102 @@
+{
+  "concepts": [
+    {
+      "term": "Boşluk ve çizgi kaybı",
+      "definition": "Hiçbir sensörün çizgiyi görmediği (00000) durum; ya çizgide dar bir boşluktur ya da robot çizgiyi kaçırmıştır.",
+      "example": "Çizgi ortadayken kaybolursa boşluk olasıdır; kenar sensöründeyken kaybolursa viraj aşılmıştır.",
+      "pitfall": "Kayıp görünce her zaman aynı yöne dönmek; boşlukta robot kendi etrafında döner."
+    },
+    {
+      "term": "Son yön ile ayırt etme",
+      "definition": "00000 görününce çizginin en son nerede görüldüğüne bakarak boşluk (sonYon = 0) ile aşılmış virajı (sonYon ≠ 0) ayırma.",
+      "example": "sonYon = −1 ise robot sola dönüyordu; çizgiyi aştı, yerinde sola dönerek aranır.",
+      "pitfall": "sonYon'u her turda sıfırlamak; hafıza silinir ve ayrım yapılamaz."
+    },
+    {
+      "term": "Süre sınırı ve DUR",
+      "definition": "Boşluğu geçme ve çizgiyi arama sürelerine üst sınır koyup dolunca robotu durdurmak.",
+      "example": "BOSLUK_MS = 900 ms düz gider, ARAMA_MS = 2500 ms döner; çizgi bulunamazsa DUR yazılır ve motorlar kapanır.",
+      "pitfall": "Aramayı sınırsız bırakmak; çizgi gerçekten yoksa robot sonsuza dek döner."
+    },
+    {
+      "term": "Kavşak kararı",
+      "definition": "11111 desenini görünce önceden verilmiş bir kararı uygulamak: −1 sola, 0 düz, +1 sağa.",
+      "example": "T kavşakta karar −1 ise robot çubuğun sol ucuna gider; + kavşakta karar 0 ise düz geçer.",
+      "pitfall": "Kavşağı görür görmez dönmek; sensör dizisi aksın önünde olduğundan dönüş yanlış yerden başlar."
+    },
+    {
+      "term": "KAVSAK_ILERI",
+      "definition": "Kavşak algılanınca dönmeden önce kısa süre ileri giderek tekerlek aksını kavşağın hizasına getiren durum.",
+      "example": "350 ms ileri gidilince aks kavşağa gelir; sonra yerinde dönülür.",
+      "pitfall": "Bu süreyi sıfır yapmak: robot T'nin ucuna gitmek yerine geldiği sapa geri döner."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d4-q1",
+      "kind": "mcq",
+      "prompt": "Robot çizgiyi orta sensörle takip ederken (sonYon = 0) desen bir anda 00000 oldu. Hangi tepki doğrudur?",
+      "options": [
+        "Hemen yerinde sola dönmeye başla",
+        "BOSLUK durumuna geç: düz git; çizgi görünürse IZLE'ye dön, süre dolarsa ARAMA'ya geç",
+        "Eşiği 0 yap ve devam et",
+        "Hemen DUR durumuna geç"
+      ],
+      "answer": 1,
+      "explanation": "Çizgi ortadayken kaybolduysa robot düz gidiyordu; büyük olasılıkla bir boşluktur. Düz gidersek dar boşluğu geçeriz. Hemen dönmek robotu boşlukta döndürür; hemen durmak gereksizdir. Süre dolarsa çizgi gerçekten kayıptır ve ARAMA devreye girer.",
+      "skills": ["rob-gap-recovery", "rob-line-memory"]
+    },
+    {
+      "id": "m5h3d4-q2",
+      "kind": "predict-output",
+      "prompt": "Okumalar: 0 = çizgi yok, 1 = solda, 2 = ortada, 3 = sağda. Çizgi yokken sonYon == 0 ise 'B' (boşluk), değilse 'A' (arama) yazılır; çizgi varsa 'I' (izle). Bu kod ne yazar?\n\n```\nint sonYon = 0;\nint okuma[] = {2, 1, 0, 0, 3};\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    int o = okuma[i];\n    if (o == 0) {\n      Serial.print(sonYon == 0 ? 'B' : 'A');\n    } else {\n      sonYon = (o == 1) ? -1 : (o == 3) ? 1 : 0;\n      Serial.print('I');\n    }\n  }\n  Serial.println();\n}\nvoid loop() {}\n```",
+      "options": [
+        "IIBBI",
+        "IIAAA",
+        "IIAAI",
+        "IBBAI"
+      ],
+      "answer": 2,
+      "explanation": "Okuma 2 ve 1'de çizgi görülür (I, I) ve sonYon son olarak −1 olur. Sonraki iki 0'da sonYon ≠ 0 olduğundan A, A yazılır. Son okuma 3 çizgiyi görür, I yazılır. Çıktı IIAAI. Birinci seçenek sonYon'un 0 kaldığını varsayar.",
+      "skills": ["rob-gap-recovery", "rob-line-memory", "prog-debug"]
+    },
+    {
+      "id": "m5h3d4-q3",
+      "kind": "numeric",
+      "prompt": "Robot BOSLUK durumunda 0,2 m/s hızla düz gidiyor ve BOSLUK_MS = 900. Bu durumda süre dolmadan en fazla kaç cm yol alır?",
+      "answer": 18,
+      "tolerance": 0.1,
+      "unit": "cm",
+      "explanation": "Yol = hız × süre = 0,2 m/s × 0,9 s = 0,18 m = 18 cm. Hız artarsa aynı sürede daha uzun yol alınır; bu yüzden BOSLUK_MS hızla birlikte yeniden düşünülmelidir. Santimetreye çevirmek için metreyi 100 ile çarpmayı unutma.",
+      "skills": ["rob-gap-recovery", "prog-timing"]
+    },
+    {
+      "id": "m5h3d4-q4",
+      "kind": "find-bug",
+      "prompt": "Kavşakta sola dönüş durumu, robot dönmeye başlar başlamaz IZLE'ye geçiyor ve yanlış yönde kalıyor. Hata nerede?\n\n```\ncase KAVSAK_DON:\n  yerindeDon(KAVSAK_KARARI);\n  if (orta) merkezGitti = true;\n  if (merkezGitti && orta) {\n    sonYon = 0;\n    gec(IZLE);\n  }\n  break;\n```",
+      "options": [
+        "`if (orta) merkezGitti = true;` ters olmalı: eski çizgi bırakılınca (!orta) merkezGitti işaretlenmeli; yazıldığı gibi dönüş daha ilk turda biter",
+        "yerindeDon çağrısı break'ten sonra olmalı",
+        "sonYon = 0 satırı silinmeli",
+        "gec(IZLE) yerine gec(DUR) yazılmalı"
+      ],
+      "answer": 0,
+      "explanation": "Dönüş başlarken orta sensör hâlâ eski çizgidedir. `orta` doğruyken merkezGitti işaretlenirse ve hemen ardından `merkezGitti && orta` kontrol edilirse koşul ilk turda sağlanır. Doğrusu önce orta sensörün eski çizgiyi bırakmasını (!orta) beklemek, sonra yeni çizgiyi bulunca bitirmektir.",
+      "skills": ["rob-junction", "rob-line-fsm", "prog-debug"]
+    },
+    {
+      "id": "m5h3d4-q5",
+      "kind": "mcq",
+      "prompt": "Robot T kavşağını (11111) görünce neden hemen dönmeye başlamaz da önce KAVSAK_ILERI durumunda kısa süre ileri gider?",
+      "options": [
+        "Motor sürücüsü ani yön değişimine izin vermez",
+        "Beş sensörün aynı anda çizgiyi görmesi bir okuma hatasıdır",
+        "ARAMA_MS dolmadan dönmek yasaktır",
+        "Sensör dizisi tekerlek aksının yaklaşık 7 cm önündedir; hemen dönen robot kavşağın ortasına varmadan, yanlış yerden döner"
+      ],
+      "answer": 3,
+      "explanation": "Kavşağı sensör dizisi görür ama robotun dönme merkezi (aks) 7 cm geridedir. Kısa bir ileri gitmeyle aks kavşağın hizasına gelir ve dönüş doğru yerden başlar. Sürücü ani yön değişimine izin verir; 11111 her zaman hata değildir, kavşağın desenidir.",
+      "skills": ["rob-junction", "rob-line-fsm"]
+    }
+  ]
+}

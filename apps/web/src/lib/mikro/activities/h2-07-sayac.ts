@@ -10,7 +10,7 @@ export const h2d2: MikroActivity = {
   starter: () => withVars(project('Sayaç', [onStart(), onButton('A', []), onButton('B', []), onButton('AB', [])]), ['sayi']),
   goals: [
     usesBlocks('degisken', "'sayi' değişkenini değiştir ve oku (değer yap, ekle, değişken bloğu)", ['variables_set', 'math_change', 'variables_get']),
-    showsNumber('uc', "A'ya üç kez basınca ekranda 3 görünsün", 3, { hint: "A bloğuna: 'sayi değerine 1 ekle', sonra 'sayıyı göster' ve içine 'sayi' bloğunu tak." }),
+    showsNumber('uc', "A'ya üç kez basınca ekranda 3 görünsün", 3, { hint: "A düğmesine kısa kısa üç kez bas. A bloğuna: 'sayi değerine 1 ekle', sonra 'sayıyı göster' ve içine 'sayi' bloğunu tak." }),
     afterInput('iki', "Ardından B'ye basınca 2 görünsün", 'button:B:press', (e) => e.kind === 'number' && e.value === 2, { hint: "B bloğunda 'sayi değerine -1 ekle' kullan." }),
     afterInput('sifir', "A+B'ye basınca sayaç 0'a dönsün ve 0 görünsün", 'button:AB:press', (e) => e.kind === 'number' && e.value === 0, { hint: "'sayi değerini 0 yap', sonra sayıyı göster." }),
   ],

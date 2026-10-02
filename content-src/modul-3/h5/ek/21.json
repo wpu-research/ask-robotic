@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Servo",
+      "definition": "İçinde motor, dişli ve açı sensörü bulunan; istenen açıya gidip orada duran motor.",
+      "example": "Bir radar tarayıcısında servo, sensörü 30 ile 150 derece arasında döndürür.",
+      "pitfall": "Servoyu sürekli dönen DC motor sanmak: servo 0-180 derece arasında bir açıya gider."
+    },
+    {
+      "term": "Darbe genişliği",
+      "definition": "SIG telindeki darbenin ne kadar sürdüğü; servo açıyı buradan anlar (0 derece ≈ 544 µs, 180 derece ≈ 2400 µs).",
+      "example": "90 derece için darbe yaklaşık 1472 µs sürer ve her 20 ms'de tekrarlanır.",
+      "pitfall": "Darbe sıklığını açı sanmak: açıyı belirleyen sıklık değil, darbenin genişliğidir."
+    },
+    {
+      "term": "attach()",
+      "definition": "Servo nesnesini bir pine bağlar ve darbe üretimini başlatır.",
+      "example": "servom.attach(9); komutu servonun sinyal telinin D9'da olduğunu söyler.",
+      "pitfall": "attach yazmayı unutmak: darbe üretilmez, servo hiç hareket etmez."
+    },
+    {
+      "term": "write()",
+      "definition": "Servoya gidilecek açıyı 0-180 derece arasında verir.",
+      "example": "servom.write(135); servoyu 135 dereceye götürür.",
+      "pitfall": "0-180 dışında açı vermek: servo mekanik sınırını zorlar."
+    },
+    {
+      "term": "map()",
+      "definition": "Bir sayıyı bir aralıktan başka bir aralığa çevirir; sonucu tam sayıdır.",
+      "example": "map(512, 0, 1023, 0, 180) yaklaşık 90 verir.",
+      "pitfall": "map'in küsuratlı sonuç vereceğini sanmak: sonuç tam sayıya aşağı yuvarlanır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d21-q1",
+      "kind": "mcq",
+      "prompt": "Servonun gideceği açıyı hangi tel taşır?",
+      "options": [
+        "VCC teli: gerilim arttıkça açı artar",
+        "GND teli: toprak açıyı belirler",
+        "SIG teli: darbenin genişliği açıyı belirler",
+        "Üç telin hepsi eşit olarak"
+      ],
+      "answer": 2,
+      "explanation": "Açı SIG teline gelen darbenin genişliğiyle söylenir. VCC ve GND yalnız güç taşır; gerilimi değiştirmek açıyı değiştirmez.",
+      "skills": [
+        "servo-angle"
+      ]
+    },
+    {
+      "id": "m3h5d21-q2",
+      "kind": "numeric",
+      "prompt": "Servo 0 derecede 544 µs, 180 derecede 2400 µs darbe istiyor ve aradaki değerler doğrusal. servom.write(45) için darbe kaç mikrosaniye olur?",
+      "answer": 1008,
+      "tolerance": 1,
+      "unit": "µs",
+      "explanation": "Açı başına (2400 − 544) / 180 ≈ 10,31 µs eklenir. 544 + 45 × 10,31 ≈ 1008 µs.",
+      "skills": [
+        "servo-angle"
+      ]
+    },
+    {
+      "id": "m3h5d21-q3",
+      "kind": "predict-output",
+      "prompt": "Potansiyometre 768 okuyor. Bu kod çalışınca servo ne yapar?\n\n```\nint okuma = 768;\nint aci = map(okuma, 0, 1023, 0, 180);\nservom.write(aci);\n```",
+      "options": [
+        "Yaklaşık 90 dereceye gider",
+        "Yaklaşık 135 dereceye gider",
+        "180 dereceye gider",
+        "768 dereceye gider"
+      ],
+      "answer": 1,
+      "explanation": "768 × 180 / 1023 ≈ 135,1 ve map tam sayıya yuvarlar: 135 derece. 90 derece ancak okuma 512 civarındayken olur; servo 180 dereceden öteye gidemez.",
+      "skills": [
+        "servo-angle",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d21-q4",
+      "kind": "find-bug",
+      "prompt": "Servo SIG-D9, VCC-5V, GND-GND olarak doğru bağlı ama hiç hareket etmiyor. Nedeni ne?\n\n```\n#include <Servo.h>\nServo servom;\n\nvoid setup() {\n}\n\nvoid loop() {\n  servom.write(90);\n  delay(1000);\n}\n```",
+      "options": [
+        "setup() içinde servom.attach(9) yok",
+        "Servo servom; satırı fazla",
+        "delay(1000) çok büyük",
+        "write(90) geçerli bir açı değil"
+      ],
+      "answer": 0,
+      "explanation": "attach olmadan darbe üretilmez ve servo komut almaz. 90 geçerli bir açıdır ve delay sorun çıkarmaz.",
+      "skills": [
+        "servo-angle",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d21-q5",
+      "kind": "numeric",
+      "prompt": "Bu tarama döngüsü servoyu 0'dan 180'e götürüyor. Tek yönlü tarama kaç milisaniye sürer?\n\n```\nfor (int aci = 0; aci <= 180; aci++) {\n  servom.write(aci);\n  delay(15);\n}\n```",
+      "answer": 2715,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "0'dan 180'e kadar (180 dahil) 181 adım vardır ve her adım 15 ms bekler: 181 × 15 = 2715 ms. 180 × 15 = 2700 demek bir adımı unutmaktır.",
+      "skills": [
+        "servo-angle",
+        "prog-timing"
+      ]
+    }
+  ]
+}

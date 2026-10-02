@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "kart sallandığında",
+      "definition": "Kartın her sallanışında bir kez çalışan olay başlığı.",
+      "example": "Başlığın içine adim değerine 1 ekle koyarsan her sallanış bir adım sayılır.",
+      "pitfall": "Başlığı boş bırakmak: sallamak hiçbir değişkeni artırmaz."
+    },
+    {
+      "term": "Eşitlik ve büyük-eşit",
+      "definition": "\"Eşit\" yalnızca tam o sayıda, \"büyük-eşit\" o sayıdan sonraki her sayıda doğrudur.",
+      "example": "adim = 10 kutlamayı bir kez yapar; adim >= 10 her adımda tekrarlar.",
+      "pitfall": "Bir kez olacak işe büyük-eşit koymak: kutlama 11., 12. adımlarda da çalar."
+    },
+    {
+      "term": "Kalan (mod)",
+      "definition": "Bir bölmeden artan sayı. adim ÷ 10 işleminin kalanı, 10'un katlarında 0 olur.",
+      "example": "30 ÷ 10 işleminin kalanı 0, 23 ÷ 10 işleminin kalanı 3'tür.",
+      "pitfall": "Bölümü kalanla karıştırmak: 23 ÷ 10 bölümü 2, kalanı 3'tür."
+    },
+    {
+      "term": "Sayma sırası",
+      "definition": "Önce sayarsın, sonra kontrol edersin. Sayma bloğu koşulun dışında olmalıdır.",
+      "example": "adim değerine 1 ekle bloğu eğer bloğundan önce gelir.",
+      "pitfall": "Sayma bloğunu eğer içine koymak: koşul hiç doğru olmaz ve değişken artmaz."
+    },
+    {
+      "term": "Olay kuyruğu",
+      "definition": "Meşgul bir başlığa gelen yeni olaylar sıraya girer ama en çok 3 tanesi saklanır.",
+      "example": "Zafer ezgisi çalarken gelen 5 sallanıştan yalnızca 3'ü işlenir.",
+      "pitfall": "Her sallanışın mutlaka sayılacağını sanmak: meşgul başlıkta fazlası kaybolur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d27-q1",
+      "kind": "predict-output",
+      "prompt": "Kart 12 kez sallanıyor (adim 0'dan başlıyor, her sallanıştan sonra ezgi bitene dek bekleniyor). Zafer ezgisi kaç kez çalar?\n\n```\nkart sallandığında:\n  adim değerine 1 ekle\n  eğer adim >= 10 ise:\n    ezgiyi çal [Zafer]\n```",
+      "options": [
+        "1 kez",
+        "2 kez",
+        "3 kez",
+        "12 kez"
+      ],
+      "answer": 2,
+      "explanation": "adim 10, 11 ve 12 olduğunda koşul doğrudur: 3 kez. \"adim = 10\" yazılsaydı yalnızca 1 kez çalardı. 12 kez çalması için ilk sallanıştan itibaren doğru olması gerekirdi.",
+      "skills": [
+        "mk-conditions",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d27-q2",
+      "kind": "find-bug",
+      "prompt": "Kartı kaç kez sallasan da 10. adımda kutlama olmuyor. Hata hangisi?\n\n```\nbaşlangıçta:\n  adim değerini 0 yap\n\nkart sallandığında:\n  eğer adim = 10 ise:\n    adim değerine 1 ekle\n    simgeyi göster [mutlu yüz]\n    ezgiyi çal [Zafer]\n```",
+      "options": [
+        "adim değerine 1 ekle bloğu eğer'in içinde; adim 0 olduğu için koşul hiç doğru olmuyor ve adim hiç artmıyor",
+        "Ezgi adı yanlış",
+        "Başlangıçta adim 0 yapılmamalı",
+        "Koşulda = yerine < kullanılmalı"
+      ],
+      "answer": 0,
+      "explanation": "Sayma bloğu koşulun dışına, ondan önceye konmalı. İçeride kalırsa adim 0'da takılır, \"adim = 10\" doğru olmaz. Başlangıçta 0 yapmak ve ezgi adı doğru.",
+      "skills": [
+        "mk-debug",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d27-q3",
+      "kind": "numeric",
+      "prompt": "Adımın 70 cm. Adımsayar 50 adım gösteriyor. Yürüdüğün yol kaç metredir?",
+      "answer": 35,
+      "unit": "m",
+      "explanation": "70 cm = 0,7 m. 50 x 0,7 = 35 m. Bloklarda adim x 7 ÷ 10 şeklinde de yazılır. 3500 cevabı santimetre cinsindendir.",
+      "skills": [
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d27-q4",
+      "kind": "mcq",
+      "prompt": "Her 10 adımda bir kutlama için \"adim ÷ 10 işleminin kalanı = 0\" koşulu kullanılıyor. Hangi adımlarda kutlama olur?",
+      "options": [
+        "Yalnız 10. adımda",
+        "1, 2, 3 ... adımlarının hepsinde",
+        "10, 20, 30 ... adımlarında",
+        "5, 15, 25 ... adımlarında"
+      ],
+      "answer": 2,
+      "explanation": "Kalan yalnızca 10'un katlarında 0 olur: 10, 20, 30 ... Yalnız 10. adımda kutlama için adim = 10 yazılırdı.",
+      "skills": [
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d27-q5",
+      "kind": "numeric",
+      "prompt": "Doğru kurulmuş adımsayarda 10. sallanış Zafer ezgisini (2,75 saniye) başlatır. Ezgi sürerken kart 5 kez daha sallanır. Ezgi bitip sıradaki olaylar işlenince adim kaç olur?",
+      "answer": 13,
+      "explanation": "Meşgul başlıkta en çok 3 olay sıraya girer; 5 sallanıştan 3'ü saklanır, 2'si kaybolur. adim 10 + 3 = 13 olur. Bu sayıyı sanal kartta çalıştırarak doğruladık.",
+      "skills": [
+        "mk-events",
+        "mk-concurrency"
+      ]
+    }
+  ]
+}

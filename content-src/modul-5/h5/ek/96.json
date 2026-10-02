@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Ayar noktası",
+      "definition": "Kontrolün ulaşmak istediği değer; çizgi izlemede çizginin dizinin tam ortasında olması.",
+      "example": "Konum 0 ise çizgi A2 sensörünün altındadır ve robot istediği yerdedir.",
+      "pitfall": "Ayar noktasını sensörün ham değeriyle karıştırmak; hata, ayar noktası ile ölçüm arasındaki farktır."
+    },
+    {
+      "term": "Hata (e)",
+      "definition": "Ayar noktası ile ölçüm arasındaki fark; hata 0 ise robot istediği yerdedir.",
+      "example": "Çizgi yalnız A1'i kapatıyorsa konum 1,0'dır ve çizgi solda olduğu için hata +1'dir.",
+      "pitfall": "Hatanın işaretini ters tanımlamak; robot çizgiye değil çizgiden uzağa döner."
+    },
+    {
+      "term": "Konum (ağırlıklı ortalama)",
+      "definition": "Çizgiyi gören sensörlerin ağırlıklarının ortalaması; sensörler +2, +1, 0, -1, -2 ağırlıklıdır.",
+      "example": "Yalnız A2 ve A3 çizgiyi görürse konum (0 + (-1)) / 2 = -0,5'tir.",
+      "pitfall": "Toplamı sensör sayısına bölmeyi unutmak; iki sensör görünce konum iki katı çıkar."
+    },
+    {
+      "term": "P kontrol",
+      "definition": "Direksiyonu hata ile doğru orantılı veren kontrol: u = Kp x e.",
+      "example": "Kp = 100 ve e = 1,5 ise u = 150 PWM olur.",
+      "pitfall": "P kontrolün hatayı tamamen sıfırlayacağını sanmak; hata sıfır olunca direksiyon da sıfır olur."
+    },
+    {
+      "term": "Kp",
+      "definition": "Hatayı direksiyona çeviren kazanç; büyüdükçe aynı hataya daha sert tepki verilir.",
+      "example": "Kp = 8'de robot çizgiyi kaybetti, Kp = 85'te turu bitirdi.",
+      "pitfall": "Kp'yi tek seferde çok büyütmek; robot çizgiyi iki yana savurur ve direksiyon titrer."
+    },
+    {
+      "term": "Çizgi kaybı",
+      "definition": "Hiçbir sensör çizgiyi görmediğinde hata yerine son görülen yöne verilen büyük bir değer.",
+      "example": "Çizgi en son soldaysa hata +2 sayılır ve robot sola dönerek çizgiyi arar.",
+      "pitfall": "sayi == 0 durumunu atlamak; sıfıra bölme olur ya da robot düz gider."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h5d96-q1",
+      "kind": "numeric",
+      "prompt": "Beş sensörün ağırlıkları A0 için +2, A1 için +1, A2 için 0, A3 için -1, A4 için -2'dir. Çizgiyi yalnız A2 ve A3 görüyorsa çizginin konumu kaçtır?",
+      "answer": -0.5,
+      "tolerance": 0.01,
+      "explanation": "Görenlerin ağırlık toplamı 0 + (-1) = -1'dir ve iki sensör gördüğü için ortalama -1 / 2 = -0,5 olur. Negatif işaret çizginin robotun sağında olduğunu söyler; Bölmeyi unutursan -1 bulursun; bu yanlıştır.",
+      "skills": [
+        "ctl-proportional"
+      ]
+    },
+    {
+      "id": "m5h5d96-q2",
+      "kind": "numeric",
+      "prompt": "Bir çizgi izleyicide TABAN = 200, Kp = 100 ve hata e = -1,5'tir. Sağ tekerleğe verilen değer (TABAN + u) kaçtır?",
+      "answer": 50,
+      "tolerance": 0,
+      "explanation": "u = Kp x e = 100 x (-1,5) = -150. Sağ tekerlek TABAN + u = 200 - 150 = 50 olur; sol tekerlek ise 200 + 150 = 350 olacağı için 255'te sınırlanır. Çizgi sağda olduğundan sağ tekerlek yavaşlar ve robot sağa döner.",
+      "skills": [
+        "ctl-proportional"
+      ]
+    },
+    {
+      "id": "m5h5d96-q3",
+      "kind": "mcq",
+      "prompt": "P kontrollü bir çizgi izleyicide Kp çok küçük seçilirse virajda en olası sonuç nedir?",
+      "options": [
+        "Robot sürekli çizginin iki yanına savrulur",
+        "Direksiyon yetmez ve robot çizgiyi kaybeder",
+        "Robot hiç hareket etmez",
+        "Robot daha hızlı ve daha doğru gider"
+      ],
+      "answer": 1,
+      "explanation": "Küçük Kp hataya yetersiz tepki verir; ölçümde Kp = 8 ile robot virajda çizgiden çıkıp onu kaybetti. Savrulma ve titreme büyük Kp'nin belirtisidir, küçük Kp'nin değil.",
+      "skills": [
+        "ctl-proportional"
+      ]
+    },
+    {
+      "id": "m5h5d96-q4",
+      "kind": "find-bug",
+      "prompt": "Konum pozitifken çizgi robotun solundadır ve robot sola dönmelidir. Aşağıdaki kodda robot çizgiden uzağa dönüyor. Tek hata nerede?\n\n```\nfloat e = hataOku();      // + : çizgi solda\nfloat u = KP * e;\nsurucu(SOL_EN, SOL_IN1, SOL_IN2, TABAN + u);\nsurucu(SAG_EN, SAG_IN1, SAG_IN2, TABAN - u);\n```",
+      "options": [
+        "KP * e yerine KP + e yazılmalı",
+        "hataOku() fonksiyonu çağrılmamalı",
+        "TABAN sabiti 255 olmalı",
+        "Sol tekerlek TABAN - u, sağ tekerlek TABAN + u almalı; işaretler ters"
+      ],
+      "answer": 3,
+      "explanation": "Çizgi soldaysa sol tekerlek yavaşlamalı ve sağ tekerlek hızlanmalıdır. Kodda tam tersi yazıldığı için robot çizgiden uzağa döner. Çarpma işlemi, fonksiyon çağrısı ve TABAN değeri doğrudur.",
+      "skills": [
+        "ctl-proportional",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h5d96-q5",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca seri monitöre ne yazar?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  int deger[5] = {100, 800, 900, 100, 100};\n  int sayi = 0;\n  int toplam = 0;\n  for (int i = 0; i < 5; i++) {\n    if (deger[i] > 500) {\n      sayi++;\n      toplam += 2 - i;\n    }\n  }\n  Serial.println((float)toplam / sayi, 1);\n}\nvoid loop() {}\n```",
+      "options": [
+        "0.5",
+        "1.5",
+        "-0.5",
+        "1.0"
+      ],
+      "answer": 0,
+      "explanation": "Eşiği yalnız A1 (800) ve A2 (900) geçer. Ağırlıklar 2 - 1 = 1 ve 2 - 2 = 0'dır; toplam 1, sensör sayısı 2 olduğu için sonuç 0.5 çıkar. Println'in ikinci argümanı 1 ondalık basamak yazar.",
+      "skills": [
+        "ctl-proportional",
+        "prog-debug"
+      ]
+    }
+  ]
+}

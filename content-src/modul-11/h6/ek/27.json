@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Değişken",
+      "definition": "Bir sayıyı (ya da sprite'ı) hatırlayan, adı olan kutu; oyunun hafızasıdır.",
+      "example": "`hiz` değişkeni 0'dan başlar, her 4 saniyede 5 artar ve uzaylının hızını hesaplamada kullanılır.",
+      "pitfall": "Başlangıçta sıfırlayan bloğu silmek; değişkenin ilk değeri belirsiz kalır ve hesap yanlış çıkabilir."
+    },
+    {
+      "term": "değiştir ile yap",
+      "definition": "`kadar değiştir` mevcut değere ekler; `yap` değeri doğrudan o sayıya sabitler.",
+      "example": "`hiz` 10 iken `[5] kadar değiştir` 15 yapar, `[5] yap` ise 5 yapar.",
+      "pitfall": "Artış için `yap` kullanmak; değer hep aynı kalır ve zorluk hiç artmaz."
+    },
+    {
+      "term": "Zamanlı olay",
+      "definition": "`her N ms'de bir` olayı, belirli aralıkla tekrar tekrar çalışır.",
+      "example": "`her 800 ms'de bir` uzaylı üretir, `her 4000 ms'de bir` zorluğu artırır.",
+      "pitfall": "Milisaniyeyi saniye sanmak; 800 ms bir saniyenin sekizde biridir, 800 saniye değil."
+    },
+    {
+      "term": "Geri sayım ve süre bitince",
+      "definition": "Geri sayım sayacı belirli saniyeden 0'a doğru sayar; 0 olunca `süre bitince` olayı çalışır.",
+      "example": "30 saniyelik sayaç bitince \"Dünya kurtuldu!\" yazılıp oyun kazanılır.",
+      "pitfall": "`süre bitince` olayını yazmamak; oyun sürenin dolmasıyla kaybedilerek biter."
+    },
+    {
+      "term": "Zorluk dengesi",
+      "definition": "Oyunun ne çok kolay ne imkânsız olması; sayıları (hız, süre, artış) deneyerek ayarlarsın.",
+      "example": "Artış 5 yerine 10 olursa 28. saniyede `hiz` 70 olur ve oyun oynanamaz.",
+      "pitfall": "Zorluğu çok hızlı artırmak; oyun daha ilk saniyelerde oynanamaz hâle gelir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h6d27-q1",
+      "kind": "mcq",
+      "prompt": "Uzay savunmasında `süre bitince` olayını hiç yazmadın. 30 saniye dolunca ne olur?",
+      "options": [
+        "Oyun kazanılır",
+        "Oyun kaybedilerek biter",
+        "Hiçbir şey olmaz, oyun sürer",
+        "Sayaç yeniden 30'dan başlar"
+      ],
+      "answer": 1,
+      "explanation": "Süre bitince olayı yoksa oyun otomatik biter ve kaybedilir. \"Süre dolunca kazan\" kuralını istiyorsan olayı yazıp içine `oyunu bitir: kazandın` koymalısın.",
+      "skills": [
+        "oyun-zorluk",
+        "oyun-olay"
+      ]
+    },
+    {
+      "id": "m11h6d27-q2",
+      "kind": "numeric",
+      "prompt": "`hiz` değişkeni 0'dan başlıyor ve `her 4000 ms'de bir` 5 artıyor. Uzaylının hızı `[20 ile 45 arası rastgele] + hiz`. `hiz` 35 olduğunda doğan bir uzaylının alabileceği EN DÜŞÜK hız kaç olur?",
+      "answer": 55,
+      "tolerance": 0,
+      "unit": "hız",
+      "explanation": "En düşük rastgele sayı 20'dir; 20 + 35 = 55. En yüksek sayı 45 + 35 = 80 olurdu. 35'i görmek için 7 artış gerekir: 7 × 4 sn = 28. saniyeden sonra.",
+      "skills": [
+        "oyun-zorluk",
+        "oyun-degisken"
+      ]
+    },
+    {
+      "id": "m11h6d27-q3",
+      "kind": "predict-output",
+      "prompt": "Oyunda şu üç kural var. Oyunun 9. saniyesinde doğan uzaylının hızı kaç olur?\n\n```\nhiz = 0\nher 4000 ms'de bir:  hiz'i 5 kadar değiştir\nher 800 ms'de bir:   uzaylının hızı = 30 + hiz\n```",
+      "options": [
+        "30",
+        "35",
+        "40",
+        "45"
+      ],
+      "answer": 2,
+      "explanation": "4. ve 8. saniyede `hiz` 5 artar, 9. saniyede `hiz` = 10 olur. Uzaylının hızı 30 + 10 = 40. 12. saniyede üçüncü artış gelir; 9. saniyede henüz gelmemiştir, bu yüzden 45 değildir.",
+      "skills": [
+        "oyun-zorluk",
+        "oyun-degisken"
+      ]
+    },
+    {
+      "id": "m11h6d27-q4",
+      "kind": "find-bug",
+      "prompt": "Oyun boyunca uzaylıların hızı hiç artmıyor. Hatalı satır hangisidir?\n\n```\noyun başlayınca:\n  hiz'i 0 yap\n\nher 4000 ms'de bir:\n  hiz'i 5 yap\n\nher 800 ms'de bir:\n  uzaylının hızı = rastgele(20, 45) + hiz\n```",
+      "options": [
+        "`hiz'i 0 yap` satırı",
+        "`hiz'i 5 yap` satırı: değeri sabitliyor, üstüne eklemiyor",
+        "`her 800 ms'de bir` satırı",
+        "`rastgele(20, 45)` satırı"
+      ],
+      "answer": 1,
+      "explanation": "`yap` değeri doğrudan 5'e eşitler; `hiz` her seferinde 5 olur ve artmaz. Doğrusu `hiz'i 5 kadar değiştir`. Başlangıçta 0 yapmak doğrudur, rastgele aralık ve 800 ms'lik üretim de hatalı değildir.",
+      "skills": [
+        "oyun-degisken",
+        "oyun-hata"
+      ]
+    },
+    {
+      "id": "m11h6d27-q5",
+      "kind": "mcq",
+      "prompt": "Uzay savunmasında Mermi-Düşman çarpışma olayını sildin. Oyunda başka ne olur?",
+      "options": [
+        "Oyun hiç açılmaz",
+        "Süre sayacı da durur",
+        "Uzaylılar üretilmez",
+        "Can ve süre kuralları çalışmaya devam eder, ama lazer artık uzaylıyı vurmaz"
+      ],
+      "answer": 3,
+      "explanation": "Her kural kendi olayında yaşar. Vurma olayı silinince yalnız skor ve patlama kalkar; uzaylı üretimi, can olayı ve süre kuralları kendi bloklarında olduğu için çalışır.",
+      "skills": [
+        "oyun-olay",
+        "oyun-iskelet"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "concepts": [
+    {
+      "term": "Durum makinesi (entegrasyon)",
+      "definition": "Her durumda tek davranışın çalıştığı, geçişlerin sensör ya da zaman koşuluna bağlı olduğu karar katmanı.",
+      "example": "CIZGI_IZLE, SERBEST, SOLA_DON, YANA_GIT, SAGA_DON ve BITTI durumları Yol A'yı yönetir.",
+      "pitfall": "Durumlar içinde `delay()` kullanmak: algılama durur, robot kör kalır."
+    },
+    {
+      "term": "Test matrisi",
+      "definition": "Senaryo, beklenen sonuç ve ölçülen sonuç sütunlarından oluşan tablo.",
+      "example": "T5: \"hedef birden kaybolur\" için beklenen \"3 cm'den az ilerler\".",
+      "pitfall": "Beklenen sütunu ölçtükten sonra yazıp sonuca göre kendini ikna etmek."
+    },
+    {
+      "term": "Güvenli varsayılan (fail-safe)",
+      "definition": "Emin olunamayan durumda tehlikeli çıkışı kapatmak.",
+      "example": "Yol C'de hedef yoksa motorlar hemen durur; sayaç dolunca KAYIP yazılır.",
+      "pitfall": "Hedef kaybolunca \"son bilinen komutu\" sürdürmek."
+    },
+    {
+      "term": "Durum başlangıç zamanı",
+      "definition": "Her geçişte kaydedilen `millis()` değeri; süreli durumlar bununla sayılır.",
+      "example": "`durumDegis()` içinde `durumBasla = millis();` yazılır.",
+      "pitfall": "Zamanlayıcıyı sıfırlamamak: sonraki durum hemen biter."
+    },
+    {
+      "term": "Ayar aktarımı",
+      "definition": "Bir kazancın (KP gibi) yalnız bulunduğu düzenek için geçerli olması.",
+      "example": "Sensör aralığı 2,0 cm'den 2,4 cm'ye çıkınca KP 55'ten 55 / 1,2 ≈ 46'ya inmelidir.",
+      "pitfall": "Başka düzenekten bulunmuş bir sayıyı olduğu gibi kopyalamak."
+    },
+    {
+      "term": "Adım sınırlı hareket",
+      "definition": "Kol eklemlerinin her periyotta en çok belirli bir açı ilerlemesi.",
+      "example": "1,5° / 20 ms ile 90°'lik hareket 60 adım, yani 1200 ms sürer.",
+      "pitfall": "Hedefe zıplatarak gitmek: servo akım çeker, kol sarsılır, parça düşer."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d3-q1",
+      "kind": "mcq",
+      "prompt": "Test matrisinin \"beklenen\" sütunu ne zaman doldurulmalıdır?",
+      "options": [
+        "Ölçümden sonra, sonuçlara bakarak",
+        "Ölçümden önce, ölçütlerden yola çıkarak",
+        "Yalnız test başarısız olduğunda",
+        "Hiç doldurulmaz, ölçülen sütun yeter"
+      ],
+      "answer": 1,
+      "explanation": "Beklenen değer ölçümden önce yazılırsa sonuç onu doğrular ya da çürütür. Sonradan yazılırsa sonuca uydurmak kolaylaşır ve matris kanıt olmaktan çıkar.",
+      "skills": [
+        "bit-test-matrix"
+      ]
+    },
+    {
+      "id": "m5h8d3-q2",
+      "kind": "numeric",
+      "prompt": "Yol A'da KP = 55, çizgi sensörleri 2,0 cm aralıklıyken bulundu. Arenada aralık 2,4 cm. Kazanç aynı oranda küçültülürse yeni KP kaçtır (en yakın tam sayıya yuvarla)?",
+      "answer": 46,
+      "tolerance": 0.5,
+      "explanation": "Aralık 2,4 / 2,0 = 1,2 kat büyüdü. 55 / 1,2 = 45,8 ≈ 46. Ölçüm de arenada 46'yı doğruladı; 55 ise çizgiyi kaybettiriyordu.",
+      "skills": [
+        "rob-tuning-transfer"
+      ]
+    },
+    {
+      "id": "m5h8d3-q3",
+      "kind": "numeric",
+      "prompt": "Robot kol her 20 ms'de her eklemi en çok 1,5° ilerletiyor. Bir eklemi 90° döndürmek en az kaç ms sürer?",
+      "answer": 1200,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "90 / 1,5 = 60 adım. Her adım 20 ms olduğundan 60 × 20 = 1200 ms. Hızı artırmak için ya adım büyütülür ya periyot küçültülür; ikisi de hareketin yumuşaklığını azaltır.",
+      "skills": [
+        "prog-timing",
+        "rob-fsm"
+      ]
+    },
+    {
+      "id": "m5h8d3-q4",
+      "kind": "predict-output",
+      "prompt": "Yol C'deki boş ölçüm sayacı şöyle çalışır. Kod bitince ne yazar?\n```\nbool hedefVar[] = {false, false, true, false, false, false};\nint bosSayac = 0;\nfor (int i = 0; i < 6; i++) {\n  if (hedefVar[i]) bosSayac = 0;\n  else bosSayac++;\n}\nSerial.println(bosSayac);\n```",
+      "options": [
+        "5",
+        "0",
+        "3",
+        "6"
+      ],
+      "answer": 2,
+      "explanation": "Sayaç şöyle gider: 1, 2, sonra hedef göründüğü için 0, sonra 1, 2, 3. Son yazılan 3'tür. 5 toplam boş ölçüm sayısıdır; ama sayaç yalnız ART ARDA boşları sayar. Bu yüzden tek bir dolu ölçüm yanlış alarmı (KAYIP) önler.",
+      "skills": [
+        "rob-fsm",
+        "rob-failsafe",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d3-q5",
+      "kind": "find-bug",
+      "prompt": "Süreli durumlar `durumBasla` ile sayılıyor ama SOLA_DON, YANA_GIT ve SAGA_DON birbiri ardına hemen bitiyor. Kodda tek hata var; hangisi?\n```\nvoid durumDegis(Durum yeni) {\n  durum = yeni;\n}\n// ...\ncase YANA_GIT:\n  surus(TABAN, TABAN);\n  if (simdi - durumBasla >= YAN_MS) durumDegis(SAGA_DON);\n  break;\n```",
+      "options": [
+        "`surus(TABAN, TABAN)` yerine `surus(0, 0)` olmalı",
+        "`>=` yerine `<=` olmalı",
+        "`case` içinde `break` olmamalı",
+        "`durumDegis` içinde `durumBasla = millis();` yok; eski zaman damgası hemen dolmuş sayılır"
+      ],
+      "answer": 3,
+      "explanation": "`durumBasla` yalnız ilk durumda atanır; sonraki durumlarda fark çoktan YAN_MS'yi aşmıştır, geçiş hemen olur. Geçiş fonksiyonuna `durumBasla = millis();` eklemek sorunu çözer. `<=` ise koşulu tersine çevirir.",
+      "skills": [
+        "rob-fsm",
+        "prog-timing",
+        "prog-debug"
+      ]
+    }
+  ]
+}

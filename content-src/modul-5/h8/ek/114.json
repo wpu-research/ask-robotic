@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "Veri sözleşmesi",
+      "definition": "Gönderen ile alıcı arasındaki alan adları, türleri, sırası ve değer aralıkları üzerine baştan yapılan anlaşma.",
+      "example": "`{\"t\":100,\"x\":0.010,\"y\":0.000,\"th\":0.000,\"d\":242.8}` satırında alanlar `t, x, y, th, d` sırasındadır.",
+      "pitfall": "Biçimi sürümlemeden bir alan eklemek: eski alıcılar bozulur."
+    },
+    {
+      "term": "JSON satırları",
+      "definition": "Her satırda tek bir JSON nesnesi bulunan düz metin biçimi.",
+      "example": "Robot her 100 ms'de bir satır yazar; alıcı satır satır okur.",
+      "pitfall": "`Serial.print` ile satır sonunu unutmak: iki nesne bitişir ve JSON bozulur."
+    },
+    {
+      "term": "null (ölçüm yok)",
+      "definition": "Geçerli ölçüm olmadığını açıkça bildiren değer.",
+      "example": "Yankı gelmediğinde `\"d\":null` yazılır.",
+      "pitfall": "Ölçüm yok diye 0 ya da 400 yazmak: sahte bir ölçüm gibi görünür."
+    },
+    {
+      "term": "Açı sargılama",
+      "definition": "Yön açısını (-π, π] aralığında tutmak.",
+      "example": "`while (th > PI) th -= 2 * PI;` ve `while (th <= -PI) th += 2 * PI;`",
+      "pitfall": "Sargılamamak: birkaç tur sonra `th` 7 olur ve sözleşme dışına çıkar."
+    },
+    {
+      "term": "Ortalama mutlak hata",
+      "definition": "Her ölçümün hatasının işaretsiz değerinin ortalaması.",
+      "example": "Hatalar 0,5; -2,5; 1,0; -1,0; 2,0 ise ortalama mutlak hata 1,4.",
+      "pitfall": "İşaretli ortalama almak: +3 ile -3 birbirini götürür, robot yanlışken sonuç 0 çıkar."
+    },
+    {
+      "term": "En büyük mutlak hata",
+      "definition": "En kötü ölçümün işaretsiz hatası.",
+      "example": "Aynı hatalarda en büyük mutlak hata 2,5.",
+      "pitfall": "Yalnız ortalamayı raporlamak: tek bir kötü ölçüm güvenlik sorunu olabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d4-q1",
+      "kind": "predict-output",
+      "prompt": "Ölçüm hata sayacına seri porttan \"e -4\", \"e 1\", \"e 3\" ve ardından \"r\" gönderiliyor. Sayaç şu koddadır:\n```\nfloat hata = fabs(Serial.parseFloat());\nadet++;\ntoplam += hata;\nif (hata > enBuyuk) enBuyuk = hata;\n// r: Serial.print(toplam / adet, 2) ve enBuyuk\n```\nSonuç satırı ne olur?",
+      "options": [
+        "n=3 ort=0.00 maks=3.00",
+        "n=3 ort=2.67 maks=4.00",
+        "n=3 ort=0.00 maks=-4.00",
+        "n=3 ort=2.67 maks=3.00"
+      ],
+      "answer": 1,
+      "explanation": "fabs işareti atar: 4, 1, 3. Toplam 8, ortalama 8 / 3 = 2,67; en büyük 4. İşaretli toplam 0 olurdu ve hatalı bir ortalama sıfır çıkardı.",
+      "skills": [
+        "rob-error-stats",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d4-q2",
+      "kind": "numeric",
+      "prompt": "Bir telemetri satırı 60 bayttır ve 9600 baud seri hattan gönderiliyor (bayt başına 10 bit). Satır hatta kaç ms yer tutar?",
+      "answer": 62.5,
+      "tolerance": 0.5,
+      "unit": "ms",
+      "explanation": "60 bayt × 10 bit = 600 bit. 600 / 9600 = 0,0625 sn = 62,5 ms. Periyot 100 ms olduğundan hat neredeyse dolar; 115200 baud'da süre 5,2 ms'dir.",
+      "skills": [
+        "rob-telemetry"
+      ]
+    },
+    {
+      "id": "m5h8d4-q3",
+      "kind": "mcq",
+      "prompt": "HC-SR04 yankı alamadı. Telemetri satırında `d` alanı için hangisi doğrudur?",
+      "options": [
+        "`\"d\":0`",
+        "`\"d\":400`",
+        "`\"d\":null`",
+        "Satır hiç yazılmaz"
+      ],
+      "answer": 2,
+      "explanation": "`null` \"ölçüm yok\" demektir. 0 cm geçerli bir ölçüm gibi görünür, 400 de gerçek bir uzaklık gibi; ikisi de alıcıyı yanıltır. Satırı atlamak ise `t` zaman akışındaki 100 ms düzenini bozar.",
+      "skills": [
+        "rob-telemetry"
+      ]
+    },
+    {
+      "id": "m5h8d4-q4",
+      "kind": "find-bug",
+      "prompt": "Robot sola dönerken (sağ tekerlek ileri, sol geri) `th` azalıyor. Kodda tek hata var; hangisi?\n```\nfloat dSol = (s - oncekiSol) * TIK_M;\nfloat dSag = (g - oncekiSag) * TIK_M;\nfloat d = (dSol + dSag) / 2.0;\nth += (dSol - dSag) / AKS_M;\n```",
+      "options": [
+        "`th` değişimi `(dSag - dSol) / AKS_M` olmalı; işaret ters",
+        "`d` toplamı ikiye bölünmemeli",
+        "TIK_M'nin birimi santimetre olmalı",
+        "`th` radyan değil derece olmalı"
+      ],
+      "answer": 0,
+      "explanation": "Sağ tekerlek sola göre fazla gittiğinde robot sola döner ve açı artmalıdır: Δθ = (sağ - sol) / aks. Kodda işaret ters, bu yüzden yol aynalanır. İki tekerleğin ortalaması ileri yolu verir, bölme doğrudur; radyan sözleşmenin gereğidir.",
+      "skills": [
+        "rob-telemetry",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d4-q5",
+      "kind": "mcq",
+      "prompt": "Sözleşmeye göre (t, x, y, th, d; th ∈ (-π, π]; d ∈ [2, 400] ya da null) hangi satır geçerlidir?",
+      "options": [
+        "{\"t\":100,\"x\":0.1,\"y\":0.2,\"th\":3.200,\"d\":50.0}",
+        "{\"t\":300,\"x\":0.3,\"y\":0.1,\"th\":0.5,\"d\":1.5}",
+        "{\"x\":0.3,\"t\":400,\"y\":0.1,\"th\":0.5,\"d\":60.0}",
+        "{\"t\":200,\"x\":0.021,\"y\":-0.003,\"th\":-3.100,\"d\":null}"
+      ],
+      "answer": 3,
+      "explanation": "Doğru satırda anahtar sırası t, x, y, th, d; th = -3,100 aralıkta; d null geçerli. th = 3,2 olan satır π (3,14) sınırını aşıyor. d = 1,5 olan satır 2 cm alt sınırının altında. Anahtarları x, t, ... sırasıyla yazan satırda sıra bozuk.",
+      "skills": [
+        "rob-telemetry"
+      ]
+    }
+  ]
+}

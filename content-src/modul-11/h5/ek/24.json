@@ -1,0 +1,124 @@
+{
+  "concepts": [
+    {
+      "term": "bu sprite / diğer sprite",
+      "definition": "Çarpışma olayında birinci türdeki (kahraman) ve ikinci türdeki (düşman) sprite.",
+      "example": "`diğer sprite patlayıp yok olsun` düşmanı yok eder.",
+      "pitfall": "bu ile diğeri karıştırmak: `bu sprite`'ı patlatırsan kahraman yok olur."
+    },
+    {
+      "term": "Düşüş ölçütü",
+      "definition": "Kahraman aşağı doğru hareket ediyor mu: y hızı > 10.",
+      "example": "Yerde yürürken y hızı 0'dır; bu koşul yan çarpmayı eler.",
+      "pitfall": "Düşüşe bakmamak: yanından geçerken de düşman ölür."
+    },
+    {
+      "term": "Konum ölçütü",
+      "definition": "Kahraman düşmanın biraz yukarısında mı: kahraman y < düşman y - 4.",
+      "example": "Kahraman y = 70, düşman y = 88: 70 < 84 olduğu için kahraman yukarıdadır.",
+      "pitfall": "Karşılaştırmayı ters yazmak: düşman üstte olsa bile ezme sayılır."
+    },
+    {
+      "term": "ve (mantık)",
+      "definition": "İki koşulun da doğru olması gereken birleşim.",
+      "example": "`(hız > 10) ve (y konumu < düşman y - 4)` ezmeyi tanır.",
+      "pitfall": "`ve` yerine `veya` kullanmak: ölçütlerden biri yetmeye başlar, ezme fazla kolaylaşır."
+    },
+    {
+      "term": "eğer ... değilse",
+      "definition": "İki kollu seçim: koşul doğruysa `ise`, yanlışsa `değilse` kolu çalışır.",
+      "example": "Ezme `ise` kolunda, yan çarpma `değilse` kolundadır.",
+      "pitfall": "Can azaltmayı kolların dışına koymak: ezerken de can kaybedersin."
+    },
+    {
+      "term": "Seken kahraman",
+      "definition": "Ezince kahramana verilen küçük yukarı hız (-150).",
+      "example": "Düşmanı ezince kahraman biraz yukarı seker, oyun akıcı hisseder.",
+      "pitfall": "Sekmeyi unutmak: ezdikten sonra kahraman düşman yerine oturur gibi durur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h5d24-q1",
+      "kind": "mcq",
+      "prompt": "Kahraman yerde yürürken balçığa yandan çarpıyor. \"y hızı > 10\" koşulu neden yanlış (yani ezme sayılmaz) çıkar?",
+      "options": [
+        "Çünkü kahramanın y hızı yerde 0'dır",
+        "Çünkü balçığın hızı büyüktür",
+        "Çünkü yan çarpışma hiç olay tetiklemez",
+        "Çünkü y hızı yalnız sağa giderken pozitiftir"
+      ],
+      "answer": 0,
+      "explanation": "Yerde yürüyen kahramanın dikey hızı 0'dır; zemin onu durdurur. 0 > 10 olmadığı için `ise` kolu çalışmaz ve `değilse` kolu çalışır. Hızın pozitif olması düşmeyi anlatır; yerde düşme yoktur.",
+      "skills": [
+        "oyun-carpisma-yon",
+        "oyun-mantik-kosul"
+      ]
+    },
+    {
+      "id": "m11h5d24-q2",
+      "kind": "predict-output",
+      "prompt": "Kahraman 200 piksel/sn hızla düşüyor, y konumu 86. Balçığın y konumu 88. Çarpışma olayı çalışınca ne olur?\n\n```\neğer (bu y hızı > 10) ve (bu y konumu < diğer y konumu - 4) ise:\n  diğer sprite patlayıp yok olsun, skoru 5 değiştir\ndeğilse:\n  canı -1 değiştir, kahramanı başa koy\n```",
+      "options": [
+        "Balçık patlar, skor 5 artar",
+        "Kahraman can kaybeder ve başa döner",
+        "Hiçbir şey olmaz",
+        "Hem balçık patlar hem can azalır"
+      ],
+      "answer": 1,
+      "explanation": "Birinci ölçüt doğru (200 > 10). İkinci ölçüt: 88 - 4 = 84 ve 86 < 84 yanlış. `ve` iki taraf da doğru olmalı; biri yanlış olduğundan `değilse` kolu çalışır: kahraman can kaybeder ve başa döner. Kahraman düşmanın yeterince üstünde değildir.",
+      "skills": [
+        "oyun-carpisma-yon",
+        "oyun-mantik-kosul",
+        "oyun-y-ekseni"
+      ]
+    },
+    {
+      "id": "m11h5d24-q3",
+      "kind": "find-bug",
+      "prompt": "Düşmanın üstüne zıpladığında balçık değil kahramanın kendisi yok oluyor. Hatalı satır hangisi?\n\n```\n1  bir [Oyuncu] sprite'ı bir [Düşman] sprite'ına çarpınca:\n2    eğer (bu y hızı > 10) ve (bu y konumu < diğer y konumu - 4) ise:\n3      bu sprite patlayıp yok olsun\n4      skoru 5 değiştir\n5    değilse:\n6      canı -1 değiştir\n```",
+      "options": [
+        "Satır 2: koşul",
+        "Satır 4: skor 5 değiştir",
+        "Satır 6: can azaltma",
+        "Satır 3: bu sprite patlıyor"
+      ],
+      "answer": 3,
+      "explanation": "3. satırda `bu sprite` kahramandır; patlatılan o olur. Düşman için `diğer sprite` kullanılmalı. 2. satırdaki koşul doğru: düşüş hızı bu sprite'ın, konum karşılaştırması da doğru yönde.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-carpisma-yon"
+      ]
+    },
+    {
+      "id": "m11h5d24-q4",
+      "kind": "numeric",
+      "prompt": "Balçığın y konumu 88. Ezme sayılması için kahramanın y konumu `balçık y - 4`ten KÜÇÜK olmalı. Kahraman y en çok hangi tam sayı değerinde olabilir?",
+      "answer": 83,
+      "tolerance": 0,
+      "unit": "piksel",
+      "explanation": "Koşul y < 88 - 4 = 84. Tam sayılar arasında 84 koşulu sağlamaz (84 < 84 yanlış); sağlayan en büyük tam sayı 83'tür. Küçük y yukarıyı gösterir; bu yüzden küçük olan kahraman daha yukarıdadır.",
+      "skills": [
+        "oyun-y-ekseni",
+        "oyun-mantik-kosul"
+      ]
+    },
+    {
+      "id": "m11h5d24-q5",
+      "kind": "mcq",
+      "prompt": "Ezme kuralına neden hem \"düşüş hızı\" hem de \"konum\" ölçütü konur?",
+      "options": [
+        "Biri yetmez, ikisi birlikte \"üstten düşerek çarpmayı\" tarif eder",
+        "Motor tek koşulu kabul etmez",
+        "Konum ölçütü hızı hesaplar",
+        "Hız ölçütü düşmanı yok eder"
+      ],
+      "answer": 0,
+      "explanation": "Yalnız hız ölçütü kullanılırsa kahraman düşmanın yanından düşerken dokunsa da düşman ölür. Yalnız konum ölçütü kullanılırsa düşmanın üstünde duran ama düşmeyen kahraman da ezmiş sayılır. İkisi birlikte \"üstten düşerek\" durumunu tarif eder.",
+      "skills": [
+        "oyun-carpisma-yon",
+        "oyun-mantik-kosul"
+      ]
+    }
+  ]
+}

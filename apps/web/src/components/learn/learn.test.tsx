@@ -87,9 +87,9 @@ describe('onay bandı ve gezinme', () => {
     const items = buildPaletteItems([])
     expect(items.filter((i) => i.id.startsWith('pg:')).map((i) => i.href).sort()).toEqual(PART_GUIDES.map((g) => `/parcalar/${g.slug}`).sort())
   })
-  it('parça dizini 6 parçayı kategori başlıklarıyla listeler', () => {
+  it('parça dizini tüm parçaları kategori başlıklarıyla listeler', () => {
     const h = clean(renderToString(<PartsIndex guides={[...PART_GUIDES]} />))
-    expect(h).toContain('6 parça')
+    expect(h).toContain(`${PART_GUIDES.length} parça`)
     for (const g of PART_GUIDES) expect(h).toContain(`/parcalar/${g.slug}`)
     for (const c of new Set(PART_GUIDES.map((g) => g.category))) expect(h).toContain(c)
   })

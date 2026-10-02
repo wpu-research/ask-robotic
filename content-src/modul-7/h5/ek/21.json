@@ -1,0 +1,106 @@
+{
+  "concepts": [
+    {
+      "term": "Vektör",
+      "definition": "Bir metni temsil eden sıralı sayı listesi; her sıra bir terime aittir.",
+      "example": "\"robot sensör\" metni (robot, sensör, motor) sırasıyla (1, 1, 0) olur.",
+      "pitfall": "Vektörü metnin anlamı sanmak; sayım vektörü yalnız hangi kelimenin kaç kez geçtiğini söyler."
+    },
+    {
+      "term": "Kelime sayımı",
+      "definition": "Her terimin metinde kaç kez geçtiğini sayan en basit vektör yöntemi.",
+      "example": "\"robot sensör robot sensör\" metni (2, 2, 0) olur.",
+      "pitfall": "Sık geçen kelimeyi önemli sanmak; \"ve\" gibi bağlaçlar çok geçer ama bir şey ayırt etmez."
+    },
+    {
+      "term": "TF-IDF",
+      "definition": "Terim sayısını, terimin ne kadar nadir olduğuyla çarpan ağırlıklandırma.",
+      "example": "Sekiz belgenin üçünde geçen \"sensör\" yaklaşık 1,81, birinde geçen \"servo\" yaklaşık 2,50 idf alır.",
+      "pitfall": "Nadir kelimeyi her zaman daha doğru sanmak; yazım hatası da nadirdir ve yüksek ağırlık alır."
+    },
+    {
+      "term": "Kosinüs benzerliği",
+      "definition": "İki vektörün arasındaki açının kosinüsü: aynı yönde 1, hiç ortak terim yoksa 0.",
+      "example": "A = (1, 1, 0) ve B = (1, 0, 1) için (A·B) / (|A||B|) = 1 / 2 = 0,5.",
+      "pitfall": "Uzunluğu da hesaba kattığını sanmak; yalnız yöne bakar, (1, 2) ile (3, 6) benzerliği 1'dir."
+    },
+    {
+      "term": "Gömme (embedding)",
+      "definition": "Metnin anlamını öğrenilmiş bir sayı listesine kodlayan vektör; anlamca yakın metinler yakın vektörler alır.",
+      "example": "Gerçek bir gömme modeli \"mesafe\" ile \"uzaklık\"ı birbirine yakın vektörlere koyabilir.",
+      "pitfall": "Atölyedeki sayım vektörünü gömme sanmak; o yalnız kelime sayar, anlam öğrenmez."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d21-q1",
+      "kind": "numeric",
+      "prompt": "Terimler sırası (robot, sensör, motor) olsun. Metin 1 \"robot sensör\" ve Metin 2 \"robot motor\" için sayım vektörleri çıkarılıyor. İki metnin kosinüs benzerliği kaçtır?",
+      "answer": 0.5,
+      "tolerance": 0.01,
+      "explanation": "Vektörler (1, 1, 0) ve (1, 0, 1). Nokta çarpım 1×1 + 1×0 + 0×1 = 1. Uzunlukların her biri √2 olduğundan çarpımları 2'dir. Benzerlik 1 / 2 = 0,5. 1 diyenler yalnız ortak terimi görüp paydayı unutmuştur.",
+      "skills": [
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d21-q2",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca ne yazdırır?\n\n```\na = [2, 0, 1]\nb = [0, 3, 0]\nprint(sum(x * y for x, y in zip(a, b)))\n```",
+      "options": [
+        "0",
+        "3",
+        "6",
+        "Hata verir"
+      ],
+      "answer": 0,
+      "explanation": "Çarpımlar 2×0, 0×3 ve 1×0 olduğundan hepsi 0'dır; toplam 0. İki vektörün aynı sırada sıfır olmayan değeri yoktur, yani ortak terimleri yoktur. Bu yüzden kosinüs benzerliği de 0 olur. 6 ve 3 değerleri çarpım yerine bir eleman almaktan çıkar; kod hata vermez.",
+      "skills": [
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d21-q3",
+      "kind": "find-bug",
+      "prompt": "Bu fonksiyon kosinüs benzerliği hesaplamak istiyor ama uzun belgeleri haksız yere öne çıkarıyor.\n\n```\nimport math\n\ndef kosinus(a, b):\n    nokta = sum(x * y for x, y in zip(a, b))\n    return nokta\n```\n\nHata nedir?",
+      "options": [
+        "Vektör uzunluklarına (normlara) bölünmüyor",
+        "zip kullanımı yanlış",
+        "sum yerine max kullanılmalı",
+        "Fonksiyon değer döndürmüyor"
+      ],
+      "answer": 0,
+      "explanation": "Kosinüs, nokta çarpımın iki vektörün uzunluklarının çarpımına bölünmesidir. Bölme yoksa uzun (çok kelimeli) belge büyük sayılar ürettiği için hep öne geçer. zip doğru kullanılmış, sum doğru ve return var.",
+      "skills": [
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d21-q4",
+      "kind": "numeric",
+      "prompt": "Atölyedeki formül idf = ln((n + 1) / (df + 1)) + 1. Toplam n = 8 belge var ve bir terim df = 3 belgede geçiyor. idf kaçtır? (iki ondalığa yuvarla)",
+      "answer": 1.81,
+      "tolerance": 0.01,
+      "explanation": "ln(9 / 4) = ln(2,25) yaklaşık 0,81; üzerine 1 eklenince 1,81 olur. Terim daha çok belgede geçseydi idf düşerdi; her belgede geçen bir terim bile 1'in altına inmez.",
+      "skills": [
+        "ai-tfidf"
+      ]
+    },
+    {
+      "id": "m7h5d21-q5",
+      "kind": "mcq",
+      "prompt": "TF-IDF, \"ve\" gibi her belgede geçen terimlere neden düşük ağırlık verir?",
+      "options": [
+        "Çünkü kısa kelimeleri sevmez",
+        "Çünkü o terim belgeleri birbirinden ayırt etmez; nadir terimler daha çok bilgi taşır",
+        "Çünkü bağlaçlar bilgisayar için anlamsızdır",
+        "Çünkü sayım vektörleri yalnız isimleri tutar"
+      ],
+      "answer": 1,
+      "explanation": "Her belgede geçen terim hangi belgenin ilgili olduğunu söylemez. Nadir terim ise az sayıda belgeyi işaret eder, bu yüzden daha çok ağırlık alır. Kelimenin kısa olması ya da türü ağırlığı belirlemez; belirleyen geçtiği belge sayısıdır.",
+      "skills": [
+        "ai-tfidf"
+      ]
+    }
+  ]
+}

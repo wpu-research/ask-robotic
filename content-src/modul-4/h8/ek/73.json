@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "İki nokta kalibrasyonu",
+      "definition": "İki bilinen ucu (örneğin kuru ve ıslak) ölçüp ham değerleri map ile 0-100 gibi anlamlı bir aralığa eşlemek.",
+      "example": "KURU = 921, ISLAK = 307 ölçüldü; map(614, 921, 307, 0, 100) yaklaşık 50 verir.",
+      "pitfall": "Kalibrasyonu bir besleme geriliminde yapıp başka beslemede kullanmak; sayılar kayar."
+    },
+    {
+      "term": "constrain()",
+      "definition": "Bir değeri verilen alt ve üst sınırlar arasında tutar.",
+      "example": "constrain(yuzde, 0, 100) kuruluktan daha kuru bir ölçümü %0'a sabitler.",
+      "pitfall": "constrain koymayı unutup yüzdenin 100'ü aşmasına ya da negatif olmasına izin vermek."
+    },
+    {
+      "term": "Pinin iç direnci",
+      "definition": "Uno çıkış pininin yaklaşık 25 Ω'luk seri direnci; yük çektikçe pin gerilimi 5 V'tan düşer.",
+      "example": "D13'e 220 Ω bağlanınca pin gerilimi 5 x 220 / 245 ≈ 4,49 V olur.",
+      "pitfall": "Pini ideal 5 V kaynağı sanıp motor ya da röleyi doğrudan pinden sürmek."
+    },
+    {
+      "term": "Brown-out",
+      "definition": "Besleme belli eşiğin altına inince mikrodenetleyicinin kendini yeniden başlatması.",
+      "example": "Güçlü bir motor çalışmaya başlayınca zayıf kaynakta kart başa döner ve setup() mesajı yeniden yazılır.",
+      "pitfall": "Laboratuvarda sıfırlanma olmadığı için gerçek devrede de olmayacağını sanmak."
+    },
+    {
+      "term": "Fail-safe (güvenli varsayılan)",
+      "definition": "Durum bilinmediğinde tehlikeli ya da masraflı çıkışı kapalı tutma ilkesi.",
+      "example": "pulseIn 0 dönerse YOK yazılır ve alarm LED'i söndürülür.",
+      "pitfall": "Cevap vermeyen sensörü \"değer 0\" sayıp alarmı çalıştırmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d3-q1",
+      "kind": "numeric",
+      "prompt": "Toprak nemi modülü 5 V ile beslenir ve AO = VCC x (0,9 - 0,6 x nem) olur. Nem = 0,25 iken analogRead yaklaşık kaç okur? (5 V = 1023 kabul et.)",
+      "answer": 767,
+      "tolerance": 1,
+      "explanation": "AO = 5 x (0,9 - 0,15) = 3,75 V. ADC = 3,75 / 5 x 1023 ≈ 767. Gerilimi 1023 ile ölçeklemek yerine 1024 kullanırsan 768 çıkar; bu yüzden küçük bir tolerans vardır.",
+      "skills": [
+        "sens-supply",
+        "sens-adc"
+      ]
+    },
+    {
+      "id": "m4h8d3-q2",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca seri monitörde ne yazar?\n\n```cpp\nvoid setup() {\n  Serial.begin(9600);\n  int y = map(768, 921, 307, 0, 100);\n  Serial.println(y);\n  Serial.println(constrain(map(300, 921, 307, 0, 100), 0, 100));\n}\nvoid loop() {}\n```",
+      "options": [
+        "24 ve 101",
+        "75 ve 0",
+        "24 ve 100",
+        "25 ve 100"
+      ],
+      "answer": 2,
+      "explanation": "map(768, 921, 307, 0, 100) = (768 - 921) x 100 / (307 - 921) = 24,9; map tam sayı bölmesi yapar ve kesiri atar: 24. İkinci satırda ham değer 300 ıslaktan (307) daha ıslak. map yaklaşık 101 verir, constrain bunu 100'e keser.",
+      "skills": [
+        "sens-calibration"
+      ]
+    },
+    {
+      "id": "m4h8d3-q3",
+      "kind": "mcq",
+      "prompt": "Bir öğrenci laboratuvarda küçük bir DC motoru Uno'nun 5V ucundan besledi ve kart hiç sıfırlanmadı. Bundan ne sonucu çıkar?",
+      "options": [
+        "Gerçek devrede de sorun çıkmaz",
+        "Laboratuvar 5V çökmesini ve brown-out'u modellemediği için gerçek devrede kartın sıfırlanıp sıfırlanmayacağı bilinmez",
+        "Motor akımı çok düşük olduğu için laboratuvar sıfırlamıştır",
+        "Gerçek devrede kart kesinlikle sıfırlanır"
+      ],
+      "answer": 1,
+      "explanation": "Laboratuvarın 5V hattı ideal kaynaktır; motor ne çekerse çeksin gerilim düşmez. Bu yüzden sonuç hiçbir şey kanıtlamaz. Gerçek devrede sorun çıkıp çıkmayacağı kaynağa ve motora bağlıdır, \"kesinlikle\" ya da \"sorun çıkmaz\" demek ikisi de yanlıştır.",
+      "skills": [
+        "sens-sim-limits",
+        "sens-supply"
+      ]
+    },
+    {
+      "id": "m4h8d3-q4",
+      "kind": "find-bug",
+      "prompt": "Bu program HC-SR04 beslenmediğinde (echo gelmediğinde) alarm LED'ini yakıyor. Asıl hata ne?\n\n```cpp\nlong sure = pulseIn(ECHO, HIGH, 30000);\nfloat cm = sure / 58.0;\ndigitalWrite(LED, cm < 20 ? HIGH : LOW);\n```",
+      "options": [
+        "30000 zaman aşımı fazla büyük",
+        "pulseIn'in 0 döndürdüğü durum (cevap yok) ayrılmıyor; 0 cm sanılıp 20'den küçük olduğu için LED yanıyor",
+        "58.0 yerine 58 yazılmalı",
+        "digitalWrite yerine analogWrite kullanılmalı"
+      ],
+      "answer": 1,
+      "explanation": "Echo gelmezse pulseIn 0 döndürür, 0 / 58 = 0 cm olur ve 0 < 20 olduğu için LED yanar. Doğrusu önce if (sure == 0) ile cevapsız durumu ayırıp LED'i söndürmektir (fail-safe). Diğer seçenekler bu davranışı değiştirmez.",
+      "skills": [
+        "sens-failsafe",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d3-q5",
+      "kind": "numeric",
+      "prompt": "KURU = 921 ve ISLAK = 307 ile kalibre ettin. Sonra modülün VCC'sini 3,3 V'a taşıdın. Nem = 0,25 iken ham değer 506 okunuyor. map(506, 921, 307, 0, 100) kaç yüzde gösterir?",
+      "answer": 67,
+      "tolerance": 1,
+      "unit": "%",
+      "explanation": "(506 - 921) x 100 / (307 - 921) = 67,6; map kesiri atar: 67. Oysa gerçek nem 0,25 iken 5 V ile ham değer 767, yani yüzde yaklaşık 25 olmalıydı. Besleme değişince eski kalibrasyon yanlış sonuç verir.",
+      "skills": [
+        "sens-calibration",
+        "sens-supply"
+      ]
+    }
+  ]
+}

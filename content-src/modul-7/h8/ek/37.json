@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Anonimleştirme",
+      "definition": "Kişisel verideki isim ve tanıtıcı ayrıntıları çıkarıp ya da değiştirip kişiyi belli olmaz hâle getirmek.",
+      "example": "'Ali Veli' yerine 'Öğrenci A' yazmak.",
+      "pitfall": "Yalnız ismi değiştirip yaş, okul ve semt gibi ayrıntıları bırakmak; kişi yine tanınabilir."
+    },
+    {
+      "term": "Gizlilik politikası",
+      "definition": "Bir servisin yazdığın veriyi nasıl sakladığını ve kullandığını anlatan kurallar.",
+      "example": "Servise bir proje metni yazmadan önce politikayı okumak.",
+      "pitfall": "Her servisin aynı davrandığını varsaymak."
+    },
+    {
+      "term": "Yapay zekâ kullanımını belirtmek",
+      "definition": "Ödev ya da projede yapay zekâdan hangi aşamada yardım aldığını açıkça yazmak.",
+      "example": "'Giriş paragrafı için taslak önerisi aldım, düzenleyip kaynakları kendim kontrol ettim.'",
+      "pitfall": "Modele yaptırdığın işi kendi işin gibi sunmak."
+    },
+    {
+      "term": "Önyargı",
+      "definition": "Modelin bazı gruplar için sistematik olarak daha kötü ya da kalıplaşmış sonuç vermesi.",
+      "example": "A grubunda %90, B grubunda %60 doğruluk.",
+      "pitfall": "Yalnız genel doğruluğa bakıp grupları ayrı ölçmemek."
+    },
+    {
+      "term": "Grup bazlı eval",
+      "definition": "Benzer vakalardan gruplar kurup her grubun doğruluğunu ayrı hesaplamak.",
+      "example": "Grup A 40 vakada 36 doğru, grup B 20 vakada 12 doğru.",
+      "pitfall": "Gruplardaki vaka sayısını çok farklı seçip sonucu kıyaslanamaz yapmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d2-q1",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisini bir yapay zekâ servisine yazmak en az risklidir?",
+      "options": [
+        "E-posta hesabının parolası",
+        "Arkadaşının telefon numarası",
+        "'Öğrenci A' etiketli, isimsiz sensör deney sonuçları",
+        "Ev adresin"
+      ],
+      "answer": 2,
+      "explanation": "Anonimleştirilmiş, kimlik bilgisi içermeyen deney verisi paylaşmak en az risklidir. Parola, başkasının telefon numarası ve ev adresi kişisel ya da gizli bilgidir; servise yazılmamalıdır.",
+      "skills": [
+        "ai-privacy"
+      ]
+    },
+    {
+      "id": "m7h8d2-q2",
+      "kind": "numeric",
+      "prompt": "Bir modelin doğruluğu A grubunda 50 vakada 45, B grubunda 20 vakada 12 doğru. Gruplar arasındaki doğruluk farkı kaç yüzde puandır?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "puan",
+      "explanation": "A: 45 / 50 = %90. B: 12 / 20 = %60. Fark 90 - 60 = 30 puan. Toplam doğruluk 57 / 70 = %81 olur ve B grubundaki sorunu saklar.",
+      "skills": [
+        "ai-bias",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d2-q3",
+      "kind": "find-bug",
+      "prompt": "Bu kod bir müşteriye hatırlatma yazdırmak için modele istek hazırlıyor. Gizlilik açısından sorunlu satır hangisi?\n\n```\nimport os\nanahtar = os.environ[\"MODEL_ANAHTARI\"]\nmusteri = {\"ad\": \"Ayşe Y.\", \"tel\": \"0555 000 00 00\"}\nistek = \"Hatırlatma yaz: \" + musteri[\"ad\"] + \" \" + musteri[\"tel\"]\n```",
+      "options": [
+        "anahtar = os.environ[\"MODEL_ANAHTARI\"]",
+        "musteri = {\"ad\": \"Ayşe Y.\", \"tel\": \"0555 000 00 00\"}",
+        "istek = \"Hatırlatma yaz: \" + musteri[\"ad\"] + \" \" + musteri[\"tel\"]",
+        "import os"
+      ],
+      "answer": 2,
+      "explanation": "Telefon numarası hatırlatma metni için gerekli değildir ve servise gönderilmemelidir. Anahtarın ortam değişkeninden okunması doğru yoldur; koda yazmak yanlış olurdu. Sorun, gereksiz kişisel veriyi isteğe eklemektir.",
+      "skills": [
+        "ai-privacy",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m7h8d2-q4",
+      "kind": "mcq",
+      "prompt": "Ödevinde bir yapay zekâ servisinden taslak yardım aldın. Hangi davranış dürüst olandır?",
+      "options": [
+        "Çıktıyı kendi yazdığını söyleyerek sunmak",
+        "Kullandığın yardımı belirtmek, kaynakları kendin kontrol etmek",
+        "Kaynakları model verdiği gibi bırakmak",
+        "Yardım aldığını saklamak, çünkü kimse fark etmez"
+      ],
+      "answer": 1,
+      "explanation": "Yardımı belirtmek, ödev kurallarına uymak ve alıntı ile kaynakları kendin doğrulamak dürüst davranıştır. Çıktıyı kendi işin gibi sunmak ya da kaynakları doğrulamadan kullanmak yanlıştır; model kaynak da uydurabilir.",
+      "skills": [
+        "ai-attribution"
+      ]
+    },
+    {
+      "id": "m7h8d2-q5",
+      "kind": "predict-output",
+      "prompt": "Bir veri setinde isimleri değiştiren bu kodun çıktısı ne olur?\n\n```\nmetin = \"Ali Veli 14 yaşında\"\nprint(metin.replace(\"Ali Veli\", \"Öğrenci A\"))\n```",
+      "options": [
+        "Ali Veli 14 yaşında",
+        "Öğrenci A",
+        "Hata verir",
+        "Öğrenci A 14 yaşında"
+      ],
+      "answer": 3,
+      "explanation": "replace, 'Ali Veli' ifadesini 'Öğrenci A' ile değiştirir ve gerisini aynen bırakır; çıktı 'Öğrenci A 14 yaşında' olur. Yaş gibi ayrıntılar kaldığı için bu yöntem tek başına tam anonimleştirme sağlamayabilir.",
+      "skills": [
+        "ai-privacy",
+        "prog-debug"
+      ]
+    }
+  ]
+}

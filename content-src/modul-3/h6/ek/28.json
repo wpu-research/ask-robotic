@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Durum (state)",
+      "definition": "Programın o an içinde bulunduğu hâl. Bir değişkende tutulur ve her an yalnızca biri geçerlidir.",
+      "example": "Trafik ışığı programında KIRMIZI, YESIL ve SARI üç durumdur.",
+      "pitfall": "Birden çok durum değişkenini birbirinden bağımsız sanmak ve aynı anda iki hâlde olmaya izin vermek."
+    },
+    {
+      "term": "Geçiş (transition)",
+      "definition": "Bir durumdan ötekine geçmeyi tetikleyen koşul: bir olay ya da süre dolması.",
+      "example": "KIRMIZI durumunda 3000 ms dolunca YESIL'e geçilir.",
+      "pitfall": "Geçişte yeni durumun zaman sayacını (durumBasi = simdi) yenilememek; yeni durum hemen biter."
+    },
+    {
+      "term": "enum",
+      "definition": "Sayılara anlamlı isimler veren tür. İlk ada 0 verir, sonrakilere birer artırarak devam eder.",
+      "example": "enum Mod { KAPALI, YAVAS, HIZLI }; yazınca KAPALI = 0, YAVAS = 1, HIZLI = 2 olur.",
+      "pitfall": "İsim yerine ham sayı yazıp kodun anlamını gizlemek (durum = 2;)."
+    },
+    {
+      "term": "switch / case / break",
+      "definition": "Bir değişkenin değerine göre yalnızca ilgili case bloğunu çalıştıran yapı. Her blok break; ile biter.",
+      "example": "switch (durum) { case YESIL: ...; break; }",
+      "pitfall": "break; unutmak: program bir sonraki case'in kodunu da çalıştırır (düşme)."
+    },
+    {
+      "term": "Kenar algılama",
+      "definition": "Butonun \"basılı olmasına\" değil, basılı olmaya yeni geçmesine bakmak. Önceki durumu bir değişkende tutarak yapılır.",
+      "example": "if (basili && !oncekiBasili) { ... } kodu bir basışı yalnızca bir kez sayar.",
+      "pitfall": "Yalnızca basili koşuluyla geçiş yapmak: basılı tutulan buton her turda moda atlatır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d28-q1",
+      "kind": "mcq",
+      "prompt": "Bir durum makinesi programında durum değişkeninin işi nedir?",
+      "options": [
+        "Programın şu an hangi hâlde olduğunu tutar",
+        "Kartın hangi pine bağlı olduğunu tutar",
+        "Geçen süreyi milisaniye olarak tutar",
+        "Butonun kaç kez basıldığını tutar"
+      ],
+      "answer": 0,
+      "explanation": "Durum değişkeni (örneğin durum ya da mod) o anki hâli tutar; switch bu değere bakarak hangi blokun çalışacağına karar verir. Geçen süre ayrı bir değişkende (durumBasi), basış sayısı ise başka bir sayaçta tutulur.",
+      "skills": [
+        "prog-fsm"
+      ]
+    },
+    {
+      "id": "m3h6d28-q2",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca Seri monitörde ne yazar?\n\n```\nenum Mod { KAPALI, YAVAS, HIZLI };\n\nvoid setup() {\n  Serial.begin(9600);\n  int mod = KAPALI;\n  for (int i = 0; i < 4; i++) {\n    mod = (mod + 1) % 3;\n  }\n  Serial.println(mod);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": 1,
+      "explanation": "Mod 0'dan başlar; her adımda 1, 2, 0, 1 olur. 4 basıştan sonra 1 (YAVAS) kalır. % 3 işlemi sonucu hiçbir zaman 3 olmasına izin vermez; 3'e ulaşınca 0'a döner.",
+      "skills": [
+        "prog-fsm",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d28-q3",
+      "kind": "numeric",
+      "prompt": "Bir trafik ışığı programı döngüde şu süreleri kullanıyor: KIRMIZI 5000 ms, YESIL 4000 ms, SARI 1500 ms, sonra yine KIRMIZI. Bir kırmızı başladıktan sonra bir sonraki kırmızının başlamasına kadar kaç milisaniye geçer?",
+      "answer": 10500,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "Üç durumun süreleri toplanır: 5000 + 4000 + 1500 = 10 500 ms. Döngü tamamlanınca kırmızıya dönülür.",
+      "skills": [
+        "prog-fsm",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d28-q4",
+      "kind": "find-bug",
+      "prompt": "İki durumlu bu programda kırmızı aşamada kırmızı LED beklenen gibi sürekli yanmıyor; D13 ile D11 birlikte titreşiyor. Hata nerede?\n\n```\nswitch (durum) {\n  case KIRMIZI:\n    digitalWrite(13, HIGH);\n    digitalWrite(11, LOW);\n    if (simdi - durumBasi >= 3000) { durum = YESIL; durumBasi = simdi; }\n  case YESIL:\n    digitalWrite(13, LOW);\n    digitalWrite(11, HIGH);\n    if (simdi - durumBasi >= 3000) { durum = KIRMIZI; durumBasi = simdi; }\n    break;\n}\n```",
+      "options": [
+        "durumBasi = simdi; yazılmamalı",
+        "digitalWrite(11, LOW); satırı gereksiz",
+        "KIRMIZI bloğunun sonunda break; yok",
+        "case YESIL: sözcüğü yanlış yazılmış"
+      ],
+      "answer": 2,
+      "explanation": "KIRMIZI bloğu break; ile bitmediği için program YESIL bloğuna düşer ve aynı turda kırmızıyı söndürüp yeşili yakar. Böylece iki LED birlikte titreşir. KIRMIZI bloğunun sonuna break; eklemek sorunu çözer. Diğer seçenekler doğru çalışan satırlardır.",
+      "skills": [
+        "prog-fsm",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d28-q5",
+      "kind": "mcq",
+      "prompt": "Bir durum makinesinde yeni duruma geçerken durumBasi = simdi; satırı yazılmazsa ne olur?",
+      "options": [
+        "Derleyici hata verir",
+        "LED'ler söner ve yeniden yanmaz",
+        "Program eski duruma geri döner ve hiç ilerlemez",
+        "Yeni durumun süresi hesaplanırken eski sayaç kullanılır ve durum hemen bitebilir"
+      ],
+      "answer": 3,
+      "explanation": "simdi - durumBasi hâlâ eski durumun başlangıcından hesaplanır; fark zaten büyük olduğundan yeni durum bir tur sonra bitebilir. Derleme hatası olmaz, program geri de dönmez; yalnızca süreler yanlış çalışır.",
+      "skills": [
+        "prog-fsm",
+        "prog-millis"
+      ]
+    }
+  ]
+}

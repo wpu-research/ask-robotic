@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Sıra",
+      "definition": "Aynı bloklar farklı sırada dizilince farklı sonuç verir; programın son durumu en son çalışan bloğa bağlıdır.",
+      "example": "Önce temizle sonra kare göster: ekranda kare kalır; ters sırada ekran boş kalır.",
+      "pitfall": "Bloklar doğru olduğu halde sırayı ters dizip programı bozuk sanmak."
+    },
+    {
+      "term": "Döngü (tekrarla)",
+      "definition": "İçine konan blokları, yazılan sayı kadar baştan sona çalıştıran blok.",
+      "example": "Tekrarla 3: kare göster, bekle, temizle, bekle. Kare üç kez yanıp söner.",
+      "pitfall": "Sayıyı yanlış girmek; 3 yazınca tam üç tur döner, ikisi ya da dördü değil."
+    },
+    {
+      "term": "İçeride ve dışarıda",
+      "definition": "Tekrarla'nın içindeki bloklar her turda, altındaki bloklar ise döngü bittikten sonra bir kez çalışır.",
+      "example": "evet simgesi tekrarla'nın altındaysa yalnızca en sonda görünür.",
+      "pitfall": "Bloğu yanlış yere takmak: içeri takılan, istenmeyen yerde tekrarlanır."
+    },
+    {
+      "term": "Tur süresi",
+      "definition": "Döngü içindeki bekleme sürelerinin toplamı; toplam süre bunun tur sayısı katıdır.",
+      "example": "300 + 300 ms tur, 3 tur için toplam 1800 ms eder.",
+      "pitfall": "Yalnızca bir turun süresini toplam sanmak."
+    },
+    {
+      "term": "Sayaç (_i)",
+      "definition": "JavaScript sekmesinde tekrarla bloğunun kullandığı, 0'dan başlayıp tur sayısına kadar artan değişken.",
+      "example": "for (let _i = 0; _i < 3; _i++) satırı 0, 1, 2 olmak üzere üç tur döner.",
+      "pitfall": "_i < 3 ifadesini \"üçe kadar dahil\" sanmak; 3 değeri dahil değildir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d4-q1",
+      "kind": "predict-output",
+      "prompt": "Bu program bittikten sonra ekranda ne vardır?\n\n```\ncard.onStart(() => {\n  screen.clear();\n  wait(300);\n  screen.showIcon(\"square\");\n  wait(300);\n});\n```",
+      "options": [
+        "Ekran boştur",
+        "Önce kare, sonra boş ekran",
+        "Kare simgesi görünür",
+        "Hata oluşur"
+      ],
+      "answer": 2,
+      "explanation": "Ekran önce temizlenir, ardından kare gösterilir. Kareden sonraki bekleme çizimi silmez; bu yüzden kare ekranda kalır. Temizle ile kare göster bloklarının yeri ters olsaydı ekran boş kalırdı.",
+      "skills": [
+        "mk-flow",
+        "mk-images"
+      ]
+    },
+    {
+      "id": "m10h1d4-q2",
+      "kind": "numeric",
+      "prompt": "Bir tekrarla bloğu 3 kez çalışıyor. Her turda 300 ms bekle, ekranı temizle, 300 ms bekle blokları var. Döngünün toplam süresi kaç milisaniyedir? (Gösterme ve temizleme blokları beklemez.)",
+      "answer": 1800,
+      "unit": "ms",
+      "explanation": "Bir tur 300 + 300 = 600 ms sürer. Üç tur: 3 x 600 = 1800 ms (1,8 saniye). Yalnızca 600'ü yazmak bir turun süresini toplam sanmaktır.",
+      "skills": [
+        "mk-repeat",
+        "mk-timing"
+      ]
+    },
+    {
+      "id": "m10h1d4-q3",
+      "kind": "find-bug",
+      "prompt": "Ece kareyi üç kez yanıp söndürmek istiyor ama kare hiç sönmüyor.\n\n```\n1  for (let _i = 0; _i < 3; _i++) {\n2    screen.showIcon(\"square\");\n3    wait(300);\n4    wait(300);\n5  }\n```\n\nHata nedir?",
+      "options": [
+        "4. satırda wait yerine screen.clear() gerekir; ekran hiç temizlenmiyor",
+        "1. satır: döngü 4 kez dönmeli",
+        "2. satır: square simgesi yanıp sönemez",
+        "3. satır: bekleme çok kısa"
+      ],
+      "answer": 0,
+      "explanation": "Yanıp sönmek için bir turda gösterme, bekleme, temizleme, bekleme gerekir. Burada temizleme yok, kare ilk turdan sonra hep yanık kalır. Tur sayısı (3) istenen sayıdır ve square geçerli bir simgedir; bekleme süresi ise sonucu bozmaz, yalnızca hızı değiştirir.",
+      "skills": [
+        "mk-repeat",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d4-q4",
+      "kind": "mcq",
+      "prompt": "\"Evet\" simgesini göstermek için bloğu tekrarla bloğunun ALTINA (dışına) takıyorsun. Bu ne sağlar?",
+      "options": [
+        "Simge her turda gösterilir",
+        "Simge hiç gösterilmez",
+        "Döngü sonsuza kadar sürer",
+        "Simge döngü tamamen bittikten sonra yalnızca bir kez gösterilir"
+      ],
+      "answer": 3,
+      "explanation": "Tekrarla'nın altındaki blok, döngü bitince bir kez çalışır. İçeri takılsaydı her turda çalışmayı denerdi. Altına takmak simgeyi gizlemez ve döngüyü uzatmaz.",
+      "skills": [
+        "mk-repeat",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d4-q5",
+      "kind": "mcq",
+      "prompt": "JavaScript sekmesinde for (let _i = 0; _i < 5; _i++) satırı var. İçindeki bloklar kaç kez çalışır?",
+      "options": [
+        "4 kez",
+        "5 kez",
+        "6 kez",
+        "Sonsuza kadar"
+      ],
+      "answer": 1,
+      "explanation": "_i değeri 0, 1, 2, 3, 4 olur ve 5 olunca koşul bozulur. Bu beş tur eder. 0'dan başladığı için \"5'e kadar\" demek 5'in dahil olduğu anlamına gelmez; dolayısıyla 6 değil 5 tur döner.",
+      "skills": [
+        "mk-repeat"
+      ]
+    }
+  ]
+}

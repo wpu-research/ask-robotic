@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Akış planı",
+      "definition": "Kodlamadan önce hangi başlığın ne zaman çalışıp ne yaptığını yazan liste.",
+      "example": "Her 2 saniyede ölç ve gönder; A: göster; mesaj gelince: tepki ver.",
+      "pitfall": "Plansız başlamak: bloklar yanlış başlığa gider."
+    },
+    {
+      "term": "Radyo grubu",
+      "definition": "Kartların aynı numaralı grupta olması gerekir; yalnızca aynı gruptaki kartlar birbirini duyar.",
+      "example": "İki kart da radyo grubunu 7 yapar.",
+      "pitfall": "Farklı gruplarda kalmak: mesajlar hiç ulaşmaz."
+    },
+    {
+      "term": "Gönderen ve alan",
+      "definition": "Gönderen kendi ölçümünü yollar; alan, gelen değeri kullanır.",
+      "example": "Alan kartta uzak değişkenine alınan değer konur.",
+      "pitfall": "Alan kartta kendi P1'ini okumak: öteki saksıyı değil kendini görürsün."
+    },
+    {
+      "term": "Mesaj adı",
+      "definition": "Radyo mesajının ad = değer çiftindeki ad.",
+      "example": "Gönderen \"nem\" yollar, alan alınan ad = \"nem\" diye bakar.",
+      "pitfall": "Büyük küçük harf farkı: \"Nem\" ile \"nem\" eşit sayılmaz."
+    },
+    {
+      "term": "Ölçeği belirleyen en çok değer",
+      "definition": "çubuk grafiğin en çok değeri, ölçüm aralığına uymalıdır.",
+      "example": "Nem yüzde olduğu için en çok değer 100'dür.",
+      "pitfall": "En çok değeri 1023 bırakmak: nem 50 iken yalnız 1 LED yanar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d30-q1",
+      "kind": "mcq",
+      "prompt": "İki kart aynı grupta ve aynı programı çalıştırıyor. Kart 1 bir mesaj gönderince kim alır?",
+      "options": [
+        "Yalnız Kart 2 alır",
+        "Kart 1 ve Kart 2 alır",
+        "Kimse almaz",
+        "Gruptaki bütün kartlar ve gönderen alır"
+      ],
+      "answer": 0,
+      "explanation": "Kart kendi mesajını almaz; mesaj yalnız öteki karta gider. Bu yüzden her kart öteki saksının durumunu görür.",
+      "skills": [
+        "mk-radio"
+      ]
+    },
+    {
+      "id": "m10h6d30-q2",
+      "kind": "find-bug",
+      "prompt": "Alan kart öteki saksı kuru olsa da üzgün yüz göstermiyor, çünkü kendi P1 giriş değeri yüksek. Hata hangisi?\n\n```\nradyo mesajı alınınca:\n  eğer alınan ad = \"nem\" ise:\n    uzak değerini ([P1 analog oku] 0-1023 -> 0-100) yap\n    eğer uzak < 30 ise:\n      simgeyi göster [üzgün yüz]\n```",
+      "options": [
+        "Eşik 30 değil 300 olmalı",
+        "uzak değeri alınan değerden değil, alan kartın kendi P1 pininden okunuyor",
+        "Üzgün yüz simgesi yok",
+        "alınan ad yerine alınan değer yazılmalı"
+      ],
+      "answer": 1,
+      "explanation": "Mesaj gelince alınan [değer] bloğu kullanılır; o öteki saksının nemidir. P1'i okumak alan kartın kendi nemini verir. Eşik ve simge doğru.",
+      "skills": [
+        "mk-radio",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h6d30-q3",
+      "kind": "numeric",
+      "prompt": "Kart 2'nin P1 giriş kaydırıcısı 150. Kart 2, 0-1023'ü 0-100'e eşleyip nemi radyoyla yolluyor. Kart 1 hangi nem değerini alır?",
+      "answer": 15,
+      "unit": "%",
+      "explanation": "150 x 100 / 1023 = 14,66 olur ve yuvarlanınca 15 çıkar. Aşağı yuvarlayıp 14 yazmak ya da 150 yazmak yanlış olurdu.",
+      "skills": [
+        "mk-sensors",
+        "mk-radio"
+      ]
+    },
+    {
+      "id": "m10h6d30-q4",
+      "kind": "predict-output",
+      "prompt": "Alan kart bu programı çalıştırıyor. Sırayla gelen mesajlar: nem = 50, nem = 28, sicak = 12, nem = 30. Üzgün yüz kaç kez gösterilir?\n\n```\nradyo mesajı alınınca:\n  eğer alınan ad = \"nem\" ise:\n    uzak değerini (alınan değer) yap\n    eğer uzak < 30 ise:\n      üzgün yüz ve Üzgün ezgisi\n    değilse:\n      çubuk grafik [uzak] / en çok [100]\n```",
+      "options": [
+        "0 kez",
+        "1 kez",
+        "2 kez",
+        "3 kez"
+      ],
+      "answer": 1,
+      "explanation": "Yalnız nem = 28 hem adı eşleştirir hem 30'un altındadır. nem = 30 için 30 < 30 yanlıştır, bu yüzden değilse koluna (çubuk grafik) gider; sicak = 12 adı eşleşmediği için hiç işlenmez.",
+      "skills": [
+        "mk-radio",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d30-q5",
+      "kind": "numeric",
+      "prompt": "Nem yüzde olarak 50 ama çubuk grafiğin en çok değeri yanlışlıkla 1023 bırakılmış. Kaç LED yanar?",
+      "answer": 1,
+      "unit": "LED",
+      "explanation": "50 / 1023 x 25 = 1,22 olur ve yuvarlanınca 1 LED yanar. En çok değer 100 olsaydı 13 LED yanardı. Ölçek, ölçülen aralığa uymalı.",
+      "skills": [
+        "mk-display",
+        "mk-debug"
+      ]
+    }
+  ]
+}

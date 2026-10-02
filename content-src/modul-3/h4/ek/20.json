@@ -1,0 +1,118 @@
+{
+  "concepts": [
+    {
+      "term": "Durumlara bölmek",
+      "definition": "Projeyi bekleme, çalma, bitiş gibi ayrı durumlara ayırıp her durum için ne olacağını önceden yazma.",
+      "example": "Müzik kutusunda buton basılıysa çalma, değilse bekleme durumundayız.",
+      "pitfall": "Plan yapmadan kod yazmaya başlamak; hangi durumda ne olacağı belli olmadığı için hatalar karışır."
+    },
+    {
+      "term": "loop() karar verir",
+      "definition": "İşi fonksiyonlara böldüğünde loop() yalnız hangi fonksiyonun çağrılacağına karar verir.",
+      "example": "if (buton basılı) melodiCal(bpm); else bekleNefesi();",
+      "pitfall": "Bütün komutları loop() içine yığmak; program uzar, okunmaz ve hata bulmak zorlaşır."
+    },
+    {
+      "term": "Vuruş süresi",
+      "definition": "Dakikadaki vuruş sayısından (bpm) bir vuruşun milisaniye cinsinden süresi: 60000 / bpm.",
+      "example": "140 bpm için bir vuruş yaklaşık 428 ms sürer.",
+      "pitfall": "Tempo yükselince vuruş süresinin de uzayacağını sanmak; tempo arttıkça vuruş kısalır."
+    },
+    {
+      "term": "switch ve break",
+      "definition": "switch bir değere göre farklı kod kollarından birini çalıştırır; her kolun sonunda break gerekir.",
+      "example": "case 262: kırmızı; case 294: turuncu; gibi nota frekansına göre renk seçilir.",
+      "pitfall": "break yazmamak; kod bir sonraki case'e düşer ve renkler karışır."
+    },
+    {
+      "term": "delay'in bedeli",
+      "definition": "delay çalışırken program başka satır çalıştırmaz; bu sırada buton ya da pot izlenemez.",
+      "example": "Melodi çalarken butona basman programa ulaşmaz, melodi bitince okunur.",
+      "pitfall": "delay içindeki bir programın aynı anda butona tepki vereceğini beklemek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h4d5-q1",
+      "kind": "numeric",
+      "prompt": "Müzik kutusu 120 vuruş/dakika ile çalıyor. Melodi 16 vuruş uzunluğunda (iki nota 2, on iki nota 1 vuruş). Bir tur melodi kaç milisaniye sürer?",
+      "answer": 8000,
+      "unit": "ms",
+      "explanation": "Bir vuruş 60000 / 120 = 500 ms'dir. 16 vuruş × 500 ms = 8000 ms. Nota sayısı olan 14'ü vuruşla karıştırırsan 7000 ms gibi yanlış bir sonuç çıkar.",
+      "skills": [
+        "prog-timing",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m3h4d5-q2",
+      "kind": "mcq",
+      "prompt": "Müzik kutusunda nota renklerindeki mavi kanal neden yalnız 0 ya da 255 değerini alır?",
+      "options": [
+        "Mavi LED parlaklık ayarını desteklemez",
+        "analogWrite 255'ten sonra otomatik sıfırlanır",
+        "RGB LED'in mavisi bağlı olduğu direncin değerinden dolayı ayarlanamaz",
+        "Mavi kanal D11'dedir ve tone çalarken D11'deki PWM bozulur"
+      ],
+      "answer": 3,
+      "explanation": "tone ile D3 ve D11'deki PWM aynı zamanlayıcıyı (Timer2) kullanır; tone çalarken D11'de ara parlaklık ayarlanamaz, tam açık ya da kapalı güvenlidir. Kırmızı (D9) ve yeşil (D10) etkilenmez. Mavi LED'in kendisi ya da direnç ayarı engellemez.",
+      "skills": [
+        "sound-tone",
+        "pwm-output",
+        "rgb-color"
+      ]
+    },
+    {
+      "id": "m3h4d5-q3",
+      "kind": "find-bug",
+      "prompt": "Do (262 Hz) notası kırmızı yanmalı, Re (294 Hz) turuncu. Ama Do çalarken LED turuncu görünüyor. Hata nerede?\n\n```\nvoid notaRengi(int frekans) {\n  switch (frekans) {\n    case 262: renkAyarla(255, 0, 0);\n    case 294: renkAyarla(255, 80, 0); break;\n    default:  renkAyarla(255, 255, 255);\n  }\n}\n```",
+      "options": [
+        "default kolu en sona yazılmamalı",
+        "case 262 satırının sonunda break; yok, bu yüzden kod bir sonraki case'e düşüyor",
+        "renkAyarla(255, 80, 0) satırında 80 yerine 0 yazılmalı",
+        "switch yerine for kullanılmalı"
+      ],
+      "answer": 1,
+      "explanation": "case 262 kırmızıyı ayarlar ama break olmadığından akış case 294'e düşer ve renk turuncuya çevrilir. 262 satırının sonuna break; eklemek çözer. default doğru yerdedir, 80 turuncu için gerekir ve switch bu iş için uygundur.",
+      "skills": [
+        "prog-debug",
+        "rgb-color"
+      ]
+    },
+    {
+      "id": "m3h4d5-q4",
+      "kind": "predict-output",
+      "prompt": "Bekleme nefesindeki parlaklık mantığının bir parçası bu. Çalışınca Serial Monitor'e ne yazılır?\n\n```\nint parlak = 250;\nint yon = 5;\n\nvoid adim() {\n  parlak = parlak + yon;\n  if (parlak >= 255) {\n    parlak = 255;\n    yon = -5;\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  adim();\n  adim();\n  adim();\n  Serial.println(parlak);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "255",
+        "260",
+        "250",
+        "245"
+      ],
+      "answer": 3,
+      "explanation": "Birinci adımda 250 + 5 = 255 olur, koşul sağlanır ve yön -5 yapılır. İkinci adımda 255 - 5 = 250, üçüncü adımda 250 - 5 = 245. Parlaklık 255'te kalmaz, yön değiştiği için geri iner. 260 olamaz çünkü üst sınır 255'e eşitlenir.",
+      "skills": [
+        "prog-functions",
+        "prog-scope",
+        "pwm-output"
+      ]
+    },
+    {
+      "id": "m3h4d5-q5",
+      "kind": "mcq",
+      "prompt": "Müzik kutusunda melodi çalarken butonu bırakıp yeniden basarsan program hemen tepki vermiyor. Nedeni nedir?",
+      "options": [
+        "Buton INPUT_PULLUP olarak ayarlanmamıştır",
+        "tone komutu butonu devre dışı bırakır",
+        "Melodi sırasında delay çalıştığı için program butonu okuyan satıra gelemez",
+        "loop() yalnız bir kez çalışır"
+      ],
+      "answer": 2,
+      "explanation": "notaCal içindeki delay, program akışını notanın süresi boyunca bekletir; buton okuma satırı ancak melodi bitince çalışır. Buton doğru yapılandırılmıştır, tone butonu etkilemez ve loop() sürekli tekrar eder. Bu sınırı ileride bloklamayan zamanlama ile aşacaksın.",
+      "skills": [
+        "prog-timing",
+        "prog-planning"
+      ]
+    }
+  ]
+}

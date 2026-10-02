@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Dedektif yöntemi",
+      "definition": "Hatayı bulmak için belirtiyi gör, olayı bul, bloğu bul, düzelt ve dene adımlarını sırayla izlemek.",
+      "example": "Skor düşüyorsa yakalama olayına bak, orada `skoru [-1] değiştir` bloğunu bul, -1'i 1 yap.",
+      "pitfall": "Aynı anda üç değişiklik yapmak; hangisinin işe yaradığını anlayamazsın."
+    },
+    {
+      "term": "Hata belirtisi",
+      "definition": "Oyunda gördüğün yanlış davranış; hatanın kendisi değil, ipucudur.",
+      "example": "\"Meyve yakalandı ama ekranda kalıyor\" bir belirtidir; nedeni silme bloğunun olmamasıdır.",
+      "pitfall": "Belirtiyi hatanın kendisi sanmak ve tüm olayı baştan yazmak."
+    },
+    {
+      "term": "Çarpışma olayı ve her karede",
+      "definition": "Çarpışma olayı değdikleri anda bir kez çalışır; her karede olayı saniyede 60 kez çalışır.",
+      "example": "Kaçırılan meyve her karede canı düşürür; çarpışmadaki skor ise bir kez artar.",
+      "pitfall": "Karelik bir kuralın içinde sprite'ı silmemek; can saniyenin bir kesrinde biter."
+    },
+    {
+      "term": "Cila",
+      "definition": "Kuralları değiştirmeden oyunu daha hissedilir yapan ses, sarsıntı ve efekt gibi küçük eklentiler.",
+      "example": "Yakalayınca `puan` melodisi, kaçırınca 200 ms ekran sarsıntısı.",
+      "pitfall": "Cilayı hatalar düzelmeden eklemek; bozuk bir oyunu parlatmak sorunu çözmez."
+    },
+    {
+      "term": "Bloğu göster",
+      "definition": "Hedefler panelindeki uyarıdan sorunlu bloğu çalışma alanında işaretleyen düğme.",
+      "example": "Program hata verince düğmeye basıp ilgili bloğu hemen bulursun.",
+      "pitfall": "Düzelttikten sonra ↺ basmamak; çalışan oyun eski programı kullanır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h6d29-q1",
+      "kind": "mcq",
+      "prompt": "Oyunda bir hata gördün. Dedektif yöntemine göre ilk adım hangisidir?",
+      "options": [
+        "Tüm programı silip baştan yazmak",
+        "Rastgele bir bloğun sayısını değiştirmek",
+        "Cilayı ekleyip hatanın kaybolmasını beklemek",
+        "Belirtiyi net biçimde görmek: ne yanlış davranıyor?"
+      ],
+      "answer": 3,
+      "explanation": "Önce neyin yanlış olduğunu görürsün; sonra o davranışı üreten olayı ve bloğu bulursun. Tüm programı silmek ya da rastgele değiştirmek hatayı çözmez, çoğu zaman yenilerini ekler.",
+      "skills": [
+        "oyun-hata"
+      ]
+    },
+    {
+      "id": "m11h6d29-q2",
+      "kind": "numeric",
+      "prompt": "Bir meyve ekranın altında kalıyor ve `her karede` olayı her karede 1 can götürüyor. Oyun saniyede 60 kare çiziyor. 3 can kaç milisaniyede biter?",
+      "answer": 50,
+      "tolerance": 1,
+      "unit": "ms",
+      "explanation": "3 can 3 karede gider. Bir kare 1000 ÷ 60 ≈ 16,7 ms sürer; 3 × 16,7 = 50 ms. Bu yüzden oyuncu hiçbir şey göremeden kaybeder. Meyveyi silmek bu döngüyü keser.",
+      "skills": [
+        "oyun-hata",
+        "oyun-olay"
+      ]
+    },
+    {
+      "id": "m11h6d29-q3",
+      "kind": "predict-output",
+      "prompt": "Yakalama olayında silme bloğu unutulmuş. Kedi bir meyveye değiyor ve meyve kedinin üstünde birkaç kare daha kalıyor. Skor kaç artar?\n\n```\nOyuncu, Yiyecek'e çarpınca:\n  skoru 1 değiştir\n  ses çal: puan\n```",
+      "options": [
+        "60 puan (her karede 1)",
+        "1 puan, çünkü çarpışma olayı değdikleri anda bir kez çalışır",
+        "0 puan",
+        "3 puan"
+      ],
+      "answer": 1,
+      "explanation": "Çarpışma olayı iki sprite'ın değmeye başladığı anda bir kez çalışır; üst üste durmaya devam etmeleri olayı tekrarlamaz. Silmeyi unutmak skoru tekrar vermez, ama meyve ekranda kalır ve sonunda kaçırma kuralı onu yine sayar.",
+      "skills": [
+        "oyun-olay",
+        "oyun-hata"
+      ]
+    },
+    {
+      "id": "m11h6d29-q4",
+      "kind": "numeric",
+      "prompt": "Meyve y = -8'de doğuyor ve `y > 116` olunca kaçırılmış sayılıyor. Bir meyve saniyede 62 piksel hızla düşüyor. Kaçırılana kadar kaç saniye geçer?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "sn",
+      "explanation": "Yol = 116 - (-8) = 124 piksel. Süre = 124 ÷ 62 = 2 saniye. Eksi işaretini unutup 116 ÷ 62 almak 1,87 verir; başlangıç noktası ekranın üstündedir.",
+      "skills": [
+        "oyun-zorluk",
+        "oyun-hata"
+      ]
+    },
+    {
+      "id": "m11h6d29-q5",
+      "kind": "find-bug",
+      "prompt": "Meyve kaçınca oyun hemen bitiyor; oyuncu üç canın bir anda gittiğini görüyor. Hatayı bul.\n\n```\nher karede:\n  her Yiyecek sprite'ı için:\n    eğer bu sprite'ın y konumu > 116 ise:\n      canı -1 değiştir\n      ekranı 200 ms salla\n```",
+      "options": [
+        "Kaçan meyve silinmiyor; her karede koşul yeniden doğru oluyor",
+        "`canı -1 değiştir` bloğu fazla",
+        "`y > 116` yerine `y < 116` olmalı",
+        "`ekranı salla` bloğu canı etkiler"
+      ],
+      "answer": 0,
+      "explanation": "Meyve silinmediği için `y > 116` her karede doğrudur ve her karede 1 can gider. Çözüm `eğer`in içine `bu sprite'ı sil` eklemektir. Canı azaltan blok doğrudur; `<` yazmak yanlış yöndeki meyveleri sayardı; sarsıntı canı değiştirmez.",
+      "skills": [
+        "oyun-hata",
+        "oyun-olay"
+      ]
+    }
+  ]
+}

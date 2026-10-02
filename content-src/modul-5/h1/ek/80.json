@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Watchdog (komut zaman aşımı)",
+      "definition": "Belli bir süre geçerli komut gelmezse robotu otomatik durduran güvenlik mekanizması. Projede CMD_TIMEOUT = 700 ms.",
+      "example": "Tek bir W20'den 700 ms sonra robot durur ve LED söner.",
+      "pitfall": "Bunu tek güvenlik önlemi saymak; masa kenarında kontrolsüz bırakmak yine tehlikelidir."
+    },
+    {
+      "term": "Güvenli durum",
+      "definition": "Sistemin açılışta ve hata anında bulunacağı varsayılan durum; robot için duruş.",
+      "example": "setup() içinde dur() çağrılır; robot açılır açılmaz hareket etmez.",
+      "pitfall": "Güvenli durumu unutmak: robot açılır açılmaz kontrolsüz döner."
+    },
+    {
+      "term": "İki durumlu makine",
+      "definition": "DURUYOR ve SURUYOR durumlarını ve aralarındaki geçişleri (komut, X, zaman aşımı) tanımlayan basit durum makinesi.",
+      "example": "Geçerli W20 gelince SURUYOR, 700 ms komut gelmeyince DURUYOR olur.",
+      "pitfall": "Durumu değiştirip LED ve motorları ayrı yerlerde güncellemek; dur() hepsini tek yerden yapmalıdır."
+    },
+    {
+      "term": "Watchdog süresinin bedeli",
+      "definition": "Komut kesildikten sonra robotun alacağı yol: hız × CMD_TIMEOUT.",
+      "example": "20 cm/s ve 0,7 s için 14 cm; 39 cm/s için yaklaşık 27 cm.",
+      "pitfall": "Süreyi hesaplamadan seçmek; çok uzun süre tehlikeli, çok kısa süre robotu sürekli durdurur."
+    },
+    {
+      "term": "Geçerli komut ve geçersiz komut",
+      "definition": "Yalnız tanınan komutlar zamanı yeniler; tanınmayan komut (Q gibi) yenilemez.",
+      "example": "2 saniye boyunca yalnız Q gönderilirse robot ilk W20'den 700 ms sonra durur.",
+      "pitfall": "Geçersiz komutun da zamanı yenilemesine izin vermek; gürültü robotu sonsuza kadar sürdürebilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d80-q1",
+      "kind": "numeric",
+      "prompt": "Watchdog süresi 700 ms. Robot 30 cm/s ile giderken komutlar tamamen kesiliyor. Robot durmadan önce yaklaşık kaç cm yol alır? (Motor gecikmesini ve frenlemeyi yok say.)",
+      "answer": 21,
+      "tolerance": 0.5,
+      "unit": "cm",
+      "explanation": "yol = hız × süre = 30 cm/s × 0,7 s = 21 cm. Süreyi milisaniye olarak (700) çarpmak 21000 verirdi; saniyeye çevirmek gerekir. Gerçek robotta durma mesafesi yüzeye ve yüke göre değişir; ölçmeden güvenli sayma.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d80-q2",
+      "kind": "find-bug",
+      "prompt": "Robot, geçersiz komutlar (Q) gelirken de durmuyor; watchdog hiç devreye girmiyor. Hata hangisi?\n\n```\nswitch (komut) {\n  case 'W': tekerlekler(v, v); break;\n  case 'X': dur(); break;\n  default:\n    Serial.println(\"?\");\n    break;\n}\nsonKomut = millis();\n```",
+      "options": [
+        "'W' satırı yanlış",
+        "default bölümünde return yerine break var; geçersiz komut da sonKomut'u yeniliyor",
+        "Serial.println çok yavaş",
+        "millis() yerine delay kullanılmalı"
+      ],
+      "answer": 1,
+      "explanation": "default içinde return kullanılırsa fonksiyon sonKomut atamasına ulaşmadan biter. break ise akışı switch'in dışına, sonKomut = millis() satırına götürür; gürültü watchdog'u sonsuza kadar yeniler.",
+      "skills": [
+        "prog-debug",
+        "prog-structure"
+      ]
+    },
+    {
+      "id": "m5h1d80-q3",
+      "kind": "mcq",
+      "prompt": "Kumanda komutu her 200 ms'de bir tekrarlıyor ve CMD_TIMEOUT = 50 ms seçildi. Robot ne yapar?",
+      "options": [
+        "Düzgün ilerler",
+        "Hiç hareket etmez",
+        "Her komuttan sonra 50 ms'de durup yeni komutla tekrar kalkar; sürekli durup kalkar",
+        "Daha hızlı gider"
+      ],
+      "answer": 2,
+      "explanation": "Komutlar arası 200 ms olduğu için sonraki komut gelmeden 50 ms dolar ve watchdog robotu durdurur. Süre, komut tekrar aralığından uzun olmalıdır (projede 700 ms > 200 ms). Hiç hareket etmez demek yanlıştır; her komut kısa bir hareket başlatır.",
+      "skills": [
+        "prog-timing",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h1d80-q4",
+      "kind": "numeric",
+      "prompt": "Yerinde sağa dönüş komutunda her tekerlek 16 cm/s hızla zıt dönüyor, L = 0,12 m. Robot 180° dönmek için yaklaşık kaç saniye gerekir?",
+      "answer": 1.18,
+      "tolerance": 0.03,
+      "unit": "s",
+      "explanation": "ω = 2·v / L = 2 · 0,16 / 0,12 yaklaşık 2,67 rad/s. 180° = π rad olduğundan süre = π / 2,67 yaklaşık 1,18 s. Hızı cm/s bırakıp metreye çevirmeyi unutmak sonucu yüz kat bozar.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d80-q5",
+      "kind": "mcq",
+      "prompt": "Watchdog süresini 700 ms'den 5 saniyeye çıkarmanın sonucu hangisidir?",
+      "options": [
+        "Bağlantı kopunca robot 5 saniye boyunca kontrolsüz yol alır; durma mesafesi büyür",
+        "Robot daha güvenli olur, çünkü daha uzun bekler",
+        "Robot hiç durmaz",
+        "Komutları tekrar etmek gerekmez ve bir risk doğmaz"
+      ],
+      "answer": 0,
+      "explanation": "Durma mesafesi hız × süredir; süre yedi katı olunca mesafe de yedi katı olur (20 cm/s'de 14 cm yerine 100 cm). Uzun süre yalnızca gecikmeye toleransı artırır, güvenliği azaltır.",
+      "skills": [
+        "prog-planning"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "concepts": [
+    {
+      "term": "RTC saniyesine bağlı kayıt",
+      "definition": "Satır, RTC'nin unixtime değeri aralığa tam bölündüğünde üretilir; böylece zamanlar millis() kaymasından bağımsız, hep aynı adımlarla çıkar.",
+      "example": "unixtime % 10 == 0 olduğunda 08:30:10, 08:30:20, 08:30:30 satırları üretilir.",
+      "pitfall": "Kayıt aralığını delay() ile beklemek; buton ve ekran bu sürede donar."
+    },
+    {
+      "term": "unixtime()",
+      "definition": "1970'ten beri geçen saniye sayısı; tek bir sayıyla zamanı ifade eder.",
+      "example": "u % 10 == 0 koşulu, saniyesi 10'a bölünen her anı yakalar.",
+      "pitfall": "Saniye değerini (0-59) tek başına kullanmak; aralık 60'a bölünmüyorsa (7 gibi) dakika geçişinde düzensiz adımlar çıkar."
+    },
+    {
+      "term": "Tekrar önleme bayrağı (sonKayit)",
+      "definition": "Son satırın yazıldığı saniyeyi saklayan değişken; aynı saniyede ikinci satırı engeller.",
+      "example": "u != sonKayit koşulu, 200 ms'lik beş turun yalnız birinde satır yazdırır.",
+      "pitfall": "Bayrağı unutmak: her 200 ms'lik turda aynı zaman damgalı bir satır çıkar."
+    },
+    {
+      "term": "Kenar algılama ile aç/kapat",
+      "definition": "Butona basıldığı an (\"basılmadı\"dan \"basıldı\"ya geçiş) bir durum değişkenini tersler.",
+      "example": "kayitAcik = !kayitAcik; kayıt açıkken kapanır, kapalıyken açılır.",
+      "pitfall": "Basılı olduğu sürece her turda durumu ters çevirmek; kayıt kontrolsüz açılıp kapanır."
+    },
+    {
+      "term": "Hataya dayanıklı kayıt",
+      "definition": "Okuma başarısız olsa bile zaman damgası yazılır, sensör alanları boş kalır; cihaz çalışmaya devam eder.",
+      "example": "DHT'nin DATA kablosu çıkarsa satır 2026-01-01 00:00:20,, olarak yazılır.",
+      "pitfall": "Okuma başarısız olunca program durdurmak (while(true) {}) ya da satırı hiç yazmamak."
+    },
+    {
+      "term": "kaydet() ayrımı",
+      "definition": "Satırı üretmek ile satırı bir yere yazmak ayrı fonksiyonlardadır; yazılan yer değişince satır biçimi değişmez.",
+      "example": "Serial sürümünden SD sürümüne geçerken yalnız kaydet() içine SD yazma eklenir.",
+      "pitfall": "Biçimlemeyi her yazma yerine ayrı ayrı kopyalamak; iki yerde farklı satır çıkar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d70-q1",
+      "kind": "numeric",
+      "prompt": "Kayıt cihazı her 10 saniyede bir satır yazıyor ve kesintisiz çalışıyor. 1 saatte kaç veri satırı yazılır?",
+      "answer": 360,
+      "unit": "satır",
+      "explanation": "Bir saat 3600 saniyedir. 3600 ÷ 10 = 360 satır. Bu hesap, kartın ne kadar sürede dolacağını tahmin etmek ve kayıt aralığını seçmek için kullanılır.",
+      "skills": [
+        "data-logging",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m4h7d70-q2",
+      "kind": "mcq",
+      "prompt": "KAYIT_ARALIGI 20 yapılırsa, RTC saniyesine bağlı (unixtime % 20 == 0) bu kayıt mantığında satırlar dakikanın hangi saniyelerinde üretilir?",
+      "options": [
+        "10, 30, 50",
+        "5, 25, 45",
+        "0, 20, 40",
+        "0 ve 30"
+      ],
+      "answer": 2,
+      "explanation": "60 saniye 20'ye tam bölünür; bu yüzden her dakikada aynı üç saniye çıkar: 0, 20 ve 40 (08:30:20, 08:30:40, 08:31:00 gibi). 0 ve 30 aralığı 30 saniye olurdu; 10, 30, 50 ise 20'ye bölünen saniyeler değildir.",
+      "skills": [
+        "data-logging",
+        "rtc-time"
+      ]
+    },
+    {
+      "id": "m4h7d70-q3",
+      "kind": "find-bug",
+      "prompt": "Kayıt aralığı 20 saniye. Ama RTC her 200 ms'de bir okunuyor ve seri monitörde aynı zaman damgalı satır 5 kez çıkıyor. Hangi koşul eksik?\n\n```\nif (kayitAcik && u % KAYIT_ARALIGI == 0) {\n  kaydet(satirOlustur(t, sicak, nem));\n}\n```",
+      "options": [
+        "kayitAcik kontrolü gereksiz",
+        "satirOlustur yerine Serial.println çağrılmalı",
+        "u != sonKayit kontrolü eksik; aynı saniye içinde beş tur da koşulu sağlıyor",
+        "KAYIT_ARALIGI float olmalı"
+      ],
+      "answer": 2,
+      "explanation": "RTC saniyesi 20'ye bölündüğünde bu saniye 1000 ms sürer ve 200 ms'lik turlar bu sürede 5 kez koşulu doğru bulur. u != sonKayit gibi bir bayrak aynı saniyede satırı bir kez yazdırır. Diğer değişiklikler tekrarı engellemez.",
+      "skills": [
+        "data-logging",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d70-q4",
+      "kind": "mcq",
+      "prompt": "Kayıt aralığını delay(10000) ile beklemek bu projede neden kötü bir fikirdir?",
+      "options": [
+        "10 saniye boyunca buton okunmaz ve ekran güncellenmez; cihaz tepkisiz kalır",
+        "delay() yalnız 1000 ms'e kadar çalışır",
+        "RTC bu sırada sıfırlanır",
+        "CSV satırı bozulur"
+      ],
+      "answer": 0,
+      "explanation": "delay() programı durdurur: butona basılsa bile fark edilmez, LCD'deki saat donar. Çözüm RTC saniyesi ya da millis() ile bloklamayan kontroldür (ders 27). delay() 1000 ms ile sınırlı değildir; RTC ve CSV satırı da etkilenmez.",
+      "skills": [
+        "prog-timing",
+        "data-logging"
+      ]
+    },
+    {
+      "id": "m4h7d70-q5",
+      "kind": "mcq",
+      "prompt": "Kaydedici çalışırken DHT22'nin DATA kablosu çıkıyor ve okuma NaN dönüyor. Dersteki tasarımda kayıt dosyasında ne görünür?",
+      "options": [
+        "Zaman damgası yazılır, sıcaklık ve nem sütunları boş bırakılır",
+        "Cihaz durur ve hiçbir satır yazılmaz",
+        "Sıcaklık sütununa 0 yazılır",
+        "Önceki ölçüm olduğu gibi tekrarlanır"
+      ],
+      "answer": 0,
+      "explanation": "satirOlustur, NaN gelen alanı yazmaz ve boş bırakır: 2026-03-14 08:30:20,, gibi bir satır çıkar. Böylece kayıtta ölçümün neden eksik olduğu görünür ve sütunlar kaymaz. Sıfır yazmak, gerçek 0 °C ölçümüyle karışırdı.",
+      "skills": [
+        "data-logging",
+        "prog-debug"
+      ]
+    }
+  ]
+}

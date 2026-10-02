@@ -15,8 +15,8 @@ export const ders21: MikroActivity = {
   starter: () => project('Radyo selam', [onStart(), onButton('A', []), onButton('B', []), onRadio([])]),
   goals: [
     usesBlocks('grup', "'radyo grubunu … yap' ve 'radyo mesajı alınınca' bloklarını kullan", ['mk_radio_group', 'mk_on_radio'], { hint: 'İkisi de Radyo kategorisinde.' }),
-    radioSent('gonder', 'Kart 1: A ile 1, B ile 2 sayısını radyoyla gönder', { kind: 'num', card: 0 }),
-    radioReceived('al', 'Kart 2 mesajı alsın', { card: 1 }),
+    radioSent('gonder', 'Kart 1: A ile 1, B ile 2 sayısını radyoyla gönder', { kind: 'num', card: 0, hint: "Radyo bloğu A ve B düğmelerinde olsun; Kart 1'de A'ya, sonra B'ye kısa bas." }),
+    radioReceived('al', 'Kart 2 mesajı alsın', { card: 1, hint: "Kart 2 yalnız mesaj bekler; Kart 1'de düğmeye bas, iki kartın radyo grubu aynı olmalı." }),
     ledPattern('kalp', 'Kart 2 ekranında kalp (1 gelince) görünsün', HEART, { card: 1, hint: "'eğer alınan sayı = 1 ise kalp göster' kur." }),
     ledPattern('mutlu', 'Kart 2 ekranında mutlu yüz (2 gelince) görünsün', HAPPY, { card: 1, hint: "'değilse' kolunda mutlu yüzü göster." }),
   ],

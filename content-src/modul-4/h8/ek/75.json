@@ -1,0 +1,106 @@
+{
+  "concepts": [
+    {
+      "term": "Girdi - durum - çıkış düzeni",
+      "definition": "Her turda önce girdileri okuyup, sonra durumu güncelleyip, en son çıkışları yazan program düzeni.",
+      "example": "Önce buton, PIR, LDR ve DHT okunur; sonra DOLU/BOS kararı verilir; sonra lamba ve röle yazılır.",
+      "pitfall": "Çıkışı girdi okunduğu yerde, yarım kalmış bir durumla yazmak; lamba ve fan tutarsız davranır."
+    },
+    {
+      "term": "Durum makinesi",
+      "definition": "Programın her an yalnızca bir durumda olduğu ve olaylarla durumlar arasında geçtiği yapı.",
+      "example": "ISINMA, BOS, DOLU ve KAPALI durumları; PIR hareketi BOS'tan DOLU'ya geçirir.",
+      "pitfall": "Durumu belirtmeden bayraklarla (bool) dağınık bir mantık kurmak; hangi çıkışın neden açıldığı karışır."
+    },
+    {
+      "term": "İki bantlı karar",
+      "definition": "Aynı programda birden çok histerezis kullanma: her sensörün kendi açma ve kapama eşiği vardır.",
+      "example": "Işık: 300 altı karanlık, 400 üstü aydınlık. Fan: 28 °C açar, 26 °C kapatır.",
+      "pitfall": "Fan için de tek eşik (28 °C) kullanmak; sıcaklık eşiğin etrafında dalgalanınca röle çıtırdar."
+    },
+    {
+      "term": "Güvenli varsayılan",
+      "definition": "Sensör geçersiz ya da durum belirsizse masraflı veya tehlikeli çıkışı kapalı bırakma.",
+      "example": "DHT22 isnan verirse fan = false ve LCD DHT HATA yazar.",
+      "pitfall": "Geçersiz bir sıcaklık okumasını son iyi değer sanıp fanı açık bırakmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d5-q1",
+      "kind": "predict-output",
+      "prompt": "Fan eşikleri 28 ve 26 °C. Sıcaklık sırayla 25, 28, 27, 26, 29 olarak okunuyor. Bu kod ne yazar?\n\n```cpp\nfloat t[] = {25, 28, 27, 26, 29};\nbool fan = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    if (t[i] >= 28.0) fan = true;\n    else if (t[i] <= 26.0) fan = false;\n    Serial.print(fan ? 1 : 0);\n  }\n}\nvoid loop() {}\n```",
+      "options": [
+        "01100",
+        "01101",
+        "01111",
+        "01001"
+      ],
+      "answer": 1,
+      "explanation": "25: kapalı (0). 28: açar (1). 27: bandın içinde, açık kalır (1). 26: kapatır (0). 29: yeniden açar (1). Çıktı 01101. 27 °C'de açık kalması histerezistir; tek eşik olsaydı 27'de kapalı olurdu.",
+      "skills": [
+        "sens-hysteresis",
+        "proj-statemachine"
+      ]
+    },
+    {
+      "id": "m4h8d5-q2",
+      "kind": "numeric",
+      "prompt": "LDR 5 V ile A1 arasında, 10 kΩ direnç A1 ile GND arasında. Işık = 0,5 iken LDR yaklaşık 14,1 kΩ'dur. analogRead(A1) yaklaşık kaç okur? (Gerilim bölücü: V = 5 x 10 / (10 + 14,1))",
+      "answer": 424,
+      "tolerance": 3,
+      "explanation": "V = 5 x 10 / 24,1 ≈ 2,07 V. ADC = 2,07 / 5 x 1023 ≈ 424. Bu değer 400'ün üstündedir, yani aydınlık eşiğinin üstünde; 300-400 arasında olsaydı önceki karar korunurdu.",
+      "skills": [
+        "proj-integration",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m4h8d5-q3",
+      "kind": "mcq",
+      "prompt": "Oda DOLU, sıcaklık 30 °C, ama DHT22 bağlantısı koptu ve okuma isnan döndürüyor. Doğru davranış hangisi?",
+      "options": [
+        "Fan son iyi okumaya göre açık kalsın",
+        "Fan kapanır ve LCD'de DHT HATA yazar",
+        "Sıcaklık 0 °C kabul edilir ve fan kapanır, hata gösterilmez",
+        "Program durur ve hiçbir çıkış güncellenmez"
+      ],
+      "answer": 1,
+      "explanation": "Sensör geçersizse bilinmeyen durumda masraflı çıkış (fan) kapalı kalır ve kullanıcı hatadan haberdar edilir. Eski değeri kullanmak gerçekle bağını koparır, sessizce 0 °C kabul etmek hatayı gizler, programı durdurmak lambayı ve ekranı da bozar.",
+      "skills": [
+        "sens-failsafe",
+        "proj-integration"
+      ]
+    },
+    {
+      "id": "m4h8d5-q4",
+      "kind": "find-bug",
+      "prompt": "Lamba karanlık ile aydınlık arasında hızla yanıp sönüyor. Hata nerede?\n\n```cpp\nint isik = analogRead(A1);\nif (!karanlik && isik < 300) karanlik = true;\nif (karanlik && isik > 300) karanlik = false;\n```",
+      "options": [
+        "analogRead yerine digitalRead kullanılmalı",
+        "karanlik bool olmamalı",
+        "isik değişkeni global olmalı",
+        "İki eşik de 300: histerezis bandı yok, 300 civarındaki dalgalanmada karar sürekli değişir"
+      ],
+      "answer": 3,
+      "explanation": "Karanlık için de aydınlık için de aynı eşik kullanılıyor, arada \"önceki kararı koru\" bölgesi yok. Doğrusu karanlık için < 300, aydınlık için > 400 gibi ayrı eşiklerdir. Diğer seçenekler hatayı gidermez.",
+      "skills": [
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d5-q5",
+      "kind": "numeric",
+      "prompt": "BOS_SURESI = 8000 ms. Odada son hareket program başladıktan 12000 ms sonra algılandı ve bir daha hareket olmadı. Oda BOS durumuna kaçıncı milisaniyede geçer?",
+      "answer": 20000,
+      "tolerance": 100,
+      "unit": "ms",
+      "explanation": "Durum, son hareketten BOS_SURESI sonra BOS olur: 12000 + 8000 = 20000 ms. Her yeni hareket sonHareket değerini günceller, bu yüzden bekleme süresi her seferinde yeniden başlar.",
+      "skills": [
+        "proj-statemachine",
+        "prog-timing"
+      ]
+    }
+  ]
+}

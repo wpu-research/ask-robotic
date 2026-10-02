@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Kesme (interrupt)",
+      "definition": "Bir olay olunca işlemcinin o anki işi bırakıp ilgili fonksiyonu çalıştırması, sonra kaldığı yere dönmesi.",
+      "example": "Buton D2'de LOW'a düşünce basildi() fonksiyonu loop() ne yapıyor olursa olsun çalışır.",
+      "pitfall": "Kesmeyi her işin çözümü sanmak; ISR içinde uzun iş yapılamaz."
+    },
+    {
+      "term": "ISR",
+      "definition": "Kesme servis rutini: kesme gelince çalışan, parametresiz ve değer döndürmeyen kısa fonksiyon.",
+      "example": "void basildi() { sayac++; } fonksiyonu bir ISR'dir.",
+      "pitfall": "ISR içine delay ya da Serial.print koymak; program takılabilir."
+    },
+    {
+      "term": "volatile",
+      "definition": "Bir değişkenin program akışı dışında (ISR'de) değişebileceğini derleyiciye bildiren sözcük.",
+      "example": "volatile unsigned int sayac = 0;",
+      "pitfall": "volatile yazmamak: loop() değeri eski kopyadan okuyabilir ve sayaç artmıyor gibi görünür."
+    },
+    {
+      "term": "Kesme modları",
+      "definition": "attachInterrupt'ın hangi olayda tetikleneceğini belirleyen ayar: FALLING, RISING, CHANGE, LOW.",
+      "example": "INPUT_PULLUP butonuna basışı yakalamak için FALLING kullanılır.",
+      "pitfall": "CHANGE seçip bir basışı bir kesme sanmak; basış ve bırakış iki kesme üretir."
+    },
+    {
+      "term": "Timer kesmesi",
+      "definition": "Kartın saat birimi sayaçlarından birinin belirlenen değere ulaşınca ürettiği düzenli kesme.",
+      "example": "Bölücü 256, OCR1A = 31249 için kesme her 0,5 saniyede gelir.",
+      "pitfall": "Timer1'i Servo ya da pin 9-10'daki analogWrite ile birlikte kullanmak: aynı birim çakışır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d29-q1",
+      "kind": "mcq",
+      "prompt": "Arduino Uno'da attachInterrupt ile dış kesme alabilen pinler hangileridir?",
+      "options": [
+        "D0 ve D1",
+        "Tüm dijital pinler",
+        "D8 ve D9",
+        "D2 ve D3"
+      ],
+      "answer": 3,
+      "explanation": "Uno'da dış kesme yalnızca INT0 (D2) ve INT1 (D3) pinlerindedir. D0 ve D1 seri haberleşme içindir; D8-D9 ya da diğer pinlerde bu kesme yoktur.",
+      "skills": [
+        "prog-interrupts"
+      ]
+    },
+    {
+      "id": "m3h6d29-q2",
+      "kind": "numeric",
+      "prompt": "Timer1 bölücü 256 ile çalışıyor (16 MHz / 256 = 62 500 tik/sn) ve OCR1A = 6249 yazılmış. Kesme kaç milisaniyede bir gelir?",
+      "answer": 100,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "Sayılan tik sayısı OCR1A + 1 = 6250. 6250 / 62 500 = 0,1 s = 100 ms. +1'i unutup 6249 / 62 500 hesaplarsan 99,98 ms bulursun; doğru formül (OCR1A + 1) kullanır.",
+      "skills": [
+        "prog-interrupts",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d29-q3",
+      "kind": "find-bug",
+      "prompt": "Buton D4 ile GND arasına bağlı. Butona basınca sayaç hiç artmıyor. Programdaki hatanın nedeni nedir?\n\n```\nvolatile unsigned int basis = 0;\n\nvoid say() {\n  basis++;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(4, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(4), say, FALLING);\n}\n\nvoid loop() {\n  Serial.println(basis);\n  delay(500);\n}\n```",
+      "options": [
+        "Uno'da D4 bir dış kesme pini değil; kesme D2 ya da D3'te kurulmalı",
+        "say() fonksiyonu volatile olmalı",
+        "FALLING yerine HIGH yazılmalı",
+        "basis değişkeni unsigned olmamalı"
+      ],
+      "answer": 0,
+      "explanation": "Uno'da dış kesme yalnızca D2 (INT0) ve D3 (INT1) pinlerinde vardır; digitalPinToInterrupt(4) geçerli bir kesme numarası vermez, bu yüzden attachInterrupt hiçbir şey kurmaz. Buton D2'ye taşınmalı. say() bir ISR'dir, volatile değişkenler için yazılır; FALLING doğru moddur; unsigned olması sorun değildir.",
+      "skills": [
+        "prog-interrupts",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d29-q4",
+      "kind": "predict-output",
+      "prompt": "İdeal bir butona (sıçrama yok) yalnızca bir kez basılıp bırakılıyor; bu işlem ilk 2 saniye içinde bitiyor. İlk yazdırılan değer nedir?\n\n```\nvolatile int sayac = 0;\n\nvoid kes() {\n  sayac++;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), kes, CHANGE);\n}\n\nvoid loop() {\n  delay(2000);\n  Serial.println(sayac);\n}\n```",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "Yazmaz, program takılır"
+      ],
+      "answer": 2,
+      "explanation": "CHANGE hem basış (HIGH→LOW) hem bırakış (LOW→HIGH) için kesme üretir; iki kesme sayacı 2 yapar. FALLING seçilseydi sonuç 1 olurdu. Kesme delay içinde bile çalışır, bu yüzden 0 çıkmaz ve program takılmaz.",
+      "skills": [
+        "prog-interrupts"
+      ]
+    },
+    {
+      "id": "m3h6d29-q5",
+      "kind": "mcq",
+      "prompt": "Bir kesme fonksiyonunun içinde Serial.println kullanmak neden önerilmez?",
+      "options": [
+        "Serial yalnızca setup() içinde çalışır",
+        "Yazdırma yavaştır, tampon dolarsa program takılabilir; ISR kısa olmalıdır",
+        "ISR içinde hiçbir değişken kullanılamaz",
+        "Seri monitör kesmeleri kapatır"
+      ],
+      "answer": 1,
+      "explanation": "ISR kısa olmalıdır. Serial.println hem yavaştır hem de çıkış tamponu dolarsa bekleyebilir; kesme içinde bu beklemenin işleyeceği kesmeler kapalıdır. Bayrak kaldırıp yazdırmayı loop()'a bırakmak doğrudur. Değişkenler ISR'de kullanılabilir (volatile olmaları gerekir).",
+      "skills": [
+        "prog-interrupts"
+      ]
+    }
+  ]
+}

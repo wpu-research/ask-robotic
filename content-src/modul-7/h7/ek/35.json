@@ -1,0 +1,98 @@
+{
+  "concepts": [
+    {
+      "term": "Kırmızı takım",
+      "definition": "Bir sistemi kırmaya çalışarak zayıf noktaları bulan ekip.",
+      "example": "Atölyede seviye 0 ve 1'i aşan bir belge yazan sensin.",
+      "pitfall": "İzinsiz gerçek sistemde denemek; bu etik dışı ve yasa dışı olabilir."
+    },
+    {
+      "term": "Mavi takım",
+      "definition": "Sistemi koruyan ve savunmayı kuran ekip.",
+      "example": "Atölyede altı saldırıyı durduran seti kuran sensin.",
+      "pitfall": "Savunmanın hiç delinmeyeceğini varsaymak."
+    },
+    {
+      "term": "Bulgu ve etki",
+      "definition": "Bulgu, bulunan açıktır; etki, açık kötüye kullanılsaydı kaybedilecek şeydir.",
+      "example": "Bulgu: kara liste atlatıldı. Etki: gizli kod sızardı.",
+      "pitfall": "Etkiyi yazmadan yalnız \"açık buldum\" demek."
+    },
+    {
+      "term": "Kalan risk",
+      "definition": "Savunmalar kurulduktan sonra bile geriye kalan belirsizlik.",
+      "example": "Simülasyon altı saldırıyı durdurur ama gerçek modellerde garanti yoktur.",
+      "pitfall": "Raporda \"tamamen güvenli\" yazmak."
+    },
+    {
+      "term": "Sorumlu ifşa",
+      "definition": "Bulunan açığı kötüye kullanmadan sahibine bildirmek.",
+      "example": "Bir okul uygulamasında hata bulursan yöneticiye yazarsın.",
+      "pitfall": "Açığı herkese duyurmak ya da başkalarının verisine bakmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d35-q1",
+      "kind": "mcq",
+      "prompt": "Kırmızı takım ve mavi takım ne yapar?",
+      "options": [
+        "İkisi de saldırır",
+        "Kırmızı saldırır, mavi savunur",
+        "Kırmızı savunur, mavi yazılım yazar",
+        "İkisi de rapor yazmaz"
+      ],
+      "answer": 1,
+      "explanation": "Kırmızı takım sistemi kırmaya çalışır, mavi takım onu korur; ortak amaç sistemi daha güvenli yapmaktır. Roller karşıt görünse de düşman değildir. Kırmızı takımın bulduğu açık, mavi takım için iş listesine dönüşür.",
+      "skills": [
+        "ai-red-team"
+      ]
+    },
+    {
+      "id": "m7h7d35-q2",
+      "kind": "mcq",
+      "prompt": "Bir okulun not sisteminde yanlışlıkla açık bir kapı fark ettin. En doğru davranış hangisi?",
+      "options": [
+        "Notları görüp ne kadar erişebildiğini denemek",
+        "Arkadaşlarına gösterip herkese duyurmak",
+        "Kimseye zarar vermeden sistemin sahibine bildirmek",
+        "Hiçbir şey olmamış gibi davranmak ve unutmak"
+      ],
+      "answer": 2,
+      "explanation": "Sorumlu ifşa: açığı kötüye kullanmadan sahibine bildirmek. İzinsiz denemek, başkalarının notlarına bakmak ya da açığı herkese duyurmak zarar verebilir ve yasa dışı olabilir. Açığı bulmak ile kötüye kullanmak farklı şeylerdir.",
+      "skills": [
+        "ai-red-team"
+      ]
+    },
+    {
+      "id": "m7h7d35-q3",
+      "kind": "numeric",
+      "prompt": "Mavi takım bütçen 4. \"En az yetki\" önlemini (maliyet 3) seçtin. Geriye kalan bütçeyle maliyeti 1 olan en çok kaç ek önlem seçebilirsin?",
+      "answer": 1,
+      "unit": "önlem",
+      "tolerance": 0,
+      "explanation": "4 - 3 = 1 birim kalır; bu da maliyeti 1 olan tek bir ek önleme yeter. Örneğin talimat hiyerarşisi eklenirse toplam 4 olur ve atölyedeki altı saldırının hepsi kapanır.",
+      "skills": [
+        "ai-red-team",
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d35-q4",
+      "kind": "predict-output",
+      "prompt": "Basit bir savunma tablosu: hangi önlem hangi saldırıyı durdurur. Seçilen önlemler yasak ve onay ise açık kalan saldırılar nelerdir?\n\n```\nsaldirilar = {\"dogrudan\": {\"yasak\", \"hiyerarsi\"},\n              \"rol\": {\"hiyerarsi\"},\n              \"arac\": {\"onay\", \"asgari\"}}\nsecilen = {\"yasak\", \"onay\"}\nacik = [ad for ad, durduranlar in saldirilar.items()\n        if not (durduranlar & secilen)]\nprint(acik)\n```",
+      "options": [
+        "['dogrudan']",
+        "['rol']",
+        "['arac']",
+        "[]"
+      ],
+      "answer": 1,
+      "explanation": "Kesişim boşsa saldırı açıktır. dogrudan için {yasak, hiyerarsi} ve {yasak, onay} kesişimi {yasak}: kapalı. rol için {hiyerarsi} ve seçilenin kesişimi boş: açık. arac için {onay, asgari} ve seçilenin kesişimi {onay}: kapalı. Çıktı ['rol'] olur. Bu, kalan riski raporlamak için kullanılan mantığın küçük bir modelidir.",
+      "skills": [
+        "ai-red-team",
+        "ai-defense"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "concepts": [
+    {
+      "term": "Zıplama hızı",
+      "definition": "Kahramana bir anda verilen yukarı (eksi) y hızı.",
+      "example": "kahraman hızı x (x hızı) y -250 kahramanı yukarı fırlatır.",
+      "pitfall": "Pozitif sayı yazmak: kahraman yukarı değil aşağı gider."
+    },
+    {
+      "term": "Tepe noktası",
+      "definition": "Yerçekimi yukarı hızı sıfıra indirdiğinde kahramanın en yükseğe çıktığı an.",
+      "example": "Hız -260, ivme 520 ise tepeye 0,5 saniyede çıkılır.",
+      "pitfall": "Tepede zıplamanın bittiğini sanmak; yerçekimi kahramanı geri indirir."
+    },
+    {
+      "term": "Yerde mi?",
+      "definition": "`alttan bir duvara dokunuyor mu?` bloğu, kahramanın altında duvar olup olmadığını söyler.",
+      "example": "Zemindeyken doğru, havadayken yanlıştır.",
+      "pitfall": "Bu koşulu unutmak: kahraman havada da zıplar, yani uçar."
+    },
+    {
+      "term": "Koşullu zıplama",
+      "definition": "Zıplama bloğunu `eğer yerdeyse` içine koymak.",
+      "example": "A düğmesine basılınca, eğer alttan duvara dokunuyorsa hız bloğu çalışır.",
+      "pitfall": "Zıplamayı oyun başlayınca içine koymak: yalnız başta bir kez olur."
+    },
+    {
+      "term": "Yatay hızı korumak",
+      "definition": "Zıplarken x hızı kutusuna kahramanın kendi x hızını koymak.",
+      "example": "`kahraman x hızı` bloğu zıplarken yürüyüş yönünü sürdürür.",
+      "pitfall": "x hızına 0 yazmak: kahraman dik çıkıp dik iner."
+    },
+    {
+      "term": "Zıplama gücü",
+      "definition": "Zıplama hızının büyüklüğü; yükseklik hızın karesiyle büyür.",
+      "example": "-250'den -300'e geçince yükselme 60 pikselden yaklaşık 86 piksele çıkar.",
+      "pitfall": "Hızı çok artırmak: kahraman ekranın dışına çıkabilir, platformlar anlamını yitirir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h5d22-q1",
+      "kind": "mcq",
+      "prompt": "Zıplama için y hızına neden eksi bir sayı yazılır?",
+      "options": [
+        "Çünkü ekranda y aşağı doğru artar, yukarı eksidir",
+        "Çünkü eksi sayılar daha hızlıdır",
+        "Çünkü A düğmesi eksi değer ister",
+        "Çünkü yerçekimi eksi sayıyla çalışır"
+      ],
+      "answer": 0,
+      "explanation": "Ekranda y aşağı doğru arttığı için yukarı yön eksidir. Pozitif sayı kahramanı aşağı iter. Seçenekler arasındaki \"ses\" ya da \"tuş\" gerekçeleri hızın işaretiyle ilgili değildir.",
+      "skills": [
+        "oyun-ziplama",
+        "oyun-y-ekseni"
+      ]
+    },
+    {
+      "id": "m11h5d22-q2",
+      "kind": "numeric",
+      "prompt": "Kahraman y hızı -260 ile zıplıyor, yerçekimi ivmesi 520 piksel/sn². Yukarı hızı sıfıra inip tepe noktasına kaç saniyede ulaşır?",
+      "answer": 0.5,
+      "tolerance": 0.05,
+      "unit": "sn",
+      "explanation": "Süre = hız / ivme = 260 / 520 = 0,5 saniye. Hız her saniye 520 azalır; 260'ın sıfıra inmesi yarım saniye sürer. Motor 1/60 saniyelik adımlarla çalıştığı için 0,05 saniyelik sapma kabul edilir.",
+      "skills": [
+        "oyun-ziplama",
+        "oyun-hiz-ivme"
+      ]
+    },
+    {
+      "id": "m11h5d22-q3",
+      "kind": "predict-output",
+      "prompt": "Oyuncu havadayken A'ya art arda basıyor. Bu program kahramanı nasıl hareket ettirir?\n\n```\nA düğmesine basılınca:\n  kahraman hızı x (kahraman x hızı) y -250\n```",
+      "options": [
+        "Havadayken basışlar işe yaramaz",
+        "Her basışta yeniden fırlar, havada da zıplar",
+        "Kahraman yere gömülür",
+        "Yalnız ilk basışta zıplar"
+      ],
+      "answer": 1,
+      "explanation": "Blokta zeminde olup olmadığını soran bir koşul yok. Her basışta yukarı hız yeniden -250 yapılır, bu yüzden kahraman havadayken de fırlar ve istediği kadar yükselir. Çözüm bu bloğu `eğer alttan bir duvara dokunuyor mu ise` içine koymaktır.",
+      "skills": [
+        "oyun-ziplama",
+        "oyun-mantik-kosul"
+      ]
+    },
+    {
+      "id": "m11h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "Kahraman A'ya basınca zıplamak yerine yere doğru itiliyor. Hatalı satır hangisi?\n\n```\n1  A düğmesine basılınca:\n2    eğer kahraman alttan bir duvara dokunuyor mu ise:\n3      kahraman hızı x (kahraman x hızı) y 250\n4      [zıplama] melodisini çal\n```",
+      "options": [
+        "Satır 1: A düğmesi olayı yanlış",
+        "Satır 2: yerde mi koşulu",
+        "Satır 4: ses çalma",
+        "Satır 3: y hızının işareti yanlış"
+      ],
+      "answer": 3,
+      "explanation": "3. satırda y hızı pozitif yazılmış; pozitif y aşağı demektir. Yukarı zıplamak için -250 olmalı. 2. satırdaki koşul doğru, 4. satırdaki ses zıplamayı etkilemez.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-ziplama",
+        "oyun-y-ekseni"
+      ]
+    },
+    {
+      "id": "m11h5d22-q5",
+      "kind": "mcq",
+      "prompt": "Zıplarken kahramanın yürüdüğü yönde gitmeye devam etmesi için hız bloğunun x hızı kutusuna ne konmalı?",
+      "options": [
+        "0",
+        "Kahramanın kendi x hızı",
+        "70",
+        "Yerçekimi ivmesi"
+      ],
+      "answer": 1,
+      "explanation": "Kahramanın kendi `x hızı` bloğu konunca yatay hız zıplama anında olduğu gibi korunur. 0 yazılırsa kahraman dik çıkıp iner; 70 yazılırsa kahraman duruyorken bile sağa fırlar.",
+      "skills": [
+        "oyun-ziplama",
+        "oyun-hiz-ivme"
+      ]
+    }
+  ]
+}

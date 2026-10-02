@@ -1,0 +1,101 @@
+{
+  "concepts": [
+    {
+      "term": "Kalibrasyon",
+      "definition": "Robot çalışmaya başlamadan önce sensörün gerçek koşullardaki değerlerini ölçüp kararları o ölçüme göre vermek.",
+      "example": "Pencere kenarında ışık artınca robot başta bir kez sallanır, yeni min ve max'ı ölçer, eşiği ona göre yeniden hesaplar.",
+      "pitfall": "Kalibrasyonu bir kez yapıp ışık belirgin biçimde değişse de eski eşiğe güvenmek."
+    },
+    {
+      "term": "Min ve max",
+      "definition": "Bir sensörün kalibrasyon süresince gördüğü en küçük değer (zemin) ve en büyük değer (çizgi).",
+      "example": "Normal ışıkta benzetimde min 163, max 860 ölçülür.",
+      "pitfall": "Kalibrasyon sırasında sensörlere çizgiyi ya da zemini hiç göstermemek; min ile max birbirine yaklaşır."
+    },
+    {
+      "term": "Eşik = (min + max) / 2",
+      "definition": "Zemin ile çizgi arasının tam ortası; okuma bunun üstündeyse çizgi, değilse zemin sayılır.",
+      "example": "Zemin 593, çizgi 941 okuyorsa eşik (593 + 941) / 2 = 767 olur.",
+      "pitfall": "Karşılaştırmada eşitliği unutmak; okuma eşiğe eşitse `okuma > esik` yanlıştır ve çizgi görünmeyebilir."
+    },
+    {
+      "term": "Başlangıç değerleri (1023 ve 0)",
+      "definition": "En küçüğü bulurken enAz'a en büyük olası sayı (1023), en büyüğü bulurken enCok'a en küçük olası sayı (0) vererek başlanır.",
+      "example": "İlk okuma 300 ise enAz = 300 ve enCok = 300 olur; sonraki okumalar bunları genişletir.",
+      "pitfall": "Başlangıcı ters yazmak (enAz = 0): hiçbir okuma 0'dan küçük olamaz, min hiç güncellenmez."
+    },
+    {
+      "term": "Sallanarak kalibrasyon",
+      "definition": "Robotun çizgi ortadayken yerinde sola ve sağa dönerek her sensörü hem çizginin üstünden hem zeminden geçirmesi.",
+      "example": "400 ms sola, 800 ms sağa, 400 ms sola dönülür, sonra robot durur ve min, max, eşik yazdırılır.",
+      "pitfall": "Sallanma PWM değerini ölü bölgenin altında bırakmak (örneğin 40): robot dönmez ve eşik bozulur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d2-q1",
+      "kind": "numeric",
+      "prompt": "Bir sensörün kalibrasyon süresince gördüğü en küçük değer 140, en büyük değer 900. (min + max) / 2 kuralıyla bulunan eşik kaçtır?",
+      "answer": 520,
+      "tolerance": 0,
+      "explanation": "(140 + 900) / 2 = 1040 / 2 = 520. Eşik zemin ile çizgi arasının ortasıdır; böylece iki yüzeyi de eşit payla ayırır.",
+      "skills": ["rob-calibration"]
+    },
+    {
+      "id": "m5h3d2-q2",
+      "kind": "mcq",
+      "prompt": "Ortam ışığı artınca zemin yaklaşık 593, çizgi yaklaşık 941 okuyor. Beş sensörün hepsi zeminin üstünde. Sabit eşik (512) ile kalibreli eşik ((593 + 941) / 2) ne görür?",
+      "options": [
+        "İkisi de 00000 görür",
+        "Sabit eşik 00000, kalibreli eşik 11111 görür",
+        "Sabit eşik 11111 görür (zemin de \"çizgi\" sayılır); kalibreli eşik (767) 00000 ile doğru sonucu verir",
+        "İkisi de 11111 görür"
+      ],
+      "answer": 2,
+      "explanation": "Zemin 593, 512'den büyüktür; sabit eşik her sensörü çizgide sanar ve 11111 verir. Kalibreli eşik 767'dir; 593 bunun altında kaldığı için zemin doğru olarak 0 görünür. Kalibrasyonun asıl işi budur: eşiği o anki koşula uydurmak.",
+      "skills": ["rob-calibration", "rob-line-pattern"]
+    },
+    {
+      "id": "m5h3d2-q3",
+      "kind": "find-bug",
+      "prompt": "Min ve max'ı bulan bu kod yanlış sonuç veriyor. Hata nerede?\n\n```\nint enAz = 0;\nint enCok = 1023;\n\nvoid kalibreAdimi(int v) {\n  if (v < enAz) enAz = v;\n  if (v > enCok) enCok = v;\n}\n```",
+      "options": [
+        "İki karşılaştırmanın yönü ters olmalı",
+        "Başlangıç değerleri ters: hiçbir okuma 0'dan küçük ya da 1023'ten büyük olamaz, bu yüzden enAz ve enCok hiç güncellenmez",
+        "kalibreAdimi int yerine float parametre almalı",
+        "Eşik hesabı eksik; bu yüzden min ve max bulunamıyor"
+      ],
+      "answer": 1,
+      "explanation": "enAz = 0 iken `v < 0` hiç doğru olmaz; enCok = 1023 iken `v > 1023` de hiç doğru olmaz. Karşılaştırmalar doğrudur. Doğrusu enAz = 1023 ve enCok = 0 ile başlamaktır; böylece ilk okuma ikisini de hemen geçer.",
+      "skills": ["rob-calibration", "prog-debug"]
+    },
+    {
+      "id": "m5h3d2-q4",
+      "kind": "predict-output",
+      "prompt": "Bu kod seri monitöre ne yazar?\n\n```\nint okumalar[] = {420, 310, 760, 690, 240};\n\nvoid setup() {\n  Serial.begin(9600);\n  int enAz = 1023, enCok = 0;\n  for (int i = 0; i < 5; i++) {\n    if (okumalar[i] < enAz) enAz = okumalar[i];\n    if (okumalar[i] > enCok) enCok = okumalar[i];\n  }\n  int esik = (enAz + enCok) / 2;\n  Serial.print(esik);\n  Serial.print(' ');\n  Serial.println(500 > esik);\n}\nvoid loop() {}\n```",
+      "options": [
+        "500 1",
+        "760 1",
+        "250 0",
+        "500 0"
+      ],
+      "answer": 3,
+      "explanation": "En küçük okuma 240, en büyük 760; eşik (240 + 760) / 2 = 500. Karşılaştırma `500 > 500` yanlıştır, yani 0 yazılır. Okuma eşiğe tam eşitken `>` çizgi demez; bu yüzden uç durumlarda eşitliği düşünmek gerekir.",
+      "skills": ["rob-calibration", "prog-debug"]
+    },
+    {
+      "id": "m5h3d2-q5",
+      "kind": "mcq",
+      "prompt": "Sallanarak kalibrasyonda SALLA_PWM 120 yerine 40 yazıldı. Ölü bölgeyi (PWM yaklaşık 51'in altında tekerlek dönmez) düşünerek ne olacağını söyle.",
+      "options": [
+        "Robot hiç dönmez; çizgideki A2 hep 860 okur, min = max = 860 ve eşik 860 olur. Çizgi bile `860 > 860` yanlış olduğundan 0 görünür",
+        "Robot yavaş döner, kalibrasyon biraz uzar ama sonuç doğru çıkar",
+        "Robot hızla döner ve eşik 0 olur",
+        "Program derlenmez"
+      ],
+      "answer": 0,
+      "explanation": "PWM 40, ölü bölgenin altındadır; tekerlekler kıpırdamaz. Sensörler hep aynı yerde kaldığı için A2 yalnız çizgiyi, diğerleri yalnız zemini görür; min ile max eşit çıkar. A2'de eşik 860 olur ve çizgi tam üstündeyken bile desen 00000 verir.",
+      "skills": ["rob-calibration", "prog-debug"]
+    }
+  ]
+}

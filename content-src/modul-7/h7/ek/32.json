@@ -1,0 +1,97 @@
+{
+  "concepts": [
+    {
+      "term": "Akıcılık ve doğruluk",
+      "definition": "Bir açıklamanın düzgün yazılmış olması, içeriğinin doğru olduğunu göstermez.",
+      "example": "Kendinden emin bir paragraf, koddaki bir hatayı gözden kaçırmış olabilir.",
+      "pitfall": "Güvenli konuşan metne inanmak."
+    },
+    {
+      "term": "Kaynakla uyumlu / çelişen / kaynakta yok",
+      "definition": "Bir iddiayı kodla karşılaştırırken kullanılan üç sınıf.",
+      "example": "\"Liste sıralanır\" iddiası, kodda sıralama yoksa kaynakla çelişir; \"dosyaya kaydeder\" ise kaynakta yoktur.",
+      "pitfall": "Sadece çelişenlere bakıp uydurulmuş ayrıntıyı (kaynakta olmayanı) gözden kaçırmak."
+    },
+    {
+      "term": "Çıktı tahmini",
+      "definition": "Kodu çalıştırmadan, adım adım elle izleyerek ekrana ne yazılacağını bulmak.",
+      "example": "[5, 7, 9, 11] listesinin ortalaması 32 / 4 = 8.0 olarak yazılır.",
+      "pitfall": "Toplamla ortalamayı karıştırıp 32 demek."
+    },
+    {
+      "term": "Uç durum",
+      "definition": "Boş liste, tek eleman gibi sıradışı girdiler.",
+      "example": "len([]) sıfır olduğundan ortalama fonksiyonu boş listede ZeroDivisionError verir.",
+      "pitfall": "Yalnız \"normal\" girdiyi denemek."
+    },
+    {
+      "term": "Girinti ve return",
+      "definition": "Python'da bir satırın hangi bloğa ait olduğunu girinti belirler.",
+      "example": "return döngünün içindeyse fonksiyon ilk turda biter.",
+      "pitfall": "Girintiyi süs sanıp açıklamanın \"toplar\" demesine kanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d32-q1",
+      "kind": "predict-output",
+      "prompt": "Bir yapay zekâ \"bu fonksiyon tüm sayıların ortalamasını döndürür\" dedi. Kodu elle izleyip ekrana ne yazıldığını bul.\n\n```\ndef ort(liste):\n    t = 0\n    for x in liste:\n        t += x\n        return t / len(liste)\nprint(ort([4, 8, 6]))\n```",
+      "options": [
+        "6.0",
+        "18",
+        "1.3333333333333333",
+        "Hata oluşur"
+      ],
+      "answer": 2,
+      "explanation": "return döngünün içinde: ilk turda t = 4 olur ve 4 / 3 = 1.3333333333333333 döndürülür, fonksiyon orada biter. Yani açıklama kodla çelişir. Doğru ortalama 6.0 olurdu; ama return'ün girintisi yüzünden bu değer hiç hesaplanmaz.",
+      "skills": [
+        "ai-code-review"
+      ]
+    },
+    {
+      "id": "m7h7d32-q2",
+      "kind": "numeric",
+      "prompt": "Bu fonksiyon [5, 7, 9, 11] listesiyle çağrılırsa döndürdüğü sayı nedir?\n\n```\ndef ort(liste):\n    t = 0\n    for x in liste:\n        t += x\n    return t / len(liste)\n```",
+      "answer": 8,
+      "tolerance": 0,
+      "explanation": "Toplam 5 + 7 + 9 + 11 = 32, eleman sayısı 4, 32 / 4 = 8.0. Çıktıyı kendin hesaplamak, \"ortalama 32\" gibi bir açıklamayı hemen çelişkili gösterir.",
+      "skills": [
+        "ai-code-review"
+      ]
+    },
+    {
+      "id": "m7h7d32-q3",
+      "kind": "mcq",
+      "prompt": "Kod yalnız bir listenin elemanlarını toplayıp sayıya bölüyor. Açıklama \"sonuç bir günlük dosyasına yazılır\" diyor. Bu iddia hangi sınıftadır?",
+      "options": [
+        "Kaynakla uyumlu",
+        "Kaynakla çelişiyor",
+        "Kaynakta yok",
+        "Her zaman doğru, çünkü zararsız"
+      ],
+      "answer": 2,
+      "explanation": "Kodda dosya işlemi hiç geçmiyor; iddia uydurulmuş bir ayrıntıdır, yani kaynakta yoktur. Çelişen, kodun tersini söylemesi demektir; burada kod hiçbir şey söylemiyor. Uyumlu olması için kodda dosya yazan bir satır bulunmalıydı.",
+      "skills": [
+        "ai-code-review",
+        "ai-verification"
+      ]
+    },
+    {
+      "id": "m7h7d32-q4",
+      "kind": "find-bug",
+      "prompt": "Bu fonksiyon boş listeyle çağrılınca çöküyor. Sorunun nedeni hangisi?\n\n```\ndef ort(liste):\n    toplam = 0\n    for x in liste:\n        toplam += x\n    return toplam / len(liste)\nprint(ort([]))\n```",
+      "options": [
+        "for döngüsü boş listede hata verir",
+        "return satırı sıfıra bölüyor çünkü len([]) sıfırdır",
+        "toplam = 0 satırı yanlış başlatma",
+        "print satırı sayı yazdıramaz"
+      ],
+      "answer": 1,
+      "explanation": "Boş listede len(liste) sıfırdır ve sıfıra bölme ZeroDivisionError üretir. for döngüsü boş listede hiç çalışmaz, ama hata değildir; toplam = 0 başlangıcı da doğrudur. Çözüm, bölmeden önce listenin boş olup olmadığını denetlemektir.",
+      "skills": [
+        "ai-code-review",
+        "ai-verification"
+      ]
+    }
+  ]
+}

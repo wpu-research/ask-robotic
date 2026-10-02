@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Eğim",
+      "definition": "Robotun dikeyden kaç derece yattığı. Bu hafta ileri eğilme pozitif sayılır.",
+      "example": "Robot 30° ileri yatmışsa eğim +30°; geri yatmışsa -30°.",
+      "pitfall": "Sensörü yanlış yönde takıp işareti çevirmeyi unutmak: robot düzeltmek yerine devrilmeyi hızlandırır."
+    },
+    {
+      "term": "İvmeölçer açısı: atan2(ax, az)",
+      "definition": "Durağan sensör yerçekimini ölçer; X ve Z eksenlerindeki paylardan eğim açısı hesaplanır.",
+      "example": "ax = 0,5 g ve az = 0,866 g ise açı 30° çıkar.",
+      "pitfall": "Argümanları ters yazmak (atan2(az, ax)): sonuç 90° sapar. Radyanı dereceye çevirmeyi de unutma."
+    },
+    {
+      "term": "Tam sayı bölmesi",
+      "definition": "Ham ivme int16_t iken 16384 tam sayısına bölmek küsuratı atar; noktalı sayı (16384.0) gerekir.",
+      "example": "axHam = 8192 için 8192 / 16384.0 = 0,5 g; tam sayı bölmesi 0 verir.",
+      "pitfall": "axHam / 16384 yazmak: sonuç hep 0 olur ve açı yanlış çıkar."
+    },
+    {
+      "term": "Jiroskop hızı ve ölçek",
+      "definition": "Jiroskop dönme hızını (°/s) verir. Ham sayı, ±250 °/s için 131'e, ±500 °/s için 65,5'e bölünür.",
+      "example": "±500 °/s aralığında ham 6550 değeri 100 °/s eder.",
+      "pitfall": "Aralığı değiştirip ölçeği değiştirmemek: hız yarıya iner ya da iki katına çıkar."
+    },
+    {
+      "term": "Sapma (bias)",
+      "definition": "Hareketsiz jiroskobun okuduğu küçük sabit değer. Açılışta ortalaması alınır ve okumalardan çıkarılır.",
+      "example": "2 °/s sapma, düzeltilmezse 20 saniyede yaklaşık 40° hata biriktirir.",
+      "pitfall": "Sapmayı ölçerken robotu tutmak ya da sallamak: yanlış sapma sonraki bütün ölçümlere bulaşır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d1-q1",
+      "kind": "mcq",
+      "prompt": "Robot hareketsiz ve 30° ileri yatık. Sensörün X ve Z eksenlerinde yerçekimi (g cinsinden) yaklaşık ne görünür?",
+      "options": [
+        "ax = 0,5 ve az = 0,866",
+        "ax = 0,866 ve az = 0,5",
+        "ax = 1 ve az = 0",
+        "ax = 0 ve az = 1"
+      ],
+      "answer": 0,
+      "explanation": "X ekseni yerçekiminin sin θ kadarını, Z ekseni cos θ kadarını görür. 30° için sin = 0,5 ve cos = 0,866'dır. İkinci seçenek 60° içindir, üçüncüsü 90° (yatmış robot), dördüncüsü 0° (dik robot) içindir.",
+      "skills": [
+        "imu-tilt"
+      ]
+    },
+    {
+      "id": "m5h6d1-q2",
+      "kind": "numeric",
+      "prompt": "Bir turda ham değerler axHam = 8192 ve azHam = 14189 okundu (±2 g aralığı, 16384 sayı/g). atan2(ax, az) kaç derecedir?",
+      "answer": 30,
+      "tolerance": 0.5,
+      "unit": "°",
+      "explanation": "ax = 8192 / 16384 = 0,5 g ve az = 14189 / 16384 = 0,866 g. atan2(0,5; 0,866) = 30°. İki ham değerin oranı da aynı sonucu verir; ama kodda g'ye çevirmek hem anlamlıdır hem de başka hesaplarda gerekir.",
+      "skills": [
+        "imu-tilt"
+      ]
+    },
+    {
+      "id": "m5h6d1-q3",
+      "kind": "numeric",
+      "prompt": "Jiroskop ±500 °/s aralığında (65,5 sayı/(°/s)). Ham gyHam = 6550 okundu. Dönme hızı kaç °/s'dir?",
+      "answer": 100,
+      "tolerance": 0.5,
+      "unit": "°/s",
+      "explanation": "6550 / 65,5 = 100 °/s. Aynı ham değeri yanlışlıkla 131'e bölersen 50 °/s bulursun; aralık değişince ölçek de değişmelidir.",
+      "skills": [
+        "imu-gyro"
+      ]
+    },
+    {
+      "id": "m5h6d1-q4",
+      "kind": "find-bug",
+      "prompt": "Robot ileri yattığında bu kod açı yerine 90° ile bu açı arasındaki farkı yazıyor (30° yatışta 60° gösteriyor). Hangi satır hatalı?\n\n```\n1  float ax = axHam / 16384.0;\n2  float az = azHam / 16384.0;\n3  float aci = atan2(az, ax) * 57.2958;\n4  float hiz = gyHam / 65.5;     // ±500 °/s aralığı\n```",
+      "options": [
+        "1. satır: 16384.0 yerine 16384 yazılmalı",
+        "2. satır: az negatif alınmalı",
+        "3. satır: atan2 argümanları ters, (ax, az) olmalı",
+        "4. satır: ölçek 131 olmalı"
+      ],
+      "answer": 2,
+      "explanation": "sin θ ile orantılı olan ax ilk argüman olmalı. (az, ax) yazınca 90° - θ çıkar: 30° yatışta 60°. 1. satırdaki 16384.0 zaten doğru; 4. satırda aralık ±500 °/s olduğu için 65,5 doğrudur.",
+      "skills": [
+        "imu-tilt",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d1-q5",
+      "kind": "predict-output",
+      "prompt": "Açılışta ölçülen sapma 1,8 °/s. Robot hareketsizken ham gyHam = 262 okunuyor (65,5 sayı/(°/s)). Bu kod ne yazar?\n\n```\nfloat sapma = 1.8;\nint16_t gyHam = 262;\nfloat hiz = gyHam / 65.5 - sapma;\nSerial.println(hiz, 2);\n```",
+      "options": [
+        "4.00",
+        "1.80",
+        "-1.80",
+        "2.20"
+      ],
+      "answer": 3,
+      "explanation": "262 / 65,5 = 4,00 °/s; sapma çıkarılınca 4,00 - 1,80 = 2,20 °/s yazılır. 4.00 sapmayı çıkarmamak olurdu; 1.80 ve -1.80 ise sapmanın kendisidir, ölçümden çıkan sonuç değildir.",
+      "skills": [
+        "imu-gyro"
+      ]
+    }
+  ]
+}

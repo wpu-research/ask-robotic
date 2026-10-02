@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Düşünme zinciri (chain of thought)",
+      "definition": "Modele cevaptan önce ara adımları yazdırma yöntemi.",
+      "example": "\"Önce adım adım çöz, sonra cevabı ayrı satıra yaz.\"",
+      "pitfall": "Her soruda gerekli sanmak; basit sorularda yalnız uzunluk ve maliyet artırır."
+    },
+    {
+      "term": "Ara adım",
+      "definition": "Son cevaba giden işlem ya da mantık parçası; yazıldığı için sonraki token'lar için bağlam olur.",
+      "example": "6 × 4 = 24, sonra 24 + 5 = 29.",
+      "pitfall": "İlk adımdaki hatanın sonraki tüm adımlara taşınması."
+    },
+    {
+      "term": "Ayrı cevap satırı",
+      "definition": "Son sonucun \"Cevap:\" gibi sabit bir etiketle ayrı satıra yazılması.",
+      "example": "Cevap: 29",
+      "pitfall": "Cevabı adımların içine gömmek; program ara sayıyı cevap sanabilir."
+    },
+    {
+      "term": "Akıcı, ama yanlış",
+      "definition": "Mantıklı görünen bir açıklamanın doğru olmak zorunda olmaması.",
+      "example": "Adımlar düzgün cümlelerle yazılmış ama 6 × 4 = 20 denmiş.",
+      "pitfall": "Açıklama güzel diye kontrol etmemek; her adımı yeniden hesapla."
+    },
+    {
+      "term": "Maliyet",
+      "definition": "Daha uzun cevap daha çok token, zaman ve para demektir.",
+      "example": "10 tokenlik cevap yerine 130 tokenlik zincir.",
+      "pitfall": "Maliyeti hesaba katmadan her isteğe zincir eklemek."
+    },
+    {
+      "term": "Araç kullanımı",
+      "definition": "Kesin hesabı modele değil bir hesap makinesi gibi araca yaptırmak.",
+      "example": "Çarpmayı hesap makinesi aracı yapar, model yalnız ne çağıracağını söyler.",
+      "pitfall": "Zinciri araç yerine sayıp kesinlik beklemek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d13-q1",
+      "kind": "mcq",
+      "prompt": "Düşünme zinciri isterken son cevabın ayrı bir satıra yazılmasını neden istersin?",
+      "options": [
+        "Program cevabı kolayca bulup çekebilsin diye",
+        "Model daha az token üretsin diye",
+        "Adımlar doğru olsun diye",
+        "Cevap kesinlikle doğru çıksın diye"
+      ],
+      "answer": 0,
+      "explanation": "Ayrı ve etiketli satır, ayrıştırmayı kolaylaştırır: program \"Cevap:\" ile başlayan satırı arar. Bu, doğruluğu garanti etmez ve token sayısını azaltmaz.",
+      "skills": [
+        "ai-reasoning-steps"
+      ]
+    },
+    {
+      "id": "m7h3d13-q2",
+      "kind": "predict-output",
+      "prompt": "Modelin cevabından sayıyı çeken küçük kod. Çalışınca ne yazdırır?\n\n```\nconst metin = 'Adımlar: 12 x 7 = 84\\nCevap: 84'\nconst satir = metin.split('\\n').find((s) => s.startsWith('Cevap:'))\nconsole.log(Number(satir.replace('Cevap:', '')) + 1)\n```",
+      "options": [
+        "84",
+        "85",
+        "Cevap: 841",
+        "Hata verir"
+      ],
+      "answer": 1,
+      "explanation": "Kod metni satırlara böler ve \"Cevap:\" ile başlayan satırı bulur. \"Cevap:\" kısmını silince \" 84\" kalır; Number bunu 84 yapar ve 1 eklenince 85 olur. \"Cevap: 841\" gibi bir sonuç, sayı metin olarak birleştirilseydi çıkardı; Number bunu engeller.",
+      "skills": [
+        "ai-reasoning-steps",
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d13-q3",
+      "kind": "find-bug",
+      "prompt": "Soru: Her robotta 4 servo var. 6 robot ve 5 yedek servo için toplam kaç servo gerekir? Modelin çözümü:\n\n```\nAdım 1: 6 × 4 = 20\nAdım 2: 20 + 5 = 25\nCevap: 25\n```\nHatayı nerede ve nasıl tanımlarsın?",
+      "options": [
+        "Adım 2: 20 + 5 yanlış toplanmış",
+        "Hata yok; adımlar mantıklı görünüyor",
+        "Cevap ayrı satıra yazılmamalıydı",
+        "Adım 1: 6 × 4 = 24 olmalı; sonraki adımlar bu hatayı tutarlı biçimde taşımış"
+      ],
+      "answer": 3,
+      "explanation": "6 × 4 = 24 olduğundan doğru cevap 24 + 5 = 29'dur. Adım 2'deki toplama kendi içinde doğrudur (20 + 5 = 25); hata ilk adımdadır ve sona taşınmıştır. Adımların akıcı görünmesi doğru olduklarını göstermez.",
+      "skills": [
+        "ai-reasoning-steps"
+      ]
+    },
+    {
+      "id": "m7h3d13-q4",
+      "kind": "numeric",
+      "prompt": "Zincirsiz cevap 10 token, zincirli cevap 130 token tutuyor. Zincirli cevap kaç kat uzun?",
+      "answer": 13,
+      "unit": "kat",
+      "explanation": "130 / 10 = 13. Ara adımlar cevabı iyileştirebilir ama maliyeti de artırır: daha çok token, daha fazla zaman. Basit sorularda bu bedel çoğu zaman gereksizdir.",
+      "skills": [
+        "ai-reasoning-steps"
+      ]
+    },
+    {
+      "id": "m7h3d13-q5",
+      "kind": "mcq",
+      "prompt": "Bir hesabın sonucu kesin doğru olmak zorunda (ör. servo siparişi). En güvenli yaklaşım hangisidir?",
+      "options": [
+        "Modelden çok uzun bir zincir yazmasını istemek",
+        "Sıcaklığı yükseltmek",
+        "Hesabı bir hesap makinesi aracına yaptırmak",
+        "Cevabı iki kez sorup uzun olanı seçmek"
+      ],
+      "answer": 2,
+      "explanation": "Kesin hesap için araç kullanmak daha güvenlidir; araç deterministik çalışır (26. ders). Uzun zincir ya da çoklu soru hatayı azaltabilir ama ortadan kaldırmaz. Sıcaklığı yükseltmek cevabı daha değişken yapar, doğru yapmaz.",
+      "skills": [
+        "ai-reasoning-steps",
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Quadrature (çeyrek faz)",
+      "definition": "Aynı anda değil, birbirinden 90 derece kaymış iki sinyal. Adımı ve yönü birlikte verir.",
+      "example": "Saat yönünde durumlar 11, 01, 00, 10 sırasıyla (CLK, DT) değişir.",
+      "pitfall": "Yalnız CLK'ya bakmak: iki yönde de aynı düşer, yön anlaşılmaz."
+    },
+    {
+      "term": "Yön kuralı",
+      "definition": "CLK düşerken DT'ye bak: DT 1 ise bir yön (sayac++), 0 ise öbür yön (sayac--).",
+      "example": "CLK 1 den 0 a düşerken DT hâlâ 1 ise sayac artar.",
+      "pitfall": "CLK ile DT'yi karıştırmak: yön ters çıkar."
+    },
+    {
+      "term": "Kesme (attachInterrupt)",
+      "definition": "Bir pin kenarı olunca loop() beklemeden kısa bir fonksiyonu (ISR) çalıştırma.",
+      "example": "attachInterrupt(digitalPinToInterrupt(2), adim, FALLING); CLK düşünce adim() çalışır.",
+      "pitfall": "CLK'yı D2 ya da D3 dışına bağlamak: Uno'da kesme çalışmaz."
+    },
+    {
+      "term": "volatile",
+      "definition": "Değişkenin kesme gibi program akışı dışında değişebileceğini derleyiciye bildirir.",
+      "example": "volatile int sayac = 0; hem ISR hem loop() içinde kullanılır.",
+      "pitfall": "volatile yazmamak: loop() değişimi görmeyebilir."
+    },
+    {
+      "term": "Bounce filtresi",
+      "definition": "İki kenar arasında en az belli bir süre geçmediyse kenarı yok sayma.",
+      "example": "micros() farkı 2000 µs'den küçükse kenar atlanır.",
+      "pitfall": "Eşiği çok büyütmek: hızlı çevirirken gerçek tıklar da atılır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d57-q1",
+      "kind": "predict-output",
+      "prompt": "Enkoder CLK=D2, DT=D3 ile bağlı ve sayac başlangıçta 5. Enkoder ters yönde 2 tık çevriliyor (her tık 11, 10, 00, 01, 11 durum sırasıyla). Sonunda seri monitörde son satır ne yazar?\n\n```\nvolatile int sayac = 5;\n\nvoid adim() {\n  if (digitalRead(3) == HIGH) {\n    sayac++;\n  } else {\n    sayac--;\n  }\n}\n// setup: attachInterrupt(digitalPinToInterrupt(2), adim, FALLING);\n// loop: sayac değişince Serial.print(\"Sayac: \") ve değeri yazar\n```",
+      "options": [
+        "Sayac: 7",
+        "Sayac: 5",
+        "Sayac: 3",
+        "Sayac: 1"
+      ],
+      "answer": 2,
+      "explanation": "Ters yönde CLK 10 den 00 a düşerken DT zaten 0'dır, bu yüzden her tıkta sayac-- çalışır: 5 - 2 = 3. Saat yönünde DT 1 olurdu ve sayac 7 olurdu.",
+      "skills": [
+        "quadrature",
+        "interrupts"
+      ]
+    },
+    {
+      "id": "m4h5d57-q2",
+      "kind": "numeric",
+      "prompt": "Laboratuvarın enkoderi her benzetim milisaniyesinde bir durum geçişi uygular ve bir tık 4 geçiştir. Konum özelliğini 0'dan 30'a bir anda getirirsen enkoder hareketini kaç ms'de bitirir?",
+      "answer": 120,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "30 tık x 4 geçiş = 120 geçiş ve her biri 1 ms sürer: 120 ms. Bu, tık başına 4 ms (en çok 250 tık/sn) demektir; bounce eşiği bu 4 ms'den küçük seçilmelidir.",
+      "skills": [
+        "debounce",
+        "quadrature"
+      ]
+    },
+    {
+      "id": "m4h5d57-q3",
+      "kind": "find-bug",
+      "prompt": "CLK kablosunu D4'e bağladın ve program yön verip saymıyor. Sayaç hiç değişmiyor. Hatalı satır hangisi?\n\n```\nconst int CLK = 4;\nconst int DT = 3;\nvolatile int sayac = 0;\n\nvoid adim() {\n  if (digitalRead(DT) == HIGH) sayac++; else sayac--;\n}\n\nvoid setup() {\n  pinMode(CLK, INPUT_PULLUP);\n  pinMode(DT, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(CLK), adim, FALLING);\n}\n```",
+      "options": [
+        "const int CLK = 4;",
+        "volatile int sayac = 0;",
+        "pinMode(DT, INPUT_PULLUP);",
+        "if (digitalRead(DT) == HIGH) sayac++; else sayac--;"
+      ],
+      "answer": 0,
+      "explanation": "Uno'da yalnız D2 ve D3 kesme pinidir. digitalPinToInterrupt(4) geçerli bir kesme vermez, ISR hiç çalışmaz. CLK D2'ye (ya da D3'e) bağlanmalı. volatile ve INPUT_PULLUP doğrudur.",
+      "skills": [
+        "interrupts",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h5d57-q4",
+      "kind": "mcq",
+      "prompt": "Yalnızca CLK sinyaline bakan bir program dönüş yönünü neden bulamaz?",
+      "options": [
+        "CLK sinyali çok hızlıdır",
+        "CLK iki yönde de aynı şekilde düşer; yönü DT'nin o anki durumu belirler",
+        "CLK yalnız düğmeyi okur",
+        "Enkoder yalnız tek yönde döner"
+      ],
+      "answer": 1,
+      "explanation": "Saat yönünde de ters yönde de CLK 1 den 0 a düşer. Fark, düşme anında DT'nin 1 mi 0 mı olduğudur; bu yüzden iki sinyal birlikte okunur.",
+      "skills": [
+        "quadrature"
+      ]
+    },
+    {
+      "id": "m4h5d57-q5",
+      "kind": "numeric",
+      "prompt": "Enkoder hızlı çevriliyor ve CLK 4 ms arayla düşüyor. Eşik ARALIK_US = 6000 seçildi. 20 ardışık düşüşte program kaç tıkı sayar? (İlk kenar kabul edilir.)",
+      "answer": 10,
+      "tolerance": 1,
+      "explanation": "Kabul edilen kenar t = 0, sonraki 4 ms sonra gelir ve 6 ms'den küçük olduğu için atılır, 8 ms sonra gelen kabul edilir. Her ikinci kenar sayılır: 20 / 2 = 10. Eşik 4 ms'den küçük (örneğin 2 ms) olsaydı 20 sayılırdı; eşik fazla büyük olduğunda gerçek tıklar kaybolur.",
+      "skills": [
+        "debounce"
+      ]
+    }
+  ]
+}

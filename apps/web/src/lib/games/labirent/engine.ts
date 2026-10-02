@@ -60,6 +60,11 @@ export function pathExists(data: MazeData, st: Pick<MazeState, 'x' | 'y' | 'angl
 /** Döngüde gövde hiç hareket etmiyorsa sonsuz beklemeyi önleyen üst sınır. */
 const IDLE_LIMIT = 2000
 
+/** Uzun labirentlerde (9-10) varsayılan hızda çözüm ~45 sn'yi aşmasın diye adım gecikmesi (ms) kısaltılır. */
+export function mazeStepDelay(levelId: number): number {
+  return levelId >= 9 ? 200 : 380
+}
+
 export function createMazeRun(level: LevelDef): GameRun<MazeState> {
   const data = dataOf(level)
   const [sx, sy] = findCell(data.grid, 'S')
@@ -103,6 +108,7 @@ export function createMazeRun(level: LevelDef): GameRun<MazeState> {
 
   return {
     api,
+    stepDelay: () => mazeStepDelay(level.id),
     snapshot: () => ({ ...st, trail: st.trail.map((p) => [p[0], p[1]] as [number, number]) }),
     evaluate(result): RunOutcome {
       if (st.atGoal) return { ok: true, message: 'Hedefe ulaştın!' }

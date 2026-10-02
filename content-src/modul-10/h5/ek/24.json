@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Protokol (ortak tablo)",
+      "definition": "İki tarafın aynı kabul ettiği kural tablosu: hangi sayı ne anlama geliyor.",
+      "example": "1 = kalp, 2 = mutlu yüz, 3 = üzgün yüz tablosu.",
+      "pitfall": "Tabloyu tek tarafta değiştirmek; öteki taraf mesajı yanlış anlar."
+    },
+    {
+      "term": "İç içe eğer zinciri",
+      "definition": "Üç ya da daha çok seçeneği sırayla soran eğer blokları; her biri öncekinin değilse kolundadır.",
+      "example": "Mesaj 1 mi, değilse 2 mi, değilse (o zaman 3) diye sorulur.",
+      "pitfall": "İkinci eğer'i değilse kolunun dışına koymak; sıra bozulur."
+    },
+    {
+      "term": "Mesajı değişkene almak",
+      "definition": "Gelen sayıyı bir değişkene kopyalayıp birçok yerde onu kullanmak.",
+      "example": "mesaj değerini alınan sayı yap; sonra mesaj = 1, mesaj = 2 karşılaştırmaları.",
+      "pitfall": "Değişkeni doldurmamak: değeri 0 kalır ve hep son kol çalışır."
+    },
+    {
+      "term": "Alma sırası",
+      "definition": "Alma başlığı meşgulken gelen mesajlar sıraya girer; en çok 3 mesaj bekler.",
+      "example": "1,25 saniyelik ezgi çalarken gelen ilk 3 mesaj sırada bekler, fazlası kaybolur.",
+      "pitfall": "Çok hızlı mesajlaşırken tüm mesajların işleneceğini sanmak."
+    },
+    {
+      "term": "ezgiyi çal bloğu",
+      "definition": "Ezgi bitene kadar bekleyen blok; başlığı bu sürede meşgul eder.",
+      "example": "Kuş cıvıltısı 120 vuruş/dakikada 1250 ms sürer.",
+      "pitfall": "Ezginin arka planda çalıp programı bekletmediğini sanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d24-q1",
+      "kind": "predict-output",
+      "prompt": "Alan kartın programı aşağıdadır. Kart 1 radyoyla 1 gönderiyor. Kart 2 ekranında ne görünür?\n\n```\nradyo mesajı alınınca:\n    mesaj değerini 0 yap\n    eğer mesaj = 1 ise\n        simgeyi göster kalp\n    değilse\n        eğer mesaj = 2 ise\n            simgeyi göster mutlu yüz\n        değilse\n            simgeyi göster üzgün yüz\n```",
+      "options": [
+        "kalp",
+        "mutlu yüz",
+        "üzgün yüz",
+        "Hiçbir şey"
+      ],
+      "answer": 2,
+      "explanation": "mesaj değişkenine alınan sayı yerine sabit 0 konmuş. Bu yüzden mesaj hep 0'dır; 1'e de 2'ye de eşit olmaz ve son değilse kolu çalışarak üzgün yüzü gösterir. Gelen sayı değişkene hiç kopyalanmadı.",
+      "skills": [
+        "mk-conditions",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h5d24-q2",
+      "kind": "numeric",
+      "prompt": "Alma başlığı ezgi çalarak meşgul. Ezgi bitmeden 5 mesaj daha geliyor. Aynı başlık için en çok kaç mesaj sırada bekleyebilir?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "mesaj",
+      "explanation": "Sıra en çok 3 mesaj alır; ilk üç mesaj sıraya girer, geri kalan ikisi atılır.",
+      "skills": [
+        "mk-message-flow"
+      ]
+    },
+    {
+      "id": "m10h5d24-q3",
+      "kind": "mcq",
+      "prompt": "Kart 1 sohbet tablosuna göre 2 gönderince mutlu yüz bekliyor, ama Kart 2'nin programında 2 numaralı kolda üzgün yüz var. B'ye basan kullanıcının mesajı alan kartta ne olur?",
+      "options": [
+        "Radyo mesajı hiç ulaşmaz",
+        "Mesaj ulaşır ama beklenenden farklı simge gösterilir",
+        "Kart hata mesajı verir",
+        "Her iki kart da aynı simgeyi gösterir ve bu beklenendir"
+      ],
+      "answer": 1,
+      "explanation": "İki taraf aynı tabloyu kullanmıyor. Gönderen 2'yi mutlu yüz sanır, alan üzgün yüz gösterir; mesajın anlamı yolda değil iki tablonun farkında bozulur. Radyo kopmuş değildir, mesaj doğru ulaşmıştır.",
+      "skills": [
+        "mk-protocol"
+      ]
+    },
+    {
+      "id": "m10h5d24-q4",
+      "kind": "find-bug",
+      "prompt": "Her düğmeye basınca Kart 2 hep kalp gösteriyor. Alan kartın eğer zinciri doğru. Hatayı bul.\n\n```\ndüğme A basılınca:    radyoyla sayı gönder 1\ndüğme B basılınca:    radyoyla sayı gönder 1\ndüğme A+B basılınca:  radyoyla sayı gönder 1\n```",
+      "options": [
+        "B ve A+B de 1 yolluyor; tablodaki 2 ve 3 olmalı",
+        "A+B bloğu yanlış başlığın içinde",
+        "Alan taraftaki eğer zinciri kısa",
+        "Radyo grubu 255 olmalı"
+      ],
+      "answer": 0,
+      "explanation": "Üç düğme de 1 yolluyor. Tabloya göre B için 2, A+B için 3 gönderilmeliydi. Alan taraf hangi tuşa basıldığını yalnız sayıdan anlayabilir. Eğer zinciri, grup ya da başlık hatası yoktur.",
+      "skills": [
+        "mk-protocol",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d24-q5",
+      "kind": "numeric",
+      "prompt": "Kuş cıvıltısı ezgisi 1,25 saniye sürer. Alan kart arka arda 3 mesajı sırayla işleyip her birinde ezgiyi çalarsa toplam kaç saniye çalar?",
+      "answer": 3.75,
+      "tolerance": 0.01,
+      "unit": "saniye",
+      "explanation": "Ezgi bloğu bitene kadar bekler, mesajlar sırayla işlenir: 3 × 1,25 = 3,75 saniye.",
+      "skills": [
+        "mk-message-flow"
+      ]
+    }
+  ]
+}

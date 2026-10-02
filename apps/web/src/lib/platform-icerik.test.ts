@@ -86,9 +86,11 @@ describe('pilot içerik: Modül 3 Hafta 1', () => {
 })
 
 describe('parça ansiklopedisi', () => {
-  it('pilotta 6 parça var; slug ve parça türü benzersiz', () => {
-    expect(allComponents.map((g) => g.slug).sort()).toEqual(['arduino-uno', 'buton', 'buzzer', 'direnc', 'led', 'potansiyometre'])
-    expect(new Set(allComponents.map((g) => g.partType)).size).toBe(6)
+  it('pilot parçaları dahil, slug ve parça türü benzersiz', () => {
+    const slugs = allComponents.map((g) => g.slug)
+    for (const k of ['arduino-uno', 'buton', 'buzzer', 'direnc', 'led', 'potansiyometre']) expect(slugs).toContain(k)
+    expect(new Set(slugs).size).toBe(slugs.length)
+    expect(new Set(allComponents.map((g) => g.partType)).size).toBe(allComponents.length)
   })
   it('pin adları laboratuvar sözleşmesiyle (contract.ts) birebir aynı', () => {
     for (const g of allComponents) {
@@ -143,7 +145,8 @@ describe('parça ansiklopedisi', () => {
   it('parça türünden rehber bulunur (laboratuvardaki "Bu parça nedir?" bağlantısı)', () => {
     expect(guideForPartType('led')?.slug).toBe('led')
     expect(guideForPartType('pot')?.slug).toBe('potansiyometre')
-    expect(guideForPartType('servo')).toBeUndefined()
+    expect(guideForPartType('servo')?.slug).toBe('servo')
+    expect(guideForPartType('yok-boyle-bir-parca' as never)).toBeUndefined()
   })
   it('beceri kimlikleri benzersiz', () => {
     expect(new Set(SKILLS.map((s) => s.id)).size).toBe(SKILLS.length)

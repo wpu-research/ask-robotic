@@ -1,0 +1,102 @@
+{
+  "concepts": [
+    {
+      "term": "Analog değer",
+      "definition": "Pinden okunan 0 ile 1023 arasındaki ham sayı.",
+      "example": "P1 giriş kaydırıcısı 512 ise analog oku bloğu 512 verir.",
+      "pitfall": "Bu sayıyı doğrudan yüzde sanmak: 512 yüzde 512 değildir."
+    },
+    {
+      "term": "eşle",
+      "definition": "Bir değeri bir aralıktan başka aralığa orantılı taşıyan ve en yakın tam sayıya yuvarlayan blok.",
+      "example": "Okunan 512'yi 0-1023 aralığından 0-100'e eşlersen 50 çıkar.",
+      "pitfall": "Aralıkları ters yazmak: 512 değeri 5238 gibi anlamsız bir sonuç verir."
+    },
+    {
+      "term": "Eşik",
+      "definition": "Uyarı vermek için seçilen sınır sayı.",
+      "example": "nem < 30 olunca saksı susamış sayılır.",
+      "pitfall": "Yanlış işaret kullanmak: nem > 30 yazarsan ıslakken uyarır."
+    },
+    {
+      "term": "çubuk grafik",
+      "definition": "Bir değeri en çok değere göre 25 LED'in kaçının yanacağıyla gösteren blok.",
+      "example": "çubuk grafik [50] / en çok [100] 13 LED yakar.",
+      "pitfall": "En çok değeri yanlış girmek: ölçek bozulur, çubuk yanlış dolu görünür."
+    },
+    {
+      "term": "Kalibrasyon",
+      "definition": "Gerçek bir sensörün okuduğu sayıları bilinen durumlarla karşılaştırıp ayar yapmak.",
+      "example": "Kuru ve ıslak toprakta okunan iki sayı, eşleme aralığını belirler.",
+      "pitfall": "Her sensörün 0-1023'ün tamamını kullandığını sanmak: gerçek sensörlerin aralığı farklı olabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d29-q1",
+      "kind": "numeric",
+      "prompt": "P1 giriş kaydırıcısı 256. Okunan değer 0-1023 aralığından 0-100 aralığına eşleniyor. Sonuç kaçtır?",
+      "answer": 25,
+      "unit": "%",
+      "explanation": "256 / 1023 yaklaşık 0,25 olur ve 100 ile çarpınca 25,02 çıkar; eşle bloğu yuvarlar: 25. Sonucu 256 olarak bırakmak eşlemeyi unutmak olurdu.",
+      "skills": [
+        "mk-sensors"
+      ]
+    },
+    {
+      "id": "m10h6d29-q2",
+      "kind": "predict-output",
+      "prompt": "P1 giriş değeri 512. Aşağıdaki blok ekranda ne gösterir?\n\n```\nsayıyı göster:\n  [P1 analog oku] değerini\n  [0]-[100] aralığından\n  [0]-[1023] aralığına eşle\n```",
+      "options": [
+        "50",
+        "512",
+        "5238",
+        "0"
+      ],
+      "answer": 2,
+      "explanation": "Aralıklar ters yazılmış: giriş 0-100, çıkış 0-1023 sayılıyor. 512 x 1023 / 100 = 5237,76 olur ve yuvarlanınca 5238 çıkar. Doğru yazım 0-1023 aralığından 0-100 aralığına olmalıydı (sonuç 50).",
+      "skills": [
+        "mk-sensors",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h6d29-q3",
+      "kind": "numeric",
+      "prompt": "Uyarı koşulu nem < 30 ve nem, P1 değerinin 0-1023'ten 0-100'e eşlenmiş hâli. Uyarının hâlâ başladığı en büyük P1 tam sayı değeri kaçtır?",
+      "answer": 301,
+      "explanation": "301 değeri 29,42 verir ve yuvarlanınca 29 olur: uyarı var. 302 değeri 29,52 verir ve yuvarlanınca 30 olur: 30 < 30 yanlış, uyarı yok. Yuvarlama yüzünden sınır 306,9 değil 301'dir.",
+      "skills": [
+        "mk-sensors",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d29-q4",
+      "kind": "numeric",
+      "prompt": "çubuk grafik [70] / en çok [200] kaç LED yakar? (25 LED'in oranı, en yakın tam sayıya yuvarlanır.)",
+      "answer": 9,
+      "unit": "LED",
+      "explanation": "70 / 200 = 0,35 ve 0,35 x 25 = 8,75 olur; en yakın tam sayı 9'dur. 8 (aşağı yuvarlama) ya da 35 (yüzde) yanlış olurdu.",
+      "skills": [
+        "mk-display"
+      ]
+    },
+    {
+      "id": "m10h6d29-q5",
+      "kind": "mcq",
+      "prompt": "Gerçek bir toprak nemi sensörü eşleme için neden önce kalibre edilir?",
+      "options": [
+        "Sensörler kalibre edilmeden hiç çalışmaz",
+        "Gerçek sensörlerin okuduğu en küçük ve en büyük sayılar sensöre göre değişir; aralığı ölçmeden eşleme yanlış yüzde verir",
+        "Kalibrasyon sensörün hızını artırır",
+        "Yüzde değeri yalnız kalibrasyonla yazılabilir"
+      ],
+      "answer": 1,
+      "explanation": "Her sensör kuru ve ıslakta farklı sayılar verebilir. Bu iki sayı ölçülürse eşleme doğru yüzdeyi verir. Sensör kalibrasyonsuz da bir sayı üretir; sorun o sayının anlamıdır.",
+      "skills": [
+        "mk-sensors"
+      ]
+    }
+  ]
+}

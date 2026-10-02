@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Jiroskop",
+      "definition": "Dönüş hızını (°/s) ölçen sensör. Açı elde etmek için hızın zamanla toplanması gerekir.",
+      "example": "gy = 10 °/s ile 3 saniye dönen çip 30 derece döner.",
+      "pitfall": "Jiroskop değerini doğrudan açı sanmak."
+    },
+    {
+      "term": "İntegral (açı = açı + hız x dt)",
+      "definition": "Hızı küçük zaman adımlarıyla çarpıp toplayarak açıyı bulma.",
+      "example": "aci += gy * dt; ile dt saniye olarak hesaplanır.",
+      "pitfall": "dt'yi milisaniye yazmak: sonuç 1000 kat büyür."
+    },
+    {
+      "term": "Sapma (bias)",
+      "definition": "Durağan jiroskopun gösterdiği küçük sabit değer. Hareketsizken ortalama alınarak bulunur.",
+      "example": "Sapma 2 °/s ise 10 saniyede 20 derecelik sahte dönüş birikir.",
+      "pitfall": "Sapma ölçerken çipi oynatmak: sapma yanlış ölçülür."
+    },
+    {
+      "term": "Tamamlayıcı filtre",
+      "definition": "Kısa vadede jiroskopa, uzun vadede ivmeölçere güvenerek ikisini ağırlıklı toplayan filtre.",
+      "example": "aci = 0,98 x (aci + gy x dt) + 0,02 x ivmeAci",
+      "pitfall": "ALFA'yı 1'e çok yaklaştırmak: ivmeölçer etkisiz kalır, kayma geri gelir."
+    },
+    {
+      "term": "ALFA (alfa)",
+      "definition": "Filtrede jiroskopa verilen ağırlık. Genelde 0,98.",
+      "example": "ALFA = 0,98 ise her adımda %98 jiroskop, %2 ivmeölçer.",
+      "pitfall": "ALFA küçük olunca titreşimin açıyı bozmasına şaşırmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d59-q1",
+      "kind": "numeric",
+      "prompt": "Çip masada hiç kıpırdamıyor ama jiroskop 1,5 °/s sapma gösteriyor ve sapma çıkarılmadan açı hız x süre ile toplanıyor. 20 saniye sonra hesaplanan açı kaç derece uzaklaşır?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "derece",
+      "explanation": "Kayma = sapma x süre = 1,5 x 20 = 30 derece. Çip hareket etmediği hâlde açı uzaklaşır; bu yüzden sapma ölçülüp çıkarılır ve ivmeölçerle düzeltilir.",
+      "skills": [
+        "gyro-drift"
+      ]
+    },
+    {
+      "id": "m4h5d59-q2",
+      "kind": "mcq",
+      "prompt": "Hangi ifade doğrudur?",
+      "options": [
+        "Jiroskop uzun vadede doğrudur, ivmeölçer kayar",
+        "İvmeölçer kısa vadede gürültülüdür ama uzun vadede kaymaz; jiroskop kısa vadede iyidir ama kayar",
+        "İkisi de uzun vadede kayar",
+        "İvmeölçer dönüş hızını, jiroskop açıyı doğrudan verir"
+      ],
+      "answer": 1,
+      "explanation": "İvmeölçer yer çekimine bakar, bu yüzden kaymaz ama titreşimi de ölçer. Jiroskop hızı ölçer; hızlı değişimi iyi yakalar ama sapma birikir. İkisini birleştirmek tamamlayıcı filtrenin işidir.",
+      "skills": [
+        "gyro-drift",
+        "complementary-filter"
+      ]
+    },
+    {
+      "id": "m4h5d59-q3",
+      "kind": "numeric",
+      "prompt": "Tamamlayıcı filtrenin tek adımı: önceki aci = 10, düzeltilmiş gy = 20 °/s, dt = 0,01 s, ivmeölçer açısı = 12 ve ALFA = 0,98. Yeni aci kaç olur?",
+      "answer": 10.236,
+      "tolerance": 0.01,
+      "unit": "derece",
+      "explanation": "aci + gy x dt = 10 + 0,2 = 10,2. 0,98 x 10,2 = 9,996 ve 0,02 x 12 = 0,24. Toplam 10,236. Yalnız jiroskop 10,2 verirdi; ivmeölçer sonucu 12'ye doğru biraz çeker.",
+      "skills": [
+        "complementary-filter"
+      ]
+    },
+    {
+      "id": "m4h5d59-q4",
+      "kind": "predict-output",
+      "prompt": "Durağan çipin jiroskopu 2,0 °/s sapma gösteriyor ve sapma çıkarılmıyor. Bu kod ne yazar?\n\n```\nfloat aci = 0;\nfloat gy = 2.0;\nfloat dt = 0.5;\nfor (int i = 0; i < 10; i++) {\n  aci += gy * dt;\n}\nSerial.println(aci, 1);\n```",
+      "options": [
+        "0.0",
+        "2.0",
+        "20.0",
+        "10.0"
+      ],
+      "answer": 3,
+      "explanation": "Her turda 2,0 x 0,5 = 1,0 eklenir ve 10 tur sonunda 10,0 olur. Çip hiç dönmediği hâlde açı 10 derece uzaklaştı: sapmanın birikmesi. Sapma çıkarılsaydı sonuç yaklaşık 0 olurdu.",
+      "skills": [
+        "gyro-drift"
+      ]
+    },
+    {
+      "id": "m4h5d59-q5",
+      "kind": "find-bug",
+      "prompt": "Filtre açısı gerçekte olması gerekenden çok farklı ve dönüş sırasında hızlıca patlıyor. Hatalı satır hangisi?\n\n```\nunsigned long simdi = micros();\nfloat dt = (simdi - sonUs) / 1000.0;\nsonUs = simdi;\naci = 0.98 * (aci + gy * dt) + 0.02 * acc;\n```",
+      "options": [
+        "unsigned long simdi = micros();",
+        "sonUs = simdi;",
+        "float dt = (simdi - sonUs) / 1000.0;",
+        "aci = 0.98 * (aci + gy * dt) + 0.02 * acc;"
+      ],
+      "answer": 2,
+      "explanation": "micros() mikrosaniye verir; saniyeye çevirmek için 1000000.0'a bölmek gerekir. 1000.0 ile bölünce dt milisaniye olur ve integral 1000 kat büyük çıkar. Filtre formülü doğrudur.",
+      "skills": [
+        "gyro-drift",
+        "prog-debug"
+      ]
+    }
+  ]
+}

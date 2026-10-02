@@ -1,0 +1,104 @@
+{
+  "concepts": [
+    {
+      "term": "Kodlama ajanı",
+      "definition": "Dosya okuyan, düzenleyen ve komut çalıştıran, kararlarını bir dil modelinin verdiği ajan.",
+      "example": "Plan yapar, dosyayı değiştirir, testi çalıştırır, sonucu görüp düzeltir.",
+      "pitfall": "Aracı kusursuz sanmak; araçlar gerçektir ama kararı veren model yanılabilir."
+    },
+    {
+      "term": "Önce plan",
+      "definition": "Kod yazdırmadan önce modelin planını okuyup onaylamak.",
+      "example": "\"Bu işi hangi adımlarla yapacaksın?\" diye sorup yanlış varsayımı kod yazılmadan düzeltirsin.",
+      "pitfall": "Planı okumadan \"yap\" demek: yanlış varsayım yüzlerce satıra yayılır."
+    },
+    {
+      "term": "Küçük adım ve commit",
+      "definition": "Büyük değişikliği parçalayıp her çalışan parçayı ayrı kaydetmek.",
+      "example": "240 satırlık işi 6 adıma bölersen her adım yaklaşık 40 satır olur.",
+      "pitfall": "Tek dev değişiklik istemek: hata çıkınca nerede olduğu bulunamaz, geri dönmek zorlaşır."
+    },
+    {
+      "term": "Uydurulmuş fonksiyon",
+      "definition": "Modelin gerçekte var olmayan bir fonksiyon ya da kütüphane adını yazması.",
+      "example": "statistics.average(...) yazılır; modülde mean vardır, average yoktur.",
+      "pitfall": "Kodu çalıştırmadan doğru sanmak."
+    },
+    {
+      "term": "Zayıf test",
+      "definition": "Yanlış kodu da geçiren, uç durumları sınamayan test.",
+      "example": "Her zaman ilk sayıyı döndüren bir fonksiyon, yalnız buyuk(7, 3) == 7 testini geçer.",
+      "pitfall": "\"Testler geçti\" cümlesini \"kod doğru\" diye okumak."
+    },
+    {
+      "term": "En az yetki",
+      "definition": "Araca yalnız işi için gereken izni vermek; riskli komutta onay istemek.",
+      "example": "Dosya silme komutunu otomatik çalıştırmak yerine her seferinde onay sorulur.",
+      "pitfall": "Kolaylık için tüm izinleri baştan açmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d31-q1",
+      "kind": "mcq",
+      "prompt": "Bir kodlama aracından değişiklik isterken önce planı okumak neden doğrudan kod yazdırmaktan iyidir?",
+      "options": [
+        "Plan, kodun daha hızlı çalışmasını sağlar",
+        "Yanlış varsayım, kod yazılmadan önce yakalanıp düzeltilebilir",
+        "Plan okununca model hata yapamaz",
+        "Plan okumak testleri gereksiz kılar"
+      ],
+      "answer": 1,
+      "explanation": "Plan, modelin varsayımlarını kod yazılmadan önce görünür kılar; yanlış varsayım o aşamada ucuza düzeltilir. Kod yazıldıktan sonra yanlış varsayım birçok dosyaya yayılmış olabilir. Planın kodu daha hızlı çalıştırması ya da modeli hatasız yapması gibi bir etkisi yoktur.",
+      "skills": [
+        "ai-code-workflow"
+      ]
+    },
+    {
+      "id": "m7h7d31-q2",
+      "kind": "predict-output",
+      "prompt": "Yapay zekâ bu fonksiyonu ve testi yazdı. Çalıştırınca ekranda ne görünür?\n\n```\ndef buyuk(a, b):\n    return a\nassert buyuk(7, 3) == 7\nprint(\"test geçti\")\n```",
+      "options": [
+        "test geçti yazılır (ama fonksiyon yine de yanlıştır)",
+        "AssertionError oluşur",
+        "SyntaxError oluşur",
+        "Hiçbir şey yazılmaz"
+      ],
+      "answer": 0,
+      "explanation": "buyuk(7, 3) ilk sayıyı, yani 7'yi döndürür; assert geçer ve \"test geçti\" yazılır. Ama fonksiyon yanlıştır: buyuk(3, 7) de 3 döndürür. Geçen bir test, kodun doğru olduğunu değil, yalnız yazılmış testin geçtiğini gösterir; uç durum eklemek gerekir.",
+      "skills": [
+        "ai-code-workflow",
+        "ai-code-review"
+      ]
+    },
+    {
+      "id": "m7h7d31-q3",
+      "kind": "find-bug",
+      "prompt": "Yapay zekânın önerdiği kodda tek bir sorun var. Hangisi?\n\n```\nimport statistics\nsonuc = statistics.average([2, 4, 9])\nprint(sonuc)\n```",
+      "options": [
+        "import satırı: statistics modülü yoktur",
+        "print satırı: print Python'da kullanılmaz",
+        "statistics.average satırı: modülde average adlı fonksiyon yok (mean var)",
+        "Liste satırı: liste üç elemanlı olamaz"
+      ],
+      "answer": 2,
+      "explanation": "statistics modülünde ortalama için mean vardır; average adlı bir fonksiyon yoktur, çalıştırınca AttributeError verir. Import satırı doğrudur, print satırı da. Bu, modelin uydurduğu fonksiyon hatasının tipik örneğidir ve çalıştırınca yakalanır.",
+      "skills": [
+        "ai-code-review",
+        "ai-code-workflow"
+      ]
+    },
+    {
+      "id": "m7h7d31-q4",
+      "kind": "numeric",
+      "prompt": "Bir araç 240 satırlık tek parça değişiklik önerdi. Sen bunu eşit büyüklükte 6 küçük adıma bölüyorsun. Her adım kaç satır olur?",
+      "answer": 40,
+      "unit": "satır",
+      "tolerance": 0,
+      "explanation": "240 / 6 = 40 satır. Küçük adım, bir şey bozulduğunda aranacak alanı küçültür; commit ile her adım ayrı saklanır.",
+      "skills": [
+        "ai-code-workflow"
+      ]
+    }
+  ]
+}

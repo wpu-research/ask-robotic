@@ -10,8 +10,8 @@ export const h2d1: MikroActivity = {
   starter: () => project('Duygu düğmeleri', [onButton('A', []), onButton('B', []), onButton('AB', [])]),
   goals: [
     usesBlocks('bloklar', "'düğme ... basılınca' bloklarını kullan", ['mk_on_button', 'mk_show_icon']),
-    afterInputPattern('a', "A'ya basınca mutlu yüz görünsün", 'button:A:press', ICON_ROWS('happy')),
-    afterInputPattern('b', "B'ye basınca üzgün yüz görünsün", 'button:B:press', ICON_ROWS('sad')),
+    afterInputPattern('a', "A'ya basınca mutlu yüz görünsün", 'button:A:press', ICON_ROWS('happy'), { hint: "Sanal kartta A düğmesine bir kez tıkla (kısa basış)." }),
+    afterInputPattern('b', "B'ye basınca üzgün yüz görünsün", 'button:B:press', ICON_ROWS('sad'), { hint: "Sanal kartta B düğmesine bir kez tıkla (kısa basış)." }),
     afterInputPattern('ab', "A ve B'ye birlikte basınca kalp görünsün", 'button:AB:press', ICON_ROWS('heart'), { hint: "Üçüncü bloğun ilk açılır listesini 'A+B' yap. Sanal kartta A+B düğmesine tıklayabilirsin." }),
   ],
   solution: () => project('Duygu düğmeleri', [

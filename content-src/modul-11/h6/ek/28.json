@@ -1,0 +1,49 @@
+{
+  "concepts": [
+    { "term": "Bayrak değişkeni", "definition": "Yalnız iki durumu (0 hayır, 1 evet) tutan değişken; bir olayın sonucunu başka olaya taşır.", "example": "`anahtarVar` anahtar alınınca 1 olur; kapı olayı bunu okuyup kapıyı açar.", "pitfall": "Bayrağı başlangıçta 0 yapmamak; ilk değeri belirsiz kalır ve kapı bazen beklenmedik açılır." },
+    { "term": "eğer … ise … değilse", "definition": "Koşul doğruysa bir kolu, yanlışsa diğer kolu çalıştıran iki yollu karar bloğu.", "example": "Kapıda `anahtarVar = 1` ise \"Kaçtın!\" yazılıp oyun kazanılır, değilse \"Kilitli!\" yazılır.", "pitfall": "`değilse` kolunu boş bırakmak; anahtarsız kapıya gelen oyuncu hiçbir şey görmez." },
+    { "term": "Karo koordinatı", "definition": "Haritadaki yeri sütun ve satır numarasıyla gösterir; numaralar 0'dan başlar ve bir karo 16 pikseldir.", "example": "Sütun 18, satır 7 karosunun ortası x = 18 × 16 + 8 = 296, y = 7 × 16 + 8 = 120 pikseldir.", "pitfall": "Karo bloğuna piksel yazmak; sprite haritanın çok dışına konur." },
+    { "term": "Duvardan geçen sprite (ghost)", "definition": "Duvarlar için engel olmayan, haritayı yok sayarak gidebilen sprite ayarı.", "example": "Labirentteki hayalet, kediyi en kısa yoldan takip eder.", "pitfall": "Hayaleti çok hızlı yapmak; kedi kaçamaz ve oyun adil olmaktan çıkar." },
+    { "term": "Olaylar arası köprü", "definition": "İki ayrı olayın birbirini göremediği durumda ortak bir değişkenle haberleşmesi.", "example": "Anahtar olayı `anahtarVar` değişkenine yazar, kapı olayı aynı değişkenden okur.", "pitfall": "İki olayda biraz farklı adlı iki değişken kullanmak; biri yazılır, diğeri okunur ve bayrak hiç çalışmaz." }
+  ],
+  "quiz": [
+    {
+      "id": "m11h6d28-q1", "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisi için bayrak değişkeni (0 ya da 1) uygun bir seçimdir?",
+      "options": ["Patron düşmanın yenilip yenilmediği", "Kedinin x konumu", "Kalan süre", "Skor"],
+      "answer": 0,
+      "explanation": "Bayrak yalnız \"evet/hayır\" tutar. Patron yenildi mi sorusunun cevabı iki değerlidir. x konumu, süre ve skor ise çok sayıda değer alan sayılardır; bunlar için normal değişken ya da hazır oyun bloğu kullanılır.",
+      "skills": ["oyun-degisken"]
+    },
+    {
+      "id": "m11h6d28-q2", "kind": "numeric",
+      "prompt": "Kapı karosu 18. sütunda ve 7. satırda (numaralar 0'dan başlıyor, bir karo 16 piksel). Kapı karosunun ortasının x konumu kaç pikseldir?",
+      "answer": 296, "tolerance": 0, "unit": "piksel",
+      "explanation": "x = sütun × 16 + 8 = 18 × 16 + 8 = 288 + 8 = 296. Yalnız 18 × 16 = 288 yazmak karonun sol kenarını verir; ortası için yarım karo (8) eklenir.",
+      "skills": ["oyun-harita"]
+    },
+    {
+      "id": "m11h6d28-q3", "kind": "predict-output",
+      "prompt": "Oyuncu önce kapıya, sonra anahtara, sonra tekrar kapıya dokunuyor. Ekranda sırasıyla hangi yazılar çıkar?\n\n```\noyun başlayınca:  anahtarVar = 0\nanahtara dokununca:  anahtarVar = 1\nkapıya dokununca:\n  eğer anahtarVar = 1 ise: \"Kaçtın!\" yaz, oyunu kazan\n  değilse: \"Kilitli!\" yaz\n```",
+      "options": ["Kaçtın!, Kaçtın!", "Kilitli!, Kaçtın!", "Kilitli!, Kilitli!", "Kaçtın!, Kilitli!"],
+      "answer": 1,
+      "explanation": "İlk kapı dokunuşunda anahtarVar 0'dır: \"Kilitli!\" çıkar. Anahtardan sonra 1 olur; ikinci dokunuşta \"Kaçtın!\" çıkar ve oyun kazanılır. Sıra tersine olsaydı iki yazı da yer değiştirirdi.",
+      "skills": ["oyun-kosul", "oyun-degisken"]
+    },
+    {
+      "id": "m11h6d28-q4", "kind": "find-bug",
+      "prompt": "Anahtarı alıp kapıya gidiyorsun ama kapı hep \"Kilitli!\" diyor. Hatalı satır hangisi?\n\n```\noyun başlayınca:        anahtarVar = 0\nanahtara dokununca:     anahtarVar = 0   <- A\n                        skoru 10 değiştir\nkapıya dokununca:       eğer anahtarVar = 1 ise kazan  <- B\n                        değilse \"Kilitli!\" yaz         <- C\n```",
+      "options": ["A satırı: anahtar alınırken bayrak 0 bırakılıyor, 1 yapılmalı", "B satırı: koşul 0 olmalı", "C satırı: `değilse` kolu fazla", "Başlangıçtaki `anahtarVar = 0` satırı"],
+      "answer": 0,
+      "explanation": "Anahtar olayı bayrağı 1 yapmalıdır; burada yine 0 yazıyor, kapı hep \"anahtar yok\" der. B satırı doğru: koşul 1'i arıyor. C satırı gerekli bir geri bildirim. Başlangıçta 0 yapmak da doğrudur.",
+      "skills": ["oyun-degisken", "oyun-hata"]
+    },
+    {
+      "id": "m11h6d28-q5", "kind": "numeric",
+      "prompt": "Hayalet duvarlardan geçer ve kediyi saniyede 14 piksel hızla takip ediyor. Kedi durmuş; aralarında 84 piksel var. Hayalet kaç saniyede kediye ulaşır?",
+      "answer": 6, "tolerance": 0, "unit": "sn",
+      "explanation": "Süre = yol ÷ hız = 84 ÷ 14 = 6 saniye. Kedinin hızı 60 olsaydı kedi kaçabilirdi; bu oyunda kedi hayaletten 4 katından fazla hızlıdır (60 ÷ 14 ≈ 4,3).",
+      "skills": ["oyun-zorluk", "oyun-harita"]
+    }
+  ]
+}

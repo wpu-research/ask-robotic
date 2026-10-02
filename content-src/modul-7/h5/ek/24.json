@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Getirme (retrieval)",
+      "definition": "Soruyu vektöre çevirip parçaları benzerliğe göre sıralama ve en uygunları seçme adımı.",
+      "example": "\"Mentörler ne kadar sürede yanıt verir?\" için \"mentörler ... iki gün\" parçası en üste çıkar.",
+      "pitfall": "Getirmeyi modelin yaptığını sanmak; sıralama modelden önce, bir arama hesabıdır."
+    },
+    {
+      "term": "Top-K",
+      "definition": "Benzerliğe göre sıralanan listeden en iyi K parçayı almak.",
+      "example": "K = 2 ise en iyi iki parça bağlama girer.",
+      "pitfall": "K'yı büyütünce hep daha iyi olacağını sanmak; bağlam uzar, ilgisiz metin girer."
+    },
+    {
+      "term": "Bağlam",
+      "definition": "Prompt'a numaralı olarak yerleştirilen, getirilen parçaların metni.",
+      "example": "\"[1] Mentörler ... iki gün içinde yanıt verir.\" satırı bağlamın bir parçasıdır.",
+      "pitfall": "Bağlamı olgusal doğru sanmak; kaynak belge hatalıysa bağlam da hatalıdır."
+    },
+    {
+      "term": "Prompt şablonu",
+      "definition": "Bağlam ve soruyu, sabit talimatlarla birlikte yerleştirdiğin metin kalıbı.",
+      "example": "\"Aşağıdaki bağlama dayanarak yanıtla. Yoksa bilmiyorum de.\"",
+      "pitfall": "Şablonda bağlam alanını boş bırakmak ya da hiç doldurmamak; model soruyu bağlamsız yanıtlar."
+    },
+    {
+      "term": "Şablon yanıt (simülasyon)",
+      "definition": "Atölyede 5. adımın yerine geçen, bağlamdaki en çok eşleşen cümleyi alıntılayan etiketli kutu.",
+      "example": "Kutu \"iki gün\" cümlesini alıntılar; bir model yorumlamaz.",
+      "pitfall": "Kutuyu gerçek model cevabı sanmak; arayüzde \"ŞABLON ÇIKTI\" olarak etiketlidir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d24-q1",
+      "kind": "mcq",
+      "prompt": "Getirme adımı yanlış parçayı getirirse sonraki adımda ne olur?",
+      "options": [
+        "Model eksik bilgiyi kendiliğinden düzeltir",
+        "Sistem otomatik olarak parça boyunu büyütür",
+        "Model, doğru bilgiyi hiç görmeden cevap yazmak zorunda kalır; yanlış ya da \"bilmiyorum\" çıkabilir",
+        "Prompt şablonu devre dışı kalır"
+      ],
+      "answer": 2,
+      "explanation": "Model yalnız prompt'a konan bağlama dayanır. Doğru parça bağlamda yoksa model ya yanlış yanıtlar ya da talimata uyup \"bilmiyorum\" der. Sistem ayarları kendiliğinden değişmez, şablon da çalışmaya devam eder.",
+      "skills": [
+        "ai-retrieval",
+        "ai-rag-pipeline"
+      ]
+    },
+    {
+      "id": "m7h5d24-q2",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca ne yazdırır?\n\n```\nskorlar = {\"p1\": 0.10, \"p2\": 0.45, \"p3\": 0.30, \"p4\": 0.0}\nsirali = sorted(skorlar, key=skorlar.get, reverse=True)\nprint(sirali[:2])\n```",
+      "options": [
+        "['p1', 'p2']",
+        "['p2', 'p3']",
+        "['p3', 'p2']",
+        "['p4', 'p1']"
+      ],
+      "answer": 1,
+      "explanation": "Skorlar büyükten küçüğe sıralanır: p2 (0,45), p3 (0,30), p1 (0,10), p4 (0). İlk iki eleman p2 ve p3. reverse=True olmasaydı küçükten büyüğe sıralanır ve p4, p1 çıkardı: bu, getirmede en alakasız parçaları almak demektir.",
+      "skills": [
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d24-q3",
+      "kind": "numeric",
+      "prompt": "Beş parçanın benzerlikleri 0,52 / 0,31 / 0 / 0 / 0,18. Getirme önce en iyi K = 4 parçayı seçiyor, sonra benzerliği 0 olanları atıyor. Prompt'a kaç parça girer?",
+      "answer": 3,
+      "unit": "parça",
+      "explanation": "Sıralı liste 0,52 · 0,31 · 0,18 · 0 · 0. İlk dördü seçilince 0,52, 0,31, 0,18 ve bir 0 gelir; 0 atılınca 3 parça kalır. K'nın büyütülmesi, ilgili parça sayısını artırmaz: yalnız ortak terimi olan parçalar girebilir.",
+      "skills": [
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d24-q4",
+      "kind": "find-bug",
+      "prompt": "Bu fonksiyon RAG prompt'unu kuruyor ama model her zaman bağlamsız cevap veriyor.\n\n```\ndef prompt_kur(baglam, soru):\n    return \"Bağlama dayanarak yanıtla.\\nSoru: \" + soru\n```\n\nHata nedir?",
+      "options": [
+        "baglam parametresi hiç kullanılmıyor; prompt'a girmiyor",
+        "Soru metne eklenmiyor",
+        "Satır sonu karakteri yanlış",
+        "Fonksiyon bir şey döndürmüyor"
+      ],
+      "answer": 0,
+      "explanation": "Fonksiyon baglam alıyor ama dönen metinde yalnız soru var. Model \"bağlama dayanarak\" yanıtla talimatını görür fakat bağlam yok. Soru ekleniyor, \"\\n\" doğru ve return var.",
+      "skills": [
+        "ai-rag-pipeline",
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d24-q5",
+      "kind": "mcq",
+      "prompt": "Atölyedeki \"ŞABLON ÇIKTI\" kutusu neden açıkça etiketlenir?",
+      "options": [
+        "Çünkü gerçek bir model çalışıyor ama yavaş",
+        "Çünkü cevap her zaman doğrudur",
+        "Çünkü kutu getirmeyi hesaplar",
+        "Çünkü sentez adımı yerine bağlamdan bir cümle alıntılayan basit bir şablon kullanılıyor; gerçek model cevabı değil"
+      ],
+      "answer": 3,
+      "explanation": "Atölyede model yoktur; kutu, bağlamdaki en çok eşleşen cümleyi alıntılar. Gerçek model yorum yapar ve yanlış da olabilir. Etiket, bu farkı gizlememek içindir. Getirme ise kutudan önceki gerçek hesaplardır.",
+      "skills": [
+        "ai-rag-grounding"
+      ]
+    }
+  ]
+}

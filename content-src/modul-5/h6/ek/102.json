@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Tamamlayıcı filtre",
+      "definition": "Açıyı jiroskopla ilerletip her turda ivmeölçer açısına doğru azıcık çeken filtre: aci = α(aci + hiz·dt) + (1 − α)·ivmeAci.",
+      "example": "α = 0,98: tahminin %98'i jiroskoptan, %2'si ivmeölçerden gelir.",
+      "pitfall": "Jiroskop terimini (hiz·dt) unutmak: filtre yalnız ivmeölçeri yumuşatır ve hızlı hareketleri geriden izler."
+    },
+    {
+      "term": "α (alfa)",
+      "definition": "Jiroskoba verilen güven payı. (1 − α) ivmeölçerin payıdır; ikisinin toplamı 1 olmalıdır.",
+      "example": "α büyüyünce açı pürüzsüzleşir ama sapma geç düzelir; küçülünce ivmeölçer gürültüsü açıya geçer.",
+      "pitfall": "α ile (1 − α) paylarının toplamını 1'den farklı seçmek: filtre şişer ya da söner."
+    },
+    {
+      "term": "Zaman sabiti τ",
+      "definition": "İvmeölçerin kalıcı bilgisinin açıya yansıdığı yaklaşık süre: τ = α·dt / (1 − α).",
+      "example": "α = 0,98 ve dt = 0,01 s için τ = 0,49 s.",
+      "pitfall": "τ'yu α'dan bağımsız sanmak: dt değişince aynı α'nın etkisi de değişir."
+    },
+    {
+      "term": "Filtreyi başlatmak",
+      "definition": "İlk turda filtre açısını ivmeölçer açısıyla başlatmak, doğru değere oturma süresini ortadan kaldırır.",
+      "example": "Robot 15° yatıkken başlıyorsa filtre 15° ile başlar, 0° ile değil.",
+      "pitfall": "Açıyı 0'dan başlatmak: filtre birkaç τ boyunca yanlış açı verir."
+    },
+    {
+      "term": "Kalman filtresi",
+      "definition": "Tamamlayıcı filtreyle aynı fikri kullanır ama düzeltme payını (kazancı) her adımda belirsizliğe bakarak kendisi hesaplar.",
+      "example": "Ölçüm gürültülüyse kazanç küçülür, tahmin belirsizse büyür.",
+      "pitfall": "Kalman'ı \"her zaman daha iyi\" sanmak: matris işlemleri ve ayar değerleri gerektirir; basit robotlarda tamamlayıcı filtre yeter."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d2-q1",
+      "kind": "mcq",
+      "prompt": "Robot motor titreşimli bir zeminde duruyor. İvmeölçer ve jiroskop için hangi ifade doğrudur?",
+      "options": [
+        "İvmeölçer kısa sürede, jiroskop uzun sürede güvenilirdir",
+        "Jiroskop kısa sürede, ivmeölçer uzun sürede güvenilirdir",
+        "İkisi de her zaman aynı derecede güvenilirdir",
+        "Titreşim jiroskobun uzun süreli kaymasını artırır"
+      ],
+      "answer": 1,
+      "explanation": "İvmeölçer yerçekimine bağlı olduğu için ortalamada doğrudur ama titreşimle zıplar. Jiroskopun hızı toplanınca pürüzsüz bir açı çıkar ama sapma birikir. Filtre ikisini bu yüzden zıt zaman ölçeklerinde kullanır.",
+      "skills": [
+        "filter-complementary",
+        "imu-tilt"
+      ]
+    },
+    {
+      "id": "m5h6d2-q2",
+      "kind": "predict-output",
+      "prompt": "Filtrenin tek adımı çalışıyor. Bu kod ne yazar?\n\n```\nfloat aci = 10.0;\nfloat hiz = 20.0;        // °/s\nfloat dt = 0.01;         // s\nfloat ivmeAci = 12.0;\naci = 0.98 * (aci + hiz * dt) + 0.02 * ivmeAci;\nSerial.println(aci, 2);\n```",
+      "options": [
+        "10.24",
+        "10.20",
+        "12.00",
+        "9.80"
+      ],
+      "answer": 0,
+      "explanation": "Önce jiroskopla ilerletilir: 10 + 20·0,01 = 10,2; 0,98 ile çarpılınca 9,996. İvmeölçer payı 0,02·12 = 0,24. Toplam 10,236 ve iki ondalıkla 10.24. 10.20 yalnız jiroskopu, 12.00 yalnız ivmeölçeri kullanmak olurdu.",
+      "skills": [
+        "filter-complementary"
+      ]
+    },
+    {
+      "id": "m5h6d2-q3",
+      "kind": "numeric",
+      "prompt": "Robot hareketsiz (gerçek açı 0°), ivmeölçer 0° okuyor, jiroskop 2 °/s sapmalı. α = 0,98 ve dt = 0,01 s. Filtre uzun süre sonra kaç derece gösterir?",
+      "answer": 0.98,
+      "tolerance": 0.02,
+      "unit": "°",
+      "explanation": "Kalıcı durumda hata, sapma çarpı zaman sabitidir. τ = 0,98·0,01 / 0,02 = 0,49 s ve hata = 2·0,49 = 0,98°. Saf jiroskop integrali ise aynı sapmayla her saniye 2° biriktirir ve hiç durmaz; filtre bu büyümeyi sınırlar.",
+      "skills": [
+        "filter-complementary",
+        "imu-gyro"
+      ]
+    },
+    {
+      "id": "m5h6d2-q4",
+      "kind": "find-bug",
+      "prompt": "Bu filtre robot hızlı yatarken açıyı geriden izliyor ve jiroskop kullanılmıyor gibi davranıyor. Hangi satır hatalı?\n\n```\n1  float ivmeAci, hiz;\n2  imuOku(ivmeAci, hiz);\n3  aci = ALFA * aci + (1 - ALFA) * ivmeAci;\n```",
+      "options": [
+        "1. satır: ivmeAci ve hiz float olmamalı",
+        "2. satır: imuOku iki kez çağrılmalı",
+        "3. satır: hiz * dt terimi eksik, filtre yalnız ivmeölçeri yumuşatıyor",
+        "3. satır: ALFA ile (1 - ALFA) toplamı 1 olmamalı"
+      ],
+      "answer": 2,
+      "explanation": "Jiroskop hızı hiç kullanılmıyor: formül ALFA * (aci + hiz * dt) olmalıydı. Bu hâliyle yalnız ivmeölçerin yavaş bir ortalaması alınıyor. ALFA ve (1 - ALFA) toplamı zaten 1'dir, bu doğru olandır.",
+      "skills": [
+        "filter-complementary",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d2-q5",
+      "kind": "mcq",
+      "prompt": "Kalman filtresi tamamlayıcı filtreden hangi bakımdan ayrılır?",
+      "options": [
+        "Jiroskop kullanmaz",
+        "Yalnız ivmeölçerle çalışır",
+        "Daha az hesap gerektirir",
+        "Düzeltme payını her adımda belirsizliğe bakarak kendisi hesaplar; tamamlayıcıda α sabittir"
+      ],
+      "answer": 3,
+      "explanation": "İkisi de jiroskopla ilerletir ve ölçümle düzeltir. Tamamlayıcı filtrede α'yı sen seçersin ve hep aynı kalır; Kalman kazancı ise tahmin ve sensör belirsizliğine göre değişir. Bunun bedeli daha çok hesap ve ayar değeridir.",
+      "skills": [
+        "filter-complementary"
+      ]
+    }
+  ]
+}

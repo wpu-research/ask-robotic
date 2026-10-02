@@ -1,0 +1,103 @@
+{
+  "concepts": [
+    {
+      "term": "ADC basamağı",
+      "definition": "10 bitlik ADC'nin ayırt edebildiği en küçük gerilim adımı: 5 V / 1023, yaklaşık 4,89 mV.",
+      "example": "2,550 V 522. basamağa yuvarlanır; geri çevirince 2551,3 mV çıkar, aradaki 1,3 mV yuvarlama farkıdır.",
+      "pitfall": "1 mV'luk bir değişimi 10 bitlik ADC ile ölçebileceğini sanmak; adım 4,89 mV'tur."
+    },
+    {
+      "term": "Gürültü",
+      "definition": "Ölçülen gerilime istemeden karışan küçük ve rastgele oynamalar.",
+      "example": "Potansiyometre sabitken gerçek devrede analogRead değeri 510, 513, 509 diye oynar.",
+      "pitfall": "Laboratuvarda değer oynamadı diye gerçek devrede de oynamayacağını varsaymak."
+    },
+    {
+      "term": "Ortalama alma",
+      "definition": "Birçok okumanın ortalamasını kullanarak gürültüyü küçültme; N okumada yaklaşık karekök(N) kat azalır.",
+      "example": "16 okumanın ortalaması gürültüyü yaklaşık 4 kat, 64 okumanın ortalaması 8 kat küçültür.",
+      "pitfall": "Okuma sayısını gereksiz büyütüp programı yavaşlatmak; 64 okuma, 1 okumanın 64 katı iştir."
+    },
+    {
+      "term": "Histerezis",
+      "definition": "Açma ve kapama için iki ayrı eşik kullanıp aradaki bölgede önceki kararı korumak.",
+      "example": "Değer 524'ü geçince LED yanar, 500'ün altına inince söner; arada olduğu gibi kalır.",
+      "pitfall": "İki eşik arasındaki boşluğu gürültünün genliğinden dar seçmek; titreme geri gelir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d1-q1",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisini laboratuvarda gerçekten görürsün?",
+      "options": [
+        "Potansiyometre sabitken ADC değerinin birkaç basamak titremesi",
+        "Gerilimin en yakın ADC basamağına yuvarlanması",
+        "Besleme geriliminin 5,00 V'tan 4,70 V'a kayması",
+        "Butonun bir basışta birkaç kez sıçraması"
+      ],
+      "answer": 1,
+      "explanation": "Laboratuvar ADC basamağını modeller: her gerilim en yakın basamağa yuvarlanır. Gürültü, referans kayması ve buton sıçraması modellenmez; laboratuvarın gerilimleri kusursuz sabittir.",
+      "skills": [
+        "sens-sim-limits",
+        "sens-adc"
+      ]
+    },
+    {
+      "id": "m4h8d1-q2",
+      "kind": "numeric",
+      "prompt": "10 bitlik ADC 0-5 V aralığını 1023 eşit adıma böler. Bir basamak yaklaşık kaç milivolttur? (Virgülden sonra iki basamak yeter.)",
+      "answer": 4.89,
+      "tolerance": 0.05,
+      "unit": "mV",
+      "explanation": "5000 mV / 1023 ≈ 4,89 mV. Bu yüzden 10 bitlik ADC ile 1 mV'luk değişimler ayırt edilemez; sonuç hep en yakın basamağa yuvarlanır.",
+      "skills": [
+        "sens-adc"
+      ]
+    },
+    {
+      "id": "m4h8d1-q3",
+      "kind": "predict-output",
+      "prompt": "Bu kod çalışınca seri monitörde ne yazar?\n\n```cpp\nconst int ACMA = 524;\nconst int KAPAMA = 500;\nint okumalar[] = {510, 530, 515, 505, 495, 520};\nbool yanik = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 6; i++) {\n    int v = okumalar[i];\n    if (!yanik && v > ACMA) yanik = true;\n    if (yanik && v < KAPAMA) yanik = false;\n    Serial.print(yanik ? 1 : 0);\n  }\n}\nvoid loop() {}\n```",
+      "options": [
+        "010100",
+        "011110",
+        "000000",
+        "011100"
+      ],
+      "answer": 3,
+      "explanation": "510 ve eşik altında: 0. 530 > 524: yanar, 1. 515 ve 505 iki eşiğin arasında, karar korunur: 1, 1. 495 < 500: söner, 0. 520 yine bandın içinde ve zaten sönük: 0. Çıktı 011100. Tek eşik (512) kullansaydın 515 ve 520'de de yanardı.",
+      "skills": [
+        "sens-hysteresis"
+      ]
+    },
+    {
+      "id": "m4h8d1-q4",
+      "kind": "find-bug",
+      "prompt": "Gürültü ±8 basamak. Bu program LED'i hâlâ titretiyor. Hata nerede?\n\n```cpp\nconst int ACMA = 510;\nconst int KAPAMA = 514;\nbool yanik = false;\n// ...\nif (!yanik && deger > ACMA) yanik = true;\nif (yanik && deger < KAPAMA) yanik = false;\n```",
+      "options": [
+        "deger değişkeni analogRead ile okunmamalıydı",
+        "Sabitler const olmamalıydı",
+        "ACMA ve KAPAMA ters yerleşmiş: KAPAMA ACMA'dan büyük, bu yüzden bant yok",
+        "bool yerine int kullanılmalıydı"
+      ],
+      "answer": 2,
+      "explanation": "Yanmak için eşik 510, sönmek için 514: değer 511 olunca yanar ama aynı turda 511 < 514 olduğu için hemen söner. Histerezis için açma eşiği kapama eşiğinden yüksek olmalı (örneğin 524 ve 500) ve aradaki boşluk gürültüden büyük olmalı. Diğer seçeneklerin davranışla ilgisi yok.",
+      "skills": [
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d1-q5",
+      "kind": "numeric",
+      "prompt": "Gürültü, N okumanın ortalamasında yaklaşık karekök(N) kat azalır. 64 okumanın ortalaması gürültüyü yaklaşık kaç kat küçültür?",
+      "answer": 8,
+      "tolerance": 0,
+      "explanation": "Karekök(64) = 8. Ama bedeli 64 kat iş: 16 okumada 4 kat, 64 okumada 8 kat azalır; kazancın azalan getirisi var, bu yüzden okuma sayısını gereksiz büyütmek programı yavaşlatır.",
+      "skills": [
+        "sens-noise"
+      ]
+    }
+  ]
+}

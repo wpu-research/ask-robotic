@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Gerilim bölücü",
+      "definition": "Seri bağlı iki dirençle gerilimin bir kısmını orta noktadan almak: Vout = Vin × R2 / (R1 + R2).",
+      "example": "R1 = 10 kΩ, R2 = 10 kΩ ise 5 V giriş 2,5 V çıkış verir.",
+      "pitfall": "R1 ve R2'nin yerini karıştırmak: formüldeki R2 GND tarafındaki dirençtir."
+    },
+    {
+      "term": "LDR",
+      "definition": "Işığa duyarlı direnç. Işık arttıkça direnci azalır.",
+      "example": "Karanlıkta yüzlerce kΩ olan LDR, parlak ışıkta birkaç yüz Ω'a kadar düşebilir.",
+      "pitfall": "LDR'yi sabit direnç olmadan doğrudan 5V ile A1 arasına bağlamak: pin havada kalır, ölçüm anlamsızlaşır."
+    },
+    {
+      "term": "LDR direnci hesabı",
+      "definition": "LDR üstteyken ham değerden direnç: R_ldr = 10000 × (1024 − ham) / ham.",
+      "example": "ham = 256 ise R_ldr = 10000 × 768 / 256 = 30 000 Ω.",
+      "pitfall": "10000 yazıp 10000.0 yazmamak: int çarpımı taşar ve sonuç anlamsızlaşır."
+    },
+    {
+      "term": "Histerezis",
+      "definition": "Aç ve kapa için iki ayrı eşik kullanmak; aradaki bölgede durum korunur.",
+      "example": "ham 250'nin altına inince LED yanar, 350'nin üstüne çıkınca söner.",
+      "pitfall": "Tek eşik kullanmak: ışık eşik civarındayken LED sürekli yanıp söner."
+    },
+    {
+      "term": "Işık yönü",
+      "definition": "LDR üstte ve sabit direnç altta ise ışık arttıkça ham değer artar. Yer değişirse yön tersine döner.",
+      "example": "LDR 5V tarafında, 10 kΩ GND tarafında: aydınlıkta ham büyüktür.",
+      "pitfall": "Yer değiştirip programın mantığını güncellememek: lamba karanlıkta söner, aydınlıkta yanar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d12-q1",
+      "kind": "numeric",
+      "prompt": "Bir gerilim bölücüde Vin = 5 V, üst direnç R1 = 10 kΩ, alt direnç R2 = 30 kΩ. Orta noktadaki gerilim kaç volttur?",
+      "answer": 3.75,
+      "tolerance": 0.01,
+      "unit": "V",
+      "explanation": "Vout = 5 × 30 / (10 + 30) = 3,75 V. Alt direnç büyük olduğundan çıkış, ortanın (2,5 V) üstündedir.",
+      "skills": [
+        "volt-divider",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h3d12-q2",
+      "kind": "numeric",
+      "prompt": "LDR üstte, 10 kΩ direnç altta ve A1'de okunan ham değer 256. LDR'nin direnci kaç ohmdur? (R_ldr = 10000 × (1024 − ham) / ham)",
+      "answer": 30000,
+      "tolerance": 10,
+      "unit": "Ω",
+      "explanation": "10000 × (1024 − 256) / 256 = 10000 × 768 / 256 = 30 000 Ω. Ham değer ortanın (512) altında olduğundan LDR sabit dirençten büyüktür, yani ortam görece karanlıktır.",
+      "skills": [
+        "sensor-ldr",
+        "volt-divider"
+      ]
+    },
+    {
+      "id": "m3h3d12-q3",
+      "kind": "mcq",
+      "prompt": "LDR 5V ile A1 arasında, 10 kΩ direnç A1 ile GND arasında. Ortam aydınlanınca A1'deki ham değer ne olur?",
+      "options": [
+        "Azalır",
+        "Değişmez",
+        "Her zaman 512 olur",
+        "Artar"
+      ],
+      "answer": 3,
+      "explanation": "Işık artınca LDR direnci düşer. Üst direnç küçülünce alt dirençteki pay büyür ve A1'deki gerilim ile ham değer artar. Yer değiştirirlerse yön tersine döner.",
+      "skills": [
+        "sensor-ldr",
+        "volt-divider"
+      ]
+    },
+    {
+      "id": "m3h3d12-q4",
+      "kind": "predict-output",
+      "prompt": "LED başlangıçta sönük. A1 okumaları sırayla 200, 300, 400, 300 geliyor ve her okumadan sonra bu kod bir kez çalışıyor. Son okumadan sonra LED nasıldır?\n\n```\nif (ham < 250) {\n  digitalWrite(13, HIGH);\n} else if (ham > 350) {\n  digitalWrite(13, LOW);\n}\n```",
+      "options": [
+        "Yanık, çünkü son değer 300 ve 350'den küçük",
+        "Sönük, çünkü 400 okuması LED'i söndürdü ve 300 arada olduğundan durum korunuyor",
+        "Yanık, çünkü ilk okuma 200 idi",
+        "Sönük, çünkü 300 < 350"
+      ],
+      "answer": 1,
+      "explanation": "200 LED'i yakar. 300 arada olduğu için durum korunur (yanık). 400 > 350 olduğundan LED söner. Son 300 yine arada olduğundan LED sönük kalır. Aynı 300 değeri iki kez farklı sonuç verdi: histerezis budur.",
+      "skills": [
+        "sensor-ldr",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d12-q5",
+      "kind": "find-bug",
+      "prompt": "LDR direnci hesaplanıyor ama sonuç anlamsız çıkıyor. (Arduino Uno'da int 16 bit, en çok 32767.) Hata nerede?\n\n```\nint ham = analogRead(A1);\nif (ham > 0) {\n  float rLdr = 10000 * (1024 - ham) / ham;\n  Serial.println(rLdr, 0);\n}\n```",
+      "options": [
+        "analogRead(A1) yerine A0 yazılmalı",
+        "10000 * (1024 - ham) tam sayı olarak hesaplanır ve int'e sığmayıp taşar",
+        "if (ham > 0) koşulu gereksiz",
+        "Serial.println ondalık yazamaz"
+      ],
+      "answer": 1,
+      "explanation": "10000 ve (1024 - ham) tam sayıdır; çarpım çoğu ham değeri için 32767'yi aşar ve taşar. Çözüm 10000.0 yazmaktır. if (ham > 0) sıfıra bölmeyi önlediği için doğrudur, println(rLdr, 0) ise sorunsuz çalışır.",
+      "skills": [
+        "sensor-ldr",
+        "prog-debug"
+      ]
+    }
+  ]
+}

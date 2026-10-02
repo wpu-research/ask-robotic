@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "CSV",
+      "definition": "Her satırı bir kayıt, sütunları virgülle ayrılmış düz metin tablosu; ilk satır sütun adlarıdır.",
+      "example": "zaman,sicaklik_C,nem_yuzde başlığının altına her ölçüm bir satır olarak eklenir.",
+      "pitfall": "Başlık satırı ile veri satırlarındaki sütun sayısını farklı yazmak."
+    },
+    {
+      "term": "Zaman damgası (ISO 8601)",
+      "definition": "Ölçümün anını yıl-ay-gün saat:dakika:saniye biçiminde, ay ve gün iki haneli yazan düzen.",
+      "example": "2026-03-14 08:30:05 her ülkede aynı okunur ve metin olarak sıralansa bile zaman sırasında dizilir.",
+      "pitfall": "Ay ve günü tek haneli bırakmak (2026-3-9); sıralama bozulur."
+    },
+    {
+      "term": "Satır üretme fonksiyonu",
+      "definition": "Bir zaman ve iki sayıdan CSV satırı üreten, donanıma dokunmayan fonksiyon.",
+      "example": "satirOlustur(DateTime(2026,1,5,7,8,9), 21.0, NAN) çıktısı sabit değerlerle denenebilir.",
+      "pitfall": "Her yere (Serial, SD) ayrı biçimleme kodu yazmak; iki yerde satır biçimi farklı çıkar."
+    },
+    {
+      "term": "NaN ve boş alan",
+      "definition": "Sensör okunamayınca float NaN olur; CSV'de bu, alanın boş bırakılmasıyla gösterilir.",
+      "example": "Üçüncü satır 2026-07-09 23:59:59,, olarak yazılır; zaman damgası kalır, sütunlar kaymaz.",
+      "pitfall": "NaN'ı yazıya çevirmeye çalışmak ya da o satırı atlayıp kaydı hiç tutmamak."
+    },
+    {
+      "term": "dtostrf()",
+      "definition": "float'ı belirli genişlik ve ondalık basamakla yazıya çeviren AVR işlevi.",
+      "example": "dtostrf(23.5, 1, 1, tampon) tampona \"23.5\" yazar.",
+      "pitfall": "sprintf'in %f ile çalışacağını sanmak; AVR'de varsayılan olarak desteklenmez."
+    },
+    {
+      "term": "Ondalık ayırıcı ve ayraç",
+      "definition": "Sayı içindeki ondalık işareti ile sütunları ayıran karakter birbirine karışmamalıdır.",
+      "example": "Türkçe Excel için 23,5;55,0 biçimi (virgül ondalık, noktalı virgül ayraç) kullanılabilir.",
+      "pitfall": "Ondalık virgül ve ayraç virgül birlikte kullanılırsa 23,5 iki sütuna bölünür."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d68-q1",
+      "kind": "predict-output",
+      "prompt": "Aşağıdaki çağrı çalışınca seri monitörde ne görünür? (satirOlustur dersteki fonksiyondur: iki haneli alanlar, bir ondalıklı sayılar, NaN için boş alan.)\n\n```\nSerial.println(satirOlustur(DateTime(2026, 1, 5, 7, 8, 9), 21.0, NAN));\n```",
+      "options": [
+        "2026-1-5 7:8:9,21.0,",
+        "2026-01-05 07:08:09,21.0,",
+        "2026-01-05 07:08:09,21.0,0",
+        "2026-01-05 07:08:09,21,"
+      ],
+      "answer": 1,
+      "explanation": "ikiHane() ay, gün, saat, dakika ve saniyeyi iki haneye tamamlar. dtostrf 1 ondalık basamak verdiği için 21.0 yazılır. nem NaN olduğu için son alan boş kalır; sıfır yazılmaz ve satırın sonundaki virgül sütun sayısını korur.",
+      "skills": [
+        "data-logging",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d68-q2",
+      "kind": "find-bug",
+      "prompt": "CSV dosyasını tablo programında zamana göre sıraladığında 2026-12-01 satırı 2026-3-9 satırından önce çıkıyor. Satır üreten kodun hangi kısmı sorumlu?\n\n```\ns += t.year();\ns += '-';\ns += t.month();\ns += '-';\ns += t.day();\n```",
+      "options": [
+        "year() yerine yıl iki haneli olmalı",
+        "Tire yerine eğik çizgi kullanılmalı",
+        "s += yerine s = kullanılmalı",
+        "month() ve day() iki haneli yazılmıyor; ikiHane() kullanılmalı"
+      ],
+      "answer": 3,
+      "explanation": "month() ve day() başa sıfır koymaz. \"2026-3-9\" ile \"2026-12-01\" metin olarak karşılaştırılınca \"2026-1\" ile \"2026-3\" karşılaştırılır; 12. ay 3. aydan önce sıralanır. İki haneli yazınca \"2026-03-09\" olur ve metin sırası zaman sırasıyla örtüşür.",
+      "skills": [
+        "data-logging",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d68-q3",
+      "kind": "numeric",
+      "prompt": "Bir kayıt cihazı satırı virgül ayraçlı ve ondalık virgüllü olarak şöyle yazıyor: 2026-03-14 08:30:05,23,5,55,0. Bir tablo programı bu satırı kaç sütun olarak okur?",
+      "answer": 5,
+      "unit": "sütun",
+      "explanation": "Satır virgüllerden bölünür: \"2026-03-14 08:30:05\", \"23\", \"5\", \"55\", \"0\". Beklenen 3 sütun yerine 5 sütun çıkar. Çözüm ondalıkta nokta kullanmak ya da ayracı noktalı virgül yapmaktır.",
+      "skills": [
+        "data-logging"
+      ]
+    },
+    {
+      "id": "m4h7d68-q4",
+      "kind": "mcq",
+      "prompt": "Zaman damgası olarak millis() değerini (örneğin 123456) yazmak neden yetersizdir?",
+      "options": [
+        "millis() kart her açıldığında sıfırlanır; satırın gerçek tarih ve saatini söylemez",
+        "millis() sayı olduğu için CSV'ye yazılamaz",
+        "millis() her zaman 1000'e bölünmelidir",
+        "CSV dosyalarında yalnız metin olabilir"
+      ],
+      "answer": 0,
+      "explanation": "millis() kart açıldığından beri geçen süreyi verir ve kart yeniden başlayınca sıfırdan başlar. Bir yıl sonra dosyayı açan biri satırın ne zaman yazıldığını bulamaz. RTC'den alınan tarih ve saat gerçek zamanı verir. Sayıların CSV'ye yazılmasında sorun yoktur.",
+      "skills": [
+        "data-logging",
+        "rtc-time"
+      ]
+    },
+    {
+      "id": "m4h7d68-q5",
+      "kind": "numeric",
+      "prompt": "Cihaz her 5 saniyede bir satır yazıyor. Bir gün (24 saat) kesintisiz çalışırsa dosyaya kaç veri satırı eklenir? (Başlık satırını sayma.)",
+      "answer": 17280,
+      "unit": "satır",
+      "explanation": "Bir günde 24 × 60 × 60 = 86400 saniye vardır. 86400 ÷ 5 = 17280 satır. Bu hesap, ölçüm aralığını seçerken kartın dolma hızını tahmin etmek için kullanılır.",
+      "skills": [
+        "data-logging",
+        "prog-planning"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "concepts": [
+    {
+      "term": "Sıçrama (bounce)",
+      "definition": "Mekanik kontakların birleşirken kısa süre titreyerek pini birkaç kez HIGH ile LOW arasında gidip getirmesi.",
+      "example": "Gerçek bir butona bir kez basarsın, sayaç 1 yerine 3 artar.",
+      "pitfall": "Laboratuvar butonu sıçramadığı için debounce'un gereksiz olduğunu düşünmek."
+    },
+    {
+      "term": "Kararlı kalma süresi",
+      "definition": "Debounce'ta bir pin değerinin kabul edilmesi için değişmeden kalması gereken süre (örneğin 20 ms).",
+      "example": "Pin son değişimden 20 ms sonra hâlâ LOW ise basış kabul edilir.",
+      "pitfall": "Süreyi çok kısa seçmek sıçramayı sızdırır, çok uzun seçmek hızlı basışları kaçırır."
+    },
+    {
+      "term": "Tepki gecikmesi",
+      "definition": "Bir olayın gerçekleşmesi ile programın buna cevap vermesi arasındaki süre.",
+      "example": "loop içinde delay(500) varsa buton tepkisi 500 ms'ye kadar gecikebilir.",
+      "pitfall": "Başka işi delay ile bekleterek butonu da aynı sürede dinlemeyi beklemek."
+    },
+    {
+      "term": "millis() ile bloklamayan kod",
+      "definition": "Yavaş işin kendi zamanını millis() ile tutması, loop() içinde diğer girdilerin her turda okunması.",
+      "example": "Her 500 ms'de bir \"tik\" yazılır ama butona her turda bakılır.",
+      "pitfall": "Basılı tutarken her turda mesaj yazıp seri monitörü doldurmak; kenar algılama gerekir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d2-q1",
+      "kind": "mcq",
+      "prompt": "Gerçek bir butonla sıçramayı önlemeyen bir sayaç, tek basışta neden birkaç sayım yapar?",
+      "options": [
+        "Pin basış sırasında kısa süre HIGH ile LOW arasında gidip gelir ve her LOW'a geçiş sayılır",
+        "Arduino butonu iki kez okuyacak şekilde tasarlanmıştır",
+        "INPUT_PULLUP butonun iki ucunu da 5 V'a bağlar",
+        "Sayaç int olduğu için sayıyı iki katına çıkarır"
+      ],
+      "answer": 0,
+      "explanation": "Kontaklar çarpışıp titrediği için pin tek basışta birkaç kez değişir ve kenar algılayan kod her düşen kenarı sayar. Arduino butonu iki kez okumaz; INPUT_PULLUP pini 5 V'a çeker, butonun ucunu değil; int sayım sayısını katlamaz.",
+      "skills": [
+        "sens-debounce"
+      ]
+    },
+    {
+      "id": "m4h8d2-q2",
+      "kind": "numeric",
+      "prompt": "Debounce kodunda SAKIN_SURE = 20 ms. Bir basışın sayılması için pinin en az kaç ms boyunca değişmeden kalması gerekir?",
+      "answer": 20,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "Kod her değişimde zamanı sıfırlar ve yalnızca değer 20 ms sakin kaldığında kabul eder. Bu yüzden 20 ms dolmadan bırakılan bir basış sayılmaz; bu bekleme süresinin bedelidir.",
+      "skills": [
+        "sens-debounce",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h8d2-q3",
+      "kind": "predict-output",
+      "prompt": "Buton D2'de (INPUT_PULLUP). Program başladıktan hemen sonra butona yalnızca 100 ms basılıp bırakılıyor. Bu kod seri monitöre ne yazar?\n\n```cpp\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\nvoid loop() {\n  if (digitalRead(2) == LOW) Serial.println(\"BASILDI\");\n  delay(500);\n}\n```",
+      "options": [
+        "BASILDI sürekli yazar",
+        "Hiçbir şey yazmaz",
+        "BASILDI bir kez yazar",
+        "BASILDI iki kez yazar"
+      ],
+      "answer": 1,
+      "explanation": "Program pini okuduktan sonra 500 ms uyur. Basış, iki okuma arasındaki 500 ms içinde başlayıp bittiği için hiç görülmez. Okuma tam basış anına denk gelmediği sürece kısa basış kaçar; millis() ile her turda okunsaydı yakalanırdı.",
+      "skills": [
+        "sens-nonblocking",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h8d2-q4",
+      "kind": "find-bug",
+      "prompt": "Bu debounce kodunda sıçrama yine sayılıyor. Hangi satır eksik?\n\n```cpp\nbool ham = digitalRead(2) == LOW;\nif (ham != sonHam) {\n  sonHam = ham;\n}\nif (millis() - sonDegisim >= 20 && ham != kararli) {\n  kararli = ham;\n  if (kararli) sayac++;\n}\n```",
+      "options": [
+        "sayac++ yerine sayac-- olmalı",
+        "digitalRead yerine analogRead kullanılmalı",
+        "20 değeri 0 olmalı",
+        "if (ham != sonHam) bloğunda sonDegisim = millis(); yok"
+      ],
+      "answer": 3,
+      "explanation": "Son değişim zamanı hiç güncellenmediği için millis() - sonDegisim hep 20'den büyük kalır; bekleme fiilen yoktur ve her sıçrama hemen kabul edilir. Doğru kodda pin her değiştiğinde sayaç sıfırlanır (sonDegisim = millis()). Diğer seçenekler hatayı gidermez; 20'yi 0 yapmak beklemeyi tamamen kaldırır.",
+      "skills": [
+        "sens-debounce",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d2-q5",
+      "kind": "numeric",
+      "prompt": "Bir programın loop() içinde delay(50) var ve pin her turda yalnızca bir kez okunuyor. Butonu garanti yakalamak için en az kaç ms basılı tutmak gerekir?",
+      "answer": 50,
+      "tolerance": 5,
+      "unit": "ms",
+      "explanation": "İki okuma arası yaklaşık 50 ms. Bu süreden kısa bir basış iki okuma arasına sığıp kaçabilir; 50 ms ya da daha uzun basış en az bir okumaya denk gelir. delay'i 5'e indirmek ya da millis() kullanmak bu aralığı küçültür.",
+      "skills": [
+        "sens-nonblocking",
+        "prog-timing"
+      ]
+    }
+  ]
+}

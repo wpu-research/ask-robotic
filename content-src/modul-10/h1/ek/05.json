@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "başlangıçta ve sonsuza kadar",
+      "definition": "başlangıçta bir kez, sonsuza kadar ise sen durdurana kadar sürekli tekrar çalışır.",
+      "example": "Selam yazısı başlangıçta içinde, kalp atışı sonsuza kadar içinde olur.",
+      "pitfall": "Yazıyı sonsuza kadar içine koymak: her turda yeniden kayar ve kalp atışını bozar."
+    },
+    {
+      "term": "Ritim",
+      "definition": "Bir hareketin bekleme sürelerinin dizisi; toplamı bir turun süresidir.",
+      "example": "150, 100, 150, 400 ms beklemeler 800 ms'lik bir kalp atışı turu verir.",
+      "pitfall": "Aradaki beklemeleri koymamak; büyük ve küçük kalp ayırt edilmez."
+    },
+    {
+      "term": "Parlaklık",
+      "definition": "ekran parlaklığını yap bloğu LED'lerin ışığını 0 (kapalı) ile 255 (en parlak) arasında ayarlar.",
+      "example": "Parlaklık 200 yapınca ekran biraz kısılır.",
+      "pitfall": "Parlaklığı 0 yapıp programın bozulduğunu sanmak; ekran çalışır ama karanlıktır."
+    },
+    {
+      "term": "Tur sayısı ve hız",
+      "definition": "Bir turun süresi kısaldıkça aynı sürede daha çok tur yapılır; dakikadaki tur sayısı 60 000 / tur süresidir.",
+      "example": "800 ms'lik turla dakikada yaklaşık 75 tur olur.",
+      "pitfall": "Süreyi saniye sanmak; bekleme blokları milisaniye cinsindendir."
+    },
+    {
+      "term": "Plan tablosu",
+      "definition": "Projeyi adım adım (hangi bölüm, hangi iş) yazan küçük tablo.",
+      "example": "Adım 1: parlaklığı ayarla, adım 2: yazıyı göster, adım 3: kalbi sonsuza kadar içinde at.",
+      "pitfall": "Plansız başlamak; blokları rastgele sürükleyip nereye ait olduklarını unutmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d5-q1",
+      "kind": "numeric",
+      "prompt": "Atan kalpte beklemeler sırasıyla 150, 100, 150 ve 400 ms'dir. Bir kalp atışı turunun bekleme süresi toplamı kaç milisaniyedir?",
+      "answer": 800,
+      "unit": "ms",
+      "explanation": "150 + 100 + 150 + 400 = 800 ms. Çizim blokları beklemediği için tur süresini yalnızca bekle blokları belirler.",
+      "skills": [
+        "mk-timing",
+        "mk-planning"
+      ]
+    },
+    {
+      "id": "m10h1d5-q2",
+      "kind": "numeric",
+      "prompt": "Bir tur 800 ms sürüyorsa, kalp 1 dakikada (60 000 ms) yaklaşık kaç kez atar? (Her turu tek atış sayın.)",
+      "answer": 75,
+      "tolerance": 2,
+      "unit": "tur",
+      "explanation": "60 000 / 800 = 75 tur. Gerçek sanal kartta sonsuza kadar bloğu her turun sonunda yaklaşık 20 ms soluklanır; bu yüzden pratikte yaklaşık 73 tur olur ve küçük bir fark kabul edilir.",
+      "skills": [
+        "mk-timing",
+        "mk-repeat"
+      ]
+    },
+    {
+      "id": "m10h1d5-q3",
+      "kind": "predict-output",
+      "prompt": "Selam yazısı yanlışlıkla sonsuza kadar bloğuna konmuştur. Bu program çalışınca ne olur?\n\n```\ncard.forever(() => {\n  screen.showText(\"Sev\");\n  screen.showIcon(\"heart\");\n  wait(500);\n});\n```",
+      "options": [
+        "Yazı bir kez kayar, sonra kalp sürekli görünür",
+        "Yalnızca yazı kayar, kalp görünmez",
+        "Kalp yarım saniye görünür, sonra yazı yeniden kayar; bu böyle sürer",
+        "Program hata verip durur"
+      ],
+      "answer": 2,
+      "explanation": "sonsuza kadar bloğundaki her şey her turda yeniden çalışır. Yazı yaklaşık 2 saniye kayar, ardından kalp 500 ms görünür ve tur başa döner. Bu yüzden yazıyı başlangıçta bloğuna koymak gerekir. Program hata vermez.",
+      "skills": [
+        "mk-flow",
+        "mk-repeat"
+      ]
+    },
+    {
+      "id": "m10h1d5-q4",
+      "kind": "find-bug",
+      "prompt": "Zeynep kalp atışı çalışırken ekranda hiçbir şey göremiyor.\n\n```\n1  card.onStart(() => {\n2    screen.setBrightness(0);\n3    screen.showText(\"Sev\");\n4  });\n```\n\nSorun hangi satırdadır?",
+      "options": [
+        "3. satır: yazı çok kısa",
+        "1. satır: onStart yerine forever gerekir",
+        "4. satır: kapanış parantezi fazla",
+        "2. satır: parlaklık 0 ekranı karartır; 0 ile 255 arasında sıfırdan büyük bir değer gerekir"
+      ],
+      "answer": 3,
+      "explanation": "Parlaklık 0 ise LED'ler çizim yapılsa bile karanlık kalır. Program bozuk değildir; sayıyı yükseltmek yeterlidir (örneğin 200). Başlangıç bloğu doğru yerdedir ve yazı uzunluğu, görünürlüğü etkilemez.",
+      "skills": [
+        "mk-debug",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d5-q5",
+      "kind": "mcq",
+      "prompt": "Koşan birinin kalbi gibi daha hızlı bir atış istiyorsun. Ne yapmalısın?",
+      "options": [
+        "Bekleme sürelerini uzatmalısın",
+        "Bekleme sürelerini kısaltmalısın",
+        "Parlaklığı 255 yapmalısın",
+        "Kalp simgesini küçük kalp yapmalısın"
+      ],
+      "answer": 1,
+      "explanation": "Tur süresi bekle bloklarının toplamıdır; kısalırsa aynı sürede daha çok tur yapılır ve kalp hızlanır. Uzatmak yavaşlatır. Parlaklık ve simge seçimi ritmi değil görüntüyü etkiler.",
+      "skills": [
+        "mk-timing",
+        "mk-planning"
+      ]
+    }
+  ]
+}

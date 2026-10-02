@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Altı parçalı prompt",
+      "definition": "Görev, rol, bağlam, örnek, biçim ve kısıt parçalarını içeren prompt.",
+      "example": "Rol: mentör; görev: özetle; bağlam: 13 yaş; örnek; \"en fazla 3 madde\"; \"bilgi ekleme\".",
+      "pitfall": "Parçaları rastgele sıralayıp birbiriyle çelişen cümleler yazmak."
+    },
+    {
+      "term": "Kaynağa sadakat kısıtı",
+      "definition": "Modele yalnız verilen metindeki bilgiyi kullanmasını söyleyen cümle.",
+      "example": "Duyuruda olmayan bir bilgi ekleme.",
+      "pitfall": "Kısıtı garanti saymak; model yine de uydurabilir (36. derste ele alınır)."
+    },
+    {
+      "term": "Sadeleştirme",
+      "definition": "Bilgi vermeyen cümleleri çıkarıp her cümlenin bir iş yapmasını sağlamak.",
+      "example": "\"Çok güzel bir özet yaz\" yerine \"en fazla 3 madde yaz\" kullanmak.",
+      "pitfall": "Hangi cümlenin gereksiz olduğunu ölçmeden çıkarmak."
+    },
+    {
+      "term": "Tasarım notu",
+      "definition": "Prompt'taki seçimlerin gerekçesini anlatan kısa yazı.",
+      "example": "Rolü, örneği ve biçimi neden seçtiğini üç cümleyle yazmak.",
+      "pitfall": "Notu hiç yazmamak; birkaç hafta sonra prompt'un neden öyle olduğunu kendin de unutursun."
+    },
+    {
+      "term": "Ölçülmüş kanıt",
+      "definition": "Prompt'un kalitesini gerçek örneklerle denenmiş sonuçlarla göstermek.",
+      "example": "10 gerçek duyuruda 9'unda özet 3 maddeyi aşmadı.",
+      "pitfall": "Yüksek puanı tek başına kanıt saymak."
+    },
+    {
+      "term": "Simülasyon dürüstlüğü",
+      "definition": "Atölyedeki Prompt denetleyici bir model değildir; bir cevap üretmez.",
+      "example": "Puan, parçaların varlığını gösterir; çıktı kalitesini değil.",
+      "pitfall": "90 puanı \"gerçek modelde de iyi çalışır\" diye yorumlamak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d15-q1",
+      "kind": "mcq",
+      "prompt": "Şu prompt'ta altı parçadan hangi ikisi eksik?\n\n\"Aşağıdaki duyuruyu 13 yaşındaki öğrenciler için özetle. Özeti en fazla 3 madde olarak yaz. Kulüp üyeleri toplantıyı kaçırmasın.\"",
+      "options": [
+        "Görev ve biçim",
+        "Rol ve örnek",
+        "Bağlam ve kısıt",
+        "Biçim ve örnek"
+      ],
+      "answer": 1,
+      "explanation": "Görev: \"özetle\". Bağlam: 13 yaşındaki öğrenciler ve toplantıyı kaçırmama amacı. Biçim ve sınır: \"en fazla 3 madde\". Rol (\"Sen … bir mentörsün\") ve örnek (Girdi/Çıktı çifti) yoktur. Atölyedeki denetleyici de bu iki parçayı eksik gösterir.",
+      "skills": [
+        "ai-prompt-parts"
+      ]
+    },
+    {
+      "id": "m7h3d15-q2",
+      "kind": "numeric",
+      "prompt": "Projede prompt en az 40 kelime olmalı. Taslağın 27 kelime. En az kaç kelime daha eklemelisin?",
+      "answer": 13,
+      "unit": "kelime",
+      "explanation": "40 − 27 = 13. Kelime sayısını artırmak için anlamsız dolgu eklemek işe yaramaz; eksik parçalardan birini (örnek, bağlam) yazmak hem sayıyı hem kaliteyi artırır.",
+      "skills": [
+        "ai-prompt-parts"
+      ]
+    },
+    {
+      "id": "m7h3d15-q3",
+      "kind": "find-bug",
+      "prompt": "Duyuru özetleyici prompt'unda hangi satır diğerleriyle çelişiyor?\n\n```\n1 Sen deneyimli bir robotik kulübü mentörüsün.\n2 Aşağıdaki duyuruyu 13 yaşındaki öğrenciler için özetle.\n3 Özeti en fazla 3 madde olarak yaz.\n4 Duyuruda olmayan bilgileri tahminle tamamla.\n```",
+      "options": [
+        "1. satır: rol gereksiz",
+        "2. satır: yaş yazılmamalı",
+        "3. satır: madde sayısı sınırlanmamalı",
+        "4. satır: özetin kaynağa sadık kalması gerekirken uydurmayı teşvik ediyor"
+      ],
+      "answer": 3,
+      "explanation": "Bir özet, duyurudaki bilgiyi aktarmalıdır; \"olmayan bilgileri tahminle tamamla\" ise uydurmaya yönlendirir. Doğrusu \"duyuruda olmayan bilgi ekleme\" olurdu. Kural tabanlı denetleyici bu çelişkiyi görmez: iki sürümün de puanı 80'dir. Bu yüzden prompt'u okumak ve denemek gerekir.",
+      "skills": [
+        "ai-prompt-parts",
+        "ai-honest-measure"
+      ]
+    },
+    {
+      "id": "m7h3d15-q4",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisi \"bu prompt iyi çalışıyor\" iddiasını en güçlü destekler?",
+      "options": [
+        "Prompt denetleyici 90 puan verdi",
+        "Prompt çok uzun ve ayrıntılı",
+        "Prompt'u 10 gerçek duyuruda denedim ve özetlerin 9'u duyuruya sadık kaldı",
+        "Prompt'u bir arkadaşım beğendi"
+      ],
+      "answer": 2,
+      "explanation": "En güçlü kanıt, gerçek örneklerde ölçülmüş sonuçtur. Denetleyici puanı yalnız parçaların varlığını söyler; uzunluk kaliteyi garanti etmez; beğeni bir görüştür. Sayıyla ifade edilen deneme (9 / 10) hem tekrar edilebilir hem tartışılabilir.",
+      "skills": [
+        "ai-honest-measure",
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d15-q5",
+      "kind": "mcq",
+      "prompt": "Atölyede prompt'un 100 puan aldı. Aynı prompt'u gerçek bir modele verirsen ne beklersin?",
+      "options": [
+        "Bir cevap gelir ama kalitesi garanti değildir; ölçmen gerekir",
+        "Atölyedeki cevabın aynısı",
+        "Mutlaka kusursuz bir özet",
+        "Model prompt'u okumaz"
+      ],
+      "answer": 0,
+      "explanation": "Atölyede model cevabı yoktur; denetleyici yalnız parçalara bakar. Gerçek bir modelde çıktı yine de değişkendir (sıcaklık, bağlam) ve yanlış ya da uydurma içerebilir. Bu yüzden prompt, gerçek örneklerle ölçülür.",
+      "skills": [
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

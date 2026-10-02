@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Şifreleme",
+      "definition": "Bilgiyi göndermeden önce başkaları anlamasın diye karıştırmak.",
+      "example": "3 rakamı anahtar 7 ile 10'a çevrilip yollanır.",
+      "pitfall": "Şifrelemeyi gerçek güvenlik sanmak; basit toplama şifresi kolay kırılır."
+    },
+    {
+      "term": "Anahtar",
+      "definition": "İki tarafın da bildiği gizli sayı; şifrelemede ve çözmede kullanılır.",
+      "example": "Anahtar 7 ise gönderen +7 yapar, alan −7 yapar.",
+      "pitfall": "Alan tarafta anahtarı ayarlamayı unutmak: değişken 0 kalır ve çözme yanlış çıkar."
+    },
+    {
+      "term": "Düz mesaj ve şifreli mesaj",
+      "definition": "Düz mesaj gerçek bilgidir; şifreli mesaj yolda giden, anahtarla değiştirilmiş sayıdır.",
+      "example": "Düz 3, anahtar 7 ise şifreli mesaj 10'dur.",
+      "pitfall": "Radyo bölümünde görünen sayıyı gerçek bilgi sanmak; o şifrelidir."
+    },
+    {
+      "term": "Ters işlem",
+      "definition": "Toplamanın tersi çıkarmadır; bir işlemi geri alan işlem.",
+      "example": "Gönderen toplar (3 + 7 = 10), alan çıkarır (10 − 7 = 3).",
+      "pitfall": "İki tarafta da aynı işlemi kullanmak; ikisi de toplarsa sonuç 17 çıkar."
+    },
+    {
+      "term": "Değişkenle anahtar",
+      "definition": "Anahtarı bir değişkende tutmak, değeri tek yerde değiştirmeyi sağlar.",
+      "example": "başlangıçta anahtar değerini 7 yap; hem gönderme hem alma anahtarı kullanır.",
+      "pitfall": "Anahtarı iki yerde elle yazmak; birini değiştirip öbürünü unutabilirsin."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d23-q1",
+      "kind": "numeric",
+      "prompt": "Düz mesaj 5, anahtar 12. Gönderen toplayarak şifreliyor. Radyoyla hangi sayı gider?",
+      "answer": 17,
+      "tolerance": 0,
+      "explanation": "Şifreli mesaj = düz mesaj + anahtar = 5 + 12 = 17. Alan taraf 17 − 12 = 5 ile gerçek rakamı bulur.",
+      "skills": [
+        "mk-cipher",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h5d23-q2",
+      "kind": "numeric",
+      "prompt": "Gönderen anahtar 12 ile 5 rakamını şifreleyip 17 yolladı. Alan kart anahtarı yanlışlıkla 7 sanıyor. Alan kart ekranda hangi sayıyı gösterir?",
+      "answer": 10,
+      "tolerance": 0,
+      "explanation": "Alan taraf 17 − 7 = 10 hesaplar. Doğru anahtar 12 olsaydı 5 bulurdu. Yanlış anahtar hata mesajı vermez, sessizce yanlış sonuç üretir.",
+      "skills": [
+        "mk-cipher",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d23-q3",
+      "kind": "predict-output",
+      "prompt": "İki kart da bu programı çalıştırıyor (grup 1). Kart 1'de A'ya 4 kez, sonra B'ye 1 kez basılıyor. Radyo bölümündeki \"Son alınan\" kutusunda ve Kart 2'nin ekranında ne görünür?\n\n```\nbaşlangıçta:\n    radyo grubunu 1 yap\n    gizli değerini 0 yap\n    anahtar değerini 7 yap\n\ndüğme A basılınca:\n    gizli değerine 1 ekle\n    sayıyı göster gizli\n\ndüğme B basılınca:\n    radyoyla sayı gönder (gizli + anahtar)\n\nradyo mesajı alınınca:\n    sayıyı göster (alınan sayı − anahtar)\n```",
+      "options": [
+        "Son alınan 4, ekran 4",
+        "Son alınan 11, ekran 11",
+        "Son alınan 4, ekran 11",
+        "Son alınan 11, ekran 4"
+      ],
+      "answer": 3,
+      "explanation": "A dört kez basılınca gizli = 4. B ile 4 + 7 = 11 gönderilir; kutu 11 gösterir. Kart 2 anahtarı da 7 olduğundan 11 − 7 = 4 gösterir. Yani yolda 11, ekranda 4 vardır.",
+      "skills": [
+        "mk-cipher",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h5d23-q4",
+      "kind": "find-bug",
+      "prompt": "Gönderen \"gizli + anahtar\" yolluyor. Alan kart gerçek rakamı bulmak istiyor ama sonuç hep fazla çıkıyor (örneğin 3 yerine 17). Hatayı bul.\n\n```\nradyo mesajı alınınca:\n    sayıyı göster (alınan sayı + anahtar)\n```",
+      "options": [
+        "Anahtar başlangıçta ayarlanmamış",
+        "Alan taraf çıkarmak yerine topluyor",
+        "Radyo grubu eksik",
+        "sayıyı göster yerine yazıyı göster bloğu gerekir"
+      ],
+      "answer": 1,
+      "explanation": "Gönderen topladığına göre alan çıkarmalı. Alan da toplarsa 10 + 7 = 17 çıkar. Anahtarın başlangıçta ayarlanması ya da grup bloğu bu sonucu üretmez.",
+      "skills": [
+        "mk-cipher",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d23-q5",
+      "kind": "mcq",
+      "prompt": "Bu toplama şifresi neden güçlü bir şifre değildir?",
+      "options": [
+        "Radyo mesajları çok yavaş gider",
+        "Toplama işlemi geri alınamaz",
+        "Anahtar küçük bir sayı olduğu için denenerek bulunabilir",
+        "Alan kart mesajı alamaz"
+      ],
+      "answer": 2,
+      "explanation": "Anahtar küçük bir sayıdır; yolu dinleyen biri 1, 2, 3 ... diye deneyerek kısa sürede bulur. Toplama geri alınabilir bir işlemdir, bu şifrenin çalışması için gerekli olan özellik budur; sorun değildir. Radyonun yavaşlığı da güvenlikle ilgisizdir.",
+      "skills": [
+        "mk-cipher"
+      ]
+    }
+  ]
+}

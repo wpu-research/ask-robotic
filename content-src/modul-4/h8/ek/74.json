@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Katmanlı hata ayıklama",
+      "definition": "Hatayı alttan üste (fiziksel, adres, kimlik, veri) sırayla doğrulayıp ilk başarısız katmanı kök neden saymak.",
+      "example": "Adres cevap veriyor ama kimlik yazmacı beklenenden farklı: kök neden katman 3'tedir.",
+      "pitfall": "Alt katmanı doğrulamadan yazılımı değiştirmeye başlamak."
+    },
+    {
+      "term": "WHO_AM_I yazmacı",
+      "definition": "Birçok sensörde cihazın kimliğini veren yazmaç; MPU6050'de adresi 0x75, beklenen değeri 0x68'dir.",
+      "example": "Wire ile 0x75'i okuyup 0x68 gelmezse yanlış ya da arızalı bir cihaz vardır.",
+      "pitfall": "Adres cevabını \"doğru cihaz bu\" diye yorumlamak."
+    },
+    {
+      "term": "Makullük kontrolü",
+      "definition": "Okunan değerin fiziksel olarak beklenen aralıkta olup olmadığına bakmak.",
+      "example": "Hareketsiz MPU6050'de ivme büyüklüğü yaklaşık 1 g olmalı; 0 g ya da 1,9 g şüphelidir.",
+      "pitfall": "Kontrolü koşulsuz yapmak: sensör hareket ederken yanlış alarm verir."
+    },
+    {
+      "term": "XOR checksum",
+      "definition": "Mesajdaki baytların XOR'u alınarak elde edilen ve alıcının yeniden hesaplayıp karşılaştırdığı kontrol baytı.",
+      "example": "AA 02 01 01 02 çerçevesinde 02 ^ 01 ^ 01 = 02, son bayt eşleşir.",
+      "pitfall": "Checksum'ı hesaplamadan gelen baytı doğru sanmak; bozuk çerçeve uygulanır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d4-q1",
+      "kind": "mcq",
+      "prompt": "MPU6050 için adres 0x68 cevap veriyor, ama kimlik yazmacından (WHO_AM_I) 0x70 geliyor (beklenen 0x68). Hata hangi katmandadır?",
+      "options": [
+        "Katman 1 (fiziksel hatlar)",
+        "Katman 2 (adres)",
+        "Katman 3 (kimlik)",
+        "Katman 4 (veri makullüğü)"
+      ],
+      "answer": 2,
+      "explanation": "Fiziksel hatlar ve adres tamam; cevap veren cihaz beklenen kimliği vermiyor, yani yanlış ya da farklı bir cihaz. İlk başarısız katman 3'tür. Katman 4'ü sınamanın anlamı yoktur, çünkü cihazın kim olduğu bilinmiyor.",
+      "skills": [
+        "dbg-layers"
+      ]
+    },
+    {
+      "id": "m4h8d4-q2",
+      "kind": "numeric",
+      "prompt": "Çerçeve: sync 0xAA, N = 3, veri baytları 0x01, 0x01, 0x06. Son bayt = N ve veri baytlarının XOR'u. Son baytın değeri (onluk) kaçtır?",
+      "answer": 5,
+      "tolerance": 0,
+      "explanation": "3 XOR 1 = 2, 2 XOR 1 = 3, 3 XOR 6 = 5. Alıcı aynı hesabı yapıp 5'i bulamazsa çerçeve bozulmuştur ve yok sayılır.",
+      "skills": [
+        "dbg-checksum"
+      ]
+    },
+    {
+      "id": "m4h8d4-q3",
+      "kind": "predict-output",
+      "prompt": "Hareketsiz sanılan bir MPU6050 eğik tutuluyor (x = 0,5, y = 0,5, z = 1,0 g). Bu kod ne yazar?\n\n```cpp\nvoid setup() {\n  Serial.begin(9600);\n  float x = 0.5, y = 0.5, z = 1.0;\n  float g = sqrt(x * x + y * y + z * z);\n  if (g < 0.8 || g > 1.2) Serial.println(\"HATA\");\n  else Serial.println(\"TAMAM\");\n}\nvoid loop() {}\n```",
+      "options": [
+        "TAMAM",
+        "Hiçbir şey yazmaz",
+        "Derleme hatası verir",
+        "HATA"
+      ],
+      "answer": 3,
+      "explanation": "g = karekök(0,25 + 0,25 + 1) ≈ 1,22, bu 1,2'den büyüktür, bu yüzden HATA yazar. Sensör sağlam; makullük aralığı \"hareketsiz\" koşuluna dayandığı için sensör eğik ya da hızlanırken yanlış alarm verir.",
+      "skills": [
+        "dbg-layers",
+        "dbg-plausibility"
+      ]
+    },
+    {
+      "id": "m4h8d4-q4",
+      "kind": "find-bug",
+      "prompt": "Bu çerçeve ayrıştırıcıda geçerli çerçeveler (örneğin AA 02 01 01 02) hep CHECKSUM HATA veriyor. Hata hangisi?\n\n```cpp\ncase UZUNLUK:\n  n = b;\n  alinan = 0;\n  xorHesap = 0;      // satır A\n  asama = VERI;\n  break;\ncase VERI:\n  xorHesap ^= b;     // satır B\n  alinan++;\n  if (alinan == n) asama = SUM;\n  break;\n```",
+      "options": [
+        "alinan++ satırı gereksiz",
+        "n = b satırı gereksiz",
+        "Satır A: XOR, uzunluk baytı n ile başlamalı (xorHesap = b)",
+        "Satır B: ^= yerine += kullanılmalı"
+      ],
+      "answer": 2,
+      "explanation": "Çerçevenin sağlama baytı N ve veri baytlarının XOR'udur. xorHesap sıfırdan başlarsa N hesaba katılmaz: 01 ^ 01 = 0 çıkar ve gelen 02 ile eşleşmez. Doğrusu xorHesap = b. XOR yerine toplama kullanmak başka bir yöntemdir ve çerçeve tanımıyla uyuşmaz.",
+      "skills": [
+        "dbg-checksum",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d4-q5",
+      "kind": "mcq",
+      "prompt": "Bir arkadaşın \"sensör arada düzeliyor, önemli değil\" diyor. En doğru yaklaşım hangisi?",
+      "options": [
+        "Düzeldiğine göre sorun yok, bırak",
+        "Kararsızlık bir katmanın sağlıksız olduğunu gösterir; katmanları alttan üste yeniden sına ve sorunun geri gelmediğinden emin olana dek izle",
+        "Kodu baştan yaz",
+        "Sensörü hemen çöpe at"
+      ],
+      "answer": 1,
+      "explanation": "Hyvex vakasındaki gibi \"arada düzeliyor\" kararsız bir katmanın işaretidir. Kök nedeni bulmadan geçiştirmek hatayı sonra geri getirir. Kodu baştan yazmak ya da sensörü atmak, hangi katmanın sorunlu olduğunu bilmeden verilen ölçüsüz tepkilerdir.",
+      "skills": [
+        "dbg-layers"
+      ]
+    }
+  ]
+}

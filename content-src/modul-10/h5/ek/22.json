@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Sayı, yazı, ad = değer",
+      "definition": "Radyonun taşıyabildiği üç mesaj türü.",
+      "example": "Komut için sayı, selam için yazı, \"sicak = 28\" gibi ölçüm için ad = değer çifti kullanılır.",
+      "pitfall": "Her şeyi sayı olarak yollamaya çalışmak; neyin ölçüldüğünü alan taraf anlayamaz."
+    },
+    {
+      "term": "Ad = değer çifti",
+      "definition": "Bir etiket (ad) ile bir sayıdan (değer) oluşan mesaj.",
+      "example": "radyoyla [sicak] = [28] gönder; alan taraf alınan ad ile alınan değeri okur.",
+      "pitfall": "Adı iki tarafta farklı yazmak; \"sicak\" ile \"sıcak\" eşleşmez."
+    },
+    {
+      "term": "Uzunluk sınırları",
+      "definition": "Yazı en çok 32 karakter, ad en çok 12 karakter olabilir; fazlası kesilir.",
+      "example": "40 harfli bir yazının alan kartta yalnız ilk 32 harfi bulunur.",
+      "pitfall": "Uzun ad seçmek; kesilen ad alan taraftaki tam adla eşleşmez."
+    },
+    {
+      "term": "alınan [ad] kontrolü",
+      "definition": "Gelen mesajın ad = değer mi olduğunu anlamanın basit yolu. Sayı ve yazı mesajlarında ad boştur.",
+      "example": "eğer alınan ad = sicak ise değeri göster, değilse yazıyı göster.",
+      "pitfall": "Her mesajda aynı bloğu okumak; mesajın türüne uygun bloğu seçmek gerekir."
+    },
+    {
+      "term": "sinyal gücü",
+      "definition": "Mesajın ne kadar güçlü geldiğini veren blok. Sanal radyoda hep 200'dür.",
+      "example": "Gerçek radyoda kartlar birbirinden uzaklaştıkça değer düşer.",
+      "pitfall": "Sanal portalda sinyal gücünün değişeceğini beklemek; uzaklık yoktur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d22-q1",
+      "kind": "mcq",
+      "prompt": "Bir kart sıcaklığı, ışığı ve ses seviyesini aynı anda öteki karta yollamak istiyor. Hangisi en uygun yöntemdir?",
+      "options": [
+        "Üç sayıyı peş peşe düz sayı olarak yollamak",
+        "Hepsini tek yazıya yazmak",
+        "Her ölçüm için ayrı ad kullanıp ad = değer mesajı yollamak",
+        "Üç farklı grup kullanmak"
+      ],
+      "answer": 2,
+      "explanation": "Üç ölçümü ayırt etmek için her birine ayrı bir ad verilir (sicak, isik, ses) ve ad = değer mesajı kullanılır; alan taraf adına bakarak değeri doğru yere koyar. Üç düz sayı gönderirsen hangisinin neyi ölçtüğü karışır.",
+      "skills": [
+        "mk-radio-types"
+      ]
+    },
+    {
+      "id": "m10h5d22-q2",
+      "kind": "numeric",
+      "prompt": "Bir kart radyoyla 40 karakterlik bir yazı gönderiyor. Alan kartta yazının kaç karakteri bulunur?",
+      "answer": 32,
+      "tolerance": 0,
+      "unit": "karakter",
+      "explanation": "Yazı en çok 32 karakter olabilir; fazlası gönderilirken kesilir, hata vermez. 40 − 32 = 8 karakter kaybolur.",
+      "skills": [
+        "mk-radio-types"
+      ]
+    },
+    {
+      "id": "m10h5d22-q3",
+      "kind": "predict-output",
+      "prompt": "Alan kartın programı aşağıdadır. Gönderen kart radyoyla [isik] = [90] gönderiyor. Alan kartta ne olur?\n\n```\nradyo mesajı alınınca:\n    eğer alınan ad = sicak ise\n        sayıyı göster alınan değer\n    değilse\n        yazıyı göster alınan yazı\n```",
+      "options": [
+        "ise kolu çalışır ve 90 görünür",
+        "değilse kolu çalışır, çünkü ad isik ve sicak değil",
+        "Program hata verir",
+        "Hiçbir şey olmaz"
+      ],
+      "answer": 1,
+      "explanation": "Gelen mesajın adı isik, kontrol edilen ad ise sicak; eşit değiller, bu yüzden değilse kolu çalışır. Mesaj ad = değer türünde olsa bile ad uyuşmazsa ise kolu atlanır. Hata çıkmaz, hiçbir şey de olmaz yanıtı yanlıştır: değilse kolu bir şey gösterir.",
+      "skills": [
+        "mk-radio-types",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "Gönderen \"sıcaklık\" ölçümünü yolluyor ama alan kart ekranda hep yazıyı gösteriyor (ise kolu hiç çalışmıyor). Hatayı bul.\n\n```\ngönderen:  radyoyla [sıcak] = [sıcaklık] gönder\nalan:      eğer alınan ad = sicak ise ...\n```",
+      "options": [
+        "Ad iki tarafta farklı yazılmış: sıcak ile sicak aynı değil",
+        "Gönderen blok yanlış kategoriden alınmış",
+        "Değer bir sayı olmalı, sıcaklık sayı değil",
+        "Radyo grubu 255'i geçiyor"
+      ],
+      "answer": 0,
+      "explanation": "Gönderen \"sıcak\" (ı harfli), alan \"sicak\" (i harfli) yazıyor. Adlar harfi harfine aynı olmalıdır; bir harf farkı eşitliği bozar. Gruplar ve değer bloğu sorunun nedeni değildir.",
+      "skills": [
+        "mk-radio-types",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d22-q5",
+      "kind": "mcq",
+      "prompt": "Gönderen radyoyla [sicaklik_olcum] = [25] gönderiyor. Alan taraf \"alınan ad = sicaklik_olcum\" diye karşılaştırıyor. Sonuç nedir?",
+      "options": [
+        "Eşit çıkar, çünkü ad aynıdır",
+        "Hata mesajı gösterilir",
+        "Eşit çıkar ama değer 0 olur",
+        "Eşit çıkmaz, çünkü ad 12 karaktere kesilir"
+      ],
+      "answer": 3,
+      "explanation": "sicaklik_olcum 14 karakterdir, ad sınırı ise 12. Gönderilirken \"sicaklik_olc\" olarak kesilir. Kesilmiş ad, alan taraftaki tam adla eşleşmediği için karşılaştırma yanlış çıkar ve hata mesajı verilmez.",
+      "skills": [
+        "mk-radio-types",
+        "prog-debug"
+      ]
+    }
+  ]
+}

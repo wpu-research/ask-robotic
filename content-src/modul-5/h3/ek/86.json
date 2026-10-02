@@ -1,0 +1,98 @@
+{
+  "concepts": [
+    {
+      "term": "Yansımalı IR sensör",
+      "definition": "Yere kızılötesi ışık gönderen bir LED ile geri dönen ışığı ölçen bir fototransistörü yan yana taşıyan sensör; okuma yüzeyin ışığı ne kadar yansıttığına göre değişir.",
+      "example": "Bu derste çizgi üstünde yaklaşık 4,2 V (analogRead ≈ 860), zeminde yaklaşık 0,8 V (≈ 164) okunur.",
+      "pitfall": "Her modülün aynı yönde okuduğunu sanmak; bazı modüllerde çizgi alçak okur, bu yüzden önce ham değerlere bakılır."
+    },
+    {
+      "term": "Eşik",
+      "definition": "Okumayı \"çizgi var\" (1) ya da \"çizgi yok\" (0) bilgisine çeviren sınır sayı: okuma eşikten büyükse 1.",
+      "example": "Zemin 164, çizgi 860 okuyorsa ikisinin ortasındaki 512 makul bir başlangıç eşiğidir.",
+      "pitfall": "Eşiği ölçmeden tahminle seçip tek sayıya bağlamak; ışık ya da zemin değişince karar bozulur."
+    },
+    {
+      "term": "Bit deseni",
+      "definition": "Beş sensörün 0/1 sonuçlarının soldan sağa yan yana yazılmış hâli.",
+      "example": "00100 çizginin tam ortada olduğunu, 01000 çizginin bir sensör solda göründüğünü söyler.",
+      "pitfall": "Sensör sırasını karıştırmak; A0'ı sağ sanırsan robot sonraki bütün derslerde ters yöne döner."
+    },
+    {
+      "term": "Çizgi konumu",
+      "definition": "Tek sensör çizgideyse sensör numarasından 2 çıkarılarak bulunan −2…+2 arası sayı; negatif çizginin solda olduğunu gösterir.",
+      "example": "Desen 10000 ise ilk sensör 0 numaralıdır, konum 0 − 2 = −2'dir.",
+      "pitfall": "Konum bulurken 2 çıkarmayı unutmak; 0…4 arası sayı ortada 0 vermez."
+    },
+    {
+      "term": "Kör bölge",
+      "definition": "Sensör aralığı çizgi genişliğinden büyük olduğu için çizgi merkezi iki sensörün arasındayken hiçbirinin çizgiyi görmediği dar şerit.",
+      "example": "2,4 cm aralık ve 2 cm çizgide kör bölge 0,4 cm'dir; bu konumda desen 00000 çıkar.",
+      "pitfall": "00000 görünce çizginin kesinlikle bittiğini sanmak; çizgi sensörlerin arasından geçiyor olabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d1-q1",
+      "kind": "mcq",
+      "prompt": "Yeni bir modülü bağlayıp ham değerleri yazdırdın: çizgi üstünde yaklaşık 164, zeminde yaklaşık 860 çıkıyor. Koddaki karar `analogRead(pin) > 512` şeklinde. Ne olur ve ne yapmalısın?",
+      "options": [
+        "Modül bozuktur, değiştirmek gerekir",
+        "Desen tersine çıkar (çizgi 0, zemin 1); karşılaştırmayı `<` yapar ya da deseni tersler, kodu modüle uydurursun",
+        "Hiçbir şey değişmez, çünkü eşik hâlâ ikisinin ortasındadır",
+        "analogRead yerine digitalRead kullanmak gerekir"
+      ],
+      "answer": 1,
+      "explanation": "Eşik ortada olsa da yön tersine dönmüştür: çizgi artık düşük okuyor, bu yüzden `>` ile çizgi 0, zemin 1 olur. Modül bozuk değildir; modüller yön bakımından farklı olabilir. Önce ham değerlere bakıp karşılaştırmayı ona göre yazarsın.",
+      "skills": ["rob-line-sensor", "prog-debug"]
+    },
+    {
+      "id": "m5h3d1-q2",
+      "kind": "numeric",
+      "prompt": "Beş çizgi sensörü yan yana, komşu sensörler arası 2,4 cm olacak biçimde dizilmiş. En soldaki sensör ile en sağdaki sensör arasında kaç cm vardır?",
+      "answer": 9.6,
+      "tolerance": 0.01,
+      "unit": "cm",
+      "explanation": "Beş sensör arasında beş değil dört aralık vardır: 4 × 2,4 = 9,6 cm. Aralık sayısı, sensör sayısından bir eksiktir.",
+      "skills": ["rob-line-geometry"]
+    },
+    {
+      "id": "m5h3d1-q3",
+      "kind": "predict-output",
+      "prompt": "Dizi, sensörlerden okunan beş değeri temsil ediyor. Bu kod seri monitöre ne yazar?\n\n```\nint v[5] = {160, 870, 170, 165, 162};\nconst int ESIK = 512;\n\nvoid setup() {\n  Serial.begin(9600);\n  int ilk = -1;\n  for (int i = 0; i < 5; i++) {\n    bool cizgide = v[i] > ESIK;\n    Serial.print(cizgide ? '1' : '0');\n    if (cizgide && ilk < 0) ilk = i;\n  }\n  Serial.print(\" konum=\");\n  Serial.println(ilk - 2);\n}\nvoid loop() {}\n```",
+      "options": [
+        "01000 konum=-1",
+        "01000 konum=1",
+        "10000 konum=-2",
+        "00100 konum=0"
+      ],
+      "answer": 0,
+      "explanation": "Yalnız v[1] = 870 eşikten büyüktür, desen 01000 olur. İlk çizgi gören sensör 1 numaradır; konum 1 − 2 = −1, yani çizgi solda. İşareti ters sanmak (konum=1) en sık yapılan hatadır.",
+      "skills": ["rob-line-pattern", "prog-loops-arrays"]
+    },
+    {
+      "id": "m5h3d1-q4",
+      "kind": "find-bug",
+      "prompt": "Bu kod beş sensörü okuyup tek satırda yazdırmak için yazıldı ama bir yerde hata var. Hata nedir?\n\n```\nconst int SENSOR_SAYISI = 5;\nconst int SENSOR_PIN[SENSOR_SAYISI] = {A0, A1, A2, A3, A4};\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for (int i = 0; i <= SENSOR_SAYISI; i++) {\n    Serial.print(analogRead(SENSOR_PIN[i]));\n    Serial.print(' ');\n  }\n  Serial.println();\n  delay(200);\n}\n```",
+      "options": [
+        "analogRead için önce her pine pinMode(INPUT) yazmak zorunludur",
+        "SENSOR_PIN dizisi const olarak tanımlanamaz",
+        "for koşulu `i <= 5` olduğu için altıncı turda SENSOR_PIN[5] diziden taşar; son geçerli indeks 4'tür",
+        "delay(200) çok kısadır, sensör bu sürede okunamaz"
+      ],
+      "answer": 2,
+      "explanation": "Dizide 0'dan 4'e kadar beş eleman vardır. `i <= SENSOR_SAYISI` koşulu i = 5 için de çalışır ve diziden taşan, anlamsız bir pini okur. Doğrusu `i < SENSOR_SAYISI`. analogRead için pinMode gerekmez ve 200 ms bir okuma için fazlasıyla yeterlidir.",
+      "skills": ["prog-loops-arrays", "prog-debug"]
+    },
+    {
+      "id": "m5h3d1-q5",
+      "kind": "numeric",
+      "prompt": "Çizgi 2 cm geniştir ve bir sensör çizginin merkezine en çok 1 cm uzaktaysa çizgiyi görür. Komşu sensörler arası 2,4 cm ise, çizgi merkezinin hiçbir sensör tarafından görülmediği kör bölgenin genişliği kaç mm'dir?",
+      "answer": 4,
+      "tolerance": 0.1,
+      "unit": "mm",
+      "explanation": "Her sensörün gördüğü şerit 2 cm genişliğindedir. Komşu iki sensörün şeritleri arasında 2,4 − 2,0 = 0,4 cm kalır; bu 4 mm'dir. Çizgi merkezi bu aralıktayken desen 00000 çıkar.",
+      "skills": ["rob-line-geometry", "rob-line-pattern"]
+    }
+  ]
+}

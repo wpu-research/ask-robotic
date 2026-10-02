@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Halüsinasyon",
+      "definition": "Modelin akıcı ve makul görünen ama kaynağı olmayan ya da yanlış bilgi üretmesi.",
+      "example": "Kaynakta olmayan bir tarihi özete eklemek.",
+      "pitfall": "Düzgün yazılmış cevabı doğru sanmak."
+    },
+    {
+      "term": "Kaynakta yok",
+      "definition": "Kaynakla çelişmeyen ama kaynakta hiç geçmeyen, uydurulmuş ayrıntı.",
+      "example": "Kaynak kulüp saatini söylerken özette aylık ücretten söz edilmesi.",
+      "pitfall": "Makul göründüğü için kontrol etmemek."
+    },
+    {
+      "term": "Çelişki",
+      "definition": "İddianın kaynağın söylediğinin tersini ya da farklı bir değerini yazması.",
+      "example": "Kaynak 'salı' derken özetin 'pazartesi' demesi.",
+      "pitfall": "Ters çevrilmiş ilişkiyi (süre uzadıkça nesne yakın demek gibi) cümle akıcı diye gözden kaçırmak."
+    },
+    {
+      "term": "Abartma",
+      "definition": "Kaynakta olmayan kesinlik eklemek: 'her zaman', 'kesinlikle'.",
+      "example": "Kaynak 'genellikle' derken özetin 'her zaman' demesi.",
+      "pitfall": "Kesin konuşan cümleyi daha güvenilir sanmak."
+    },
+    {
+      "term": "Halüsinasyon oranı",
+      "definition": "İncelenen çıktılar içinde en az bir uydurma içerenlerin yüzdesi.",
+      "example": "50 özetin 4'ü hatalıysa oran %8'dir.",
+      "pitfall": "Hangi ve kaç çıktıya baktığını yazmadan tek bir yüzde vermek."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d1-q1",
+      "kind": "mcq",
+      "prompt": "Kaynak: 'Robot kulübü cumartesi toplanır.' Bir özet 'Kulüp pazar günü toplanır.' diyor. Bu iddia hangi türdendir?",
+      "options": [
+        "Kaynakla uyumlu",
+        "Kaynakla çelişiyor",
+        "Kaynakta yok (uydurma ayrıntı)",
+        "Abartma"
+      ],
+      "answer": 1,
+      "explanation": "Kaynak cumartesi diyor, iddia pazar diyor: kaynağın söylediğiyle çelişiyor. 'Kaynakta yok' olsaydı kaynak toplantı gününden hiç söz etmeyecekti; abartmada ise kesinlik artırılırdı.",
+      "skills": [
+        "ai-hallucination"
+      ]
+    },
+    {
+      "id": "m7h8d1-q2",
+      "kind": "mcq",
+      "prompt": "Bir model bir cevabı çok kendinden emin bir dille yazdı. Bu neden cevabın doğru olduğunu göstermez?",
+      "options": [
+        "Modeller hep yanlış söyler",
+        "Akıcı ve kesin görünen bir dil üretmek, bilginin doğru olduğunu garanti etmez",
+        "Kendinden emin cevaplar her zaman uzundur",
+        "Doğrulama yalnız sayısal cevaplar için gerekir"
+      ],
+      "answer": 1,
+      "explanation": "Model akıcı yazmak üzere olasılıkla sözcük seçer; emin görünen dil, bilginin kaynağı olduğunu kanıtlamaz. Doğruluk kaynakla karşılaştırarak ya da araçla kontrol edilir. Yanlış bilgi de aynı akıcılıkla yazılabilir.",
+      "skills": [
+        "ai-hallucination",
+        "ai-verify"
+      ]
+    },
+    {
+      "id": "m7h8d1-q3",
+      "kind": "numeric",
+      "prompt": "Bir ekip 80 özeti kaynaklarıyla karşılaştırdı ve 12 özette en az bir uydurma ayrıntı buldu. Halüsinasyon oranı yüzde kaçtır?",
+      "answer": 15,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Oran = 12 / 80 x 100 = %15. Halüsinasyonsuz özet oranı %85'tir; soru hatalı olanların oranını soruyor.",
+      "skills": [
+        "ai-eval-rate",
+        "ai-hallucination"
+      ]
+    },
+    {
+      "id": "m7h8d1-q4",
+      "kind": "predict-output",
+      "prompt": "Bir model 'bu kodun çıktısı 5' dedi. Kodu çalıştırınca ne yazdırır?\n\n```\nliste = [2, 7, 9, 4]\nprint(sum(liste) / len(liste))\n```",
+      "options": [
+        "5.5",
+        "5",
+        "22",
+        "Hata verir"
+      ],
+      "answer": 0,
+      "explanation": "Toplam 2+7+9+4 = 22, eleman sayısı 4; 22 / 4 = 5.5. Python 3'te bölme ondalık verir, 5'e yuvarlamaz. Modelin 5 demesi doğrulanmadan kabul edilmemeli: kodu çalıştırmak en güvenilir kontroldür.",
+      "skills": [
+        "ai-verify",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m7h8d1-q5",
+      "kind": "find-bug",
+      "prompt": "Bu kod 40 özette 6 hatalı özet bulunduğunda doğruluk oranını (%85) hesaplamak için yazıldı ama 15.0 yazdırıyor. Hatalı satır hangisi?\n\n```\ntoplam = 40\nyanlis = 6\nprint(\"Doğruluk:\")\ndogruluk = yanlis / toplam * 100\nprint(dogruluk)\n```",
+      "options": [
+        "toplam = 40",
+        "yanlis = 6",
+        "print(\"Doğruluk:\")",
+        "dogruluk = yanlis / toplam * 100"
+      ],
+      "answer": 3,
+      "explanation": "Doğruluk doğru özetlerin oranıdır: (toplam - yanlis) / toplam x 100 = 85. Kod yanlış sayısını bölüyor ve hata oranını (15.0) veriyor. Diğer satırlar sorun çıkarmaz.",
+      "skills": [
+        "ai-eval-rate",
+        "prog-debug"
+      ]
+    }
+  ]
+}

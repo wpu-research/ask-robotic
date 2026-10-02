@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Girdi, karar, çıkış",
+      "definition": "Bir otomasyonun üç parçası: ölçüm yapan sensör, kuralı uygulayan program ve harekete geçen aygıt.",
+      "example": "NTC sıcaklığı ölçer, program eşiğe bakar, fan ve servo çalışır.",
+      "pitfall": "Hepsini birden yazıp denemek: önce parçaları tek tek sına."
+    },
+    {
+      "term": "map ile hız",
+      "definition": "Sıcaklık aralığını PWM aralığına çevirir.",
+      "example": "map(400, 300, 500, 90, 255) 40 °C için 172 verir.",
+      "pitfall": "map'e küsuratlı sıcaklık vermek: önce 10 ile çarpıp tam sayıya çevir."
+    },
+    {
+      "term": "Minimum PWM",
+      "definition": "Küçük motorun dönmeye başladığı en düşük PWM değeri; projede 90 alındı.",
+      "example": "constrain(hiz, 90, 255) hızın 90'ın altına inmesini engeller.",
+      "pitfall": "PWM'i sıfırdan başlatmak: motor ilk değerlerde dönmeyip uğuldayabilir."
+    },
+    {
+      "term": "Adım adım tarama",
+      "definition": "Servoyu her loop turunda birkaç derece ilerletmek; sıcaklık okuması bekletilmez.",
+      "example": "aci = aci + yon; sonra tarayici.write(aci);",
+      "pitfall": "Taramayı for ile tek seferde yapmak: tarama bitene kadar sıcaklık okunmaz."
+    },
+    {
+      "term": "Servo ve PWM pinleri",
+      "definition": "Servo kütüphanesi Uno'da D9 ve D10'daki analogWrite çıkışını kapatır.",
+      "example": "Fan D6'dadır, servo D9'dadır.",
+      "pitfall": "Fanı D9 ya da D10'a bağlamak: hız ayarı çalışmaz."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d25-q1",
+      "kind": "mcq",
+      "prompt": "Fan 30 °C'de açılıyor ama 28 °C'nin altına inene kadar kapanmıyor. Bu iki ayrı eşik neden kullanılır?",
+      "options": [
+        "Fan daha hızlı dönsün diye",
+        "Sıcaklık eşik civarında oynarken fan sürekli açılıp kapanmasın diye",
+        "NTC'nin direnci ters çalıştığı için",
+        "Seri monitörde daha az yazı çıksın diye"
+      ],
+      "answer": 1,
+      "explanation": "Tek eşikte sıcaklık 29,9 ile 30,1 arasında titrerse fan sürekli açılır kapanır. İki eşik arasındaki bölgede (28-30 °C) durum korunur. Hız, direnç ya da seri çıktı ile ilgisi yoktur.",
+      "skills": [
+        "hysteresis"
+      ]
+    },
+    {
+      "id": "m3h5d25-q2",
+      "kind": "predict-output",
+      "prompt": "Fan başta kapalı (fanAcik = false). Sıcaklık sırayla 31, 29 ve 27,5 °C oluyor. Her ölçümden sonra fan durumu ne olur?\n\n```\nif (!fanAcik && sicak >= 30.0) {\n  fanAcik = true;\n} else if (fanAcik && sicak < 28.0) {\n  fanAcik = false;\n}\n```",
+      "options": [
+        "Kapalı, açık, kapalı",
+        "Açık, açık, kapalı",
+        "Açık, kapalı, kapalı",
+        "Açık, açık, açık"
+      ],
+      "answer": 1,
+      "explanation": "31 ≥ 30 olduğundan açılır. 29 °C, 28-30 arasındadır; açık kalır. 27,5 < 28 olunca kapanır.",
+      "skills": [
+        "hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d25-q3",
+      "kind": "numeric",
+      "prompt": "Fan hızı map((int)(sicak * 10), 300, 500, 90, 255) ile hesaplanıyor. Sıcaklık 40 °C ise PWM değeri kaçtır? (map tam sayı hesabı yapar.)",
+      "answer": 172,
+      "tolerance": 0,
+      "explanation": "sicak * 10 = 400. map: (400 − 300) × (255 − 90) / (500 − 300) + 90 = 100 × 165 / 200 + 90 = 82 + 90 = 172 (82,5 aşağı yuvarlanır).",
+      "skills": [
+        "motor-pwm-speed",
+        "sensor-actuator-project"
+      ]
+    },
+    {
+      "id": "m3h5d25-q4",
+      "kind": "numeric",
+      "prompt": "NTC altta, 10 kΩ sabit direnç üstte; A2 NTC üzerinden okunuyor. 45 °C'de NTC'nin direnci yaklaşık 4,35 kΩ. A2'deki gerilim yaklaşık kaç volttur?",
+      "answer": 1.5,
+      "tolerance": 0.05,
+      "unit": "V",
+      "explanation": "Gerilim bölücü: V = 5 × 4,35 / (4,35 + 10) ≈ 1,52 V. Isındıkça NTC direnci düşer, A2 gerilimi de düşer; 25 °C'de 2,5 V'tu.",
+      "skills": [
+        "sensor-actuator-project",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h5d25-q5",
+      "kind": "find-bug",
+      "prompt": "Servo kullanan bu projede fan hızı ayarlanamıyor; fan ya hep açık ya hep kapalı gibi davranıyor. Hatalı satır hangisi?\n\n```\nconst int SERVO_PIN = 9;\n// ...\ntarayici.attach(SERVO_PIN);\n// ...\nanalogWrite(FAN_PIN, hiz);\n```\n(Başka bir yerde: const int FAN_PIN = 10;)",
+      "options": [
+        "tarayici.attach(SERVO_PIN);",
+        "const int SERVO_PIN = 9;",
+        "analogWrite(FAN_PIN, hiz);",
+        "const int FAN_PIN = 10;"
+      ],
+      "answer": 3,
+      "explanation": "Servo kütüphanesi Uno'da D9 ve D10'daki PWM'i kapatır, bu yüzden D10'dan analogWrite hız ayarı yapmaz. Fan D6 gibi başka bir PWM pinine taşınmalıdır. Diğer satırlar doğrudur.",
+      "skills": [
+        "sensor-actuator-project",
+        "servo-angle",
+        "prog-debug"
+      ]
+    }
+  ]
+}

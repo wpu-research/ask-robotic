@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Eş anlamlı sorunu",
+      "definition": "Anlamca aynı ama yazımca farklı kelimelerin sayım vektöründe ayrı terim sayılması.",
+      "example": "\"uzaklığı nasıl bulur\" sorgusu \"mesafeyi hesaplar\" cümlesiyle eşleşmez; benzerlik 0 çıkar.",
+      "pitfall": "Sorgudaki her kelimeyi belgede arayıp bulamayınca belgede bilgi yok sanmak; bilgi vardır, kelime farklıdır."
+    },
+    {
+      "term": "Gövdeleme",
+      "definition": "Kelimeleri ortak köke indirip \"mesafe\" ile \"mesafeyi\"nin aynı terim olmasını sağlayan işlem.",
+      "example": "Atölyede ilk beş harf tutulur: \"mesafeyi\" ve \"mesafe\" ikisi de \"mesaf\" olur.",
+      "pitfall": "Gövdelemenin anlamı da bağladığını sanmak; \"uzak\" ile \"mesaf\" yine ayrı kalır."
+    },
+    {
+      "term": "Sorgu genişletme",
+      "definition": "Sorguya eş anlamlı kelimeleri ekleyerek eşleşme şansını artırmak.",
+      "example": "\"ödev\" sorgusuna \"görev\" ve \"proje\" eklenir.",
+      "pitfall": "Listeyi tek yönlü yazmak ya da asıl kelimeyi listeden çıkarmak; sorgu kendi kelimesini de kaybeder."
+    },
+    {
+      "term": "Gömme modeli",
+      "definition": "Çok büyük metinlerden öğrenilmiş, anlamca yakın metinleri yakın vektörlere yerleştiren model.",
+      "example": "Ortak kelimesi olmayan \"araç\" ve \"taşıt\" metinleri yakın vektör alabilir.",
+      "pitfall": "Gömme modelinin hep doğru olduğunu sanmak; o da yanlış eşleşme yapabilir ve eval ile sınanmalıdır."
+    },
+    {
+      "term": "İlgili belgeyi kaçırmak",
+      "definition": "Arama sisteminin doğru belge var olduğu hâlde onu getirememesi.",
+      "example": "Kullanıcı \"uzaklık\" yazar, belge \"mesafe\" der; sonuç listesi boş döner.",
+      "pitfall": "Boş sonucu \"zaten cevap yok\" diye yorumlamak; sistem sessizce hata yapmış olabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d22-q1",
+      "kind": "mcq",
+      "prompt": "Sorguda yalnız \"uzaklık\", belgede yalnız \"mesafe\" geçiyor. Sayım tabanlı bir sistemde benzerlik neden 0 çıkar?",
+      "options": [
+        "Çünkü belge çok kısadır",
+        "Çünkü iki kelime ayrı terimdir; ortak terim olmayınca nokta çarpım 0 olur",
+        "Çünkü kosinüs her zaman 0 ile başlar",
+        "Çünkü \"mesafe\" kelimesi atılan bağlaçlardandır"
+      ],
+      "answer": 1,
+      "explanation": "Sayım vektöründe her kelime ayrı bir sütundur. Ortak sütunda iki vektörün de değeri olmayınca çarpımların toplamı 0 olur. Belgenin kısalığı ya da kosinüsün başlangıç değeri bunu açıklamaz; \"mesafe\" de atılan bağlaçlar arasında değildir.",
+      "skills": [
+        "ai-embed-limit",
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d22-q2",
+      "kind": "predict-output",
+      "prompt": "Atölyedeki gibi, uzunluğu 5'ten büyük kelimelerin ilk beş harfini tutan gövdeleme yazıldı. Bu kod ne yazdırır?\n\n```\ndef govde(w):\n    return w[:5] if len(w) > 5 else w\n\nprint(govde(\"mesafeyi\"), govde(\"mesafe\"), govde(\"uzak\"))\n```",
+      "options": [
+        "mesaf mesaf uzak",
+        "mesafeyi mesafe uzak",
+        "mesaf mesafe uzak",
+        "mesaf mesaf uza"
+      ],
+      "answer": 0,
+      "explanation": "\"mesafeyi\" 8 harf, \"mesafe\" 6 harftir; ikisi de 5'ten uzun olduğundan \"mesaf\" olur. \"uzak\" 4 harftir, olduğu gibi kalır. Yani gövdeleme \"mesafe\" ile \"mesafeyi\"yi birleştirir ama \"uzak\" ile \"mesaf\" yine ayrı kalır.",
+      "skills": [
+        "ai-embed-limit"
+      ]
+    },
+    {
+      "id": "m7h5d22-q3",
+      "kind": "numeric",
+      "prompt": "Sorgu 3 terimden oluşuyor (a, b, c). Bir belge 4 terimden oluşuyor (a, b, d, e). Her terim bir kez geçiyor ve sayım vektörleri kullanılıyor. Kosinüs benzerliği kaçtır? (iki ondalık)",
+      "answer": 0.58,
+      "tolerance": 0.01,
+      "explanation": "Ortak terimler a ve b; nokta çarpım 2. Sorgunun uzunluğu √3, belgenin uzunluğu √4 = 2. Benzerlik 2 / (√3 × 2) = 1 / √3 yaklaşık 0,577. Ortak terim sayısını (2) benzerlik sanmak sık yapılan hatadır.",
+      "skills": [
+        "ai-vektor-kosinus",
+        "ai-embed-limit"
+      ]
+    },
+    {
+      "id": "m7h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "Bir okul arama kutusu, \"ödev\" arayanlara \"görev\" ve \"proje\" belgelerini de göstermek için sorguyu genişletiyor. \"yarın ödev\" sorgusunda genişletme çalışmıyor.\n\n```\nesanlamli = {\"ödev\": [\"ödev\", \"görev\", \"proje\"]}\n\ndef genislet(sorgu):\n    sonuc = []\n    for kelime in sorgu.split():\n        sonuc = esanlamli.get(kelime, [kelime])\n    return sonuc\n```\n\nHata nedir?",
+      "options": [
+        "split() kelimeleri ayıramaz",
+        "sonuc her turda ezilir; önceki kelimelerin listesi kaybolur (+= ya da extend gerekir)",
+        "Sözlük yanlış tanımlanmış",
+        "for döngüsü gereksizdir, kaldırılmalı"
+      ],
+      "answer": 1,
+      "explanation": "\"yarın ödev\" için döngü önce \"yarın\", sonra \"ödev\" işler. Atama (=) her turda sonuc listesini yenisiyle değiştirir; \"yarın\" kaybolur. Hatalı kodda yalnız son kelimenin listesi kalır; [\"ödev\", \"görev\", \"proje\"] gibi. Doğru kod sonuc += ... yazar. split() ve sözlük doğrudur, döngü de gereklidir.",
+      "skills": [
+        "ai-embed-limit",
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d22-q5",
+      "kind": "mcq",
+      "prompt": "Hangisi sayım vektörünün eş anlamlı sınırını en köklü biçimde aşar?",
+      "options": [
+        "Sorguyu büyük harfe çevirmek",
+        "Belgeleri daha uzun yazmak",
+        "Anlamca yakın metinleri yakın vektörlere yerleştirmeyi öğrenmiş gömme modeli kullanmak",
+        "Kosinüs yerine toplamı kullanmak"
+      ],
+      "answer": 2,
+      "explanation": "Sınır, vektörün anlamı değil kelimenin yazımını tutmasından gelir. Öğrenilmiş gömme modelleri bunu hedefler. Büyük harf, uzun belge ya da farklı bir toplama sorunu çözmez; gömme modeli de kusursuz değildir ve eval ile sınanır.",
+      "skills": [
+        "ai-embed-limit"
+      ]
+    }
+  ]
+}

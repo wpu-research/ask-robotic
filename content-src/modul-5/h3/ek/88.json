@@ -1,0 +1,102 @@
+{
+  "concepts": [
+    {
+      "term": "Bang-bang kontrol",
+      "definition": "Çıkışın yalnızca birkaç sabit seçenekten biri olduğu, ara değer olmayan kontrol türü.",
+      "example": "Çizgi izlemede seçenekler sola dön, düz git, sağa dön'dür; termostat da ya tam açık ya tam kapalıdır.",
+      "pitfall": "Çok hızlı sürmek: robot dönmeye başlamadan çizgiyi geçer ve bang-bang yetişemez."
+    },
+    {
+      "term": "Zigzag",
+      "definition": "Robotun çizginin iki yanına sırayla sapması; bang-bang kontrolün doğal sonucu.",
+      "example": "Yalnız orta sensörle robot hiç düz gidemez, sürekli sağa-sola döner; beş sensörle zigzag çok azalır.",
+      "pitfall": "Zigzagı hata sanmak; bang-bang'de beklenir, amaç onu küçük tutmaktır."
+    },
+    {
+      "term": "Son yön hafızası (sonYon)",
+      "definition": "Çizginin en son hangi tarafta görüldüğünü tutan değişken: −1 sol, 0 orta, +1 sağ.",
+      "example": "Çizgi sol sensörde görülüp kaybolursa robot sola dönmeye devam eder.",
+      "pitfall": "Çizgi görünmediğinde sonYon'u sıfırlamak; hafıza silinir ve robot düz gidip virajı kaçırır."
+    },
+    {
+      "term": "Histerezis (iki eşik)",
+      "definition": "Açmak için bir üst eşik, kapatmak için ayrı bir alt eşik kullanarak kararın titremesini önlemek.",
+      "example": "Açma 600, kapama 420: okuma 500 ile 550 arasında dalgalansa da karar sabit kalır.",
+      "pitfall": "İki eşiği birbirine çok yakın seçmek; gürültü aradaki boşluktan büyükse titreme sürer."
+    },
+    {
+      "term": "Çizgi kayıp süresi",
+      "definition": "Hiçbir sensörün çizgiyi görmediği toplam süre; bir çizgi izleyicinin ne kadar iyi tuttuğunun ölçüsü.",
+      "example": "Benzetimde hafızalı program yaklaşık 3,9 sn, hafızasız yaklaşık 12 sn kayıp verir.",
+      "pitfall": "Yalnız tur süresine bakmak; hızlı ama çizgiyi sürekli kaybeden robot gerçekte kontrolsüzdür."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d3-q1",
+      "kind": "mcq",
+      "prompt": "Yalnız orta sensörü kullanan bang-bang robot (çizgideysem sağa, değilsem sola) neden asla düz gidemez?",
+      "options": [
+        "Motorlar yalnız tek yönde dönebildiği için",
+        "Beş sensör bağlı olmadığı için robot yön bulamaz",
+        "Eşik değeri hep yanlış hesaplandığı için",
+        "Kuralın yalnız iki çıkışı var (sağa dön, sola dön); \"düz git\" seçeneği hiç bulunmuyor"
+      ],
+      "answer": 3,
+      "explanation": "Bang-bang çıkışı kuralın sunduğu seçeneklerle sınırlıdır. Tek sensör yalnız \"çizgideyim / değilim\" diyebilir, iki seçenek çıkar ve ikisi de döndürür. Düz gitmek için çizginin ortada olduğunu anlayan ek sensörler ve bir üçüncü kural gerekir.",
+      "skills": ["rob-bangbang"]
+    },
+    {
+      "id": "m5h3d3-q2",
+      "kind": "predict-output",
+      "prompt": "Adımlar: 1 = çizgi solda görüldü, 2 = ortada, 3 = sağda, 0 = hiçbir sensör görmüyor. Bu kod ne yazar?\n\n```\nint sonYon = 0;\nint adim[] = {1, 0, 0, 2, 0, 3, 0};\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 7; i++) {\n    if (adim[i] == 1) sonYon = -1;\n    else if (adim[i] == 3) sonYon = 1;\n    else if (adim[i] == 2) sonYon = 0;\n    Serial.print(sonYon + 1);\n  }\n  Serial.println();\n}\nvoid loop() {}\n```",
+      "options": [
+        "0111121",
+        "0001122",
+        "0001111",
+        "0001021"
+      ],
+      "answer": 1,
+      "explanation": "sonYon sırayla −1, −1, −1, 0, 0, 1, 1 olur; +1 eklenince 0001122. Adım 0 (çizgi yok) sonYon'u değiştirmez: hafıza budur. Hafızasız bir sürümde her 0 adımında sonYon sıfırlanır ve 0111121 çıkardı.",
+      "skills": ["rob-line-memory", "rob-bangbang"]
+    },
+    {
+      "id": "m5h3d3-q3",
+      "kind": "numeric",
+      "prompt": "LED başlangıçta kapalı. İki eşikli karar: değer 600'ü aşınca açılır, 420'nin altına inince kapanır, arada durum korunur. Sırayla okunan değerler: 300, 620, 560, 450, 500, 430, 610, 580, 410, 400. LED kaç kez durum değiştirir?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "kez",
+      "explanation": "620'de açılır (1). 560, 450, 500, 430, 610, 580 arasında ne 420'nin altına inilir ne de yeniden açma gerekir; LED açık kalır. 410'da kapanır (2). 400 zaten kapalıdır. Tek eşik (512) olsaydı aynı dizide 4 kez değişirdi: 620, 450, 610, 410.",
+      "skills": ["rob-line-memory"]
+    },
+    {
+      "id": "m5h3d3-q4",
+      "kind": "find-bug",
+      "prompt": "Robot düz çizgide iyi gidiyor ama virajda çizgi kaybolunca hep düz gidip virajı kaçırıyor. Hatalı kısım hangisi?\n\n```\nif (sol) {\n  sonYon = -1;\n} else if (sag) {\n  sonYon = 1;\n} else {\n  sonYon = 0;\n}\n```",
+      "options": [
+        "sol değişkeni s[0] && s[1] olmalı",
+        "sonYon değişkeni int olmamalı, bool olmalı",
+        "Son else, hiçbir sensör çizgiyi görmediğinde de sonYon'u 0 yapıyor; hafıza siliniyor. `else if (orta)` olmalı",
+        "motor() işlevinin parametre sırası ters"
+      ],
+      "answer": 2,
+      "explanation": "Çizgi kaybolunca sol ve sag yanlış olur ve son else çalışır: sonYon 0'a döner, robot \"çizgi ortadaydı\" sanıp düz gider. Hafızanın amacı bu durumda eski değeri korumaktır; yalnız orta sensör çizgiyi gördüğünde `else if (orta) sonYon = 0;` yazılmalı. Diğer seçenekler hatanın belirtisini açıklamaz.",
+      "skills": ["rob-line-memory", "prog-debug"]
+    },
+    {
+      "id": "m5h3d3-q5",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisi iki eşikli (histerezisli) bir karardır?",
+      "options": [
+        "Okuma 512'den büyükse aç, değilse kapat",
+        "Okuma 600'ü geçince aç, 420'nin altına inince kapat; arada eski durumu koru",
+        "Okumayı her 100 ms'de bir yap ve hep aç",
+        "Üç sensörün ortalamasını alıp eşikle karşılaştır"
+      ],
+      "answer": 1,
+      "explanation": "Histerezisin ayırt edici özelliği açma ve kapama eşiğinin farklı olması ve aradaki bölgede eski kararın korunmasıdır. Birinci seçenek tek eşiktir ve eşik civarında titrer; üçüncü ve dördüncü seçenek örnekleme ve ortalama ile ilgilidir.",
+      "skills": ["rob-line-memory"]
+    }
+  ]
+}

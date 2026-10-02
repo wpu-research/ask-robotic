@@ -1,0 +1,122 @@
+{
+  "concepts": [
+    {
+      "term": "RTC (gerçek zaman saati)",
+      "definition": "Kendi kristaliyle saniyeleri sayan ve tarihi tutan ayrı bir çip; Arduino ona I2C ile sorar.",
+      "example": "Veri kaydedicin her ölçümün yanına \"2026-03-14 08:30:10\" gibi gerçek bir zaman yazar.",
+      "pitfall": "Saati millis() ile tutmaya çalışmak; millis() güç kesilince sıfırlanır, RTC kalır."
+    },
+    {
+      "term": "DateTime ve rtc.now()",
+      "definition": "rtc.now() o anki zamanı bir DateTime nesnesi olarak verir; year(), month(), day(), hour(), minute(), second() ile parçalarını alırsın.",
+      "example": "t.hour() 7 döndürür; ekrana 07 yazmak için başına sıfırı kendin eklersin.",
+      "pitfall": "month() değerinin iki haneli geleceğini sanmak; 3. ay için 3 döner, \"03\" gelmez."
+    },
+    {
+      "term": "rtc.adjust() ve lostPower()",
+      "definition": "adjust() saati kurar; lostPower() saatin durup durmadığını söyler.",
+      "example": "if (rtc.lostPower()) { rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); } saati yalnız gerekince kurar.",
+      "pitfall": "adjust(__DATE__, __TIME__) satırını koşulsuz setup()'a koymak; kart her açıldığında saat derleme anına geri döner."
+    },
+    {
+      "term": "I2C adresi 0x68",
+      "definition": "RTC modülünün I2C hattındaki adı; hatta aynı adrese sahip iki cihaz olamaz.",
+      "example": "RTC (0x68) ile I2C LCD (0x27) aynı SDA ve SCL kablolarını paylaşabilir.",
+      "pitfall": "MPU6050 ile RTC'yi aynı hatta bağlamak; ikisi de 0x68 kullanır ve çakışırlar."
+    },
+    {
+      "term": "Yedek pil",
+      "definition": "Gerçek RTC modülünde ana güç kesilince saati çalıştırmaya devam eden küçük pil.",
+      "example": "Pil takılıyken fişi çekip bir saat sonra taksan saat doğru ilerlemiş olur.",
+      "pitfall": "Pil bitmişken saatin doğru kalacağını sanmak; güç kesilince saat unutulur ve yeniden kurulması gerekir."
+    },
+    {
+      "term": "Bayrakla tekrarı önlemek",
+      "definition": "Alarm koşulu bir dakika boyunca doğru kalır; \"bugün çaldı mı?\" değişkeni alarmı bir kez çaldırır.",
+      "example": "sonTetikGunu değişkeni alarmın son çaldığı ayın gününü tutar.",
+      "pitfall": "Bayrak olmadan 07:30 boyunca alarmı sürekli yeniden başlatmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d66-q1",
+      "kind": "mcq",
+      "prompt": "Bir cihazın günler sonra bile \"dün saat kaçtı\" sorusuna cevap verebilmesi için neden millis() yerine RTC kullanılır?",
+      "options": [
+        "millis() kart açılınca sıfırdan başlar ve güç kesilince unutulur; RTC ise gerçek tarihi ve saati tutar",
+        "millis() çok yavaş sayar",
+        "RTC her zaman daha hassas ölçer",
+        "millis() yalnızca saniye sayar"
+      ],
+      "answer": 0,
+      "explanation": "millis() kart açıldığından beri geçen süreyi sayar ve her yeniden başlatmada sıfırlanır. RTC ayrı bir çiptir; gerçek tarihi ve saati tutar. Hassasiyet asıl fark değildir: millis() milisaniye sayar, hız sorunu yoktur.",
+      "skills": [
+        "rtc-time"
+      ]
+    },
+    {
+      "id": "m4h7d66-q2",
+      "kind": "predict-output",
+      "prompt": "RTC takılı. Bu kod çalışınca seri monitörde ne görünür?\n\n```\nrtc.adjust(DateTime(2026, 12, 31, 23, 59, 58));\ndelay(3000);\nDateTime t = rtc.now();\nSerial.print(t.year());  Serial.print('-');\nSerial.print(t.month()); Serial.print('-');\nSerial.println(t.day());\n```",
+      "options": [
+        "2026-12-31",
+        "2027-01-01",
+        "2027-1-1",
+        "2026-12-34"
+      ],
+      "answer": 2,
+      "explanation": "23:59:58'den 3 saniye sonra saat 00:00:01 olur ve yıl 2027'ye, tarih 1 Ocak'a geçer. RTC takvimi kendisi bilir, bu yüzden 2026-12-34 gibi bir değer çıkmaz. month() ve day() sayı döndürür, başa sıfır koymaz; çıktı 2027-1-1 olur. 2027-01-01 yazmak için iki hane biçimlemesi gerekir.",
+      "skills": [
+        "rtc-time",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d66-q3",
+      "kind": "find-bug",
+      "prompt": "Bu program her yeniden başladığında saat, programın derlendiği ana geri dönüyor. Hatalı satır hangisi?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));\n}\n```",
+      "options": [
+        "Serial.begin(9600); satırı",
+        "rtc.begin(); satırı",
+        "rtc.adjust(...) satırı, çünkü koşulsuz çalışıyor; yalnızca rtc.lostPower() doğruysa çağrılmalı",
+        "void setup() satırı"
+      ],
+      "answer": 2,
+      "explanation": "adjust satırı koşulsuz olduğu için kart her açıldığında saati derleme anına çeker; RTC'nin güç kesilince saati koruma işi boşa gider. Çözüm: if (rtc.lostPower()) { ... }. Serial.begin ve rtc.begin saatin değerini değiştirmez.",
+      "skills": [
+        "rtc-time",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d66-q4",
+      "kind": "numeric",
+      "prompt": "Alarm programı saati 07:29:55'e kurar. Alarm 07:30'da çalar ve ALARM_SURESI 5000 ms sürer. LED, program başladıktan yaklaşık kaç saniye sonra söner?",
+      "answer": 10,
+      "tolerance": 1,
+      "unit": "saniye",
+      "explanation": "Alarm saatine 5 saniye vardır (07:29:55'ten 07:30:00'a). Çaldıktan sonra 5000 ms yani 5 saniye yanık kalır. Toplam yaklaşık 5 + 5 = 10 saniye. Alarmın gerçek başlangıcı çeyrek saniyelik kontrol aralığı kadar gecikebilir; bu yüzden küçük bir pay vardır.",
+      "skills": [
+        "rtc-time",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h7d66-q5",
+      "kind": "mcq",
+      "prompt": "Aynı devrede RTC (DS3231) ve MPU6050 var; ikisi de varsayılan adreslerinde. Ne olur?",
+      "options": [
+        "Sorun olmaz; I2C her cihazı otomatik ayırır",
+        "Yalnızca RTC çalışır, MPU6050 bozulur",
+        "Hız 400 kHz'e düşer",
+        "İkisi de 0x68 kullandığı için çakışırlar"
+      ],
+      "answer": 3,
+      "explanation": "I2C'de cihazlar adresle seçilir. İkisi de 0x68 kullanırsa hangisinin cevap vereceği belli olmaz. Çözüm: bu kursta olduğu gibi ikisini aynı devrede kullanmamak ya da MPU6050'nin adresini (AD0 ucuyla 0x69) değiştirmek.",
+      "skills": [
+        "rtc-time",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

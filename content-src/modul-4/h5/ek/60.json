@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Ofset (sıfırlama)",
+      "definition": "Düğmeye basıldığında o anki açıyı \"yatay\" kabul edip sonraki açılardan çıkarma.",
+      "example": "egim = aci - ofset; ofset = 12 iken aci 12 ise egim 0 olur.",
+      "pitfall": "Ofseti her turda güncellemek: eğim hep 0 görünür."
+    },
+    {
+      "term": "Ters yönde kompanzasyon",
+      "definition": "Eğim kadar zıt yönde dönerek platformu yatay tutma. servo = 90 - egim.",
+      "example": "egim = 20 ise servo 70 dereceye gider.",
+      "pitfall": "İşareti ters almak: platform eğimi iki katına çıkarır."
+    },
+    {
+      "term": "constrain ile sınırlama",
+      "definition": "Servo açısını güvenli aralığa (10...170) kısıtlar.",
+      "example": "egim = 85 ise 90 - 85 = 5 çıkar ama constrain 10 yapar.",
+      "pitfall": "Sınırlamamak: servo mekanik ucuna dayanır, zorlanır ve ısınır."
+    },
+    {
+      "term": "Bloklamayan döngü",
+      "definition": "delay() yerine millis() farkıyla her işi kendi hızında yürütmek.",
+      "example": "Filtre 10 ms'de, LCD 250 ms'de bir güncellenir.",
+      "pitfall": "delay kullanmak: düğmeye basış kaçar, filtre dt'si bozulur."
+    },
+    {
+      "term": "Açık çevrim",
+      "definition": "Çıkışın sonucunu ölçmeyen kontrol. Mini gimbalda platformun gerçek açısını ölçen sensör yoktur.",
+      "example": "MPU yalnız tabanı ölçer; servo platformu yatay tuttu mu bilinmez.",
+      "pitfall": "Açık çevrimi kusursuz sanmak: servo yükü ya da kayma hatayı görünmez bırakır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d60-q1",
+      "kind": "numeric",
+      "prompt": "Düğmeye basılınca ofset = 10 oldu. Şu an filtreli açı aci = 25. Mini gimbal egim = aci - ofset ve servo = 90 - egim kuralıyla çalışıyor. Servo kaç dereceye gider? (Sınırlar aşılmıyor.)",
+      "answer": 75,
+      "tolerance": 0,
+      "unit": "derece",
+      "explanation": "egim = 25 - 10 = 15 ve servo = 90 - 15 = 75. Eğim pozitif olduğu için servo 90'ın altına, yani ters yöne gider.",
+      "skills": [
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h5d60-q2",
+      "kind": "predict-output",
+      "prompt": "egim = 85 derece olduğunda bu kod ne yazar?\n\n```\nfloat egim = 85;\nint servoAci = 90 - (int)round(egim);\nbool sinirda = (servoAci <= 10 || servoAci >= 170);\nservoAci = constrain(servoAci, 10, 170);\nSerial.print(servoAci);\nSerial.print(\" \");\nSerial.println(sinirda ? 1 : 0);\n```",
+      "options": [
+        "5 0",
+        "5 1",
+        "10 0",
+        "10 1"
+      ],
+      "answer": 3,
+      "explanation": "90 - 85 = 5; 5 <= 10 olduğundan sinirda true olur. constrain 5'i 10'a yükseltir. Çıktı \"10 1\" olur: servo 10 dereceye gider ve LED sınır uyarısı için yanar.",
+      "skills": [
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h5d60-q3",
+      "kind": "numeric",
+      "prompt": "Servo kütüphanesi 0 dereceyi 544 µs, 180 dereceyi 2400 µs ile eşler (doğrusal). servo.write(70) yaklaşık kaç µs genişliğinde darbe üretir?",
+      "answer": 1266,
+      "tolerance": 2,
+      "unit": "µs",
+      "explanation": "544 + 70 / 180 x (2400 - 544) = 544 + 721,8 = 1265,8 yaklaşık 1266 µs (Arduino'nun tam sayı map'i 1265 verir). 90 derece ise 1472 µs'dir.",
+      "skills": [
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h5d60-q4",
+      "kind": "mcq",
+      "prompt": "Mini gimbalda MPU6050 yalnız tabanın eğimini ölçüyor; platformun gerçek açısını ölçen bir sensör yok. Bu tür kontrole ne ad verilir?",
+      "options": [
+        "Kapalı çevrim",
+        "Açık çevrim",
+        "Kesme tabanlı kontrol",
+        "Bloklamayan kontrol"
+      ],
+      "answer": 1,
+      "explanation": "Çıkışın sonucu ölçülüp hata düzeltilmiyorsa kontrol açık çevrimdir. Platformun açısını da ölçüp farkı sürekli düzelten sistem kapalı çevrimdir. Bloklamayan, millis ile zamanlama biçimidir; kontrol türü değildir.",
+      "skills": [
+        "control-loop"
+      ]
+    },
+    {
+      "id": "m4h5d60-q5",
+      "kind": "find-bug",
+      "prompt": "Mini gimbal butona basışı sık sık kaçırıyor ve servo çok ağır tepki veriyor. Hatalı satır hangisi?\n\n```\nvoid loop() {\n  bool basili = (digitalRead(SIFIRLA) == LOW);\n  if (basili && !oncekiBasili) ofset = aci;\n  oncekiBasili = basili;\n\n  mpuOku();\n  servo.write(servoAcisiHesapla());\n  delay(500);\n}\n```",
+      "options": [
+        "delay(500);",
+        "if (basili && !oncekiBasili) ofset = aci;",
+        "mpuOku();",
+        "servo.write(servoAcisiHesapla());"
+      ],
+      "answer": 0,
+      "explanation": "delay(500) tüm döngüyü yarım saniye bekletir: düğme kaçar, ölçüm ve servo saniyede 2 kez güncellenir. Bunun yerine millis() ile 10 ms'de bir ölçüm yapılır. Kenar algılama satırı doğrudur.",
+      "skills": [
+        "nonblocking-timing",
+        "prog-debug"
+      ]
+    }
+  ]
+}

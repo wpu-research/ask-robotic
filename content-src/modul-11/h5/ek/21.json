@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Hız",
+      "definition": "Sprite'ın saniyede kaç piksel gittiği (piksel/sn).",
+      "example": "Hız x 100 olan sprite her saniye 100 piksel sağa gider.",
+      "pitfall": "Hızı ivmeyle karıştırmak; hız sabit kalır, ivme hızı değiştirir."
+    },
+    {
+      "term": "İvme",
+      "definition": "Hızın saniyede ne kadar arttığı (piksel/sn²).",
+      "example": "İvme y = 400 ise aşağı hız her saniye 400 artar; 0,5 saniye sonra 200 olur.",
+      "pitfall": "İvme yerine hıza sabit bir sayı yazmak: sprite hep aynı hızla gider, hızlanma hissi olmaz."
+    },
+    {
+      "term": "Yerçekimi",
+      "definition": "Sprite'a sürekli aşağı verilen pozitif y ivmesi.",
+      "example": "kahraman ivmesi x 0 y 520 bloğu kahramanı hızlanarak düşürür.",
+      "pitfall": "İvmeyi oyun başlayınca içine koymayı unutmak: blok çalışmaz, kahraman asılı kalır."
+    },
+    {
+      "term": "y ekseni",
+      "definition": "Ekranda y yukarıdan aşağı doğru artar; sol üst köşe (0, 0).",
+      "example": "y = 24'ten y = 88'e inen sprite aşağı hareket etmiştir.",
+      "pitfall": "Aşağı yön için eksi sayı yazmak; aşağı pozitiftir, yukarı eksidir."
+    },
+    {
+      "term": "Sağa-sola hareket",
+      "definition": "Tuşlar yalnız yatay hızı kontrol eder, dikey hızı yerçekimine bırakır.",
+      "example": "Platform oyununda `oyuncu tuşlarıyla [sağa-sola] hareket etsin` seçilir.",
+      "pitfall": "Dört yönü seçmek: y hızı her karede tuşlara göre yazılır ve yerçekimi neredeyse etkisiz kalır."
+    },
+    {
+      "term": "Zemin duvarı",
+      "definition": "Duvar karosu sprite'ı durdurur ve o yöndeki hızı sıfırlar.",
+      "example": "Düşen kahraman zemin karosuna değince durur ve y hızı 0 olur.",
+      "pitfall": "Kahramanı başlangıçta zeminin içine koymak: duvarın içinde sıkışır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h5d21-q1",
+      "kind": "mcq",
+      "prompt": "Bir sprite'a ivme x 0 y 300 verdin. Bu blok ne yapar?",
+      "options": [
+        "Sprite'ı hemen 300 piksel aşağı kaydırır",
+        "Aşağı yönlü hızı her saniye 300 piksel/sn artırır",
+        "Sprite'ın hızını hep 300'e sabitler",
+        "Sprite'ın boyunu 300 piksel yapar"
+      ],
+      "answer": 1,
+      "explanation": "İvme hızı değiştirir: aşağı hız her saniye 300 piksel/sn artar. Konumu doğrudan kaydırmaz (o yüzden ilk seçenek yanlış), hızı 300'e sabitlemez (üçüncü seçenek hız bloğunun işidir) ve görünüşle ilgisi yoktur.",
+      "skills": [
+        "oyun-hiz-ivme",
+        "oyun-yercekimi"
+      ]
+    },
+    {
+      "id": "m11h5d21-q2",
+      "kind": "numeric",
+      "prompt": "Bir sprite durgun başlıyor (hız 0) ve aşağı ivmesi 400 piksel/sn². 0,75 saniye sonra aşağı hızı kaç piksel/sn olur?",
+      "answer": 300,
+      "tolerance": 1,
+      "unit": "piksel/sn",
+      "explanation": "Hız = ivme x süre = 400 x 0,75 = 300 piksel/sn. Hızlanmayı süre ile çarpmak yeterlidir; konum farkı değil hız sorulmuştur.",
+      "skills": [
+        "oyun-hiz-ivme"
+      ]
+    },
+    {
+      "id": "m11h5d21-q3",
+      "kind": "predict-output",
+      "prompt": "Kahraman havada başlıyor ve hiçbir tuşa basılmıyor. Bu program çalışınca kahraman ne yapar?\n\n```\noyun başlayınca:\n  kahraman ivmesi x 0 y 300\n  kahraman oyuncu tuşlarıyla [dört yöne] hareket etsin, hız 70\n```",
+      "options": [
+        "Hızlanarak düşer ve zemine iner",
+        "Havada neredeyse asılı kalır, saniyede yalnız birkaç piksel süzülür",
+        "Yukarı doğru uçar",
+        "Derleme hatası olur"
+      ],
+      "answer": 1,
+      "explanation": "Dört yön seçildiğinde motor her karede y hızını tuşlara göre yeniden yazar; tuşa basılmıyorsa 0 olur. İvme her karede ancak küçük bir artış verir, bu yüzden kahraman hızlanarak düşmez; saniyede yalnız birkaç piksel süzülür. Sağa-sola seçilseydi yerçekimi serbest kalırdı.",
+      "skills": [
+        "oyun-yercekimi",
+        "oyun-hiz-ivme"
+      ]
+    },
+    {
+      "id": "m11h5d21-q4",
+      "kind": "find-bug",
+      "prompt": "Kahraman düşmüyor, havada kalıyor. Hatalı satır hangisi?\n\n```\n1  oyun başlayınca:\n2    kahraman = yeni [oyuncu-kahraman] sprite'ı, türü [oyuncu]\n3    kahraman konumu x 80 y 24\n4    kahraman ivmesi x 520 y 0\n5    kahraman oyuncu tuşlarıyla [sağa-sola] hareket etsin, hız 70\n```",
+      "options": [
+        "Satır 2: sprite oluşturulurken tür yanlış",
+        "Satır 3: konum havada olduğu için",
+        "Satır 4: ivmenin x ve y değerleri ters",
+        "Satır 5: sağa-sola hareket seçilmesi"
+      ],
+      "answer": 2,
+      "explanation": "4. satırda x ve y değerleri ters yazılmış: ivme yatayda 520, dikeyde 0. Yerçekimi için ivmenin y kutusuna 520 yazılmalı. 2, 3 ve 5. satırlar doğru: sprite oluşturuluyor, havaya konuyor ve sağa-sola hareket seçiliyor.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-yercekimi",
+        "oyun-y-ekseni"
+      ]
+    },
+    {
+      "id": "m11h5d21-q5",
+      "kind": "numeric",
+      "prompt": "Zemin karosunun üst kenarı y = 96 pikselde. Kahramanın boyu 16 piksel ve konumu merkezinden ölçülüyor. Kahraman zemine inip durunca merkez y değeri kaç olur?",
+      "answer": 88,
+      "tolerance": 0,
+      "unit": "piksel",
+      "explanation": "Sprite'ın merkezi alt kenarından boyun yarısı (8) kadar yukarıdadır. Alt kenar zemin üstüne (96) oturduğu için merkez 96 - 8 = 88 olur. y aşağı doğru arttığından yukarı çıkmak için çıkarırız.",
+      "skills": [
+        "oyun-y-ekseni",
+        "oyun-yercekimi"
+      ]
+    }
+  ]
+}

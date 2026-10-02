@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Bloklama",
+      "definition": "Bir komutun bitmesini beklerken programın başka hiçbir satırı çalıştırmaması.",
+      "example": "delay(2000) çalışırken kart 2 saniye boyunca butona da seri porta da bakmaz.",
+      "pitfall": "Bloklamayı \"kart donuyor\" sanmak; kart çalışıyor, yalnızca bekleme komutunu yerine getiriyor."
+    },
+    {
+      "term": "Tur süresi",
+      "definition": "loop() içindeki tüm komutların bir kez çalışması için geçen toplam süre. Delay'li kodda neredeyse tamamı bekleme süresidir.",
+      "example": "İki delay(500) içeren loop() tur başına yaklaşık 1000 ms sürer.",
+      "pitfall": "Yalnızca tek bir delay'i sayıp turdaki diğer delay'leri unutmak."
+    },
+    {
+      "term": "Bakış anı",
+      "definition": "Bir girişin (örneğin butonun) okunduğu an. Bakış anları arasındaki olaylar programa hiç ulaşmaz.",
+      "example": "Butona turun sonunda bakan 2000 ms'lik bir programda bakış anları 2 saniye arayla gelir.",
+      "pitfall": "\"Butona bastım ama sayılmadı, buton bozuk\" demek; sorun genellikle program yapısındadır."
+    },
+    {
+      "term": "Kaçan basış",
+      "definition": "Bakış anları arasında başlayıp biten, bu yüzden programın hiç görmediği buton basışı.",
+      "example": "100 ms'lik basışın 2000 ms'lik turda yakalanma şansı yaklaşık %5'tir.",
+      "pitfall": "Kaçan basışı \"şansızlık\" saymak; yapıdaki bir kusurdur ve sürekli tekrarlanır."
+    },
+    {
+      "term": "Süreyi kısaltma çözümü",
+      "definition": "delay değerlerini küçülterek bakış sıklığını artırma denemesi; sorunu azaltır, bitirmez.",
+      "example": "delay(1000) yerine delay(100) yazmak turu kısaltır ama LED'i de 10 kat hızlandırır.",
+      "pitfall": "Bu yolla hem zamanlamayı bozmak hem de kaçan basışları tümüyle yok edemeyip \"çözdüm\" sanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d26-q1",
+      "kind": "mcq",
+      "prompt": "delay(1500) çalışırken Arduino ne yapar?",
+      "options": [
+        "Başka satırları çalıştırmaya devam eder, yalnızca LED beklemeye girer",
+        "Giriş pinlerini okumaya devam eder ama çıkışları dondurur",
+        "Bekleme bitene kadar başka hiçbir satırı çalıştırmaz",
+        "Yalnızca loop() içindeki sonraki delay'i atlar"
+      ],
+      "answer": 2,
+      "explanation": "delay() bloklayan bir komuttur: süre dolana kadar işlemci sonraki satıra geçmez, butona da bakmaz. Diğer seçenekler delay'in yalnızca bir kısmı beklettiğini ya da girişlerin okunduğunu söyler; hiçbiri doğru değildir.",
+      "skills": [
+        "prog-blocking"
+      ]
+    },
+    {
+      "id": "m3h6d26-q2",
+      "kind": "numeric",
+      "prompt": "Bir program loop() içinde butona yalnızca turun sonunda bakıyor. Tur, 1000 ms + 1000 ms'lik iki delay'den oluşuyor. Butona 100 ms boyunca basılıyor ve basışın başlama anı rastgele. Bu basışın yakalanma olasılığı yaklaşık yüzde kaçtır? (Bakışın anlık olduğunu varsay.)",
+      "answer": 5,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Bakış anları 2000 ms arayla gelir. 100 ms süren basış, ancak bakış anını kapsarsa yakalanır; bu da 100 / 2000 = 0,05, yani %5 demektir. %50 ya da %10 yazmak, turu 1000 ms ya da 200 ms sanmaktan çıkar.",
+      "skills": [
+        "prog-blocking",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d26-q3",
+      "kind": "predict-output",
+      "prompt": "Bu program çalışırken (butona basılmıyor) şu olaylar yaşanıyor: 100-200 ms arasında buton basılı tutuluyor, sonra 550-700 ms arasında yeniden basılı tutuluyor. 2 saniyenin sonunda Seri monitörde ne görünür?\n\n```\nint sayac = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(300);\n  digitalWrite(13, LOW);\n  delay(300);\n  if (digitalRead(2) == LOW) {\n    sayac++;\n    Serial.print(\"Basis sayisi: \");\n    Serial.println(sayac);\n  }\n}\n```",
+      "options": [
+        "Hiçbir şey",
+        "Basis sayisi: 1 ve Basis sayisi: 2",
+        "Basis sayisi: 1",
+        "Basis sayisi: 2"
+      ],
+      "answer": 2,
+      "explanation": "Buton yalnızca 600. ms'de okunur (300 + 300). 100-200 ms'deki basış bakıştan önce bitmiştir, kaçar. 550-700 ms'deki basış 600. ms'i kapsar, sayılır. Sonraki bakış 1200. ms'dedir ve buton bırakılmıştır. Sonuç tek satırdır.",
+      "skills": [
+        "prog-blocking",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d26-q4",
+      "kind": "find-bug",
+      "prompt": "Bu programın amacı butona basılınca LED'i hemen yakmaktır. Ama çoğu basış hiçbir şey yapmıyor. Asıl soruna yol açan satır hangisi?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {\n    digitalWrite(13, HIGH);\n  }\n  delay(3000);\n}\n```",
+      "options": [
+        "pinMode(2, INPUT_PULLUP);",
+        "if (digitalRead(2) == LOW) {",
+        "digitalWrite(13, HIGH);",
+        "delay(3000);"
+      ],
+      "answer": 3,
+      "explanation": "Buton her 3 saniyede yalnızca bir kez okunuyor; delay(3000) kartı bloklar ve basışlar kaçar. Pull-up ve LOW karşılaştırması basılı = LOW kuralına uygundur, digitalWrite satırı da doğrudur.",
+      "skills": [
+        "prog-blocking",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d26-q5",
+      "kind": "mcq",
+      "prompt": "Bir arkadaşın kaçan basışları azaltmak için delay(1000) değerlerini delay(100) yaptı. Bu yaklaşımın en önemli sakıncası nedir?",
+      "options": [
+        "LED'in yanıp sönme hızı da değişir ve yine de bazı basışlar kaçar",
+        "Derleyici hata verir",
+        "Butona hiç bakılmaz",
+        "Kart ısınır ve yavaşlar"
+      ],
+      "answer": 0,
+      "explanation": "Süreyi küçültmek bakış sıklığını artırır ama basışlar yine bakış anları arasında kaçabilir; üstelik LED'in zamanlaması 10 kat hızlanarak bozulur. Derleme hatası ya da ısınma gibi sonuçlar doğmaz.",
+      "skills": [
+        "prog-blocking",
+        "prog-timing"
+      ]
+    }
+  ]
+}

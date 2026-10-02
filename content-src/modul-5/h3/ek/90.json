@@ -1,0 +1,102 @@
+{
+  "concepts": [
+    {
+      "term": "Durum makinesi (KALIBRE, IZLE, BOSLUK, ARAMA, BITTI, HATA)",
+      "definition": "Programın her an altı durumdan yalnız birinde olduğu ve koşullarla durumlar arasında geçtiği yapı.",
+      "example": "KALIBRE bitince IZLE'ye, IZLE'de çizgi kaybolunca BOSLUK ya da ARAMA'ya geçilir.",
+      "pitfall": "Durumları bayraklarla (bool) dağınık yazmak; hangi çıkışın hangi nedenle çalıştığı karışır."
+    },
+    {
+      "term": "MIN_KONTRAST",
+      "definition": "Kalibrasyonda max − min bu değerden küçükse çizgi ile zemin ayırt edilemiyor sayılır; robot sürülmez.",
+      "example": "Sensör 500 ile 640 arasında kalırsa fark 140 < 200'dür ve KALIBRASYON HATASI yazılır.",
+      "pitfall": "Bu denetimi koymayıp robotu belirsiz eşiklerle sürmek; robot çizgiden habersiz hareket eder."
+    },
+    {
+      "term": "Başlangıç koruması (BITIS_BEKLE_MS)",
+      "definition": "Bitiş bandı kararını yalnız başlangıçtan belli bir süre sonra aramak.",
+      "example": "İlk 3 sn beş sensörün birden çizgide olması bitiş sayılmaz.",
+      "pitfall": "Bu korumayı koymamak: başlangıçtaki tuhaf bir okuma robotu hemen durdurabilir."
+    },
+    {
+      "term": "kayipMs ve enUzunMs",
+      "definition": "Robotun kendi ölçtüğü, hiçbir sensörün çizgiyi görmediği toplam süre ve tek seferde en uzun kesinti.",
+      "example": "Bu pistte en uzun kesinti 9 cm'lik boşlukta oluşur ve yaklaşık 0,37 sn sürer.",
+      "pitfall": "sonTur'u her turda güncellememek; fark başlangıçtan beri büyür ve kayıp kat kat fazla çıkar."
+    },
+    {
+      "term": "Hız ödünleşimi",
+      "definition": "Hız arttıkça tur kısalır ama güvenilirlik düşer; iyi ayar, ölçülen değerlerle bulunur.",
+      "example": "Benzetimde HIZ 140'tan 230'a çıkınca tur 17,6 sn'den 8,6 sn'ye iner; 255'te robot dik virajda çizgiyi bulamaz.",
+      "pitfall": "En hızlı ayarı en iyi sanmak; pisti bitirmeyen robotun tur süresi yoktur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d5-q1",
+      "kind": "predict-output",
+      "prompt": "Üç sensör için kalibrasyon sonucu elde edildi. Bu kod ne yazar?\n\n```\nconst int N = 3;\nint enAz[N] = {163, 500, 163};\nint enCok[N] = {860, 640, 860};\nconst int MIN_KONTRAST = 200;\n\nvoid setup() {\n  Serial.begin(9600);\n  bool tamam = true;\n  for (int i = 0; i < N; i++) {\n    Serial.print((enAz[i] + enCok[i]) / 2);\n    Serial.print(' ');\n    if (enCok[i] - enAz[i] < MIN_KONTRAST) tamam = false;\n  }\n  Serial.println(tamam ? \"TAMAM\" : \"HATA\");\n}\nvoid loop() {}\n```",
+      "options": [
+        "511 570 511 TAMAM",
+        "511 511 511 HATA",
+        "511 570 511 HATA",
+        "570 570 570 HATA"
+      ],
+      "answer": 2,
+      "explanation": "Eşikler (163 + 860) / 2 = 511 (int bölmesi), (500 + 640) / 2 = 570 ve yine 511'dir. İkinci sensörün kontrastı 640 − 500 = 140 < 200 olduğu için tamam false olur ve HATA yazılır. Bir sensör yetersizse robot sürülmez.",
+      "skills": ["rob-calibration", "rob-safe-stop", "prog-debug"]
+    },
+    {
+      "id": "m5h3d5-q2",
+      "kind": "mcq",
+      "prompt": "Projede bitiş bandı yalnız başlangıçtan 3 sn sonra aranıyor (BITIS_BEKLE_MS = 3000). Bunun amacı nedir?",
+      "options": [
+        "Başlangıçtaki tuhaf bir okuma (beş sensörün birden çizgide görünmesi) robotu yanlışlıkla durdurmasın",
+        "Motorların ısınması için süre tanımak",
+        "Kalibrasyon süresini uzatmak",
+        "Pist uzunluğunu hesaplamak"
+      ],
+      "answer": 0,
+      "explanation": "Bitiş bandı da kavşak gibi 11111 desenidir. Başlangıçta robot çizginin üstünde ve hareket etmeden önce sensörler yanlış bir desen okuyabilir; koruma süresi bu yanlış alarmı engeller. Motor ısınması, kalibrasyon süresi ya da pist uzunluğuyla ilgisi yoktur.",
+      "skills": ["rob-line-fsm", "rob-safe-stop"]
+    },
+    {
+      "id": "m5h3d5-q3",
+      "kind": "numeric",
+      "prompt": "Bir pist turu 16 sn sürdü ve robot bu sürenin 4 sn'sinde hiçbir sensörle çizgiyi göremedi. Çizgiyi görmediği süre turun yüzde kaçıdır?",
+      "answer": 25,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Oran = kayıp / tur = 4 / 16 = 0,25, yani %25. Tur süresi tek başına yetmez; iki robot aynı sürede bitirse de çizgiyi daha az kaybeden daha kontrollüdür.",
+      "skills": ["rob-line-metrics"]
+    },
+    {
+      "id": "m5h3d5-q4",
+      "kind": "find-bug",
+      "prompt": "Robot çizgiyi birkaç kez kısa süre kaybetti ama program raporda yüz binlerce ms kayıp yazıyor. Hata nerede?\n\n```\nunsigned long sonTur = 0;\nunsigned long kayipMs = 0;\n\nvoid loop() {\n  unsigned long simdi = millis();\n  bool hicbiri = !(sol || sag || orta);   // yukarıda hesaplandı\n  if (hicbiri) {\n    kayipMs += simdi - sonTur;\n  }\n}\n```",
+      "options": [
+        "kayipMs unsigned long olmamalı, int olmalı",
+        "hicbiri tanımındaki ! işareti kaldırılmalı",
+        "millis() yerine delay() kullanılmalı",
+        "sonTur hiç güncellenmiyor: her kayıp turunda başlangıçtan beri geçen süre eklenir. Turun sonunda sonTur = simdi yazılmalı"
+      ],
+      "answer": 3,
+      "explanation": "simdi − sonTur, son turdan beri geçen süre olmalıdır; sonTur 0'da kalırsa fark programın başlangıcından beri geçen süre olur ve her kayıp turunda bu eklenir. Çözüm sonTur = simdi ile her turda saklamaktır. Diğer seçenekler hatanın nedeni değildir; delay() bu projede kullanılmaz.",
+      "skills": ["rob-line-metrics", "prog-timing", "prog-debug"]
+    },
+    {
+      "id": "m5h3d5-q5",
+      "kind": "mcq",
+      "prompt": "Aynı pistte HIZ 140, 170 ve 230 iken robot pisti bitirdi (hız arttıkça hem tur süresi hem kayıp süresi azaldı), HIZ 255'te ise CIZGI KAYBOLDU yazıp durdu. Hangi yorum en doğrudur?",
+      "options": [
+        "En yüksek hız her zaman en iyisidir, 255 yalnız şanssızlıktır",
+        "Yalnız tur süresine bakmak yeterlidir",
+        "Hız arttıkça tur kısalır ama bir sınırdan sonra robot pisti bitiremez; ayar, bitiren en yüksek güvenli hızı ölçümle bulmaktır",
+        "Kayıp süresi önemsizdir, yalnız hız ölçülmelidir"
+      ],
+      "answer": 2,
+      "explanation": "Ölçüm hız ile güvenilirlik arasında ödünleşim olduğunu gösterir: 255'te tur süresi bile yoktur çünkü robot pisti bitirmemiştir. İyi ayar hem süreye hem çizgi kaybına hem de bitirip bitirmediğe bakılarak yapılır.",
+      "skills": ["rob-line-metrics", "rob-gap-recovery"]
+    }
+  ]
+}

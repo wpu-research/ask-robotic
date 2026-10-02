@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Görev (task)",
+      "definition": "Programın bağımsız yürüttüğü küçük bir iş: LED yanıp sönmesi, buzzer, buton okuma. Her görevin kendi zaman değişkeni vardır.",
+      "example": "Nabız LED'i ledZaman ile, buzzer buzzerZaman ile yönetilir.",
+      "pitfall": "İki göreve tek ortak zaman değişkeni vermek: biri güncellenince öteki zamanını kaybeder."
+    },
+    {
+      "term": "Bekletmeyen döngü",
+      "definition": "Hiç delay içermeyen, her turda tüm görevlere kısaca bakıp hemen başa dönen loop().",
+      "example": "Her tur birkaç mikrosaniye sürer; buton, LED ve buzzer her turda kontrol edilir.",
+      "pitfall": "Bir göreve küçük bir delay eklemek: bütün diğer görevler de o kadar bekler."
+    },
+    {
+      "term": "ISR + bayrak",
+      "definition": "Kesme fonksiyonunda yalnızca bir volatile bayrak kaldırılır; asıl iş loop()'ta yapılır.",
+      "example": "modTusu() içinde modIstegi = true; loop() bayrağı görünce modGec() çağırır.",
+      "pitfall": "ISR içinde mod değiştirmek, LED sürmek ya da Serial.print kullanmak."
+    },
+    {
+      "term": "Zaman aşımı (timeout)",
+      "definition": "Belli süre komut ya da olay gelmezse çıkışı kendiliğinden güvenli duruma getiren mantık.",
+      "example": "700 ms komut gelmezse D7 çıkışı LOW olur ve motor durur.",
+      "pitfall": "Son komut \"çalış\" iken bağlantı kopsa da çıkışı açık bırakmak; motor kontrolsüz döner."
+    },
+    {
+      "term": "Görev tablosu",
+      "definition": "Kodu yazmadan önce görev, tetikleyici, yöntem ve değişkenleri listeleyen plan tablosu.",
+      "example": "Mod değişimi: tetikleyici D2 butonu, yöntem kesme + bayrak, değişken modIstegi.",
+      "pitfall": "Planlamadan kod yazmaya başlamak: görevlerin birbirinin değişkenini bozduğu sonradan fark edilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d30-q1",
+      "kind": "mcq",
+      "prompt": "Çoklu görev panelinde MOD butonunun kesmesi (ISR) neden yalnızca modIstegi = true; yazıyor da modu kendisi değiştirmiyor?",
+      "options": [
+        "Kesmeler değişken yazamaz",
+        "Mod değişkeni yalnızca setup()'ta yazılabilir",
+        "ISR kısa kalmalı; asıl iş loop()'ta yapılır",
+        "Buton okuma yalnızca loop()'ta mümkündür"
+      ],
+      "answer": 2,
+      "explanation": "ISR kısa olmalıdır; mod değiştirme LED ve buzzer sayaçlarını sıfırlama gibi işler içerir ve ana programla çakışabilir. Kesmeler değişken yazabilir (volatile olmaları gerekir), buton da kesmeyle okunabilir.",
+      "skills": [
+        "prog-multitask",
+        "prog-interrupts"
+      ]
+    },
+    {
+      "id": "m3h6d30-q2",
+      "kind": "find-bug",
+      "prompt": "SUSTUR butonu (D3, INPUT_PULLUP) basılınca ALARM'dan çıkılması gerekiyor. Ama ALARM'a girer girmez hemen BEKLE'ye dönülüyor. Hatalı satır hangisi?\n\n```\nif (mod == ALARM) {\n  if (digitalRead(3) == HIGH || simdi - modBasi >= 5000) {\n    modGec(BEKLE);\n  }\n}\n```",
+      "options": [
+        "if (mod == ALARM) {",
+        "if (digitalRead(3) == HIGH || simdi - modBasi >= 5000) {",
+        "modGec(BEKLE);",
+        "Kod doğru; sorun devrede"
+      ],
+      "answer": 1,
+      "explanation": "INPUT_PULLUP ile basılmamış buton HIGH okunur, basılı buton LOW. Koşul == HIGH olduğu için buton basılmadan koşul hemen doğru olur. Doğrusu == LOW. Diğer satırlar doğrudur.",
+      "skills": [
+        "prog-multitask",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d30-q3",
+      "kind": "numeric",
+      "prompt": "ALARM modunda buzzer 200 ms çalıp 200 ms susuyor; moda girildiğinde buzzerZaman = modBasi olarak sıfırlanıyor ve buzzer önce 200 ms susuyor. ALARM 5 saniye sürüyor (5000 ms'de BEKLE'ye dönülüyor). Bu sürede buzzer kaç kez çalmaya başlar?",
+      "answer": 12,
+      "tolerance": 0,
+      "unit": "bip",
+      "explanation": "Bip başlangıçları 200, 600, 1000, ... ms (her 400 ms'de bir). 200 + 400k < 5000 koşulunu k = 0...11 sağlar: 12 bip. 5000. ms'de alarmdan çıkış kontrolü buzzer kontrolünden önce yapıldığı için 13. bip başlamaz.",
+      "skills": [
+        "prog-multitask",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d30-q4",
+      "kind": "numeric",
+      "prompt": "Bir çıkış 700 ms zaman aşımıyla korunuyor: her '1' komutu sayacı yeniliyor, 700 ms komut gelmezse çıkış kapanıyor. Son '1' komutu t = 600 ms'de geldi, sonra hiçbiri gelmedi. Çıkış kaçıncı milisaniyede kapanır?",
+      "answer": 1300,
+      "tolerance": 10,
+      "unit": "ms",
+      "explanation": "Zaman aşımı, son komuttan itibaren sayılır: 600 + 700 = 1300 ms. İlk komut zamanına bakmak (700 ms) ya da toplam süreye 700 eklemek yanlış olur; sayaç her komutla yenilenir.",
+      "skills": [
+        "prog-multitask",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d30-q5",
+      "kind": "mcq",
+      "prompt": "Uzaktan kumandalı bir sistemde bağlantı kopunca çıkışın otomatik kapanması neden istenir?",
+      "options": [
+        "Kod daha kısa olsun diye",
+        "Buzzer çalmaya devam etsin diye",
+        "Bağlantı kopunca kart kendini kapatır zaten",
+        "Son komut \"çalış\" ise çıkışın sonsuza kadar açık kalmasını önlemek için"
+      ],
+      "answer": 3,
+      "explanation": "Bağlantı koparsa son komut hâlâ geçerli sanılabilir ve motor kontrolsüz dönebilir. Zaman aşımı güvenli duruma (kapalı) geçer. Kart bağlantı kopunca kendiliğinden bir şey yapmaz; mantığı sen yazarsın.",
+      "skills": [
+        "prog-multitask"
+      ]
+    }
+  ]
+}

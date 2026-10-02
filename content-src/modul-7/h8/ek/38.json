@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Kural",
+      "definition": "Girdiden eyleme giden açık ve sabit bir karar adımı.",
+      "example": "'Kalan mesafe 50 cm'den azsa dur.'",
+      "pitfall": "Her işi kurala bağlamaya çalışmak; görüntü tanıma gibi işleri kuralla yazmak çok zordur."
+    },
+    {
+      "term": "Öğrenilmiş model",
+      "definition": "Karar kurallarını verilerden öğrenen sistem; örneğin kameradan engel tanıyan görü modeli.",
+      "example": "Kamera görüntüsünde insan olup olmadığını tahmin etmek.",
+      "pitfall": "Yanılmayacağını ve nedeninin açıklanabileceğini varsaymak."
+    },
+    {
+      "term": "Deterministik",
+      "definition": "Aynı girdiyle her seferinde aynı sonucu veren.",
+      "example": "Atölyedeki betik ve araçlar aynı betikte hep aynı sonucu verir.",
+      "pitfall": "Gerçek model tabanlı kararın da hep aynı olacağını sanmak."
+    },
+    {
+      "term": "Eşik",
+      "definition": "Bir koşulun doğru ya da yanlış olduğu sınır değer.",
+      "example": "eğer $son < 50: dur() satırında eşik 50'dir.",
+      "pitfall": "Eşiği adım büyüklüğünü hesaba katmadan seçmek; robot eşiği atlayabilir."
+    },
+    {
+      "term": "Sert sınır",
+      "definition": "Modelden bağımsız, ondan sonra çalışan ve ihlal edilemeyen güvenlik kuralı.",
+      "example": "Model 'ileri' dese bile duvara 20 cm kala komutu engelleyen katman.",
+      "pitfall": "Güvenlik kuralını modelin istemine (prompt) yazıp yetindiğini sanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d3-q1",
+      "kind": "predict-output",
+      "prompt": "Sanal koridorda duvar 100 cm uzakta. Bu betik çalışınca ajanın nihai cevabı (bitir) ne olur?\n\n```\nileri(30)\nileri(30)\nmesafe()\neğer $son < 50: dur()\nbitir($son)\n```",
+      "options": [
+        "40",
+        "60",
+        "ÇARPTI",
+        "durdu"
+      ],
+      "answer": 3,
+      "explanation": "İki adımdan sonra robot 60 cm ilerlemiştir; mesafe() 40 verir. 40 < 50 doğru olduğu için dur() çalışır ve sonucu 'durdu' olur. $son en son başarılı çağrının sonucudur; bu yüzden bitir($son) '40' değil 'durdu' verir.",
+      "skills": [
+        "ai-agent-script",
+        "ai-rule-vs-model"
+      ]
+    },
+    {
+      "id": "m7h8d3-q2",
+      "kind": "numeric",
+      "prompt": "Duvar 100 cm uzakta. Robot 35 cm'lik adımlar atıyor; her adımdan sonra kalan mesafeyi ölçüyor ve kalan 50 cm'den azsa duruyor. Robot kaç cm ilerlemiş olarak durur?",
+      "answer": 70,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "Birinci adım: 35 cm ilerledi, kalan 65 (50'den az değil). İkinci adım: 70 cm ilerledi, kalan 30 < 50; robot durur. Cevap 70.",
+      "skills": [
+        "ai-rule-vs-model",
+        "ai-agent-script"
+      ]
+    },
+    {
+      "id": "m7h8d3-q3",
+      "kind": "find-bug",
+      "prompt": "Robot duvar 100 cm uzakta ve kalan mesafe 30 cm'nin altına inince durmalı ama duvara çarpıyor. Hatalı satır hangisi?\n\n```\nileri(40)\nileri(40)\nmesafe()\neğer $son > 30: dur()\nileri(40)\n```",
+      "options": [
+        "ileri(40) (birinci satır)",
+        "mesafe() (üçüncü satır)",
+        "eğer $son > 30: dur() (dördüncü satır)",
+        "ileri(40) (beşinci satır)"
+      ],
+      "answer": 2,
+      "explanation": "İki adımdan sonra mesafe 20'dir. Koşul 'büyükse dur' diyor; 20 > 30 yanlış olduğundan dur() çalışmaz ve son ileri(40) robotu duvara çarptırır. Koşul '<' olmalıdır. Diğer satırlar kuralın çalışması için gerekli, doğru yazılmış adımlardır.",
+      "skills": [
+        "ai-agent-script",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m7h8d3-q4",
+      "kind": "mcq",
+      "prompt": "Bir dil modeli robota 'ileri git' komutunu çevirdi ama önünde duvar var. Robotu koruyan kural nerede yaşamalıdır?",
+      "options": [
+        "Yalnız modelin istemi (prompt) içinde",
+        "Modelden bağımsız çalışan ayrı bir sert sınır katmanında",
+        "Sadece kullanıcının dikkatinde",
+        "Hiçbir yerde; model zaten doğru karar verir"
+      ],
+      "answer": 1,
+      "explanation": "Güvenlik sınırı modelin dışında, modelin çıktısından sonra çalışan bir katmanda olmalıdır. Model yanılabilir ya da yönlendirilebilir; kural ise her seferinde aynı davranır. Modelin kendi isteminde tutulan bir kural garanti vermez.",
+      "skills": [
+        "ai-safety-layer"
+      ]
+    },
+    {
+      "id": "m7h8d3-q5",
+      "kind": "mcq",
+      "prompt": "'Kalan mesafe 40 cm ise dur' kuralı neden güvenlik kararlarında iyi bir seçimdir?",
+      "options": [
+        "Kural, görüntü tanımada modelden her zaman iyidir",
+        "Kural, aynı girdiyle aynı sonucu verir ve sınanabilir",
+        "Kural hiç hata yapmaz, her koşulu bilir",
+        "Kural, yazması ve değiştirmesi gerekmeyen sihirli bir çözümdür"
+      ],
+      "answer": 1,
+      "explanation": "Kural öngörülebilir, sınanabilir ve açıklanabilirdir; aynı girdiyle aynı sonucu verir. Bu, güvenlik için önemlidir. Kuralın modelden her zaman daha 'akıllı' olduğu doğru değildir; görüntü tanıma gibi işlerde model daha yararlıdır.",
+      "skills": [
+        "ai-rule-vs-model"
+      ]
+    }
+  ]
+}

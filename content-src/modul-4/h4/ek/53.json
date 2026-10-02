@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Isınma süresi",
+      "definition": "MQ-2'nin içindeki ısıtıcının sensör elemanını çalışma sıcaklığına getirmesi için beklenen süre.",
+      "example": "Derste 5 saniye bekleriz; gerçek modül için veri sayfasındaki süreyi kullanırsın.",
+      "pitfall": "Isınmayı beklememek: baz değer yanlış çıkar, alarm yanlış çalar ya da hiç çalmaz."
+    },
+    {
+      "term": "Baz değer",
+      "definition": "Isındıktan sonra temiz havada ölçülen ortalama okuma.",
+      "example": "Sanal modülde Gaz düzeyi 0 iken baz yaklaşık 102'dir.",
+      "pitfall": "Bazı gazlı ortamda ölçmek: eşikler yukarı kayar ve gerçek bir artış kaçar."
+    },
+    {
+      "term": "Göreli eşik (oran)",
+      "definition": "Eşiği sabit sayı yerine bazın katı olarak yazmak.",
+      "example": "ALARM_ORAN = 1,5 ve baz 120 ise alarm 180 ve üstünde başlar.",
+      "pitfall": "okuma > 400 gibi sabit sayı kullanmak: başka modülde ya da başka havada anlamsız olur."
+    },
+    {
+      "term": "Yumuşatma",
+      "definition": "Her yeni okumayı eski ortalamayla karıştırarak ani sıçramaları yumuşatmak.",
+      "example": "ort = 0.8 * ort + 0.2 * okuma satırı tek bir sıçramanın alarm vermesini engeller.",
+      "pitfall": "Alarmı tek bir ham okumaya bağlamak: bir sıçrama yanlış alarm üretir."
+    },
+    {
+      "term": "Tamsayı bölmesi tuzağı",
+      "definition": "İki int sayıyı bölmek küsuratı atar: 160 / 100 sonucu 1 olur.",
+      "example": "float oran = ort / 100.0; yazarsan oran 1,6 çıkar.",
+      "pitfall": "Oranı float değişkene atayıp doğru olduğunu sanmak; bölme int ile yapılmışsa küsurat zaten kaybolmuştur."
+    },
+    {
+      "term": "Sayısal ppm yerine bağıl okuma",
+      "definition": "ppm için gaz türü, eğri ve kalibrasyon gerekir; yoksa yalnızca bazın katı söylenir.",
+      "example": "\"Temiz havanın 1,6 katı\" doğru bir ifadedir; \"500 ppm\" bu devrede uydurmadır.",
+      "pitfall": "Okumayı ppm'e çevirip doğru sanmak ya da devreyi gerçek can güvenliği için tek başına kullanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d3-q1",
+      "kind": "numeric",
+      "prompt": "Başka bir MQ-2 modülünde temiz havada baz değer 120 ölçüldü. Alarm oranı 1,5 ise alarmın başlayacağı en küçük okuma değeri kaçtır?",
+      "answer": 180,
+      "tolerance": 0,
+      "explanation": "Eşik bazın katıdır: 120 × 1,5 = 180. Aynı kodu baz 102 olan sanal modülde çalıştırsan eşik 153 olurdu. Eşiği sabit sayı yazmaman bu yüzden önemlidir.",
+      "skills": [
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d3-q2",
+      "kind": "predict-output",
+      "prompt": "Baz 100, yumuşatma ort = 0.8 * ort + 0.2 * okuma. Okuma birden 300'e çıkıp orada kalıyor. Bu kod ne yazar?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  float ort = 100;\n  for (int i = 1; i <= 3; i++) {\n    ort = 0.8 * ort + 0.2 * 300;\n    Serial.println(ort, 0);\n  }\n}\n```\n(println ikinci parametre 0: küsurat basamağı yok.)",
+      "options": [
+        "300, 300, 300",
+        "140, 172, 198",
+        "120, 136, 149",
+        "140, 140, 140"
+      ],
+      "answer": 1,
+      "explanation": "Birinci adım 0,8 × 100 + 60 = 140, ikinci 0,8 × 140 + 60 = 172, üçüncü 0,8 × 172 + 60 = 197,6 ve println 198 yazar. Ort ancak ikinci adımda 150'yi (bazın 1,5 katı) geçer. Yumuşatma bu yüzden tek bir sıçramada değil, kalıcı artışta alarm verir.",
+      "skills": [
+        "sens-smoothing",
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d3-q3",
+      "kind": "mcq",
+      "prompt": "Gerçek bir MQ-2 modülünü yeni bağladın ve hemen baz ölçüyorsun. Neden bu iyi bir fikir değildir?",
+      "options": [
+        "Isıtıcı ısınmadan okumalar kararsızdır; bu baz yanlış çıkar",
+        "MQ-2 hiç analog çıkış vermez",
+        "Baz yalnızca fabrikada ölçülür",
+        "analogRead ısınmadan çalışmaz"
+      ],
+      "answer": 0,
+      "explanation": "MQ-2'nin ısıtıcısı sensör elemanını çalışma sıcaklığına getirmeden okumalar yavaş yavaş oturur. O sırada ölçülen baz, sonraki okumalara göre çok farklı olur ve oran hesabı bozulur. Diğer seçenekler yanlıştır: modülün AO çıkışı vardır, analogRead her zaman çalışır ve baz ortamda ölçülür.",
+      "skills": [
+        "sens-baseline",
+        "safety-sensors"
+      ]
+    },
+    {
+      "id": "m4h4d3-q4",
+      "kind": "find-bug",
+      "prompt": "Gerçek oran 1,6 iken (ort = 160, baz = 100) alarm hiç başlamıyor. Hata nerede?\n\n```\nint baz = 100;\nint ort = 160;\nfloat oran = ort / baz;\nif (oran >= 1.5) alarm = true;\n```",
+      "options": [
+        "int ort = 160; satırı",
+        "if (oran >= 1.5) satırı",
+        "int baz = 100; satırı",
+        "float oran = ort / baz; satırı: iki int bölününce sonuç 1 olur"
+      ],
+      "answer": 3,
+      "explanation": "ort ve baz iki int olduğu için 160 / 100 tamsayı bölmesidir ve sonuç 1 çıkar; float değişkene atamak küsuratı geri getirmez. Çözüm ort / (float)baz ya da ort / 100.0 yazmaktır. Diğer satırlar doğrudur.",
+      "skills": [
+        "prog-debug",
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d3-q5",
+      "kind": "mcq",
+      "prompt": "MQ-2 okuması 500. Bir arkadaşın \"Bu kaç ppm gaz demek?\" diye soruyor. En doğru cevap hangisidir?",
+      "options": [
+        "500 ppm",
+        "5 ppm, çünkü 500 / 100",
+        "Bu devrede ppm söylenemez; yalnızca temiz havadaki baza göre kaç kat arttığı söylenebilir",
+        "Sıfır ppm, çünkü gaz yok"
+      ],
+      "answer": 2,
+      "explanation": "ppm için veri sayfasındaki eğri, gazın türü ve sensörün kalibrasyonu gerekir. MQ-2 gazı ayırt edemez ve kalibrasyon yapılmamıştır. Bu yüzden yalnızca oran (okuma / baz) söylenir. Diğer seçenekler uydurma bir dönüşüm yapar.",
+      "skills": [
+        "sens-baseline",
+        "safety-sensors"
+      ]
+    }
+  ]
+}

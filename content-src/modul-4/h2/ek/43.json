@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Reed anahtarı",
+      "definition": "Cam tüpte iki metal dilden oluşan, yanına mıknatıs gelince kontağı kapanan anahtar.",
+      "example": "Pencere alarmında çerçeveye reed, kanada mıknatıs yapıştırılır.",
+      "pitfall": "Mıknatısın belirli bir kutbu gerektiğini sanmak; sade reed her iki kutupta da kapanır."
+    },
+    {
+      "term": "Limit anahtarı",
+      "definition": "Bir kola mekanik olarak basılınca kontağı değişen mikro şalter.",
+      "example": "3B yazıcıda eksen uç noktaya gelince kola çarpıp durmayı tetikler.",
+      "pitfall": "Onu özel bir sensör sanmak; elektrik bakımından sıradan bir butondur."
+    },
+    {
+      "term": "INPUT_PULLUP ile okuma",
+      "definition": "Anahtarın bir ucu pine, diğeri GND'ye bağlanır; kontak kapalıyken LOW, açıkken HIGH okunur.",
+      "example": "pinMode(4, INPUT_PULLUP); kapali = (digitalRead(4) == LOW);",
+      "pitfall": "Pull-up'ı unutmak: kontak açıkken pin havada kalır ve okuma rastgele olur."
+    },
+    {
+      "term": "NO ve NC",
+      "definition": "NO (normalde açık) basılınca kapanır; NC (normalde kapalı) basılınca açılır.",
+      "example": "Alarm kapı kontağı NC bağlıysa kopan kablo da kontağı açar ve alarm verir.",
+      "pitfall": "NO ile NC'yi karıştırmak: mantık tersine çalışır ya da kopan kablo fark edilmez."
+    },
+    {
+      "term": "Kontak titreşimi (bounce)",
+      "definition": "Mekanik kontak kapanırken bir an açılıp kapanır ve tek olay birkaç olay gibi görünür.",
+      "example": "Kapı sallanınca reed bir an LOW-HIGH-LOW verebilir.",
+      "pitfall": "Debounce koymamak: yalancı olaylar ve yalancı alarmlar üretilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d3-q1",
+      "kind": "mcq",
+      "prompt": "Reed anahtarının bir ucu D4'e, diğer ucu GND'ye bağlı ve pin INPUT_PULLUP. Mıknatıs reed'e yaklaşınca digitalRead(4) ne verir?",
+      "options": [
+        "HIGH",
+        "Okuma kararsızdır, rastgele",
+        "LOW",
+        "Yaklaşık 2,5 V ve belirsiz"
+      ],
+      "answer": 2,
+      "explanation": "Mıknatıs kontağı kapatır, pin GND'ye bağlanır ve LOW okunur. Mıknatıs uzaktayken kontak açıktır ve iç pull-up pini 5 V'a çeker (HIGH). Sade reed mıknatısın hangi kutbunun yaklaştığına bakmaz.",
+      "skills": [
+        "sensor-contact"
+      ]
+    },
+    {
+      "id": "m4h2d3-q2",
+      "kind": "mcq",
+      "prompt": "Kapı kontağını NC bağlayıp \"kontak açıldı = ihlal\" kuralını uyguladın. Hırsız kapıya dokunmadan kontağın kablosunu kesiyor. Ne olur?",
+      "options": [
+        "Hiçbir şey olmaz, sistem kapıyı kapalı sanar",
+        "Pin LOW okur ve sistem kapıyı kapalı sanar",
+        "Pin HIGH okur ve sistem bunu ihlal sayar",
+        "Arduino yeniden başlar"
+      ],
+      "answer": 2,
+      "explanation": "Kablo kopunca devre açılır, pin INPUT_PULLUP sayesinde HIGH okur ve sistem bunu kontağın açılması, yani ihlal olarak görür. Alarm çalar. Kontak NO bağlı ve kural \"kontak kapanınca ihlal\" olsaydı, kesilen kablo hiçbir şeyi değiştirmez ve sistem sessiz kalırdı.",
+      "skills": [
+        "design-failsafe",
+        "sensor-contact"
+      ]
+    },
+    {
+      "id": "m4h2d3-q3",
+      "kind": "numeric",
+      "prompt": "reed_kapi sketch'inde KARARLI_MS = 20. Reed kapanırken ham okuma 1 ms aralıkla şöyle değişiyor: t = 0'da LOW, 3'te HIGH, 6'da LOW, 9'da HIGH, 12'de LOW ve sonra LOW kalıyor. Program kapıyı kaçıncı milisaniyede \"kapalı\" olarak kabul eder?",
+      "answer": 32,
+      "tolerance": 1,
+      "unit": "ms",
+      "explanation": "Her ham değişimde sonDegisim yenilenir. Son değişim t = 12'dedir ve değer 20 ms boyunca sabit kalmalıdır: 12 + 20 = 32 ms. Daha öncesinde hiçbir değer 20 ms kararlı kalmadığı için erken kabul olmaz.",
+      "skills": [
+        "prog-debounce",
+        "sensor-contact"
+      ]
+    },
+    {
+      "id": "m4h2d3-q4",
+      "kind": "predict-output",
+      "prompt": "Laboratuvarda Mıknatıs yakın kutusu işaretsiz başlıyor. Program iki satır yazdıktan sonra kutuyu işaretliyorsun. Toplam dört satırda ne görürsün?\n\n```\nvoid setup() {\n  pinMode(4, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(digitalRead(4) ? \"acik\" : \"kapali\");\n  delay(500);\n}\n```",
+      "options": [
+        "kapali, kapali, acik, acik",
+        "acik, acik, kapali, kapali",
+        "Hep acik",
+        "Hep kapali"
+      ],
+      "answer": 1,
+      "explanation": "İşaretsizken kontak açıktır, pin HIGH okunur (ifade doğru sayılır) ve \"acik\" yazılır. Kutu işaretlenince kontak kapanır, pin LOW olur (ifade yanlış sayılır) ve \"kapali\" yazılır. Sıra: acik, acik, kapali, kapali.",
+      "skills": [
+        "sensor-contact",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d3-q5",
+      "kind": "find-bug",
+      "prompt": "Reed'in bir ucu D4'te, diğer ucu GND'de. Mıknatıs uzakta olduğu hâlde LED ara sıra kendiliğinden yanıp sönüyor. Sorun hangi satırda?\n\n```\nconst int REED = 4;\n\nvoid setup() {\n  pinMode(REED, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, digitalRead(REED) == LOW);\n}\n```",
+      "options": [
+        "const int REED = 4;",
+        "pinMode(REED, INPUT);",
+        "pinMode(13, OUTPUT);",
+        "digitalWrite(13, digitalRead(REED) == LOW);"
+      ],
+      "answer": 1,
+      "explanation": "Reed açıkken pin hiçbir yere bağlı değildir (yüzen giriş) ve okuma rastgele olur. `INPUT_PULLUP` pini açık kontakta 5 V'a çeker. Karşılaştırma (`== LOW` kontak kapalı demektir) doğrudur.",
+      "skills": [
+        "sensor-contact",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Kısa ölçüm ve çarpma",
+      "definition": "Kısa bir süre sayıp sonucu çarparak bir dakikalık değeri tahmin etmek.",
+      "example": "10 saniyede 14 atış sayarsan 14 x 6 = 84 atış/dakika bulursun.",
+      "pitfall": "Çarpanı unutmak: ekranda atış sayısı kalır, dakikadaki atış değil."
+    },
+    {
+      "term": "Bayrak",
+      "definition": "0 ya da 1 tutan ve \"şimdi şu işlem geçerli mi?\" sorusunu cevaplayan değişken.",
+      "example": "olcum = 1 iken A sayar, olcum = 0 iken A hiçbir şey yapmaz.",
+      "pitfall": "Bayrağı 1 yapmayı unutmak: ölçüm hiç başlamaz ve A hiç saymaz."
+    },
+    {
+      "term": "bekle ve başlıklar",
+      "definition": "bekle bloğu yalnızca kendi başlığını durdurur; öteki başlıklar çalışmaya devam eder.",
+      "example": "B 10 saniye beklerken A düğmesi basışları saymaya devam eder.",
+      "pitfall": "bekle bloğunu bütün kartı durdurur sanmak."
+    },
+    {
+      "term": "Sıfırlama",
+      "definition": "Sayacı yeni ölçümün başında 0 yapmak.",
+      "example": "B başlığının ilk bloğu sayac değerini 0 yap olur.",
+      "pitfall": "Sıfırlamamak: ikinci ölçümde önceki atışlar da toplanır ve sonuç şişer."
+    },
+    {
+      "term": "Milisaniye",
+      "definition": "bekle bloğunun birimi; 1000 ms = 1 saniye.",
+      "example": "10 saniye için bekle [10000] ms yazılır.",
+      "pitfall": "bekle [10] yazmak: bu yalnızca 10 ms, yani gözle fark edilmez."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d26-q1",
+      "kind": "numeric",
+      "prompt": "Nabız ölçerde 10 saniye boyunca 14 atış saydın. Kart kaç sayısını göstermelidir?",
+      "answer": 84,
+      "unit": "atış/dk",
+      "explanation": "10 saniyenin 6 katı bir dakikadır. 14 x 6 = 84. Atış sayısını (14) göstermek ya da 10 ile çarpmak (140) dakikadaki atışı vermez.",
+      "skills": [
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d26-q2",
+      "kind": "mcq",
+      "prompt": "B başlığı bekle [10000] ms bloğunda beklerken A düğmesine basılırsa ne olur?",
+      "options": [
+        "A düğmesi çalışmaz, çünkü kart beklemektedir",
+        "Kart bir hata verir",
+        "A başlığı çalışır, çünkü başlıklar birbirinden bağımsız ilerler",
+        "A basışları 10 saniye sonra toplu işlenir"
+      ],
+      "answer": 2,
+      "explanation": "bekle yalnızca kendi başlığını durdurur. A başlığı ayrı bir görevdir ve her basışta hemen çalışır. Bu yüzden beklerken sayım yapılabilir.",
+      "skills": [
+        "mk-concurrency",
+        "mk-events"
+      ]
+    },
+    {
+      "id": "m10h6d26-q3",
+      "kind": "find-bug",
+      "prompt": "Bu program 10 saniyede 12 kez A'ya basılsa da hep 0 gösteriyor. Hata hangisi?\n\n```\ndüğme B basılınca:\n  sayac değerini 0 yap\n  bekle 10000 ms\n  olcum değerini 1 yap\n  sayıyı göster (sayac x 6)\n\ndüğme A basılınca:\n  eğer olcum = 1 ise:\n    sayac değerine 1 ekle\n```",
+      "options": [
+        "A başlığında sayac 1 yerine 2 artmalı",
+        "olcum değerini 1 yapma bloğu bekle bloğundan sonra; bekleme sırasında olcum 0 olduğu için A hiç saymaz",
+        "Çarpan 6 değil 10 olmalı",
+        "sayac başta sıfırlanmamış"
+      ],
+      "answer": 1,
+      "explanation": "Bayrak bekleme başlamadan önce 1 yapılmalıdır. Burada bekleme bittikten sonra 1 oluyor, yani sayma penceresi hiç açılmıyor ve sayac 0 kalıyor. Çarpan ve sıfırlama doğru.",
+      "skills": [
+        "mk-debug",
+        "mk-concurrency",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d26-q4",
+      "kind": "predict-output",
+      "prompt": "Aşağıdaki program kullanılıyor. Birinci ölçümde 12 atış, hemen ardından ikinci ölçümde 9 atış sayıldı. İkinci ölçümün sonunda kart ne gösterir?\n\n```\nbaşlangıçta:\n  sayac değerini 0 yap\n  olcum değerini 0 yap\n\ndüğme B basılınca:\n  olcum değerini 1 yap\n  bekle 10000 ms\n  olcum değerini 0 yap\n  sayıyı göster (sayac x 6)\n\ndüğme A basılınca:\n  eğer olcum = 1 ise:\n    sayac değerine 1 ekle\n```",
+      "options": [
+        "54",
+        "72",
+        "126",
+        "0"
+      ],
+      "answer": 2,
+      "explanation": "Program sayac'ı B'de sıfırlamıyor. İkinci ölçümde sayac 12 + 9 = 21 olur ve 21 x 6 = 126 gösterilir. 54 yalnız ikinci ölçümün sonucu olurdu; ancak sıfırlama bulunmuyor.",
+      "skills": [
+        "mk-variables",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h6d26-q5",
+      "kind": "numeric",
+      "prompt": "Ölçüm süresini 15 saniyeye çıkardın ve çarpanı 4 yaptın. 15 saniyede 17 atış saydın. Dakikadaki atış kaçtır?",
+      "answer": 68,
+      "unit": "atış/dk",
+      "explanation": "15 saniyenin 4 katı 60 saniyedir. 17 x 4 = 68. Çarpan süreye göre seçilir: süre x çarpan = 60.",
+      "skills": [
+        "mk-variables"
+      ]
+    }
+  ]
+}

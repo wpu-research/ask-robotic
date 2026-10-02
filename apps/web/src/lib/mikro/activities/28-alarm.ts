@@ -21,7 +21,7 @@ export const ders28: MikroActivity = {
       if (at < 0) return false
       const t = log[at].t
       return log.slice(0, at).some((e) => e.kind === 'melody') && !log.slice(at + 1).some((e) => e.kind === 'melody' && e.t > t + 50)
-    }, { hint: "'kurulu' ve 'alarm' değişkenlerini 0 yap." }),
+    }, { hint: "Sanal kartta A+B düğmesini yaklaşık 1 saniye basılı tut (uzun basış). 'kurulu' ve 'alarm' değişkenlerini 0 yap." }),
     ledPattern('mutlu', "Alarm kapanınca mutlu yüz görünsün", ICON_BY_ID.happy.rows),
   ],
   solution: () => project('Alarm', [

@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Sahne",
+      "definition": "Oyunun oynandığı ekran. Oyun Atölyesi'nde 160 piksel geniş ve 120 piksel yüksektir.",
+      "example": "Arka plan rengini gök mavisi yaparak sahnenin zeminini kurarsın.",
+      "pitfall": "Blokları değiştirdikten sonra sahnenin kendiliğinden güncellendiğini sanmak; yeni hâlini görmek için oyunu baştan başlatman gerekir."
+    },
+    {
+      "term": "Sprite",
+      "definition": "Sahnedeki bir oyuncu ya da nesne; kendi resmi, konumu ve türü vardır.",
+      "example": "Kedi bir sprite'tır, elma da; ikisi birbirinden bağımsız hareket edebilir.",
+      "pitfall": "Konumun sprite'ın sol üst köşesini gösterdiğini sanmak; konum sprite'ın merkezini gösterir."
+    },
+    {
+      "term": "Koordinat (x ve y)",
+      "definition": "Sahnedeki bir noktayı gösteren iki sayı: x soldan, y yukarıdan uzaklıktır.",
+      "example": "Sol üst köşe x 0 y 0, ekranın ortası x 80 y 60 noktasıdır.",
+      "pitfall": "y büyüdükçe sprite'ın yukarı çıkacağını sanmak; y aşağı doğru artar."
+    },
+    {
+      "term": "Tür",
+      "definition": "Sprite'ın oyundaki rolü: Oyuncu, Düşman, Yiyecek gibi.",
+      "example": "Elmayı Yiyecek türünde oluşturursan sonra \"Oyuncu, Yiyecek'e çarpınca\" kuralını yazabilirsin.",
+      "pitfall": "Türü resimle aynı şey sanmak; Elma resmini Düşman türünde de oluşturabilirsin."
+    },
+    {
+      "term": "Değişken",
+      "definition": "Bir sprite'a ya da değere verdiğin ad etiketi; sonra o adla ona ulaşırsın.",
+      "example": "kedi değişkenine yeni bir sprite koyunca, kedi bloğu o sprite'ı gösterir.",
+      "pitfall": "İki sprite için aynı değişken adını kullanmak; değişken yeni sprite'ı gösterir ve ilkine bir daha ulaşamazsın."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h1d1-q1",
+      "kind": "mcq",
+      "prompt": "Sahnede bir sprite'ın y değerini büyütürsen sprite ne yapar?",
+      "options": [
+        "Yukarı çıkar",
+        "Sağa gider",
+        "Aşağı iner",
+        "Büyür"
+      ],
+      "answer": 2,
+      "explanation": "y, yukarıdan uzaklıktır ve aşağı doğru artar. x değeri büyüyünce sprite sağa gider. Yukarı çıkmak için y'yi küçültürsün. Sprite'ın boyutunu ne x ne y değiştirir.",
+      "skills": [
+        "game-coords"
+      ]
+    },
+    {
+      "id": "m11h1d1-q2",
+      "kind": "predict-output",
+      "prompt": "Bu bloklar çalışınca sahnede ne görürsün?\n\n```\noyun başlayınca\n  kedi = yeni Kedi sprite'ı, türü Oyuncu\n  kedi konumu x 40 y 80\n  elma = yeni Elma sprite'ı, türü Yiyecek\n  elma konumu x 120 y 80\n```",
+      "options": [
+        "Elma kedinin solunda",
+        "Elma kedinin sağında, aynı yükseklikte",
+        "Elma kedinin tam üstünde",
+        "Elma kedinin altında, aynı hizada"
+      ],
+      "answer": 1,
+      "explanation": "Elmanın x değeri (120) kedininkinden (40) büyük, yani elma sağdadır. İki sprite'ın y değeri de 80 olduğu için aynı yüksekliktedirler. Elmanın kedinin üstünde olması için x değerlerinin aynı, y değerlerinin farklı olması gerekirdi.",
+      "skills": [
+        "game-coords",
+        "game-sprite"
+      ]
+    },
+    {
+      "id": "m11h1d1-q3",
+      "kind": "find-bug",
+      "prompt": "Kedi x 40 y 80 noktasına gitmeli, ama sahnenin ortasında (x 80 y 60) kalıyor. Hata hangisi?\n\n```\n1  oyun başlayınca\n2    kedi = yeni Kedi sprite'ı, türü Oyuncu\n3    elma = yeni Elma sprite'ı, türü Yiyecek\n4    bu sprite konumu x 40 y 80\n5    elma konumu x 120 y 80\n```",
+      "options": [
+        "Satır 2: kedi değişkeni hiç oluşturulmamış",
+        "Satır 3: elma, kediden önce oluşturulmalı",
+        "Satır 5: elmanın x değeri 120 olamaz",
+        "Satır 4: bu sprite en son oluşturulan sprite'tır, yani elmadır; kedi için kedi değişkeni kullanılmalı"
+      ],
+      "answer": 3,
+      "explanation": "Yeni sprite'lar sahnenin ortasında doğar. Satır 4'teki bu sprite, en son oluşturulan sprite olan elmayı gösterir; kedi hiç yerleştirilmez. Satır 5 elmayı zaten ikinci kez yerleştirir. Doğrusu, satır 4'te bu sprite yerine kedi değişkenini kullanmaktır.",
+      "skills": [
+        "game-debug",
+        "game-sprite"
+      ]
+    },
+    {
+      "id": "m11h1d1-q4",
+      "kind": "numeric",
+      "prompt": "Kedi x 40 y 80 noktasında, elma x 120 y 80 noktasında duruyor. Aralarındaki yatay uzaklık kaç pikseldir?",
+      "answer": 80,
+      "tolerance": 0,
+      "unit": "piksel",
+      "explanation": "İki sprite aynı yükseklikte olduğu için uzaklık yalnızca x değerlerinin farkıdır: 120 − 40 = 80 piksel. Sahne 160 piksel genişliğinde olduğundan bu, sahnenin yarısı kadardır.",
+      "skills": [
+        "game-coords"
+      ]
+    },
+    {
+      "id": "m11h1d1-q5",
+      "kind": "mcq",
+      "prompt": "Bir sprite'a tür (Oyuncu, Yiyecek, Düşman) vermenin asıl yararı nedir?",
+      "options": [
+        "Sonraki derslerde kuralları türlere göre yazabilirsin",
+        "Sprite oyunda daha hızlı hareket eder",
+        "Sprite'ın rengi türüne göre kendiliğinden değişir",
+        "Sprite sahnede daha büyük görünür"
+      ],
+      "answer": 0,
+      "explanation": "Tür, sprite'ın rolünü söyler; hız, renk ya da boyutla ilgisi yoktur. Çarpışma gibi olaylarda bilgisayar hangi sprite'ın oyuncu, hangisinin yiyecek olduğunu türden anlar.",
+      "skills": [
+        "game-sprite"
+      ]
+    }
+  ]
+}

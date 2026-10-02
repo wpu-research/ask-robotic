@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Diferansiyel sürüş",
+      "definition": "Robotun yönünü iki tekerleğin hız farkıyla değiştirmesi; direksiyon yoktur.",
+      "example": "Sağ tekerlek sol tekerlekten hızlı dönerse robot sola kavis çizer.",
+      "pitfall": "Dönmek için ayrı bir direksiyon motoru gerektiğini sanmak."
+    },
+    {
+      "term": "v ve ω",
+      "definition": "v robotun ortasının ileri hızı (m/s), ω dönme hızıdır (rad/s). v = (vR + vL) / 2 ve ω = (vR − vL) / L.",
+      "example": "vL = 0,10 ve vR = 0,30 m/s için v = 0,20 m/s olur.",
+      "pitfall": "ω'yı iki hızın toplamından hesaplamak; ω fark ister, toplam v'yi verir."
+    },
+    {
+      "term": "Aks aralığı (L)",
+      "definition": "İki tekerleğin yere değdiği noktalar arası mesafe; ω formülünde bölen sayıdır. Derslerdeki robotta 0,12 m.",
+      "example": "Aynı hız farkı, aks aralığı küçük robotta daha hızlı dönüş verir.",
+      "pitfall": "L'yi santimetre (12) yazıp hızı m/s kullanmak ya da tekerlek yarıçapını (0,033) L yerine koymak."
+    },
+    {
+      "term": "Dönme yarıçapı (R)",
+      "definition": "Robotun çizdiği çemberin yarıçapı: R = v / ω. Hızlar eşitse R sonsuzdur (düz gidiş).",
+      "example": "Bir tekerlek dururken diğeri döndüğünde R = L / 2 = 6 cm olur.",
+      "pitfall": "vR = vL iken R formülünü hesaplamaya çalışmak; payda sıfır olur."
+    },
+    {
+      "term": "Ters problem",
+      "definition": "İstenen v ve ω'dan tekerlek hızlarını bulmak: vR = v + ω·L/2 ve vL = v − ω·L/2.",
+      "example": "v = 0,20 m/s ve ω = 1 rad/s için vR = 0,26 ve vL = 0,14 m/s çıkar.",
+      "pitfall": "Bulunan değerin m/s olduğunu unutup doğrudan analogWrite'a yazmak; önce PWM'e çevrilmesi gerekir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d76-q1",
+      "kind": "numeric",
+      "prompt": "Robotun aks aralığı L = 0,12 m. Sol tekerlek 0,10 m/s, sağ tekerlek 0,25 m/s hızla dönüyor. Robotun dönme hızı ω kaç rad/s'dir?",
+      "answer": 1.25,
+      "tolerance": 0.01,
+      "unit": "rad/s",
+      "explanation": "ω = (vR − vL) / L = (0,25 − 0,10) / 0,12 = 1,25 rad/s. Sağ tekerlek hızlı olduğu için ω pozitiftir, robot sola döner. Hızları toplamak (v'nin formülü) yanlış olurdu.",
+      "skills": [
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h1d76-q2",
+      "kind": "mcq",
+      "prompt": "vL = 0,20 m/s ve vR = 0,10 m/s ise robot ne yapar?",
+      "options": [
+        "Olduğu yerde döner",
+        "Düz gider",
+        "Sağa kavis çizer",
+        "Sola kavis çizer"
+      ],
+      "answer": 2,
+      "explanation": "ω = (0,10 − 0,20) / 0,12 negatiftir; negatif ω sağa dönüş demektir. Sol tekerlek hızlı olunca robot sağa kıvrılır. İki hız da pozitif olduğu için yerinde dönüş olmaz, hızlar eşit olmadığı için düz gitmez.",
+      "skills": [
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h1d76-q3",
+      "kind": "numeric",
+      "prompt": "Robot yerinde dönüyor: sol tekerlek −0,15 m/s, sağ tekerlek +0,15 m/s. L = 0,12 m. Bir tam tur (2π rad) yaklaşık kaç saniye sürer?",
+      "answer": 2.51,
+      "tolerance": 0.03,
+      "unit": "s",
+      "explanation": "ω = (0,15 − (−0,15)) / 0,12 = 2,5 rad/s. Tur süresi = 2π / 2,5 yaklaşık 2,51 s. Hız farkını (0,30) değil, doğru ω değerini kullanmak gerekir; v burada sıfırdır.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d76-q4",
+      "kind": "find-bug",
+      "prompt": "Aşağıdaki kodda L = 0,12 m ve hızlar m/s. Robotun dönüşü beklenenden çok farklı çıkıyor. Hata hangisinde?\n\n```\nfloat v = (vR + vL) / 2;\nfloat w = (vR + vL) / L;\n```",
+      "options": [
+        "1. satır: v için toplam değil fark gerekir",
+        "2. satır: ω için toplam değil fark (vR − vL) gerekir",
+        "L sabiti float olmamalı",
+        "Her iki satır da doğru, hata seri porttadır"
+      ],
+      "answer": 1,
+      "explanation": "ω dönme hızıdır ve iki tekerleğin FARKINDAN gelir: (vR − vL) / L. Toplam ortalama ileri hızı (v) belirler; 1. satır doğrudur. Hatalı satırla düz giden robot bile dönüyormuş gibi hesaplanır.",
+      "skills": [
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d76-q5",
+      "kind": "predict-output",
+      "prompt": "Sol tekerlek 0,30 m/s, sağ tekerlek durmuş. Bu kod ne yazdırır?\n\n```\nfloat vL = 0.30, vR = 0.0;\nfloat w = (vR - vL) / 0.12;\nSerial.println(w, 1);\n```",
+      "options": [
+        "-0.3",
+        "2.5",
+        "-2.5",
+        "0.0"
+      ],
+      "answer": 2,
+      "explanation": "(0 − 0,30) / 0,12 = −2,5. Negatif ω robotun sağa, duran sağ tekerleğin etrafında döndüğü anlamına gelir. 2.5 işareti unutmuştur; 0.0 iki hızın eşit olduğu durumdur.",
+      "skills": [
+        "digital-out"
+      ]
+    }
+  ]
+}

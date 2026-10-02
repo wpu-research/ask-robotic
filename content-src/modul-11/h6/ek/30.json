@@ -1,0 +1,49 @@
+{
+  "concepts": [
+    { "term": "Dört tur", "definition": "Oyunu sırayla iskelet, toplanacak şey ile tehlike, bitiş ve cila olarak üretme planı.", "example": "35 dakikalık dersi 10 + 10 + 5 + 10 dakikaya bölüp her tur sonunda ↺ ile denersin.", "pitfall": "Aynı anda her şeyi yapmaya çalışıp hiçbir parçayı bitirmemek." },
+    { "term": "Sprite türü", "definition": "Sprite'ın oyundaki rolü: Oyuncu, Yiyecek, Düşman, Bonus, Hedef, Engel ya da Nesne.", "example": "Kiraz Yiyecek, hayalet Düşman türünde yapılır; çarpışma olayı bu türleri bekler.", "pitfall": "Toplanacak şeyi Nesne türüyle yapıp olayda Yiyecek beklemek; olay hiç çalışmaz." },
+    { "term": "Hedefler paneli", "definition": "Oyununu türlere ve olaylara bakarak sınayıp tam bir oyunun işaretlerini kontrol eden liste.", "example": "Bitiş hedefi programında `oyunu bitir` bloğu olup olmadığına bakar.", "pitfall": "Bir hedefin ✓ olmasını oyunun iyi olduğu sanmak; panel yalnız tam olmayı sınar." },
+    { "term": "Oyun dengesi", "definition": "Hız, süre, can ve hedef skor gibi sayıları, oyun ne çok kolay ne imkânsız olacak biçimde ayarlamak.", "example": "Skor hedefi 5, can 3: oyuncu en çok 2 kez çarpışıp hâlâ kazanabilir.", "pitfall": "Sayıları hiç denemeden bırakmak; oyun fazla kolay ya da oynanamaz çıkar." },
+    { "term": "↺ Başa dön ve ↺ yeniden başlat", "definition": "Etkinlikteki ↺ Başa dön başlangıç projesini geri yükler; sahnedeki ↺ yalnız oyunu baştan oynatır.", "example": "Oyunu denemek için sahnedeki ↺ düğmesine basarsın, bloklarına dokunulmaz.", "pitfall": "Etkinlikteki ↺ düğmesine bilmeden basmak; yaptığın bloklar gider." }
+  ],
+  "quiz": [
+    {
+      "id": "m11h6d30-q1", "kind": "mcq",
+      "prompt": "Hedefler paneli \"Skor\" hedefini işaretlemiyor. Oyuncuyu kiraza çarptırıyorsun ama skor artmıyor. En olası neden hangisi?",
+      "options": ["Kiraz sprite'ı Nesne türünde, çarpışma olayı Yiyecek bekliyor", "Kiraz resmi küçük", "Sahnenin arka planı lacivert", "Oyuncunun hızı fazla"],
+      "answer": 0,
+      "explanation": "Çarpışma olayı sprite'ın türüne bakar. Tür olayın beklediğiyle eşleşmezse olay hiç çalışmaz ve skor değişmez. Resmin boyutu, arka plan rengi ve hız olayın tetiklenip tetiklenmemesini bu şekilde belirlemez.",
+      "skills": ["oyun-olay", "oyun-tasarim"]
+    },
+    {
+      "id": "m11h6d30-q2", "kind": "numeric",
+      "prompt": "Oyununda can 3 ile başlıyor ve düşmana her çarpışma 1 can götürüyor. Oyun kaybedilmeden en fazla kaç kez düşmana çarpabilirsin?",
+      "answer": 2, "tolerance": 0, "unit": "çarpışma",
+      "explanation": "Üç çarpışma canı 3'ten 0'a düşürür ve oyun kaybedilir. Bu yüzden kaybetmeden en fazla 2 çarpışma yapabilirsin. 3 yazmak, canın 0 olunca oyunun bittiğini unutmaktır.",
+      "skills": ["oyun-iskelet"]
+    },
+    {
+      "id": "m11h6d30-q3", "kind": "predict-output",
+      "prompt": "Kedi 80,100 noktasında başlıyor. Can 3. Kedi hayalete çarparsa ne olur?\n\n```\nOyuncu, Düşman'a çarpınca:\n  canı -1 değiştir\n  ekranı 250 ms salla\n  bu sprite'ı 80,100 noktasına koy\n```",
+      "options": ["Can 2 olur, ekran sallanır ve kedi başlangıç noktasına döner", "Oyun hemen kaybedilir", "Hayalet silinir, can 3 kalır", "Kedi değil hayalet 80,100'e gider"],
+      "answer": 0,
+      "explanation": "`bu sprite` çarpışma olayında birinci tür olan Oyuncu'dur, yani kedi. Can 3'ten 2'ye iner, ekran sallanır ve kedi merkeze döner. Hayalet silinmez ve yerinde kalır. Can 0 olmadığı için oyun bitmez.",
+      "skills": ["oyun-olay", "oyun-iskelet"]
+    },
+    {
+      "id": "m11h6d30-q4", "kind": "mcq",
+      "prompt": "Etkinlikte bir süredir blok yazıyorsun. Hangi düğmeye bilmeden basmak yazdığın blokları siler?",
+      "options": ["Sahnedeki ↺ düğmesi", "Etkinlikteki ↺ Başa dön düğmesi", "Hedefler panelini açmak", "Resimler sekmesine geçmek"],
+      "answer": 1,
+      "explanation": "↺ Başa dön, etkinliği başlangıç projesine geri döndürür ve bloklarını siler. Sahnedeki ↺ yalnız oyunu baştan başlatır. Hedef panelini açmak ve sekme değiştirmek projeye dokunmaz.",
+      "skills": ["oyun-tasarim"]
+    },
+    {
+      "id": "m11h6d30-q5", "kind": "numeric",
+      "prompt": "Final dersinde dört tur sırasıyla 10, 10, 5 ve 10 dakika sürüyor. Toplam kaç dakikada bir oyunun bitmiş olur?",
+      "answer": 35, "tolerance": 0, "unit": "dk",
+      "explanation": "10 + 10 + 5 + 10 = 35 dakika. Bitiş turu (5 dk) en kısadır çünkü yalnız bir kazanma kuralı yazılır; cila turu ise ayar yapmak için daha uzundur.",
+      "skills": ["oyun-tasarim"]
+    }
+  ]
+}

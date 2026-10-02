@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Eval (değerlendirme)",
+      "definition": "Bir sistemin beklenen davranışı ne kadar karşıladığını ölçen test setidir; her vaka bir girdi ve beklenen çıktıdan oluşur.",
+      "example": "Beş yorum ve her birinin doğru etiketini yazıp sistemin kaçını doğru bulduğuna bakarsın.",
+      "pitfall": "Üç kez deneyip \"güzel çalışıyor\" demek; üç deneme bir ölçüm değildir."
+    },
+    {
+      "term": "Test vakası",
+      "definition": "Tek bir girdi ile o girdi için beklenen çıktıdan oluşan çift.",
+      "example": "(\"Çok yavaş ve sıkıcı\", olumsuz) bir vakadır.",
+      "pitfall": "Beklenen çıktıyı yazmadan yalnızca girdi yazmak; neyin doğru sayılacağı belli olmaz."
+    },
+    {
+      "term": "Doğruluk",
+      "definition": "Doğru bulunan vaka sayısının toplam vaka sayısına oranıdır.",
+      "example": "8 vakadan 6'sı doğruysa doğruluk 6/8 = %75'tir.",
+      "pitfall": "Oranı tersine hesaplamak (yanlış / toplam) ya da yüzdeye çevirmeyi unutmak."
+    },
+    {
+      "term": "Kural tabanlı sınıflandırıcı",
+      "definition": "Eğitilmiş bir model değil, elle yazılmış kurallarla (sözcük listeleri gibi) karar veren küçük program.",
+      "example": "Bu haftaki duygu sınıflandırıcısı olumlu ve olumsuz sözcük listelerine bakar.",
+      "pitfall": "Onu gerçek bir dil modeli sanmak; yöntem aynıdır ama sistemin kendisi bir model değildir."
+    },
+    {
+      "term": "Alay ve bilinmeyen sözcük",
+      "definition": "Kuralların çoğu zaman yakalayamadığı iki zayıf nokta.",
+      "example": "\"Harika, yine bozuldu\" cümlesinde alay vardır; sistem yalnız \"harika\" sözcüğünü görür.",
+      "pitfall": "Yalnız kolay vakalar yazıp zayıf noktaları hiç yoklamamak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d16-q1",
+      "kind": "numeric",
+      "prompt": "Bir sınıflandırıcıyı 8 test vakasıyla denedin ve 6 vakada beklenen etiketi buldu. Doğruluk yüzde kaçtır?",
+      "answer": 75,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Doğruluk = doğru sayısı / toplam vaka = 6 / 8 = 0,75, yani %75. Yanlış sayısını (2) toplama bölersen %25 bulursun; o doğruluk değil hata oranıdır.",
+      "skills": [
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d16-q2",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisi gerçek bir eval sayılır?",
+      "options": [
+        "Prompt'u üç kez deneyip sonuçlara bakmak",
+        "Beklenen çıktıları önceden yazılmış çok sayıda vakayı çalıştırıp doğruluğu hesaplamak",
+        "En iyi görünen örneği arkadaşlara göstermek",
+        "Sistemin cevabının \"güzel durduğuna\" karar vermek"
+      ],
+      "answer": 1,
+      "explanation": "Eval, beklenen çıktısı önceden belli vakaları sisteme verip sonucu bir sayıya çevirir. Diğer seçenekler sezgiye ya da seçilmiş örneğe dayanır; tekrarlanamaz ve karşılaştırılamaz.",
+      "skills": [
+        "eval-basics",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d16-q3",
+      "kind": "predict-output",
+      "prompt": "Duygu sınıflandırıcısı şu kuralla çalışıyor: olumlu sözcük listesinde \"harika\" var; \"bozuk\" olumsuz listededir, \"bozuldu\" hiçbir listede yoktur. Sistem sözcükleri tek tek tarar, olumluya +1, olumsuza -1 puan verir; toplam > 0 ise \"olumlu\", < 0 ise \"olumsuz\", 0 ise \"belirsiz\" der.\n\n```\netiketle(\"Harika, yine bozuldu\")\n```\n\nSistem hangi etiketi döndürür?",
+      "options": [
+        "olumsuz",
+        "belirsiz",
+        "olumlu",
+        "hata"
+      ],
+      "answer": 2,
+      "explanation": "\"harika\" +1 puan verir; \"yine\" ve \"bozuldu\" listelerde olmadığı için puan eklemez. Toplam 1 > 0 olduğundan sistem \"olumlu\" der. İnsan için cümle alaylı ve olumsuzdur; bu fark, eval'ın yakalaması gereken bir hatadır.",
+      "skills": [
+        "eval-basics",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d16-q4",
+      "kind": "find-bug",
+      "prompt": "Aşağıdaki kod doğruluğu yüzde olarak hesaplamak istiyor (8 vaka, 6 doğru). Hangi satır hatalıdır?\n\n```\n1: vakalar = 8\n2: dogru = 6\n3: yanlis = vakalar - dogru\n4: dogruluk = 100 * yanlis / vakalar\n```",
+      "options": [
+        "1. satır: vakalar 8 olmalı",
+        "2. satır: dogru 6 olmalı",
+        "3. satır: yanlış sayısı vakalar - dogru olamaz",
+        "4. satır: doğruluk için dogru kullanılmalı, yanlis değil"
+      ],
+      "answer": 3,
+      "explanation": "4. satır yanlış sayısını toplama böler ve hata oranını (%25) verir; doğruluk için 100 * dogru / vakalar yazılmalıdır (%75). Diğer satırlar doğrudur: 1 ve 2 verilen değerleri, 3 ise yanlış sayısını (2) hesaplar.",
+      "skills": [
+        "eval-basics",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d16-q5",
+      "kind": "mcq",
+      "prompt": "Test setine yalnızca kolay vakalar yazarsan ne olur?",
+      "options": [
+        "Doğruluk yüksek çıkar ama sistemin zayıf noktaları görünmez",
+        "Doğruluk mutlaka düşük çıkar",
+        "Sistem kendiliğinden iyileşir",
+        "Eval daha güvenilir olur"
+      ],
+      "answer": 0,
+      "explanation": "Kolay vakaları çoğu sistem bilir; doğruluk yüksek görünür ama alay, belirsizlik ve sınır gibi zor durumlar sınanmadığı için sonuç yanıltıcıdır. Eval'ın değeri sistemin yanıldığı yerleri göstermesindedir.",
+      "skills": [
+        "eval-cases",
+        "eval-basics"
+      ]
+    }
+  ]
+}

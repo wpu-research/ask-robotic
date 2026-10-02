@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Token",
+      "definition": "Modelin metni işlerken kullandığı parça; kelime, kelime parçası, harf ya da noktalama olabilir.",
+      "example": "\"robotlar\" araçta \"▁robot\", \"l\", \"ar\" olmak üzere üç token'a bölünür.",
+      "pitfall": "Token sayısını kelime sayısına eşit saymak; token çoğu zaman kelimeden küçüktür."
+    },
+    {
+      "term": "Token kimliği (sayı)",
+      "definition": "Her token'a karşılık gelen tamsayı; model metni bu sayı dizisi olarak işler.",
+      "example": "[▁robot] [l] [ar] dizisi, model için üç tamsayıdan oluşan bir listedir.",
+      "pitfall": "Modelin harfleri ve kelimeleri doğrudan okuduğunu sanmak."
+    },
+    {
+      "term": "Birleştirme sayısı",
+      "definition": "Araçta, parçalayıcının uyguladığı öğrenilmiş birleştirme adımı sayısı; arttıkça token sayısı düşer.",
+      "example": "\"robot ileri\" 0 birleştirmede 12, çok birleştirmede 2 token tutar.",
+      "pitfall": "Sıfır birleştirmede token sayısını yalnız harf sayısı sanmak; kelime başı işareti de bir token sayılır."
+    },
+    {
+      "term": "Kelime başı işareti (▁)",
+      "definition": "Bir parçanın kelimenin başında olduğunu gösteren işaret; araçta \"·\" ile de görünür.",
+      "example": "\"▁robot\" ayrı bir kelimedir, \"robot\" ise başka bir kelimenin içinden gelen parçadır.",
+      "pitfall": "İşareti boşluk karakteri sanıp token sayısına katmamak."
+    },
+    {
+      "term": "Derlem",
+      "definition": "Parçalayıcıyı ya da modeli eğitmekte kullanılan metin topluluğu.",
+      "example": "Araçta Türkçe ve İngilizce iki küçük derlem vardır.",
+      "pitfall": "Küçük derlemle eğitilen araçtaki parçalayıcıyı gerçek bir modelinki sanmak."
+    },
+    {
+      "term": "Dile bağlı token maliyeti",
+      "definition": "Eğitimde az görülen bir dildeki aynı metin, daha çok ve daha küçük token'a bölünür.",
+      "example": "120 birleştirmede \"the robot turns left\" İngilizce derlemle 4, Türkçe derlemle 13 token tutar.",
+      "pitfall": "Daha çok token'ı daha \"zengin\" anlam sanmak; yalnızca parçalayıcı o dile az uyuyordur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d2-q1",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisi token için doğrudur?",
+      "options": [
+        "Her token tam bir kelimedir",
+        "Token kelime parçası, harf ya da noktalama da olabilir",
+        "Token yalnız sayılardan oluşur",
+        "Token, cümlenin sonundaki noktadır"
+      ],
+      "answer": 1,
+      "explanation": "Token bir kelimenin tamamı olabilir ama kelime parçası, tek harf ya da noktalama da olabilir. İlk seçenek bu yüzden yanlıştır; modelin içinde token'lar sayıya çevrilir ama token'ın kendisi yalnız sayı değildir.",
+      "skills": [
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d2-q2",
+      "kind": "numeric",
+      "prompt": "Araçta birleştirme sayısı 0 iken \"robot ileri\" yazdın. Her harf ayrı token, her kelimenin başındaki işaret de ayrı bir token. Toplam kaç token görünür?",
+      "answer": 12,
+      "unit": "token",
+      "explanation": "\"robot\" 5 harf ve 1 kelime başı işareti, yani 6 token eder; \"ileri\" de 5 harf ve 1 işaret, 6 token eder. Toplam 6 + 6 = 12. Yalnız harfleri sayanlar 10 bulur ve işareti unutur.",
+      "skills": [
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d2-q3",
+      "kind": "predict-output",
+      "prompt": "Parçalayıcı \"robotlar\" kelimesini üç token'a böldü. Bu kod çalışınca ekrana ne yazar?\n\n```\nconst parcalar = [\"▁robot\", \"l\", \"ar\"]\nconsole.log(parcalar.length)\nconsole.log(parcalar.join(\"\").replace(\"▁\", \"\"))\n```",
+      "options": [
+        "1, ardından ▁robotlar",
+        "3, ardından robotlar",
+        "3, ardından ▁robot l ar",
+        "8, ardından robotlar"
+      ],
+      "answer": 1,
+      "explanation": "Dizide üç eleman olduğu için ilk satır 3 yazar. join parçaları aralarında boşluk olmadan birleştirir, replace de kelime başı işaretini siler; sonuç robotlar olur. Parçalara bölmek bilgiyi kaybetmez: parçaları birleştirince metin geri gelir.",
+      "skills": [
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d2-q4",
+      "kind": "find-bug",
+      "prompt": "Bir öğrenci cümlenin modelde kaç token tutacağını bulmak istiyor. Kodda tek bir hata var; hangisi?\n\n```\nconst cumle = \"robotlar duvarı görünce durur\"\nconst tokenSayisi = cumle.split(\" \").length\nconsole.log(\"Model \" + tokenSayisi + \" token görür\")\n```",
+      "options": [
+        "cumle değişkeni const olmamalı",
+        "split(\" \") kelimeleri sayar; token sayısı kelime sayısıyla aynı varsayılmış",
+        "console.log çağrısında + işareti kullanılamaz",
+        "Cümlede nokta yok"
+      ],
+      "answer": 1,
+      "explanation": "split(\" \") kelimeleri sayar ve 4 bulur. Oysa \"robotlar\" tek başına birden çok token olabilir; token sayısı ancak parçalayıcı çalıştırılarak bulunur. const kullanmak ve + ile metin birleştirmek bu kodda sorun değildir.",
+      "skills": [
+        "ai-tokens",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d2-q5",
+      "kind": "mcq",
+      "prompt": "Aynı İngilizce cümle, Türkçe derlemle eğitilmiş parçalayıcıda (13 token) İngilizce derlemle eğitilmişe (4 token) göre çok daha fazla token tutuyor. En olası neden hangisi?",
+      "options": [
+        "İngilizce cümleler daha uzundur",
+        "Parçalayıcı eğitimde az gördüğü dili daha küçük parçalara ayırır",
+        "Türkçe derlem daha büyük bir sözlük içerir",
+        "Araç rastgele sayı üretir"
+      ],
+      "answer": 1,
+      "explanation": "Parçalayıcı sık gördüğü parçaları tek token yapar; eğitimde az gördüğü dilde bu parçalar yoktur ve metin harflere yakın küçük parçalara dağılır. Hesap rastgele değildir; her seferinde aynı sonucu verir.",
+      "skills": [
+        "ai-tokens",
+        "ai-bpe"
+      ]
+    }
+  ]
+}

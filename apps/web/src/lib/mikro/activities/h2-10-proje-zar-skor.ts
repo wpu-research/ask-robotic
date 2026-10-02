@@ -13,7 +13,7 @@ export const h2d5: MikroActivity = {
     showsNumber('zar', "A'ya basınca 1-6 arası bir zar sayısı görünsün", (n) => n >= 1 && n <= 6),
     playsSound('zafer', '6 gelince zafer ezgisi çalsın (6 gelene kadar bas)', { melody: 'fanfare' }),
     afterInput('goster', "A'ya beş kez ya da fazla bas; B'ye basınca toplam (en az 5) görünsün", 'button:B:press', (e) => e.kind === 'number' && e.value >= 5, { hint: "'toplam değerine zar ekle' bloğunu A'nın içine, 'sayıyı göster toplam' bloğunu B'nin içine koy." }),
-    afterInput('sifirla', "A+B'ye basınca toplam sıfırlansın ve 0 görünsün", 'button:AB:press', (e) => e.kind === 'number' && e.value === 0),
+    afterInput('sifirla', "A+B'ye basınca toplam sıfırlansın ve 0 görünsün", 'button:AB:press', (e) => e.kind === 'number' && e.value === 0, { hint: "Sanal kartta A+B düğmesine birlikte kısa bas." }),
   ],
   solution: () => withVars(project('Zar skor panosu', [
     onStart(setVar('toplam', 0)),

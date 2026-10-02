@@ -10,7 +10,7 @@ export const h2d4: MikroActivity = {
   starter: () => project('Gizli düğmeler', [hatBlock('mk_on_logo', [], { EV: 'touch' }), hatBlock('mk_on_logo', [], { EV: 'release' }), onButton('A', [], 'long')]),
   goals: [
     usesBlocks('logo', "'logoya ... ' bloklarını kullan", ['mk_on_logo']),
-    afterInputPattern('dokun', 'Logoya dokununca kalp görünsün', 'logo:touch', ICON_ROWS('heart')),
+    afterInputPattern('dokun', 'Logoya dokununca kalp görünsün', 'logo:touch', ICON_ROWS('heart'), { hint: "Sanal kartta logoya dokun (basılı tut) ve bırak." }),
     clearedAfter('birak', 'Logodan parmağını çekince ekran sönsün', 'logo:release', "İkinci logo bloğunun listesi 'bırakılınca' olsun; içine 'ekranı temizle' koy."),
     afterInputPattern('uzun', "A'ya uzun basınca uyuyan yüz görünsün", 'button:A:long', ICON_ROWS('asleep'), { hint: "'düğme A' bloğunun ikinci listesini 'uzun basılınca' yap. Sanal düğmeyi 1 saniye basılı tut." }),
   ],

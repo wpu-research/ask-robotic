@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Joystick",
+      "definition": "Birbirine dik iki potansiyometre ve bir düğmeden oluşan girdi parçası; VRX, VRY ve SW pinleri vardır.",
+      "example": "X ekseni özelliği 0,25 iken VRX yaklaşık 1,25 V verir ve analogRead yaklaşık 256 okur.",
+      "pitfall": "Joystick'i tek bir sensör sanmak: iki ayrı analog pin (A0 ve A1) ve bir dijital pin gerekir."
+    },
+    {
+      "term": "Merkez (orta nokta)",
+      "definition": "Kol bırakılmışken okunan değer. Açılışta 16 okumanın ortalamasıyla ölçülür.",
+      "example": "Bir modülde merkez 532, ötekinde 491 çıkabilir.",
+      "pitfall": "Merkezi sabit 512 yazmak: kol bırakılmışken değer kayar."
+    },
+    {
+      "term": "Ölü bölge",
+      "definition": "Merkezin çevresinde değerin sıfır sayıldığı küçük aralık.",
+      "example": "Ölü bölge 40 iken merkezden 25 sapma 0 olarak işlenir.",
+      "pitfall": "Ölü bölge koymamak: servo ya da motor 510, 514, 509 diye dalgalanan değerle titrer."
+    },
+    {
+      "term": "map() ile ölçekleme",
+      "definition": "Bir aralıktaki değeri başka bir aralığa doğrusal olarak çevirir; tam sayı bölmesi yapar.",
+      "example": "map(68, 40, 491, 0, 100) sonucu 6'dır.",
+      "pitfall": "Ölü bölgeyi ölçeklemeden bırakmak: değer 0'dan aniden 40'a sıçrar."
+    },
+    {
+      "term": "INPUT_PULLUP ile düğme",
+      "definition": "Pini içeriden 5 V'a çeker; basılı düğme GND'ye bağlandığı için LOW okunur.",
+      "example": "digitalRead(2) == LOW ise joystick düğmesine basılıdır.",
+      "pitfall": "INPUT_PULLUP yazmamak: bırakılmış düğmede pin havada kalır, rastgele basış okunur."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d56-q1",
+      "kind": "numeric",
+      "prompt": "Joystick 5 V ile beslenmiş. X ekseni özelliğini 0,25 yaptın (kol bir çeyrek dolayında). VRX pinini A0'a bağladın. analogRead(A0) yaklaşık kaç okur?",
+      "answer": 256,
+      "tolerance": 2,
+      "explanation": "Gerilim = 0,25 x 5 V = 1,25 V. analogRead = 1,25 / 5 x 1024 yaklaşık 256 (Arduino'da 255 ya da 256). 512 kol ortadayken, 768 ise 0,75 iken çıkar.",
+      "skills": [
+        "analog-read"
+      ]
+    },
+    {
+      "id": "m4h5d56-q2",
+      "kind": "mcq",
+      "prompt": "Kol bırakılmışken joystick neden \"0\" değil, yaklaşık 512 okutur?",
+      "options": [
+        "Program hatalıdır, 0 okunmalıdır",
+        "Silgi şeridin yarısında durur, gerilim yaklaşık 2,5 V olur",
+        "Düğme basılı kalmıştır",
+        "ADC 512'den başlar"
+      ],
+      "answer": 1,
+      "explanation": "Her eksen bir gerilim bölücüdür ve kol ortadayken silgi yarıdadır: 5 V'un yarısı, yani yaklaşık 512. Düğme (SW) ayrı bir pindir ve eksen değerini etkilemez. ADC 0 ile 1023 arası okur, 512'den başlamaz.",
+      "skills": [
+        "analog-read",
+        "axis-calibration"
+      ]
+    },
+    {
+      "id": "m4h5d56-q3",
+      "kind": "numeric",
+      "prompt": "Merkez 532 olarak ölçüldü, ölü bölge 40. Kol sağa itilince ham değer 600 okunuyor. Dersteki eksen() fonksiyonu için fark = 68 olur ve map(fark, 40, 1023 - 532, 0, 100) çağrılır. Sonuç kaçtır?",
+      "answer": 6,
+      "tolerance": 0,
+      "explanation": "Girdi aralığı 40...491. (68 - 40) x 100 / (491 - 40) = 2800 / 451 = 6,2; map tam sayı bölmesi yaptığından 6 olur. Ölü bölge dışındaki kısım yeniden ölçeklendiği için değer 0'dan başlar, 68 çıkmaz.",
+      "skills": [
+        "axis-calibration"
+      ]
+    },
+    {
+      "id": "m4h5d56-q4",
+      "kind": "find-bug",
+      "prompt": "Düğme bırakılmışken bile seri monitörde ara sıra \"BASILDI\" yazıyor. Hatalı satır hangisi?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {\n    Serial.println(\"BASILDI\");\n  }\n  delay(100);\n}\n```",
+      "options": [
+        "Serial.begin(9600);",
+        "delay(100);",
+        "pinMode(2, INPUT);",
+        "if (digitalRead(2) == LOW) {"
+      ],
+      "answer": 2,
+      "explanation": "SW pini INPUT_PULLUP olmalı. Düz INPUT ile bırakılmış düğmede pin havada kalır ve rastgele okunur. LOW kontrolü doğrudur çünkü basılı düğme GND'ye bağlanır.",
+      "skills": [
+        "input-pullup",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h5d56-q5",
+      "kind": "predict-output",
+      "prompt": "Merkez 512. Kol hafifçe itilmiş ve ham değer 540. Bu kod çalışınca seri monitörde ne yazar?\n\n```\nint merkez = 512;\nint ham = 540;\nint fark = ham - merkez;\nif (abs(fark) < 40) {\n  Serial.println(\"ORTA\");\n} else if (fark > 0) {\n  Serial.println(\"SAG\");\n} else {\n  Serial.println(\"SOL\");\n}\n```",
+      "options": [
+        "ORTA",
+        "SAG",
+        "SOL",
+        "Hiçbir şey"
+      ],
+      "answer": 0,
+      "explanation": "fark = 28 ve 28 < 40 olduğundan ölü bölgededir; \"ORTA\" yazılır. \"SAG\" yazması için fark en az 40 olmalıdır.",
+      "skills": [
+        "axis-calibration"
+      ]
+    }
+  ]
+}

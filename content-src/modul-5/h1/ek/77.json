@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Motor sürücüsü",
+      "definition": "Arduino'nun zayıf sinyalini ayrı bir pilden gelen motor akımına çeviren kart (L298N, TB6612). İçinde her motor için bir H-köprüsü vardır.",
+      "example": "Tek bir sürücü kartı robotun sol ve sağ motorunu bağımsız sürer.",
+      "pitfall": "Motoru doğrudan Arduino pinine ya da 5V çıkışına bağlamak."
+    },
+    {
+      "term": "Yön ve hız girişleri",
+      "definition": "IN1/IN2 akımın yönünü, EN (TB6612'de PWMA) PWM ile hızı belirler.",
+      "example": "IN1 = HIGH, IN2 = LOW, EN'e analogWrite(150) verilirse motor ileri ve orta hızda döner.",
+      "pitfall": "EN'i PWM olmayan bir pine bağlamak; analogWrite yalnızca 3, 5, 6, 9, 10, 11'de PWM üretir."
+    },
+    {
+      "term": "Fren ve serbest bırakma",
+      "definition": "Frende (IN1 = IN2 = HIGH, EN yüksek) motor uçları kısa devre edilir ve motor durmaya zorlanır; serbest bırakmada motor bağlantısız kalır ve kendi hızıyla yavaşlar.",
+      "example": "Yokuş aşağıda robotu tutmak için fren, rahatça yuvarlanması için serbest bırakma kullanılır.",
+      "pitfall": "İkisinin aynı şey olduğunu sanmak; gerçek robotta durma mesafeleri farklıdır."
+    },
+    {
+      "term": "STBY ve EN jumper'ı",
+      "definition": "TB6612'de STBY LOW ise sürücü bekleme modundadır ve motor dönmez. Hazır L298N kartlarında ENA/ENB üzerindeki jumper motoru tam hızda tutar.",
+      "example": "L298N'de PWM ile hız ayarlamak için jumper'ı çıkarıp EN'i D5'e bağlarsın.",
+      "pitfall": "STBY'yi bağlamayı ya da EN jumper'ını çıkarmayı unutmak; motor ya hiç dönmez ya da hız ayarı etki etmez."
+    },
+    {
+      "term": "Ortak GND",
+      "definition": "Motor pilinin eksisini Arduino GND'sine bağlamak; sinyallerin aynı 0 V referansını kullanmasını sağlar.",
+      "example": "Pil kutusunun eksi ucu, sürücünün GND'si ve Arduino GND'si birleştirilir.",
+      "pitfall": "GND'leri birleştirmemek; yön ve PWM sinyalleri sürücüde anlaşılmaz, motor rastgele davranır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d77-q1",
+      "kind": "mcq",
+      "prompt": "Sol motorda IN1 = HIGH, IN2 = HIGH ve EN = 255 verilirse motor ne olur?",
+      "options": [
+        "Hızla ileri döner",
+        "Hızla geri döner",
+        "Fren yapar, durmaya zorlanır",
+        "Bağlantısız kalır ve serbestçe döner"
+      ],
+      "answer": 2,
+      "explanation": "İki yön girişi aynı ve EN yüksek olunca motor uçları kısa devre edilir; bu fren durumudur. Serbest bırakma için IN'ler LOW ve EN 0 olmalıdır; ileri ve geri için IN'ler zıt olmalıdır.",
+      "skills": [
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d77-q2",
+      "kind": "predict-output",
+      "prompt": "Sol motor sürücüsüne (EN D5, IN1 D7, IN2 D8) şu komutlar veriliyor. Motor ne yapar?\n\n```\ndigitalWrite(7, LOW);\ndigitalWrite(8, HIGH);\nanalogWrite(5, 100);\n```",
+      "options": [
+        "İleri, tam hızda",
+        "İleri, yavaş",
+        "Geri, yaklaşık yüzde 39 doluluk oranıyla",
+        "Durur, çünkü iki pin farklı"
+      ],
+      "answer": 2,
+      "explanation": "IN1 LOW ve IN2 HIGH geri yönü verir. EN'e 100 verildiği için PWM doluluk oranı 100/255 yaklaşık yüzde 39'dur. Yön girişleri farklı olduğu için motor durmaz; durduran şey aynı olmalarıdır (fren).",
+      "skills": [
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d77-q3",
+      "kind": "numeric",
+      "prompt": "EN pinine analogWrite(EN, 191) yazıldı. PWM doluluk oranı yaklaşık yüzde kaçtır?",
+      "answer": 75,
+      "tolerance": 1,
+      "unit": "%",
+      "explanation": "Doluluk oranı = 191 / 255 yaklaşık 0,749, yani yüzde 75. analogWrite değeri 0-255 aralığındadır; 255 yüzde 100 demektir. Değeri doğrudan yüzde sanmak (yüzde 191) mümkün değildir.",
+      "skills": [
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d77-q4",
+      "kind": "find-bug",
+      "prompt": "Sağ motorun hızı hiç değişmiyor; analogWrite ne yazılırsa yazılsın motor ya hiç dönmüyor ya da hep aynı hızda. Sürücü pinleri şöyle bağlanmış: EN D4, IN3 D9, IN4 D10. En olası hata hangisi?\n\n```\nconst int SAG_EN = 4;\nconst int SAG_IN1 = 9;\nconst int SAG_IN2 = 10;\n...\nanalogWrite(SAG_EN, 180);\n```",
+      "options": [
+        "SAG_EN = 4: EN, PWM destekleyen bir pine bağlanmalı",
+        "SAG_IN1 = 9 olmamalı",
+        "analogWrite yerine digitalWrite yazılmalı",
+        "180 değeri çok büyük, 255’ten az olmalı"
+      ],
+      "answer": 0,
+      "explanation": "analogWrite yalnızca Uno'nun PWM pinlerinde (3, 5, 6, 9, 10, 11) gerçek PWM üretir; D4'te yalnızca HIGH/LOW gibi davranır. 180 geçerli bir değerdir ve 9 ile 10 yön pinleri olarak uygundur.",
+      "skills": [
+        "prog-debug",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m5h1d77-q5",
+      "kind": "mcq",
+      "prompt": "Motor pilinin eksisi Arduino GND'sine bağlanmazsa ne olur?",
+      "options": [
+        "Motor daha hızlı döner",
+        "Sürücü sinyalleri ortak bir referans bulamaz, motor rastgele davranır",
+        "Yalnız fren çalışmaz",
+        "Hiçbir şey olmaz, sinyaller havadan gider"
+      ],
+      "answer": 1,
+      "explanation": "Sinyaller ancak aynı 0 V referansına göre anlamlıdır. GND'ler ortak değilse sürücü HIGH ve LOW'u güvenilir ayırt edemez. Bu bir hız değil, belirsizlik sorunudur; sorun frenle sınırlı değildir.",
+      "skills": [
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

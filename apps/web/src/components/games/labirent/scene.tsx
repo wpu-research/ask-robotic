@@ -2,7 +2,7 @@
 // Labirent sahnesi: saf SVG + CSS. Yolcu, çalı duvarlar ve bayrak bu projeye özgü çizimlerdir.
 import { useMemo } from 'react'
 import type { SceneProps } from '@/lib/games/types'
-import { dataOf, findCell, type MazeState } from '@/lib/games/labirent/engine'
+import { dataOf, findCell, mazeStepDelay, type MazeState } from '@/lib/games/labirent/engine'
 
 const S = 40 // bir karenin SVG birimi
 
@@ -106,7 +106,7 @@ export default function Scene({ level, frame, speed, outcome }: SceneProps<MazeS
     return out
   }, [data.grid])
 
-  const dur = Math.max(60, Math.round(320 / Math.max(0.25, speed)))
+  const dur = Math.max(60, Math.round(Math.min(320, mazeStepDelay(level.id) * 0.85) / Math.max(0.25, speed)))
   const w = cols * S, h = rows * S
   const won = frame.atGoal || outcome?.ok === true
   const px = frame.x * S + S / 2, py = frame.y * S + S / 2

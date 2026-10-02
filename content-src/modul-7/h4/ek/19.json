@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Kenar durum",
+      "definition": "Kuralın karar değiştirdiği sınırın hemen yanındaki girdi.",
+      "example": "Eşik 20 ise 19 ve 20 mesafeleri kenar durumdur.",
+      "pitfall": "Yalnız ortadaki \"rahat\" değerleri denemek; hatalar sınırda saklanır."
+    },
+    {
+      "term": "Eşik değeri",
+      "definition": "Çıktının bir etiketten diğerine geçtiği sayı.",
+      "example": "Robot kuralında 20 cm'de \"dur\"dan \"yavaşla\"ya, 50 cm'de \"yavaşla\"dan \"devam\"a geçilir.",
+      "pitfall": "\"20'den küçükse\" ile \"20 ve altı\" ifadelerini karıştırmak."
+    },
+    {
+      "term": "Eksik girdi (hız)",
+      "definition": "Sistemin hesaba katmadığı ama kararı etkilemesi gereken değişken.",
+      "example": "Mesafe 40 cm iken hız 100 cm/sn ise bu kural yine \"yavaşla\" der.",
+      "pitfall": "Kuralın her girdiyi kullandığını varsaymak; bunu ancak çift vakalar gösterir."
+    },
+    {
+      "term": "Veri sızıntısı",
+      "definition": "Test vakalarını sistemi ayarlarken de kullanıp ölçümü olduğundan iyi göstermek.",
+      "example": "Kuralı 6 vakaya göre düzeltip aynı 6 vakayla ölçersen %100 çıkar.",
+      "pitfall": "Ayar ve ölçümü aynı sette yapmak; ayar seti ile son ölçüm seti ayrı olmalıdır."
+    },
+    {
+      "term": "Çift (karşılaştırmalı) vaka",
+      "definition": "Yalnız tek bir girdisi değişen iki vaka; o girdinin etkisini sınar.",
+      "example": "(mesafe=35 hız=10) ile (mesafe=35 hız=90) hızın etkisini ayrı ayrı gösterir.",
+      "pitfall": "Aynı anda birden çok girdiyi değiştirmek; neden hangisi belli olmaz."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d19-q1",
+      "kind": "mcq",
+      "prompt": "Robot kuralının hızı hesaba katıp katmadığını anlamak için hangi vaka çifti en uygundur?",
+      "options": [
+        "mesafe=35 hız=10 ile mesafe=35 hız=90",
+        "mesafe=10 hız=10 ile mesafe=60 hız=90",
+        "mesafe=35 hız=10 ile mesafe=36 hız=10",
+        "mesafe=35 hız=10 ile aynı vakanın tekrarı"
+      ],
+      "answer": 0,
+      "explanation": "Yalnız hız değişir, mesafe sabit kalır; kural hızı kullanıyorsa iki sonuç farklı olabilir. İkinci seçenekte iki girdi birden değişir ve neden belli olmaz. Üçüncüde yalnız mesafe değişir, dördüncüde hiçbir şey değişmez.",
+      "skills": [
+        "eval-edge",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d19-q2",
+      "kind": "numeric",
+      "prompt": "Robot kuralı: mesafe < 20 ise \"dur\", mesafe < 50 ise \"yavaşla\", aksi hâlde \"devam\". 0'dan 60'a kadar (0 ve 60 dahil) tam sayı mesafelerden kaçı için sistem \"yavaşla\" der?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "değer",
+      "explanation": "\"yavaşla\" için 20 ≤ mesafe < 50 olmalı: 20, 21, ..., 49. Bu 49 - 20 + 1 = 30 değerdir. 20 dahil, 50 hariçtir; sınırın hangi tarafa ait olduğu kenar durum testlerinin konusudur.",
+      "skills": [
+        "eval-edge"
+      ]
+    },
+    {
+      "id": "m7h4d19-q3",
+      "kind": "predict-output",
+      "prompt": "Kural yalnız mesafeye bakar; hızı yok sayar:\n\n```\nkarar(d):\n  d < 20  -> \"dur\"\n  d < 50  -> \"yavaşla\"\n  değilse -> \"devam\"\n\nkarar_ver(\"mesafe=60 hız=300\")\n```\n\nSistem ne döndürür?",
+      "options": [
+        "dur",
+        "yavaşla",
+        "hata",
+        "devam"
+      ],
+      "answer": 3,
+      "explanation": "Mesafe 60, yani 50'den küçük değil; kural \"devam\" der. Hız 300 olsa bile kural onu kullanmaz. Bir insan bu hızda daha uzak mesafede bile yavaşlamak isterdi; eval bu eksik davranışı yakalamak içindir.",
+      "skills": [
+        "eval-edge",
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d19-q4",
+      "kind": "find-bug",
+      "prompt": "Şartname: \"Mesafe 20'den KÜÇÜKSE dur, 20 ve üstü yavaşla (50'ye kadar)\". Kodda tek hata var. Hangi satır?\n\n```\n1: eger d <= 20: dur\n2: degilse eger d < 50: yavasla\n3: degilse: devam\n```",
+      "options": [
+        "2. satır: d < 50 yerine d <= 50 olmalı",
+        "1. satır: d <= 20 yerine d < 20 olmalı",
+        "3. satır: devam yerine dur olmalı",
+        "Hata yok"
+      ],
+      "answer": 1,
+      "explanation": "1. satır tam 20 cm'de de \"dur\" der, şartname ise 20'de \"yavaşla\" ister. d < 20 olmalıdır. Hata yalnız d = 20 gibi sınır girdisiyle görünür; 5 ya da 35 ile deneyen biri onu hiç fark etmez.",
+      "skills": [
+        "eval-edge",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d19-q5",
+      "kind": "mcq",
+      "prompt": "Kuralı düzeltirken kullandığın vakalarla son ölçümü de yaparsan ne olur?",
+      "options": [
+        "Ölçüm daha güvenilir olur",
+        "Ölçüm değişmez",
+        "Doğruluk olduğundan iyi görünür; buna veri sızıntısı denir",
+        "Sistem daha hızlı çalışır"
+      ],
+      "answer": 2,
+      "explanation": "Kuralı bu vakalara uydurduğun için sistem onlarda iyi görünür; yeni vakalarda ise aynı başarıyı göstermeyebilir. Bu yüzden ayar için bir set, son ölçüm için ayrı bir set tutulur.",
+      "skills": [
+        "eval-method"
+      ]
+    }
+  ]
+}

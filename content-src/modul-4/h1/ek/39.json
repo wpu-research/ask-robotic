@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Sonar tarama",
+      "definition": "Ultrasonik sensörü servoyla döndürüp her açıda ölçüm alarak çevrenin kesitini çıkarmak.",
+      "example": "0°'den 180°'ye 30°'lik adımlarla 7 ölçüm noktası alınır.",
+      "pitfall": "Servo daha dönerken ölçmek: ölçüm başka açıya aittir."
+    },
+    {
+      "term": "Servo bekleme süresi",
+      "definition": "Servo yeni açıya varana kadar beklenen süre (bu derste 300 ms).",
+      "example": "servo.write(aci); delay(300); ölçüm sırasıyla yapılır.",
+      "pitfall": "Beklemeyi atlamak: açı ile mesafe eşleşmez."
+    },
+    {
+      "term": "En küçüğü tutma",
+      "definition": "Şimdiye kadar görülen en küçük değeri ve konumunu saklayıp her yeni değerle karşılaştırmak.",
+      "example": "if (cm < enYakin) { enYakin = cm; enYakinAci = aci; }",
+      "pitfall": "Başlangıç değerini 0 yapmak: hiçbir ölçüm 0'dan küçük olamaz, nesne bulunamaz."
+    },
+    {
+      "term": "Işın konisi",
+      "definition": "HC-SR04 tek çizgiye değil, tipik olarak yaklaşık 15° genişliğinde bir koniye bakar.",
+      "example": "30°'lik adım, koninin kapsamadığı boşluklar bırakabilir.",
+      "pitfall": "İnce bir nesnenin her zaman bulunacağını sanmak."
+    },
+    {
+      "term": "aci:mesafe biçimi",
+      "definition": "Her ölçümü \"açı:mesafe\" olarak yazmak; başka bir program \":\" işaretinden bölerek veriyi okuyabilir.",
+      "example": "120:35.0 satırı 120° yönünde 35 cm anlamına gelir.",
+      "pitfall": "Her çıktıyı serbest metinle yazmak: sonradan ayrıştırmak zorlaşır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d39-q1",
+      "kind": "numeric",
+      "prompt": "Bir tarama döngüsü şöyle yazıldı: for (int aci = 0; aci <= 180; aci += 20). Tarama başına kaç ölçüm noktası (açı) alınır?",
+      "answer": 10,
+      "tolerance": 0,
+      "explanation": "Açılar 0, 20, 40, ... 180 olur: 180 / 20 + 1 = 10 nokta. Başlangıç noktası (0°) da sayıldığı için bölümün üstüne 1 eklenir.",
+      "skills": [
+        "prog-loops-arrays",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q2",
+      "kind": "numeric",
+      "prompt": "Taramada her adımda servoyu 300 ms beklettin, sonra üç ölçümün arasına 30 ms'lik iki bekleme koydun (ölçüm sürelerini ihmal et). 30°'lik adımla 0-180° tarama (7 nokta) yaklaşık kaç milisaniye sürer?",
+      "answer": 2520,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "Bir noktada 300 + 2 × 30 = 360 ms bekleme olur. 7 nokta için 7 × 360 = 2520 ms. Gerçek tarama ölçüm süreleri yüzünden biraz daha uzundur; adımı küçültürsen süre nokta sayısıyla orantılı artar.",
+      "skills": [
+        "prog-timing",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q3",
+      "kind": "predict-output",
+      "prompt": "Üç ölçümün ortancasını bulan formül şöyle. Bu kod çalışınca ne yazılır?\n\n```\nfloat a = 400, b = 35, c = 36;\nSerial.println(max(min(a, b), min(max(a, b), c)), 0);\n```",
+      "options": [
+        "35",
+        "36",
+        "157",
+        "400"
+      ],
+      "answer": 1,
+      "explanation": "min(400, 35) = 35; max(400, 35) = 400 ve min(400, 36) = 36; max(35, 36) = 36. Üç sayının ortancası 36'dır. 157 ortalamadır; 400 aykırı değerdir ve medyan onu seçmez.",
+      "skills": [
+        "sens-filter",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q4",
+      "kind": "find-bug",
+      "prompt": "Tarama programı en yakın nesneyi hiç bulamıyor; enYakinAci hep -1 kalıyor. Hatalı satır hangisi?\n\n```\nfloat enYakin = 0;\nint enYakinAci = -1;\nfor (int aci = 0; aci <= 180; aci += 30) {\n  servo.write(aci);\n  delay(300);\n  float cm = olc();\n  if (cm < enYakin) {\n    enYakin = cm;\n    enYakinAci = aci;\n  }\n}\n```",
+      "options": [
+        "float enYakin = 0;",
+        "servo.write(aci);",
+        "delay(300);",
+        "if (cm < enYakin) {"
+      ],
+      "answer": 0,
+      "explanation": "enYakin 0 ile başladığı için hiçbir ölçüm 0'dan küçük olamaz ve koşul hiç doğru olmaz. Başlangıç değeri büyük olmalı (örneğin 400.0). Karşılaştırma satırı doğrudur.",
+      "skills": [
+        "prog-debug",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q5",
+      "kind": "mcq",
+      "prompt": "30°'lik adımlarla tarayan bir sonar, ince bir kalemi neden kaçırabilir?",
+      "options": [
+        "Servo 30° adımda hiç durmaz",
+        "Sensör tek bir çizgiye değil yaklaşık 15° genişliğinde bir koniye bakar; adımlar arasında koninin kapsamadığı boşluklar kalabilir",
+        "HC-SR04 çok ince nesneleri her zaman 400 cm gösterir",
+        "delay(300) ölçümü iptal eder"
+      ],
+      "answer": 1,
+      "explanation": "Işın koni biçimindedir ve adımlar koniden büyük olduğunda iki yön arasında kör bölge kalır; ince bir nesne tam oraya düşebilir. Adımı küçültmek bu riski azaltır, ama taramayı uzatır. Servo adımlarda durur; delay ölçümü iptal etmez.",
+      "skills": [
+        "sens-servo-scan",
+        "sens-ultrasonic"
+      ]
+    }
+  ]
+}

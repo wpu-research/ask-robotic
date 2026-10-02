@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Karo",
+      "definition": "Haritayı oluşturan 16 x 16 pikselik küçük kare resim.",
+      "example": "Taş duvar, çimen ve su üç ayrı karodur; harita bunları yan yana dizerek odayı kurar.",
+      "pitfall": "Karoyu sprite ile karıştırmak: karo haritanın bir hücresidir, kendi kendine hareket etmez."
+    },
+    {
+      "term": "Harita ve ızgara",
+      "definition": "Karoların sütun ve satırlar hâlinde dizildiği ızgara; boyutu karo sayısıyla söylenir.",
+      "example": "10 sütun ve 7 satırlık oda 160 x 112 piksel eder.",
+      "pitfall": "Haritayı Harita sekmesinde çizip oyuna yüklemeyi unutmak: `haritayı yükle` bloğu çalışmazsa harita görünmez."
+    },
+    {
+      "term": "Sütun ve satır (0'dan sayma)",
+      "definition": "Bir karonun adresi: soldan sağa sütun, yukarıdan aşağı satır. Sol üst karo sütun 0, satır 0'dır.",
+      "example": "Sütun 5, satır 3 karosunun merkezi (5 x 16 + 8, 3 x 16 + 8) = (88, 56) pikseldedir.",
+      "pitfall": "1'den saymak: 10 sütunlu haritanın son sütunu 10 değil 9'dur."
+    },
+    {
+      "term": "Duvar kutusu",
+      "definition": "Karo takımında her karonun yanındaki kutu; işaretliyse sprite o karoya giremez.",
+      "example": "Taş duvar ve su işaretlidir, çimen işaretsizdir; kedi çimende yürür ama taşı geçemez.",
+      "pitfall": "Karoyu duvar gibi boyayıp kutuyu işaretlememek: kedi içinden geçer."
+    },
+    {
+      "term": "Karo takımı",
+      "definition": "Haritada kullanabileceğin karoların listesi ve her birinin özellikleri.",
+      "example": "Bu derste takımda taş duvar, çimen ve su vardır.",
+      "pitfall": "Karo takımından bir karoyu çıkarmak: haritadaki bütün örnekleri de silinir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d11-q1",
+      "kind": "numeric",
+      "prompt": "Oda haritası 10 sütun ve 7 satırdır, her karo 16 piksel. Harita kaç piksel yüksekliğindedir?",
+      "answer": 112,
+      "unit": "piksel",
+      "explanation": "Yükseklik satır sayısı ile karo boyunun çarpımıdır: 7 x 16 = 112 piksel. 160 değeri genişliktir (10 x 16); satır ile sütunu karıştırmak en sık yapılan hatadır.",
+      "skills": [
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d11-q2",
+      "kind": "mcq",
+      "prompt": "Taş duvar karosunu boyadın ama kedi duvarın içinden geçiyor. En olası neden hangisidir?",
+      "options": [
+        "Kedinin hızı çok yüksektir",
+        "Harita 10 sütundan büyüktür",
+        "Karo takımında taş duvar karosunun duvar kutusu işaretli değildir",
+        "Bloklarda `oyuncu tuşlarıyla hareket` bloğu eksiktir"
+      ],
+      "answer": 2,
+      "explanation": "Sprite'ı durduran şey karonun resmi değil, duvar kutusudur. Kutu işaretli değilse karo yalnız süstür. Hız ve harita boyutu duvarın çalışmasını etkilemez; hareket bloğu eksik olsaydı kedi hiç yürümezdi.",
+      "skills": [
+        "oyun-karo-duvar"
+      ]
+    },
+    {
+      "id": "m11h3d11-q3",
+      "kind": "numeric",
+      "prompt": "Kediyi `sütun 5 satır 3 karosuna koy` bloğuyla yerleştirdin. Kedinin merkezi kaç piksel x konumunda olur? (Karo 16 piksel; merkez karonun ortasıdır.)",
+      "answer": 88,
+      "unit": "piksel",
+      "explanation": "Sütun 5 karosu 5 x 16 = 80 pikselde başlar. Merkez, karonun yarısı kadar (8 piksel) sağdadır: 80 + 8 = 88. Sütunu 16 ile çarpıp ortasını eklemeyi unutursan 80 bulursun.",
+      "skills": [
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d11-q4",
+      "kind": "find-bug",
+      "prompt": "Haritayı Harita sekmesinde çizdin ama oyunu çalıştırınca ekran boş, yalnız kedi görünüyor. Bloklar şöyle:\n\n```\n1  haritayı yükle: [oda]\n2  oyun başlayınca\n3      [kedi] sprite'ını oluştur\n4      [kedi] sprite'ını sütun [5] satır [3] karosuna koy\n5      [kedi] oyuncu tuşlarıyla hareket etsin\n```\n\nSatır 1 çalışma alanında tek başına duruyor, `oyun başlayınca` bloğunun içinde değil. Hata nedir?",
+      "options": [
+        "`haritayı yükle` bloğu `oyun başlayınca` bloğunun dışında kaldığı için hiç çalışmıyor",
+        "Kedinin sütun ve satırı yanlış",
+        "Hareket bloğu yanlış sprite'a bağlı",
+        "Harita adı büyük harfle yazılmamış"
+      ],
+      "answer": 0,
+      "explanation": "Başlangıçta çalışacak bloklar `oyun başlayınca` içinde olmalıdır. Dışarıda kalan blok hiç çalışmaz, harita da yüklenmez. Kedinin konumu ve hareketi doğru; harita adının büyük ya da küçük harf olması burada sorun değil.",
+      "skills": [
+        "oyun-hata-ayiklama"
+      ]
+    },
+    {
+      "id": "m11h3d11-q5",
+      "kind": "predict-output",
+      "prompt": "Oda kapalı. Sütun 4, satır 3 karosunda bir taş duvar (duvar kutusu işaretli) var. Kedi sütun 2, satır 3 karosuna konuyor ve oyuncu sağ ok tuşuna basılı tutuyor.\n\n```\nharitayı yükle: [oda]\n[kedi] sütun [2] satır [3] karosuna koy\n[kedi] oyuncu tuşlarıyla [dört yöne] hareket etsin, hız [60]\n```\n\nBirkaç saniye sonra ne olur?",
+      "options": [
+        "Kedi duvarın içinden geçip sağ kenara gider",
+        "Kedi duvarın üstünden zıplar",
+        "Duvar kaybolur",
+        "Kedi taş duvarın hemen solunda durur ve ilerleyemez"
+      ],
+      "answer": 3,
+      "explanation": "Duvar kutusu işaretli karo sprite'ı durdurur; kedi duvara değince kalır. Bunun için ayrıca blok yazmak gerekmez. Duvarın kendiliğinden kaybolması ya da kedinin zıplaması bu derste hiçbir blokla tanımlanmamıştır.",
+      "skills": [
+        "oyun-karo-duvar",
+        "oyun-harita-izgara"
+      ]
+    }
+  ]
+}

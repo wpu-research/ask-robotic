@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Eşik",
+      "definition": "Bir sensör okumasının \"evet\" ile \"hayır\" arasında ayrıldığı sayı.",
+      "example": "Karanlık için analogRead(A1) < 473 yazarsan eşik 473'tür.",
+      "pitfall": "Eşiğin yönünü devreye bakmadan yazmak: LDR 5V tarafındaysa karanlıkta değer küçüktür, GND tarafındaysa büyüktür."
+    },
+    {
+      "term": "Titreme (eşik gürültüsü)",
+      "definition": "Okuma eşiğin yanında dalgalanınca çıkışın hızla açılıp kapanması.",
+      "example": "Değer 445 ile 488 arasında oynarsa 473 eşiğini her geçişte aşar ve LED yanıp söner.",
+      "pitfall": "Titremeyi sensörün bozuk olduğuna yormak; sorun tek eşikte, kodda."
+    },
+    {
+      "term": "Histerezis",
+      "definition": "Açma ve kapama için iki ayrı eşik kullanıp kararı şimdiki duruma da bağlamak.",
+      "example": "423'ün altında yan, 523'ün üstünde sön; arası değişmez.",
+      "pitfall": "Açma ve kapama eşiğini aynı yazmak: bu yine tek eşiktir ve titreme geri gelir."
+    },
+    {
+      "term": "Ölü bölge (bant)",
+      "definition": "İki eşik arasındaki aralık; çıkış bu aralıkta değişmez.",
+      "example": "Gürültü 80 birimse 100 birimlik bant titremeyi bitirir.",
+      "pitfall": "Bandı gereğinden geniş seçmek: lamba geç yanar, geç söner ve sistem az hassas olur."
+    },
+    {
+      "term": "Hassasiyet ve kararlılık dengesi",
+      "definition": "Dar bant hızlı tepki verir ama titreyebilir; geniş bant kararlıdır ama geç tepki verir.",
+      "example": "Gece lambası için 423-523 bandı, 200-800 bandından daha hassastır.",
+      "pitfall": "Hem çok hızlı hem hiç titremeyen bir sistem istemek; ikisi aynı anda mümkün değildir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d1-q1",
+      "kind": "mcq",
+      "prompt": "LDR 5V ile A1 arasında, 10 kΩ direnç A1 ile GND arasında bağlı. Oda aydınlandıkça analogRead(A1) değeri ne yapar?",
+      "options": [
+        "Büyür",
+        "Küçülür",
+        "Değişmez",
+        "Önce büyür, sonra küçülür"
+      ],
+      "answer": 0,
+      "explanation": "Işık artınca LDR'nin direnci düşer, bölücüden A1'e giden gerilim yükselir ve analogRead büyür (ışık 0,1 iken 23, 0,9 iken 977). LDR'yi GND tarafına alırsan yön tersine döner; bu yüzden karşılaştırmayı devreye göre yazarsın.",
+      "skills": [
+        "sens-ldr-divider"
+      ]
+    },
+    {
+      "id": "m4h4d1-q2",
+      "kind": "numeric",
+      "prompt": "LED başta sönük. Program iki eşik kullanıyor: değer 423'ün altına inince yanar, 523'ün üstüne çıkınca söner. Okumalar sırayla şöyle geliyor: 500, 460, 480, 450, 490, 440, 400, 510, 540. LED toplam kaç kez durum değiştirir?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "kez",
+      "explanation": "400 değeri 423'ün altında olduğu için LED yanar (1). Sonra 510 ölü bölgede kalır, LED yanık kalır. 540 değeri 523'ün üstündedir, LED söner (2). Aynı dizi tek eşikle (473) denenseydi LED 6 kez durum değiştirirdi: histerezis titremeyi yok eder.",
+      "skills": [
+        "sens-hysteresis",
+        "sens-noise"
+      ]
+    },
+    {
+      "id": "m4h4d1-q3",
+      "kind": "predict-output",
+      "prompt": "Biri açma ve kapama eşiklerini yanlışlıkla ters yazdı. Işık sabit, analogRead(A1) hep 480 okuyor. Bu kod çalışınca D13'teki LED ne yapar?\n\n```\nconst int ACMA = 523;\nconst int KAPAMA = 423;\nbool yanik = false;\n\nvoid loop() {\n  int d = analogRead(A1);\n  if (!yanik && d < ACMA) yanik = true;\n  else if (yanik && d > KAPAMA) yanik = false;\n  digitalWrite(13, yanik);\n}\n```",
+      "options": [
+        "Sürekli yanık kalır",
+        "Sürekli sönük kalır",
+        "Her turda açılıp kapanır (çok hızlı titrer)",
+        "Derleme hatası olur"
+      ],
+      "answer": 2,
+      "explanation": "480 değeri 523'ten küçük olduğu için sönükken yanar; yanıkken de 423'ten büyük olduğu için söner. Böylece ölü bölge ters çalışır ve LED her turda değişir. Sürekli yanık ya da sönük kalma yalnızca 423'ün altında ya da 523'ün üstünde olur. Kod derlenir; hata yalnız davranıştadır.",
+      "skills": [
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d1-q4",
+      "kind": "find-bug",
+      "prompt": "Devre derstekiyle aynı (LDR 5V tarafında). Gece lambası gündüz yanıyor, gece sönüyor. Hata nerede?\n\n```\nconst int ESIK = 473;\n\nvoid loop() {\n  int deger = analogRead(A1);\n  bool karanlik = (deger > ESIK);\n  digitalWrite(13, karanlik);\n}\n```",
+      "options": [
+        "ESIK sabiti int yerine float olmalı",
+        "digitalWrite yerine analogWrite kullanılmalı",
+        "analogRead(A1) yerine digitalRead(A1) kullanılmalı",
+        "Karşılaştırma yönü ters: bu devrede karanlıkta değer küçüktür"
+      ],
+      "answer": 3,
+      "explanation": "Bu devrede ışık artınca değer büyür, karanlıkta küçülür. Karanlık için deger < ESIK yazılmalıdır; deger > ESIK aydınlığı yakalar. Diğer seçenekler hatayı çözmez: sayı tipi doğru, LED dijital çıkıştır ve sensör analog okunur.",
+      "skills": [
+        "sens-ldr-divider",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d1-q5",
+      "kind": "mcq",
+      "prompt": "Ortamdaki ışık gürültüsü tepeden tepeye yaklaşık 80 birim oynatıyor. Histerezis bandı için hangi seçim en uygundur?",
+      "options": [
+        "0 birim (tek eşik)",
+        "30 birim",
+        "100 birim",
+        "900 birim"
+      ],
+      "answer": 2,
+      "explanation": "Bant gürültünün tepeden tepeye genişliğinden büyük olmalı: 100 > 80 titremeyi bitirir. 0 ve 30 birim gürültüden dardır, titreme sürer. 900 birim her şeyi kaplar; lamba neredeyse hiç tepki vermez, yani sistem aşırı az hassas olur.",
+      "skills": [
+        "sens-hysteresis",
+        "sens-noise"
+      ]
+    }
+  ]
+}

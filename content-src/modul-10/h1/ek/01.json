@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "LED ekranı",
+      "definition": "Kartın 5 sütun ve 5 satırdan oluşan, toplam 25 küçük ışığı olan ekranı.",
+      "example": "Kalp simgesi, ekrandaki 25 ışığın bir bölümünün yanmasıyla çizilir.",
+      "pitfall": "Ekranı yüzlerce noktalı bir ekran sanmak; yalnızca 25 ışık vardır, bu yüzden uzun yazı sığmaz ve kayar."
+    },
+    {
+      "term": "Başlık bloğu (başlangıçta)",
+      "definition": "Programın nereden çalışmaya başlayacağını belirleyen blok; altına takılan bloklar ▶ ile bir kez çalışır.",
+      "example": "yazıyı göster bloğunu başlangıçta bloğunun içine takınca ▶ ile yazı kayar.",
+      "pitfall": "Bloğu başlangıçta bloğunun dışında bırakmak: bağlı olmayan blok soluk görünür ve hiç çalışmaz."
+    },
+    {
+      "term": "Sıra",
+      "definition": "Bloklar yukarıdan aşağıya, bir bitmeden bir sonraki başlamadan çalışır.",
+      "example": "Önce yazıyı, sonra sayıyı göstermek için yazı bloğunu sayı bloğunun üstüne koyarsın.",
+      "pitfall": "Blokları ters sırada dizip \"program bozuk\" sanmak; çoğu zaman yalnızca sıra yanlıştır."
+    },
+    {
+      "term": "Kayan yazı",
+      "definition": "Ekrana sığmayan yazının sağdan sola kayarak gösterilmesi; tek karakter kaymaz, ortada kısa süre durur.",
+      "example": "\"Merhaba\" yaklaşık 4 saniyede kayar; tek basamaklı 7 ortada durur, 25 ise iki karakter olduğu için kayar.",
+      "pitfall": "Kayan yazının bitmesini beklememek: sonraki blok yazı bitene kadar başlamaz."
+    },
+    {
+      "term": "Kod sekmeleri",
+      "definition": "JavaScript ve Python sekmeleri, bloklarının yazılı kod karşılığını salt okunur gösterir.",
+      "example": "JavaScript sekmesinde screen.showText(\"Merhaba\") satırını görürsün.",
+      "pitfall": "Sekmelerde kodu değiştirmeye çalışmak; değişiklik blokların üzerinden yapılır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d1-q1",
+      "kind": "mcq",
+      "prompt": "Bir blok, başlangıçta bloğuna bağlı olmadan ekranda tek başına duruyor. ▶ düğmesine basınca ne olur?",
+      "options": [
+        "Blok yine de çalışır, çünkü ekranda görünüyor",
+        "Kart hata verip tüm programı siler",
+        "Blok çalışmaz; başlık bloğuna bağlı olmayan blok soluk görünür",
+        "Blok başlangıçta bloğunun içine kendiliğinden gider"
+      ],
+      "answer": 2,
+      "explanation": "Programlar bir başlık bloğunun içinde yaşar. Başlık bloğuna bağlı olmayan yığın çalışmaz ve soluk görünür. Bloğun ekranda durması çalıştığı anlamına gelmez; kart de hata vermez, yalnızca onu görmez.",
+      "skills": [
+        "mk-flow",
+        "mk-card"
+      ]
+    },
+    {
+      "id": "m10h1d1-q2",
+      "kind": "predict-output",
+      "prompt": "Bu programın JavaScript sekmesindeki görünümü aşağıdadır. ▶ ile çalışınca ekranda ne olur?\n\n```\ncard.onStart(() => {\n  screen.showNumber(7);\n  screen.showText(\"Merhaba\");\n});\n```",
+      "options": [
+        "Önce 7 ortada kısa süre durur, sonra Merhaba kayar",
+        "Önce Merhaba kayar, sonra 7 görünür",
+        "7 ve Merhaba aynı anda ekranda olur",
+        "Hiçbir şey olmaz, sayı yazıdan sonra gelmeliydi"
+      ],
+      "answer": 0,
+      "explanation": "Bloklar yukarıdan aşağıya çalışır; sayı bloğu yazı bloğundan önce geldiği için 7 önce görünür. Tek basamaklı 7 kaymaz, ortada kısa süre durur ve sonra Merhaba kayar. Sıra ters olsa sonuç da ters olurdu.",
+      "skills": [
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d1-q3",
+      "kind": "numeric",
+      "prompt": "Mikro Kart ekranı 5 sütun ve 5 satırdan oluşur. Ekranda toplam kaç LED vardır?",
+      "answer": 25,
+      "unit": "LED",
+      "explanation": "Sütun sayısı çarpı satır sayısı: 5 x 5 = 25. Toplamayı (5 + 5 = 10) karıştırmamak gerekir; her sütunda 5 ışık vardır ve 5 sütun vardır.",
+      "skills": [
+        "mk-card"
+      ]
+    },
+    {
+      "id": "m10h1d1-q4",
+      "kind": "find-bug",
+      "prompt": "Selin önce \"Merhaba\" yazısının kaymasını, ardından 7 rakamının görünmesini istiyor. Ama ekranda önce 7 çıkıyor. Programı inceleyin:\n\n```\n1  card.onStart(() => {\n2    screen.showNumber(7);\n3    screen.showText(\"Merhaba\");\n4  });\n```\n\nHata nedir?",
+      "options": [
+        "1. satır: onStart yerine başka başlık bloğu gerekir",
+        "4. satır: kapanış eksik",
+        "3. satırda Merhaba çok uzun, kısaltılmalı",
+        "2. ve 3. satırların sırası ters; yazı bloğu sayı bloğunun üstünde olmalı"
+      ],
+      "answer": 3,
+      "explanation": "Kart blokları yukarıdan aşağıya çalıştırır. Önce yazının görünmesi için yazı bloğu üstte, sayı bloğu altta olmalıdır. Diğer satırlarda hata yoktur: onStart doğru başlık bloğudur ve yazının uzunluğu sıralamayı etkilemez.",
+      "skills": [
+        "mk-flow",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d1-q5",
+      "kind": "mcq",
+      "prompt": "Hangi gösterim ekranda KAYMAZ, ortada kısa süre durur?",
+      "options": [
+        "Yazı: Merhaba",
+        "Sayı: 7",
+        "Sayı: 25",
+        "Yazı: Ali"
+      ],
+      "answer": 1,
+      "explanation": "Tek bir karakter (harf ya da tek basamaklı sayı) ekrana sığar ve ortada durur. Merhaba ve Ali birden çok karakter olduğu için kayar. 25 iki karakterdir; iki basamaklı sayı da yazı gibi kayar.",
+      "skills": [
+        "mk-card",
+        "mk-timing"
+      ]
+    }
+  ]
+}

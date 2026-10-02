@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Geçilebilir karo",
+      "definition": "Duvar olmayan, sprite'ın içinden geçebildiği karo (altın, diken, kapı).",
+      "example": "Kahraman altının içinden geçer; motor yine de dokunma olayı tetikler.",
+      "pitfall": "Altın ya da dikeni duvar yapmak: kahraman içine giremez, toplayamaz."
+    },
+    {
+      "term": "karosuna dokununca",
+      "definition": "Bir sprite'ın belirli bir karoya girdiği anda çalışan olay.",
+      "example": "Oyuncu + Altın karosu olayında skor artırılır.",
+      "pitfall": "Türü yanlış seçmek: Oyuncu yerine Düşman seçersen kahraman dokununca olay çalışmaz."
+    },
+    {
+      "term": "Kenar tetikleme",
+      "definition": "Olay, karoya girilince bir kez çalışır; karoda durmak tekrar tetiklemez.",
+      "example": "Dikende üç saniye dursan olay bir kez çalışır, çıkıp girersen yeniden.",
+      "pitfall": "Olayın her karede çalışacağını sanmak."
+    },
+    {
+      "term": "olay karosunun sütunu / satırı",
+      "definition": "Olayı tetikleyen karonun konumunu veren bloklar.",
+      "example": "Altını `sütun (olay karosunun sütunu) satır (olay karosunun satırı) karosunu boşalt` ile silersin.",
+      "pitfall": "Sabit bir sayı yazmak: hep aynı karo boşalır."
+    },
+    {
+      "term": "Karo boşaltmak",
+      "definition": "Haritadaki bir karoyu silmek; altın böylece toplanmış olur.",
+      "example": "Altın olayında `karosunu boşalt` çalışınca altın kaybolur.",
+      "pitfall": "Boşaltmayı unutmak: altın kalır, çıkıp girdikçe puan verir."
+    },
+    {
+      "term": "Karo merkezi",
+      "definition": "Karoya konan sprite'ın merkezi: x = sütun x 16 + 8, y = satır x 16 + 8.",
+      "example": "Sütun 2, satır 5 karosunun merkezi (40, 88) olur.",
+      "pitfall": "Karo numarası yerine piksel yazmak ya da tersini yapmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h5d23-q1",
+      "kind": "mcq",
+      "prompt": "Altın karosu neden duvar yapılmaz?",
+      "options": [
+        "Altın duvar olursa çizilemez",
+        "Duvar olsa kahraman içine giremez, olay tetiklenmezdi",
+        "Duvar karoları puan vermez",
+        "Altın ancak platform üstünde durabilir"
+      ],
+      "answer": 1,
+      "explanation": "Duvar olsaydı kahraman altının içine giremezdi; önünde durup kalırdı. Geçilebilir karoya girince motor dokunma olayını tetikler ve toplama ya da yaralanma gerçekleşir. Duvar olmak çarpışmayı değil durdurmayı sağlar.",
+      "skills": [
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h5d23-q2",
+      "kind": "predict-output",
+      "prompt": "Altın olayı aşağıdaki gibi. Altın karosu haritada hâlâ duruyor. Kahraman karoya girip çıkıyor, sonra bir kez daha girip çıkıyor. Skor kaç olur?\n\n```\nbir [Oyuncu] sprite'ı [Altın] karosuna dokununca:\n  skoru 1 değiştir\n```",
+      "options": [
+        "1",
+        "2",
+        "0",
+        "Her karede arttığı için çok yüksek bir sayı"
+      ],
+      "answer": 1,
+      "explanation": "Olay karoya her girişte bir kez çalışır. Karo boşaltılmadığı için iki giriş iki puan verir (1 + 1 = 2). Karoda dururken tekrar tetiklenmez ama ikinci giriş yeni bir tetiklemedir. Bu yüzden altın olayında karoyu boşaltmak gerekir.",
+      "skills": [
+        "oyun-olay-kenar",
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h5d23-q3",
+      "kind": "find-bug",
+      "prompt": "Kahraman altına dokunuyor, skor artıyor ama altın ekranda kalıyor. Hatalı satır hangisi?\n\n```\n1  bir [Oyuncu] sprite'ı [Altın] karosuna dokununca:\n2    sütun 0 satır 0 karosunu boşalt\n3    skoru 1 değiştir\n```",
+      "options": [
+        "Satır 1: olay türü",
+        "Satır 2: sabit sütun ve satır",
+        "Satır 3: skor değişimi",
+        "Hata yok, altın zaten kaybolur"
+      ],
+      "answer": 1,
+      "explanation": "2. satırda sütun ve satır sabit 0 yazılmış; her seferinde sol üst köşedeki karo boşaltılır ve dokunulan altın yerinde kalır. Orada `olay karosunun sütunu` ve `olay karosunun satırı` blokları olmalı. Skor satırı doğru.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h5d23-q4",
+      "kind": "numeric",
+      "prompt": "Kahramanı `sütun 6 satır 4` karosuna koyuyorsun. Karo 16 piksel; sprite karonun ortasına oturur. Kahramanın merkez x konumu kaç piksel olur?",
+      "answer": 104,
+      "tolerance": 0,
+      "unit": "piksel",
+      "explanation": "Merkez x = sütun x 16 + 8 = 6 x 16 + 8 = 104. Sütun numarası 0'dan başlar; karonun sol kenarı 96, orta noktası 104'tür.",
+      "skills": [
+        "oyun-harita-olcu"
+      ]
+    },
+    {
+      "id": "m11h5d23-q5",
+      "kind": "mcq",
+      "prompt": "Dikene yukarı zıplarken değen kahraman başlangıç karosuna konuyor ama hızı sıfırlanmıyor. Ne olur?",
+      "options": [
+        "Hiçbir şey olmaz",
+        "Kahraman yukarı hızını koruyup başlangıç karosundan havaya fırlar",
+        "Kahraman zemine gömülür",
+        "Can iki kez azalır"
+      ],
+      "answer": 1,
+      "explanation": "Konum değişse de hız aynı kalır; kahraman yukarı doğru hızını sürdürerek başlangıç karosundan havaya fırlar. Aşağı doğru kalan hız zemine çarpınca zaten sıfırlanır, o yüzden asıl sorun yukarı hızdır. Bu yüzden başa koyarken hızı da 0, 0 yaparız.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-hiz-ivme"
+      ]
+    }
+  ]
+}

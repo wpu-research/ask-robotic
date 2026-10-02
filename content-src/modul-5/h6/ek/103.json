@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "dt",
+      "definition": "İki ölçüm arasındaki gerçek süre (saniye). Açı integrali, filtre ve PID'nin türev ile integral terimleri ona bağlıdır.",
+      "example": "Tur 5,35 ms sürerken dt = 0,005 varsaymak, açıyı yaklaşık %6,5 eksik hesaplatır.",
+      "pitfall": "dt'yi sabit yazıp döngünün gerçekte o sürede dönmediğini ölçmemek."
+    },
+    {
+      "term": "delay() ile periyot",
+      "definition": "delay(5) yalnız 5 ms bekler; turun işi bunun üstüne eklenir, tur süresi iş kadar uzar ve değişir.",
+      "example": "I2C okuma ve hesap 0,35 ms sürerse tur 5,35 ms olur.",
+      "pitfall": "delay(5) ile \"200 Hz döngü\" yaptığını sanmak."
+    },
+    {
+      "term": "Planlanan zaman (+=)",
+      "definition": "Bir sonraki turun zamanını tutup her turda ona periyot eklemek; küçük gecikmeler birikmez.",
+      "example": "sonPlanUs += 5000; her tur 5000 µs aralıkla planlanır.",
+      "pitfall": "sonPlanUs = simdi yazmak: her gecikme bir sonrakine eklenir ve periyot hedeften uzaklaşır."
+    },
+    {
+      "term": "Taşma (kaçan tur)",
+      "definition": "İş bir turdan uzun sürünce tur kaçar. Sayaçla fark edilir, plan yeniden eşitlenir ve gerçek dt yine ölçülür.",
+      "example": "12 ms'lik ağır iş 5 ms periyotta bir turu kaçırır.",
+      "pitfall": "Taşma sayacı tutmamak: kaçan turlar fark edilmez ve robot nedensiz sallanır."
+    },
+    {
+      "term": "micros() sarması",
+      "definition": "micros() 32 bit sayar ve yaklaşık 71,6 dakikada başa sarar. Çıkarma unsigned long ile yapılırsa sarmada da doğru fark çıkar.",
+      "example": "simdi = 50 ve sonUs = 4294967000 iken unsigned fark 346 µs eder.",
+      "pitfall": "Farkı int ile almak: AVR'de int 16 bittir ve 32,7 ms'den uzun farklarda taşar."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d3-q1",
+      "kind": "mcq",
+      "prompt": "Bir kontrol döngüsünün sonunda delay(5) var. Döngü hakkında hangisi doğrudur?",
+      "options": [
+        "Tur her zaman tam 5 ms sürer",
+        "Tur 5 ms artı turdaki işin süresi kadar sürer ve her turda değişebilir",
+        "Tur 5 ms'den kısa sürer, çünkü delay işlemciyi hızlandırır",
+        "delay(5) bir kesme kurar ve her 5 ms'de bir çalışır"
+      ],
+      "answer": 1,
+      "explanation": "delay bekleme süresini turun işine ekler: I2C okuma, hesap ve Serial.print'in süresi 5 ms'nin üstüne biner. Bu yüzden tur süresi ne tam 5 ms ne de sabittir. Benzetimde ortalama 5,35 ms, en uzun 6,64 ms ölçüldü.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h6d3-q2",
+      "kind": "numeric",
+      "prompt": "Jiroskop 4 saniye boyunca sabit 50 °/s dönüyor (gerçek açı 200°). Döngü gerçekte 5,35 ms'de bir dönüyor ama kod aci += hiz * 0.005 yazıyor. Kod kaç derece bulur?",
+      "answer": 186.9,
+      "tolerance": 0.5,
+      "unit": "°",
+      "explanation": "Tur sayısı 4 / 0,00535 ≈ 747,7; her tur 50·0,005 = 0,25° ekler: 747,7·0,25 ≈ 186,9°. Eksik bulunan oran 5/5,35 = %93,5; yani yaklaşık %6,5 hata. Gerçek dt ölçülseydi tam 200° çıkardı.",
+      "skills": [
+        "ctrl-fixed-period"
+      ]
+    },
+    {
+      "id": "m5h6d3-q3",
+      "kind": "numeric",
+      "prompt": "micros() 32 bit (0 ile 4 294 967 295 arası) mikrosaniye sayar. Kart açıldıktan kaç dakika sonra başa sarar?",
+      "answer": 71.6,
+      "tolerance": 0.1,
+      "unit": "dk",
+      "explanation": "2^32 µs = 4 294,97 saniye ≈ 71,6 dakikadır. Çıkarma unsigned long ile yapılırsa sarma anında bile iki ölçüm arasındaki fark doğru çıkar; sorun yalnız farkı int gibi küçük bir türde almaktır.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h6d3-q4",
+      "kind": "find-bug",
+      "prompt": "Bu döngü hedef 5 ms iken zamanla 5 ms'den daha seyrek çalışmaya başlıyor. Hangi satır hatalı?\n\n```\n1  unsigned long simdi = micros();\n2  if (simdi - sonPlanUs < PERIYOT_US) return;\n3  sonPlanUs = simdi;\n4  islemYap();\n```",
+      "options": [
+        "1. satır: micros() yerine millis() kullanılmalı",
+        "2. satır: < yerine > yazılmalı",
+        "3. satır: sonPlanUs += PERIYOT_US olmalı; simdi atamak gecikmeleri biriktirir",
+        "4. satır: islemYap() döngü dışında çağrılmalı"
+      ],
+      "answer": 2,
+      "explanation": "Döngü, süre dolduktan bir miktar sonra bile işe girebilir. sonPlanUs = simdi yazınca bu gecikme bir sonraki turun başlangıcına eklenir ve periyot sürekli uzar. += ile planlanan an sabit adımlarla ilerler, gecikme birikmez. 2. satırdaki karşılaştırma doğrudur.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d3-q5",
+      "kind": "predict-output",
+      "prompt": "micros() başa sardıktan hemen sonra bu kod çalışıyor. Ne yazar?\n\n```\nunsigned long simdi = 50;             // sarmadan sonra\nunsigned long sonUs = 4294967000UL;  // sarmadan önce\nSerial.println(simdi - sonUs);\n```",
+      "options": [
+        "-4294966950",
+        "346",
+        "4294966950",
+        "Derleme hatası olur"
+      ],
+      "answer": 1,
+      "explanation": "unsigned long 2^32 üzerinden hesaplanır: 50 - 4294967000 = -4294966950, buna 4294967296 eklenince 346 olur. Yani sarmadan 296 µs önce ve 50 µs sonra alınan iki ölçüm arasında 346 µs vardır. Eksi işaret çıkmaz çünkü tür işaretsizdir.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-timing"
+      ]
+    }
+  ]
+}

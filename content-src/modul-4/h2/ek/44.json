@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "ToF (uçuş süresi)",
+      "definition": "Sensörün bir ışık darbesi gönderip yansımanın dönme süresinden mesafeyi hesaplaması.",
+      "example": "VL53L0X kızılötesi lazerle ölçer ve sonucu milimetre olarak verir.",
+      "pitfall": "Ultrasonik gibi sesle çalıştığını sanmak; ToF ışık kullanır."
+    },
+    {
+      "term": "VL53L0X ve adres 0x29",
+      "definition": "I2C üzerinden konuşan ToF mesafe sensörü; varsayılan adresi 0x29'dur.",
+      "example": "Adres tarama çıktısında 0x29 görmek sensörün hatta bağlı olduğunu gösterir.",
+      "pitfall": "Sensör adresini LCD'nin 0x27'si ile karıştırmak."
+    },
+    {
+      "term": "init() ve timeoutOccurred()",
+      "definition": "init() sensörün bulunup bulunmadığını, timeoutOccurred() okumanın zamanında bitip bitmediğini bildirir.",
+      "example": "if (!sensor.init()) { Serial.println(\"VL53L0X bulunamadi\"); }",
+      "pitfall": "Okuma başarısızken dönen sayıyı gerçek mesafe sanmak."
+    },
+    {
+      "term": "Wire.begin()",
+      "definition": "I2C hattını başlatan çağrı; sensörle konuşmadan önce setup() içinde yapılır.",
+      "example": "Wire.begin(); sensor.init();",
+      "pitfall": "Wire.begin()'i unutmak: sensörle iletişim kurulamaz ve init() başarısız olur."
+    },
+    {
+      "term": "Milimetre ve eşik payı",
+      "definition": "VL53L0X mm verir (10 mm = 1 cm); yakın ve uzak eşikleri arasındaki fark histerezis payıdır.",
+      "example": "300 mm ve 340 mm eşikleri arasındaki pay 40 mm, yani 4 cm'dir.",
+      "pitfall": "mm ile cm'yi karıştırmak: 300 mm'yi 300 cm sanmak."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d4-q1",
+      "kind": "mcq",
+      "prompt": "Aynı I2C hattında I2C LCD (0x27), MPU6050 (0x68) ve BMP280 (0x76) varsa VL53L0X adres taramasında hangi adreste görünür?",
+      "options": [
+        "0x76",
+        "0x68",
+        "0x27",
+        "0x29"
+      ],
+      "answer": 3,
+      "explanation": "VL53L0X'in varsayılan adresi 0x29'dur. 0x27 LCD'ye, 0x68 MPU6050 ve RTC'ye, 0x76 BMP280'e aittir. Adresler farklı olduğu için hepsi aynı hatta bulunabilir.",
+      "skills": [
+        "sensor-tof",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m4h2d4-q2",
+      "kind": "numeric",
+      "prompt": "tof_esik sketch'inde YAKIN_MM = 300 ve UZAK_MM = 340. İki eşik arasındaki histerezis payı kaç santimetredir?",
+      "answer": 4,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "Fark 340 − 300 = 40 mm'dir. 10 mm = 1 cm olduğundan pay 40 / 10 = 4 cm'dir. Bu pay, mesafe eşik civarında oynasa da durumun titremesini önler.",
+      "skills": [
+        "prog-hysteresis",
+        "sensor-tof"
+      ]
+    },
+    {
+      "id": "m4h2d4-q3",
+      "kind": "numeric",
+      "prompt": "tof_esik mantığıyla (YAKIN_MM = 300, UZAK_MM = 340, başlangıçta \"uzak\") sensör sırasıyla 350, 295, 305, 296, 310, 345, 330, 290 mm okuyor. \"Yakin\" ya da \"Uzak\" mesajı toplam kaç kez yazılır?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "mesaj",
+      "explanation": "350: değişmez. 295 < 300: \"Yakin\" (1). 305, 296 ve 310 arada kalır, durum korunur (310 hâlâ 340'ın altında). 345 > 340: \"Uzak\" (2). 330 değişmez. 290 < 300: \"Yakin\" (3). Toplam 3 mesaj. Tek eşik olsaydı durum 5 kez değişirdi.",
+      "skills": [
+        "prog-hysteresis",
+        "sensor-tof"
+      ]
+    },
+    {
+      "id": "m4h2d4-q4",
+      "kind": "find-bug",
+      "prompt": "VL53L0X doğru bağlı olduğu hâlde init() hep false dönüyor ve seri monitörde \"VL53L0X bulunamadi\" yazıyor. Kodda eksik olan nedir?\n\n```\n#include <VL53L0X.h>\n\nVL53L0X sensor;\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.setTimeout(500);\n  if (!sensor.init()) {\n    Serial.println(\"VL53L0X bulunamadi\");\n    while (true) {}\n  }\n  sensor.startContinuous();\n}\n```",
+      "options": [
+        "sensor.setTimeout(500) çağrısı fazla",
+        "startContinuous() init()'ten önce çağrılmalı",
+        "Wire.begin() çağrısı eksik",
+        "Serial.begin(9600) I2C'yi kapatıyor"
+      ],
+      "answer": 2,
+      "explanation": "Kütüphane I2C hattını kendisi başlatmaz; kullanım örneklerinde setup() içinde önce Wire.begin() çağrılır. Bu çağrı olmadan sensöre ulaşılamaz. setTimeout(500) ve startContinuous() çağrıları doğru yerdedir.",
+      "skills": [
+        "sensor-tof",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d4-q5",
+      "kind": "mcq",
+      "prompt": "sensor.readRangeContinuousMillimeters() çağrısından sonra sensor.timeoutOccurred() true döndü. Elindeki sayı için ne yapmalısın?",
+      "options": [
+        "Gerçek mesafe kabul edip eşikle karşılaştırmak",
+        "Okumayı geçersiz sayıp o turdaki kararı atlamak",
+        "Değeri iki ile çarpıp kullanmak",
+        "Sensörü santimetreye çevirmek için 10'a bölmek"
+      ],
+      "answer": 1,
+      "explanation": "timeoutOccurred() true ise okuma zamanında bitmemiştir; dönen sayı gerçek bir mesafe değildir. Doğrusu bu turu atlamak ya da hata bildirmektir. Sayıyı mm kabul etmek yanlış eşik kararlarına yol açar.",
+      "skills": [
+        "sensor-tof",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "IR engel sensörü",
+      "definition": "Kızılötesi ışık gönderip yansımasını yakalayarak önünde engel olup olmadığını söyleyen modül; mesafeyi ölçmez.",
+      "example": "Otomatik sabun makinesi elini bu şekilde fark eder.",
+      "pitfall": "Ondan santimetre cinsinden mesafe beklemek; yalnız \"var/yok\" bilgisi verir."
+    },
+    {
+      "term": "Yansıma ve yüzey",
+      "definition": "Algılama, cismin geri döndürdüğü ışığın miktarına bağlıdır; renk ve yüzey bunu değiştirir.",
+      "example": "Beyaz mat kutu çok yansıtır; parlak siyah yüzey az yansıtır ve daha yakında bile algılanmayabilir.",
+      "pitfall": "Aynı mesafede her cismin aynı sonucu vereceğini sanmak."
+    },
+    {
+      "term": "Eşik",
+      "definition": "Yansımanın \"engel var\" sayılması için aşması gereken düzey. Dijital çıkışta modüldeki vidayla, analog çıkışta kodla ayarlanır.",
+      "example": "Laboratuvarda Eşik kaydırıcısı 0,5 iken Yakınlık 0,5 ve üstü engel sayılır.",
+      "pitfall": "Hem vidayı hem kodu aynı işi yapıyor sanmak; dijital çıkışta kod eşiği görmez."
+    },
+    {
+      "term": "Çıkış seviyesi sabiti",
+      "definition": "Modülün \"engel var\" derken hangi seviyeyi verdiğini const int ile bir kez yazıp kodun her yerinde onu kullanmak.",
+      "example": "const int ENGEL_SEVIYESI = LOW; ... digitalRead(IR) == ENGEL_SEVIYESI",
+      "pitfall": "Her modülün engelde LOW verdiğini varsaymak; bazı modüller tersini yapar."
+    },
+    {
+      "term": "Histerezis",
+      "definition": "Aç ve kapa kararı için iki ayrı eşik kullanıp aradaki bölgede önceki durumu korumak.",
+      "example": "Eşikler 600 ve 500 iken 550 civarında oynayan AO değeri çıktıyı titretmez.",
+      "pitfall": "Tek eşik kullanmak: değer eşik civarında dalgalanınca çıktı sürekli değişir."
+    },
+    {
+      "term": "Kenar sayma",
+      "definition": "Bir cismi yalnız \"yoktan vara\" geçtiği anda bir kez saymak.",
+      "example": "Bandın önünde 3 saniye duran kutu tek sayılır.",
+      "pitfall": "Seviyeyi saymak: duran kutu her turda yeniden sayılır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d2-q1",
+      "kind": "mcq",
+      "prompt": "IR engel modülü ile HC-SR04 arasındaki en önemli fark hangisidir?",
+      "options": [
+        "IR engel modülü santimetre cinsinden mesafe verir, HC-SR04 vermez",
+        "IR engel modülü yalnızca engel var/yok der, HC-SR04 mesafe ölçer",
+        "IR engel modülü ses, HC-SR04 ışık kullanır",
+        "IR engel modülü yüzey rengine hiç duyarlı değildir"
+      ],
+      "answer": 1,
+      "explanation": "IR engel modülünün dijital çıkışı yalnız \"engel var/yok\" der; eşik vidayla belirlenir. Mesafeyi santimetre olarak veren HC-SR04'tür. Her iki sensör de yüzeyden etkilenir; ikisi de pasif değildir, çünkü ikisi de kendi sinyalini gönderir.",
+      "skills": [
+        "sensor-ir-obstacle"
+      ]
+    },
+    {
+      "id": "m4h2d2-q2",
+      "kind": "mcq",
+      "prompt": "Parlak siyah bir kutuyu IR engel modülünün önüne tutuyorsun ama modül hiç algılamıyor; beyaz kutu ise rahatça algılanıyor. En olası açıklama hangisidir?",
+      "options": [
+        "Kutu çok uzakta olduğu için ses geri dönmüyor",
+        "Siyah yüzey az yansıtır, yansıma eşiği aşamıyor",
+        "INPUT_PULLUP kullanılmamış",
+        "Siyah kutuda manyetik alan oluşuyor"
+      ],
+      "answer": 1,
+      "explanation": "Koyu ve parlak yüzey ışığı sensöre geri döndürmez; yansıma eşiği aşamaz. Çözüm eşiği (vidayı) daha duyarlı yapmak ya da ölçümü yüzeye göre kalibre etmektir. Sensör bozuk değildir ve kod hatası aramak gerekmez; yüzey etkisi gerçek donanımın bilinen bir özelliğidir.",
+      "skills": [
+        "sensor-ir-obstacle"
+      ]
+    },
+    {
+      "id": "m4h2d2-q3",
+      "kind": "numeric",
+      "prompt": "ir_analog_esik'te ESIK_YUKSEK = 600, ESIK_ALCAK = 500 ve başlangıçta \"engel yok\". AO'dan sırasıyla 450, 620, 550, 520, 480, 590 okunuyor. Kaç kez \"Engel var\" ya da \"Engel yok\" satırı yazılır?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "satır",
+      "explanation": "450: yok kalır. 620 >= 600: \"Engel var\" (1). 550 ve 520 arada kalır, durum korunur. 480 <= 500: \"Engel yok\" (2). 590 < 600, hâlâ yok. Toplam 2 satır. Tek eşik 550 olsaydı 620'de, 520'de ve 590'da olmak üzere üç değişim yazılırdı; histerezis bunu ikiye indirir.",
+      "skills": [
+        "prog-hysteresis",
+        "sensor-ir-obstacle"
+      ]
+    },
+    {
+      "id": "m4h2d2-q4",
+      "kind": "predict-output",
+      "prompt": "Laboratuvardaki IR engel parçasında AO ucu A0'a bağlı. AO gerilimi yakınlıkla doğrusal artar (yakınlık 0 için yaklaşık 51, yakınlık 1 için yaklaşık 972 okuma). Yakınlığı önce 0,4, sonra 0,8 yaparsın. Seri monitörde ne görürsün?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (analogRead(A0) >= 600) Serial.println(\"Y\");\n  else Serial.println(\"N\");\n  delay(500);\n}\n```",
+      "options": [
+        "Önce hep Y, sonra hep N",
+        "Hep N",
+        "Hep Y",
+        "Önce hep N, sonra hep Y"
+      ],
+      "answer": 3,
+      "explanation": "Yakınlık 0,4 iken AO okuması yaklaşık 419 olduğu için 600'ün altındadır: N yazılır. Yakınlık 0,8 iken yaklaşık 788 olur, 600'ü geçer: Y yazılır. AO yakınlıkla arttığı için sıra N'den Y'ye doğrudur.",
+      "skills": [
+        "sensor-ir-obstacle",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d2-q5",
+      "kind": "find-bug",
+      "prompt": "Konveyör bandındaki kutuları saymak istiyorsun. Tek kutu sensörün önünde bir saniye duruyor ve sayaç 10'a çıkıyor (her 100 ms'de bir artıyor). Sorun hangi satırda?\n\n```\nint sayac = 0;\n\nvoid setup() {\n  pinMode(3, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool engel = (digitalRead(3) == LOW);\n  if (engel) {\n    sayac++;\n    Serial.println(sayac);\n  }\n  delay(100);\n}\n```",
+      "options": [
+        "pinMode(3, INPUT);",
+        "bool engel = (digitalRead(3) == LOW);",
+        "if (engel) {",
+        "delay(100);"
+      ],
+      "answer": 2,
+      "explanation": "`if (engel)` seviyeyi sınar: engel var olduğu sürece her turda sayaç artar. Doğrusu \"önceki tur engel yoktu, şimdi var\" kenarını sınamaktır (bool onceki tutup `engel && !onceki`). Okuma satırı ve pinMode doğrudur.",
+      "skills": [
+        "prog-edge-detect",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Kabul ölçütü",
+      "definition": "Bir işin \"bitti\" sayılması için ölçülen değerin sağlaması gereken, sayı ve birimle yazılmış koşul.",
+      "example": "Takip robotu için \"hedef 20 cm ± 3 cm, yani 17-23 cm arasında kalır\".",
+      "pitfall": "Ölçütü sonuç açıklandıktan sonra, robot tutturamadığı için gevşetmek."
+    },
+    {
+      "term": "Ölçülebilir gereksinim",
+      "definition": "Sayısı, birimi ve ölçüm yöntemi olan gereksinim.",
+      "example": "\"Üç noktada uç noktası hatası 5 mm'den az; cetvelle ölçülür.\"",
+      "pitfall": "\"Düzgün gitsin\" ya da \"hassas olsun\" yazmak: sayı yoksa gereksinim değil dilektir."
+    },
+    {
+      "term": "Sınır değer",
+      "definition": "Ölçütün tam eşikte nasıl davranacağı: katı (<) ya da dahil (<=).",
+      "example": "\"5 mm'den az\" katıdır; 5,0 ölçersen kalırsın ve kod `hata < 5.0` yazar.",
+      "pitfall": "`<` yerine `<=` yazıp tam eşiği geçti saymak."
+    },
+    {
+      "term": "Alt sistem",
+      "definition": "Tek bir iş yapan, tek başına sınanabilen ve kendi geçme koşulu olan parça.",
+      "example": "Yol A'da sürüş, mesafe ve çizgi modülleri; her biri seri komutla ayrı denenir.",
+      "pitfall": "\"Birleşince bakarım\" deyip alt sistemi sınamadan geçmek: hatanın kimden geldiği bilinmez."
+    },
+    {
+      "term": "Tasarım belgesi",
+      "definition": "Kod yazmadan önce doldurulan tek sayfa: amaç, gereksinimler, alt sistemler, durum makinesi, test planı, riskler.",
+      "example": "Gereksinim tablosundaki her satırın yanında bir sayı ve \"nasıl ölçülür\" sütunu vardır.",
+      "pitfall": "Boş kutu bırakmak: sonradan tartışmanın nedeni olur."
+    },
+    {
+      "term": "Ortak GND",
+      "definition": "Harici güç kaynağının eksi ucunun Arduino GND'sine bağlanması.",
+      "example": "Servolar harici 5 V ile beslenir, kaynağın GND'si Arduino GND'siyle birleşir.",
+      "pitfall": "Servo ya da motoru Arduino'nun 5 V pininden beslemek: kart resetlenir ya da zarar görür."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d1-q1",
+      "kind": "mcq",
+      "prompt": "Aşağıdakilerden hangisi ölçülebilir bir gereksinimdir?",
+      "options": [
+        "Robot düzgün gitsin",
+        "Robot hızlı olsun",
+        "Hedefi 20 cm ± 3 cm mesafede takip etsin; mesafe cetvelle ölçülsün",
+        "Robot hassas çalışsın"
+      ],
+      "answer": 2,
+      "explanation": "Ölçülebilir gereksinimde sayı, birim ve ölçüm yöntemi bulunur: 20 ± 3 cm ve cetvel. Diğerleri sayısız dileklerdir; \"düzgün\", \"hızlı\", \"hassas\" ne kanıtlanabilir ne çürütülebilir.",
+      "skills": [
+        "bit-requirements",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h8d1-q2",
+      "kind": "numeric",
+      "prompt": "Takip robotunun ölçütü 20 cm ± 3 cm (sınırlar dahil). Takip boyunca en küçük ve en büyük mesafe arasındaki farkın alabileceği en büyük değer kaç cm'dir?",
+      "answer": 6,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "İzin verilen aralık 17 cm ile 23 cm arasıdır. En büyük fark 23 - 17 = 6 cm'dir; bunu aşan robot ölçütü sağlamaz.",
+      "skills": [
+        "bit-acceptance"
+      ]
+    },
+    {
+      "id": "m5h8d1-q3",
+      "kind": "predict-output",
+      "prompt": "Kol ölçütü \"uç noktası hatası 5 mm'den az\". Aşağıdaki kod çalışınca seri monitörde ne yazar?\n```\nfloat hata = 5.0;\nSerial.println(hata < 5.0 ? \"GECTI\" : \"KALDI\");\n```",
+      "options": [
+        "GECTI",
+        "Derleme hatası verir",
+        "Hiçbir şey yazmaz",
+        "KALDI"
+      ],
+      "answer": 3,
+      "explanation": "5.0 < 5.0 yanlıştır, bu yüzden \"KALDI\" yazar. \"5 mm'den az\" katı bir ifadedir; tam 5,0 geçmez. `<=` yazılsaydı GECTI yazardı, bu da ölçütü sessizce gevşetirdi.",
+      "skills": [
+        "bit-acceptance",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d1-q4",
+      "kind": "find-bug",
+      "prompt": "Yol A ölçütü \"çarpmadan bitir\". Kodda tek hata var; hangisi?\n```\nint carpma = 0;\nint bitti = 0;            // robot olduğu yerde duruyor\nbool gecti = (carpma == 0 || bitti == 1);\n```",
+      "options": [
+        "`carpma == 0` yerine `carpma != 0` olmalı",
+        "`||` yerine `&&` olmalı; yoksa hiç hareket etmeyen robot da geçer",
+        "`bitti` bool olmalı",
+        "Değişkenler `int` olamaz"
+      ],
+      "answer": 1,
+      "explanation": "Ölçüt iki koşulun birleşimidir: çarpma yok VE parkur bitti. `||` ile birinin sağlanması yeter; yerinde duran robot çarpmadığı için geçer. `carpma != 0` ise anlamı tersine çevirirdi.",
+      "skills": [
+        "bit-acceptance",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d1-q5",
+      "kind": "mcq",
+      "prompt": "Yol A'da tamponlar (D2, D3) ile enkoder aynı anda kullanılamaz. Neden?",
+      "options": [
+        "İkisi de analog giriş ister",
+        "Tamponlar PWM kullanır",
+        "İkisi de D2 ve D3 pinlerini ister",
+        "Enkoder yalnız harici güçle çalışır"
+      ],
+      "answer": 2,
+      "explanation": "Tamponlar ve enkoder kesme pinleri olan D2 ve D3'e bağlanır; aynı pine iki parça bağlanamaz. Bir parçayı seçmek ya da tasarımı değiştirmek gerekir. Analog giriş (A0-A4) çizgi sensörlerine ayrılmıştır.",
+      "skills": [
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

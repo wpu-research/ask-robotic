@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "Olay karosu (sütun, satır)",
+      "definition": "Karo olayının içinde, dokunulan karonun sütununu ve satırını veren iki değer.",
+      "example": "Kedi (8, 1) konumundaki elmasa değince olay karosunun sütunu 8, satırı 1 olur.",
+      "pitfall": "Karoyu boşaltan bloğa sabit sayı yazmak: hep aynı karo silinir."
+    },
+    {
+      "term": "Karoyu boşalt",
+      "definition": "Verilen sütun ve satırdaki karoyu haritadan kaldıran blok.",
+      "example": "Elmasa dokununca o elmasın karosu boşaltılır, diğer elmaslar yerinde kalır.",
+      "pitfall": "Sütun ile satırı yer değiştirmek: başka (ya da haritanın dışındaki) bir karo gösterilir."
+    },
+    {
+      "term": "Karo sayacı",
+      "definition": "`haritadaki [Elmas] karo sayısı` bloğu haritada o karodan kaç tane kaldığını verir.",
+      "example": "Dört elmastan üçü toplanınca sayaç 1 gösterir.",
+      "pitfall": "Sayacı karo boşaltılmadan önce okumak: son elmasta sayı 1 görünür, kazanma hiç tetiklenmez."
+    },
+    {
+      "term": "Kazanma koşulu",
+      "definition": "Bir sayı ya da durum doğru olunca oyunu kazandıran `eğer` bloğu.",
+      "example": "Eğer elmas sayısı = 0 ise oyunu bitir: kazandın.",
+      "pitfall": "Koşulu `= 0` yerine yanlış sayıyla kurmak ya da `eğer` bloğunu olayın dışında bırakmak."
+    },
+    {
+      "term": "Tehlikeli karo (lav)",
+      "definition": "Dokununca canı azaltan karo; çoğu zaman oyuncuyu başlangıca da gönderir.",
+      "example": "Lavda `canı -1 değiştir` ve `bu sprite` sütun 1 satır 1 karosuna konur.",
+      "pitfall": "Işınlama bloğunu unutmak: kedi lavın üstünde kalır, bir can gider ve oyuncu hâlâ tehlikededir."
+    },
+    {
+      "term": "Bu sprite",
+      "definition": "Olayı tetikleyen sprite; karo olayında dokunan sprite'tır.",
+      "example": "Lav olayında `bu sprite`, lava değen kediyi gösterir.",
+      "pitfall": "Başka bir sprite'ın adını yazmak: yanlış sprite taşınır."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d13-q1",
+      "kind": "mcq",
+      "prompt": "Bir arkadaşın elmas olayında `sütun [3] satır [2] karosunu boşalt` yazmış. Kedi hangi elmasa dokunursa ne olur?",
+      "options": [
+        "Dokunulan elmas silinir",
+        "Hiçbir şey silinmez",
+        "Her seferinde sütun 3, satır 2 karosu silinir; dokunulan elmas silinmeyebilir",
+        "Bütün elmaslar birden silinir"
+      ],
+      "answer": 2,
+      "explanation": "Sabit sayılar her dokunuşta aynı karoyu gösterir. Dokunulan karoyu silmek için `olay karosunun sütunu` ve `olay karosunun satırı` değerleri kullanılmalıdır. Tüm elmasları silmek için ayrı bir döngü ya da çevirme bloğu gerekirdi.",
+      "skills": [
+        "oyun-olay-karosu"
+      ]
+    },
+    {
+      "id": "m11h3d13-q2",
+      "kind": "find-bug",
+      "prompt": "Dört elmasın hepsi toplanıyor, skor 4 oluyor ama oyun hiç kazanılmıyor.\n\n```\n1  bir [Oyuncu] sprite'ı [Elmas] karosuna dokununca\n2      eğer haritadaki [Elmas] karo sayısı = [0] ise\n3          oyunu bitir: [kazandın]\n4      sütun [olay karosunun sütunu] satır [olay karosunun satırı] karosunu boşalt\n5      skoru [1] değiştir\n```\n\nHatalı satır hangisidir?",
+      "options": [
+        "Satır 2-3: kontrol karo boşaltılmadan (satır 4) önce yapılıyor",
+        "Satır 1: yanlış karo seçilmiş",
+        "Satır 5: skor 1 artırılmamalı",
+        "Satır 4: boşaltma bloğunda olay karosu kullanılmamalı"
+      ],
+      "answer": 0,
+      "explanation": "Son elmasa değildiğinde sayaç hâlâ 1'dir, çünkü boşaltma kontrolden sonra gelir. Bu yüzden `= 0` hiçbir zaman doğru olmaz. Doğrusu boşaltmayı önce yapmak. Skor çalışıyor (skor 4 oluyor), yani 1. ve 5. satırlar doğru; satır 4 de doğru kullanılmış.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d13-q3",
+      "kind": "numeric",
+      "prompt": "Başlangıçta skor 0 ve can 3. Elmas olayı skoru 1 artırır, lav olayı canı 1 azaltıp kediyi başa gönderir. Kedi sırayla şu karolara dokundu: elmas, lav, elmas, lav, elmas (hepsi farklı karolar). Sonunda can kaçtır?",
+      "answer": 1,
+      "unit": "can",
+      "explanation": "Lav iki kez çalıştı: 3 - 1 - 1 = 1. Elmaslar canı değiştirmez (skor 3 olur). Üç lav olsaydı can 0 olurdu.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d13-q4",
+      "kind": "predict-output",
+      "prompt": "Can 5. Lav olayında kediyi başa gönderen blok yok:\n\n```\nbir [Oyuncu] sprite'ı [Lav] karosuna dokununca\n    canı [-2] değiştir\n```\n\nKedi lav karosuna girip 4 saniye üstünde duruyor. Can kaç olur?",
+      "options": [
+        "5",
+        "-3",
+        "1",
+        "3"
+      ],
+      "answer": 3,
+      "explanation": "Karo olayı ilk değmede bir kez çalışır; 5 - 2 = 3. Kedi lavda beklese de olay tekrar etmez. Her saniye canın düşeceği (-3) ya da hiç düşmeyeceği (5) doğru değildir.",
+      "skills": [
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h3d13-q5",
+      "kind": "mcq",
+      "prompt": "Haritada soldan 3., yukarıdan 2. karoyu göstermek istiyorsun. Sütun ve satır sayıları ne olmalıdır?",
+      "options": [
+        "Sütun 2, satır 1",
+        "Sütun 3, satır 2",
+        "Sütun 2, satır 3",
+        "Sütun 1, satır 2"
+      ],
+      "answer": 0,
+      "explanation": "Sayma 0'dan başlar: soldan 3. karo sütun 2, yukarıdan 2. karo satır 1'dir. Sütun 3, satır 2 aslında soldan 4. ve yukarıdan 3. karodur; sütun ile satırı yer değiştirmek de başka bir karoyu gösterir.",
+      "skills": [
+        "oyun-harita-izgara",
+        "oyun-olay-karosu"
+      ]
+    }
+  ]
+}

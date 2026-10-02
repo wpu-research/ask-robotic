@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Dünya ve ekran",
+      "definition": "Dünya haritanın tamamıdır; ekran 160 x 120 piksellik, dünyaya açılan bir penceredir.",
+      "example": "30 karoluk ova 480 piksel genişliğindedir, ekranın 3 katıdır.",
+      "pitfall": "Ekranı dünya sanmak: ekran dünyanın yalnız bir bölümünü gösterir."
+    },
+    {
+      "term": "Kamera takibi",
+      "definition": "`kamera [kedi] sprite'ını takip etsin` bloğu sprite'ı ekranın ortasında tutacak şekilde görüntüyü kaydırır.",
+      "example": "Kedi 200 pikselde ise kamera x = 200 - 80 = 120 olur.",
+      "pitfall": "Kamera bloğunu eklememek: kedi ekranın dışına çıkar ve kaybolur."
+    },
+    {
+      "term": "Kamera sınırı",
+      "definition": "Kamera dünyanın kenarında durur; dünyanın dışındaki boşluğu göstermez.",
+      "example": "480 piksellik dünyada kamera x en çok 480 - 160 = 320 olur.",
+      "pitfall": "Kenarda kedinin hâlâ ekranın ortasında olacağını beklemek: kenarda kedi ortadan kayar."
+    },
+    {
+      "term": "Karoyu sprite'a çevirmek",
+      "definition": "Haritadaki bir cins karoyu boşaltıp her birinin yerine bir sprite koyar.",
+      "example": "Yedi elma karosu yedi Yiyecek sprite'ına dönüşür.",
+      "pitfall": "Çevirmeyi unutmak: elma yalnız resim kalır, çarpışma olayı çalışmaz."
+    },
+    {
+      "term": "Sprite türü",
+      "definition": "Sprite'ın bir etiketi (oyuncu, yiyecek vb.); olaylar türe göre çalışır.",
+      "example": "Toplama kodu `Yiyecek` türünü bekler.",
+      "pitfall": "Çevirirken yanlış tür seçmek: elmalar toplanamaz."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d14-q1",
+      "kind": "numeric",
+      "prompt": "Ova haritası 30 karo genişliğinde (480 piksel). Kamera kediyi takip ediyor ve kedinin merkezi x = 200 pikselde. Ekran 160 piksel genişliğinde. Kameranın x değeri kaçtır?",
+      "answer": 120,
+      "unit": "piksel",
+      "explanation": "Kamera sprite'ı ortada tutar: 200 - 160 / 2 = 120. Bu değer 0 ile 480 - 160 = 320 arasında olduğundan sınıra takılmaz. Yalnız 200 - 160 = 40 hesabı ekranın yarısını kullanmayı unutmaktır.",
+      "skills": [
+        "oyun-kamera",
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d14-q2",
+      "kind": "mcq",
+      "prompt": "Kedi ovanın en sağ ucuna yürüdü (x = 470 piksel) ve kamera kediyi takip ediyor. Ne görürsün?",
+      "options": [
+        "Kamera dünyanın sağ kenarında durur; kedi ekranın ortasından biraz sağa kayar",
+        "Kamera dünyanın dışını gösterir",
+        "Kedi kaybolur",
+        "Kamera sola geri döner"
+      ],
+      "answer": 0,
+      "explanation": "Kamera dünyanın sınırını aşmaz: x en çok 480 - 160 = 320. Kedi bu durumda ekranda ortadan sağa doğru kayar. Boşluk gösterilmez, kedi kaybolmaz ve kamera sola dönmez.",
+      "skills": [
+        "oyun-kamera"
+      ]
+    },
+    {
+      "id": "m11h3d14-q3",
+      "kind": "find-bug",
+      "prompt": "Kamera kediyi izliyor, ama kedi elmaya değince skor artmıyor ve elma silinmiyor. Toplama kodu doğru: `Oyuncu` ile `Yiyecek` çarpışınca skor 1 artar.\n\n```\n1  oyun başlayınca\n2      haritayı yükle: [ova]\n3      kedi oluştur ve sütun [1] satır [4] karosuna koy\n4      kedi oyuncu tuşlarıyla hareket etsin\n5      kamera [kedi] sprite'ını takip etsin\n```\n\nHata nedir?",
+      "options": [
+        "Elma karolarını Yiyecek sprite'ına çeviren blok yok",
+        "Satır 5'te kamera yanlış",
+        "Kedi sütun 1'e konmamalı",
+        "Harita adı yanlış"
+      ],
+      "answer": 0,
+      "explanation": "Çarpışma olayı Yiyecek sprite'ı bekler; elma karoları ise yalnız resimdir. Çevirme bloğu eksik olduğu için olay hiç tetiklenmez. Kamera ve kedi çalışıyor, harita da yüklenmiş.",
+      "skills": [
+        "oyun-karo-sprite",
+        "oyun-hata-ayiklama"
+      ]
+    },
+    {
+      "id": "m11h3d14-q4",
+      "kind": "predict-output",
+      "prompt": "Ova 30 karo genişliğinde. Bloklarda kamera bloğu yok:\n\n```\nharitayı yükle: [ova]\nkedi sütun [1] satır [4] karosuna koy\nkedi oyuncu tuşlarıyla hareket etsin\n```\n\nOyuncu kediyi sütun 12 karosuna kadar (x = 200 piksel) yürütüyor. Ekranda ne görünür?",
+      "options": [
+        "Kamera kediyi kendiliğinden izler",
+        "Kedi sütun 9'da durur",
+        "Kamera kıpırdamaz (x = 0); kedi 160 pikselden sonra ekranın sağından çıkıp görünmez olur",
+        "Harita küçülür"
+      ],
+      "answer": 2,
+      "explanation": "Kamera takip bloğu olmadan sabit kalır ve ekran dünyanın ilk 160 pikselini gösterir. Kedi 200 pikselde ekranın dışındadır. Kamerayı izleme işi kendiliğinden yapılmaz; harita da küçülmez.",
+      "skills": [
+        "oyun-kamera",
+        "oyun-hata-ayiklama"
+      ]
+    },
+    {
+      "id": "m11h3d14-q5",
+      "kind": "mcq",
+      "prompt": "Elma karolarını neden `Yiyecek` sprite'larına çeviriyoruz?",
+      "options": [
+        "Karolar renkli olmadığı için",
+        "Kamera yalnız sprite'ları gösterir",
+        "Haritayı küçültmek için",
+        "Sprite'lar çarpışma olayına katılabilir, hareket edebilir ve silinebilir; karo yalnız haritadaki bir resimdir"
+      ],
+      "answer": 3,
+      "explanation": "Sprite olan elma toplama olayına katılır, hareket ettirilebilir ve silinebilir. Renk ya da kameranın neyi gösterdiği çevirmenin nedeni değildir; harita da çevirmeyle küçülmez, yalnız elma karoları boşalır.",
+      "skills": [
+        "oyun-karo-sprite"
+      ]
+    }
+  ]
+}

@@ -19,7 +19,7 @@ export const h3d5: MikroActivity = {
       if (!d) return false
       const a = d.device.log.filter((e) => e.kind === 'input' && e.key === 'button:A:press').length
       return a >= 3 && d.runtime.vars.get('mod') === 0 && usedTypes(c.ws).has('math_modulo')
-    }, { hint: "A bloğu: 'mod değerini (mod + 1) ÷ 3 işleminin kalanı yap'." }),
+    }, { hint: "Sanal kartta A düğmesine üç kez kısa bas. A bloğu: 'mod değerini (mod + 1) ÷ 3 işleminin kalanı yap'." }),
   ],
   solution: () => withVars(project('Çevre istasyonu', [
     onStart(setVar('mod', 0)),

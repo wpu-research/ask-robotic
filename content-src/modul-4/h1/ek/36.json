@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Ultrasonik ses",
+      "definition": "İnsan kulağının duyamayacağı kadar yüksek frekanslı ses; HC-SR04 40 kHz kullanır.",
+      "example": "Sensör 40 kHz'lik kısa bir ses demeti yollar ve yankısını dinler.",
+      "pitfall": "Sensörün mesafeyi doğrudan \"bildiğini\" sanmak; o yalnızca bir süre ölçer."
+    },
+    {
+      "term": "TRIG ve ECHO",
+      "definition": "TRIG karttan sensöre \"ölç\" komutudur; ECHO sensörden karta yankı gelene kadar HIGH kalan bacaktır.",
+      "example": "TRIG kısa HIGH alınca ses çıkar; ECHO yankı dönene dek HIGH tutulur.",
+      "pitfall": "İki bacağın rolünü karıştırmak: TRIG'i giriş, ECHO'yu çıkış sanmak."
+    },
+    {
+      "term": "Gidiş-dönüş süresi",
+      "definition": "ECHO'nun HIGH kaldığı süre; sesin nesneye gidip geri gelmesi için geçen toplam süredir.",
+      "example": "ECHO 5830 µs HIGH kaldıysa ses 5830 µs boyunca yolda olmuştur.",
+      "pitfall": "Süreyi tek yön sanıp ikiye bölmeyi unutmak: mesafe iki kat çıkar."
+    },
+    {
+      "term": "Mesafe formülü",
+      "definition": "mesafe (cm) = süre (µs) × 0,0343 / 2; yaklaşık olarak süre / 58 de aynı sonucu verir.",
+      "example": "2915 µs × 0,0343 / 2 yaklaşık 50 cm eder.",
+      "pitfall": "343 m/s değerini birim çevirmeden cm/µs formülüne koymak."
+    },
+    {
+      "term": "Ses hızı ve sıcaklık",
+      "definition": "Ses hızı sıcaklıkla artar: c ≈ 331,3 + 0,606 × T (m/s, T: °C).",
+      "example": "0 °C'de c = 331,3 m/s; sabit 343 m/s varsayan program 100 cm'yi yaklaşık 103,5 cm okur.",
+      "pitfall": "Sıcaklığın etkisini hiç düşünmemek: soğuk garajda ölçüm birkaç santimetre kayabilir."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d36-q1",
+      "kind": "numeric",
+      "prompt": "ECHO bacağı 3500 µs boyunca HIGH kaldı. Ses hızını 0,0343 cm/µs alarak nesnenin mesafesi kaç santimetredir? (En yakın tam sayıya yuvarla.)",
+      "answer": 60,
+      "tolerance": 0.5,
+      "unit": "cm",
+      "explanation": "Mesafe = 3500 × 0,0343 / 2 = 60,0 cm. 3500 × 0,0343 = 120,05 değeri gidiş-dönüş yoludur; ikiye bölmeden bırakırsan 120 cm bulursun ve bu yanlıştır.",
+      "skills": [
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d36-q2",
+      "kind": "numeric",
+      "prompt": "Nesne sensörden 150 cm uzakta. ECHO yaklaşık kaç mikrosaniye HIGH kalır? (0,0343 cm/µs ya da 58 µs/cm ile hesaplayabilirsin.)",
+      "answer": 8746,
+      "tolerance": 50,
+      "unit": "µs",
+      "explanation": "Ses 150 cm gidip 150 cm döner, toplam 300 cm yol alır. Süre = 300 / 0,0343 yaklaşık 8746 µs. Yalnız 150 cm'yi kullanırsan yarısını, yani yaklaşık 4373 µs'yi bulursun; bu gidiş-dönüşü unutmaktır.",
+      "skills": [
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d36-q3",
+      "kind": "mcq",
+      "prompt": "Süreyi santimetreye çeviren formülde sonucu neden ikiye böleriz?",
+      "options": [
+        "Sensör iki ayrı nesneyi aynı anda ölçer",
+        "Ölçülen süre sesin gidiş ve dönüş yolunu içerir, mesafe ise yalnız gidiş yoludur",
+        "Ses havada yarı hızla gider",
+        "ECHO bacağı süreyi iki kat uzun gösterir"
+      ],
+      "answer": 1,
+      "explanation": "Ses nesneye gider ve geri döner; ECHO bu iki yolun toplam süresince HIGH kalır. Nesneye uzaklık yalnız gidiş yoludur, bu yüzden ikiye bölünür. Ses hızı yarıya düşmez; sensör de süreyi kendiliğinden iki katına çıkarmaz.",
+      "skills": [
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d36-q4",
+      "kind": "predict-output",
+      "prompt": "Hava 0 °C iken nesne gerçekte 100 cm uzaktadır, ama program sensörün 343 m/s ile çalıştığını varsayıyor. Bu kod çalışınca Serial Monitor'a ne yazılır?\n\n```\nfloat c = 331.3 + 0.606 * 0;       // 0 °C\nfloat okunan = 100.0 * 343.0 / c;\nSerial.println(okunan, 1);\n```",
+      "options": [
+        "96.5",
+        "100.0",
+        "103.5",
+        "106.2"
+      ],
+      "answer": 2,
+      "explanation": "0 °C'de ses 331,3 m/s ile gider, yani 343 m/s'den yavaştır. Gerçekte ses daha geç döner ama program onu 343 m/s ile hesapladığı için mesafeyi büyük bulur: 100 × 343 / 331,3 yaklaşık 103,5. 96,5 sıcak havada (40 °C) çıkardı.",
+      "skills": [
+        "sens-sound-speed"
+      ]
+    },
+    {
+      "id": "m4h1d36-q5",
+      "kind": "find-bug",
+      "prompt": "Bir öğrenci 5830 µs'lik süreden mesafeyi hesaplamak istiyor ama sonuç santimetre değil, anlamsız bir sayı çıkıyor. Hatalı satır hangisi?\n\n```\nunsigned long sure = 5830;            // µs\nfloat cm = sure * 343.0 / 2.0;\nSerial.println(cm);\n```",
+      "options": [
+        "unsigned long sure = 5830;",
+        "float cm = sure * 343.0 / 2.0;",
+        "Serial.println(cm);"
+      ],
+      "answer": 1,
+      "explanation": "343 m/s değeri cm/µs'ye çevrilmeden kullanılmış. Doğru çarpan 0,0343 cm/µs'dir: sure * 0.0343 / 2.0 yaklaşık 100 cm verir. Dönüşü atlayınca sonuç yaklaşık 10 000 kat büyür. Diğer iki satır doğrudur.",
+      "skills": [
+        "sens-ultrasonic",
+        "prog-debug"
+      ]
+    }
+  ]
+}
