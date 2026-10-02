@@ -83,7 +83,7 @@ const walk3: Activity = {
         const end = simulate(p, { press: 'flag', ms: 15000 }).snapshot.sprites.find((s) => s.id === start.id)
         return !!end && dist(start, end) >= 60
       },
-      hint: 'İleri bloklarının adım sayısını − ve + ile artır, sonra 🏁 Başlat\'a bas.',
+      hint: 'İleri bloğundaki sayıya dokunup daha büyük bir sayı yaz, sonra 🏁 Başlat\'a bas.',
     },
   ],
   solution: () => {
@@ -261,7 +261,8 @@ const debug: Activity = {
       'cat', CAT_START.x, CAT_START.y,
       // Hata 1: tekrar sayısı eksik (3 olmalı). Hata 2: yanlış dönüş yönü (Sola dön olmalı).
       script(B('flag'), B('repeat', 2, [B('forward', 3)]), B('turnRight', 90)),
-      // Hata 3: başlatma bloğu yok, betik hiç çalışmaz.
+      // Hata 3: başlatma bloğu yok, betik hiç çalışmaz. Çözüm: bu bloğu ana betiğin Sola dön bloğunun altına yapıştırmak
+      // (bayrak eklemek bloğu ana betikle aynı anda, başlangıç yönüyle çalıştırır; silmek yıldıza varmayı engeller).
       script(B('forward', 8)),
     )
     p.pages[0].sprites = [cat, mkSprite('star', STAR_POS.x, STAR_POS.y)]
@@ -286,7 +287,7 @@ const debug: Activity = {
       id: 'no-dead',
       text: 'Çalışmayan betik kalmasın: her betik bir başlatma bloğuyla başlasın.',
       check: (p) => p.pages.every((pg) => pg.sprites.every((s) => s.scripts.every(scriptIsRunnable))),
-      hint: 'Başlatma bloğu olmayan betik hiç çalışmaz. Ona Yeşil bayrak ekle ya da betiği sil.',
+      hint: 'Başlatma bloğu olmayan betik hiç çalışmaz. Ona Yeşil bayrak koyarsan ana betikle aynı anda başlar ve kedi yukarı değil sağa gider; betiği silersen kedi yıldıza varamaz. İleri 8 bloğunu ana betiğin Sola dön bloğunun altına yapıştır.',
     },
   ],
   solution: () => {
@@ -373,7 +374,7 @@ const robotGame: Activity = {
         const star = snap.sprites.find((s) => s.character === 'star')
         return !!star && snap.sprites.some((s) => s.character === 'robot' && dist(s, star) <= 36)
       },
-      hint: 'Robot önce sağa gitmeli, sonra Sağa dön ile aşağı bakıp yürümeli. İleri bloklarının adım sayısını − ve + ile ayarla.',
+      hint: 'Robot önce sağa gitmeli, sonra Sağa dön ile aşağı bakıp yürümeli. İleri bloğundaki sayıya dokunup yeni sayıyı yaz.',
     },
     {
       id: 'order',
@@ -468,7 +469,7 @@ const repeatLesson: Activity = {
       id: 'short',
       text: `Betiği kısalt: Yeşil bayrak dahil en çok ${MAX_REPEAT_BLOCKS} blok kalsın.`,
       check: (p) => countBlocks(p) <= MAX_REPEAT_BLOCKS,
-      hint: 'Fazla kopyaları × ile sil ya da sürükleyip paletin üzerine bırak.',
+      hint: 'Fazla blokları sürükleyip sağ alttaki çöp kutusuna bırak.',
     },
   ],
   solution: () => {

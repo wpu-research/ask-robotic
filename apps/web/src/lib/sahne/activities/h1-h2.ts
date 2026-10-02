@@ -15,7 +15,7 @@ export const A_1_1: SahneActivity = {
   scenario: [{ do: 'seconds', s: 6 }],
   goals: [
     { id: 'kartlar', label: 'Dansında en az 6 komut kartı var', hint: 'Adım at, dön, alkış kartlarını bayrağın altına sırayla tutturup 6 kart yap.', kind: 'custom', test: (r) => commandCount(r.project) >= 6 },
-    { id: 'adim-alkis', label: '"Adım at" ve "alkış" (ses çal) kartlarını kullandın', kind: 'usesBlocks', types: ['sh_move', 'sh_play'] },
+    { id: 'adim-alkis', label: '"Adım at" ve "alkış" (… sesini çal) kartlarını kullandın', kind: 'usesBlocks', types: ['sh_move', 'sh_play'] },
     { id: 'don', label: '"Dön" kartını kullandın', kind: 'usesBlocks', types: ['sh_turn_r', 'sh_turn_l'], mode: 'any' },
     { id: 'dans', label: 'Bayrağa basınca Robot dans ediyor (yer değiştiriyor ve alkışlıyor)', hint: 'Bloklar bayrak bloğuna gerçekten tutturulmuş mu?', kind: 'moved', sprite: 'robot', min: 30 },
     { id: 'tekrar', label: '"3 kere tekrarla: adım, alkış" yaptın', hint: 'Kontrol\'den "tekrarla" bloğunu al, içine adım ve alkışı koy.', kind: 'event', name: 'sound', min: 3 },
@@ -54,7 +54,7 @@ export const A_1_2: SahneActivity = {
 export const A_2_1: SahneActivity = {
   id: 'scratch:2:1',
   title: 'Karakter yürüsün',
-  intro: 'Kedinin iki kostümü var: biraz farklı iki resim. Yeşil bayrağın altına "sonraki kostüm" ve "bekle" bloklarını koy, bayrağa bas. Sonra bekleme süresini 0,05 ve 1 saniye yapıp farkı gör.',
+  intro: 'Kedinin iki kostümü var: biraz farklı iki resim. Yeşil bayrağın altına "sonraki kostüm" ve "bekle" bloklarını koy, bayrağa bas. Sonra bekleme süresini 0,1 ve 1 saniye yapıp farkı gör (sahne saniyede 30 kare çizer; 0,1 saniye 3 karedir).',
   allowedBlocks: allow('sh_when_flag', 'sh_next_costume', 'sh_costume', 'sh_wait', 'sh_move', 'sh_repeat', 'sh_forever'),
   starter: () => makeProject('Canlı karakter', [{ id: 'kedi', name: 'Kedi', char: 'kedi' }], { backdrops: ['gokyuzu'] }),
   // yeşil bayrağa art arda basmak da (tek "sonraki kostüm" ile) kostümü üç kez değiştirir
@@ -66,7 +66,7 @@ export const A_2_1: SahneActivity = {
     { id: 'yuruyor', label: 'Karakter yürüyor: kostüm en az 3 kez değişti', hint: 'Bayrağa art arda bas ya da Kontrol\'den "tekrarla" bloğunu kullan.', kind: 'event', name: 'costume', min: 3 },
     { id: 'hizli', label: 'Deney: bekleme süresini 0,1 saniye ya da daha kısa yaptın', kind: 'custom', optional: true, test: (r) => waitValues(r.project).some((v) => v <= 0.1) },
   ],
-  solution: () => makeProject('Canlı karakter', [{ id: 'kedi', name: 'Kedi', char: 'kedi', blocks: [flag([repeat(10, [b('sh_next_costume'), wait(0.05)])])] }], { backdrops: ['gokyuzu'] }),
+  solution: () => makeProject('Canlı karakter', [{ id: 'kedi', name: 'Kedi', char: 'kedi', blocks: [flag([repeat(10, [b('sh_next_costume'), wait(0.1)])])] }], { backdrops: ['gokyuzu'] }),
 }
 
 function waitValues(p: ReturnType<typeof makeProject>): number[] {

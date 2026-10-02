@@ -42,9 +42,9 @@ export const A_5_1: SahneActivity = {
     { do: 'collide', a: 'sepet', b: 'elma' }, { do: 'checkpoint', name: 'yakala' },
   ],
   goals: [
-    { id: 'sag', label: 'Sağ ok tuşuyla sepet sağa gidiyor', hint: '"sağ ok tuşuna basılı mı?" bloğunu "eğer" içinde kullan ve x\'i artır.', kind: 'prop', sprite: 'sepet', prop: 'x', op: 'gt', value: 5, at: 'sag' },
+    { id: 'sag', label: 'Sağ ok tuşuyla sepet sağa gidiyor', hint: '"sağ ok tuşuna basılı mı?" bloğunu "eğer" içinde kullan ve x\'i 10 değiştir (sola için -10).', kind: 'prop', sprite: 'sepet', prop: 'x', op: 'gt', value: 5, at: 'sag' },
     { id: 'sol', label: 'Sol ok tuşuyla sepet sola gidiyor', kind: 'custom', test: (r) => { const a = cpSprite(r, 'sag', 'sepet'), c = cpSprite(r, 'sol', 'sepet'); return !!a && !!c && c.x < a.x - 5 } },
-    { id: 'dusme', label: 'Elma yukarıdan aşağı iniyor', hint: 'Elmanın "sonsuza kadar" döngüsünde y\'yi azalt.', kind: 'prop', sprite: 'elma', prop: 'y', op: 'lt', value: 100, at: 'dusme' },
+    { id: 'dusme', label: 'Elma yukarıdan aşağı iniyor', hint: 'Elmanın "sonsuza kadar" döngüsünde y\'yi -5 değiştir.', kind: 'prop', sprite: 'elma', prop: 'y', op: 'lt', value: 100, at: 'dusme' },
     { id: 'yere', label: 'Elma yere inince tekrar yukarıdan başlıyor', hint: 'y konumu -150\'den küçükse y\'yi 150 yap.', kind: 'prop', sprite: 'elma', prop: 'y', op: 'gt', value: 100, at: 'yer' },
     { id: 'yakala', label: 'Elma sepete değince tekrar yukarıdan başlıyor', kind: 'prop', sprite: 'elma', prop: 'y', op: 'gt', value: 100, at: 'yakala' },
     { id: 'sonsuz', label: 'Hareket kodu "sonsuza kadar" döngüsünün içinde', kind: 'usesBlocks', types: ['sh_forever'] },
@@ -62,7 +62,7 @@ const altinSpec = (blocks: BlockNode[] = []): SpriteSpec => ({ id: 'altin', name
 export const A_5_2: SahneActivity = {
   id: 'scratch:5:2',
   title: 'Skor tutalım',
-  intro: 'Bilgisayar yakaladığın elmaları nerede tutar? Bir DEĞİŞKENDE: üzerine isim yazılı bir kutu. "Değişken oluştur" ile "skor" yap, bayrakta skoru 0 yap, elma sepete değince 1 artır. Bonus: altın elma skoru 5 artırsın.',
+  intro: 'Bilgisayar yakaladığın elmaları nerede tutar? Bir DEĞİŞKENDE: üzerine isim yazılı bir kutu. "Değişken oluştur" ile "skor" yap, bayrakta "skor = 0 yap", elma sepete değince "skor değişkenini 1 kadar değiştir". Bonus: altın elma skoru 5 kadar değiştirsin.',
   allowedBlocks: allow(...OYUN_BLOKLARI, 'degiskenler'),
   starter: () => makeProject('Yakalama oyunu', [sepetSpec(sepetKodu()), elmaSpec(elmaKodu()), altinSpec()], { backdrops: BACK }),
   scenario: [
@@ -97,7 +97,7 @@ const bittiMi = (r: RunReport): boolean => r.session.engine.sayLog.filter((x) =>
 export const A_6_1: SahneActivity = {
   id: 'scratch:6:1',
   title: 'Can, süre ve oyun bitti',
-  intro: 'Oyun sonsuza kadar sürmesin! "can" (3 ile başlasın) ve "süre" (30 ile başlasın) değişkenleri yap. Elma yere düşünce canı azalt, can bitince ya da süre dolunca "Oyun bitti" de ve "hepsini dur". Süre için 1 saniye bekleyip süreyi 1 azalt.',
+  intro: 'Oyun sonsuza kadar sürmesin! "can" (3 ile başlasın) ve "süre" (30 ile başlasın) değişkenleri yap. Elma yere düşünce can değişkenini -1 kadar değiştir; "can < 1" olunca ya da süre dolunca "Oyun bitti" de ve "hepsini dur" (sonsuza kadar döngüsünü tek başına durduran blok yok). Süre için 1 saniye bekleyip süre değişkenini -1 kadar değiştir.',
   allowedBlocks: allow(...OYUN_BLOKLARI, 'degiskenler'),
   starter: () => makeProject('Yakalama oyunu', [
     sepetSpec(sepetKodu()),
@@ -141,7 +141,7 @@ export const A_6_1: SahneActivity = {
 export const A_6_2: SahneActivity = {
   id: 'scratch:6:2',
   title: 'Rastgele ve klonlar',
-  intro: 'Her elma aynı yerden düşerse sıkıcı olur. Başlarken x konumunu -200 ile 200 arasında RASTGELE yap. Aynı anda birçok elma düşsün: "kendimin klonunu oluştur" ile her saniye bir klon üret; klon olarak başlayınca elma aşağı insin, sepete değince ya da yere inince kendini silsin.',
+  intro: 'Her elma aynı yerden düşerse sıkıcı olur. Başlarken x konumunu -200 ile 200 arasında RASTGELE yap. Aynı anda birçok elma düşsün: "kendimin klonunu oluştur" ile her saniye bir klon üret; klon olarak başlayınca elma aşağı insin, sepete değince ya da yere inince "bu klonu sil".',
   allowedBlocks: allow(...OYUN_BLOKLARI, 'degiskenler', 'sh_create_clone', 'sh_when_clone', 'sh_delete_clone', 'sh_show', 'sh_hide', 'sh_set_x', 'sh_set_y', 'sh_goto_xy', 'sh_repeat_until'),
   starter: () => makeProject('Yakalama oyunu', [
     sepetSpec(sepetKodu()),

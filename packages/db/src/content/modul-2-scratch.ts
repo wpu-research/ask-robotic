@@ -39,7 +39,7 @@ Etkinlik penceresindeki **Sahne Atölyesi**'ni kullan. Proje bu tarayıcıda kay
 1. Ekranın bölümlerini bul: **Sahne** (sağ üst), **Sprite listesi** (sağ alt), **Blok paleti** (sol), **Kod alanı** (orta).
 2. Kedi sprite'ını silip yeni bir sprite seç. Kodu **Kod** sekmesinde, karakterin görünüşünü **Kostümler** sekmesinde yaparsın; ikisine de bak.
 3. Sahneye bir **arka plan** ekle.
-4. Olaylar (sarı) kategorisinden **yeşil bayrak tıklandığında** bloğunu kod alanına sürükle.
+4. Olaylar (sarı) kategorisinden **🏁 tıklanınca** (yeşil bayrak) başlığını kod alanına sürükle.
 5. Altına Hareket (mavi) kategorisinden bir hareket bloğu tutturup yeşil bayrağa bas.
 6. **10 blok challenge:** 10 farklı blok kullanarak sprite'ına bir şey yaptır. Kaçını yapabildin?
 
@@ -62,7 +62,7 @@ Projeni paylaşırken (dosya olarak indirip) **gerçek adını, okulunu, adresin
 2. Görünüm (mor) kategorisinden **sonraki kostüm** bloğunu bul.
 3. Yeşil bayrak bloğunun altına şunu kur: *sonraki kostüm → 0,2 saniye bekle*.
 4. Çalıştır. Karakter yürüyor gibi görünüyor mu?
-5. Bekleme süresini 0,05 ve 1 saniye yap. Hızlandıkça ve yavaşladıkça ne değişiyor?
+5. Bekleme süresini 0,1 ve 1 saniye yap. Hızlandıkça ve yavaşladıkça ne değişiyor? (Sahne saniyede 30 kez çizilir; 0,1 saniye 3 karedir, yani saniyede 10 değişim. Bundan çok daha kısa beklemelerde fark gözle seçilmez.)
 
 ## Hata ayıklama ipucu
 Karakter hiç kıpırdamıyorsa: yeşil bayrak bloğuna bloklar **gerçekten tutturulmuş** mu? Bloğun yan yana durması yetmez.`,
@@ -76,7 +76,7 @@ Karakter hiç kıpırdamıyorsa: yeşil bayrak bloğuna bloklar **gerçekten tut
 1. Önceki projene devam et. Kontrol (turuncu) kategorisinden **sonsuza kadar** bloğunu al.
 2. Kostüm değiştirme ve hareket bloklarını bunun **içine** al.
 3. Karakter ekranın kenarına çarpınca ne oluyor? **kenara değince sek** bloğunu ekle.
-4. Şimdi **tekrar (10 kere)** bloğuyla sonsuz yerine sayılı bir döngü dene.
+4. Şimdi **10 kere tekrarla** bloğuyla sonsuz yerine sayılı bir döngü dene.
 5. İki sprite ekle, ikisi de aynı anda animasyon yapsın. İki ayrı kod alanında yeşil bayrakla başla.
 
 ## Meydan okuma
@@ -98,10 +98,12 @@ Anahtar kavram: **döngü** ve **paralellik** (iki karakter aynı anda). Çocuk 
           problem: 'Bir piyano tuşuna basınca ses çıkar. Bunu klavyenle sen nasıl yapabilirsin?',
           contentMd: `## Etkinlik
 1. Olaylar (sarı) kategorisinden **... tuşuna basılınca** bloğunu al.
-2. Altına Ses (pembe) kategorisinden bir **ses çal** bloğu tutturup tuşu seç (örneğin **a**).
+2. Altına Ses (pembe) kategorisinden bir **… sesini çal** bloğu tutturup (ses listesinden bir ses seç) tuşu seç (örneğin **a**).
 3. Aynı mantıkla **s**, **d**, **f** tuşlarına başka sesler bağla.
-4. Her tuş için sprite'ın **rengini** değiştir. Görsel ve ses birlikte çalsın.
-5. Fareyle **sprite'a tıklayınca** ses çalan bir düğme de ekle.
+4. Her tuş için sprite'ın rengini değiştir (Görünüm kategorisinde **renk efektini değiştir**). Görsel ve ses birlikte çalsın.
+5. Fareyle **bu sprite tıklanınca** başlığıyla ses çalan bir düğme de ekle.
+
+Not: Tuşu basılı tutmak tek başına başlığı sürekli başlatmaz; başlık tuşa basma olayıyla (ve klavyenin tekrar olaylarıyla) çalışır. Tuş basılı olduğu sürece sürekli bir şey yapılsın istiyorsan Algılama kategorisindeki **… tuşuna basılı mı?** bloğunu kullan (Ders 9).
 
 ## Ebeveyn / öğretmen notu
 Kavram: **olay** (event). Program, bir şeyin olmasını bekliyor. Çocuk "yeşil bayrağa basmadan da program çalışıyor" fark etsin.`,
@@ -115,11 +117,11 @@ Kavram: **olay** (event). Program, bir şeyin olmasını bekliyor. Çocuk "yeşi
 1. **Plan:** kâğıda çalgının resmini çiz. Kaç tuş? Hangi sesler?
 2. En az **4 tuşlu** bir çalgı yap. Her tuş farklı ses çalsın.
 3. Her tuş için **görsel geri bildirim** ekle: renk değişimi, büyüme, parlama.
-4. Bir sprite'ı ayrı bir **kayıt düğmesi** yap: tıklayınca bir melodi kendiliğinden çalsın (ses çal, bekle, ses çal…).
+4. Bir sprite'ı ayrı bir **kayıt düğmesi** yap: tıklayınca bir melodi kendiliğinden çalsın (… sesini bitene dek çal, … sesini bitene dek çal…).
 5. Bir arkadaşına çaldır, kafası karışan yerleri not et ve düzelt.
 
 ## Meydan okuma
-Çalgıya ses yüksekliğini değiştiren iki tuş ekle (artır / azalt).`,
+Çalgıya ses seviyesini değiştiren iki tuş ekle (**ses seviyesini 10 değiştir** ve **ses seviyesini -10 değiştir**).`,
           question: 'Arkadaşın çalgını kullanırken en çok nerede zorlandı? Ne değiştirdin?',
         },
       ],
@@ -134,7 +136,7 @@ Kavram: **olay** (event). Program, bir şeyin olmasını bekliyor. Çocuk "yeşi
           problem: 'İki karakter sırayla konuşuyor. Biri bitmeden öbürü konuşmaya başlarsa ne olur?',
           contentMd: `## Etkinlik
 1. İki sprite seç (örneğin bir hayvan ve bir insan) ve bir arka plan.
-2. Birinci sprite: yeşil bayrakta **söyle (2 saniye)** bloğuyla ilk cümleyi söylesin.
+2. Birinci sprite: yeşil bayrakta **Merhaba! de 2 saniye** bloğuyla (Görünüm kategorisi; kutuya ilk cümleni yaz) ilk cümleyi söylesin.
 3. İkinci sprite: aynı bayrakla başlıyor. **2 saniye bekle**, sonra yanıt versin.
 4. Üç satırlık bir konuşma yaz. Beklemeleri **dikkatle** hesapla ki konuşmalar üst üste binmesin.
 5. Konuşmayı **yanlış zamanlamayla** bozup tekrar düzelt. Neyi değiştirdin?
@@ -151,7 +153,7 @@ Kavram: **olay** (event). Program, bir şeyin olmasını bekliyor. Çocuk "yeşi
 1. Olaylar (sarı) kategorisinde **… mesajını yayınla** ve **… mesajını alınca** bloklarını bul.
 2. Önceki hikâyende bekleme bloklarını kaldır. Birinci karakter cümlesini bitirince **"sıra sende"** mesajını yayınlasın.
 3. İkinci karakter **"sıra sende" mesajını alınca** yanıtlasın, sonra yeni bir mesaj yayınlasın.
-4. **Arka plan değiştirme:** mesaj gelince arka planı değiştirerek ikinci sahneyi başlat.
+4. **Arka plan değiştirme:** mesaj gelince **sonraki arka plan** (ya da **arka planı … yap**) bloğuyla ikinci sahneyi başlat.
 5. Hikâyenin **başlangıcı, olayı ve sonu** olsun: en az 3 sahne.
 
 ## Ebeveyn / öğretmen notu
@@ -173,25 +175,27 @@ Bir arkadaşla "bunu sen yaz, ben onunla konuşayım" şeklinde hikâyeyi böl: 
           problem: 'Oyunda bir karakteri klavyeyle yönetip düşen bir nesneyi yakalamak istiyorsun. Neler gerekiyor?',
           contentMd: `## Etkinlik
 1. İki sprite: **oyuncu** (kova/sepet) ve **nesne** (elma).
-2. Oyuncu: **sonsuza kadar** içinde, **sağ ok** tuşuna basılıysa x'i 10 artır, **sol ok** tuşuna basılıysa 10 azalt (Algılama ve Kontrol kategorileri).
-3. Nesne: üstte başlasın, **sonsuza kadar** aşağı doğru insin (y'yi azalt).
-4. Nesne **oyuncuya değince** veya yere inince tekrar yukarı çıksın.
+2. Oyuncu: **sonsuza kadar** içinde, **eğer sağ ok tuşuna basılı mı? ise** **x'i 10 değiştir**; **eğer sol ok tuşuna basılı mı? ise** **x'i -10 değiştir** (Kontrol ve Algılama kategorileri).
+3. Nesne: üstte başlasın, **sonsuza kadar** aşağı doğru insin (**y'yi -5 değiştir**).
+4. Nesne **kova değiyor mu?** (Algılama) koşulu doğru olunca veya yere inince tekrar yukarı çıksın.
 5. Oyuncuyla nesneyi çarpıştırıp ne olduğunu gör.
 
 ## Hata ayıklama ipucu
-Oyuncu hareket etmiyorsa tuş kontrolünü sonsuz döngünün **içine** koyduğundan emin ol.`,
-          question: '"Tuşuna basıldığında" ile "tuşuna basılı mı?" arasındaki fark ne? Hangisi oyuncuyu sürekli hareket ettirir?',
+Oyuncu hareket etmiyorsa tuş kontrolünü sonsuz döngünün **içine** koyduğundan emin ol.
+
+Not: **… tuşuna basılınca** başlığı tuşu basılı tutmakla tek başına sürekli başlamaz; başlık tuşa basma olayıyla (klavyenin tekrar olaylarıyla) çalışır. Düzgün, kesintisiz hareket için sonsuza kadar içinde **… tuşuna basılı mı?** koşulunu kullan.`,
+          question: '"tuşuna basılınca" ile "tuşuna basılı mı?" arasındaki fark ne? Hangisi oyuncuyu sürekli hareket ettirir?',
         },
         {
           title: 'Skor: değişkenler',
           durationMin: 30,
           problem: 'Oyunda kaç elma yakaladığını hatırlaması gerekiyor. Bilgisayar sayıyı nerede tutar?',
           contentMd: `## Etkinlik
-1. Değişkenler (turuncu-kırmızı) kategorisinde **Bir değişken oluştur** düğmesine bas, adı **skor** olsun.
-2. Yeşil bayrakta **skoru 0 yap**.
-3. Elma oyuncuya değince **skoru 1 artır** ve elmayı yukarıdan yeniden başlat.
-4. Skor sahnede görünüyor mu? Görünüyorsa çalıştır, yakaladıkça artıyor mu?
-5. Bonus: altın elma yakalayınca **skor 5 artsın**.
+1. Değişkenler (turuncu) kategorisinde **Değişken oluştur** düğmesine bas, adı **skor** olsun.
+2. Yeşil bayrak başlığının altında **skor = 0 yap** bloğunu kullan.
+3. Elma oyuncuya değince **skor değişkenini 1 kadar değiştir** ve elmayı yukarıdan yeniden başlat.
+4. Skor sahnede görünüyor mu? Görünmüyorsa **skor değişkenini göster** bloğunu kullan ya da değişkenin yanındaki kutuyu işaretle. Çalıştır: yakaladıkça artıyor mu?
+5. Bonus: altın elma yakalayınca **skor değişkenini 5 kadar değiştirsin**.
 
 ## Meydan okuma
 Skor 10 olunca "Kazandın!" desin.
@@ -212,13 +216,13 @@ Kavram: **değişken** = üzerine isim yazılı bir kutu. Çocuğa "kutunun içi
           problem: 'Oyunun sonsuza kadar sürmesini istemiyorsun. Oyun ne zaman bitmeli, bitince ne olmalı?',
           contentMd: `## Etkinlik
 1. İki yeni değişken: **can** (3 ile başlasın) ve **süre** (30 ile başlasın).
-2. Elma yere düşünce **canı 1 azalt**.
-3. **Eğer can = 0 ise** sonsuz döngüyü durdur ve "Oyun bitti" de (Kontrol ve İşlemler kategorileri).
-4. Süre için sonsuz döngünün içinde 1 saniye bekleyip süreyi 1 azalt. 0 olunca oyun bitsin.
-5. Oyun bitince **tüm sprite'lar** durmalı. Hangi blok bunu yapıyor?
+2. Elma yere düşünce **can değişkenini -1 kadar değiştir**.
+3. **Eğer can < 1 ise** "Oyun bitti" de ve **hepsini dur** (Kontrol ve İşlemler kategorileri). Sonsuza kadar döngüsünü tek başına durduran bir blok yoktur: **hepsini dur** bütün betikleri, **bu betiği dur** ise yalnız çalıştığı betiği durdurur.
+4. Süre için sonsuz döngünün içinde 1 saniye bekle, sonra **süre değişkenini -1 kadar değiştir**. 0 olunca oyun bitsin.
+5. Oyun bitince **tüm sprite'lar** durmalı. Hangi blok bunu yapıyor? (İpucu: **hepsini dur**.)
 
 ## Hata ayıklama ipucu
-"Oyun bitti" yazısı hiç çıkmıyorsa koşulda **=** yerine **<** kullanmayı dene (can 0'ın altına da düşebilir).`,
+"Oyun bitti" yazısı hiç çıkmıyorsa koşulda **can = 0** yerine **can < 1** kullan: can 0'ı atlayıp eksiye geçerse "=" hiç doğru olmaz, "<" ise yine yakalar. Bitiş kontrolünü de sonsuza kadar döngüsünün **içine** koy.`,
           question: 'Oyunu bitirmek için hangi iki koşulu kullandın? İkisi aynı anda doğru olursa ne olur?',
         },
         {
@@ -228,7 +232,7 @@ Kavram: **değişken** = üzerine isim yazılı bir kutu. Çocuğa "kutunun içi
           contentMd: `## Etkinlik
 1. **Rastgele:** İşlemler kategorisindeki **... ile ... arasında rastgele sayı seç** bloğunu bul. Elma başlarken x konumunu **−200 ile 200 arasında rastgele** yap.
 2. **Klon:** Kontrol kategorisinde **kendimin klonunu oluştur** bloğunu bul. Elmanın ana kodunda, her saniyede bir klon üret.
-3. **Klon olarak başladığımda** bloğuna klonun davranışını yaz: aşağı insin, oyuncuya değince skor artsın, sonra kendini sil.
+3. **klon olarak başlayınca** başlığının altına klonun davranışını yaz: aşağı insin, oyuncuya değince skor artsın, sonra **bu klonu sil**.
 4. Birkaç saniyede kaç elma düşüyor? Sayıyı ayarla.
 
 ## Meydan okuma
@@ -250,7 +254,7 @@ Klonlar zor bir kavram: aynı sprite'ın çoğaltılmış kopyaları. Çocuk zor
           problem: 'Aynı 5 bloğu programın her yerinde tekrar tekrar yazıyorsun. Onları tek bir blok olarak adlandırıp çağırabilsen?',
           contentMd: `## Etkinlik
 1. Bloklarım (pembe) kategorisinde **Bir blok yap** düğmesine bas, adı **zıpla** olsun.
-2. Tanım bloğunun altına şunu kur: *y'yi 20 artır → 0,1 saniye bekle → y'yi 20 azalt*.
+2. Tanım bloğunun altına şunu kur: *y'yi 20 değiştir → 0,1 saniye bekle → y'yi -20 değiştir*.
 3. Ana kodunda **zıpla** bloğunu kullan. Birkaç kez çağır.
 4. Bloğa bir **girdi** ekle (örneğin yükseklik) ve kaç birim zıplayacağını çağırırken belirle.
 5. Şimdi **dans**, **ses** gibi başka bloklar tanımla.
@@ -266,8 +270,8 @@ Kavram: **fonksiyon / soyutlama**. Bir işi bir kez yazıp adıyla çağırmak. 
           contentMd: `## Etkinlik
 1. Değişkenler kategorisinden **Liste oluştur** düğmesine bas, adı **sorular** olsun. İçine 4-5 soru ekle.
 2. Bir ikinci liste **cevaplar** yap, aynı sırayla cevapları yaz.
-3. Bir değişken **sıra** (1 ile başlasın). Sprite **sorular listesinin sıra. öğesini** sorsun (**sor … ve bekle** bloğu).
-4. Cevap **cevaplar listesinin sıra. öğesine** eşitse "Doğru!" de ve skoru artır, değilse "Yanlış" de. Sonra **sıra'yı 1 artır**.
+3. Bir değişken **sıra** (1 ile başlasın). Sprite **sorular listesinin sıra. öğesini** sorsun (**… diye sor ve bekle** bloğu).
+4. Cevap **cevaplar listesinin sıra. öğesine** eşitse "Doğru!" de ve **skor değişkenini 1 kadar değiştir**, değilse "Yanlış" de. Sonra **sıra değişkenini 1 kadar değiştir**.
 5. Liste bittiğinde yarışma sonlansın ve skoru söylesin.
 
 ## Meydan okuma
@@ -307,7 +311,7 @@ Plan, çocuğun "bitmeyen proje" tuzağına düşmesini azaltır. Küçük başl
 2. Bir **test arkadaşı** bul: projeni kullandırırken **ona yardım etme**, sadece izle. Nerede takıldı? Not al.
 3. Notlardan en az **iki şeyi düzelt**.
 4. **Sergi:** projeni aileye/arkadaşlara göster. Anlat: ne yaptın, hangi bloklar seni zorladı, neyi çözdün?
-5. Proje bilgisi (📝) bölümüne **nasıl oynanır** ve **hangi fikirlerden esinlendiğini** yaz. Kişisel bilgi yazma.
+5. Editörün üstündeki **Proje bilgisi** düğmesine bas ve açılan bölüme **nasıl oynanır** ve **hangi fikirlerden esinlendiğini** yaz. Kişisel bilgi yazma.
 
 ## Sırada ne var?
 Sahne Atölyesi'nde ekrandaki karakterleri yönettin. Bir sonraki modülde (Arduino) bir devreyi ve gerçek ışıkları, sensörleri yöneteceksin: aynı mantık, farklı bir dünya.`,

@@ -180,7 +180,7 @@ Yandaki uygulamada kısa bir hikâye yapacaksın. Sayfa şeridinde **+** düğme
 2. Karakterin için **Yeşil bayrak** ile başlayan kısa bir betik yaz: biraz **İleri** git, sonra bir şey **Söyle**.
 3. Sayfa şeridindeki **+** düğmesine bas: yeni, boş bir sayfa (2) eklenir. Arka planını değiştir (örneğin Gece ya da Oda).
 4. 2. sayfada karakter şeridindeki **+** ile bir karakter ekle ve ona **Yeşil bayrak** ile başlayan bir betik yaz: **Söyle** bloğuyla ikinci sahnenin sözünü söylet.
-5. 1. sayfaya dön. Betiğin sonuna **Bitiş** kategorisinden **Sayfaya git** bloğunu ekle; sayfa sayısı **2** olsun.
+5. 1. sayfaya dön. Betiğin sonuna **Bitiş** kategorisinden **Sayfaya git** bloğunu ekle; içine **2** yaz: bu sayı, gidilecek **sayfanın numarasıdır** ("2. sayfaya git").
 6. 1. sayfadayken **🏁 Başlat**'a bas: hikâye birinci sahneden ikinciye geçiyor mu? **↺ Başa al** ile baştan izle.
 
 **Sayfaya git** yeni sayfaya geçer ve o sayfadaki yeşil bayrak betiklerini kendiliğinden başlatır.
@@ -205,7 +205,7 @@ Yandaki uygulamada bu sefer proje **hazır ama bozuk**. Sahnede bir kedi ve uzak
 ## Etkinlik
 1. **🏁 Başlat**'a bas ve kedinin ne yaptığına bak. Yıldıza vardı mı? **↺ Başa al** ile başa dön.
 2. Şimdi dedektif ol: betiklere tek tek bak. Programda **en az üç hata** saklı. Şunlara dikkat et:
-   - Bir betiğin en üstünde başlatma bloğu yok mu? Başlatma bloğu olmayan betik **soluk** görünür ve **Başlat**'a basınca çalışmaz.
+   - Bir betiğin en üstünde başlatma bloğu yok mu? Başlatma bloğu olmayan betik **soluk** görünür ve **Başlat**'a basınca çalışmaz. Dikkat: böyle bir betiğe yeşil bayrak koyarsan ana betikle **aynı anda** başlar ve kendi yönüne göre yürür; kedi yukarı değil sağa gider. Betiği silersen de kedi yıldıza varamaz. Doğru çözüm: bu betiğin bloğunu sürükleyip ana betiğin **Sola dön** bloğunun altına yapıştırmak.
    - Kedi yanlış yöne mi dönüyor? **Sağa dön** mü olmalıydı, **Sola dön** mü?
    - Yeterince yürümüyor mu? **Tekrarla** sayısı ya da **İleri** adımı az olabilir. Sayıya dokunup yeni değer yazabilirsin.
 3. Her düzeltmeden sonra **🏁 Başlat**'a bas. Kedi yıldızın yanına varınca hedef işaretlenir.

@@ -21,7 +21,7 @@ etkinlik artık **Sahne Atölyesi**'nde (dersin etkinlik penceresi) yapılıyor.
 | 6:2 | "**kendimin klonunu oluştur**" | Aynı ("kendimin klonunu oluştur"). Klon bloklarının "Kontrol" kategorisinde olduğu doğru |
 | 7:2 | "**Bir liste oluştur**… listenin **sıra. öğesi**" | "Liste oluştur" düğmesi; blok: "… listesinin … . öğesi". Liste içeriği üstteki **Değişkenler** penceresinden de yazılabilir |
 | 8:1 | "Başkasının projesini **remix**le başlamak istersen orijinal sahibini belirt" | Sanal ortamda remix yok: "Başkasının fikrinden esinlendiysen proje notuna yaz." |
-| 8:2 | "Paylaşırken proje açıklamasına… yaz" | "Proje bilgisi (📝) bölümüne nasıl oynanacağını yaz." (etkinlik hedefi bunu denetliyor) |
+| 8:2 | "Paylaşırken proje açıklamasına… yaz" | "Proje bilgisi düğmesine basıp açılan bölüme nasıl oynanacağını yaz." (etkinlik hedefi bunu denetliyor) |
 | 8:2 "Sırada ne var?" | "Scratch'te ekrandaki karakterleri yönettin." | "Sahne Atölyesi'nde ekrandaki karakterleri yönettin." |
 | Başlık | modül adı 'Scratch ile Kendi Oyununu Yap' | Görev gereği **kalır** (arayüzde editör adı "Sahne Atölyesi") |
 

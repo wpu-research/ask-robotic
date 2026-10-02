@@ -1,6 +1,9 @@
 import type { ModuleContent } from './types'
-import { modul1 } from './modul-1-scratchjr'
-import { modul2 } from './modul-2-scratch'
+import { modul1 as modul1Base } from './modul-1-scratchjr'
+import { modul2 as modul2Base } from './modul-2-scratch'
+import { withExtras } from './extras'
+import { modul1Extras } from './extras/modul-1'
+import { modul2Extras } from './extras/modul-2'
 import { modul3 } from './arduino-temelleri.generated'
 import { modul4 } from './sensorler-ve-projeler.generated'
 import { modul5 } from './robotik.generated'
@@ -10,6 +13,9 @@ import { modul11 } from './oyun-atolyesi.generated'
 
 import type { ComponentGuide } from './types'
 import { parcalar } from './parcalar.generated'
+
+const modul1 = withExtras(modul1Base, modul1Extras)
+const modul2 = withExtras(modul2Base, modul2Extras)
 
 export * from './types'
 export const allComponents: ComponentGuide[] = parcalar

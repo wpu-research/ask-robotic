@@ -203,6 +203,35 @@ describe('etkinliklere özgü davranışlar', () => {
     expect(res.find((g) => g.id === 'reach')!.done).toBe(false)
   })
 
+  it('5.1: başlatmasız İleri 8 betiğine bayrak eklemek hedefi sağlamaz; bloğu Sola dön\'ün altına taşımak sağlar', () => {
+    const a = get('scratchjr:5:1')
+    const fixMain = () => {
+      const p = a.starter()
+      const cat = p.pages[0].sprites.find((s) => s.character === 'cat')!
+      const main = cat.scripts.find((sc) => sc.blocks[0].type === 'flag')!
+      main.blocks[1].value = 3
+      main.blocks[2] = { ...main.blocks[2], type: 'turnLeft' }
+      return { p, cat, main }
+    }
+    // Bayrak eklenen betik ana betikle aynı anda başlar: İleri 8 başlangıç yönüyle (sağa) hesaplanır.
+    const a1 = fixMain()
+    const loose = a1.cat.scripts.find((sc) => sc.blocks[0].type !== 'flag')!
+    loose.blocks.unshift({ id: 'fl', type: 'flag' })
+    const r1 = evaluateGoals(a1.p, a.goals)
+    expect(r1.find((g) => g.id === 'no-dead')!.done).toBe(true)
+    expect(r1.find((g) => g.id === 'reach')!.done).toBe(false)
+    // Betiği silmek de yıldıza vardırmaz.
+    const a2 = fixMain()
+    a2.cat.scripts = [a2.main]
+    expect(evaluateGoals(a2.p, a.goals).find((g) => g.id === 'reach')!.done).toBe(false)
+    // Doğru çözüm: İleri 8'i ana betiğin Sola dön bloğunun altına yapıştır.
+    const a3 = fixMain()
+    const l3 = a3.cat.scripts.find((sc) => sc.blocks[0].type !== 'flag')!
+    a3.main.blocks.push(...l3.blocks)
+    a3.cat.scripts = [a3.main]
+    expect(evaluateGoals(a3.p, a.goals).every((g) => g.done)).toBe(true)
+  })
+
   it('5.2: boş proje hiçbir hedefi sağlamaz; hedefler yaratıcıyı kısıtlamaz (başka bir çözüm de geçer)', () => {
     const a = get('scratchjr:5:2')
     expect(done(a.starter(), a).some(Boolean)).toBe(false)

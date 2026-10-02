@@ -13,7 +13,7 @@ const DANS: ProcDef = { id: 'dans', name: 'dans et', params: [] }
 export const A_7_1: SahneActivity = {
   id: 'scratch:7:1',
   title: 'Kendi bloğunu yap',
-  intro: 'Aynı bloklar programın her yerinde tekrar ediyorsa onlara bir ad ver! Bloklarım\'da "Bir blok yap" de, adı "zıpla" olsun ve "yükseklik" girdisi ekle. Altına: y\'yi yükseklik kadar artır, bekle, geri indir. Sonra ana kodunda birkaç kez çağır; ikinci bir blok da yap (ör. "dans et").',
+  intro: 'Aynı bloklar programın her yerinde tekrar ediyorsa onlara bir ad ver! Bloklarım\'da "Bir blok yap" de, adı "zıpla" olsun ve "yükseklik" girdisi ekle. Altına: y\'yi (yükseklik) değiştir, bekle, sonra y\'yi (0 − yükseklik) değiştir (İşlemler\'deki − bloğu). Sonra ana kodunda birkaç kez çağır; ikinci bir blok da yap (ör. "dans et").',
   allowedBlocks: allow('sh_when_flag', 'sh_when_key', 'sh_change_y', 'sh_set_y', 'sh_wait', 'sh_repeat', 'sh_turn_r', 'sh_turn_l', 'sh_move', 'sh_say', 'sh_say_for', 'sh_play', 'islemler', 'bloklarim'),
   starter: () => makeProject('Bilgi yarışması', [{ id: 'kedi', name: 'Kedi', char: 'kedi', y: 0, sounds: ['ziplama'], blocks: [flag([say('Zıplıyorum!')])] }], { backdrops: ['gokyuzu'] }),
   scenario: [{ do: 'seconds', s: 4 }],
@@ -46,7 +46,7 @@ const autoCorrect = (q: string, s: import('../session').SahneSession): string =>
 export const A_7_2: SahneActivity = {
   id: 'scratch:7:2',
   title: 'Bilgi yarışması',
-  intro: 'Her soruyu ayrı değişkende tutmak yerine LİSTE kullan: "sorular" ve "cevaplar" listeleri yap (4-5 öğe, aynı sırada). "sıra" değişkeniyle sırayla sor; cevap doğruysa "Doğru!" de ve skoru artır, değilse "Yanlış" de. Liste bitince yarışma sona ersin.',
+  intro: 'Her soruyu ayrı değişkende tutmak yerine LİSTE kullan: "sorular" ve "cevaplar" listeleri yap (4-5 öğe, aynı sırada). "sıra" değişkeniyle sırayla sor; cevap doğruysa "Doğru!" de ve skor değişkenini 1 kadar değiştir, değilse "Yanlış" de. Liste bitince yarışma sona ersin.',
   allowedBlocks: allow('sh_when_flag', 'sh_say', 'sh_say_for', 'sh_wait', 'sh_repeat', 'sh_repeat_until', 'sh_if', 'sh_if_else', 'sh_ask', 'sh_answer', 'sh_stop', 'islemler', 'degiskenler'),
   starter: yarismaBaslangic,
   scenario: [

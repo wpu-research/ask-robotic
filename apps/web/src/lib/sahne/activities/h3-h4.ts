@@ -49,7 +49,7 @@ export const A_3_2: SahneActivity = {
     { id: 'tuslar', label: 'En az 4 farklı tuşlu bir çalgı yaptın', kind: 'hats', type: 'sh_when_key', min: 4, distinct: 'K' },
     { id: 'sesler', label: 'Her tuş farklı bir ses çalıyor', kind: 'event', name: 'sound', min: 4, distinct: 4 },
     { id: 'gorsel', label: 'Tuşlara basınca düğmeler görsel tepki veriyor (büyüme, renk, kostüm)', kind: 'custom', test: (r) => ['effect', 'size', 'costume'].reduce((n, k) => n + (r.session.engine.counts[k] ?? 0), 0) >= 4 },
-    { id: 'kayit', label: 'Kayıt (yıldız) tıklanınca en az 3 notalık bir melodi çalıyor', hint: '"ses çal … bitene dek" blokları art arda dizilirse sesler sırayla çalar.', kind: 'event', name: 'sound', of: 'kayit', min: 3 },
+    { id: 'kayit', label: 'Kayıt (yıldız) tıklanınca en az 3 notalık bir melodi çalıyor', hint: '"… sesini bitene dek çal" blokları art arda dizilirse sesler sırayla çalar.', kind: 'event', name: 'sound', of: 'kayit', min: 3 },
     { id: 'ses-seviyesi', label: 'Meydan okuma: ses seviyesini değiştiren iki tuş (artır / azalt)', kind: 'usesBlocks', types: ['sh_change_volume', 'sh_set_volume'], mode: 'any', optional: true },
   ],
   solution: () => {
