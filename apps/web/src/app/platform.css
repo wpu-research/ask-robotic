@@ -1,0 +1,121 @@
+/* Öğrenme platformu katmanı (pilot): anlatım, kavram kartları, mini test, parça ansiklopedisi, ilerleme, onay bandı.
+   Yalnız globals.css'teki token'ları kullanır. */
+
+/* Anlatım ve kavram kartları */
+.lesson-explainer .stage-label { margin-bottom: 8px; }
+.concepts { margin-top: 32px; }
+.concepts-title { font-size: 1.2rem; margin-bottom: 12px; }
+.concept-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.concept-card { display: flex; flex-direction: column; gap: 8px; padding: 16px 20px; background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--track, var(--primary)); border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
+.concept-card h3 { margin: 0; font-size: 1.05rem; }
+.concept-card p { margin: 0; font-size: .94rem; }
+.concept-def { color: var(--text); }
+.concept-ex { color: var(--muted); }
+.concept-pit { color: var(--warn); background: var(--warn-soft); border-radius: var(--radius-xs); padding: 6px 10px; }
+
+/* Mini test */
+.quiz { display: grid; gap: 16px; }
+.quiz-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.quiz-head h2 { margin: 0; }
+.quiz-count { color: var(--muted); font-weight: 700; font-size: .9rem; }
+.quiz-q { display: grid; gap: 12px; padding: 20px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.quiz-prompt .lesson-md { font-size: 1.06rem; }
+.quiz-prompt .lesson-md p:last-child { margin-bottom: 0; }
+.quiz-options { display: grid; gap: 8px; }
+.quiz-opt { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 48px; padding: 10px 14px; text-align: left; font: inherit; color: var(--text); background: var(--surface-2); border: 2px solid var(--border); border-radius: var(--radius-sm); cursor: pointer; transition: border-color .12s, background .12s; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--primary); background: var(--primary-soft); }
+.quiz-opt:disabled { cursor: default; }
+.quiz-letter { flex: none; display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-strong); font-weight: 800; font-size: .85rem; }
+.quiz-opt[data-state='correct'] { border-color: var(--ok); background: var(--ok-soft); }
+.quiz-opt[data-state='wrong'] { border-color: var(--warn); background: var(--warn-soft); }
+.quiz-opt[data-state='idle'] { opacity: .65; }
+.quiz-num { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.quiz-input { min-height: 44px; padding: 8px 14px; font: inherit; color: var(--text); background: var(--surface); border: 2px solid var(--border-strong); border-radius: var(--radius-sm); min-width: 0; }
+.quiz-num .quiz-input { width: 12ch; }
+.quiz-input:focus-visible { border-color: var(--primary); }
+.quiz-unit { font-weight: 700; color: var(--muted); }
+.quiz-feedback { padding: 12px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border); }
+.quiz-feedback p { margin: 6px 0 0; }
+.quiz-feedback[data-ok='true'] { background: var(--ok-soft); border-color: var(--ok); }
+.quiz-feedback[data-ok='false'] { background: var(--warn-soft); border-color: var(--warn); }
+.quiz-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: .85rem; }
+.quiz-note { font-size: .9rem; color: var(--muted); }
+.quiz-result { text-align: center; justify-items: center; }
+.quiz-score { font-size: 1.6rem; margin: 0; }
+.quiz-review { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.quiz-review li { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border); font-size: .88rem; }
+.quiz-review li[data-ok='true'] { background: var(--ok-soft); color: var(--ok); border-color: transparent; }
+.quiz-review li[data-ok='false'] { background: var(--warn-soft); color: var(--warn); border-color: transparent; }
+.quiz-mark { font-weight: 800; }
+.quiz-skills { font-size: .9rem; max-width: 60ch; }
+
+/* Haftalık rehber (modül sayfası) */
+.wk-guide { margin: 0 0 16px; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.wk-guide summary { cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.wk-guide summary small { color: var(--muted); font-weight: 500; }
+.wk-guide[open] summary { margin-bottom: 12px; }
+
+/* Parça ansiklopedisi */
+.parts-search { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+.parts-search .quiz-input { flex: 1 1 260px; max-width: 480px; }
+.parts-cat h2 { margin: 24px 0 12px; font-size: 1.1rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.parts-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.part-card { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 20px; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--k-devre); border-radius: var(--radius); box-shadow: var(--shadow-sm); }
+a.part-card:hover { text-decoration: none; border-color: var(--border-strong); border-top-color: var(--k-devre); box-shadow: var(--shadow); }
+.part-card h3 { margin: 0; }
+.part-card p { margin: 0; color: var(--muted); font-size: .93rem; }
+.part-pins { margin-top: auto; font-size: .8rem; font-family: ui-monospace, monospace; color: var(--k-devre); }
+.part-page .lead { color: var(--muted); max-width: 70ch; }
+.part-layout { display: grid; gap: 32px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { .part-layout { grid-template-columns: minmax(0, 1fr) 340px; align-items: start; } }
+.part-main section { margin-bottom: 28px; }
+.part-main h2 { font-size: 1.25rem; }
+.part-side { display: grid; gap: 16px; }
+.pin-list > div, .value-list > div { display: grid; gap: 2px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.pin-list > div:last-child, .value-list > div:last-child { border-bottom: 0; }
+.pin-list dt code { font-weight: 800; color: var(--k-devre); }
+.pin-list dd, .value-list dd { margin: 0; font-size: .9rem; }
+.value-list dt { font-size: .82rem; color: var(--muted); }
+.value-list dd small { display: block; color: var(--muted); }
+.rel-lessons li { display: grid; padding: 6px 0; }
+.rel-lessons small { color: var(--muted); }
+.lab-partinfo { display: inline-block; margin: 0 0 8px; font-weight: 700; font-size: .88rem; }
+
+/* İlerlemem ve Testlerim */
+.stat-tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); margin-bottom: 20px; }
+.stat-tiles li { display: grid; gap: 2px; padding: 16px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); }
+.stat-tiles b { font-size: 1.6rem; line-height: 1.1; }
+.stat-tiles span { color: var(--muted); font-size: .85rem; }
+.empty-note { padding: 12px 16px; margin-bottom: 20px; background: var(--primary-soft); border-radius: var(--radius-sm); font-size: .92rem; }
+.page .panel + .panel { margin-top: 20px; }
+.skill-map { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.skill-map li { display: grid; gap: 6px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
+.skill-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.skill-meta { margin: 0; font-size: .85rem; font-weight: 700; }
+.skill-desc { margin: 0; font-size: .85rem; color: var(--muted); }
+.skill-map li[data-level='ustalasti'] .progress-fill { background: var(--ok); }
+.skill-map li[data-level='baslangic'] .progress-fill { background: var(--warn); }
+.history li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 16px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); }
+.history li:last-child { border-bottom: 0; }
+.history li > span small { display: block; color: var(--muted); }
+.history li > small { grid-column: 1 / -1; color: var(--muted); }
+.history li > .btn { grid-column: 2; grid-row: 1 / span 2; }
+.event-counts { display: flex; flex-wrap: wrap; gap: 8px 24px; }
+
+/* Onay bandı ve veri ayarları */
+.consent-banner { position: fixed; z-index: 90; left: 16px; right: 16px; bottom: 16px; max-width: 760px; margin: 0 auto; padding: 16px 20px; background: var(--surface); border: 2px solid var(--primary); border-radius: var(--radius); box-shadow: var(--shadow-lg); max-height: 70vh; overflow: auto; font-size: .92rem; }
+@media (max-width: 899px) { .consent-banner { bottom: calc(var(--tabbar-h) + 8px); } }
+.consent-banner h2 { font-size: 1.05rem; margin-bottom: 6px; }
+.consent-banner p { margin: 0 0 8px; }
+.consent-draft { color: var(--muted); font-style: italic; }
+.consent-ack { display: flex; gap: 8px; align-items: flex-start; margin: 8px 0; font-weight: 600; }
+.consent-ack input { margin-top: 4px; width: 18px; height: 18px; }
+.consent-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.consent-settings h3 { margin: 16px 0 8px; font-size: 1rem; }
+.consent-msg { margin-top: 12px; padding: 8px 12px; border-radius: var(--radius-xs); background: var(--ok-soft); }
+
+/* Anlatım, rehber ve ansiklopedi metinlerinde liste işaretleri (globals.css listeleri sıfırlar) */
+.lesson-explainer .lesson-md ul, .wk-guide .lesson-md ul, .part-main .lesson-md ul { list-style: disc; }
+.lesson-explainer .lesson-md ol, .wk-guide .lesson-md ol, .part-main .lesson-md ol { list-style: decimal; }
+.part-page .page-title p { margin-bottom: 16px; }
+.pin-list, .value-list { margin: 0; }

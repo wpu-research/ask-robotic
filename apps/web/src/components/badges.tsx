@@ -2,8 +2,8 @@ import { Icon, type IconName } from './shell/icons'
 import { KIND_LABEL, LESSON_KIND_LABEL, type LessonKind, type ModuleKind } from '@/lib/module-meta'
 import type { LessonStatus } from '@/lib/dashboard'
 
-const KIND_ICON: Record<ModuleKind, IconName> = { blok: 'atolye', devre: 'laboratuvar', robot: 'arena', oyun: 'oyun' }
-const LESSON_ICON: Record<LessonKind, IconName> = { metin: 'text', blok: 'atolye', devre: 'laboratuvar', arena: 'arena', oyun: 'oyun' }
+const KIND_ICON: Record<ModuleKind, IconName> = { blok: 'atolye', devre: 'laboratuvar', robot: 'arena', oyun: 'oyun', ai: 'ai' }
+const LESSON_ICON: Record<LessonKind, IconName> = { metin: 'text', blok: 'atolye', devre: 'laboratuvar', arena: 'arena', oyun: 'oyun', ai: 'ai' }
 
 /** Modül türü rozeti: Blok / Devre / Robot / Oyun. */
 export function KindBadge({ kind }: { kind: ModuleKind }) {

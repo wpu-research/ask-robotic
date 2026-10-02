@@ -50,6 +50,7 @@ export class Sim {
   readonly ports: Record<PortLetter, AVRIOPort>
   readonly adc: AVRADC
   readonly eeprom: AVREEPROM
+  private readonly _eepromBackend: EEPROMMemoryBackend
   readonly twi: AVRTWI
   readonly i2c: dev.I2CBus
   readonly usart: AVRUSART
@@ -73,7 +74,8 @@ export class Sim {
     // Düz INPUT için gerçek devrenin (pull-down vb.) durumunu drive() ile test içinde tanımla.
     for (const port of Object.values(this.ports)) for (let bit = 0; bit < 8; bit++) port.setPin(bit, true)
     this.adc = new AVRADC(this.cpu, adcConfig)
-    this.eeprom = new AVREEPROM(this.cpu, new EEPROMMemoryBackend(1024), eepromConfig)
+    this._eepromBackend = new EEPROMMemoryBackend(1024)
+    this.eeprom = new AVREEPROM(this.cpu, this._eepromBackend, eepromConfig)
     this.twi = new AVRTWI(this.cpu, twiConfig, CPU_HZ)
     this.i2c = new dev.I2CBus(this.twi)
     this.usart = new AVRUSART(this.cpu, usart0Config, CPU_HZ)
@@ -123,6 +125,16 @@ export class Sim {
   keypad(o: dev.KeypadOptions): dev.Keypad { return dev.attachKeypad(this, o) }
   rover(o: robot.RoverConfig): robot.Rover { return robot.attachRover(this, o) }
   balancer(o: robot.BalancerConfig): robot.Balancer { return robot.attachBalancer(this, o) }
+
+  /** EEPROM'un (1024 bayt) anlık görüntüsü: güç kesilince korunan içerik. Boş hücre = 255. */
+  exportEeprom(): Uint8Array { return Uint8Array.from(this._eepromBackend.memory) }
+  /** EEPROM içeriğini yükler (güç verirken önceki çalıştırmadan taşımak için). Eksik baytlar 255 kalır, fazlası atılır. */
+  importEeprom(data: ArrayLike<number>): this {
+    const mem = this._eepromBackend.memory
+    const n = Math.min(mem.length, data.length)
+    for (let i = 0; i < n; i++) mem[i] = Number(data[i]) & 0xff
+    return this
+  }
 
   /** Benzetim zamanı (ms). */
   nowMs(): number { return (this.cpu.cycles / CPU_HZ) * 1000 }

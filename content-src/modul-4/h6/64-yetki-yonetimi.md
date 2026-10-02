@@ -276,7 +276,7 @@ void loop() {
 ### Dene
 - `EKLE:9999:AABBCCDD`, sonra `LISTE`, sonra kartı tekrar `EKLE`. İkincisinde ne yazıyor? EEPROM'a yazıldı mı? (Cevap: yazılmadı, çünkü `kartBul` kartı buldu.)
 - Üç kart ekle, ortadakini `SIL` ile sil, `LISTE` ile sırayı gör. Son kart nereye geldi?
-- Bir kart ekle ve `PINDEGIS` ile PIN'i değiştir. Sonra ■ ile durdurup ▶ ile yeniden başlat ve `LISTE` yaz. Ne görüyorsun? Laboratuvardaki EEPROM çalıştırmalar arasında saklanmaz: liste boşalır ve açılışta yine `Fabrika ayari yazildi` çıkar. Gerçek bir Arduino'da veriler güç kesilse bile EEPROM'da kalırdı.
+- Bir kart ekle ve `PINDEGIS` ile PIN'i değiştir. Sonra ■ ile durdurup ▶ ile yeniden başlat ve `LISTE` yaz. Ne görüyorsun? Laboratuvardaki EEPROM, gerçek kartta olduğu gibi güç kesilince korunur: kart listesi yerinde durur ve açılışta `Fabrika ayari yazildi` bir daha çıkmaz (işaret baytı artık yazılı). Verileri silmek için ↺ Sıfırla'ya bas; EEPROM boşalır ve fabrika ayarı yeniden yazılır.
 
 ### Sık yapılan hatalar
 - Kurulum işareti koymamak: boş EEPROM'daki `255` değerlerini PIN sanırsın.

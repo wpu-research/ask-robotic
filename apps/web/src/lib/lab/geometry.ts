@@ -94,6 +94,8 @@ export const PART_DEFS: Record<PartType, PartDef> = {
   flame: { name: 'Alev sensörü', w: 76, h: 88, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 84) },
   sound: { name: 'Ses sensörü', w: 76, h: 88, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 84) },
   soil: { name: 'Toprak nemi', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
+  rain: { name: 'Yağmur sensörü', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
+  waterlevel: { name: 'Su seviyesi sensörü', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
 }
 
 export type Rotation = PartInstance['rotation']

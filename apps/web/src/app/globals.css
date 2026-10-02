@@ -7,7 +7,7 @@
   --ok: #047857; --ok-soft: #d6f3e6; --warn: #b45309; --warn-soft: #fdf0d5; --focus: #4338ca;
   --c-cocuk: #f59e0b; --c-maker: #0d9488; --c-ai: #7c3aed;
   --c-cocuk-ink: #a14a07; --c-maker-ink: #0f6b63; --c-ai-ink: #6d28d9;
-  --k-blok: #7c3aed; --k-devre: #0f766e; --k-robot: #c2410c; --k-oyun: #be185d; --k-metin: #475569;
+  --k-blok: #7c3aed; --k-devre: #0f766e; --k-robot: #c2410c; --k-oyun: #be185d; --k-ai: #6d28d9; --k-metin: #475569;
   --code-bg: #0f172a; --code-text: #e2e8f0; --code-border: #1e293b;
   --hl-keyword: #c4b5fd; --hl-type: #7dd3fc; --hl-string: #86efac; --hl-number: #fdba74; --hl-comment: #7c8aa5; --hl-title: #fda4af; --hl-meta: #fcd34d;
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
@@ -24,7 +24,7 @@
   --primary: #818cf8; --primary-hover: #a5b4fc; --primary-ink: #0b1020; --primary-soft: #1e2547;
   --ok: #34d399; --ok-soft: #12332a; --warn: #fbbf24; --warn-soft: #3a2c0c; --focus: #a5b4fc;
   --c-cocuk-ink: #fbbf24; --c-maker-ink: #5eead4; --c-ai-ink: #c4b5fd;
-  --k-blok: #c4b5fd; --k-devre: #5eead4; --k-robot: #fdba74; --k-oyun: #f9a8d4; --k-metin: #cbd5e1;
+  --k-blok: #c4b5fd; --k-devre: #5eead4; --k-robot: #fdba74; --k-oyun: #f9a8d4; --k-ai: #c4b5fd; --k-metin: #cbd5e1;
   --code-bg: #0a0f1d; --code-text: #e2e8f0; --code-border: #1c2742;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
   --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
@@ -38,7 +38,7 @@
     --primary: #818cf8; --primary-hover: #a5b4fc; --primary-ink: #0b1020; --primary-soft: #1e2547;
     --ok: #34d399; --ok-soft: #12332a; --warn: #fbbf24; --warn-soft: #3a2c0c; --focus: #a5b4fc;
     --c-cocuk-ink: #fbbf24; --c-maker-ink: #5eead4; --c-ai-ink: #c4b5fd;
-    --k-blok: #c4b5fd; --k-devre: #5eead4; --k-robot: #fdba74; --k-oyun: #f9a8d4; --k-metin: #cbd5e1;
+    --k-blok: #c4b5fd; --k-devre: #5eead4; --k-robot: #fdba74; --k-oyun: #f9a8d4; --k-ai: #c4b5fd; --k-metin: #cbd5e1;
     --code-bg: #0a0f1d; --code-text: #e2e8f0; --code-border: #1c2742;
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .4);
     --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
@@ -162,7 +162,7 @@ a.user-chip:hover { text-decoration: none; background: var(--surface-2); }
 .track-maker { --track: var(--c-maker); --track-ink: var(--c-maker-ink); }
 .track-ai { --track: var(--c-ai); --track-ink: var(--c-ai-ink); }
 .kind { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border-radius: var(--radius-xs); font-size: .75rem; font-weight: 800; letter-spacing: .02em; color: var(--kc); background: color-mix(in srgb, var(--kc) 12%, var(--surface)); border: 1px solid color-mix(in srgb, var(--kc) 28%, var(--border)); white-space: nowrap; }
-.kind-blok, .lkind-blok { --kc: var(--k-blok); } .kind-devre, .lkind-devre { --kc: var(--k-devre); } .kind-robot, .lkind-arena { --kc: var(--k-robot); } .kind-oyun, .lkind-oyun { --kc: var(--k-oyun); } .lkind-metin { --kc: var(--k-metin); }
+.kind-blok, .lkind-blok { --kc: var(--k-blok); } .kind-devre, .lkind-devre { --kc: var(--k-devre); } .kind-robot, .lkind-arena { --kc: var(--k-robot); } .kind-oyun, .lkind-oyun { --kc: var(--k-oyun); } .kind-ai, .lkind-ai { --kc: var(--k-ai); } .lkind-metin { --kc: var(--k-metin); }
 .status { display: inline-flex; align-items: center; gap: 8px; font-size: .8rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
 .status-dot { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--border-strong); }
 .status-suruyor { color: var(--warn); } .status-suruyor .status-dot { border-color: var(--warn); background: linear-gradient(90deg, var(--warn) 50%, transparent 50%); }
@@ -675,6 +675,8 @@ a.mcard:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 
 .arena-bar b, .arena-bar i { position: relative; font-style: normal; }
 .arena-btns { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
 .arena-quick { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 8px; }
+.arena-quick .jr-btn[role='tab'][aria-selected='true'] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.arena-variants { display: grid; gap: 4px; }
 @container (max-width: 560px) { .arena-panel-col.wide { grid-column: span 1; } }
 .arena-pad { display: grid; grid-template-columns: repeat(3, auto); gap: 6px; justify-content: start; margin-bottom: 4px; }
 .arena-wall.mover { stroke: #dc2626; stroke-width: 4.5; }

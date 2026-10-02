@@ -7,7 +7,7 @@ export const STAGE_A_PARTS: PartType[] = ['led', 'resistor', 'button', 'pot', 'l
 /** Aşama B (Modül 3, H5-H7). */
 export const STAGE_B_PARTS: PartType[] = ['diode', 'npn', 'mosfet', 'dcmotor', 'l293d', 'relay', 'sevenseg', 'sr595', 'lcd1602', 'lcdI2c']
 /** Aşama C (Modül 4): sensörler ve girdi cihazları. */
-export const STAGE_C_PARTS: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil']
+export const STAGE_C_PARTS: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel']
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
 export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS]
 
@@ -21,7 +21,7 @@ export const PICKER_CATEGORIES: PartCategory[] = [
 
 export const SHORT_NAME: Partial<Record<PartType, string>> = {
   ldr: 'LDR', ntc: 'NTC', pot: 'Potansiyometre', lcd1602: 'LCD 16x2', lcdI2c: 'LCD I2C', npn: 'NPN', sevenseg: '7-segment', relay: 'Röle',
-  dht: 'DHT11/22', irobstacle: 'IR engel', reed: 'Reed', encoder: 'Enkoder', keypad: 'Keypad 4x4', rtc: 'RTC DS3231', mq2: 'MQ-2 gaz', soil: 'Toprak nemi',
+  dht: 'DHT11/22', irobstacle: 'IR engel', reed: 'Reed', encoder: 'Enkoder', keypad: 'Keypad 4x4', rtc: 'RTC DS3231', mq2: 'MQ-2 gaz', soil: 'Toprak nemi', rain: 'Yağmur', waterlevel: 'Su seviyesi',
 }
 
 export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
@@ -45,6 +45,8 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   flame: 'alev yangın ateş sensörü kızılötesi',
   sound: 'ses mikrofon sensörü gürültü alkış',
   soil: 'toprak nem sensörü bitki sulama kapasitif',
+  rain: 'yağmur sensörü yağış damla ıslaklık hava durumu yl-83',
+  waterlevel: 'su seviyesi sensörü depo tank sıvı seviye taşma',
   lcd1602: 'ekran lcd 16x2 hd44780 yazı display paralel', lcdI2c: 'ekran lcd 16x2 i2c pcf8574 yazı display',
 }
 

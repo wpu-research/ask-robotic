@@ -331,7 +331,7 @@ export const STMTS: Record<string, StmtHandler> = {
       const s = yield* execChain(b.inputs?.DO?.block, c)
       if (s === 'break') break
       if (s === 'return') return s
-      yield* loopYield(c)
+      yield* loopYield(c, b.id ?? null)
     }
   },
   *controls_whileUntil(b, c) {
@@ -342,7 +342,7 @@ export const STMTS: Record<string, StmtHandler> = {
       const s = yield* execChain(b.inputs?.DO?.block, c)
       if (s === 'break') break
       if (s === 'return') return s
-      yield* loopYield(c)
+      yield* loopYield(c, b.id ?? null)
     }
   },
   *controls_for(b, c) {
@@ -357,7 +357,7 @@ export const STMTS: Record<string, StmtHandler> = {
       const s = yield* execChain(b.inputs?.DO?.block, c)
       if (s === 'break') break
       if (s === 'return') return s
-      yield* loopYield(c)
+      yield* loopYield(c, b.id ?? null)
     }
   },
   *controls_forEach(b, c) {
@@ -369,7 +369,7 @@ export const STMTS: Record<string, StmtHandler> = {
       const s = yield* execChain(b.inputs?.DO?.block, c)
       if (s === 'break') break
       if (s === 'return') return s
-      yield* loopYield(c)
+      yield* loopYield(c, b.id ?? null)
     }
   },
   controls_flow_statements(b) { return b.fields?.FLOW === 'CONTINUE' ? 'continue' : 'break' },
@@ -391,10 +391,10 @@ export const STMTS: Record<string, StmtHandler> = {
 }
 
 /** Her döngü turu bir adımdır: boş gövdeli sonsuz döngü bile sınırlara takılır ve dilim sonunda zamanı bırakır. */
-function* loopYield(c: Ctx): Gen<void> {
+function* loopYield(c: Ctx, blockId: string | null): Gen<void> {
   const rt = c.rt
-  if (++rt.steps > rt.opts.totalStepLimit) throw new MikroError('Program çok fazla adım çalıştırdı. Döngülerini kontrol et.', null)
-  if (++c.task.burst > rt.opts.burstLimit) throw new MikroError("Program durmadan döngüde kaldı. Döngünün içine bir 'bekle' bloğu ekle.", null)
+  if (++rt.steps > rt.opts.totalStepLimit) throw new MikroError('Program çok fazla adım çalıştırdı. Döngülerini kontrol et.', blockId)
+  if (++c.task.burst > rt.opts.burstLimit) throw new MikroError("Program durmadan döngüde kaldı. Döngünün içine bir 'bekle' bloğu ekle.", blockId)
   if (++c.task.slice >= SLICE_STEPS) { c.task.slice = 0; yield -1 }
 }
 

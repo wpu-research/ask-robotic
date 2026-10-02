@@ -7,7 +7,7 @@ import { MODULE_META, moduleKind, type LessonKind, type ModuleKind } from './mod
 
 /** Panel ve arama için düz, JSON'a çevrilebilir müfredat görünümü. */
 export interface CatalogLesson { id: number; title: string; durationMin: number; kind: LessonKind; position: number }
-export interface CatalogWeek { id: number; position: number; title: string; project: string | null; lessons: CatalogLesson[] }
+export interface CatalogWeek { id: number; position: number; title: string; project: string | null; /** Haftalık çalışma rehberi var mı (metni modül sayfası ayrıca yükler; panel verisi şişmesin). */ hasGuide?: boolean; lessons: CatalogLesson[] }
 export interface CatalogModule {
   id: number
   slug: string
@@ -21,11 +21,17 @@ export interface CatalogModule {
   weeks: CatalogWeek[]
 }
 
+/** Yalnız metin olan AI dersleri (hafta:sıra): 1, 8, 13, 31, 37, 39, 40. */
+const AI_TEXT_ONLY = new Set(['1:1', '2:3', '3:3', '7:1', '8:2', '8:4', '8:5'])
+
 export function lessonKind(moduleSlug: string, weekPos: number, lessonPos: number): LessonKind {
   // Mikro Kart ve Oyun Atölyesi: 6 hafta x 5 ders, hepsinin etkinliği vardır (testlerle doğrulanır; sunucuda etkinlik kodu yüklenmesin diye anahtar kuralı).
   const inRange = weekPos >= 1 && weekPos <= 6 && lessonPos >= 1 && lessonPos <= 5
   if (moduleSlug === 'mikro-kart' && inRange) return 'blok'
   if (moduleSlug === 'oyun-atolyesi' && inRange) return 'oyun'
+  // Sahne Atölyesi (Modül 2: 8 hafta x 2 ders) ve AI Mühendisliği (8 hafta x 5 ders): etkinliği olmayan ders metindir.
+  if (moduleSlug === 'scratch' && weekPos >= 1 && weekPos <= 8 && lessonPos >= 1 && lessonPos <= 2) return 'blok'
+  if (moduleSlug === 'ai-muhendisligi' && weekPos >= 1 && weekPos <= 8 && lessonPos >= 1 && lessonPos <= 5) return AI_TEXT_ONLY.has(`${weekPos}:${lessonPos}`) ? 'metin' : 'ai'
   const key = activityKey(moduleSlug, weekPos, lessonPos)
   if (getArenaActivity(key)) return 'arena'
   if (getLabActivity(key)) return 'devre'
@@ -41,7 +47,7 @@ function toCatalogModule(m: Tree['module'], tree: Tree | null): CatalogModule {
     id: m.id, slug: m.slug, title: m.title, position: m.position, track: m.track, kind: moduleKind(m.slug), minAge: m.minAge,
     tagline: meta?.tagline ?? '', audience: meta?.audience ?? '',
     weeks: (tree?.weeks ?? []).map((w) => ({
-      id: w.id, position: w.position, title: w.title, project: w.project ?? null,
+      id: w.id, position: w.position, title: w.title, project: w.project ?? null, hasGuide: !!w.guideMd,
       lessons: w.lessons.map((l) => ({ id: l.id, title: l.title, durationMin: l.durationMin, position: l.position, kind: lessonKind(m.slug, w.position, l.position) })),
     })),
   }

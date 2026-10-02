@@ -195,7 +195,7 @@ void loop() {
 ### Dene
 - `HISTEREZIS` değerini 0,2 ve 2 yap. Röle ne kadar sık açılıp kapanıyor?
 - Hedefi sıcaklığın üstüne çıkar, sonra NTC'nin **Sıcaklık** özelliğini adım adım yükselt. Röle hangi sıcaklıkta kapanıyor?
-- ■ ile durdurup yeniden ▶'e bas. Hedef sıcaklık ilk değerine (22) dönüyor mu? Neden? (Laboratuvar EEPROM'u çalıştırmalar arasında saklamaz; gerçek kartta hedef korunurdu.)
+- Hedefi bir kez değiştir (örneğin 22 → 24), 2 saniye bekle, ■ ile durdurup yeniden ▶'e bas (güç kesip verme). Hedef 24 olarak mı açıldı? Neden? Sonra ↺ Sıfırla'ya bas ve yeniden çalıştır: hedef neden yine 22 oldu? (EEPROM güç kesilince korunur; ↺ Sıfırla EEPROM'u boşaltır, böylece `255` okunur ve varsayılan 22 kullanılır.) Bir de ayarı değiştirdikten hemen sonra (2 saniye dolmadan) ■'ya bas: yeni hedef kaydedilmiş mi?
 - Yeni bir özellik ekle: laboratuvara bir buzzer ekle (+ ucu D8, - ucu GND). Sıcaklık hedefin 5 dereceden fazla altındaysa çaldır. Hangi duruma ekleyeceksin?
 
 ### Sık yapılan hatalar

@@ -8,6 +8,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./parcalar": {
+      "types": "./dist/content/parcalar.generated.d.ts",
+      "default": "./dist/content/parcalar.generated.js"
     }
   },
   "scripts": {

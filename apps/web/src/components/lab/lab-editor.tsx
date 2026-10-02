@@ -1,6 +1,7 @@
 'use client'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { compileCode, type CompileError } from '@/lib/lab/compile-client'
+import { logEvent } from '@/lib/events'
 import { PROPS, type Circuit, type LabApi, type PartType, type PropValue } from '@/lib/lab/contract'
 import { PART_DEFS } from '@/lib/lab/geometry'
 import { evaluateLabGoals, type LabGoal, type LabGoalResult } from '@/lib/lab/goals'
@@ -161,7 +162,12 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
   const stopRun = useCallback(() => {
     runId.current++
     const l = lab.current
-    if (l) { setLastSerial(l.state.serial.slice(serialBaseRef.current)); l.dispose() }
+    if (l) {
+      const st = l.state
+      setLastSerial(st.serial.slice(serialBaseRef.current))
+      eepromRef.current = st.eeprom.some((b) => b !== 255) ? st.eeprom : null // güç kesilince EEPROM korunur
+      l.dispose()
+    }
     lab.current = null
     setBuzzer(false, 0)
     setRunning(false); setPaused(false); speedRef.current = 1
@@ -169,6 +175,8 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
     setCompile((c) => (c.status === 'compiling' ? { status: 'idle' } : c))
   }, [])
   const serialBaseRef = useRef(0); serialBaseRef.current = serialBase
+  /** Önceki çalıştırmadan kalan EEPROM (gerçek kartta güç kesilince korunur); ↺ Sıfırla boşaltır. */
+  const eepromRef = useRef<Uint8Array | null>(null)
 
   useEffect(() => () => { lab.current?.dispose(); lab.current = null; setBuzzer(false, 0); clearTimeout(noticeTimer.current) }, [])
 
@@ -179,17 +187,21 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
     setCompile({ status: 'compiling' })
     const out = await compileCode(codeRef.current)
     if (id !== runId.current) return // Dur'a basıldı ya da yeni çalıştırma başladı
+    logEvent('compile', { p: { ok: out.ok, kind: 'lab' } })
     if (!out.ok) {
       setCompile(out.errors.length ? { status: 'errors', errors: out.errors } : { status: 'failed', message: out.message ?? 'Derleme başarısız oldu.', unavailable: out.unavailable })
       return
     }
     try {
-      const l = createRuntime(circuitRef.current, out.hex)
+      const kept = eepromRef.current
+      const l = createRuntime(circuitRef.current, out.hex, kept ? { eeprom: kept } : undefined)
+      if (kept) say('EEPROM önceki çalıştırmadaki içeriğiyle başladı (güç kesilince korunur). Boşaltmak için ↺ Sıfırla.')
       lab.current = l
       tracker.current.reset()
       setSerialBase(0); setLastSerial(''); setPaused(false); speedRef.current = 1
       setCompile({ status: 'ok', flashBytes: out.flashBytes, ramBytes: out.ramBytes })
       setRunning(true)
+      logEvent('run', { p: { kind: 'lab' } })
     } catch (e) {
       console.error(e)
       setCompile({ status: 'failed', message: 'Benzetim başlatılamadı. Hex dosyası ya da devre geçersiz olabilir.' })
@@ -197,6 +209,7 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
   }
 
   const resetRun = () => {
+    eepromRef.current = null // Sıfırla: EEPROM da fabrika durumuna (255) döner
     setSerialBase(0); setLastSerial('')
     const l = lab.current
     tracker.current.reset()

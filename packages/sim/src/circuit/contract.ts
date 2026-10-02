@@ -12,7 +12,7 @@ export type PartType =
   | 'diode' | 'npn' | 'mosfet' | 'dcmotor' | 'l293d' | 'relay' | 'sevenseg' | 'sr595' | 'lcd1602' | 'lcdI2c'
   // Aşama C (Modül 4): sensörler ve girdi cihazları
   | 'hcsr04' | 'dht' | 'pir' | 'irobstacle' | 'reed' | 'bmp280' | 'mpu6050' | 'joystick' | 'encoder' | 'keypad' | 'rtc'
-  | 'mq2' | 'flame' | 'sound' | 'soil'
+  | 'mq2' | 'flame' | 'sound' | 'soil' | 'rain' | 'waterlevel'
 
 /**
  * Parça pin kimlikleri (devrede kablo uçları böyle adlandırılır). `Record<PartType, readonly string[]>`
@@ -56,6 +56,8 @@ export const PINS: Record<PartType, readonly string[]> = {
   flame: ['VCC', 'GND', 'AO', 'DO'], // alev modülü; AO alevde düşer, DO alevde LOW
   sound: ['VCC', 'GND', 'AO', 'DO'], // ses modülü; AO sesle yükselir, DO eşik üstünde LOW
   soil: ['VCC', 'GND', 'AO', 'DO'], // kapasitif toprak nemi; AO kuruda yüksek, ıslakta düşük, DO eşik üstü nemde LOW
+  rain: ['VCC', 'GND', 'AO', 'DO'], // yağmur sensörü (kart + LM393); AO kuruda yüksek, ıslandıkça düşer, DO eşik üstü ıslaklıkta LOW
+  waterlevel: ['VCC', 'GND', 'AO', 'DO'], // su seviyesi (çıplak izli çubuk); AO su yükseldikçe artar, DO eşik üstü seviyede LOW
 }
 
 export interface PropDef {
@@ -152,6 +154,14 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
     { key: 'moisture', label: 'Toprak nemi', kind: 'number', default: 0.3, min: 0, max: 1, step: 0.01, live: true },
     { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
   ],
+  rain: [
+    { key: 'wetness', label: 'Islaklık (yağmur)', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
+    { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
+  waterlevel: [
+    { key: 'level', label: 'Su seviyesi', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
+    { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
 }
 
 export interface PartInstance {
@@ -221,7 +231,7 @@ export interface PartRuntime {
   /** Enkoder: position = şu ana kadar uygulanan tık (saat yönü +); moving = kuyrukta dönüş var; clk/dt pin seviyeleri. */
   encoder?: { position: number; moving: boolean; clk: boolean; dt: boolean; pressed: boolean }
   keypad?: { key: string | null }
-  /** MQ-2 / alev / ses / toprak nemi: level = fiziksel büyüklük (0-1), aoVolts = AO gerilimi, doHigh = DO seviyesi (eşik üstünde LOW). */
+  /** MQ-2 / alev / ses / toprak nemi / yağmur / su seviyesi: level = fiziksel büyüklük (0-1), aoVolts = AO gerilimi, doHigh = DO seviyesi (eşik üstünde LOW). */
   analogModule?: { powered: boolean; level: number; aoVolts: number; doHigh: boolean }
 }
 
@@ -244,6 +254,15 @@ export interface LabState {
   parts: Record<string, PartRuntime>
   serial: string
   warnings: LabWarning[]
+  /** Uno EEPROM'unun (1024 bayt) anlık görüntüsü; boş hücre 255. Güç kesilince korunan içeriktir (createLab seçenekleriyle taşınır). */
+  eeprom: Uint8Array
+  /** true: bu çalıştırma önceki bir çalıştırmadan taşınan EEPROM içeriğiyle başladı ("güç kesip yeniden verdin"). */
+  eepromRestored: boolean
+}
+
+export interface LabOptions {
+  /** Önceki çalıştırmadan alınan EEPROM içeriği (LabState.eeprom). Verilmezse EEPROM boş (255) başlar. */
+  eeprom?: ArrayLike<number>
 }
 
 export interface LabApi {
@@ -253,8 +272,8 @@ export interface LabApi {
   /** Benzetimi ms kadar ilerletir (içeride devre çözücü gerektikçe yeniden çalışır). */
   advance(ms: number): void
   sendSerial(text: string): void
-  /** Başlangıç durumuna döner (yanmış LED'ler dahil). */
-  reset(): void
+  /** Başlangıç durumuna döner (yanmış LED'ler dahil). EEPROM de boşaltılır (fabrika ayarı); `{ keepEeprom: true }` ile korunur (yalnız güç döngüsü). */
+  reset(opts?: { keepEeprom?: boolean }): void
   dispose(): void
 }
 

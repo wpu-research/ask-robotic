@@ -19,7 +19,7 @@ Arduino Uno'nun (ATmega328P) üç ayrı belleği vardır:
 ### Devre
 Bu derste devre kurmayacaksın: laboratuvardaki Uno yeterli, ek parça yok. Sonuçları **Seri monitörde** (9600 baud) okuyacaksın.
 
-**Laboratuvar notu:** ▶ ile her çalıştırmada Uno'nun EEPROM'u boş (her hücrede 255) başlar; laboratuvar bellek içeriğini çalıştırmalar arasında saklamaz. Gerçek bir Uno'da EEPROM, güç kesilse de içeriğini korurdu. Bu yüzden bu derste "kalıcılığı" kodun mantığından ve yazma sayısından anlarsın, çalıştırmalar arasında değil.
+**Laboratuvar notu:** İlk ▶'de Uno'nun EEPROM'u boştur (her hücrede 255). ■ ile durdurup yeniden ▶'e basmak, gerçek kartta **güç kesip yeniden vermek** gibidir: laboratuvar EEPROM içeriğini korur ve yeni çalıştırma o içerikle başlar. Çalıştırma sırasında EEPROM'a yazdıkların bir sonraki çalıştırmada orada durur. Hücreleri tekrar boşaltmak (255) için ↺ Sıfırla'ya bas. (Yalnız ■/▶ ile durdurup başlatmak EEPROM'a dokunmaz; kodu değiştirsen de içerik kalır, tıpkı gerçek kartta yeni program yüklemenin EEPROM'u silmemesi gibi.)
 
 ### Program: açılış sayacı
 Her açılışta EEPROM'daki sayıyı bir artıran program. Hiç yazılmamış bir EEPROM hücresinde `255` bulunur; bunu "boş" kabul ediyoruz.
@@ -42,7 +42,7 @@ void loop() {
 }
 ```
 
-Gerçek bir kartta güç kesilip yeniden verildikçe sayı 1, 2, 3 diye artar. Laboratuvarda ise EEPROM her çalıştırmada boş başladığı için ▶'e her bastığında "Acilis sayisi: 1" görürsün; kod doğrudur, yalnızca bellek saklanmıyor.
+Güç kesilip yeniden verildikçe sayı 1, 2, 3 diye artar. Laboratuvarda da böyle: ilk ▶'de "Acilis sayisi: 1" görürsün; ■ ile durdurup yeniden ▶'e basınca (güç kesip verme) 2, sonra 3 olur. ↺ Sıfırla'ya basarsan EEPROM boşalır ve sayaç yeniden 1'den başlar.
 
 ### Yıpranma: write mi, update mi?
 EEPROM hücreleri sonsuza kadar yazılamaz. Üretici her hücre için yaklaşık **100.000 yazma** garanti eder. Bundan sonra hücre bozulabilir. Okumak ise hücreyi yıpratmaz.
@@ -154,7 +154,7 @@ Bu hafta üç kütüphane gördün: `LiquidCrystal`, `Wire`, `EEPROM`. Hepsi ayn
 Laboratuvarda bu kütüphaneler (`LiquidCrystal`, `LiquidCrystal_I2C`, `Wire`, `EEPROM`, `Servo`) hazırdır; programın başına `#include` yazman yeter, ayrıca kurulum gerekmez. Gerçek Arduino IDE'de yeni bir kütüphaneyi **Taslak > Kütüphane Ekle > Kütüphaneleri Yönet** menüsünden kurarsın; kütüphanenin **Dosya > Örnekler** altındaki hazır örnekleri, nasıl kullanılacağını gösteren en iyi kaynaktır.
 
 ### Dene
-- `eeprom_sayac` programını çalıştır, ■ ile durdurup yeniden ▶'e bas. Sayı neden hep 1? (İpucu: laboratuvar EEPROM'u her çalıştırmada boş başlatır.) Gerçek kartta sonuç ne olurdu?
+- `eeprom_sayac` programını çalıştır, ■ ile durdurup yeniden ▶'e bas; bunu üç kez yap. Sayı neden 1, 2, 3 diye arttı? Sonra ↺ Sıfırla'ya basıp yeniden çalıştır: sayı neden yine 1? Program her açılışta EEPROM'a kaç kez yazıyor?
 - `eeprom_yipranma` içinde `update` döngüsünü 1000 kez döndür. Sonuç neden hâlâ 7?
 - `sram_string` programında `String` uzunluğunu 200 karaktere çıkar. `Sonra` değeri ne kadar azalıyor?
 - Laboratuvara bir potansiyometre ve bir buton ekle. Pot ile ayarlanan değeri butona basıldığında EEPROM'a kaydet. Her döngüde kaydetsen ne olurdu?

@@ -6,7 +6,7 @@ import type { Circuit, LabApi, PartInstance, PartType, PropValue, Wire } from '.
 import { BLINK_HEX } from './lab-fixtures.js'
 import {
   FAN_POT_HEX, FAN_RAMPA_HEX, I2C_LCD_HEX, I2C_TARAMA_HEX, LCD_DERECE_HEX, LCD_MERHABA_HEX, LED_SERIDI_HEX, MOTOR_BUTON_HEX, MOTOR_YON_HEX,
-  ROLE_BUTON_HEX, ROLE_ESIK_HEX, SR_LSB01_HEX, SR_MSB01_HEX, SR_NOLATCH_HEX, TERMOSTAT_HEX, YEDI_SEGMENT_SAYAC_HEX,
+  EEPROM_SAYAC_HEX, ROLE_BUTON_HEX, ROLE_ESIK_HEX, SR_LSB01_HEX, SR_MSB01_HEX, SR_NOLATCH_HEX, TERMOSTAT_HEX, YEDI_SEGMENT_SAYAC_HEX,
 } from './lab-fixtures-b.js'
 import { MODEL } from './model.js'
 
@@ -702,5 +702,69 @@ describe('sanal ölçüm (meas)', () => {
     expect(rt(m(true), 'm1').meas!.currentMa).toBeLessThan(0)
     expect(rt(m(true), 'm1').meas!.vAcross).toBeLessThan(0)
     expect(rt(m(true), 'm1').dcmotor!.speed).toBeLessThan(0)
+  })
+})
+
+// ---------------------------------------------------------------------------------------------------------------------
+// (z) Kalıcı EEPROM (ders 34-35): güç kesilince içerik korunur; createLab seçeneğiyle taşınır, reset() boşaltır.
+// ---------------------------------------------------------------------------------------------------------------------
+describe('kalıcı EEPROM', () => {
+  const uno = (): Circuit => circuit([], [])
+  const acilis = (n: number): RegExp => new RegExp(`Acilis sayisi: ${n}\\b`)
+
+  it('varsayılan: EEPROM boş (255), eepromRestored false', () => {
+    const lab = createLab(uno(), EEPROM_SAYAC_HEX)
+    expect(lab.state.eeprom.length).toBe(1024)
+    expect(lab.state.eeprom.every((b) => b === 255)).toBe(true)
+    expect(lab.state.eepromRestored).toBe(false)
+    lab.dispose()
+  })
+
+  it('güç döngüsü: sayaç 1, 2, 3 diye artar (eeprom seçeneği taşınır)', () => {
+    let snap: Uint8Array | undefined
+    for (const beklenen of [1, 2, 3]) {
+      const lab = createLab(uno(), EEPROM_SAYAC_HEX, snap ? { eeprom: snap } : undefined)
+      expect(lab.state.eepromRestored).toBe(snap !== undefined)
+      lab.advance(300)
+      expect(lab.state.serial).toMatch(acilis(beklenen))
+      expect(lab.state.eeprom[0]).toBe(beklenen)
+      snap = lab.state.eeprom
+      lab.dispose()
+    }
+  })
+
+  it('anlık görüntü kopyadır: sonradan çalışan benzetim önceki görüntüyü değiştirmez', () => {
+    const lab = createLab(uno(), EEPROM_SAYAC_HEX)
+    const once = lab.state.eeprom
+    lab.advance(300)
+    expect(once[0]).toBe(255)
+    expect(lab.state.eeprom[0]).toBe(1)
+    lab.dispose()
+  })
+
+  it('reset() EEPROM’u boşaltır; reset({keepEeprom:true}) korur', () => {
+    const lab = createLab(uno(), EEPROM_SAYAC_HEX)
+    lab.advance(300)
+    expect(lab.state.eeprom[0]).toBe(1)
+    lab.reset({ keepEeprom: true })
+    expect(lab.state.eeprom[0]).toBe(1)
+    expect(lab.state.eepromRestored).toBe(true)
+    lab.advance(300)
+    expect(lab.state.serial).toMatch(acilis(2))
+    lab.reset()
+    expect(lab.state.eeprom.every((b) => b === 255)).toBe(true)
+    expect(lab.state.eepromRestored).toBe(false)
+    lab.advance(300)
+    expect(lab.state.serial).toMatch(acilis(1))
+    lab.dispose()
+  })
+
+  it('kısa ya da fazla uzun veri güvenle yüklenir (eksik 255, fazlası atılır)', () => {
+    const lab = createLab(uno(), EEPROM_SAYAC_HEX, { eeprom: [7, 8] })
+    expect(Array.from(lab.state.eeprom.slice(0, 3))).toEqual([7, 8, 255])
+    lab.dispose()
+    const big = createLab(uno(), EEPROM_SAYAC_HEX, { eeprom: new Array(3000).fill(9) })
+    expect(big.state.eeprom.length).toBe(1024)
+    big.dispose()
   })
 })

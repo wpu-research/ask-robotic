@@ -26,7 +26,7 @@ const nz = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(
 const lcdLines = (ctx: LabGoalCtx): string[][] => partsOf(ctx.circuit, 'lcdI2c').map((p) => ctx.lab?.parts[p.id]?.lcd?.lines ?? [])
 
 /** AO ucu belirli bir Uno pinine bağlı olan analog modül. */
-const moduleOn = (ctx: LabGoalCtx, type: 'soil' | 'sound', unoPin: string) =>
+const moduleOn = (ctx: LabGoalCtx, type: 'soil' | 'rain' | 'waterlevel', unoPin: string) =>
   partsOf(ctx.circuit, type).find((p) => toUno(ctx, p.id, 'AO', unoPin))
 const levelOf = (ctx: LabGoalCtx, id: string | undefined) => (id ? ctx.lab?.parts[id]?.analogModule?.level ?? 0 : 0)
 
@@ -281,14 +281,13 @@ void loop() {
 }
 
 // ---------------------------------------------------------------- Ders 48: toprak nemi, yağmur, su seviyesi
-// Laboratuvarda yağmur ve su seviyesi sensörü yok: yağmur için ikinci bir "Toprak nemi" modülü (ıslakta AO düşer),
-// su seviyesi için "Ses" modülü (seviye arttıkça AO yükselir) aynı yönde davrandığı için onlar kullanılır.
+// Toprak nemi (A2), yağmur sensörü (A0, ıslandıkça AO düşer) ve su seviyesi sensörü (A1, su yükseldikçe AO artar).
 const analogCircuit = (): Circuit => {
   const c = unoOnly()
   c.parts.push(
     part('toprak', 'soil', 460, 40, { moisture: 0.4 }),
-    part('yagmur', 'soil', 460, 190, { moisture: 0 }),
-    part('seviye', 'sound', 460, 340, { sound: 0 }),
+    part('yagmur', 'rain', 460, 190, { wetness: 0 }),
+    part('seviye', 'waterlevel', 460, 340, { level: 0 }),
   )
   for (const id of ['toprak', 'yagmur', 'seviye']) { w(c, [id, 'VCC'], ['uno', '5V']); w(c, [id, 'GND'], ['uno', 'GND']) }
   w(c, ['toprak', 'AO'], ['uno', 'A2']); w(c, ['yagmur', 'AO'], ['uno', 'A0']); w(c, ['seviye', 'AO'], ['uno', 'A1'])
@@ -356,31 +355,30 @@ void loop() {
 `
 
 const analogEtkinlik: LabActivity = {
-  intro: 'Laboratuvarda yağmur ve su seviyesi sensörü yok. Toprak nemi için bir Toprak nemi modülü, yağmur için ikinci bir Toprak nemi modülü (ıslanınca AO düşer), su seviyesi için Ses modülü (şiddet arttıkça AO yükselir) kullan. Kaydırıcıları oynatarak ham sayıyı yüzdeye ve duruma çevir.',
+  intro: 'Üç analog sensör kur: Toprak nemi (A2), Yağmur sensörü (A0; ıslandıkça AO düşer) ve Su seviyesi sensörü (A1; su yükseldikçe AO artar). Kaydırıcıları oynatarak ham sayıyı yüzdeye ve duruma çevir.',
   starter: () => ({ circuit: unoOnly(), code: ANALOG_STARTER }),
-  allowedParts: ['soil', 'sound'],
+  allowedParts: ['soil', 'rain', 'waterlevel'],
   goals: [
     {
       id: 'parcalar',
-      text: 'Tuvale iki Toprak nemi modülü (toprak ve yağmur için) ve bir Ses modülü (su seviyesi için) ekle.',
-      hint: '"Parça ekle" menüsünden Toprak nemi modülünü iki kez, Ses modülünü bir kez seç.',
-      check: ({ circuit }) => partsOf(circuit, 'soil').length >= 2 && partsOf(circuit, 'sound').length >= 1,
+      text: 'Tuvale bir Toprak nemi modülü, bir Yağmur sensörü ve bir Su seviyesi sensörü ekle.',
+      hint: '"Parça ekle" menüsünden (Sensörler) Toprak nemi, Yağmur ve Su seviyesi parçalarını birer kez seç.',
+      check: ({ circuit }) => partsOf(circuit, 'soil').length >= 1 && partsOf(circuit, 'rain').length >= 1 && partsOf(circuit, 'waterlevel').length >= 1,
     },
     {
       id: 'besleme',
       text: 'Üç modülün VCC uçlarını 5V’a, GND uçlarını GND’ye bağla.',
       hint: 'Besleme eksik modül AO ucunda anlamlı gerilim vermez.',
       check: (ctx) => {
-        const hepsi = [...partsOf(ctx.circuit, 'soil'), ...partsOf(ctx.circuit, 'sound')]
+        const hepsi = [...partsOf(ctx.circuit, 'soil'), ...partsOf(ctx.circuit, 'rain'), ...partsOf(ctx.circuit, 'waterlevel')]
         return hepsi.length >= 3 && hepsi.every((m) => to5V(ctx, m.id, 'VCC') && toGnd(ctx, m.id, 'GND'))
       },
     },
     {
       id: 'sinyal',
-      text: 'Toprak modülünün AO ucunu A2’ye, yağmur modülünün AO ucunu A0’a, seviye (Ses) modülünün AO ucunu A1’e bağla.',
-      hint: 'Kodda toprak A2, yağmur A0, seviye A1’den okunuyor. Hangi Toprak modülünün toprak, hangisinin yağmur olduğunu sen seç.',
-      check: (ctx) => !!moduleOn(ctx, 'soil', 'A2') && !!moduleOn(ctx, 'soil', 'A0') && !!moduleOn(ctx, 'sound', 'A1')
-        && moduleOn(ctx, 'soil', 'A2')!.id !== moduleOn(ctx, 'soil', 'A0')!.id,
+      text: 'Toprak nemi modülünün AO ucunu A2’ye, Yağmur sensörünün AO ucunu A0’a, Su seviyesi sensörünün AO ucunu A1’e bağla.',
+      hint: 'Kodda toprak A2, yağmur A0, su seviyesi A1’den okunuyor.',
+      check: (ctx) => !!moduleOn(ctx, 'soil', 'A2') && !!moduleOn(ctx, 'rain', 'A0') && !!moduleOn(ctx, 'waterlevel', 'A1'),
     },
     {
       id: 'yuzde-kod',
@@ -397,25 +395,25 @@ const analogEtkinlik: LabActivity = {
     },
     {
       id: 'yagmur-var',
-      text: 'Yağmur modülünü ıslat (Toprak nemi 0,6 ya da üstü): seri monitörde yağmur için VAR yazsın.',
-      hint: 'A0 değeri 600’ün altına inince yağmur var demektir. Modül ıslandıkça AO gerilimi düşer.',
+      text: 'Yağmur sensörünü ıslat (Islaklık 0,5 ya da üstü): seri monitörde yağmur için VAR yazsın.',
+      hint: 'A0 değeri 600’ün altına inince yağmur var demektir. Sensör ıslandıkça AO gerilimi düşer (0,5 ıslaklıkta A0 ≈ 537).',
       behavior: true,
-      check: (ctx) => levelOf(ctx, moduleOn(ctx, 'soil', 'A0')?.id) >= 0.6 && /VAR/i.test(ctx.lab?.serial ?? ''),
+      check: (ctx) => levelOf(ctx, moduleOn(ctx, 'rain', 'A0')?.id) >= 0.5 && /VAR/i.test(ctx.lab?.serial ?? ''),
     },
     {
       id: 'seviye-dolu',
-      text: 'Seviye modülünün Ses şiddeti kaydırıcısını 0,5 üstüne çek: seri monitörde su seviyesi için DOLU yazsın.',
-      hint: 'A1 değeri 600’ü geçince "dolu" kolu çalışır. Kaydırıcıyı yeterince sağa çek.',
+      text: 'Su seviyesi kaydırıcısını 0,8 ya da üstüne çek: seri monitörde su seviyesi için DOLU yazsın.',
+      hint: 'A1 değeri 600’ü geçince "dolu" kolu çalışır. Su seviyesi 0,7’de A1 ≈ 588 (ORTA), 0,8’de ≈ 665 (DOLU); sensör 5 V’ta tam ölçeğe ulaşmaz.',
       behavior: true,
-      check: (ctx) => levelOf(ctx, moduleOn(ctx, 'sound', 'A1')?.id) >= 0.5 && /DOLU/i.test(ctx.lab?.serial ?? ''),
+      check: (ctx) => levelOf(ctx, moduleOn(ctx, 'waterlevel', 'A1')?.id) >= 0.8 && /DOLU/i.test(ctx.lab?.serial ?? ''),
     },
   ],
   solution: () => ({ circuit: analogCircuit(), code: ANALOG_SOLUTION }),
   scenario: (s) => {
     s.advance(1000)
     s.setProp('toprak', 'moisture', 1)
-    s.setProp('yagmur', 'moisture', 0.8)
-    s.setProp('seviye', 'sound', 0.6)
+    s.setProp('yagmur', 'wetness', 0.8)
+    s.setProp('seviye', 'level', 0.9)
     s.advance(1500)
   },
 }

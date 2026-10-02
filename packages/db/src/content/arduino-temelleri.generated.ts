@@ -11,41 +11,605 @@ export const modul3: ModuleContent = {
     {
       "title": "Temeller",
       "project": "Trafik ışığı",
+      "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Mikrodenetleyicinin ne olduğunu ve Arduino Uno üzerindeki pinleri (dijital, analog, 5V, GND) söyleyebilir.\n2. Ohm yasasıyla (V = I × R) gerilim, akım ve direnç hesaplayabilir; LED için seri direncin neden gerektiğini açıklayabilir.\n3. `setup()`, `loop()`, `pinMode`, `digitalWrite` ve `delay` ile bir LED'i yakıp söndüren program yazabilir.\n4. `for` döngüsü ve dizi ile birden çok LED'i sürebilir.\n5. Plan tablosundan yola çıkarak üç LED'li bir trafik ışığı kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-30 dakikadır. Aşağıdaki plan günde bir ders içindir. Daha yoğun bir takvim isteyenler iki dersi birleştirebilir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Mikrodenetleyici nedir? | ~20 dk | Anlatımı oku, Uno'yu laboratuvarda tanı, dahili L LED'ini yak, mini testi çöz. |\n| 2 | Elektrik: V, I, R ve Ohm yasası | ~20 dk | Hesapları elle yap, sanal ölçümle akımı oku, hesapla karşılaştır. |\n| 3 | İlk program: Blink | ~20 dk | İlk devreyi kur, programı çalıştır, bekleme sürelerini değiştir. |\n| 4 | Çoklu LED, for döngüsü ve diziler | ~25 dk | Dört LED kur, döngü ve dizi sürümlerini dene. |\n| 5 | Proje: Trafik ışığı | ~30 dk | Planı tabloya yaz, devreyi kur, programı yaz, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta özel bir ön bilgi gerekmez. Başlamadan önce şunları kontrol et:\n- Tarayıcıda devre laboratuvarı açılıyor mu? (Menüden \"Devre laboratuvarı\")\n- Öğrenci dört işlem ve ondalık sayılarla rahat mı? (Ohm yasası bölme ve çarpma içerir.)\n- Fare ile kablo çekmek ve parça seçmek konusunda sorun var mı?\n\n### Kavram haritası\n- **Donanım:** mikrodenetleyici → Arduino Uno → pinler (dijital, analog) → 5V ve GND\n- **Elektrik:** gerilim, akım, direnç → Ohm yasası → LED için seri direnç → kapalı devre\n- **Program:** sketch → `setup()` ve `loop()` → `pinMode`, `digitalWrite`, `delay` → `for` ve dizi\n- **Proje:** plan tablosu → aşamalar → söndür-yak-bekle kalıbı → tur süresi\n\n### Sık yapılan hatalar\n- **mA ile A'yı karıştırmak.** 20 mA = 0,02 A. Hesaptan önce ampere çevir.\n- **LED'i dirençsiz bağlamak.** Akım sınırlanmaz; laboratuvar uyarı verir.\n- **LED'i ters bağlamak ya da GND'yi unutmak.** Devre kapanmaz, LED yanmaz.\n- **`pinMode` unutmak.** LED çok sönük yanar ya da hiç yanmaz.\n- **Noktalı virgül unutmak.** Derleyici \"expected ';'\" der. Hata mesajını okumak çözümün yarısıdır.\n- **`delay` süresini saniye sanmak.** `delay(5)` 5 milisaniyedir.\n- **Dizide 1'den saymak.** İlk eleman `ledler[0]`'dır; 4 elemanlı dizide `ledler[4]` diziden taşar.\n- **Önceki aşamanın LED'ini söndürmemek.** Trafik ışığında iki LED birlikte yanar.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Blink programını sıfırdan, bakmadan yaz; sonra bekleme sürelerini değiştir.\n4. Kırmızı LED için 330 Ω yerine 1 kΩ ve 150 Ω kullanıldığında akımın nasıl değiştiğini hesapla ve laboratuvarda ölç.\n5. Kendi cümlelerinle şu soruyu cevapla: \"LED'in önündeki direnç ne işe yarar?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Trafik ışığı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | LED'lerden biri yanmıyor ya da dirençsiz | Üç LED kendi direnciyle ve doğru yönde bağlı | Renkler doğru seçilmiş, bağlantılar düzenli |\n| Plan | Tablo yok | Aşama, LED ve süre tablosu var | Tablo, kodla birebir uyuyor ve açıklanmış |\n| Program | Aynı anda birden çok LED yanıyor ya da program çalışmıyor | Üç aşama doğru sırada ve tek LED yanıyor | Kırmızı-sarı uyarı aşaması gibi bir geliştirme eklenmiş |\n| Zamanlama | Süreler yanlış (örneğin delay(5)) | Süreler tabloyla uyuşuyor | Süreleri değiştirip etkisini açıklıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta bir şey \"ezberletmek\" değil, öğrencinin devre kurmaya ve çalışan ilk programı görmeye alışmasıdır. Hata yapmak laboratuvarda güvenlidir; yanan LED ya da kısa devre sanaldır ve ↺ ile sıfırlanır.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şu soruları sor: \"Akım nereden girip nereden çıkıyor?\", \"Hata mesajı ne diyor?\", \"Hangi pinleri bağladın, kodda hangisini yazdın?\"\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Her ders arasında kısa bir tekrar yeterlidir.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Ders ilerleyip gerçek kart kullanılacaksa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
       "lessons": [
         {
           "title": "Mikrodenetleyici nedir?",
           "durationMin": 20,
           "problem": "Bir asansör hangi kata gideceğini, bir çamaşır makinesi suyu ne zaman boşaltacağını nereden bilir? İçlerinde küçük bir bilgisayar vardır ve bu bilgisayar tek bir iş için programlanmıştır. Bu derste o küçük bilgisayarın ne olduğunu ve Arduino Uno kartının üzerinde neler bulunduğunu öğreneceksin.",
           "contentMd": "### Mikrodenetleyici ve bilgisayar\nBir bilgisayarda işlemci, bellek ve giriş-çıkış parçaları ayrı ayrı bulunur. **Mikrodenetleyici** bunların hepsini tek bir küçük çipin içinde toplar. Ekranı ve klavyesi yoktur. Onun yerine bacakları vardır. Bu bacaklara LED, buton, sensör, motor gibi parçalar bağlanır.\n\nMikrodenetleyici yaptığı işi **program** sayesinde bilir. Programı bir kez yüklersin. Güç kesilip yeniden verilse bile program çipte kalır ve kart enerji alır almaz çalışmaya başlar.\n\n### Arduino Uno'nun anatomisi\nArduino Uno, ATmega328P adlı bir mikrodenetleyici üzerine kurulmuş bir geliştirme kartıdır. Bu parçaları laboratuvardaki **Uno çiziminde** görebilirsin: laboratuvarı açınca Uno tuvalde hazır durur. Çipi, pin başlıklarını ve D13 yanındaki küçük L LED'ini çizim üzerinde bul. Kartın başlıca parçaları şunlardır.\n\n| Parça | Ne işe yarar? |\n|---|---|\n| ATmega328P çipi | Programı çalıştıran mikrodenetleyici |\n| Dijital pinler (0-13) | Dışarıya HIGH/LOW (5 V / 0 V) verir ya da dışarıdan okur |\n| Analog giriş pinleri (A0-A5) | 0-5 V arasındaki gerilimi ölçer |\n| 5V ve GND pinleri | Parçalara 5 V besleme ve toprak (0 V) verir |\n| USB girişi | Gerçek kartta programı yüklemek ve kartı beslemek için kullanılır. Laboratuvarda yükleme ve besleme otomatiktir |\n| Reset düğmesi | Programı baştan başlatır. Laboratuvarda bu işi ↺ düğmesi görür |\n| D13'e bağlı dahili LED (L) | Hiçbir parça eklemeden deneme yapmak için |\n\nATmega328P'nin bazı sayısal özellikleri: 16 MHz saat hızı, 32 KB program belleği (flash), 2 KB çalışma belleği (SRAM) ve 1 KB EEPROM. Bunlar bir telefonla kıyaslanınca çok küçüktür. Ama bir LED'i yakmak ya da bir motoru kontrol etmek için fazlasıyla yeter.\n\n### Dijital pin ne yapar?\nDijital bir pin iki durumdan birinde olur:\n- **HIGH:** Pin yaklaşık 5 V verir.\n- **LOW:** Pin 0 V verir.\n\nBir pin ya **çıkış** (kart dışarıya gerilim verir, örneğin LED yakmak için) ya da **giriş** (kart dışarıyı dinler, örneğin buton okumak için) olarak çalışır. Bu ayarı programda sen yaparsın.\n\n### Program nasıl çalışır?\nArduino programına **sketch** denir. Her sketch'te iki bölüm bulunur:\n- `setup()`: Kart açılınca bir kez çalışır.\n- `loop()`: Sürekli tekrar eder.\n\nSonraki derslerde bunları kendin yazacaksın. Şimdilik yalnızca kalıbı tanı:\n\n```\nvoid setup() {\n  // bir kez çalışacak komutlar\n}\n\nvoid loop() {\n  // sürekli tekrar eden komutlar\n}\n```\n\n### Çalışma ortamı\nBu modülde her şeyi platformun **devre laboratuvarında** yapacaksın. Solda kod düzenleyici, sağda devre tuvali vardır; Uno tuvalde hazır durur. Parçaları **Parça ekle** menüsünden seçersin, pinleri kablo çekerek bağlarsın. Sonra ▶ **Derle ve çalıştır**'a basarsın ve devre canlanır. Laboratuvar Uno'nun 5V, 3V3 ve GND pinlerini otomatik besler. Hata yaparsan hiçbir şey bozulmaz: ■ ile durdurup düzeltir, ↺ ile baştan başlarsın.\n\n### Dene\n- Laboratuvardaki Uno çizimine bak. 14 dijital pini ve 6 analog pini say.\n- 5V, GND ve D13 yazılarını çizimde bul. D13 yanındaki L LED'ini göster.\n- Etkinlik: devre kurmadan, yalnız kod yazarak D13'e bağlı dahili L LED'i yanıp söndür.\n- Evinde mikrodenetleyici bulunan üç cihaz yaz (ör. mikrodalga fırın, uzaktan kumanda).\n\n### Sık yapılan hatalar\n- Mikrodenetleyiciyi \"küçük bilgisayar\" sanıp her şeyi yapmasını beklemek: tek ve basit işler için tasarlanmıştır.\n- Pin numarasını kartın üzerindeki yazıyla karıştırmak: `A0` analog, `0` dijital pindir.\n- Devreyi kurarken GND'yi unutmak: devre tamamlanmaz, parçalar çalışmaz.",
-          "question": "Evindeki hangi cihazın içinde bir mikrodenetleyici olduğunu düşünüyorsun ve bunu nereden anladın? Aynı cihazı tek bir işe değil, çok işe programlayabilsek ne olurdu?"
+          "question": "Evindeki hangi cihazın içinde bir mikrodenetleyici olduğunu düşünüyorsun ve bunu nereden anladın? Aynı cihazı tek bir işe değil, çok işe programlayabilsek ne olurdu?",
+          "explainerMd": "### Bu derste öğreneceklerin\n- Mikrodenetleyicinin ne olduğunu ve sıradan bir bilgisayardan farkını\n- Arduino Uno kartının başlıca parçalarını (pinler, 5V, GND, dahili L LED)\n- Bir pinin HIGH ve LOW durumlarını\n- Her programın iki bölümünü: `setup()` ve `loop()`\n\n### Önceden bilmen gerekenler\nHiçbir şey. Bu ders sıfırdan başlar. Yalnızca bir bilgisayar ve laboratuvarı açabilecek bir tarayıcı yeter.\n\n### Etrafındaki küçük bilgisayarlar\nMikrodalga fırının ne kadar süre çalışacağını, çamaşır makinesinin suyu ne zaman boşaltacağını, uzaktan kumandanın hangi tuşa basıldığını bir devre \"bilir\". Bu devrenin kalbinde genellikle bir **mikrodenetleyici** vardır.\n\nMikrodenetleyici, bir bilgisayarın üç temel parçasını (işlemci, bellek, giriş-çıkış) **tek bir çipe** sığdırır. Ekranı ya da klavyesi yoktur; onun yerine **bacakları (pin)** vardır. Bu pinlere LED, buton, sensör, motor gibi parçalar bağlanır. Bir bilgisayar her işi yapabilsin diye tasarlanır. Mikrodenetleyici ise **tek bir iş için** programlanır ve o işi sürekli yapar.\n\n### Program çipte kalır\nProgramı karta bir kez yüklersin. Program çipin **flash** belleğine yazılır ve güç kesilse bile silinmez. Kartı yeniden çalıştırdığında program kendiliğinden başlar. Bu yüzden bir cihazı prize taktığında hemen çalışır.\n\n### Arduino Uno, çipin etrafına kurulmuş bir kart\nArduino Uno'nun beyni **ATmega328P** çipidir. Kart, çipi kullanmayı kolaylaştıran parçalarla birlikte gelir:\n\n- **Dijital pinler (0-13):** HIGH ya da LOW verir ya da dışarıdan okur.\n- **Analog giriş pinleri (A0-A5):** 0 ile 5 V arasındaki gerilimi ölçer.\n- **5V ve GND pinleri:** Parçalara 5 volt ve toprak (0 V) verir.\n- **Dahili L LED'i:** D13'e bağlıdır. Hiçbir parça eklemeden deneme yapabilirsin.\n\nBu parçaları laboratuvarda Uno çiziminin üzerinde bulabilirsin. Laboratuvar, gerçek kartın USB ile program yükleme ve besleme işlerini senin yerine yapar.\n\n### HIGH ve LOW\nDijital bir pin iki durumdan birinde olur. **HIGH**, pinin yaklaşık 5 V verdiği; **LOW**, 0 V verdiği durumdur. Bir pin **çıkış** olarak ayarlanırsa kart pini kendisi sürer (örneğin LED yakar). **Giriş** olarak ayarlanırsa kart pini dinler (örneğin buton okur). Bu ayarı `pinMode` komutuyla programda sen yaparsın.\n\n### Her programın iki bölümü\nArduino programına **sketch** denir. İki bölümü vardır:\n\n```\nvoid setup() {\n  // kart açılınca BİR KEZ çalışır\n}\n\nvoid loop() {\n  // sürekli, baştan sona, tekrar tekrar çalışır\n}\n```\n\n`setup()` hazırlık içindir (pinlerin yönünü belirlemek gibi). `loop()` asıl iştir ve sonuna gelince başa döner. Kart güç aldığı sürece bu döngü hiç durmaz.\n\n### Özet\nMikrodenetleyici tek çipte küçük bir bilgisayardır ve tek bir iş için programlanır. Arduino Uno bu çipi pinlerle kullanılabilir hâle getirir. Pinler HIGH ya da LOW olur; programın `setup()` bölümü bir kez, `loop()` bölümü sürekli çalışır. Şimdi etkinlikte laboratuvarı açıp Uno'yu tanıyacaksın.",
+          "concepts": [
+            {
+              "term": "Mikrodenetleyici",
+              "definition": "İşlemci, bellek ve giriş-çıkış parçalarını tek çipte toplayan, tek bir iş için programlanan küçük bilgisayar.",
+              "example": "Çamaşır makinesinin içindeki çip, suyun ne zaman boşaltılacağını programdan bilir.",
+              "pitfall": "Onu her işi yapabilen bir bilgisayar sanmak; tek ve basit işler için tasarlanmıştır."
+            },
+            {
+              "term": "Sketch",
+              "definition": "Arduino programının adı. İçinde setup() ve loop() bölümleri bulunur.",
+              "example": "Dahili LED'i yakıp söndüren on satırlık bir sketch yazabilirsin.",
+              "pitfall": "Sketch'i bir kez yüklenip kaybolan bir şey sanmak; güç kesilse de çipin flash belleğinde kalır."
+            },
+            {
+              "term": "setup() ve loop()",
+              "definition": "setup() kart açılınca bir kez çalışır; loop() bittiği anda baştan başlar ve sürekli tekrar eder.",
+              "example": "Pinin yönünü setup() içinde bir kez belirlersin, LED'i yakıp söndürmeyi loop() içinde yaparsın.",
+              "pitfall": "Sürekli tekrar etmesi gereken komutu setup() içine yazmak: yalnız bir kez çalışır."
+            },
+            {
+              "term": "HIGH ve LOW",
+              "definition": "Bir dijital pinin iki durumu. HIGH yaklaşık 5 V, LOW 0 V demektir.",
+              "example": "D13 HIGH olunca bağlı LED yanar, LOW olunca söner.",
+              "pitfall": "HIGH'ı hep \"açık\" sanmak; buton okurken (INPUT_PULLUP) basılı olmak LOW demektir."
+            },
+            {
+              "term": "Çıkış ve giriş (pinMode)",
+              "definition": "Çıkış pinini kart sürer; giriş pinini kart dinler. Yönü pinMode ile sen belirlersin.",
+              "example": "LED için pinMode(13, OUTPUT), buton için pinMode(2, INPUT_PULLUP) yazılır.",
+              "pitfall": "pinMode yazmayı unutmak: pin çıkış olmaz, LED çok sönük yanar ya da hiç yanmaz."
+            },
+            {
+              "term": "GND",
+              "definition": "Devrenin 0 V referans noktası (toprak). Akımın geri döndüğü yoldur.",
+              "example": "LED'in katot ucu GND'ye bağlanınca devre kapanır ve akım akabilir.",
+              "pitfall": "GND'yi bağlamayı unutmak: devre tamamlanmaz, parça çalışmaz."
+            }
+          ],
+          "quiz": [
+            {
+              "id": "m3h1d1-q1",
+              "kind": "mcq",
+              "prompt": "Mikrodenetleyiciyi sıradan bir bilgisayardan ayıran en önemli özellik hangisidir?",
+              "options": [
+                "Mutlaka bir ekranı ve klavyesi olması",
+                "İşlemci, bellek ve giriş-çıkışı tek çipte toplaması ve genellikle tek bir iş için programlanması",
+                "Yalnızca internete bağlanabilmesi",
+                "Elektrik olmadan çalışabilmesi"
+              ],
+              "answer": 1,
+              "explanation": "Mikrodenetleyici bir bilgisayarın temel parçalarını tek çipe sığdırır ve genellikle tek bir iş için programlanır. Ekranı ya da klavyesi yoktur; bacakları vardır.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "id": "m3h1d1-q2",
+              "kind": "mcq",
+              "prompt": "Program karta yüklendikten sonra güç kesilip yeniden verilirse ne olur?",
+              "options": [
+                "Program silinir, yeniden yüklemen gerekir",
+                "Program çipte kalır ve kart enerji alınca kendiliğinden çalışmaya başlar",
+                "Yalnızca setup() çalışır",
+                "Kart yeni bir program bekler"
+              ],
+              "answer": 1,
+              "explanation": "Program flash belleğe yazılır ve güç kesilince silinmez. Güç gelince kart programı baştan çalıştırır.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "id": "m3h1d1-q3",
+              "kind": "predict-output",
+              "prompt": "D13 pinine LED bağlı. Bu sketch çalışınca LED ne yapar?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n  digitalWrite(13, HIGH);\n}\n\nvoid loop() {\n}\n```",
+              "options": [
+                "Yanıp söner",
+                "Sürekli yanık kalır",
+                "Hiç yanmaz",
+                "Derleme hatası olur"
+              ],
+              "answer": 1,
+              "explanation": "setup() bir kez çalışır ve D13'ü HIGH yapar. loop() boş olduğu için pini değiştiren başka komut yoktur; pin HIGH kalır ve LED sürekli yanar.",
+              "skills": [
+                "digital-out",
+                "prog-structure"
+              ]
+            },
+            {
+              "id": "m3h1d1-q4",
+              "kind": "mcq",
+              "prompt": "Aşağıdaki ifadelerden hangisi doğrudur?",
+              "options": [
+                "A0 ile 0 aynı pindir",
+                "A0 bir analog giriş pinidir, 0 ise dijital bir pindir",
+                "A0 yalnızca LED yakmak içindir",
+                "Uno'da analog pin yoktur"
+              ],
+              "answer": 1,
+              "explanation": "A0-A5 analog giriş pinleridir. 0-13 numaralı pinler ise dijitaldir. Aynı numarayı taşımaları onları aynı yapmaz.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "id": "m3h1d1-q5",
+              "kind": "numeric",
+              "prompt": "Arduino Uno'nun D0'dan D13'e kadar kaç dijital pini vardır?",
+              "answer": 14,
+              "unit": "pin",
+              "explanation": "D0'dan D13'e kadar sayılırsa 0, 1, 2 ... 13 olmak üzere 14 pin eder. Saymaya 0'dan başlandığı için son numara (13) ile pin sayısı (14) farklıdır.",
+              "skills": [
+                "mcu-board"
+              ]
+            }
+          ]
         },
         {
           "title": "Elektrik: V, I, R ve Ohm yasası",
           "durationMin": 20,
           "problem": "Gerçek bir LED'i doğrudan 5 V'a bağlarsan çok kısa sürede bozulabilir. Aradaki küçük bir direnç onu nasıl kurtarır? Ve o direncin değerini tahmin etmek yerine hesaplayabilir miyiz? Laboratuvar bu kuralı modeller: LED'e fazla akım giderse uyarı çıkar. Üstelik akımı kendin ölçebilirsin.",
           "contentMd": "### Üç temel büyüklük\n| Büyüklük | Simge | Birim | Su borusu benzetmesi |\n|---|---|---|---|\n| Gerilim | V | volt (V) | Suyu iten basınç |\n| Akım | I | amper (A) | Borudan geçen su miktarı |\n| Direnç | R | ohm (Ω) | Borunun darlığı |\n\nSu benzetmesi basit bir modeldir. Elektrik suya benzemez ama fikri anlamana yardım eder: basınç artarsa akış artar, boru daralırsa akış azalır.\n\nKüçük akımları **miliamper** (mA) ile yazarız: 1 A = 1000 mA. Büyük dirençleri **kiloohm** (kΩ) ile yazarız: 1 kΩ = 1000 Ω.\n\n### Ohm yasası\nBir direncin uçları arasındaki gerilim, ondan geçen akımla direncin çarpımına eşittir:\n\n**V = I × R**\n\nBuradan iki tane daha formül çıkar:\n- **I = V / R** (akımı bulmak için)\n- **R = V / I** (direnci bulmak için)\n\n### Örnek hesaplar\n1. 5 V ve 1000 Ω (1 kΩ): I = 5 / 1000 = 0,005 A = **5 mA**.\n2. 5 V ve 500 Ω: I = 5 / 500 = 0,01 A = **10 mA**. Direnç yarıya inince akım iki katına çıkar.\n3. 9 V ve 3 A akım isteyen bir yük: R = 9 / 3 = **3 Ω**.\n4. 220 Ω dirençten 20 mA geçiyor: V = 0,02 × 220 = **4,4 V**.\n\n### LED için direnç hesabı\nLED bir direnç değildir. Yanarken uçlarında yaklaşık sabit bir gerilim düşer. Kırmızı bir LED için bu değer tipik olarak yaklaşık 2 V'tur (kesin değer LED'in veri sayfasında yazar). Geri kalan gerilim seri dirençte düşmelidir.\n\nBesleme 5 V, LED gerilimi 2 V ise direncin üzerinde 5 − 2 = 3 V kalır.\n\nBu hesap pinin ve LED'in iç dirençlerini yok sayan idealleştirilmiş bir hesaptır:\n\n- 330 Ω için akım: I = 3 / 330 ≈ 0,0091 A ≈ **9 mA**. LED güvenle yanar.\n- 150 Ω için akım: I = 3 / 150 = 0,02 A = **20 mA**. Daha parlak olur, ama sınıra yakındır.\n- 100 Ω için akım: I = 3 / 100 = **30 mA**. Bu fazladır; LED ve pin zarar görebilir.\n\nArduino Uno'nun bir pini için önerilen en yüksek akım yaklaşık 20 mA'dir; 40 mA ise aşılmaması gereken mutlak sınırdır. Bu yüzden bu modülde kırmızı LED'lerle **330 Ω** kullanıyoruz.\n\n### Sanal ölçüm: akımı ve gerilimi oku\nGerçek devrelerde bu değerleri multimetre ölçer. Laboratuvarda bunun karşılığı **sanal ölçümdür**. Devre çalışırken tuvalde bir parçayı (örneğin direnci ya da LED'i) seç. Parçanın uçları arasındaki **gerilim** ve içinden geçen **akım** özellik panelinde görünür. Önce ▶ ile devreyi çalıştırman gerekir; çalışmayan devrede ölçülecek bir şey yoktur.\n\nOhm yasasını bununla sınayabilirsin: D13'ü 330 Ω'luk bir dirençle LED'e bağla, kod D13'ü HIGH yapsın. Direnci seçince yaklaşık 2,8 V ve 8,6 mA görmelisin. Hesabımız 3 V ve 9 mA demişti; küçük fark normaldir, çünkü laboratuvar Uno pininin iç direncini (yaklaşık 25 Ω) ve LED'in iç direncini de modeller. Bu iki direnç de gerilimden pay alır, o yüzden seri dirence 3 V'un tamamı düşmez. Fark küçük direnç değerlerinde büyür: 150 Ω'da akım 20 mA değil yaklaşık 17 mA, 100 Ω'da 30 mA değil yaklaşık 24 mA ölçülür. Sonra ■ ile durdur, direnci özellik panelinden 1000 Ω yap ve yeniden çalıştırıp ölç: akım yaklaşık 3 mA'e düşmelidir (gerilim de 3 V'a yaklaşır, çünkü akım azalınca pinde ve LED'de kaybolan pay küçülür).\n\n### Dirençte renk kodu\nGerçek dirençlerin üzerindeki renkli halkalar değeri verir. Laboratuvarda değeri özellik panelinden yazarsın, ama gerçek dirençleri okumak için kodu bilmek yararlıdır. 330 Ω için sıra: turuncu, turuncu, kahverengi. İlk iki halka rakamdır (3 ve 3), üçüncü halka çarpandır (kahverengi = ×10), yani 33 × 10 = 330 Ω.\n\n### Dene\n- 5 V'a bağlı 220 Ω'luk bir dirençten ne kadar akım geçer? (Cevap: yaklaşık 22,7 mA)\n- Aynı 5 V ile 10 mA akım geçirmek istiyorsan hangi direnç gerekir? (Cevap: 500 Ω)\n- Kırmızı LED (2 V) ve 5 V besleme ile 330 Ω yerine 1 kΩ kullanırsan akım ne olur? LED nasıl görünür? (Cevap: 3 mA; sönük yanar)\n- Laboratuvarda bu devreyi kur, direnç değerini değiştir ve sanal ölçümle akımı oku. Hesabınla ölçülen değer uyuşuyor mu? Küçük farkın nedenini kendi cümlelerinle açıkla.\n\n### Sık yapılan hatalar\n- mA ile A'yı karıştırmak: 20 mA = 0,02 A'dir. Formülde önce ampere çevir.\n- LED'e direnç koymamak: akım hiçbir şey tarafından sınırlanmaz. Laboratuvar bunu modeller ve LED yanarsa uyarı verir; ↺ ile baştan başlayabilirsin.\n- \"Direnç büyükse akım büyüktür\" sanmak: tersine, direnç büyüdükçe akım **azalır**.",
-          "question": "Direnci iki katına çıkarırsan LED'in parlaklığı nasıl değişir ve neden? Çok parlak ama güvenli bir LED için dirençle oynamak iyi bir fikir midir?"
+          "question": "Direnci iki katına çıkarırsan LED'in parlaklığı nasıl değişir ve neden? Çok parlak ama güvenli bir LED için dirençle oynamak iyi bir fikir midir?",
+          "explainerMd": "### Bu derste öğreneceklerin\n- Gerilim, akım ve direncin ne olduğunu ve birimlerini\n- Ohm yasasını (V = I × R) ve onunla hesap yapmayı\n- Bir LED için seri direncin neden gerektiğini ve değerini nasıl seçeceğini\n- Laboratuvarda sanal ölçümle akımı okumayı\n\n### Önceden bilmen gerekenler\nDers 1'deki HIGH (≈ 5 V) ve LOW (0 V) fikri. Dört işlem ve ondalık sayılar yeter.\n\n### Üç temel büyüklük\nElektrik devresini bir **su borusu** gibi düşünebilirsin. Bu benzetme gerçek değildir ama fikri oturtmaya yardım eder.\n\n| Büyüklük | Simge | Birim | Benzetme |\n|---|---|---|---|\n| Gerilim | V | volt (V) | Suyu iten basınç |\n| Akım | I | amper (A) | Borudan geçen su miktarı |\n| Direnç | R | ohm (Ω) | Borunun darlığı |\n\nKüçük akımları **miliamper** (mA) ile yazarız: 1 A = 1000 mA. Büyük dirençleri **kiloohm** (kΩ) ile yazarız: 1 kΩ = 1000 Ω.\n\n### Ohm yasası\nBir direncin uçları arasındaki gerilim, ondan geçen akımla direncin çarpımına eşittir:\n\n**V = I × R**\n\nBunu üç biçimde kullanırsın: `I = V / R` (akımı bul), `R = V / I` (direnci bul), `V = I × R` (gerilimi bul). Hesap yapmadan önce **birimleri çevir**: akımı amper, direnci ohm yaz.\n\n**Örnek.** 5 V'a bağlı 1 kΩ'luk bir dirençten geçen akım: I = 5 / 1000 = 0,005 A = **5 mA**. Direnci 500 Ω yaparsan akım **10 mA** olur. Direnç yarıya indi, akım iki katına çıktı.\n\n### Neden LED'e direnç koyarız?\nLED bir direnç gibi akımı kendisi sınırlamaz. Yanarken uçlarında yaklaşık sabit bir gerilim düşer (kırmızıda yaklaşık 2 V). Kalan gerilimin bir yerde düşmesi gerekir. Aradaki **seri direnç** o kalan gerilimi üstlenir ve akımı belirler:\n\n`I = (V besleme − V LED) / R`\n\n5 V besleme, 2 V'luk kırmızı LED ve 330 Ω için: I = (5 − 2) / 330 ≈ 0,009 A ≈ **9 mA**. Bu, LED'in güvenle yandığı bir akımdır. 100 Ω kullansaydın akım 30 mA olurdu; bu fazladır.\n\n### Hesap ile ölçüm\nBu hesap idealleştirilmiştir. Gerçekte (ve laboratuvarda) Uno pininin iç direnci ve LED'in iç direnci de gerilimden pay alır. Bu yüzden ölçülen akım hesaptan biraz küçük çıkar: 330 Ω'da yaklaşık 8,6 mA gibi. Küçük fark normaldir ve hata değildir; modelin daha ayrıntılı olduğunu gösterir.\n\n### Özet\nGerilim itici, akım akış, direnç engeldir. Ohm yasası üçünü bağlar: V = I × R. LED'in akımını direnç belirler; bu yüzden LED'e hep seri direnç koyarız. Bu modülde 5 V ile kırmızı LED için **330 Ω** kullanıyoruz.",
+          "concepts": [
+            {
+              "term": "Gerilim (V)",
+              "definition": "Akımı iten \"basınç\"; birimi volt. İki nokta arasındaki elektriksel fark.",
+              "example": "Uno'nun HIGH pini yaklaşık 5 V verir.",
+              "pitfall": "Gerilimi \"içinden geçen şey\" sanmak; gerilim iki nokta arasında ölçülür, akım ise içinden geçer."
+            },
+            {
+              "term": "Akım (I)",
+              "definition": "Devreden geçen yük akışı; birimi amper. Elektronikte çoğunlukla miliamper (mA) kullanılır.",
+              "example": "Kırmızı LED 330 Ω ile yaklaşık 9 mA çeker.",
+              "pitfall": "mA ile A'yı karıştırmak: 20 mA = 0,02 A'dir."
+            },
+            {
+              "term": "Direnç (R)",
+              "definition": "Akıma karşı koyan özellik; birimi ohm (Ω). Büyüdükçe akım azalır.",
+              "example": "5 V'ta 1 kΩ'dan 5 mA, 500 Ω'dan 10 mA geçer.",
+              "pitfall": "\"Direnç büyükse akım büyüktür\" sanmak; tersine, akım azalır."
+            },
+            {
+              "term": "Ohm yasası",
+              "definition": "V = I × R. Üç büyüklükten ikisi biliniyorsa üçüncüsü bulunur.",
+              "example": "220 Ω'dan 20 mA geçiyorsa V = 0,02 × 220 = 4,4 V.",
+              "pitfall": "Birimleri çevirmeden formüle koymak (mA'yi doğrudan yazmak)."
+            },
+            {
+              "term": "Seri direnç",
+              "definition": "LED ile art arda bağlanan ve akımı sınırlayan direnç.",
+              "example": "D13 → 330 Ω → LED → GND bağlantısında 330 Ω seri dirençtir.",
+              "pitfall": "LED'e direnç koymamak: akım sınırlanmaz, LED yanabilir."
+            },
+            {
+              "term": "Sanal ölçüm",
+              "definition": "Laboratuvarda devre çalışırken bir parçayı seçince özellik panelinde gerilim ve akımı görmen.",
+              "example": "Çalışan devrede 330 Ω direnci seçince yaklaşık 2,8 V ve 8,6 mA görürsün.",
+              "pitfall": "Devre çalışmıyorken ölçmeye çalışmak: önce ▶ ile çalıştır."
+            }
+          ],
+          "quiz": [
+            {
+              "id": "m3h1d2-q1",
+              "kind": "numeric",
+              "prompt": "5 V'a bağlı 1000 Ω'luk (1 kΩ) bir dirençten kaç mA akım geçer?",
+              "answer": 5,
+              "tolerance": 0.01,
+              "unit": "mA",
+              "explanation": "I = V / R = 5 / 1000 = 0,005 A. 0,005 A = 5 mA.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "id": "m3h1d2-q2",
+              "kind": "numeric",
+              "prompt": "5 V ile bir dirençten 10 mA akım geçirmek istiyorsun. Direnç kaç ohm olmalı?",
+              "answer": 500,
+              "tolerance": 0.5,
+              "unit": "Ω",
+              "explanation": "Önce akımı ampere çevir: 10 mA = 0,01 A. R = V / I = 5 / 0,01 = 500 Ω.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "id": "m3h1d2-q3",
+              "kind": "mcq",
+              "prompt": "Gerilim sabitken bir dirençin değerini iki katına çıkarırsan akım ne olur?",
+              "options": [
+                "İki katına çıkar",
+                "Yarıya iner",
+                "Değişmez",
+                "Sıfır olur"
+              ],
+              "answer": 1,
+              "explanation": "I = V / R. Payda iki katına çıkınca sonuç yarıya iner: direnç büyüdükçe akım azalır.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "id": "m3h1d2-q4",
+              "kind": "mcq",
+              "prompt": "Bir LED'i doğrudan, seri direnç olmadan 5 V'a bağlarsan ne olur?",
+              "options": [
+                "LED daha parlak yanar ve zarar görmez",
+                "Akım hiçbir şey tarafından sınırlanmaz; LED çok akım çeker ve zarar görebilir",
+                "LED hiç yanmaz",
+                "Hiçbir şey değişmez"
+              ],
+              "answer": 1,
+              "explanation": "LED akımı kendisi sınırlamaz. Seri direnç yoksa akım yükselir ve LED (ve Uno pini) zarar görebilir. Laboratuvar bunu modeller ve uyarı verir.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "id": "m3h1d2-q5",
+              "kind": "mcq",
+              "prompt": "Laboratuvarda 330 Ω'luk dirençte 8,6 mA ölçtün; hesabın 9 mA demişti. Fark neden çıktı?",
+              "options": [
+                "Laboratuvar yanlış çalışıyor",
+                "Uno pininin ve LED'in iç dirençleri de gerilimden pay alır, hesap bunları yok sayıyordu",
+                "Ohm yasası burada geçerli değil",
+                "mA ile A karıştırıldı"
+              ],
+              "answer": 1,
+              "explanation": "Hesap idealleştirilmişti. Laboratuvar pinin iç direncini (yaklaşık 25 Ω) ve LED'in iç direncini de modeller; seri dirence 3 V'un tamamı düşmez, akım biraz küçük çıkar.",
+              "skills": [
+                "elec-ohm",
+                "elec-led-resistor"
+              ]
+            }
+          ]
         },
         {
           "title": "İlk program: Blink",
           "durationMin": 20,
           "problem": "Her programın bir \"merhaba dünya\"sı vardır. Donanımda bu bir LED'i yakıp söndürmektir. Peki bir kart, bir LED'in ne zaman yanıp ne zaman sönmesi gerektiğini nereden bilir?",
           "contentMd": "### Devre\n| Parça | Bağlantı |\n|---|---|\n| LED (kırmızı) | **A** (anot, uzun bacak) → direncin bir ucu; **K** (katot, kısa bacak) → GND |\n| 330 Ω direnç | Bir ucu **D13**, öbür ucu LED'in **A** ucu |\n\nParçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Direncin değerini özellik panelinden 330 Ω yap.\n\nUno'daki dahili L LED de D13'e bağlıdır; harici LED olmadan da program onu yakıp söndürür.\n\n### Program\n```cpp\n// sketch: blink\nvoid setup() {\n  pinMode(13, OUTPUT);      // 13. pini çıkış yap\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);   // LED yansın\n  delay(1000);              // 1000 ms bekle\n  digitalWrite(13, LOW);    // LED sönsün\n  delay(1000);\n}\n```\n\n### Nasıl çalışıyor?\n1. `setup()` kart açılınca **bir kez** çalışır. Pinlerin yönünü burada belirlersin.\n2. `loop()` bittiği anda **baştan başlar**, sonsuza kadar.\n3. `HIGH` pine 5 V verir, `LOW` 0 V. LED, direnç üzerinden bu gerilimle yanar.\n4. `delay(1000)` işlemciyi 1000 milisaniye (1 saniye) boyunca bekletir.\n\n### Dene\n- Bekleme süresini 200 ms yap ve yeniden ▶'e bas. LED hâlâ yanıp sönüyor mu, yoksa sürekli yanık mı görünüyor?\n- Yanık süresini 100 ms, sönük süresini 900 ms yap. Hangisi \"nabız\" gibi görünür?\n- S.O.S: üç kısa, üç uzun, üç kısa yanıp sönme programı yaz.\n\n### Sık yapılan hatalar\n- `pinMode` yazmayı unutmak: pin çıkış olmaz, LED çok sönük yanar ya da hiç yanmaz.\n- Her satırın sonundaki `;` işaretini unutmak: derleyici \"expected ';'\" der.\n- LED'i ters bağlamak: LED yönlüdür, A ve K ucu ters bağlanınca yanmaz.\n- Direnç koymamak: gerçek devrede LED ve pin zarar görebilir; laboratuvar bunu modeller ve uyarı verir. Direnç akımı sınırlar.",
-          "question": "`delay(1000)` çalışırken kart başka bir iş yapabilir mi? Bu program sırasında bir butona basılsa fark eder mi?"
+          "question": "`delay(1000)` çalışırken kart başka bir iş yapabilir mi? Bu program sırasında bir butona basılsa fark eder mi?",
+          "explainerMd": "### Bu derste öğreneceklerin\n- Bir pini çıkış yapmayı (`pinMode`) ve HIGH/LOW yazmayı (`digitalWrite`)\n- `delay` ile beklemeyi ve süreyi milisaniye olarak düşünmeyi\n- İlk devreni kurmayı: LED, direnç ve GND'nin bir halka oluşturması\n- Küçük program hatalarını tanımayı\n\n### Önceden bilmen gerekenler\nDers 1'de `setup()` ve `loop()`, HIGH ve LOW; ders 2'de LED için seri direncin gerekliliği.\n\n### Blink, donanımın \"merhaba dünya\"sı\nYeni bir dil öğrenirken ilk yazılan program ekrana \"Merhaba dünya\" yazar. Donanımda bunun karşılığı bir LED'i **yakıp söndürmektir**. Adı **Blink**'tir. Küçük görünür ama içinde programlamanın ve devrenin temelleri vardır.\n\n### Devre bir halkadır\nAkımın akması için kapalı bir yol gerekir: Uno pini → direnç → LED'in anodu (A) → LED'in katodu (K) → GND. Yolun herhangi bir yerinde kopukluk varsa LED yanmaz. LED **yönlüdür**: akım yalnız A'dan K'ya geçer. Direnç LED'i korur, değeri 330 Ω'dur (2. ders).\n\n### Program: dört komut\n```\npinMode(13, OUTPUT);     // 13. pini çıkış yap\ndigitalWrite(13, HIGH);  // pine 5 V ver\ndigitalWrite(13, LOW);   // pine 0 V ver\ndelay(1000);             // 1000 ms bekle\n```\n\n- `pinMode(pin, OUTPUT)` pinin **yönünü** belirler. `setup()` içinde bir kez yazılır.\n- `digitalWrite(pin, HIGH/LOW)` pinin **durumunu** belirler.\n- `delay(ms)` programı **milisaniye** cinsinden bekletir. 1000 ms = 1 saniye.\n\n### Sıra önemlidir\nKart komutları yukarıdan aşağıya, **sırayla** çalıştırır. `loop()` sonuna gelince en başa döner. Blink'te sıra şudur: yak, bekle, söndür, bekle, baştan. Bekleme süreleri yanık ve sönük kalma sürelerini belirler. Yanık 1000 ms, sönük 1000 ms ise bir tam tur 2000 ms sürer.\n\n### Sık görülen küçük hatalar\n- Her komutun sonundaki `;` unutulursa derleyici hata verir.\n- `pinMode` yazılmazsa pin çıkış olmaz; LED çok sönük yanar ya da hiç yanmaz.\n- LED ters bağlanırsa yanmaz. Hata yapmak bu ortamda güvenlidir: ■ ile durdurup düzeltebilir, ↺ ile baştan başlayabilirsin.\n\n### Özet\nBlink üç şeyi birleştirir: doğru kurulmuş bir devre, pinin yönünü belirleyen `pinMode` ve pini sürüp bekleyen `digitalWrite` ile `delay`. Komutlar sırayla çalışır ve `loop()` sürekli tekrar eder.",
+          "concepts": [
+            {
+              "term": "pinMode()",
+              "definition": "Bir pinin çıkış mı giriş mi olacağını belirler. Genellikle setup() içinde bir kez yazılır.",
+              "example": "pinMode(13, OUTPUT); komutu D13'ü çıkış yapar.",
+              "pitfall": "Yazmayı unutmak: pin çıkış olmaz, LED çok sönük yanar ya da hiç yanmaz."
+            },
+            {
+              "term": "digitalWrite()",
+              "definition": "Çıkış yapılmış bir pine HIGH (≈ 5 V) ya da LOW (0 V) yazar.",
+              "example": "digitalWrite(13, HIGH); LED'i yakar, digitalWrite(13, LOW); söndürür.",
+              "pitfall": "Pini çıkış yapmadan digitalWrite yazmak."
+            },
+            {
+              "term": "delay()",
+              "definition": "Programı verilen milisaniye kadar bekletir. 1000 ms = 1 saniye.",
+              "example": "delay(500); yarım saniye bekletir.",
+              "pitfall": "Süreyi saniye sanmak: delay(5) 5 saniye değil, 5 milisaniyedir."
+            },
+            {
+              "term": "Anot ve katot",
+              "definition": "LED'in iki ucu. Akım anot (A) ucundan girer, katot (K) ucundan çıkar. Gerçek LED'de uzun bacak anottur.",
+              "example": "Blink devresinde anot dirence, katot GND'ye bağlanır.",
+              "pitfall": "LED'i ters bağlamak: yanmaz."
+            },
+            {
+              "term": "Kapalı devre",
+              "definition": "Akımın pinden GND'ye kadar kesintisiz bir yol bulduğu devre. Yol kopuksa akım akmaz.",
+              "example": "D13 → direnç → LED → GND yolu bir halka oluşturur.",
+              "pitfall": "GND bağlantısını unutmak: devre kapanmaz, LED yanmaz."
+            },
+            {
+              "term": "Derleme hatası",
+              "definition": "Programın dil kurallarına uymaması yüzünden derleyicinin programı kabul etmemesi.",
+              "example": "Satır sonunda ';' eksikse \"expected ';'\" mesajı çıkar.",
+              "pitfall": "Hata mesajını okumadan kodu rastgele değiştirmek; mesaj hatanın nerede olduğunu söyler."
+            }
+          ],
+          "quiz": [
+            {
+              "id": "m3h1d3-q1",
+              "kind": "numeric",
+              "prompt": "Blink programında LED 1000 ms yanık, 1000 ms sönük kalıyor. Bir tam yanıp sönme turu kaç milisaniye sürer?",
+              "answer": 2000,
+              "tolerance": 0,
+              "unit": "ms",
+              "explanation": "Bir tur yanık süre ile sönük sürenin toplamıdır: 1000 + 1000 = 2000 ms (2 saniye).",
+              "skills": [
+                "prog-timing",
+                "digital-out"
+              ]
+            },
+            {
+              "id": "m3h1d3-q2",
+              "kind": "find-bug",
+              "prompt": "Bu program derlenirken hata veriyor. Hatalı satır hangisi?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH)\n  delay(500);\n  digitalWrite(13, LOW);\n  delay(500);\n}\n```",
+              "options": [
+                "pinMode(13, OUTPUT);",
+                "digitalWrite(13, HIGH)",
+                "delay(500);",
+                "digitalWrite(13, LOW);"
+              ],
+              "answer": 1,
+              "explanation": "digitalWrite(13, HIGH) satırının sonunda noktalı virgül yok. Derleyici \"expected ';'\" hatası verir. Her komut ';' ile bitmelidir.",
+              "skills": [
+                "prog-debug"
+              ]
+            },
+            {
+              "id": "m3h1d3-q3",
+              "kind": "find-bug",
+              "prompt": "Harici LED D13'e doğru bağlı ama LED çok sönük yanıyor ya da hiç yanmıyor. Sorunun nedeni ne?\n\n```\nvoid setup() {\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(1000);\n  digitalWrite(13, LOW);\n  delay(1000);\n}\n```",
+              "options": [
+                "setup() içinde pinMode(13, OUTPUT) yok",
+                "delay değerleri çok büyük",
+                "loop() kullanılmış",
+                "HIGH büyük harfle yazılmış"
+              ],
+              "answer": 0,
+              "explanation": "Pin çıkış olarak ayarlanmadığı için digitalWrite pini gerçekten sürmez. pinMode(13, OUTPUT) setup() içine yazılmalı.",
+              "skills": [
+                "prog-debug",
+                "digital-out"
+              ]
+            },
+            {
+              "id": "m3h1d3-q4",
+              "kind": "mcq",
+              "prompt": "Blink devresinde LED'in katot (K) ucu nereye bağlanır?",
+              "options": [
+                "Doğrudan D13'e",
+                "5V pinine",
+                "GND'ye",
+                "Hiçbir yere"
+              ],
+              "answer": 2,
+              "explanation": "Akım pinden direnç ve LED'in anodu üzerinden girer, katottan çıkıp GND'ye döner. Katot GND'ye bağlanmazsa devre kapanmaz.",
+              "skills": [
+                "circuit-wiring"
+              ]
+            },
+            {
+              "id": "m3h1d3-q5",
+              "kind": "numeric",
+              "prompt": "LED 100 ms yanık, 900 ms sönük kalacak. LED bir turun yüzde kaçında yanıktır?",
+              "answer": 10,
+              "tolerance": 0,
+              "unit": "%",
+              "explanation": "Tur süresi 100 + 900 = 1000 ms. Yanık süre 100 ms olduğundan 100 / 1000 = %10.",
+              "skills": [
+                "prog-timing"
+              ]
+            }
+          ]
         },
         {
           "title": "Çoklu LED, for döngüsü ve diziler",
           "durationMin": 25,
           "problem": "Dört LED'i sırayla yakmak için aynı satırları dört kez yazmak gerekir. Peki 40 LED olsaydı? Programcılar aynı işi tekrar tekrar yazmak yerine kartın bunu kendisinin tekrar etmesini sağlar.",
           "contentMd": "### Devre\n| Parça | Bağlantı |\n|---|---|\n| LED 1 (kırmızı) | Anot → 330 Ω → **D13**; katot → GND |\n| LED 2 (sarı) | Anot → 330 Ω → **D12**; katot → GND |\n| LED 3 (yeşil) | Anot → 330 Ω → **D11**; katot → GND |\n| LED 4 (mavi) | Anot → 330 Ω → **D10**; katot → GND |\n\nParçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Her LED'in kendi direnci olur. Dört K ucunu Uno'nun GND pinlerinden birine bağlayabilirsin. LED'in rengini özellik panelinden seçersin.\n\n### for döngüsü\n`for` döngüsü bir işi belirli sayıda tekrar eder. Üç parçası vardır:\n\n```\nfor (int i = 10; i <= 13; i++) {\n  // i sırasıyla 10, 11, 12, 13 değerini alır\n}\n```\n\n- `int i = 10`: sayaç 10'dan başlar.\n- `i <= 13`: sayaç 13'e eşit ya da küçük olduğu sürece devam et.\n- `i++`: her turdan sonra sayacı 1 artır.\n\nDört `pinMode` satırı yazmak yerine döngü kullanabilirsin:\n\n```\nfor (int pin = 10; pin <= 13; pin++) {\n  pinMode(pin, OUTPUT);\n}\n```\n\n### Program 1: Sırayla yanan LED'ler\n```cpp\n// sketch: coklu_led\nvoid setup() {\n  for (int pin = 10; pin <= 13; pin++) {\n    pinMode(pin, OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int pin = 10; pin <= 13; pin++) {\n    digitalWrite(pin, HIGH);   // bu LED yansın\n    delay(300);\n    digitalWrite(pin, LOW);    // sonra sönsün\n  }\n}\n```\n\n### Dizi (array)\nBir dizi, aynı türden birçok değeri tek bir isim altında saklar. Elemanlar **0'dan** başlayarak numaralanır.\n\n```\nint ledler[] = {13, 12, 11, 10};\n// ledler[0] = 13, ledler[1] = 12, ledler[2] = 11, ledler[3] = 10\n```\n\nDizi sayesinde pin numaralarının sıralı olması gerekmez. LED'leri istediğin pine bağlarsın, sırayı dizide yazarsın.\n\n### Program 2: Gidip gelen ışık\n```cpp\n// sketch: dizi_led\nint ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  // ileri: 13, 12, 11, 10\n  for (int i = 0; i < 4; i++) {\n    digitalWrite(ledler[i], HIGH);\n    delay(200);\n    digitalWrite(ledler[i], LOW);\n  }\n  // geri: 11, 12\n  for (int i = 2; i >= 1; i--) {\n    digitalWrite(ledler[i], HIGH);\n    delay(200);\n    digitalWrite(ledler[i], LOW);\n  }\n}\n```\n\n### Nasıl çalışıyor?\n1. `setup()` içinde döngü, dört pini de çıkış yapar.\n2. İleri döngüsünde `i` 0'dan 3'e gider. `ledler[i]` sırayla 13, 12, 11 ve 10 olur.\n3. Geri döngüsünde `i--` sayacı bir azaltır; `i` 2'den 1'e iner. Böylece uçtaki LED'ler iki kez yanmaz ve ışık gidip gelir.\n4. Her LED 200 ms yanar, sonra söner. Bir tam tur 6 × 200 = 1200 ms sürer.\n\n### Dene\n- `delay` değerlerini 50 ms yap ve yeniden ▶'e bas. Işık hâlâ ayrı ayrı görülebiliyor mu?\n- `ledler` dizisine yeni bir pin ekle (ör. D9) ve döngü sınırlarını buna göre değiştir.\n- Önce hepsini birlikte yakıp sonra hepsini birlikte söndüren bir program yaz.\n\n### Sık yapılan hatalar\n- Dizide `ledler[4]` yazmak: 4 elemanlı dizinin son elemanı `ledler[3]`'tür. Diziden taşmak beklenmedik davranışa yol açar.\n- Döngü koşulunda `<` ile `<=` karıştırmak: bir eleman fazla ya da eksik işlenir.\n- `for` satırının sonuna `;` koymak: döngü gövdesi çalışmaz.\n- Dizinin elemanları 1'den başlıyor sanmak: ilk eleman `ledler[0]`'dır.",
-          "question": "Dört LED yerine otuz LED olsaydı, döngü ve dizi kullanmak sana ne kazandırırdı? Dizi kullanmadan aynı programı yazmak ne kadar uzun olurdu?"
+          "question": "Dört LED yerine otuz LED olsaydı, döngü ve dizi kullanmak sana ne kazandırırdı? Dizi kullanmadan aynı programı yazmak ne kadar uzun olurdu?",
+          "explainerMd": "### Bu derste öğreneceklerin\n- Bir işi tekrar tekrar yazmak yerine `for` döngüsüyle tekrarlamayı\n- Dizilerle birden çok değeri tek isim altında tutmayı ve elemanlara numarayla ulaşmayı\n- Dört LED'i sırayla yakmayı\n- Döngü ve dizi hatalarını tanımayı\n\n### Önceden bilmen gerekenler\nDers 3: `pinMode`, `digitalWrite`, `delay`, devre kurma. Ders 2: her LED'in kendi seri direnci olur.\n\n### Tekrar eden iş\nDört LED'i sırayla yakmak için aynı üç satırı dört kez yazman gerekir. Otuz LED olsaydı doksan satır yazardın. Programcılar bu tür işleri bilgisayara bırakır: \"Bu adımları şu kadar kez tekrarla.\"\n\n### for döngüsü\n`for` üç parçayla çalışır:\n\n```\nfor (int i = 10; i <= 13; i++) {\n  // gövde: i sırasıyla 10, 11, 12, 13 olur\n}\n```\n\n1. **Başlangıç** (`int i = 10`): sayaç, döngü başlamadan önce bir kez kurulur.\n2. **Koşul** (`i <= 13`): her turdan önce kontrol edilir; doğruysa gövde çalışır, yanlışsa döngü biter.\n3. **Artış** (`i++`): her turdan sonra sayaç 1 artar. `i--` ise 1 azaltır.\n\nBu örnekte gövde i = 10, 11, 12 ve 13 için çalışır, yani **4 tur**. i 14 olunca koşul yanlış olur ve döngü biter.\n\n### Dizi\n**Dizi**, aynı türden birçok değeri tek bir isim altında saklar:\n\n```\nint ledler[] = {13, 12, 11, 10};\n```\n\nElemanlara **numarayla (indeks)** ulaşırsın ve numaralama **0'dan başlar**:\n\n| İndeks | 0 | 1 | 2 | 3 |\n|---|---|---|---|---|\n| Değer | 13 | 12 | 11 | 10 |\n\n`ledler[2]` değeri 11'dir. 4 elemanlı bir dizide geçerli indeksler 0, 1, 2 ve 3'tür; `ledler[4]` diziden **taşar** ve beklenmedik davranışa yol açar.\n\n### Döngü ve dizi birlikte\nDiziyi `for` ile gezersen her LED için aynı kodu bir kez yazarsın:\n\n```\nfor (int i = 0; i < 4; i++) {\n  digitalWrite(ledler[i], HIGH);\n}\n```\n\n`i < 4` ile `i <= 3` aynı sonucu verir. Eleman sayısı N ise dizi döngüsünde genellikle `i < N` yazılır. Pin numaralarının sıralı olması da gerekmez; sırayı dizide sen belirlersin.\n\n### Dikkat\n- `for (...)` satırının sonuna `;` koyarsan döngü gövdesi boş kalır; ardından gelen `{ }` bloğu döngünün parçası olmaz.\n- `<` ile `<=` farkı bir tur fazla ya da eksik demektir.\n\n### Özet\n`for` bir işi tekrarlar; dizi birden çok değeri tek isimde tutar. İndeksler 0'dan başlar, N elemanlı dizinin son indeksi N − 1'dir. İkisini birlikte kullanınca kısa ve değiştirmesi kolay programlar yazılır.",
+          "concepts": [
+            {
+              "term": "for döngüsü",
+              "definition": "Bir işi sayaçla belirli sayıda tekrar eder: başlangıç, koşul ve artıştan oluşur.",
+              "example": "for (int pin = 10; pin <= 13; pin++) dört pini sırayla işler.",
+              "pitfall": "for satırının sonuna ';' koymak: döngü gövdesi boş kalır."
+            },
+            {
+              "term": "Sayaç değişkeni",
+              "definition": "Döngünün kaçıncı turda olduğunu tutan değişken. Genellikle i adı verilir.",
+              "example": "Döngüde i sırasıyla 0, 1, 2, 3 değerini alır.",
+              "pitfall": "Sayacı döngü içinde yanlışlıkla değiştirmek."
+            },
+            {
+              "term": "Dizi (array)",
+              "definition": "Aynı türden birçok değeri tek bir isim altında saklar.",
+              "example": "int ledler[] = {13, 12, 11, 10}; dört pin numarasını tutar.",
+              "pitfall": "Elemanlarının 1'den başladığını sanmak."
+            },
+            {
+              "term": "İndeks",
+              "definition": "Dizideki bir elemanın sıra numarası. 0'dan başlar.",
+              "example": "ledler[0] = 13, ledler[3] = 10.",
+              "pitfall": "4 elemanlı dizide ledler[4] yazmak: diziden taşar."
+            },
+            {
+              "term": "i++ ve i--",
+              "definition": "Sayacı 1 artırır ya da 1 azaltır.",
+              "example": "for (int i = 2; i >= 1; i--) döngüsü 2 ve 1 değerleriyle iki tur çalışır.",
+              "pitfall": "Azalan döngüde koşulu yanlış yönde yazmak (örneğin i <= 1)."
+            },
+            {
+              "term": "< ve <= farkı",
+              "definition": "< \"küçükse\", <= \"küçük ya da eşitse\" demektir. Tur sayısını değiştirir.",
+              "example": "i < 4 ile i = 0, 1, 2, 3 (4 tur); i <= 4 ile 5 tur döner.",
+              "pitfall": "Dizi gezerken <= kullanıp son turda diziden taşmak."
+            }
+          ],
+          "quiz": [
+            {
+              "id": "m3h1d4-q1",
+              "kind": "predict-output",
+              "prompt": "Bu dizide ledler[2] hangi değere sahiptir?\n\n```\nint ledler[] = {13, 12, 11, 10};\n```",
+              "options": [
+                "13",
+                "12",
+                "11",
+                "10"
+              ],
+              "answer": 2,
+              "explanation": "İndeksler 0'dan başlar: ledler[0] = 13, ledler[1] = 12, ledler[2] = 11, ledler[3] = 10.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "id": "m3h1d4-q2",
+              "kind": "numeric",
+              "prompt": "Bu döngünün gövdesi kaç kez çalışır?\n\n```\nfor (int pin = 10; pin <= 13; pin++) {\n  pinMode(pin, OUTPUT);\n}\n```",
+              "answer": 4,
+              "tolerance": 0,
+              "unit": "kez",
+              "explanation": "pin sırasıyla 10, 11, 12 ve 13 olur. 14'te koşul (pin <= 13) yanlış olur ve döngü biter. Toplam 4 tur.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "id": "m3h1d4-q3",
+              "kind": "find-bug",
+              "prompt": "Program dört LED'i çıkış yapmak istiyor ama dizi sınırının dışına taşıyor. Hata nerede?\n\n```\nint ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i <= 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n```",
+              "options": [
+                "int ledler[] = {13, 12, 11, 10};",
+                "i <= 4 koşulu",
+                "pinMode(ledler[i], OUTPUT);",
+                "i++ ifadesi"
+              ],
+              "answer": 1,
+              "explanation": "Dizinin son indeksi 3'tür. i <= 4 olduğundan döngü 5 tur döner ve son turda ledler[4]'e ulaşır; bu dizinin dışıdır. Doğrusu i < 4 (ya da i <= 3).",
+              "skills": [
+                "prog-loops-arrays",
+                "prog-debug"
+              ]
+            },
+            {
+              "id": "m3h1d4-q4",
+              "kind": "numeric",
+              "prompt": "\"Gidip gelen ışık\" programında ileri turda 4 LED, geri turda 2 LED sırayla 200 ms yanıyor. Loop'un bir tam turu kaç ms sürer? (Söndürme anında beklemek yok sayılır.)",
+              "answer": 1200,
+              "tolerance": 0,
+              "unit": "ms",
+              "explanation": "Toplam 4 + 2 = 6 yanma var ve her biri 200 ms sürüyor: 6 × 200 = 1200 ms.",
+              "skills": [
+                "prog-timing",
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "id": "m3h1d4-q5",
+              "kind": "numeric",
+              "prompt": "Bu döngü kaç tur döner?\n\n```\nfor (int i = 2; i >= 1; i--) {\n  // ...\n}\n```",
+              "answer": 2,
+              "tolerance": 0,
+              "unit": "tur",
+              "explanation": "i = 2 için koşul (i >= 1) doğru, gövde çalışır. i = 1 için de doğru. i = 0 olunca koşul yanlış olur. Toplam 2 tur.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            }
+          ]
         },
         {
           "title": "Proje: Trafik ışığı",
           "durationMin": 30,
           "problem": "Her kavşakta ışıklar belli bir düzenle yanar: kırmızıda dur, yeşilde geç, sarıda hazırlan. Aynı düzeni üç LED ve birkaç satır kodla kurabilir misin?",
           "contentMd": "### Devre\n| Parça | Bağlantı |\n|---|---|\n| Kırmızı LED | Anot → 330 Ω → **D13**; katot → GND |\n| Sarı LED | Anot → 330 Ω → **D12**; katot → GND |\n| Yeşil LED | Anot → 330 Ω → **D11**; katot → GND |\n\nParçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. LED'lerin renklerini özellik panelinden kırmızı, sarı ve yeşil yap. Her LED'in kendi direnci olmalı. Kırmızı LED için 330 Ω, 5 V'ta yaklaşık 9 mA akım verir (2. dersteki hesap gibi). Sarı ve yeşil LED'lerin gerilim düşümü biraz farklı olabilir; yine de bu direnç güvenli bir seçimdir.\n\n### Plan\nÖnce ışığın sırasını bir tabloya yaz. Programı yazmadan önce planı yapmak hatayı azaltır.\n\n| Aşama | Yanan LED | Süre |\n|---|---|---|\n| 1 | Kırmızı (D13) | 5 saniye |\n| 2 | Yeşil (D11) | 5 saniye |\n| 3 | Sarı (D12) | 2 saniye |\n\nSonra başa dönülür. Aynı anda yalnızca bir LED yanar.\n\n### Program\n```cpp\n// sketch: trafik_isigi\nvoid setup() {\n  pinMode(13, OUTPUT);   // kırmızı\n  pinMode(12, OUTPUT);   // sarı\n  pinMode(11, OUTPUT);   // yeşil\n}\n\nvoid loop() {\n  // 1. aşama: kırmızı\n  digitalWrite(13, HIGH);\n  digitalWrite(12, LOW);\n  digitalWrite(11, LOW);\n  delay(5000);\n\n  // 2. aşama: yeşil\n  digitalWrite(13, LOW);\n  digitalWrite(11, HIGH);\n  delay(5000);\n\n  // 3. aşama: sarı\n  digitalWrite(11, LOW);\n  digitalWrite(12, HIGH);\n  delay(2000);\n\n  digitalWrite(12, LOW);\n}\n```\n\n### Nasıl çalışıyor?\n1. `setup()` üç pini de çıkış yapar.\n2. `loop()` her aşamada önce hangi LED'lerin yanacağını belirler, sonra `delay` ile bekler.\n3. Aşamalar bittiğinde sarı LED söndürülür ve `loop()` baştan başlar. Böylece kırmızı yeniden yanar.\n4. Bir tam tur 5 + 5 + 2 = 12 saniye sürer.\n\n### Diziyle yeniden yaz\nAynı projeyi `for` döngüsü ve dizi ile de kurabilirsin. Pin numaralarını bir diziye koyup `setup()` içinde döngüyle çıkış yapabilirsin. Bu, 4. derste öğrendiğin yöntemdir.\n\n```\nint ledler[] = {13, 12, 11};\n\nvoid setup() {\n  for (int i = 0; i < 3; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n```\n\n### Dene\n- Gerçek kavşaklarda kırmızıdan yeşile geçmeden önce kısa bir uyarı aşaması olabilir. Kırmızı ve sarıyı birlikte yakan 1 saniyelik bir aşama ekle.\n- Yeşil LED'i bitmeden önce 3 kez yanıp söndür.\n- Süreleri değiştir: kırmızı 3 saniye, yeşil 8 saniye. Hangi yönün trafiği daha yoğun olurdu?\n\n### Sık yapılan hatalar\n- Bir önceki aşamanın LED'ini söndürmeyi unutmak: iki LED birlikte yanar.\n- LED'leri GND yerine 5 V'a bağlamak: LED yanmaz ya da ters yanar.\n- Pin numarasını yanlış yazmak: kırmızı için D13 kullandıysan `digitalWrite`'ta da 13 yazmalısın.\n- `delay` süresini saniye sanmak: `delay(5)` 5 saniye değil, 5 milisaniyedir.",
-          "question": "Gerçek bir kavşakta iki yönün ışıkları birbirine bağlı çalışır. İkinci bir ışık takımı ekleseydin, kırmızı ve yeşil aşamalarını nasıl düzenlerdin? Aynı anda iki yönün yeşili yanması neden tehlikeli olurdu?"
+          "question": "Gerçek bir kavşakta iki yönün ışıkları birbirine bağlı çalışır. İkinci bir ışık takımı ekleseydin, kırmızı ve yeşil aşamalarını nasıl düzenlerdin? Aynı anda iki yönün yeşili yanması neden tehlikeli olurdu?",
+          "explainerMd": "### Bu derste öğreneceklerin\n- Bir projeye kodla değil **plan** ile başlamayı\n- Aşamaları tabloya dökmeyi (hangi LED, ne kadar süre)\n- Trafik ışığı devresini ve programını kurmayı\n- Önceki derslerin bilgilerini tek bir projede birleştirmeyi\n\n### Önceden bilmen gerekenler\n`pinMode`, `digitalWrite`, `delay` (3. ders), her LED için seri direnç (2. ders), çoklu LED bağlantısı (4. ders). Dizi ve döngü bu derste isteğe bağlıdır.\n\n### Plan, koddan önce gelir\nKüçük bir proje bile birkaç adımdan oluşur. Doğrudan koda atlarsan hangi LED'in ne zaman yanması gerektiğini yazarken kafan karışır. Önce bir **tablo** çiz:\n\n| Aşama | Yanan LED | Süre |\n|---|---|---|\n| 1 | Kırmızı (D13) | 5 saniye |\n| 2 | Yeşil (D11) | 5 saniye |\n| 3 | Sarı (D12) | 2 saniye |\n\nTablo bir kez doğru olunca kod, tablonun satır satır çevirisi olur.\n\n### Tablodan koda\nHer aşama kodda aynı üç adımdan oluşur:\n1. Yanması gerekmeyen LED'leri **söndür** (`LOW`).\n2. Yanacak LED'i **yak** (`HIGH`).\n3. Süre kadar **bekle** (`delay`).\n\nBir aşamada önceki LED'i söndürmeyi unutursan iki LED birlikte yanar. Gerçek bir kavşakta iki yönün birlikte yeşil olması kazaya yol açardı.\n\n### Süreleri doğru yaz\n`delay` **milisaniye** alır. 5 saniye için `delay(5000)` yazarsın. `delay(5)` yalnızca 5 milisaniye bekletir. Tüm turun süresi aşama sürelerinin toplamıdır: 5 + 5 + 2 = 12 saniye.\n\n### Devre\nHer LED'in kendi seri direnci olur. Kırmızı LED için 330 Ω ile 5 V'ta yaklaşık 9 mA akım geçer (2. ders). Sarı ve yeşil LED'lerin gerilim düşümü biraz farklıdır; aynı direnç güvenli bir seçimdir.\n\n### Özet\nProje = plan + devre + kod. Önce tabloyu yaz, sonra her aşamayı \"söndür, yak, bekle\" kalıbıyla koda çevir. Süreleri milisaniyeye çevirmeyi ve önceki LED'i söndürmeyi unutma.",
+          "concepts": [
+            {
+              "term": "Plan tablosu",
+              "definition": "Programı yazmadan önce aşamaları, yanacak LED'leri ve süreleri sıralayan tablo.",
+              "example": "Trafik ışığında üç satırlık tablo: kırmızı 5 s, yeşil 5 s, sarı 2 s.",
+              "pitfall": "Planı atlayıp doğrudan kod yazmak: hata arama süresi uzar."
+            },
+            {
+              "term": "Aşama (durum)",
+              "definition": "Bir anda hangi LED'lerin yandığını tanımlayan adım. Süresi dolunca bir sonrakine geçilir.",
+              "example": "Kırmızı aşamada yalnız D13 HIGH, diğerleri LOW'dur.",
+              "pitfall": "Bir aşamada önceki LED'i söndürmeyi unutmak: iki LED birlikte yanar."
+            },
+            {
+              "term": "Söndür - yak - bekle kalıbı",
+              "definition": "Her aşamada önce gereksiz LED'leri söndürür, sonra yanacak olanı yakar, ardından beklersin.",
+              "example": "digitalWrite(13, LOW); digitalWrite(11, HIGH); delay(5000);",
+              "pitfall": "Sırayı karıştırıp önce bekleyip sonra yakmak."
+            },
+            {
+              "term": "Tur süresi",
+              "definition": "loop()'un bir kez baştan sona çalışması için geçen süre; aşama sürelerinin toplamıdır.",
+              "example": "5 + 5 + 2 = 12 saniye.",
+              "pitfall": "Süreleri milisaniye yerine saniye sanıp delay(5) yazmak."
+            },
+            {
+              "term": "Her LED'e ayrı direnç",
+              "definition": "Her LED'in akımını kendi seri direnci sınırlar.",
+              "example": "Üç LED için üç tane 330 Ω direnç kullanılır.",
+              "pitfall": "Dirençsiz LED bağlamak: akım sınırlanmaz."
+            }
+          ],
+          "quiz": [
+            {
+              "id": "m3h1d5-q1",
+              "kind": "numeric",
+              "prompt": "Trafik ışığında kırmızı 5 s, yeşil 5 s ve sarı 2 s yanıyor. Bir tam tur kaç saniye sürer?",
+              "answer": 12,
+              "tolerance": 0,
+              "unit": "s",
+              "explanation": "Tur süresi aşama sürelerinin toplamıdır: 5 + 5 + 2 = 12 saniye.",
+              "skills": [
+                "prog-timing",
+                "prog-planning"
+              ]
+            },
+            {
+              "id": "m3h1d5-q2",
+              "kind": "find-bug",
+              "prompt": "Bu programda yeşil aşamada kırmızı LED de yanık kalıyor. Eksik olan nedir?\n\n```\ndigitalWrite(13, HIGH);   // kırmızı\ndelay(5000);\ndigitalWrite(11, HIGH);   // yeşil\ndelay(5000);\n```",
+              "options": [
+                "Yeşil aşamadan önce kırmızıyı söndüren digitalWrite(13, LOW) satırı",
+                "pinMode(13, OUTPUT) satırı",
+                "delay(5000) çok kısa",
+                "digitalWrite(11, LOW) satırı"
+              ],
+              "answer": 0,
+              "explanation": "Kırmızı bir kez HIGH yapıldıktan sonra LOW yapılmazsa yanık kalır. Yeşile geçmeden önce digitalWrite(13, LOW) gerekir.",
+              "skills": [
+                "prog-debug",
+                "digital-out"
+              ]
+            },
+            {
+              "id": "m3h1d5-q3",
+              "kind": "numeric",
+              "prompt": "5 saniye beklemek için delay() içine hangi sayıyı yazmalısın?",
+              "answer": 5000,
+              "tolerance": 0,
+              "unit": "ms",
+              "explanation": "delay milisaniye bekler. 1 saniye = 1000 ms olduğundan 5 saniye = 5000 ms. delay(5) yalnız 5 milisaniye bekler.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "id": "m3h1d5-q4",
+              "kind": "mcq",
+              "prompt": "Projeye kod yazarak değil, önce bir plan tablosuyla başlamanın en büyük faydası nedir?",
+              "options": [
+                "Kod daha hızlı çalışır",
+                "Hangi aşamada hangi LED'in ne kadar yanacağı baştan netleşir; kod tablonun çevirisi olur ve hata azalır",
+                "Tablo olmadan program derlenmez",
+                "LED'ler daha parlak yanar"
+              ],
+              "answer": 1,
+              "explanation": "Plan, programın ne yapacağını önceden netleştirir. Tablo doğruysa kod onun satır satır çevirisidir; hata aramak da kolaylaşır.",
+              "skills": [
+                "prog-planning"
+              ]
+            },
+            {
+              "id": "m3h1d5-q5",
+              "kind": "numeric",
+              "prompt": "Kırmızı LED (yaklaşık 2 V), 5 V besleme ve 330 Ω direnç için idealleştirilmiş hesapla akım kaç mA çıkar? (En yakın tam sayıya yuvarla.)",
+              "answer": 9,
+              "tolerance": 0.5,
+              "unit": "mA",
+              "explanation": "I = (5 − 2) / 330 ≈ 0,0091 A ≈ 9 mA. Laboratuvarda pin ve LED iç dirençleri yüzünden ölçüm biraz daha küçük (yaklaşık 8,6 mA) çıkar.",
+              "skills": [
+                "elec-led-resistor",
+                "elec-ohm"
+              ]
+            }
+          ]
         }
       ]
     },
@@ -283,14 +847,14 @@ export const modul3: ModuleContent = {
           "title": "EEPROM, String ve SRAM",
           "durationMin": 25,
           "problem": "Bir cihazın gücü kesilip yeniden verildiğinde tüm değişkenlerinin değerleri sıfırlanır. Termostatın \"hedef sıcaklık 24 derece\" ayarını nasıl hatırlayacak? Üstelik Uno'nun belleği çok küçük: bir telefon fotoğrafı bile ona sığmaz. Bu küçük belleği nasıl akıllıca kullanırız?",
-          "contentMd": "### Üç bellek\nArduino Uno'nun (ATmega328P) üç ayrı belleği vardır:\n\n| Bellek | Boyut | Ne tutar? | Güç kesilince? |\n|---|---|---|---|\n| Flash | 32 KB | Programın kendisi | Kalır |\n| SRAM | 2 KB | Çalışırken değişkenler | Silinir |\n| EEPROM | 1 KB | Kalıcı ayarlar | Kalır |\n\n`int`, `float`, `String` gibi değişkenlerin hepsi SRAM'dedir. Kalıcı olmasını istediğin veriyi **EEPROM**'a yazarsın.\n\n### Devre\nBu derste devre kurmayacaksın: laboratuvardaki Uno yeterli, ek parça yok. Sonuçları **Seri monitörde** (9600 baud) okuyacaksın.\n\n**Laboratuvar notu:** ▶ ile her çalıştırmada Uno'nun EEPROM'u boş (her hücrede 255) başlar; laboratuvar bellek içeriğini çalıştırmalar arasında saklamaz. Gerçek bir Uno'da EEPROM, güç kesilse de içeriğini korurdu. Bu yüzden bu derste \"kalıcılığı\" kodun mantığından ve yazma sayısından anlarsın, çalıştırmalar arasında değil.\n\n### Program: açılış sayacı\nHer açılışta EEPROM'daki sayıyı bir artıran program. Hiç yazılmamış bir EEPROM hücresinde `255` bulunur; bunu \"boş\" kabul ediyoruz.\n\n```cpp\n// sketch: eeprom_sayac\n#include <EEPROM.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  byte sayi = EEPROM.read(0);        // 0. adresteki baytı oku\n  if (sayi == 255) sayi = 0;         // hiç yazılmamış: sıfırdan başla\n  sayi = sayi + 1;\n  EEPROM.update(0, sayi);            // yeni değeri 0. adrese yaz\n  Serial.print(\"Acilis sayisi: \");\n  Serial.println(sayi);\n}\n\nvoid loop() {\n}\n```\n\nGerçek bir kartta güç kesilip yeniden verildikçe sayı 1, 2, 3 diye artar. Laboratuvarda ise EEPROM her çalıştırmada boş başladığı için ▶'e her bastığında \"Acilis sayisi: 1\" görürsün; kod doğrudur, yalnızca bellek saklanmıyor.\n\n### Yıpranma: write mi, update mi?\nEEPROM hücreleri sonsuza kadar yazılamaz. Üretici her hücre için yaklaşık **100.000 yazma** garanti eder. Bundan sonra hücre bozulabilir. Okumak ise hücreyi yıpratmaz.\n\nHesap: hedef sıcaklığı her saniye aynı hücreye yazarsan 100.000 saniye = yaklaşık 27,8 saat sonra hücre garanti sınırına ulaşır. Her dakika yazsan bile yaklaşık 69 gün yeter. Bu yüzden EEPROM'a **yalnızca değer değiştiğinde** ve mümkünse seyrek yazmalısın.\n\n- `EEPROM.write(adres, değer)` her çağrıldığında yazar, değer aynı olsa bile.\n- `EEPROM.update(adres, değer)` önce hücreyi okur; değer zaten aynıysa **hiç yazmaz**.\n\n```cpp\n// sketch: eeprom_yipranma\n#include <EEPROM.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    EEPROM.write(10, 7);     // her seferinde yazar\n  }\n  for (int i = 0; i < 5; i++) {\n    EEPROM.update(11, 7);    // yalnızca ilkinde yazar\n  }\n  Serial.print(\"10. adres: \");\n  Serial.println(EEPROM.read(10));\n  Serial.print(\"11. adres: \");\n  Serial.println(EEPROM.read(11));\n}\n\nvoid loop() {\n}\n```\n\nİki adreste de sonuç 7'dir, ama ilk döngü 5 yazma harcar, ikincisi yalnızca 1 (ilk değer 255 olduğu için). Ayrıca bir yazma işlemi yaklaşık 3-4 ms sürer; yani `update` hem hücreyi korur hem de zaman kazandırır.\n\n### Birden çok değer: put ve get\n`EEPROM.read` ve `EEPROM.write` tek bayt içindir. `int` iki bayt, `float` dört bayt kaplar. Bunları tek komutla yazmak için `EEPROM.put` ve `EEPROM.get` vardır. Bu komutlar da değer aynıysa baytı yeniden yazmaz.\n\n```cpp\n// sketch: eeprom_put_get\n#include <EEPROM.h>\n\nstruct Ayar {            // birden çok değeri bir arada tutan kutu\n  int hedef;\n  float fark;\n};\n\nvoid setup() {\n  Serial.begin(9600);\n  Ayar a = {24, 0.5};\n  EEPROM.put(20, a);     // 20. adresten itibaren yaz\n\n  Ayar b;\n  EEPROM.get(20, b);     // aynı yerden geri oku\n  Serial.print(\"hedef=\");\n  Serial.print(b.hedef);\n  Serial.print(\" fark=\");\n  Serial.println(b.fark, 1);\n}\n\nvoid loop() {\n}\n```\n\n`Ayar` 2 + 4 = 6 bayt kaplar; yani 20-25 numaralı adresler dolar. Yeni bir veri yazacaksan 26'dan başlamalısın, yoksa üstüne yazarsın.\n\n### String ve SRAM\nSRAM yalnızca 2048 bayttır. Her yazı, her dizi, her değişken buradan yer alır. `String` nesneleri kullanışlıdır (`+` ile birleştirilir) ama uzadıkça SRAM'de yer değiştirir ve belleği parçalayabilir. Kalıcı çalışacak programlarda mümkünse sabit boyutlu `char` dizileri kullan ve `String` kullanımını az tut.\n\nBir ipucu da şu: `Serial.println(\"Merhaba\")` yazısı SRAM'de yer tutar. `Serial.println(F(\"Merhaba\"))` ise yazıyı Flash'ta bırakır ve SRAM'i korur.\n\nAşağıdaki program, boş SRAM'i ölçer ve bir `String`'in ne kadar yer tuttuğunu gösterir.\n\n```cpp\n// sketch: sram_string\nextern int __heap_start, *__brkval;\n\nint bosRam() {\n  int v;\n  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(F(\"SRAM olcumu\"));\n  Serial.print(F(\"Once: \"));\n  Serial.println(bosRam());\n\n  String s = \"\";\n  for (int i = 0; i < 10; i++) {\n    s += \"0123456789\";          // her turda 10 karakter ekle (toplam 100)\n  }\n  Serial.print(F(\"Sonra: \"));\n  Serial.println(bosRam());\n  Serial.print(F(\"String uzunlugu: \"));\n  Serial.println(s.length());\n}\n\nvoid loop() {\n}\n```\n\n`bosRam()` yığın (stack) ile öbek (heap) arasındaki boşluğu hesaplar. `Sonra` değeri `Once` değerinden yaklaşık 100 küçüktür, çünkü `String` 100 karakteri SRAM'de saklar. Tam sayı kartına ve derleyiciye göre birkaç bayt oynayabilir.\n\n### Kütüphane kullanımı\nBu hafta üç kütüphane gördün: `LiquidCrystal`, `Wire`, `EEPROM`. Hepsi aynı kalıbı izler:\n1. `#include <Ad.h>` ile kütüphaneyi ekle.\n2. Gerekiyorsa bir **nesne** oluştur: `LiquidCrystal lcd(...)`. (`EEPROM` ve `Wire` için nesne hazırdır.)\n3. `nesne.komut()` biçiminde komutlarını çağır: `lcd.print()`, `Wire.begin()`, `EEPROM.read()`.\n\nLaboratuvarda bu kütüphaneler (`LiquidCrystal`, `LiquidCrystal_I2C`, `Wire`, `EEPROM`, `Servo`) hazırdır; programın başına `#include` yazman yeter, ayrıca kurulum gerekmez. Gerçek Arduino IDE'de yeni bir kütüphaneyi **Taslak > Kütüphane Ekle > Kütüphaneleri Yönet** menüsünden kurarsın; kütüphanenin **Dosya > Örnekler** altındaki hazır örnekleri, nasıl kullanılacağını gösteren en iyi kaynaktır.\n\n### Dene\n- `eeprom_sayac` programını çalıştır, ■ ile durdurup yeniden ▶'e bas. Sayı neden hep 1? (İpucu: laboratuvar EEPROM'u her çalıştırmada boş başlatır.) Gerçek kartta sonuç ne olurdu?\n- `eeprom_yipranma` içinde `update` döngüsünü 1000 kez döndür. Sonuç neden hâlâ 7?\n- `sram_string` programında `String` uzunluğunu 200 karaktere çıkar. `Sonra` değeri ne kadar azalıyor?\n- Laboratuvara bir potansiyometre ve bir buton ekle. Pot ile ayarlanan değeri butona basıldığında EEPROM'a kaydet. Her döngüde kaydetsen ne olurdu?\n\n### Sık yapılan hatalar\n- EEPROM'a her `loop` turunda yazmak: hücre kısa sürede yıpranır. Yalnızca değer değiştiğinde yaz; `update` kullan.\n- Adresleri çakıştırmak: iki farklı veriyi aynı adrese yazarsan biri ötekini bozar. Hangi veri hangi adreste, bir yere not et.\n- `EEPROM.read` ile `int` okumaya çalışmak: `read` yalnızca 1 bayt döndürür. 2 baytlık değerler için `get` kullan.\n- Hiç yazılmamış hücrenin 0 olduğunu sanmak: boş hücrede 255 vardır. Okuduğun değerin geçerli olup olmadığını kontrol et.\n- Uzun ve çok sayıda `String` birleştirmek: SRAM dolabilir ve kart zamanla beklenmedik davranabilir.",
+          "contentMd": "### Üç bellek\nArduino Uno'nun (ATmega328P) üç ayrı belleği vardır:\n\n| Bellek | Boyut | Ne tutar? | Güç kesilince? |\n|---|---|---|---|\n| Flash | 32 KB | Programın kendisi | Kalır |\n| SRAM | 2 KB | Çalışırken değişkenler | Silinir |\n| EEPROM | 1 KB | Kalıcı ayarlar | Kalır |\n\n`int`, `float`, `String` gibi değişkenlerin hepsi SRAM'dedir. Kalıcı olmasını istediğin veriyi **EEPROM**'a yazarsın.\n\n### Devre\nBu derste devre kurmayacaksın: laboratuvardaki Uno yeterli, ek parça yok. Sonuçları **Seri monitörde** (9600 baud) okuyacaksın.\n\n**Laboratuvar notu:** İlk ▶'de Uno'nun EEPROM'u boştur (her hücrede 255). ■ ile durdurup yeniden ▶'e basmak, gerçek kartta **güç kesip yeniden vermek** gibidir: laboratuvar EEPROM içeriğini korur ve yeni çalıştırma o içerikle başlar. Çalıştırma sırasında EEPROM'a yazdıkların bir sonraki çalıştırmada orada durur. Hücreleri tekrar boşaltmak (255) için ↺ Sıfırla'ya bas. (Yalnız ■/▶ ile durdurup başlatmak EEPROM'a dokunmaz; kodu değiştirsen de içerik kalır, tıpkı gerçek kartta yeni program yüklemenin EEPROM'u silmemesi gibi.)\n\n### Program: açılış sayacı\nHer açılışta EEPROM'daki sayıyı bir artıran program. Hiç yazılmamış bir EEPROM hücresinde `255` bulunur; bunu \"boş\" kabul ediyoruz.\n\n```cpp\n// sketch: eeprom_sayac\n#include <EEPROM.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  byte sayi = EEPROM.read(0);        // 0. adresteki baytı oku\n  if (sayi == 255) sayi = 0;         // hiç yazılmamış: sıfırdan başla\n  sayi = sayi + 1;\n  EEPROM.update(0, sayi);            // yeni değeri 0. adrese yaz\n  Serial.print(\"Acilis sayisi: \");\n  Serial.println(sayi);\n}\n\nvoid loop() {\n}\n```\n\nGüç kesilip yeniden verildikçe sayı 1, 2, 3 diye artar. Laboratuvarda da böyle: ilk ▶'de \"Acilis sayisi: 1\" görürsün; ■ ile durdurup yeniden ▶'e basınca (güç kesip verme) 2, sonra 3 olur. ↺ Sıfırla'ya basarsan EEPROM boşalır ve sayaç yeniden 1'den başlar.\n\n### Yıpranma: write mi, update mi?\nEEPROM hücreleri sonsuza kadar yazılamaz. Üretici her hücre için yaklaşık **100.000 yazma** garanti eder. Bundan sonra hücre bozulabilir. Okumak ise hücreyi yıpratmaz.\n\nHesap: hedef sıcaklığı her saniye aynı hücreye yazarsan 100.000 saniye = yaklaşık 27,8 saat sonra hücre garanti sınırına ulaşır. Her dakika yazsan bile yaklaşık 69 gün yeter. Bu yüzden EEPROM'a **yalnızca değer değiştiğinde** ve mümkünse seyrek yazmalısın.\n\n- `EEPROM.write(adres, değer)` her çağrıldığında yazar, değer aynı olsa bile.\n- `EEPROM.update(adres, değer)` önce hücreyi okur; değer zaten aynıysa **hiç yazmaz**.\n\n```cpp\n// sketch: eeprom_yipranma\n#include <EEPROM.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    EEPROM.write(10, 7);     // her seferinde yazar\n  }\n  for (int i = 0; i < 5; i++) {\n    EEPROM.update(11, 7);    // yalnızca ilkinde yazar\n  }\n  Serial.print(\"10. adres: \");\n  Serial.println(EEPROM.read(10));\n  Serial.print(\"11. adres: \");\n  Serial.println(EEPROM.read(11));\n}\n\nvoid loop() {\n}\n```\n\nİki adreste de sonuç 7'dir, ama ilk döngü 5 yazma harcar, ikincisi yalnızca 1 (ilk değer 255 olduğu için). Ayrıca bir yazma işlemi yaklaşık 3-4 ms sürer; yani `update` hem hücreyi korur hem de zaman kazandırır.\n\n### Birden çok değer: put ve get\n`EEPROM.read` ve `EEPROM.write` tek bayt içindir. `int` iki bayt, `float` dört bayt kaplar. Bunları tek komutla yazmak için `EEPROM.put` ve `EEPROM.get` vardır. Bu komutlar da değer aynıysa baytı yeniden yazmaz.\n\n```cpp\n// sketch: eeprom_put_get\n#include <EEPROM.h>\n\nstruct Ayar {            // birden çok değeri bir arada tutan kutu\n  int hedef;\n  float fark;\n};\n\nvoid setup() {\n  Serial.begin(9600);\n  Ayar a = {24, 0.5};\n  EEPROM.put(20, a);     // 20. adresten itibaren yaz\n\n  Ayar b;\n  EEPROM.get(20, b);     // aynı yerden geri oku\n  Serial.print(\"hedef=\");\n  Serial.print(b.hedef);\n  Serial.print(\" fark=\");\n  Serial.println(b.fark, 1);\n}\n\nvoid loop() {\n}\n```\n\n`Ayar` 2 + 4 = 6 bayt kaplar; yani 20-25 numaralı adresler dolar. Yeni bir veri yazacaksan 26'dan başlamalısın, yoksa üstüne yazarsın.\n\n### String ve SRAM\nSRAM yalnızca 2048 bayttır. Her yazı, her dizi, her değişken buradan yer alır. `String` nesneleri kullanışlıdır (`+` ile birleştirilir) ama uzadıkça SRAM'de yer değiştirir ve belleği parçalayabilir. Kalıcı çalışacak programlarda mümkünse sabit boyutlu `char` dizileri kullan ve `String` kullanımını az tut.\n\nBir ipucu da şu: `Serial.println(\"Merhaba\")` yazısı SRAM'de yer tutar. `Serial.println(F(\"Merhaba\"))` ise yazıyı Flash'ta bırakır ve SRAM'i korur.\n\nAşağıdaki program, boş SRAM'i ölçer ve bir `String`'in ne kadar yer tuttuğunu gösterir.\n\n```cpp\n// sketch: sram_string\nextern int __heap_start, *__brkval;\n\nint bosRam() {\n  int v;\n  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(F(\"SRAM olcumu\"));\n  Serial.print(F(\"Once: \"));\n  Serial.println(bosRam());\n\n  String s = \"\";\n  for (int i = 0; i < 10; i++) {\n    s += \"0123456789\";          // her turda 10 karakter ekle (toplam 100)\n  }\n  Serial.print(F(\"Sonra: \"));\n  Serial.println(bosRam());\n  Serial.print(F(\"String uzunlugu: \"));\n  Serial.println(s.length());\n}\n\nvoid loop() {\n}\n```\n\n`bosRam()` yığın (stack) ile öbek (heap) arasındaki boşluğu hesaplar. `Sonra` değeri `Once` değerinden yaklaşık 100 küçüktür, çünkü `String` 100 karakteri SRAM'de saklar. Tam sayı kartına ve derleyiciye göre birkaç bayt oynayabilir.\n\n### Kütüphane kullanımı\nBu hafta üç kütüphane gördün: `LiquidCrystal`, `Wire`, `EEPROM`. Hepsi aynı kalıbı izler:\n1. `#include <Ad.h>` ile kütüphaneyi ekle.\n2. Gerekiyorsa bir **nesne** oluştur: `LiquidCrystal lcd(...)`. (`EEPROM` ve `Wire` için nesne hazırdır.)\n3. `nesne.komut()` biçiminde komutlarını çağır: `lcd.print()`, `Wire.begin()`, `EEPROM.read()`.\n\nLaboratuvarda bu kütüphaneler (`LiquidCrystal`, `LiquidCrystal_I2C`, `Wire`, `EEPROM`, `Servo`) hazırdır; programın başına `#include` yazman yeter, ayrıca kurulum gerekmez. Gerçek Arduino IDE'de yeni bir kütüphaneyi **Taslak > Kütüphane Ekle > Kütüphaneleri Yönet** menüsünden kurarsın; kütüphanenin **Dosya > Örnekler** altındaki hazır örnekleri, nasıl kullanılacağını gösteren en iyi kaynaktır.\n\n### Dene\n- `eeprom_sayac` programını çalıştır, ■ ile durdurup yeniden ▶'e bas; bunu üç kez yap. Sayı neden 1, 2, 3 diye arttı? Sonra ↺ Sıfırla'ya basıp yeniden çalıştır: sayı neden yine 1? Program her açılışta EEPROM'a kaç kez yazıyor?\n- `eeprom_yipranma` içinde `update` döngüsünü 1000 kez döndür. Sonuç neden hâlâ 7?\n- `sram_string` programında `String` uzunluğunu 200 karaktere çıkar. `Sonra` değeri ne kadar azalıyor?\n- Laboratuvara bir potansiyometre ve bir buton ekle. Pot ile ayarlanan değeri butona basıldığında EEPROM'a kaydet. Her döngüde kaydetsen ne olurdu?\n\n### Sık yapılan hatalar\n- EEPROM'a her `loop` turunda yazmak: hücre kısa sürede yıpranır. Yalnızca değer değiştiğinde yaz; `update` kullan.\n- Adresleri çakıştırmak: iki farklı veriyi aynı adrese yazarsan biri ötekini bozar. Hangi veri hangi adreste, bir yere not et.\n- `EEPROM.read` ile `int` okumaya çalışmak: `read` yalnızca 1 bayt döndürür. 2 baytlık değerler için `get` kullan.\n- Hiç yazılmamış hücrenin 0 olduğunu sanmak: boş hücrede 255 vardır. Okuduğun değerin geçerli olup olmadığını kontrol et.\n- Uzun ve çok sayıda `String` birleştirmek: SRAM dolabilir ve kart zamanla beklenmedik davranabilir.",
           "question": "Termostatın hedef sıcaklığını tam olarak ne zaman EEPROM'a yazmalısın? Butona her basışta mı, yoksa kullanıcı ayarı bitirdikten bir süre sonra mı? Neden?"
         },
         {
           "title": "Bitirme projesi: Termostat",
           "durationMin": 35,
           "problem": "Evdeki kombi, akvaryum ısıtıcısı, kuluçka makinesi: hepsinin içinde aynı küçük beyin var. Sıcaklığı ölçer, istenen değerle karşılaştırır, ısıtıcıyı açar ya da kapatır. Üstelik fişi çekilse de istenen sıcaklığı unutmaz. Bu modülün bitirme projesinde bu beyni sen yapacaksın.",
-          "contentMd": "### Ne yapacağız?\nBu proje öğrendiklerini birleştirir:\n- **Hafta 3:** NTC termistörle sıcaklık hesabı (A2).\n- **Hafta 5:** Röle ile açma-kapama ve histerezis (D7).\n- **Hafta 6:** `millis()` ile bloklamayan kod ve durum makinesi.\n- **Hafta 7:** I2C LCD ekran ve EEPROM'da kalıcı ayar.\n\nKullanıcı iki butonla hedef sıcaklığı ayarlar. Ölçülen sıcaklık hedefin altına düşünce röle ısıtıcıyı açar, hedefe ulaşınca kapatır. Hedef sıcaklık EEPROM'da saklanır.\n\n### Devre\nParçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Gereken parçalar: NTC (`ntc`), iki direnç (10 kΩ ve 330 Ω), iki buton, bir röle (`relay`), bir LED ve bir I2C LCD (`lcdI2c`).\n\n| Parça | Bağlantı |\n|---|---|\n| NTC termistör | 1 ucu **A2**, 2 ucu GND |\n| 10 kΩ direnç (sabit) | 1 ucu 5V, 2 ucu **A2** |\n| Buton \"artır\" | A ucu **D2**, B ucu GND |\n| Buton \"azalt\" | A ucu **D3**, B ucu GND |\n| Röle IN | **D7** (röle VCC → 5V, röle GND → GND) |\n| \"Isıtıcı\" yerine LED | Röle COM → 5V; röle NO → 330 Ω direnç → LED A; LED K → GND |\n| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND (adres 0x27) |\n\nIsıtıcı yerine LED kullanıyoruz: LED yanıyorsa \"ısıtıcı açık\" demektir. Butonlar `INPUT_PULLUP` olduğu için basılı buton `LOW` okunur. NTC'nin direnci 10 kΩ'dur (25 °C'de) ve β değeri 3950'dir; sıcaklığı NTC'yi seçip sağ panelden değiştirirsin (çalışırken de olur). Röle özelliklerinde **Tetik** \"HIGH ile çeker\" olmalı (varsayılan); \"LOW ile çeker\" seçersen programdaki `HIGH` ve `LOW` yerlerini değiştirmen gerekir. LCD adresi 0x27'den farklıysa, önceki derste öğrendiğin tarama programıyla bul. LCD, `lcd.init()` içindeki bekleme yüzünden ▶'ten yaklaşık 1,5 saniye sonra yazı gösterir.\n\nNTC ve sabit direnç bir **gerilim bölücü** oluşturur: sıcaklık arttıkça NTC'nin direnci düşer ve A2'deki gerilim azalır. NTC direncini `R = 10000 × ADC / (1023 − ADC)` formülüyle buluruz. Sıcaklığı ise β = 3950 değerli Steinhart-Hart (beta) formülüyle hesaplarız. Gerçek bir termistörün β değeri farklıysa sabiti değiştirirsin; laboratuvarın NTC'si 3950 kullanır.\n\n### Durum makinesi\nTermostatın üç durumu var:\n\n| Durum | Röle | Bu durumdan çıkış |\n|---|---|---|\n| KAPALI | Kapalı | Sıcaklık `hedef − 0,5` değerine eşit ya da daha düşükse ISITIYOR; bir butona basılırsa AYAR |\n| ISITIYOR | Açık | Sıcaklık `hedef + 0,5` değerine eşit ya da daha yüksekse KAPALI; bir butona basılırsa AYAR |\n| AYAR | Kapalı | Son buton basışından 2 saniye sonra hedef EEPROM'a yazılır, KAPALI |\n\nHedefin 0,5 derece altında ve üstünde iki ayrı eşik vardır (**histerezis**). Böylece sıcaklık hedef civarında dalgalanırken röle bir açılıp bir kapanmaz.\n\nAYAR durumunda her basış hedefi 1 derece değiştirir ve 2 saniyelik süreyi yeniden başlatır. EEPROM'a yazma, ayar bittikten sonra **bir kez** yapılır; böylece art arda 5 basış 5 yazma harcamaz.\n\n### Program\n```cpp\n// sketch: termostat\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <EEPROM.h>\n\nconst int ARTIR = 2;\nconst int AZALT = 3;\nconst int ROLE = 7;\nconst int NTC_PIN = A2;\n\nconst int ADRES = 0;                // hedef sıcaklığın EEPROM adresi\nconst int HEDEF_MIN = 10;\nconst int HEDEF_MAX = 35;\nconst int HEDEF_VARSAYILAN = 22;\nconst float HISTEREZIS = 0.5;       // hedefin altı ve üstü için pay\nconst unsigned long AYAR_SURESI = 2000;   // ms\nconst unsigned long OLCUM_ARALIGI = 500;  // ms\n\nenum Durum { KAPALI, ISITIYOR, AYAR };\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nDurum durum = KAPALI;\nint hedef;\nfloat sicaklik;\nunsigned long sonOlcum = 0;\nunsigned long ayarBasla = 0;\nunsigned long sonBasis = 0;\nbool oncekiArtir = false;\nbool oncekiAzalt = false;\n\nfloat sicaklikOku() {\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(NTC_PIN);\n  }\n  float adc = toplam / 8.0;\n  if (adc < 1.0) adc = 1.0;           // sıfıra bölmeyi önle\n  if (adc > 1022.0) adc = 1022.0;\n  float direnc = 10000.0 * adc / (1023.0 - adc);\n  float kelvin = 1.0 / (log(direnc / 10000.0) / 3950.0 + 1.0 / 298.15);\n  return kelvin - 273.15;\n}\n\nconst char* durumAdi() {\n  if (durum == ISITIYOR) return \"ISIT  \";\n  if (durum == AYAR) return \"AYAR  \";\n  return \"KAPALI\";\n}\n\nvoid ekranYaz() {\n  lcd.setCursor(0, 0);\n  lcd.print(\"Su an: \");\n  lcd.print(sicaklik, 1);\n  lcd.print(\" C    \");\n  lcd.setCursor(0, 1);\n  lcd.print(\"Hedef:\");\n  lcd.print(hedef);\n  lcd.print(\"C \");\n  lcd.print(durumAdi());\n}\n\nvoid setup() {\n  pinMode(ARTIR, INPUT_PULLUP);\n  pinMode(AZALT, INPUT_PULLUP);\n  pinMode(ROLE, OUTPUT);\n  digitalWrite(ROLE, LOW);\n  Serial.begin(9600);\n\n  hedef = EEPROM.read(ADRES);\n  if (hedef < HEDEF_MIN || hedef > HEDEF_MAX) {\n    hedef = HEDEF_VARSAYILAN;         // boş (255) ya da bozuk değer\n  }\n\n  lcd.init();\n  lcd.backlight();\n  sicaklik = sicaklikOku();\n  ekranYaz();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Butonlar: basıldığı an (yüksekten alçağa geçiş) bir kez işle\n  bool artirBasili = (digitalRead(ARTIR) == LOW);\n  bool azaltBasili = (digitalRead(AZALT) == LOW);\n  bool artirYeni = artirBasili && !oncekiArtir;\n  bool azaltYeni = azaltBasili && !oncekiAzalt;\n  oncekiArtir = artirBasili;\n  oncekiAzalt = azaltBasili;\n\n  if ((artirYeni || azaltYeni) && simdi - sonBasis > 50) {   // 50 ms: sıçrama önleme\n    sonBasis = simdi;\n    if (artirYeni && hedef < HEDEF_MAX) hedef++;\n    if (azaltYeni && hedef > HEDEF_MIN) hedef--;\n    durum = AYAR;                      // ayar moduna gir, 2 saniyelik süreyi başlat\n    ayarBasla = simdi;\n    ekranYaz();\n  }\n\n  // 2) Sıcaklık: yarım saniyede bir ölç\n  bool olcumZamani = false;\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    sicaklik = sicaklikOku();\n    olcumZamani = true;\n  }\n\n  // 3) Durum makinesi\n  switch (durum) {\n    case KAPALI:\n      if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n      break;\n    case ISITIYOR:\n      if (sicaklik >= hedef + HISTEREZIS) durum = KAPALI;\n      break;\n    case AYAR:\n      if (simdi - ayarBasla >= AYAR_SURESI) {\n        EEPROM.update(ADRES, hedef);   // ayar bitti: yalnızca değiştiyse yazar\n        durum = KAPALI;\n      }\n      break;\n  }\n  digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW);\n\n  // 4) Ekran ve seri çıktı: her ölçümden sonra\n  if (olcumZamani) {\n    ekranYaz();\n    Serial.print(\"sicaklik=\");\n    Serial.print(sicaklik, 1);\n    Serial.print(\" hedef=\");\n    Serial.print(hedef);\n    Serial.print(\" role=\");\n    Serial.println(durum == ISITIYOR ? 1 : 0);\n  }\n}\n```\n\n### Nasıl çalışıyor?\n1. `setup` içinde önce EEPROM'dan hedef okunur. Hiç yazılmamış hücrede 255 vardır; bu değer 10-35 aralığının dışında olduğu için varsayılan 22 derece kullanılır.\n2. `loop` dört iş yapar ve hiçbirinde `delay` yoktur: butonlar, ölçüm, durum makinesi, ekran. Ölçüm ve ekran `millis()` ile yarım saniyede bir yapılır. Sıçrama önleme de `millis()` ile yapılır: son basıştan 50 ms geçmediyse yeni basış sayılmaz.\n3. Butonlar yalnızca **basıldığı anda** işlenir: önceki turda basılı değil, şimdi basılı ise hedef değişir. Böylece düğmeyi basılı tutmak hedefi sürekli artırmaz.\n4. Butona basılınca `AYAR` durumuna geçilir. Bu durumda röle kapalıdır; ısıtıcı, kullanıcı hedefi değiştirirken çalışmaz. 2 saniye hiçbir tuşa basılmazsa hedef EEPROM'a yazılır.\n5. `switch` ile üç durum tek bir yerde yazılmıştır. Röle çıkışı durumun doğrudan sonucudur: `digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW)`.\n6. `EEPROM.update` kullanıldığı için hedef aynı kalmışsa (örneğin artırıp geri azalttıysan) EEPROM'a hiç yazılmaz.\n\n### Dene\n- `HISTEREZIS` değerini 0,2 ve 2 yap. Röle ne kadar sık açılıp kapanıyor?\n- Hedefi sıcaklığın üstüne çıkar, sonra NTC'nin **Sıcaklık** özelliğini adım adım yükselt. Röle hangi sıcaklıkta kapanıyor?\n- ■ ile durdurup yeniden ▶'e bas. Hedef sıcaklık ilk değerine (22) dönüyor mu? Neden? (Laboratuvar EEPROM'u çalıştırmalar arasında saklamaz; gerçek kartta hedef korunurdu.)\n- Yeni bir özellik ekle: laboratuvara bir buzzer ekle (+ ucu D8, - ucu GND). Sıcaklık hedefin 5 dereceden fazla altındaysa çaldır. Hangi duruma ekleyeceksin?\n\n### Sık yapılan hatalar\n- NTC ile sabit direnci ters yerleştirmek (NTC'yi 5V'a, sabit direnci GND'ye bağlamak): sıcaklık arttıkça ölçüm düşer ya da tersine çalışır. Direnç bölücüsünü gerilim formülüyle yeniden hesapla.\n- Histerezis olmadan tek eşik kullanmak: sıcaklık eşik civarında dalgalanınca röle çok hızlı açılıp kapanır, röle bozulur.\n- EEPROM'a her buton basışında yazmak: art arda basışlar gereksiz yazma harcar. Yazmayı ayar bittikten sonra yap.\n- Hedef değerini sınırlamamak: negatif ya da çok yüksek hedefler ısıtıcıyı sürekli açık bırakabilir.\n- 255 olarak okunan boş EEPROM'u geçerli hedef sanmak.",
+          "contentMd": "### Ne yapacağız?\nBu proje öğrendiklerini birleştirir:\n- **Hafta 3:** NTC termistörle sıcaklık hesabı (A2).\n- **Hafta 5:** Röle ile açma-kapama ve histerezis (D7).\n- **Hafta 6:** `millis()` ile bloklamayan kod ve durum makinesi.\n- **Hafta 7:** I2C LCD ekran ve EEPROM'da kalıcı ayar.\n\nKullanıcı iki butonla hedef sıcaklığı ayarlar. Ölçülen sıcaklık hedefin altına düşünce röle ısıtıcıyı açar, hedefe ulaşınca kapatır. Hedef sıcaklık EEPROM'da saklanır.\n\n### Devre\nParçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çekerek bağla. Gereken parçalar: NTC (`ntc`), iki direnç (10 kΩ ve 330 Ω), iki buton, bir röle (`relay`), bir LED ve bir I2C LCD (`lcdI2c`).\n\n| Parça | Bağlantı |\n|---|---|\n| NTC termistör | 1 ucu **A2**, 2 ucu GND |\n| 10 kΩ direnç (sabit) | 1 ucu 5V, 2 ucu **A2** |\n| Buton \"artır\" | A ucu **D2**, B ucu GND |\n| Buton \"azalt\" | A ucu **D3**, B ucu GND |\n| Röle IN | **D7** (röle VCC → 5V, röle GND → GND) |\n| \"Isıtıcı\" yerine LED | Röle COM → 5V; röle NO → 330 Ω direnç → LED A; LED K → GND |\n| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND (adres 0x27) |\n\nIsıtıcı yerine LED kullanıyoruz: LED yanıyorsa \"ısıtıcı açık\" demektir. Butonlar `INPUT_PULLUP` olduğu için basılı buton `LOW` okunur. NTC'nin direnci 10 kΩ'dur (25 °C'de) ve β değeri 3950'dir; sıcaklığı NTC'yi seçip sağ panelden değiştirirsin (çalışırken de olur). Röle özelliklerinde **Tetik** \"HIGH ile çeker\" olmalı (varsayılan); \"LOW ile çeker\" seçersen programdaki `HIGH` ve `LOW` yerlerini değiştirmen gerekir. LCD adresi 0x27'den farklıysa, önceki derste öğrendiğin tarama programıyla bul. LCD, `lcd.init()` içindeki bekleme yüzünden ▶'ten yaklaşık 1,5 saniye sonra yazı gösterir.\n\nNTC ve sabit direnç bir **gerilim bölücü** oluşturur: sıcaklık arttıkça NTC'nin direnci düşer ve A2'deki gerilim azalır. NTC direncini `R = 10000 × ADC / (1023 − ADC)` formülüyle buluruz. Sıcaklığı ise β = 3950 değerli Steinhart-Hart (beta) formülüyle hesaplarız. Gerçek bir termistörün β değeri farklıysa sabiti değiştirirsin; laboratuvarın NTC'si 3950 kullanır.\n\n### Durum makinesi\nTermostatın üç durumu var:\n\n| Durum | Röle | Bu durumdan çıkış |\n|---|---|---|\n| KAPALI | Kapalı | Sıcaklık `hedef − 0,5` değerine eşit ya da daha düşükse ISITIYOR; bir butona basılırsa AYAR |\n| ISITIYOR | Açık | Sıcaklık `hedef + 0,5` değerine eşit ya da daha yüksekse KAPALI; bir butona basılırsa AYAR |\n| AYAR | Kapalı | Son buton basışından 2 saniye sonra hedef EEPROM'a yazılır, KAPALI |\n\nHedefin 0,5 derece altında ve üstünde iki ayrı eşik vardır (**histerezis**). Böylece sıcaklık hedef civarında dalgalanırken röle bir açılıp bir kapanmaz.\n\nAYAR durumunda her basış hedefi 1 derece değiştirir ve 2 saniyelik süreyi yeniden başlatır. EEPROM'a yazma, ayar bittikten sonra **bir kez** yapılır; böylece art arda 5 basış 5 yazma harcamaz.\n\n### Program\n```cpp\n// sketch: termostat\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <EEPROM.h>\n\nconst int ARTIR = 2;\nconst int AZALT = 3;\nconst int ROLE = 7;\nconst int NTC_PIN = A2;\n\nconst int ADRES = 0;                // hedef sıcaklığın EEPROM adresi\nconst int HEDEF_MIN = 10;\nconst int HEDEF_MAX = 35;\nconst int HEDEF_VARSAYILAN = 22;\nconst float HISTEREZIS = 0.5;       // hedefin altı ve üstü için pay\nconst unsigned long AYAR_SURESI = 2000;   // ms\nconst unsigned long OLCUM_ARALIGI = 500;  // ms\n\nenum Durum { KAPALI, ISITIYOR, AYAR };\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nDurum durum = KAPALI;\nint hedef;\nfloat sicaklik;\nunsigned long sonOlcum = 0;\nunsigned long ayarBasla = 0;\nunsigned long sonBasis = 0;\nbool oncekiArtir = false;\nbool oncekiAzalt = false;\n\nfloat sicaklikOku() {\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(NTC_PIN);\n  }\n  float adc = toplam / 8.0;\n  if (adc < 1.0) adc = 1.0;           // sıfıra bölmeyi önle\n  if (adc > 1022.0) adc = 1022.0;\n  float direnc = 10000.0 * adc / (1023.0 - adc);\n  float kelvin = 1.0 / (log(direnc / 10000.0) / 3950.0 + 1.0 / 298.15);\n  return kelvin - 273.15;\n}\n\nconst char* durumAdi() {\n  if (durum == ISITIYOR) return \"ISIT  \";\n  if (durum == AYAR) return \"AYAR  \";\n  return \"KAPALI\";\n}\n\nvoid ekranYaz() {\n  lcd.setCursor(0, 0);\n  lcd.print(\"Su an: \");\n  lcd.print(sicaklik, 1);\n  lcd.print(\" C    \");\n  lcd.setCursor(0, 1);\n  lcd.print(\"Hedef:\");\n  lcd.print(hedef);\n  lcd.print(\"C \");\n  lcd.print(durumAdi());\n}\n\nvoid setup() {\n  pinMode(ARTIR, INPUT_PULLUP);\n  pinMode(AZALT, INPUT_PULLUP);\n  pinMode(ROLE, OUTPUT);\n  digitalWrite(ROLE, LOW);\n  Serial.begin(9600);\n\n  hedef = EEPROM.read(ADRES);\n  if (hedef < HEDEF_MIN || hedef > HEDEF_MAX) {\n    hedef = HEDEF_VARSAYILAN;         // boş (255) ya da bozuk değer\n  }\n\n  lcd.init();\n  lcd.backlight();\n  sicaklik = sicaklikOku();\n  ekranYaz();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Butonlar: basıldığı an (yüksekten alçağa geçiş) bir kez işle\n  bool artirBasili = (digitalRead(ARTIR) == LOW);\n  bool azaltBasili = (digitalRead(AZALT) == LOW);\n  bool artirYeni = artirBasili && !oncekiArtir;\n  bool azaltYeni = azaltBasili && !oncekiAzalt;\n  oncekiArtir = artirBasili;\n  oncekiAzalt = azaltBasili;\n\n  if ((artirYeni || azaltYeni) && simdi - sonBasis > 50) {   // 50 ms: sıçrama önleme\n    sonBasis = simdi;\n    if (artirYeni && hedef < HEDEF_MAX) hedef++;\n    if (azaltYeni && hedef > HEDEF_MIN) hedef--;\n    durum = AYAR;                      // ayar moduna gir, 2 saniyelik süreyi başlat\n    ayarBasla = simdi;\n    ekranYaz();\n  }\n\n  // 2) Sıcaklık: yarım saniyede bir ölç\n  bool olcumZamani = false;\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    sicaklik = sicaklikOku();\n    olcumZamani = true;\n  }\n\n  // 3) Durum makinesi\n  switch (durum) {\n    case KAPALI:\n      if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n      break;\n    case ISITIYOR:\n      if (sicaklik >= hedef + HISTEREZIS) durum = KAPALI;\n      break;\n    case AYAR:\n      if (simdi - ayarBasla >= AYAR_SURESI) {\n        EEPROM.update(ADRES, hedef);   // ayar bitti: yalnızca değiştiyse yazar\n        durum = KAPALI;\n      }\n      break;\n  }\n  digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW);\n\n  // 4) Ekran ve seri çıktı: her ölçümden sonra\n  if (olcumZamani) {\n    ekranYaz();\n    Serial.print(\"sicaklik=\");\n    Serial.print(sicaklik, 1);\n    Serial.print(\" hedef=\");\n    Serial.print(hedef);\n    Serial.print(\" role=\");\n    Serial.println(durum == ISITIYOR ? 1 : 0);\n  }\n}\n```\n\n### Nasıl çalışıyor?\n1. `setup` içinde önce EEPROM'dan hedef okunur. Hiç yazılmamış hücrede 255 vardır; bu değer 10-35 aralığının dışında olduğu için varsayılan 22 derece kullanılır.\n2. `loop` dört iş yapar ve hiçbirinde `delay` yoktur: butonlar, ölçüm, durum makinesi, ekran. Ölçüm ve ekran `millis()` ile yarım saniyede bir yapılır. Sıçrama önleme de `millis()` ile yapılır: son basıştan 50 ms geçmediyse yeni basış sayılmaz.\n3. Butonlar yalnızca **basıldığı anda** işlenir: önceki turda basılı değil, şimdi basılı ise hedef değişir. Böylece düğmeyi basılı tutmak hedefi sürekli artırmaz.\n4. Butona basılınca `AYAR` durumuna geçilir. Bu durumda röle kapalıdır; ısıtıcı, kullanıcı hedefi değiştirirken çalışmaz. 2 saniye hiçbir tuşa basılmazsa hedef EEPROM'a yazılır.\n5. `switch` ile üç durum tek bir yerde yazılmıştır. Röle çıkışı durumun doğrudan sonucudur: `digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW)`.\n6. `EEPROM.update` kullanıldığı için hedef aynı kalmışsa (örneğin artırıp geri azalttıysan) EEPROM'a hiç yazılmaz.\n\n### Dene\n- `HISTEREZIS` değerini 0,2 ve 2 yap. Röle ne kadar sık açılıp kapanıyor?\n- Hedefi sıcaklığın üstüne çıkar, sonra NTC'nin **Sıcaklık** özelliğini adım adım yükselt. Röle hangi sıcaklıkta kapanıyor?\n- Hedefi bir kez değiştir (örneğin 22 → 24), 2 saniye bekle, ■ ile durdurup yeniden ▶'e bas (güç kesip verme). Hedef 24 olarak mı açıldı? Neden? Sonra ↺ Sıfırla'ya bas ve yeniden çalıştır: hedef neden yine 22 oldu? (EEPROM güç kesilince korunur; ↺ Sıfırla EEPROM'u boşaltır, böylece `255` okunur ve varsayılan 22 kullanılır.) Bir de ayarı değiştirdikten hemen sonra (2 saniye dolmadan) ■'ya bas: yeni hedef kaydedilmiş mi?\n- Yeni bir özellik ekle: laboratuvara bir buzzer ekle (+ ucu D8, - ucu GND). Sıcaklık hedefin 5 dereceden fazla altındaysa çaldır. Hangi duruma ekleyeceksin?\n\n### Sık yapılan hatalar\n- NTC ile sabit direnci ters yerleştirmek (NTC'yi 5V'a, sabit direnci GND'ye bağlamak): sıcaklık arttıkça ölçüm düşer ya da tersine çalışır. Direnç bölücüsünü gerilim formülüyle yeniden hesapla.\n- Histerezis olmadan tek eşik kullanmak: sıcaklık eşik civarında dalgalanınca röle çok hızlı açılıp kapanır, röle bozulur.\n- EEPROM'a her buton basışında yazmak: art arda basışlar gereksiz yazma harcar. Yazmayı ayar bittikten sonra yap.\n- Hedef değerini sınırlamamak: negatif ya da çok yüksek hedefler ısıtıcıyı sürekli açık bırakabilir.\n- 255 olarak okunan boş EEPROM'u geçerli hedef sanmak.",
           "question": "Sıcaklık sensörü koptuysa ya da yanlış bağlandıysa termostatın ne yaptığını düşün: ısıtıcı sonsuza kadar açık kalır mı? Bu projeye bir güvenlik önlemi eklemek istesen ne eklerdin?"
         }
       ]

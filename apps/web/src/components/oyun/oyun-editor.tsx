@@ -195,11 +195,11 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
             ))}
             <span className="oy-spacer" />
             {tab === 'bloklar' && (
-              <>
+              <span className="oy-tab-acts">
                 <button type="button" className="oy-tab-act" onClick={() => blocks.current?.undo()} title="Geri al">↶</button>
                 <button type="button" className="oy-tab-act" onClick={() => blocks.current?.redo()} title="Yinele">↷</button>
                 <button type="button" className="oy-tab-act" onClick={() => blocks.current?.arrange()} title="Blokları düzenle">⇅ Düzenle</button>
-              </>
+              </span>
             )}
           </div>
           <div className="oy-panels">

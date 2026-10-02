@@ -368,7 +368,8 @@ void setup() {
   // 1) EEPROM’dan oku
   // 2) hücre boşsa (255) varsayılan 22 kullan
   // 3) "hedef=22" biçiminde seri monitöre yazdır
-  // 4) değeri update ile geri kaydet
+  // 4) hücre dolu idiyse ayrıca "kayitli deger okundu" yazdır
+  // 5) değeri update ile geri kaydet
 }
 
 void loop() {
@@ -376,7 +377,7 @@ void loop() {
 `
 
 const eeprom: LabActivity = {
-  intro: 'Devre yok: yalnız Uno ve kod. Hedef sıcaklığı EEPROM’dan oku, boşsa (255) varsayılan 22 kullan, seri monitöre yazdır ve update ile kaydet. Laboratuvar EEPROM’u her çalıştırmada boş (255) başlatır.',
+  intro: 'Devre yok: yalnız Uno ve kod. Hedef sıcaklığı EEPROM’dan oku, boşsa (255) varsayılan 22 kullan, seri monitöre yazdır ve update ile kaydet. İlk çalıştırmada EEPROM boştur (255). ■ ile durdurup yeniden ▶’e basman güç kesip yeniden vermek gibidir: EEPROM içeriği korunur. ↺ Sıfırla EEPROM’u da boşaltır.',
   starter: () => ({ circuit: unoOnly(), code: EEPROM_CODE }),
   allowedParts: [],
   goals: [
@@ -401,9 +402,23 @@ const eeprom: LabActivity = {
     {
       id: 'seri-hedef',
       text: 'Programı çalıştır: seri monitörde "hedef=22" yazsın.',
-      hint: 'Serial.begin(9600); sonra Serial.print("hedef="); Serial.println(hedef); Laboratuvarda EEPROM boş başladığı için 22 çıkar.',
+      hint: 'Serial.begin(9600); sonra Serial.print("hedef="); Serial.println(hedef); İlk çalıştırmada EEPROM boş olduğu için 22 çıkar.',
       behavior: true,
       check: ({ lab }) => /hedef=22/.test(lab?.serial ?? ''),
+    },
+    {
+      id: 'eeprom-yazildi',
+      text: 'Çalıştırınca 0. EEPROM hücresine 22 yazılsın (anlık görüntüde 0. bayt = 22).',
+      hint: 'Kodun sonunda EEPROM.update(ADRES, hedef); çağır. Laboratuvar, EEPROM’un 0. baytını çalıştırma sırasında izler.',
+      behavior: true,
+      check: ({ lab }) => lab?.eeprom[0] === 22,
+    },
+    {
+      id: 'guc-kes',
+      text: 'Güç kes ve yeniden ver: ■ ile durdur, ▶’e bas. Bu kez EEPROM dolu başlar; seri monitörde "kayitli deger okundu" yazsın.',
+      hint: 'Okuduğun değer 255 değilse Serial.println("kayitli deger okundu"); yaz. Güç kesilince EEPROM’un kalıcı olması tam budur. (↺ Sıfırla hücreyi yine boşaltır.)',
+      behavior: true,
+      check: ({ lab }) => !!lab && lab.eepromRestored && /hedef=22/.test(lab.serial) && /kayitli deger okundu/.test(lab.serial),
     },
   ],
   solution: () => ({
@@ -415,9 +430,11 @@ const int ADRES = 0;
 void setup() {
   Serial.begin(9600);
   int hedef = EEPROM.read(ADRES);
+  bool kayitli = (hedef != 255);
   if (hedef == 255) hedef = 22;
   Serial.print("hedef=");
   Serial.println(hedef);
+  if (kayitli) Serial.println("kayitli deger okundu");
   EEPROM.update(ADRES, hedef);
 }
 
@@ -425,7 +442,7 @@ void loop() {
 }
 `,
   }),
-  scenario: (s) => s.advance(500),
+  scenario: (s) => { s.advance(500); s.powerCycle(); s.advance(500) },
 }
 
 // ---------------------------------------------------------------- Ders 35: Termostat
@@ -584,7 +601,7 @@ void loop() {
 `
 
 const termostat: LabActivity = {
-  intro: 'Bitirme projesi: devreyi kur (NTC bölücü, iki buton, röle, ısıtıcı LED’i, I2C LCD). Ders metnindeki program hazır yüklüdür; sen devreyi kurup NTC sıcaklığını değiştirerek termostatı dene.',
+  intro: 'Bitirme projesi: devreyi kur (NTC bölücü, iki buton, röle, ısıtıcı LED’i, I2C LCD). Ders metnindeki program hazır yüklüdür; sen devreyi kurup NTC sıcaklığını değiştirerek termostatı dene. Hedef ayarı EEPROM’da kalıcıdır: ■ ile durdurup ▶’e basmak güç kesip vermek gibidir, ↺ Sıfırla ise EEPROM’u boşaltır.',
   starter: () => ({ circuit: unoOnly(), code: TERMOSTAT_CODE }),
   allowedParts: ['ntc', 'resistor', 'button', 'relay', 'led', 'lcdI2c'],
   goals: [
@@ -639,12 +656,27 @@ const termostat: LabActivity = {
       behavior: true,
       check: ({ stats }) => (stats?.pinEdges['D7'] ?? 0) >= 2,
     },
+    {
+      id: 'kalici-ayar',
+      text: 'Ayarı kalıcı yap: "artır"a basıp hedefi değiştir (22 → 23), 2 saniye bekle. Sonra ■ ile durdur, ▶’e bas (güç kes/ver): ekran yeni hedefi göstersin.',
+      hint: 'Hedef, ayar bittikten 2 saniye sonra EEPROM’a yazılır. Hemen durdurursan yazılmaz. Güç yeniden verilince ekranın alt satırında "Hedef:23C" görünür; ↺ Sıfırla EEPROM’u boşaltıp hedefi 22’ye döndürür.',
+      behavior: true,
+      check: ({ lab }) => {
+        if (!lab || !lab.eepromRestored) return false
+        const h = lab.eeprom[0]
+        return h !== 255 && h !== 22 && Object.values(lab.parts).some((p) => p.lcd?.lines[1]?.startsWith(`Hedef:${h}C`))
+      },
+    },
   ],
   solution: () => ({ circuit: termostatCircuit(), code: TERMOSTAT_CODE }),
   scenario: (s) => {
     s.advance(2500)                       // 15 °C: ısıtıyor
     s.setProp('ntc', 'tempC', 30)
     s.advance(1500)                       // 30 °C: kapatır
+    s.setProp('artir', 'pressed', true); s.advance(120)   // hedef 22 → 23
+    s.setProp('artir', 'pressed', false); s.advance(2500) // 2 sn sonra EEPROM’a yazılır
+    s.powerCycle()                        // güç kes, yeniden ver: ayar korunur
+    s.advance(2000)
   },
 }
 

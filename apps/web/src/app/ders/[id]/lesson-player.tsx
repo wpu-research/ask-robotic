@@ -1,27 +1,35 @@
 'use client'
 
 import Link from 'next/link'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { JrEditor } from '@/components/jr/jr-editor'
 import { ArenaEditor } from '@/components/arena/arena-editor'
 import { LabEditor } from '@/components/lab/lab-editor'
 import { MikroEditor } from '@/components/mikro/mikro-editor'
 import { OyunEditor } from '@/components/oyun/oyun-editor'
+import { SahneEditor } from '@/components/sahne/sahne-editor'
+import { AiEditor } from '@/components/ai/ai-editor'
 import { getActivity } from '@/lib/jr/activity'
 import { getArenaActivity } from '@/lib/arena/activity'
 import { getLabActivity } from '@/lib/lab/activity'
 import { getMikroActivity } from '@/lib/mikro/activities'
 import { getOyunActivity } from '@/lib/oyun/activities/ders-registry'
+import { getSahneActivity } from '@/lib/sahne/activities'
+import { getAiActivity } from '@/lib/ai/activities'
 import { markDone, unmarkDone, useDoneIds } from '@/lib/progress-store'
 import { recordFinished, recordGoals, recordOpen } from '@/lib/activity-store'
 import { countDone } from '@/lib/dashboard'
 import { Icon } from '@/components/shell/icons'
 import { LessonKindBadge } from '@/components/badges'
+import { ConceptCards } from '@/components/learn/concept-cards'
+import { QuizPlayer } from '@/components/learn/quiz-player'
+import { logEvent, setEventLesson, startLessonTimer } from '@/lib/events'
+import type { Concept, QuizQuestion } from '@ask/db'
 import type { LessonKind } from '@/lib/module-meta'
 import { LessonMarkdown } from './lesson-markdown'
 
 interface Props {
-  lesson: { id: number; title: string; durationMin: number; problem: string; contentMd: string; question: string }
+  lesson: { id: number; title: string; durationMin: number; problem: string; contentMd: string; question: string; explainerMd?: string | null; concepts?: Concept[] | null; quiz?: QuizQuestion[] | null }
   moduleTitle: string
   moduleSlug: string
   trackClass: string
@@ -40,11 +48,20 @@ interface Props {
   serverDone: number[]
 }
 
-// Hyvex formatı: problem → kavram/etkinlik → soru → bitir
-const STEPS = ['Merak', 'Etkinlik', 'Konuşalım', 'Bitti'] as const
+// Hyvex formatı: problem → kavram/etkinlik → soru → bitir. Öğrenme platformu katmanı: dersin anlatımı/testi varsa
+// "Anlatım" (Merak'tan sonra) ve "Test" (Etkinlik'ten sonra) adımları eklenir; yoksa eski 4 adım aynen kalır.
+type StepId = 'merak' | 'anlatim' | 'etkinlik' | 'test' | 'konusalim' | 'bitti'
+const STEP_LABEL: Record<StepId, string> = { merak: 'Merak', anlatim: 'Anlatım', etkinlik: 'Etkinlik', test: 'Test', konusalim: 'Konuşalım', bitti: 'Bitti' }
 
 export function LessonPlayer(p: Props) {
+  const hasExplainer = !!(p.lesson.explainerMd || p.lesson.concepts?.length)
+  const hasQuiz = !!p.lesson.quiz?.length
+  const STEPS = useMemo<StepId[]>(
+    () => ['merak', ...(hasExplainer ? ['anlatim' as const] : []), 'etkinlik', ...(hasQuiz ? ['test' as const] : []), 'konusalim', 'bitti'],
+    [hasExplainer, hasQuiz],
+  )
   const [step, setStep] = useState(0)
+  const cur = STEPS[step]
   const [error, setError] = useState('')
   const [goalsDone, setGoalsDone] = useState(false)
   const doneIds = useDoneIds()
@@ -56,23 +73,39 @@ export function LessonPlayer(p: Props) {
   const arenaCode = useMemo(() => arenaActivity?.starter(), [arenaActivity])
   const mikroActivity = useMemo(() => getMikroActivity(p.activityKey), [p.activityKey])
   const oyunActivity = useMemo(() => getOyunActivity(p.activityKey), [p.activityKey])
+  const sahneActivity = useMemo(() => getSahneActivity(p.activityKey), [p.activityKey])
+  const aiActivity = useMemo(() => getAiActivity(p.activityKey), [p.activityKey])
   const done = doneIds.has(p.lesson.id)
-  const hasApp = !!(activity || labActivity || arenaActivity || mikroActivity || oyunActivity)
-  const kind: LessonKind = arenaActivity ? 'arena' : labActivity ? 'devre' : oyunActivity ? 'oyun' : activity || mikroActivity ? 'blok' : 'metin'
+  const hasApp = !!(activity || labActivity || arenaActivity || mikroActivity || oyunActivity || sahneActivity || aiActivity)
+  const kind: LessonKind = aiActivity ? 'ai' : arenaActivity ? 'arena' : labActivity ? 'devre' : oyunActivity ? 'oyun' : activity || mikroActivity || sahneActivity ? 'blok' : 'metin'
   const goalTexts: string[] = (
     arenaActivity?.goals.map((g) => g.text) ?? labActivity?.goals.map((g) => g.text) ?? mikroActivity?.goals.map((g) => g.text)
-    ?? oyunActivity?.goals.map((g) => g.label) ?? activity?.goals.map((g) => g.text) ?? []
+    ?? oyunActivity?.goals.map((g) => g.label) ?? sahneActivity?.goals.filter((g) => !g.optional).map((g) => g.label) ?? aiActivity?.goals.map((g) => g.label) ?? activity?.goals.map((g) => g.text) ?? []
   )
   const modCount = countDone(p.moduleLessonIds ?? [], doneIds)
 
   // Son açılan ders kaydı (panelde "kaldığın yerden devam et" için)
   useEffect(() => { recordOpen(p.lesson.id) }, [p.lesson.id])
-  const onGoals = useCallback(() => { setGoalsDone(true); recordGoals(p.lesson.id) }, [p.lesson.id])
+  // Ölçme verisi (yalnız onayla kaydedilir): ders görüntüleme, ekranda geçen süre
+  useEffect(() => {
+    setEventLesson(p.lesson.id)
+    logEvent('lesson_view', { lessonId: p.lesson.id, p: { kind } })
+    const stop = startLessonTimer(p.lesson.id)
+    return () => { stop(); setEventLesson(null) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.lesson.id])
+  const started = useRef(false)
+  useEffect(() => {
+    if (cur === 'etkinlik' && hasApp && !started.current) { started.current = true; logEvent('activity_start', { lessonId: p.lesson.id, p: { kind } }) }
+    if (cur === 'anlatim' && p.lesson.concepts?.length) logEvent('concept_view', { lessonId: p.lesson.id, p: { n: p.lesson.concepts.length } })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cur])
+  const onGoals = useCallback(() => { setGoalsDone(true); recordGoals(p.lesson.id); logEvent('goal_done', { lessonId: p.lesson.id }) }, [p.lesson.id])
 
   // Giriş açıkken sunucudaki ilerleme tarayıcıdakiyle birleştirilir
   useEffect(() => { p.serverDone.forEach(markDone) }, [p.serverDone])
 
-  const go = useCallback((n: number) => setStep(Math.max(0, Math.min(STEPS.length - 1, n))), [])
+  const go = useCallback((n: number) => setStep(Math.max(0, Math.min(STEPS.length - 1, n))), [STEPS])
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLElement && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return
@@ -87,6 +120,7 @@ export function LessonPlayer(p: Props) {
     setError('')
     markDone(p.lesson.id)
     recordFinished(p.lesson.id)
+    logEvent('lesson_done', { lessonId: p.lesson.id, p: { goals: goalsDone } })
     if (p.serverSync) {
       const res = await fetch('/api/progress', {
         method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lessonId: p.lesson.id }),
@@ -95,7 +129,7 @@ export function LessonPlayer(p: Props) {
     }
   }
 
-  const wide = hasApp && step === 1
+  const wide = hasApp && cur === 'etkinlik'
   return (
     <div className={`page page-lesson ${hasApp ? 'has-app' : ''} ${wide ? 'wide-step' : ''} ${p.trackClass}`}>
       <nav aria-label="Konum" className="crumbs">
@@ -121,16 +155,24 @@ export function LessonPlayer(p: Props) {
             {STEPS.map((s, i) => (
               <li key={s}>
                 <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined} className={i < step ? 'done' : undefined}>
-                  <span className="n">{i < step ? <Icon name="check" size={13} /> : i + 1}</span><span className="label">{s}</span>
+                  <span className="n">{i < step ? <Icon name="check" size={13} /> : i + 1}</span><span className="label">{STEP_LABEL[s]}</span>
                 </button>
               </li>
             ))}
           </ol>
 
       <section className={`stage${wide ? '' : ' stage-read'}`} aria-live="polite">
-        {step === 0 && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
-        {step === 1 && (
-          <div className={activity ? 'lesson-split' : labActivity || arenaActivity || mikroActivity || oyunActivity ? 'lesson-stack' : undefined}>
+        {cur === 'merak' && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
+        {cur === 'anlatim' && (
+          <div className="lesson-explainer">
+            <div className="stage-label">Konu anlatımı</div>
+            {p.lesson.explainerMd && <LessonMarkdown>{p.lesson.explainerMd}</LessonMarkdown>}
+            {p.lesson.concepts && p.lesson.concepts.length > 0 && <ConceptCards concepts={p.lesson.concepts} />}
+          </div>
+        )}
+        {cur === 'test' && p.lesson.quiz && <QuizPlayer key={p.lesson.id} lessonId={p.lesson.id} questions={p.lesson.quiz} />}
+        {cur === 'etkinlik' && (
+          <div className={activity ? 'lesson-split' : labActivity || arenaActivity || mikroActivity || oyunActivity || sahneActivity || aiActivity ? 'lesson-stack' : undefined}>
             <div>
               {p.callout && (
                 <details className="callout" style={{ marginTop: 0 }}>
@@ -191,6 +233,26 @@ export function LessonPlayer(p: Props) {
                 </div>
               </div>
             )}
+            {sahneActivity && (
+              <div className="lesson-lab lesson-sahne" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+                <SahneEditor
+                  key={p.lesson.id}
+                  activity={sahneActivity}
+                  storageKey={`ask:sahne:ders:${p.activityKey}`}
+                  onGoalsChange={(_r, all) => { if (all) onGoals() }}
+                />
+              </div>
+            )}
+            {aiActivity && (
+              <div className="lesson-lab lesson-ai" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+                <AiEditor
+                  key={p.lesson.id}
+                  activity={aiActivity}
+                  storageKey={`ask:ai:ders:${p.activityKey}`}
+                  onGoalsChange={(_r, all) => { if (all) onGoals() }}
+                />
+              </div>
+            )}
             {activity && starter && (
               <div className="lesson-app" data-activity={p.activityKey}>
                 {activity.intro && <p className="lesson-app-intro">{activity.intro}</p>}
@@ -207,8 +269,8 @@ export function LessonPlayer(p: Props) {
             )}
           </div>
         )}
-        {step === 2 && (<><div className="stage-label">Birlikte konuşun</div><p className="stage-big">{p.lesson.question}</p></>)}
-        {step === 3 && (
+        {cur === 'konusalim' && (<><div className="stage-label">Birlikte konuşun</div><p className="stage-big">{p.lesson.question}</p></>)}
+        {cur === 'bitti' && (
           <div className="done-box">
             {done ? (
               <>
@@ -253,7 +315,7 @@ export function LessonPlayer(p: Props) {
             {STEPS.map((s, i) => (
               <li key={s} data-state={i === step ? 'now' : i < step ? 'done' : 'todo'}>
                 <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined}>
-                  <span className="n" aria-hidden="true">{i < step ? <Icon name="check" size={12} /> : i + 1}</span>{s}
+                  <span className="n" aria-hidden="true">{i < step ? <Icon name="check" size={12} /> : i + 1}</span>{STEP_LABEL[s]}
                 </button>
               </li>
             ))}

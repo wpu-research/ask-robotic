@@ -346,8 +346,8 @@ function RtcArt(c: Ctx) {
   )
 }
 
-// ---------------------------------------------------------------- Analog modüller: MQ-2, alev, ses, toprak nemi
-const propLevelKey: Record<string, string> = { mq2: 'gas', flame: 'flame', sound: 'sound', soil: 'moisture' }
+// ---------------------------------------------------------------- Analog modüller: MQ-2, alev, ses, toprak nemi, yağmur, su seviyesi
+const propLevelKey: Record<string, string> = { mq2: 'gas', flame: 'flame', sound: 'sound', soil: 'moisture', rain: 'wetness', waterlevel: 'level' }
 
 function analogInfo(c: Ctx) {
   const m = c.rt?.analogModule
@@ -454,6 +454,50 @@ function SoilArt(c: Ctx) {
   )
 }
 
+/** Yağmur sensörü (YL-83 benzeri): üstte altın tarak izli siyah plaka, altında LM393 kontrol kartı. Islaklığa göre damlalar belirir. */
+const DROPS: ReadonlyArray<readonly [number, number, number]> = [[18, 14, 1], [44, 10, 2], [30, 24, 3], [54, 26, 4], [14, 38, 5], [40, 40, 6], [60, 46, 7], [24, 52, 8]]
+function RainArt(c: Ctx) {
+  const { level, powered, doLow } = analogInfo(c)
+  const nDrops = level > 0.03 ? Math.max(1, Math.round(level * DROPS.length)) : 0
+  return (
+    <g data-module-level={level.toFixed(2)} data-module-powered={powered ? 'true' : 'false'} data-module-do={doLow ? 'low' : 'high'} data-rain-drops={nDrops}>
+      <rect x={4} y={2} width={68} height={68} rx={4} fill="#111827" stroke="#030712" strokeWidth={1.4} />
+      {/* tarak (açık bakır) izleri */}
+      {[...Array(8)].map((_, k) => <path key={k} d={`M10 ${10 + k * 7.4} H${k % 2 ? 62 : 66}`} stroke={GOLD} strokeWidth={2.4} strokeLinecap="round" opacity={0.9} />)}
+      {level > 0.03 && <rect x={4} y={2} width={68} height={68} rx={4} fill="#38bdf8" opacity={0.12 + level * 0.22} />}
+      {DROPS.slice(0, nDrops).map(([x, y, k]) => (
+        <path key={k} d={`M${x} ${y - 4.5} C${x + 3.6} ${y} ${x + 3.4} ${y + 3.4} ${x} ${y + 3.4} C${x - 3.4} ${y + 3.4} ${x - 3.6} ${y} ${x} ${y - 4.5} Z`} fill="#7dd3fc" stroke="#0284c7" strokeWidth={0.6} opacity={0.9} data-rain-drop />
+      ))}
+      <rect x={0} y={72} width={76} height={64} rx={5} fill="#1d4ed8" stroke="#1e3a8a" strokeWidth={1.6} />
+      <rect x={2.5} y={74.5} width={71} height={59} rx={4} fill="none" stroke="#60a5fa" strokeWidth={0.7} opacity={0.6} />
+      <text x={38} y={85} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">YAĞMUR</text>
+      <Trimmer x={62} y={104} /><Chip x={22} y={102} w={20} h={6} text="LM393" />
+      <ModuleLeds y={104} powered={powered} doLow={doLow} />
+      <Pads type="rain" />
+    </g>
+  )
+}
+
+/** Su seviyesi sensörü: uzun çubuk üzerinde açık bakır şeritler; su yükseldikçe alttan dolar ve çıplak şeritler suya gömülür. */
+function WaterLevelArt(c: Ctx) {
+  const { level, powered, doLow } = analogInfo(c)
+  const fillH = Math.round(level * 62)
+  return (
+    <g data-module-level={level.toFixed(2)} data-module-powered={powered ? 'true' : 'false'} data-module-do={doLow ? 'low' : 'high'}>
+      <rect x={20} y={2} width={36} height={76} rx={3} fill="#0f3d2e" stroke="#052e16" strokeWidth={1.4} />
+      {[...Array(9)].map((_, k) => <path key={k} d={`M25 ${9 + k * 7.6} H51`} stroke={GOLD} strokeWidth={2.2} strokeLinecap="round" opacity={0.85} />)}
+      <rect x={21} y={78 - fillH} width={34} height={fillH} fill="#38bdf8" opacity={0.55} data-water-fill={fillH} />
+      {fillH > 3 && <path d={`M21 ${78 - fillH} q4 -2.4 8.5 0 t8.5 0 t8.5 0 t8.5 0`} fill="none" stroke="#e0f2fe" strokeWidth={1} opacity={0.9} />}
+      <rect x={0} y={78} width={76} height={58} rx={5} fill="#1d4ed8" stroke="#1e3a8a" strokeWidth={1.6} />
+      <rect x={2.5} y={80.5} width={71} height={53} rx={4} fill="none" stroke="#60a5fa" strokeWidth={0.7} opacity={0.6} />
+      <text x={38} y={90} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">SU SEVİYESİ</text>
+      <Trimmer x={62} y={104} /><Chip x={22} y={102} w={20} h={6} text="LM393" />
+      <ModuleLeds y={104} powered={powered} doLow={doLow} />
+      <Pads type="waterlevel" />
+    </g>
+  )
+}
+
 /** Aşama C parçası değilse null. */
 export function StageCArt({ part, runtime }: { part: PartInstance; runtime?: PartRuntime }) {
   const c: Ctx = { part, rt: runtime }
@@ -473,6 +517,8 @@ export function StageCArt({ part, runtime }: { part: PartInstance; runtime?: Par
     case 'flame': return FlameArt(c)
     case 'sound': return SoundArt(c)
     case 'soil': return SoilArt(c)
+    case 'rain': return RainArt(c)
+    case 'waterlevel': return WaterLevelArt(c)
     default: return null
   }
 }

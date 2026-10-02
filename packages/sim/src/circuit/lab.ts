@@ -3,7 +3,7 @@ import { HD44780, type BMP280, type DHT, type HCSR04, type I2CDevice, type Keypa
 import { Sim, type Pin, type PinStateName } from '../sim.js'
 import { staticWarnings } from './analysis.js'
 import type {
-  Circuit, LabApi, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
+  Circuit, LabApi, LabOptions, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
 import { PINS } from './contract.js'
 import { ANALOG_MODULES, MODEL, SEGMENTS, isAnalogModule, ldrOhms, ledSpecs, ntcOhms, num, type LedSpec } from './model.js'
@@ -124,8 +124,13 @@ class LabImpl implements LabApi {
   private servoPulses = new Map<string, number>()
   private overSince = new Map<string, number>() // buzzer: son kez eşik üstü görülen zaman
   private disposed = false
+  /** Sonraki boot'ta yüklenecek EEPROM (null: boş). Çalışırken state.eeprom canlı Sim'den okunur. */
+  private eepromCarry: Uint8Array | null
+  private eepromRestored: boolean
 
-  constructor(circuit: Circuit, hex: string) {
+  constructor(circuit: Circuit, hex: string, opts?: LabOptions) {
+    this.eepromCarry = opts?.eeprom ? Uint8Array.from(opts.eeprom as ArrayLike<number>, (x) => Number(x) & 0xff) : null
+    this.eepromRestored = this.eepromCarry !== null
     this.circuit = {
       parts: circuit.parts.map((p) => ({ ...p, props: { ...p.props } })),
       wires: circuit.wires.map((w) => ({ ...w, a: { ...w.a }, b: { ...w.b } })),
@@ -199,6 +204,7 @@ class LabImpl implements LabApi {
 
   private boot(): void {
     this.sim = new Sim(this.hex)
+    if (this.eepromCarry) this.sim.importEeprom(this.eepromCarry)
     this.trackers.clear()
     for (const n of this.wiredPins) this.trackers.set(n, new PinTracker(this.sim, simPin(n)))
     this.attachDevices()
@@ -344,6 +350,8 @@ class LabImpl implements LabApi {
       parts,
       serial: this.sim.serial,
       warnings: this.allWarnings(),
+      eeprom: this.sim.exportEeprom(),
+      eepromRestored: this.eepromRestored,
     }
   }
 
@@ -371,7 +379,8 @@ class LabImpl implements LabApi {
 
   sendSerial(text: string): void { this.sim.sendSerial(text) }
 
-  reset(): void {
+  reset(opts?: { keepEeprom?: boolean }): void {
+    if (opts?.keepEeprom) { this.eepromCarry = this.sim.exportEeprom(); this.eepromRestored = true } else { this.eepromCarry = null; this.eepromRestored = false }
     this.burnt.clear()
     this.dynWarnings.clear()
     this.runtime = {}
@@ -484,7 +493,7 @@ class LabImpl implements LabApi {
           input.logic!.push({ node: this.node(ref(p, 'OUT')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) && !(prox >= thr) ? v[vcc] : 0) })
           break
         }
-        case 'mq2': case 'flame': case 'sound': case 'soil': {
+        case 'mq2': case 'flame': case 'sound': case 'soil': case 'rain': case 'waterlevel': {
           const cfg = ANALOG_MODULES[p.type]
           const level = clamp01(num(p, cfg.prop, 0)), thr = clamp01(num(p, 'threshold', 0.5))
           const f = ADC_FRACTION(cfg.base, cfg.span, level)
@@ -847,7 +856,7 @@ class LabImpl implements LabApi {
         return true
       }
       case 'keypad': out.keypad = { key: this.keypads.get(p.id)?.pressed ?? null }; return true
-      case 'mq2': case 'flame': case 'sound': case 'soil': {
+      case 'mq2': case 'flame': case 'sound': case 'soil': case 'rain': case 'waterlevel': {
         const level = clamp01(num(p, ANALOG_MODULES[p.type].prop, 0))
         out.analogModule = { powered: this.modPowered(p, v), level, aoVolts: volts('AO'), doHigh: volts('DO') > MODEL.digitalThreshold }
         return true
@@ -961,6 +970,6 @@ class LabImpl implements LabApi {
   }
 }
 
-export function createLab(circuit: Circuit, hex: string): LabApi {
-  return new LabImpl(circuit, hex)
+export function createLab(circuit: Circuit, hex: string, opts?: LabOptions): LabApi {
+  return new LabImpl(circuit, hex, opts)
 }

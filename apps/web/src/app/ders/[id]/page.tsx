@@ -40,6 +40,9 @@ export default async function Ders({ params }: { params: Promise<{ id: string }>
         problem: ctx.lesson.problem ?? '',
         contentMd: ctx.lesson.contentMd ?? '',
         question: ctx.lesson.question ?? '',
+        explainerMd: ctx.lesson.explainerMd ?? null,
+        concepts: ctx.lesson.concepts ?? null,
+        quiz: ctx.lesson.quiz ?? null,
       }}
       moduleTitle={ctx.module.title}
       moduleSlug={ctx.module.slug}

@@ -20,6 +20,8 @@ export interface ArenaRuntime {
   press(pin: number, down: boolean): void
   /** Robotu konuma ışınlar (yalnız robot sahnesi). */
   place(pose: Partial<Pose>): void
+  /** Dengelenen robota itme: eğim hızına dps (°/s) ekler (yalnız denge sahnesi; öbürlerinde etkisiz). */
+  push(dps: number): void
   /** Ultrasonik tarama servosunun açısı (°, 90 = ileri). */
   servoDeg(): number
   dispose(): void
@@ -206,6 +208,7 @@ function createRoverRuntime(hex: string, scene: RoverScene): ArenaRuntime {
     scene, sim, rover, advance, snapshot,
     sendSerial: (t) => bytes.push(t),
     place: (pose) => { if (pose.x !== undefined) s.x = pose.x; if (pose.y !== undefined) s.y = pose.y; if (pose.theta !== undefined) s.theta = pose.theta },
+    push: () => {},
     press: (pin, down) => { if (scene.buttons?.some((b) => b.pin === pin)) sim.drive(pin, !down) },
     servoDeg: servo,
     dispose: () => { /* tarayıcıda tutulan kaynak yok */ },
@@ -225,9 +228,9 @@ function createArmRuntime(hex: string, scene: ArmScene): ArenaRuntime {
   const cmd = { q1: 90, q2: 0, grip: 90 }
   const cur = { q1: 90, q2: 0, grip: 90 }
   const last = { q1: NaN, q2: NaN, grip: NaN }
-  let maxJump = 0
+  let maxJump = 0, maxJointJump = 0
   const track = (k: 'q1' | 'q2' | 'grip') => (deg: number) => {
-    if (!Number.isNaN(last[k])) maxJump = Math.max(maxJump, Math.abs(deg - last[k]))
+    if (!Number.isNaN(last[k])) { const j = Math.abs(deg - last[k]); maxJump = Math.max(maxJump, j); if (k !== 'grip') maxJointJump = Math.max(maxJointJump, j) }
     last[k] = deg; cmd[k] = deg
   }
   servoReader(sim, 9, track('q1')); servoReader(sim, 10, track('q2')); servoReader(sim, 11, track('grip'))
@@ -238,7 +241,7 @@ function createArmRuntime(hex: string, scene: ArmScene): ArenaRuntime {
   let lastT = sim.nowMs()
   let serialLen = 0, serialT = 0
 
-  const gripClosed = () => cur.grip < scene.gripClosedBelowDeg
+  const gripClosed = () => (scene.gripClosedAboveDeg !== undefined ? cur.grip > scene.gripClosedAboveDeg : cur.grip < scene.gripClosedBelowDeg)
   const observe = (dtMs: number) => {
     if (sim.serial.length !== serialLen) { serialLen = sim.serial.length; serialT = sim.nowMs() / 1000 }
     const step = (rate * dtMs) / 1000
@@ -270,38 +273,65 @@ function createArmRuntime(hex: string, scene: ArmScene): ArenaRuntime {
     return {
       kind: 'arm', timeS: sim.nowMs() / 1000, q1: cur.q1, q2: cur.q2, grip: cur.grip, cmd: { ...cmd },
       tipX: tip.x, tipY: tip.y, gripClosed: gripClosed(), held, objects: objects.map((o) => ({ ...o })), placed: { ...placed },
-      maxJumpDeg: maxJump, serial: sim.serial, serialAgeS: sim.nowMs() / 1000 - serialT, inZone: new Set(inZone),
+      maxJumpDeg: maxJump, maxJointJumpDeg: maxJointJump, serial: sim.serial, serialAgeS: sim.nowMs() / 1000 - serialT, inZone: new Set(inZone),
     }
   }
-  return { scene, sim, rover: null, advance, snapshot, sendSerial: (t) => bytes.push(t), press: () => {}, place: () => {}, servoDeg: () => 90, dispose: () => {} }
+  return { scene, sim, rover: null, advance, snapshot, sendSerial: (t) => bytes.push(t), press: () => {}, place: () => {}, push: () => {}, servoDeg: () => 90, dispose: () => {} }
 }
 
 // ================================================================ dengelenen robot
+const SETTLE_DEG = 1, SETTLE_HOLD_S = 1
+
 function createBalancerRuntime(hex: string, scene: BalancerScene): ArenaRuntime {
   const sim = new Sim(hex)
-  const opt: Partial<Pick<BalancerScene, 'A' | 'B' | 'C' | 'deadband' | 'fallDeg' | 'gyroBiasDps'>> = {}
-  for (const k of ['A', 'B', 'C', 'deadband', 'fallDeg', 'gyroBiasDps'] as const) if (scene[k] !== undefined) opt[k] = scene[k] // undefined, varsayılanı ezmesin
+  const opt: Partial<Pick<BalancerScene, 'A' | 'B' | 'C' | 'deadband' | 'fallDeg' | 'gyroBiasDps' | 'accelOffsetDeg' | 'accelNoiseG' | 'vibrationG' | 'vibrationHz' | 'gyroNoiseDps' | 'seed'>> = {}
+  for (const k of ['A', 'B', 'C', 'deadband', 'fallDeg', 'gyroBiasDps', 'accelOffsetDeg', 'accelNoiseG', 'vibrationG', 'vibrationHz', 'gyroNoiseDps', 'seed'] as const) if (scene[k] !== undefined) opt[k] = scene[k] // undefined, varsayılanı ezmesin
   const bal = sim.balancer({ motors: STD_MOTORS, theta0Deg: scene.theta0Deg, ...opt })
   const bytes = new ByteQueue()
   let lastT = sim.nowMs(), fellAt: number | null = null
   let serialLen = 0, serialT = 0
+  // itmeler: sahne çizelgesi (atS sırasıyla) + elle "İt"
+  const plan = [...(scene.pushes ?? [])].sort((a, b) => a.atS - b.atS)
+  let planIdx = 0, pushCount = 0
+  let first: { atS: number; dps: number } | null = null
+  let maxSince = 0, lastOutside = 0
+  const applyPush = (dps: number) => {
+    bal.push(dps); pushCount++
+    if (!first) { first = { atS: sim.nowMs() / 1000, dps }; maxSince = Math.abs(bal.thetaDeg); lastOutside = first.atS }
+  }
   const observe = () => {
     const t = sim.nowMs() / 1000
     if (sim.serial.length !== serialLen) { serialLen = sim.serial.length; serialT = t }
     if (bal.state.fell && fellAt === null) fellAt = t
+    if (first) {
+      const a = Math.abs(bal.thetaDeg)
+      if (a > maxSince) maxSince = a
+      if (a > SETTLE_DEG) lastOutside = t
+    }
   }
   const advance = (ms: number) => {
     let left = ms
     while (left > 1e-9) {
-      const d = Math.min(bytes.pending ? BYTE_GAP_MS : SLICE_MS, left)
+      let d = Math.min(bytes.pending ? BYTE_GAP_MS : SLICE_MS, left)
+      // itme anını dilimin sonuna denk getir: itme sn cinsinden tam zamanında uygulanır
+      const next = planIdx < plan.length ? plan[planIdx].atS * 1000 - sim.nowMs() : Infinity
+      if (next > 1e-9 && next < d) d = next
       bytes.pump(sim); sim.run(d); left -= d
-      lastT = sim.nowMs(); observe()
+      lastT = sim.nowMs()
+      while (planIdx < plan.length && plan[planIdx].atS * 1000 <= lastT + 1e-6) applyPush(plan[planIdx++].dps)
+      observe()
     }
   }
-  const snapshot = (): BalancerSnapshot => ({
-    kind: 'balancer', timeS: lastT / 1000, thetaDeg: bal.thetaDeg, rateDps: (bal.state.omega * 180) / Math.PI, x: bal.state.x, v: bal.state.v,
-    fell: bal.state.fell, fellAtS: fellAt, uprightS: fellAt ?? sim.nowMs() / 1000, maxAbsDeg: bal.state.maxAbsDeg,
-    serial: sim.serial, serialAgeS: sim.nowMs() / 1000 - serialT,
-  })
-  return { scene, sim, rover: null, advance, snapshot, sendSerial: (t) => bytes.push(t), press: () => {}, place: () => {}, servoDeg: () => 90, dispose: () => {} }
+  const snapshot = (): BalancerSnapshot => {
+    const now = sim.nowMs() / 1000
+    const f = first as { atS: number; dps: number } | null
+    return {
+      kind: 'balancer', timeS: lastT / 1000, thetaDeg: bal.thetaDeg, rateDps: (bal.state.omega * 180) / Math.PI, x: bal.state.x, v: bal.state.v,
+      fell: bal.state.fell, fellAtS: fellAt, uprightS: fellAt ?? now, maxAbsDeg: bal.state.maxAbsDeg,
+      pushCount,
+      push: f ? { atS: f.atS, dps: f.dps, maxAbsDeg: maxSince, lastOutsideS: lastOutside, settleMs: !bal.state.fell && now - lastOutside >= SETTLE_HOLD_S ? Math.round((lastOutside - f.atS) * 1000) : null } : null,
+      serial: sim.serial, serialAgeS: now - serialT,
+    }
+  }
+  return { scene, sim, rover: null, advance, snapshot, sendSerial: (t) => bytes.push(t), press: () => {}, place: () => {}, push: (dps) => applyPush(dps), servoDeg: () => 90, dispose: () => {} }
 }

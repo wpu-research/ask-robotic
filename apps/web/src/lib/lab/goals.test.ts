@@ -32,7 +32,7 @@ describe('hedef değerlendirme', () => {
     expect(Object.fromEntries(r.map((g) => [g.id, g.done]))).toEqual({ wired: true, direct: true, gnd: true, blink: false, code: true, throws: false })
   })
   it('davranış hedefi lab durumuna bağlı', () => {
-    const lab = { timeMs: 1, running: true, pins: {}, parts: { led1: { led: { on: true, brightness: 1, currentMa: 10, burnt: false } } }, serial: '', warnings: [] }
+    const lab = { timeMs: 1, running: true, pins: {}, parts: { led1: { led: { on: true, brightness: 1, currentMa: 10, burnt: false } } }, serial: '', warnings: [], eeprom: new Uint8Array(1024).fill(255), eepromRestored: false }
     expect(evaluateLabGoals(goals, { circuit, analysis, lab, code: '', stats: emptyStats() }).find((g) => g.id === 'blink')?.done).toBe(true)
   })
   it('yedek analiz: doğrudan değilse via olmadan bağlı değil', () => {

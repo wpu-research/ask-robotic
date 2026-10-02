@@ -164,6 +164,16 @@ function BalancerPanel({ snap }: { snap: BalancerSnapshot }) {
           <Row id="x" k="Konum" v={`${f(snap.x, 2)} m`} />
         </dl>
       </div>
+      {snap.push && (
+        <div className="arena-panel-col">
+          <h4>İtme ({snap.pushCount})</h4>
+          <dl>
+            <Row id="push-at" k="İlk itme" v={`${f(snap.push.atS, 2)} sn, ${snap.push.dps > 0 ? '+' : ''}${f(snap.push.dps, 0)} °/s`} />
+            <Row id="push-max" k="İtmeden beri en büyük eğim" v={`${f(snap.push.maxAbsDeg, 1)}°`} />
+            <Row id="push-settle" k="Oturma süresi" v={snap.push.settleMs === null ? 'oturmadı' : `${snap.push.settleMs} ms`} />
+          </dl>
+        </div>
+      )}
     </section>
   )
 }

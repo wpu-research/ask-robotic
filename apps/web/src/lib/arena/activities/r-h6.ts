@@ -227,8 +227,8 @@ void loop() {
 
 // ---------------------------------------------------------------- Ders 104: kaskad PID (açı ve hız)
 const d104: ArenaActivity = {
-  intro: 'İç döngü açıyı (PD, 200 Hz), dış döngü konum ve hızı kontrol eder ve iç döngüye hedef açı verir (20 ms’de bir, ±6° ile sınırlı). Robot yalnız dik değil, yerinde de durmalı. Yan görünüşte konum izlenir.',
-  scene: balScene('r6-104', 'Kaskad denge', 'Robot 3° eğik başlar; hedef: dik kal ve yerinden kayma.', 14),
+  intro: 'İç döngü açıyı (PD, 200 Hz), dış döngü konum ve hızı kontrol eder ve iç döngüye hedef açı verir (20 ms’de bir, ±6° ile sınırlı). Bu arenada ivmeölçer 4° kaymış takılı (montaj hatası): yalnız açı PD’si robotu ayakta tutar ama robot yavaşça süzülür (15 saniyede yaklaşık 17 cm). Dış döngü bunu durdurmalı; robot yalnız dik değil, yerinde de durmalı.',
+  scene: balScene('r6-104', 'Kaskad denge', 'Robot 3° eğik başlar. İvmeölçer 4° kaymış: okunan açı gerçek açıdan 4° fazladır (yalnız okunan değer bozulur). Hedef: dik kal ve yerinden kayma.', 14, { accelOffsetDeg: 4 }),
   starter: () => `#include <Wire.h>
 
 const int MPU_ADRES = 0x68;
@@ -300,6 +300,7 @@ void loop() {
     { id: 'ayakta', text: 'Robotu 12 saniye ayakta tut.', behavior: true, check: ({ snap }) => !B(snap).fell && B(snap).timeS >= 12 },
     { id: 'sakin', text: 'En büyük eğim 6°’nin altında kalsın.', behavior: true, check: ({ snap }) => !B(snap).fell && B(snap).timeS >= 12 && B(snap).maxAbsDeg < 6 },
     { id: 'konum', text: 'Yerinde dur: 10. saniyeden sonra konum 10 cm içinde kalsın.', hint: 'Dış döngü konum ve hızdan hedef açı üretir.', behavior: true, check: ({ snap }) => B(snap).timeS >= 11 && !B(snap).fell && Math.abs(B(snap).x) < 0.1 },
+    { id: 'dik', text: 'Sensör 4° kaymış olsa da gerçek eğim 11. saniyeden sonra ±1° içinde kalsın (dış döngü hedef açıyı kaydırarak telafi eder).', hint: 'Yalnız açı PD’sinde gerçek eğim yaklaşık −4,15°’de kalır; kaskadda hedef açı bunu kaydırır.', behavior: true, check: ({ snap }) => B(snap).timeS >= 11 && !B(snap).fell && Math.abs(B(snap).thetaDeg) < 1 },
     { id: 'rapor', text: 'Düzenli aralıkla "ms,açı,hedefAçı,konum" satırı yazdır (en az 8 satır).', behavior: true, check: ({ snap }) => csv(snap.serial).filter((r) => r.length === 4).length >= 8 },
     { id: 'sinir', text: 'Hedef açıyı constrain() ile HEDEF_SINIR’a sınırla.', check: ({ code }) => /constrain\s*\([^;]*HEDEF_SINIR/.test(noC(code)) },
   ],
@@ -307,8 +308,8 @@ void loop() {
 
 // ---------------------------------------------------------------- Ders 105: proje, kendini dengeleyen robot
 const d105: ArenaActivity = {
-  intro: 'Projeyi tamamla: robot dik kalsın, durumunu (DENGE, KONTROLSUZ, DUSTU) yönetsin, düşünce LED’i yaksın ve "DUSTU,ms" yazsın. "k" komutu kontrolü kapatır: robot yaklaşık 0,8 saniyede devrilir ve sen düşmeyi raporlarsın.',
-  scene: balScene('r6-105', 'Denge projesi', 'Robot 3° eğik başlar. Seri monitörden "k" göndererek kontrolü kapatıp düşmeyi gözleyebilirsin.', 20),
+  intro: 'Projeyi tamamla: robot dik kalsın, durumunu (DENGE, KONTROLSUZ, DUSTU) yönetsin, düşünce LED’i yaksın ve "DUSTU,ms" yazsın. 3. saniyede robota +200 °/s’lik bir itme verilir; robot toparlanmalı ve "RAPOR,itmeMs,enBüyükEğim,oturmaMs" yazmalı. Arena itmenin gerçek değerlerini ölçer ve raporunu bununla sınar. "k" komutu kontrolü kapatır: robot yaklaşık 0,8 saniyede devrilir ve sen düşmeyi raporlarsın.',
+  scene: balScene('r6-105', 'Denge projesi', 'Robot 3° eğik başlar, 3. saniyede +200 °/s itilir. Ek itme için düğmeleri, kontrolü kapatıp düşmeyi görmek için seri monitörden "k" komutunu kullanabilirsin.', 20, { pushes: [{ atS: 3, dps: 200 }] }),
   quickSend: [{ label: 'k (kontrolü kapat)', text: 'k' }],
   starter: () => `#include <Wire.h>
 
@@ -371,6 +372,8 @@ void loop() {
   // TODO: seriden 'k' gelirse durum = KONTROLSUZ (motorlar kapalı)
   // TODO: |aci| > DUSME_ACISI ise durum = DUSTU, motorları kes, LED yak, "DUSTU,<ms>" yaz
   // TODO: DENGE'de kaskad kontrol (104. ders); her 100 ms "T,ms,aci,konum" satırı yaz
+  // TODO: 2. saniyeden sonra |aci| > 2° olunca "itildik" say; en büyük eğimi izle; |aci| 1°'nin altında 1 sn kalınca
+  //       "RAPOR,<itmeMs>,<enBuyukEgim>,<oturmaMs>" yaz (oturma = itmeden eğimin 1°'yi son aştığı ana kadar süre)
 }
 `,
   solutionSketch: 'denge_robotu',
@@ -381,6 +384,15 @@ void loop() {
     { id: 'telemetri', text: 'Her 100 ms’de "T,ms,açı,konum" telemetrisi yazdır.', behavior: true, check: serialHas(/^T,\d+,-?[\d.]+,-?[\d.]+/m) },
     { id: 'kontrolsuz', text: '"k" gönder: kontrol kapanınca robot devrilsin ve "DUSTU,ms" yazılsın.', hint: 'Seri monitörün altındaki k düğmesini kullan.', behavior: true, check: ({ snap }) => B(snap).fell && /DUSTU,\d+/.test(snap.serial) },
     { id: 'durum', text: 'Durumları enum ile yönet: DENGE, KONTROLSUZ, DUSTU.', check: codeHas(/\benum\b/) },
+    {
+      id: 'rapor', text: 'İtmeyi raporla: "RAPOR,itmeMs,enBüyükEğim,oturmaMs" satırı arenanın ölçtüğü gerçek değerlerle uyuşsun (itme anı ±100 ms, en büyük eğim ±0,6°, oturma ±100 ms).',
+      hint: 'İtme 3. saniyede gelir. Rapor, eğim 1°’nin altında 1 sn kaldıktan sonra yazılır; oturma süresi itmeden eğimin 1°’yi son aştığı ana kadardır.', behavior: true,
+      check: ({ snap }) => {
+        const b = B(snap), m = snap.serial.match(/^RAPOR,(\d+),(-?[\d.]+),(\d+)/m)
+        if (!m || !b.push || b.push.settleMs === null) return false
+        return Math.abs(Number(m[1]) - b.push.atS * 1000) <= 100 && Math.abs(Number(m[2]) - b.push.maxAbsDeg) <= 0.6 && Math.abs(Number(m[3]) - b.push.settleMs) <= 100
+      },
+    },
   ],
 }
 

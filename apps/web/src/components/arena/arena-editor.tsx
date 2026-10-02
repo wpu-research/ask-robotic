@@ -4,8 +4,10 @@ import { CodePane, type CodePaneApi } from '@/components/lab/code-pane'
 import { SerialMonitor } from '@/components/lab/serial-monitor'
 import { GoalTracker, idleSnapshot } from '@/lib/arena/goals'
 import { createArenaRuntime, type ArenaRuntime } from '@/lib/arena/runtime'
+import { variantsForScene, type ArenaVariantEntry } from '@/lib/arena/variants'
 import type { ArenaGoal, ArenaGoalResult, ArenaScene, ArenaSnapshot } from '@/lib/arena/types'
 import { compileCode, type CompileError } from '@/lib/lab/compile-client'
+import { logEvent } from '@/lib/events'
 import { ArenaCanvas } from './arena-canvas'
 import { ArenaGoals, SensorPanel } from './arena-panels'
 
@@ -40,7 +42,7 @@ const fmtTime = (s: number) => {
   return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(t % 1000).padStart(3, '0')}`
 }
 
-export function ArenaEditor({ scene: sceneProp, scenes, starters, initialCode, goals, storageKey, quickSend, onGoalsComplete, compact }: ArenaEditorProps) {
+function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goals, storageKey, quickSend, onGoalsComplete, compact }: ArenaEditorProps) {
   const free = !!scenes?.length
   const [sceneId, setSceneId] = useState(sceneProp.id)
   const scene = useMemo(() => (free ? scenes!.find((s) => s.id === sceneId) ?? sceneProp : sceneProp), [free, scenes, sceneId, sceneProp])
@@ -175,6 +177,7 @@ export function ArenaEditor({ scene: sceneProp, scenes, starters, initialCode, g
     setCompile({ status: 'compiling' })
     const out = await compileCode(codeRef.current)
     if (id !== runId.current) return
+    logEvent('compile', { p: { ok: out.ok, kind: 'arena' } })
     if (!out.ok) {
       setCompile(out.errors.length ? { status: 'errors', errors: out.errors } : { status: 'failed', message: out.message ?? 'Derleme başarısız oldu.', unavailable: out.unavailable })
       return
@@ -187,6 +190,7 @@ export function ArenaEditor({ scene: sceneProp, scenes, starters, initialCode, g
       setSerialBase(0); setPaused(false); measured.current = 1
       setCompile({ status: 'ok', flashBytes: out.flashBytes, ramBytes: out.ramBytes })
       setRunning(true)
+      logEvent('run', { p: { kind: 'arena' } })
     } catch (e) {
       console.error(e)
       setCompile({ status: 'failed', message: 'Benzetim başlatılamadı. Hex dosyası geçersiz olabilir.' })
@@ -298,6 +302,14 @@ export function ArenaEditor({ scene: sceneProp, scenes, starters, initialCode, g
             {stale && rt && <p className="lab-lockhint" data-testid="arena-stale">Kodu değiştirdin; sonuçlar eski çalıştırmaya ait. ▶ ile yeniden çalıştır.</p>}
           </div>
           {scene.description && <p className="arena-desc muted">{scene.description}</p>}
+          {scene.kind === 'balancer' && (
+            <div className="arena-quick" role="group" aria-label="Dışarıdan itme" data-testid="arena-push">
+              <span className="muted">İtme (eğim hızına ekler):</span>
+              {([[200, 'İleri it +200 °/s'], [-200, 'Geri it −200 °/s'], [500, 'Sert it +500 °/s']] as const).map(([dps, label]) => (
+                <button key={dps} type="button" className="jr-btn small" disabled={!running} data-push={dps} onClick={() => rtRef.current?.push(dps)}>{label}</button>
+              ))}
+            </div>
+          )}
           <SensorPanel scene={scene} snap={snap} onButton={(pin, down) => rtRef.current?.press(pin, down)} onNudge={nudge} />
         </div>
 
@@ -318,4 +330,48 @@ export function ArenaEditor({ scene: sceneProp, scenes, starters, initialCode, g
       </div>
     </div>
   )
+}
+
+/** Dersin birden çok yolu varsa (A/B/C) yol sekmelerini gösterir; her yolun kodu ve hedefleri ayrı saklanır. */
+function VariantHost({ variants, ...props }: ArenaEditorProps & { variants: ArenaVariantEntry[] }) {
+  const base = variants[0]
+  const vKey = props.storageKey ? `${props.storageKey}:yol` : undefined
+  const [vid, setVid] = useState<string>(base.activity.variant?.id ?? 'a')
+  useEffect(() => { // son seçilen yol hatırlanır
+    if (!vKey) return
+    try { const raw = localStorage.getItem(vKey); if (raw && variants.some((v) => v.activity.variant?.id === raw)) setVid(raw) } catch { /* yok say */ }
+  }, [vKey, variants])
+  const pick = (id: string) => { setVid(id); if (vKey) { try { localStorage.setItem(vKey, id) } catch { /* kota */ } } }
+  const cur = variants.find((v) => v.activity.variant?.id === vid) ?? base
+  const isBase = cur === base
+  const a = cur.activity
+  const code = useMemo(() => (isBase ? props.initialCode : a.starter()), [isBase, a, props.initialCode])
+  return (
+    <div className="arena-variants" data-testid="arena-variants">
+      <div className="arena-quick" role="tablist" aria-label="Yol seç">
+        <span className="muted">Yol:</span>
+        {variants.map((v) => {
+          const id = v.activity.variant?.id ?? v.key
+          return <button key={v.key} type="button" role="tab" className="jr-btn small" aria-selected={cur === v} aria-pressed={cur === v} data-variant={id} onClick={() => pick(id)}>{v.activity.variant?.label ?? id}</button>
+        })}
+      </div>
+      {!isBase && a.intro && <p className="lesson-app-intro" data-testid="arena-variant-intro">{a.intro}</p>}
+      <ArenaEditorBase
+        key={cur.key}
+        scene={isBase ? props.scene : a.scene}
+        initialCode={code}
+        goals={isBase ? props.goals : a.goals}
+        quickSend={isBase ? props.quickSend : a.quickSend}
+        storageKey={isBase || !props.storageKey ? props.storageKey : `${props.storageKey}:${a.variant?.id ?? cur.key}`}
+        onGoalsComplete={props.onGoalsComplete}
+        compact={props.compact}
+      />
+    </div>
+  )
+}
+
+export function ArenaEditor(props: ArenaEditorProps) {
+  const variants = props.scenes?.length ? null : variantsForScene(props.scene.id)
+  if (!variants) return <ArenaEditorBase {...props} />
+  return <VariantHost {...props} variants={variants} />
 }

@@ -125,6 +125,8 @@ describe('palet', () => {
     expect(t('alev')).toEqual(['flame'])
     expect(t('mikrofon')).toEqual(['sound'])
     expect(t('enkoder')).toEqual(['encoder'])
+    expect(t('yağmur')).toEqual(['rain'])
+    expect(t('seviye')).toEqual(['waterlevel'])
   })
   it('Diğer: kategorisiz izinli tür görünür', () => {
     expect(pickerGroups(['uno', 'led'], '').map((x) => x.title)).toEqual(['Çıkış', 'Diğer'])

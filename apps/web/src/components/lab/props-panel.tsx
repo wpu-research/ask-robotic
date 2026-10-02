@@ -2,6 +2,8 @@
 import { PINS, PROPS, type PartInstance, type PartRuntime, type PropDef, type PropValue } from '@/lib/lab/contract'
 import { MEASURE_HINT, MEASURE_IDLE, MEASURE_NONE, formatMeasurement } from '@/lib/lab/measure'
 import { PART_DEFS } from '@/lib/lab/geometry'
+import { guideForPartType } from '@/lib/parca-rehberi'
+import { logEvent } from '@/lib/events'
 import type { Selection } from './canvas'
 
 interface Props {
@@ -112,6 +114,14 @@ export function PropsPanel({ selection, part, runtime, wireInfo, running, locked
   return (
     <section className="lab-props" aria-label="Özellikler" data-props-for={part.id}>
       <div className="lab-props-head"><b>{PART_DEFS[part.type].name}</b><small>{part.id}{locked ? ' · kilitli' : ''}</small></div>
+      {(() => {
+        const guide = guideForPartType(part.type)
+        return guide ? (
+          <a className="lab-partinfo" href={`/parcalar/${guide.slug}`} target="_blank" rel="noopener" data-testid="lab-partinfo" onClick={() => logEvent('hint', { p: { src: 'part-info', part: part.type } })}>
+            Bu parça nedir? <span aria-hidden="true">↗</span><span className="sr-only"> ({guide.title} sayfası yeni sekmede açılır)</span>
+          </a>
+        ) : null
+      })()}
       <MeasureBox part={part} runtime={runtime} running={running} />
       {defs.length === 0 && <p className="lab-hint">Bu parçanın ayarlanabilir özelliği yok.</p>}
       {defs.map((d) => (

@@ -141,6 +141,7 @@
 .oy-note { margin: 0; font-size: .8rem; color: var(--ok); font-weight: 700; }
 .oy-empty { color: var(--muted); font-size: .88rem; list-style: none; }
 .oy-hint { margin: 0; font-size: .78rem; color: var(--muted); line-height: 1.4; }
+.oy-tab-acts { display: flex; gap: 4px; flex: none; position: sticky; right: 0; padding-left: 4px; background: var(--surface-2); }
 .oy-tabs-sm { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
 .oy-tabs-sm button { min-height: 36px; padding: 2px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; font-size: .85rem; cursor: pointer; }
 .oy-tabs-sm button[aria-selected='true'] { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }

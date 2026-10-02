@@ -94,7 +94,7 @@ export const MODEL = {
 
 /**
  * Analog çıkışlı modüller: AO = VCC · clamp(base + span · seviye). `prop` seviyenin özellik anahtarı (0-1).
- * Yönler derslerdeki varsayımlarla uyumludur: MQ-2 gazda yükselir, alev düşer, ses yükselir, kapasitif toprak nemi ıslakta düşer.
+ * 
  * DO çıkışı, seviye ≥ eşik olduğunda LOW'dur (LM393 karşılaştırıcılı modüller).
  */
 export const ANALOG_MODULES = {
@@ -102,6 +102,10 @@ export const ANALOG_MODULES = {
   flame: { prop: 'flame', base: 1, span: -0.95, minVolts: 3 },
   sound: { prop: 'sound', base: 0.25, span: 0.7, minVolts: 3 },
   soil: { prop: 'moisture', base: 0.9, span: -0.6, minVolts: 3 },
+  /** Yağmur kartı: kuruda yüksek (~0,95), ıslandıkça düşer (tam ıslakta ~0,10). */
+  rain: { prop: 'wetness', base: 0.95, span: -0.85, minVolts: 3 },
+  /** Su seviyesi çubuğu: boşta ~0,05, su yükseldikçe artar (tam doluda ~0,80; çubuk 5 V'ta tam ölçeğe ulaşmaz). */
+  waterlevel: { prop: 'level', base: 0.05, span: 0.75, minVolts: 3 },
 } as const
 export type AnalogModuleType = keyof typeof ANALOG_MODULES
 export const isAnalogModule = (t: string): t is AnalogModuleType => t in ANALOG_MODULES

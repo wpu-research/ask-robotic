@@ -192,7 +192,19 @@ void loop() {
 
 T4 ve T5'te duvara yakınlık azaldı; yani tekerlek uyumsuzluğu tolerans payını yiyor. Bu payı bilmek, ölçütü gerçek robotta yazarken önemlidir (93. ders).
 
+**Arenada sensör aralığı farklı: KP'yi yeniden ayarla.** Yukarıdaki tablo, sensörleri 2,0 cm aralıklı dizilmiş bir sınama düzeneğinde ölçüldü. Laboratuvardaki **arenada** (bu dersin etkinliği) çizgi sensörleri 2,4 cm aralıklıdır. `cizgiKonum()` konumu sensör **numarası** cinsinden verir (−2 ... +2); sensörler %20 daha seyrek olduğundan aynı konum değeri artık %20 daha büyük bir gerçek sapmaya karşılık gelir ve `KP = 55` ile düzeltme fazla sert olur. Arenada ölçtüğümüz:
+
+| `KP` | Arena sonucu |
+|---|---|
+| 55 | Çizgiyi kaybediyor: 3,6 sn'de, çizgi bitmeden (x = 1,02 m; çizgi 1,30 m'ye kadar gidiyor) çaprazın ortasında `durum: SERBEST` yazılıyor. Robot serbest dolaşıp 3 kez çarpıyor ve pisti bitiremiyor |
+| 52 ve altı | Bitiriyor (yaklaşık 11,5 sn), çarpma yok |
+| **46** | Bitiriyor (11,3 sn), çarpma yok; `SERBEST`'e doğru yerde, çizgi bittikten sonra (x = 1,31 m) geçiyor |
+
+Öneri: arenada `KP = 46` kullan (55 / 1,2 ≈ 46; sensör aralığı %20 büyüdüğü için kazancı aynı oranda küçülttük). Genel kural: sensör aralığını değiştirirsen ya da farklı bir dizi kullanırsan `KP`'yi yeniden ölç; bir sayıyı başka bir düzenekten kopyalama. Arena etkinliğinin çözümünde bu yüzden `KP = 46` yazar. Bu dersin metnindeki `a_arac` sketch'i 2,0 cm'lik sınama düzeneğine göre `KP = 55` bırakıldı.
+
 ### Yol B: üç noktadan al-bırak dizisi
+*Arena etkinliğinde **B: Robot kol** sekmesi: parça P1'de durur, yeşil daire P3'tür; tutucu 90°'nin üstünde kapalı sayılır (bu dersteki sketch'te açık = 30°, kapalı = 100°). Arena parçanın gerçekten alınıp bırakıldığını da sınar.*
+
 Durumlar:
 
 | Durum | Ne yapar | Çıkış koşulu |
@@ -353,6 +365,8 @@ void loop() {
 Gerçek kolda bu sayılar bu kadar iyi çıkmaz; tablodaki 0,05-0,09 mm, matematiğin ve servo darbesinin doğruluğudur. Kalan hatayı cetvelle ve kendi kolunla ölçeceksin.
 
 ### Yol C: hedefi takip et, kaybolursa dur
+*Arena etkinliğinde **C: Takip** sekmesi: levha hareketi (uzaklaşma, kaybolma, geri dönme) arenada zamanla kendiliğinden olur; aşağıdaki T1, T5 ve T6 satırlarını sen elle yapmadan görürsün.*
+
 Durumlar:
 
 | Durum | Ne yapar | Çıkış koşulu |

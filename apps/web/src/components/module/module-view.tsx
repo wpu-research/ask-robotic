@@ -9,6 +9,7 @@ import { ageLabel, MODULE_META, TRACKS } from '@/lib/module-meta'
 import { useDoneIds } from '@/lib/progress-store'
 import { KindBadge, LessonKindBadge, StatusPill } from '../badges'
 import { Icon } from '../shell/icons'
+import { LessonMarkdown } from '@/app/ders/[id]/lesson-markdown'
 
 const isProject = (t: string) => /^(Proje|Bitirme)/.test(t)
 
@@ -24,7 +25,7 @@ function WeekProgress({ w }: { w: CatalogWeek }) {
   )
 }
 
-export function ModuleView({ m }: { m: CatalogModule }) {
+export function ModuleView({ m, guides = {} }: { m: CatalogModule; /** Hafta sırası -> haftalık çalışma rehberi (Markdown). */ guides?: Record<number, string> }) {
   const done = useDoneIds()
   const act = useActivity()
   const meta = MODULE_META[m.slug]
@@ -112,6 +113,12 @@ export function ModuleView({ m }: { m: CatalogModule }) {
                   </button>
                 </h3>
                 <div id={panelId} role="region" aria-label={`${w.position}. hafta dersleri`} hidden={!isOpen}>
+                  {guides[w.position] && (
+                    <details className="wk-guide">
+                      <summary><Icon name="book" size={16} /> Haftalık rehber <small>hedefler, gün gün plan, tekrar ve proje ölçütü</small></summary>
+                      <LessonMarkdown>{guides[w.position]}</LessonMarkdown>
+                    </details>
+                  )}
                   <ol className="lessons">
                     {w.lessons.map((l, i) => {
                       const st = lessonStatus(l.id, done, act.opened)

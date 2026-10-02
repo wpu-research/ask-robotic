@@ -1,0 +1,17 @@
+{
+  "slug": "ai-muhendisligi",
+  "title": "AI Mühendisliği + Claude",
+  "track": "ai",
+  "position": 7,
+  "minAge": 13,
+  "weeks": [
+    { "dir": "h1", "title": "Dil modelleri nasıl çalışır?", "project": "Mini dil modeli", "lessons": 5 },
+    { "dir": "h2", "title": "Sıcaklık, bağlam ve ilk prompt", "project": "Prompt şablonu", "lessons": 5 },
+    { "dir": "h3", "title": "Prompt mühendisliği", "project": "Duyuru özetleyici", "lessons": 5 },
+    { "dir": "h4", "title": "Değerlendirme (eval)", "project": "Kendi eval setin", "lessons": 5 },
+    { "dir": "h5", "title": "Bilgi getirme: embedding ve RAG", "project": "Kendi RAG hattın", "lessons": 5 },
+    { "dir": "h6", "title": "Araçlar ve ajanlar", "project": "Mini ajan", "lessons": 5 },
+    { "dir": "h7", "title": "Kod yazan yapay zekâ ve güvenlik", "project": "Kırmızı takım raporu", "lessons": 5 },
+    { "dir": "h8", "title": "Sorumlu kullanım ve robotik", "project": "Mühendislik portföyü", "lessons": 5 }
+  ]
+}

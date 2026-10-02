@@ -1,7 +1,9 @@
 import type { ReactNode } from 'react'
 import './globals.css'
+import './platform.css'
 import { AppShell } from '@/components/shell/app-shell'
 import { authEnabled } from '@/lib/flags'
+import { ConsentBanner } from '@/components/learn/consent-banner'
 
 export const metadata = {
   title: { default: 'ASK Robotic', template: '%s · ASK Robotic' },
@@ -17,6 +19,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <head><script dangerouslySetInnerHTML={{ __html: bootScript }} /></head>
       <body>
         <AppShell authOn={authEnabled()}>{children}</AppShell>
+        <ConsentBanner />
       </body>
     </html>
   )

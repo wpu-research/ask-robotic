@@ -119,6 +119,8 @@ void loop() {
 - `s` ve `d` ile 420 ms'lik dönüş yaklaşık 91° döndürdü. Bu sayıyı biz ölçerek bulduk: aynı hızda 500 ms yaklaşık 108° döndürüyordu. Kendi robotunda `delay` süresini, robot tam 90° dönene kadar ayarla; iletki ya da telefonun pusulası işini görür.
 
 ### Yol B: ters kinematik fonksiyonu ve servo sürücü
+*Arena etkinliğinde bu yol için **B: Robot kol** sekmesini aç: kolu `g x y` komutlarıyla hedeflere gönder, arena uç noktasını darbeden yeniden hesaplayıp 1 mm ölçütünü senin yerine sınar.*
+
 Devre ders 111'deki Yol B tablosudur (servolar D9, D10, D11; harici güç ve ortak GND). Kolun iki bölümü de 10 cm'dir. 108. derste gördüğün iki eksenli ters kinematiği burada tek bir yere topluyoruz. Açı düzenimiz şöyle:
 
 | Servo | Açı | Anlamı |
@@ -232,6 +234,8 @@ void loop() {
 - Aynı açıları tam dereceye yuvarlasaydık (`Servo.write` gibi) en büyük sapma 0,9 mm olurdu. Yani yuvarlama tek başına 5 mm ölçütünü tehdit etmez. Asıl riskler mekaniktir: dişli boşluğu, kolun ağırlığıyla eğilmesi, servonun ölü bandı, kol uzunluklarını cetvelle hatalı ölçmek. Bunlar simülatörde yok; gerçek kolda ölçüt bunlarla zorlanır. Servonun ölü bandını kendi servonun veri sayfasında ara.
 
 ### Yol C: mesafe PID alt sistemi
+*Arena etkinliğinde **C: Takip** sekmesi: 44 cm önündeki levhaya yaklaşan robotun gerçek mesafesi (ışın, gürültüsüz) sağ panelde görünür; 17-23 cm ölçütü bu değerle sınanır.*
+
 Devre ders 111'deki Yol C tablosudur. Öndeki hedefe 20 cm mesafeyi korumak için hata, hedef mesafe ile ölçülen mesafenin farkıdır: `hata = ölçülen − 20`. Artı hata "hedef uzakta, ileri git", eksi hata "çok yakın, geri çekil" demektir. PID'in üç terimini (96-98. dersler) toplarız.
 
 | Modül | Fonksiyon | Sınama | Geçme koşulu |

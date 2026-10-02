@@ -82,7 +82,13 @@ export function toJavaScript(program: ProgramState, defs: readonly GameBlockDef[
     if (!d || !d.js) return isValue ? `${ident(b.type)}()` : `${ident(b.type)}();\n`
     if (typeof d.js === 'function') return d.js(ctxFor(b))
     const c = ctxFor(b)
-    return d.js.replace(/\{([A-Za-z0-9_]+)\}/g, (_, n: string) => (b.fields && n in b.fields ? c.field(n) : b.inputs?.[n] ? c.value(n) : ''))
+    // Deyim girişleri (input_statement) ifade değil, girintili deyim yığını olarak yazılır.
+    const stmtInputs = new Set<string>()
+    for (const [k, v] of Object.entries(d.json as Record<string, unknown>)) {
+      if (!/^args\d+$/.test(k) || !Array.isArray(v)) continue
+      for (const a of v as { type?: string; name?: string }[]) if (a?.type === 'input_statement' && a.name) stmtInputs.add(a.name)
+    }
+    return d.js.replace(/\{([A-Za-z0-9_]+)\}/g, (_, n: string) => (b.fields && n in b.fields ? c.field(n) : stmtInputs.has(n) ? c.statements(n) : b.inputs?.[n] ? c.value(n) : ''))
   }
 
   const stmt = (b: ProgramBlock): string => {

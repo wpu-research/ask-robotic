@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { Sim, pinInfo } from './index.js'
+import { STD_MOTORS, Sim, pinInfo } from './index.js'
 import { ANALOG_HEX, BLINK_HEX, BUTTON_HEX, SERIAL_HEX } from './test-fixtures.js'
 
 const lines = (s: string): string[] => s.trim().split(/\r?\n/)
@@ -62,5 +62,71 @@ describe('Sim (önceden derlenmiş hex)', () => {
     expect(pinInfo(3)).toEqual({ port: 'D', bit: 3 })
     expect(pinInfo('A2')).toEqual({ port: 'C', bit: 2 })
     expect(() => pinInfo(99)).toThrow()
+  })
+})
+
+describe('Dengelenen robot: sensör bozucuları ve itme', () => {
+  const RAD = Math.PI / 180
+  const make = (o: Parameters<Sim['balancer']>[0] extends infer T ? Partial<T> : never = {}) => {
+    const sim = new Sim(BLINK_HEX) // motor pinleri sürülmez: robot kontrolsüz
+    const bal = sim.balancer({ motors: STD_MOTORS, theta0Deg: 0, ...o })
+    return { sim, bal }
+  }
+
+  it('bozucusuz: okunan değer gerçek açıyı izler (ax = sinθ, az = cosθ)', () => {
+    const { sim, bal } = make({ theta0Deg: 3 })
+    sim.run(2)
+    expect(bal.mpu.ax).toBeCloseTo(Math.sin(bal.state.theta), 6)
+    expect(bal.mpu.az).toBeCloseTo(Math.cos(bal.state.theta), 6)
+  })
+
+  it('ivmeölçer ofseti: okunan açı gerçekten ofset kadar kayar, gerçek durum etkilenmez', () => {
+    const a = make({ accelOffsetDeg: 4 }), b = make()
+    a.sim.run(5); b.sim.run(5)
+    expect(a.bal.state.theta).toBeCloseTo(b.bal.state.theta, 9)
+    const okunan = Math.atan2(a.bal.mpu.ax, a.bal.mpu.az) / RAD, gercek = a.bal.thetaDeg
+    expect(okunan - gercek).toBeCloseTo(4, 3)
+  })
+
+  it('ivmeölçer gürültüsü sınırlıdır ve aynı tohumda aynıdır; farklı tohum farklıdır', () => {
+    const seri = (seed: number): number[] => {
+      const { sim, bal } = make({ accelNoiseG: 0.05, seed })
+      const out: number[] = []
+      for (let i = 0; i < 20; i++) { sim.run(1); out.push(bal.mpu.ax - Math.sin(bal.state.theta)) }
+      return out
+    }
+    const s1 = seri(1), s2 = seri(1), s3 = seri(2)
+    expect(s1).toEqual(s2)
+    expect(s1).not.toEqual(s3)
+    expect(Math.max(...s1.map(Math.abs))).toBeLessThanOrEqual(0.05 + 1e-9)
+    expect(Math.max(...s1.map(Math.abs))).toBeGreaterThan(0.005)
+  })
+
+  it('jiroskop gürültüsü ve sapması: gy = gerçek hız + sapma + gürültü', () => {
+    const { sim, bal } = make({ gyroBiasDps: 1, gyroNoiseDps: 0.5, seed: 3 })
+    let ort = 0
+    const n = 300
+    for (let i = 0; i < n; i++) { sim.run(1); ort += bal.mpu.gy - (bal.state.omega * 180) / Math.PI }
+    ort /= n
+    expect(Math.abs(ort - 1)).toBeLessThan(0.15)
+  })
+
+  it('titreşim: ax sinüsle değişir', () => {
+    const { sim, bal } = make({ vibrationG: 0.1, vibrationHz: 50 })
+    let mx = -1, mn = 1
+    for (let i = 0; i < 40; i++) { sim.run(1); const d = bal.mpu.ax - Math.sin(bal.state.theta); mx = Math.max(mx, d); mn = Math.min(mn, d) }
+    expect(mx).toBeGreaterThan(0.08); expect(mn).toBeLessThan(-0.08)
+  })
+
+  it('push: eğim hızına tam dps ekler; düşmüş robota etki etmez', () => {
+    const { sim, bal } = make()
+    sim.run(1)
+    const w0 = bal.state.omega
+    bal.push(200)
+    expect((bal.state.omega - w0) / RAD).toBeCloseTo(200, 6)
+    bal.state.fell = true
+    const w1 = bal.state.omega
+    bal.push(500)
+    expect(bal.state.omega).toBe(w1)
   })
 })

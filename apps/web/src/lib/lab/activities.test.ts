@@ -56,7 +56,7 @@ describe('laboratuvar etkinlikleri', () => {
         const sol = act.solution!()
         const r = await compileSketch(sol.code)
         if (!r.ok) throw new Error('derleme hatası: ' + JSON.stringify(r))
-        const lab = createRuntime(sol.circuit, r.hex)
+        let lab = createRuntime(sol.circuit, r.hex)
         const tr = new StatsTracker()
         const advance = (ms: number) => { for (let t = 0; t < ms; t += 5) { lab.advance(Math.min(5, ms - t)); tr.observe(lab.state) } }
         if (act.scenario) {
@@ -64,6 +64,7 @@ describe('laboratuvar etkinlikleri', () => {
             advance,
             setProp: (id, k, v) => lab.setProp(id, k, v),
             sendSerial: (t) => lab.sendSerial(t),
+            powerCycle: () => { const eeprom = lab.state.eeprom; lab.dispose(); lab = createRuntime(sol.circuit, r.hex, { eeprom }) },
             get serial() { return lab.state.serial },
           })
         } else advance(3000)

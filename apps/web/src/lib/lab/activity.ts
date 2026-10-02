@@ -10,6 +10,8 @@ export interface LabScenario {
   advance(ms: number): void
   setProp(partId: string, key: string, value: PropValue): void
   sendSerial(text: string): void
+  /** Güç kes ve yeniden ver: yeni çalıştırma başlar, EEPROM içeriği korunur (seri çıktı ve istatistikler sıfırlanır). */
+  powerCycle(): void
   /** Şu anki benzetim durumu (seri çıktı vb. okumak için). */
   readonly serial: string
 }

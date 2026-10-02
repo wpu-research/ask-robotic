@@ -36,6 +36,7 @@ Sketch adları bir hafta içinde benzersiz olmalı. İşaretsiz ` ```cpp ` blokl
 | `sim.pulseWidthsUs(pin, from, to)` | HIGH darbe genişlikleri (µs) — servo, HC-SR04 |
 | `sim.nowMs()` | benzetim zamanı |
 | `sim.eeprom.backend.memory` | EEPROM baytları (Uint8Array) |
+| `sim.exportEeprom()` / `sim.importEeprom(bytes)` | EEPROM anlık görüntüsü (1024 bayt) al / yükle: güç kesip yeniden verme. Laboratuvarda `createLab(circuit, hex, { eeprom })` ve `lab.state.eeprom` aynı işi yapar |
 
 Doğrulanmış ölçümler: Blink 1 Hz %50; `analogWrite(9,128)` ≈ 490 Hz %50; `tone(8,440)` ≈ 440 Hz; `Servo.write(90)` ≈ 1472 µs; `analogRead` 2,5 V → 512.
 
@@ -79,3 +80,5 @@ Standart pinler: sol motor EN D5 (PWM) IN1 D7 IN2 D8; sağ motor EN D6 (PWM) IN3
 `imu:true` (+ isteğe bağlı `gyroBiasDps`, `gyroNoiseDps`) robota MPU6050 (0x68) ekler: `gz` = yaw hızı (°/s, sola dönüş +), `az=1`, diğerleri 0; ham `Wire` okumasıyla (ders 58) okunur, `robot.imu` canlı alanları verir.
 Fizik: tekerlek yarıçapı 3,3 cm, aks aralığı 12 cm, robot yarıçapı 7,5 cm, azami tekerlek hızı 12 rad/s (≈ 0,4 m/s), PWM ölü bölgesi %20 (altında tekerlek dönmez), motor gecikmesi τ=80 ms, enkoder 20 yuva/devir. `theta=0` = +x ekseni. Robot duvara girmez (çarpışınca durur).
 `sim.balancer({motors: STD_MOTORS, theta0Deg:3, A, B, C})` = ters sarkaç (θ'' = A·sinθ − B·u − C·θ'), MPU6050 (0x68) ham verisini besler: `ax=sinθ, az=cosθ`, `gy=θ'` (°/s). `bal.thetaDeg`, `bal.state.fell` (45° üstü = düştü), `bal.state.maxAbsDeg`. Kontrolsüz ≈ 1 sn'de düşer; `u = 0.15·açı° + 0.02·hız°/s` (−1…1, pwm=|u|·255, işaret yönü seçer) ayakta tutar (doğrulandı).
+
+`sim.balancer` ölçüm bozucuları (yalnız OKUNAN değer bozulur, `bal.state` gerçek kalır): `accelOffsetDeg` (ivmeölçer montaj hatası: okunan açı = gerçek + ofset), `accelNoiseG` (ax gürültüsü, ±g tepe), `vibrationG` / `vibrationHz` (motor titreşimi), `gyroBiasDps`, `gyroNoiseDps`, `seed`. `bal.push(dps)` eğim hızına dps (°/s) ekler (itme; düşmüş robota etkisiz). Arena sahnesinde (`apps/web/src/lib/arena`) aynı seçenekler `BalancerScene` alanlarıdır; ek olarak `pushes: [{ atS, dps }]` zamanlı itme çizelgesidir ve anlık görüntüdeki `push` alanı (itme anı, itmeden beri en büyük eğim, oturma süresi) robotun RAPOR satırını sınamak içindir.

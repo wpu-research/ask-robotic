@@ -3,7 +3,7 @@ import type { IconName } from './icons'
 export interface NavItem { href: string; label: string; icon: IconName; soon?: boolean; /** Alt çubukta (mobil) görünür. */ tab?: boolean }
 export interface NavGroup { title: string; items: NavItem[] }
 
-// "Yakında" öğeler şimdilik devre dışı; menüde yerleri ayrılmıştır.
+// `soon: true` işaretli öğeler devre dışı görünür ("Yakında"); şu an hepsi aktiftir.
 export const NAV: NavGroup[] = [
   {
     title: 'Öğren',
@@ -21,14 +21,16 @@ export const NAV: NavGroup[] = [
       { href: '/oyunlar', label: 'Oyunlar', icon: 'oyun' },
       { href: '/mikro-kart', label: 'Mikro Kart atölyesi', icon: 'mikro' },
       { href: '/oyun-atolyesi', label: 'Oyun atölyesi', icon: 'oyun' },
+      { href: '/sahne-atolyesi', label: 'Sahne atölyesi', icon: 'sahne' },
+      { href: '/ai-atolyesi', label: 'AI atölyesi', icon: 'ai' },
     ],
   },
   {
-    title: 'Yakında',
+    title: 'Öğrenme',
     items: [
-      { href: '#parcalar', label: 'Parçalar', icon: 'parcalar', soon: true },
-      { href: '#testlerim', label: 'Testlerim', icon: 'testler', soon: true },
-      { href: '#ilerlemem', label: 'İlerlemem', icon: 'ilerleme', soon: true },
+      { href: '/parcalar', label: 'Parçalar', icon: 'parcalar' },
+      { href: '/testler', label: 'Testlerim', icon: 'testler' },
+      { href: '/ilerleme', label: 'İlerlemem', icon: 'ilerleme' },
     ],
   },
 ]

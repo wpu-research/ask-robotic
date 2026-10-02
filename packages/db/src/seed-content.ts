@@ -18,10 +18,10 @@ export async function seedContent(db: Db, content: ModuleContent[] = allModules)
     for (const [wi, w] of m.weeks.entries()) {
       const [week] = await db
         .insert(weeks)
-        .values({ moduleId: mod.id, position: wi + 1, title: w.title, project: w.project })
+        .values({ moduleId: mod.id, position: wi + 1, title: w.title, project: w.project, guideMd: w.guideMd ?? null })
         .onConflictDoUpdate({
           target: [weeks.moduleId, weeks.position],
-          set: { title: w.title, project: w.project },
+          set: { title: w.title, project: w.project, guideMd: w.guideMd ?? null },
         })
         .returning()
 
@@ -36,6 +36,9 @@ export async function seedContent(db: Db, content: ModuleContent[] = allModules)
             problem: l.problem,
             contentMd: l.contentMd,
             question: l.question,
+            explainerMd: l.explainerMd ?? null,
+            concepts: l.concepts ?? null,
+            quiz: l.quiz ?? null,
           })
           .onConflictDoUpdate({
             target: [lessons.weekId, lessons.position],
@@ -45,6 +48,9 @@ export async function seedContent(db: Db, content: ModuleContent[] = allModules)
               problem: l.problem,
               contentMd: l.contentMd,
               question: l.question,
+              explainerMd: l.explainerMd ?? null,
+              concepts: l.concepts ?? null,
+              quiz: l.quiz ?? null,
             },
           })
       }

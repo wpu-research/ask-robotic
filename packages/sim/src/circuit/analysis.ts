@@ -10,7 +10,7 @@ const PASSIVE: readonly PartType[] = ['resistor', 'button', 'reed', 'pot', 'ldr'
 /** Pinleri sinyal girişi/çıkışı olan etkin parçalar: bu parçalara bağlı hat "yüzen" sayılmaz. */
 const ACTIVE: readonly PartType[] = [
   'npn', 'mosfet', 'l293d', 'relay', 'sr595', 'lcd1602', 'lcdI2c',
-  'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil',
+  'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel',
 ]
 
 /** Besleme pinleri (modül/entegre): VCC 5 V hattında (ya da bir Uno pininde), GND toprakta olmalı. */
@@ -33,6 +33,8 @@ const POWER: Partial<Record<PartType, { vcc: string[]; gnd: string; name: string
   flame: { vcc: ['VCC'], gnd: 'GND', name: 'Alev modülü', v33: true },
   sound: { vcc: ['VCC'], gnd: 'GND', name: 'Ses modülü', v33: true },
   soil: { vcc: ['VCC'], gnd: 'GND', name: 'Toprak nemi modülü', v33: true },
+  rain: { vcc: ['VCC'], gnd: 'GND', name: 'Yağmur sensörü', v33: true },
+  waterlevel: { vcc: ['VCC'], gnd: 'GND', name: 'Su seviyesi sensörü', v33: true },
 }
 
 /** Doğrudan bir Uno pinine bağlanması gereken sinyal uçları (Sim cihaz modelleri bu pinleri kullanır). */

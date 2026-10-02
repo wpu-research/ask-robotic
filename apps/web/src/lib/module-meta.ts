@@ -18,7 +18,7 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ag
     tagline: 'Animasyon, hikâye ve oyun yap. Değişken, mesajlaşma, klon ve liste öğren.',
     audience: '8-12 yaş',
     ages: '8-12 yaş',
-    callout: 'Dersler tarayıcıda çalışan Scratch 3 ile yapılır. Hesap açmadan da kullanılabilir.',
+    callout: 'Dersler tarayıcıda çalışan Sahne Atölyesi ile yapılır: karakterlerini çizer ya da galeriden seçer, bloklarla canlandırırsın. Kurulum ve hesap gerekmez; çalışmaların bu tarayıcıda saklanır.',
   },
   'arduino-temelleri': {
     tagline: 'LED\'den termostata: giriş/çıkış, analog, PWM, motor, zamanlama ve ekran.',
@@ -42,6 +42,12 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ag
     ages: '8+ yaş',
     callout: 'Her dersin etkinliği tarayıcıdaki Oyun Atölyesi ile yapılır: blokları birleştirirsin, sahnede oyunun hemen çalışır. Resim ve harita editörleri aynı sayfadadır; kurulum gerekmez. Çalışırken blok değiştirirsen yeni hâli için sıfırla (↺) düğmesine basman gerekir.',
   },
+  'ai-muhendisligi': {
+    tagline: 'Dil modellerinin nasıl çalıştığını, prompt yazmayı, ölçmeyi, bilgi getirmeyi, ajanları ve güvenliği kendi ellerinle dene.',
+    audience: '13 yaş ve üzeri; temel programlama bilgisi yeterli',
+    ages: '13+ yaş',
+    callout: 'Her dersin etkinliği tarayıcıda çalışan yerel bir araçla yapılır: token ve BPE, sonraki kelime olasılığı, benzerlik, RAG hattı, ajan döngüsü, prompt denetimi, injection ve eval. Hesaplar gerçektir; ancak gerçek bir dil modelinin yerini tutan her adım "simülasyon" ya da "şablon" diye açıkça etiketlenir. Dış servis, hesap ya da anahtar gerekmez.',
+  },
   robotik: {
     tagline: 'Sanal arenada sürüş, engel, çizgi, enkoder, PID ve denge. Bitirmede kendi robotunu seç.',
     audience: 'Sensörler ve Projeler\'i bitirenler',
@@ -50,8 +56,8 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ag
 }
 
 /** Modül türü rozeti: Blok / Devre / Robot. */
-export type ModuleKind = 'blok' | 'devre' | 'robot' | 'oyun'
-export const KIND_LABEL: Record<ModuleKind, string> = { blok: 'Blok', devre: 'Devre', robot: 'Robot', oyun: 'Oyun' }
+export type ModuleKind = 'blok' | 'devre' | 'robot' | 'oyun' | 'ai'
+export const KIND_LABEL: Record<ModuleKind, string> = { blok: 'Blok', devre: 'Devre', robot: 'Robot', oyun: 'Oyun', ai: 'AI' }
 export const MODULE_KIND: Record<string, ModuleKind> = {
   scratchjr: 'blok',
   scratch: 'blok',
@@ -60,28 +66,21 @@ export const MODULE_KIND: Record<string, ModuleKind> = {
   robotik: 'robot',
   'mikro-kart': 'blok',
   'oyun-atolyesi': 'oyun',
+  'ai-muhendisligi': 'ai',
 }
 export const moduleKind = (slug: string): ModuleKind => MODULE_KIND[slug] ?? 'devre'
 
 /** Ders türü rozeti: dersin etkinlik alanında ne açıldığı. */
-export type LessonKind = 'metin' | 'blok' | 'devre' | 'arena' | 'oyun'
-export const LESSON_KIND_LABEL: Record<LessonKind, string> = { metin: 'Metin', blok: 'Blok', devre: 'Devre', arena: 'Arena', oyun: 'Oyun' }
+export type LessonKind = 'metin' | 'blok' | 'devre' | 'arena' | 'oyun' | 'ai'
+export const LESSON_KIND_LABEL: Record<LessonKind, string> = { metin: 'Metin', blok: 'Blok', devre: 'Devre', arena: 'Arena', oyun: 'Oyun', ai: 'AI' }
 
 /**
- * Panelde "Yakında" kartı olarak görünen modüller (veritabanında yok).
+ * Panelde "Yakında" kartı olarak görünen modüller (veritabanında yok). Modül 7 yayında olduğundan şu an boş.
  * Modül 6 (Diğer Kartlar) hiç gösterilmez; Modül 8 ve 9 şimdilik gizlidir (docs/plan-moduller.md).
  * Açıklama docs/plan-moduller.md'deki modül listesinden alınmıştır; ayrıntı uydurulmaz.
  */
-export const UPCOMING = [
-  {
-    slug: 'ai-engineering',
-    position: 7,
-    title: 'AI Engineering + Claude',
-    track: 'ai' as TrackKey,
-    status: 'Planlandı',
-    description: 'Yapay zekâ mühendisliği hattı: AI Engineering ve Claude ile çalışma. Planlandı; içerik henüz yazılmadı.',
-  },
-]
+export interface UpcomingModule { slug: string; position: number; title: string; track: TrackKey; status: string; description: string }
+export const UPCOMING: UpcomingModule[] = []
 
 /** Yaş aralığı etiketi: önce elle girilmiş aralık, yoksa veritabanındaki en küçük yaş. */
 export const ageLabel = (slug: string, minAge: number | null): string | null =>

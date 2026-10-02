@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import type { CatalogModule } from '@/lib/catalog'
 import { moduleLessonIds, countDone, moduleState } from '@/lib/dashboard'
-import { ageLabel, TRACKS, UPCOMING } from '@/lib/module-meta'
+import { ageLabel, TRACKS, type UpcomingModule } from '@/lib/module-meta'
 import { hoursLabel } from '@/lib/format'
 import { useActivity } from '@/lib/activity-store'
 import { useDoneIds } from '@/lib/progress-store'
@@ -47,7 +47,7 @@ export function ModuleCard({ m }: { m: CatalogModule }) {
   )
 }
 
-export function SoonCard({ u }: { u: (typeof UPCOMING)[number] }) {
+export function SoonCard({ u }: { u: UpcomingModule }) {
   return (
     <div className={`mcard mcard-soon track-${u.track}`} aria-disabled="true">
       <div className="mcard-top">

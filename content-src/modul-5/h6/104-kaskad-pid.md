@@ -13,7 +13,7 @@ süre: 30
 ### Tek döngü neden yetmiyor?
 Şimdiye kadarki kontrol bir **açı PD**'siydi: `komut = KP · açı + KD · açıHızı`. Hedef hep 0°. Bu iş ayakta tutar. Ama robotun gerçekten dengede durduğu açı 0° olmayabilir: sensör 4° kaymış takılmışsa (ya da ağırlık merkezi önde/arkadaysa) sensörün "0°" dediği nokta gerçek denge noktası değildir. PD sensörün 0°'sine gitmeye çalışır, robot gerçekte biraz eğik kalır ve eğik robot ayakta kalmak için sürekli aynı yöne sürmek zorunda olur. Sonuç: **süzülme**.
 
-Benzetimde sensörü 4° kaymış yaptık (ivmeölçer montaj hatası) ve robotu 15 saniye izledik.
+Benzetimde sensörü 4° kaymış yaptık (ivmeölçer montaj hatası) ve robotu 15 saniye izledik. Arena etkinliğinde de ivmeölçer 4° kaymış takılıdır: yalnız **okunan** değer 4° bozulur, robotun gerçek eğimi bozulmaz. Bu, gerçek robotta sensörün yamuk takılmasının tam karşılığıdır; arenadaki sayılar aşağıdaki tablolarla aynı çıkar.
 
 ### Program 1: yalnız açı PD'si (ve konumu izleyen yazdırma)
 Bu benzetimde robotun enkoderi yok. Konumu, motora verdiğimiz komuttan tahmin ediyoruz: model tekerlek hızını yaklaşık `0,5 · komut` (m/s) olarak veriyor. Gerçek robotta konum ve hız enkoderden (ders 92) gelir; komuttan tahmin etmek yalnız bu benzetim için bir kısayoldur ve tekerlek kayınca yanlış olur.

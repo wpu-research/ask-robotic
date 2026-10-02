@@ -10,7 +10,7 @@
     "db:generate": "turbo db:generate --filter=@ask/db",
     "db:migrate": "turbo db:migrate --filter=@ask/db",
     "test": "turbo test",
-    "content:build": "node tools/content/build.mjs modul-3 && node tools/content/build.mjs modul-4 && node tools/content/build.mjs modul-5 && node tools/content/build.mjs modul-10 && node tools/content/build.mjs modul-11",
+    "content:build": "node tools/content/build.mjs modul-3 && node tools/content/build.mjs modul-4 && node tools/content/build.mjs modul-5 && node tools/content/build.mjs modul-7 && node tools/content/build.mjs modul-10 && node tools/content/build.mjs modul-11 && node tools/content/build.mjs parcalar",
     "content:check": "node tools/sim/check.mjs modul-3 && node tools/sim/check.mjs modul-4 && node tools/sim/check.mjs modul-5"
   },
   "devDependencies": {

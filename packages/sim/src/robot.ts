@@ -232,6 +232,18 @@ export interface BalancerConfig {
   deadband?: number
   fallDeg?: number
   gyroBiasDps?: number
+  /** Sensör bozucuları (yalnız OKUNAN değer bozulur; gerçek durum `state`'te kalır). */
+  /** İvmeölçer montaj/ağırlık merkezi hatası (derece): okunan açı = gerçek açı + ofset. */
+  accelOffsetDeg?: number
+  /** İvmeölçer gürültüsü: her ms'de düzgün dağılımlı ±değer (g, tepe). */
+  accelNoiseG?: number
+  /** Motor titreşimi: ax'e eklenen sinüs (genlik g, frekans Hz; varsayılan 40 Hz). */
+  vibrationG?: number
+  vibrationHz?: number
+  /** Jiroskop gürültüsü (°/s, standart sapma). */
+  gyroNoiseDps?: number
+  /** Gürültü tohumu (aynı tohum = aynı gürültü). */
+  seed?: number
 }
 export interface BalancerState {
   theta: number; omega: number; x: number; v: number; fell: boolean; maxAbsDeg: number
@@ -240,6 +252,8 @@ export interface Balancer {
   state: BalancerState
   mpu: MPU6050
   readonly thetaDeg: number
+  /** Dışarıdan itme: eğim hızına `dps` (°/s) ekler (+ = ileri). Düşmüş robota etki etmez. */
+  push(dps: number): void
 }
 
 /**
@@ -257,6 +271,8 @@ export function attachBalancer(sim: Sim, cfg: BalancerConfig): Balancer {
     return dir * ((d - P.deadband) / (1 - P.deadband))
   }
   const mpu = sim.mpu6050(cfg.mpu ?? {})
+  const rnd = mulberry32(P.seed ?? 1)
+  const off = ((P.accelOffsetDeg ?? 0) * Math.PI) / 180
   const step = (dt: number): void => {
     if (!s.fell) {
       const u = (cmd('left') + cmd('right')) / 2
@@ -266,13 +282,18 @@ export function attachBalancer(sim: Sim, cfg: BalancerConfig): Balancer {
       s.maxAbsDeg = Math.max(s.maxAbsDeg, Math.abs((s.theta * 180) / Math.PI))
       if (Math.abs(s.theta) > (P.fallDeg * Math.PI) / 180) s.fell = true
     }
-    mpu.ax = Math.sin(s.theta); mpu.az = Math.cos(s.theta); mpu.ay = 0
-    mpu.gy = ((s.omega * 180) / Math.PI) + (P.gyroBiasDps ?? 0)
+    const noise = P.accelNoiseG ? (rnd() * 2 - 1) * P.accelNoiseG : 0
+    const vib = P.vibrationG ? P.vibrationG * Math.sin(2 * Math.PI * (P.vibrationHz ?? 40) * (sim.nowMs() / 1000)) : 0
+    mpu.ax = Math.sin(s.theta + off) + noise + vib; mpu.az = Math.cos(s.theta + off); mpu.ay = 0
+    mpu.gy = ((s.omega * 180) / Math.PI) + (P.gyroBiasDps ?? 0) + (P.gyroNoiseDps ? gauss(rnd) * P.gyroNoiseDps : 0)
   }
   const loop = (): void => { step(0.001); sim.cpu.addClockEvent(loop, CYCLES_PER_MS) }
   sim.cpu.addClockEvent(loop, CYCLES_PER_MS)
   step(0.001)
-  return { state: s, mpu, get thetaDeg() { return (s.theta * 180) / Math.PI } }
+  return {
+    state: s, mpu, get thetaDeg() { return (s.theta * 180) / Math.PI },
+    push: (dps) => { if (!s.fell && Number.isFinite(dps)) s.omega += (dps * Math.PI) / 180 },
+  }
 }
 
 /** Modül 5 standart pin düzeni (derslerde ve checks.mjs'te aynı kullanılır). */

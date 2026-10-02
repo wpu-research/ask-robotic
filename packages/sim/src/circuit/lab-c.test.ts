@@ -25,7 +25,7 @@ const clearSerial = (lab: LabApi): void => { (lab as unknown as { sim: { serial:
 
 // ---------------------------------------------------------------------------------------------------------------------
 describe('sözleşme: Aşama C parçalarının pin ve özellik tanımları', () => {
-  const C: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil']
+  const C: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel']
   it('her parçanın pinleri ve benzersiz özellik anahtarları var; mevcut parçalar bozulmadı', () => {
     for (const t of C) {
       expect(PINS[t].length).toBeGreaterThan(1)
@@ -667,12 +667,14 @@ describe('Keypad 4x4', () => {
 // ---------------------------------------------------------------------------------------------------------------------
 // Analog modüller: ses A0, alev A1, toprak A2, MQ-2 A3; DO -> D7. AO = 5 V · (base + span · seviye); DO seviye ≥ eşik iken LOW.
 // ---------------------------------------------------------------------------------------------------------------------
-describe('Analog modüller (MQ-2, alev, ses, toprak nemi)', () => {
+describe('Analog modüller (MQ-2, alev, ses, toprak nemi, yağmur, su seviyesi)', () => {
   const cases = [
     { type: 'sound' as const, prop: 'sound', ao: 'A0', idx: 0, f: (l: number) => 0.25 + 0.7 * l },
     { type: 'flame' as const, prop: 'flame', ao: 'A1', idx: 1, f: (l: number) => 1 - 0.95 * l },
     { type: 'soil' as const, prop: 'moisture', ao: 'A2', idx: 2, f: (l: number) => 0.9 - 0.6 * l },
     { type: 'mq2' as const, prop: 'gas', ao: 'A3', idx: 3, f: (l: number) => 0.1 + 0.9 * l },
+    { type: 'rain' as const, prop: 'wetness', ao: 'A0', idx: 0, f: (l: number) => 0.95 - 0.85 * l },
+    { type: 'waterlevel' as const, prop: 'level', ao: 'A1', idx: 1, f: (l: number) => 0.05 + 0.75 * l },
   ]
   const build = (type: PartType, ao: string, props: Record<string, PropValue>, vcc = true): Circuit => circuit([part('m', type, props)],
     [['m.AO', `uno.${ao}`], ['m.DO', 'uno.D7'], ['m.GND', 'uno.GND'], ...(vcc ? ([['m.VCC', 'uno.5V']] as Array<[string, string]>) : [])])
@@ -719,6 +721,26 @@ describe('Analog modüller (MQ-2, alev, ses, toprak nemi)', () => {
     expect(ao('mq2', 'gas', 1, 'A3')).toBeGreaterThan(ao('mq2', 'gas', 0, 'A3'))
     expect(ao('flame', 'flame', 1, 'A1')).toBeLessThan(ao('flame', 'flame', 0, 'A1'))
     expect(ao('soil', 'moisture', 1, 'A2')).toBeLessThan(ao('soil', 'moisture', 0, 'A2'))
+    expect(ao('rain', 'wetness', 1, 'A0')).toBeLessThan(ao('rain', 'wetness', 0, 'A0')) // yağmur kuruda yüksek, ıslakta düşük
+    expect(ao('waterlevel', 'level', 1, 'A1')).toBeGreaterThan(ao('waterlevel', 'level', 0, 'A1')) // su yükseldikçe artar
+  })
+
+  it('yağmur ve su seviyesi: ham değerler (derste kullanılan eşikler) ve dört ucu da kablolu hâlde uyarı yok', () => {
+    const rainAdc = (w: number): number => { const l = createLab(build('rain', 'A0', { wetness: w }), ANALOG_DO_HEX); l.advance(300); return row(l)[0] }
+    const levelAdc = (v: number): number => { const l = createLab(build('waterlevel', 'A1', { level: v }), ANALOG_DO_HEX); l.advance(300); return row(l)[1] }
+    // 1023 · (0,95 − 0,85 · w) ve 1023 · (0,05 + 0,75 · v), en yakın tamsayı (±2)
+    expect(Math.abs(rainAdc(0) - 972)).toBeLessThanOrEqual(2)
+    expect(rainAdc(0.2)).toBeGreaterThan(790)
+    expect(rainAdc(0.6)).toBeLessThan(600)    // YAGMUR_ESIK = 600: 0,6 ve üstü "VAR"
+    expect(rainAdc(0.2)).toBeGreaterThan(600) // hafif nem henüz yağmur sayılmaz
+    expect(Math.abs(levelAdc(0) - 51)).toBeLessThanOrEqual(2)
+    expect(levelAdc(0.25)).toBeLessThan(300)  // BOS
+    expect(levelAdc(0.5)).toBeGreaterThan(300); expect(levelAdc(0.5)).toBeLessThan(600) // ORTA
+    expect(levelAdc(0.8)).toBeGreaterThan(600) // DOLU
+    for (const t of ['rain', 'waterlevel'] as const) {
+      expect(PINS[t]).toEqual(['VCC', 'GND', 'AO', 'DO'])
+      expect(analyzeCircuit(build(t, 'A0', {})).warnings).toEqual([])
+    }
   })
 })
 

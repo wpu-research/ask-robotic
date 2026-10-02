@@ -4,12 +4,12 @@ import type { ArenaGoal, ArenaGoalCtx, ArenaGoalResult, ArenaScene, ArenaSnapsho
 /** Çalışmadan önceki başlangıç görüntüsü (hedefler "başlamadı" durumunu görür). */
 export function idleSnapshot(scene: ArenaScene): ArenaSnapshot {
   if (scene.kind === 'balancer') {
-    return { kind: 'balancer', timeS: 0, thetaDeg: scene.theta0Deg, rateDps: 0, x: 0, v: 0, fell: false, fellAtS: null, uprightS: 0, maxAbsDeg: Math.abs(scene.theta0Deg), serial: '', serialAgeS: 0 }
+    return { kind: 'balancer', timeS: 0, thetaDeg: scene.theta0Deg, rateDps: 0, x: 0, v: 0, fell: false, fellAtS: null, uprightS: 0, maxAbsDeg: Math.abs(scene.theta0Deg), pushCount: 0, push: null, serial: '', serialAgeS: 0 }
   }
   if (scene.kind === 'arm') {
     const s: ArmSnapshot = {
       kind: 'arm', timeS: 0, q1: 90, q2: 0, grip: 90, cmd: { q1: 90, q2: 0, grip: 90 }, tipX: 0, tipY: scene.l1 + scene.l2, gripClosed: false,
-      held: null, objects: scene.objects.map((o) => ({ id: o.id, x: o.x, y: o.y })), placed: {}, maxJumpDeg: 0, serial: '', serialAgeS: 0, inZone: new Set(),
+      held: null, objects: scene.objects.map((o) => ({ id: o.id, x: o.x, y: o.y })), placed: {}, maxJumpDeg: 0, maxJointJumpDeg: 0, serial: '', serialAgeS: 0, inZone: new Set(),
     }
     return s
   }

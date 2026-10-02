@@ -11,14 +11,14 @@ Parçaları laboratuvarda **Parça ekle** menüsünden seç, pinleri kablo çeke
 | Parça | Bağlantı |
 |---|---|
 | Toprak nemi modülü | VCC → 5V, GND → GND, AO → **A2** |
-| İkinci Toprak nemi modülü (yağmur yerine) | VCC → 5V, GND → GND, AO → **A0** |
-| Ses modülü (su seviyesi yerine) | VCC → 5V, GND → GND, AO → **A1** |
+| Yağmur sensörü | VCC → 5V, GND → GND, AO → **A0** |
+| Su seviyesi sensörü | VCC → 5V, GND → GND, AO → **A1** |
 
-**Laboratuvarda yağmur ve su seviyesi sensörü yok.** Çıkış yönleri aynı olduğu için yerlerine şunları kullanıyoruz:
-- **Yağmur:** ikinci bir Toprak nemi modülü. Sağ paneldeki **Toprak nemi** kaydırıcısı "yüzey ne kadar ıslak" gibi düşünülür; ıslandıkça AO düşer (kuruda yüksek, ıslakta düşük), yağmur sensörü örneğimizle aynı yönde.
-- **Su seviyesi:** Ses modülü. **Ses şiddeti** kaydırıcısı "su seviyesi" gibi düşünülür; arttıkça AO yükselir, su seviyesi örneğimizle aynı yönde.
+Üç modül de analog çıkışlıdır (AO). Sağ paneldeki kaydırıcılar fiziksel büyüklüğü verir: **Toprak nemi** (yüzey ne kadar ıslak), **Islaklık (yağmur)** (kartın üstüne ne kadar yağmur düştüğü) ve **Su seviyesi** (çubuğun ne kadarı suda). Hepsi 0 ile 1 arasındadır. Modüllerin DO çıkışlarını bu derste kullanmıyoruz.
 
-Kaydırıcılar 0 ile 1 arasındadır; ham sayıları aşağıda ölçülmüş olarak vereceğiz. Modüllerin DO çıkışlarını bu derste kullanmıyoruz.
+Üç sensörün yönü farklıdır; bunu ham sayılardan okuyacaksın:
+- **Toprak nemi** ve **yağmur sensörü:** ıslandıkça AO **düşer** (kuruda yüksek, ıslakta düşük).
+- **Su seviyesi:** su yükseldikçe AO **artar** (çubuğun çıplak izleri suya gömüldükçe).
 
 ### İki tür toprak nemi sensörü
 - **Dirençli (resistive) sensör:** Toprağa gömülen iki açık metal uç vardır. Toprak nemliyse uçlar arasındaki direnç değişir ve bunu okursun. Ucundan sürekli akım geçtiği için metal zamanla **aşınır, paslanır**; bu tür sensörler ömürlü değildir. Akımı azaltmak için sensörü sürekli beslemek yerine yalnız ölçüm anında beslemek yaygın bir yöntemdir; modülün besleme akımı için veri sayfasına bak.
@@ -129,7 +129,7 @@ void loop() {
 Laboratuvarda kaydırıcı 0 iken `k` (Kuru kaydedildi: 921), kaydırıcı 1 iken `i` gönderdik (Islak kaydedildi: 307); sonra kaydırıcıyı 0,5 yapınca `nem=%50` yazdı. Kaydırıcı 0,5 iken hem `k` hem `i` gönderince (iki uç da 614) "Kalibrasyon gecersiz: uclar cok yakin" yazdı.
 
 ### Program 3: yağmur ve su seviyesi
-Yağmur modülünde ıslak yüzey okumayı değiştirir; su seviyesi sensöründe ise su çıplak izleri kapattıkça değer büyür. Yönler modüle göre değişir. Bu örnekte yağmur sensörü **kuruda yüksek, ıslakta düşük**, su seviyesi sensörü **su arttıkça yüksek** değer verir. Eşikleri gerçek bir sensörde ölçerek belirlemelisin; laboratuvarda ikinci Toprak nemi modülü (A0) yağmuru, Ses modülü (A1) su seviyesini temsil eder.
+Yağmur sensöründe kartın üstüne düşen damlalar iki bakır iz arasını köprüler ve okuma düşer; su seviyesi sensöründe ise su çıplak izleri kapattıkça değer büyür. Yönler modüle göre değişir. Bu örnekte yağmur sensörü **kuruda yüksek, ıslakta düşük**, su seviyesi sensörü **su arttıkça yüksek** değer verir. Eşikleri gerçek bir sensörde ölçerek belirlemelisin; aşağıdaki eşikler laboratuvardaki modeller için ölçüldü.
 
 ```cpp
 // sketch: yagmur_su
@@ -164,7 +164,29 @@ void loop() {
 }
 ```
 
-Laboratuvarda yağmur modülünün **Toprak nemi** kaydırıcısını 0 yaptık (A0 yaklaşık 921), sonra 0,8 yaptık (A0 yaklaşık 430); çıktı `YOK`, sonra `VAR` oldu. Seviye modülünün **Ses şiddeti** kaydırıcısını 0 (A1 yaklaşık 255), 0,2 (yaklaşık 399) ve 0,6 (yaklaşık 686) yaptık; çıktı sırasıyla `BOS`, `ORTA` ve `DOLU` oldu.
+Laboratuvarda yağmur sensörünün **Islaklık (yağmur)** kaydırıcısını gezdirerek ölçtük:
+
+| Islaklık | A0 | Seri monitörde |
+|---|---|---|
+| 0 (kuru kart) | 972 | `YOK` |
+| 0,2 | 798 | `YOK` |
+| 0,4 | 624 | `YOK` (eşik 600'ün hemen üstünde) |
+| 0,5 | 537 | `VAR` |
+| 0,8 | 276 | `VAR` |
+| 1 (sağanak) | 102 | `VAR` |
+
+Su seviyesi sensörünün **Su seviyesi** kaydırıcısıyla:
+
+| Su seviyesi | A1 | Seri monitörde |
+|---|---|---|
+| 0 (boş) | 51 | `BOS` |
+| 0,2 | 204 | `BOS` |
+| 0,4 | 358 | `ORTA` |
+| 0,7 | 588 | `ORTA` (DOLU eşiği 600'ün hemen altında) |
+| 0,8 | 665 | `DOLU` |
+| 1 (çubuk tamamen suda) | 819 | `DOLU` |
+
+Dikkat: su seviyesi sensörü 5 V'ta tam ölçeğe (1023) ulaşmaz; çubuğun en üst değeri yaklaşık 819 kalır. Bu yüzden eşikleri 1023'e göre değil, sensörün gerçek aralığına göre seçtik. Laboratuvarda kaydırıcıyı oynatırken **kartın** ya da **çubuğun** çizimindeki damlaların ve su düzeyinin kaydırıcıyla birlikte değiştiğini de izle.
 
 ### Nasıl çalışıyor?
 1. Üç sensör de gerilim üretir ve `analogRead` bunu 0-1023 arası sayıya çevirir (11. ders).
@@ -176,6 +198,7 @@ Laboratuvarda yağmur modülünün **Toprak nemi** kaydırıcısını 0 yaptık 
 - `toprak_yuzde` programında `KURU` ve `ISLAK` değerlerini yer değiştir. Yüzde ne oluyor? Bir sensörün hangi yönde olduğunu kaydırıcıyı 0'dan 1'e çekip ham sayının nasıl değiştiğine bakarak nasıl anlarsın?
 - `toprak_kalibre` programını çalıştırırken kaydırıcı 0 iken `k`, kaydırıcı 1 iken `i` gönder. Sonra kaydırıcıyı 0,3 yap: yüzde kaç çıkıyor?
 - Sensörün yönü tersse (kuruda düşük) `yagmur_su` programındaki yağmur karşılaştırmasını nasıl değiştirirsin?
+- Yağmur kaydırıcısını 0,4 ile 0,5 arasında yavaşça gezdir: `YOK` ile `VAR` arasında nerede geçiş oluyor? Eşiği 700 yapsan geçiş hangi ıslaklıkta olurdu?
 
 ### Sık yapılan hatalar
 - Sensörün yönünü bilmeden "büyük sayı = ıslak" varsaymak.

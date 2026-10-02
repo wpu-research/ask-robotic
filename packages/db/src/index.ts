@@ -7,8 +7,8 @@ export * from './schema'
 // Tek drizzle-orm kopyası: web tarafı operatörleri buradan almalı (pnpm iki kopya kurabiliyor)
 export { and, asc, eq, gt, inArray, sql } from 'drizzle-orm'
 export { seedContent } from './seed-content'
-export { allModules } from './content'
-export type { ModuleContent, WeekContent, LessonContent } from './content'
+export { allModules, allComponents } from './content'
+export type { ModuleContent, WeekContent, LessonContent, Concept, QuizQuestion, QuizKind, ComponentGuide } from './content'
 
 export function createDb(url = process.env.DATABASE_URL) {
   if (!url) throw new Error('DATABASE_URL tanımlı değil')

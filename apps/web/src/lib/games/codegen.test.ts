@@ -7,10 +7,16 @@ const defs: GameBlockDef[] = [
   { type: 'g_ileri', category: 'Hareket', json: {}, js: 'ileri({N});' },
   { type: 'g_don', category: 'Hareket', json: {}, js: (c) => `don('${c.field('DIR')}');` },
   { type: 'g_yol_var', category: 'Koşul', json: {}, js: 'yolVar()' },
+  { type: 'g_surekli', category: 'Hareket', json: { message0: 'sürekli %1', args0: [{ type: 'input_statement', name: 'DO' }] }, js: 'while (true) {\n{DO}}' },
   { type: 'g_basla', category: 'Hareket', json: {}, hat: true, js: '// başla' },
 ]
 
 describe('JavaScript üretici', () => {
+  it('şablondaki deyim girişi girintili yığın olarak yazılır', () => {
+    const p = program(seq(b('g_surekli', {}, { DO: seq(b('g_ileri', {}, { N: 1 }), b('g_ileri', {}, { N: 2 })) })))
+    expect(toJavaScript(p, defs)).toBe('while (true) {\n  ileri(1);\n  ileri(2);\n}\n')
+  })
+
   it('döngü, koşul ve özel bloklar', () => {
     const p = program(seq(
       b('g_basla'),

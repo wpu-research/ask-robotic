@@ -74,6 +74,16 @@ describe('içerik verisi', () => {
     expect(m.position).toBe(11)
     for (const w of m.weeks) { expect(w.lessons).toHaveLength(5); expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Final/) }
   })
+  it('Modül 7 (AI Mühendisliği): 8 hafta, 40 ders, AI hattı, 13+ yaş', () => {
+    const m = allModules.find((x) => x.slug === 'ai-muhendisligi')!
+    expect(m.weeks).toHaveLength(8)
+    expect(m.weeks.flatMap((w) => w.lessons)).toHaveLength(40)
+    expect(m.track).toBe('ai')
+    expect(m.position).toBe(7)
+    expect(m.minAge).toBe(13)
+    for (const w of m.weeks) expect(w.lessons).toHaveLength(5)
+    expect(JSON.stringify(m)).not.toMatch(/micro:?bit|makecode/i)
+  })
   it('modül konumları ve slug\'lar benzersiz', () => {
     expect(new Set(allModules.map((m) => m.slug)).size).toBe(allModules.length)
     expect(new Set(allModules.map((m) => m.position)).size).toBe(allModules.length)
@@ -95,7 +105,7 @@ describe('seed', () => {
     const before = await count()
     await seedContent(db)
     expect(await count()).toEqual(before)
-    expect(before).toEqual([7, 48, 201])
+    expect(before).toEqual([8, 56, 241])
   })
   it('içerik değişince günceller', async () => {
     const changed = structuredClone(allModules)

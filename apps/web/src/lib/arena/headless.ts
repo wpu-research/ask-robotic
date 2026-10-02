@@ -16,6 +16,7 @@ export function runHeadless(act: ArenaActivity, hex: string, code: string): Head
     advance,
     press: (pin, down) => rt.press(pin, down),
     place: (pose) => rt.place(pose),
+    push: (dps) => rt.push(dps),
     sendSerial: (t) => rt.sendSerial(t),
     until: (pred, maxMs) => {
       for (let t = 0; t < maxMs; t += 20) { if (pred(rt.snapshot())) return true; advance(20) }

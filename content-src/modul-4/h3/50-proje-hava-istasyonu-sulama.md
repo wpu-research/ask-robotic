@@ -263,7 +263,7 @@ void loop() {
 ### Dene
 - `ESIK_ALT` ve `ESIK_UST` değerlerini %30 ve %32 yap. Toprak nemi kaydırıcısını 0,42 ile 0,44 arasında (yaklaşık %30-%33) ileri geri oynat: uyarı kaç kez açılıp kapanıyor? Neden iki eşik daha iyi?
 - D3'e ikinci bir buton ekle: basınca buzzer'ı 10 dakikalığına sustursun, LED yanık kalsın. Bunun için hangi değişkenlere ihtiyacın var?
-- 48. dersteki gibi yağmur yerine ikinci bir Toprak nemi modülünü A0'a bağla: ıslak olduğunda (yağmur var) toprak kuru olsa bile sulama uyarısı verme. Koşulu nereye yazarsın?
+- 48. dersteki gibi bir Yağmur sensörünü A0'a bağla: yağmur yağdığında (yağmur var) toprak kuru olsa bile sulama uyarısı verme. Koşulu nereye yazarsın?
 
 ### Sık yapılan hatalar
 - Tek eşik kullanmak: nem eşik civarında dalgalanınca LED ve buzzer hızlıca açılıp kapanır, seri port satırlarla dolar.

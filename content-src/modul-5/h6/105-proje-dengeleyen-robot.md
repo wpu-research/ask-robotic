@@ -224,7 +224,7 @@ void loop() {
 Seri çıktıdaki `T,` satırları (saniyede bir): zaman, süzülmüş açı, tahmini konum.
 
 ### Ölçümler
-Robotu 3° eğik başlattık. 3. saniyede robotun açısal hızına benzetimden **+200 °/s** ekledik: hafif ama net bir itme.
+Robotu 3° eğik başlattık. 3. saniyede robotun açısal hızına benzetimden **+200 °/s** ekledik: hafif ama net bir itme. Arena etkinliğinde bu itme 3. saniyede kendiliğinden gelir; ayrıca "İt" düğmeleriyle istediğin zaman ileri ya da geri itebilirsin. Arena, itmenin gerçek anını, en büyük eğimini ve oturma süresini ölçer ve robotun `RAPOR` satırını bununla karşılaştırır (itme anı ±100 ms, eğim ±0,6°, oturma ±100 ms).
 
 | Ölçüm | Gerçek (`bal`) | Robotun raporu |
 |---|---|---|

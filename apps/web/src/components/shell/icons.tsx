@@ -31,6 +31,8 @@ const PATHS = {
   text: <><path d="M5 7h14M5 12h14M5 17h9" /></>,
   oyun: <><rect x="2.5" y="7" width="19" height="11" rx="5.5" /><path d="M7.5 10.5v4M5.5 12.5h4M15.5 11.5h.01M18 13.5h.01" /></>,
   mikro: <><rect x="3" y="6" width="18" height="12" rx="3" /><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01" /></>,
+  ai: <><path d="M12 3v3M12 18v3M3 12h3M18 12h3" /><rect x="7" y="7" width="10" height="10" rx="2.5" /><path d="M10 12h.01M14 12h.01" /></>,
+  sahne: <><rect x="3" y="4" width="18" height="13" rx="2.5" /><path d="M8 21h8M12 17v4M7 14l3-4 3 3 2-2 2 3" /></>,
   code: <><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></>,
   reset: <><path d="M4 12a8 8 0 1 0 2.6-5.9L4 8.5" /><path d="M4 3.5v5h5" /></>,
   stop: <><rect x="6" y="6" width="12" height="12" rx="2" /></>,

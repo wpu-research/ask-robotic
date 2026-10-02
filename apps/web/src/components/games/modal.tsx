@@ -11,7 +11,7 @@ export function Modal({ open, onClose, title, children, wide = false }: { open: 
     if (!open && el.open) el.close()
   }, [open])
   return (
-    <dialog ref={ref} className="gm-modal" data-wide={wide} aria-label={title} onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose() }}>
+    <dialog ref={ref} className="gm-modal" data-wide={wide} aria-label={title} onClose={() => { if (open) onClose() }} onClick={(e) => { if (e.target === ref.current) onClose() }}>
       {open && (
         <div className="gm-modal-box">
           <h2 className="gm-modal-title">{title}</h2>

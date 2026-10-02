@@ -14,13 +14,13 @@ export const modul2: ModuleContent = {
       project: 'İlk projem',
       lessons: [
         {
-          title: 'Programlanmış dans (ekransız)',
+          title: 'Programlanmış dans',
           durationMin: 25,
           problem: 'Arkadaşına bir dans öğretmen gerekiyor ama sadece yazılı komut kartlarıyla. Dans nasıl yazılır?',
           contentMd: `## Etkinlik
-1. Üç kâğıda sırayla şunları yaz: **adım at**, **dön**, **alkış**.
-2. Bu kartlarla 6 adımlık bir dans **programı** oluştur. Kartları sıraya dizmen yeterli.
-3. Bir arkadaşın ya da aile üyen programı **aynen** uygulasın. Yorum katmasın, sadece kartlara baksın.
+1. Üç komut kartın var: **adım at**, **dön**, **alkış**. Etkinlik penceresinde Robot'a bu kartlarla 6 kartlık bir dans öğret.
+2. Kartları bayrağın altına sırayla diz: bu senin dans **programın**.
+3. Robot kartları **aynen** uygular, yorum katmaz. Bayrağa bas ve sadece Robot'un ne yaptığına bak. İstersen dansı ailene göstererek anlat.
 4. Dans çirkin çıktıysa programı düzelt: kartları değiştir, ekle, çıkar.
 5. Şimdi dansa **tekrar** ekle: "3 kere tekrarla: adım, alkış".
 
@@ -29,22 +29,22 @@ Amaç: bilgisayarın **yorum yapmadığını**, yazılanı aynen uyguladığın�
           question: 'Dans neden senin istediğin gibi çıkmadı? Programda neyi değiştirdin?',
         },
         {
-          title: 'Scratch\'te ilk projem',
+          title: 'Sahne Atölyesi\'nde ilk projem',
           durationMin: 30,
           problem: 'Ekrandaki karakteri senin yazdığın talimatlar yönetecek. Peki karakter, sahne ve talimatlar nerede duruyor?',
           contentMd: `## Hazırlık
-Tarayıcıda Scratch'i aç ve **Yeni proje** başlat. Hesap açmadan da çalışabilirsin.
+Etkinlik penceresindeki **Sahne Atölyesi**'ni kullan. Proje bu tarayıcıda kaydedilir; hesap ya da kurulum gerekmez.
 
 ## Etkinlik
 1. Ekranın bölümlerini bul: **Sahne** (sağ üst), **Sprite listesi** (sağ alt), **Blok paleti** (sol), **Kod alanı** (orta).
-2. Kedi sprite'ını silip yeni bir sprite seç. Sprite'ın **Kostümler** sekmesine bak.
+2. Kedi sprite'ını silip yeni bir sprite seç. Kodu **Kod** sekmesinde, karakterin görünüşünü **Kostümler** sekmesinde yaparsın; ikisine de bak.
 3. Sahneye bir **arka plan** ekle.
 4. Olaylar (sarı) kategorisinden **yeşil bayrak tıklandığında** bloğunu kod alanına sürükle.
 5. Altına Hareket (mavi) kategorisinden bir hareket bloğu tutturup yeşil bayrağa bas.
 6. **10 blok challenge:** 10 farklı blok kullanarak sprite'ına bir şey yaptır. Kaçını yapabildin?
 
 ## Güvenlik notu
-Scratch topluluğuna proje paylaşırken **gerçek adını, okulunu, adresini ve fotoğrafını** projeye ya da profiline yazma.`,
+Projeni paylaşırken (dosya olarak indirip) **gerçek adını, okulunu, adresini ve fotoğrafını** projeye ya da proje notlarına yazma.`,
           question: 'Sprite, kostüm ve sahne arasındaki fark ne?',
         },
       ],
@@ -75,7 +75,7 @@ Karakter hiç kıpırdamıyorsa: yeşil bayrak bloğuna bloklar **gerçekten tut
           contentMd: `## Etkinlik
 1. Önceki projene devam et. Kontrol (turuncu) kategorisinden **sonsuza kadar** bloğunu al.
 2. Kostüm değiştirme ve hareket bloklarını bunun **içine** al.
-3. Karakter ekranın kenarına çarpınca ne oluyor? **Kenara geldiğinde sek** bloğunu ekle.
+3. Karakter ekranın kenarına çarpınca ne oluyor? **kenara değince sek** bloğunu ekle.
 4. Şimdi **tekrar (10 kere)** bloğuyla sonsuz yerine sayılı bir döngü dene.
 5. İki sprite ekle, ikisi de aynı anda animasyon yapsın. İki ayrı kod alanında yeşil bayrakla başla.
 
@@ -83,7 +83,7 @@ Karakter hiç kıpırdamıyorsa: yeşil bayrak bloğuna bloklar **gerçekten tut
 Karakter 10 adım atınca durup bir şey söylesin.
 
 ## Ebeveyn / öğretmen notu
-Anahtar kavram: **döngü** ve **paralellik** (iki karakter aynı anda). Çocuk bloğu "içine koymayı" kaçırıyorsa, Scratch'in blok şeklinin bir kap gibi aldığını gösterin.`,
+Anahtar kavram: **döngü** ve **paralellik** (iki karakter aynı anda). Çocuk bloğu "içine koymayı" kaçırıyorsa, blok şeklinin bir kap gibi aldığını gösterin.`,
           question: '"Sonsuza kadar" ile "10 kere tekrarla" arasındaki fark ne? Hangisini ne zaman kullanırsın?',
         },
       ],
@@ -97,7 +97,7 @@ Anahtar kavram: **döngü** ve **paralellik** (iki karakter aynı anda). Çocuk 
           durationMin: 30,
           problem: 'Bir piyano tuşuna basınca ses çıkar. Bunu klavyenle sen nasıl yapabilirsin?',
           contentMd: `## Etkinlik
-1. Olaylar (sarı) kategorisinden **... tuşuna basıldığında** bloğunu al.
+1. Olaylar (sarı) kategorisinden **... tuşuna basılınca** bloğunu al.
 2. Altına Ses (pembe) kategorisinden bir **ses çal** bloğu tutturup tuşu seç (örneğin **a**).
 3. Aynı mantıkla **s**, **d**, **f** tuşlarına başka sesler bağla.
 4. Her tuş için sprite'ın **rengini** değiştir. Görsel ve ses birlikte çalsın.
@@ -148,9 +148,9 @@ Kavram: **olay** (event). Program, bir şeyin olmasını bekliyor. Çocuk "yeşi
           durationMin: 35,
           problem: 'Bir karakter "başlayabilirsin" diye haber verince diğer karakter nasıl duyar? Beklemeleri hesaplamak yerine daha iyi bir yol var mı?',
           contentMd: `## Etkinlik
-1. Olaylar (sarı) kategorisinde **yayın … mesajı** ve **… mesajını aldığımda** bloklarını bul.
+1. Olaylar (sarı) kategorisinde **… mesajını yayınla** ve **… mesajını alınca** bloklarını bul.
 2. Önceki hikâyende bekleme bloklarını kaldır. Birinci karakter cümlesini bitirince **"sıra sende"** mesajını yayınlasın.
-3. İkinci karakter **"sıra sende" mesajını aldığımda** yanıtlasın, sonra yeni bir mesaj yayınlasın.
+3. İkinci karakter **"sıra sende" mesajını alınca** yanıtlasın, sonra yeni bir mesaj yayınlasın.
 4. **Arka plan değiştirme:** mesaj gelince arka planı değiştirerek ikinci sahneyi başlat.
 5. Hikâyenin **başlangıcı, olayı ve sonu** olsun: en az 3 sahne.
 
@@ -264,7 +264,7 @@ Kavram: **fonksiyon / soyutlama**. Bir işi bir kez yazıp adıyla çağırmak. 
           durationMin: 35,
           problem: 'Bir yarışmada 5 soru var. Her soruyu ayrı bir değişkenle tutmak mı, yoksa hepsini bir listede tutmak mı daha iyi?',
           contentMd: `## Etkinlik
-1. Değişkenler kategorisinden **Bir liste oluştur** de, adı **sorular** olsun. İçine 4-5 soru ekle.
+1. Değişkenler kategorisinden **Liste oluştur** düğmesine bas, adı **sorular** olsun. İçine 4-5 soru ekle.
 2. Bir ikinci liste **cevaplar** yap, aynı sırayla cevapları yaz.
 3. Bir değişken **sıra** (1 ile başlasın). Sprite **sorular listesinin sıra. öğesini** sorsun (**sor … ve bekle** bloğu).
 4. Cevap **cevaplar listesinin sıra. öğesine** eşitse "Doğru!" de ve skoru artır, değilse "Yanlış" de. Sonra **sıra'yı 1 artır**.
@@ -292,7 +292,7 @@ Soruları her seferinde rastgele sırada sor.`,
    - Hangi bloklar gerekecek (olay, döngü, değişken, mesaj, kendi blok)?
 3. Projenin **en küçük çalışan halini** (MVP) yaz: sadece bir sprite ve tek bir etkileşim.
 4. Planını bir arkadaşına ya da aileye 1 dakikada **anlat**. Anlattıkça aklına gelen eksikleri yaz.
-5. Başkasının projesini **remix**le başlamak istersen orijinal sahibini mutlaka projede belirt.
+5. Başkasının fikrinden esinlendiysen bunu proje notuna yaz.
 
 ## Ebeveyn / öğretmen notu
 Plan, çocuğun "bitmeyen proje" tuzağına düşmesini azaltır. Küçük başlayıp büyütmeyi önerin.`,
@@ -307,10 +307,10 @@ Plan, çocuğun "bitmeyen proje" tuzağına düşmesini azaltır. Küçük başl
 2. Bir **test arkadaşı** bul: projeni kullandırırken **ona yardım etme**, sadece izle. Nerede takıldı? Not al.
 3. Notlardan en az **iki şeyi düzelt**.
 4. **Sergi:** projeni aileye/arkadaşlara göster. Anlat: ne yaptın, hangi bloklar seni zorladı, neyi çözdün?
-5. Paylaşırken proje açıklamasına **nasıl oynanır** ve **hangi fikirlerden esinlendiğini** yaz. Kişisel bilgi yazma.
+5. Proje bilgisi (📝) bölümüne **nasıl oynanır** ve **hangi fikirlerden esinlendiğini** yaz. Kişisel bilgi yazma.
 
 ## Sırada ne var?
-Scratch'te ekrandaki karakterleri yönettin. Bir sonraki modülde (Arduino) bir devreyi ve gerçek ışıkları, sensörleri yöneteceksin: aynı mantık, farklı bir dünya.`,
+Sahne Atölyesi'nde ekrandaki karakterleri yönettin. Bir sonraki modülde (Arduino) bir devreyi ve gerçek ışıkları, sensörleri yöneteceksin: aynı mantık, farklı bir dünya.`,
           question: 'Test arkadaşın projende neyi fark etti, sen fark etmemiştin? Neyi düzelttin?',
         },
       ],

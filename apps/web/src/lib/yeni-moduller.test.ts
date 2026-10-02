@@ -44,3 +44,51 @@ describe('Mikro Kart ve Oyun Atölyesi kaydı', () => {
     }
   })
 })
+
+// Sahne Atölyesi (Modül 2) ve AI Mühendisliği (Modül 7) entegrasyonu
+import { getSahneActivity } from './sahne/activities'
+import { getAiActivity } from './ai/activities'
+import { UPCOMING } from './module-meta'
+import { STATIC_ITEMS } from './command-palette'
+import { NAV } from '@/components/shell/nav-items'
+
+const scratch = allModules.find((m) => m.slug === 'scratch')!
+const ai = allModules.find((m) => m.slug === 'ai-muhendisligi')!
+
+describe('Sahne Atölyesi ve AI Mühendisliği kaydı', () => {
+  it('Modül 2: 16 dersin hepsinin Sahne etkinliği var, rozet Blok', () => {
+    let n = 0
+    scratch.weeks.forEach((w, wi) => w.lessons.forEach((l, li) => {
+      n++
+      expect(getSahneActivity(activityKey('scratch', wi + 1, li + 1)), `${w.title} / ${l.title}`).not.toBeNull()
+      expect(lessonKind('scratch', wi + 1, li + 1)).toBe('blok')
+    }))
+    expect(n).toBe(16)
+  })
+  it('Modül 2 metinleri: dış hizmet yönlendirmesi ve ekransız ibaresi kalmadı', () => {
+    const txt = JSON.stringify(scratch.weeks)
+    expect(txt).not.toMatch(/remix|ekransız|topluluğuna|Hesap açmadan|Scratch'i aç/i)
+  })
+  it('Modül 7: etkinliği olan dersler AI, olmayanlar Metin rozeti alır; etkinlik sayısı 33', () => {
+    let withAct = 0
+    ai.weeks.forEach((w, wi) => w.lessons.forEach((l, li) => {
+      const has = !!getAiActivity(activityKey('ai-muhendisligi', wi + 1, li + 1))
+      if (has) withAct++
+      expect(lessonKind('ai-muhendisligi', wi + 1, li + 1), `${w.title} / ${l.title}`).toBe(has ? 'ai' : 'metin')
+    }))
+    expect(withAct).toBe(33)
+    expect(moduleKind('ai-muhendisligi')).toBe('ai')
+    expect(KIND_LABEL.ai).toBe('AI')
+    expect(LESSON_KIND_LABEL.ai).toBe('AI')
+    expect(MODULE_META['ai-muhendisligi'].callout).toMatch(/simülasyon/)
+  })
+  it('Modül 7 artık "Yakında" değil', () => {
+    expect(UPCOMING.some((u) => u.position === 7 || /ai-/.test(u.slug))).toBe(false)
+  })
+  it('kenar çubuğu ve komut paletinde Sahne ve AI atölyesi var', () => {
+    const hrefs = NAV.flatMap((g) => g.items.map((i) => i.href))
+    expect(hrefs).toEqual(expect.arrayContaining(['/sahne-atolyesi', '/ai-atolyesi']))
+    const p = STATIC_ITEMS.map((i) => i.href)
+    expect(p).toEqual(expect.arrayContaining(['/sahne-atolyesi', '/ai-atolyesi']))
+  })
+})

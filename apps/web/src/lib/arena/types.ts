@@ -79,6 +79,8 @@ export interface ArmScene {
   zones: ArmZone[]
   /** Tutucu bu açının altındayken kapalı sayılır (°). */
   gripClosedBelowDeg: number
+  /** Verilirse tutucu bu açının ÜSTÜNDEYKEN kapalı sayılır (`gripClosedBelowDeg` yok sayılır): kapalı = büyük açı olan tutucular için. */
+  gripClosedAboveDeg?: number
   /** Sunucuya gidecek sınır (cm) – çizim penceresi. */
   view: { xMin: number; xMax: number; yMin: number; yMax: number }
   /** Servo hız sınırı (°/sn). */
@@ -101,6 +103,20 @@ export interface BalancerScene {
   /** Bu eğimin üstünde robot "düştü" sayılır (varsayılan 45°). */
   fallDeg?: number
   gyroBiasDps?: number
+  /** Sensör bozucuları: yalnız OKUNAN değer bozulur, gerçek durum etkilenmez. */
+  /** İvmeölçer montaj/ağırlık merkezi hatası (°): okunan açı = gerçek + ofset. */
+  accelOffsetDeg?: number
+  /** İvmeölçer gürültüsü (g, tepe; düzgün dağılım). */
+  accelNoiseG?: number
+  /** Motor titreşimi: ax'e eklenen sinüs (g) ve frekansı (Hz, varsayılan 40). */
+  vibrationG?: number
+  vibrationHz?: number
+  /** Jiroskop gürültüsü (°/s, standart sapma). */
+  gyroNoiseDps?: number
+  /** Gürültü tohumu. */
+  seed?: number
+  /** Zamanlı itmeler: atS saniyede eğim hızına dps (°/s) eklenir (+ = ileri). */
+  pushes?: Array<{ atS: number; dps: number }>
   timeLimitS?: number
 }
 
@@ -181,8 +197,10 @@ export interface ArmSnapshot {
   objects: Array<{ id: string; x: number; y: number }>
   /** Bırakıldığı bölgeler: nesne id → bölge id. */
   placed: Record<string, string>
-  /** Servo sinyalinde görülen darbe sayısı (µs → atlama bilgisi). */
+  /** Servo sinyalinde görülen en büyük açı sıçraması (°), üç servo için. */
   maxJumpDeg: number
+  /** Yalnız omuz ve dirsek servolarının en büyük sıçraması (°): tutucu doğal olarak aniden açılıp kapanabilir. */
+  maxJointJumpDeg: number
   serial: string
   serialAgeS: number
   inZone: ReadonlySet<string>
@@ -203,6 +221,20 @@ export interface BalancerSnapshot {
   /** Düşmeden geçen süre (sn). */
   uprightS: number
   maxAbsDeg: number
+  /** Uygulanan itme sayısı (sahne çizelgesi + elle "İt"). */
+  pushCount: number
+  /** İlk itmenin gerçek ölçümü (itme olmadıysa null). Robotun RAPOR satırı bununla sınanır. */
+  push: {
+    /** İtme anı (sn) ve şiddeti (°/s). */
+    atS: number
+    dps: number
+    /** İtmeden beri en büyük mutlak eğim (°). */
+    maxAbsDeg: number
+    /** Gerçek eğimin 1°'yi son aştığı an (sn). */
+    lastOutsideS: number
+    /** Eğim 1°'nin altında en az 1 sn kaldıysa: itmeden son aşmaya kadar süre (ms); değilse null. */
+    settleMs: number | null
+  } | null
   serial: string
   serialAgeS: number
 }
@@ -229,7 +261,12 @@ export interface ArenaGoal {
 
 export interface ArenaGoalResult { id: string; text: string; done: boolean; hint: string | undefined }
 
+/** Aynı dersin birden çok yolu (ör. Modül 5, 112-113: A araç, B kol, C takip). Kayıt anahtarı "robotik:8:3:kol" gibi dördüncü bölüm alır. */
+export interface ArenaVariant { id: string; label: string }
+
 export interface ArenaActivity {
+  /** Verilirse bu etkinlik dersin bir "yolu"dur; arayüzde yol sekmesi olarak görünür. Temel etkinlik (anahtarda dördüncü bölüm yok) de bir yol etiketi taşır. */
+  variant?: ArenaVariant
   /** Kısa yönerge (arenanın üstünde gösterilir). */
   intro?: string
   /** Her çağrıda başlangıç kodunu üretir. */
@@ -255,6 +292,8 @@ export interface ArenaScenario {
   press(pin: number, down: boolean): void
   /** Robotu verilen konuma ışınlar (öğrencinin robotu elle kaydırmasını taklit eder). */
   place(pose: Partial<Pose>): void
+  /** Dengelenen robota itme (eğim hızına dps °/s ekler). */
+  push(dps: number): void
   sendSerial(text: string): void
   /** Koşul sağlanana ya da süre dolana kadar ilerler; koşul sağlandı mı döner. */
   until(pred: (s: ArenaSnapshot) => boolean, maxMs: number): boolean

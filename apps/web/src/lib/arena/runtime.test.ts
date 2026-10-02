@@ -196,3 +196,77 @@ describe.skipIf(!hasCli)('createArenaRuntime (denge)', () => {
     expect(s.fell).toBe(false); expect(s.uprightS).toBeGreaterThan(7.5); expect(s.maxAbsDeg).toBeLessThan(15)
   })
 })
+
+describe.skipIf(!hasCli)('createArenaRuntime (denge: sensör bozucuları ve itme)', () => {
+  const base: BalancerScene = { kind: 'balancer', id: 'd', title: 'd', theta0Deg: 3, timeLimitS: 15 }
+  const dengeSrc = () => { const src = sketchOf('robotik:6:5', 'denge_robotu'); if (!src) throw new Error('denge_robotu bulunamadı'); return src }
+  const runTo = (rt: ReturnType<typeof createArenaRuntime>, sec: number) => { for (let t = 0; t < sec * 1000; t += 100) rt.advance(100); return rt.snapshot() as BalancerSnapshot }
+
+  it('sahne çizelgesindeki itme tam zamanında uygulanır; gerçek ölçüm (en büyük eğim, oturma) kaydedilir', async () => {
+    const rt = createArenaRuntime(await hex(dengeSrc()), { ...base, pushes: [{ atS: 3, dps: 200 }] })
+    expect((rt.snapshot() as BalancerSnapshot).push).toBeNull()
+    expect(runTo(rt, 2.9).pushCount).toBe(0)
+    const s = runTo(rt, 6)
+    expect(s.fell).toBe(false); expect(s.pushCount).toBe(1)
+    expect(s.push!.atS).toBeCloseTo(3, 2); expect(s.push!.dps).toBe(200)
+    // dersteki ölçüm: en büyük eğim 4,96°, oturma 177 ms
+    expect(s.push!.maxAbsDeg).toBeGreaterThan(4.5); expect(s.push!.maxAbsDeg).toBeLessThan(5.5)
+    expect(s.push!.settleMs).not.toBeNull(); expect(s.push!.settleMs!).toBeGreaterThan(100); expect(s.push!.settleMs!).toBeLessThan(300)
+    // robotun kendi RAPOR satırı gerçek değerlerle uyuşur
+    const m = s.serial.match(/^RAPOR,(\d+),(-?[\d.]+),(\d+)/m)!
+    expect(m).toBeTruthy()
+    expect(Math.abs(Number(m[1]) - 3000)).toBeLessThanOrEqual(100)
+    expect(Math.abs(Number(m[2]) - s.push!.maxAbsDeg)).toBeLessThanOrEqual(0.6)
+    expect(Math.abs(Number(m[3]) - s.push!.settleMs!)).toBeLessThanOrEqual(100)
+  })
+
+  it('elle itme (rt.push) anında etkir ve kaydedilir; düşmüş robota itme sayılmaz etkisizdir', async () => {
+    const rt = createArenaRuntime(await hex(`void setup(){}void loop(){}`), { ...base, theta0Deg: 0 })
+    rt.advance(100)
+    const w0 = (rt.snapshot() as BalancerSnapshot).rateDps
+    rt.push(200)
+    const s = rt.snapshot() as BalancerSnapshot
+    expect(s.pushCount).toBe(1); expect(s.push!.dps).toBe(200)
+    expect(rt.snapshot().kind).toBe('balancer'); expect(w0).toBeDefined()
+  })
+
+  it('ivmeölçer ofseti: yalnız PD’de gerçek eğim ofsetin tersine kayar, robot süzülür (ders 104 sayıları)', async () => {
+    const src = sketchOf('robotik:6:4', 'pd_aci')
+    if (!src) throw new Error('pd_aci bulunamadı')
+    const rt = createArenaRuntime(await hex(src), { ...base, accelOffsetDeg: 4 })
+    const s = runTo(rt, 15)
+    expect(s.fell).toBe(false)
+    expect(s.thetaDeg).toBeLessThan(-3.9); expect(s.thetaDeg).toBeGreaterThan(-4.4)
+    expect(s.x).toBeLessThan(-0.15); expect(s.x).toBeGreaterThan(-0.18) // dersteki ölçüm: −0,166 m
+    // aynı kod ofsetsiz: süzülme yok
+    const ok = runTo(createArenaRuntime(await hex(src), base), 15)
+    expect(Math.abs(ok.x)).toBeLessThan(0.01)
+  })
+
+  it('kaskad ofseti telafi eder: konum durur, gerçek eğim ~0°', async () => {
+    const rt = createArenaRuntime(await hex(sketchOf('robotik:6:4', 'kaskad_denge')!), { ...base, accelOffsetDeg: 4 })
+    const s = runTo(rt, 15)
+    expect(s.fell).toBe(false); expect(Math.abs(s.thetaDeg)).toBeLessThan(0.6)
+    expect(s.x).toBeLessThan(-0.03); expect(s.x).toBeGreaterThan(-0.05) // dersteki ölçüm: −0,038 m
+  })
+})
+
+describe.skipIf(!hasCli)('createArenaRuntime (kol: kapalı = büyük açı)', () => {
+  const src = `#include <Servo.h>
+Servo t;void setup(){t.attach(11);t.write(30);delay(600);t.write(100);}void loop(){}`
+  it('gripClosedAboveDeg: 100° kapalı, 30° açık sayılır; varsayılan sahnede tersi', async () => {
+    const h = await hex(src)
+    const a = createArenaRuntime(h, armScene({ id: 'k', gripClosedAboveDeg: 90 }))
+    a.advance(300); expect((a.snapshot() as ArmSnapshot).gripClosed).toBe(false)
+    a.advance(800); expect((a.snapshot() as ArmSnapshot).gripClosed).toBe(true)
+    const b = createArenaRuntime(h, armScene({ id: 'k2' }))
+    b.advance(300); expect((b.snapshot() as ArmSnapshot).gripClosed).toBe(true)
+    b.advance(800); expect((b.snapshot() as ArmSnapshot).gripClosed).toBe(false)
+  })
+  it('maxJointJumpDeg tutucu sıçramasını saymaz', async () => {
+    const rt = createArenaRuntime(await hex(src), armScene({ id: 'k', gripClosedAboveDeg: 90 }))
+    rt.advance(1200)
+    const s = rt.snapshot() as ArmSnapshot
+    expect(s.maxJumpDeg).toBeGreaterThan(60); expect(s.maxJointJumpDeg).toBeLessThan(2.5)
+  })
+})

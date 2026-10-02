@@ -132,7 +132,7 @@ describe('Aşama C çizimleri', () => {
     expect((svg('keypad').match(/data-key=/g) ?? []).length).toBe(16)
   })
   it('MQ-2 / alev / ses / toprak: düzey, güç ve DO LED’i', () => {
-    for (const t of ['mq2', 'flame', 'sound', 'soil'] as const) {
+    for (const t of ['mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel'] as const) {
       const hi = svg(t, analog({ level: 0.8, doHigh: false }))
       expect(hi, t).toContain('data-module-level="0.80"'); expect(hi, t).toContain('data-module-do="low"')
       expect((hi.match(/data-led-on="true"/g) ?? []).length, t).toBe(2)
@@ -145,6 +145,11 @@ describe('Aşama C çizimleri', () => {
     expect(svg('sound', analog({ level: 0.7 }))).toContain('data-sound-wave')
     expect(svg('soil', analog({ level: 1 }))).toContain('data-soil-fill="62"')
     expect(svg('soil', undefined, { moisture: 0.5 })).toContain('data-soil-fill="31"')
+    expect(svg('rain', analog({ level: 0 }))).toContain('data-rain-drops="0"')
+    expect(svg('rain', analog({ level: 1 }))).toContain('data-rain-drops="8"')
+    expect(svg('rain', undefined, { wetness: 0.5 })).toContain('data-rain-drops="4"')
+    expect(svg('waterlevel', analog({ level: 1 }))).toContain('data-water-fill="62"')
+    expect(svg('waterlevel', undefined, { level: 0.5 })).toContain('data-water-fill="31"')
   })
 })
 

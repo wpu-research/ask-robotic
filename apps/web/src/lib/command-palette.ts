@@ -55,10 +55,15 @@ export function filterPalette(items: PaletteItem[], query: string, limit = 24): 
 export const STATIC_ITEMS: PaletteItem[] = [
   { id: 'p:panel', group: 'Sayfa', title: 'Panel', subtitle: 'Ana sayfa', href: '/', keywords: 'ana sayfa devam ilerleme' },
   { id: 'p:moduller', group: 'Sayfa', title: 'Modüller', subtitle: 'Tüm modüller', href: '/moduller', keywords: 'müfredat dersler' },
+  { id: 'p:parcalar', group: 'Sayfa', title: 'Parçalar', subtitle: 'Parça ansiklopedisi', href: '/parcalar', keywords: 'led direnç buton potansiyometre buzzer arduino uno ansiklopedi bileşen' },
+  { id: 'p:testler', group: 'Sayfa', title: 'Testlerim', subtitle: 'Mini testler ve puanlar', href: '/testler', keywords: 'sınav quiz soru puan' },
+  { id: 'p:ilerleme', group: 'Sayfa', title: 'İlerlemem', subtitle: 'Beceri haritası ve özet', href: '/ilerleme', keywords: 'beceri ustalık süre hedef veri verilerimi sil' },
   { id: 'a:atolye', group: 'Araç', title: 'Blok atölyesi', subtitle: 'Serbest blok programlama', href: '/atolye', keywords: 'blok scratch karakter' },
   { id: 'a:lab', group: 'Araç', title: 'Devre laboratuvarı', subtitle: 'Sanal Arduino ve devre', href: '/laboratuvar', keywords: 'arduino uno devre simülatör' },
   { id: 'a:arena', group: 'Araç', title: 'Robot arenası', subtitle: 'Sanal robot sürüşü', href: '/arena', keywords: 'robot çizgi labirent' },
   { id: 'a:oyunlar', group: 'Araç', title: 'Oyunlar', subtitle: 'Bloklarla 8 öğretici oyun', href: '/oyunlar', keywords: 'blockly games bulmaca labirent kuş kaplumbağa film müzik gölet' },
   { id: 'a:mikro-kart', group: 'Araç', title: 'Mikro Kart atölyesi', subtitle: 'Sanal LED kartı bloklarla programla', href: '/mikro-kart', keywords: 'mikro kart led düğme sensör radyo ivme pusula sanal kart' },
   { id: 'a:oyun-atolyesi', group: 'Araç', title: 'Oyun atölyesi', subtitle: 'Bloklarla kendi oyununu yap', href: '/oyun-atolyesi', keywords: 'oyun yap sprite harita piksel karakter platform' },
+  { id: 'a:sahne-atolyesi', group: 'Araç', title: 'Sahne atölyesi', subtitle: 'Karakterlerini bloklarla canlandır', href: '/sahne-atolyesi', keywords: 'sahne sprite kostüm animasyon hikâye karakter arka plan ses scratch' },
+  { id: 'a:ai-atolyesi', group: 'Araç', title: 'AI atölyesi', subtitle: 'Token, prompt, RAG, ajan ve eval araçları', href: '/ai-atolyesi', keywords: 'yapay zekâ ai llm token bpe prompt rag embedding ajan eval injection dil modeli' },
 ]

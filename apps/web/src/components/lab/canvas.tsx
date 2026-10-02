@@ -4,6 +4,7 @@ import type { Circuit, LabState, PinRef } from '@/lib/lab/contract'
 import { PART_DEFS, WORLD, partBounds, pinDir, pinWorld, snap, wireCurve, wirePreview, type Pt } from '@/lib/lab/geometry'
 import { addWire, canAddWire, formatOhms, movePart, removePart, removeWire, rotatePart, wireColor } from '@/lib/lab/ops'
 import { formatPinBalloon } from '@/lib/lab/measure'
+import { layoutCanvasLabels } from '@/lib/lab/label-layout'
 import { PartArt } from './part-art'
 
 export type Selection = { kind: 'part'; id: string } | { kind: 'wire'; id: string } | null
@@ -256,6 +257,15 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     }
   }
 
+  // Etiket yerleşimi: yakınlaştırma azaldıkça yazı ekranda ~9,5 px kalacak biçimde büyütülür (okunur kalsın); çakışanlar kaydırılır.
+  const labelFs = Math.round(Math.min(15, Math.max(9, 9.5 / view.k)) * 2) / 2
+  const labels = useMemo(() => {
+    const caps = new Map<string, string>()
+    for (const p of circuit.parts) { const t = caption(p.id); if (t) caps.set(p.id, t) }
+    return layoutCanvasLabels(circuit.parts, caps, labelFs)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [circuit.parts, labelFs])
+
   return (
     <div className="lab-canvas-wrap" style={{ height: `clamp(320px, 75vw, ${height}px)` }}>
       <svg
@@ -319,10 +329,11 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
               const sel = selection?.kind === 'part' && selection.id === p.id
               const warn = warnParts.has(p.id)
               const cap = caption(p.id)
+              const cl = labels.get(`cap:${p.id}`)
               return (
                 <g key={p.id}>
                   {(sel || warn) && <rect x={b.x - 5} y={b.y - 5} width={b.w + 10} height={b.h + 10} rx={8} className={warn ? 'lab-warn-ring' : 'lab-sel-ring'} data-warn={warn ? p.id : undefined} />}
-                  {cap && <text x={b.x + b.w / 2} y={b.y + b.h + 26} textAnchor="middle" className="lab-caption">{cap}</text>}
+                  {cap && <text x={cl?.x ?? b.x + b.w / 2} y={cl?.y ?? b.y + b.h + 26} textAnchor={cl?.anchor ?? 'middle'} className="lab-caption" style={{ fontSize: labelFs * 11 / 9 }} data-caption-for={p.id}>{cap}</text>}
                 </g>
               )
             })}
@@ -333,12 +344,8 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
               const pt = pinWorld(p, pin)!
               const isTarget = draft?.target?.part === p.id && draft.target.pin === pin
               const isFrom = draft?.from.part === p.id && draft.from.pin === pin
-              const b = partBounds(p)
-              // etiket: parçanın merkezinden dışarı doğru
-              const cx = b.x + b.w / 2, cy = b.y + b.h / 2
-              const dx = pt.x - cx, dy = pt.y - cy
-              const horiz = Math.abs(dx) / (b.w || 1) > Math.abs(dy) / (b.h || 1)
-              const lx = horiz ? Math.sign(dx) * 11 : 0, ly = horiz ? 3 : Math.sign(dy) * 12
+              // etiket konumu: çakışmayı azaltan yerleşimden (label-layout.ts); pin grubuna göre göreli
+              const pl = labels.get(`${p.id}:${pin}`)
               const cls = `lab-pin${connected.has(`${p.id}:${pin}`) ? ' wired' : ''}${isTarget ? ' target' : ''}${isFrom ? ' from' : ''}`
               return (
                 <g
@@ -348,7 +355,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
                 >
                   <circle r={9} fill="transparent" className="lab-pin-hit" />
                   <circle r={3.6} className="lab-pin-dot" />
-                  {p.type !== 'uno' && !PART_DEFS[p.type].ownLabels && <text x={lx} y={ly} textAnchor={horiz ? (dx < 0 ? 'end' : 'start') : 'middle'} className="lab-pin-label" pointerEvents="none">{pin}</text>}
+                  {pl && <text x={pl.x - pt.x} y={pl.y - pt.y} textAnchor={pl.anchor} className="lab-pin-label" style={{ fontSize: labelFs }} pointerEvents="none">{pin}</text>}
                 </g>
               )
             }))}
@@ -392,6 +399,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
         <button type="button" className="lab-zbtn" onClick={() => zoomAt(1.25)} aria-label="Yakınlaştır">+</button>
         <button type="button" className="lab-zbtn" onClick={() => zoomAt(0.8)} aria-label="Uzaklaştır">−</button>
         <button type="button" className="lab-zbtn" onClick={fit} aria-label="Sığdır" title="Sığdır">⤢</button>
+        <button type="button" className="lab-zbtn" onClick={() => zoomAt(1 / viewRef.current.k)} aria-label="Gerçek boyut (%100)" title="Gerçek boyut (%100): bacak adları okunur" data-testid="lab-zoom-100">1:1</button>
       </div>
     </div>
   )

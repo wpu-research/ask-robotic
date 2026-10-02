@@ -15,6 +15,7 @@ import { Board } from './board'
 import { BlocklyPane as BlocklyPaneRaw } from './blockly-pane'
 import { CodeView } from './highlight'
 import { SimPanel } from './sim-panel'
+import { logEvent } from '@/lib/events'
 import './mikro.css'
 
 export interface MikroEditorProps {
@@ -131,7 +132,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
       bump()
       sinceGoals += dt
       if (sinceGoals > 250) { sinceGoals = 0; evalGoals() }
-      if (s.error) { setError(s.error); setRunning(false); s.stop(); evalGoals(); return }
+      if (s.error) { setError(s.error); setRunning(false); setGlow(''); s.stop(); evalGoals(); return }
       raf = requestAnimationFrame(loop)
     }
     raf = requestAnimationFrame(loop)
@@ -143,6 +144,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
     const next = makeSim(projectRef.current, twoCards ? 2 : 1, simRef.current)
     next.start()
     setSim(next); setError(null); setRan(true); setDirty(false); setRunning(true)
+    logEvent('run', { p: { kind: 'mikro' } })
   }
   const stop = () => {
     sim.stop(); setRunning(false); setGlow('')
