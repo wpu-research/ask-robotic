@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "name": "Kuzey bulucu",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_forever",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_if",
+                "extraState": {
+                  "hasElse": true
+                },
+                "inputs": {
+                  "IF0": {
+                    "block": {
+                      "type": "mk_button_is",
+                      "fields": {
+                        "BTN": "A"
+                      }
+                    }
+                  },
+                  "DO0": {
+                    "block": {
+                      "type": "mk_show_number",
+                      "inputs": {
+                        "VALUE": {
+                          "block": {
+                            "type": "mk_compass"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ELSE": {
+                    "block": {
+                      "type": "mk_show_arrow_deg",
+                      "inputs": {
+                        "ANGLE": {
+                          "block": {
+                            "type": "math_arithmetic",
+                            "fields": {
+                              "OP": "MINUS"
+                            },
+                            "inputs": {
+                              "A": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 360
+                                  }
+                                }
+                              },
+                              "B": {
+                                "block": {
+                                  "type": "mk_compass"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

@@ -1,0 +1,246 @@
+{
+  "version": 1,
+  "name": "LED çizimi",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_plot",
+                "inputs": {
+                  "X": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  },
+                  "Y": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_plot",
+                    "inputs": {
+                      "X": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 1
+                          }
+                        }
+                      },
+                      "Y": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 1
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_plot",
+                        "inputs": {
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 2
+                              }
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 2
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_plot",
+                            "inputs": {
+                              "X": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 3
+                                  }
+                                }
+                              },
+                              "Y": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 3
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "mk_plot",
+                                "inputs": {
+                                  "X": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 4
+                                      }
+                                    }
+                                  },
+                                  "Y": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 4
+                                      }
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "mk_pause",
+                                    "inputs": {
+                                      "MS": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 1000
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "mk_clear",
+                                        "next": {
+                                          "block": {
+                                            "type": "mk_plot",
+                                            "inputs": {
+                                              "X": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 0
+                                                  }
+                                                }
+                                              },
+                                              "Y": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 0
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "mk_plot",
+                                                "inputs": {
+                                                  "X": {
+                                                    "block": {
+                                                      "type": "math_number",
+                                                      "fields": {
+                                                        "NUM": 4
+                                                      }
+                                                    }
+                                                  },
+                                                  "Y": {
+                                                    "block": {
+                                                      "type": "math_number",
+                                                      "fields": {
+                                                        "NUM": 0
+                                                      }
+                                                    }
+                                                  }
+                                                },
+                                                "next": {
+                                                  "block": {
+                                                    "type": "mk_plot",
+                                                    "inputs": {
+                                                      "X": {
+                                                        "block": {
+                                                          "type": "math_number",
+                                                          "fields": {
+                                                            "NUM": 0
+                                                          }
+                                                        }
+                                                      },
+                                                      "Y": {
+                                                        "block": {
+                                                          "type": "math_number",
+                                                          "fields": {
+                                                            "NUM": 4
+                                                          }
+                                                        }
+                                                      }
+                                                    },
+                                                    "next": {
+                                                      "block": {
+                                                        "type": "mk_plot",
+                                                        "inputs": {
+                                                          "X": {
+                                                            "block": {
+                                                              "type": "math_number",
+                                                              "fields": {
+                                                                "NUM": 4
+                                                              }
+                                                            }
+                                                          },
+                                                          "Y": {
+                                                            "block": {
+                                                              "type": "math_number",
+                                                              "fields": {
+                                                                "NUM": 4
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

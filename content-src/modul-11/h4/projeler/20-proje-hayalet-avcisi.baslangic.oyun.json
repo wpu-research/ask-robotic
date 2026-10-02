@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "name": "Hayalet avcısı",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#15131f"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "avci"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-astronot"
+                                },
+                                "id": "b5733"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b5732"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "avci"
+                                }
+                              },
+                              "id": "b5735"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b5736"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 104
+                              },
+                              "id": "b5737"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "den_hareket",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "avci"
+                                    }
+                                  },
+                                  "id": "b5739"
+                                }
+                              },
+                              "N": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 80
+                                  },
+                                  "id": "b5740"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "M": "h"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "avci"
+                                        }
+                                      },
+                                      "id": "b5742"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "stay",
+                                  "ON": "true"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "oyun_skor_ayarla",
+                                    "inputs": {
+                                      "N": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 0
+                                          },
+                                          "id": "b5744"
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "oyun_can_ayarla",
+                                        "inputs": {
+                                          "N": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 3
+                                              },
+                                              "id": "b5746"
+                                            }
+                                          }
+                                        },
+                                        "id": "b5745"
+                                      }
+                                    },
+                                    "id": "b5743"
+                                  }
+                                },
+                                "id": "b5741"
+                              }
+                            },
+                            "id": "b5738"
+                          }
+                        },
+                        "id": "b5734"
+                      }
+                    },
+                    "id": "b5731"
+                  }
+                },
+                "id": "b5730"
+              }
+            }
+          },
+          "id": "b5729",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "avci",
+        "id": "avci"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-astronot": {
+      "name": "Astronot",
+      "rows": [
+        "..000000000000..",
+        ".0cccccccccccc0.",
+        "0cc9999999999cc0",
+        "0c9aaaaaaaaaa9c0",
+        "0c9aaaaaaaaaa9c0",
+        "0cc9aaaaaaaa9cc0",
+        ".0ccc999999ccc0.",
+        ".0cccccccccccc0.",
+        "0cc0cccccccc0cc0",
+        "0c20cccccccc02c0",
+        "0ccccc0cc0ccccc0",
+        ".0cccc0cc0cccc0.",
+        "..0cc0cccc0cc0..",
+        "..0cc00cc00cc0..",
+        "..0dd0dddd0dd0..",
+        "..000000000000.."
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

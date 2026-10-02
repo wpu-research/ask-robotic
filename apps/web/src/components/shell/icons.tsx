@@ -29,6 +29,11 @@ const PATHS = {
   spark: <><path d="m12 3 1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" /></>,
   book: <><path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z" /><path d="M5 17a3 3 0 0 1 3-3h11" /></>,
   text: <><path d="M5 7h14M5 12h14M5 17h9" /></>,
+  oyun: <><rect x="2.5" y="7" width="19" height="11" rx="5.5" /><path d="M7.5 10.5v4M5.5 12.5h4M15.5 11.5h.01M18 13.5h.01" /></>,
+  mikro: <><rect x="3" y="6" width="18" height="12" rx="3" /><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01" /></>,
+  code: <><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></>,
+  reset: <><path d="M4 12a8 8 0 1 0 2.6-5.9L4 8.5" /><path d="M4 3.5v5h5" /></>,
+  stop: <><rect x="6" y="6" width="12" height="12" rx="2" /></>,
   flag: <><path d="M5 21V4M5 4h11l-2 4 2 4H5" /></>,
 } satisfies Record<string, ReactNode>
 

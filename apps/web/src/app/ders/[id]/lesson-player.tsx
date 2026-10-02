@@ -5,9 +5,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { JrEditor } from '@/components/jr/jr-editor'
 import { ArenaEditor } from '@/components/arena/arena-editor'
 import { LabEditor } from '@/components/lab/lab-editor'
+import { MikroEditor } from '@/components/mikro/mikro-editor'
+import { OyunEditor } from '@/components/oyun/oyun-editor'
 import { getActivity } from '@/lib/jr/activity'
 import { getArenaActivity } from '@/lib/arena/activity'
 import { getLabActivity } from '@/lib/lab/activity'
+import { getMikroActivity } from '@/lib/mikro/activities'
+import { getOyunActivity } from '@/lib/oyun/activities/ders-registry'
 import { markDone, unmarkDone, useDoneIds } from '@/lib/progress-store'
 import { recordFinished, recordGoals, recordOpen } from '@/lib/activity-store'
 import { countDone } from '@/lib/dashboard'
@@ -50,10 +54,15 @@ export function LessonPlayer(p: Props) {
   const labStarter = useMemo(() => labActivity?.starter(), [labActivity])
   const arenaActivity = useMemo(() => getArenaActivity(p.activityKey), [p.activityKey])
   const arenaCode = useMemo(() => arenaActivity?.starter(), [arenaActivity])
+  const mikroActivity = useMemo(() => getMikroActivity(p.activityKey), [p.activityKey])
+  const oyunActivity = useMemo(() => getOyunActivity(p.activityKey), [p.activityKey])
   const done = doneIds.has(p.lesson.id)
-  const hasApp = !!(activity || labActivity || arenaActivity)
-  const kind: LessonKind = arenaActivity ? 'arena' : labActivity ? 'devre' : activity ? 'blok' : 'metin'
-  const goalTexts: string[] = (arenaActivity?.goals ?? labActivity?.goals ?? activity?.goals ?? []).map((g) => g.text)
+  const hasApp = !!(activity || labActivity || arenaActivity || mikroActivity || oyunActivity)
+  const kind: LessonKind = arenaActivity ? 'arena' : labActivity ? 'devre' : oyunActivity ? 'oyun' : activity || mikroActivity ? 'blok' : 'metin'
+  const goalTexts: string[] = (
+    arenaActivity?.goals.map((g) => g.text) ?? labActivity?.goals.map((g) => g.text) ?? mikroActivity?.goals.map((g) => g.text)
+    ?? oyunActivity?.goals.map((g) => g.label) ?? activity?.goals.map((g) => g.text) ?? []
+  )
   const modCount = countDone(p.moduleLessonIds ?? [], doneIds)
 
   // Son açılan ders kaydı (panelde "kaldığın yerden devam et" için)
@@ -121,7 +130,7 @@ export function LessonPlayer(p: Props) {
       <section className={`stage${wide ? '' : ' stage-read'}`} aria-live="polite">
         {step === 0 && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
         {step === 1 && (
-          <div className={activity ? 'lesson-split' : labActivity || arenaActivity ? 'lesson-stack' : undefined}>
+          <div className={activity ? 'lesson-split' : labActivity || arenaActivity || mikroActivity || oyunActivity ? 'lesson-stack' : undefined}>
             <div>
               {p.callout && (
                 <details className="callout" style={{ marginTop: 0 }}>
@@ -158,6 +167,30 @@ export function LessonPlayer(p: Props) {
                 />
               </div>
             )}
+            {mikroActivity && (
+              <div className="lesson-lab lesson-mikro" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+                <div className="mk-page-body">
+                  <MikroEditor
+                    key={p.lesson.id}
+                    activity={mikroActivity}
+                    storageKey={`ask:mikro:ders:${p.activityKey}`}
+                    onGoalsChange={(_s, all) => { if (all) onGoals() }}
+                  />
+                </div>
+              </div>
+            )}
+            {oyunActivity && (
+              <div className="lesson-lab lesson-oyun" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+                <div className="oy-tool-body">
+                  <OyunEditor
+                    key={p.lesson.id}
+                    activity={oyunActivity}
+                    storageKey={`ask:oyun:ders:${p.activityKey}`}
+                    onGoalsChange={(_r, all) => { if (all) onGoals() }}
+                  />
+                </div>
+              </div>
+            )}
             {activity && starter && (
               <div className="lesson-app" data-activity={p.activityKey}>
                 {activity.intro && <p className="lesson-app-intro">{activity.intro}</p>}
@@ -192,7 +225,7 @@ export function LessonPlayer(p: Props) {
             ) : (
               <>
                 <h2>Etkinliği bitirdin mi?</h2>
-                {(activity || labActivity || arenaActivity) && (
+                {hasApp && (
                   <p className="muted">{goalsDone ? 'Uygulamadaki tüm hedefleri tamamladın.' : 'Uygulamadaki hedeflerin hepsi henüz tamamlanmadı; yine de devam edebilirsin.'}</p>
                 )}
                 <p className="muted">Tamamladığında ilerlemene işlenir.</p>

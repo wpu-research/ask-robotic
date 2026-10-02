@@ -1,0 +1,342 @@
+{
+  "version": 1,
+  "name": "İstasyon",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_nem"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "mk_temperature"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "mk_map",
+                      "inputs": {
+                        "V": {
+                          "block": {
+                            "type": "mk_pin_aread",
+                            "fields": {
+                              "PIN": "P1"
+                            }
+                          }
+                        },
+                        "A": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 0
+                            }
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1023
+                            }
+                          }
+                        },
+                        "C": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 0
+                            }
+                          }
+                        },
+                        "D": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 100
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "AB",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_bar",
+                "inputs": {
+                  "V": {
+                    "block": {
+                      "type": "mk_map",
+                      "inputs": {
+                        "V": {
+                          "block": {
+                            "type": "mk_pin_aread",
+                            "fields": {
+                              "PIN": "P1"
+                            }
+                          }
+                        },
+                        "A": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 0
+                            }
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1023
+                            }
+                          }
+                        },
+                        "C": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 0
+                            }
+                          }
+                        },
+                        "D": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 100
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "MAX": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 100
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_every",
+          "fields": {
+            "MS": 2000
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_nem"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "mk_map",
+                      "inputs": {
+                        "V": {
+                          "block": {
+                            "type": "mk_pin_aread",
+                            "fields": {
+                              "PIN": "P1"
+                            }
+                          }
+                        },
+                        "A": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 0
+                            }
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1023
+                            }
+                          }
+                        },
+                        "C": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 0
+                            }
+                          }
+                        },
+                        "D": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 100
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_serial",
+                    "inputs": {
+                      "TEXT": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "v_nem"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "controls_if",
+                        "inputs": {
+                          "IF0": {
+                            "block": {
+                              "type": "logic_compare",
+                              "fields": {
+                                "OP": "LT"
+                              },
+                              "inputs": {
+                                "A": {
+                                  "block": {
+                                    "type": "variables_get",
+                                    "fields": {
+                                      "VAR": {
+                                        "id": "v_nem"
+                                      }
+                                    }
+                                  }
+                                },
+                                "B": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 30
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "DO0": {
+                            "block": {
+                              "type": "mk_show_icon",
+                              "fields": {
+                                "ICON": "sad"
+                              },
+                              "next": {
+                                "block": {
+                                  "type": "mk_play_melody",
+                                  "fields": {
+                                    "MEL": "sad"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 824
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "nem",
+        "id": "v_nem"
+      }
+    ]
+  }
+}

@@ -1,0 +1,331 @@
+{
+  "version": 1,
+  "name": "Labirent",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_dosemesi",
+                "inputs": {
+                  "IMG": {
+                    "block": {
+                      "type": "oyun_resim",
+                      "fields": {
+                        "IMG": "karo-zemin"
+                      },
+                      "id": "b5268"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "harita_yukle",
+                    "inputs": {
+                      "M": {
+                        "block": {
+                          "type": "oyun_harita",
+                          "fields": {
+                            "MAP": "labirent"
+                          },
+                          "id": "b5270"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "variables_set",
+                        "fields": {
+                          "VAR": {
+                            "id": "kedi"
+                          }
+                        },
+                        "inputs": {
+                          "VALUE": {
+                            "block": {
+                              "type": "sprite_yeni",
+                              "inputs": {
+                                "IMG": {
+                                  "block": {
+                                    "type": "oyun_resim",
+                                    "fields": {
+                                      "IMG": "oyuncu-mini-kedi"
+                                    },
+                                    "id": "b5273"
+                                  }
+                                }
+                              },
+                              "fields": {
+                                "K": "oyuncu"
+                              },
+                              "id": "b5272"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "harita_konumla",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "kedi"
+                                    }
+                                  },
+                                  "id": "b5275"
+                                }
+                              },
+                              "C": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 1
+                                  },
+                                  "id": "b5276"
+                                }
+                              },
+                              "R": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 1
+                                  },
+                                  "id": "b5277"
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "den_hareket",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "kedi"
+                                        }
+                                      },
+                                      "id": "b5279"
+                                    }
+                                  },
+                                  "N": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 60
+                                      },
+                                      "id": "b5280"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "M": "four"
+                                },
+                                "id": "b5278"
+                              }
+                            },
+                            "id": "b5274"
+                          }
+                        },
+                        "id": "b5271"
+                      }
+                    },
+                    "id": "b5269"
+                  }
+                },
+                "id": "b5267"
+              }
+            }
+          },
+          "id": "b5266",
+          "x": 20,
+          "y": 20
+        },
+        {
+          "type": "harita_karoya_dokununca",
+          "fields": {
+            "K": "oyuncu"
+          },
+          "inputs": {
+            "IMG": {
+              "block": {
+                "type": "oyun_resim",
+                "fields": {
+                  "IMG": "nesne-kapi"
+                },
+                "id": "b5282"
+              }
+            },
+            "DO": {
+              "block": {
+                "type": "oyun_mesaj",
+                "inputs": {
+                  "T": {
+                    "block": {
+                      "type": "text",
+                      "fields": {
+                        "TEXT": "Çıkışı buldun!"
+                      },
+                      "id": "b5284"
+                    }
+                  },
+                  "N": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      },
+                      "id": "b5285"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "ses_melodi",
+                    "fields": {
+                      "M": "zafer"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "oyun_bitir",
+                        "fields": {
+                          "R": "win"
+                        },
+                        "id": "b5287"
+                      }
+                    },
+                    "id": "b5286"
+                  }
+                },
+                "id": "b5283"
+              }
+            }
+          },
+          "id": "b5281",
+          "x": 20,
+          "y": 358
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "kedi",
+        "id": "kedi"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-mini-kedi": {
+      "name": "Mini kedi",
+      "rows": [
+        "03....30",
+        "03300330",
+        "03333330",
+        "03600630",
+        "03333330",
+        "033bb330",
+        ".033330.",
+        "..0000.."
+      ]
+    },
+    "karo-tugla": {
+      "name": "Tuğla duvar",
+      "rows": [
+        "3333333303333333",
+        "3333333303333333",
+        "3333333303333333",
+        "0000000000000000",
+        "3333033333330333",
+        "3333033333330333",
+        "3333033333330333",
+        "0000000000000000",
+        "3333333303333333",
+        "3333333303333333",
+        "3333333303333333",
+        "0000000000000000",
+        "3333033333330333",
+        "3333033333330333",
+        "3333033333330333",
+        "0000000000000000"
+      ]
+    },
+    "karo-zemin": {
+      "name": "Zemin",
+      "rows": [
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "edeedeedeedeedee",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "edeedeedeedeedee"
+      ]
+    },
+    "nesne-kapi": {
+      "name": "Kapı",
+      "rows": [
+        "..000000000000..",
+        ".01111111111110.",
+        "0111111111111110",
+        "0111331111331110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0000000000000000"
+      ]
+    }
+  },
+  "tileset": [
+    {
+      "image": "karo-tugla",
+      "wall": true
+    },
+    {
+      "image": "nesne-kapi",
+      "wall": false
+    }
+  ],
+  "maps": [
+    {
+      "name": "labirent",
+      "cols": 12,
+      "rows": 9,
+      "cells": [
+        "111111111111",
+        "1...1......1",
+        "1.1.1.1111.1",
+        "1.1...1..1.1",
+        "1.11111.11.1",
+        "1.....1....1",
+        "11111.1111.1",
+        "1.....1...21",
+        "111111111111"
+      ]
+    }
+  ],
+  "bg": 15
+}

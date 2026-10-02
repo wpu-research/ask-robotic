@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "name": "Sanal piyano",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "AB",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_on_pin",
+          "fields": {
+            "PIN": "P0",
+            "EV": "touch"
+          },
+          "x": 24,
+          "y": 824
+        },
+        {
+          "type": "mk_on_pin",
+          "fields": {
+            "PIN": "P1",
+            "EV": "touch"
+          },
+          "x": 24,
+          "y": 1024
+        },
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "touch"
+          },
+          "x": 24,
+          "y": 1224
+        }
+      ]
+    },
+    "variables": []
+  }
+}

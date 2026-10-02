@@ -30,6 +30,18 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ag
     audience: 'Arduino Temelleri\'ni bitirenler',
     callout: 'Programlar sanal sensör modelleriyle sınandı (HC-SR04, DHT, BMP280, MPU6050 vb.). Bazı parçalar (RC522, SD kart, VL53L0X) yalnız derleme düzeyinde doğrulandı; derslerde belirtilir.',
   },
+  'mikro-kart': {
+    tagline: 'Sanal bir LED kartı programla: 5x5 ekran, düğmeler, sensörler, müzik ve radyo.',
+    audience: '8 yaş ve üzeri, sıfırdan başlayanlar',
+    ages: '8+ yaş',
+    callout: 'Her dersin etkinliği tarayıcıdaki sanal Mikro Kart ile yapılır: bloklarla program yazarsın, kartın 5x5 LED ekranı, düğmeleri ve sensörleri canlı çalışır. Sıcaklık, ışık, ses ve hareket kaydırıcılarla verilir; hiçbir fiziksel parça gerekmez. Radyo derslerinde iki sanal kart yan yana çalışır. Bloklara karşılık gelen JavaScript ve Python kodunu da görebilirsin.',
+  },
+  'oyun-atolyesi': {
+    tagline: 'Bloklarla kendi oyununu yap: sprite, çarpışma, skor, harita, düşman ve platform.',
+    audience: '8 yaş ve üzeri, sıfırdan başlayanlar',
+    ages: '8+ yaş',
+    callout: 'Her dersin etkinliği tarayıcıdaki Oyun Atölyesi ile yapılır: blokları birleştirirsin, sahnede oyunun hemen çalışır. Resim ve harita editörleri aynı sayfadadır; kurulum gerekmez. Çalışırken blok değiştirirsen yeni hâli için sıfırla (↺) düğmesine basman gerekir.',
+  },
   robotik: {
     tagline: 'Sanal arenada sürüş, engel, çizgi, enkoder, PID ve denge. Bitirmede kendi robotunu seç.',
     audience: 'Sensörler ve Projeler\'i bitirenler',
@@ -38,20 +50,22 @@ export const MODULE_META: Record<string, { tagline: string; audience: string; ag
 }
 
 /** Modül türü rozeti: Blok / Devre / Robot. */
-export type ModuleKind = 'blok' | 'devre' | 'robot'
-export const KIND_LABEL: Record<ModuleKind, string> = { blok: 'Blok', devre: 'Devre', robot: 'Robot' }
+export type ModuleKind = 'blok' | 'devre' | 'robot' | 'oyun'
+export const KIND_LABEL: Record<ModuleKind, string> = { blok: 'Blok', devre: 'Devre', robot: 'Robot', oyun: 'Oyun' }
 export const MODULE_KIND: Record<string, ModuleKind> = {
   scratchjr: 'blok',
   scratch: 'blok',
   'arduino-temelleri': 'devre',
   'sensorler-ve-projeler': 'devre',
   robotik: 'robot',
+  'mikro-kart': 'blok',
+  'oyun-atolyesi': 'oyun',
 }
 export const moduleKind = (slug: string): ModuleKind => MODULE_KIND[slug] ?? 'devre'
 
 /** Ders türü rozeti: dersin etkinlik alanında ne açıldığı. */
-export type LessonKind = 'metin' | 'blok' | 'devre' | 'arena'
-export const LESSON_KIND_LABEL: Record<LessonKind, string> = { metin: 'Metin', blok: 'Blok', devre: 'Devre', arena: 'Arena' }
+export type LessonKind = 'metin' | 'blok' | 'devre' | 'arena' | 'oyun'
+export const LESSON_KIND_LABEL: Record<LessonKind, string> = { metin: 'Metin', blok: 'Blok', devre: 'Devre', arena: 'Arena', oyun: 'Oyun' }
 
 /**
  * Panelde "Yakında" kartı olarak görünen modüller (veritabanında yok).

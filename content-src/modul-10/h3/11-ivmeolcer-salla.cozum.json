@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "name": "Sihirli top",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "shake"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_if",
+                "extraState": {
+                  "hasElse": true
+                },
+                "inputs": {
+                  "IF0": {
+                    "block": {
+                      "type": "mk_random_bool"
+                    }
+                  },
+                  "DO0": {
+                    "block": {
+                      "type": "mk_show_icon",
+                      "fields": {
+                        "ICON": "yes"
+                      }
+                    }
+                  },
+                  "ELSE": {
+                    "block": {
+                      "type": "mk_show_icon",
+                      "fields": {
+                        "ICON": "no"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltLeft"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "arrowLeft"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltRight"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "arrowRight"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": []
+  }
+}

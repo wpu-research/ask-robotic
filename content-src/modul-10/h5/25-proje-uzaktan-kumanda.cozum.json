@@ -1,0 +1,474 @@
+{
+  "version": 1,
+  "name": "Uzaktan kumanda",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_group",
+                "inputs": {
+                  "G": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltLeft"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_send_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 1
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltRight"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_send_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltForward"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_send_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 3
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltBack"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_send_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 4
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 824
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_send_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 1024
+        },
+        {
+          "type": "mk_on_radio",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_komut"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "mk_radio_recv",
+                      "fields": {
+                        "KIND": "number"
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "controls_if",
+                    "extraState": {
+                      "hasElse": true
+                    },
+                    "inputs": {
+                      "IF0": {
+                        "block": {
+                          "type": "logic_compare",
+                          "fields": {
+                            "OP": "EQ"
+                          },
+                          "inputs": {
+                            "A": {
+                              "block": {
+                                "type": "variables_get",
+                                "fields": {
+                                  "VAR": {
+                                    "id": "v_komut"
+                                  }
+                                }
+                              }
+                            },
+                            "B": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 1
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "DO0": {
+                        "block": {
+                          "type": "mk_show_arrow",
+                          "fields": {
+                            "DIR": "W"
+                          },
+                          "next": {
+                            "block": {
+                              "type": "mk_pin_servo",
+                              "fields": {
+                                "PIN": "P0"
+                              },
+                              "inputs": {
+                                "ANGLE": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 45
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "ELSE": {
+                        "block": {
+                          "type": "controls_if",
+                          "extraState": {
+                            "hasElse": true
+                          },
+                          "inputs": {
+                            "IF0": {
+                              "block": {
+                                "type": "logic_compare",
+                                "fields": {
+                                  "OP": "EQ"
+                                },
+                                "inputs": {
+                                  "A": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "v_komut"
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "B": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 2
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "DO0": {
+                              "block": {
+                                "type": "mk_show_arrow",
+                                "fields": {
+                                  "DIR": "E"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "mk_pin_servo",
+                                    "fields": {
+                                      "PIN": "P0"
+                                    },
+                                    "inputs": {
+                                      "ANGLE": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 135
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            },
+                            "ELSE": {
+                              "block": {
+                                "type": "controls_if",
+                                "extraState": {
+                                  "hasElse": true
+                                },
+                                "inputs": {
+                                  "IF0": {
+                                    "block": {
+                                      "type": "logic_compare",
+                                      "fields": {
+                                        "OP": "EQ"
+                                      },
+                                      "inputs": {
+                                        "A": {
+                                          "block": {
+                                            "type": "variables_get",
+                                            "fields": {
+                                              "VAR": {
+                                                "id": "v_komut"
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "B": {
+                                          "block": {
+                                            "type": "math_number",
+                                            "fields": {
+                                              "NUM": 3
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "DO0": {
+                                    "block": {
+                                      "type": "mk_show_arrow",
+                                      "fields": {
+                                        "DIR": "N"
+                                      },
+                                      "next": {
+                                        "block": {
+                                          "type": "mk_pin_servo",
+                                          "fields": {
+                                            "PIN": "P0"
+                                          },
+                                          "inputs": {
+                                            "ANGLE": {
+                                              "block": {
+                                                "type": "math_number",
+                                                "fields": {
+                                                  "NUM": 90
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  },
+                                  "ELSE": {
+                                    "block": {
+                                      "type": "controls_if",
+                                      "extraState": {
+                                        "hasElse": true
+                                      },
+                                      "inputs": {
+                                        "IF0": {
+                                          "block": {
+                                            "type": "logic_compare",
+                                            "fields": {
+                                              "OP": "EQ"
+                                            },
+                                            "inputs": {
+                                              "A": {
+                                                "block": {
+                                                  "type": "variables_get",
+                                                  "fields": {
+                                                    "VAR": {
+                                                      "id": "v_komut"
+                                                    }
+                                                  }
+                                                }
+                                              },
+                                              "B": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 4
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "DO0": {
+                                          "block": {
+                                            "type": "mk_show_arrow",
+                                            "fields": {
+                                              "DIR": "S"
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "mk_pin_servo",
+                                                "fields": {
+                                                  "PIN": "P0"
+                                                },
+                                                "inputs": {
+                                                  "ANGLE": {
+                                                    "block": {
+                                                      "type": "math_number",
+                                                      "fields": {
+                                                        "NUM": 90
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        },
+                                        "ELSE": {
+                                          "block": {
+                                            "type": "mk_show_icon",
+                                            "fields": {
+                                              "ICON": "no"
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "mk_pin_servo",
+                                                "fields": {
+                                                  "PIN": "P0"
+                                                },
+                                                "inputs": {
+                                                  "ANGLE": {
+                                                    "block": {
+                                                      "type": "math_number",
+                                                      "fields": {
+                                                        "NUM": 90
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 1224
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "komut",
+        "id": "v_komut"
+      }
+    ]
+  }
+}

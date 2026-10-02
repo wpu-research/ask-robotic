@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "Üç yanıp sönme",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

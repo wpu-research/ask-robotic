@@ -1,0 +1,454 @@
+{
+  "version": 1,
+  "name": "Hazine adası",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_dosemesi",
+                "inputs": {
+                  "IMG": {
+                    "block": {
+                      "type": "oyun_resim",
+                      "fields": {
+                        "IMG": "karo-zemin"
+                      },
+                      "id": "b5546"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "harita_yukle",
+                    "inputs": {
+                      "M": {
+                        "block": {
+                          "type": "oyun_harita",
+                          "fields": {
+                            "MAP": "ada"
+                          },
+                          "id": "b5548"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "variables_set",
+                        "fields": {
+                          "VAR": {
+                            "id": "kahraman"
+                          }
+                        },
+                        "inputs": {
+                          "VALUE": {
+                            "block": {
+                              "type": "sprite_yeni",
+                              "inputs": {
+                                "IMG": {
+                                  "block": {
+                                    "type": "oyun_resim",
+                                    "fields": {
+                                      "IMG": "oyuncu-kahraman"
+                                    },
+                                    "id": "b5551"
+                                  }
+                                }
+                              },
+                              "fields": {
+                                "K": "oyuncu"
+                              },
+                              "id": "b5550"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "harita_konumla",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "kahraman"
+                                    }
+                                  },
+                                  "id": "b5553"
+                                }
+                              },
+                              "C": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 1
+                                  },
+                                  "id": "b5554"
+                                }
+                              },
+                              "R": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 1
+                                  },
+                                  "id": "b5555"
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "den_hareket",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "kahraman"
+                                        }
+                                      },
+                                      "id": "b5557"
+                                    }
+                                  },
+                                  "N": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 60
+                                      },
+                                      "id": "b5558"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "M": "four"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "kamera_takip",
+                                    "inputs": {
+                                      "S": {
+                                        "block": {
+                                          "type": "variables_get",
+                                          "fields": {
+                                            "VAR": {
+                                              "id": "kahraman"
+                                            }
+                                          },
+                                          "id": "b5560"
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "oyun_skor_ayarla",
+                                        "inputs": {
+                                          "N": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 0
+                                              },
+                                              "id": "b5562"
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "oyun_can_ayarla",
+                                            "inputs": {
+                                              "N": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 3
+                                                  },
+                                                  "id": "b5564"
+                                                }
+                                              }
+                                            },
+                                            "id": "b5563"
+                                          }
+                                        },
+                                        "id": "b5561"
+                                      }
+                                    },
+                                    "id": "b5559"
+                                  }
+                                },
+                                "id": "b5556"
+                              }
+                            },
+                            "id": "b5552"
+                          }
+                        },
+                        "id": "b5549"
+                      }
+                    },
+                    "id": "b5547"
+                  }
+                },
+                "id": "b5545"
+              }
+            }
+          },
+          "id": "b5544",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "kahraman",
+        "id": "kahraman"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-kahraman": {
+      "name": "Kahraman",
+      "rows": [
+        "...2222222222...",
+        "..222222222222..",
+        ".02222222222220.",
+        ".0cccccccccccc0.",
+        ".0ccccc33ccccc0.",
+        ".03c0c3cc3c0c30.",
+        ".03cccccccccc30.",
+        "..03c22cc22c30..",
+        "..000000000000..",
+        ".09999999999990.",
+        "0c99ccc99ccc99c0",
+        "0c999999999999c0",
+        ".00999999999900.",
+        "..088088880880..",
+        "..088088880880..",
+        ".00000000000000."
+      ]
+    },
+    "karo-tas": {
+      "name": "Taş duvar",
+      "rows": [
+        "ddddddddddddddd0",
+        "dcccccccddcccccd",
+        "dcddddddddddddcd",
+        "dcddddddddddddcd",
+        "dcddddddddddddcd",
+        "dddddddddddddddd",
+        "ddddd0000dddd000",
+        "dcccccdddcccccdd",
+        "dcdddddddcddddcd",
+        "dcdddddddcddddcd",
+        "dcdddddddcddddcd",
+        "dddddddddddddddd",
+        "ddddd0000dddd000",
+        "ddddddddddddddd0",
+        "eeeeeeeeeeeeeeee",
+        "0000000000000000"
+      ]
+    },
+    "karo-zemin": {
+      "name": "Zemin",
+      "rows": [
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "edeedeedeedeedee",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "edeedeedeedeedee"
+      ]
+    },
+    "karo-su": {
+      "name": "Su",
+      "rows": [
+        "9999999999999999",
+        "99aa999999aa9999",
+        "a9999999a9999999",
+        "9999aa9999999aa9",
+        "9999999999999999",
+        "9aa9999999aa9999",
+        "9999999a99999999",
+        "99999aa999999aa9",
+        "9999999999999999",
+        "a9999999aa999999",
+        "99aa999999999a99",
+        "9999999999aa9999",
+        "9999999999999999",
+        "9aa9999a99999999",
+        "9999999999aa9999",
+        "9999999999999999"
+      ]
+    },
+    "karo-lav": {
+      "name": "Lav",
+      "rows": [
+        "3333433333333433",
+        "3233333323333333",
+        "3333333333332333",
+        "4333333433333333",
+        "3333333333433333",
+        "3323333333333323",
+        "3333333233333333",
+        "3333433333332333",
+        "3333333333333333",
+        "2333333343333333",
+        "3333323333333433",
+        "3433333333233333",
+        "3333333333333333",
+        "3333233333333343",
+        "3333333334333333",
+        "3333333333333333"
+      ]
+    },
+    "nesne-anahtar": {
+      "name": "Anahtar",
+      "rows": [
+        "................",
+        "................",
+        "....0000........",
+        "...044440.......",
+        "..04400440......",
+        "..04400440......",
+        "...044440.......",
+        "....00004.......",
+        ".......04.......",
+        ".......0440.....",
+        ".......04.......",
+        ".......0440.....",
+        ".......04.......",
+        ".......000......",
+        "................",
+        "................"
+      ]
+    },
+    "nesne-kapi": {
+      "name": "Kapı",
+      "rows": [
+        "..000000000000..",
+        ".01111111111110.",
+        "0111111111111110",
+        "0111331111331110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0111111111111110",
+        "0000000000000000"
+      ]
+    },
+    "nesne-sandik": {
+      "name": "Sandık",
+      "rows": [
+        "................",
+        "..000000000000..",
+        ".01111111111110.",
+        "0111111111111110",
+        "0111111111111110",
+        "0000000000000000",
+        "0444444444444440",
+        "0111111111111110",
+        "0111444444441110",
+        "0111144444411110",
+        "0111111111111110",
+        "0111111111111110",
+        "0000000000000000",
+        "................",
+        "................",
+        "................"
+      ]
+    },
+    "nesne-elmas": {
+      "name": "Elmas",
+      "rows": [
+        "................",
+        "................",
+        "..000000000000..",
+        ".0bbbbbbbbbbbb0.",
+        "0babbaaaaaabbab0",
+        "00000000000000..",
+        ".0bbaaaaaaaabb0.",
+        "..0baaaaaaaab0..",
+        "...0baaaaaab0...",
+        "....0baaaab0....",
+        ".....0baab0.....",
+        "......0aa0......",
+        ".......00.......",
+        "................",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [
+    {
+      "image": "karo-tas",
+      "wall": true
+    },
+    {
+      "image": "nesne-kapi",
+      "wall": true
+    },
+    {
+      "image": "karo-su",
+      "wall": true
+    },
+    {
+      "image": "karo-lav",
+      "wall": false
+    },
+    {
+      "image": "nesne-anahtar",
+      "wall": false
+    },
+    {
+      "image": "nesne-sandik",
+      "wall": false
+    },
+    {
+      "image": "nesne-elmas",
+      "wall": false
+    }
+  ],
+  "maps": [
+    {
+      "name": "ada",
+      "cols": 20,
+      "rows": 10,
+      "cells": [
+        "11111111111111111111",
+        "1......7..1........1",
+        "1.......4.1..7.....1",
+        "1...4.....1........1",
+        "1.........1..3.....1",
+        "1.........2..3...6.1",
+        "1.....4...1..3.....1",
+        "1.5.......1........1",
+        "1.........1.....7..1",
+        "11111111111111111111"
+      ]
+    }
+  ],
+  "bg": 15
+}

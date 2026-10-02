@@ -2,6 +2,7 @@ import type { CatalogModule } from './catalog'
 import type { PaletteItem } from './command-palette'
 import { PART_DEFS } from './lab/geometry'
 import { DEFAULT_PARTS, PART_KEYWORDS, SHORT_NAME } from './lab/parts'
+import { GAME_META } from './games/meta'
 import { LESSON_KIND_LABEL, UPCOMING } from './module-meta'
 
 /** Modül, ders ve parça arama dizini (sunucuda üretilir; komut paleti ilk açılışta çeker). */
@@ -20,6 +21,9 @@ export function buildPaletteItems(catalog: CatalogModule[]): PaletteItem[] {
         })
       }
     }
+  }
+  for (const g of GAME_META) {
+    items.push({ id: `g:${g.slug}`, group: 'Araç', title: `Oyun: ${g.title}`, subtitle: g.tagline, href: `/oyunlar/${g.slug}`, keywords: `oyun ${g.keywords}` })
   }
   for (const t of DEFAULT_PARTS) {
     const d = PART_DEFS[t]

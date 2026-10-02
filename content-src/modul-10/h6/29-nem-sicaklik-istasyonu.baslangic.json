@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "name": "İstasyon",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "AB",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_every",
+          "fields": {
+            "MS": 2000
+          },
+          "x": 24,
+          "y": 824
+        }
+      ]
+    },
+    "variables": []
+  }
+}

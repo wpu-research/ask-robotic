@@ -58,6 +58,22 @@ describe('içerik verisi', () => {
     expect(lessons.filter((l) => l.contentMd.includes('// sketch:')).length).toBeGreaterThanOrEqual(35)
     for (const w of m.weeks) expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Bitirme|Sergi/)
   })
+  it('Modül 10 (Mikro Kart): 6 hafta, 30 ders, her hafta proje dersiyle biter', () => {
+    const m = allModules.find((x) => x.slug === 'mikro-kart')!
+    expect(m.weeks).toHaveLength(6)
+    expect(m.weeks.flatMap((w) => w.lessons)).toHaveLength(30)
+    expect(m.track).toBe('maker')
+    expect(m.position).toBe(10)
+    for (const w of m.weeks) { expect(w.lessons).toHaveLength(5); expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Final/) }
+  })
+  it('Modül 11 (Oyun Atölyesi): 6 hafta, 30 ders, her hafta proje dersiyle biter', () => {
+    const m = allModules.find((x) => x.slug === 'oyun-atolyesi')!
+    expect(m.weeks).toHaveLength(6)
+    expect(m.weeks.flatMap((w) => w.lessons)).toHaveLength(30)
+    expect(m.track).toBe('maker')
+    expect(m.position).toBe(11)
+    for (const w of m.weeks) { expect(w.lessons).toHaveLength(5); expect(w.lessons.at(-1)!.title, w.title).toMatch(/Proje|Final/) }
+  })
   it('modül konumları ve slug\'lar benzersiz', () => {
     expect(new Set(allModules.map((m) => m.slug)).size).toBe(allModules.length)
     expect(new Set(allModules.map((m) => m.position)).size).toBe(allModules.length)
@@ -79,7 +95,7 @@ describe('seed', () => {
     const before = await count()
     await seedContent(db)
     expect(await count()).toEqual(before)
-    expect(before).toEqual([5, 36, 141])
+    expect(before).toEqual([7, 48, 201])
   })
   it('içerik değişince günceller', async () => {
     const changed = structuredClone(allModules)

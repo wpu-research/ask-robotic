@@ -1,0 +1,45 @@
+{
+  "slug": "mikro-kart",
+  "title": "Mikro Kart",
+  "track": "maker",
+  "position": 10,
+  "minAge": 8,
+  "weeks": [
+    {
+      "dir": "h1",
+      "title": "Kartı tanı",
+      "project": "Atan kalp",
+      "lessons": 5
+    },
+    {
+      "dir": "h2",
+      "title": "Düğmeler ve olaylar",
+      "project": "Zar oyunu skor panosu",
+      "lessons": 5
+    },
+    {
+      "dir": "h3",
+      "title": "Sensörler",
+      "project": "Çevre istasyonu",
+      "lessons": 5
+    },
+    {
+      "dir": "h4",
+      "title": "Müzik ve ses",
+      "project": "Sanal piyano",
+      "lessons": 5
+    },
+    {
+      "dir": "h5",
+      "title": "Radyo ve iletişim",
+      "project": "Uzaktan kumanda",
+      "lessons": 5
+    },
+    {
+      "dir": "h6",
+      "title": "Projeler",
+      "project": "Ders sonu final projesi",
+      "lessons": 5
+    }
+  ]
+}

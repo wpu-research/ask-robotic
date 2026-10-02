@@ -1,0 +1,45 @@
+{
+  "slug": "oyun-atolyesi",
+  "title": "Oyun Atölyesi",
+  "track": "maker",
+  "position": 11,
+  "minAge": 8,
+  "weeks": [
+    {
+      "dir": "h1",
+      "title": "İlk oyunum",
+      "project": "Gezgin kedi",
+      "lessons": 5
+    },
+    {
+      "dir": "h2",
+      "title": "Çarpışma ve skor",
+      "project": "Meyve avı",
+      "lessons": 5
+    },
+    {
+      "dir": "h3",
+      "title": "Harita ve dünya",
+      "project": "Hazine adası",
+      "lessons": 5
+    },
+    {
+      "dir": "h4",
+      "title": "Düşman ve zekâ",
+      "project": "Hayalet avcısı",
+      "lessons": 5
+    },
+    {
+      "dir": "h5",
+      "title": "Platform ve fizik",
+      "project": "Platform atlayıcı",
+      "lessons": 5
+    },
+    {
+      "dir": "h6",
+      "title": "Proje: tam oyunlar",
+      "project": "Final oyunum",
+      "lessons": 5
+    }
+  ]
+}

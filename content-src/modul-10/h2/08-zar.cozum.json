@@ -1,0 +1,123 @@
+{
+  "version": 1,
+  "name": "Zar",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_zar"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_random_int",
+                      "inputs": {
+                        "FROM": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1
+                            }
+                          }
+                        },
+                        "TO": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 6
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_show_number",
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "v_zar"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "controls_if",
+                        "inputs": {
+                          "IF0": {
+                            "block": {
+                              "type": "logic_compare",
+                              "fields": {
+                                "OP": "EQ"
+                              },
+                              "inputs": {
+                                "A": {
+                                  "block": {
+                                    "type": "variables_get",
+                                    "fields": {
+                                      "VAR": {
+                                        "id": "v_zar"
+                                      }
+                                    }
+                                  }
+                                },
+                                "B": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 6
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "DO0": {
+                            "block": {
+                              "type": "mk_show_icon",
+                              "fields": {
+                                "ICON": "heart"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "zar",
+        "id": "v_zar"
+      }
+    ]
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "name": "Enstrüman",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_play_note",
+                "fields": {
+                  "NOTE": "Do",
+                  "BEATS": "1"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_play_note",
+                "fields": {
+                  "NOTE": "Re",
+                  "BEATS": "1"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "AB",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_play_note",
+                "fields": {
+                  "NOTE": "Mi",
+                  "BEATS": "1"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_every",
+          "fields": {
+            "MS": 100
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_if",
+                "inputs": {
+                  "IF0": {
+                    "block": {
+                      "type": "mk_logo_is"
+                    }
+                  },
+                  "DO0": {
+                    "block": {
+                      "type": "mk_ring",
+                      "inputs": {
+                        "FREQ": {
+                          "block": {
+                            "type": "mk_map",
+                            "inputs": {
+                              "V": {
+                                "block": {
+                                  "type": "mk_light"
+                                }
+                              },
+                              "A": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 0
+                                  }
+                                }
+                              },
+                              "B": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 255
+                                  }
+                                }
+                              },
+                              "C": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 200
+                                  }
+                                }
+                              },
+                              "D": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 1000
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "release"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_stop_sound"
+              }
+            }
+          },
+          "x": 24,
+          "y": 824
+        }
+      ]
+    },
+    "variables": []
+  }
+}

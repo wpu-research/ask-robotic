@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "name": "Uzaktan kumanda",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltLeft"
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltRight"
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltForward"
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_on_gesture",
+          "fields": {
+            "G": "tiltBack"
+          },
+          "x": 24,
+          "y": 824
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 1024
+        },
+        {
+          "type": "mk_on_radio",
+          "x": 24,
+          "y": 1224
+        }
+      ]
+    },
+    "variables": []
+  }
+}

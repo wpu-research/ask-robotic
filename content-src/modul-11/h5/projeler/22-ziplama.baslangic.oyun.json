@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "name": "Zıplama",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "harita_yukle",
+                "inputs": {
+                  "M": {
+                    "block": {
+                      "type": "oyun_harita",
+                      "fields": {
+                        "MAP": "zemin"
+                      },
+                      "id": "b6003"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "kahraman"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-kahraman"
+                                },
+                                "id": "b6006"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b6005"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "kahraman"
+                                }
+                              },
+                              "id": "b6008"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b6009"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 88
+                              },
+                              "id": "b6010"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "sprite_bayrak",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "kahraman"
+                                    }
+                                  },
+                                  "id": "b6012"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "F": "stay",
+                              "ON": "true"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "hareket_ivme",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "kahraman"
+                                        }
+                                      },
+                                      "id": "b6014"
+                                    }
+                                  },
+                                  "AX": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 0
+                                      },
+                                      "id": "b6015"
+                                    }
+                                  },
+                                  "AY": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 520
+                                      },
+                                      "id": "b6016"
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "den_hareket",
+                                    "inputs": {
+                                      "S": {
+                                        "block": {
+                                          "type": "variables_get",
+                                          "fields": {
+                                            "VAR": {
+                                              "id": "kahraman"
+                                            }
+                                          },
+                                          "id": "b6018"
+                                        }
+                                      },
+                                      "N": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 70
+                                          },
+                                          "id": "b6019"
+                                        }
+                                      }
+                                    },
+                                    "fields": {
+                                      "M": "h"
+                                    },
+                                    "id": "b6017"
+                                  }
+                                },
+                                "id": "b6013"
+                              }
+                            },
+                            "id": "b6011"
+                          }
+                        },
+                        "id": "b6007"
+                      }
+                    },
+                    "id": "b6004"
+                  }
+                },
+                "id": "b6002"
+              }
+            }
+          },
+          "id": "b6001",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "kahraman",
+        "id": "kahraman"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-kahraman": {
+      "name": "Kahraman",
+      "rows": [
+        "...2222222222...",
+        "..222222222222..",
+        ".02222222222220.",
+        ".0cccccccccccc0.",
+        ".0ccccc33ccccc0.",
+        ".03c0c3cc3c0c30.",
+        ".03cccccccccc30.",
+        "..03c22cc22c30..",
+        "..000000000000..",
+        ".09999999999990.",
+        "0c99ccc99ccc99c0",
+        "0c999999999999c0",
+        ".00999999999900.",
+        "..088088880880..",
+        "..088088880880..",
+        ".00000000000000."
+      ]
+    },
+    "karo-cimenli-toprak": {
+      "name": "Çimenli toprak",
+      "rows": [
+        "6666566666656666",
+        "5666666665666666",
+        "6665666666666566",
+        "1616161616161616",
+        "1111111111111111",
+        "1131111111111111",
+        "1111111111113111",
+        "1111111111111111",
+        "1111113111111111",
+        "1111111111111111",
+        "1111111111111111",
+        "1311111111111111",
+        "1111111111111131",
+        "1111111111111111",
+        "1111111311111111",
+        "1111111111111111"
+      ]
+    },
+    "karo-toprak": {
+      "name": "Toprak",
+      "rows": [
+        "1111111111111111",
+        "1111111111111111",
+        "1131111111111111",
+        "1111111111113111",
+        "1111111111111111",
+        "1111113111111111",
+        "1111111111111111",
+        "1111111111111111",
+        "1311111111111111",
+        "1111111111111131",
+        "1111111111111111",
+        "1111111311111111",
+        "1111111111111111",
+        "1111111111113111",
+        "1113111111111111",
+        "1111111111111111"
+      ]
+    }
+  },
+  "tileset": [
+    {
+      "image": "karo-cimenli-toprak",
+      "wall": true
+    },
+    {
+      "image": "karo-toprak",
+      "wall": true
+    }
+  ],
+  "maps": [
+    {
+      "name": "zemin",
+      "cols": 10,
+      "rows": 8,
+      "cells": [
+        "..........",
+        "..........",
+        "..........",
+        "..........",
+        "..........",
+        "..........",
+        "1111111111",
+        "2222222222"
+      ]
+    }
+  ],
+  "bg": 10
+}

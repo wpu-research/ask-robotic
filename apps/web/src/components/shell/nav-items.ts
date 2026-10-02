@@ -18,6 +18,9 @@ export const NAV: NavGroup[] = [
       { href: '/atolye', label: 'Blok atölyesi', icon: 'atolye', tab: true },
       { href: '/laboratuvar', label: 'Devre laboratuvarı', icon: 'laboratuvar', tab: true },
       { href: '/arena', label: 'Robot arenası', icon: 'arena', tab: true },
+      { href: '/oyunlar', label: 'Oyunlar', icon: 'oyun' },
+      { href: '/mikro-kart', label: 'Mikro Kart atölyesi', icon: 'mikro' },
+      { href: '/oyun-atolyesi', label: 'Oyun atölyesi', icon: 'oyun' },
     ],
   },
   {

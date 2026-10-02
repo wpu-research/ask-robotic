@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "name": "Kuzey bulucu",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_forever",
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

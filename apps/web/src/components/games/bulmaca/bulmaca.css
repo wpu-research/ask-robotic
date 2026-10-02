@@ -1,0 +1,28 @@
+/* Bulmaca sahnesi. Çizim alanı sabit pastel zemin kullanır (koyu temada da okunur). */
+.bul { container-type: inline-size; display: grid; grid-template-rows: 1fr auto; gap: 8px; width: 100%; height: 100%; padding: 10px; box-sizing: border-box; background: var(--surface); }
+.bul-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; min-height: 0; }
+.bul-panel { position: relative; margin: 0; display: flex; flex-direction: column; min-height: 0; border-radius: 16px; border: 3px dashed #b9c3d9; background: #fff8e7; overflow: hidden; color: #2b3345; }
+.bul-card { border-style: solid; border-color: #ffb454; background: #fff3d6; }
+.bul-built { border-color: #7aa7ff; background: #eef4ff; transition: border-color .2s, background .2s; }
+.bul-built[data-state='ok'] { border-style: solid; border-color: #1fa855; background: #e8f8ee; }
+.bul-built[data-state='bad'] { border-color: #e5484d; }
+.bul-cap { display: flex; justify-content: space-between; align-items: center; gap: 6px; padding: 5px 10px 0; font-weight: 800; font-size: clamp(.68rem, 2.6cqw, .9rem); }
+.bul-tag { align-self: center; max-width: 92%; margin: 0 0 6px; padding: 2px 12px; border-radius: 999px; background: #fff; border: 2px solid #4a3b2a; font-weight: 800; font-size: clamp(.7rem, 2.4cqw, .9rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.4em; }
+.bul-tag:empty { visibility: hidden; }
+.bul-animal { flex: 1; min-height: 0; width: 100%; padding: 2px 8px; box-sizing: border-box; }
+.bul-ok-mark { position: absolute; right: 8px; top: 6px; width: 28px; height: 28px; border-radius: 50%; background: #1fa855; color: #fff; display: grid; place-items: center; font-weight: 900; }
+.bul-chips { display: flex; flex-wrap: wrap; gap: 5px; margin: 0; padding: 0; list-style: none; min-height: 26px; }
+.bul-chip { padding: 2px 9px; border-radius: 999px; font-size: clamp(.68rem, 2.4cqw, .82rem); font-weight: 800; background: var(--surface-2); color: var(--muted); border: 2px solid transparent; font-variant-numeric: tabular-nums; }
+.bul-chip[data-ok='true'] { background: var(--ok-soft); color: var(--ok); border-color: var(--ok); }
+.bul-chip[data-ok='false'][data-touched='true'] { background: var(--warn-soft); color: var(--warn); }
+.bul-dots { display: flex; gap: 6px; margin: 0; padding: 0; list-style: none; align-items: center; font-size: .78rem; font-weight: 800; color: var(--muted); }
+.bul-dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border-strong); background: var(--surface); }
+.bul-dot[data-s='ok'] { background: var(--ok); border-color: var(--ok); }
+.bul-dot[data-s='bad'] { background: #e5484d; border-color: #e5484d; }
+.bul-dot[data-cur='true'] { box-shadow: 0 0 0 3px var(--primary-soft); }
+.bul-bottom { display: flex; flex-direction: column; gap: 6px; }
+
+.bul-part { transform-box: fill-box; transform-origin: center; }
+.bul-pop { animation: bul-pop calc(.32s / var(--bul-speed, 1)) cubic-bezier(.3, 1.6, .5, 1) both; }
+@keyframes bul-pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bul-pop { animation: none; } .bul-built { transition: none; } }

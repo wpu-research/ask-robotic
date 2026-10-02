@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "name": "Duygu düğmeleri",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "happy"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "sad"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "AB",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "heart"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": []
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "name": "Çevre istasyonu",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_mod"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_forever",
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "mod",
+        "id": "v_mod"
+      },
+      {
+        "name": "okuma",
+        "id": "v_okuma"
+      },
+      {
+        "name": "enCok",
+        "id": "v_enCok"
+      }
+    ]
+  }
+}

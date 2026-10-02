@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "name": "Ritim",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_set_tempo",
+                "inputs": {
+                  "BPM": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 60
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "Sol",
+                      "BEATS": "1"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_rest",
+                        "fields": {
+                          "BEATS": "1"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_set_tempo",
+                            "inputs": {
+                              "BPM": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 240
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "mk_play_note",
+                                "fields": {
+                                  "NOTE": "Sol",
+                                  "BEATS": "1"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "mk_rest",
+                                    "fields": {
+                                      "BEATS": "1"
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "mk_play_note",
+                                        "fields": {
+                                          "NOTE": "Sol",
+                                          "BEATS": "1"
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

@@ -1,0 +1,395 @@
+{
+  "version": 1,
+  "name": "Çarpışma",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#62c8ff"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "kedi"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-kedi"
+                                },
+                                "id": "b4196"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b4195"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "kedi"
+                                }
+                              },
+                              "id": "b4198"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 30
+                              },
+                              "id": "b4199"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 30
+                              },
+                              "id": "b4200"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "den_hareket",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "kedi"
+                                    }
+                                  },
+                                  "id": "b4202"
+                                }
+                              },
+                              "N": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 60
+                                  },
+                                  "id": "b4203"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "M": "four"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "kedi"
+                                        }
+                                      },
+                                      "id": "b4205"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "stay",
+                                  "ON": "true"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "variables_set",
+                                    "fields": {
+                                      "VAR": {
+                                        "id": "elma"
+                                      }
+                                    },
+                                    "inputs": {
+                                      "VALUE": {
+                                        "block": {
+                                          "type": "sprite_yeni",
+                                          "inputs": {
+                                            "IMG": {
+                                              "block": {
+                                                "type": "oyun_resim",
+                                                "fields": {
+                                                  "IMG": "yiyecek-elma"
+                                                },
+                                                "id": "b4208"
+                                              }
+                                            }
+                                          },
+                                          "fields": {
+                                            "K": "yiyecek"
+                                          },
+                                          "id": "b4207"
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "sprite_konum",
+                                        "inputs": {
+                                          "S": {
+                                            "block": {
+                                              "type": "variables_get",
+                                              "fields": {
+                                                "VAR": {
+                                                  "id": "elma"
+                                                }
+                                              },
+                                              "id": "b4210"
+                                            }
+                                          },
+                                          "X": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 120
+                                              },
+                                              "id": "b4211"
+                                            }
+                                          },
+                                          "Y": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 30
+                                              },
+                                              "id": "b4212"
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "variables_set",
+                                            "fields": {
+                                              "VAR": {
+                                                "id": "hayalet"
+                                              }
+                                            },
+                                            "inputs": {
+                                              "VALUE": {
+                                                "block": {
+                                                  "type": "sprite_yeni",
+                                                  "inputs": {
+                                                    "IMG": {
+                                                      "block": {
+                                                        "type": "oyun_resim",
+                                                        "fields": {
+                                                          "IMG": "dusman-hayalet"
+                                                        },
+                                                        "id": "b4215"
+                                                      }
+                                                    }
+                                                  },
+                                                  "fields": {
+                                                    "K": "dusman"
+                                                  },
+                                                  "id": "b4214"
+                                                }
+                                              }
+                                            },
+                                            "next": {
+                                              "block": {
+                                                "type": "sprite_konum",
+                                                "inputs": {
+                                                  "S": {
+                                                    "block": {
+                                                      "type": "variables_get",
+                                                      "fields": {
+                                                        "VAR": {
+                                                          "id": "hayalet"
+                                                        }
+                                                      },
+                                                      "id": "b4217"
+                                                    }
+                                                  },
+                                                  "X": {
+                                                    "block": {
+                                                      "type": "math_number",
+                                                      "fields": {
+                                                        "NUM": 120
+                                                      },
+                                                      "id": "b4218"
+                                                    }
+                                                  },
+                                                  "Y": {
+                                                    "block": {
+                                                      "type": "math_number",
+                                                      "fields": {
+                                                        "NUM": 90
+                                                      },
+                                                      "id": "b4219"
+                                                    }
+                                                  }
+                                                },
+                                                "id": "b4216"
+                                              }
+                                            },
+                                            "id": "b4213"
+                                          }
+                                        },
+                                        "id": "b4209"
+                                      }
+                                    },
+                                    "id": "b4206"
+                                  }
+                                },
+                                "id": "b4204"
+                              }
+                            },
+                            "id": "b4201"
+                          }
+                        },
+                        "id": "b4197"
+                      }
+                    },
+                    "id": "b4194"
+                  }
+                },
+                "id": "b4193"
+              }
+            }
+          },
+          "id": "b4192",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "kedi",
+        "id": "kedi"
+      },
+      {
+        "name": "elma",
+        "id": "elma"
+      },
+      {
+        "name": "hayalet",
+        "id": "hayalet"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-kedi": {
+      "name": "Kedi",
+      "rows": [
+        "................",
+        "..0..........0..",
+        ".030........030.",
+        ".0330......0330.",
+        ".0333......3330.",
+        ".03333333333330.",
+        ".03333333333330.",
+        ".03366333366330.",
+        ".03333333333330.",
+        ".033cccbbccc330.",
+        ".0333cccccc3330.",
+        "..033333333330..",
+        "..0033cccc3300..",
+        "..033cccccc330..",
+        "..033333333330..",
+        "..000000000000.."
+      ]
+    },
+    "yiyecek-elma": {
+      "name": "Elma",
+      "rows": [
+        "................",
+        ".......11.......",
+        "......1001......",
+        "...0006006000...",
+        "..022266662220..",
+        ".02222222222220.",
+        ".02c22222222c20.",
+        ".02c22222222c20.",
+        ".02222222222220.",
+        ".02222222222220.",
+        ".02222222222220.",
+        "..022222222220..",
+        "..002222222200..",
+        "....00222200....",
+        "................",
+        "................"
+      ]
+    },
+    "dusman-hayalet": {
+      "name": "Hayalet",
+      "rows": [
+        "....00000000....",
+        "..00cccccccc00..",
+        ".0cccccccccccc0.",
+        ".0cccccccccccc0.",
+        "0cc00cccccc00cc0",
+        "0cc00cccccc00cc0",
+        "0cccccccccccccc0",
+        "0ccc00cccc00ccc0",
+        "0cccc0cccc0cccc0",
+        "0cccccccccccccc0",
+        "0cccccccccccccc0",
+        "0cccccc00cccccc0",
+        "0cc0ccc00ccc0cc0",
+        "0c0.0cc00cc0.0c0",
+        ".0..0c0..0c0..0.",
+        ".....0....0....."
+      ]
+    },
+    "nesne-bomba": {
+      "name": "Bomba",
+      "rows": [
+        ".......44.......",
+        "......4224......",
+        ".....040040.....",
+        "....000..000....",
+        "..000ffffff000..",
+        ".0ffffffffffff0.",
+        ".0fcffffffffcf0.",
+        "0ffcffffffffcff0",
+        "0ffffffffffffff0",
+        "0ffffffffffffff0",
+        "0ffffffffffffff0",
+        ".0ffffffffffff0.",
+        ".0ffffffffffff0.",
+        "..00ffffffff00..",
+        "....00000000....",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

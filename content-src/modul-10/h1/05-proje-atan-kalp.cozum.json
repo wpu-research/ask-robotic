@@ -1,0 +1,148 @@
+{
+  "version": 1,
+  "name": "Atan kalp",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_set_brightness",
+                "inputs": {
+                  "B": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 200
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_show_text",
+                    "inputs": {
+                      "TEXT": {
+                        "block": {
+                          "type": "text",
+                          "fields": {
+                            "TEXT": "Sev"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_forever",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "heart"
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_pause",
+                    "inputs": {
+                      "MS": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 150
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_show_icon",
+                        "fields": {
+                          "ICON": "smallHeart"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_pause",
+                            "inputs": {
+                              "MS": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 100
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "mk_show_icon",
+                                "fields": {
+                                  "ICON": "heart"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "mk_pause",
+                                    "inputs": {
+                                      "MS": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 150
+                                          }
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "mk_show_icon",
+                                        "fields": {
+                                          "ICON": "smallHeart"
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "mk_pause",
+                                            "inputs": {
+                                              "MS": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 400
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        }
+      ]
+    },
+    "variables": []
+  }
+}

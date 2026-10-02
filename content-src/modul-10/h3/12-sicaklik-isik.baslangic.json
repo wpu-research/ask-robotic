@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "name": "Hava istasyonu",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "x": 24,
+          "y": 224
+        }
+      ]
+    },
+    "variables": []
+  }
+}

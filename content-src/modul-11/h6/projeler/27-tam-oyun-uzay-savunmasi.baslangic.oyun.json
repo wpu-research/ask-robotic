@@ -1,0 +1,658 @@
+{
+  "version": 1,
+  "name": "Uzay savunması",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#15131f"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "gemi"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-gemi"
+                                },
+                                "id": "b7317"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b7316"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "gemi"
+                                }
+                              },
+                              "id": "b7319"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b7320"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 104
+                              },
+                              "id": "b7321"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "den_hareket",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "gemi"
+                                    }
+                                  },
+                                  "id": "b7323"
+                                }
+                              },
+                              "N": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 80
+                                  },
+                                  "id": "b7324"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "M": "h"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "gemi"
+                                        }
+                                      },
+                                      "id": "b7326"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "stay",
+                                  "ON": "true"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "oyun_skor_ayarla",
+                                    "inputs": {
+                                      "N": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 0
+                                          },
+                                          "id": "b7328"
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "oyun_can_ayarla",
+                                        "inputs": {
+                                          "N": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 3
+                                              },
+                                              "id": "b7330"
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "variables_set",
+                                            "fields": {
+                                              "VAR": {
+                                                "id": "hiz"
+                                              }
+                                            },
+                                            "inputs": {
+                                              "VALUE": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 0
+                                                  },
+                                                  "id": "b7332"
+                                                }
+                                              }
+                                            },
+                                            "id": "b7331"
+                                          }
+                                        },
+                                        "id": "b7329"
+                                      }
+                                    },
+                                    "id": "b7327"
+                                  }
+                                },
+                                "id": "b7325"
+                              }
+                            },
+                            "id": "b7322"
+                          }
+                        },
+                        "id": "b7318"
+                      }
+                    },
+                    "id": "b7315"
+                  }
+                },
+                "id": "b7314"
+              }
+            }
+          },
+          "id": "b7313",
+          "x": 20,
+          "y": 20
+        },
+        {
+          "type": "den_dugme",
+          "fields": {
+            "B": "a",
+            "E": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "lazer"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "sprite_yeni",
+                      "inputs": {
+                        "IMG": {
+                          "block": {
+                            "type": "oyun_resim",
+                            "fields": {
+                              "IMG": "nesne-lazer"
+                            },
+                            "id": "b7336"
+                          }
+                        }
+                      },
+                      "fields": {
+                        "K": "mermi"
+                      },
+                      "id": "b7335"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "sprite_konum",
+                    "inputs": {
+                      "S": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "lazer"
+                            }
+                          },
+                          "id": "b7338"
+                        }
+                      },
+                      "X": {
+                        "block": {
+                          "type": "sprite_oku",
+                          "inputs": {
+                            "S": {
+                              "block": {
+                                "type": "variables_get",
+                                "fields": {
+                                  "VAR": {
+                                    "id": "gemi"
+                                  }
+                                },
+                                "id": "b7340"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "P": "x"
+                          },
+                          "id": "b7339"
+                        }
+                      },
+                      "Y": {
+                        "block": {
+                          "type": "math_arithmetic",
+                          "fields": {
+                            "OP": "MINUS"
+                          },
+                          "inputs": {
+                            "A": {
+                              "block": {
+                                "type": "sprite_oku",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "gemi"
+                                        }
+                                      },
+                                      "id": "b7343"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "P": "y"
+                                },
+                                "id": "b7342"
+                              }
+                            },
+                            "B": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 12
+                                },
+                                "id": "b7344"
+                              }
+                            }
+                          },
+                          "id": "b7341"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "hareket_hiz",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "lazer"
+                                }
+                              },
+                              "id": "b7346"
+                            }
+                          },
+                          "VX": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 0
+                              },
+                              "id": "b7347"
+                            }
+                          },
+                          "VY": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": -140
+                              },
+                              "id": "b7348"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "sprite_bayrak",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "lazer"
+                                    }
+                                  },
+                                  "id": "b7350"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "F": "autoDestroy",
+                              "ON": "true"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "ses_melodi",
+                                "fields": {
+                                  "M": "lazer"
+                                },
+                                "id": "b7351"
+                              }
+                            },
+                            "id": "b7349"
+                          }
+                        },
+                        "id": "b7345"
+                      }
+                    },
+                    "id": "b7337"
+                  }
+                },
+                "id": "b7334"
+              }
+            }
+          },
+          "id": "b7333",
+          "x": 20,
+          "y": 430
+        },
+        {
+          "type": "oyun_her_n_ms",
+          "fields": {
+            "MS": 800
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "ufo"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "sprite_yeni",
+                      "inputs": {
+                        "IMG": {
+                          "block": {
+                            "type": "oyun_resim",
+                            "fields": {
+                              "IMG": "dusman-uzayli"
+                            },
+                            "id": "b7355"
+                          }
+                        }
+                      },
+                      "fields": {
+                        "K": "dusman"
+                      },
+                      "id": "b7354"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "sprite_konum",
+                    "inputs": {
+                      "S": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "ufo"
+                            }
+                          },
+                          "id": "b7357"
+                        }
+                      },
+                      "X": {
+                        "block": {
+                          "type": "math_random_int",
+                          "inputs": {
+                            "FROM": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 10
+                                },
+                                "id": "b7359"
+                              }
+                            },
+                            "TO": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 150
+                                },
+                                "id": "b7360"
+                              }
+                            }
+                          },
+                          "id": "b7358"
+                        }
+                      },
+                      "Y": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": -8
+                          },
+                          "id": "b7361"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "hareket_hiz",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "ufo"
+                                }
+                              },
+                              "id": "b7363"
+                            }
+                          },
+                          "VX": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 0
+                              },
+                              "id": "b7364"
+                            }
+                          },
+                          "VY": {
+                            "block": {
+                              "type": "math_random_int",
+                              "inputs": {
+                                "FROM": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 20
+                                    },
+                                    "id": "b7366"
+                                  }
+                                },
+                                "TO": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 45
+                                    },
+                                    "id": "b7367"
+                                  }
+                                }
+                              },
+                              "id": "b7365"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "sprite_bayrak",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "ufo"
+                                    }
+                                  },
+                                  "id": "b7369"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "F": "autoDestroy",
+                              "ON": "true"
+                            },
+                            "id": "b7368"
+                          }
+                        },
+                        "id": "b7362"
+                      }
+                    },
+                    "id": "b7356"
+                  }
+                },
+                "id": "b7353"
+              }
+            }
+          },
+          "id": "b7352",
+          "x": 20,
+          "y": 840
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "gemi",
+        "id": "gemi"
+      },
+      {
+        "name": "hiz",
+        "id": "hiz"
+      },
+      {
+        "name": "lazer",
+        "id": "lazer"
+      },
+      {
+        "name": "ufo",
+        "id": "ufo"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-gemi": {
+      "name": "Uzay gemisi",
+      "rows": [
+        ".......00.......",
+        ".......00.......",
+        "......0cc0......",
+        "......0cc0......",
+        ".....0cccc0.....",
+        ".....0c99c0.....",
+        ".....0c99c0.....",
+        "....0cc99cc0....",
+        ".0..0cccccc0..0.",
+        ".0e0ddccccdd0e0.",
+        "0e20dddddddd02e0",
+        "0e20dddddddd02e0",
+        "0e2dddd00dddd2e0",
+        "0220dd0..0dd0220",
+        ".00.03000030.00.",
+        "....04300340...."
+      ]
+    },
+    "nesne-lazer": {
+      "name": "Lazer",
+      "rows": [
+        "...00...",
+        "..0aa0..",
+        "..0ca0..",
+        "..0ca0..",
+        "..0ca0..",
+        "..0ca0..",
+        "..0aa0..",
+        "...00..."
+      ]
+    },
+    "dusman-uzayli": {
+      "name": "Uzaylı",
+      "rows": [
+        "...0........0...",
+        "....0......0....",
+        "...0000..0000...",
+        "..066666666660..",
+        ".06666666666660.",
+        ".066c066660c660.",
+        ".06666666666660.",
+        ".06666666666660.",
+        ".06606600660660.",
+        "..066666666660..",
+        "..060000000060..",
+        ".060........060.",
+        ".060........060.",
+        "0600........0060",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

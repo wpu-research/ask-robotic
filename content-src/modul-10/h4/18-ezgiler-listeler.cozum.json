@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "name": "Ezgi",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_ezgi"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "lists_create_with",
+                      "extraState": {
+                        "itemCount": 4
+                      },
+                      "inputs": {
+                        "ADD0": {
+                          "block": {
+                            "type": "mk_note",
+                            "fields": {
+                              "NOTE": "Do"
+                            }
+                          }
+                        },
+                        "ADD1": {
+                          "block": {
+                            "type": "mk_note",
+                            "fields": {
+                              "NOTE": "Mi"
+                            }
+                          }
+                        },
+                        "ADD2": {
+                          "block": {
+                            "type": "mk_note",
+                            "fields": {
+                              "NOTE": "Sol"
+                            }
+                          }
+                        },
+                        "ADD3": {
+                          "block": {
+                            "type": "mk_note",
+                            "fields": {
+                              "NOTE": "Tiz Do"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_play_melody",
+                "fields": {
+                  "MEL": "twinkle"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_forEach",
+                "fields": {
+                  "VAR": {
+                    "id": "v_öğe"
+                  }
+                },
+                "inputs": {
+                  "LIST": {
+                    "block": {
+                      "type": "variables_get",
+                      "fields": {
+                        "VAR": {
+                          "id": "v_ezgi"
+                        }
+                      }
+                    }
+                  },
+                  "DO": {
+                    "block": {
+                      "type": "mk_play_tone",
+                      "fields": {
+                        "BEATS": "1"
+                      },
+                      "inputs": {
+                        "FREQ": {
+                          "block": {
+                            "type": "variables_get",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_öğe"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "ezgi",
+        "id": "v_ezgi"
+      },
+      {
+        "name": "öğe",
+        "id": "v_öğe"
+      }
+    ]
+  }
+}

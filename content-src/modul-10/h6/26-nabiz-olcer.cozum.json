@@ -1,0 +1,291 @@
+{
+  "version": 1,
+  "name": "Nabız ölçer",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_sayac"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "v_olcum"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 0
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_if",
+                "inputs": {
+                  "IF0": {
+                    "block": {
+                      "type": "logic_compare",
+                      "fields": {
+                        "OP": "EQ"
+                      },
+                      "inputs": {
+                        "A": {
+                          "block": {
+                            "type": "variables_get",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_olcum"
+                              }
+                            }
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "DO0": {
+                    "block": {
+                      "type": "math_change",
+                      "fields": {
+                        "VAR": {
+                          "id": "v_sayac"
+                        }
+                      },
+                      "inputs": {
+                        "DELTA": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1
+                            }
+                          }
+                        }
+                      },
+                      "next": {
+                        "block": {
+                          "type": "mk_show_icon",
+                          "fields": {
+                            "ICON": "heart"
+                          },
+                          "next": {
+                            "block": {
+                              "type": "mk_pause",
+                              "inputs": {
+                                "MS": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 100
+                                    }
+                                  }
+                                }
+                              },
+                              "next": {
+                                "block": {
+                                  "type": "mk_clear"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_sayac"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "v_olcum"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 1
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_show_icon",
+                        "fields": {
+                          "ICON": "smallHeart"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_pause",
+                            "inputs": {
+                              "MS": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 10000
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "variables_set",
+                                "fields": {
+                                  "VAR": {
+                                    "id": "v_olcum"
+                                  }
+                                },
+                                "inputs": {
+                                  "VALUE": {
+                                    "block": {
+                                      "type": "math_number",
+                                      "fields": {
+                                        "NUM": 0
+                                      }
+                                    }
+                                  }
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "mk_show_number",
+                                    "inputs": {
+                                      "VALUE": {
+                                        "block": {
+                                          "type": "math_arithmetic",
+                                          "fields": {
+                                            "OP": "MULTIPLY"
+                                          },
+                                          "inputs": {
+                                            "A": {
+                                              "block": {
+                                                "type": "variables_get",
+                                                "fields": {
+                                                  "VAR": {
+                                                    "id": "v_sayac"
+                                                  }
+                                                }
+                                              }
+                                            },
+                                            "B": {
+                                              "block": {
+                                                "type": "math_number",
+                                                "fields": {
+                                                  "NUM": 6
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "sayac",
+        "id": "v_sayac"
+      },
+      {
+        "name": "olcum",
+        "id": "v_olcum"
+      }
+    ]
+  }
+}

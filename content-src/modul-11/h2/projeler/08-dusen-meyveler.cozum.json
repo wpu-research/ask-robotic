@@ -1,0 +1,516 @@
+{
+  "version": 1,
+  "name": "Düşen meyveler",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#62c8ff"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "sepet"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-kedi"
+                                },
+                                "id": "b4544"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b4543"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "sepet"
+                                }
+                              },
+                              "id": "b4546"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b4547"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 104
+                              },
+                              "id": "b4548"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "den_hareket",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "sepet"
+                                    }
+                                  },
+                                  "id": "b4550"
+                                }
+                              },
+                              "N": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 90
+                                  },
+                                  "id": "b4551"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "M": "h"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "sepet"
+                                        }
+                                      },
+                                      "id": "b4553"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "stay",
+                                  "ON": "true"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "oyun_skor_ayarla",
+                                    "inputs": {
+                                      "N": {
+                                        "block": {
+                                          "type": "math_number",
+                                          "fields": {
+                                            "NUM": 0
+                                          },
+                                          "id": "b4555"
+                                        }
+                                      }
+                                    },
+                                    "id": "b4554"
+                                  }
+                                },
+                                "id": "b4552"
+                              }
+                            },
+                            "id": "b4549"
+                          }
+                        },
+                        "id": "b4545"
+                      }
+                    },
+                    "id": "b4542"
+                  }
+                },
+                "id": "b4541"
+              }
+            }
+          },
+          "id": "b4540",
+          "x": 20,
+          "y": 20
+        },
+        {
+          "type": "sprite_carpisinca",
+          "fields": {
+            "KA": "oyuncu",
+            "KB": "yiyecek"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "oyun_skor_degistir",
+                "inputs": {
+                  "N": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 1
+                      },
+                      "id": "b4558"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "ses_melodi",
+                    "fields": {
+                      "M": "puan"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_sil",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "oyun_diger_sprite",
+                              "id": "b4561"
+                            }
+                          }
+                        },
+                        "id": "b4560"
+                      }
+                    },
+                    "id": "b4559"
+                  }
+                },
+                "id": "b4557"
+              }
+            }
+          },
+          "id": "b4556",
+          "x": 20,
+          "y": 358
+        },
+        {
+          "type": "oyun_her_n_ms",
+          "fields": {
+            "MS": 800
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "meyve"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "sprite_yeni",
+                      "inputs": {
+                        "IMG": {
+                          "block": {
+                            "type": "oyun_resim",
+                            "fields": {
+                              "IMG": "yiyecek-elma"
+                            },
+                            "id": "b4565"
+                          }
+                        }
+                      },
+                      "fields": {
+                        "K": "yiyecek"
+                      },
+                      "id": "b4564"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "sprite_konum",
+                    "inputs": {
+                      "S": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "meyve"
+                            }
+                          },
+                          "id": "b4567"
+                        }
+                      },
+                      "X": {
+                        "block": {
+                          "type": "math_random_int",
+                          "inputs": {
+                            "FROM": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 10
+                                },
+                                "id": "b4569"
+                              }
+                            },
+                            "TO": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 150
+                                },
+                                "id": "b4570"
+                              }
+                            }
+                          },
+                          "id": "b4568"
+                        }
+                      },
+                      "Y": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": -8
+                          },
+                          "id": "b4571"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "hareket_hiz",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "meyve"
+                                }
+                              },
+                              "id": "b4573"
+                            }
+                          },
+                          "VX": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 0
+                              },
+                              "id": "b4574"
+                            }
+                          },
+                          "VY": {
+                            "block": {
+                              "type": "math_random_int",
+                              "inputs": {
+                                "FROM": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 35
+                                    },
+                                    "id": "b4576"
+                                  }
+                                },
+                                "TO": {
+                                  "block": {
+                                    "type": "math_number",
+                                    "fields": {
+                                      "NUM": 70
+                                    },
+                                    "id": "b4577"
+                                  }
+                                }
+                              },
+                              "id": "b4575"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "sprite_bayrak",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "meyve"
+                                    }
+                                  },
+                                  "id": "b4579"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "F": "autoDestroy",
+                              "ON": "true"
+                            },
+                            "id": "b4578"
+                          }
+                        },
+                        "id": "b4572"
+                      }
+                    },
+                    "id": "b4566"
+                  }
+                },
+                "id": "b4563"
+              }
+            }
+          },
+          "id": "b4562",
+          "x": 20,
+          "y": 588
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "sepet",
+        "id": "sepet"
+      },
+      {
+        "name": "meyve",
+        "id": "meyve"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-kedi": {
+      "name": "Kedi",
+      "rows": [
+        "................",
+        "..0..........0..",
+        ".030........030.",
+        ".0330......0330.",
+        ".0333......3330.",
+        ".03333333333330.",
+        ".03333333333330.",
+        ".03366333366330.",
+        ".03333333333330.",
+        ".033cccbbccc330.",
+        ".0333cccccc3330.",
+        "..033333333330..",
+        "..0033cccc3300..",
+        "..033cccccc330..",
+        "..033333333330..",
+        "..000000000000.."
+      ]
+    },
+    "yiyecek-elma": {
+      "name": "Elma",
+      "rows": [
+        "................",
+        ".......11.......",
+        "......1001......",
+        "...0006006000...",
+        "..022266662220..",
+        ".02222222222220.",
+        ".02c22222222c20.",
+        ".02c22222222c20.",
+        ".02222222222220.",
+        ".02222222222220.",
+        ".02222222222220.",
+        "..022222222220..",
+        "..002222222200..",
+        "....00222200....",
+        "................",
+        "................"
+      ]
+    },
+    "yiyecek-portakal": {
+      "name": "Portakal",
+      "rows": [
+        "................",
+        "......0660......",
+        ".....066660.....",
+        "...0000000000...",
+        "..033333333330..",
+        ".03333333333330.",
+        ".03c33333333c30.",
+        "03c3333333333c30",
+        "0333333333333330",
+        "0333333333333330",
+        "0333333333333330",
+        ".03333333333330.",
+        "..033333333330..",
+        "...0000000000...",
+        "................",
+        "................"
+      ]
+    },
+    "yiyecek-kiraz": {
+      "name": "Kiraz",
+      "rows": [
+        "................",
+        ".......00.......",
+        "......0110......",
+        ".....0.11.0.....",
+        "....0..11..0....",
+        "...0...11...0...",
+        "..0..........0..",
+        ".0000......0000.",
+        "022220.00.022220",
+        "02c2220..0222c20",
+        "0222220..0222220",
+        ".00000....00000.",
+        "................",
+        "................",
+        "................",
+        "................"
+      ]
+    },
+    "nesne-sandik": {
+      "name": "Sandık",
+      "rows": [
+        "................",
+        "..000000000000..",
+        ".01111111111110.",
+        "0111111111111110",
+        "0111111111111110",
+        "0000000000000000",
+        "0444444444444440",
+        "0111111111111110",
+        "0111444444441110",
+        "0111144444411110",
+        "0111111111111110",
+        "0111111111111110",
+        "0000000000000000",
+        "................",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

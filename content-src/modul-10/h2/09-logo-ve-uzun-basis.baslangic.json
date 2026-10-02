@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "name": "Gizli düğmeler",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "touch"
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "release"
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "long"
+          },
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": []
+  }
+}

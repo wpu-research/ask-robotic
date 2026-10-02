@@ -1,0 +1,14 @@
+ASK Robotic
+Bu proje üçüncü taraf yazılımlar kullanır ve bir eğitim yaklaşımından esinlenmiştir.
+
+1. Blockly (https://github.com/google/blockly)
+   Copyright Google LLC. Apache License 2.0 ile lisanslıdır.
+   Blok editörü bileşeni olarak `blockly` npm paketi kullanılır; kaynak kodu bu depoya kopyalanmamıştır.
+   Lisans metni: https://www.apache.org/licenses/LICENSE-2.0
+
+2. Blockly Games (https://blockly.games, https://github.com/google/blockly-games)
+   Copyright Google LLC. Apache License 2.0 ile lisanslıdır.
+   "Oyunlar" bölümündeki sekiz oyunun (Bulmaca, Labirent, Kuş, Kaplumbağa, Film, Müzik, Gölet Eğitmeni, Gölet)
+   öğretim amacı ve seviye akışı Blockly Games'ten esinlenmiştir. Bu projedeki oyun motorları, seviye tasarımları,
+   çizimler (SVG/CSS) ve metinler ASK Robotic'e özgüdür; Blockly Games'in kodu, görselleri veya sesleri kopyalanmamıştır.
+   Oyun sayfalarının alt bilgisinde şu not yer alır: "Blockly Games (Google, Apache 2.0) esinlenmiştir."

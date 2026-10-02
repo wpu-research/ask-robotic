@@ -1,0 +1,104 @@
+{
+  "version": 1,
+  "name": "Hava istasyonu",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "mk_temperature"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "controls_if",
+                    "inputs": {
+                      "IF0": {
+                        "block": {
+                          "type": "logic_compare",
+                          "fields": {
+                            "OP": "GT"
+                          },
+                          "inputs": {
+                            "A": {
+                              "block": {
+                                "type": "mk_temperature"
+                              }
+                            },
+                            "B": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 30
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "DO0": {
+                        "block": {
+                          "type": "mk_show_icon",
+                          "fields": {
+                            "ICON": "sad"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_bar",
+                "inputs": {
+                  "V": {
+                    "block": {
+                      "type": "mk_light"
+                    }
+                  },
+                  "MAX": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 255
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        }
+      ]
+    },
+    "variables": []
+  }
+}

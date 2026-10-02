@@ -1,0 +1,247 @@
+{
+  "version": 1,
+  "name": "Düğme ve konuşma",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#62c8ff"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "kedi"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-kedi"
+                                },
+                                "id": "b3926"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b3925"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "kedi"
+                                }
+                              },
+                              "id": "b3928"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b3929"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 60
+                              },
+                              "id": "b3930"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "den_hareket",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "kedi"
+                                    }
+                                  },
+                                  "id": "b3932"
+                                }
+                              },
+                              "N": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 60
+                                  },
+                                  "id": "b3933"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "M": "four"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "kedi"
+                                        }
+                                      },
+                                      "id": "b3935"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "stay",
+                                  "ON": "true"
+                                },
+                                "id": "b3934"
+                              }
+                            },
+                            "id": "b3931"
+                          }
+                        },
+                        "id": "b3927"
+                      }
+                    },
+                    "id": "b3924"
+                  }
+                },
+                "id": "b3923"
+              }
+            }
+          },
+          "id": "b3922",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "kedi",
+        "id": "kedi"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-kedi": {
+      "name": "Kedi",
+      "rows": [
+        "................",
+        "..0..........0..",
+        ".030........030.",
+        ".0330......0330.",
+        ".0333......3330.",
+        ".03333333333330.",
+        ".03333333333330.",
+        ".03366333366330.",
+        ".03333333333330.",
+        ".033cccbbccc330.",
+        ".0333cccccc3330.",
+        "..033333333330..",
+        "..0033cccc3300..",
+        "..033cccccc330..",
+        "..033333333330..",
+        "..000000000000.."
+      ]
+    },
+    "oyuncu-robot": {
+      "name": "Robot",
+      "rows": [
+        ".......00.......",
+        ".......00.......",
+        ".......44.......",
+        "..000000000000..",
+        ".0dddddddddddd0.",
+        ".0d0000dd0000d0.",
+        ".0d4004dd4004d0.",
+        ".0d0000dd0000d0.",
+        ".0dddddddddddd0.",
+        "..0ffff00ffff0..",
+        ".0eeeeeeeeeeee0.",
+        "0d0e22eeee22e0d0",
+        "0d0eeeeeeeeee0d0",
+        ".00eeeeeeeeee00.",
+        "..0ee0eeee0ee0..",
+        "..000000000000.."
+      ]
+    },
+    "oyuncu-astronot": {
+      "name": "Astronot",
+      "rows": [
+        "..000000000000..",
+        ".0cccccccccccc0.",
+        "0cc9999999999cc0",
+        "0c9aaaaaaaaaa9c0",
+        "0c9aaaaaaaaaa9c0",
+        "0cc9aaaaaaaa9cc0",
+        ".0ccc999999ccc0.",
+        ".0cccccccccccc0.",
+        "0cc0cccccccc0cc0",
+        "0c20cccccccc02c0",
+        "0ccccc0cc0ccccc0",
+        ".0cccc0cc0cccc0.",
+        "..0cc0cccc0cc0..",
+        "..0cc00cc00cc0..",
+        "..0dd0dddd0dd0..",
+        "..000000000000.."
+      ]
+    },
+    "oyuncu-ninja": {
+      "name": "Ninja",
+      "rows": [
+        "...0000000000...",
+        "..0ffffffffff0..",
+        ".0ffffffffffff0.",
+        ".0f2f222222f2f0.",
+        ".0fcc0cccc0ccf0.",
+        ".0fcc0cccc0ccf0.",
+        ".0ffffffffffff0.",
+        "..0ffffffffff0..",
+        ".0f2ffffffff2f0.",
+        "0ff2fff00fff2ff0",
+        "0f0ffff00ffff0f0",
+        ".00ffffffffff00.",
+        "..0ff00ff00ff0..",
+        "..0ff0.00.0ff0..",
+        "..0ff0.00.0ff0..",
+        "..00000..00000.."
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

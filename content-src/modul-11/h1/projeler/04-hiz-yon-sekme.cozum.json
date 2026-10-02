@@ -1,0 +1,295 @@
+{
+  "version": 1,
+  "name": "Hız ve sekme",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "top"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "sprite_yeni",
+                      "inputs": {
+                        "IMG": {
+                          "block": {
+                            "type": "oyun_resim",
+                            "fields": {
+                              "IMG": "nesne-top"
+                            },
+                            "id": "b4025"
+                          }
+                        }
+                      },
+                      "fields": {
+                        "K": "nesne"
+                      },
+                      "id": "b4024"
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "sprite_konum",
+                    "inputs": {
+                      "S": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "top"
+                            }
+                          },
+                          "id": "b4027"
+                        }
+                      },
+                      "X": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 80
+                          },
+                          "id": "b4028"
+                        }
+                      },
+                      "Y": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 60
+                          },
+                          "id": "b4029"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sahne_dosemesi",
+                        "inputs": {
+                          "IMG": {
+                            "block": {
+                              "type": "oyun_resim",
+                              "fields": {
+                                "IMG": "karo-cimen"
+                              },
+                              "id": "b4031"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "hareket_hiz",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "top"
+                                    }
+                                  },
+                                  "id": "b4033"
+                                }
+                              },
+                              "VX": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 50
+                                  },
+                                  "id": "b4034"
+                                }
+                              },
+                              "VY": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 35
+                                  },
+                                  "id": "b4035"
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "top"
+                                        }
+                                      },
+                                      "id": "b4037"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "bounce",
+                                  "ON": "true"
+                                },
+                                "id": "b4036"
+                              }
+                            },
+                            "id": "b4032"
+                          }
+                        },
+                        "id": "b4030"
+                      }
+                    },
+                    "id": "b4026"
+                  }
+                },
+                "id": "b4023"
+              }
+            }
+          },
+          "id": "b4022",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "top",
+        "id": "top"
+      }
+    ]
+  },
+  "images": {
+    "nesne-top": {
+      "name": "Top",
+      "rows": [
+        "..0000..",
+        ".0cccc0.",
+        "0cc9999.",
+        "0c999990",
+        "09999990",
+        "09999990",
+        ".099990.",
+        "..0000.."
+      ]
+    },
+    "nesne-yildiz": {
+      "name": "Yıldız",
+      "rows": [
+        ".......00.......",
+        ".......00.......",
+        "......0440......",
+        "......0440......",
+        "00000044000000..",
+        "0444444444444440",
+        ".04444444444440.",
+        "..044444444440..",
+        "..044444444440..",
+        ".04444444444440.",
+        ".04440044004440.",
+        "04440.0000.04440",
+        "0440........0440",
+        "00............00",
+        "................",
+        "................"
+      ]
+    },
+    "karo-cimen": {
+      "name": "Çimen",
+      "rows": [
+        "6666666666666666",
+        "6666566666666666",
+        "6666666666656666",
+        "6566666666666666",
+        "6666666666666656",
+        "6666666566666666",
+        "6666666666666666",
+        "5666666666566666",
+        "6666666666666666",
+        "6666566666666666",
+        "6666666666666666",
+        "6666666666666566",
+        "6566666666666666",
+        "6666666666666666",
+        "6666666656666666",
+        "6666666666666666"
+      ]
+    },
+    "karo-zemin": {
+      "name": "Zemin",
+      "rows": [
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "edeedeedeedeedee",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "dddddddddddddddd",
+        "edeedeedeedeedee"
+      ]
+    },
+    "karo-kum": {
+      "name": "Kum",
+      "rows": [
+        "4444444444444444",
+        "4444444344444444",
+        "4444444444444434",
+        "4344444444444444",
+        "4444444444434444",
+        "4444444444444444",
+        "4444344444444444",
+        "4444444444444443",
+        "4444444444444444",
+        "4444444344444444",
+        "4344444444444444",
+        "4444444444443444",
+        "4444444444444444",
+        "4444344444444444",
+        "4444444444444434",
+        "4444444444444444"
+      ]
+    },
+    "karo-su": {
+      "name": "Su",
+      "rows": [
+        "9999999999999999",
+        "99aa999999aa9999",
+        "a9999999a9999999",
+        "9999aa9999999aa9",
+        "9999999999999999",
+        "9aa9999999aa9999",
+        "9999999a99999999",
+        "99999aa999999aa9",
+        "9999999999999999",
+        "a9999999aa999999",
+        "99aa999999999a99",
+        "9999999999aa9999",
+        "9999999999999999",
+        "9aa9999a99999999",
+        "9999999999aa9999",
+        "9999999999999999"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

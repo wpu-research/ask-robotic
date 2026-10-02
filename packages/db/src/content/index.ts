@@ -4,6 +4,8 @@ import { modul2 } from './modul-2-scratch'
 import { modul3 } from './arduino-temelleri.generated'
 import { modul4 } from './sensorler-ve-projeler.generated'
 import { modul5 } from './robotik.generated'
+import { modul10 } from './mikro-kart.generated'
+import { modul11 } from './oyun-atolyesi.generated'
 
 export * from './types'
-export const allModules: ModuleContent[] = [modul1, modul2, modul3, modul4, modul5]
+export const allModules: ModuleContent[] = [modul1, modul2, modul3, modul4, modul5, modul10, modul11]

@@ -1,0 +1,167 @@
+{
+  "version": 1,
+  "name": "Devriye",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#213a8f"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "yarasa"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "dusman-yarasa"
+                                },
+                                "id": "b5365"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "dusman"
+                          },
+                          "id": "b5364"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "yarasa"
+                                }
+                              },
+                              "id": "b5367"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 40
+                              },
+                              "id": "b5368"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 60
+                              },
+                              "id": "b5369"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "hareket_hiz",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "yarasa"
+                                    }
+                                  },
+                                  "id": "b5371"
+                                }
+                              },
+                              "VX": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 40
+                                  },
+                                  "id": "b5372"
+                                }
+                              },
+                              "VY": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 0
+                                  },
+                                  "id": "b5373"
+                                }
+                              }
+                            },
+                            "id": "b5370"
+                          }
+                        },
+                        "id": "b5366"
+                      }
+                    },
+                    "id": "b5363"
+                  }
+                },
+                "id": "b5362"
+              }
+            }
+          },
+          "id": "b5361",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "yarasa",
+        "id": "yarasa"
+      }
+    ]
+  },
+  "images": {
+    "dusman-yarasa": {
+      "name": "Yarasa",
+      "rows": [
+        "................",
+        "0..............0",
+        "00.....00.....00",
+        "070...0770...070",
+        "0770.077770.0770",
+        "0777077777707770",
+        "0777777777777770",
+        "07777c0770c77770",
+        "0777777777777770",
+        ".07777777777770.",
+        "..077077770770..",
+        "...0.007700.0...",
+        "................",
+        "................",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

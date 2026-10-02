@@ -22,6 +22,10 @@ export interface CatalogModule {
 }
 
 export function lessonKind(moduleSlug: string, weekPos: number, lessonPos: number): LessonKind {
+  // Mikro Kart ve Oyun Atölyesi: 6 hafta x 5 ders, hepsinin etkinliği vardır (testlerle doğrulanır; sunucuda etkinlik kodu yüklenmesin diye anahtar kuralı).
+  const inRange = weekPos >= 1 && weekPos <= 6 && lessonPos >= 1 && lessonPos <= 5
+  if (moduleSlug === 'mikro-kart' && inRange) return 'blok'
+  if (moduleSlug === 'oyun-atolyesi' && inRange) return 'oyun'
   const key = activityKey(moduleSlug, weekPos, lessonPos)
   if (getArenaActivity(key)) return 'arena'
   if (getLabActivity(key)) return 'devre'

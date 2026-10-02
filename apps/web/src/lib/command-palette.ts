@@ -42,7 +42,7 @@ function score(item: PaletteItem, words: string[]): number {
 export function filterPalette(items: PaletteItem[], query: string, limit = 24): PaletteItem[] {
   const words = normTr(query).split(' ').filter(Boolean)
   if (!words.length) {
-    const quota: Record<PaletteGroup, number> = { Sayfa: 6, Araç: 3, Modül: 5, Ders: 0, Parça: 0 }
+    const quota: Record<PaletteGroup, number> = { Sayfa: 6, Araç: 6, Modül: 5, Ders: 0, Parça: 0 }
     return GROUP_ORDER.flatMap((g) => items.filter((i) => i.group === g).slice(0, quota[g]))
   }
   const scored = items.map((item, idx) => ({ item, idx, s: score(item, words) })).filter((x) => x.s >= 0)
@@ -58,4 +58,7 @@ export const STATIC_ITEMS: PaletteItem[] = [
   { id: 'a:atolye', group: 'Araç', title: 'Blok atölyesi', subtitle: 'Serbest blok programlama', href: '/atolye', keywords: 'blok scratch karakter' },
   { id: 'a:lab', group: 'Araç', title: 'Devre laboratuvarı', subtitle: 'Sanal Arduino ve devre', href: '/laboratuvar', keywords: 'arduino uno devre simülatör' },
   { id: 'a:arena', group: 'Araç', title: 'Robot arenası', subtitle: 'Sanal robot sürüşü', href: '/arena', keywords: 'robot çizgi labirent' },
+  { id: 'a:oyunlar', group: 'Araç', title: 'Oyunlar', subtitle: 'Bloklarla 8 öğretici oyun', href: '/oyunlar', keywords: 'blockly games bulmaca labirent kuş kaplumbağa film müzik gölet' },
+  { id: 'a:mikro-kart', group: 'Araç', title: 'Mikro Kart atölyesi', subtitle: 'Sanal LED kartı bloklarla programla', href: '/mikro-kart', keywords: 'mikro kart led düğme sensör radyo ivme pusula sanal kart' },
+  { id: 'a:oyun-atolyesi', group: 'Araç', title: 'Oyun atölyesi', subtitle: 'Bloklarla kendi oyununu yap', href: '/oyun-atolyesi', keywords: 'oyun yap sprite harita piksel karakter platform' },
 ]

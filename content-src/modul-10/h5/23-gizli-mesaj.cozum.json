@@ -1,0 +1,221 @@
+{
+  "version": 1,
+  "name": "Şifreli mesaj",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_group",
+                "inputs": {
+                  "G": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 1
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "v_gizli"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 0
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "variables_set",
+                        "fields": {
+                          "VAR": {
+                            "id": "v_anahtar"
+                          }
+                        },
+                        "inputs": {
+                          "VALUE": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 7
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "math_change",
+                "fields": {
+                  "VAR": {
+                    "id": "v_gizli"
+                  }
+                },
+                "inputs": {
+                  "DELTA": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 1
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_show_number",
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "variables_get",
+                          "fields": {
+                            "VAR": {
+                              "id": "v_gizli"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_radio_send_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_arithmetic",
+                      "fields": {
+                        "OP": "ADD"
+                      },
+                      "inputs": {
+                        "A": {
+                          "block": {
+                            "type": "variables_get",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_gizli"
+                              }
+                            }
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "variables_get",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_anahtar"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_radio",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_number",
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_arithmetic",
+                      "fields": {
+                        "OP": "MINUS"
+                      },
+                      "inputs": {
+                        "A": {
+                          "block": {
+                            "type": "mk_radio_recv",
+                            "fields": {
+                              "KIND": "number"
+                            }
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "variables_get",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_anahtar"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 624
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "gizli",
+        "id": "v_gizli"
+      },
+      {
+        "name": "anahtar",
+        "id": "v_anahtar"
+      }
+    ]
+  }
+}

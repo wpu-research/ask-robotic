@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "name": "İlk nota",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "note"
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "Do",
+                      "BEATS": "1"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_play_note",
+                        "fields": {
+                          "NOTE": "Re",
+                          "BEATS": "1"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_play_note",
+                            "fields": {
+                              "NOTE": "Mi",
+                              "BEATS": "1"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

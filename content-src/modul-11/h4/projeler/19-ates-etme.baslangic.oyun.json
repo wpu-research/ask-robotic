@@ -1,0 +1,296 @@
+{
+  "version": 1,
+  "name": "Ateş",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#15131f"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "gemi"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "oyuncu-gemi"
+                                },
+                                "id": "b5587"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "oyuncu"
+                          },
+                          "id": "b5586"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "gemi"
+                                }
+                              },
+                              "id": "b5589"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b5590"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 100
+                              },
+                              "id": "b5591"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "den_hareket",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "gemi"
+                                    }
+                                  },
+                                  "id": "b5593"
+                                }
+                              },
+                              "N": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 80
+                                  },
+                                  "id": "b5594"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "M": "h"
+                            },
+                            "next": {
+                              "block": {
+                                "type": "sprite_bayrak",
+                                "inputs": {
+                                  "S": {
+                                    "block": {
+                                      "type": "variables_get",
+                                      "fields": {
+                                        "VAR": {
+                                          "id": "gemi"
+                                        }
+                                      },
+                                      "id": "b5596"
+                                    }
+                                  }
+                                },
+                                "fields": {
+                                  "F": "stay",
+                                  "ON": "true"
+                                },
+                                "next": {
+                                  "block": {
+                                    "type": "variables_set",
+                                    "fields": {
+                                      "VAR": {
+                                        "id": "uzayli"
+                                      }
+                                    },
+                                    "inputs": {
+                                      "VALUE": {
+                                        "block": {
+                                          "type": "sprite_yeni",
+                                          "inputs": {
+                                            "IMG": {
+                                              "block": {
+                                                "type": "oyun_resim",
+                                                "fields": {
+                                                  "IMG": "dusman-uzayli"
+                                                },
+                                                "id": "b5599"
+                                              }
+                                            }
+                                          },
+                                          "fields": {
+                                            "K": "dusman"
+                                          },
+                                          "id": "b5598"
+                                        }
+                                      }
+                                    },
+                                    "next": {
+                                      "block": {
+                                        "type": "sprite_konum",
+                                        "inputs": {
+                                          "S": {
+                                            "block": {
+                                              "type": "variables_get",
+                                              "fields": {
+                                                "VAR": {
+                                                  "id": "uzayli"
+                                                }
+                                              },
+                                              "id": "b5601"
+                                            }
+                                          },
+                                          "X": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 80
+                                              },
+                                              "id": "b5602"
+                                            }
+                                          },
+                                          "Y": {
+                                            "block": {
+                                              "type": "math_number",
+                                              "fields": {
+                                                "NUM": 20
+                                              },
+                                              "id": "b5603"
+                                            }
+                                          }
+                                        },
+                                        "next": {
+                                          "block": {
+                                            "type": "oyun_skor_ayarla",
+                                            "inputs": {
+                                              "N": {
+                                                "block": {
+                                                  "type": "math_number",
+                                                  "fields": {
+                                                    "NUM": 0
+                                                  },
+                                                  "id": "b5605"
+                                                }
+                                              }
+                                            },
+                                            "id": "b5604"
+                                          }
+                                        },
+                                        "id": "b5600"
+                                      }
+                                    },
+                                    "id": "b5597"
+                                  }
+                                },
+                                "id": "b5595"
+                              }
+                            },
+                            "id": "b5592"
+                          }
+                        },
+                        "id": "b5588"
+                      }
+                    },
+                    "id": "b5585"
+                  }
+                },
+                "id": "b5584"
+              }
+            }
+          },
+          "id": "b5583",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "gemi",
+        "id": "gemi"
+      },
+      {
+        "name": "uzayli",
+        "id": "uzayli"
+      }
+    ]
+  },
+  "images": {
+    "oyuncu-gemi": {
+      "name": "Uzay gemisi",
+      "rows": [
+        ".......00.......",
+        ".......00.......",
+        "......0cc0......",
+        "......0cc0......",
+        ".....0cccc0.....",
+        ".....0c99c0.....",
+        ".....0c99c0.....",
+        "....0cc99cc0....",
+        ".0..0cccccc0..0.",
+        ".0e0ddccccdd0e0.",
+        "0e20dddddddd02e0",
+        "0e20dddddddd02e0",
+        "0e2dddd00dddd2e0",
+        "0220dd0..0dd0220",
+        ".00.03000030.00.",
+        "....04300340...."
+      ]
+    },
+    "dusman-uzayli": {
+      "name": "Uzaylı",
+      "rows": [
+        "...0........0...",
+        "....0......0....",
+        "...0000..0000...",
+        "..066666666660..",
+        ".06666666666660.",
+        ".066c066660c660.",
+        ".06666666666660.",
+        ".06666666666660.",
+        ".06606600660660.",
+        "..066666666660..",
+        "..060000000060..",
+        ".060........060.",
+        ".060........060.",
+        "0600........0060",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

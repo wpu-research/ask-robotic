@@ -1,0 +1,200 @@
+{
+  "version": 1,
+  "name": "Devriye",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#213a8f"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "yarasa"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "dusman-yarasa"
+                                },
+                                "id": "b5391"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "dusman"
+                          },
+                          "id": "b5390"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "yarasa"
+                                }
+                              },
+                              "id": "b5393"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 40
+                              },
+                              "id": "b5394"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 60
+                              },
+                              "id": "b5395"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "hareket_hiz",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "yarasa"
+                                    }
+                                  },
+                                  "id": "b5397"
+                                }
+                              },
+                              "VX": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 40
+                                  },
+                                  "id": "b5398"
+                                }
+                              },
+                              "VY": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 0
+                                  },
+                                  "id": "b5399"
+                                }
+                              }
+                            },
+                            "id": "b5396"
+                          }
+                        },
+                        "id": "b5392"
+                      }
+                    },
+                    "id": "b5389"
+                  }
+                },
+                "id": "b5388"
+              }
+            }
+          },
+          "id": "b5387",
+          "x": 20,
+          "y": 20
+        },
+        {
+          "type": "oyun_her_n_ms",
+          "fields": {
+            "MS": 1500
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "hareket_ters",
+                "inputs": {
+                  "S": {
+                    "block": {
+                      "type": "variables_get",
+                      "fields": {
+                        "VAR": {
+                          "id": "yarasa"
+                        }
+                      },
+                      "id": "b5402"
+                    }
+                  }
+                },
+                "fields": {
+                  "A": "x"
+                },
+                "id": "b5401"
+              }
+            }
+          },
+          "id": "b5400",
+          "x": 20,
+          "y": 286
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "yarasa",
+        "id": "yarasa"
+      }
+    ]
+  },
+  "images": {
+    "dusman-yarasa": {
+      "name": "Yarasa",
+      "rows": [
+        "................",
+        "0..............0",
+        "00.....00.....00",
+        "070...0770...070",
+        "0770.077770.0770",
+        "0777077777707770",
+        "0777777777777770",
+        "07777c0770c77770",
+        "0777777777777770",
+        ".07777777777770.",
+        "..077077770770..",
+        "...0.007700.0...",
+        "................",
+        "................",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

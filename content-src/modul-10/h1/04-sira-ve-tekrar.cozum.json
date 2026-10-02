@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "name": "Üç yanıp sönme",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_repeat_ext",
+                "inputs": {
+                  "TIMES": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 3
+                      }
+                    }
+                  },
+                  "DO": {
+                    "block": {
+                      "type": "mk_show_icon",
+                      "fields": {
+                        "ICON": "square"
+                      },
+                      "next": {
+                        "block": {
+                          "type": "mk_pause",
+                          "inputs": {
+                            "MS": {
+                              "block": {
+                                "type": "math_number",
+                                "fields": {
+                                  "NUM": 300
+                                }
+                              }
+                            }
+                          },
+                          "next": {
+                            "block": {
+                              "type": "mk_clear",
+                              "next": {
+                                "block": {
+                                  "type": "mk_pause",
+                                  "inputs": {
+                                    "MS": {
+                                      "block": {
+                                        "type": "math_number",
+                                        "fields": {
+                                          "NUM": 300
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_show_icon",
+                    "fields": {
+                      "ICON": "yes"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

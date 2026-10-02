@@ -1,0 +1,162 @@
+{
+  "version": 1,
+  "name": "Rastgele",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#213a8f"
+                },
+                "next": {
+                  "block": {
+                    "type": "variables_set",
+                    "fields": {
+                      "VAR": {
+                        "id": "yarasa"
+                      }
+                    },
+                    "inputs": {
+                      "VALUE": {
+                        "block": {
+                          "type": "sprite_yeni",
+                          "inputs": {
+                            "IMG": {
+                              "block": {
+                                "type": "oyun_resim",
+                                "fields": {
+                                  "IMG": "dusman-yarasa"
+                                },
+                                "id": "b5527"
+                              }
+                            }
+                          },
+                          "fields": {
+                            "K": "dusman"
+                          },
+                          "id": "b5526"
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "sprite_konum",
+                        "inputs": {
+                          "S": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "yarasa"
+                                }
+                              },
+                              "id": "b5529"
+                            }
+                          },
+                          "X": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 80
+                              },
+                              "id": "b5530"
+                            }
+                          },
+                          "Y": {
+                            "block": {
+                              "type": "math_number",
+                              "fields": {
+                                "NUM": 60
+                              },
+                              "id": "b5531"
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "sprite_bayrak",
+                            "inputs": {
+                              "S": {
+                                "block": {
+                                  "type": "variables_get",
+                                  "fields": {
+                                    "VAR": {
+                                      "id": "yarasa"
+                                    }
+                                  },
+                                  "id": "b5533"
+                                }
+                              }
+                            },
+                            "fields": {
+                              "F": "stay",
+                              "ON": "true"
+                            },
+                            "id": "b5532"
+                          }
+                        },
+                        "id": "b5528"
+                      }
+                    },
+                    "id": "b5525"
+                  }
+                },
+                "id": "b5524"
+              }
+            }
+          },
+          "id": "b5523",
+          "x": 20,
+          "y": 20
+        },
+        {
+          "type": "oyun_her_n_ms",
+          "fields": {
+            "MS": 700
+          },
+          "id": "b5534",
+          "x": 20,
+          "y": 286
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "yarasa",
+        "id": "yarasa"
+      }
+    ]
+  },
+  "images": {
+    "dusman-yarasa": {
+      "name": "Yarasa",
+      "rows": [
+        "................",
+        "0..............0",
+        "00.....00.....00",
+        "070...0770...070",
+        "0770.077770.0770",
+        "0777077777707770",
+        "0777777777777770",
+        "07777c0770c77770",
+        "0777777777777770",
+        ".07777777777770.",
+        "..077077770770..",
+        "...0.007700.0...",
+        "................",
+        "................",
+        "................",
+        "................"
+      ]
+    }
+  },
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

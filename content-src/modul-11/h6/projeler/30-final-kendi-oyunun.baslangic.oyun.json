@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "name": "Kendi oyunum",
+  "blocks": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "oyun_baslangic",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "sahne_renk",
+                "fields": {
+                  "C": "#213a8f"
+                },
+                "id": "b8044"
+              }
+            }
+          },
+          "id": "b8043",
+          "x": 20,
+          "y": 20
+        }
+      ]
+    },
+    "variables": []
+  },
+  "images": {},
+  "tileset": [],
+  "maps": [],
+  "bg": 8
+}

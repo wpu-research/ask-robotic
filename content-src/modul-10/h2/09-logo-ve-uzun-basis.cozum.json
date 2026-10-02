@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "name": "Gizli düğmeler",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "touch"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "heart"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "release"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_clear"
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "long"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "asleep"
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        }
+      ]
+    },
+    "variables": []
+  }
+}

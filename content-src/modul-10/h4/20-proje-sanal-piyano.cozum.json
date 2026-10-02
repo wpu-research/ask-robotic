@@ -1,0 +1,480 @@
+{
+  "version": 1,
+  "name": "Sanal piyano",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_kayit"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "lists_create_with",
+                      "extraState": {
+                        "itemCount": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "A",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_plot",
+                "inputs": {
+                  "X": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  },
+                  "Y": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "Do",
+                      "BEATS": "0.5"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_list_add",
+                        "inputs": {
+                          "LIST": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "v_kayit"
+                                }
+                              }
+                            }
+                          },
+                          "ITEM": {
+                            "block": {
+                              "type": "mk_note",
+                              "fields": {
+                                "NOTE": "Do"
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_clear"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "B",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_plot",
+                "inputs": {
+                  "X": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 1
+                      }
+                    }
+                  },
+                  "Y": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "Re",
+                      "BEATS": "0.5"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_list_add",
+                        "inputs": {
+                          "LIST": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "v_kayit"
+                                }
+                              }
+                            }
+                          },
+                          "ITEM": {
+                            "block": {
+                              "type": "mk_note",
+                              "fields": {
+                                "NOTE": "Re"
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_clear"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 424
+        },
+        {
+          "type": "mk_on_button",
+          "fields": {
+            "BTN": "AB",
+            "EV": "press"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_plot",
+                "inputs": {
+                  "X": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  },
+                  "Y": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "Mi",
+                      "BEATS": "0.5"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_list_add",
+                        "inputs": {
+                          "LIST": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "v_kayit"
+                                }
+                              }
+                            }
+                          },
+                          "ITEM": {
+                            "block": {
+                              "type": "mk_note",
+                              "fields": {
+                                "NOTE": "Mi"
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_clear"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 624
+        },
+        {
+          "type": "mk_on_pin",
+          "fields": {
+            "PIN": "P0",
+            "EV": "touch"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_plot",
+                "inputs": {
+                  "X": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 3
+                      }
+                    }
+                  },
+                  "Y": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "Sol",
+                      "BEATS": "0.5"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_list_add",
+                        "inputs": {
+                          "LIST": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "v_kayit"
+                                }
+                              }
+                            }
+                          },
+                          "ITEM": {
+                            "block": {
+                              "type": "mk_note",
+                              "fields": {
+                                "NOTE": "Sol"
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_clear"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 824
+        },
+        {
+          "type": "mk_on_pin",
+          "fields": {
+            "PIN": "P1",
+            "EV": "touch"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_plot",
+                "inputs": {
+                  "X": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 4
+                      }
+                    }
+                  },
+                  "Y": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 2
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_play_note",
+                    "fields": {
+                      "NOTE": "La",
+                      "BEATS": "0.5"
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_list_add",
+                        "inputs": {
+                          "LIST": {
+                            "block": {
+                              "type": "variables_get",
+                              "fields": {
+                                "VAR": {
+                                  "id": "v_kayit"
+                                }
+                              }
+                            }
+                          },
+                          "ITEM": {
+                            "block": {
+                              "type": "mk_note",
+                              "fields": {
+                                "NOTE": "La"
+                              }
+                            }
+                          }
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_clear"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 1024
+        },
+        {
+          "type": "mk_on_logo",
+          "fields": {
+            "EV": "touch"
+          },
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_forEach",
+                "fields": {
+                  "VAR": {
+                    "id": "v_öğe"
+                  }
+                },
+                "inputs": {
+                  "LIST": {
+                    "block": {
+                      "type": "variables_get",
+                      "fields": {
+                        "VAR": {
+                          "id": "v_kayit"
+                        }
+                      }
+                    }
+                  },
+                  "DO": {
+                    "block": {
+                      "type": "mk_play_tone",
+                      "fields": {
+                        "BEATS": "0.5"
+                      },
+                      "inputs": {
+                        "FREQ": {
+                          "block": {
+                            "type": "variables_get",
+                            "fields": {
+                              "VAR": {
+                                "id": "v_öğe"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_pause",
+                    "inputs": {
+                      "MS": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 100
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 1224
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "kayit",
+        "id": "v_kayit"
+      },
+      {
+        "name": "öğe",
+        "id": "v_öğe"
+      }
+    ]
+  }
+}

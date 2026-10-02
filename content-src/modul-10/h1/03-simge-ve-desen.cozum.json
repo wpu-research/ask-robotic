@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "name": "Yüzler",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "mk_show_icon",
+                "fields": {
+                  "ICON": "happy"
+                },
+                "next": {
+                  "block": {
+                    "type": "mk_pause",
+                    "inputs": {
+                      "MS": {
+                        "block": {
+                          "type": "math_number",
+                          "fields": {
+                            "NUM": 1000
+                          }
+                        }
+                      }
+                    },
+                    "next": {
+                      "block": {
+                        "type": "mk_show_icon",
+                        "fields": {
+                          "ICON": "sad"
+                        },
+                        "next": {
+                          "block": {
+                            "type": "mk_pause",
+                            "inputs": {
+                              "MS": {
+                                "block": {
+                                  "type": "math_number",
+                                  "fields": {
+                                    "NUM": 1000
+                                  }
+                                }
+                              }
+                            },
+                            "next": {
+                              "block": {
+                                "type": "mk_show_leds",
+                                "fields": {
+                                  "LEDS": "0010001110101011111110101"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        }
+      ]
+    },
+    "variables": []
+  }
+}

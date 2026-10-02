@@ -1,0 +1,141 @@
+{
+  "version": 1,
+  "name": "Alkış sayacı",
+  "workspace": {
+    "blocks": {
+      "languageVersion": 0,
+      "blocks": [
+        {
+          "type": "mk_on_start",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "variables_set",
+                "fields": {
+                  "VAR": {
+                    "id": "v_alkis"
+                  }
+                },
+                "inputs": {
+                  "VALUE": {
+                    "block": {
+                      "type": "math_number",
+                      "fields": {
+                        "NUM": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 24
+        },
+        {
+          "type": "mk_forever",
+          "inputs": {
+            "DO": {
+              "block": {
+                "type": "controls_if",
+                "extraState": {
+                  "hasElse": true
+                },
+                "inputs": {
+                  "IF0": {
+                    "block": {
+                      "type": "logic_compare",
+                      "fields": {
+                        "OP": "GT"
+                      },
+                      "inputs": {
+                        "A": {
+                          "block": {
+                            "type": "mk_sound"
+                          }
+                        },
+                        "B": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 150
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "DO0": {
+                    "block": {
+                      "type": "math_change",
+                      "fields": {
+                        "VAR": {
+                          "id": "v_alkis"
+                        }
+                      },
+                      "inputs": {
+                        "DELTA": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 1
+                            }
+                          }
+                        }
+                      },
+                      "next": {
+                        "block": {
+                          "type": "mk_show_number",
+                          "inputs": {
+                            "VALUE": {
+                              "block": {
+                                "type": "variables_get",
+                                "fields": {
+                                  "VAR": {
+                                    "id": "v_alkis"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "ELSE": {
+                    "block": {
+                      "type": "mk_show_bar",
+                      "inputs": {
+                        "V": {
+                          "block": {
+                            "type": "mk_sound"
+                          }
+                        },
+                        "MAX": {
+                          "block": {
+                            "type": "math_number",
+                            "fields": {
+                              "NUM": 255
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "x": 24,
+          "y": 224
+        }
+      ]
+    },
+    "variables": [
+      {
+        "name": "alkis",
+        "id": "v_alkis"
+      }
+    ]
+  }
+}
