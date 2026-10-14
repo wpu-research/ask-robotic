@@ -6,7 +6,7 @@ import { getModuleTree, listModules } from './content'
 import { MODULE_META, moduleKind, type LessonKind, type ModuleKind } from './module-meta'
 
 /** Panel ve arama için düz, JSON'a çevrilebilir müfredat görünümü. */
-export interface CatalogLesson { id: number; title: string; durationMin: number; kind: LessonKind; position: number }
+export interface CatalogLesson { id: number; title: string; durationMin: number; kind: LessonKind; position: number; /** Etkileşimli (v2) adımları var: adım sayısı. */ steps?: number }
 export interface CatalogWeek { id: number; position: number; title: string; project: string | null; /** Haftalık çalışma rehberi var mı (metni modül sayfası ayrıca yükler; panel verisi şişmesin). */ hasGuide?: boolean; lessons: CatalogLesson[] }
 export interface CatalogModule {
   id: number
@@ -48,7 +48,7 @@ function toCatalogModule(m: Tree['module'], tree: Tree | null): CatalogModule {
     tagline: meta?.tagline ?? '', audience: meta?.audience ?? '',
     weeks: (tree?.weeks ?? []).map((w) => ({
       id: w.id, position: w.position, title: w.title, project: w.project ?? null, hasGuide: !!w.guideMd,
-      lessons: w.lessons.map((l) => ({ id: l.id, title: l.title, durationMin: l.durationMin, position: l.position, kind: lessonKind(m.slug, w.position, l.position) })),
+      lessons: w.lessons.map((l) => ({ id: l.id, title: l.title, durationMin: l.durationMin, position: l.position, kind: lessonKind(m.slug, w.position, l.position), ...(l.steps?.length ? { steps: l.steps.length } : {}) })),
     })),
   }
 }

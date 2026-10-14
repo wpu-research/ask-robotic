@@ -53,7 +53,7 @@ export function filterPalette(items: PaletteItem[], query: string, limit = 24): 
 }
 
 export const STATIC_ITEMS: PaletteItem[] = [
-  { id: 'p:panel', group: 'Sayfa', title: 'Panel', subtitle: 'Ana sayfa', href: '/', keywords: 'ana sayfa devam ilerleme' },
+  { id: 'p:panel', group: 'Sayfa', title: 'Panel', subtitle: 'Ana sayfa', href: '/panel', keywords: 'ana sayfa devam ilerleme' },
   { id: 'p:moduller', group: 'Sayfa', title: 'Modüller', subtitle: 'Tüm modüller', href: '/moduller', keywords: 'müfredat dersler' },
   { id: 'p:parcalar', group: 'Sayfa', title: 'Parçalar', subtitle: 'Parça ansiklopedisi', href: '/parcalar', keywords: 'led direnç buton potansiyometre buzzer arduino uno ansiklopedi bileşen' },
   { id: 'p:testler', group: 'Sayfa', title: 'Testlerim', subtitle: 'Mini testler ve puanlar', href: '/testler', keywords: 'sınav quiz soru puan' },

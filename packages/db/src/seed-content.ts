@@ -39,6 +39,8 @@ export async function seedContent(db: Db, content: ModuleContent[] = allModules)
             explainerMd: l.explainerMd ?? null,
             concepts: l.concepts ?? null,
             quiz: l.quiz ?? null,
+            steps: l.steps ?? null,
+            stepsEn: l.stepsEn ?? null,
           })
           .onConflictDoUpdate({
             target: [lessons.weekId, lessons.position],
@@ -51,6 +53,8 @@ export async function seedContent(db: Db, content: ModuleContent[] = allModules)
               explainerMd: l.explainerMd ?? null,
               concepts: l.concepts ?? null,
               quiz: l.quiz ?? null,
+              steps: l.steps ?? null,
+              stepsEn: l.stepsEn ?? null,
             },
           })
       }

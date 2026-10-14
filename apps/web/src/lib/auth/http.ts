@@ -21,6 +21,8 @@ export async function readSessionToken() {
   return (await cookies()).get(SESSION_COOKIE)?.value
 }
 
+export const ipOf = (req: Request) => req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+
 export function clientKey(req: Request, email: string) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
   return `${ip}|${email.toLowerCase()}`

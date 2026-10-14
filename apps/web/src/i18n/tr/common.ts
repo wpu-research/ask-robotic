@@ -1,0 +1,33 @@
+// Ortak metinler (birden çok ekranda). İngilizcesi: ../en/common.ts
+export const common = {
+  appName: 'ASK Robotic',
+  tagline: "0'dan AI robotik mühendisliğine",
+  metaDescription: "0'dan AI robotik mühendisliğine: Scratch'ten Arduino'ya, sensörlerden robotlara adım adım dersler.",
+  loading: 'Yükleniyor…',
+  save: 'Kaydet',
+  cancel: 'Vazgeç',
+  close: 'Kapat',
+  back: 'Geri',
+  next: 'İleri',
+  continue: 'Devam et',
+  retry: 'Tekrar dene',
+  soon: 'Yakında',
+  errorGeneric: 'Bir şeyler ters gitti. Biraz sonra tekrar dene.',
+  errorNetwork: 'Bağlantı kurulamadı. İnternetini kontrol et.',
+  language: {
+    label: 'Dil',
+    switchTo: 'Dili değiştir: {name}',
+    tr: 'Türkçe',
+    en: 'English',
+  },
+  lessonOnlyTurkish: 'Bu ders şimdilik yalnız Türkçe.',
+  lessonFallbackTitle: 'Ders',
+  weekLabel: '{n}. hafta · {title}',
+  weekLabelClassic: '{n}. hafta: {title}',
+  legalOnlyTurkish: 'Yasal metinler yalnız Türkçe yayımlanır.',
+  badges: {
+    kind: { blok: 'Blok', devre: 'Devre', robot: 'Robot', oyun: 'Oyun', ai: 'AI' },
+    lessonKind: { metin: 'Metin', blok: 'Blok', devre: 'Devre', arena: 'Arena', oyun: 'Oyun', ai: 'AI' },
+    status: { yok: 'Yapılmadı', suruyor: 'Sürüyor', bitti: 'Bitti' },
+  },
+}

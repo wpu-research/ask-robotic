@@ -146,6 +146,35 @@ Robot verdiğin komutları sırayla yapar. Sıra değişirse sonuç da değişir
           q({ id: 'm1h1d1-q3', kind: 'find-bug', prompt: 'Robot önce sağa gidip sonra aşağı inecek. Hangi betik hatalı?\n\n' + kod('A: 🏁 → ➡️ İleri → ↩️ Sağa dön → ➡️ İleri', 'B: 🏁 → ↩️ Sağa dön → ➡️ İleri → ➡️ İleri'), options: ['A hatalı', 'B hatalı'], answer: 1, explanation: 'B\'de robot önce dönüyor. Bu yüzden hemen aşağı yürür, sağa hiç gitmez. Önce İleri, sonra dönüş gerekir. A doğrudur.', skills: ['jr-sequence', 'jr-debug'] }),
           q({ id: 'm1h1d1-q4', kind: 'numeric', prompt: 'Robot bu betiği yapıyor. Toplam kaç adım yürür?\n\n' + kod('🏁 Yeşil bayrak', '➡️ İleri 7', '↩️ Sağa dön', '➡️ İleri 6'), answer: 13, unit: 'adım', explanation: 'Önce 7 adım, sonra 6 adım yürür: 7 + 6 = 13. Dönmek adım sayılmaz.', skills: ['jr-motion'] }),
         ],
+        // Etkileşimli ders (v2). 5-7 yaş: kısa cümleler, en çok 3 seçenek; metinler sesli okunur.
+        // Sayılar etkinlikten: robot sağa bakar, yıldıza İleri 7, Sağa dön, İleri 6 ile varır.
+        steps: [
+          { kind: 'intro', art: 'robot', title: 'Robot oyunu', body: 'Bu bir robot. Uzakta bir yıldız var. Hadi robotu yıldıza götürelim!' },
+          { kind: 'choice', prompt: 'Robot ne yapar? 🤖', options: ['🤔 Aklına geleni yapar', '🧩 Benim komutlarımı yapar'], answer: 1, why: 'Robot kendi kendine düşünmez. Yalnızca senin verdiğin komutları yapar.', hint: 'Robot kendi kendine bir şey düşünebilir mi?', skills: ['jr-sequence'] },
+          { kind: 'explain', art: 'robot', body: 'Komutlar bloktur. **İleri** robotu yürütür, içindeki sayı adım sayısıdır. **Sağa dön** robotu çevirir.' },
+          { kind: 'choice', prompt: 'Robot sağa bakıyor. **Sağa dön** yapınca nereye bakar?', options: ['⬆️ Yukarı', '⬇️ Aşağı', '⬅️ Sola'], answer: 1, why: 'Sağa bakan robot Sağa dön yapınca aşağı bakar. Yukarı bakması için Sola dön gerekir.', hint: 'Robotun yüzü sağda. Onu biraz sağa çevir.', skills: ['jr-motion'] },
+          { kind: 'numeric', prompt: 'Robot bu blokları yaptı. Kaç adım yürüdü?', code: '🏁 Yeşil bayrak\n➡️ İleri 2\n➡️ İleri 3', answer: 5, unit: 'adım', why: 'Önce 2 adım, sonra 3 adım yürüdü. 2 ile 3, 5 eder.', hint: 'İki bloktaki sayıları birlikte say.', skills: ['jr-motion'] },
+          { kind: 'explain', art: 'robot', body: 'Robot blokları yukarıdan aşağıya, sırayla yapar. Sıra değişirse robot başka yere gider.' },
+          { kind: 'order', prompt: 'Robot önce sağa gitsin, sonra aşağı insin. Blokları sırala.', lines: ['➡️ İleri 7', '↩️ Sağa dön', '➡️ İleri 6'], why: 'Robot sağa bakıyor. Önce İleri 7 ile sağa yürür. Sonra Sağa dön ile aşağı bakar ve İleri 6 ile iner.', hint: 'Robot şu an hangi yöne bakıyor?', skills: ['jr-sequence', 'jr-motion'] },
+          { kind: 'choice', prompt: 'Ece önce **Sağa dön** koydu. Robot nereye yürür?', code: '🏁 Yeşil bayrak\n↩️ Sağa dön\n➡️ İleri 7', options: ['➡️ Sağa yürür', '⬇️ Aşağı yürür'], answer: 1, why: 'Robot önce döndü ve aşağı baktı. Sonra İleri ile aşağı yürüdü. Sağa gitmesi için önce İleri gerekir.', hint: 'İlk blok ne yapıyor?', skills: ['jr-sequence', 'jr-debug'] },
+          { kind: 'choice', prompt: 'Betiğin en üstünde hangi blok olmalı?', options: ['➡️ İleri', '⤴️ Zıpla', '🏁 Yeşil bayrak'], answer: 2, why: 'Yeşil bayrak betiği başlatır. O yoksa Başlat düğmesine basınca robot kıpırdamaz.', hint: 'Betiği hangi blok başlatır?', skills: ['jr-start-block'] },
+          { kind: 'activity', prompt: 'Şimdi sıra sende! Robotu yıldıza götür. Varınca **Zıpla** ile kutla. Bitince **Kontrol et**\'e bas.' },
+          { kind: 'reflect', prompt: 'Büyüğünle konuşun: Sağa dön bloğunu İleri\'den önce koyunca robot nereye gitti? Neden?' },
+        ],
+        // İngilizcesi (arayüz dili 'en'): yapı aynı; blok adları (İleri, Sağa dön, Yeşil bayrak, Zıpla) etkinlikteki gibi Türkçe kalır.
+        stepsEn: [
+          { kind: 'intro', art: 'robot', title: 'Robot game', body: 'This is a robot. There is a star far away. Let\'s take the robot to the star!' },
+          { kind: 'choice', prompt: 'What does the robot do? 🤖', options: ['🤔 Whatever it thinks of', '🧩 What I tell it to do'], answer: 1, why: 'A robot does not think by itself. It only does what you tell it.', hint: 'Can a robot think of things by itself?', skills: ['jr-sequence'] },
+          { kind: 'explain', art: 'robot', body: 'Commands are blocks. **İleri** (forward) makes the robot walk. The number on it is how many steps. **Sağa dön** (turn right) turns the robot.' },
+          { kind: 'choice', prompt: 'The robot faces right. Where does it face after **Sağa dön** (turn right)?', options: ['⬆️ Up', '⬇️ Down', '⬅️ Left'], answer: 1, why: 'A robot facing right looks down after Sağa dön. To look up, it needs Sola dön (turn left).', hint: 'The robot\'s face is on the right. Turn it a little to the right.', skills: ['jr-motion'] },
+          { kind: 'numeric', prompt: 'The robot did these blocks. How many steps did it walk?', code: '🏁 Yeşil bayrak\n➡️ İleri 2\n➡️ İleri 3', answer: 5, unit: 'steps', why: 'First 2 steps, then 3 steps. 2 and 3 make 5.', hint: 'Count the numbers on both blocks together.', skills: ['jr-motion'] },
+          { kind: 'explain', art: 'robot', body: 'The robot does the blocks from top to bottom, in order. If the order changes, the robot goes somewhere else.' },
+          { kind: 'order', prompt: 'The robot should go right first, then go down. Put the blocks in order.', lines: ['➡️ İleri 7', '↩️ Sağa dön', '➡️ İleri 6'], why: 'The robot faces right. First İleri 7 takes it right. Then Sağa dön makes it look down, and İleri 6 takes it down.', hint: 'Which way is the robot facing now?', skills: ['jr-sequence', 'jr-motion'] },
+          { kind: 'choice', prompt: 'Ece put **Sağa dön** first. Where does the robot walk?', code: '🏁 Yeşil bayrak\n↩️ Sağa dön\n➡️ İleri 7', options: ['➡️ It walks right', '⬇️ It walks down'], answer: 1, why: 'The robot turned first and looked down. Then İleri made it walk down. To go right, İleri has to come first.', hint: 'What does the first block do?', skills: ['jr-sequence', 'jr-debug'] },
+          { kind: 'choice', prompt: 'Which block goes at the very top of the script?', options: ['➡️ İleri', '⤴️ Zıpla', '🏁 Yeşil bayrak'], answer: 2, why: 'Yeşil bayrak (green flag) starts the script. Without it, the robot does not move when you press Başlat (start).', hint: 'Which block starts the script?', skills: ['jr-start-block'] },
+          { kind: 'activity', prompt: 'Your turn! Take the robot to the star. When it gets there, celebrate with **Zıpla** (jump). When you finish, press **Kontrol et** (check).' },
+          { kind: 'reflect', prompt: 'Talk with a grown-up: When you put Sağa dön before İleri, where did the robot go? Why?' },
+        ],
       },
       // 1.2 İlk hareket
       {

@@ -1,0 +1,25 @@
+// league ad alanı (Türkçe kaynak): /lig. İngilizcesi: ../en/league.ts
+export const league = {
+  metaTitle: 'Sınıf ligi',
+  eyebrow: 'Haftalık lig',
+  title: 'Sınıf ligi',
+  lead: "Bu hafta kazandığın XP ile sınıf arkadaşların arasındaki sıran. Her Pazartesi 00:00'da sıfırlanır.",
+  closed: 'Okulunda ligler kapalı.',
+  joinPrompt: 'Ligler sınıf arkadaşlarınla yarışmak için. Öğretmeninden sınıf kodunu al ve katıl.',
+  joinCta: 'Bir sınıfa katıl',
+  yourRank: 'Sıran:',
+  you: ' (sen)',
+  tiersSoon: 'Yakında okullar arası lig kademeleri: {tiers}.',
+  tiers: {
+    t1: 'Direnç',
+    t2: 'Kondansatör',
+    t3: 'Transistör',
+    t4: 'Mikrodenetleyici',
+    t5: 'Servo',
+    t6: 'Sensör',
+    t7: 'Lidar',
+    t8: 'Robot Kol',
+    t9: 'Otonom',
+    t10: 'Android',
+  },
+}

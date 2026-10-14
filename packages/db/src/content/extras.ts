@@ -1,7 +1,7 @@
-import type { Concept, ModuleContent, QuizQuestion } from './types'
+import type { Concept, LessonStep, ModuleContent, QuizQuestion } from './types'
 
 /** Bir dersin platform katmanı içeriği (anlatım, kavram kartları, mini test). */
-export interface LessonExtras { explainerMd?: string; concepts?: Concept[]; quiz?: QuizQuestion[] }
+export interface LessonExtras { explainerMd?: string; concepts?: Concept[]; quiz?: QuizQuestion[]; steps?: LessonStep[]; stepsEn?: LessonStep[] }
 /** Bir haftanın ek içeriği: haftalık rehber ve ders sırasıyla dersler. */
 export interface WeekExtras { guideMd?: string; lessons: LessonExtras[] }
 

@@ -136,6 +136,330 @@ export const modul7: ModuleContent = {
                 "ai-simulation-literacy"
               ]
             }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "brain",
+              "title": "Anlıyor mu, tahmin mi ediyor?",
+              "body": "Bir yapay zekâ asistanına \"robotum duvara çarpıyor\" yazarsın ve düzgün bir cevap alırsın. Bu cevabı veren şey seni **anlıyor** mu, yoksa çok iyi **tahmin** mi ediyor? Bu derste sezgiyle değil, mekanizmaya bakarak cevap arayacağız."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Telefon klavyesine `robot duvara` yazdın, üstte `çarptı` önerisi çıktı. Bir yazı önerici bu kelimeyi büyük olasılıkla nasıl buluyor?",
+              "options": [
+                "Ne demek istediğini anlayıp cümleni kendi düşüncesiyle tamamlıyor",
+                "Çok sayıda metinde bu kelimelerden sonra en sık gelenleri öğrenmiş",
+                "Olası her cümle için elle yazılmış bir cevap listesine bakıyor",
+                "Sözlükten rastgele bir kelime seçiyor"
+              ],
+              "answer": 1,
+              "why": "Öneri, örnek metinlerden öğrenilmiş bir istatistiktir: \"robot duvara\"dan sonra \"çarptı\" sık geçtiği için öne çıkar. Olası bütün cümleler için elle liste yazmak imkânsızdır; rastgele seçim de bu kadar yerinde öneriler vermezdi.",
+              "hint": "Olası cümle sayısı sonsuza yakın. Birisi hepsini tek tek yazabilir mi?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "brain",
+              "body": "Üç terim iç içe kutular gibidir. **Yapay zekâ** en geniş şemsiyedir; elle yazılmış bir kural listesi bile buna girebilir. **Makine öğrenmesi** kuralı örneklerden kendisi bulan yöntemlerdir; **dil modeli** ise örneklerini metinlerden alan bir makine öğrenmesi modelidir.",
+              "code": "Yapay zekâ\n  └─ Makine öğrenmesi\n       └─ Dil modeli"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bir robotta şu kod çalışıyor: `if (mesafe < 10) dur()`. Bu hangi kutuya girer?",
+              "options": [
+                "Yapay zekâ, ama makine öğrenmesi değil",
+                "Makine öğrenmesi",
+                "Dil modeli",
+                "Hiçbiri; kural listesi yapay zekâ sayılmaz"
+              ],
+              "answer": 0,
+              "why": "Kuralı bir insan elle yazdı; sistem hiçbir örnekten öğrenmedi. Bu yüzden makine öğrenmesi değildir, ama zekâ gerektiren bir işi (engelden kaçmayı) yapan bir sistem olarak geniş **yapay zekâ** şemsiyesine girebilir.",
+              "hint": "10 sayısını kim seçti: bir insan mı, örneklerden öğrenen bir sistem mi?",
+              "skills": [
+                "ai-concepts"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Hangisi bir **makine öğrenmesi** örneğidir?",
+              "options": [
+                "\"Kötü\" kelimesi geçen her yorumu olumsuz sayan bir kural yazmak",
+                "Sisteme 500 etiketli yorum gösterip olumlu ile olumsuzu ayırmayı kendisinin bulmasını sağlamak",
+                "Yorumları alfabetik sıraya dizmek",
+                "Her yorumun kelime sayısını hesaplamak"
+              ],
+              "answer": 1,
+              "why": "Makine öğrenmesinde kuralı sen yazmazsın; etiketli örnekleri verirsin, sistem örüntüyü kendisi çıkarır. Birinci seçenek elle yazılmış bir kuraldır; sıralama ve sayma ise öğrenme içermeyen hesaplardır.",
+              "skills": [
+                "ai-concepts"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "Bir dil modelinin temel görevi tek cümledir: **o ana kadar yazılanlara bakıp sonraki parçayı tahmin etmek.** Bu parçaya **token** denir; bir kelime, kelime parçası ya da noktalama olabilir. Model her adımda olası token'lar için bir **olasılık listesi** çıkarır ve birini seçer."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Metin şu an `robot engeli görünce`. Bir model sonraki token için şu olasılıkları çıkarmış: `durur` %55, `döner` %30, `geri` %10, `uçar` ?. Listede başka token yoksa `uçar`ın olasılığı yüzde kaçtır?",
+              "answer": 5,
+              "unit": "%",
+              "why": "Bir olasılık listesinin toplamı her zaman %100'dür: 100 − 55 − 30 − 10 = **5**. Model bir token'ı kesin bilmez; her adayın bir payı vardır, bazılarınınki çok küçüktür.",
+              "hint": "Bütün olasılıklar toplandığında ne çıkmalı?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Model aynı listeden `durur`u seçti. Bu seçim neyi gösterir?",
+              "options": [
+                "Model robotların engel görünce gerçekten durduğunu biliyor ve anlıyor",
+                "Eğitim metinlerinde bu bağlamdan sonra `durur` sık geçtiği için olasılığı en yüksek çıktı",
+                "Model internete bakıp robotların ne yaptığını kontrol etti",
+                "Bu cevap elle yazılmış bir kuraldan geldi"
+              ],
+              "answer": 1,
+              "why": "Olasılıklar eğitimde görülen metinlerden öğrenilmiştir; seçim, o metinlerdeki örüntüyü yansıtır. Model cevap üretirken internete bakmaz ve bu seçim elle yazılmış bir kural değildir. Örüntü yanlış olsaydı model aynı rahatlıkla yanlış bir token seçerdi.",
+              "hint": "Olasılıklar nereden öğrenildi?",
+              "skills": [
+                "ai-next-token",
+                "ai-concepts"
+              ]
+            },
+            {
+              "kind": "order",
+              "prompt": "Bir dil modelinin metin üretme döngüsünü doğru sıraya diz.",
+              "lines": [
+                "O ana kadarki metne (bağlama) bak",
+                "Sonraki token için olasılık listesi çıkar",
+                "Listeden bir token seç",
+                "Seçilen token'ı metnin sonuna ekle",
+                "Cevap bitene kadar yeni metinle baştan başla"
+              ],
+              "why": "Üretim aynı adımın tekrarıdır: bağlama bak, olasılıkları hesapla, birini seç, ekle, tekrarla. Eklenen her token bir sonraki tahminin bağlamına girer; bu yüzden model cevabı baştan hazır bilmez, parça parça kurar.",
+              "hint": "Olasılık hesaplamadan önce neye bakması gerekir?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Başlangıç metni `robot`. Model sırayla `sağa`, `döner`, `.` token'larını seçiyor. **Üçüncü** tahmini yaparken baktığı metin hangisidir?",
+              "options": [
+                "robot",
+                "robot sağa",
+                "robot sağa döner",
+                "robot sağa döner ."
+              ],
+              "answer": 2,
+              "why": "1. tahmin `robot`a bakar ve `sağa`yı ekler; 2. tahmin `robot sağa`ya bakar ve `döner`i ekler; 3. tahmin `robot sağa döner`e bakar ve `.`yı ekler. Son seçenek, üçüncü tahminin **sonucudur**, girdisi değil.",
+              "hint": "Her tahmin, kendinden önceki bütün eklemeleri görür; kendi eklediğini henüz görmez.",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Bir model her adımda tek token ekliyor ve saniyede 20 token üretiyor. 60 token'lık bir cevabın yazılması kaç saniye sürer?",
+              "answer": 3,
+              "unit": "s",
+              "why": "60 token = 60 ayrı tahmin. Saniyede 20 tahminle 60 / 20 = **3 saniye**. Sohbet asistanlarında cevabın ekrana kelime kelime akmasının nedeni budur: metin gerçekten parça parça üretilir.",
+              "hint": "Kaç tahmin gerekiyor, saniyede kaçı yapılıyor?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "search",
+              "body": "Bu modülde araçlar tarayıcında çalışır ve iki tür adım vardır. **Gerçek hesap:** parçalama, sayım, olasılık ve doğruluk ölçümü gerçekten hesaplanır. **Simülasyon ya da şablon:** büyük bir modelin yerini tutan adımlar etiketlidir; gerçek Claude burada çalışmaz."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Hangisi bu portalda **gerçekten hesaplanan** bir sonuçtur?",
+              "options": [
+                "Token aracının bir cümleyi kaç parçaya böldüğü",
+                "\"Simülasyon\" etiketli bir kutudaki \"model cevabı\" metni",
+                "Ajan etkinliğindeki betikli \"model adımı\"",
+                "Şablon etiketli bir adımda Claude'un verdiği söylenen cevap"
+              ],
+              "answer": 0,
+              "why": "Parçalama gerçek bir algoritmayla tarayıcında hesaplanır. Etiketli \"model cevabı\" ve \"model adımı\" elle yazılmış ya da betikli örneklerdir; bu portalda gerçek bir Claude çağrısı yapılmaz.",
+              "hint": "Etiketlere bak: hangisinde \"simülasyon\" ya da \"şablon\" uyarısı yok?",
+              "skills": [
+                "ai-simulation-literacy"
+              ]
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Bir dil modeli sonraki token'ı tahmin ediyorsa, onun \"anlıyor\" olduğunu söylemek doğru mudur? Bir şeyin \"anlamak\" için neye ihtiyacı olduğunu düşün ve arkadaşınla tartış."
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "brain",
+              "title": "Does it understand, or does it predict?",
+              "body": "You type \"my robot keeps hitting the wall\" to an AI assistant and get a sensible answer. Does the thing giving that answer **understand** you, or is it just very good at **predicting**? In this lesson we'll look for the answer by examining the mechanism, not by gut feeling."
+            },
+            {
+              "kind": "choice",
+              "prompt": "You typed `robot hit the` on your phone keyboard, and the suggestion `wall` popped up. How does a text predictor most likely come up with that word?",
+              "options": [
+                "It understands what you mean and finishes your sentence with its own thoughts",
+                "It learned which words most often come after these words in lots of text",
+                "It looks in a hand-written list of answers for every possible sentence",
+                "It picks a random word from the dictionary"
+              ],
+              "answer": 1,
+              "why": "The suggestion is a statistic learned from example texts: \"wall\" often follows \"robot hit the\", so it comes out on top. Writing a list by hand for every possible sentence is impossible, and random picks wouldn't give such fitting suggestions.",
+              "hint": "The number of possible sentences is close to infinite. Could anyone write them all out one by one?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "brain",
+              "body": "These three terms are like boxes inside boxes. **Artificial intelligence** is the widest umbrella; even a hand-written list of rules can count. **Machine learning** is the set of methods that find the rules themselves from examples; a **language model** is a machine learning model that takes its examples from text.",
+              "code": "Yapay zekâ\n  └─ Makine öğrenmesi\n       └─ Dil modeli"
+            },
+            {
+              "kind": "choice",
+              "prompt": "This code runs on a robot: `if (mesafe < 10) dur()`. Which box does it go in?",
+              "options": [
+                "Artificial intelligence, but not machine learning",
+                "Machine learning",
+                "Language model",
+                "None; a list of rules doesn't count as AI"
+              ],
+              "answer": 0,
+              "why": "A human wrote the rule by hand; the system didn't learn from any examples. So it isn't machine learning, but as a system doing a task that takes intelligence (avoiding obstacles), it can fit under the broad **artificial intelligence** umbrella.",
+              "hint": "Who chose the number 10: a person, or a system learning from examples?",
+              "skills": [
+                "ai-concepts"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Which one is an example of **machine learning**?",
+              "options": [
+                "Writing a rule that marks every review containing the word \"bad\" as negative",
+                "Showing the system 500 labelled reviews and letting it work out for itself how to tell positive from negative",
+                "Sorting the reviews alphabetically",
+                "Counting the number of words in each review"
+              ],
+              "answer": 1,
+              "why": "In machine learning you don't write the rule; you give labelled examples and the system finds the pattern itself. The first option is a hand-written rule; sorting and counting are calculations with no learning involved.",
+              "skills": [
+                "ai-concepts"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "A language model's core job fits in one sentence: **look at what's been written so far and predict the next piece.** That piece is called a **token**; it can be a word, part of a word or a punctuation mark. At each step the model produces a **probability list** for the possible tokens and picks one."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "The text so far is `when the robot sees an obstacle it`. A model gives these probabilities for the next token: `stops` 55%, `turns` 30%, `reverses` 10%, `flies` ?. If there are no other tokens in the list, what is the probability of `flies`, in percent?",
+              "answer": 5,
+              "unit": "%",
+              "why": "The probabilities in a list always add up to 100%: 100 − 55 − 30 − 10 = **5**. The model never knows a token for certain; every candidate gets a share, and some shares are very small.",
+              "hint": "What should all the probabilities add up to?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "The model picked `stops` from that same list. What does this choice show?",
+              "options": [
+                "The model knows and understands that robots really do stop when they see an obstacle",
+                "`stops` often came after this context in the training texts, so its probability was the highest",
+                "The model went online to check what robots do",
+                "This answer came from a hand-written rule"
+              ],
+              "answer": 1,
+              "why": "The probabilities were learned from the texts seen during training; the choice reflects the patterns in those texts. The model doesn't go online while producing an answer, and this choice isn't a hand-written rule. If the pattern were wrong, the model would pick a wrong token just as easily.",
+              "hint": "Where were the probabilities learned from?",
+              "skills": [
+                "ai-next-token",
+                "ai-concepts"
+              ]
+            },
+            {
+              "kind": "order",
+              "prompt": "Put a language model's text-generation loop in the right order.",
+              "lines": [
+                "Look at the text so far (the context)",
+                "Produce a probability list for the next token",
+                "Pick a token from the list",
+                "Add the chosen token to the end of the text",
+                "Start over with the new text until the answer is finished"
+              ],
+              "why": "Generation is the same step repeated: look at the context, calculate probabilities, pick one, add it, repeat. Every added token becomes part of the context for the next prediction; that's why the model doesn't know the answer in advance but builds it piece by piece.",
+              "hint": "What does it need to look at before calculating probabilities?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "The starting text is `robot`. The model picks the tokens `turns`, `right`, `.` one after another. Which text does it look at when making the **third** prediction?",
+              "options": [
+                "robot",
+                "robot turns",
+                "robot turns right",
+                "robot turns right ."
+              ],
+              "answer": 2,
+              "why": "Prediction 1 looks at `robot` and adds `turns`; prediction 2 looks at `robot turns` and adds `right`; prediction 3 looks at `robot turns right` and adds `.`. The last option is the **result** of the third prediction, not its input.",
+              "hint": "Each prediction sees everything added before it; it doesn't yet see what it adds itself.",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "A model adds one token at each step and produces 20 tokens per second. How many seconds does it take to write a 60-token answer?",
+              "answer": 3,
+              "unit": "s",
+              "why": "60 tokens = 60 separate predictions. At 20 predictions per second, 60 / 20 = **3 seconds**. That's why chat assistants' answers flow onto the screen word by word: the text really is produced piece by piece.",
+              "hint": "How many predictions are needed, and how many happen per second?",
+              "skills": [
+                "ai-next-token"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "search",
+              "body": "In this module the tools run in your browser, and there are two kinds of steps. **Real computation:** tokenizing, counting, probabilities and accuracy measurements are actually calculated. **Simulation or template:** steps that stand in for a large model are labelled; the real Claude doesn't run here."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Which one is a result that is **actually calculated** on this platform?",
+              "options": [
+                "How many pieces the token tool splits a sentence into",
+                "The \"model answer\" text in a box labelled \"simulation\"",
+                "The scripted \"model step\" in the agent activity",
+                "An answer said to come from Claude in a step labelled as a template"
+              ],
+              "answer": 0,
+              "why": "Tokenizing is calculated in your browser with a real algorithm. The labelled \"model answer\" and \"model step\" are hand-written or scripted examples; no real Claude call is made on this platform.",
+              "hint": "Look at the labels: which one has no \"simulation\" or \"template\" warning?",
+              "skills": [
+                "ai-simulation-literacy"
+              ]
+            },
+            {
+              "kind": "reflect",
+              "prompt": "If a language model predicts the next token, is it right to say it \"understands\"? Think about what something needs in order to \"understand\", and discuss it with a friend."
+            }
           ]
         },
         {
@@ -260,6 +584,318 @@ export const modul7: ModuleContent = {
                 "ai-tokens",
                 "ai-bpe"
               ]
+            }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "search",
+              "title": "Model yazıyı nasıl görür?",
+              "body": "Sen bir cümleyi kelimelerden oluşmuş görürsün. Bir dil modeli ise onu **token** denen parçalardan oluşmuş görür. `robot` tek parça mı, yoksa birkaç parça mı? Bu derste parçaları kendin sayacaksın."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Sence bir dil modeli `robotlar` kelimesini nasıl görür?",
+              "options": [
+                "Tek bir bütün kelime olarak",
+                "Her zaman harf harf, 8 ayrı harf olarak",
+                "Sık görülen parçalar hâlinde; örneğin bir `robot` parçası ve ekin parçaları",
+                "Kelimenin resmi olarak"
+              ],
+              "answer": 2,
+              "why": "Model metni, parçalayıcının (tokenizer) sözlüğündeki parçalara böler. Sık geçen `robot` tek parça olur, `lar` eki ayrı parça(lar) olarak kalabilir. Tek kelime sanmak da, hep harf harf sanmak da yanlıştır; parçalar sözlüğe göre değişir.",
+              "hint": "Model `robot` kelimesini çok sık görmüştür. `robotlar` biçimini aynı sıklıkta görmüş müdür?",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "**Token**, modelin metni işlerken kullandığı parçadır: bütün bir kelime, kelime parçası, tek harf ya da noktalama olabilir. Model önce metni token'lara böler, sonra her token'ı bir **tamsayıya** (token kimliği) çevirir. Kelime başındaki boşluk `▁` işaretiyle gösterilir.",
+              "code": "metin     :  robotlar duvarı\ntoken'lar :  [▁robot] [l] [ar] [▁duvarı]\nsayılar   :  [ 118 ] [ 9 ] [ 41 ] [ 77 ]   (örnek değerler)"
+            },
+            {
+              "kind": "choice",
+              "prompt": "Modelin içinde asıl işlenen şey hangisidir?",
+              "options": [
+                "Harflerin kendisi",
+                "Boşluklarla ayrılmış kelimeler",
+                "Token'lara karşılık gelen tamsayılardan oluşan bir dizi",
+                "Cümlenin anlamı, doğrudan"
+              ],
+              "answer": 2,
+              "why": "Model ne harfleri ne kelimeleri doğrudan okur: metin token'lara bölünür ve her token bir tamsayıya çevrilir. Modelin tahmin ettiği şey de aslında bir sonraki tamsayıdır; o sayı yeniden token'a ve metne çevrilir.",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "search",
+              "body": "Atölyedeki **Token ve BPE** aracında birleştirme sayısı 0 iken her harf ayrı bir token'dır. Her kelimenin başındaki `▁` işareti de ayrı bir token sayılır, noktalama da. Yani `robot` → `▁ r o b o t` = 6 token."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Birleştirme sayısı 0. `robot sağa döner.` metni kaç token tutar?",
+              "answer": 18,
+              "unit": "token",
+              "why": "Harfler: robot 5 + sağa 4 + döner 5 = 14. Her kelimenin başında bir `▁`: 3. Nokta: 1. Toplam 14 + 3 + 1 = **18**. Yalnız harfleri sayan 14, noktayı unutan 17 bulur.",
+              "hint": "Üç şeyi ayrı ayrı say: harfler, kelime başı işaretleri, noktalama. `ğ` tek harftir.",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "gear",
+              "body": "**BPE** (bayt çifti kodlaması) eğitim metninde en sık yan yana gelen iki parçayı tek parçada birleştirir ve bunu tekrar eder. Araçtaki **birleştirme sayısı**, öğrenilmiş bu adımlardan kaçının uygulanacağını seçer. Birleştirme arttıkça parçalar büyür, token sayısı azalır."
+            },
+            {
+              "kind": "order",
+              "prompt": "Türkçe derlemle `robot ileri` yazdın ve birleştirme sayısını 0 → 10 → 30 → 60 diye artırdın. Gördüğün parçalanmaları bu sıraya diz.",
+              "lines": [
+                "[▁] [r] [o] [b] [o] [t] [▁] [i] [l] [e] [r] [i]",
+                "[▁robot] [▁] [i] [l] [er] [i]",
+                "[▁robot] [▁i] [l] [eri]",
+                "[▁robot] [▁ileri]"
+              ],
+              "why": "Token sayısı 12 → 6 → 4 → 2 diye azalır. İlk 10 birleştirmede derlemde çok sık geçen `▁robot` ve `er` oluşur, 30'a kadar `▁i` ve `eri` eklenir, 60'ta `▁ileri` tek token olur. Birleştirme hiçbir zaman token sayısını artırmaz.",
+              "hint": "Birleştirme arttıkça parça sayısı ne yöne gider?",
+              "skills": [
+                "ai-bpe",
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Türkçe derlem ve 120 birleştirmeyle `robot` → `[▁robot]`, `robotlar` → `[▁robot] [l] [ar]` oluyor. Hangisi doğrudur?",
+              "options": [
+                "`robotlar` tek kelime olduğu için 1 token'dır",
+                "`robotlar` 3 token tutar ve `robot` ile `[▁robot]` parçasını paylaşır",
+                "`robotlar` 8 harfli olduğu için 8 token tutar",
+                "İki kelime hiçbir parçayı paylaşmaz, çünkü farklı kelimelerdir"
+              ],
+              "answer": 1,
+              "why": "Ekranda üç parça var: `[▁robot]`, `[l]`, `[ar]`. İlk parça `robot` kelimesinin token'ıyla aynıdır. Ekli kelimeler kökü paylaşır, ek ise ayrı parça(lar) olarak eklenir; token sayısı ne kelime sayısına ne harf sayısına eşittir.",
+              "skills": [
+                "ai-tokens",
+                "ai-bpe"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Türkçe derlem, 120 birleştirme. İngilizce `the robot turns left` cümlesi şöyle bölündü: `[▁t] [h] [e] [▁robot] [▁t] [ur] [n] [s] [▁] [l] [e] [f] [t]`. Kaç token var?",
+              "answer": 13,
+              "unit": "token",
+              "why": "Parçaları tek tek sayınca **13** eder. Aynı cümle İngilizce derlemle `[▁the] [▁robot] [▁turns] [▁left]`, yani yalnız 4 token tutar. Parçalayıcı eğitimde az gördüğü dili harflere yakın küçük parçalara böler; yalnız `robot` iki derlemde de sık geçtiği için tek parça kalmıştır.",
+              "hint": "Köşeli parantezleri say; tek başına duran `▁` da bir token'dır.",
+              "skills": [
+                "ai-tokens",
+                "ai-bpe"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bir model aynı anda en çok 4000 token görebiliyor. Aynı bilgiyi taşıyan bir metin A dilinde B diline göre **iki kat** fazla token tutuyor. Ne olur?",
+              "options": [
+                "A dilinde pencereye yaklaşık yarısı kadar metin sığar ve işlemek daha pahalıdır",
+                "Fark etmez; model kelimeleri saydığı için iki dilde aynı miktar metin sığar",
+                "Daha çok token daha çok anlam demektir; model A dilini daha iyi anlar",
+                "Model A dilindeki metni hiç okuyamaz"
+              ],
+              "answer": 0,
+              "why": "Sınır token'la ölçülür: 4000 token'a A dilinde yaklaşık yarısı kadar bilgi sığar. Çoğu model hizmetinde ücret ve hız da işlenen token sayısına bağlıdır. Fazla token daha zengin anlam değildir; yalnız parçalayıcının o dile daha az uyduğunu gösterir.",
+              "hint": "Sınır kelimeyle mi ölçülüyor, token'la mı?",
+              "skills": [
+                "ai-tokens",
+                "ai-model-limits"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "Parçalayıcı `görünce` kelimesini 4 token'a böldü. Boşlukları doldur: ilk satır token sayısını yazsın, ikinci satır parçaları yeniden kelimeye çevirsin.",
+              "code": "const parcalar = [\"▁görü\", \"n\", \"c\", \"e\"]\nconsole.log(parcalar.___)                        // 4\nconsole.log(parcalar.___(\"\").replace(\"▁\", \"\"))   // görünce",
+              "tokens": [
+                "length",
+                "join",
+                "split",
+                "size",
+                "count"
+              ],
+              "answer": [
+                "length",
+                "join"
+              ],
+              "why": "Dizinin eleman sayısı `length` ile okunur. `join(\"\")` parçaları arada boşluk bırakmadan birleştirir; `replace` kelime başı işaretini siler ve `görünce` geri gelir. Parçalama bilgi kaybetmez. `split` metinlerin yöntemidir, dizilerin değil; `size` ve `count` JavaScript dizilerinde yoktur.",
+              "hint": "Biri bir özellik (parantezsiz), diğeri parçaları yapıştıran bir yöntem.",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Şimdi atölyede kendin dene! **Token ve BPE** aracına en az sekiz kelimelik bir cümle yaz, birleştirme sayısını artırıp token sayısını karakter sayısının altına indir, sonra derlemi Türkçe ile İngilizce arasında değiştir. Bu araçtaki parçalayıcı küçük bir örnektir; gerçek modellerinki çok daha büyük metinlerle eğitilir."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Türkçe gibi ekli bir dilde kelimeler kolayca uzar: `robot`, `robotlar`, `robotlarımızdan`. Bu, bir modelin Türkçe metni işleme maliyetini ve bağlam penceresine sığan metin miktarını nasıl etkileyebilir?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "search",
+              "title": "How does a model see text?",
+              "body": "You see a sentence as made of words. A language model sees it as made of pieces called **tokens**. Is `robot` one piece, or several? In this lesson you'll count the pieces yourself. Our examples use Turkish words, because the tool's tokenizer is trained on Turkish text."
+            },
+            {
+              "kind": "choice",
+              "prompt": "How do you think a language model sees the Turkish word `robotlar` (robots)?",
+              "options": [
+                "As a single whole word",
+                "Always letter by letter, as 8 separate letters",
+                "As common pieces; for example a `robot` piece plus pieces for the suffix",
+                "As a picture of the word"
+              ],
+              "answer": 2,
+              "why": "The model splits text into the pieces in the tokenizer's vocabulary. The common word `robot` becomes one piece, and the suffix `lar` can stay as separate piece(s). Thinking it's one word is wrong, and so is thinking it's always letter by letter; the pieces depend on the vocabulary.",
+              "hint": "The model has seen the word `robot` very often. Has it seen the form `robotlar` just as often?",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "A **token** is the piece a model uses when processing text: a whole word, part of a word, a single letter or a punctuation mark. The model first splits the text into tokens, then turns each token into an **integer** (the token ID). The space at the start of a word is shown with the `▁` mark.",
+              "code": "metin     :  robotlar duvarı\ntoken'lar :  [▁robot] [l] [ar] [▁duvarı]\nsayılar   :  [ 118 ] [ 9 ] [ 41 ] [ 77 ]   (örnek değerler)"
+            },
+            {
+              "kind": "choice",
+              "prompt": "What is actually processed inside the model?",
+              "options": [
+                "The letters themselves",
+                "Words separated by spaces",
+                "A sequence of integers that stand for tokens",
+                "The meaning of the sentence, directly"
+              ],
+              "answer": 2,
+              "why": "The model reads neither letters nor words directly: the text is split into tokens, and each token is turned into an integer. What the model predicts is really the next integer; that number is turned back into a token and then text.",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "search",
+              "body": "In the workshop's **Token ve BPE** (Tokens and BPE) tool, when the number of merges is 0, every letter is a separate token. The `▁` mark at the start of each word also counts as a separate token, and so does punctuation. So `robot` → `▁ r o b o t` = 6 tokens."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "The number of merges is 0. How many tokens is the Turkish text `robot sağa döner.` (the robot turns right.)?",
+              "answer": 18,
+              "unit": "tokens",
+              "why": "Letters: robot 5 + sağa 4 + döner 5 = 14. One `▁` at the start of each word: 3. The full stop: 1. Total 14 + 3 + 1 = **18**. Counting only the letters gives 14, and forgetting the full stop gives 17.",
+              "hint": "Count three things separately: letters, word-start marks, punctuation. `ğ` is a single letter.",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "gear",
+              "body": "**BPE** (byte pair encoding) merges the two pieces that most often appear side by side in the training text into a single piece, and repeats this. The tool's **number of merges** chooses how many of these learned steps are applied. The more merges, the bigger the pieces and the fewer the tokens."
+            },
+            {
+              "kind": "order",
+              "prompt": "With the Turkish corpus you typed `robot ileri` (robot forward) and raised the number of merges 0 → 10 → 30 → 60. Put the splits you saw in that order.",
+              "lines": [
+                "[▁] [r] [o] [b] [o] [t] [▁] [i] [l] [e] [r] [i]",
+                "[▁robot] [▁] [i] [l] [er] [i]",
+                "[▁robot] [▁i] [l] [eri]",
+                "[▁robot] [▁ileri]"
+              ],
+              "why": "The token count drops 12 → 6 → 4 → 2. In the first 10 merges, the very common `▁robot` and `er` form; by 30, `▁i` and `eri` are added; at 60, `▁ileri` becomes a single token. Merging never increases the number of tokens.",
+              "hint": "As merges increase, which way does the number of pieces go?",
+              "skills": [
+                "ai-bpe",
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "With the Turkish corpus and 120 merges, `robot` → `[▁robot]` and `robotlar` → `[▁robot] [l] [ar]`. Which statement is true?",
+              "options": [
+                "`robotlar` is 1 token because it is a single word",
+                "`robotlar` is 3 tokens and shares the `[▁robot]` piece with `robot`",
+                "`robotlar` is 8 tokens because it has 8 letters",
+                "The two words share no pieces, because they are different words"
+              ],
+              "answer": 1,
+              "why": "There are three pieces on screen: `[▁robot]`, `[l]`, `[ar]`. The first piece is the same as the token for the word `robot`. Words with suffixes share the root, and the suffix is added as separate piece(s); the number of tokens equals neither the number of words nor the number of letters.",
+              "skills": [
+                "ai-tokens",
+                "ai-bpe"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Turkish corpus, 120 merges. The English sentence `the robot turns left` was split like this: `[▁t] [h] [e] [▁robot] [▁t] [ur] [n] [s] [▁] [l] [e] [f] [t]`. How many tokens are there?",
+              "answer": 13,
+              "unit": "tokens",
+              "why": "Counting the pieces one by one gives **13**. With the English corpus the same sentence becomes `[▁the] [▁robot] [▁turns] [▁left]`, only 4 tokens. A tokenizer splits a language it rarely saw in training into small, almost letter-sized pieces; only `robot` stayed whole because it is common in both corpora.",
+              "hint": "Count the square brackets; a lone `▁` is a token too.",
+              "skills": [
+                "ai-tokens",
+                "ai-bpe"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "A model can see at most 4000 tokens at a time. A text carrying the same information takes **twice** as many tokens in language A as in language B. What happens?",
+              "options": [
+                "About half as much text fits in the window in language A, and it costs more to process",
+                "It makes no difference; the model counts words, so the same amount of text fits in both languages",
+                "More tokens means more meaning; the model understands language A better",
+                "The model can't read text in language A at all"
+              ],
+              "answer": 0,
+              "why": "The limit is measured in tokens: in language A, 4000 tokens hold about half as much information. In most model services, price and speed also depend on the number of tokens processed. More tokens doesn't mean richer meaning; it only shows the tokenizer fits that language less well.",
+              "hint": "Is the limit measured in words or in tokens?",
+              "skills": [
+                "ai-tokens",
+                "ai-model-limits"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "The tokenizer split the Turkish word `görünce` (when it sees) into 4 tokens. Fill in the blanks: the first line should print the number of tokens, the second should turn the pieces back into the word.",
+              "code": "const parcalar = [\"▁görü\", \"n\", \"c\", \"e\"]\nconsole.log(parcalar.___)                        // 4\nconsole.log(parcalar.___(\"\").replace(\"▁\", \"\"))   // görünce",
+              "tokens": [
+                "length",
+                "join",
+                "split",
+                "size",
+                "count"
+              ],
+              "answer": [
+                "length",
+                "join"
+              ],
+              "why": "An array's number of elements is read with `length`. `join(\"\")` glues the pieces together with no gaps; `replace` removes the word-start mark and `görünce` comes back. Tokenizing loses no information. `split` is a method of strings, not arrays; `size` and `count` don't exist on JavaScript arrays.",
+              "hint": "One is a property (no parentheses), the other is a method that glues the pieces together.",
+              "skills": [
+                "ai-tokens"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Now try it yourself in the workshop! Type a sentence of at least eight words into the **Token ve BPE** (Tokens and BPE) tool, raise the number of merges until the token count drops below the character count, then switch the corpus between Turkish and English. The tokenizer in this tool is a small example; real models' tokenizers are trained on far more text."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "In a language with suffixes, like Turkish, words grow long easily: `robot`, `robotlar`, `robotlarımızdan`. How might this affect the cost of processing Turkish text with a model, and how much text fits in the context window? How does English compare?"
             }
           ]
         },

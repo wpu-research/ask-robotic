@@ -3,13 +3,17 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { filterPalette, STATIC_ITEMS, type PaletteItem } from '@/lib/command-palette'
 import { Icon, type IconName } from './icons'
+import { useT } from '@/i18n/client'
+import type { MessageKey } from '@/i18n'
 
 const GROUP_ICON: Record<PaletteItem['group'], IconName> = { Sayfa: 'panel', Araç: 'atolye', Modül: 'moduller', Ders: 'book', Parça: 'parcalar' }
+const GROUP_KEY: Record<PaletteItem['group'], MessageKey> = { Sayfa: 'shell.palette.groups.page', Araç: 'shell.palette.groups.tool', Modül: 'shell.palette.groups.module', Ders: 'shell.palette.groups.lesson', Parça: 'shell.palette.groups.part' }
 
 let cache: PaletteItem[] | null = null
 
 export function CommandPalette({ open, onClose }: { open: boolean; onClose: () => void }) {
   const router = useRouter()
+  const t = useT()
   const ref = useRef<HTMLDialogElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const listId = useId()
@@ -59,7 +63,7 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
 
   let lastGroup = ''
   return (
-    <dialog ref={ref} className="palette" aria-label="Komut paleti" onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose() }}>
+    <dialog ref={ref} className="palette" aria-label={t('shell.palette.aria')} onClose={onClose} onClick={(e) => { if (e.target === ref.current) onClose() }}>
       <div className="palette-box" onKeyDown={onKey}>
         <div className="palette-input">
           <Icon name="search" />
@@ -67,25 +71,25 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Modül, ders veya parça ara…"
+            placeholder={t('shell.palette.placeholder')}
             role="combobox"
             aria-expanded="true"
             aria-controls={listId}
             aria-activedescendant={items.length ? `${listId}-${active}` : undefined}
             aria-autocomplete="list"
-            aria-label="Ara"
+            aria-label={t('shell.search')}
             autoComplete="off"
             spellCheck={false}
           />
           <kbd>Esc</kbd>
         </div>
-        <ul id={listId} role="listbox" aria-label="Sonuçlar" className="palette-list">
+        <ul id={listId} role="listbox" aria-label={t('shell.palette.results')} className="palette-list">
           {items.map((it, i) => {
             const head = it.group !== lastGroup
             lastGroup = it.group
             return (
               <li key={it.id} role="presentation">
-                {head && <div className="palette-group" aria-hidden="true">{it.group}</div>}
+                {head && <div className="palette-group" aria-hidden="true">{t(GROUP_KEY[it.group])}</div>}
                 <div
                   id={`${listId}-${i}`}
                   role="option"
@@ -100,14 +104,14 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                     <span className="palette-title">{it.title}</span>
                     {it.subtitle && <span className="palette-sub">{it.subtitle}</span>}
                   </span>
-                  <span className="palette-kind">{it.group}</span>
+                  <span className="palette-kind">{t(GROUP_KEY[it.group])}</span>
                 </div>
               </li>
             )
           })}
-          {!items.length && <li className="palette-empty" role="presentation">{loading ? 'Aranıyor…' : `“${query}” için sonuç yok. Başka bir sözcük dene.`}</li>}
+          {!items.length && <li className="palette-empty" role="presentation">{loading ? t('shell.palette.searching') : t('shell.palette.empty', { q: query })}</li>}
         </ul>
-        <div className="palette-foot" aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> gez</span><span><kbd>Enter</kbd> aç</span></div>
+        <div className="palette-foot" aria-hidden="true"><span><kbd>↑</kbd><kbd>↓</kbd> {t('shell.palette.navigate')}</span><span><kbd>Enter</kbd> {t('shell.palette.open')}</span></div>
       </div>
     </dialog>
   )

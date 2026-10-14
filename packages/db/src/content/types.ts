@@ -28,6 +28,42 @@ export interface QuizQuestion {
   skills: string[]
 }
 
+/**
+ * Etkileşimli ders (v2) adımı — Brilliant tarzı akış: kısa metin → hemen etkileşim → anında geri bildirim.
+ * Kaynak: content-src/<modül>/<hafta>/ek/NN.adimlar.json (tools/content/ek.mjs doğrular).
+ * Ortak alanlar: `why` doğru cevaptan sonra "Neden?" ile açılan açıklama; `hint` ilk yanlıştan sonra gösterilen ipucu;
+ * `skills` lib/skills.ts beceri kimlikleri. Metinlerde `kod` ve **kalın** (satır içi Markdown) kullanılabilir.
+ */
+export type LessonStep =
+  /** Dersin açılışı: büyük görsel + başlık + 1-2 cümle hikâye. */
+  | { kind: 'intro'; title: string; body: string; art?: string }
+  /** Kısa açıklama (≤ 3 cümle), isteğe bağlı kod parçası ve görsel. */
+  | { kind: 'explain'; body: string; code?: string; art?: string }
+  /** Tek doğru seçenekli soru (çıktıyı tahmin et, hatayı bul, kavram). */
+  | { kind: 'choice'; prompt: string; code?: string; options: string[]; answer: number; why: string; hint?: string; skills?: string[] }
+  /** Sayısal cevap; `tolerance` mutlak. */
+  | { kind: 'numeric'; prompt: string; code?: string; answer: number; tolerance?: number; unit?: string; why: string; hint?: string; skills?: string[] }
+  /** Token'lı kod editörü: `code` içindeki her `___` boşluğu sırayla `answer[i]` ile dolar; öğrenci `tokens` çiplerine dokunur. */
+  | { kind: 'fill'; prompt: string; code: string; tokens: string[]; answer: string[]; why: string; hint?: string; skills?: string[] }
+  /** Satırları doğru sıraya diz (`lines` doğru sıradır; oynatıcı karıştırır). */
+  | { kind: 'order'; prompt: string; lines: string[]; why: string; hint?: string; skills?: string[] }
+  /** Etkileşimli widget + hedef listesi: aynı widget, değişen kısıtlar. */
+  | { kind: 'widget'; prompt: string; widget: WidgetSpec; goals: WidgetGoal[]; why: string; hint?: string; skills?: string[] }
+  /** Dersin simülatör etkinliği (laboratuvar/arena/atölye) derse gömülü açılır; hedefler etkinliğin kendi hedefleridir. */
+  | { kind: 'activity'; prompt: string }
+  /** Konuşalım: doğru/yanlışı olmayan düşünme sorusu. */
+  | { kind: 'reflect'; prompt: string }
+
+/** Widget türü ve başlangıç ayarları. Metrikler widget'a göre: bkz. apps/web/src/components/lesson-v2/widgets. */
+export type WidgetSpec =
+  /** Ohm yasası: gerilim kaynağı + direnç + LED. Metrikler: V, R, I_mA, P_mW, ledOn (0/1). */
+  | { type: 'ohm'; v?: number; r?: number; lockV?: boolean; lockR?: boolean; led?: boolean }
+  /** Yanıp sönen LED zamanlaması. Metrikler: onMs, offMs, periodMs, hz, duty (0-100). */
+  | { type: 'blink'; onMs?: number; offMs?: number }
+
+/** Widget hedefi: metrik [min, max] aralığında olmalı (uçlar dahil). */
+export interface WidgetGoal { label: string; metric: string; min?: number; max?: number }
+
 export interface LessonContent {
   title: string
   durationMin: number
@@ -43,6 +79,13 @@ export interface LessonContent {
   concepts?: Concept[]
   /** Mini test (3-5 soru), opsiyonel */
   quiz?: QuizQuestion[]
+  /** Etkileşimli ders (v2) adımları; varsa ders yeni oynatıcıda açılır. */
+  steps?: LessonStep[]
+  /**
+   * `steps`in İngilizcesi (NN.adimlar.en.json / extras `stepsEn`): aynı yapı, yalnız insan metni çevrilir; kod, sayılar,
+   * cevap sıraları aynı kalır (tools/content/ek.mjs mirrorSteps doğrular). Arayüz dili 'en' iken ders sayfası bunu kullanır.
+   */
+  stepsEn?: LessonStep[]
 }
 
 export interface WeekContent {

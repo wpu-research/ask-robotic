@@ -16,7 +16,7 @@ export async function createSession(db: Db, userId: string, now = new Date()) {
 export async function getSessionUser(db: Db, token: string | undefined, now = new Date()) {
   if (!token) return null
   const rows = await db
-    .select({ id: users.id, email: users.email, name: users.name, role: users.role })
+    .select({ id: users.id, email: users.email, username: users.username, name: users.name, role: users.role, locale: users.locale })
     .from(sessions)
     .innerJoin(users, eq(users.id, sessions.userId))
     .where(and(eq(sessions.tokenHash, hashToken(token)), gt(sessions.expiresAt, now)))

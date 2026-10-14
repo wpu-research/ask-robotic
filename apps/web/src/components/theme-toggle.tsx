@@ -1,8 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { Icon } from './shell/icons'
+import { useT } from '@/i18n/client'
 
 export function ThemeToggle() {
+  const t = useT()
   const [theme, setTheme] = useState<'light' | 'dark' | null>(null)
   useEffect(() => {
     const cur = document.documentElement.dataset.theme
@@ -15,7 +17,7 @@ export function ThemeToggle() {
     try { localStorage.setItem('ask:theme', next) } catch { /* yoksay */ }
   }
   return (
-    <button type="button" className="icon-btn" onClick={toggle} aria-label={theme === 'dark' ? 'Açık temaya geç' : 'Koyu temaya geç'} title="Temayı değiştir">
+    <button type="button" className="icon-btn" onClick={toggle} aria-label={theme === 'dark' ? t('shell.theme.toLight') : t('shell.theme.toDark')} title={t('shell.theme.title')}>
       <Icon name={theme === 'dark' ? 'sun' : 'moon'} />
     </button>
   )

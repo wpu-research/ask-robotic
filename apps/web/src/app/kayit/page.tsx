@@ -1,16 +1,22 @@
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { RegisterForm } from '@/components/auth/auth-forms'
+import { AuthScreen, safeNext } from '@/components/auth/auth-screen'
 import { authEnabled } from '@/lib/flags'
-import { AuthForm } from '../auth-form'
+import { getT } from '@/i18n/server'
 
-export default function Sayfa() {
-  if (!authEnabled()) notFound() // giriş şimdilik kapalı
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())('auth.register.metaTitle') }
+}
+
+export default async function Sayfa({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
+  if (!authEnabled()) notFound()
+  const sp = await searchParams
+  const t = await getT()
+  const fromOnboarding = sp.from === 'basla'
   return (
-    <div className="page">
-      <div className="panel form-card">
-        <h1 style={{ fontSize: '1.6rem' }}>Kayıt ol</h1>
-        <AuthForm mode="register" />
-        <p className="muted">Zaten hesabın var mı? <a href="/giris">Giriş yap</a></p>
-      </div>
-    </div>
+    <AuthScreen title={t(fromOnboarding ? 'auth.register.titleFromOnboarding' : 'auth.register.title')} lead={t('auth.register.lead')}>
+      <RegisterForm next={safeNext(sp.next)} fromOnboarding={fromOnboarding} />
+    </AuthScreen>
   )
 }

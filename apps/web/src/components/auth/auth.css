@@ -1,0 +1,40 @@
+/* Giriş/kayıt ekranları (onboarding .ob-* düzeniyle) ve kullanıcı menüsü. Renkler: learn-v2.css / globals.css belirteçleri. */
+.au-card { width: min(440px, 100%); margin: 0 auto; display: grid; gap: 16px; }
+.au-head { display: grid; justify-items: center; gap: 4px; text-align: center; margin-bottom: 4px; }
+.au-head h1 { margin: 10px 0 0; font-size: clamp(1.5rem, 3.4vw, 1.9rem); }
+.au-head p { margin: 0; color: var(--v2-ink-2); }
+.au-form { display: grid; gap: 14px; }
+.au-field { display: grid; gap: 6px; font-weight: 700; font-size: .92rem; }
+.au-field input, .au-field select { min-height: 52px; padding: 0 16px; border-radius: 14px; border: 2px solid var(--v2-line); background: var(--surface); color: var(--v2-ink); font: inherit; font-size: 1.02rem; font-weight: 500; }
+.au-field input:focus, .au-field select:focus { border-color: var(--v2-accent); outline: none; }
+.au-hint { font-weight: 500; font-size: .84rem; color: var(--muted); }
+.au-roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.au-roles .ob-card { min-height: 92px; padding: 12px 8px; gap: 4px; }
+.au-roles .ob-icon { font-size: 28px !important; }
+.au-check { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border-radius: 16px; background: var(--v2-accent-soft); font-size: .92rem; line-height: 1.5; }
+.au-check input { width: 22px; height: 22px; margin-top: 1px; flex: none; accent-color: var(--v2-accent); }
+.au-error { margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--v2-bad-soft); color: var(--v2-bad-ink); font-weight: 600; }
+.au-note { margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--v2-ok-soft); color: var(--v2-ok-ink); font-weight: 600; font-size: .92rem; }
+.au-form .v2-btn { width: 100%; }
+.au-alt { text-align: center; color: var(--muted); margin: 0; }
+.au-alt a { font-weight: 700; }
+.au-or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: .85rem; }
+.au-or::before, .au-or::after { content: ''; flex: 1; height: 1px; background: var(--v2-line); }
+.au-small { font-size: .82rem; color: var(--muted); text-align: center; margin: 0; line-height: 1.5; }
+@media (max-width: 420px) { .au-roles { grid-template-columns: 1fr; } .au-roles .ob-card { min-height: 60px; grid-auto-flow: column; justify-content: start; } }
+
+.um { position: relative; }
+.um-btn { cursor: pointer; font: inherit; }
+.um-btn:hover { background: var(--surface-2); }
+.um-who { display: grid; line-height: 1.15; text-align: left; }
+.um-role { font-weight: 600; font-size: .75rem; color: var(--muted); }
+.um-menu { position: absolute; right: 0; top: calc(100% + 8px); z-index: 80; min-width: 220px; padding: 8px; border-radius: 16px; border: 1px solid var(--border); background: var(--surface); box-shadow: 0 12px 32px rgb(0 0 0 / .16); display: grid; gap: 2px; }
+.um-menu a, .um-menu button { display: flex; align-items: center; min-height: 44px; padding: 8px 12px; border-radius: 10px; border: 0; background: none; color: var(--text); font: inherit; font-weight: 600; text-align: left; cursor: pointer; text-decoration: none; }
+.um-menu a:hover, .um-menu button:hover, .um-menu a:focus-visible, .um-menu button:focus-visible { background: var(--surface-2); text-decoration: none; }
+.um-menu hr { border: 0; border-top: 1px solid var(--border); margin: 6px 4px; }
+.um-head { padding: 8px 12px 6px; }
+.um-head b { display: block; }
+.um-guest { display: flex; gap: 8px; align-items: center; }
+.um-guest .v2-btn { min-width: 0; min-height: 40px; padding: 0 16px; font-size: .9rem; }
+.um-login { font-weight: 700; padding: 0 10px; color: var(--text); }
+@media (max-width: 640px) { .um-who, .um-guest .um-start { display: none; } }

@@ -131,6 +131,272 @@ export const modul10: ModuleContent = {
                 "mk-timing"
               ]
             }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "chip",
+              "title": "Avucundaki bilgisayar",
+              "body": "Avucuna sığan bir bilgisayar düşün. Ekranı yalnızca **küçük ışıklardan** oluşuyor ama yazı yazabiliyor, sayı gösterebiliyor. Peki bu kadar küçük bir ekrana bir yazı nasıl sığar?"
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Mikro Kart'ın ekranı **5 sütun** ve **5 satırlık** bir ızgaradır. Ekranda toplam kaç LED vardır?",
+              "answer": 25,
+              "unit": "LED",
+              "why": "Her sütunda 5 LED var ve 5 sütun var: 5 x 5 = 25. Sütun ve satır sayısını toplamak (5 + 5 = 10) yanlış olur.",
+              "hint": "Bir sütunda kaç ışık var, kaç tane sütun var?",
+              "skills": [
+                "mk-card"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "chip",
+              "body": "Mikro Kart'ta 25 LED'lik ekranın yanında **A** ve **B** düğmeleri ve dokununca programa haber veren bir **logo** (yıldız) var. Altındaki **P0, P1, P2** bağlantı noktalarını ilerleyen haftalarda kullanacaksın. Bu kart **sanaldır**: bilgisayarın içinde çalışır, kablo ya da pil gerekmez."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Hangisi Mikro Kart'ın bir parçası **değildir**?",
+              "options": [
+                "LED ekranı",
+                "A ve B düğmeleri",
+                "Klavye",
+                "Logo"
+              ],
+              "answer": 2,
+              "why": "Mikro Kart'ın klavyesi yoktur. Ona LED ekranı, A ve B düğmeleri ve logo ile bilgi verir, bilgi alırsın.",
+              "hint": "Az önce sayılan parçaları hatırla. Hangisi orada geçmedi?",
+              "skills": [
+                "mk-card"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "Programı renkli **blokları** birbirine takarak kurarsın. **başlangıçta** bir **başlık bloğudur**: ▶ **Çalıştır**'a basınca içindeki bloklar **bir kez** çalışır. Başlık bloğuna bağlı olmayan blok soluk görünür ve hiç çalışmaz."
+            },
+            {
+              "kind": "choice",
+              "prompt": "**yazıyı göster** bloğunu **başlangıçta** bloğunun içine değil, yanındaki boşluğa bıraktın. ▶ düğmesine basınca ne olur?",
+              "options": [
+                "Yazı yine de kayar",
+                "Kart hata mesajı verir",
+                "Blok kendiliğinden başlangıçta'nın içine girer",
+                "Hiçbir şey olmaz; blok soluk görünür ve çalışmaz"
+              ],
+              "answer": 3,
+              "why": "Kart yalnızca bir başlık bloğuna bağlı blokları çalıştırır. Bağlı olmayan blok soluk görünür; kart hata vermez, onu yalnızca görmez.",
+              "hint": "Programın nereden başladığını hangi blok belirliyordu?",
+              "skills": [
+                "mk-flow"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "Bloklar **yukarıdan aşağıya**, sırayla çalışır ve bir blok bitmeden sonraki başlamaz. Ekran 5 sütun genişliğinde olduğu için uzun yazı sağdan sola **kayar**. Tek bir harf ya da tek basamaklı sayı ise kaymaz, ortada kısa süre durur."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Hangisi ekranda **kaymaz**, ortada kısa süre durur?",
+              "options": [
+                "Sayı: 25",
+                "Harf: A",
+                "Yazı: Ali",
+                "Sayı: 10"
+              ],
+              "answer": 1,
+              "why": "Tek bir harf ekrana sığar ve ortada durur. 25 ve 10 iki basamaklı sayılardır; iki karakter oldukları için yazı gibi kayarlar. Ali de üç harfli bir yazıdır.",
+              "hint": "Her seçenekte kaç karakter var? Say.",
+              "skills": [
+                "mk-card"
+              ]
+            },
+            {
+              "kind": "order",
+              "prompt": "Kart açılınca önce **Merhaba** kaysın, sonra **7** görünsün. Blokları yukarıdan aşağıya sırala.",
+              "lines": [
+                "başlangıçta",
+                "yazıyı göster \"Merhaba\"",
+                "sayıyı göster 7"
+              ],
+              "why": "En üstte başlık bloğu olur; diğer bloklar onun içine takılır. Bloklar yukarıdan aşağıya çalıştığı için önce görünmesi gereken yazı bloğu, sayı bloğunun üstünde durur.",
+              "hint": "Program hangi bloğun içinde yaşıyordu? Sonra ekranda ilk ne görünmeli?",
+              "skills": [
+                "mk-flow"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Program önce **Merhaba** yazısını kaydırıyor, altında **sayıyı göster 7** var. Sayı ne zaman görünür?",
+              "options": [
+                "Yazıyla aynı anda",
+                "Yazı kayıp bittikten sonra",
+                "Hiç görünmez, yazı ekranı kapatır"
+              ],
+              "answer": 1,
+              "why": "Kayan yazı bitmeden bir sonraki blok başlamaz; kart yazının bitmesini bekler. Merhaba yaklaşık 4 saniyede kayar, sonra 7 görünür.",
+              "hint": "Bir blok bitmeden sonraki başlar mı?",
+              "skills": [
+                "mk-flow",
+                "mk-timing"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "**JavaScript** sekmesinde şu satırı görüyorsun. Yazıyı **Selam** yapmak istiyorsun. Ne yaparsın?",
+              "code": "screen.showText(\"Merhaba\");",
+              "options": [
+                "Satırı JavaScript sekmesinde değiştiririm",
+                "Bloktaki yazıyı değiştiririm; sekme yalnızca okunur",
+                "Python sekmesine geçip orada değiştiririm"
+              ],
+              "answer": 1,
+              "why": "JavaScript ve Python sekmeleri blokların yazılı kod hâlini yalnızca gösterir; orada yazı değiştiremezsin. Bloktaki yazıyı değiştirirsen sekmelerdeki kod da değişir.",
+              "hint": "Sekmelerde yazı değiştirebiliyor muydun?"
+            },
+            {
+              "kind": "activity",
+              "prompt": "Şimdi kartın ilk programını yaz: **başlangıçta** bloğunun içine **yazıyı göster** koy, altına **sayıyı göster** tak ve ▶ **Çalıştır**'a bas. Hedeflerin hepsi ✓ olunca **Kontrol et**'e bas."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Kartın ekranı yalnızca 5 sütun genişliğinde. Uzun bir yazıyı küçük ekranda göstermenin kayma dışında başka yolları olur mu? Sence neden tek bir harfi kaydırmak yerine ortada tutuyoruz?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "chip",
+              "title": "A computer in your hand",
+              "body": "Imagine a computer that fits in your hand. Its screen is made only of **tiny lights**, but it can still write words and show numbers. So how does a word fit on such a small screen?"
+            },
+            {
+              "kind": "numeric",
+              "prompt": "The Mikro Kart's screen is a grid of **5 columns** and **5 rows**. How many LEDs are on the screen in total?",
+              "answer": 25,
+              "unit": "LEDs",
+              "why": "Each column has 5 LEDs and there are 5 columns: 5 x 5 = 25. Adding the columns and rows together (5 + 5 = 10) would be wrong.",
+              "hint": "How many lights are in one column, and how many columns are there?",
+              "skills": [
+                "mk-card"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "chip",
+              "body": "Besides the 25-LED screen, the Mikro Kart has buttons **A** and **B** and a **logo** (a star) that tells the program when you touch it. You'll use the **P0, P1, P2** connection points at the bottom in later weeks. This board is **virtual**: it runs inside the computer, so you don't need any wires or batteries."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Which one is **not** part of the Mikro Kart?",
+              "options": [
+                "LED screen",
+                "A and B buttons",
+                "Keyboard",
+                "Logo"
+              ],
+              "answer": 2,
+              "why": "The Mikro Kart has no keyboard. You give it information and get information from it with the LED screen, the A and B buttons, and the logo.",
+              "hint": "Remember the parts we just listed. Which one wasn't there?",
+              "skills": [
+                "mk-card"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "You build a program by snapping colourful **blocks** together. **başlangıçta** (on start) is a **header block**: when you press ▶ **Çalıştır** (Run), the blocks inside it run **once**. A block that isn't attached to a header block looks faded and never runs."
+            },
+            {
+              "kind": "choice",
+              "prompt": "You dropped the **yazıyı göster** (show text) block in the empty space next to **başlangıçta**, not inside it. What happens when you press ▶?",
+              "options": [
+                "The text still scrolls",
+                "The board shows an error message",
+                "The block jumps inside başlangıçta by itself",
+                "Nothing happens; the block looks faded and doesn't run"
+              ],
+              "answer": 3,
+              "why": "The board only runs blocks attached to a header block. A block that isn't attached looks faded; the board doesn't show an error, it just doesn't see it.",
+              "hint": "Which block decided where the program starts?",
+              "skills": [
+                "mk-flow"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "Blocks run **from top to bottom**, in order, and the next block doesn't start until the one before it finishes. The screen is only 5 columns wide, so long text **scrolls** from right to left. A single letter or a one-digit number doesn't scroll; it stays in the middle for a moment."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Which one does **not** scroll and stays in the middle for a moment?",
+              "options": [
+                "Number: 25",
+                "Letter: A",
+                "Text: Ali",
+                "Number: 10"
+              ],
+              "answer": 1,
+              "why": "A single letter fits on the screen and stays in the middle. 25 and 10 are two-digit numbers; because they have two characters, they scroll like text. Ali is a three-letter word too.",
+              "hint": "How many characters are in each option? Count them.",
+              "skills": [
+                "mk-card"
+              ]
+            },
+            {
+              "kind": "order",
+              "prompt": "When the board starts, **Merhaba** (Hello) should scroll first, then **7** should appear. Put the blocks in order from top to bottom.",
+              "lines": [
+                "başlangıçta",
+                "yazıyı göster \"Merhaba\"",
+                "sayıyı göster 7"
+              ],
+              "why": "The header block goes at the top; the other blocks snap inside it. Blocks run from top to bottom, so the text block that should appear first sits above the number block.",
+              "hint": "Which block did the program live inside? Then what should appear on the screen first?",
+              "skills": [
+                "mk-flow"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "The program first scrolls the text **Merhaba**, and below it is **sayıyı göster 7** (show number 7). When does the number appear?",
+              "options": [
+                "At the same time as the text",
+                "After the text has finished scrolling",
+                "Never, the text switches the screen off"
+              ],
+              "answer": 1,
+              "why": "The next block doesn't start until the scrolling text has finished; the board waits for the text to end. Merhaba takes about 4 seconds to scroll, then 7 appears.",
+              "hint": "Does the next block start before a block has finished?",
+              "skills": [
+                "mk-flow",
+                "mk-timing"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "In the **JavaScript** tab you see this line. You want to change the text to **Selam** (Hi). What do you do?",
+              "code": "screen.showText(\"Merhaba\");",
+              "options": [
+                "I change the line in the JavaScript tab",
+                "I change the text in the block; the tab is read-only",
+                "I switch to the Python tab and change it there"
+              ],
+              "answer": 1,
+              "why": "The JavaScript and Python tabs only show the blocks written out as code; you can't change text there. If you change the text in the block, the code in the tabs changes too.",
+              "hint": "Could you type in the tabs?"
+            },
+            {
+              "kind": "activity",
+              "prompt": "Now write the board's first program: put **yazıyı göster** (show text) inside the **başlangıçta** (on start) block, snap **sayıyı göster** (show number) below it, and press ▶ **Çalıştır** (Run). When all the goals are ✓, press **Kontrol et** (Check)."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "The board's screen is only 5 columns wide. Apart from scrolling, are there other ways to show long text on a small screen? Why do you think we keep a single letter in the middle instead of scrolling it?"
+            }
           ]
         },
         {
@@ -250,6 +516,286 @@ export const modul10: ModuleContent = {
                 "mk-timing",
                 "mk-flow"
               ]
+            }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "search",
+              "title": "Işıkların adresi",
+              "body": "Hazine haritasında \"üç adım sağa, iki adım aşağı\" dendiğinde hazineyi bulursun. Kartın ekranındaki 25 ışığın da birer adresi var. Adresi bilirsen istediğin ışığı yakabilirsin."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bir sırada 5 sandalye var. Numaralar **0'dan** başlıyor. Son sandalyenin numarası kaçtır?",
+              "options": [
+                "5",
+                "4",
+                "6"
+              ],
+              "answer": 1,
+              "why": "Numaralar 0, 1, 2, 3, 4 diye gider. Beş sandalye var ama son numara 4'tür; çünkü saymaya 1'den değil 0'dan başladık.",
+              "hint": "Numaraları 0'dan başlayarak tek tek yaz.",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "Her LED'in adresi **(x, y)** biçiminde yazılır: önce x, sonra y. **x** soldan sağa **sütun**, **y** yukarıdan aşağıya **satır** numarasıdır. İkisi de **0'dan** başlar ve en çok **4** olur; sol üst köşe (0, 0), tam orta (2, 2)'dir."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Sağ üst köşedeki LED'in **x** değeri kaçtır?",
+              "answer": 4,
+              "why": "x sütun numarasıdır ve en sağdaki sütun 4'tür. Beş sütun var ama sayım 0'dan başladığı için en büyük numara 5 değil 4'tür. Bu LED'in adresi (4, 0)'dır.",
+              "hint": "x hangi yönde artıyordu? Sütunları 0'dan başlayarak say.",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "**(0, 4)** adresindeki LED ekranın neresindedir?",
+              "options": [
+                "Sağ üst köşe",
+                "Sol alt köşe",
+                "Sol üst köşe",
+                "Sağ alt köşe"
+              ],
+              "answer": 1,
+              "why": "x = 0 en soldaki sütun, y = 4 en alttaki satırdır; yani sol alt köşe. x ile y'yi karıştırırsan sağ üst köşe sanabilirsin; sağ üst köşe (4, 0)'dır.",
+              "hint": "Önce x'e bak: hangi sütun? Sonra y'ye bak: hangi satır?",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "**Alt satırın tam ortasındaki** LED'in adresi hangisidir?",
+              "options": [
+                "(4, 2)",
+                "(2, 4)",
+                "(2, 5)",
+                "(3, 5)"
+              ],
+              "answer": 1,
+              "why": "Ortadaki sütun x = 2, en alt satır y = 4'tür: (2, 4). (4, 2) x ile y'yi ters yazar; (2, 5) ve (3, 5) ise 1'den sayılmış adreslerdir ve ekranın dışında kalır.",
+              "hint": "Önce sütunu bul, sonra satırı. İkisi de 0'dan sayılıyor.",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "**LED yak x y** bloğu o adresteki ışığı yakar, **LED söndür** aynı adresi söndürür, **ekranı temizle** 25 ışığın hepsini birden söndürür. LED blokları **beklemez**; bir çizimin ne kadar görüneceğini **bekle** bloğu belirler. Bekle süresi milisaniye (ms) cinsindendir."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ayşe **sol alt köşeyi** yakmak istiyor ve şu bloğu yazdı. Hangi LED yanar?",
+              "code": "LED yak x 4 y 0",
+              "options": [
+                "Sol alt köşe",
+                "Sağ üst köşe",
+                "Sağ alt köşe",
+                "Hiçbiri, kart hata verir"
+              ],
+              "answer": 1,
+              "why": "x = 4 en sağ sütun, y = 0 en üst satırdır; bu sağ üst köşedir. Ayşe x ile y'yi ters yazmış. Sol alt köşe için x 0 y 4 yazmalıydı.",
+              "hint": "x yatay mıydı, dikey mi?",
+              "skills": [
+                "mk-coords",
+                "mk-debug"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Program şu bloğa gelince ne olur?",
+              "code": "LED yak x 7 y 2",
+              "options": [
+                "Kart kırmızı bir hata mesajı gösterir",
+                "En sağdaki (4, 2) LED'i yanar",
+                "Hiçbir LED yanmaz; kart bu bloğu sessizce yok sayar",
+                "Program orada durur"
+              ],
+              "answer": 2,
+              "why": "x en çok 4 olabilir; 7 ekranın dışındadır. Kart ekran dışı adresi hata vermeden yok sayar ve program devam eder. Bu yüzden bir ışık yanmıyorsa önce adreslere bakmak gerekir.",
+              "hint": "x hangi aralıkta olabilir? Kart ekran dışı adreste ne yapıyordu?",
+              "skills": [
+                "mk-coords",
+                "mk-debug"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Sağ üstten sol alta bir çapraz çiziyorsun: (4, 0), (3, 1), (2, 2), (1, 3) ve bir LED daha. Son LED'in **x** değeri kaçtır?",
+              "answer": 0,
+              "why": "Her adımda x 1 azalır, y 1 artar. (1, 3)'ten sonra (0, 4) gelir; yani x = 0. Bu LED sol alt köşedir.",
+              "hint": "Sıradaki adreslerde x nasıl değişiyor?",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Çapraz çizgi ekranda **1 saniye** kalsın, sonra ekran temizlensin. **bekle** bloğuna kaç ms yazarsın?",
+              "answer": 1000,
+              "unit": "ms",
+              "why": "1 saniye 1000 milisaniyedir; bekle bloğuna 1000 yazılır. Bekle koymazsan LED blokları beklemediği için çizim hemen silinir ve gözle görülmez.",
+              "hint": "Bir saniyede kaç milisaniye var?",
+              "skills": [
+                "mk-timing"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Şimdi çiz! **LED yak** bloklarıyla sol üstten sağ alta çapraz bir çizgi yak, **1000 ms bekle**, **ekranı temizle** ve dört köşeyi yak. Hedeflerin hepsi ✓ olunca **Kontrol et**'e bas."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Bir ışığı yakmak için neden iki sayıya ihtiyacımız var? Sence 25 ışığın her birine 1'den 25'e kadar tek bir numara verseydik daha kolay mı olurdu?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "search",
+              "title": "Addresses for lights",
+              "body": "On a treasure map, when it says \"three steps right, two steps down\", you find the treasure. Each of the 25 lights on the board's screen has an address too. If you know the address, you can light up any light you want."
+            },
+            {
+              "kind": "choice",
+              "prompt": "There are 5 chairs in a row. The numbers start at **0**. What is the number of the last chair?",
+              "options": [
+                "5",
+                "4",
+                "6"
+              ],
+              "answer": 1,
+              "why": "The numbers go 0, 1, 2, 3, 4. There are five chairs, but the last number is 4, because we started counting at 0 instead of 1.",
+              "hint": "Write the numbers one by one, starting at 0.",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "Each LED's address is written as **(x, y)**: x first, then y. **x** is the **column** number from left to right, and **y** is the **row** number from top to bottom. Both start at **0** and go up to **4**; the top-left corner is (0, 0) and the very middle is (2, 2)."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "What is the **x** value of the LED in the top-right corner?",
+              "answer": 4,
+              "why": "x is the column number, and the rightmost column is 4. There are five columns, but since counting starts at 0, the biggest number is 4, not 5. This LED's address is (4, 0).",
+              "hint": "Which way did x grow? Count the columns starting from 0.",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Where on the screen is the LED at address **(0, 4)**?",
+              "options": [
+                "Top-right corner",
+                "Bottom-left corner",
+                "Top-left corner",
+                "Bottom-right corner"
+              ],
+              "answer": 1,
+              "why": "x = 0 is the leftmost column and y = 4 is the bottom row, so it's the bottom-left corner. If you mix up x and y, you might think it's the top-right corner; the top-right corner is (4, 0).",
+              "hint": "Look at x first: which column? Then look at y: which row?",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "What is the address of the LED in **the very middle of the bottom row**?",
+              "options": [
+                "(4, 2)",
+                "(2, 4)",
+                "(2, 5)",
+                "(3, 5)"
+              ],
+              "answer": 1,
+              "why": "The middle column is x = 2 and the bottom row is y = 4: (2, 4). (4, 2) has x and y swapped; (2, 5) and (3, 5) are addresses counted from 1 and fall off the screen.",
+              "hint": "Find the column first, then the row. Both are counted from 0.",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "The **LED yak x y** (LED on) block lights the light at that address, **LED söndür** (LED off) turns the same address off, and **ekranı temizle** (clear screen) turns all 25 lights off at once. LED blocks **don't wait**; the **bekle** (wait) block decides how long a drawing stays visible. The wait time is in milliseconds (ms)."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ayşe wants to light the **bottom-left corner** and wrote this block. Which LED lights up?",
+              "code": "LED yak x 4 y 0",
+              "options": [
+                "Bottom-left corner",
+                "Top-right corner",
+                "Bottom-right corner",
+                "None, the board shows an error"
+              ],
+              "answer": 1,
+              "why": "x = 4 is the rightmost column and y = 0 is the top row; that's the top-right corner. Ayşe swapped x and y. For the bottom-left corner she should have written x 0 y 4.",
+              "hint": "Was x across or up and down?",
+              "skills": [
+                "mk-coords",
+                "mk-debug"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "What happens when the program reaches this block?",
+              "code": "LED yak x 7 y 2",
+              "options": [
+                "The board shows a red error message",
+                "The rightmost LED at (4, 2) lights up",
+                "No LED lights up; the board quietly ignores this block",
+                "The program stops there"
+              ],
+              "answer": 2,
+              "why": "x can be at most 4; 7 is off the screen. The board ignores an off-screen address without an error, and the program carries on. That's why, if a light won't turn on, the first thing to check is the addresses.",
+              "hint": "What range can x be in? What did the board do with an off-screen address?",
+              "skills": [
+                "mk-coords",
+                "mk-debug"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "You're drawing a diagonal from the top right to the bottom left: (4, 0), (3, 1), (2, 2), (1, 3) and one more LED. What is the **x** value of the last LED?",
+              "answer": 0,
+              "why": "At each step x goes down by 1 and y goes up by 1. After (1, 3) comes (0, 4), so x = 0. This LED is the bottom-left corner.",
+              "hint": "How does x change from one address to the next?",
+              "skills": [
+                "mk-coords"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "The diagonal line should stay on the screen for **1 second**, then the screen should be cleared. How many ms do you put in the **bekle** (wait) block?",
+              "answer": 1000,
+              "unit": "ms",
+              "why": "1 second is 1000 milliseconds, so you put 1000 in the wait block. If you leave out the wait, the LED blocks don't wait, so the drawing is erased right away and you can't see it.",
+              "hint": "How many milliseconds are in one second?",
+              "skills": [
+                "mk-timing"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Now draw! Use **LED yak** (LED on) blocks to light a diagonal line from the top left to the bottom right, **wait 1000 ms**, **clear the screen**, and light the four corners. When all the goals are ✓, press **Kontrol et** (Check)."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Why do we need two numbers to light one light? Do you think it would be easier if we gave each of the 25 lights a single number from 1 to 25?"
             }
           ]
         },

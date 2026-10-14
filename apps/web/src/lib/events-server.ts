@@ -1,4 +1,5 @@
-// Olay günlüğünün sunucu tarafı (PİLOT, taslak). Kişisel veri tutulmaz: IP ve kullanıcı bilgisi veritabanına YAZILMAZ.
+// Olay günlüğünün sunucu tarafı (PİLOT, taslak). IP veritabanına YAZILMAZ. Giriş yapmışsa yalnız user_id yazılır (öğretmen paneli
+// beceri haritası); ad/e-posta yazılmaz. Anonim kayıtta user_id null.
 import { events, eq, type Db } from '@ask/db'
 import { BATCH, sanitizeEvent, type AppEvent } from './events-core'
 
@@ -21,9 +22,9 @@ export function parseBatch(body: unknown, now = Date.now()): ParsedBatch {
   return { ok: true, deviceId: b.deviceId, events: good, dropped: b.events.length - good.length }
 }
 
-export async function storeEvents(db: Db, deviceId: string, list: AppEvent[]): Promise<number> {
+export async function storeEvents(db: Db, deviceId: string, list: AppEvent[], userId: string | null = null): Promise<number> {
   if (!list.length) return 0
-  await db.insert(events).values(list.map((e) => ({ deviceId, type: e.type, lessonId: e.lessonId ?? null, payload: e.p ?? null, ts: new Date(e.t) })))
+  await db.insert(events).values(list.map((e) => ({ deviceId, userId, type: e.type, lessonId: e.lessonId ?? null, payload: e.p ?? null, ts: new Date(e.t) })))
   return list.length
 }
 

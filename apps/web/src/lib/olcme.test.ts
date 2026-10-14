@@ -192,7 +192,8 @@ describe('sunucu: /api/events ve depolama', () => {
     const rows = await db.select().from(events).where(eq(events.deviceId, ID))
     expect(rows).toHaveLength(2)
     expect(rows[0]).toMatchObject({ type: 'lesson_view', lessonId: 4, payload: { kind: 'devre' } })
-    expect(Object.keys(rows[0]).sort()).toEqual(['deviceId', 'id', 'lessonId', 'payload', 'ts', 'type']) // kişisel alan yok
+    expect(Object.keys(rows[0]).sort()).toEqual(['deviceId', 'id', 'lessonId', 'payload', 'ts', 'type', 'userId']) // kişisel alan yok
+    expect(rows[0].userId).toBeNull() // anonim kayıt
     expect(await deleteDeviceEvents(db, ID)).toBe(2)
     expect(await db.select().from(events).where(eq(events.deviceId, ID))).toHaveLength(0)
     expect(await db.select().from(events).where(eq(events.deviceId, other))).toHaveLength(1)

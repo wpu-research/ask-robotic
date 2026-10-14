@@ -135,6 +135,300 @@ export const modul3: ModuleContent = {
                 "mcu-board"
               ]
             }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "chip",
+              "title": "Gizli bilgisayarlar",
+              "body": "Asansör hangi kata gideceğini, çamaşır makinesi suyu ne zaman boşaltacağını nereden bilir? İçlerinde **tek bir iş için programlanmış** minik bir bilgisayar var. Hadi onu tanıyalım."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Sence bu eşyalardan hangisinin içinde bir mikrodenetleyici **yoktur**?",
+              "options": [
+                "Mikrodalga fırın",
+                "TV kumandası",
+                "Tahta cetvel",
+                "Dijital kol saati"
+              ],
+              "answer": 2,
+              "why": "Fırın, kumanda ve dijital saat düğmelere basılınca ne yapacağını bir programdan bilir. Tahta cetvelde ne elektrik ne program vardır.",
+              "hint": "Hangisi elektrikle çalışmıyor?",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "chip",
+              "body": "**Mikrodenetleyici**, bir bilgisayarın işlemcisini, belleğini ve giriş-çıkış parçalarını **tek bir çipte** toplar. Ekranı ve klavyesi yoktur; onun yerine **pinleri** (bacakları) vardır. LED, buton, sensör ve motorlar bu pinlere bağlanır."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Mikrodenetleyici dış dünyayla nasıl haberleşir?",
+              "options": [
+                "Ekranı ve klavyesiyle",
+                "Pinlerine bağlanan parçalarla",
+                "Yalnızca internet üzerinden",
+                "Hoparlörüyle konuşarak"
+              ],
+              "answer": 1,
+              "why": "Mikrodenetleyicinin ekranı ya da klavyesi yoktur. Pinlerine bağlanan LED'leri yakar, butonları okur, motorları döndürür.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "chip",
+              "body": "**Arduino Uno**, ATmega328P adlı bir mikrodenetleyicinin üzerine kurulu bir karttır. Üstünde **D0–D13** dijital pinler, **A0–A5** analog pinler, **5V** ve **GND** besleme pinleri ve D13'e bağlı küçük bir **L** LED'i vardır."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "D0'dan D13'e kadar kaç tane dijital pin vardır?",
+              "answer": 14,
+              "unit": "pin",
+              "why": "0, 1, 2 … 13 diye sayınca 14 pin eder. Saymaya 0'dan başladığımız için son numara (13) ile pin sayısı (14) farklıdır.",
+              "hint": "D0'ı da saymayı unutma.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "`A0` ile `0` aynı pin midir?",
+              "options": [
+                "Evet, ikisi de aynı pinin adı",
+                "Hayır: A0 analog giriş pini, 0 ise dijital pin",
+                "A0 yalnız LED yakmak içindir",
+                "Uno'da A0 diye bir pin yoktur"
+              ],
+              "answer": 1,
+              "why": "A0–A5 gerilimi ölçen **analog giriş** pinleridir. 0–13 ise **dijital** pinlerdir. Numaraları benzese de farklı pinlerdir.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "Bir dijital pin iki durumdan birindedir: **HIGH** yaklaşık 5 V verir, **LOW** 0 V verir. Pin **çıkış** olursa kart dışarıya gerilim verir (LED yakmak gibi), **giriş** olursa dışarıyı dinler (buton okumak gibi)."
+            },
+            {
+              "kind": "choice",
+              "prompt": "D13'e bir LED bağlı ve pin **çıkış** olarak ayarlı. D13 **HIGH** olunca LED ne yapar?",
+              "options": [
+                "Yanar",
+                "Söner",
+                "Yanıp söner",
+                "Hiçbir şey olmaz"
+              ],
+              "answer": 0,
+              "why": "HIGH, pinin yaklaşık 5 V vermesi demektir. Akım LED'den geçer ve LED yanar. LOW olunca 0 V olur, LED söner.",
+              "skills": [
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "Arduino programına **sketch** denir. Her sketch'te iki bölüm vardır: `setup()` kart açılınca **bir kez** çalışır, `loop()` ise bittiği anda baştan başlar ve **sürekli** tekrar eder.",
+              "code": "void setup() {\n  // bir kez çalışır\n}\n\nvoid loop() {\n  // sürekli tekrar eder\n}"
+            },
+            {
+              "kind": "fill",
+              "prompt": "Boşlukları doldur: pinin yönü **bir kez** ayarlansın, LED **sürekli** kontrol edilsin.",
+              "code": "void ___() {\n  pinMode(13, OUTPUT);\n}\n\nvoid ___() {\n  digitalWrite(13, HIGH);\n}",
+              "tokens": [
+                "setup",
+                "loop",
+                "start",
+                "repeat"
+              ],
+              "answer": [
+                "setup",
+                "loop"
+              ],
+              "why": "Bir kez yapılacak ayarlar `setup()` içine, sürekli tekrar edecek işler `loop()` içine yazılır. `start` ve `repeat` Arduino'da bu anlamda yoktur.",
+              "hint": "Arduino'nun iki bölümünün adı derste geçti.",
+              "skills": [
+                "prog-structure"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bu sketch çalışınca D13'teki LED ne yapar?",
+              "code": "void setup() {\n  pinMode(13, OUTPUT);\n  digitalWrite(13, HIGH);\n}\n\nvoid loop() {\n}",
+              "options": [
+                "Yanıp söner",
+                "Sürekli yanık kalır",
+                "Hiç yanmaz",
+                "Derleme hatası verir"
+              ],
+              "answer": 1,
+              "why": "`setup()` bir kez çalışır ve D13'ü HIGH yapar. `loop()` boş olduğu için pini değiştiren başka komut yok; pin HIGH kalır, LED sürekli yanar.",
+              "hint": "loop() içinde pini değiştiren bir komut var mı?",
+              "skills": [
+                "prog-structure",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Şimdi sıra sende! Laboratuvarda **devre kurmadan**, yalnız kod yazarak D13'e bağlı **L** LED'ini yanıp söndür. Hedefler tamamlanınca **Kontrol et**'e bas."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Evindeki hangi cihazın içinde bir mikrodenetleyici olduğunu düşünüyorsun? Bunu nereden anladın?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "chip",
+              "title": "Hidden computers",
+              "body": "How does an elevator know which floor to go to, or a washing machine know when to drain the water? Inside each one is a tiny computer **programmed for a single job**. Let's meet it."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Which of these objects does **not** have a microcontroller inside?",
+              "options": [
+                "Microwave oven",
+                "TV remote",
+                "Wooden ruler",
+                "Digital wristwatch"
+              ],
+              "answer": 2,
+              "why": "The oven, the remote and the digital watch all follow a program that tells them what to do when you press a button. A wooden ruler has no electricity and no program.",
+              "hint": "Which one doesn't run on electricity?",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "chip",
+              "body": "A **microcontroller** packs a computer's processor, memory and input/output parts into **a single chip**. It has no screen or keyboard; instead it has **pins** (legs). LEDs, buttons, sensors and motors connect to these pins."
+            },
+            {
+              "kind": "choice",
+              "prompt": "How does a microcontroller talk to the outside world?",
+              "options": [
+                "Through its screen and keyboard",
+                "Through parts connected to its pins",
+                "Only over the internet",
+                "By speaking through its speaker"
+              ],
+              "answer": 1,
+              "why": "A microcontroller has no screen or keyboard. It lights LEDs, reads buttons and spins motors that are connected to its pins.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "chip",
+              "body": "The **Arduino Uno** is a board built around a microcontroller called the ATmega328P. On it you'll find digital pins **D0–D13**, analog pins **A0–A5**, the **5V** and **GND** power pins, and a small LED labelled **L** that is connected to D13."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "How many digital pins are there from D0 to D13?",
+              "answer": 14,
+              "unit": "pins",
+              "why": "Counting 0, 1, 2 … 13 gives 14 pins. Because we start counting at 0, the last number (13) and the number of pins (14) are different.",
+              "hint": "Don't forget to count D0 too.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Are `A0` and `0` the same pin?",
+              "options": [
+                "Yes, both are names for the same pin",
+                "No: A0 is an analog input pin, 0 is a digital pin",
+                "A0 is only for lighting LEDs",
+                "There is no pin called A0 on the Uno"
+              ],
+              "answer": 1,
+              "why": "A0–A5 are **analog input** pins that measure voltage. 0–13 are **digital** pins. The numbers look alike, but they are different pins.",
+              "skills": [
+                "mcu-board"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "A digital pin is always in one of two states: **HIGH** gives about 5 V, **LOW** gives 0 V. When a pin is an **output**, the board sends voltage out (like lighting an LED); when it is an **input**, it listens to the outside (like reading a button)."
+            },
+            {
+              "kind": "choice",
+              "prompt": "An LED is connected to D13 and the pin is set as an **output**. What does the LED do when D13 goes **HIGH**?",
+              "options": [
+                "It turns on",
+                "It turns off",
+                "It blinks",
+                "Nothing happens"
+              ],
+              "answer": 0,
+              "why": "HIGH means the pin gives about 5 V. Current flows through the LED and it lights up. When the pin is LOW it gives 0 V and the LED goes out.",
+              "skills": [
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "An Arduino program is called a **sketch**. Every sketch has two parts: `setup()` runs **once** when the board powers on, and `loop()` starts over as soon as it finishes, repeating **forever**.",
+              "code": "void setup() {\n  // bir kez çalışır\n}\n\nvoid loop() {\n  // sürekli tekrar eder\n}"
+            },
+            {
+              "kind": "fill",
+              "prompt": "Fill in the blanks: set the pin direction **once**, and control the LED **continuously**.",
+              "code": "void ___() {\n  pinMode(13, OUTPUT);\n}\n\nvoid ___() {\n  digitalWrite(13, HIGH);\n}",
+              "tokens": [
+                "setup",
+                "loop",
+                "start",
+                "repeat"
+              ],
+              "answer": [
+                "setup",
+                "loop"
+              ],
+              "why": "Settings you make once go inside `setup()`, and work that repeats forever goes inside `loop()`. `start` and `repeat` don't exist in Arduino with this meaning.",
+              "hint": "The names of Arduino's two parts came up in the lesson.",
+              "skills": [
+                "prog-structure"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "When this sketch runs, what does the LED on D13 do?",
+              "code": "void setup() {\n  pinMode(13, OUTPUT);\n  digitalWrite(13, HIGH);\n}\n\nvoid loop() {\n}",
+              "options": [
+                "It blinks",
+                "It stays on all the time",
+                "It never turns on",
+                "It gives a compile error"
+              ],
+              "answer": 1,
+              "why": "`setup()` runs once and sets D13 to HIGH. `loop()` is empty, so no other command changes the pin; it stays HIGH and the LED stays on.",
+              "hint": "Is there a command inside loop() that changes the pin?",
+              "skills": [
+                "prog-structure",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Your turn! In the lab, **without building a circuit**, just by writing code, make the **L** LED on D13 blink. When the goals are complete, press **Kontrol et** (Check)."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Which device in your home do you think has a microcontroller inside? How can you tell?"
+            }
           ]
         },
         {
@@ -255,6 +549,370 @@ export const modul3: ModuleContent = {
                 "elec-ohm",
                 "elec-led-resistor"
               ]
+            }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "bolt",
+              "title": "LED'i kurtaran direnç",
+              "body": "Bir LED'i doğrudan 5 V'a bağlarsan kısa sürede bozulabilir. Araya giren küçük bir **direnç** onu kurtarır. Ama hangi direnç? Tahmin etmek yerine **hesaplayacağız**."
+            },
+            {
+              "kind": "explain",
+              "art": "wave",
+              "body": "Elektriği borudaki suya benzetelim: **Gerilim (V)** suyu iten basınçtır, **akım (I)** borudan geçen su miktarıdır, **direnç (R)** ise borunun darlığıdır. Boru daraldıkça daha az su geçer."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Su borusu benzetmesinde **akım** neye karşılık gelir?",
+              "options": [
+                "Suyu iten basınç",
+                "Borudan geçen su miktarı",
+                "Borunun darlığı",
+                "Borunun rengi"
+              ],
+              "answer": 1,
+              "why": "Akım, bir noktadan geçen yük miktarıdır; tıpkı borudan geçen su gibi. Basınç gerilime, darlık dirence karşılık gelir.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "bolt",
+              "body": "**Ohm yasası** üçünü bağlar: `V = I × R`. Akımı bulmak için `I = V / R` yazarız. Akım küçük olduğu için çoğu zaman **miliamper** kullanırız: 1 A = 1000 mA."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Gerilim 5 V'ta sabit. Direnci değiştirerek akımı **tam 5 mA** yap.",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 220,
+                "led": false
+              },
+              "goals": [
+                {
+                  "label": "Akım 5 mA olsun",
+                  "metric": "I_mA",
+                  "min": 4.9,
+                  "max": 5.1
+                }
+              ],
+              "why": "`I = V / R` → 5 V / 1000 Ω = 0,005 A = **5 mA**. Direnç büyüdükçe akım küçülür.",
+              "hint": "Akım fazla geliyorsa direnci büyüt.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "9 V'luk bir pile 450 Ω'luk bir direnç bağlandı. Akım kaç **mA** olur?",
+              "answer": 20,
+              "tolerance": 0.5,
+              "unit": "mA",
+              "why": "`I = V / R` = 9 / 450 = 0,02 A. Miliampere çevirmek için 1000 ile çarparız: **20 mA**.",
+              "hint": "Önce amper bul, sonra 1000 ile çarp.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "LED biraz farklıdır: üstünde yaklaşık **2 V** (kırmızı LED) kendisi harcar. Direncin üstünde kalan gerilim `5 − 2 = 3 V` olur. Yani `I = (5 − 2) / R`. Bir LED için **5–20 mA** güvenli bir akımdır."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Devrede şimdi bir LED var. Direnci seç: LED **yansın** ama akım **20 mA'yı geçmesin**.",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 47,
+                "led": true
+              },
+              "goals": [
+                {
+                  "label": "LED yansın",
+                  "metric": "ledOn",
+                  "min": 1
+                },
+                {
+                  "label": "Akım en çok 20 mA olsun",
+                  "metric": "I_mA",
+                  "max": 20
+                }
+              ],
+              "why": "47 Ω ile akım (5 − 2) / 47 ≈ 64 mA olur: LED yanar ama bozulur. 150 Ω ve üstü akımı 20 mA'nın altına çeker. Çok büyük direnç seçersen LED çok sönük kalır.",
+              "hint": "Akım 20 mA'nın üstündeyse direnci büyüt.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "widget",
+              "prompt": "Daha uzun ömür için hedef daralsın: akım **8 ile 10 mA** arasında olsun.",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 150,
+                "led": true
+              },
+              "goals": [
+                {
+                  "label": "LED yansın",
+                  "metric": "ledOn",
+                  "min": 1
+                },
+                {
+                  "label": "Akım 8–10 mA arasında olsun",
+                  "metric": "I_mA",
+                  "min": 8,
+                  "max": 10
+                }
+              ],
+              "why": "330 Ω ile `I = (5 − 2) / 330` ≈ **9,1 mA**. LED'i rahatça görecek kadar parlak, ama çipi ve LED'i yormayacak kadar küçük bir akım.",
+              "hint": "220 Ω ile akım ≈ 13,6 mA; bir sonraki değeri dene.",
+              "skills": [
+                "elec-led-resistor",
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "5 V, kırmızı LED (2 V) ve **10 mA** akım istiyoruz. Direnç kaç **Ω** olmalı?",
+              "answer": 300,
+              "tolerance": 1,
+              "unit": "Ω",
+              "why": "Direncin üstündeki gerilim 5 − 2 = 3 V. `R = V / I` = 3 / 0,010 = **300 Ω**.",
+              "hint": "Önce direncin üstünde kalan gerilimi bul, sonra 10 mA'yı amper'e çevir (0,010 A).",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Hesap **300 Ω** çıktı ama elinde yalnız 220 Ω, 330 Ω ve 1 kΩ dirençler var. Hangisini seçersin?",
+              "options": [
+                "220 Ω",
+                "330 Ω",
+                "1 kΩ",
+                "Direnç kullanmam"
+              ],
+              "answer": 1,
+              "why": "Hesaba en yakın **biraz büyük** değeri seçeriz: 330 Ω akımı biraz azaltır (≈ 9 mA), bu güvenlidir. 220 Ω akımı artırır, 1 kΩ LED'i çok sönük bırakır.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ayşe LED'i **direnç olmadan** doğrudan D13 ile GND arasına bağladı. Ne olur?",
+              "options": [
+                "LED daha parlak ve sorunsuz yanar",
+                "Akım çok büyür; LED ve pin zarar görebilir",
+                "LED hiç yanmaz",
+                "Program derlenmez"
+              ],
+              "answer": 1,
+              "why": "Direnç yoksa akımı sınırlayan bir şey kalmaz; akım LED'in ve pinin dayanabileceğinden çok büyür. Laboratuvar bu durumda uyarı verir.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Laboratuvarda gerçek devreyi kur: D13 → direnç → LED → GND. Direnci seçip **sanal ölçümle** akımı oku ve **5–12 mA** aralığına getir."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Direnci büyütmek LED'i nasıl etkiliyor? Çok çok büyük bir direnç seçseydik ne olurdu?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "bolt",
+              "title": "The resistor that saves the LED",
+              "body": "If you connect an LED straight to 5 V, it can burn out quickly. A small **resistor** placed in between saves it. But which resistor? Instead of guessing, we're going to **calculate** it."
+            },
+            {
+              "kind": "explain",
+              "art": "wave",
+              "body": "Think of electricity as water in a pipe: **voltage (V)** is the pressure pushing the water, **current (I)** is how much water flows through the pipe, and **resistance (R)** is how narrow the pipe is. The narrower the pipe, the less water gets through."
+            },
+            {
+              "kind": "choice",
+              "prompt": "In the water pipe analogy, what does **current** correspond to?",
+              "options": [
+                "The pressure pushing the water",
+                "The amount of water flowing through the pipe",
+                "How narrow the pipe is",
+                "The colour of the pipe"
+              ],
+              "answer": 1,
+              "why": "Current is the amount of charge passing a point, just like water flowing through a pipe. Pressure corresponds to voltage, and narrowness to resistance.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "bolt",
+              "body": "**Ohm's law** connects all three: `V = I × R`. To find the current we write `I = V / R`. Because the current is small, we usually use **milliamps**: 1 A = 1000 mA."
+            },
+            {
+              "kind": "widget",
+              "prompt": "The voltage is fixed at 5 V. Change the resistance to make the current **exactly 5 mA**.",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 220,
+                "led": false
+              },
+              "goals": [
+                {
+                  "label": "Current is 5 mA",
+                  "metric": "I_mA",
+                  "min": 4.9,
+                  "max": 5.1
+                }
+              ],
+              "why": "`I = V / R` → 5 V / 1000 Ω = 0.005 A = **5 mA**. The bigger the resistance, the smaller the current.",
+              "hint": "If the current is too high, increase the resistance.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "A 450 Ω resistor is connected to a 9 V battery. What is the current in **mA**?",
+              "answer": 20,
+              "tolerance": 0.5,
+              "unit": "mA",
+              "why": "`I = V / R` = 9 / 450 = 0.02 A. To convert to milliamps we multiply by 1000: **20 mA**.",
+              "hint": "First find the amps, then multiply by 1000.",
+              "skills": [
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "led",
+              "body": "An LED is a bit different: it uses up about **2 V** itself (for a red LED). The voltage left across the resistor is `5 − 2 = 3 V`. So `I = (5 − 2) / R`. For an LED, **5–20 mA** is a safe current."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Now there's an LED in the circuit. Pick a resistor so the LED **lights up** but the current **doesn't go above 20 mA**.",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 47,
+                "led": true
+              },
+              "goals": [
+                {
+                  "label": "LED is on",
+                  "metric": "ledOn",
+                  "min": 1
+                },
+                {
+                  "label": "Current is at most 20 mA",
+                  "metric": "I_mA",
+                  "max": 20
+                }
+              ],
+              "why": "With 47 Ω the current is (5 − 2) / 47 ≈ 64 mA: the LED lights up but gets damaged. 150 Ω or more brings the current below 20 mA. If you pick a huge resistor, the LED stays very dim.",
+              "hint": "If the current is above 20 mA, increase the resistance.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "widget",
+              "prompt": "For a longer life, let's narrow the target: keep the current **between 8 and 10 mA**.",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 150,
+                "led": true
+              },
+              "goals": [
+                {
+                  "label": "LED is on",
+                  "metric": "ledOn",
+                  "min": 1
+                },
+                {
+                  "label": "Current is between 8 and 10 mA",
+                  "metric": "I_mA",
+                  "min": 8,
+                  "max": 10
+                }
+              ],
+              "why": "With 330 Ω, `I = (5 − 2) / 330` ≈ **9.1 mA**. That's bright enough to see the LED easily, but small enough not to strain the chip or the LED.",
+              "hint": "With 220 Ω the current is ≈ 13.6 mA; try the next value up.",
+              "skills": [
+                "elec-led-resistor",
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "We have 5 V, a red LED (2 V) and we want **10 mA** of current. How many **Ω** should the resistor be?",
+              "answer": 300,
+              "tolerance": 1,
+              "unit": "Ω",
+              "why": "The voltage across the resistor is 5 − 2 = 3 V. `R = V / I` = 3 / 0.010 = **300 Ω**.",
+              "hint": "First find the voltage left across the resistor, then convert 10 mA to amps (0.010 A).",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Your calculation says **300 Ω**, but you only have 220 Ω, 330 Ω and 1 kΩ resistors. Which one do you choose?",
+              "options": [
+                "220 Ω",
+                "330 Ω",
+                "1 kΩ",
+                "I don't use a resistor"
+              ],
+              "answer": 1,
+              "why": "We pick the closest value that is **slightly bigger**: 330 Ω lowers the current a little (≈ 9 mA), which is safe. 220 Ω raises the current, and 1 kΩ leaves the LED very dim.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ayşe connected the LED **without a resistor**, directly between D13 and GND. What happens?",
+              "options": [
+                "The LED shines brighter with no problems",
+                "The current gets too big; the LED and the pin can be damaged",
+                "The LED doesn't light at all",
+                "The program doesn't compile"
+              ],
+              "answer": 1,
+              "why": "Without a resistor nothing limits the current; it grows far beyond what the LED and the pin can handle. The lab shows a warning in this case.",
+              "skills": [
+                "elec-led-resistor"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Build the real circuit in the lab: D13 → resistor → LED → GND. Choose a resistor, read the current with the **virtual meter**, and bring it into the **5–12 mA** range."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "How does a bigger resistor affect the LED? What would happen if we chose a really, really big resistor?"
             }
           ]
         },
@@ -378,6 +1036,414 @@ export const modul3: ModuleContent = {
                 "prog-timing"
               ]
             }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "led",
+              "title": "Donanımın merhaba dünyası",
+              "body": "Her programcının ilk programı ekrana \"Merhaba dünya\" yazar. Donanımda bunun karşılığı bir LED'i **yakıp söndürmektir**: adı **Blink**. Kart, LED'in ne zaman yanıp ne zaman söneceğini nereden bilir? Hadi görelim."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bu sketch çalışınca D13'teki LED ne yapar? Önce tahmin et.",
+              "code": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(1000);\n  digitalWrite(13, LOW);\n  delay(1000);\n}",
+              "options": [
+                "1 saniye yanar, 1 saniye söner ve bu sonsuza kadar tekrar eder",
+                "Bir kez yanıp söner, sonra hep sönük kalır",
+                "Sürekli yanık kalır",
+                "1 saniye boyunca çok hızlı yanıp söner, sonra durur"
+              ],
+              "answer": 0,
+              "why": "`loop()` bittiği anda baştan başlar. Yak, 1000 ms bekle, söndür, 1000 ms bekle; sonra yine en başa döner. Bu yüzden LED durmadan yanıp söner.",
+              "hint": "loop() sonuna gelince ne oluyordu?",
+              "skills": [
+                "prog-structure",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "clock",
+              "body": "Blink dört komutla çalışır: `pinMode(13, OUTPUT)` pini çıkış yapar, `digitalWrite(13, HIGH)` ve `LOW` LED'i yakıp söndürür, `delay(ms)` bekletir. `delay` **milisaniye** alır: 1000 ms = 1 saniye. Yanık süre ile sönük sürenin toplamına **periyot** (bir tur) denir.",
+              "code": "digitalWrite(13, HIGH);  // yak\ndelay(1000);             // yanık süre\ndigitalWrite(13, LOW);   // söndür\ndelay(1000);             // sönük süre"
+            },
+            {
+              "kind": "widget",
+              "prompt": "Kaydırıcılar iki `delay` değeridir. LED şu an 2 saniyede bir yanıyor. Onu **saniyede 1 kez**, yanık ve sönük süreleri **eşit** olacak şekilde yanıp söndür.",
+              "widget": {
+                "type": "blink",
+                "onMs": 1000,
+                "offMs": 1000
+              },
+              "goals": [
+                {
+                  "label": "Saniyede 1 kez yansın",
+                  "metric": "hz",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "label": "Yanık ve sönük süre eşit olsun (%50)",
+                  "metric": "duty",
+                  "min": 50,
+                  "max": 50
+                }
+              ],
+              "why": "Saniyede 1 kez demek, bir turun 1000 ms sürmesi demek. Eşit bölünce 500 ms yanık + 500 ms sönük olur: kodda iki kez `delay(500)`.",
+              "hint": "Bir tur kaç milisaniye sürmeli? Bunu ikiye böl.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "LED 1000 ms yanık, 1000 ms sönük kalıyor ve ilk yanışı 0. saniyede başlıyor. **10 saniye** içinde LED kaç kez yanar?",
+              "answer": 5,
+              "unit": "kez",
+              "why": "Bir tur 1000 + 1000 = 2000 ms = 2 saniye. LED 0, 2, 4, 6 ve 8. saniyelerde yanar: 10 / 2 = **5** kez.",
+              "hint": "Önce bir turun kaç saniye sürdüğünü bul.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "widget",
+              "prompt": "Biraz hızlanalım: LED **saniyede 2 kez** yanıp sönsün, yanık ve sönük süreler yine **eşit** olsun.",
+              "widget": {
+                "type": "blink",
+                "onMs": 500,
+                "offMs": 500
+              },
+              "goals": [
+                {
+                  "label": "Saniyede 2 kez yansın",
+                  "metric": "hz",
+                  "min": 2,
+                  "max": 2
+                },
+                {
+                  "label": "Yanık ve sönük süre eşit olsun (%50)",
+                  "metric": "duty",
+                  "min": 50,
+                  "max": 50
+                }
+              ],
+              "why": "Saniyede 2 tur varsa bir tur 1000 / 2 = 500 ms sürer. Eşit bölünce 250 ms yanık + 250 ms sönük olur.",
+              "hint": "Saniyede 2 tur sığacaksa bir tur ne kadar kısa olmalı?",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "wave",
+              "body": "Yanık sürenin bütün tura oranına **yanık kalma oranı** denir. Örneğin 300 ms yanık, 700 ms sönük bir turda LED zamanın 300 / 1000 = **%30**'unda yanıktır. Periyodu aynı tutup bu oranı değiştirirsen LED'in \"karakteri\" değişir: kısa yanış bir kalp atışı ya da uyarı ışığı gibi görünür."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Bir **nabız ışığı** yap: LED yine **saniyede 1 kez** yansın ama **kısa yansın, uzun sönsün**. Yanık kalma oranı **%10 ile %20** arasında olsun.",
+              "widget": {
+                "type": "blink",
+                "onMs": 250,
+                "offMs": 250
+              },
+              "goals": [
+                {
+                  "label": "Saniyede 1 kez yansın",
+                  "metric": "hz",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "label": "Yanık kalma %10–20 arası olsun",
+                  "metric": "duty",
+                  "min": 10,
+                  "max": 20
+                }
+              ],
+              "why": "Tur 1000 ms olmalı; yanık süre bunun %10–20'si, yani 100–200 ms. Örneğin 200 ms yanık + 800 ms sönük: 200 / 1000 = %20. Toplam aynı kaldıkça hız değişmez, yalnız oran değişir.",
+              "hint": "Önce toplamı 1000 ms'ye getir, sonra yanık süreyi küçültüp sönük süreyi aynı miktarda büyüt.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "Nabız ışığını koda çevir: D13'teki LED **200 ms yansın, 800 ms sönsün**.",
+              "code": "void setup() {\n  pinMode(13, ___);\n}\n\nvoid loop() {\n  digitalWrite(13, ___);\n  delay(___);\n  digitalWrite(13, LOW);\n  delay(800);\n}",
+              "tokens": [
+                "OUTPUT",
+                "Output",
+                "HIGH",
+                "high",
+                "200",
+                "200ms",
+                "0.2"
+              ],
+              "answer": [
+                "OUTPUT",
+                "HIGH",
+                "200"
+              ],
+              "why": "Arduino büyük/küçük harfe duyarlıdır: `OUTPUT` ve `HIGH` tamamen büyük harfle yazılır; `Output` ya da `high` derleme hatası verir. `delay` milisaniyeyi birimsiz bir sayı olarak alır: `delay(200)`. `200ms` geçersizdir, `0.2` ise 0 ms'ye yuvarlanır.",
+              "hint": "Arduino sabitleri nasıl yazılıyordu? delay hangi birimi kullanıyor?",
+              "skills": [
+                "digital-out",
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ali LED'in 2 saniye yanıp 2 saniye sönmesini istedi ve bu kodu yazdı. Ne görür?",
+              "code": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(2);\n  digitalWrite(13, LOW);\n  delay(2);\n}",
+              "options": [
+                "LED 2 saniye yanar, 2 saniye söner",
+                "LED saniyede 250 kez yanıp söner; göz bunu ayırt edemez, LED sürekli ama biraz sönük yanıyor gibi görünür",
+                "Derleme hatası: delay saniye ister",
+                "LED hiç yanmaz"
+              ],
+              "answer": 1,
+              "why": "`delay(2)` 2 saniye değil **2 milisaniye** bekler. Bir tur 2 + 2 = 4 ms, saniyede 1000 / 4 = 250 tur eder. Göz bu kadar hızlı yanıp sönmeyi göremez. 2 saniye için `delay(2000)` yazılmalıydı.",
+              "hint": "delay içindeki sayının birimi ne?",
+              "skills": [
+                "prog-timing",
+                "prog-debug"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "bolt",
+              "body": "Gerçek bir LED yakmak için akımın **kapalı bir halka** bulması gerekir: D13 → 330 Ω direnç → LED'in **anodu** (A, uzun bacak) → **katodu** (K, kısa bacak) → GND. LED yönlüdür; akım yalnız A'dan K'ya geçer. Direnç akımı sınırlar ve LED'i korur."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ece devreyi kurdu: D13 → 330 Ω → LED'in A ucu. LED'in **K ucu ise boşta**. Program doğru. LED ne yapar?",
+              "options": [
+                "Normal yanıp söner",
+                "Hiç yanmaz; akımın GND'ye dönüş yolu yok",
+                "Sürekli yanar",
+                "Daha parlak yanar çünkü direnç yalnız bir uçta"
+              ],
+              "answer": 1,
+              "why": "Akım D13'ten çıkıp GND'ye dönebileceği kesintisiz bir yol bulamazsa akmaz. K ucu GND'ye bağlanmadıkça halka kapanmaz ve LED yanmaz.",
+              "hint": "Akım LED'den çıktıktan sonra nereye gidecek?",
+              "skills": [
+                "circuit-wiring"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Şimdi gerçek devre! Laboratuvarda bir **LED** ve bir **direnç** ekle. D13'ü direnç üzerinden LED'in **A** ucuna, LED'in **K** ucunu GND'ye bağla ve direnci yaklaşık **330 Ω** yap. Sonra `pinMode`, `digitalWrite` ve `delay` ile LED'i **yanıp söndür**."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "`delay(1000)` çalışırken kart başka bir iş yapabilir mi? Bu sırada bir butona basılsa kart bunu fark eder miydi?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "led",
+              "title": "Hello world for hardware",
+              "body": "Every programmer's first program prints \"Hello world\" on the screen. In hardware, the equivalent is **blinking** an LED on and off: it's called **Blink**. How does the board know when the LED should be on and when it should be off? Let's find out."
+            },
+            {
+              "kind": "choice",
+              "prompt": "When this sketch runs, what does the LED on D13 do? Make a guess first.",
+              "code": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(1000);\n  digitalWrite(13, LOW);\n  delay(1000);\n}",
+              "options": [
+                "It's on for 1 second, off for 1 second, and repeats forever",
+                "It blinks once, then stays off",
+                "It stays on all the time",
+                "It blinks very fast for 1 second, then stops"
+              ],
+              "answer": 0,
+              "why": "`loop()` starts over as soon as it ends. Turn on, wait 1000 ms, turn off, wait 1000 ms; then back to the top. That's why the LED keeps blinking.",
+              "hint": "What happened when loop() reached its end?",
+              "skills": [
+                "prog-structure",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "clock",
+              "body": "Blink uses four commands: `pinMode(13, OUTPUT)` makes the pin an output, `digitalWrite(13, HIGH)` and `LOW` turn the LED on and off, and `delay(ms)` waits. `delay` takes **milliseconds**: 1000 ms = 1 second. The on time plus the off time is called the **period** (one cycle).",
+              "code": "digitalWrite(13, HIGH);  // yak\ndelay(1000);             // yanık süre\ndigitalWrite(13, LOW);   // söndür\ndelay(1000);             // sönük süre"
+            },
+            {
+              "kind": "widget",
+              "prompt": "The sliders are the two `delay` values. Right now the LED lights once every 2 seconds. Make it blink **once per second**, with **equal** on and off times.",
+              "widget": {
+                "type": "blink",
+                "onMs": 1000,
+                "offMs": 1000
+              },
+              "goals": [
+                {
+                  "label": "Blinks once per second",
+                  "metric": "hz",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "label": "On and off times are equal (50%)",
+                  "metric": "duty",
+                  "min": 50,
+                  "max": 50
+                }
+              ],
+              "why": "Once per second means one cycle lasts 1000 ms. Split equally that's 500 ms on + 500 ms off: `delay(500)` twice in the code.",
+              "hint": "How many milliseconds should one cycle take? Split that in two.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "The LED stays on for 1000 ms and off for 1000 ms, and first lights up at second 0. How many times does the LED light up within **10 seconds**?",
+              "answer": 5,
+              "unit": "times",
+              "why": "One cycle is 1000 + 1000 = 2000 ms = 2 seconds. The LED lights up at seconds 0, 2, 4, 6 and 8: 10 / 2 = **5** times.",
+              "hint": "First find how many seconds one cycle takes.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "widget",
+              "prompt": "Let's speed up: make the LED blink **twice per second**, again with **equal** on and off times.",
+              "widget": {
+                "type": "blink",
+                "onMs": 500,
+                "offMs": 500
+              },
+              "goals": [
+                {
+                  "label": "Blinks twice per second",
+                  "metric": "hz",
+                  "min": 2,
+                  "max": 2
+                },
+                {
+                  "label": "On and off times are equal (50%)",
+                  "metric": "duty",
+                  "min": 50,
+                  "max": 50
+                }
+              ],
+              "why": "With 2 cycles per second, one cycle lasts 1000 / 2 = 500 ms. Split equally that's 250 ms on + 250 ms off.",
+              "hint": "If 2 cycles have to fit into a second, how short must one cycle be?",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "wave",
+              "body": "The share of the cycle the LED spends on is called the **duty cycle**. For example, in a cycle with 300 ms on and 700 ms off, the LED is on 300 / 1000 = **30%** of the time. Keep the period the same but change this ratio, and the LED's \"character\" changes: a short flash looks like a heartbeat or a warning light."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Make a **pulse light**: the LED should still light **once per second**, but **flash briefly and stay off longer**. Keep the duty cycle **between 10% and 20%**.",
+              "widget": {
+                "type": "blink",
+                "onMs": 250,
+                "offMs": 250
+              },
+              "goals": [
+                {
+                  "label": "Blinks once per second",
+                  "metric": "hz",
+                  "min": 1,
+                  "max": 1
+                },
+                {
+                  "label": "Duty cycle is between 10% and 20%",
+                  "metric": "duty",
+                  "min": 10,
+                  "max": 20
+                }
+              ],
+              "why": "The cycle must be 1000 ms; the on time is 10–20% of that, so 100–200 ms. For example, 200 ms on + 800 ms off: 200 / 1000 = 20%. As long as the total stays the same, the speed doesn't change, only the ratio does.",
+              "hint": "First bring the total to 1000 ms, then shrink the on time and grow the off time by the same amount.",
+              "skills": [
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "Turn the pulse light into code: the LED on D13 should be **on for 200 ms and off for 800 ms**.",
+              "code": "void setup() {\n  pinMode(13, ___);\n}\n\nvoid loop() {\n  digitalWrite(13, ___);\n  delay(___);\n  digitalWrite(13, LOW);\n  delay(800);\n}",
+              "tokens": [
+                "OUTPUT",
+                "Output",
+                "HIGH",
+                "high",
+                "200",
+                "200ms",
+                "0.2"
+              ],
+              "answer": [
+                "OUTPUT",
+                "HIGH",
+                "200"
+              ],
+              "why": "Arduino is case-sensitive: `OUTPUT` and `HIGH` are written in all capitals; `Output` or `high` cause a compile error. `delay` takes milliseconds as a plain number with no unit: `delay(200)`. `200ms` is invalid, and `0.2` gets rounded down to 0 ms.",
+              "hint": "How were Arduino constants written? What unit does delay use?",
+              "skills": [
+                "digital-out",
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ali wanted the LED to be on for 2 seconds and off for 2 seconds, and wrote this code. What does he see?",
+              "code": "void setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(2);\n  digitalWrite(13, LOW);\n  delay(2);\n}",
+              "options": [
+                "The LED is on for 2 seconds, off for 2 seconds",
+                "The LED blinks 250 times a second; the eye can't tell, so it looks like it's always on but a bit dim",
+                "Compile error: delay wants seconds",
+                "The LED never turns on"
+              ],
+              "answer": 1,
+              "why": "`delay(2)` waits **2 milliseconds**, not 2 seconds. One cycle is 2 + 2 = 4 ms, which makes 1000 / 4 = 250 cycles per second. The eye can't see blinking that fast. For 2 seconds he should have written `delay(2000)`.",
+              "hint": "What unit is the number inside delay?",
+              "skills": [
+                "prog-timing",
+                "prog-debug"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "bolt",
+              "body": "To light a real LED, the current needs to find a **closed loop**: D13 → 330 Ω resistor → the LED's **anode** (A, long leg) → **cathode** (K, short leg) → GND. An LED has a direction; current only flows from A to K. The resistor limits the current and protects the LED."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Ece built the circuit: D13 → 330 Ω → the LED's A leg. But the LED's **K leg is left unconnected**. The program is correct. What does the LED do?",
+              "options": [
+                "It blinks normally",
+                "It never lights; the current has no path back to GND",
+                "It stays on all the time",
+                "It shines brighter because the resistor is only on one side"
+              ],
+              "answer": 1,
+              "why": "If current leaving D13 can't find an unbroken path back to GND, it doesn't flow. Until the K leg is connected to GND the loop isn't closed, and the LED won't light.",
+              "hint": "Where will the current go after it leaves the LED?",
+              "skills": [
+                "circuit-wiring"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Now for a real circuit! In the lab, add an **LED** and a **resistor**. Connect D13 through the resistor to the LED's **A** leg, connect the LED's **K** leg to GND, and set the resistor to about **330 Ω**. Then use `pinMode`, `digitalWrite` and `delay` to make the LED **blink**."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "While `delay(1000)` is running, can the board do anything else? If someone pressed a button during that time, would the board notice?"
+            }
           ]
         },
         {
@@ -496,6 +1562,378 @@ export const modul3: ModuleContent = {
                 "prog-loops-arrays"
               ]
             }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "code",
+              "title": "40 LED'i kim yakacak?",
+              "body": "Dört LED'i sırayla yakmak için aynı satırları dört kez yazabilirsin. Peki 40 LED olsaydı? Programcılar tekrar eden işi elle yazmaz; **kartın kendisine tekrarlatır**. Bu derste bunun iki aracını öğreneceksin: **for döngüsü** ve **dizi**."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Bir LED'i sırayla yakmak için 3 satır gerekiyor: yak, bekle, söndür. Döngü kullanmadan **40 LED** için kaç satır yazman gerekir?",
+              "answer": 120,
+              "unit": "satır",
+              "why": "Her LED için 3 satır: 40 × 3 = **120** satır. Üstelik bir bekleme süresini değiştirmek istesen 40 yerde değiştirirdin. Döngüyle aynı iş 5 satırda biter.",
+              "hint": "Her LED için kaç satır, kaç LED var?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "gear",
+              "body": "`for` döngüsünün üç parçası vardır: **başlangıç** (`int pin = 10`) bir kez kurulur, **koşul** (`pin <= 13`) her turdan önce kontrol edilir, **artış** (`pin++`) her turdan sonra sayacı 1 artırır. Koşul yanlış olunca döngü biter.",
+              "code": "for (int pin = 10; pin <= 13; pin++) {\n  pinMode(pin, OUTPUT);\n}"
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Yukarıdaki döngünün gövdesi (`pinMode` satırı) kaç kez çalışır?",
+              "answer": 4,
+              "unit": "kez",
+              "why": "`pin` sırasıyla 10, 11, 12 ve 13 olur: **4** tur. `pin` 14 olunca `pin <= 13` yanlış olur ve döngü biter.",
+              "hint": "pin'in alabileceği değerleri tek tek yaz; iki ucu da say.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "D10, D11, D12 ve **D13**'ün hepsi çıkış olsun. Döngü başlığını tamamla.",
+              "code": "for (int ___ = 10; pin ___ 13; pin___) {\n  pinMode(pin, OUTPUT);\n}",
+              "tokens": [
+                "pin",
+                "i",
+                "<=",
+                "<",
+                "=<",
+                "++",
+                "--"
+              ],
+              "answer": [
+                "pin",
+                "<=",
+                "++"
+              ],
+              "why": "Sayacın adı gövdede kullanılanla aynı olmalı: `pin`. `pin < 13` yazsaydın D13 atlanırdı; 13'ün de dahil olması için `<=` gerekir (`=<` diye bir işleç yoktur). `pin++` sayacı artırır; `pin--` ile pin 10, 9, 8… diye azalır ve koşul hep doğru kalır.",
+              "hint": "13 de dahil olsun istiyoruz. Sayaç büyümeli mi küçülmeli mi?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "**Dizi**, aynı türden birçok değeri tek isim altında tutar. Elemanlara köşeli parantez içindeki **indeks** ile ulaşırsın ve indeks **0'dan başlar**. Sırayı dizide sen belirlediğin için pinlerin sıralı olması gerekmez.",
+              "code": "int ledler[] = {13, 12, 11, 10};\n// indeks:      0   1   2   3"
+            },
+            {
+              "kind": "choice",
+              "prompt": "`int ledler[] = {13, 12, 11, 10};` dizisinde `ledler[1]` kaçtır?",
+              "options": [
+                "13",
+                "12",
+                "11",
+                "1"
+              ],
+              "answer": 1,
+              "why": "İndeks 0'dan başlar: `ledler[0]` = 13, `ledler[1]` = **12**. 13'ü seçtiysen saymaya 1'den başladın.",
+              "hint": "İlk elemanın indeksi kaçtı?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "`int pinler[] = {2, 4, 6, 8, 10, 12};` dizisinde **son elemanın indeksi** kaçtır?",
+              "answer": 5,
+              "why": "Dizide 6 eleman var ve indeksler 0, 1, 2, 3, 4, **5**'tir. N elemanlı bir dizinin son indeksi N − 1'dir.",
+              "hint": "Önce eleman sayısını bul; saymaya 0'dan başladığını unutma.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "Döngü ve diziyi birleştir: dizideki **dört pinin hepsi** çıkış olsun.",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i ___ 4; i++) {\n    pinMode(ledler[___], OUTPUT);\n  }\n}",
+              "tokens": [
+                "<",
+                "<=",
+                "i",
+                "4",
+                "1"
+              ],
+              "answer": [
+                "<",
+                "i"
+              ],
+              "why": "`i < 4` ile `i` 0, 1, 2, 3 olur; dört geçerli indeksin hepsi. Her turda `ledler[i]` farklı bir pini verir. `ledler[4]` ya da `ledler[1]` yazsaydın her turda aynı (biri de diziden taşan) eleman işlenirdi.",
+              "hint": "Hangi indeksler geçerli? Her turda değişen şey ne?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bu programda bir hata var. Hangisi?",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i <= 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n}",
+              "options": [
+                "Döngü 5 tur döner; son turda ledler[4] okunur ama 4 elemanlı dizide böyle bir eleman yok",
+                "İndeks 1'den başlamalı: int i = 1",
+                "i++ yerine i-- yazılmalı",
+                "Dizi setup() içinde tanımlanmalı"
+              ],
+              "answer": 0,
+              "why": "`i <= 4` ile `i` 0, 1, 2, 3, **4** olur: 5 tur. Son indeks 3 olduğu için `ledler[4]` diziden **taşar** ve rastgele bir değer okunur. Doğrusu `i < 4`.",
+              "hint": "i'nin alacağı değerleri yaz ve dizinin geçerli indeksleriyle karşılaştır.",
+              "skills": [
+                "prog-loops-arrays",
+                "prog-debug"
+              ]
+            },
+            {
+              "kind": "order",
+              "prompt": "`loop()` içinde dört LED sırayla **yansın, 300 ms beklesin, sönsün**. Satırları doğru sıraya diz.",
+              "lines": [
+                "for (int i = 0; i < 4; i++) {",
+                "  digitalWrite(ledler[i], HIGH);",
+                "  delay(300);",
+                "  digitalWrite(ledler[i], LOW);",
+                "}"
+              ],
+              "why": "Önce döngü açılır; her turda o anki LED yanar, 300 ms bekler ve söner. Bekleme yakmakla söndürmek arasında olmalı; yoksa LED yanık kalmadan söner ve göremezsin.",
+              "hint": "Tek bir LED için Blink'teki sırayı düşün, sonra onu döngünün içine koy.",
+              "skills": [
+                "prog-loops-arrays",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Işığın geri dönmesi için bu döngü yazıldı. Hangi pinler **hangi sırayla** yanar?",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int i = 2; i >= 1; i--) {\n    digitalWrite(ledler[i], HIGH);\n    delay(150);\n    digitalWrite(ledler[i], LOW);\n  }\n}",
+              "options": [
+                "D11, sonra D12",
+                "D12, sonra D13",
+                "D11, D12, sonra D13",
+                "Hiçbiri; azalan döngü çalışmaz"
+              ],
+              "answer": 0,
+              "why": "`i` önce 2, sonra 1 olur; `i` 0 olunca `i >= 1` yanlış olur. `ledler[2]` = 11, `ledler[1]` = 12. Yani D11, sonra D12. \"D12, sonra D13\" diyen indeksi 1'den saymıştır.",
+              "hint": "i hangi değerleri alıyor? Her biri için diziye bak.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "\"Gidip gelen ışık\" programında `loop()`'un bir tam turu kaç **ms** sürer? (Komutların kendi süresi yok sayılır.)",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    digitalWrite(ledler[i], HIGH);\n    delay(150);\n    digitalWrite(ledler[i], LOW);\n  }\n  for (int i = 2; i >= 1; i--) {\n    digitalWrite(ledler[i], HIGH);\n    delay(150);\n    digitalWrite(ledler[i], LOW);\n  }\n}",
+              "answer": 900,
+              "unit": "ms",
+              "why": "İlk döngü 4 tur, ikinci döngü 2 tur döner: toplam 6 yanış. Her yanışta bir `delay(150)` var: 6 × 150 = **900 ms**.",
+              "hint": "Her döngü kaç tur dönüyor? Her turda kaç ms bekleniyor?",
+              "skills": [
+                "prog-timing",
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Laboratuvarda **dört LED** ve **dört direnç** ekle. D13, D12, D11 ve D10'un her birini kendi direnci üzerinden bir LED'in **A** ucuna, bütün **K** uçlarını GND'ye bağla. Kodda `int ledler[] = {13, 12, 11, 10};` dizisini ve bir **for döngüsünü** kullanarak dört LED'in dördünü de sırayla yakıp söndür."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Dört LED yerine otuz LED olsaydı, döngü ve dizi sana ne kazandırırdı? Programda neyi değiştirmen yeterli olurdu?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "code",
+              "title": "Who's going to light 40 LEDs?",
+              "body": "To light four LEDs one after another, you could write the same lines four times. But what if there were 40 LEDs? Programmers don't write repetitive work by hand; they **make the board repeat it**. In this lesson you'll learn two tools for that: the **for loop** and the **array**."
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Lighting one LED in turn takes 3 lines: turn on, wait, turn off. Without a loop, how many lines would you need to write for **40 LEDs**?",
+              "answer": 120,
+              "unit": "lines",
+              "why": "3 lines per LED: 40 × 3 = **120** lines. And if you wanted to change a waiting time, you'd have to change it in 40 places. With a loop the same job takes 5 lines.",
+              "hint": "How many lines per LED, and how many LEDs are there?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "gear",
+              "body": "A `for` loop has three parts: the **start** (`int pin = 10`) is set up once, the **condition** (`pin <= 13`) is checked before every round, and the **step** (`pin++`) adds 1 to the counter after every round. When the condition becomes false, the loop ends.",
+              "code": "for (int pin = 10; pin <= 13; pin++) {\n  pinMode(pin, OUTPUT);\n}"
+            },
+            {
+              "kind": "numeric",
+              "prompt": "How many times does the body of the loop above (the `pinMode` line) run?",
+              "answer": 4,
+              "unit": "times",
+              "why": "`pin` becomes 10, 11, 12 and 13 in turn: **4** rounds. When `pin` reaches 14, `pin <= 13` is false and the loop ends.",
+              "hint": "Write out every value pin can take; count both ends.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "Make D10, D11, D12 and **D13** all outputs. Complete the loop header.",
+              "code": "for (int ___ = 10; pin ___ 13; pin___) {\n  pinMode(pin, OUTPUT);\n}",
+              "tokens": [
+                "pin",
+                "i",
+                "<=",
+                "<",
+                "=<",
+                "++",
+                "--"
+              ],
+              "answer": [
+                "pin",
+                "<=",
+                "++"
+              ],
+              "why": "The counter's name must match the one used in the body: `pin`. If you wrote `pin < 13`, D13 would be skipped; to include 13 you need `<=` (there's no `=<` operator). `pin++` increases the counter; with `pin--`, pin goes 10, 9, 8… and the condition stays true forever.",
+              "hint": "We want 13 included. Should the counter grow or shrink?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "An **array** holds many values of the same type under one name. You reach each element with an **index** in square brackets, and the index **starts at 0**. Because you choose the order in the array, the pins don't have to be in sequence.",
+              "code": "int ledler[] = {13, 12, 11, 10};\n// indeks:      0   1   2   3"
+            },
+            {
+              "kind": "choice",
+              "prompt": "In the array `int ledler[] = {13, 12, 11, 10};`, what is `ledler[1]`?",
+              "options": [
+                "13",
+                "12",
+                "11",
+                "1"
+              ],
+              "answer": 1,
+              "why": "Indexes start at 0: `ledler[0]` = 13, `ledler[1]` = **12**. If you picked 13, you started counting from 1.",
+              "hint": "What was the index of the first element?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "In the array `int pinler[] = {2, 4, 6, 8, 10, 12};`, what is the **index of the last element**?",
+              "answer": 5,
+              "why": "The array has 6 elements and the indexes are 0, 1, 2, 3, 4, **5**. The last index of an array with N elements is N − 1.",
+              "hint": "First find the number of elements; remember that you start counting at 0.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "fill",
+              "prompt": "Combine the loop and the array: make **all four pins** in the array outputs.",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i ___ 4; i++) {\n    pinMode(ledler[___], OUTPUT);\n  }\n}",
+              "tokens": [
+                "<",
+                "<=",
+                "i",
+                "4",
+                "1"
+              ],
+              "answer": [
+                "<",
+                "i"
+              ],
+              "why": "With `i < 4`, `i` becomes 0, 1, 2, 3: all four valid indexes. Each round, `ledler[i]` gives a different pin. If you wrote `ledler[4]` or `ledler[1]`, the same element (and in one case one that's past the end of the array) would be used every round.",
+              "hint": "Which indexes are valid? What changes every round?",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "This program has a bug. Which one?",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i <= 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n}",
+              "options": [
+                "The loop runs 5 rounds; the last round reads ledler[4], but a 4-element array has no such element",
+                "The index should start at 1: int i = 1",
+                "It should say i-- instead of i++",
+                "The array should be declared inside setup()"
+              ],
+              "answer": 0,
+              "why": "With `i <= 4`, `i` becomes 0, 1, 2, 3, **4**: 5 rounds. The last index is 3, so `ledler[4]` goes **past the end** of the array and reads a random value. The fix is `i < 4`.",
+              "hint": "Write out the values of i and compare them with the array's valid indexes.",
+              "skills": [
+                "prog-loops-arrays",
+                "prog-debug"
+              ]
+            },
+            {
+              "kind": "order",
+              "prompt": "Inside `loop()`, the four LEDs should, one after another, **turn on, wait 300 ms, turn off**. Put the lines in the right order.",
+              "lines": [
+                "for (int i = 0; i < 4; i++) {",
+                "  digitalWrite(ledler[i], HIGH);",
+                "  delay(300);",
+                "  digitalWrite(ledler[i], LOW);",
+                "}"
+              ],
+              "why": "First the loop opens; each round the current LED turns on, waits 300 ms and turns off. The wait must be between turning on and turning off; otherwise the LED goes out before it has a chance to stay on, and you won't see it.",
+              "hint": "Think of the Blink order for a single LED, then put it inside the loop.",
+              "skills": [
+                "prog-loops-arrays",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "This loop was written to send the light back. Which pins light up, **in what order**?",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int i = 2; i >= 1; i--) {\n    digitalWrite(ledler[i], HIGH);\n    delay(150);\n    digitalWrite(ledler[i], LOW);\n  }\n}",
+              "options": [
+                "D11, then D12",
+                "D12, then D13",
+                "D11, D12, then D13",
+                "None; a counting-down loop doesn't work"
+              ],
+              "answer": 0,
+              "why": "`i` is first 2, then 1; when `i` becomes 0, `i >= 1` is false. `ledler[2]` = 11, `ledler[1]` = 12. So D11, then D12. Anyone who said \"D12, then D13\" counted the index from 1.",
+              "hint": "Which values does i take? Look up each one in the array.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "In the \"back-and-forth light\" program, how many **ms** does one full round of `loop()` take? (Ignore the time the commands themselves take.)",
+              "code": "int ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int i = 0; i < 4; i++) {\n    digitalWrite(ledler[i], HIGH);\n    delay(150);\n    digitalWrite(ledler[i], LOW);\n  }\n  for (int i = 2; i >= 1; i--) {\n    digitalWrite(ledler[i], HIGH);\n    delay(150);\n    digitalWrite(ledler[i], LOW);\n  }\n}",
+              "answer": 900,
+              "unit": "ms",
+              "why": "The first loop runs 4 rounds and the second runs 2: 6 flashes in total. Each flash has one `delay(150)`: 6 × 150 = **900 ms**.",
+              "hint": "How many rounds does each loop run? How many ms does each round wait?",
+              "skills": [
+                "prog-timing",
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "In the lab, add **four LEDs** and **four resistors**. Connect each of D13, D12, D11 and D10 through its own resistor to an LED's **A** leg, and connect all the **K** legs to GND. In the code, use the array `int ledler[] = {13, 12, 11, 10};` and a **for loop** to light up and turn off all four LEDs one after another."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "If there were thirty LEDs instead of four, what would the loop and the array save you? What would be enough to change in the program?"
+            }
           ]
         },
         {
@@ -608,6 +2046,358 @@ export const modul3: ModuleContent = {
                 "elec-led-resistor",
                 "elec-ohm"
               ]
+            }
+          ],
+          "steps": [
+            {
+              "kind": "intro",
+              "art": "traffic",
+              "title": "Kavşağın beyni",
+              "body": "Her kavşakta ışıklar aynı düzenle yanar: kırmızıda dur, yeşilde geç, sarıda hazırlan. Bu düzeni **üç LED** ve birkaç satır kodla kuracaksın. Ama bu sefer koda değil, **plana** başlayarak."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Bizim trafik ışığımız kırmızı → yeşil → sarı diye döner. **Yeşilden hemen sonra** neden doğrudan kırmızı değil de sarı yanar?",
+              "options": [
+                "Sürücülere ışığın değişeceğini haber verir; ani kırmızıda fren yetişmeyebilir",
+                "Sarı LED en az akımı çektiği için",
+                "Sarı yanmazsa program derlenmez",
+                "Kırmızı LED'in ısınması için zaman tanır"
+              ],
+              "answer": 0,
+              "why": "Sarı bir **uyarı aşamasıdır**: yeşilde geçmekte olan araç, kırmızı yanmadan önce durmaya ya da kavşağı boşaltmaya zaman bulur. Programdaki her aşamanın gerçek dünyada bir görevi vardır.",
+              "hint": "Hızla giden bir araba yeşil birden kırmızıya dönerse ne olur?",
+              "skills": [
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "traffic",
+              "body": "Mühendisler önce bir **plan tablosu** yazar: her **aşamada** hangi LED yanar, ne kadar sürer. Bizim planımız: kırmızı (D13) 5 s, yeşil (D11) 5 s, sarı (D12) 2 s, sonra başa dön. Aynı anda yalnız bir LED yanar."
+            },
+            {
+              "kind": "order",
+              "prompt": "Plan tablosunu kur: aşamaları `loop()`'un bir turundaki sırasına diz.",
+              "lines": [
+                "Kırmızı yanar, 5 saniye beklenir",
+                "Kırmızı söner, yeşil yanar, 5 saniye beklenir",
+                "Yeşil söner, sarı yanar, 2 saniye beklenir",
+                "Sarı söner ve loop() baştan başlar"
+              ],
+              "why": "Tur kırmızıyla başlar, yeşil ve sarıyla devam eder. Sarı söndükten sonra `loop()` başa döner ve kırmızı yeniden yanar. Her aşama, bir önceki LED'i söndürerek başlar.",
+              "hint": "Yeşilden sonra ne geliyordu? Tur nasıl kapanıyor?",
+              "skills": [
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Plandaki süreleri `delay` değerlerine çevir ve topla: `loop()`'un bir tam turu kaç **milisaniye** sürer?",
+              "answer": 12000,
+              "unit": "ms",
+              "why": "`delay` milisaniye alır: 5 s = 5000 ms, 2 s = 2000 ms. Tur: 5000 + 5000 + 2000 = **12000 ms** (12 saniye).",
+              "hint": "Her saniye 1000 ms. Önce üç süreyi çevir, sonra topla.",
+              "skills": [
+                "prog-timing",
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "Tablonun her satırı kodda aynı kalıba dönüşür: **söndür, yak, bekle**. Önce artık yanmaması gereken LED'i `LOW` yap, sonra yeni LED'i `HIGH` yap, ardından `delay` ile bekle. Bu kalıp sayesinde hiçbir aşamada iki LED birlikte yanık kalmaz."
+            },
+            {
+              "kind": "fill",
+              "prompt": "2. aşamayı koda çevir: **kırmızı (D13) sönsün, yeşil (D11) yansın, 5 saniye beklensin**.",
+              "code": "void loop() {\n  // 1. aşama: kırmızı\n  digitalWrite(13, HIGH);\n  delay(5000);\n\n  // 2. aşama: yeşil\n  digitalWrite(13, ___);\n  digitalWrite(___, HIGH);\n  delay(___);\n}",
+              "tokens": [
+                "LOW",
+                "HIGH",
+                "11",
+                "12",
+                "5000",
+                "5",
+                "500"
+              ],
+              "answer": [
+                "LOW",
+                "11",
+                "5000"
+              ],
+              "why": "Önce kırmızı söner: `digitalWrite(13, LOW)`. Yeşil D11'de olduğu için `digitalWrite(11, HIGH)`. 5 saniye = **5000** ms; `delay(5)` yalnız 5 milisaniye, `delay(500)` yarım saniye bekletir. D12 sarı LED'dir.",
+              "hint": "Söndür, yak, bekle. Yeşil LED hangi pinde? delay hangi birimi alıyor?",
+              "skills": [
+                "digital-out",
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Programı çalıştırınca **sarı aşamada iki LED birlikte yanıyor**. Neden?",
+              "code": "void loop() {\n  // 2. aşama: yeşil\n  digitalWrite(13, LOW);\n  digitalWrite(11, HIGH);\n  delay(5000);\n\n  // 3. aşama: sarı\n  digitalWrite(12, HIGH);\n  delay(2000);\n}",
+              "options": [
+                "Sarı yakılmadan önce `digitalWrite(11, LOW);` yok; yeşil yanık kalıyor",
+                "`delay(2000)` çok kısa",
+                "Sarı LED için 12 değil 13 yazılmalı",
+                "`digitalWrite` her seferinde iki LED yakar"
+              ],
+              "answer": 0,
+              "why": "Bir pin `HIGH` yapıldıktan sonra biri onu `LOW` yapana kadar yanık kalır. Sarı aşaması \"söndür\" adımını atlamış: yeşil (D11) söndürülmediği için sarıyla birlikte yanıyor. Gerçek kavşakta bu karışıklığa yol açardı.",
+              "hint": "Söndür, yak, bekle kalıbının hangi adımı eksik?",
+              "skills": [
+                "prog-debug",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Bu yönde trafik yoğun, turu **15 saniyeye** çıkarmak istiyorsun. Kırmızı 5 s ve sarı 2 s aynı kalacak. Yeşil aşamadaki `delay()` içine kaç yazmalısın?",
+              "answer": 8000,
+              "unit": "ms",
+              "why": "Yeşile kalan süre 15 − 5 − 2 = 8 saniye. `delay` milisaniye aldığı için `delay(8000)`.",
+              "hint": "Önce yeşile kaç saniye kaldığını bul, sonra milisaniyeye çevir.",
+              "skills": [
+                "prog-timing",
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "Programı 4. dersteki gibi diziyle yazdın. `ledler[2]` hangi LED'dir?",
+              "code": "int ledler[] = {13, 12, 11};  // kırmızı, sarı, yeşil\n\nvoid setup() {\n  for (int i = 0; i < 3; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n}",
+              "options": [
+                "Kırmızı (D13)",
+                "Sarı (D12)",
+                "Yeşil (D11)",
+                "Hiçbiri; 3 elemanlı dizide ledler[2] taşar"
+              ],
+              "answer": 2,
+              "why": "İndeks 0'dan başlar: `ledler[0]` = 13 (kırmızı), `ledler[1]` = 12 (sarı), `ledler[2]` = **11 (yeşil)**. 3 elemanlı dizinin son geçerli indeksi 2'dir; taşma `ledler[3]`'te olurdu.",
+              "hint": "İndeksleri 0'dan sayarak eşleştir.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "bolt",
+              "body": "Devrede her LED'in **kendi** seri direnci olur: üç LED, üç tane 330 Ω. Kırmızı LED üzerinde yaklaşık 2 V düşer; direncin üstünde 5 − 2 = 3 V kalır. Sarı ve yeşil LED'lerde düşüm biraz farklıdır ama 330 Ω yine güvenlidir."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Kırmızı LED'in direncini seç: LED **yansın** ve akım **5 ile 10 mA** arasında kalsın. 330 Ω bu aralığa giriyor mu?",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 47,
+                "led": true
+              },
+              "goals": [
+                {
+                  "label": "LED yansın",
+                  "metric": "ledOn",
+                  "min": 1
+                },
+                {
+                  "label": "Akım 5–10 mA arasında olsun",
+                  "metric": "I_mA",
+                  "min": 5,
+                  "max": 10
+                }
+              ],
+              "why": "330 Ω ile `I = (5 − 2) / 330` ≈ **9,1 mA**: aralığın içinde. 470 Ω (≈ 6,4 mA) de olur. 220 Ω ile akım ≈ 13,6 mA'ya çıkar, 47 Ω ile ≈ 64 mA olur ve LED bozulur.",
+              "hint": "Akım fazlaysa direnci büyüt; 2. dersteki hesabı hatırla.",
+              "skills": [
+                "elec-led-resistor",
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Projeyi kur! Laboratuvarda **üç LED** ve **üç direnç** ekle. D13, D12 ve D11'in her birini kendi direnci üzerinden bir LED'in **A** ucuna, bütün **K** uçlarını GND'ye bağla. Renkleri **D13 kırmızı, D12 sarı, D11 yeşil** yap. Planını koda çevir ve çalıştır: üç LED de sırayla yanıp sönsün (bir tur yaklaşık 12 saniye)."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "Gerçek bir kavşakta iki yönün ışıkları birbirine bağlı çalışır. İkinci bir ışık takımı ekleseydin plan tablon nasıl değişirdi? İki yönün yeşilinin aynı anda yanması neden tehlikeli olurdu?"
+            }
+          ],
+          "stepsEn": [
+            {
+              "kind": "intro",
+              "art": "traffic",
+              "title": "The brain of the intersection",
+              "body": "At every intersection the lights follow the same pattern: stop on red, go on green, get ready on yellow. You're going to build this pattern with **three LEDs** and a few lines of code. But this time you'll start with a **plan**, not with code."
+            },
+            {
+              "kind": "choice",
+              "prompt": "Our traffic light cycles red → green → yellow. **Right after green**, why does yellow light up instead of going straight to red?",
+              "options": [
+                "It warns drivers that the light is about to change; with a sudden red they might not be able to brake in time",
+                "Because the yellow LED draws the least current",
+                "If yellow doesn't light, the program won't compile",
+                "It gives the red LED time to warm up"
+              ],
+              "answer": 0,
+              "why": "Yellow is a **warning stage**: a car going through on green gets time to stop or clear the intersection before red comes on. Every stage in the program has a job in the real world.",
+              "hint": "What happens if a fast car's green suddenly turns red?",
+              "skills": [
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "traffic",
+              "body": "Engineers first write a **plan table**: which LED is on in each **stage**, and for how long. Our plan: red (D13) 5 s, green (D11) 5 s, yellow (D12) 2 s, then back to the start. Only one LED is on at a time."
+            },
+            {
+              "kind": "order",
+              "prompt": "Build the plan table: put the stages in their order within one round of `loop()`.",
+              "lines": [
+                "Red turns on, wait 5 seconds",
+                "Red turns off, green turns on, wait 5 seconds",
+                "Green turns off, yellow turns on, wait 2 seconds",
+                "Yellow turns off and loop() starts over"
+              ],
+              "why": "The round starts with red and continues with green and yellow. After yellow goes out, `loop()` goes back to the start and red lights up again. Each stage begins by turning off the previous LED.",
+              "hint": "What came after green? How does the round end?",
+              "skills": [
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Convert the times in the plan into `delay` values and add them up: how many **milliseconds** does one full round of `loop()` take?",
+              "answer": 12000,
+              "unit": "ms",
+              "why": "`delay` takes milliseconds: 5 s = 5000 ms, 2 s = 2000 ms. One round: 5000 + 5000 + 2000 = **12000 ms** (12 seconds).",
+              "hint": "Each second is 1000 ms. Convert the three times first, then add them.",
+              "skills": [
+                "prog-timing",
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "code",
+              "body": "Each row of the table turns into the same pattern in code: **turn off, turn on, wait**. First set the LED that should no longer be on to `LOW`, then set the new LED to `HIGH`, then wait with `delay`. Thanks to this pattern, two LEDs are never left on together in any stage."
+            },
+            {
+              "kind": "fill",
+              "prompt": "Turn stage 2 into code: **red (D13) turns off, green (D11) turns on, wait 5 seconds**.",
+              "code": "void loop() {\n  // 1. aşama: kırmızı\n  digitalWrite(13, HIGH);\n  delay(5000);\n\n  // 2. aşama: yeşil\n  digitalWrite(13, ___);\n  digitalWrite(___, HIGH);\n  delay(___);\n}",
+              "tokens": [
+                "LOW",
+                "HIGH",
+                "11",
+                "12",
+                "5000",
+                "5",
+                "500"
+              ],
+              "answer": [
+                "LOW",
+                "11",
+                "5000"
+              ],
+              "why": "First red turns off: `digitalWrite(13, LOW)`. Green is on D11, so `digitalWrite(11, HIGH)`. 5 seconds = **5000** ms; `delay(5)` waits only 5 milliseconds and `delay(500)` waits half a second. D12 is the yellow LED.",
+              "hint": "Turn off, turn on, wait. Which pin is the green LED on? What unit does delay take?",
+              "skills": [
+                "digital-out",
+                "prog-timing"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "When you run the program, **two LEDs are on together during the yellow stage**. Why?",
+              "code": "void loop() {\n  // 2. aşama: yeşil\n  digitalWrite(13, LOW);\n  digitalWrite(11, HIGH);\n  delay(5000);\n\n  // 3. aşama: sarı\n  digitalWrite(12, HIGH);\n  delay(2000);\n}",
+              "options": [
+                "There's no `digitalWrite(11, LOW);` before yellow turns on; green stays on",
+                "`delay(2000)` is too short",
+                "It should say 13, not 12, for the yellow LED",
+                "`digitalWrite` lights two LEDs every time"
+              ],
+              "answer": 0,
+              "why": "Once a pin is set to `HIGH`, it stays on until something sets it to `LOW`. The yellow stage skipped the \"turn off\" step: green (D11) was never turned off, so it's on together with yellow. At a real intersection this would cause confusion.",
+              "hint": "Which step of the turn off, turn on, wait pattern is missing?",
+              "skills": [
+                "prog-debug",
+                "digital-out"
+              ]
+            },
+            {
+              "kind": "numeric",
+              "prompt": "Traffic is heavy in this direction, and you want to make the round **15 seconds** long. Red stays 5 s and yellow stays 2 s. What should you put inside `delay()` in the green stage?",
+              "answer": 8000,
+              "unit": "ms",
+              "why": "The time left for green is 15 − 5 − 2 = 8 seconds. Since `delay` takes milliseconds: `delay(8000)`.",
+              "hint": "First find how many seconds are left for green, then convert to milliseconds.",
+              "skills": [
+                "prog-timing",
+                "prog-planning"
+              ]
+            },
+            {
+              "kind": "choice",
+              "prompt": "You wrote the program with an array, as in lesson 4. Which LED is `ledler[2]`?",
+              "code": "int ledler[] = {13, 12, 11};  // kırmızı, sarı, yeşil\n\nvoid setup() {\n  for (int i = 0; i < 3; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n}",
+              "options": [
+                "Red (D13)",
+                "Yellow (D12)",
+                "Green (D11)",
+                "None; in a 3-element array ledler[2] is out of range"
+              ],
+              "answer": 2,
+              "why": "Indexes start at 0: `ledler[0]` = 13 (red), `ledler[1]` = 12 (yellow), `ledler[2]` = **11 (green)**. The last valid index of a 3-element array is 2; going out of range would happen at `ledler[3]`.",
+              "hint": "Match them up, counting indexes from 0.",
+              "skills": [
+                "prog-loops-arrays"
+              ]
+            },
+            {
+              "kind": "explain",
+              "art": "bolt",
+              "body": "In the circuit, each LED has **its own** series resistor: three LEDs, three 330 Ω resistors. About 2 V drops across the red LED; 5 − 2 = 3 V is left across the resistor. The drop is a little different for the yellow and green LEDs, but 330 Ω is still safe."
+            },
+            {
+              "kind": "widget",
+              "prompt": "Choose the red LED's resistor: the LED should **light up** and the current should stay **between 5 and 10 mA**. Does 330 Ω fall in that range?",
+              "widget": {
+                "type": "ohm",
+                "v": 5,
+                "lockV": true,
+                "r": 47,
+                "led": true
+              },
+              "goals": [
+                {
+                  "label": "LED is on",
+                  "metric": "ledOn",
+                  "min": 1
+                },
+                {
+                  "label": "Current is between 5 and 10 mA",
+                  "metric": "I_mA",
+                  "min": 5,
+                  "max": 10
+                }
+              ],
+              "why": "With 330 Ω, `I = (5 − 2) / 330` ≈ **9.1 mA**: inside the range. 470 Ω (≈ 6.4 mA) also works. With 220 Ω the current rises to ≈ 13.6 mA, and with 47 Ω it's ≈ 64 mA and the LED gets damaged.",
+              "hint": "If the current is too high, increase the resistance; remember the calculation from lesson 2.",
+              "skills": [
+                "elec-led-resistor",
+                "elec-ohm"
+              ]
+            },
+            {
+              "kind": "activity",
+              "prompt": "Build the project! In the lab, add **three LEDs** and **three resistors**. Connect each of D13, D12 and D11 through its own resistor to an LED's **A** leg, and connect all the **K** legs to GND. Set the colours to **D13 red, D12 yellow, D11 green**. Turn your plan into code and run it: the three LEDs should light up one after another (one round takes about 12 seconds)."
+            },
+            {
+              "kind": "reflect",
+              "prompt": "At a real intersection, the lights for two directions work together. If you added a second set of lights, how would your plan table change? Why would it be dangerous for both directions to be green at the same time?"
             }
           ]
         }

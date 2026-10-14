@@ -1,9 +1,10 @@
 import { getDb } from '@/lib/db'
 import { isJson } from '@/lib/auth/http'
 import { rateLimited } from '@/lib/auth/rate-limit'
+import { getCurrentUser } from '@/lib/auth/current'
 import { MAX_BODY_BYTES, DEVICE_RE, deleteDeviceEvents, parseBatch, storeEvents } from '@/lib/events-server'
 
-// Anonim olay günlüğü (pilot, taslak). Kimlik doğrulama yok: kayıtlar yalnız rastgele cihaz kimliğine bağlıdır.
+// Olay günlüğü (pilot, taslak). Kayıtlar rastgele cihaz kimliğine bağlıdır; istekte oturum çerezi varsa user_id de yazılır.
 // Oran sınırı: cihaz başına dakikada 20 istek (bellek içi, tek örnek). IP veritabanına yazılmaz; yalnız oran anahtarında kullanılır.
 const ipOf = (req: Request) => req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
 
@@ -24,7 +25,8 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Çok sık istek' }, { status: 429, headers: { 'retry-after': '30' } })
   }
   try {
-    const stored = await storeEvents(getDb(), parsed.deviceId, parsed.events)
+    const user = await getCurrentUser().catch(() => null)
+    const stored = await storeEvents(getDb(), parsed.deviceId, parsed.events, user?.id ?? null)
     return Response.json({ ok: true, stored, dropped: parsed.dropped })
   } catch {
     return Response.json({ error: 'Kaydedilemedi' }, { status: 503 })
