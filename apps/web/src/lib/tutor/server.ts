@@ -4,6 +4,9 @@ import { loadAccessContext } from '@/lib/entitlements-db'
 import { resolveAccess } from '@/lib/entitlements'
 import { aiTutorAllowedForUser } from '@/lib/org-settings'
 import { dayStart } from './limits'
+import { getLessonContext, getModuleTree } from '@/lib/content'
+import { guideBySlug } from '@/lib/parca-rehberi'
+import { routeForPath, type PageSource } from './page-context'
 
 export interface TutorLessonRow { id: number; title: string; moduleTitle: string; minAge: number | null; steps: LessonStep[]; stepsEn?: LessonStep[] | null }
 
@@ -18,6 +21,28 @@ export async function loadTutorLesson(db: Db, lessonId: number): Promise<TutorLe
     .limit(1)
   if (!row?.steps?.length) return null
   return { ...row, steps: row.steps }
+}
+
+/** Sayfa yolundan Robi bağlamı: ders/parça/kurs içeriği sunucuda yüklenir; bulunamazsa genel bölüm. */
+export async function loadPageSource(db: Db, path: string, loggedIn: boolean): Promise<PageSource> {
+  const r = routeForPath(path, loggedIn)
+  if (r.kind === 'lesson') {
+    const ctx = await getLessonContext(db, r.id)
+    if (ctx) {
+      const l = ctx.lesson
+      return { kind: 'lesson', lessonId: l.id, title: l.title, moduleTitle: ctx.module.title, weekTitle: ctx.week.title, minAge: ctx.module.minAge, problem: l.problem, contentMd: l.contentMd, explainerMd: l.explainerMd, question: l.question }
+    }
+    return { kind: 'section', key: 'courses' }
+  }
+  if (r.kind === 'part') {
+    const g = guideBySlug(r.slug)
+    return g ? { kind: 'part', ...g } : { kind: 'section', key: 'parts' }
+  }
+  if (r.kind === 'module') {
+    const tree = await getModuleTree(db, r.slug)
+    return tree ? { kind: 'module', title: tree.module.title, minAge: tree.module.minAge, weeks: tree.weeks.map((w) => w.title) } : { kind: 'section', key: 'courses' }
+  }
+  return r
 }
 
 /** Kullanıcının dil/yaş bilgisi (doğum yılı → yaş). */
@@ -47,7 +72,8 @@ export async function countUserMessagesToday(db: Db, userId: string, now = new D
 export interface SaveInput {
   userId: string | null
   deviceId: string | null
-  lessonId: number
+  /** Ders oynatıcısı ya da ders sayfasındaki sohbette ders; diğer sayfalarda null. */
+  lessonId: number | null
   question: string
   answer: string
   /** 'refusal' | 'error' | null */

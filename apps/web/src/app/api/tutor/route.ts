@@ -7,9 +7,12 @@ import { GUEST_DAILY, GUEST_IP_DAILY, refundDaily, takeDaily, USER_DAILY } from 
 import { ageBandFor, buildTutorContext } from '@/lib/tutor/prompt'
 import { REPLACE, TUTOR_TEXTS } from '@/lib/tutor/protocol'
 import { MAX_BODY_BYTES, parseTutorRequest } from '@/lib/tutor/request'
-import { countUserMessagesToday, loadTutorLesson, loadTutorUser, saveTutorExchange, tutorGate } from '@/lib/tutor/server'
+import { countUserMessagesToday, loadPageSource, loadTutorLesson, loadTutorUser, saveTutorExchange, tutorGate } from '@/lib/tutor/server'
+import { buildPageContext, ROBI_PAGE_SYSTEM, type PageSource } from '@/lib/tutor/page-context'
+import { TUTOR_SYSTEM } from '@/lib/tutor/prompt'
 
-// Robi: ders içi AI öğretmen. Yanıt düz metin akışıdır (text/plain); sözleşme: lib/tutor/protocol.ts.
+// Robi: AI öğretmen. İki kip: ders oynatıcısında adım bağlamı (lessonId/stepIndex) ya da her sayfada sayfa bağlamı (page).
+// Yanıt düz metin akışıdır (text/plain); sözleşme: lib/tutor/protocol.ts.
 // Ayrıntı: lib/tutor/*. Adım verisi her zaman DB'den yüklenir; istemciden yalnız kimlik ve öğrencinin durumu gelir.
 export const dynamic = 'force-dynamic'
 
@@ -27,6 +30,8 @@ export async function POST(req: Request) {
   const parsed = parseTutorRequest(body)
   if (!parsed.ok) return json({ error: parsed.error }, 400)
   const q = parsed.data
+  const lessonReq = parsed.mode === 'lesson' ? parsed.data : null
+  const pageReq = parsed.mode === 'page' ? parsed.data : null
 
   const user = await getCurrentUser().catch(() => null)
   const deviceId = user ? null : q.deviceId ?? null
@@ -38,11 +43,15 @@ export async function POST(req: Request) {
   }
 
   const db = getDb()
-  let lesson, gate
+  let lesson: Awaited<ReturnType<typeof loadTutorLesson>> = null
+  let source: PageSource | null = null
+  let gate
   try {
-    lesson = await loadTutorLesson(db, q.lessonId)
-    if (!lesson) return json({ error: 'Ders bulunamadı' }, 404)
-    if (q.stepIndex >= lesson.steps.length) return json({ error: 'Geçersiz adım' }, 400)
+    if (lessonReq) {
+      lesson = await loadTutorLesson(db, lessonReq.lessonId)
+      if (!lesson) return json({ error: 'Ders bulunamadı' }, 404)
+      if (lessonReq.stepIndex >= lesson.steps.length) return json({ error: 'Geçersiz adım' }, 400)
+    } else source = await loadPageSource(db, pageReq!.page, !!user)
     gate = await tutorGate(db, user?.id ?? null)
   } catch {
     return json({ error: 'tutor_unavailable' }, 503)
@@ -71,21 +80,34 @@ export async function POST(req: Request) {
   // Arayüz dili (istekteki) öncelikli, yoksa hesabın dili. İngilizcede dersin İngilizce adımları varsa onlar bağlam olur
   // (aynı sıra ve yapı: tools/content/ek.mjs mirrorSteps).
   const locale = (q.locale ?? profile?.locale) === 'en' ? 'en' : 'tr'
-  const steps = locale === 'en' && lesson.stepsEn?.length === lesson.steps.length ? lesson.stepsEn : lesson.steps
   const { refusal: REFUSAL_TEXT, error: ERROR_TEXT, empty: EMPTY_TEXT } = TUTOR_TEXTS[locale]
-  const context = buildTutorContext({
-    lesson: { id: lesson.id, title: lesson.title, moduleTitle: lesson.moduleTitle, steps },
-    stepIndex: q.stepIndex,
-    status: q.status,
-    attempts: q.attempts,
-    answerSnapshot: q.answerSnapshot,
-    ageBand: ageBandFor(profile?.age ?? q.age, lesson.minAge),
-    locale,
-  })
+  let context: string
+  let system: string
+  let savedLessonId: number | null
+  if (lesson && lessonReq) {
+    const steps = locale === 'en' && lesson.stepsEn?.length === lesson.steps.length ? lesson.stepsEn : lesson.steps
+    context = buildTutorContext({
+      lesson: { id: lesson.id, title: lesson.title, moduleTitle: lesson.moduleTitle, steps },
+      stepIndex: lessonReq.stepIndex,
+      status: lessonReq.status,
+      attempts: lessonReq.attempts,
+      answerSnapshot: lessonReq.answerSnapshot,
+      ageBand: ageBandFor(profile?.age ?? q.age, lesson.minAge),
+      locale,
+    })
+    system = TUTOR_SYSTEM
+    savedLessonId = lesson.id
+  } else {
+    const src = source!
+    const minAge = src.kind === 'lesson' || src.kind === 'module' ? src.minAge : null
+    context = buildPageContext({ source: src, ageBand: ageBandFor(profile?.age ?? q.age, minAge), locale })
+    system = ROBI_PAGE_SYSTEM
+    savedLessonId = src.kind === 'lesson' ? src.lessonId : null
+  }
   const question = q.messages[q.messages.length - 1].content
 
   // İlk parçayı yanıt açılmadan bekle: erken API hataları doğru HTTP durumuyla dönsün
-  const gen = streamTutor(context, q.messages, req.signal)
+  const gen = streamTutor(context, q.messages, req.signal, system)
   let first: IteratorResult<string, TutorResult>
   try {
     first = await gen.next()
@@ -129,7 +151,7 @@ export async function POST(req: Request) {
         try { controller.close() } catch { /* zaten kapalı */ }
       }
       await saveTutorExchange(db, {
-        userId: user?.id ?? null, deviceId, lessonId: lesson.id, question,
+        userId: user?.id ?? null, deviceId, lessonId: savedLessonId, question,
         answer: flag === 'refusal' ? `${REFUSAL_TEXT}${text ? `\n[kısmi: ${text.slice(0, 500)}]` : ''}` : shown,
         flag,
       }).catch((e) => console.error('[tutor] kayıt', e))

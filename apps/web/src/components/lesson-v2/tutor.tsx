@@ -10,25 +10,30 @@ import { MAX_CHARS, visibleText } from '@/lib/tutor/protocol'
 import { InlineMd, plain } from './inline-md'
 import { Mascot } from './mascot'
 
-// Robi sohbet paneli: ders oynatıcısında alttan açılır. Sunucu: /api/tutor (düz metin akışı).
+// Robi sohbet paneli: ders oynatıcısında (adım bağlamı) ve her sayfada (RobiDock, sayfa bağlamı) açılır.
+// Sunucu: /api/tutor (düz metin akışı).
 
 export type TutorStatus = 'idle' | 'wrong' | 'correct' | 'revealed'
 
 export interface TutorPanelProps {
   open: boolean
   onClose: () => void
-  lessonId: number
-  stepIndex: number
-  status: TutorStatus
-  attempts: number
-  /** Öğrencinin şu anki cevabı (adım görünümünün onSnapshot'ı). */
-  snapshot: string
-  interactive: boolean
+  /** İstek gövdesinin bağlam alanları: ders oynatıcısında { lessonId, stepIndex, status, attempts, answerSnapshot }, sayfada { page }. */
+  context: Record<string, unknown>
+  /** Hızlı soru düğmeleri (arayüz dilinde). */
+  chips: string[]
+  /** Boş sohbetteki karşılama. */
+  greeting: string
+  /** Değişince sohbet sıfırlanır (ör. sayfa yolu). */
+  resetKey?: string
   /** Sesli anlatım açıksa cevabı okur. */
   say: (text: string) => void
+  /** Verilirse başlıkta ses aç/kapat düğmesi. */
+  voice?: { supported: boolean; on: boolean; toggle: () => void }
 }
 
-const CHIPS: MessageKey[] = ['lesson.tutor.chipHint', 'lesson.tutor.chipExplain', 'lesson.tutor.chipMistake']
+/** Ders oynatıcısının hızlı soruları; etkileşimsiz adımda ilk ikisi. */
+export const LESSON_CHIPS: MessageKey[] = ['lesson.tutor.chipHint', 'lesson.tutor.chipExplain', 'lesson.tutor.chipMistake']
 
 // ---- Konuşma tanıma (Web Speech API); desteklenmiyorsa mikrofon gizlenir ----
 interface SpeechRec { lang: string; interimResults: boolean; maxAlternatives: number; start(): void; stop(): void; abort(): void; onresult: ((e: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => void) | null; onend: (() => void) | null; onerror: (() => void) | null }
@@ -56,6 +61,7 @@ export function TutorPanel(p: TutorPanelProps) {
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => { listEnd.current?.scrollIntoView({ block: 'end' }) }, [msgs])
+  useEffect(() => { abort.current?.abort(); setMsgs([]) }, [p.resetKey])
   useEffect(() => { if (p.open) inputRef.current?.focus({ preventScroll: true }) }, [p.open])
   useEffect(() => () => { abort.current?.abort(); rec.current?.abort() }, [])
   // Esc ile kapat
@@ -85,8 +91,7 @@ export function TutorPanel(p: TutorPanelProps) {
         headers: { 'content-type': 'application/json' },
         signal: ctrl.signal,
         body: JSON.stringify({
-          lessonId: p.lessonId, stepIndex: p.stepIndex, status: p.status, attempts: p.attempts,
-          answerSnapshot: p.snapshot.slice(0, MAX_CHARS), messages: historyForRequest(next),
+          ...p.context, messages: historyForRequest(next),
           deviceId: getDeviceId(), locale, ...(profile?.age ? { age: profile.age } : {}),
         }),
       })
@@ -139,18 +144,21 @@ export function TutorPanel(p: TutorPanelProps) {
   }
 
   if (!p.open) return null
-  const chips = (p.interactive ? CHIPS : CHIPS.slice(0, 2)).map((c) => t(c))
+  const chips = p.chips
   return (
     <section className="tutor-panel" role="dialog" aria-modal="false" aria-label={t('lesson.tutor.dialog')}>
       <header className="tutor-head">
         <Mascot mood={busy ? 'think' : 'idle'} size={34} />
         <div className="tutor-title"><b>Robi</b><span>{offline ? t('lesson.tutor.offline') : busy ? t('lesson.tutor.thinking') : t('lesson.tutor.ready')}</span></div>
+        {p.voice?.supported && (
+          <button type="button" className="v2-icon-btn" onClick={p.voice.toggle} aria-pressed={p.voice.on} aria-label={p.voice.on ? t('lesson.player.voiceOff') : t('lesson.player.voiceOn')} title={t('lesson.player.voiceTitle')}>{p.voice.on ? '🔊' : '🔈'}</button>
+        )}
         <button type="button" className="v2-icon-btn" onClick={p.onClose} aria-label={t('lesson.tutor.close')}>✕</button>
       </header>
 
       <div className="tutor-list" aria-live="polite">
         {msgs.length === 0 && (
-          <p className="tutor-msg bot">{offline ? t('lesson.tutor.err.offline') : t('lesson.tutor.greeting')}</p>
+          <p className="tutor-msg bot">{offline ? t('lesson.tutor.err.offline') : p.greeting}</p>
         )}
         {msgs.map((m, i) => (
           <p key={i} className={`tutor-msg ${m.role === 'user' ? 'me' : 'bot'} ${m.local ? 'note' : ''}`}>

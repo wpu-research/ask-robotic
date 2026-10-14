@@ -14,7 +14,7 @@ const h = vi.hoisted(() => {
     stream: vi.fn(),
     ctor: vi.fn(),
     server: {
-      loadTutorLesson: vi.fn(), loadTutorUser: vi.fn(), tutorGate: vi.fn(),
+      loadTutorLesson: vi.fn(), loadPageSource: vi.fn(), loadTutorUser: vi.fn(), tutorGate: vi.fn(),
       countUserMessagesToday: vi.fn(), saveTutorExchange: vi.fn(),
     },
     user: vi.fn(),
@@ -44,6 +44,7 @@ import { POST } from './route'
 import { resetDailyCounts } from '@/lib/tutor/limits'
 import { REFUSAL_TEXT, REPLACE } from '@/lib/tutor/protocol'
 import { TUTOR_SYSTEM } from '@/lib/tutor/prompt'
+import { ROBI_PAGE_SYSTEM } from '@/lib/tutor/page-context'
 
 const STEPS: LessonStep[] = [
   { kind: 'explain', body: 'Direnç akımı sınırlar.' },
@@ -224,5 +225,32 @@ describe('POST /api/tutor', () => {
     const res = await POST(req(body()))
     expect(res.status).toBe(403)
     expect(await res.json()).toEqual({ error: 'tutor_not_allowed', reason: 'org_disabled' })
+  })
+})
+
+describe('POST /api/tutor — her sayfada Robi', () => {
+  it('sayfa bağlamı sunucuda yüklenir, sayfa istemiyle akar ve ders kimliğiyle kaydedilir', async () => {
+    h.user.mockResolvedValue({ id: 'u1' })
+    h.server.loadPageSource.mockResolvedValue({ kind: 'lesson', lessonId: 9, title: 'Klasik LED', moduleTitle: 'Arduino', weekTitle: 'Işık', minAge: 10, question: 'Neden?' })
+    h.stream.mockReturnValue(fakeStream(['Sence ', 'ne olur?']))
+    const r = await POST(req({ page: '/ders/9', messages: [{ role: 'user', content: 'Basitçe anlat' }] }))
+    expect(r.status).toBe(200)
+    expect(await r.text()).toBe('Sence ne olur?')
+    expect(h.server.loadPageSource).toHaveBeenCalledWith({}, '/ders/9', true)
+    expect(h.server.loadTutorLesson).not.toHaveBeenCalled()
+    const params = h.stream.mock.calls[0][0]
+    expect(params.system[0].text).toBe(ROBI_PAGE_SYSTEM)
+    expect(params.system[1].text).toContain('Klasik LED')
+    await flush()
+    expect(h.server.saveTutorExchange).toHaveBeenCalledWith({}, expect.objectContaining({ lessonId: 9, userId: 'u1' }))
+  })
+  it('genel sayfada ders kimliği null', async () => {
+    h.user.mockResolvedValue({ id: 'u1' })
+    h.server.loadPageSource.mockResolvedValue({ kind: 'section', key: 'lab' })
+    h.stream.mockReturnValue(fakeStream(['Devre kur!']))
+    const r = await POST(req({ page: '/laboratuvar', messages: [{ role: 'user', content: 'Burada ne yapabilirim?' }] }))
+    await r.text(); await flush()
+    expect(h.stream.mock.calls[0][0].system[1].text).toContain('laboratuvar')
+    expect(h.server.saveTutorExchange).toHaveBeenCalledWith({}, expect.objectContaining({ lessonId: null }))
   })
 })

@@ -4,6 +4,8 @@ import './platform.css'
 import './learn-v2.css'
 import { AppShell } from '@/components/shell/app-shell'
 import { authEnabled } from '@/lib/flags'
+import { tutorEnabled } from '@/lib/tutor/claude'
+import { ttsEnabled } from '@/lib/tts/providers'
 import { ConsentBanner } from '@/components/learn/consent-banner'
 import { I18nProvider } from '@/i18n/client'
 import { getLocale, getT } from '@/i18n/server'
@@ -27,7 +29,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <head><script dangerouslySetInnerHTML={{ __html: bootScript }} /></head>
       <body>
         <I18nProvider locale={locale}>
-          <AppShell authOn={authEnabled()}>{children}</AppShell>
+          <AppShell authOn={authEnabled()} robiOn={tutorEnabled()} ttsOn={ttsEnabled()}>{children}</AppShell>
           <ConsentBanner />
         </I18nProvider>
       </body>

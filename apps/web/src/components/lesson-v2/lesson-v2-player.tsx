@@ -13,7 +13,9 @@ import type { MessageKey } from '@/i18n'
 import { InlineMd, plain } from './inline-md'
 import { Mascot, type Mood } from './mascot'
 import { ActivityView, ChoiceView, CodeBlock, FillView, NumericView, OrderView, WidgetView } from './step-views'
-import { TutorPanel } from './tutor'
+import { LESSON_CHIPS, TutorPanel } from './tutor'
+import { MAX_CHARS } from '@/lib/tutor/protocol'
+import { useClaimRobi } from '@/components/robi/presence'
 import { useVoice } from './voice'
 
 export interface V2Props {
@@ -64,6 +66,7 @@ export function LessonV2Player(p: V2Props) {
   const [tutorOpen, setTutorOpen] = useState(false)
   const [snapshot, setSnapshot] = useState('')
   const voice = useVoice()
+  useClaimRobi()
   const t = useT()
   const { state: game, today } = useGame()
   const step = steps[i]
@@ -254,8 +257,10 @@ export function LessonV2Player(p: V2Props) {
       </footer>
       {!finished && (
         <TutorPanel
-          open={tutorOpen} onClose={closeTutor} lessonId={p.lesson.id} stepIndex={i} status={status} attempts={attempts}
-          snapshot={snapshot} interactive={interactive} say={voice.say}
+          open={tutorOpen} onClose={closeTutor} say={voice.say}
+          context={{ lessonId: p.lesson.id, stepIndex: i, status, attempts, answerSnapshot: snapshot.slice(0, MAX_CHARS) }}
+          chips={(interactive ? LESSON_CHIPS : LESSON_CHIPS.slice(0, 2)).map((c) => t(c))}
+          greeting={t('lesson.tutor.greeting')}
         />
       )}
     </div>

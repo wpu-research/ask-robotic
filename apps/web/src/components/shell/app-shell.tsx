@@ -12,6 +12,8 @@ import { SessionSync } from '../auth/session-sync'
 import { LocaleSwitcher } from './locale-switcher'
 import { useT } from '@/i18n/client'
 import type { MessageKey } from '@/i18n'
+import { RobiDock } from '../robi/robi-dock'
+import { VoiceProvider } from '../lesson-v2/voice'
 
 /** Alt sekme çubuğunda kısa adlar. */
 const TAB_KEY: Record<string, MessageKey> = { '/laboratuvar': 'shell.tab.lab', '/arena': 'shell.tab.arena', '/atolye': 'shell.tab.blocks' }
@@ -26,7 +28,7 @@ function Brand({ compact = false }: { compact?: boolean }) {
   )
 }
 
-export function AppShell({ children, authOn }: { children: ReactNode; authOn: boolean }) {
+export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { children: ReactNode; authOn: boolean; robiOn?: boolean; ttsOn?: boolean }) {
   const pathname = usePathname()
   const t = useT()
   const [collapsed, setCollapsed] = useState(false)
@@ -91,6 +93,7 @@ export function AppShell({ children, authOn }: { children: ReactNode; authOn: bo
   )
 
   return (
+    <VoiceProvider natural={ttsOn}>
     <div className="shell shell-top">
       <a className="skip-link" href="#icerik">{t('shell.skipToContent')}</a>
       <div className="scrim" data-open={drawer} onClick={() => setDrawer(false)} aria-hidden="true" />
@@ -145,6 +148,8 @@ export function AppShell({ children, authOn }: { children: ReactNode; authOn: bo
 
       <CommandPalette open={palette} onClose={() => setPalette(false)} />
       {authOn && <SessionSync />}
+      <RobiDock enabled={robiOn} />
     </div>
+    </VoiceProvider>
   )
 }
