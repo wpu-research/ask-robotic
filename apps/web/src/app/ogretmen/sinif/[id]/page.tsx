@@ -9,7 +9,7 @@ import { skillById } from '@/lib/skills'
 import { qrSvg, originFromHeaders } from '@/lib/qr-svg'
 import { requireClassPage } from '@/lib/teacher-page'
 import { BulkAddForm, RosterTable } from '@/components/teacher/cards'
-import { AssignForm, DeleteAssignmentButton } from '@/components/teacher/assign-form'
+import { AssignForm, DeleteAssignmentButton, PlanForm } from '@/components/teacher/assign-form'
 import { AutoRefresh } from '@/components/teacher/auto-refresh'
 import { intlTag, type TFunction } from '@/i18n'
 import { getLocale, getT } from '@/i18n/server'
@@ -125,6 +125,10 @@ async function Assignments({ classId, tx: { t, when } }: { classId: string; tx: 
       <section className="panel">
         <h2 className="panel-title">{t('teacher.assign.newTitle')}</h2>
         <AssignForm classId={classId} catalog={pick} />
+      </section>
+      <section className="panel">
+        <h2 className="panel-title">{t('teacher.plan.title')}</h2>
+        <PlanForm classId={classId} catalog={pick} />
       </section>
     </>
   )

@@ -4,7 +4,7 @@ import {
   and, asc, assignments, classes, classMembers, eq, inArray, lessons, licenses, modules, organizationMembers, organizations,
   progress, sql, users, weeks, xpEvents, events, type Db,
 } from '@ask/db'
-import { assignmentColumns, assignmentTarget, type AssignmentTargetInput } from './assignments'
+import { assignmentColumns, assignmentTarget, PLAN_MAX_EVERY_WEEKS, weeklyPlan, type AssignmentTargetInput } from './assignments'
 import { seatsAvailable } from './entitlements'
 import { createQrCredentials } from './auth/qr'
 import { asciiSlug, classSuffix, fullName, makeUsername, MAX_ROSTER, type RosterName } from './roster'
@@ -244,6 +244,28 @@ export async function createAssignment(
   }
   const [row] = await db.insert(assignments).values({ classId, createdBy, dueAt, ...assignmentColumns(target) }).returning({ id: assignments.id })
   return { ok: true, id: row.id }
+}
+
+export type WeeklyPlanResult = { ok: true; created: number; skipped: number } | { ok: false; error: string }
+
+/** Modülün her haftasını ayrı ödev olarak takvime yayar; sınıfta zaten ödevlendirilmiş haftalar atlanır. */
+export async function createWeeklyPlan(
+  db: Db, classId: string, createdBy: string, input: { moduleId: number; firstDue: string | Date; everyWeeks: number },
+): Promise<WeeklyPlanResult> {
+  const firstDue = new Date(input.firstDue)
+  const every = input.everyWeeks
+  if (!Number.isInteger(input.moduleId) || Number.isNaN(firstDue.getTime()) || !Number.isInteger(every) || every < 1 || every > PLAN_MAX_EVERY_WEEKS) {
+    return { ok: false, error: `Plan için modül, ilk teslim tarihi ve 1-${PLAN_MAX_EVERY_WEEKS} haftalık aralık gerekli` }
+  }
+  const ws = await db.select({ id: weeks.id }).from(weeks).where(eq(weeks.moduleId, input.moduleId)).orderBy(asc(weeks.position))
+  if (!ws.length) return { ok: false, error: 'Seçilen içerik bulunamadı' }
+  const weekIds = ws.map((w) => w.id)
+  const taken = await db.select({ id: assignments.weekId }).from(assignments)
+    .where(and(eq(assignments.classId, classId), inArray(assignments.weekId, weekIds)))
+  const plan = weeklyPlan(weekIds, firstDue, every, new Set(taken.map((t) => t.id!)))
+  if (!plan.length) return { ok: false, error: 'Bu modülün bütün haftaları zaten ödevlendirilmiş' }
+  await db.insert(assignments).values(plan.map((p) => ({ classId, createdBy, weekId: p.weekId, dueAt: p.dueAt })))
+  return { ok: true, created: plan.length, skipped: weekIds.length - plan.length }
 }
 
 export async function deleteAssignment(db: Db, classId: string, assignmentId: string) {

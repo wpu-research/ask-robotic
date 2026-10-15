@@ -7,9 +7,10 @@ import {
 import { createTestDb } from './test-db'
 import { requireClassStaff, requireOrgStaff, ADMIN_ROLES } from './class-access'
 import {
-  addStudents, createAssignment, createClass, createSchool, joinClassByCode, listAssignments, listTeacherClasses,
+  addStudents, createAssignment, createClass, createSchool, createWeeklyPlan, joinClassByCode, listAssignments, listTeacherClasses,
   normalizeJoinCode, regenerateStudentCard, SeatLimitError,
 } from './classroom'
+import { weeklyPlan } from './assignments'
 import { asciiSlug, makeUsername, parseRoster, shortName } from './roster'
 import { istanbulWeekStart, LEAGUE_TIERS, loadClassLeague, myLeagues, rankLeague } from './leagues'
 import { aiTutorAllowedForUser, getOrgSettings, updateOrgSettings } from './org-settings'
@@ -193,6 +194,31 @@ describe('ödevler', () => {
     const wk = list.find((a) => a.target === 'week')!
     expect(m.cells[s.id][wk.id]).toEqual({ done: 1, total: 2 })
     expect(m.lastActivity[s.id]?.getTime()).toBe(now.getTime())
+  })
+})
+
+describe('haftalık plan', () => {
+  it('saf: sırayla, aralıklı; atlanan hafta yer tutmaz', () => {
+    const first = new Date('2026-10-20T09:00:00Z')
+    expect(weeklyPlan([1, 2, 3], first, 2, new Set([2])).map((p) => [p.weekId, p.dueAt.toISOString()])).toEqual([
+      [1, '2026-10-20T09:00:00.000Z'],
+      [3, '2026-11-03T09:00:00.000Z'],
+    ])
+  })
+
+  it('her haftayı ödevlendirir, tekrarında var olanları atlar, geçersiz girdiyi reddeder', async () => {
+    const { t, cls } = await school('Planlı')
+    const [mod] = await db.select({ id: weeks.moduleId }).from(weeks).where(eq(weeks.id, weekIds[0]))
+    expect(await createWeeklyPlan(db, cls.id, t.id, { moduleId: mod.id, firstDue: 'yarın', everyWeeks: 1 })).toMatchObject({ ok: false })
+    expect(await createWeeklyPlan(db, cls.id, t.id, { moduleId: mod.id, firstDue: '2026-10-20T09:00:00Z', everyWeeks: 5 })).toMatchObject({ ok: false })
+    expect(await createWeeklyPlan(db, cls.id, t.id, { moduleId: 999999, firstDue: '2026-10-20T09:00:00Z', everyWeeks: 1 })).toMatchObject({ ok: false })
+
+    await createAssignment(db, cls.id, t.id, { weekId: weekIds[1] })
+    expect(await createWeeklyPlan(db, cls.id, t.id, { moduleId: mod.id, firstDue: '2026-10-20T09:00:00Z', everyWeeks: 1 }))
+      .toEqual({ ok: true, created: 1, skipped: 1 })
+    const rows = await db.select().from(assignments).where(eq(assignments.classId, cls.id))
+    expect(rows.find((r) => r.weekId === weekIds[0])?.dueAt?.toISOString()).toBe('2026-10-20T09:00:00.000Z')
+    expect(await createWeeklyPlan(db, cls.id, t.id, { moduleId: mod.id, firstDue: '2026-10-20T09:00:00Z', everyWeeks: 1 })).toMatchObject({ ok: false })
   })
 })
 

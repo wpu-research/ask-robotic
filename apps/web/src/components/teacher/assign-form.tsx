@@ -68,6 +68,51 @@ export function AssignForm({ classId, catalog }: { classId: string; catalog: Pic
   )
 }
 
+/** Haftalık plan: modülün haftaları sırayla, ilk teslimden başlayarak `n` haftada bir. */
+export function PlanForm({ classId, catalog }: { classId: string; catalog: PickModule[] }) {
+  const t = useT()
+  const router = useRouter()
+  const [error, setError] = useState('')
+  const [ok, setOk] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  async function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const f = new FormData(e.currentTarget)
+    const first = String(f.get('first') ?? '')
+    setBusy(true); setError(''); setOk('')
+    const r = await sendJson<{ created: number; skipped: number }>(`/api/ogretmen/sinif/${classId}/odevler/plan`, {
+      moduleId: Number(f.get('module')),
+      firstDue: first ? new Date(first).toISOString() : '',
+      everyWeeks: Number(f.get('every')),
+    })
+    setBusy(false)
+    if (!r.ok) { setError(localizeError(t, r.error)); return }
+    setOk(t('teacher.plan.created', { created: r.data.created, skipped: r.data.skipped }))
+    router.refresh()
+  }
+  if (!catalog.length) return null
+  return (
+    <form className="og-form" onSubmit={onSubmit} style={{ maxWidth: 720 }}>
+      <p className="muted" style={{ margin: 0 }}>{t('teacher.plan.lead')}</p>
+      <label className="field">{t('teacher.assign.module')}
+        <select name="module" defaultValue={catalog[0].id}>
+          {catalog.map((m) => <option key={m.id} value={m.id}>{m.title} ({m.weeks.length})</option>)}
+        </select>
+      </label>
+      <label className="field">{t('teacher.plan.firstDue')}<input type="datetime-local" name="first" required /></label>
+      <label className="field">{t('teacher.plan.every')}
+        <select name="every" defaultValue={1}>
+          {[1, 2, 3, 4].map((n) => <option key={n} value={n}>{t('teacher.plan.everyOption', { n })}</option>)}
+        </select>
+      </label>
+      {error && <p role="alert" className="og-err">{error}</p>}
+      {ok && <p role="status" className="og-ok">{ok}</p>}
+      <button className="v2-btn accent" disabled={busy}>{t('teacher.plan.submit')}</button>
+    </form>
+  )
+}
+
 export function DeleteAssignmentButton({ classId, assignmentId }: { classId: string; assignmentId: string }) {
   const t = useT()
   const router = useRouter()

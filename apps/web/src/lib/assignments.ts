@@ -17,6 +17,19 @@ export function assignmentTarget(input: AssignmentTargetInput): AssignmentTarget
   return { [k]: v } as AssignmentTarget
 }
 
+export const PLAN_MAX_EVERY_WEEKS = 4
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000
+
+/**
+ * Haftalık ödev planı: haftalar sırayla, ilk teslimden başlayıp `everyWeeks` haftada bir teslim edilir.
+ * `skip` içindeki (zaten ödevlendirilmiş) haftalar takvimde yer tutmadan atlanır.
+ */
+export function weeklyPlan(weekIds: readonly number[], firstDue: Date, everyWeeks: number, skip: ReadonlySet<number> = new Set()) {
+  return weekIds
+    .filter((id) => !skip.has(id))
+    .map((weekId, i) => ({ weekId, dueAt: new Date(firstDue.getTime() + i * everyWeeks * WEEK_MS) }))
+}
+
 /** Satıra yazılacak kolonlar (diğer ikisi null). */
 export const assignmentColumns = (t: AssignmentTarget) => ({
   lessonId: 'lessonId' in t ? t.lessonId : null,
