@@ -40,3 +40,4 @@
   .rb-pick { overflow: visible; }
   .rb-pick ul { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
+.rb-3d { width: 100%; aspect-ratio: 4 / 3; max-height: 460px; border-radius: var(--radius-xs); overflow: hidden; background: #dde5ef; }

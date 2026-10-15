@@ -9,6 +9,10 @@ import type { ArenaGoal, ArenaGoalResult, ArenaScene, ArenaSnapshot } from '@/li
 import { compileCode, type CompileError } from '@/lib/lab/compile-client'
 import { logEvent } from '@/lib/events'
 import { ArenaCanvas } from './arena-canvas'
+import dynamic from 'next/dynamic'
+import { useView3D, ViewBar } from '../three/view-bar'
+
+const Arena3D = dynamic(() => import('./arena-3d').then((m) => m.Arena3D), { ssr: false, loading: () => <div className="arena-3d" /> })
 import { ArenaGoals, SensorPanel } from './arena-panels'
 
 export interface ArenaEditorProps {
@@ -53,6 +57,7 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
   const tracker = useMemo(() => new GoalTracker(goals ?? []), [goals])
   const [running, setRunning] = useState(false)
   const [paused, setPaused] = useState(false)
+  const view = useView3D()
   const [speed, setSpeed] = useState<(typeof SPEEDS)[number]>(1)
   const [compile, setCompile] = useState<CompileView>({ status: 'idle' })
   const [notice, setNotice] = useState('')
@@ -297,7 +302,10 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
             </div>
           </div>
           <div className="arena-stage">
-            <ArenaCanvas scene={scene} snap={snap} trail={trail} servoDeg={rt?.servoDeg()} onDrag={rt ? (x, y) => place({ x, y }) : undefined} />
+            <ViewBar v={view} cams={scene.kind === 'rover'} />
+            {view.is3d
+              ? <Arena3D scene={scene} snap={snap} trail={trail} servoDeg={rt?.servoDeg()} onDrag={rt ? (x, y) => place({ x, y }) : undefined} mode={scene.kind === 'rover' ? view.mode : 'genel'} />
+              : <ArenaCanvas scene={scene} snap={snap} trail={trail} servoDeg={rt?.servoDeg()} onDrag={rt ? (x, y) => place({ x, y }) : undefined} />}
             {notice && <div className="lab-toast" role="status">{notice}</div>}
             {stale && rt && <p className="lab-lockhint" data-testid="arena-stale">Kodu değiştirdin; sonuçlar eski çalıştırmaya ait. ▶ ile yeniden çalıştır.</p>}
           </div>

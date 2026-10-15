@@ -151,6 +151,9 @@ export class DriveBase {
   resetAngles() { this.zeroL = this.degL; this.zeroR = this.degR; this.zeroTheta = this.theta }
 
   // ---------- sensörler ----------
+  /** Ham tekerlek açıları (derece; çizim için, sıfırlanmaz). */
+  get wheelDegL(): number { return this.degL }
+  get wheelDegR(): number { return this.degR }
   get motorDegL(): number { return Math.round(this.degL - this.zeroL) }
   get motorDegR(): number { return Math.round(this.degR - this.zeroR) }
   /** Başlangıçtan (ya da sıfırlamadan) bu yana yön değişimi; sola +. */

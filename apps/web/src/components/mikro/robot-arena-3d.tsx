@@ -1,0 +1,63 @@
+'use client'
+// Robot Atölyesi 3B görünüm: robot durumu her karede DriveBase'ten (ve kart LED'leri Device'tan) okunur.
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
+import type { Device } from '@/lib/mikro/device'
+import { FLOOR_COLORS, type DriveBase, type LightColor } from '@/lib/mikro/robot'
+import { applyCamera, createStage, fitShadow, makeFloor, makeTrail, makeWall, wallMaterial, type CamMode, type FloorSpec } from '../three/core'
+import { makeBlokRobot, makeGezginRobot, poseMobile, type MobileModel } from '../three/models'
+
+const LIGHT_CSS: Record<LightColor, string | null> = { kapali: null, kirmizi: '#ef4444', yesil: '#22c55e', mavi: '#3b82f6', sari: '#facc15', beyaz: '#ffffff' }
+const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1' } as const
+
+const floorSpec = (r: DriveBase): FloorSpec => ({
+  w: r.scene.width, h: r.scene.height, lines: r.scene.lines, lineWidth: r.scene.lineWidth ?? 0.02,
+  patches: r.scene.patches.map((p) => ({ ...p, css: FLOOR_COLORS[p.color].css })),
+  zones: r.scene.zones.map((z) => ({ ...z, color: ZONE_CSS[z.kind], visited: r.visited.has(z.id) })),
+})
+
+export function RobotArena3D({ robot, device, mode }: { robot: DriveBase; device: Device; mode: CamMode }) {
+  const host = useRef<HTMLDivElement>(null)
+  const live = useRef({ robot, device, mode })
+  live.current = { robot, device, mode }
+  const sceneId = robot.scene.id
+  const profileId = robot.profile.id
+
+  useEffect(() => {
+    const stage = createStage(host.current!)
+    const r0 = live.current.robot
+    const { width: w, height: h } = r0.scene
+    fitShadow(stage, w / 2, -h / 2, Math.max(w, h))
+    const floor = makeFloor(floorSpec(r0))
+    stage.scene.add(floor.mesh)
+    const wm = wallMaterial()
+    for (const seg of r0.scene.walls) stage.scene.add(makeWall(seg, wm))
+    const trail = makeTrail()
+    stage.scene.add(trail.line)
+    const p = r0.profile
+    const model: MobileModel = p.id === 'blok' ? makeBlokRobot(p.wheelBase, p.wheelDiameter) : makeGezginRobot(p.wheelBase, p.wheelDiameter)
+    stage.scene.add(model.group)
+    const rayMat = new THREE.LineBasicMaterial({ color: 0xef4444 })
+    const rayGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)])
+    const ray = new THREE.Line(rayGeo, rayMat)
+    ray.position.set(p.radius * 0.8, p.wheelDiameter / 2 + 0.015, 0)
+    model.group.add(ray)
+
+    let visitedN = -1, trailN = -1, lastMode: CamMode | null = null
+    stage.onFrame = (dt) => {
+      const { robot: r, device: d, mode } = live.current
+      poseMobile(model, r.x, r.y, r.theta, r.wheelDegL, r.wheelDegR)
+      model.card?.setLeds(d.frame())
+      model.setLights?.(LIGHT_CSS[r.lights])
+      if (model.bumper) (model.bumper.material as THREE.MeshStandardMaterial).color.set(r.has('force') && r.pressed ? 0xf97316 : 0x94a3b8)
+      if (r.has('distance')) { ray.visible = true; ray.scale.x = Math.max(0.001, r.distanceCm / 100) } else ray.visible = false
+      if (r.visited.size !== visitedN) { visitedN = r.visited.size; floor.paint(floorSpec(r)) }
+      if (r.trail.length !== trailN || r.moving) { trailN = r.trail.length; trail.set(r.trail, [r.x, r.y]) }
+      if (mode !== lastMode) { applyCamera(stage, mode, { w, h }, r); lastMode = mode }
+      else if (mode === 'takip') applyCamera(stage, mode, { w, h }, r, dt)
+    }
+    return () => stage.dispose()
+  }, [sceneId, profileId])
+
+  return <div ref={host} className="rb-3d" data-testid="robot-arena-3d" />
+}

@@ -31,6 +31,7 @@
     "react-markdown": "^10.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
+    "three": "0.170.0",
     "zod": "^3.25.76"
   },
   "devDependencies": {
@@ -40,6 +41,7 @@
     "@types/qrcode": "1.5.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "0.170.0",
     "rimraf": "^6.0.1",
     "typescript": "^5.5.4",
     "vitest": "^2.1.9"

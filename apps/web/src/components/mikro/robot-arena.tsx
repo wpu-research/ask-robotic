@@ -1,12 +1,38 @@
 'use client'
-// Robot Atölyesi arenası: üstten görünüş. 1 birim = 1 cm. Robot durumu her karede DriveBase'ten okunur (tick yeniden çizdirir).
+// Robot Atölyesi arenası: 3B (varsayılan, WebGL varsa) ya da üstten 2B görünüş. 2B'de 1 birim = 1 cm.
+// Robot durumu DriveBase'ten okunur: 2B'yi `tick` yeniden çizdirir, 3B kendi kare döngüsüyle okur.
+import dynamic from 'next/dynamic'
+import type { Device } from '@/lib/mikro/device'
 import { FLOOR_COLORS, type DriveBase, type LightColor } from '@/lib/mikro/robot'
+import { useView3D, ViewBar } from '../three/view-bar'
+
+const RobotArena3D = dynamic(() => import('./robot-arena-3d').then((m) => m.RobotArena3D), { ssr: false, loading: () => <div className="rb-3d" /> })
 
 const CM = 100
 const LIGHT_CSS: Record<LightColor, string> = { kapali: '#475569', kirmizi: '#ef4444', yesil: '#22c55e', mavi: '#3b82f6', sari: '#facc15', beyaz: '#ffffff' }
 const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1' } as const
 
-export function RobotArena({ robot, tick }: { robot: DriveBase; tick: number }) {
+export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: Device; tick: number }) {
+  const v = useView3D()
+  const dist = robot.has('distance') ? robot.distanceCm : null
+  const status = robot.collisions ? `${robot.collisions} çarpma` : 'çarpma yok'
+  return (
+    <figure className="rb-arena" data-testid="robot-arena" data-tick={tick} data-view={v.is3d ? '3d' : '2d'}>
+      <ViewBar v={v} />
+      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} />}
+      <figcaption className="rb-readout" aria-live="off">
+        {dist != null && <span>mesafe <b>{dist.toFixed(0)} cm</b></span>}
+        {robot.has('color') && <span>renk <b>{FLOOR_COLORS[robot.color].label}</b></span>}
+        {robot.has('line') && <span>çizgi <b>{robot.lineOn('left') ? '●' : '○'}{robot.lineOn('right') ? '●' : '○'}</b></span>}
+        <span>yön <b>{robot.headingDeg}°</b></span>
+        <span>yol <b>{(robot.distanceM * 100).toFixed(0)} cm</b></span>
+        <span className={robot.collisions ? 'bad' : undefined}>{status}</span>
+      </figcaption>
+    </figure>
+  )
+}
+
+function TopView({ robot }: { robot: DriveBase }) {
   const s = robot.scene
   const W = s.width * CM, H = s.height * CM
   const X = (x: number) => x * CM, Y = (y: number) => (s.height - y) * CM
@@ -17,10 +43,8 @@ export function RobotArena({ robot, tick }: { robot: DriveBase; tick: number }) 
   const dist = robot.has('distance') ? robot.distanceCm : null
   const ray = dist != null ? Math.min(dist, 250) + R * 0.8 : 0
   const light = LIGHT_CSS[robot.lights]
-  const status = robot.collisions ? `${robot.collisions} çarpma` : 'çarpma yok'
 
   return (
-    <figure className="rb-arena" data-testid="robot-arena" data-tick={tick}>
       <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} role="img" aria-label={`${s.title}: ${p.title} üstten görünüş`}>
         <rect x={0} y={0} width={W} height={H} className="rb-floor" />
         {s.patches.map((q, i) => (
@@ -61,14 +85,5 @@ export function RobotArena({ robot, tick }: { robot: DriveBase; tick: number }) 
           <path d={`M${-R * 0.2} -3L${R * 0.25} 0L${-R * 0.2} 3`} className="rb-arrow" />
         </g>
       </svg>
-      <figcaption className="rb-readout" aria-live="off">
-        {dist != null && <span>mesafe <b>{dist.toFixed(0)} cm</b></span>}
-        {robot.has('color') && <span>renk <b>{FLOOR_COLORS[robot.color].label}</b></span>}
-        {robot.has('line') && <span>çizgi <b>{robot.lineOn('left') ? '●' : '○'}{robot.lineOn('right') ? '●' : '○'}</b></span>}
-        <span>yön <b>{robot.headingDeg}°</b></span>
-        <span>yol <b>{(robot.distanceM * 100).toFixed(0)} cm</b></span>
-        <span className={robot.collisions ? 'bad' : undefined}>{status}</span>
-      </figcaption>
-    </figure>
   )
 }

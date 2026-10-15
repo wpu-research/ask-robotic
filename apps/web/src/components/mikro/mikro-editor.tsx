@@ -309,7 +309,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
 
         {/* sağ: sanal kart(lar) */}
         <aside className="mk-right" aria-label={sim.robot ? 'Sanal robot' : 'Sanal kart'}>
-          {sim.robot && <RobotArena robot={sim.robot} tick={tick} />}
+          {sim.robot && <RobotArena robot={sim.robot} device={sim.device} tick={tick} />}
           <div className={`mk-boards${sim.cards.length > 1 ? ' two' : ''}`}>
             {sim.cards.map((c, i) => (
               <Board key={i} device={c.device} tick={tick} title={sim.robot ? 'ROBOTUN KARTI' : sim.cards.length > 1 ? `KART ${i + 1}` : 'MİKRO KART'} compact={sim.cards.length > 1 || !!sim.robot}

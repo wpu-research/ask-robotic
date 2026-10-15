@@ -768,3 +768,14 @@ a.mcard:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 
   a.mcard:hover { transform: none; }
 }
 @media (forced-colors: active) { .status-dot, .progress-fill { forced-color-adjust: none; } .sb-link[aria-current='page'] { outline: 2px solid Highlight; } }
+
+/* 3B / 2B görünüm seçici (robot sahneleri) */
+.v3-bar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-between; }
+.v3-seg { display: inline-flex; gap: 2px; padding: 2px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--border); }
+.v3-seg button { border: 0; background: transparent; color: var(--muted); font: 600 .78rem/1 inherit; padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.v3-seg button[aria-pressed='true'] { background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.v3-seg button:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.arena-3d { width: 100%; aspect-ratio: 16 / 10; max-height: 560px; background: #dde5ef; }
+.arena-stage .v3-bar { position: absolute; top: 8px; left: 8px; right: 8px; z-index: 2; pointer-events: none; }
+.arena-stage .v3-bar .v3-seg { pointer-events: auto; }
+.arena-hud { position: absolute; left: 10px; bottom: 10px; z-index: 2; background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--text); border-radius: 8px; padding: 4px 10px; font: 700 .85rem/1.4 system-ui, sans-serif; }
