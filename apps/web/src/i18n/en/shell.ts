@@ -44,6 +44,7 @@ export const shell: typeof Tr = {
     arena: 'Robot arena',
     games: 'Games',
     microCard: 'Micro Card workshop',
+    robotStudio: 'Robot workshop',
     gameStudio: 'Game studio',
     stage: 'Stage workshop',
     ai: 'AI workshop',

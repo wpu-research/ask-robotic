@@ -137,6 +137,7 @@ export class Runtime {
     this.timers = []
     this.events.clear()
     this.dev.stopSound()
+    this.dev.robot?.stop()
   }
 
   /** Çalışmayı hata ile sonlandırır. */
@@ -145,6 +146,7 @@ export class Runtime {
     this.error = { message, blockId, card: this.dev.id }
     this.tasks = []
     this.dev.stopSound()
+    this.dev.robot?.stop()
   }
 
   /** Şu an çalışan (ya da kuyrukta bekleyen) üst düzey başlık blokları. */

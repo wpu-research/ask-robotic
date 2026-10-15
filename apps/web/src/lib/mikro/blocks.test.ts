@@ -6,6 +6,7 @@ import { ARROWS, ICONS, arrowForAngle } from './icons'
 import { OPS } from './ops'
 import { EXPRS, STMTS, installOps } from './runtime'
 import { MELODIES } from './music'
+import { ROBOT_PROFILES, type RobotProfile } from './robot'
 import { b, onStart, project, hatBlock } from './program'
 import { Device } from './device'
 
@@ -51,12 +52,23 @@ describe('blok tanımları', () => {
   it('araç kutusu: kategoriler sıralı, süzme çalışır, boş kategori yok', () => {
     const all = toolboxCategories()
     expect(all.map((c) => c.label)).toEqual(expect.arrayContaining(['Temel', 'Giriş', 'LED', 'Müzik', 'Radyo', 'Döngü', 'Mantık', 'Değişken', 'Matematik', 'Liste', 'Fonksiyon', 'Pinler']))
-    expect(all.length).toBe(CATEGORIES.length)
+    expect(all.length).toBe(CATEGORIES.length - 1)
+    expect(all.some((c) => c.key === 'robot')).toBe(false)
     const small = toolboxCategories(['mk_on_start', 'mk_show_icon'])
     expect(small.map((c) => c.key)).toEqual(['basic'])
     expect(small[0].entries.map((e) => e.type)).toEqual(['mk_on_start', 'mk_show_icon'])
     const tb = toolboxJson(['mk_plot']) as { contents: { name: string; contents: unknown[] }[] }
     expect(tb.contents.length).toBe(1)
+  })
+  it('robot kategorisi yalnız gövde varken ve gövdenin sensörlerine göre çıkar', () => {
+    const types = (p: RobotProfile) => toolboxCategories(null, p).find((c) => c.key === 'robot')!.entries.map((e) => e.type)
+    const blok = types(ROBOT_PROFILES.blok)
+    const gezgin = types(ROBOT_PROFILES.gezgin)
+    expect(blok).toEqual(expect.arrayContaining(['rb_move', 'rb_turn', 'rb_distance', 'rb_color_is', 'rb_pressed']))
+    expect(blok).not.toContain('rb_line')
+    expect(gezgin).toEqual(expect.arrayContaining(['rb_move', 'rb_distance', 'rb_line']))
+    expect(gezgin).not.toContain('rb_color_is')
+    expect(gezgin).not.toContain('rb_pressed')
   })
   it('değişken/fonksiyon kategorileri yalnız izinliyse çıkar', () => {
     expect(toolboxCategories(['variables_set']).some((c) => c.key === 'vars')).toBe(true)

@@ -3,6 +3,7 @@
 import { glyphFrame, scrollDuration, scrollFrame } from './font'
 import type { ButtonEvent, ButtonName, DeviceEvent, FrameEntry, GestureName, InputKey, PinName, RadioMessage } from './types'
 import { PINS } from './types'
+import type { DriveBase } from './robot'
 
 export const LONG_PRESS_MS = 1000
 export const SHAKE_MS = 500
@@ -61,6 +62,9 @@ export class Device {
   radioLocked = false
   lastRadio: RadioMessage | null = null
   onRadioSend: ((from: Device, msg: RadioMessage) => void) | null = null
+
+  /** Kart bir robot gövdesine takılıysa (Robot Atölyesi); zamanı kartla birlikte ilerler. */
+  robot: DriveBase | null = null
 
   // ---- Günlük ----
   log: DeviceEvent[] = []
@@ -212,6 +216,7 @@ export class Device {
   /** Zaman ilerledikçe uzun basış olaylarını üretir. */
   tick(now: number) {
     this.now = now
+    this.robot?.advanceTo(now)
     for (const b of ['A', 'B', 'AB'] as const) {
       const held = b === 'AB' ? this.abActive : this.btn[b] && !this.abActive
       if (held && !this.longFired[b] && now - this.downAt[b] >= LONG_PRESS_MS) { this.longFired[b] = true; this.emit(`button:${b}:long`) }

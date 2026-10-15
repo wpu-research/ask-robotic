@@ -63,6 +63,7 @@ export const STATIC_ITEMS: PaletteItem[] = [
   { id: 'a:arena', group: 'Araç', title: 'Robot arenası', subtitle: 'Sanal robot sürüşü', href: '/arena', keywords: 'robot çizgi labirent' },
   { id: 'a:oyunlar', group: 'Araç', title: 'Oyunlar', subtitle: 'Bloklarla 8 öğretici oyun', href: '/oyunlar', keywords: 'blockly games bulmaca labirent kuş kaplumbağa film müzik gölet' },
   { id: 'a:mikro-kart', group: 'Araç', title: 'Mikro Kart atölyesi', subtitle: 'Sanal LED kartı bloklarla programla', href: '/mikro-kart', keywords: 'mikro kart led düğme sensör radyo ivme pusula sanal kart' },
+  { id: 'a:robot-atolyesi', group: 'Araç', title: 'Robot atölyesi', subtitle: 'Mikro Kart\'ı robota tak, bloklarla görev yap', href: '/robot-atolyesi', keywords: 'robot lego spike vincibot blok robotu mini gezgin çizgi izleyen mesafe sensörü renk sensörü motor' },
   { id: 'a:oyun-atolyesi', group: 'Araç', title: 'Oyun atölyesi', subtitle: 'Bloklarla kendi oyununu yap', href: '/oyun-atolyesi', keywords: 'oyun yap sprite harita piksel karakter platform' },
   { id: 'a:sahne-atolyesi', group: 'Araç', title: 'Sahne atölyesi', subtitle: 'Karakterlerini bloklarla canlandır', href: '/sahne-atolyesi', keywords: 'sahne sprite kostüm animasyon hikâye karakter arka plan ses scratch' },
   { id: 'a:ai-atolyesi', group: 'Araç', title: 'AI atölyesi', subtitle: 'Token, prompt, RAG, ajan ve eval araçları', href: '/ai-atolyesi', keywords: 'yapay zekâ ai llm token bpe prompt rag embedding ajan eval injection dil modeli' },

@@ -1,0 +1,42 @@
+/* Robot Atölyesi: arena ve görev seçici. Zemin ve robot boyaları her iki temada aynı kalır (sahne bir fotoğraf gibi). */
+.rb-arena { margin: 0; display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 8px; }
+.rb-arena svg { width: 100%; height: auto; display: block; border-radius: var(--radius-xs); }
+.rb-floor { fill: #f8fafc; stroke: #cbd5e1; stroke-width: .5; }
+.rb-line { fill: none; stroke: #111827; stroke-linecap: round; stroke-linejoin: round; }
+.rb-wall { stroke: #334155; stroke-width: 2.5; stroke-linecap: round; }
+.rb-trail { fill: none; stroke: #0d9488; stroke-width: 1; stroke-opacity: .6; stroke-dasharray: 2 2; }
+.rb-ztext { font: 700 5px system-ui, sans-serif; fill: #0f172a; }
+.rb-body { stroke: #0f172a; stroke-width: .8; }
+.rb-body.blok { fill: #fde68a; }
+.rb-body.gezgin { fill: #a5f3fc; }
+.rb-wheel { fill: #1f2937; }
+.rb-hub { stroke: #0f172a; stroke-width: .5; }
+.rb-bumper { fill: #94a3b8; }
+.rb-bumper[data-pressed] { fill: #f97316; }
+.rb-eye { stroke: #0f172a; stroke-width: .4; }
+.rb-sensor { stroke: #0f172a; stroke-width: .3; }
+.rb-ray { stroke: #ef4444; stroke-width: .6; stroke-dasharray: 2 1.5; }
+.rb-arrow { fill: none; stroke: #0f172a; stroke-width: .9; stroke-linejoin: round; }
+.rb-readout { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: .8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.rb-readout b { color: var(--text); }
+.rb-readout .bad { color: var(--warn); font-weight: 700; }
+
+.rb-studio { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; min-height: 0; height: 100%; }
+.rb-pick { display: grid; gap: 12px; align-content: start; overflow-y: auto; min-height: 0; }
+.rb-pick h2 { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.rb-pick ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.rb-pick button { width: 100%; text-align: left; display: grid; gap: 2px; padding: 10px 12px; border-radius: var(--radius-xs); border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font: inherit; }
+.rb-pick button:hover { border-color: var(--border-strong); }
+.rb-pick button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.rb-pick button[aria-current='true'] { border-color: var(--c-maker); box-shadow: inset 3px 0 0 var(--c-maker); }
+.rb-pick small { color: var(--muted); font-size: .78rem; }
+.rb-pick .rb-done { color: var(--ok); font-weight: 700; }
+.rb-profiles { display: grid; gap: 6px; }
+.rb-profile { font-size: .8rem; color: var(--muted); }
+.rb-profile b { color: var(--text); }
+.rb-ed { min-width: 0; min-height: 0; }
+@media (max-width: 900px) {
+  .rb-studio { grid-template-columns: 1fr; height: auto; }
+  .rb-pick { overflow: visible; }
+  .rb-pick ul { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+}

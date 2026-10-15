@@ -43,6 +43,7 @@ export const shell = {
     arena: 'Robot arenası',
     games: 'Oyunlar',
     microCard: 'Mikro Kart atölyesi',
+    robotStudio: 'Robot atölyesi',
     gameStudio: 'Oyun atölyesi',
     stage: 'Sahne atölyesi',
     ai: 'AI atölyesi',

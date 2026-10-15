@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type * as BlocklyNS from 'blockly'
 import { MESSAGES_TR } from '@/lib/mikro/messages'
 import { BLOCK_BY_TYPE, BLOCK_JSON, CATEGORIES, shade, styleName, toolboxJson } from '@/lib/mikro/blocks'
+import type { RobotProfile } from '@/lib/mikro/robot'
 import type { WorkspaceState } from '@/lib/mikro/types'
 import { askText } from './dialogs'
 import './mikro-blockly.css'
@@ -21,6 +22,8 @@ export interface BlocklyPaneProps {
   activeHatIds?: string[]
   /** Hata veren blok seçilip görünür yapılır. */
   errorBlockId?: string | null
+  /** Kart bir robot gövdesine takılıysa: Robot kategorisi bu gövdenin bloklarıyla açılır. */
+  robot?: RobotProfile | null
 }
 
 let defined = false
@@ -131,15 +134,15 @@ function showTopLeft(ws: BlocklyNS.WorkspaceSvg) {
 
 const isHatLike = (type: string) => BLOCK_BY_TYPE[type]?.kind === 'hat' || type === 'procedures_defnoreturn' || type === 'procedures_defreturn'
 
-export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, activeHatIds, errorBlockId }: BlocklyPaneProps) {
+export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, activeHatIds, errorBlockId, robot }: BlocklyPaneProps) {
   const host = useRef<HTMLDivElement>(null)
   const wsRef = useRef<BlocklyNS.WorkspaceSvg | null>(null)
   const blocklyRef = useRef<B | null>(null)
   const [ready, setReady] = useState(false)
   const [empty, setEmpty] = useState(!(workspace.blocks?.blocks?.length))
   const [failed, setFailed] = useState(false)
-  const cb = useRef({ onChange, allowedBlocks })
-  cb.current = { onChange, allowedBlocks }
+  const cb = useRef({ onChange, allowedBlocks, robot })
+  cb.current = { onChange, allowedBlocks, robot }
   const lastSig = useRef<string | null>(null)
   const lastReset = useRef<string | undefined>(undefined)
   const loading = useRef(false)
@@ -180,7 +183,7 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
         ws = Blockly.inject(host.current, {
           renderer: 'zelos',
           theme: makeTheme(Blockly),
-          toolbox: toolboxJson(cb.current.allowedBlocks) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: toolboxJson(cb.current.allowedBlocks, cb.current.robot) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
           media: '/blockly/media/',
           sounds: false,
           grid: { spacing: 0, length: 0, colour: '#0000', snap: false },
@@ -259,10 +262,10 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
   }, [workspace, resetKey, ready])
 
   // ---- palet ----
-  const allowSig = (allowedBlocks ?? ['*']).join(',')
+  const allowSig = `${(allowedBlocks ?? ['*']).join(',')}|${robot?.id ?? ''}`
   useEffect(() => {
     if (!ready || !wsRef.current) return
-    wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
+    wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks, cb.current.robot) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
   }, [allowSig, ready])
 
   const glowSig = (activeHatIds ?? []).join(',')

@@ -29,6 +29,7 @@ export const NAV: NavGroup[] = [
       { href: '/arena', label: 'Robot arenası', key: 'shell.nav.arena', icon: 'arena', tab: true },
       { href: '/oyunlar', label: 'Oyunlar', key: 'shell.nav.games', icon: 'oyun' },
       { href: '/mikro-kart', label: 'Mikro Kart atölyesi', key: 'shell.nav.microCard', icon: 'mikro' },
+      { href: '/robot-atolyesi', label: 'Robot atölyesi', key: 'shell.nav.robotStudio', icon: 'arena' },
       { href: '/oyun-atolyesi', label: 'Oyun atölyesi', key: 'shell.nav.gameStudio', icon: 'oyun' },
       { href: '/sahne-atolyesi', label: 'Sahne atölyesi', key: 'shell.nav.stage', icon: 'sahne' },
       { href: '/ai-atolyesi', label: 'AI atölyesi', key: 'shell.nav.ai', icon: 'ai' },

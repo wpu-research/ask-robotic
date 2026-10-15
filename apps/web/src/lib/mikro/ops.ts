@@ -6,6 +6,7 @@ import { MikroError, ev, evBool, evNum, evStr, type Ctx, type ExprHandler, type 
 import type { ButtonName, GestureName, PinName, Value } from './types'
 import { fmtNum, looseEq, toNum, toStr } from './values'
 import type { PBlock } from './types'
+import { ROBOT_OPS } from './robot-ops'
 
 /** Tek harf/rakam gösteriminin sabit kalma süresi (ms). */
 export const GLYPH_HOLD_MS = 600
@@ -207,5 +208,5 @@ function* Evaluate<T>(b: PBlock, c: Ctx, fn: (x: number, y: number) => T): Gen<T
   return fn(x, y)
 }
 
-export const OPS = { stmts, exprs }
+export const OPS = { stmts: { ...stmts, ...ROBOT_OPS.stmts }, exprs: { ...exprs, ...ROBOT_OPS.exprs } }
 export { evBool }

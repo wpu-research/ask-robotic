@@ -15,6 +15,8 @@ import { Board } from './board'
 import { BlocklyPane as BlocklyPaneRaw } from './blockly-pane'
 import { CodeView } from './highlight'
 import { SimPanel } from './sim-panel'
+import { RobotArena } from './robot-arena'
+import { ROBOT_PROFILES, type RobotProfileId, type RobotScene } from '@/lib/mikro/robot'
 import { logEvent } from '@/lib/events'
 import './mikro.css'
 
@@ -27,7 +29,11 @@ export interface MikroEditorProps {
   onGoalsChange?: (goals: GoalStatus[], allDone: boolean) => void
   /** Başlangıç projesi (etkinlik yoksa; verilmezse boş proje). */
   initialProject?: MikroProject
+  /** Robot Atölyesi: kart bu gövdeye takılır, robot her çalıştırmada `scene()` sahnesinin başında başlar. */
+  robot?: RobotSetup
 }
+
+export interface RobotSetup { profile: RobotProfileId; scene: () => RobotScene }
 
 const BlocklyPane = memo(BlocklyPaneRaw)
 
@@ -39,8 +45,8 @@ const Icon = {
   reset: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.7 9" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /><path d="M4 4v5h5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>,
 }
 
-function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation): Simulation {
-  const sim = new Simulation(project, { cards, seed: (Date.now() & 0xffff) + 1 })
+function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation, robot?: RobotSetup): Simulation {
+  const sim = new Simulation(project, { cards: robot ? 1 : cards, seed: (Date.now() & 0xffff) + 1, robot: robot && { profile: robot.profile, scene: robot.scene() } })
   sim.cards.forEach((c, i) => {
     c.device.soundHook = makeSoundHook()
     const p = prev?.cards[i]
@@ -52,14 +58,14 @@ function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation): Simula
 
 const fmtTime = (ms: number) => `${(ms / 1000).toFixed(1).replace('.', ',')} sn`
 
-export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject }: MikroEditorProps) {
+export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject, robot }: MikroEditorProps) {
   const base = useMemo(() => initialProject ?? activity?.starter() ?? emptyProject(), [initialProject, activity])
   const [project, setProject] = useState<MikroProject>(base)
   const [resetKey, setResetKey] = useState('0')
   const [loaded, setLoaded] = useState(false)
   const [tab, setTab] = useState<Tab>('blocks')
   const [twoCards, setTwoCards] = useState(activity?.cards === 2)
-  const [sim, setSim] = useState<Simulation>(() => makeSim(base, activity?.cards === 2 ? 2 : 1))
+  const [sim, setSim] = useState<Simulation>(() => makeSim(base, activity?.cards === 2 ? 2 : 1, undefined, robot))
   const [running, setRunning] = useState(false)
   const [tick, setTick] = useState(0)
   const [error, setError] = useState<RunError | null>(null)
@@ -141,10 +147,10 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
 
   const start = () => {
     unlockAudio()
-    const next = makeSim(projectRef.current, twoCards ? 2 : 1, simRef.current)
+    const next = makeSim(projectRef.current, twoCards ? 2 : 1, simRef.current, robot)
     next.start()
     setSim(next); setError(null); setRan(true); setDirty(false); setRunning(true)
-    logEvent('run', { p: { kind: 'mikro' } })
+    logEvent('run', { p: { kind: robot ? 'robot' : 'mikro' } })
   }
   const stop = () => {
     sim.stop(); setRunning(false); setGlow('')
@@ -155,14 +161,14 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
   const reset = () => {
     sim.stop()
     setRunning(false); setGlow(''); setError(null); setRan(false); setDirty(false)
-    setSim(makeSim(projectRef.current, twoCards ? 2 : 1, sim))
+    setSim(makeSim(projectRef.current, twoCards ? 2 : 1, sim, robot))
     setTimeout(evalGoals, 0)
   }
   const toggleTwo = () => {
     const next = !twoCards
     setTwoCards(next)
     const wasRunning = running
-    const ns = makeSim(projectRef.current, next ? 2 : 1, sim)
+    const ns = makeSim(projectRef.current, next ? 2 : 1, sim, robot)
     sim.stop()
     setSim(ns); setError(null)
     if (wasRunning) { ns.start(); setRunning(true) } else { setRunning(false); setRan(false) }
@@ -181,7 +187,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
     stickyRef.current = new Set()
     setProject(p); setResetKey((k) => `${k}:n`); setRunning(false); setRan(false); setError(null); setGlow(''); setDirty(false)
     setTwoCards(cards === 2)
-    setSim(makeSim(p, cards, sim))
+    setSim(makeSim(p, cards, sim, robot))
   }
   const hasWork = countBlocks(project.workspace) > 0
   const confirmReplace = () => !hasWork || window.confirm('Şu anki projenin üzerine yazılacak. Devam edelim mi?')
@@ -253,7 +259,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
         </span>
         {dirty && running && <span className="mk-chipnote">Değişiklikler için ▶ düğmesine bas</span>}
         <span className="mk-spacer" />
-        {!activity && <button className="mk-btn" onClick={() => setGalleryOpen(true)} data-testid="mikro-gallery-open">Örnekler</button>}
+        {!activity && !robot && <button className="mk-btn" onClick={() => setGalleryOpen(true)} data-testid="mikro-gallery-open">Örnekler</button>}
         <button className="mk-btn" onClick={newProject} data-testid="mikro-new">{activity ? 'Başa dön' : 'Yeni'}</button>
         <button className="mk-btn" onClick={doExport} data-testid="mikro-export">Dışa aktar</button>
         <button className="mk-btn" onClick={() => fileRef.current?.click()} data-testid="mikro-import">İçe aktar</button>
@@ -294,7 +300,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
           <div className="mk-work">
             {/* Blockly sekme değişince yok edilmesin: gizlenir */}
             <div className="mk-pane" hidden={tab !== 'blocks'}>
-              <BlocklyPane workspace={project.workspace} onChange={onWorkspace} allowedBlocks={allowed} resetKey={resetKey} activeHatIds={glowIds} errorBlockId={error?.blockId ?? null} />
+              <BlocklyPane workspace={project.workspace} onChange={onWorkspace} allowedBlocks={allowed} robot={robot ? ROBOT_PROFILES[robot.profile] : null} resetKey={resetKey} activeHatIds={glowIds} errorBlockId={error?.blockId ?? null} />
             </div>
             {tab === 'js' && <div className="mk-pane code"><CodeView code={js} lang="js" /></div>}
             {tab === 'py' && <div className="mk-pane code"><CodeView code={py} lang="py" /></div>}
@@ -302,16 +308,17 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
         </section>
 
         {/* sağ: sanal kart(lar) */}
-        <aside className="mk-right" aria-label="Sanal kart">
+        <aside className="mk-right" aria-label={sim.robot ? 'Sanal robot' : 'Sanal kart'}>
+          {sim.robot && <RobotArena robot={sim.robot} tick={tick} />}
           <div className={`mk-boards${sim.cards.length > 1 ? ' two' : ''}`}>
             {sim.cards.map((c, i) => (
-              <Board key={i} device={c.device} tick={tick} title={sim.cards.length > 1 ? `KART ${i + 1}` : 'MİKRO KART'} compact={sim.cards.length > 1}
+              <Board key={i} device={c.device} tick={tick} title={sim.robot ? 'ROBOTUN KARTI' : sim.cards.length > 1 ? `KART ${i + 1}` : 'MİKRO KART'} compact={sim.cards.length > 1 || !!sim.robot}
                 onButton={(b, down) => { if (down) c.device.press(b); else c.device.release(b); bump() }}
                 onLogo={(down) => { c.device.setLogo(down); bump() }}
                 onPin={(p, down) => { c.device.setPinTouch(p, down); bump() }} />
             ))}
           </div>
-          <SimPanel sim={sim} tick={tick} bump={bump} twoCards={twoCards} onToggleTwo={toggleTwo} muted={muted} onMute={toggleMute} />
+          <SimPanel sim={sim} tick={tick} bump={bump} twoCards={twoCards} onToggleTwo={toggleTwo} muted={muted} onMute={toggleMute} noRadio={!!robot} />
         </aside>
       </div>
 

@@ -3,12 +3,14 @@
 // (döngü, mantık, matematik, liste, değişken, işlev) `BUILTIN_ENTRIES` içinde kategorilere dağıtılır; çalıştırma ve kod üretimi bizdedir.
 import { ARROWS, ICONS } from './icons'
 import { BEATS, MELODIES, NOTES } from './music'
+import type { RobotProfile, RobotSensor } from './robot'
 
-export type CatKey = 'basic' | 'input' | 'led' | 'music' | 'radio' | 'loops' | 'logic' | 'vars' | 'math' | 'text' | 'list' | 'func' | 'pins'
+export type CatKey = 'robot' | 'basic' | 'input' | 'led' | 'music' | 'radio' | 'loops' | 'logic' | 'vars' | 'math' | 'text' | 'list' | 'func' | 'pins'
 
 export interface Category { key: CatKey; label: string; color: string; icon: string; custom?: 'VARIABLE' | 'PROCEDURE' }
 
 export const CATEGORIES: Category[] = [
+  { key: 'robot', label: 'Robot', color: '#0d9488', icon: '🤖' },
   { key: 'basic', label: 'Temel', color: '#3b82f6', icon: '🏠' },
   { key: 'input', label: 'Giriş', color: '#f43f5e', icon: '👆' },
   { key: 'led', label: 'LED', color: '#8b5cf6', icon: '💡' },
@@ -81,6 +83,8 @@ export interface Spec {
   prec?: number
   /** Araç kutusunda gösterilmez (yalnız programlarda var olabilir). */
   hidden?: boolean
+  /** Robot bloğu: gövdede bu sensör yoksa araç kutusunda gösterilmez. */
+  sensor?: RobotSensor
 }
 
 const hat = (type: string, cat: CatKey, label: string, call: string, args: Arg[] = [], tip?: string): Spec => ({ type, cat, kind: 'hat', label, args, call, tip })
@@ -88,7 +92,28 @@ const st = (type: string, cat: CatKey, label: string, call: string, args: Arg[] 
 const val = (type: string, cat: CatKey, label: string, call: string, args: Arg[] = [], extra: Partial<Spec> = {}): Spec => ({ type, cat, kind: 'value', label, args, call, ...extra })
 const bl = (type: string, cat: CatKey, label: string, call: string, args: Arg[] = [], extra: Partial<Spec> = {}): Spec => ({ type, cat, kind: 'bool', label, args, call, ...extra })
 
+const SIDE_OPTS: [string, string][] = [['sol', 'left'], ['sağ', 'right']]
+export const FLOOR_OPTS: [string, string][] = [['siyah', 'siyah'], ['beyaz', 'beyaz'], ['kırmızı', 'kirmizi'], ['yeşil', 'yesil'], ['mavi', 'mavi'], ['sarı', 'sari']]
+export const LIGHT_OPTS: [string, string][] = [['kırmızı', 'kirmizi'], ['yeşil', 'yesil'], ['mavi', 'mavi'], ['sarı', 'sari'], ['beyaz', 'beyaz'], ['kapalı', 'kapali']]
+
 export const SPECS: Spec[] = [
+  // ---- Robot (yalnız robot gövdesi takılıyken) ----
+  st('rb_move', 'robot', '{DIR} {CM} cm git', 'robot.move', [drop('DIR', [['ileri', 'forward'], ['geri', 'back']], 'forward'), num('CM', 20)], { tip: 'Robot bu kadar yol gidip durana kadar sonraki bloğa geçilmez.' }),
+  st('rb_turn', 'robot', '{DIR} {DEG} derece dön', 'robot.turn', [drop('DIR', [['sola', 'left'], ['sağa', 'right']], 'left'), num('DEG', 90)], { tip: 'Robot yerinde döner; dönüş bitince sonraki bloğa geçilir.' }),
+  st('rb_motors', 'robot', 'motorları çalıştır sol % {L} sağ % {R}', 'robot.setMotors', [num('L', 50), num('R', 50)], { tip: 'Güç -100 ile 100 arasındadır; eksi geri döndürür. Robot sen durdurana kadar sürer.' }),
+  st('rb_stop', 'robot', 'motorları durdur', 'robot.stop'),
+  st('rb_speed', 'robot', 'sürüş hızını % {P} yap', 'robot.setSpeed', [num('P', 50)], { tip: '"git" ve "dön" blokları bu hızı kullanır (10-100).' }),
+  val('rb_distance', 'robot', 'mesafe (cm)', 'robot.distance', [], { sensor: 'distance', tip: 'Önündeki engele uzaklık; en çok 250 cm.' }),
+  bl('rb_color_is', 'robot', 'zemin rengi {C} mi?', 'robot.isColor', [drop('C', FLOOR_OPTS, 'kirmizi')], { sensor: 'color' }),
+  val('rb_color', 'robot', 'zemin rengi', 'robot.color', [], { sensor: 'color' }),
+  val('rb_reflect', 'robot', 'yansıyan ışık (%)', 'robot.reflectedLight', [], { sensor: 'color', tip: 'Beyaz zeminde yüksek, siyah çizgide düşüktür.' }),
+  bl('rb_line', 'robot', '{SIDE} çizgi sensörü çizgide mi?', 'robot.onLine', [drop('SIDE', SIDE_OPTS, 'left')], { sensor: 'line' }),
+  bl('rb_pressed', 'robot', 'tampona basılı mı?', 'robot.pressed', [], { sensor: 'force' }),
+  val('rb_motor_deg', 'robot', '{SIDE} motor açısı (°)', 'robot.motorAngle', [drop('SIDE', SIDE_OPTS, 'left')], { tip: 'Tekerleğin döndüğü toplam açı.' }),
+  val('rb_heading', 'robot', 'dönüş açısı (°)', 'robot.heading', [], { tip: 'Başlangıçtan bu yana ne kadar döndüğü; sola artı, sağa eksi.' }),
+  st('rb_reset', 'robot', 'açıları sıfırla', 'robot.resetAngles', [], { tip: 'Motor açılarını ve dönüş açısını sıfırlar.' }),
+  st('rb_lights', 'robot', 'ışıkları {COLOR} yap', 'robot.setLights', [drop('COLOR', LIGHT_OPTS, 'yesil')]),
+
   // ---- Temel ----
   hat('mk_on_start', 'basic', 'başlangıçta', 'card.onStart', [], 'Program başlayınca bir kez çalışır.'),
   hat('mk_forever', 'basic', 'sonsuza kadar', 'card.forever', [], 'İçindeki bloklar durmadan tekrarlanır.'),
@@ -282,18 +307,23 @@ export const ALWAYS_ALLOWED = ['math_number', 'text', 'logic_boolean']
 
 export interface ToolboxCat { key: CatKey; label: string; color: string; custom?: 'VARIABLE' | 'PROCEDURE'; entries: Record<string, unknown>[] }
 
-/** `allowed` verilirse yalnız o türler; boş kategori gösterilmez. */
-export function toolboxCategories(allowed?: readonly string[] | null): ToolboxCat[] {
+/** Blok bu gövdede kullanılabilir mi (robot bloğu değilse her zaman). */
+export const specFitsRobot = (s: Spec, robot: RobotProfile | null | undefined): boolean =>
+  s.cat !== 'robot' || (!!robot && (!s.sensor || robot.sensors.includes(s.sensor)))
+
+/** `allowed` verilirse yalnız o türler; boş kategori gösterilmez. Robot kategorisi yalnız `robot` verilince ve gövdenin sensörlerine göre. */
+export function toolboxCategories(allowed?: readonly string[] | null, robot?: RobotProfile | null): ToolboxCat[] {
   const ok = allowed ? new Set(allowed) : null
   const out: ToolboxCat[] = []
   for (const c of CATEGORIES) {
+    if (c.key === 'robot' && !robot) continue
     if (c.custom) {
       const types = c.custom === 'VARIABLE' ? VARIABLE_TYPES : PROCEDURE_TYPES
       if (!ok || types.some((t) => ok.has(t))) out.push({ key: c.key, label: c.label, color: c.color, custom: c.custom, entries: [] })
       continue
     }
     const entries: Record<string, unknown>[] = []
-    for (const s of SPECS) if (s.cat === c.key && !s.hidden && (!ok || ok.has(s.type))) entries.push(flyoutEntry(s))
+    for (const s of SPECS) if (s.cat === c.key && !s.hidden && specFitsRobot(s, robot) && (!ok || ok.has(s.type))) entries.push(flyoutEntry(s))
     for (const b of BUILTIN_ENTRIES[c.key] ?? []) {
       if (ok && !ok.has(b.type)) continue
       entries.push({ kind: 'block', type: b.type, ...(b.inputs ? { inputs: b.inputs } : {}), ...(b.fields ? { fields: b.fields } : {}), ...(b.extraState ? { extraState: b.extraState } : {}) })
@@ -303,10 +333,10 @@ export function toolboxCategories(allowed?: readonly string[] | null): ToolboxCa
   return out
 }
 
-export function toolboxJson(allowed?: readonly string[] | null) {
+export function toolboxJson(allowed?: readonly string[] | null, robot?: RobotProfile | null) {
   return {
     kind: 'categoryToolbox',
-    contents: toolboxCategories(allowed).map((c) => ({
+    contents: toolboxCategories(allowed, robot).map((c) => ({
       kind: 'category',
       name: c.label,
       categorystyle: `mk_cat_${c.key}`,

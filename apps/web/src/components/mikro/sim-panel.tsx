@@ -13,6 +13,8 @@ export interface SimPanelProps {
   onToggleTwo(): void
   muted: boolean
   onMute(): void
+  /** Robot Atölyesi: ikinci kart ve radyo bölümü gösterilmez. */
+  noRadio?: boolean
 }
 
 const GESTURES: [GestureName, string][] = [
@@ -67,7 +69,7 @@ function ServoDial({ angle }: { angle: number }) {
   )
 }
 
-export function SimPanel({ sim, tick, bump, twoCards, onToggleTwo, muted, onMute }: SimPanelProps) {
+export function SimPanel({ sim, tick, bump, twoCards, onToggleTwo, muted, onMute, noRadio }: SimPanelProps) {
   void tick
   const [sel, setSel] = useState(0)
   const [msgKind, setMsgKind] = useState<'num' | 'str' | 'kv'>('num')
@@ -140,7 +142,7 @@ export function SimPanel({ sim, tick, bump, twoCards, onToggleTwo, muted, onMute
         })}
       </details>
 
-      <details open={twoCards}>
+      {!noRadio && <details open={twoCards}>
         <summary>Radyo</summary>
         <div className="mk-radio-top">
           <button className="mk-chip strong" onClick={onToggleTwo} data-testid="mikro-toggle-two" aria-pressed={twoCards}>{twoCards ? 'İkinci kartı çıkar' : 'İkinci kart ekle'}</button>
@@ -164,7 +166,7 @@ export function SimPanel({ sim, tick, bump, twoCards, onToggleTwo, muted, onMute
           <button className="mk-chip" onClick={sendMsg} data-testid="mikro-msg-send">Kart {idx + 1}&apos;e gönder</button>
         </div>
         <p className="mk-readout">Son alınan: <b data-testid="mikro-last-radio">{d.lastRadio ? (d.lastRadio.kind === 'num' ? d.lastRadio.num : d.lastRadio.kind === 'str' ? `"${d.lastRadio.str}"` : `${d.lastRadio.name} = ${d.lastRadio.value}`) : 'yok'}</b></p>
-      </details>
+      </details>}
 
       <details>
         <summary>Hoparlör</summary>

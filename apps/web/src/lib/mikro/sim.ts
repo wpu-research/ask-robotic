@@ -1,6 +1,7 @@
 // Benzetim: bir ya da iki sanal kart + paylaşılan radyo ortamı. Zaman kuantumlarla ilerler (radyo iletimi bir sonraki kuantumda gelir).
 import { Device } from './device'
 import { Runtime, type RuntimeOptions } from './runtime'
+import { DriveBase, type RobotProfileId, type RobotScene } from './robot'
 import type { DeviceEvent, MikroProject, RadioMessage, RunError, WorkspaceState } from './types'
 
 export const QUANTUM_MS = 10
@@ -11,6 +12,8 @@ export interface Card { device: Device; runtime: Runtime }
 export interface SimOptions extends RuntimeOptions {
   /** 1 ya da 2 kart. İkinci kart aynı programı çalıştırır (aynı kodu iki karta yüklemek gibi). */
   cards?: 1 | 2
+  /** Verilirse 1. kart bu robot gövdesine takılır ve robot bu sahnede başlar. */
+  robot?: { profile: RobotProfileId; scene: RobotScene }
 }
 
 export class Simulation {
@@ -28,11 +31,13 @@ export class Simulation {
   private addCard(opts: SimOptions) {
     const device = new Device(this.cards.length)
     device.onRadioSend = (from, msg) => this.broadcast(from, msg)
+    if (opts.robot && this.cards.length === 0) device.robot = new DriveBase(opts.robot.profile, opts.robot.scene)
     this.cards.push({ device, runtime: new Runtime(device, this.ws, { seed: opts.seed, burstLimit: opts.burstLimit, totalStepLimit: opts.totalStepLimit }) })
   }
 
   get card(): Card { return this.cards[0] }
   get device(): Device { return this.cards[0].device }
+  get robot(): DriveBase | null { return this.cards[0].device.robot }
 
   start() { for (const c of this.cards) c.runtime.start() }
   stop() { for (const c of this.cards) c.runtime.stop() }

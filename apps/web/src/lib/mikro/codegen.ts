@@ -10,8 +10,8 @@ interface Expr { c: string; p: number }
 // öncelik sınıfları (küçük = sıkı bağlanır)
 const ATOM = 0, UNARY = 2, MUL = 3, ADD = 4, REL = 5, EQ = 6, AND = 7, OR = 8, TERN = 9
 
-const JS_RESERVED = new Set('break case catch class const continue debugger default delete do else export extends finally for function if import in instanceof new return super switch this throw try typeof var void while with yield let static enum await implements package protected interface private public null true false undefined card screen input music radio pins console Math String Number'.split(' '))
-const PY_RESERVED = new Set('False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield card screen input music radio pins print len str float int min max abs pow round'.split(' '))
+const JS_RESERVED = new Set('break case catch class const continue debugger default delete do else export extends finally for function if import in instanceof new return super switch this throw try typeof var void while with yield let static enum await implements package protected interface private public null true false undefined card screen input music radio pins robot console Math String Number'.split(' '))
+const PY_RESERVED = new Set('False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield card screen input music radio pins robot print len str float int min max abs pow round'.split(' '))
 
 const TR_MAP: Record<string, string> = { ç: 'c', Ç: 'C', ğ: 'g', Ğ: 'G', ı: 'i', İ: 'I', ö: 'o', Ö: 'O', ş: 's', Ş: 'S', ü: 'u', Ü: 'U' }
 export function ident(name: string, lang: Lang): string {
