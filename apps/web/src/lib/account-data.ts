@@ -2,7 +2,7 @@
 // Dışa aktarımda parola/QR özetleri ve oturum belirteçleri yer almaz.
 import {
   classMembers, consents, enrollments, eq, events, guardianLinks, organizationMembers, payments, progress, sessions,
-  sql, subscriptionMembers, subscriptions, tutorMessages, users, xpEvents, type Db,
+  skillRuns, sql, subscriptionMembers, subscriptions, tutorMessages, users, xpEvents, type Db,
 } from '@ask/db'
 
 export const DELETE_CONFIRM_PHRASE = 'HESABIMI SİL'
@@ -15,7 +15,7 @@ export async function exportUserData(db: Db, userId: string, now = new Date()) {
   }).from(users).where(eq(users.id, userId))
   if (!user) return null
 
-  const [prog, enr, subs, subMember, pays, cons, xp, ev, tutor, guardians, orgs, cls, sess] = await Promise.all([
+  const [prog, enr, subs, subMember, pays, cons, xp, ev, tutor, skills, guardians, orgs, cls, sess] = await Promise.all([
     db.select().from(progress).where(eq(progress.userId, userId)),
     db.select().from(enrollments).where(eq(enrollments.userId, userId)),
     db.select({
@@ -31,6 +31,7 @@ export async function exportUserData(db: Db, userId: string, now = new Date()) {
     db.select().from(xpEvents).where(eq(xpEvents.userId, userId)),
     db.select().from(events).where(eq(events.userId, userId)),
     db.select().from(tutorMessages).where(eq(tutorMessages.userId, userId)),
+    db.select().from(skillRuns).where(eq(skillRuns.userId, userId)),
     db.select().from(guardianLinks).where(sql`${guardianLinks.parentUserId} = ${userId} or ${guardianLinks.studentUserId} = ${userId}`),
     db.select().from(organizationMembers).where(eq(organizationMembers.userId, userId)),
     db.select().from(classMembers).where(eq(classMembers.userId, userId)),
@@ -50,6 +51,7 @@ export async function exportUserData(db: Db, userId: string, now = new Date()) {
     xpEvents: xp,
     events: ev,
     tutorMessages: tutor,
+    skillRuns: skills,
     guardianLinks: guardians,
     organizationMemberships: orgs,
     classMemberships: cls,

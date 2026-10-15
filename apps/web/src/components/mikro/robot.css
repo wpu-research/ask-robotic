@@ -41,3 +41,31 @@
   .rb-pick ul { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
 }
 .rb-3d { width: 100%; aspect-ratio: 4 / 3; max-height: 460px; border-radius: var(--radius-xs); overflow: hidden; background: #dde5ef; }
+/* Sanal beceri paneli */
+.rb-ed { display: grid; gap: 12px; align-content: start; }
+.sk-panel { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.sk-head { display: flex; flex-wrap: wrap; gap: 8px 16px; justify-content: space-between; align-items: flex-start; }
+.sk-head h2 { margin: 0; font-size: 1.15rem; }
+.sk-eyebrow { margin: 0; font: 700 .7rem/1.2 system-ui, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--c-maker-ink); }
+.sk-sum { margin: 2px 0 0; color: var(--muted); max-width: 70ch; }
+.sk-best { margin: 0; color: var(--muted); }
+.sk-best b { font-size: 1.4rem; color: var(--text); font-variant-numeric: tabular-nums; }
+.sk-rules summary { cursor: pointer; font-weight: 600; }
+.sk-rules ul { margin: 6px 0; padding-left: 1.2em; display: grid; gap: 3px; }
+.sk-rules p { margin: 0; color: var(--muted); font-size: .85rem; }
+.sk-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sk-actions .mk-btn.sk-send { background: var(--c-maker); color: #fff; border-color: transparent; }
+.sk-actions .mk-btn.sk-send:disabled { background: var(--surface-3); color: var(--muted); }
+.sk-note { color: var(--muted); font-size: .88rem; margin: 0; }
+.sk-err { color: var(--warn); margin: 0; font-weight: 600; }
+.sk-ok { color: var(--ok); margin: 0; font-weight: 600; }
+.sk-score { border-collapse: collapse; width: 100%; max-width: 420px; font-variant-numeric: tabular-nums; }
+.sk-score td { padding: 4px 8px; border-bottom: 1px solid var(--border); }
+.sk-score td:last-child { text-align: right; font-weight: 700; }
+.sk-score .sk-total td { border-bottom: 0; font-weight: 800; font-size: 1.05rem; }
+.sk-board h3 { margin: 4px 0 6px; font-size: .95rem; }
+.sk-board ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; max-width: 560px; }
+.sk-board li { display: grid; grid-template-columns: 28px 1fr auto auto; gap: 10px; align-items: baseline; padding: 6px 10px; border-radius: var(--radius-xs); background: var(--surface-2); font-variant-numeric: tabular-nums; }
+.sk-board li.me { outline: 2px solid var(--c-maker); }
+.sk-board small { color: var(--muted); }
+.sk-rank { font-weight: 800; text-align: center; }

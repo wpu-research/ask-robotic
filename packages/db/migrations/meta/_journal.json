@@ -57,6 +57,13 @@
       "when": 1791992476937,
       "tag": "0007_ders_ingilizce",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792107655653,
+      "tag": "0008_sanal_beceri",
+      "breakpoints": true
     }
   ]
 }

@@ -313,3 +313,16 @@ export const payments = pgTable('payments', {
   raw: jsonb('raw').$type<Record<string, unknown>>(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [uniqueIndex('payments_provider_ref').on(t.provider, t.providerRef), index('payments_user').on(t.userId)])
+
+// ---- Sanal Beceri (Robot Atölyesi): öğrencinin gönderdiği program ve SUNUCUDA yeniden hesaplanan puanı ----
+// Sınıf puan tablosu, sınıf üyelerinin en iyi kaydından üretilir (sınıf kodu = erişim). Hesap silinince kayıtlar da silinir.
+export const skillRuns = pgTable('skill_runs', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  challengeId: text('challenge_id').notNull(),
+  score: integer('score').notNull(),
+  /** Bitiş koşulunun sağlandığı an (ms); bitirmediyse null. Eşit puanda kısa olan önde. */
+  finishMs: integer('finish_ms'),
+  program: jsonb('program').$type<Record<string, unknown>>().notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [index('skill_runs_challenge_user').on(t.challengeId, t.userId), index('skill_runs_user_at').on(t.userId, t.createdAt)])

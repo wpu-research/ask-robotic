@@ -6,6 +6,9 @@ import { getCatalog } from '@/lib/catalog'
 import { classStudents, listAssignments } from '@/lib/classroom'
 import { lastActivity, loadProgressMatrix, loadSkillHeatmap, loadStuck, loadTutorMessages } from '@/lib/class-insights'
 import { skillById } from '@/lib/skills'
+import { classBoard } from '@/lib/beceri-server'
+import { SKILL_CHALLENGES } from '@/lib/mikro/beceri'
+import { ROBOT_PROFILES } from '@/lib/mikro/robot'
 import { qrSvg, originFromHeaders } from '@/lib/qr-svg'
 import { requireClassPage } from '@/lib/teacher-page'
 import { BulkAddForm, RosterTable } from '@/components/teacher/cards'
@@ -20,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 export const dynamic = 'force-dynamic'
 
-const TABS = [{ id: 'ogrenciler' }, { id: 'odevler' }, { id: 'ilerleme' }, { id: 'beceriler' }, { id: 'sohbetler' }] as const
+const TABS = [{ id: 'ogrenciler' }, { id: 'odevler' }, { id: 'ilerleme' }, { id: 'beceriler' }, { id: 'beceri' }, { id: 'sohbetler' }] as const
 type Tab = (typeof TABS)[number]['id']
 
 /** Sayfa dili: çevirici + tarih biçimi (istek başına). */
@@ -57,6 +60,7 @@ export default async function Sinif({ params, searchParams }: Props) {
       {tab === 'odevler' && <Assignments classId={id} tx={tx} />}
       {tab === 'ilerleme' && <ProgressTab classId={id} tx={tx} />}
       {tab === 'beceriler' && <SkillsTab classId={id} tx={tx} />}
+      {tab === 'beceri' && <VirtualSkillsTab classId={id} joinCode={cls.joinCode} tx={tx} />}
       {tab === 'sohbetler' && <ChatsTab classId={id} studentId={typeof sp.ogrenci === 'string' ? sp.ogrenci : undefined} tx={tx} />}
     </div>
   )
@@ -227,6 +231,40 @@ async function SkillsTab({ classId, tx: { t } }: { classId: string; tx: I18n }) 
         </table>
       </div>
     </section>
+  )
+}
+
+async function VirtualSkillsTab({ classId, joinCode, tx: { t, when } }: { classId: string; joinCode: string; tx: I18n }) {
+  const db = getDb()
+  const boards = await Promise.all(SKILL_CHALLENGES.map(async (c) => ({ c, rows: await classBoard(db, classId, c.id) })))
+  const sec = (ms: number | null) => (ms == null ? t('teacher.vskills.notFinished') : `${(ms / 1000).toFixed(1)} s`)
+  return (
+    <>
+      <section className="panel">
+        <div className="og-head">
+          <h2 className="panel-title" style={{ margin: 0 }}>{t('teacher.vskills.title')}</h2>
+          <Link className="btn btn-ghost btn-sm" href="/robot-atolyesi">{t('teacher.vskills.open')}</Link>
+        </div>
+        <p className="muted">{t('teacher.vskills.lead', { code: joinCode })}</p>
+      </section>
+      {boards.map(({ c, rows }) => (
+        <section key={c.id} className="panel" data-testid={`vskills-${c.id}`}>
+          <h2 className="panel-title">{c.title} <span className="muted" style={{ fontWeight: 400 }}>· {ROBOT_PROFILES[c.profile].title} · {c.timeLimitS} s</span></h2>
+          {rows.length ? (
+            <div className="og-table-wrap">
+              <table className="og-table">
+                <thead><tr><th>{t('teacher.vskills.rank')}</th><th>{t('teacher.vskills.student')}</th><th>{t('teacher.vskills.score')}</th><th>{t('teacher.vskills.finish')}</th><th>{t('teacher.vskills.attempts')}</th><th>{t('teacher.vskills.last')}</th></tr></thead>
+                <tbody>
+                  {rows.map((r) => (
+                    <tr key={r.userId}><td>{r.rank}</td><td>{r.name}</td><td><b>{r.score}</b></td><td>{sec(r.finishMs)}</td><td>{r.attempts}</td><td className="muted">{when(r.lastAt)}</td></tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : <p className="muted">{t('teacher.vskills.none')}</p>}
+        </section>
+      ))}
+    </>
   )
 }
 

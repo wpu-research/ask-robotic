@@ -31,6 +31,8 @@ export interface MikroEditorProps {
   initialProject?: MikroProject
   /** Robot Atölyesi: kart bu gövdeye takılır, robot her çalıştırmada `scene()` sahnesinin başında başlar. */
   robot?: RobotSetup
+  /** Proje her değiştiğinde (yükleme dahil) çağrılır. */
+  onProjectChange?: (p: MikroProject) => void
 }
 
 export interface RobotSetup { profile: RobotProfileId; scene: () => RobotScene }
@@ -58,7 +60,7 @@ function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation, robot?:
 
 const fmtTime = (ms: number) => `${(ms / 1000).toFixed(1).replace('.', ',')} sn`
 
-export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject, robot }: MikroEditorProps) {
+export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject, robot, onProjectChange }: MikroEditorProps) {
   const base = useMemo(() => initialProject ?? activity?.starter() ?? emptyProject(), [initialProject, activity])
   const [project, setProject] = useState<MikroProject>(base)
   const [resetKey, setResetKey] = useState('0')
@@ -107,6 +109,9 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
     const t = setTimeout(() => { saveProject(storageKey, project) }, 300)
     return () => clearTimeout(t)
   }, [project, storageKey, loaded])
+
+  const projectCb = useRef(onProjectChange); projectCb.current = onProjectChange
+  useEffect(() => { projectCb.current?.(project) }, [project])
 
   // ---- hedefler ----
   const evalGoals = useCallback(() => {

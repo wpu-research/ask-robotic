@@ -5,10 +5,13 @@ import { MikroEditor } from './mikro-editor'
 import { ROBOT_MISSIONS, freeScene, type RobotMission } from '@/lib/mikro/robot-missions'
 import { ROBOT_PROFILES, type RobotProfileId } from '@/lib/mikro/robot'
 import { onStart, project } from '@/lib/mikro/program'
+import { SKILL_CHALLENGES } from '@/lib/mikro/beceri'
+import type { MikroProject } from '@/lib/mikro/types'
+import { SkillPanel } from './skill-panel'
 import './robot.css'
 
 const DONE_KEY = 'ask:robot:done:v1'
-type Pick = { kind: 'mission'; id: string } | { kind: 'free'; profile: RobotProfileId }
+type Pick = { kind: 'mission'; id: string } | { kind: 'free'; profile: RobotProfileId } | { kind: 'skill'; id: string }
 
 function loadDone(): Set<string> {
   try { return new Set(JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]') as string[]) } catch { return new Set() }
@@ -19,11 +22,13 @@ export function RobotStudio() {
   const [done, setDone] = useState<Set<string>>(new Set())
   useEffect(() => { setDone(loadDone()) }, [])
 
+  const [current, setCurrent] = useState<MikroProject | null>(null)
   const mission: RobotMission | null = pick.kind === 'mission' ? ROBOT_MISSIONS.find((m) => m.id === pick.id) ?? null : null
-  const profile: RobotProfileId = mission ? mission.profile : pick.kind === 'free' ? pick.profile : 'blok'
-  const robot = useMemo(() => ({ profile, scene: mission ? mission.scene : freeScene }), [profile, mission])
-  const key = mission ? `m:${mission.id}` : `f:${profile}`
-  const freeStart = useMemo(() => project(`${ROBOT_PROFILES[profile].title} serbest`, [onStart()]), [profile])
+  const skill = pick.kind === 'skill' ? SKILL_CHALLENGES.find((c) => c.id === pick.id) ?? null : null
+  const profile: RobotProfileId = mission ? mission.profile : skill ? skill.profile : pick.kind === 'free' ? pick.profile : 'blok'
+  const robot = useMemo(() => ({ profile, scene: mission ? mission.scene : skill ? skill.scene : freeScene }), [profile, mission, skill])
+  const key = mission ? `m:${mission.id}` : skill ? `s:${skill.id}` : `f:${profile}`
+  const freeStart = useMemo(() => project(skill ? skill.title : `${ROBOT_PROFILES[profile].title} serbest`, [onStart()]), [profile, skill])
 
   const onGoals = useCallback((_: unknown, allDone: boolean) => {
     if (!allDone || !mission) return
@@ -49,6 +54,17 @@ export function RobotStudio() {
             </li>
           ))}
         </ul>
+        <h2>Sanal beceri</h2>
+        <ul>
+          {SKILL_CHALLENGES.map((c) => (
+            <li key={c.id}>
+              <button aria-current={pick.kind === 'skill' && pick.id === c.id} onClick={() => setPick({ kind: 'skill', id: c.id })} data-testid={`robot-skill-${c.id}`}>
+                <b>{c.title}</b>
+                <small>{ROBOT_PROFILES[c.profile].title} · {c.timeLimitS} sn · puanlı</small>
+              </button>
+            </li>
+          ))}
+        </ul>
         <h2>Serbest arena</h2>
         <ul>
           {(['blok', 'gezgin'] as const).map((p) => (
@@ -66,7 +82,8 @@ export function RobotStudio() {
         </div>
       </nav>
       <div className="rb-ed">
-        <MikroEditor key={key} storageKey={`ask:robot:${key}:v1`} activity={mission ?? undefined} robot={robot} initialProject={mission ? undefined : freeStart} onGoalsChange={onGoals} />
+        {skill && <SkillPanel challenge={skill} project={current} />}
+        <MikroEditor onProjectChange={setCurrent} key={key} storageKey={`ask:robot:${key}:v1`} activity={mission ?? undefined} robot={robot} initialProject={mission ? undefined : freeStart} onGoalsChange={onGoals} />
       </div>
     </div>
   )
