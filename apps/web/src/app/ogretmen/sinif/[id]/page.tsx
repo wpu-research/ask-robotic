@@ -170,7 +170,7 @@ async function ProgressTab({ classId, tx: { t, when } }: { classId: string; tx: 
               <tbody>
                 {m.students.map((s) => (
                   <tr key={s.id}>
-                    <td>{s.name}</td>
+                    <td>{s.name} <Link className="og-link-btn" href={`/ogretmen/sinif/${classId}/karne/${s.id}`}>{t('teacher.report.open')}</Link></td>
                     {m.assignments.map((a) => {
                       const c = m.cells[s.id][a.id]
                       return <td key={a.id}><span className={`og-cell${c.total && c.done === c.total ? ' full' : c.done ? ' part' : ''}`}>{c.done}/{c.total}</span></td>
