@@ -40,7 +40,10 @@ export default async function Ogretmen() {
           <p className="v2-eyebrow">{t('teacher.panel')}</p>
           <h1>{t('teacher.myClasses')}</h1>
         </div>
-        <Link className="btn btn-ghost" href="/ogretmen/okul">{t('teacher.schoolSettings')}</Link>
+        <span style={{ display: 'flex', gap: 8 }}>
+          <Link className="btn btn-ghost" href="/ogretmen/kazanim">{t('teacher.matrix.link')}</Link>
+          <Link className="btn btn-ghost" href="/ogretmen/okul">{t('teacher.schoolSettings')}</Link>
+        </span>
       </div>
       {orgs.map(({ org }) => {
         const mine = classes.filter((c) => c.orgId === org.id)

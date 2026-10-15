@@ -79,8 +79,14 @@
 .og-card b { font-size: 1.05rem; }
 .og-card .og-code { font-size: .95rem; letter-spacing: .04em; }
 .og-card small { color: #475569; font-size: .72rem; }
+.og-matrix td { vertical-align: top; }
+.og-matrix td:first-child { font-weight: 700; width: 3em; }
+.og-matrix-note { font-size: .85rem; margin-top: 12px; }
 .og-print-only { display: none; }
 @media print {
+  .og-print .og-table-wrap { overflow: visible; border: 0; }
+  .og-print .og-table thead th { position: static; }
+  .og-print .og-table tr { break-inside: avoid; }
   @page { margin: 10mm; }
   body * { visibility: hidden !important; }
   .og-print, .og-print * { visibility: visible !important; }
