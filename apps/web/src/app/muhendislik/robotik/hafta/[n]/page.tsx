@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CodeBlock } from '@/components/robotik/code-block'
+import { Quiz } from '@/components/robotik/quiz'
 import { SimBox } from '@/components/robotik/sim-box'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
@@ -58,6 +59,13 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
           {/* İçerik ders notlarıdır (weeks.json, depoda); kullanıcı girdisi değildir. */}
           <div className="rb-prose" dangerouslySetInnerHTML={{ __html: t.notes }} />
 
+          {t.deep && (
+            <>
+              <h2>{en ? (w.exam ? 'Worked solutions' : 'Going deeper') : (w.exam ? 'Çözümlü örnekler' : 'Derinlemesine')}</h2>
+              <div className="rb-prose" dangerouslySetInnerHTML={{ __html: t.deep }} />
+            </>
+          )}
+
           {w.sims.length > 0 && (
             <>
               <h2>{w.exam ? (en ? 'Review simulations' : 'Tekrar simülasyonları') : en ? (w.sims.length > 1 ? 'Simulations' : 'Simulation') : (w.sims.length > 1 ? 'Simülasyonlar' : 'Simülasyon')}</h2>
@@ -70,6 +78,19 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
               <h2>{en ? 'Code' : 'Kod'}</h2>
               {t.code.map((c) => <CodeBlock key={c.title} title={c.title} src={c.src} lang={lang} />)}
             </>
+          )}
+
+          {t.pitfalls.length > 0 && (
+            <section className="rb-pitfalls" aria-labelledby="rb-pit">
+              <h2 id="rb-pit">{en ? 'Common mistakes' : 'Sık yapılan hatalar'}</h2>
+              <ul>{t.pitfalls.map((x) => <li key={x}>{x}</li>)}</ul>
+            </section>
+          )}
+          {t.se && (
+            <section className="rb-se" aria-labelledby="rb-se">
+              <h2 id="rb-se">{en ? 'Software engineering connection' : 'Yazılım mühendisliği bağlantısı'}</h2>
+              <div className="rb-prose" dangerouslySetInnerHTML={{ __html: t.se }} />
+            </section>
           )}
 
           {ck && (
@@ -92,6 +113,8 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
               )}
             </section>
           )}
+          {t.quiz.length > 0 && <Quiz key={`${w.n}-${lang}`} items={t.quiz} lang={lang} />}
+
           {steps.length > 0 && (
             <section className="rb-proj-step" aria-labelledby="rb-ps">
               <h3 id="rb-ps">{en ? 'Term project this week' : 'Bu hafta dönem projesinde'}</h3>

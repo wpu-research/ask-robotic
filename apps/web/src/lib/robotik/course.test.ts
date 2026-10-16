@@ -102,3 +102,19 @@ describe('ESOF 323 dönem projeleri', () => {
     expect(milestonesOfWeek(3)).toHaveLength(0)
   })
 })
+
+describe('genişletilmiş içerik', () => {
+  it('her haftada derinlemesine, hatalar, YM bağlantısı ve 4 soru; TR/EN cevapları aynı', () => {
+    for (const w of WEEKS) {
+      for (const l of ['tr', 'en'] as const) {
+        expect(w[l].deep.length, `${w.n} ${l}`).toBeGreaterThan(800)
+        expect(w[l].pitfalls.length, `${w.n} ${l}`).toBeGreaterThanOrEqual(4)
+        expect(w[l].quiz, `${w.n} ${l}`).toHaveLength(4)
+        for (const q of w[l].quiz) { expect(q.options).toHaveLength(4); expect(q.answer).toBeGreaterThanOrEqual(0); expect(q.answer).toBeLessThan(4) }
+        expect(w[l].deep + w[l].se, `${w.n} ${l}`).not.toContain('—')
+      }
+      expect(w.tr.quiz.map((q) => q.answer)).toEqual(w.en.quiz.map((q) => q.answer))
+      expect(tags(w.tr.deep)).toBe(tags(w.en.deep))
+    }
+  })
+})

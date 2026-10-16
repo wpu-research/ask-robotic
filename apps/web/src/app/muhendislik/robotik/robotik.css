@@ -117,3 +117,26 @@
 .rb-proj-step ul { display: grid; gap: 6px; }
 .rb-proj-step li { font-size: .92rem; }
 .eng .part-main > *, .rb-code, .rb-art > * { min-width: 0; } .rb-code pre { max-width: 100%; }
+.rb-pitfalls, .rb-se { margin: 28px 0; padding: 16px 20px; border-radius: var(--radius); }
+.rb-pitfalls { background: var(--warn-soft); }
+.rb-pitfalls h2, .rb-se h2 { font-size: 1.05rem; margin: 0 0 10px; }
+.rb-pitfalls h2 { color: var(--warn); }
+.rb-pitfalls ul { list-style: disc; padding-left: 20px; display: grid; gap: 6px; }
+.rb-se { background: var(--surface-2); border: 1px solid var(--border); }
+.rb-quiz { margin: 32px 0; padding: 20px 24px; border-radius: var(--radius); border: 1px solid color-mix(in srgb, var(--eng) 35%, var(--border)); background: var(--surface); }
+.rb-quiz h2 { margin: 0 0 12px; font-size: 1.15rem; }
+.rb-quiz ol { list-style: decimal; padding-left: 22px; display: grid; gap: 18px; }
+.rb-q { font-weight: 700; margin: 0 0 8px; }
+.rb-opts { display: grid; gap: 6px; }
+.rb-opt { display: flex; gap: 10px; align-items: flex-start; text-align: left; font: inherit; font-size: .93rem; padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+.rb-opt:hover:not(:disabled) { border-color: var(--eng); }
+.rb-opt:disabled { cursor: default; }
+.rb-opt.ok { background: var(--ok-soft); border-color: var(--ok); }
+.rb-opt.bad { background: var(--warn-soft); border-color: var(--warn); }
+.rb-opt.dim { opacity: .6; }
+.rb-opt-k { font-family: var(--mono); font-weight: 800; color: var(--eng); }
+.rb-why { margin: 8px 0 0; font-size: .9rem; }
+.rb-why.ok { color: var(--ok); }
+.rb-why.bad { color: var(--warn); }
+.rb-score { display: flex; gap: 12px; align-items: center; margin: 16px 0 0; font-weight: 800; font-family: var(--mono); }
+.rb-score button { font: inherit; font-family: var(--font-sans, inherit); font-weight: 700; font-size: .85rem; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }

@@ -6,7 +6,18 @@ import data from './weeks.json'
 
 export type Lang = 'tr' | 'en'
 export interface CodeBlock { title: string; src: string }
-export interface WeekText { title: string; tools: string; goals: string[]; notes: string; code: CodeBlock[]; lab: string; hw: string }
+export interface QuizItem { q: string; options: string[]; answer: number; why: string }
+export interface WeekText {
+  title: string; tools: string; goals: string[]; notes: string; code: CodeBlock[]; lab: string; hw: string
+  /** Derinlemesine bölüm (HTML, çözümlü örneklerle). */
+  deep: string
+  /** Sık yapılan hatalar. */
+  pitfalls: string[]
+  /** Yazılım mühendisliği bağlantısı (HTML). */
+  se: string
+  /** Kendini sına: 4 çoktan seçmeli soru. */
+  quiz: QuizItem[]
+}
 export interface Week {
   n: number
   sims: SimId[]
