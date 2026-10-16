@@ -32,6 +32,7 @@ export const shell = {
   groups: {
     learn: 'Öğren',
     tools: 'Araçlar',
+    kids: 'Çocuklar için',
     learning: 'Öğrenme',
     adults: 'Büyükler için',
   },
@@ -54,7 +55,34 @@ export const shell = {
     league: 'Sınıf ligi',
     pricing: 'Planlar ve fiyatlar',
     engineering: 'Mühendislik yolu',
+    vision: 'Robotun Gözleri',
     robotics: 'Robotik dersi (ESOF 323)',
+  },
+  /** Atölyeler panelindeki tek satırlık açıklamalar. */
+  navDesc: {
+    blocks: 'Karakterini bloklarla programla',
+    robotStudio: 'Robotunu bloklarla görevlere gönder',
+    microCard: 'Işık, ses ve sensörlü sanal kart',
+    vision: 'Robotlar nasıl görür? Kamera oyunları',
+    gameStudio: 'Kendi oyununu tasarla',
+    stage: 'Karakterleri canlandır, hikâye anlat',
+    games: 'Bloklarla 8 öğretici oyun',
+    lab: 'Sanal Arduino ile devre kur ve kodla',
+    arena: 'Robotu kodla sür, engelden kaçır',
+    ai: 'Token, prompt, RAG ve ajan araçları',
+    engineering: "128 gerçek parça, temelden drone'a",
+    robotics: 'Üniversite dersi: 14 hafta, simülasyonlar',
+    parts: 'Parça ansiklopedisi',
+    tests: 'Mini testler ve puanlar',
+    progress: 'Beceri haritan',
+    league: 'Sınıfınla yarış',
+    pricing: 'Planlar ve fiyatlar',
+  },
+  /** Atölyeler paneli grup alt başlıkları. */
+  groupDesc: {
+    kids: 'Bloklarla, oyunlarla ve robotlarla 5–12 yaş',
+    adults: 'Gerçek devreler, parçalar ve üniversite dersi',
+    learning: 'İlerleme ve kaynaklar',
   },
   /** Alt sekme çubuğundaki kısa adlar. */
   tab: {

@@ -1,5 +1,5 @@
 // Kart illüstrasyonları (kendi çizimimiz, SVG). Her biri 320x180; arka plan rengi sahnenin parçasıdır, iki temada da aynı kalır.
-export type ArtKind = 'robot' | 'devre' | 'sensor' | 'mikro' | 'oyun' | 'blok' | 'ai' | 'sahne' | 'oyunlar' | 'beceri' | 'arena' | 'parcalar'
+export type ArtKind = 'goz' | 'robot' | 'devre' | 'sensor' | 'mikro' | 'oyun' | 'blok' | 'ai' | 'sahne' | 'oyunlar' | 'beceri' | 'arena' | 'parcalar'
 
 const W = 320, H = 180
 
@@ -188,7 +188,26 @@ function Parcalar() {
   )
 }
 
-const ART: Record<ArtKind, () => React.JSX.Element> = { robot: Robot, devre: Devre, sensor: Sensor, mikro: Mikro, oyun: Oyun, blok: Blok, ai: Ai, sahne: Sahne, oyunlar: Oyunlar, beceri: Beceri, arena: Arena, parcalar: Parcalar }
+function Goz() {
+  const px = [[0, 0, 1, 1, 1, 1, 0, 0], [0, 1, 2, 2, 2, 2, 1, 0], [1, 2, 3, 2, 2, 3, 2, 1], [1, 2, 2, 2, 2, 2, 2, 1], [1, 2, 3, 2, 2, 3, 2, 1], [1, 2, 2, 3, 3, 2, 2, 1], [0, 1, 2, 2, 2, 2, 1, 0], [0, 0, 1, 1, 1, 1, 0, 0]]
+  const C = ['#fde68a', '#f59e0b', '#fbbf24', '#7a4426']
+  return (
+    <>
+      <rect width={W} height={H} fill="#e0f2fe" />
+      <g transform="translate(36 30)">{px.flatMap((r, y) => r.map((v, x) => <rect key={`${x}-${y}`} x={x * 15} y={y * 15} width={14} height={14} rx={2} fill={C[v]} />))}</g>
+      <path d="M170 90 H196" stroke="#0f766e" strokeWidth="5" strokeDasharray="6 5" strokeLinecap="round" />
+      <g transform="translate(250 90)">
+        <rect x="-44" y="-38" width="88" height="76" rx="18" fill="#0f766e" stroke="#134e4a" strokeWidth="4" />
+        <circle cx="-16" cy="-6" r="15" fill="#fff" /><circle cx="16" cy="-6" r="15" fill="#fff" />
+        <circle cx="-12" cy="-6" r="7" fill="#2a1a12" /><circle cx="20" cy="-6" r="7" fill="#2a1a12" />
+        <path d="M-14 20 Q0 28 14 20" stroke="#fff" strokeWidth="4" fill="none" strokeLinecap="round" />
+        <path d="M0 -38 V-52" stroke="#134e4a" strokeWidth="4" /><circle cy="-56" r="6" fill="#f43f5e" />
+      </g>
+    </>
+  )
+}
+
+const ART: Record<ArtKind, () => React.JSX.Element> = { goz: Goz, robot: Robot, devre: Devre, sensor: Sensor, mikro: Mikro, oyun: Oyun, blok: Blok, ai: Ai, sahne: Sahne, oyunlar: Oyunlar, beceri: Beceri, arena: Arena, parcalar: Parcalar }
 
 /** Modül slug'ı → illüstrasyon. */
 export const MODULE_ART: Record<string, ArtKind> = {

@@ -2,7 +2,7 @@ import type { MessageKey } from '@/i18n'
 import type { IconName } from './icons'
 
 export interface NavItem { href: string; /** Türkçe ad (testler ve dil bağımsız tüketiciler); arayüz `key` ile çevirir. */ label: string; key: MessageKey; icon: IconName; soon?: boolean; /** Alt çubukta (mobil) görünür. */ tab?: boolean }
-export interface NavGroup { title: string; key: MessageKey; items: NavItem[] }
+export interface NavGroup { title: string; key: MessageKey; items: NavItem[]; /** Atölyeler panelindeki alt başlık ve renk tonu. */ desc?: MessageKey; tone?: 'kids' | 'adults' | 'learning' }
 
 /** Üst menüde doğrudan görünen bağlantılar; geri kalanı "Atölyeler" açılır panelinde ve çekmecede. */
 export const TOP_NAV: NavItem[] = [
@@ -22,28 +22,29 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
-    title: 'Araçlar', key: 'shell.groups.tools',
+    title: 'Çocuklar için', key: 'shell.groups.kids', desc: 'shell.groupDesc.kids', tone: 'kids',
     items: [
       { href: '/atolye', label: 'Blok atölyesi', key: 'shell.nav.blocks', icon: 'atolye', tab: true },
-      { href: '/laboratuvar', label: 'Devre laboratuvarı', key: 'shell.nav.lab', icon: 'laboratuvar', tab: true },
-      { href: '/arena', label: 'Robot arenası', key: 'shell.nav.arena', icon: 'arena', tab: true },
-      { href: '/oyunlar', label: 'Oyunlar', key: 'shell.nav.games', icon: 'oyun' },
-      { href: '/mikro-kart', label: 'Mikro Kart atölyesi', key: 'shell.nav.microCard', icon: 'mikro' },
       { href: '/robot-atolyesi', label: 'Robot atölyesi', key: 'shell.nav.robotStudio', icon: 'arena' },
+      { href: '/mikro-kart', label: 'Mikro Kart atölyesi', key: 'shell.nav.microCard', icon: 'mikro' },
+      { href: '/robotun-gozleri', label: 'Robotun Gözleri', key: 'shell.nav.vision', icon: 'eye' },
       { href: '/oyun-atolyesi', label: 'Oyun atölyesi', key: 'shell.nav.gameStudio', icon: 'oyun' },
       { href: '/sahne-atolyesi', label: 'Sahne atölyesi', key: 'shell.nav.stage', icon: 'sahne' },
-      { href: '/ai-atolyesi', label: 'AI atölyesi', key: 'shell.nav.ai', icon: 'ai' },
+      { href: '/oyunlar', label: 'Oyunlar', key: 'shell.nav.games', icon: 'oyun' },
     ],
   },
   {
-    title: 'Büyükler için', key: 'shell.groups.adults',
+    title: 'Büyükler için', key: 'shell.groups.adults', desc: 'shell.groupDesc.adults', tone: 'adults',
     items: [
+      { href: '/laboratuvar', label: 'Devre laboratuvarı', key: 'shell.nav.lab', icon: 'laboratuvar', tab: true },
+      { href: '/arena', label: 'Robot arenası', key: 'shell.nav.arena', icon: 'arena', tab: true },
+      { href: '/ai-atolyesi', label: 'AI atölyesi', key: 'shell.nav.ai', icon: 'ai' },
       { href: '/muhendislik', label: 'Mühendislik yolu', key: 'shell.nav.engineering', icon: 'drone' },
       { href: '/muhendislik/robotik', label: 'Robotik dersi', key: 'shell.nav.robotics', icon: 'book' },
     ],
   },
   {
-    title: 'Öğrenme', key: 'shell.groups.learning',
+    title: 'Öğrenme', key: 'shell.groups.learning', desc: 'shell.groupDesc.learning', tone: 'learning',
     items: [
       { href: '/parcalar', label: 'Parçalar', key: 'shell.nav.parts', icon: 'parcalar' },
       { href: '/testler', label: 'Testlerim', key: 'shell.nav.tests', icon: 'testler' },

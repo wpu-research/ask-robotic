@@ -36,6 +36,7 @@ const PATHS = {
   code: <><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16" /></>,
   reset: <><path d="M4 12a8 8 0 1 0 2.6-5.9L4 8.5" /><path d="M4 3.5v5h5" /></>,
   stop: <><rect x="6" y="6" width="12" height="12" rx="2" /></>,
+  eye: <><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></>,
   drone: <><circle cx="5.5" cy="5.5" r="2.5" /><circle cx="18.5" cy="5.5" r="2.5" /><circle cx="5.5" cy="18.5" r="2.5" /><circle cx="18.5" cy="18.5" r="2.5" /><path d="m7.5 7.5 2.5 2.5M16.5 7.5 14 10M7.5 16.5l2.5-2.5M16.5 16.5 14 14" /><rect x="10" y="10" width="4" height="4" rx="1" /></>,
   flag: <><path d="M5 21V4M5 4h11l-2 4 2 4H5" /></>,
 } satisfies Record<string, ReactNode>

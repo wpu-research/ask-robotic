@@ -7,6 +7,7 @@ export interface Workshop { href: string; art: ArtKind; k: string; age: string }
 export const WORKSHOPS: Workshop[] = [
   { href: '/robot-atolyesi', art: 'robot', k: 'robot', age: '8+' },
   { href: '/mikro-kart', art: 'mikro', k: 'micro', age: '8+' },
+  { href: '/robotun-gozleri', art: 'goz', k: 'vision', age: '8+' },
   { href: '/oyun-atolyesi', art: 'oyun', k: 'gameStudio', age: '8+' },
   { href: '/atolye', art: 'blok', k: 'blocks', age: '5+' },
   { href: '/sahne-atolyesi', art: 'sahne', k: 'stage', age: '8+' },

@@ -5,6 +5,7 @@ import { useGame } from '@/lib/gamification'
 import { streak } from '@/lib/gamification-core'
 import { Icon } from './icons'
 import { useT } from '@/i18n/client'
+import type { MessageKey } from '@/i18n'
 import { isActive, NAV, TOP_NAV } from './nav-items'
 
 /**
@@ -40,14 +41,23 @@ export function TopNav({ pathname }: { pathname: string }) {
         {open && (
           <div className="tn-panel" role="menu">
             {groups.map((g) => (
-              <div key={g.title} className="tn-group">
-                <div className="tn-group-title">{t(g.key)}</div>
-                {g.items.map((it) => (
-                  <Link key={it.href} href={it.href} role="menuitem" className="tn-item" aria-current={isActive(it.href, pathname) ? 'page' : undefined}>
-                    <span className="tn-icon" aria-hidden="true"><Icon name={it.icon} size={18} /></span>{t(it.key)}
-                  </Link>
-                ))}
-              </div>
+              <section key={g.title} className={`tn-group tn-${g.tone ?? 'learning'}`} aria-label={t(g.key)}>
+                <header className="tn-group-head">
+                  <span className="tn-group-title">{t(g.key)}</span>
+                  {g.desc && <span className="tn-group-desc">{t(g.desc)}</span>}
+                </header>
+                <div className="tn-items">
+                  {g.items.map((it) => {
+                    const desc = `shell.navDesc.${it.key.split('.').pop()}` as MessageKey
+                    return (
+                      <Link key={it.href} href={it.href} role="menuitem" className="tn-item" aria-current={isActive(it.href, pathname) ? 'page' : undefined}>
+                        <span className="tn-icon" aria-hidden="true"><Icon name={it.icon} size={18} /></span>
+                        <span className="tn-item-text"><b>{t(it.key)}</b>{g.tone !== 'learning' && <small>{t(desc)}</small>}</span>
+                      </Link>
+                    )
+                  })}
+                </div>
+              </section>
             ))}
           </div>
         )}

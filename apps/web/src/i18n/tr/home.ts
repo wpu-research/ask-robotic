@@ -87,6 +87,8 @@ export const home = {
     aiText: 'Yapay zekâyı dene ve eğit.',
     parts: 'Parçalar',
     partsText: 'Elektronik parçaları ve özelliklerini incele.',
+    vision: 'Robotun Gözleri',
+    visionText: 'Robotlar nasıl görür? Pikseller, renkler ve kamerayla oyunlar.',
     robot: 'Robot atölyesi',
     robotText: 'Robotunu bloklarla programla, görevleri bitir.',
     skills: 'Sanal beceri',

@@ -88,6 +88,8 @@ export const home: typeof Tr = {
     aiText: 'Try out and train artificial intelligence.',
     parts: 'Parts',
     partsText: 'Explore electronic parts and what they do.',
+    vision: 'Robot Eyes',
+    visionText: 'How do robots see? Pixels, colours and camera games.',
     robot: 'Robot workshop',
     robotText: 'Program your robot with blocks and finish missions.',
     skills: 'Virtual skills',
