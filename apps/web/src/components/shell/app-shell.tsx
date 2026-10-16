@@ -8,6 +8,7 @@ import { Icon } from './icons'
 import { MACADEMIA_URL, NAV } from './nav-items'
 import { MainNav, StreakPill } from './top-nav'
 import { Brand, NutLogo, Wordmark } from './brand'
+import { Mascot } from '../lesson-v2/mascot'
 import { UserMenu } from '../auth/user-menu'
 import { SessionSync } from '../auth/session-sync'
 import { LocaleSwitcher } from './locale-switcher'
@@ -85,6 +86,7 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
       <main id="icerik" tabIndex={-1}>{children}</main>
 
       <footer className="site-footer">
+        <span className="foot-mac" aria-hidden="true"><Mascot size={84} mood="happy" /></span>
         <div className="wrap">
           <div className="cols">
             <div>

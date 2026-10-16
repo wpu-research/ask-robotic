@@ -4,6 +4,7 @@ import { BANDS, bandText, TOPICS, topicText } from '@/lib/learning-paths'
 import { Mascot } from '@/components/lesson-v2/mascot'
 import { dictionaries, type Locale } from '@/i18n'
 import { ContinueLink, HeroDemo, MeetTabs } from './landing-client'
+import { HeroScene } from './hero-scene'
 import { WorkshopCards } from '@/components/kids/workshop-cards'
 import { WORKSHOPS } from '@/components/kids/workshops'
 import { MACADEMIA_URL } from '@/components/shell/nav-items'
@@ -14,8 +15,8 @@ import '@/app/landing.css'
 const SAMPLE = [{ p: 31, u: 17 }, { p: 58, u: 14 }, { p: 72, u: 11 }]
 
 /**
- * Tanıtım ana sayfası (giriş yapmamış ziyaretçi için "/"), macademia.online'ın bölüm sırasıyla: kahraman (fotoğraf + bugünün
- * planı kartı) · nasıl çalışır (dört adım) · programlarımız (kartlar) · hemen dene · Mac · yaşa göre yol · kurumsal bant ·
+ * Tanıtım ana sayfası (giriş yapmamış ziyaretçi için "/"), macademia.online'ın bölüm sırasıyla: kahraman (çizim sahne + Mac'in
+ * konuşma balonu "bugünün planı") · nasıl çalışır (dört adım) · programlarımız (kartlar) · hemen dene · Mac · yaşa göre yol · kurumsal bant ·
  * hakkımızda ilkeleri · başla. Sayılar katalogdan gelir (uydurma istatistik yok).
  */
 export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; parts: number; locale: Locale }) {
@@ -39,7 +40,7 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
             <p className="mx-hero-sub"><ContinueLink label={L.hero.continue} /><span className="muted">{L.hero.noHardware}</span></p>
           </div>
           <div className="hero-visual">
-            <div className="hero-photo"><img src={PHOTOS.robotik.file} alt="" width={800} height={500} /></div>
+            <HeroScene />
             <div className="today-card" aria-label={X.hero.card.label}>
               <div className="label"><span>{X.hero.card.label}</span><span className="chip chip-line">{X.hero.card.tag}</span></div>
               <strong>{X.hero.card.title}</strong>
@@ -51,6 +52,7 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
             </div>
           </div>
         </div>
+        <span className="mx-wave" aria-hidden="true" />
       </section>
 
       <section className="section" id="yontem">

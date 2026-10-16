@@ -1,7 +1,9 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#4f46e5"/><stop offset="1" stop-color="#06b6d4"/></linearGradient></defs>
-  <rect width="32" height="32" rx="8" fill="url(#g)"/>
-  <g transform="translate(4 4) scale(1)" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-    <rect x="5" y="8" width="14" height="11" rx="3"/><path d="M12 8V4M9 13h.01M15 13h.01M9.5 16.5h5"/><circle cx="12" cy="3.5" r="1"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs><clipPath id="k"><polygon points="32,34 30,26 35,21 30,15 34,7 70,4 70,46 60,43 53,38 47,43 41,36"/></clipPath></defs>
+  <circle cx="32" cy="35" r="25" fill="#7a4426"/>
+  <circle cx="24" cy="25" r="5" fill="#ffffff" opacity=".18"/>
+  <g clip-path="url(#k)"><circle cx="32" cy="35" r="25" fill="#5a2f19"/><circle cx="32" cy="35" r="20" fill="#f6e3bf"/><circle cx="38" cy="28" r="6" fill="#e8c98e" opacity=".55"/></g>
+  <g fill="none" stroke="#5a2f19" stroke-width="2" stroke-linejoin="round"><polyline points="32,34 30,26 35,21 30,15 33,10"/><polyline points="32,34 41,36 47,43 53,38 57,41"/></g>
+  <path d="M27 13 C19 1, 8 0, 2 5 C7 12, 17 17, 27 13 Z" fill="#3f7d3a"/>
+  <path d="M27 13 Q15 8 4 5" fill="none" stroke="#2b5c28" stroke-width="1.6" stroke-linecap="round"/>
 </svg>
