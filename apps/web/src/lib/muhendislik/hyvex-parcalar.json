@@ -137,7 +137,9 @@
    "Uzun kablo, endüstriyel doğruluk"
   ],
   "warnings": [],
-  "offline": "faz2"
+  "lab": {
+   "kit": "ds18b20"
+  }
  },
  {
   "slug": "mlx90614",
@@ -322,7 +324,9 @@
    "Ultrasonik alternatifi"
   ],
   "warnings": [],
-  "offline": "faz2"
+  "lab": {
+   "kit": "vl53l0x"
+  }
  },
  {
   "slug": "tf-luna-lidar",
@@ -592,7 +596,9 @@
    "I²C bus örneği"
   ],
   "warnings": [],
-  "offline": "faz2"
+  "lab": {
+   "kit": "bme280"
+  }
  },
  {
   "slug": "ldr",
@@ -1097,7 +1103,9 @@
   "warnings": [
    "UNO'da framebuffer 1 KB RAM yer"
   ],
-  "offline": "faz2"
+  "lab": {
+   "kit": "oled"
+  }
  },
  {
   "slug": "tft-st7735-1-8",

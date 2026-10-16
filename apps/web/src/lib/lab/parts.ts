@@ -12,17 +12,21 @@ export const STAGE_C_PARTS: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 
 export const STAGE_D_SENSORS: PartType[] = ['mq3', 'mq4', 'mq7', 'mq135', 'sharpir']
 export const STAGE_D_MOTION: PartType[] = ['l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper', 'esc']
 export const STAGE_D_PARTS: PartType[] = [...STAGE_D_SENSORS, ...STAGE_D_MOTION]
+/** Aşama E (Hyvex, büyükler için): gerçek Arduino kütüphaneleriyle çalışan veri yolu cihazları (I2C, 1-Wire). */
+export const STAGE_E_OUTPUTS: PartType[] = ['oled']
+export const STAGE_E_SENSORS: PartType[] = ['bme280', 'ds18b20', 'vl53l0x']
+export const STAGE_E_PARTS: PartType[] = [...STAGE_E_OUTPUTS, ...STAGE_E_SENSORS]
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
-export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS]
+export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS, ...STAGE_E_PARTS]
 
 /** `key`: sözlükteki kategori adı (lab.picker.cat.*); `title` Türkçe kaynak. */
 export interface PartCategory { key: PickerCategoryKey; title: string; types: PartType[] }
 export type PickerCategoryKey = 'output' | 'input' | 'active' | 'sensors' | 'motion' | 'other'
 export const PICKER_CATEGORIES: PartCategory[] = [
-  { key: 'output', title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', 'dcmotor', 'servo', 'relay'] },
+  { key: 'output', title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', ...STAGE_E_OUTPUTS, 'dcmotor', 'servo', 'relay'] },
   { key: 'input', title: 'Giriş', types: ['button', 'pot', 'ldr', 'ntc'] },
   { key: 'active', title: 'Aktif devre elemanları', types: ['resistor', 'diode', 'npn', 'mosfet', 'l293d', 'sr595'] },
-  { key: 'sensors', title: 'Sensörler', types: [...STAGE_C_PARTS, ...STAGE_D_SENSORS] },
+  { key: 'sensors', title: 'Sensörler', types: [...STAGE_C_PARTS, ...STAGE_D_SENSORS, ...STAGE_E_SENSORS] },
   { key: 'motion', title: 'Motor sürücüler ve hareket', types: [...STAGE_D_MOTION] },
 ]
 
@@ -31,6 +35,7 @@ export const SHORT_NAME: Partial<Record<PartType, string>> = {
   dht: 'DHT11/22', irobstacle: 'IR engel', reed: 'Reed', encoder: 'Enkoder', keypad: 'Keypad 4x4', rtc: 'RTC DS3231', mq2: 'MQ-2 gaz', soil: 'Toprak nemi', rain: 'Yağmur', waterlevel: 'Su seviyesi',
   mq3: 'MQ-3 alkol', mq4: 'MQ-4 metan', mq7: 'MQ-7 CO', mq135: 'MQ-135', sharpir: 'Sharp IR', l298n: 'L298N', tb6612: 'TB6612FNG', drv8833: 'DRV8833',
   bts7960: 'BTS7960', md10c: 'MD10C', stepper: 'Step motor', esc: 'ESC + BLDC',
+  oled: 'OLED 0.96"', bme280: 'BME280', ds18b20: 'DS18B20', vl53l0x: 'VL53L0X',
 }
 
 export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
@@ -69,6 +74,10 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   stepper: 'step motor adım nema17 tmc2209 a4988 sürücü cnc 3d yazıcı',
   esc: 'esc fırçasız bldc motor drone pervane brushless kv lipo',
   lcd1602: 'ekran lcd 16x2 hd44780 yazı display paralel', lcdI2c: 'ekran lcd 16x2 i2c pcf8574 yazı display',
+  oled: 'ekran oled ssd1306 128x64 grafik piksel display i2c 0.96',
+  bme280: 'sıcaklık basınç nem barometre rakım hava istasyonu i2c bosch',
+  ds18b20: 'sıcaklık termometre su geçirmez prob 1-wire onewire dallas',
+  vl53l0x: 'mesafe uzaklık lazer tof uçuş süresi i2c',
 }
 
 /** İngilizce arama sözcükleri (İngilizce ad dahil); arama her iki dilde de çalışır. */
@@ -90,6 +99,8 @@ export const PART_KEYWORDS_EN: Partial<Record<PartType, string>> = {
   l298n: 'motor driver h bridge dual channel', tb6612: 'motor driver h bridge mosfet dual channel', drv8833: 'motor driver h bridge small battery',
   bts7960: 'motor driver high current big motor', md10c: 'motor driver pwm dir single channel',
   stepper: 'stepper motor step nema17 driver cnc 3d printer', esc: 'esc brushless bldc motor drone propeller lipo',
+  oled: 'oled screen display graphics pixel', bme280: 'temperature pressure humidity barometer weather station',
+  ds18b20: 'temperature thermometer waterproof probe one wire', vl53l0x: 'distance range laser time of flight tof',
 }
 
 /** Küçük harfe indirir, Türkçe aksanları (ö→o, ı→i…) ve tireyi sadeleştirir: "ROLE", "rele", "transistor", "7 segment" bulunur. */

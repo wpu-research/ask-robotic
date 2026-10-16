@@ -5,6 +5,7 @@ import {
   PinState, adcConfig, avrInstruction, eepromConfig, portBConfig, portCConfig, portDConfig,
   timer0Config, timer1Config, timer2Config, twiConfig, usart0Config,
 } from 'avr8js'
+import * as bus from './bus-devices.js'
 import * as dev from './devices.js'
 import * as robot from './robot.js'
 
@@ -123,6 +124,10 @@ export class Sim {
   lcd(o: dev.LCDOptions): dev.HD44780 { return dev.attachLCD(this, o) }
   lcdI2C(o?: dev.LCDI2COptions): dev.LCDI2C { return dev.attachLCDI2C(this, o) }
   keypad(o: dev.KeypadOptions): dev.Keypad { return dev.attachKeypad(this, o) }
+  ssd1306(o?: bus.SSD1306Options): bus.SSD1306 { return bus.attachSSD1306(this, o) }
+  bme280(o?: bus.BME280Options): bus.BME280 { return bus.attachBME280(this, o) }
+  ds18b20(o: bus.DS18B20Options): bus.DS18B20 { return bus.attachDS18B20(this, o) }
+  vl53l0x(o?: bus.VL53L0XOptions): bus.VL53L0X { return bus.attachVL53L0X(this, o) }
   rover(o: robot.RoverConfig): robot.Rover { return robot.attachRover(this, o) }
   balancer(o: robot.BalancerConfig): robot.Balancer { return robot.attachBalancer(this, o) }
 

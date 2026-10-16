@@ -18,7 +18,7 @@ export const ALLOWED_HEADERS: ReadonlySet<string> = new Set([
   'Arduino.h', 'Servo.h', 'LiquidCrystal.h', 'LiquidCrystal_I2C.h', 'Wire.h', 'EEPROM.h', 'SPI.h',
   'SoftwareSerial.h', 'DHT.h', 'Adafruit_Sensor.h', 'Adafruit_BMP280.h', 'RTClib.h', 'Keypad.h',
   'NewPing.h', 'MFRC522.h', 'IRremote.h', 'IRremote.hpp', 'SD.h', 'VL53L0X.h', 'Adafruit_SSD1306.h',
-  'Adafruit_GFX.h', 'avr/pgmspace.h', 'avr/interrupt.h', 'math.h', 'stdlib.h', 'string.h', 'stdint.h',
+  'Adafruit_GFX.h', 'Adafruit_BME280.h', 'OneWire.h', 'DallasTemperature.h', 'avr/pgmspace.h', 'avr/interrupt.h', 'math.h', 'stdlib.h', 'string.h', 'stdint.h',
   'stdbool.h', 'limits.h', 'ctype.h', 'stdio.h',
 ])
 

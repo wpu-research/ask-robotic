@@ -2,10 +2,11 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { PINS, PROPS, type PartInstance, type PartRuntime, type PartType } from '@/lib/lab/contract'
-import { STAGE_B_PARTS, STAGE_C_PARTS, STAGE_D_PARTS } from '@/lib/lab/parts'
+import { STAGE_B_PARTS, STAGE_C_PARTS, STAGE_D_PARTS, STAGE_E_PARTS } from '@/lib/lab/parts'
 import { PART_DEFS } from '@/lib/lab/geometry'
 import { MeasureBox, PropsPanel } from './props-panel'
 import { PartArt, lcdRows } from './part-art'
+import { decodePixels, oledPath } from './part-art-e'
 
 const part = (type: PartType, props: PartInstance['props'] = {}): PartInstance => ({ id: `${type}1`, type, x: 0, y: 0, rotation: 0, props })
 const svg = (type: PartType, runtime?: PartRuntime, props?: PartInstance['props']) => renderToStaticMarkup(createElement('svg', null, createElement(PartArt, { part: part(type, props), runtime })))
@@ -220,5 +221,43 @@ describe('Aşama D çizimleri', () => {
     const e = svg('esc', { esc: { armed: true, pulseUs: 1400, throttle: 0.4, rpm: 10212 } })
     expect(e).toContain('data-esc-armed="true"'); expect(e).toContain('KURULU')
     expect(svg('esc')).toContain('KURULMADI')
+  })
+})
+
+/** 1024 baytlık çerçeve tamponu: (x, y) yanık pikseller → base64. */
+const frame = (on: (x: number, y: number) => boolean): string => {
+  const b = new Uint8Array(1024)
+  for (let y = 0; y < 64; y++) for (let x = 0; x < 128; x++) if (on(x, y)) b[(y >> 3) * 128 + x] |= 1 << (y & 7)
+  let bin = ''
+  for (const v of b) bin += String.fromCharCode(v)
+  return btoa(bin)
+}
+
+describe('Aşama E çizimleri', () => {
+  it('her parça çalışma zamanı olmadan, boş ve kısmi çalışma zamanıyla çizilir; her pin için ped ve etiket var', () => {
+    for (const t of STAGE_E_PARTS) {
+      expect(svg(t).length, t).toBeGreaterThan(300)
+      expect(() => svg(t, {} as PartRuntime), t).not.toThrow()
+      expect(() => svg(t, { oled: {}, bme280: {}, ds18b20: {}, vl53l0x: {} } as unknown as PartRuntime), t).not.toThrow()
+      const m = svg(t)
+      expect(m, t).toContain(`data-pads="${t}"`)
+      for (const pin of PINS[t]) expect(m, `${t}:${pin}`).toContain(`>${pin}</text>`)
+    }
+  })
+  it('OLED: çerçeve tamponu piksellere çevrilir; kapalıyken boş', () => {
+    const px = frame((x, y) => x < 10 && y < 4) // 40 piksel, 4 satır koşusu
+    const on = svg('oled', { oled: { powered: true, present: true, on: true, inverted: false, contrast: 207, pixels: px } })
+    expect(on).toContain('data-oled-on="true"'); expect(on).toContain('data-oled-lit="40"'); expect(on).toContain('M0 0h10v1h-10z')
+    const off = svg('oled', { oled: { powered: true, present: true, on: false, inverted: false, contrast: 207, pixels: px } })
+    expect(off).toContain('data-oled-lit="0"'); expect(off).not.toContain('data-oled-pixels')
+    expect(svg('oled', { oled: { powered: true, present: true, on: true, inverted: false, contrast: 207, pixels: 'bozuk!' } })).toContain('data-oled-lit="0"')
+    expect(oledPath(decodePixels(frame(() => true))).lit).toBe(128 * 64)
+  })
+  it('BME280, DS18B20, VL53L0X okumaları', () => {
+    expect(svg('bme280', { bme280: { powered: true, present: true, tempC: 21.5, pressureHpa: 1002.3, humidity: 48 } })).toContain('21,5°C 48%')
+    expect(svg('ds18b20', { ds18b20: { powered: true, present: true, pullup: true, tempC: -3.5, resolution: 12, conversions: 1 } })).toContain('-3,50°C')
+    expect(svg('ds18b20', { ds18b20: { powered: true, present: false, pullup: false, tempC: 20, resolution: 12, conversions: 0 } })).toContain('pull-up?')
+    expect(svg('vl53l0x', { vl53l0x: { powered: true, present: true, distanceMm: 347, inRange: true, continuous: false, measurements: 3 } })).toContain('347 mm')
+    expect(svg('vl53l0x', { vl53l0x: { powered: true, present: true, distanceMm: 2400, inRange: false, continuous: false, measurements: 3 } })).toContain('data-tof-active="true"')
   })
 })

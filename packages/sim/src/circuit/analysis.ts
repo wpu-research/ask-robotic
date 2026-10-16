@@ -1,5 +1,5 @@
 // Statik devre analizi (hex gerekmez): düğüm eşitliği, parça üzerinden bağlantı ve statik uyarılar.
-import type { Circuit, CircuitAnalysis, LabWarning, PartType, PinRef } from './contract.js'
+import type { Circuit, CircuitAnalysis, LabWarning, PartInstance, PartType, PinRef } from './contract.js'
 import { PINS } from './contract.js'
 import { ledSpecs } from './model.js'
 import { buildNetlist, internalPaths, type Netlist } from './netlist.js'
@@ -12,6 +12,7 @@ const ACTIVE: readonly PartType[] = [
   'npn', 'mosfet', 'l293d', 'relay', 'sr595', 'lcd1602', 'lcdI2c',
   'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel',
   'mq3', 'mq4', 'mq7', 'mq135', 'sharpir', 'l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper', 'esc',
+  'oled', 'bme280', 'ds18b20', 'vl53l0x',
 ]
 
 /** Besleme pinleri (modül/entegre): VCC 5 V hattında (ya da bir Uno pininde), GND toprakta olmalı. */
@@ -48,6 +49,11 @@ const POWER: Partial<Record<PartType, { vcc: string[]; gnd: string; name: string
   bts7960: { vcc: ['VCC'], gnd: 'GND', name: 'BTS7960' },
   md10c: { vcc: ['VCC'], gnd: 'GND', name: 'MD10C' },
   stepper: { vcc: ['VCC'], gnd: 'GND', name: 'TMC2209 step sürücü', v33: true },
+  // Aşama E
+  oled: { vcc: ['VCC'], gnd: 'GND', name: 'SSD1306 OLED', v33: true },
+  bme280: { vcc: ['VCC'], gnd: 'GND', name: 'BME280', v33: true },
+  ds18b20: { vcc: ['VCC'], gnd: 'GND', name: 'DS18B20', v33: true },
+  vl53l0x: { vcc: ['VCC'], gnd: 'GND', name: 'VL53L0X', v33: true },
 }
 
 /** Doğrudan bir Uno pinine bağlanması gereken sinyal uçları (Sim cihaz modelleri bu pinleri kullanır). */
@@ -57,9 +63,31 @@ const DIRECT_PINS: Partial<Record<PartType, { pins: string[]; name: string }>> =
   stepper: { pins: ['STEP'], name: 'Step sürücü' },
   esc: { pins: ['SIG'], name: 'ESC' },
   keypad: { pins: ['R1', 'R2', 'R3', 'R4', 'C1', 'C2', 'C3', 'C4'], name: 'Keypad' },
+  ds18b20: { pins: ['DQ'], name: 'DS18B20' },
 }
 /** I2C sensörleri: SDA A4'e, SCL A5'e bağlı olmalı. */
-const I2C_PARTS: readonly PartType[] = ['bmp280', 'mpu6050', 'rtc']
+const I2C_PARTS: readonly PartType[] = ['bmp280', 'mpu6050', 'rtc', 'oled', 'bme280', 'vl53l0x']
+
+/** 1-Wire pull-up için kabul edilen en büyük direnç (Ω): gerçekte 4,7 kΩ; 1-10 kΩ arası çalışır. */
+export const ONEWIRE_PULLUP_MAX_OHMS = 10_000
+
+/**
+ * DS18B20 DQ hattının pull-up direncinin besleme ucundaki düğümler: DQ'dan tek bir dirençle (≤ 10 kΩ) 5V/3V3 hattına, bir Uno pinine
+ * ya da sensörün kendi VCC düğümüne gidilebiliyorsa o düğüm. Boş dizi: pull-up yok.
+ */
+export function oneWirePullupNets(circuit: Circuit, nl: Netlist, p: PartInstance): number[] {
+  const dq = nl.netOf({ part: p.id, pin: 'DQ' })
+  if (dq === undefined || !nl.isWired({ part: p.id, pin: 'DQ' })) return []
+  const vcc = nl.isWired({ part: p.id, pin: 'VCC' }) ? nl.netOf({ part: p.id, pin: 'VCC' }) : undefined
+  const out: number[] = []
+  for (const e of nl.neighbors(dq, ['resistor'])) {
+    const r = circuit.parts.find((x) => x.id === e.partId)
+    const ohms = typeof r?.props.ohms === 'number' ? r.props.ohms : 330
+    if (ohms > ONEWIRE_PULLUP_MAX_OHMS || e.to === dq || e.to === nl.ground) continue
+    if (e.to === nl.rail5 || e.to === nl.rail3 || e.to === vcc || nl.unoPinsOnNet(e.to).length > 0) out.push(e.to)
+  }
+  return out
+}
 
 interface Ends { gnd: boolean; rail: boolean; pin: boolean; freeSrc: Set<number>; freeSink: Set<number> }
 
@@ -181,6 +209,9 @@ function staticPartWarnings(circuit: Circuit, nl: Netlist, out: LabWarning[]): v
           out.push({ kind: 'floating-input', partId: p.id, message: `${POWER[p.type]?.name ?? p.type} ${pin} ucu ${uno} pinine bağlı değil: I2C cihazı veri yolunda görünmez.` })
         }
       }
+    }
+    if (p.type === 'ds18b20' && nl.isWired(ref(p.id, 'DQ')) && oneWirePullupNets(circuit, nl, p).length === 0) {
+      out.push({ kind: 'floating-input', partId: p.id, message: 'DS18B20 DQ hattında pull-up direnci yok: DQ ile VCC arasına 4,7 kΩ direnç bağla (yoksa sensör bulunamaz).' })
     }
     if (p.type === 'sr595') {
       for (const pin of ['SER', 'SRCLK', 'RCLK', 'OE', 'SRCLR']) {

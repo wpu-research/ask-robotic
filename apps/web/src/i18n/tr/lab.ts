@@ -202,6 +202,7 @@ export const lab = {
       pinToGnd: '{name} pini doğrudan GND\'ye bağlı (kısa devre).',
       pinTo5v: '{name} pini doğrudan 5V\'a bağlı (kısa devre).',
       pinOvercurrent: '{name} pininden {ma} mA geçiyor (sınır 40 mA).',
+      oneWirePullup: '{name} DQ hattında pull-up direnci yok: DQ ile VCC arasına 4,7 kΩ direnç bağla (yoksa sensör bulunamaz).',
     },
     // Sim iletilerindeki Türkçe modül adları.
     name: {
@@ -276,6 +277,10 @@ export const lab = {
     md10c: 'Cytron MD10C sürücü',
     stepper: 'Step motor (TMC2209 + NEMA17)',
     esc: 'ESC + fırçasız motor',
+    oled: 'OLED 128x64 (SSD1306, I2C)',
+    bme280: 'BME280 sıcaklık/basınç/nem',
+    ds18b20: 'DS18B20 sıcaklık (1-Wire)',
+    vl53l0x: 'VL53L0X lazer mesafe (ToF)',
   },
   /** Paletteki kısa adlar (SHORT_NAME). */
   short: {
@@ -309,6 +314,10 @@ export const lab = {
     md10c: 'MD10C',
     stepper: 'Step motor',
     esc: 'ESC + BLDC',
+    oled: 'OLED 0.96"',
+    bme280: 'BME280',
+    ds18b20: 'DS18B20',
+    vl53l0x: 'VL53L0X',
   },
   /** Özellik etiketleri: parça türü → özellik anahtarı (packages/sim PROPS[tür][].label). */
   propLabel: {
@@ -348,6 +357,10 @@ export const lab = {
     sharpir: { distanceCm: 'Mesafe' },
     stepper: { microsteps: 'Mikro adım' },
     esc: { kv: 'Motor KV', cells: 'LiPo hücre' },
+    oled: { address: 'I2C adresi' },
+    bme280: { tempC: 'Sıcaklık', pressureHpa: 'Basınç', humidity: 'Nem', address: 'I2C adresi' },
+    ds18b20: { tempC: 'Sıcaklık' },
+    vl53l0x: { distanceMm: 'Mesafe' },
   },
   /** Seçenek etiketleri (yalnız çevrilmesi gerekenler): tür → anahtar → değer. Boş değer için `none`. */
   propOpt: {

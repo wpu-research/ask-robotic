@@ -129,6 +129,11 @@ export const PART_DEFS: Record<PartType, PartDef> = {
   },
   stepper: { name: 'Step motor (TMC2209 + NEMA17)', w: 150, h: 104, ownLabels: true, pins: row(['VCC', 'GND', 'EN', 'STEP', 'DIR'], 12, 14, 100) },
   esc: { name: 'ESC + fırçasız motor', w: 160, h: 76, ownLabels: true, pins: { SIG: { x: 4, y: 28 }, GND: { x: 4, y: 48 } } },
+  // Aşama E (veri yolu cihazları). Çizim part-art-e.tsx'te. OLED modülünün başlığı gerçekteki gibi üst kenarda (GND VCC SCL SDA).
+  oled: { name: 'OLED 128x64 (SSD1306, I2C)', w: 96, h: 84, ownLabels: true, pins: hdr(['GND', 'VCC', 'SCL', 'SDA'], 96, 5) },
+  bme280: { name: 'BME280 sıcaklık/basınç/nem', w: 68, h: 62, ownLabels: true, pins: hdr(['VCC', 'GND', 'SCL', 'SDA'], 68, 58) },
+  ds18b20: { name: 'DS18B20 sıcaklık (1-Wire)', w: 56, h: 84, ownLabels: true, pins: hdr(['GND', 'DQ', 'VCC'], 56, 80, 14) },
+  vl53l0x: { name: 'VL53L0X lazer mesafe (ToF)', w: 100, h: 62, ownLabels: true, pins: hdr(['VCC', 'GND', 'SCL', 'SDA', 'XSHUT'], 100, 58, 17) },
 }
 
 export type Rotation = PartInstance['rotation']

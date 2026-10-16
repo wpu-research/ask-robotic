@@ -17,6 +17,8 @@ export type PartType =
   | 'mq3' | 'mq4' | 'mq7' | 'mq135' | 'sharpir'
   | 'l298n' | 'tb6612' | 'drv8833' | 'bts7960' | 'md10c'
   | 'stepper' | 'esc'
+  // Aşama E (Hyvex, büyükler için): veri yolu cihazları — gerçek Arduino kütüphaneleriyle çalışır
+  | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x'
 
 /**
  * Parça pin kimlikleri (devrede kablo uçları böyle adlandırılır). `Record<PartType, readonly string[]>`
@@ -82,6 +84,11 @@ export const PINS: Record<PartType, readonly string[]> = {
   stepper: ['VCC', 'GND', 'EN', 'STEP', 'DIR'],
   // ESC + fırçasız (BLDC) motor (birleşik): SIG servo darbesi (1000-2000 µs), GND ortak toprak
   esc: ['SIG', 'GND'],
+  // Aşama E
+  oled: ['VCC', 'GND', 'SDA', 'SCL'], // SSD1306 128x64 I2C OLED (0x3C); SDA = A4, SCL = A5
+  bme280: ['VCC', 'GND', 'SDA', 'SCL'], // I2C sıcaklık/basınç/nem (0x76); SDA = A4, SCL = A5
+  ds18b20: ['VCC', 'GND', 'DQ'], // 1-Wire sıcaklık (TO-92); DQ doğrudan bir Uno pinine + DQ ile VCC arasında 4,7 kΩ pull-up
+  vl53l0x: ['VCC', 'GND', 'SDA', 'SCL', 'XSHUT'], // I2C ToF lazer mesafe (0x29); XSHUT LOW = kapalı (kartta pull-up var)
 }
 
 export interface PropDef {
@@ -227,6 +234,16 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
     { key: 'kv', label: 'Motor KV', kind: 'number', default: 2300, min: 100, max: 5000, step: 50, unit: 'RPM/V' },
     { key: 'cells', label: 'LiPo hücre', kind: 'select', default: '3', options: [{ value: '2', label: '2S (7.4 V)' }, { value: '3', label: '3S (11.1 V)' }, { value: '4', label: '4S (14.8 V)' }] },
   ],
+  oled: [{ key: 'address', label: 'I2C adresi', kind: 'select', default: '0x3C', options: [{ value: '0x3C', label: '0x3C' }, { value: '0x3D', label: '0x3D' }] }],
+  bme280: [
+    { key: 'tempC', label: 'Sıcaklık', kind: 'number', default: 25, min: -40, max: 85, step: 0.5, unit: '°C', live: true },
+    { key: 'pressureHpa', label: 'Basınç', kind: 'number', default: 1013.25, min: 300, max: 1100, step: 0.25, unit: 'hPa', live: true },
+    { key: 'humidity', label: 'Nem', kind: 'number', default: 50, min: 0, max: 100, step: 1, unit: '%', live: true },
+    { key: 'address', label: 'I2C adresi', kind: 'select', default: '0x76', options: [{ value: '0x76', label: '0x76' }, { value: '0x77', label: '0x77' }] },
+  ],
+  ds18b20: [{ key: 'tempC', label: 'Sıcaklık', kind: 'number', default: 25, min: -55, max: 125, step: 0.5, unit: '°C', live: true }],
+  // 2000 mm üstü sensörün menzili dışıdır (8190 okunur); kaydırıcı bunu denemek için 2500'e kadar gider
+  vl53l0x: [{ key: 'distanceMm', label: 'Mesafe', kind: 'number', default: 500, min: 30, max: 2500, step: 5, unit: 'mm', live: true }],
 }
 
 export interface PartInstance {
@@ -307,6 +324,17 @@ export interface PartRuntime {
   stepper?: { powered: boolean; enabled: boolean; steps: number; angleDeg: number; dirHigh: boolean }
   /** ESC + BLDC: armed = düşük gazla kurulmuş; throttle 0-1; rpm = KV × gerilim × gaz. */
   esc?: { armed: boolean; pulseUs: number; throttle: number; rpm: number }
+  // ---- Aşama E ----
+  /**
+   * SSD1306 OLED: on = ekran açık (0xAF) ve şarj pompası etkin; inverted = ters renk (0xA7);
+   * pixels = ekranda yanan pikseller, base64 ile kodlanmış 1024 bayt: bayt (sayfa*128 + x), bit k → y = sayfa*8 + k (kapalıyken hepsi 0).
+   */
+  oled?: { powered: boolean; present: boolean; on: boolean; inverted: boolean; contrast: number; pixels: string }
+  bme280?: { powered: boolean; present: boolean; tempC: number; pressureHpa: number; humidity: number }
+  /** DS18B20: pullup = DQ ile besleme arasında pull-up direnci var; present = beslenmiş + pull-up + DQ bir Uno pininde; resolution 9-12 bit. */
+  ds18b20?: { powered: boolean; present: boolean; pullup: boolean; tempC: number; resolution: number; conversions: number }
+  /** VL53L0X: present = veri yolunda (beslenmiş, SDA/SCL doğru, XSHUT LOW değil); inRange = 2000 mm içinde; continuous = sürekli ölçüm kipi. */
+  vl53l0x?: { powered: boolean; present: boolean; distanceMm: number; inRange: boolean; continuous: boolean; measurements: number }
 }
 
 export interface PinSnapshot {

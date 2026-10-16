@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PINS, type PartType } from './contract'
 import { PART_DEFS, localToWorld, partBounds, pinWorld } from './geometry'
 import { currentArrow, formatMeasurement, formatMilliamps, formatPinBalloon, formatVolts } from './measure'
-import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups, STAGE_D_MOTION, STAGE_D_PARTS, STAGE_D_SENSORS } from './parts'
+import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups, STAGE_D_MOTION, STAGE_D_PARTS, STAGE_D_SENSORS, STAGE_E_PARTS, STAGE_E_SENSORS } from './parts'
 import { WARNING_META, warningMeta } from './warnings'
 
 const ALL = Object.keys(PINS) as PartType[]
@@ -75,15 +75,34 @@ describe('geometri: Aşama C', () => {
   })
 })
 
+describe('geometri: Aşama E', () => {
+  for (const t of STAGE_E_PARTS) {
+    it(`${t}: pinler sözleşmeyle birebir, sınır içinde, >= 10 px aralıklı, kendi etiketini çizer`, () => {
+      const d = PART_DEFS[t]
+      expect(Object.keys(d.pins).sort()).toEqual([...PINS[t]].sort())
+      expect(d.ownLabels).toBe(true)
+      const pts = Object.entries(d.pins)
+      for (const [n, p] of pts) {
+        expect(p.x, n).toBeGreaterThanOrEqual(0); expect(p.x, n).toBeLessThanOrEqual(d.w)
+        expect(p.y, n).toBeGreaterThanOrEqual(0); expect(p.y, n).toBeLessThanOrEqual(d.h)
+      }
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) {
+        expect(Math.hypot(pts[i][1].x - pts[j][1].x, pts[i][1].y - pts[j][1].y), `${pts[i][0]}-${pts[j][0]}`).toBeGreaterThanOrEqual(10)
+      }
+    })
+  }
+})
+
 describe('palet', () => {
-  it('varsayılan = A + B + C + D', () => {
-    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS])
+  it('varsayılan = A + B + C + D + E', () => {
+    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS, ...STAGE_E_PARTS])
     expect(new Set(DEFAULT_PARTS).size).toBe(DEFAULT_PARTS.length)
   })
   it('kategoriler: çıkış, giriş, aktif devre elemanları, sensörler, motor sürücüler', () => {
     const g = pickerGroups(DEFAULT_PARTS, '')
     expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler', 'Motor sürücüler ve hareket'])
-    expect(g[3].types).toEqual([...STAGE_C_PARTS, ...STAGE_D_SENSORS])
+    expect(g[3].types).toEqual([...STAGE_C_PARTS, ...STAGE_D_SENSORS, ...STAGE_E_SENSORS])
+    expect(g[0].types).toContain('oled')
     expect(g[4].types).toEqual(STAGE_D_MOTION)
     expect(g[0].types).toContain('relay'); expect(g[1].types).toEqual(['button', 'pot', 'ldr', 'ntc']); expect(g[2].types).toContain('l293d')
     expect(g.flatMap((x) => x.types).sort()).toEqual([...DEFAULT_PARTS].sort())
@@ -110,12 +129,12 @@ describe('palet', () => {
     expect(t('lcd i2c')).toEqual(['lcdI2c'])
     expect(t('servo motor')).toEqual(['servo'])
     expect(t('encoder')).toEqual(['encoder'])
-    expect(t('sicaklik').sort()).toEqual(['bmp280', 'dht', 'ntc'])
+    expect(t('sicaklik').sort()).toEqual(['bme280', 'bmp280', 'dht', 'ds18b20', 'ntc'])
   })
   it('arama: Aşama C Türkçe anahtar sözcükler', () => {
     const t = (q: string) => pickerGroups(DEFAULT_PARTS, q).flatMap((x) => x.types)
-    expect(t('mesafe')).toEqual(['hcsr04', 'sharpir'])
-    expect(t('Nem').sort()).toEqual(['dht', 'soil', 'stepper']) // step motorun adında NEMA17 geçer
+    expect(t('mesafe')).toEqual(['hcsr04', 'sharpir', 'vl53l0x'])
+    expect(t('Nem').sort()).toEqual(['bme280', 'dht', 'soil', 'stepper']) // step motorun adında NEMA17 geçer
     expect(t('hareket')).toEqual(expect.arrayContaining(['pir', 'mpu6050']))
     expect(t('mıknatıs')).toEqual(['reed'])
     expect(t('Şifre')).toEqual(['keypad'])
@@ -130,6 +149,9 @@ describe('palet', () => {
     expect(t('enkoder')).toEqual(['encoder'])
     expect(t('yağmur')).toEqual(['rain'])
     expect(t('seviye')).toEqual(['waterlevel'])
+    expect(t('oled')).toEqual(['oled'])
+    expect(t('1-wire')).toEqual(['ds18b20'])
+    expect(t('lazer')).toEqual(['vl53l0x'])
   })
   it('Diğer: kategorisiz izinli tür görünür', () => {
     expect(pickerGroups(['uno', 'led'], '').map((x) => x.title)).toEqual(['Çıkış', 'Diğer'])

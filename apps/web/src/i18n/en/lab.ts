@@ -200,6 +200,7 @@ export const lab = {
       pinToGnd: 'Pin {name} is connected straight to GND (short circuit).',
       pinTo5v: 'Pin {name} is connected straight to 5V (short circuit).',
       pinOvercurrent: '{ma} mA flowing through pin {name} (limit 40 mA).',
+      oneWirePullup: '{name} has no pull-up resistor on the DQ line: connect a 4.7 kΩ resistor between DQ and VCC (otherwise the sensor is not found).',
     },
     name: {
       relay: 'Relay module',
@@ -272,6 +273,10 @@ export const lab = {
     md10c: 'Cytron MD10C driver',
     stepper: 'Stepper motor (TMC2209 + NEMA17)',
     esc: 'ESC + brushless motor',
+    oled: 'OLED 128x64 (SSD1306, I2C)',
+    bme280: 'BME280 temperature/pressure/humidity',
+    ds18b20: 'DS18B20 temperature (1-Wire)',
+    vl53l0x: 'VL53L0X laser distance (ToF)',
   },
   short: {
     ldr: 'LDR',
@@ -304,6 +309,10 @@ export const lab = {
     md10c: 'MD10C',
     stepper: 'Stepper motor',
     esc: 'ESC + BLDC',
+    oled: 'OLED 0.96"',
+    bme280: 'BME280',
+    ds18b20: 'DS18B20',
+    vl53l0x: 'VL53L0X',
   },
   propLabel: {
     led: { color: 'Color' },
@@ -342,6 +351,10 @@ export const lab = {
     sharpir: { distanceCm: 'Distance' },
     stepper: { microsteps: 'Microstepping' },
     esc: { kv: 'Motor KV', cells: 'LiPo cells' },
+    oled: { address: 'I2C address' },
+    bme280: { tempC: 'Temperature', pressureHpa: 'Pressure', humidity: 'Humidity', address: 'I2C address' },
+    ds18b20: { tempC: 'Temperature' },
+    vl53l0x: { distanceMm: 'Distance' },
   },
   propOpt: {
     led: { color: { red: 'Red', yellow: 'Yellow', green: 'Green', blue: 'Blue', white: 'White' } },

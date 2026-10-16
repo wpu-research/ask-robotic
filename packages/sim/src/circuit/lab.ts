@@ -1,7 +1,8 @@
 // Sanal devre laboratuvarı: Sim (avr8js) + netlist + DC çözücü. Tarayıcı ve Node uyumlu.
+import { toBase64, type BME280, type DS18B20, type SSD1306, type VL53L0X, VL53L0X_MAX_MM } from '../bus-devices.js'
 import { HD44780, type BMP280, type DHT, type HCSR04, type I2CDevice, type Keypad, type LCDI2C, type MPU6050, type RTC } from '../devices.js'
 import { Sim, type Pin, type PinStateName } from '../sim.js'
-import { staticWarnings } from './analysis.js'
+import { oneWirePullupNets, staticWarnings } from './analysis.js'
 import type {
   Circuit, LabApi, LabOptions, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
@@ -72,9 +73,9 @@ interface Compiled { input: SolverInput; src: SrcMeta[]; leds: LedSpec[]; npnIds
 interface Sol { res: SolverResult; comp: Compiled }
 interface I2cEntry { lcd: LCDI2C; dev: I2CDevice | undefined; reg: number | null }
 /** Aşama C I2C sensörü: cihaz veri yoluna yalnız bağlı ve beslenmişse girer (syncI2c). */
-interface I2cSensor { dev: I2CDevice | undefined; reg: number | null; model: BMP280 | MPU6050 | RTC }
+interface I2cSensor { dev: I2CDevice | undefined; reg: number | null; model: BMP280 | MPU6050 | RTC | SSD1306 | BME280 | VL53L0X; powered?: boolean }
 
-const DEFAULT_ADDR: Partial<Record<string, number>> = { lcdI2c: 0x27, bmp280: 0x76, mpu6050: 0x68, rtc: 0x68 }
+const DEFAULT_ADDR: Partial<Record<string, number>> = { lcdI2c: 0x27, bmp280: 0x76, mpu6050: 0x68, rtc: 0x68, oled: 0x3c, bme280: 0x76, vl53l0x: 0x29 }
 const parseAddr = (p: PartInstance): number => {
   const def = DEFAULT_ADDR[p.type] ?? 0x27
   const n = Number(String(p.props.address ?? def))
@@ -126,6 +127,9 @@ class LabImpl implements LabApi {
   // Aşama D
   private steppers = new Map<string, { steps: number }>()
   private escs = new Map<string, EscState>()
+  // Aşama E
+  private ds18 = new Map<string, DS18B20>()
+  private oledCache = new Map<string, { version: number; on: boolean; pixels: string }>()
   /** Sim cihaz modellerinin doğrudan sürdüğü Uno pinleri (ECHO, DHT DATA, keypad satırları): düğüm gerilimi bunlara yazılmaz. */
   private devOwned = new Set<string>()
 
@@ -262,7 +266,7 @@ class LabImpl implements LabApi {
   /** Aşama C: Sim cihaz modellerini (HC-SR04, DHT, BMP280, MPU6050, RTC, keypad) ve durum modellerini (PIR, enkoder) kurar. */
   private attachSensors(): void {
     this.hcs.clear(); this.dhts.clear(); this.i2cSensors.clear(); this.keypads.clear(); this.pirs.clear(); this.encs.clear(); this.devOwned.clear()
-    this.steppers.clear()
+    this.steppers.clear(); this.ds18.clear(); this.oledCache.clear()
     const u = (p: PartInstance, pin: string): { name: string; pin: Pin } | undefined => wiredUno(this.nl, p.id, pin)
     for (const p of this.circuit.parts) {
       switch (p.type) {
@@ -279,11 +283,14 @@ class LabImpl implements LabApi {
           }
           break
         }
-        case 'bmp280': case 'mpu6050': case 'rtc': {
+        case 'bmp280': case 'mpu6050': case 'rtc': case 'oled': case 'bme280': case 'vl53l0x': {
           const addr = parseAddr(p)
           const model = p.type === 'bmp280' ? this.sim.bmp280({ address: addr })
             : p.type === 'mpu6050' ? this.sim.mpu6050({ address: addr })
-              : this.sim.rtc({ address: addr, start: new Date(MODEL.rtcStartIso) })
+              : p.type === 'oled' ? this.sim.ssd1306({ address: addr })
+                : p.type === 'bme280' ? this.sim.bme280({ address: addr })
+                  : p.type === 'vl53l0x' ? this.sim.vl53l0x({ address: addr })
+                    : this.sim.rtc({ address: addr, start: new Date(MODEL.rtcStartIso) })
           const dev = this.sim.i2c.devices.get(addr)
           this.sim.i2c.devices.delete(addr) // veri yoluna yalnız bağlı ve beslenmişse girer (syncI2c)
           this.i2cSensors.set(p.id, { dev, reg: null, model })
@@ -295,6 +302,11 @@ class LabImpl implements LabApi {
             this.keypads.set(p.id, { dev: this.sim.keypad({ rows: rows.map((r) => r!.pin), cols: cols.map((c) => c!.pin) }), pressed: null })
             for (const r of rows) this.devOwned.add(r!.name)
           }
+          break
+        }
+        case 'ds18b20': {
+          const dq = u(p, 'DQ')
+          if (dq) { this.ds18.set(p.id, this.sim.ds18b20({ pin: dq.pin, tempC: num(p, 'tempC', 25) })); this.devOwned.add(dq.name) }
           break
         }
         case 'pir': this.pirs.set(p.id, new PirModel()); break
@@ -329,6 +341,21 @@ class LabImpl implements LabApi {
       case 'bmp280': {
         const m = this.i2cSensors.get(p.id)?.model as BMP280 | undefined
         if (m) { m.tempC = num(p, 'tempC', 25); m.pressurePa = num(p, 'pressureHpa', 1013.25) * 100 }
+        break
+      }
+      case 'bme280': {
+        const m = this.i2cSensors.get(p.id)?.model as BME280 | undefined
+        if (m) { m.tempC = num(p, 'tempC', 25); m.pressurePa = num(p, 'pressureHpa', 1013.25) * 100; m.humidity = num(p, 'humidity', 50) }
+        break
+      }
+      case 'vl53l0x': {
+        const m = this.i2cSensors.get(p.id)?.model as VL53L0X | undefined
+        if (m) m.distanceMm = num(p, 'distanceMm', 500)
+        break
+      }
+      case 'ds18b20': {
+        const d = this.ds18.get(p.id)
+        if (d) d.tempC = num(p, 'tempC', 25)
         break
       }
       case 'mpu6050': {
@@ -437,7 +464,7 @@ class LabImpl implements LabApi {
   /** Aşama C modüllerinin beslenmesi (3,3 V ile çalışanlar için eşik düşük). */
   private modPowered(p: PartInstance, v: Float64Array): boolean {
     const min = isAnalogModule(p.type) ? ANALOG_MODULES[p.type].minVolts
-      : ['dht', 'irobstacle', 'bmp280', 'mpu6050', 'rtc', 'joystick'].includes(p.type) ? MODEL.powerMin3v3 : MODEL.powerMinVolts
+      : ['dht', 'irobstacle', 'bmp280', 'mpu6050', 'rtc', 'joystick', 'oled', 'bme280', 'ds18b20', 'vl53l0x'].includes(p.type) ? MODEL.powerMin3v3 : MODEL.powerMinVolts
     return this.supplyOk(p, 'VCC', 'GND', v, min)
   }
 
@@ -573,6 +600,10 @@ class LabImpl implements LabApi {
           if (p.props.pressed === true) R(ref(p, 'SW'), ref(p, 'GND'), MODEL.encoderContactOhms)
           break
         }
+        case 'vl53l0x':
+          // kartta XSHUT → VCC pull-up: bağlı değilse ya da pin giriş kipindeyse sensör açık
+          if (nl.isWired(ref(p, 'VCC'))) R(ref(p, 'VCC'), ref(p, 'XSHUT'), MODEL.modulePullupOhms)
+          break
         case 'pir': {
           const m = this.pirs.get(p.id)
           const vcc = this.node(ref(p, 'VCC'))
@@ -960,6 +991,44 @@ class LabImpl implements LabApi {
         else if (p.type === 'mpu6050') {
           out.mpu6050 = { powered, present, ax: num(p, 'ax', 0), ay: num(p, 'ay', 0), az: num(p, 'az', 1), gx: num(p, 'gx', 0), gy: num(p, 'gy', 0), gz: num(p, 'gz', 0) }
         } else out.rtc = { powered, present, time: (e?.model as RTC | undefined)?.now().toISOString() ?? MODEL.rtcStartIso }
+        return true
+      }
+      case 'oled': case 'bme280': case 'vl53l0x': {
+        const powered = this.modPowered(p, v)
+        const xshutOff = p.type === 'vl53l0x' && this.inLow(p, 'XSHUT', v, this.base.res.floating)
+        const present = this.i2cPresent(p, v) && !xshutOff
+        this.syncI2c(p, present)
+        const e = this.i2cSensors.get(p.id)
+        if (e) {
+          // güç kesilince ya da XSHUT LOW iken denetleyici sıfırlanır (yeniden başlatma gerekir)
+          const alive = powered && !xshutOff
+          if (e.powered !== undefined && e.powered && !alive) (e.model as SSD1306 | BME280 | VL53L0X).reset()
+          e.powered = alive
+        }
+        if (p.type === 'oled') {
+          const m = e?.model as SSD1306 | undefined
+          let c = this.oledCache.get(p.id)
+          const on = present && !!m && m.on && m.chargePump
+          if (m && (!c || c.version !== m.version || c.on !== on)) {
+            c = { version: m.version, on, pixels: toBase64(on ? m.visible() : new Uint8Array(1024)) }
+            this.oledCache.set(p.id, c)
+          }
+          out.oled = { powered, present, on, inverted: !!m?.inverted, contrast: m?.contrast ?? 0, pixels: c?.pixels ?? toBase64(new Uint8Array(1024)) }
+        } else if (p.type === 'bme280') {
+          out.bme280 = { powered, present, tempC: num(p, 'tempC', 25), pressureHpa: num(p, 'pressureHpa', 1013.25), humidity: num(p, 'humidity', 50) }
+        } else {
+          const m = e?.model as VL53L0X | undefined
+          const mm = num(p, 'distanceMm', 500)
+          out.vl53l0x = { powered, present, distanceMm: mm, inRange: mm <= VL53L0X_MAX_MM, continuous: present && !!m?.continuous, measurements: m?.measurements ?? 0 }
+        }
+        return true
+      }
+      case 'ds18b20': {
+        const d = this.ds18.get(p.id)
+        const powered = this.modPowered(p, v)
+        const pullup = oneWirePullupNets(this.circuit, this.nl, p).some((n) => v[this.nodeIdx.get(n) ?? 0] > MODEL.powerMin3v3)
+        if (d && (d.powered !== powered || d.pullup !== pullup)) { d.powered = powered; d.pullup = pullup; d.refresh() }
+        out.ds18b20 = { powered, present: !!d && powered && pullup, pullup, tempC: num(p, 'tempC', 25), resolution: d?.resolution() ?? 12, conversions: d?.conversions ?? 0 }
         return true
       }
       case 'joystick':

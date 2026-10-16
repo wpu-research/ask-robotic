@@ -6,6 +6,7 @@ import type { SketchName } from './sketches'
 export type KitName =
   | 'led' | 'buton' | 'ldr' | 'npn' | 'mosfet' | 'gaz' | 'dht22' | 'mesafe' | 'sharp'
   | 'l298n' | 'tb6612' | 'drv8833' | 'bts7960' | 'md10c' | 'stepper' | 'esc' | 'servo' | 'mpu6050' | 'lcd' | 'lcdi2c'
+  | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x'
 
 export interface Kit {
   /** Laboratuvar başlığında görünen kısa ad. */
@@ -175,6 +176,32 @@ export const KITS: Record<KitName, Kit> = {
     watch: 'Aynı ekran yalnız iki veri kablosuyla (SDA/SCL). Adres 0x27. Kütüphane açılışta ~1 s bekler, sonra yazı gelir.',
     en: { title: "I2C LCD (PCF8574)", watch: "The same display with only two data wires (SDA/SCL). Address 0x27. The library waits about 1 s at start-up, then the text appears." },
     circuit: () => build([part('lcd', 'lcdI2c', 380, 240)], [['lcd.GND', 'uno.GND'], ['lcd.VCC', 'uno.5V'], ['lcd.SDA', 'uno.A4'], ['lcd.SCL', 'uno.A5']]),
+  },
+  oled: {
+    title: 'OLED 128x64 (SSD1306, Adafruit kütüphanesi)', sketch: 'oled_merhaba',
+    watch: 'Ekranda "Merhaba!", çerçeve ve dolu daire; alt satırda geçen saniye. Kütüphane 1 KB\'lık tamponu display() ile I2C üzerinden gönderir.',
+    en: { title: 'OLED 128x64 (SSD1306, Adafruit library)', watch: 'The screen shows "Merhaba!", a frame and a filled circle; the bottom line counts seconds. The library sends its 1 KB buffer over I2C with display().' },
+    circuit: () => build([part('o', 'oled', 440, 220)], [['o.VCC', 'uno.5V'], ['o.GND', 'uno.GND'], ['o.SDA', 'uno.A4'], ['o.SCL', 'uno.A5']]),
+  },
+  bme280: {
+    title: 'BME280 sıcaklık, basınç ve nem (I2C)', sketch: 'bme280_oku',
+    watch: 'Saniyede bir T, P ve H. Kaydırıcıları değiştir: değer bir sonraki okumada gelir. Adresi 0x77 yaparsan sensör bulunamaz.',
+    en: { title: 'BME280 temperature, pressure and humidity (I2C)', watch: 'T, P and H once a second. Move the sliders: the value arrives with the next reading. Set the address to 0x77 and the sensor is not found.' },
+    circuit: () => build([part('b', 'bme280', 440, 230, { tempC: 22, pressureHpa: 1013.25, humidity: 45 })],
+      [['b.VCC', 'uno.5V'], ['b.GND', 'uno.GND'], ['b.SDA', 'uno.A4'], ['b.SCL', 'uno.A5']]),
+  },
+  ds18b20: {
+    title: 'DS18B20 sıcaklık (1-Wire, 4,7 kΩ pull-up)', sketch: 'ds18b20_oku',
+    watch: 'Dönüşüm (12 bit) ~0,6 s sürer, sonra sıcaklık yazılır. 4,7 kΩ direnci çıkar: hat yükselmez, "sensor yok" yazılır.',
+    en: { title: 'DS18B20 temperature (1-Wire, 4.7 k\u03a9 pull-up)', watch: 'A 12-bit conversion takes about 0.6 s, then the temperature is printed. Remove the 4.7 k\u03a9 resistor: the line never rises and it prints "sensor yok" (no sensor).' },
+    circuit: () => build([part('t', 'ds18b20', 440, 230, { tempC: 24 }), part('r', 'resistor', 420, 120, { ohms: 4700 })],
+      [['t.GND', 'uno.GND'], ['t.VCC', 'uno.5V'], ['t.DQ', 'uno.D2'], ['r.1', 't.DQ'], ['r.2', 'uno.5V']]),
+  },
+  vl53l0x: {
+    title: 'VL53L0X lazer mesafe (ToF, Pololu kütüphanesi)', sketch: 'vl53l0x_mesafe',
+    watch: 'Tek atış ölçüm ~33 ms sürer, mesafe mm olarak yazılır. 2000 mm\'nin ötesinde 8190 (hedef yok) okunur. XSHUT\'u GND\'ye bağla: sensör kapanır.',
+    en: { title: 'VL53L0X laser distance (ToF, Pololu library)', watch: 'A single-shot measurement takes about 33 ms and the distance is printed in mm. Beyond 2000 mm it reads 8190 (no target). Tie XSHUT to GND and the sensor shuts down.' },
+    circuit: () => build([part('v', 'vl53l0x', 440, 230, { distanceMm: 350 })], [['v.VCC', 'uno.5V'], ['v.GND', 'uno.GND'], ['v.SDA', 'uno.A4'], ['v.SCL', 'uno.A5']]),
   },
 }
 

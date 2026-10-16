@@ -3,6 +3,7 @@ import { PART_DEFS } from '@/lib/lab/geometry'
 import { BAND_COLORS, resistorBands } from '@/lib/lab/ops'
 import { StageCArt } from './part-art-c'
 import { StageDArt } from './part-art-d'
+import { StageEArt } from './part-art-e'
 import { Tx } from './tx'
 import { useT } from '@/i18n/client'
 
@@ -549,7 +550,7 @@ export function PartArt({ part, runtime, pins }: { part: PartInstance; runtime?:
     case 'sr595': return <Sr595Art rt={runtime} />
     case 'lcd1602': return <Lcd1602Art rt={runtime} />
     case 'lcdI2c': return <LcdI2cArt rt={runtime} />
-    default: return StageCArt({ part, runtime }) ?? <StageDArt part={part} runtime={runtime} />
+    default: return StageCArt({ part, runtime }) ?? StageDArt({ part, runtime }) ?? <StageEArt part={part} runtime={runtime} />
   }
 }
 

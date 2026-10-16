@@ -1,5 +1,6 @@
 export * from './sim.js'
 export * from './devices.js'
+export * from './bus-devices.js'
 export * from './robot.js'
 export * from './circuit/contract.js'
 export * from './circuit/lab.js'

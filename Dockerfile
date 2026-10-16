@@ -33,7 +33,7 @@ RUN curl -fsSL "https://github.com/arduino/arduino-cli/releases/download/v${ARDU
  && arduino-cli lib install "Servo@1.3.0" "LiquidCrystal@1.0.7" "LiquidCrystal I2C@1.1.2" "DHT sensor library@1.4.6" \
       "Adafruit Unified Sensor@1.1.15" "Adafruit BusIO@1.17.4" "Adafruit BMP280 Library@3.0.0" "Adafruit GFX Library@1.12.4" \
       "Adafruit SSD1306@2.5.16" "RTClib@2.1.4" "Keypad@3.1.1" "NewPing@1.9.7" "MFRC522@1.4.12" "IRremote@4.5.0" \
-      "SD@1.3.0" "VL53L0X@1.3.1" \
+      "SD@1.3.0" "VL53L0X@1.3.1" "OneWire@2.3.8" "DallasTemperature@4.0.5" "Adafruit BME280 Library@2.2.4" \
  && rm -rf /opt/arduino/downloads \
  && chown -R node:node /opt/arduino
 

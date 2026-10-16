@@ -49,6 +49,7 @@ describe('uyarı iletileri', () => {
     'Röle modülü beslenmemiş: VCC, GND 5 V / GND hattına bağlı değil.', 'L293D beslenmemiş: VCC2 (motor beslemesi) 5 V / GND hattına bağlı değil.',
     'HC-SR04 TRIG ucu bağlı değil: sensör çalışmaz.', 'Step sürücü STEP ucu doğrudan bir Arduino pinine bağlı olmalı (araya direnç/parça koyma).',
     'BMP280 SDA ucu A4 pinine bağlı değil: I2C cihazı veri yolunda görünmez.',
+    'DS18B20 DQ hattında pull-up direnci yok: DQ ile VCC arasına 4,7 kΩ direnç bağla (yoksa sensör bulunamaz).', 'SSD1306 OLED beslenmemiş: VCC 5 V / GND hattına bağlı değil.',
     '74HC595 OE ucu bağlı değil (yüzen giriş): çıkışlar kapalı kalır (OE GND\'ye bağlanmalı).',
     '74HC595 SRCLR ucu bağlı değil (yüzen giriş): kaydırma yazmacı temizlenmiş sayılır (SRCLR 5 V\'a bağlanmalı).',
     '74HC595 SER ucu bağlı değil (yüzen giriş): çip çalışmaz.',
@@ -79,7 +80,8 @@ describe('dile bağlı biçim ve arama', () => {
     const q = (s: string) => pickerGroups(DEFAULT_PARTS, s).flatMap((x) => x.types)
     expect(q('relay')).toEqual(['relay'])
     expect(q('resistor')).toContain('resistor')
-    expect(q('humidity')).toEqual(['dht'])
+    expect(q('humidity')).toEqual(['dht', 'bme280'])
+    expect(q('one wire')).toEqual(['ds18b20'])
     expect(q('flame')).toEqual(['flame'])
     expect(pickerGroups(DEFAULT_PARTS, '').map((g) => g.key)).toEqual(['output', 'input', 'active', 'sensors', 'motion'])
   })

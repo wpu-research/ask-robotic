@@ -56,6 +56,7 @@ const RULES: Rule[] = [
   [/^(\S+) hattı dirençsiz bir yolla topraklandı/, (t, m) => t(M('railGrounded'), { name: m[1] })],
   [/^(\S+) pini doğrudan GND'ye bağlı/, (t, m) => t(M('pinToGnd'), { name: m[1] })],
   [/^(\S+) pini doğrudan 5V'a bağlı/, (t, m) => t(M('pinTo5v'), { name: m[1] })],
+  [/^(.+) DQ hattında pull-up direnci yok/, (t, m) => t(M('oneWirePullup'), { name: moduleName(t, m[1]) })],
   [/^(\S+) pininden (\d+) mA geçiyor/, (t, m) => t(M('pinOvercurrent'), { name: m[1], ma: m[2] })],
 ]
 
