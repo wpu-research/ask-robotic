@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useLocale } from '@/i18n/client'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { JrEditor } from '@/components/jr/jr-editor'
 import { ArenaEditor } from '@/components/arena/arena-editor'
@@ -54,6 +55,7 @@ type StepId = 'merak' | 'anlatim' | 'etkinlik' | 'test' | 'konusalim' | 'bitti'
 const STEP_LABEL: Record<StepId, string> = { merak: 'Merak', anlatim: 'Anlatım', etkinlik: 'Etkinlik', test: 'Test', konusalim: 'Konuşalım', bitti: 'Bitti' }
 
 export function LessonPlayer(p: Props) {
+  const en = useLocale() === 'en'
   const hasExplainer = !!(p.lesson.explainerMd || p.lesson.concepts?.length)
   const hasQuiz = !!p.lesson.quiz?.length
   const STEPS = useMemo<StepId[]>(
@@ -279,7 +281,7 @@ export function LessonPlayer(p: Props) {
                 {error && <p role="alert" className="error">{error}</p>}
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 14 }}>
                   {p.nextLessonId
-                    ? <Link className="btn btn-primary btn-lg" href={`/ders/${p.nextLessonId}`}>Sonraki ders →</Link>
+                    ? <Link className="btn btn-primary btn-lg" href={`/ders/${p.nextLessonId}`}>{en ? 'Next lesson →' : 'Sonraki ders →'}</Link>
                     : <Link className="btn btn-primary btn-lg" href={`/moduller/${p.moduleSlug}`}>Modül sayfasına dön</Link>}
                   <button type="button" className="btn btn-ghost" onClick={() => unmarkDone(p.lesson.id)}>Tamamlanmadı olarak işaretle</button>
                 </div>
@@ -301,7 +303,7 @@ export function LessonPlayer(p: Props) {
           <div className="player-nav">
             {step > 0
               ? <button type="button" className="btn btn-ghost" onClick={() => go(step - 1)}><Icon name="arrowLeft" size={18} />Geri</button>
-              : p.prevLessonId ? <Link className="btn btn-ghost" href={`/ders/${p.prevLessonId}`}><Icon name="arrowLeft" size={18} />Önceki ders</Link> : <span />}
+              : p.prevLessonId ? <Link className="btn btn-ghost" href={`/ders/${p.prevLessonId}`}><Icon name="arrowLeft" size={18} />{en ? 'Previous lesson' : 'Önceki ders'}</Link> : <span />}
             {step < STEPS.length - 1
               ? <button type="button" className="btn btn-primary" onClick={() => go(step + 1)}>İleri<Icon name="arrowRight" size={18} /></button>
               : <span />}
@@ -335,8 +337,8 @@ export function LessonPlayer(p: Props) {
             <span className="progress-label">{modCount.done} / {modCount.total}</span>
           </div>
           <div className="aside-nav">
-            {p.prevLessonId && <Link href={`/ders/${p.prevLessonId}`}><small>Önceki ders</small>{p.prevTitle}</Link>}
-            {p.nextLessonId && <Link href={`/ders/${p.nextLessonId}`}><small>Sonraki ders</small>{p.nextTitle}</Link>}
+            {p.prevLessonId && <Link href={`/ders/${p.prevLessonId}`}><small>{en ? 'Previous lesson' : 'Önceki ders'}</small>{p.prevTitle}</Link>}
+            {p.nextLessonId && <Link href={`/ders/${p.nextLessonId}`}><small>{en ? 'Next lesson' : 'Sonraki ders'}</small>{p.nextTitle}</Link>}
           </div>
         </aside>
       </div>

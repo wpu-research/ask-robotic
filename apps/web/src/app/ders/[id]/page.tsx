@@ -12,13 +12,16 @@ import { Paywall } from '@/components/paywall/paywall'
 import { checkLessonAccess } from '@/lib/paywall'
 import { paywallEnabled } from '@/lib/entitlements'
 import { getLocale, getT } from '@/i18n/server'
+import { moduleTitle, weekTitle } from '@/lib/catalog-en'
+import { lessonTitle } from '@/lib/lesson-titles-en'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const n = Number((await params).id)
   const ctx = Number.isInteger(n) && n > 0 ? await getLessonContext(getDb(), n).catch(() => null) : null
-  return { title: ctx?.lesson.title ?? (await getT())('common.lessonFallbackTitle') }
+  if (!ctx) return { title: (await getT())('common.lessonFallbackTitle') }
+  return { title: lessonTitle(ctx.module.slug, ctx.week.position, ctx.lesson.position, ctx.lesson.title, await getLocale()) }
 }
 
 export default async function Ders({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ klasik?: string }> }) {
@@ -37,7 +40,7 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
   if (paywallEnabled()) {
     const gate = await checkLessonAccess(db, user?.id, lessonId)
     if (!gate.decision.ok) {
-      return <Paywall reason={gate.decision.reason} loggedIn={!!user} trialAvailable={gate.trialAvailable} lessonTitle={ctx.lesson.title} />
+      return <Paywall reason={gate.decision.reason} loggedIn={!!user} trialAvailable={gate.trialAvailable} lessonTitle={lessonTitle(ctx.module.slug, ctx.week.position, ctx.lesson.position, ctx.lesson.title, await getLocale())} />
     }
   }
   const tree = await getModuleTree(db, ctx.module.slug)
@@ -48,19 +51,27 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
   const key = activityKey(ctx.module.slug, ctx.week.position, ctx.lesson.position)
   const locale = await getLocale()
   const t = await getT()
+  // Başlık, modül ve hafta adı dile göre (lib/lesson-titles-en.ts, lib/catalog-en.ts); ders gövdesi Türkçe kalabilir
+  const slug = ctx.module.slug
+  const weekPosOf = new Map(tree?.weeks.map((w) => [w.id, w.position]) ?? [])
+  const titleOf = (l: { title: string; weekId: number; position: number } | null) =>
+    l ? lessonTitle(slug, weekPosOf.get(l.weekId) ?? 0, l.position, l.title, locale) : null
+  const title = lessonTitle(slug, ctx.week.position, ctx.lesson.position, ctx.lesson.title, locale)
+  const modTitle = moduleTitle(slug, ctx.module.title, locale)
+  const wkTitle = weekTitle(slug, ctx.week.position, ctx.week.title, locale)
   // Arayüz İngilizceyse ve dersin İngilizcesi varsa onu; yoksa Türkçe adımlar + küçük not
   const english = locale === 'en' && !!ctx.lesson.stepsEn?.length
   const steps = english ? ctx.lesson.stepsEn : ctx.lesson.steps
   if (steps?.length && !classic) {
     return (
       <LessonV2Player
-        lesson={{ id: ctx.lesson.id, title: ctx.lesson.title, steps }}
+        lesson={{ id: ctx.lesson.id, title, steps }}
         notice={locale === 'en' && !english ? t('common.lessonOnlyTurkish') : undefined}
         moduleSlug={ctx.module.slug}
-        moduleTitle={ctx.module.title}
-        weekLabel={t('common.weekLabel', { n: ctx.week.position, title: ctx.week.title })}
+        moduleTitle={modTitle}
+        weekLabel={t('common.weekLabel', { n: ctx.week.position, title: wkTitle })}
         nextLessonId={ctx.next?.id ?? null}
-        nextTitle={ctx.next?.title ?? null}
+        nextTitle={titleOf(ctx.next)}
         activityKey={key}
         serverSync={!!user}
         classicHref={`/ders/${ctx.lesson.id}?klasik=1`}
@@ -74,7 +85,7 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
       <LessonPlayer
         lesson={{
           id: ctx.lesson.id,
-          title: ctx.lesson.title,
+          title,
           durationMin: ctx.lesson.durationMin,
           problem: ctx.lesson.problem ?? '',
           contentMd: ctx.lesson.contentMd ?? '',
@@ -83,15 +94,15 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
           concepts: ctx.lesson.concepts ?? null,
           quiz: ctx.lesson.quiz ?? null,
         }}
-        moduleTitle={ctx.module.title}
+        moduleTitle={modTitle}
         moduleSlug={ctx.module.slug}
         trackClass={`track-${ctx.module.track}`}
-        weekLabel={t('common.weekLabelClassic', { n: ctx.week.position, title: ctx.week.title })}
+        weekLabel={t('common.weekLabelClassic', { n: ctx.week.position, title: wkTitle })}
         position={{ index: ctx.index, total: ctx.total }}
         prevLessonId={ctx.prev?.id ?? null}
         nextLessonId={ctx.next?.id ?? null}
-        prevTitle={ctx.prev?.title ?? null}
-        nextTitle={ctx.next?.title ?? null}
+        prevTitle={titleOf(ctx.prev)}
+        nextTitle={titleOf(ctx.next)}
         moduleLessonIds={ids}
         activityKey={key}
         callout={MODULE_META[ctx.module.slug]?.callout}

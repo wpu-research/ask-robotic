@@ -4,10 +4,9 @@ import { notFound } from 'next/navigation'
 import { LessonMarkdown } from '@/app/ders/[id]/lesson-markdown'
 import { PartViewLogger } from '@/components/learn/part-view-logger'
 import { Icon } from '@/components/shell/icons'
-import { resolveLessonKeys } from '@/lib/content'
+import { resolveLocalizedLessonKeys } from '@/lib/content-i18n'
 import { getDb } from '@/lib/db'
 import { localizedGuideBySlug } from '@/lib/parca-rehberi-i18n'
-import { weekTitle } from '@/lib/catalog-en'
 import { getLocale, getT } from '@/i18n/server'
 
 export const dynamic = 'force-dynamic'
@@ -23,7 +22,7 @@ export default async function Parca({ params }: { params: Promise<{ slug: string
   const g = localizedGuideBySlug((await params).slug, locale)
   if (!g) notFound()
   // Veritabanı kapalıysa sayfa yine açılır; yalnız ilgili ders bağlantıları görünmez.
-  const lessons = await resolveLessonKeys(getDb(), g.relatedLessons).catch(() => [])
+  const lessons = await resolveLocalizedLessonKeys(getDb(), g.relatedLessons).catch(() => [])
   return (
     <div className="page part-page">
       <PartViewLogger slug={g.slug} />
@@ -58,8 +57,7 @@ export default async function Parca({ params }: { params: Promise<{ slug: string
             <section className="panel" aria-labelledby="p-ders">
               <h2 id="p-ders" className="panel-title">{t('content.parts.related')}</h2>
               <ul className="rel-lessons">
-                {/* Ders başlıkları yalnız Türkçe (ders başına İngilizce başlık alanı yok) */}
-                {lessons.map((l) => (<li key={l.key}><Link href={`/ders/${l.id}`}>{l.title}</Link><small>{t('content.parts.weekLabel', { n: l.weekPos, title: weekTitle(l.moduleSlug, l.weekPos, l.weekName, locale) })}</small></li>))}
+                {lessons.map((l) => (<li key={l.key}><Link href={`/ders/${l.id}`}>{l.title}</Link><small>{t('content.parts.weekLabel', { n: l.weekPos, title: l.weekName })}</small></li>))}
               </ul>
             </section>
           )}

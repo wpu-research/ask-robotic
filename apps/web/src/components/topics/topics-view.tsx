@@ -1,7 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { CatalogModule } from '@/lib/catalog'
+import { localizeCatalog } from '@/lib/catalog-en'
 import { countDone, moduleLessonIds } from '@/lib/dashboard'
 import { BANDS, bandForAge, bandText, SECTIONS, sectionLabel, TOPICS, topicText, type BandKey } from '@/lib/learning-paths'
 import { useLocale, useT } from '@/i18n/client'
@@ -14,10 +15,12 @@ const ICON: Record<string, string> = { 'blokla-kodlama': '🧩', 'oyun-yapimi': 
  * Konu kataloğu (Brilliant "Topics" gibi): bölüm → konu satırı (seviye etiketi, ad, tek cümlelik vaat).
  * Satır açılınca konunun kursları önerilen sırayla; profil varsa öğrencinin bandı seçili gelir.
  */
-export function TopicsView({ catalog }: { catalog: CatalogModule[] }) {
+export function TopicsView({ catalog: catalogTr }: { catalog: CatalogModule[] }) {
   const profile = useProfile()
   const t = useT()
   const locale = useLocale()
+  // Modül adı/tanıtımı ve ders başlıkları dile göre (lib/catalog-en.ts)
+  const catalog = useMemo(() => localizeCatalog(catalogTr, locale), [catalogTr, locale])
   const done = useDoneIds()
   const [band, setBand] = useState<BandKey | 'hepsi'>('hepsi')
   const [open, setOpen] = useState<string | null>(null)

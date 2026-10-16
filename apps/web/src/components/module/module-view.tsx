@@ -13,7 +13,8 @@ import { Icon } from '../shell/icons'
 import { LessonMarkdown } from '@/app/ders/[id]/lesson-markdown'
 import { CourseMap } from './course-map'
 
-const isProject = (t: string) => /^(Proje|Bitirme)/.test(t)
+// Başlık dile göre gelir (lib/lesson-titles-en.ts): "Proje/Bitirme" ↔ "Project/Final project/Final robot"
+const isProject = (t: string) => /^(Proje|Bitirme|Project:|Final (project|robot):)/.test(t)
 
 function WeekProgress({ w }: { w: CatalogWeek }) {
   const done = useDoneIds()
@@ -34,7 +35,7 @@ export function ModuleView({ m: mTr, guides = {} }: { m: CatalogModule; /** Haft
   const t = useT()
   const locale = useLocale()
   const fmt = useFormat()
-  // Modül adı, tanıtım, kitle ve hafta adları dile göre (lib/catalog-en.ts); ders başlıkları Türkçe kalır
+  // Modül adı, tanıtım, kitle, hafta adları ve ders başlıkları dile göre (lib/catalog-en.ts)
   const m = localizeModule(mTr, locale)
   const meta = MODULE_META[m.slug] ? { audience: m.audience || MODULE_META[m.slug].audience, callout: moduleCallout(m.slug, locale) } : undefined
   const ids = moduleLessonIds(m)

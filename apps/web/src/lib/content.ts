@@ -82,14 +82,14 @@ export async function resolveLessonKeys(db: Db, keys: string[]) {
 }
 
 /** Mini testi olan dersler (Testlerim ve İlerlemem için): kimlik, başlık, soru sayısı ve konum.
- * weekLabel Türkçe hazır etikettir; dile göre etiket için moduleSlug/moduleTitle/weekPos/weekTitle (lib/catalog-en.ts). */
+ * weekLabel Türkçe hazır etikettir; dile göre etiket ve başlık için moduleSlug/moduleTitle/weekPos/lessonPos/weekTitle (lib/content-i18n.ts). */
 export async function listQuizLessons(db: Db) {
   const rows = await db
-    .select({ id: lessons.id, title: lessons.title, quiz: lessons.quiz, weekPos: weeks.position, weekTitle: weeks.title, moduleTitle: modules.title, moduleSlug: modules.slug })
+    .select({ id: lessons.id, title: lessons.title, quiz: lessons.quiz, lessonPos: lessons.position, weekPos: weeks.position, weekTitle: weeks.title, moduleTitle: modules.title, moduleSlug: modules.slug })
     .from(lessons)
     .innerJoin(weeks, eq(weeks.id, lessons.weekId))
     .innerJoin(modules, eq(modules.id, weeks.moduleId))
     .where(and(eq(modules.published, true), sql`${lessons.quiz} is not null`))
     .orderBy(asc(modules.position), asc(weeks.position), asc(lessons.position))
-  return rows.map((r) => ({ id: r.id, title: r.title, total: r.quiz?.length ?? 0, weekLabel: `${r.moduleTitle} › ${r.weekPos}. hafta: ${r.weekTitle}`, moduleSlug: r.moduleSlug, moduleTitle: r.moduleTitle, weekPos: r.weekPos, weekTitle: r.weekTitle }))
+  return rows.map((r) => ({ id: r.id, title: r.title, total: r.quiz?.length ?? 0, weekLabel: `${r.moduleTitle} › ${r.weekPos}. hafta: ${r.weekTitle}`, moduleSlug: r.moduleSlug, moduleTitle: r.moduleTitle, weekPos: r.weekPos, lessonPos: r.lessonPos, weekTitle: r.weekTitle }))
 }

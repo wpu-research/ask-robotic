@@ -1,10 +1,11 @@
 // Modül kataloğunun İngilizcesi (modül adı, kısa tanıtım, hedef kitle, yaş, açıklama, hafta adları ve projeleri).
 // Türkçe kaynak: veritabanı (content-src/*/module.json, packages/db/src/content/modul-*.ts) + lib/module-meta.ts.
-// Görüntülemede slug ile birleşir (localizeModule); eksik alan Türkçede kalır. Ders başlıkları ve gövdeleri burada yok.
+// Görüntülemede slug ile birleşir (localizeModule); eksik alan Türkçede kalır. Ders başlıkları lib/lesson-titles-en.ts'te; gövdeler Türkçe.
 // catalog-en.test.ts: her yayındaki modülün girdisi var ve hafta sayısı Türkçeyle aynı.
 import type { Locale } from '@/i18n'
 import type { CatalogModule } from './catalog'
 import { MODULE_META } from './module-meta'
+import { lessonTitle } from './lesson-titles-en'
 
 export interface ModuleEn {
   title: string
@@ -166,18 +167,24 @@ export function localizedAgeLabel(slug: string, minAge: number | null, locale: L
   return MODULE_META[slug]?.ages ?? (minAge ? `${minAge}+ yaş` : null)
 }
 
-/** Katalog modülünün metinlerini (ad, tanıtım, kitle, hafta adı/projesi) dile göre değiştirir. Ders başlıkları değişmez. */
+/** Katalog modülünün metinlerini (ad, tanıtım, kitle, hafta adı/projesi, ders başlıkları) dile göre değiştirir. Türkçede aynı nesne döner. */
 export function localizeModule(m: CatalogModule, locale: Locale): CatalogModule {
   const en = locale === 'en' ? MODULES_EN[m.slug] : undefined
-  if (!en) return m
+  if (locale !== 'en') return m
   return {
     ...m,
-    title: en.title,
-    tagline: en.tagline,
-    audience: en.audience,
+    ...(en ? { title: en.title, tagline: en.tagline, audience: en.audience } : {}),
     weeks: m.weeks.map((w) => {
-      const e = en.weeks[w.position - 1]
-      return e ? { ...w, title: e[0], project: w.project ? e[1] : w.project } : w
+      const e = en?.weeks[w.position - 1]
+      return {
+        ...w,
+        ...(e ? { title: e[0], project: w.project ? e[1] : w.project } : {}),
+        lessons: w.lessons.map((l) => ({ ...l, title: lessonTitle(m.slug, w.position, l.position, l.title, locale) })),
+      }
     }),
   }
 }
+
+/** Tüm katalog dile göre (localizeModule). Türkçede aynı dizi döner. */
+export const localizeCatalog = (catalog: CatalogModule[], locale: Locale): CatalogModule[] =>
+  locale === 'en' ? catalog.map((m) => localizeModule(m, locale)) : catalog

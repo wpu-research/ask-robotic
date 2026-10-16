@@ -4,7 +4,8 @@ import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { CatalogModule } from '@/lib/catalog'
 import { useActivity } from '@/lib/activity-store'
 import { badges, buildEvents, computeStats, continueTarget, overallProgress, recommendNext, type BadgeInfo } from '@/lib/dashboard'
-import { useFormat, useT } from '@/i18n/client'
+import { useFormat, useLocale, useT } from '@/i18n/client'
+import { localizeCatalog } from '@/lib/catalog-en'
 import type { MessageKey, TFunction } from '@/i18n'
 import { UPCOMING } from '@/lib/module-meta'
 import { useDoneIds } from '@/lib/progress-store'
@@ -203,8 +204,11 @@ function Feed({ catalog }: { catalog: CatalogModule[] }) {
   )
 }
 
-export function Dashboard({ catalog, league }: { catalog: CatalogModule[]; /** Sınıf ligi kartı (sunucu bileşeni; giriş açıkken). */ league?: ReactNode }) {
+export function Dashboard({ catalog: catalogTr, league }: { catalog: CatalogModule[]; /** Sınıf ligi kartı (sunucu bileşeni; giriş açıkken). */ league?: ReactNode }) {
   const t = useT()
+  const locale = useLocale()
+  // Modül/hafta adları ve ders başlıkları dile göre (lib/catalog-en.ts); alt kartlar (devam, plan, rozet, akış) bunu kullanır
+  const catalog = useMemo(() => localizeCatalog(catalogTr, locale), [catalogTr, locale])
   const session = useSession()
   const soon = UPCOMING.filter((u) => !catalog.some((m) => m.slug === u.slug))
   const first = session.user?.name?.split(' ')[0]
