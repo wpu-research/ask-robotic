@@ -60,6 +60,7 @@ export const NAV: NavGroup[] = [
       { href: '/laboratuvar', label: 'Devre laboratuvarı', key: 'shell.nav.lab', icon: 'laboratuvar', tab: true },
       { href: '/arena', label: 'Robot arenası', key: 'shell.nav.arena', icon: 'arena', tab: true },
       { href: '/ai-atolyesi', label: 'AI atölyesi', key: 'shell.nav.ai', icon: 'ai' },
+      { href: '/makine-ogrenmesi', label: 'Makine öğrenmesi', key: 'shell.nav.ml', icon: 'ai' },
       { href: '/muhendislik', label: 'Mühendislik yolu', key: 'shell.nav.engineering', icon: 'drone' },
       { href: '/muhendislik/robotik', label: 'Robotik dersi', key: 'shell.nav.robotics', icon: 'book' },
     ],

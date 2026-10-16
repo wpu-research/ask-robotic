@@ -1931,7 +1931,14 @@
     }
    ]
   },
-  "courseKit": null
+  "courseKit": null,
+  "related": [
+   {
+    "href": "/makine-ogrenmesi",
+    "tr": "Makine Öğrenmesi, sıfırdan: regresyon, k-NN, karar ağacı, k-means, PCA ve küçük bir sinir ağı",
+    "en": "Machine Learning from scratch: regression, k-NN, decision trees, k-means, PCA and a small neural network"
+   }
+  ]
  },
  {
   "n": 12,

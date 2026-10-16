@@ -1,0 +1,47 @@
+import type { Metadata } from 'next'
+import Link from 'next/link'
+import { getLocale } from '@/i18n/server'
+import { LESSONS } from '@/lib/ml/lessons'
+import { ML_TEXT } from '@/lib/ml/text'
+import './ml.css'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const T = ML_TEXT[await getLocale()]
+  return { title: T.title, description: T.lead }
+}
+
+/** Makine Öğrenmesi (sıfırdan) kurs sayfası: Macademia bölüm düzeni, ders kartları. */
+export default async function MakineOgrenmesi() {
+  const lang = await getLocale()
+  const T = ML_TEXT[lang]
+  return (
+    <div className="page ml-page">
+      <header className="page-title">
+        <p className="eyebrow">{T.eyebrow}</p>
+        <h1>{T.title}</h1>
+        <p className="lead">{T.lead}</p>
+        <div className="hero-actions"><Link className="btn btn-primary" href={`/makine-ogrenmesi/${LESSONS[0].slug}`}>{T.start}</Link></div>
+      </header>
+
+      <section aria-labelledby="ml-how">
+        <div className="section-head"><div><p className="eyebrow">{T.how2}</p><h2 id="ml-how">{T.howTitle}</h2></div></div>
+        <div className="steps">{T.how.map(([h, p]) => <div key={h} className="step"><h3>{h}</h3><p>{p}</p></div>)}</div>
+      </section>
+
+      <section aria-labelledby="ml-list">
+        <div className="section-head"><div><p className="eyebrow">{T.course}</p><h2 id="ml-list">{T.lessons}</h2></div></div>
+        <ol className="ml-list">
+          {LESSONS.map((l) => (
+            <li key={l.slug}>
+              <Link href={`/makine-ogrenmesi/${l.slug}`} className="ml-item" data-testid={`ml-${l.slug}`}>
+                <span className="ml-n">{String(l.n).padStart(2, '0')}</span>
+                <span className="ml-item-body"><b>{l.title[lang]}</b><span>{l.sub[lang]}</span></span>
+                <span aria-hidden="true" className="ml-go">→</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+    </div>
+  )
+}

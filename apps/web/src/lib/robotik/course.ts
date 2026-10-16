@@ -31,6 +31,8 @@ export interface Week {
   wokwi: Array<'esp32' | 'stm32'>
   /** Derse özel laboratuvar kit(ler)i (/laboratuvar?kit=). */
   courseKit?: CourseKitName | CourseKitName[] | null
+  /** Site içi ilgili sayfalar (ör. 11. hafta → Makine Öğrenmesi kursu). */
+  related?: Array<{ href: string; tr: string; en: string }>
   exam: boolean
   tr: WeekText
   en: WeekText

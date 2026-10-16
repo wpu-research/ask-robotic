@@ -90,6 +90,7 @@ export const shell = {
     engineering: 'Mühendislik yolu',
     vision: 'Robotun Gözleri',
     robotics: 'Robotik dersi (ESOF 323)',
+    ml: 'Makine öğrenmesi',
   },
   /** Atölyeler panelindeki tek satırlık açıklamalar. */
   navDesc: {
@@ -105,6 +106,7 @@ export const shell = {
     ai: 'Token, prompt, RAG ve ajan araçları',
     engineering: "128 gerçek parça, temelden drone'a",
     robotics: 'Üniversite dersi: 14 hafta, simülasyonlar',
+    ml: 'Regresyondan sinir ağına, kodu adım adım',
     parts: 'Parça ansiklopedisi',
     tests: 'Mini testler ve puanlar',
     progress: 'Beceri haritan',

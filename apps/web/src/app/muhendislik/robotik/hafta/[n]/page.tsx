@@ -93,6 +93,13 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
             </section>
           )}
 
+          {w.related?.map((r) => (
+            <section key={r.href} className="eng-labbox rb-kitbox">
+              <h2>{en ? 'Related course' : 'İlgili kurs'}</h2>
+              <p>{en ? r.en : r.tr}</p>
+              <Link className="btn btn-primary" href={r.href}>{en ? 'Open' : 'Aç'} <Icon name="arrowRight" size={16} /></Link>
+            </section>
+          ))}
           {cks.map(({ name, kit: ck }) => (
             <section key={name} className="eng-labbox rb-kitbox" aria-labelledby={`rb-kit-${name}`}>
               <h2 id={`rb-kit-${name}`}>{en ? 'In the lab' : 'Laboratuvarda'}: {en ? ck.en.title : ck.title}</h2>
