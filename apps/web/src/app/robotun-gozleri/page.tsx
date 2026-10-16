@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Art } from '@/components/kids/art'
 import { getLocale } from '@/i18n/server'
-import { GAMES, LESSONS } from '@/lib/robotun-gozleri'
+import { GAME_KIND_LABEL, GAMES, LESSONS } from '@/lib/robotun-gozleri'
 
 export const metadata: Metadata = { title: 'Robotun Gözleri', description: 'Çocuklar için görüntü işleme: pikseller, renkler, maske, nesne bulma ve kamera oyunları.' }
 
@@ -42,7 +42,7 @@ export default async function RobotunGozleri() {
           {GAMES.map((g) => (
             <li key={g.slug}>
               <Link href={`/robotun-gozleri/oyun/${g.slug}`} className="gz-card" data-testid={`gz-game-${g.slug}`}>
-                <span className="gz-card-art" style={{ background: g.color }} aria-hidden="true"><span>{g.emoji}</span></span>
+                <span className="gz-card-art" style={{ background: g.color }} aria-hidden="true"><span>{g.emoji}</span><i className={`gz-kind ${g.kind}`}>{GAME_KIND_LABEL[g.kind][lang]}</i></span>
                 <span className="gz-card-body"><b>{g[lang].title}</b><small>{g[lang].text}</small></span>
               </Link>
             </li>

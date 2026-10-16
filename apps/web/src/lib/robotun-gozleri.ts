@@ -1,9 +1,11 @@
-// "Robotun Gözleri": çocuklar için görüntü işleme (8–12 yaş). 6 kısa ders (kamerasız da çalışır) + 3 kameralı oyun.
+// "Robotun Gözleri": çocuklar için görüntü işleme (8–12 yaş). 6 kısa ders (kamerasız da çalışır) + 10 kameralı oyun
+// (yüz, el ve vücut modelleriyle; mantıkları lib/gozler-logic.ts, bileşenleri components/gozler/games*.tsx).
 // Oyunlar tarayıcıda, cihaz içinde çalışan MediaPipe modelleri kullanır (dosyalar /mediapipe altından); görüntü hiçbir yere gönderilmez.
 
 interface Text { title: string; story: string; learned: string[] }
 export interface Lesson { n: number; emoji: string; color: string; tr: Text; en: Text }
-export interface Game { slug: 'yuz-aynasi' | 'tas-kagit-makas' | 'balon-patlat'; emoji: string; color: string; tr: { title: string; text: string; how: string }; en: { title: string; text: string; how: string } }
+export type GameKind = 'face' | 'hand' | 'body'
+export interface Game { slug: 'yuz-aynasi' | 'tas-kagit-makas' | 'balon-patlat' | 'burun-avcisi' | 'agzinla-yakala' | 'kafa-pinpon' | 'parmak-hesabi' | 'sihirli-firca' | 'dogru-mu-yanlis-mi' | 'robotu-taklit-et'; kind: GameKind; emoji: string; color: string; tr: { title: string; text: string; how: string }; en: { title: string; text: string; how: string } }
 
 export const LESSONS: Lesson[] = [
   {
@@ -40,21 +42,57 @@ export const LESSONS: Lesson[] = [
 
 export const GAMES: Game[] = [
   {
-    slug: 'yuz-aynasi', emoji: '😄', color: '#fef9c3',
+    slug: 'yuz-aynasi', kind: 'face', emoji: '😄', color: '#fef9c3',
     tr: { title: 'Yüz Aynası', text: 'Robot yüzündeki noktaları görür ve gülüyor musun, şaşırdın mı, kızgın mısın anlar.', how: 'Robot bir yüz ifadesi ister. O ifadeyi yap ve bir saniye tut: puanı kap! Gülümse, şaşır (ağzını aç, kaşlarını kaldır), kaşlarını çatıp kızgın ol ya da göz kırp.' },
     en: { title: 'Face Mirror', text: 'The robot sees the dots on your face and knows if you are smiling, surprised or angry.', how: 'The robot asks for a face. Make it and hold it for a second to score! Smile, look surprised (open your mouth, raise your eyebrows), frown like you are angry, or wink.' },
   },
   {
-    slug: 'tas-kagit-makas', emoji: '✌️', color: '#e0f2fe',
+    slug: 'tas-kagit-makas', kind: 'hand', emoji: '✌️', color: '#e0f2fe',
     tr: { title: 'Taş Kâğıt Makas', text: 'Robotla taş-kâğıt-makas oyna; robot elini kamerayla görür.', how: '"Oyna" düğmesine bas. 3, 2, 1 sayımı bitince elini göster: yumruk taş, açık el kâğıt, iki parmak makas. Robot da seçer, kim kazandı?' },
     en: { title: 'Rock Paper Scissors', text: 'Play rock-paper-scissors with the robot; it sees your hand through the camera.', how: 'Press "Play". When the 3, 2, 1 countdown ends, show your hand: a fist is rock, an open hand is paper, two fingers are scissors. The robot picks too. Who won?' },
   },
   {
-    slug: 'balon-patlat', emoji: '🎈', color: '#fce7f3',
+    slug: 'balon-patlat', kind: 'body', emoji: '🎈', color: '#fce7f3',
     tr: { title: 'Balon Patlat', text: 'Bütün vücudunla oyna: ellerini sallayarak uçan balonları patlat.', how: 'Kameradan biraz uzaklaş, ellerin görünsün. Balonlar aşağıdan yükselir; ellerini balona değdir ve patlat. 45 saniyede kaç balon?' },
     en: { title: 'Balloon Pop', text: 'Play with your whole body: wave your hands to pop the floating balloons.', how: 'Step back from the camera so your hands are visible. Balloons rise from the bottom; touch them with your hands to pop them. How many in 45 seconds?' },
+  },
+  {
+    slug: 'burun-avcisi', kind: 'face', emoji: '👃', color: '#fef3c7',
+    tr: { title: 'Burun Avcısı', text: 'Robot burnunun ucunu bulur. Başını oynatarak ekrandaki yıldızları burnunla topla.', how: 'Başla\'ya bas. Ekranda yıldızlar belirir ve birkaç saniye sonra kaybolur. Başını oynatıp sarı noktayı (burnunu) yıldıza değdir. 45 saniyede kaç yıldız?' },
+    en: { title: 'Nose Catcher', text: 'The robot finds the tip of your nose. Move your head to collect the stars with your nose.', how: 'Press Start. Stars appear and vanish after a few seconds. Move your head and touch them with the yellow dot (your nose). How many in 45 seconds?' },
+  },
+  {
+    slug: 'agzinla-yakala', kind: 'face', emoji: '😋', color: '#fee2e2',
+    tr: { title: 'Ağzınla Yakala', text: 'Robot ağzının açık mı kapalı mı olduğunu görür. Düşen meyveleri ağzını açarak ye.', how: 'Başla\'ya bas. Meyveler yukarıdan düşer. Başını meyvenin altına getir ve tam ağzına gelirken ağzını aç: halka yeşil olunca ağzın açıktır.' },
+    en: { title: 'Catch with Your Mouth', text: 'The robot sees whether your mouth is open. Open it to eat the falling fruit.', how: 'Press Start. Fruit falls from the top. Move your head under it and open your mouth as it arrives: the ring turns green when your mouth is open.' },
+  },
+  {
+    slug: 'kafa-pinpon', kind: 'face', emoji: '🏓', color: '#dcfce7',
+    tr: { title: 'Kafa Pinpon', text: 'Raketi başınla yönet: robot yüzünün nerede olduğunu izler, raket seninle kayar.', how: 'Başla\'ya bas. Başını sağa sola oynat, alttaki raket de kayar. Topu yere düşürmeden geri vur. Üç canın var; her vuruşta top biraz hızlanır.' },
+    en: { title: 'Head Pong', text: 'Steer the paddle with your head: the robot tracks where your face is and the paddle follows.', how: 'Press Start. Move your head left and right and the paddle moves too. Hit the ball back before it falls. You have three lives and the ball speeds up a little on every hit.' },
+  },
+  {
+    slug: 'parmak-hesabi', kind: 'hand', emoji: '🖐️', color: '#ede9fe',
+    tr: { title: 'Parmak Hesabı', text: 'Robot elindeki kalkık parmakları sayar. İşlemin cevabını parmaklarınla göster.', how: 'Ekranda bir toplama ya da çıkarma var, cevabı 0 ile 5 arasında. Elini kameraya göster ve cevap kadar parmağını kaldır; bir saniye tut. Yumruk sıfır demektir.' },
+    en: { title: 'Finger Maths', text: 'The robot counts the fingers you hold up. Show the answer with your fingers.', how: 'There is an addition or subtraction with an answer from 0 to 5. Show your hand and hold up that many fingers for a second. A fist means zero.' },
+  },
+  {
+    slug: 'sihirli-firca', kind: 'hand', emoji: '🪄', color: '#e0f2fe',
+    tr: { title: 'Sihirli Fırça', text: 'Havada çiz! Robot işaret parmağını izler ve onun ucuyla ekrana resim yapar.', how: 'Yalnız işaret parmağını kaldır (☝️): çizer. Elini aç (✋) ve bir saniye tut: siler. Zafer işareti (✌️) rengi değiştirir. Parmağını indirince fırça kalkar.' },
+    en: { title: 'Magic Brush', text: 'Draw in the air! The robot follows your index finger and paints with its tip.', how: 'Point with only your index finger (☝️) to draw. Hold an open hand (✋) for a second to clear. A peace sign (✌️) changes the colour. Lower your finger to lift the brush.' },
+  },
+  {
+    slug: 'dogru-mu-yanlis-mi', kind: 'hand', emoji: '👍', color: '#fce7f3',
+    tr: { title: 'Doğru mu Yanlış mı?', text: 'Robot başparmağını görür. Görüntü işleme hakkındaki 10 ifadeyi başparmağınla yanıtla.', how: 'İfadeyi oku. Doğruysa başparmağını yukarı (👍), yanlışsa aşağı (👎) göster ve bir an tut. Robot cevabını kontrol eder ve sıradaki ifadeye geçer.' },
+    en: { title: 'True or False?', text: 'The robot sees your thumb. Answer 10 statements about computer vision with a thumbs up or down.', how: 'Read the statement. Show a thumbs up (👍) if it is true and a thumbs down (👎) if it is false, and hold it for a moment. The robot checks and moves on.' },
+  },
+  {
+    slug: 'robotu-taklit-et', kind: 'body', emoji: '🤖', color: '#fef9c3',
+    tr: { title: 'Robotu Taklit Et', text: 'Robot bir poz yapar, sen de aynısını yap: robot kollarının ve ellerinin yerini görür.', how: 'Kameradan biraz uzaklaş, omuzların ve ellerin görünsün. Başla\'ya bas. Robotun istediği pozu (iki el yukarı, uçak, sağ ya da sol el yukarı) bir saniye tut. 45 saniyede kaç poz?' },
+    en: { title: 'Copy the Robot', text: 'The robot strikes a pose and you copy it: it sees where your arms and hands are.', how: 'Step back so your shoulders and hands are visible. Press Start. Hold the pose the robot asks for (both hands up, plane, right or left hand up) for a second. How many poses in 45 seconds?' },
   },
 ]
 
 export const lessonOf = (n: number) => LESSONS.find((l) => l.n === n)
+export const GAME_KIND_LABEL: Record<GameKind, { tr: string; en: string }> = { face: { tr: 'Yüz', en: 'Face' }, hand: { tr: 'El', en: 'Hand' }, body: { tr: 'Vücut', en: 'Body' } }
 export const gameOf = (slug: string) => GAMES.find((g) => g.slug === slug)

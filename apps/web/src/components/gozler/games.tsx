@@ -1,12 +1,13 @@
 'use client'
-// "Robotun Gözleri" kamera oyunları: yüz ifadesi (FaceLandmarker + blendshapes), taş-kâğıt-makas (GestureRecognizer),
+// "Robotun Gözleri" kamera oyunları (ilk üçü; diğerleri games-more.tsx): yüz ifadesi (FaceLandmarker + blendshapes), taş-kâğıt-makas (GestureRecognizer),
 // balon patlatma (PoseLandmarker). Modeller ve wasm /mediapipe altından; görüntü cihazda işlenir, hiçbir yere gönderilmez.
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { readFace, type FaceK } from '@/lib/gozler-logic'
 
-type L = 'tr' | 'en'
-const T = (l: L, tr: string, en: string) => (l === 'en' ? en : tr)
+export type L = 'tr' | 'en'
+export const T = (l: L, tr: string, en: string) => (l === 'en' ? en : tr)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Any = any
+export type Any = any
 
 let filesetP: Promise<{ v: Any; fs: Any }> | null = null
 function fileset() {
@@ -21,10 +22,10 @@ export async function createModel(kind: 'face' | 'gesture' | 'pose'): Promise<An
   return withDelegate((d) => v.PoseLandmarker.createFromOptions(fs, { baseOptions: { modelAssetPath: '/mediapipe/pose_landmarker_lite.task', delegate: d }, runningMode: 'VIDEO', numPoses: 1 }))
 }
 
-type Phase = 'idle' | 'loading' | 'on' | 'denied' | 'error'
+export type Phase = 'idle' | 'loading' | 'on' | 'denied' | 'error'
 
 /** Kamera + model + çizim döngüsü. `frame(ctx, W, H, result, t)` her karede çağrılır (görüntü aynalanmış çizilir). */
-function useCameraGame(kind: 'face' | 'gesture' | 'pose', frame: (ctx: CanvasRenderingContext2D, W: number, H: number, res: Any, t: number) => void) {
+export function useCameraGame(kind: 'face' | 'gesture' | 'pose', frame: (ctx: CanvasRenderingContext2D, W: number, H: number, res: Any, t: number) => void) {
   const video = useRef<HTMLVideoElement>(null), canvas = useRef<HTMLCanvasElement>(null)
   const [phase, setPhase] = useState<Phase>('idle')
   const frameRef = useRef(frame); frameRef.current = frame
@@ -59,7 +60,7 @@ function useCameraGame(kind: 'face' | 'gesture' | 'pose', frame: (ctx: CanvasRen
   return { video, canvas, phase, start }
 }
 
-function CameraShell({ lang, phase, start, video, canvas, children }: { lang: L; phase: Phase; start: () => void; video: React.RefObject<HTMLVideoElement | null>; canvas: React.RefObject<HTMLCanvasElement | null>; children?: React.ReactNode }) {
+export function CameraShell({ lang, phase, start, video, canvas, children }: { lang: L; phase: Phase; start: () => void; video: React.RefObject<HTMLVideoElement | null>; canvas: React.RefObject<HTMLCanvasElement | null>; children?: React.ReactNode }) {
   return (
     <div className="gz-cam">
       <div className="gz-cam-stage">
@@ -79,23 +80,13 @@ function CameraShell({ lang, phase, start, video, canvas, children }: { lang: L;
   )
 }
 
-const dot = (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, c: string) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill() }
+export const dot = (ctx: CanvasRenderingContext2D, x: number, y: number, r: number, c: string) => { ctx.fillStyle = c; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill() }
 
 // ---------------------------------------------------------------- Yüz Aynası
 const FACES = [
   { k: 'smile', emoji: '😄', tr: 'Gülümse', en: 'Smile' }, { k: 'surprise', emoji: '😮', tr: 'Şaşır', en: 'Look surprised' },
   { k: 'angry', emoji: '😠', tr: 'Kızgın ol', en: 'Look angry' }, { k: 'wink', emoji: '😉', tr: 'Göz kırp', en: 'Wink' },
 ] as const
-type FaceK = (typeof FACES)[number]['k'] | 'neutral'
-function readFace(bs: Array<{ categoryName: string; score: number }>): FaceK {
-  const s = (n: string) => bs.find((b) => b.categoryName === n)?.score ?? 0
-  const blinkL = s('eyeBlinkLeft'), blinkR = s('eyeBlinkRight')
-  if ((blinkL > 0.55) !== (blinkR > 0.55) && Math.abs(blinkL - blinkR) > 0.35) return 'wink'
-  if (s('jawOpen') > 0.35 && s('browInnerUp') > 0.25) return 'surprise'
-  if ((s('mouthSmileLeft') + s('mouthSmileRight')) / 2 > 0.5) return 'smile'
-  if ((s('browDownLeft') + s('browDownRight')) / 2 > 0.35) return 'angry'
-  return 'neutral'
-}
 export function FaceMirror({ lang }: { lang: L }) {
   const [now, setNow] = useState<FaceK>('neutral')
   const [target, setTarget] = useState(0)
@@ -132,7 +123,7 @@ export function FaceMirror({ lang }: { lang: L }) {
 const RPS = { Closed_Fist: 0, Open_Palm: 1, Victory: 2 } as const
 const RPS_E = ['✊', '✋', '✌️']
 const RPS_N: Record<L, string[]> = { tr: ['Taş', 'Kâğıt', 'Makas'], en: ['Rock', 'Paper', 'Scissors'] }
-const HAND = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [17, 18], [18, 19], [19, 20], [0, 17]]
+export const HAND = [[0, 1], [1, 2], [2, 3], [3, 4], [0, 5], [5, 6], [6, 7], [7, 8], [5, 9], [9, 10], [10, 11], [11, 12], [9, 13], [13, 14], [14, 15], [15, 16], [13, 17], [17, 18], [18, 19], [19, 20], [0, 17]]
 export function RockPaperScissors({ lang }: { lang: L }) {
   const [seen, setSeen] = useState<number | null>(null)
   const [count, setCount] = useState<number | null>(null)
@@ -181,7 +172,7 @@ export function RockPaperScissors({ lang }: { lang: L }) {
 // ---------------------------------------------------------------- Balon Patlat
 interface Balloon { x: number; y: number; r: number; c: string; vy: number; pop: number }
 const BCOL = ['#ef4444', '#f59e0b', '#22c55e', '#3b82f6', '#a855f7', '#ec4899']
-const BODY = [[11, 13], [13, 15], [12, 14], [14, 16], [11, 12], [11, 23], [12, 24], [23, 24]]
+export const BODY = [[11, 13], [13, 15], [12, 14], [14, 16], [11, 12], [11, 23], [12, 24], [23, 24]]
 export function BalloonPop({ lang }: { lang: L }) {
   const [score, setScore] = useState(0)
   const [left, setLeft] = useState(0)
@@ -228,4 +219,3 @@ export function BalloonPop({ lang }: { lang: L }) {
   )
 }
 
-export const GAME_COMPONENTS = { 'yuz-aynasi': FaceMirror, 'tas-kagit-makas': RockPaperScissors, 'balon-patlat': BalloonPop } as const

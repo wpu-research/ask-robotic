@@ -95,3 +95,11 @@
 .gz-emoji { font-size: 2.2rem; line-height: 1.1; }
 .gz-privacy { font-size: .9rem; color: var(--muted); margin: 0; max-width: 80ch; }
 @media (prefers-reduced-motion: reduce) { .gz-card:hover, .gz-btn:hover { transform: none; } }
+/* oyun türü etiketi (yüz / el / vücut) ve yeni oyunların göstergeleri */
+.gz-kind { position: absolute; top: 10px; right: 12px; padding: 2px 10px; border-radius: 999px; font-style: normal; font-size: .78rem; font-weight: 800; background: var(--surface); color: var(--gz-ink); box-shadow: var(--shadow-sm); }
+.gz-kind.face { color: #9a5b00; } .gz-kind.hand { color: #1d5f8a; } .gz-kind.body { color: #24683a; }
+.gz-hud-box.wide { flex: 1 1 360px; justify-items: start; text-align: left; }
+.gz-q { font-size: 1.15rem; line-height: 1.4; }
+.gz-inks { display: flex; gap: 6px; margin-top: 4px; }
+.gz-inks button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; }
+.gz-inks button[aria-pressed='true'] { outline: 3px solid var(--gz-ink, #2a1a12); outline-offset: 1px; }
