@@ -8,6 +8,7 @@ import { useActivity } from '@/lib/activity-store'
 import { useDoneIds } from '@/lib/progress-store'
 import { Icon } from './shell/icons'
 import { KindBadge, StatusPill } from './badges'
+import { Art, MODULE_ART } from './kids/art'
 
 export function ModuleCard({ m }: { m: CatalogModule }) {
   const done = useDoneIds()
@@ -19,17 +20,16 @@ export function ModuleCard({ m }: { m: CatalogModule }) {
   const age = ageLabel(m.slug, m.minAge)
   return (
     <Link href={`/moduller/${m.slug}`} className={`mcard track-${m.track}`}>
+      <Art kind={MODULE_ART[m.slug] ?? 'blok'} className="mcard-art" />
       <div className="mcard-top">
-        <span className="mcard-no">Modül {m.position}</span>
+        <span className="mcard-no">{age ?? `${ids.length} ders`}</span>
         <KindBadge kind={m.kind} />
       </div>
       <h3>{m.title}</h3>
       <p className="mcard-desc">{m.tagline}</p>
       <ul className="facts" aria-label="Modül bilgisi">
         <li>{ids.length} ders</li>
-        <li>{m.weeks.length} hafta</li>
         <li>~{hoursLabel(minutes)}</li>
-        {age && <li>{age}</li>}
       </ul>
       <div className="mcard-foot">
         <div className="progress">

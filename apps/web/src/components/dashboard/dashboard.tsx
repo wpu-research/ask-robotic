@@ -12,6 +12,9 @@ import { LessonKindBadge } from '../badges'
 import { ModuleCard, SoonCard } from '../module-card'
 import { Icon, type IconName } from '../shell/icons'
 import { HomeHero } from './home-hero'
+import { Mascot } from '../lesson-v2/mascot'
+import { WorkshopCards } from '../kids/workshop-cards'
+import { useSession } from '@/lib/session'
 
 const MODE_TEXT: Record<'resume' | 'next' | 'start', MessageKey> = { resume: 'home.continue.resume', next: 'home.continue.next', start: 'home.continue.start' }
 const BTN_TEXT: Record<'resume' | 'next' | 'start', MessageKey> = { resume: 'home.continue.btnResume', next: 'home.continue.btnNext', start: 'home.continue.btnStart' }
@@ -200,57 +203,34 @@ function Feed({ catalog }: { catalog: CatalogModule[] }) {
   )
 }
 
-const TOOLS: { href: string; icon: IconName; k: 'blocks' | 'lab' | 'arena' | 'games' | 'micro' | 'gameStudio' | 'stage' | 'ai' | 'parts' }[] = [
-  { href: '/atolye', icon: 'atolye', k: 'blocks' },
-  { href: '/laboratuvar', icon: 'laboratuvar', k: 'lab' },
-  { href: '/arena', icon: 'arena', k: 'arena' },
-  { href: '/oyunlar', icon: 'oyun', k: 'games' },
-  { href: '/mikro-kart', icon: 'mikro', k: 'micro' },
-  { href: '/oyun-atolyesi', icon: 'oyun', k: 'gameStudio' },
-  { href: '/sahne-atolyesi', icon: 'sahne', k: 'stage' },
-  { href: '/ai-atolyesi', icon: 'ai', k: 'ai' },
-  { href: '/parcalar', icon: 'parcalar', k: 'parts' },
-]
-
-function QuickTools() {
-  const tr = useT()
-  return (
-    <section aria-labelledby="arac-b">
-      <h2 id="arac-b" className="section-title">{tr('home.tools.title')}</h2>
-      <div className="tools">
-        {TOOLS.map((t) => (
-          <Link key={t.href} href={t.href} className="tool">
-            <span className="tool-icon" aria-hidden="true"><Icon name={t.icon} size={24} /></span>
-            <span><b>{tr(`home.tools.${t.k}`)}</b><small>{tr(`home.tools.${t.k}Text`)}</small></span>
-            <Icon name="arrowRight" size={18} className="tool-go" />
-          </Link>
-        ))}
-      </div>
-    </section>
-  )
-}
-
 export function Dashboard({ catalog, league }: { catalog: CatalogModule[]; /** Sınıf ligi kartı (sunucu bileşeni; giriş açıkken). */ league?: ReactNode }) {
   const t = useT()
+  const session = useSession()
   const soon = UPCOMING.filter((u) => !catalog.some((m) => m.slug === u.slug))
+  const first = session.user?.name?.split(' ')[0]
   return (
     <div className="page dash">
-      <header className="page-title">
-        <h1>{t('home.title')}</h1>
-        <p className="muted">{t('home.subtitle')}</p>
+      <header className="kid-hello">
+        <Mascot size={64} mood="happy" />
+        <div>
+          <h1>{first ? t('home.kids.helloName', { name: first }) : t('home.kids.hello')}</h1>
+          <p className="muted">{t('home.kids.lead')}</p>
+        </div>
       </header>
 
       <HomeHero catalog={catalog} />
       {league}
 
-      <div className="dash-top">
-        <ContinueCard catalog={catalog} />
-        <Ring catalog={catalog} />
-      </div>
-
-      <section aria-labelledby="mod-b">
+      <section aria-labelledby="atolye-b" className="kid-section">
         <div className="section-head">
-          <h2 id="mod-b" className="section-title">{t('home.modules')}</h2>
+          <div><h2 id="atolye-b" className="section-title">{t('home.kids.workshops')}</h2><p className="muted kid-sub">{t('home.kids.workshopsLead')}</p></div>
+        </div>
+        <WorkshopCards />
+      </section>
+
+      <section aria-labelledby="mod-b" className="kid-section">
+        <div className="section-head">
+          <h2 id="mod-b" className="section-title">{t('home.kids.lessons')}</h2>
           <Link href="/moduller" className="link-more">{t('home.seeAll')} <Icon name="arrowRight" size={16} /></Link>
         </div>
         {catalog.length === 0 ? (
@@ -263,14 +243,20 @@ export function Dashboard({ catalog, league }: { catalog: CatalogModule[]; /** S
         )}
       </section>
 
-      <div className="dash-two">
-        <WeekPlan catalog={catalog} />
-        <Feed catalog={catalog} />
-      </div>
-
-      <QuickTools />
-
-      <Stats catalog={catalog} />
+      <details className="dash-more">
+        <summary>{t('home.kids.more')}</summary>
+        <div className="dash-more-body">
+          <div className="dash-top">
+            <ContinueCard catalog={catalog} />
+            <Ring catalog={catalog} />
+          </div>
+          <div className="dash-two">
+            <WeekPlan catalog={catalog} />
+            <Feed catalog={catalog} />
+          </div>
+          <Stats catalog={catalog} />
+        </div>
+      </details>
     </div>
   )
 }

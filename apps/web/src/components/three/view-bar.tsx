@@ -31,15 +31,34 @@ const MODES: [CamMode, string, string][] = [
   ['ustten', 'Üstten', 'Kuşbakışı'],
 ]
 
-/** `cams`: kamera kipleri gösterilsin mi (yalnız arenada gezen robotlar için anlamlı). */
-export function ViewBar({ v, cams = true }: { v: ViewState; cams?: boolean }) {
-  if (!v.supported) return null
+/** Tam ekran (sahne büyütme) durumu; Esc kapatır. */
+export function useFullView(): [boolean, (v: boolean) => void] {
+  const [full, setFull] = useState(false)
+  useEffect(() => {
+    if (!full) return
+    const k = (e: KeyboardEvent) => { if (e.key === 'Escape') setFull(false) }
+    window.addEventListener('keydown', k)
+    document.documentElement.classList.add('v3-lock')
+    return () => { window.removeEventListener('keydown', k); document.documentElement.classList.remove('v3-lock') }
+  }, [full])
+  return [full, setFull]
+}
+
+/** `cams`: kamera kipleri gösterilsin mi (yalnız arenada gezen robotlar için anlamlı). `onFull`: büyüt düğmesi. */
+export function ViewBar({ v, cams = true, full, onFull }: { v: ViewState; cams?: boolean; full?: boolean; onFull?: (v: boolean) => void }) {
+  const big = onFull && (
+    <button type="button" className="v3-full" aria-pressed={!!full} onClick={() => onFull(!full)} data-testid="view-full" title={full ? 'Küçült (Esc)' : 'Büyüt'}>
+      {full ? '✕ Küçült' : '⛶ Büyüt'}
+    </button>
+  )
+  if (!v.supported) return big ? <div className="v3-bar">{big}</div> : null
   return (
     <div className="v3-bar" role="group" aria-label="Görünüm">
       <div className="v3-seg">
         <button type="button" aria-pressed={v.is3d} onClick={() => v.set3d(true)} data-testid="view-3d">3B</button>
         <button type="button" aria-pressed={!v.is3d} onClick={() => v.set3d(false)} data-testid="view-2d">2B</button>
       </div>
+      {big}
       {v.is3d && cams && (
         <div className="v3-seg">
           {MODES.map(([m, label, tip]) => (

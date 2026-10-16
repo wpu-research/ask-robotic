@@ -23,6 +23,8 @@ export interface Stage {
   sun: THREE.DirectionalLight
   /** Her karede çağrılır (render'dan hemen önce). */
   onFrame: ((dt: number) => void) | null
+  /** Tuval boyutu değişince (ör. tam ekran) çağrılır. */
+  onResize: (() => void) | null
   dispose(): void
 }
 
@@ -55,13 +57,14 @@ export function createStage(host: HTMLElement): Stage {
   controls.dampingFactor = 0.12
   controls.maxPolarAngle = Math.PI / 2 - 0.04
 
-  const stage: Stage = { scene, camera, controls, renderer, sun, onFrame: null, dispose }
+  const stage: Stage = { scene, camera, controls, renderer, sun, onFrame: null, onResize: null, dispose }
 
   const resize = () => {
     const w = Math.max(1, host.clientWidth), h = Math.max(1, host.clientHeight)
     renderer.setSize(w, h, false)
     camera.aspect = w / h
     camera.updateProjectionMatrix()
+    stage.onResize?.()
   }
   const ro = new ResizeObserver(resize)
   ro.observe(host)
@@ -128,7 +131,12 @@ export function applyCamera(stage: Stage, mode: CamMode, area: { w: number; h: n
     const hgt = (size / 2) / Math.tan((camera.fov * Math.PI) / 360) * 1.15
     camera.position.set(cx, hgt, cz + 0.001)
   } else {
-    camera.position.set(cx - size * 0.05, size * 0.5, cz + size * 0.72)
+    // Arenayı genişlik ve derinlikte tam sığdır: ekran ne kadar büyükse robot o kadar büyük görünür.
+    const vf = (camera.fov * Math.PI) / 180
+    const hf = 2 * Math.atan(Math.tan(vf / 2) * camera.aspect)
+    const elev = (40 * Math.PI) / 180
+    const dist = Math.max((area.w / 2) / Math.tan(hf / 2), (area.h * Math.sin(elev) * 0.62) / Math.tan(vf / 2)) * 1.04
+    camera.position.set(cx, Math.sin(elev) * dist, cz + Math.cos(elev) * dist)
   }
   controls.target.set(cx, 0, cz)
   camera.lookAt(controls.target)

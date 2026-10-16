@@ -40,45 +40,29 @@ export function RobotStudio() {
     })
   }, [mission])
 
+  const card = (id: string, title: string, sub: string, active: boolean, onClick: () => void, testid: string, isDone = false) => (
+    <li key={id}>
+      <button className="rb-card" aria-current={active} onClick={onClick} data-testid={testid}>
+        <b>{title}{isDone && <span className="rb-done" aria-label="tamamlandı"> ✓</span>}</b>
+        <small>{sub}</small>
+      </button>
+    </li>
+  )
+
   return (
     <div className="rb-studio">
       <nav className="rb-pick" aria-label="Görevler">
-        <h2>Görevler</h2>
-        <ul>
-          {ROBOT_MISSIONS.map((m) => (
-            <li key={m.id}>
-              <button aria-current={pick.kind === 'mission' && pick.id === m.id} onClick={() => setPick({ kind: 'mission', id: m.id })} data-testid={`robot-mission-${m.id}`}>
-                <b>{m.title} {done.has(m.id) && <span className="rb-done" aria-label="tamamlandı">✓</span>}</b>
-                <small>{ROBOT_PROFILES[m.profile].title}</small>
-              </button>
-            </li>
-          ))}
-        </ul>
-        <h2>Sanal beceri</h2>
-        <ul>
-          {SKILL_CHALLENGES.map((c) => (
-            <li key={c.id}>
-              <button aria-current={pick.kind === 'skill' && pick.id === c.id} onClick={() => setPick({ kind: 'skill', id: c.id })} data-testid={`robot-skill-${c.id}`}>
-                <b>{c.title}</b>
-                <small>{ROBOT_PROFILES[c.profile].title} · {c.timeLimitS} sn · puanlı</small>
-              </button>
-            </li>
-          ))}
-        </ul>
-        <h2>Serbest arena</h2>
-        <ul>
-          {(['blok', 'gezgin'] as const).map((p) => (
-            <li key={p}>
-              <button aria-current={pick.kind === 'free' && pick.profile === p} onClick={() => setPick({ kind: 'free', profile: p })} data-testid={`robot-free-${p}`}>
-                <b>{ROBOT_PROFILES[p].title}</b>
-                <small>Çizgi pisti, renkli alanlar, engel</small>
-              </button>
-            </li>
-          ))}
-        </ul>
-        <div className="rb-profiles">
-          <h2>Gövdeler</h2>
-          {(['blok', 'gezgin'] as const).map((p) => <p key={p} className="rb-profile"><b>{ROBOT_PROFILES[p].title}:</b> {ROBOT_PROFILES[p].summary}</p>)}
+        <div className="rb-row">
+          <h2>Görevler</h2>
+          <ul>{ROBOT_MISSIONS.map((m) => card(m.id, m.title, ROBOT_PROFILES[m.profile].title, pick.kind === 'mission' && pick.id === m.id, () => setPick({ kind: 'mission', id: m.id }), `robot-mission-${m.id}`, done.has(m.id)))}</ul>
+        </div>
+        <div className="rb-row">
+          <h2>Sanal beceri</h2>
+          <ul>{SKILL_CHALLENGES.map((c) => card(c.id, c.title, `${ROBOT_PROFILES[c.profile].title} · ${c.timeLimitS} sn · puanlı`, pick.kind === 'skill' && pick.id === c.id, () => setPick({ kind: 'skill', id: c.id }), `robot-skill-${c.id}`))}</ul>
+        </div>
+        <div className="rb-row">
+          <h2>Serbest arena</h2>
+          <ul>{(['blok', 'gezgin'] as const).map((p) => card(p, ROBOT_PROFILES[p].title, ROBOT_PROFILES[p].sensors.length === 3 ? 'mesafe · renk · tampon' : 'mesafe · iki çizgi sensörü', pick.kind === 'free' && pick.profile === p, () => setPick({ kind: 'free', profile: p }), `robot-free-${p}`))}</ul>
         </div>
       </nav>
       <div className="rb-ed">

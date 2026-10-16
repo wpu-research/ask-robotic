@@ -21,26 +21,22 @@
 .rb-readout b { color: var(--text); }
 .rb-readout .bad { color: var(--warn); font-weight: 700; }
 
-.rb-studio { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 16px; min-height: 0; height: 100%; }
-.rb-pick { display: grid; gap: 12px; align-content: start; overflow-y: auto; min-height: 0; }
-.rb-pick h2 { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
-.rb-pick ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.rb-pick button { width: 100%; text-align: left; display: grid; gap: 2px; padding: 10px 12px; border-radius: var(--radius-xs); border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font: inherit; }
-.rb-pick button:hover { border-color: var(--border-strong); }
-.rb-pick button:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.rb-pick button[aria-current='true'] { border-color: var(--c-maker); box-shadow: inset 3px 0 0 var(--c-maker); }
-.rb-pick small { color: var(--muted); font-size: .78rem; }
-.rb-pick .rb-done { color: var(--ok); font-weight: 700; }
-.rb-profiles { display: grid; gap: 6px; }
-.rb-profile { font-size: .8rem; color: var(--muted); }
-.rb-profile b { color: var(--text); }
+.rb-studio { display: grid; gap: 14px; min-height: 0; }
+.rb-pick { display: grid; gap: 10px; }
+.rb-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: 10px; }
+.rb-row h2 { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
+.rb-row ul { list-style: none; margin: 0; padding: 2px; display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; }
+.rb-row li { flex: none; scroll-snap-align: start; }
+.rb-card { display: grid; gap: 1px; text-align: left; min-width: 150px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font: inherit; box-shadow: var(--shadow-sm); }
+.rb-card:hover { border-color: var(--border-strong); }
+.rb-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.rb-card[aria-current='true'] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.rb-card[aria-current='true'] small { color: inherit; opacity: .85; }
+.rb-card small { color: var(--muted); font-size: .78rem; }
+.rb-done { color: var(--ok); font-weight: 800; }
+.rb-card[aria-current='true'] .rb-done { color: inherit; }
 .rb-ed { min-width: 0; min-height: 0; }
-@media (max-width: 900px) {
-  .rb-studio { grid-template-columns: 1fr; height: auto; }
-  .rb-pick { overflow: visible; }
-  .rb-pick ul { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
-}
-.rb-3d { width: 100%; aspect-ratio: 4 / 3; max-height: 460px; border-radius: var(--radius-xs); overflow: hidden; background: #dde5ef; }
+@media (max-width: 640px) { .rb-row { grid-template-columns: 1fr; gap: 4px; } }
 /* Sanal beceri paneli */
 .rb-ed { display: grid; gap: 12px; align-content: start; }
 .sk-panel { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
@@ -69,3 +65,13 @@
 .sk-board li.me { outline: 2px solid var(--c-maker); }
 .sk-board small { color: var(--muted); }
 .sk-rank { font-weight: 800; text-align: center; }
+/* Robot kipinde sahne büyük: editör ve arena yarı yarıya */
+.mk-robot .mk-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+.mk-robot .rb-3d { aspect-ratio: 4 / 3; max-height: 68vh; }
+.rb-full { position: fixed; inset: 0; z-index: 70; border-radius: 0; border: 0; display: flex; flex-direction: column; padding-block: max(10px, env(safe-area-inset-top, 0px)) max(10px, env(safe-area-inset-bottom, 0px)); padding-left: max(10px, env(safe-area-inset-left, 0px)); padding-right: max(10px, env(safe-area-inset-right, 0px)); }
+.rb-full .rb-3d { flex: 1; aspect-ratio: auto; max-height: none; }
+.rb-full > svg { flex: 1; max-height: calc(100vh - 120px); }
+@media (max-width: 900px) { .mk-robot .mk-main { grid-template-columns: 1fr; } }
+/* Robot sayfası: editör kendi yüksekliğinde (görev satırları ve puan paneli üstte kalır, altbilgiyle çakışmaz) */
+.rb-ed .mk-box { height: max(700px, calc(100dvh - 110px)); }
+@media (max-width: 900px) { .rb-ed .mk-box { height: auto; } }

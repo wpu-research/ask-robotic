@@ -44,6 +44,7 @@ export function RobotArena3D({ robot, device, mode }: { robot: DriveBase; device
     model.group.add(ray)
 
     let visitedN = -1, trailN = -1, lastMode: CamMode | null = null
+    stage.onResize = () => { lastMode = null }
     stage.onFrame = (dt) => {
       const { robot: r, device: d, mode } = live.current
       poseMobile(model, r.x, r.y, r.theta, r.wheelDegL, r.wheelDegR)

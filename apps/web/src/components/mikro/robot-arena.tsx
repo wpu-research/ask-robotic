@@ -4,7 +4,7 @@
 import dynamic from 'next/dynamic'
 import type { Device } from '@/lib/mikro/device'
 import { FLOOR_COLORS, type DriveBase, type LightColor } from '@/lib/mikro/robot'
-import { useView3D, ViewBar } from '../three/view-bar'
+import { useFullView, useView3D, ViewBar } from '../three/view-bar'
 
 const RobotArena3D = dynamic(() => import('./robot-arena-3d').then((m) => m.RobotArena3D), { ssr: false, loading: () => <div className="rb-3d" /> })
 
@@ -14,11 +14,12 @@ const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1' } as
 
 export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: Device; tick: number }) {
   const v = useView3D()
+  const [full, setFull] = useFullView()
   const dist = robot.has('distance') ? robot.distanceCm : null
   const status = robot.collisions ? `${robot.collisions} çarpma` : 'çarpma yok'
   return (
-    <figure className="rb-arena" data-testid="robot-arena" data-tick={tick} data-view={v.is3d ? '3d' : '2d'}>
-      <ViewBar v={v} />
+    <figure className={`rb-arena${full ? ' rb-full' : ''}`} data-testid="robot-arena" data-tick={tick} data-view={v.is3d ? '3d' : '2d'}>
+      <ViewBar v={v} full={full} onFull={setFull} />
       {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} />}
       <figcaption className="rb-readout" aria-live="off">
         {dist != null && <span>mesafe <b>{dist.toFixed(0)} cm</b></span>}

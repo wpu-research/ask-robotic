@@ -1,28 +1,29 @@
-/* ASK Robotic tasarım sistemi: uygulama kabuğu + panel. Açık/koyu tema, 8px ızgara, mobil öncelikli. */
+/* ASK Robotic tasarım sistemi: uygulama kabuğu + panel. Açık/koyu tema, 8px ızgara, mobil öncelikli.
+   Palet Macademia ailesiyle aynı: krem zemin, çikolata kahvesi vurgu, Poppins. */
 :root {
   /* Renk */
-  --bg: #f4f6fb; --surface: #ffffff; --surface-2: #eef1f8; --surface-3: #e4e9f4; --text: #0f172a; --muted: #566075;
-  --border: #dfe4ef; --border-strong: #c6cddd;
-  --primary: #4338ca; --primary-hover: #3730a3; --primary-ink: #ffffff; --primary-soft: #ebeafd;
-  --ok: #047857; --ok-soft: #d6f3e6; --warn: #b45309; --warn-soft: #fdf0d5; --focus: #4338ca;
+  --bg: #fffdf9; --surface: #ffffff; --surface-2: #f8f1e7; --surface-3: #efe3d3; --text: #2a1a12; --muted: #6b5848;
+  --border: #ece2d6; --border-strong: #dccbb7;
+  --primary: #7a4426; --primary-hover: #5f331b; --primary-ink: #ffffff; --primary-soft: #f6e9dc;
+  --ok: #047857; --ok-soft: #d6f3e6; --warn: #b45309; --warn-soft: #fdf0d5; --focus: #7a4426;
   --c-cocuk: #f59e0b; --c-maker: #0d9488; --c-ai: #7c3aed;
   --c-cocuk-ink: #a14a07; --c-maker-ink: #0f6b63; --c-ai-ink: #6d28d9;
   --k-blok: #7c3aed; --k-devre: #0f766e; --k-robot: #c2410c; --k-oyun: #be185d; --k-ai: #6d28d9; --k-metin: #475569;
   --code-bg: #0f172a; --code-text: #e2e8f0; --code-border: #1e293b;
   --hl-keyword: #c4b5fd; --hl-type: #7dd3fc; --hl-string: #86efac; --hl-number: #fdba74; --hl-comment: #7c8aa5; --hl-title: #fda4af; --hl-meta: #fcd34d;
-  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
-  --shadow: 0 1px 2px rgba(15, 23, 42, .05), 0 8px 24px rgba(15, 23, 42, .06);
-  --shadow-lg: 0 24px 64px rgba(15, 23, 42, .22);
+  --shadow-sm: 0 1px 2px rgba(42, 26, 18, .06);
+  --shadow: 0 1px 2px rgba(42, 26, 18, .05), 0 8px 24px rgba(42, 26, 18, .07);
+  --shadow-lg: 0 24px 64px rgba(42, 26, 18, .22);
   /* Biçim */
   --radius: 16px; --radius-sm: 12px; --radius-xs: 8px;
   --sidebar-w: 264px; --sidebar-w-collapsed: 72px; --topbar-h: 64px; --tabbar-h: 64px;
   color-scheme: light;
 }
 :root[data-theme='dark'] {
-  --bg: #0b1020; --surface: #121a2e; --surface-2: #17213a; --surface-3: #1e2a48; --text: #e8ecf6; --muted: #a2aec8;
-  --border: #243050; --border-strong: #34446c;
-  --primary: #818cf8; --primary-hover: #a5b4fc; --primary-ink: #0b1020; --primary-soft: #1e2547;
-  --ok: #34d399; --ok-soft: #12332a; --warn: #fbbf24; --warn-soft: #3a2c0c; --focus: #a5b4fc;
+  --bg: #1b120d; --surface: #241812; --surface-2: #2e2018; --surface-3: #3a2a20; --text: #f6ece2; --muted: #c4ad99;
+  --border: #3d2b20; --border-strong: #574032;
+  --primary: #e0aa76; --primary-hover: #ecc093; --primary-ink: #2a1a12; --primary-soft: #3a2619;
+  --ok: #34d399; --ok-soft: #12332a; --warn: #fbbf24; --warn-soft: #3a2c0c; --focus: #ecc093;
   --c-cocuk-ink: #fbbf24; --c-maker-ink: #5eead4; --c-ai-ink: #c4b5fd;
   --k-blok: #c4b5fd; --k-devre: #5eead4; --k-robot: #fdba74; --k-oyun: #f9a8d4; --k-ai: #c4b5fd; --k-metin: #cbd5e1;
   --code-bg: #0a0f1d; --code-text: #e2e8f0; --code-border: #1c2742;
@@ -33,10 +34,10 @@
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #0b1020; --surface: #121a2e; --surface-2: #17213a; --surface-3: #1e2a48; --text: #e8ecf6; --muted: #a2aec8;
-    --border: #243050; --border-strong: #34446c;
-    --primary: #818cf8; --primary-hover: #a5b4fc; --primary-ink: #0b1020; --primary-soft: #1e2547;
-    --ok: #34d399; --ok-soft: #12332a; --warn: #fbbf24; --warn-soft: #3a2c0c; --focus: #a5b4fc;
+    --bg: #1b120d; --surface: #241812; --surface-2: #2e2018; --surface-3: #3a2a20; --text: #f6ece2; --muted: #c4ad99;
+    --border: #3d2b20; --border-strong: #574032;
+    --primary: #e0aa76; --primary-hover: #ecc093; --primary-ink: #2a1a12; --primary-soft: #3a2619;
+    --ok: #34d399; --ok-soft: #12332a; --warn: #fbbf24; --warn-soft: #3a2c0c; --focus: #ecc093;
     --c-cocuk-ink: #fbbf24; --c-maker-ink: #5eead4; --c-ai-ink: #c4b5fd;
     --k-blok: #c4b5fd; --k-devre: #5eead4; --k-robot: #fdba74; --k-oyun: #f9a8d4; --k-ai: #c4b5fd; --k-metin: #cbd5e1;
     --code-bg: #0a0f1d; --code-text: #e2e8f0; --code-border: #1c2742;
@@ -52,7 +53,7 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0; background: var(--bg); color: var(--text);
-  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-sans, 'Poppins'), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
   line-height: 1.6; font-size: 16px; min-height: 100vh;
 }
 a { color: var(--primary); text-decoration: none; }
@@ -216,6 +217,37 @@ a.mcard:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 
 .mcard-foot { margin-top: auto; padding-top: 16px; display: grid; gap: 12px; }
 .mcard-state { display: flex; align-items: center; justify-content: space-between; }
 .mcard-go { display: inline-flex; align-items: center; gap: 4px; font-size: .88rem; font-weight: 800; color: var(--primary); }
+/* Modül kartı illüstrasyonu (kenardan kenara) */
+.mcard-art { display: block; width: calc(100% + 48px); height: auto; aspect-ratio: 16 / 9; margin: -24px -24px 6px; border-bottom: 1px solid var(--border); }
+.mcard { overflow: hidden; }
+
+/* Çocuk paneli: karşılama + atölye kartları (Macademia program kartı düzeni) */
+.kid-hello { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+.kid-hello h1 { margin: 0; font-size: clamp(1.6rem, 3.2vw, 2.3rem); line-height: 1.15; text-wrap: balance; }
+.kid-hello p { margin: 4px 0 0; }
+.kid-section { display: grid; gap: 12px; }
+.kid-sub { margin: 2px 0 0; font-size: .92rem; }
+.kc-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.kc-card { display: flex; flex-direction: column; height: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; color: var(--text); box-shadow: var(--shadow-sm); transition: transform .12s ease, box-shadow .12s ease; }
+.kc-card:hover { text-decoration: none; transform: translateY(-3px); box-shadow: var(--shadow); }
+.kc-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.kc-art { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; }
+.kc-body { display: grid; gap: 4px; padding: 14px 16px 18px; }
+.kc-body b { font-size: 1.12rem; line-height: 1.25; }
+.kc-meta { font-size: .8rem; font-weight: 700; color: var(--primary); letter-spacing: .02em; }
+.kc-text { color: var(--muted); font-size: .92rem; line-height: 1.45; }
+.dash-more { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
+.dash-more > summary { cursor: pointer; padding: 14px 18px; font-weight: 700; color: var(--muted); }
+.dash-more[open] > summary { border-bottom: 1px solid var(--border); }
+.dash-more-body { display: grid; gap: 24px; padding: 18px; }
+@media (prefers-reduced-motion: reduce) { .kc-card, .mcard { transition: none; } .kc-card:hover { transform: none; } }
+@media (max-width: 560px) {
+  .kc-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .kc-body { padding: 10px 12px 14px; }
+  .kc-body b { font-size: 1rem; }
+  .kc-text { display: none; }
+  .kid-hello { gap: 10px; }
+}
 .mcard-soon { border-style: dashed; border-top-style: solid; background: transparent; box-shadow: none; opacity: .9; }
 .mcard-soon h3 { color: var(--muted); }
 
@@ -743,6 +775,7 @@ a.mcard:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 
   .page { padding: 24px 16px; gap: 24px; }
   .page-tool { padding-top: 16px; }
   .panel, .mcard { padding: 16px; }
+  .mcard-art { width: calc(100% + 32px); margin: -16px -16px 4px; }
   .continue { padding: 24px 16px; }
   .stage { padding: 16px; }
   .stepper .label { display: none; }
@@ -779,3 +812,13 @@ a.mcard:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 
 .arena-stage .v3-bar { position: absolute; top: 8px; left: 8px; right: 8px; z-index: 2; pointer-events: none; }
 .arena-stage .v3-bar .v3-seg { pointer-events: auto; }
 .arena-hud { position: absolute; left: 10px; bottom: 10px; z-index: 2; background: color-mix(in srgb, var(--surface) 85%, transparent); color: var(--text); border-radius: 8px; padding: 4px 10px; font: 700 .85rem/1.4 system-ui, sans-serif; }
+
+/* Sahne büyütme (tam ekran) ve robot düzeni */
+.v3-full { border: 1px solid var(--border); background: var(--surface); color: var(--text); font: 700 .8rem/1 inherit; padding: 8px 12px; border-radius: 999px; cursor: pointer; pointer-events: auto; }
+.v3-full:focus-visible { outline: 2px solid var(--focus); outline-offset: 1px; }
+.v3-full[aria-pressed='true'] { background: var(--primary); color: var(--primary-ink); border-color: transparent; }
+html.v3-lock, html.v3-lock body { overflow: hidden; }
+.arena-stage.is-full { position: fixed; inset: 0; z-index: 70; border-radius: 0; border: 0; display: flex; flex-direction: column; background: var(--surface); }
+.arena-stage.is-full .arena-3d { flex: 1; aspect-ratio: auto; max-height: none; }
+.arena-stage.is-full .arena-svg { max-height: calc(100vh - 24px); margin: auto; }
+.arena-3d { max-height: 70vh; }

@@ -10,6 +10,10 @@ import { ConsentBanner } from '@/components/learn/consent-banner'
 import { I18nProvider } from '@/i18n/client'
 import { getLocale, getT } from '@/i18n/server'
 import type { Metadata } from 'next'
+import { Poppins } from 'next/font/google'
+
+// Macademia ile aynı yazı tipi; Türkçe karakterler için latin-ext.
+const poppins = Poppins({ subsets: ['latin', 'latin-ext'], weight: ['400', '500', '600', '700', '800'], variable: '--font-sans', display: 'swap' })
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT()
@@ -25,7 +29,7 @@ const bootScript = `try{var d=document.documentElement,t=localStorage.getItem('a
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const locale = await getLocale()
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className={poppins.variable} suppressHydrationWarning>
       <head><script dangerouslySetInnerHTML={{ __html: bootScript }} /></head>
       <body>
         <I18nProvider locale={locale}>

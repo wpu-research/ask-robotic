@@ -1,5 +1,5 @@
 /* Tanıtım ana sayfası ("/", ziyaretçi). Brilliant ana sayfası ritmi: büyük başlık, bol boşluk, sade kartlar. */
-.ld { max-width: 1200px; margin: 0 auto; padding: 24px 24px 64px; color: var(--v2-ink); }
+.ld { max-width: 1200px; margin: 0 auto; padding: 24px 24px 64px; color: var(--v2-ink); overflow-x: clip; }
 .ld h1, .ld h2 { letter-spacing: -.025em; }
 
 .ld-hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 48px; align-items: center; padding: 48px 0 40px; }
@@ -11,7 +11,7 @@
 .ld-cta-sub { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-top: 18px; font-size: .92rem; }
 
 .ld-demo { padding: 22px; border-radius: 28px; background: var(--surface); border: 1px solid var(--border); box-shadow: 0 30px 80px rgba(76, 29, 149, .14); display: grid; gap: 14px; position: relative; }
-.ld-demo::before { content: ''; position: absolute; inset: -40px -30px auto auto; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(124, 58, 237, .18), transparent 70%); z-index: -1; }
+.ld-demo::before { content: ''; position: absolute; inset: -40px -30px auto auto; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(circle, rgba(122, 68, 38, .16), transparent 70%); z-index: -1; }
 .ld-demo-head { display: flex; gap: 12px; align-items: center; }
 .ld-demo-head small { display: block; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; font-size: .7rem; color: var(--v2-accent); }
 .ld-demo-head b { font-size: 1.05rem; }
@@ -99,7 +99,7 @@
 .ld-week .charge i { background: #dcfce7; border-color: #4ade80; }
 .ld-goal { display: grid; gap: 6px; font-weight: 700; font-size: .92rem; }
 
-.ld-schools { padding: 40px; margin-top: 64px; border-radius: 30px; background: linear-gradient(135deg, #1e1b4b, #4c1d95); color: #fff; }
+.ld-schools { padding: 40px; margin-top: 64px; border-radius: 30px; background: linear-gradient(135deg, #2a1a12, #7a4426); color: #fff; }
 .ld-schools .ld-sub { color: #ddd6fe; }
 .ld-pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
 .ld-pills li { padding: 6px 14px; border-radius: 999px; background: rgba(255, 255, 255, .12); font-weight: 700; font-size: .9rem; }

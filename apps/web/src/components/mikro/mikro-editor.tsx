@@ -250,7 +250,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
   const allowed = activity?.allowedBlocks ?? null
 
   return (
-    <div className="mk-box"><div className="mk-ed" data-testid="mikro-editor" data-running={running}>
+    <div className="mk-box"><div className={`mk-ed${robot ? ' mk-robot' : ''}`} data-testid="mikro-editor" data-running={running}>
       {/* üst çubuk */}
       <div className="mk-bar" role="toolbar" aria-label="Mikro Kart araçları">
         <div className="mk-run">

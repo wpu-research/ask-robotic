@@ -4,6 +4,8 @@ import { BANDS, bandText, TOPICS, topicText } from '@/lib/learning-paths'
 import { Mascot } from '@/components/lesson-v2/mascot'
 import { dictionaries, type Locale } from '@/i18n'
 import { ContinueLink, HeroDemo, MeetTabs } from './landing-client'
+import { WorkshopCards } from '@/components/kids/workshop-cards'
+import { WORKSHOPS } from '@/components/kids/workshops'
 import '@/app/landing.css'
 
 const BAND_ART = ['🧩', '🎮', '🔆', '💡', '🤖']
@@ -15,6 +17,7 @@ const BAND_ART = ['🧩', '🎮', '🔆', '💡', '🤖']
  */
 export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; parts: number; locale: Locale }) {
   const L = dictionaries[locale].landing
+  const H = dictionaries[locale].home
   const lessons = catalog.reduce((n, m) => n + m.weeks.reduce((k, w) => k + w.lessons.length, 0), 0)
   const stats = [
     { v: String(lessons), l: L.stats.lessons },
@@ -41,6 +44,12 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
       <ul className="ld-stats" aria-label="ASK Robotic">
         {stats.map((s) => <li key={s.l}><b>{s.v}</b><span>{s.l}</span></li>)}
       </ul>
+
+      <section className="ld-section" aria-labelledby="ld-atolye">
+        <h2 id="ld-atolye" className="ld-h2">{H.kids.workshops}</h2>
+        <p className="ld-sub">{H.kids.workshopsLead}</p>
+        <WorkshopCards items={WORKSHOPS.slice(0, 8)} />
+      </section>
 
       <section className="ld-section">
         <div className="ld-title"><Mascot size={56} mood="happy" /><div><h2>{L.meet.title}</h2><p>{L.meet.lead}</p></div></div>

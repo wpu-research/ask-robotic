@@ -13,7 +13,7 @@ export interface SimPanelProps {
   onToggleTwo(): void
   muted: boolean
   onMute(): void
-  /** Robot Atölyesi: ikinci kart ve radyo bölümü gösterilmez. */
+  /** Robot Atölyesi: ikinci kart, radyo ve kart sensörü (ivme, pusula, pin) denetimleri gösterilmez. */
   noRadio?: boolean
 }
 
@@ -96,6 +96,7 @@ export function SimPanel({ sim, tick, bump, twoCards, onToggleTwo, muted, onMute
         </div>
       )}
 
+      {!noRadio && <>
       <details open>
         <summary>Hareket (ivmeölçer)</summary>
         <div className="mk-grid-btns">
@@ -141,6 +142,7 @@ export function SimPanel({ sim, tick, bump, twoCards, onToggleTwo, muted, onMute
           )
         })}
       </details>
+      </>}
 
       {!noRadio && <details open={twoCards}>
         <summary>Radyo</summary>

@@ -94,6 +94,7 @@ function buildRover(stage: Stage, live: { current: Props }): Built {
   el.addEventListener('pointerleave', up)
 
   let angL = 0, angR = 0, lastT = snap0.timeS, visitedN = -1, lastMode: CamMode | null = null
+  stage.onResize = () => { lastMode = null }
   return {
     frame(p, dt) {
       const snap = p.snap as RoverSnapshot
