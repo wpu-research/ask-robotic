@@ -14,6 +14,7 @@ export default async function Parcalar() {
   return (
     <div className="page">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.learning')}</p>
         <h1>{t('content.parts.title')}</h1>
         <p className="muted">{t('content.parts.intro', { n: guides.length })}</p>
       </header>

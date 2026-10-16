@@ -14,6 +14,7 @@ export default async function Arena() {
   return (
     <div className="page page-tool">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.adults')}</p>
         <h1>{t('lab.arena.page.title')}</h1>
         <p className="muted">{t('lab.arena.page.intro')}</p>
       </header>

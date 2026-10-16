@@ -12,6 +12,7 @@ export default async function AiAtolyesi() {
   return (
     <div className="page page-tool">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.adults')}</p>
         <h1>{t('studios.ai.page.title')}</h1>
         <p className="muted">
           {t('studios.ai.page.intro')}

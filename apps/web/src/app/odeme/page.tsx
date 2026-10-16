@@ -48,6 +48,7 @@ export default async function Odeme({ searchParams }: { searchParams: Promise<{ 
   return (
     <div className="page co">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.nav.pricing')}</p>
         <h1>{t('pricing.checkout.title')}</h1>
         <p className="muted">{t('pricing.checkout.lead')}</p>
       </header>

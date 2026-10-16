@@ -35,6 +35,7 @@ export function TopicsView({ catalog: catalogTr }: { catalog: CatalogModule[] })
   return (
     <div className="page topics">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.mnav.programs')}</p>
         <h1>{t('topics.title')}</h1>
         <p className="muted">{t('topics.intro')}</p>
       </header>

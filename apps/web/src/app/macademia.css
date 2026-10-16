@@ -194,6 +194,67 @@ h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -.01em; }
 .crumbs a { color: inherit; text-decoration: none; }
 .crumbs a:hover { color: var(--brand); }
 
+/* ---------- İç sayfalar (Macademia program sayfası ölçüleri) ----------
+   Sayfa CSS'leri (muhendislik.css, gozler.css…) bu dosyadan sonra yüklenir; geçersiz kılmalar .mx-shell önekiyle. */
+.mx-shell .page { padding: 40px var(--gutter-r) 88px var(--gutter-l); gap: 36px; }
+.mx-shell .page-tool { padding-top: 28px; padding-bottom: 56px; gap: 18px; }
+.mx-shell .page-title { display: grid; gap: 0; justify-items: start; }
+.mx-shell .page-title > * { max-width: 100%; }
+.mx-shell .page-title h1 { font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -.01em; margin: 10px 0 12px; }
+.mx-shell .page-title > p:not(.eyebrow), .mx-shell .page-title .lead { font-size: 17px; color: var(--muted); max-width: 66ch; margin: 0; }
+.mx-shell .page-tool .page-title h1 { font-size: clamp(26px, 3vw, 34px); margin: 8px 0 8px; }
+.mx-shell .page-tool .page-title > p:not(.eyebrow) { font-size: 15px; }
+.mx-shell .crumbs { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 13px; color: var(--muted); }
+.mx-shell .crumbs svg { color: var(--muted); opacity: .7; }
+.mx-shell .panel { border-color: var(--line); box-shadow: none; }
+.mx-shell .v2-eyebrow { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+
+/* Mühendislik yolu ve ESOF 323: turkuaz yerine Macademia kahvesi, eşaralıklı başlık sayıları yerine Poppins rakamları */
+.mx-shell .eng { --eng: var(--brand); --eng-soft: var(--brand-soft); --k-devre: var(--brand); --mono: var(--font-sans, 'Poppins'), system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+.mx-shell .eng .eyebrow { color: var(--brand); }
+.mx-shell .eng-hero h1, .mx-shell .eng-lv-head h1, .mx-shell .rb-hero h1, .mx-shell .eng-part-head h1 { font-size: clamp(30px, 4vw, 44px); font-weight: 700; }
+.mx-shell .eng-hero .lead, .mx-shell .eng-lv-head .lead, .mx-shell .rb-hero .lead { font-size: 17px; color: var(--muted); }
+.mx-shell .eng-level { box-shadow: none; border-color: var(--line); }
+.mx-shell .eng-level:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.mx-shell .eng-level-n { border-radius: 50%; border: 0; background: var(--brand-soft); color: var(--brand); font-weight: 700; }
+.mx-shell .eng-path::before { background: var(--line); }
+.mx-shell .rb-code-big { color: var(--brand); font-weight: 800; }
+.mx-shell .rb-sim { --sim-a: #7a4426; box-shadow: none; border-color: var(--line); }
+.mx-shell .eng-chip { border-radius: 999px; background: var(--surface); border-color: var(--line); }
+
+/* Okullar: Macademia kahraman bandı gibi krem zemin, düz köşeler */
+.mx-shell .sc-hero { background: var(--bg-soft); border-radius: var(--radius); padding: 56px 48px; position: relative; overflow: hidden; }
+.mx-shell .sc-hero::after { content: ""; position: absolute; width: 360px; height: 360px; right: -120px; top: -140px; border-radius: 50%; border: 50px solid var(--brand); opacity: .07; pointer-events: none; }
+.mx-shell .sc-hero h1 { font-size: clamp(32px, 4.4vw, 48px); font-weight: 700; }
+.mx-shell .sc-card { border-radius: var(--radius); border-color: var(--line); box-shadow: none; }
+
+/* Robotun Gözleri */
+.mx-shell .gz-hero-art { border-radius: var(--radius); }
+.mx-shell .gz-hero h1 { font-size: clamp(32px, 4.4vw, 48px); font-weight: 700; }
+
+/* Fiyatlar: Macademia bölüm başlığı gibi sola hizalı */
+.mx-shell .pr-hero { text-align: left; justify-items: start; }
+.mx-shell .pr-hero h1 { font-size: clamp(32px, 4.4vw, 48px); font-weight: 700; }
+.mx-shell .pr-hero p { color: var(--muted); font-size: 17px; }
+
+/* Seviye tespiti ve giriş ekranları: tam ekran kaplama değil, Macademia'daki gibi başlık ve alt bilgi arasında krem bant */
+.mx-shell .ob { position: static; inset: auto; z-index: auto; background: var(--bg-soft); min-height: min(760px, calc(100dvh - 116px)); }
+.mx-shell .ob-body { overflow: visible; }
+.mx-shell .au-field input, .mx-shell .au-field select { border-radius: var(--radius); border-width: 1px; border-color: var(--line); min-height: 46px; }
+.mx-shell .au-field input:focus, .mx-shell .au-field select:focus { border-color: var(--brand); }
+.mx-shell .ob-card { border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface); }
+.mx-shell .ob-card.on { border-color: var(--brand); box-shadow: inset 0 0 0 1px var(--brand); }
+
+/* Parça kartları ve modül kartları: Macademia kartı (ince çizgi, gölgesiz; vurgu kahve) */
+.mx-shell .part-card { border-top: 3px solid var(--brand); box-shadow: none; border-color: var(--line); }
+.mx-shell .mcard { box-shadow: none; border-color: var(--line); border-top-width: 3px; }
+.mx-shell .v2-progress { height: 6px; border-radius: 3px; background: var(--line); }
+.mx-shell .v2-progress > div { background: var(--brand); border-radius: 3px; }
+.mx-shell .page-tool { max-width: 1240px; }
+
+/* Öğretmen paneli başlıkları */
+.mx-shell .og-head h1 { font-size: clamp(28px, 3.4vw, 38px); font-weight: 700; }
+
 /* Atölye kartları (kids/workshop-cards) Macademia kartı gibi */
 .kc-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 24px; }
 .kc-card { border-color: var(--line); border-radius: var(--radius); box-shadow: none; transition: box-shadow .25s, transform .25s; }

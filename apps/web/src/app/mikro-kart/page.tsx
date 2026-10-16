@@ -13,6 +13,7 @@ export default async function MikroKart() {
   return (
     <div className="page page-tool">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.kids')}</p>
         <h1>{t('mikro.pages.cardTitle')}</h1>
         <p className="muted">{t('mikro.pages.cardIntro')}</p>
       </header>

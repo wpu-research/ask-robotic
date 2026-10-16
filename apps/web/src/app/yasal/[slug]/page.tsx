@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { LEGAL_LINKS } from '@/components/pricing/legal-links'
+import { LEGAL_LINKS } from '@/lib/legal-links'
 import { LEGAL } from '../metinler'
 import '../../odeme.css'
 

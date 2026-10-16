@@ -17,6 +17,7 @@ export default async function Oyunlar() {
   return (
     <div className="page">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.kids')}</p>
         <h1>{t('studios.games.page.title')}</h1>
         <p className="muted">{t('studios.games.page.intro')}</p>
       </header>

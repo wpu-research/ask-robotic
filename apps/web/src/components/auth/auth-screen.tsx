@@ -8,11 +8,11 @@ import './auth.css'
 export async function AuthScreen({ title, lead, mood = 'happy', children }: { title: string; lead?: ReactNode; mood?: Mood; children: ReactNode }) {
   const t = await getT()
   return (
-    <div className="ob" role="dialog" aria-modal="true" aria-label={title}>
+    <section className="ob" aria-label={title}>
       <header className="ob-top">
         <Link href="/" className="v2-icon-btn" aria-label={t('auth.close')}>✕</Link>
       </header>
-      <main className="ob-body">
+      <div className="ob-body">
         <div className="au-card">
           <div className="au-head">
             <Mascot size={88} mood={mood} />
@@ -21,8 +21,8 @@ export async function AuthScreen({ title, lead, mood = 'happy', children }: { ti
           </div>
           {children}
         </div>
-      </main>
-    </div>
+      </div>
+    </section>
   )
 }
 

@@ -17,6 +17,7 @@ export default async function Moduller() {
   return (
     <div className="page">
       <header className="page-title">
+        <p className="eyebrow">{tr('shell.mnav.programs')}</p>
         <h1>{tr('moduleView.listTitle')}</h1>
         <p className="muted">{tr('moduleView.listIntro')}</p>
       </header>

@@ -90,6 +90,7 @@ export default async function Laboratuvar({ searchParams }: { searchParams: Sear
   return (
     <div className="page page-tool">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.adults')}</p>
         <h1>{t('lab.page.title')}</h1>
         <p className="muted">{t('lab.page.intro')}</p>
       </header>

@@ -22,6 +22,7 @@ export function TestsView({ quizLessons }: { quizLessons: QuizLessonInfo[] }) {
   return (
     <div className="page">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.learning')}</p>
         <h1>{t('content.tests.title')}</h1>
         <p className="muted">{t('content.tests.intro')}</p>
       </header>

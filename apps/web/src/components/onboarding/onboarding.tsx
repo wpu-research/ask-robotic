@@ -72,7 +72,7 @@ export function Onboarding({ courses }: { courses: CourseInfo[] }) {
   const recTopic = topicText(rec.topic, locale)
 
   return (
-    <div className="ob" role="dialog" aria-modal="true" aria-label={t('onboarding.dialogLabel')}>
+    <section className="ob" aria-label={t('onboarding.dialogLabel')}>
       <header className="ob-top">
         {history.length > 0 && screen !== 'building' && screen !== 'plan'
           ? <button type="button" className="v2-icon-btn" onClick={back} aria-label={t('onboarding.back')}>←</button>
@@ -81,7 +81,7 @@ export function Onboarding({ courses }: { courses: CourseInfo[] }) {
         <LocaleSwitcher className="ob-locale" />
       </header>
 
-      <main className="ob-body" key={screen}>
+      <div className="ob-body" key={screen}>
         {screen === 'hello' && (
           <div className="ob-center">
             <Mascot size={120} mood="happy" />
@@ -194,7 +194,7 @@ export function Onboarding({ courses }: { courses: CourseInfo[] }) {
             <p className="muted ob-small">{t('onboarding.later', { list: TOPICS.filter((x) => x.bands.includes(rec.band.key) && x.key !== rec.topic.key).map((x) => topicText(x, locale).title).join(' · ') || t('onboarding.laterFallback') })}</p>
           </div>
         )}
-      </main>
+      </div>
 
       <footer className="ob-foot">
         {screen === 'hello' && <button type="button" className="v2-btn" onClick={() => go('who')}>{t('onboarding.letsGo')}</button>}
@@ -213,7 +213,7 @@ export function Onboarding({ courses }: { courses: CourseInfo[] }) {
           </div>
         )}
       </footer>
-    </div>
+    </section>
   )
 }
 

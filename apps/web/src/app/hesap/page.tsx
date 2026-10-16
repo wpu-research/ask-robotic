@@ -60,6 +60,7 @@ export default async function Hesap({ searchParams }: { searchParams: Promise<{ 
   return (
     <div className="page ac">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.user.account')}</p>
         <h1>{t('account.title')}</h1>
         <p className="muted">{t('account.lead')}</p>
       </header>

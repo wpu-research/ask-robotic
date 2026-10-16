@@ -13,6 +13,7 @@ export default async function SahneAtolyesi() {
   return (
     <div className="page page-tool sh-page">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.kids')}</p>
         <h1>{t('studios.sahne.page.title')}</h1>
         <p className="muted">
           {t('studios.sahne.page.intro')}

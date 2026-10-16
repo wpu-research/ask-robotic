@@ -12,6 +12,7 @@ export default async function RobotAtolyesi() {
   return (
     <div className="page page-tool">
       <header className="page-title">
+        <p className="eyebrow">{t('shell.groups.kids')}</p>
         <h1>{t('mikro.pages.robotTitle')}</h1>
         <p className="muted">{t('mikro.pages.robotIntro')}</p>
       </header>
