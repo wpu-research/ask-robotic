@@ -13,7 +13,6 @@ import { UserMenu } from '../auth/user-menu'
 import { SessionSync } from '../auth/session-sync'
 import { LocaleSwitcher } from './locale-switcher'
 import { useT } from '@/i18n/client'
-import { PHOTOS } from '@/lib/photo-credits'
 import { RobiDock } from '../robi/robi-dock'
 import { VoiceProvider } from '../lesson-v2/voice'
 
@@ -115,14 +114,6 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
           </div>
           <div className="bottom">
             <span>{t('shell.foot.copy')}</span>
-            <details className="credits">
-              <summary>{t('shell.foot.credits')}</summary>
-              <ul>
-                {Object.values(PHOTOS).map((p) => (
-                  <li key={p.file}><a href={p.source}>{p.title}</a> · <a href={p.creatorUrl}>{p.creator}</a> · <a href={p.licenseUrl}>{p.license}</a></li>
-                ))}
-              </ul>
-            </details>
             <a href={MACADEMIA_URL}>macademia.online</a>
           </div>
         </div>

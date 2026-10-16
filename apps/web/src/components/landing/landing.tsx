@@ -5,10 +5,10 @@ import { Mascot } from '@/components/lesson-v2/mascot'
 import { dictionaries, type Locale } from '@/i18n'
 import { ContinueLink, HeroDemo, MeetTabs } from './landing-client'
 import { HeroScene } from './hero-scene'
+import { ProgramArt } from './program-art'
 import { WorkshopCards } from '@/components/kids/workshop-cards'
 import { WORKSHOPS } from '@/components/kids/workshops'
 import { MACADEMIA_URL } from '@/components/shell/nav-items'
-import { PHOTOS } from '@/lib/photo-credits'
 import '@/app/landing.css'
 
 /** "Bugünün planı" kartındaki örnek ustalık değerleri (belirsizlik aralığıyla; Macademia'daki "TUS örneği" gibi örnek olarak işaretli). */
@@ -73,17 +73,21 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
             <div><p className="eyebrow">{X.programs.eyebrow}</p><h2>{X.programs.title}</h2></div>
             <p>{fill(X.programs.lead)}</p>
           </div>
-          <div className="mx-cards three mx-feature">
+          <div className="mx-cards mx-feature">
+            <Link href="/robot-atolyesi" className="mx-card">
+              <span className="mx-card-img"><ProgramArt kind="kids" /></span>
+              <span className="mx-card-body"><h3>{X.programs.kidsTitle}</h3><span className="mx-card-meta">{X.programs.kidsMeta}</span><p>{X.programs.kidsText}</p></span>
+            </Link>
             <Link href="/muhendislik" className="mx-card">
-              <span className="mx-card-img"><img src={PHOTOS.robotik.file} alt="" width={800} height={500} /></span>
+              <span className="mx-card-img"><ProgramArt kind="eng" /></span>
               <span className="mx-card-body"><h3>{X.programs.engTitle}</h3><span className="mx-card-meta">{X.programs.engMeta}</span><p>{X.programs.engText}</p></span>
             </Link>
             <Link href="/muhendislik/robotik" className="mx-card">
-              <span className="mx-card-img"><img src={PHOTOS.gencler.file} alt="" width={800} height={500} /></span>
+              <span className="mx-card-img"><ProgramArt kind="uni" /></span>
               <span className="mx-card-body"><h3>{X.programs.courseTitle}</h3><span className="mx-card-meta">{X.programs.courseMeta}</span><p>{X.programs.courseText}</p></span>
             </Link>
             <Link href="/konular" className="mx-card">
-              <span className="mx-card-img"><img src={PHOTOS.kodlama.file} alt="" width={800} height={500} /></span>
+              <span className="mx-card-img"><ProgramArt kind="topics" /></span>
               <span className="mx-card-body"><h3>{X.programs.allTopics}</h3><span className="mx-card-meta">{lessons} {L.stats.lessons} · {catalog.length} {L.stats.courses}</span><p>{L.catalog.lead}</p></span>
             </Link>
           </div>

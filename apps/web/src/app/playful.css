@@ -224,3 +224,40 @@
 .mx-shell .eng-level:nth-child(5n+3) .eng-level-n { background: var(--sprout-soft); color: var(--sprout-ink); }
 .mx-shell .eng-level:nth-child(5n+4) .eng-level-n { background: var(--sun-soft); color: var(--sun-ink); }
 .mx-shell .eng-level:nth-child(5n) .eng-level-n { background: var(--grape-soft); color: var(--grape-ink); }
+
+/* ---------- Program kartı çizimleri (components/landing/program-art.tsx) ---------- */
+.program-art { display: block; width: 100%; height: 100%; }
+.pa-kids .pa-bg { fill: var(--sun-soft); } .pa-kids .pa-dot { fill: var(--sun); }
+.pa-eng .pa-bg { fill: var(--sky-soft); } .pa-eng .pa-dot { fill: var(--sky); }
+.pa-uni .pa-bg { fill: var(--grape-soft); } .pa-uni .pa-dot { fill: var(--grape); }
+.pa-topics .pa-bg { fill: var(--sprout-soft); } .pa-topics .pa-dot { fill: var(--sprout); }
+.pa-dot { opacity: .3; }
+.pa-sun { fill: var(--sun); } .pa-sky { fill: var(--sky); } .pa-coral { fill: var(--coral); } .pa-grape { fill: var(--grape); } .pa-sprout { fill: var(--sprout); }
+.pa-white { fill: #ffffff; } .pa-ink { fill: #2a1a12; }
+.pa-line { stroke: #e3d6c7; stroke-width: 2; }
+.pa-ground { fill: var(--sun); opacity: .35; }
+.pa-stroke { fill: none; stroke: #2a1a12; stroke-width: 4; stroke-linecap: round; }
+.pa-label { fill: #ffffff; font: 700 12px var(--font-sans, 'Poppins'), sans-serif; }
+.pa-star { fill: var(--sun); }
+.pa-kids .pa-star { fill: var(--coral); }
+.pa-hole { fill: #d9cbbb; }
+.pa-leg { stroke: #9aa3ad; stroke-width: 3; stroke-linecap: round; }
+.pa-wire-r { fill: none; stroke: var(--coral); stroke-width: 4; stroke-linecap: round; }
+.pa-wire-b { fill: none; stroke: var(--sky); stroke-width: 4; stroke-linecap: round; }
+.pa-glow { fill: var(--sun); opacity: .35; animation: hs-blink 1.6s ease-in-out infinite; }
+.pa-prop { fill: #2a1a12; opacity: .25; transform-box: fill-box; transform-origin: center; animation: pa-prop .25s linear infinite alternate; }
+.pa-hover { animation: hs-float 3s ease-in-out infinite; }
+.pa-dash { stroke: var(--grape); stroke-width: 2; stroke-dasharray: 5 5; opacity: .6; }
+.pa-curve { fill: none; stroke: var(--coral); stroke-width: 4; stroke-linecap: round; }
+.pa-small { fill: var(--grape-ink); font: 700 12px var(--font-sans, 'Poppins'), sans-serif; }
+.pa-code { fill: var(--grape-ink); font: 800 18px var(--font-sans, 'Poppins'), sans-serif; }
+.pa-arm { fill: none; stroke: var(--grape); stroke-width: 14; stroke-linecap: round; }
+.pa-grip { fill: none; stroke: #2a1a12; stroke-width: 4; stroke-linecap: round; }
+.pa-tassel { stroke: var(--sun); stroke-width: 3; }
+.pa-shine { fill: #ffffff; opacity: .15; }
+.pa-emoji { font-size: 28px; }
+.mx-card:hover .program-art { transform: scale(1.04); }
+.mx-card-img > .program-art { transition: transform .5s; }
+@keyframes pa-prop { from { transform: scaleX(1); } to { transform: scaleX(.4); } }
+@media (prefers-reduced-motion: reduce) { .program-art * { animation: none !important; } }
+@media (max-width: 1180px) and (min-width: 601px) { .mx-cards.mx-feature { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
