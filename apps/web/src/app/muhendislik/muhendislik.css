@@ -111,3 +111,17 @@
 .p3d-wait { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--eng); animation: p3dspin 0.9s linear infinite; }
 @keyframes p3dspin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .p3d-wait { animation: none; } .eng-card:hover .p3d-thumb img { transform: none; } }
+
+/* Parça açıklaması ve datasheet bağlantıları */
+.eng-doc { padding: 20px 24px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border); }
+.eng-doc h2 { margin: 0 0 8px; }
+.eng-doc h3 { margin: 16px 0 6px; font-size: 1rem; color: var(--eng); }
+.eng-doc p { margin: 0; max-width: 72ch; line-height: 1.65; }
+.eng-ds ul { display: grid; gap: 8px; }
+.eng-ds a { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+.eng-ds a:hover { text-decoration: none; border-color: var(--eng); }
+.eng-ds a span:last-child { display: grid; min-width: 0; }
+.eng-ds b { font-size: .9rem; overflow-wrap: anywhere; }
+.eng-ds small { color: var(--muted); font-size: .78rem; }
+.eng-ds-kind { font: 800 .68rem var(--mono); letter-spacing: .04em; padding: 4px 7px; border-radius: 6px; background: var(--eng); color: var(--surface); }
+.eng-ds-kind.k-product, .eng-ds-kind.k-reference { background: var(--primary); }

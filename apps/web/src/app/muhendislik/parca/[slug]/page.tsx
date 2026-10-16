@@ -4,7 +4,9 @@ import { notFound } from 'next/navigation'
 import { PartViewer } from '@/components/parts3d/part-viewer'
 import { Icon } from '@/components/shell/icons'
 import { ENG_PARTS, GROUP_NAME, OFFLINE_TEXT, kitOf, labHref, levelOf, partBySlug, partsOfLevel } from '@/lib/muhendislik/catalog'
+import { docOf } from '@/lib/muhendislik/docs'
 import { wiringRows } from '@/lib/muhendislik/wiring'
+import { getLocale } from '@/i18n/server'
 
 export const dynamicParams = false
 export const generateStaticParams = () => ENG_PARTS.map((p) => ({ slug: p.slug }))
@@ -18,6 +20,10 @@ export default async function MuhendislikParca({ params }: { params: Promise<{ s
   const p = partBySlug((await params).slug)
   if (!p) notFound()
   const level = levelOf(p.level)!
+  const lang = await getLocale()
+  const en = lang === 'en'
+  const doc = docOf(p.slug)
+  const dt = doc?.[lang]
   const kit = kitOf(p)
   const href = labHref(p)
   const rows = kit ? wiringRows(kit.circuit(p.lab!.model)) : []
@@ -48,6 +54,16 @@ export default async function MuhendislikParca({ params }: { params: Promise<{ s
 
       <div className="part-layout">
         <div className="part-main">
+          {dt && (
+            <section className="eng-doc" aria-labelledby="p-what">
+              <h2 id="p-what">{en ? 'What is it?' : 'Nedir?'}</h2>
+              <p>{dt.what}</p>
+              <h3>{en ? 'How does it work?' : 'Nasıl çalışır?'}</h3>
+              <p>{dt.how}</p>
+              <h3>{en ? 'When to choose it' : 'Ne zaman seçilir?'}</h3>
+              <p>{dt.choose}</p>
+            </section>
+          )}
           {kit && href ? (
             <section className="eng-labbox" aria-labelledby="p-lab">
               <h2 id="p-lab">Laboratuvarda: {kit.title}</h2>
@@ -71,6 +87,21 @@ export default async function MuhendislikParca({ params }: { params: Promise<{ s
           )}
         </div>
         <aside className="part-side">
+          {doc && doc.datasheets.length > 0 && (
+            <section className="panel eng-ds" aria-labelledby="p-ds">
+              <h2 id="p-ds" className="panel-title">{en ? 'Datasheets and documents' : 'Datasheet ve belgeler'}</h2>
+              <ul>
+                {doc.datasheets.map((d) => (
+                  <li key={d.url}>
+                    <a href={d.url} target="_blank" rel="noopener noreferrer" data-testid="eng-datasheet">
+                      <span className={`eng-ds-kind k-${d.kind}`}>{d.kind === 'datasheet' ? 'PDF' : d.kind === 'product' ? (en ? 'Product' : 'Ürün') : (en ? 'Guide' : 'Rehber')}</span>
+                      <span><b>{d.title}</b><small>{d.publisher} ↗</small></span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
           {rows.length > 0 && (
             <section className="panel" aria-labelledby="p-wire">
               <h2 id="p-wire" className="panel-title">Kablolama</h2>
