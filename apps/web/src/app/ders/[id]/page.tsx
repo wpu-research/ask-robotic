@@ -5,14 +5,13 @@ import { authEnabled } from '@/lib/flags'
 import { getCurrentUser } from '@/lib/auth/current'
 import { getCompletedLessonIds, getLessonContext, getModuleTree } from '@/lib/content'
 import { activityKey } from '@/lib/jr/activity'
-import { MODULE_META } from '@/lib/module-meta'
 import { LessonPlayer } from './lesson-player'
 import { LessonV2Player } from '@/components/lesson-v2/lesson-v2-player'
 import { Paywall } from '@/components/paywall/paywall'
 import { checkLessonAccess } from '@/lib/paywall'
 import { paywallEnabled } from '@/lib/entitlements'
 import { getLocale, getT } from '@/i18n/server'
-import { moduleTitle, weekTitle } from '@/lib/catalog-en'
+import { moduleCallout, moduleTitle, weekTitle } from '@/lib/catalog-en'
 import { lessonTitle } from '@/lib/lesson-titles-en'
 
 export const dynamic = 'force-dynamic'
@@ -107,7 +106,7 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
         nextTitle={titleOf(ctx.next)}
         moduleLessonIds={ids}
         activityKey={key}
-        callout={MODULE_META[ctx.module.slug]?.callout}
+        callout={moduleCallout(ctx.module.slug, locale)}
         serverSync={!!user}
         serverDone={serverDone}
       />
