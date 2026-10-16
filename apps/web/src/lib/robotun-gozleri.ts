@@ -58,8 +58,8 @@ export const GAMES: Game[] = [
   },
   {
     slug: 'burun-avcisi', kind: 'face', emoji: '👃', color: '#fef3c7',
-    tr: { title: 'Burun Avcısı', text: 'Robot burnunun ucunu bulur. Başını oynatarak ekrandaki yıldızları burnunla topla.', how: 'Başla\'ya bas. Ekranda yıldızlar belirir ve birkaç saniye sonra kaybolur. Başını oynatıp sarı noktayı (burnunu) yıldıza değdir. 45 saniyede kaç yıldız?' },
-    en: { title: 'Nose Catcher', text: 'The robot finds the tip of your nose. Move your head to collect the stars with your nose.', how: 'Press Start. Stars appear and vanish after a few seconds. Move your head and touch them with the yellow dot (your nose). How many in 45 seconds?' },
+    tr: { title: 'Burun Avcısı', text: 'Robot burnunun ucunu bulur. Başını oynatarak ekrandaki kar toplarını burnunla topla.', how: 'Başla\'ya bas. Ekranda kar topları belirir ve birkaç saniye sonra erir. Başını oynatıp sarı noktayı (burnunu) kar topuna değdir. 45 saniyede kaç kar topu?' },
+    en: { title: 'Nose Catcher', text: 'The robot finds the tip of your nose. Move your head to collect the snowballs with your nose.', how: 'Press Start. Snowballs appear and melt after a few seconds. Move your head and touch them with the yellow dot (your nose). How many in 45 seconds?' },
   },
   {
     slug: 'agzinla-yakala', kind: 'face', emoji: '😋', color: '#fee2e2',

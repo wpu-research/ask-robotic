@@ -1,5 +1,5 @@
 'use client'
-// "Robotun Gözleri" kamera oyunları 4–10: Burun Avcısı, Ağzınla Yakala, Kafa Pinpon (yüz); Parmak Hesabı, Sihirli Fırça,
+// "Robotun Gözleri" kamera oyunları 4–10: Burun Avcısı (kar topu), Ağzınla Yakala, Kafa Pinpon (yüz); Parmak Hesabı, Sihirli Fırça,
 // Doğru mu Yanlış mı (el); Robotu Taklit Et (vücut). Aynı üç cihaz içi model (games.tsx); mantık lib/gozler-logic.ts'te.
 import { useRef, useState } from 'react'
 import { classifyPose, countFingers, hit, mathQuestion, mouthOpen, POSES, QUIZ, shuffle, type PoseK } from '@/lib/gozler-logic'
@@ -30,34 +30,43 @@ function drawHand(ctx: CanvasRenderingContext2D, lm: Any[], W: number, H: number
   for (const p of lm) dot(ctx, mx(p, W), p.y * H, 5, '#0f766e')
 }
 
+/** Kar topu: gölgeli beyaz top ve birkaç kar tanesi lekesi. */
+function snowball(ctx: CanvasRenderingContext2D, x: number, y: number, r: number) {
+  const gr = ctx.createRadialGradient(x - r * 0.35, y - r * 0.4, r * 0.1, x, y, r)
+  gr.addColorStop(0, '#ffffff'); gr.addColorStop(0.7, '#eef6fb'); gr.addColorStop(1, '#b9d3e6')
+  ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill()
+  ctx.strokeStyle = 'rgba(120,160,190,.55)'; ctx.lineWidth = 2; ctx.stroke()
+  ctx.fillStyle = 'rgba(185,211,230,.8)'; for (const [dx, dy, rr] of [[0.3, 0.25, 0.12], [-0.25, 0.35, 0.09], [0.1, -0.1, 0.07]]) { ctx.beginPath(); ctx.arc(x + dx * r, y + dy * r, rr * r, 0, 7); ctx.fill() }
+}
+
 // ---------------------------------------------------------------- Burun Avcısı (yüz)
 export function NoseCatcher({ lang }: { lang: L }) {
   const [score, setScore] = useState(0)
   const round = useRound()
-  const st = useRef({ stars: [] as Array<{ x: number; y: number; life: number; pop: number }>, spawn: 0, lm: null as Any })
+  const st = useRef({ balls: [] as Array<{ x: number; y: number; life: number; pop: number }>, spawn: 0, lm: null as Any })
   const g = useCameraGame('face', (ctx, W, H, res, t) => {
     const s = st.current, dt = round.tick(t)
     if (res) s.lm = res.faceLandmarks?.[0] ?? null
     const nose = s.lm ? { x: mx(s.lm[1], W), y: s.lm[1].y * H } : null
     if (round.running()) {
       s.spawn -= dt
-      if (s.spawn <= 0 && s.stars.filter((x) => !x.pop).length < 3) { s.spawn = 0.9; s.stars.push({ x: 60 + Math.random() * (W - 120), y: 60 + Math.random() * (H - 120), life: 3.5, pop: 0 }) }
-      for (const a of s.stars) {
+      if (s.spawn <= 0 && s.balls.filter((x) => !x.pop).length < 3) { s.spawn = 0.9; s.balls.push({ x: 60 + Math.random() * (W - 120), y: 60 + Math.random() * (H - 120), life: 3.5, pop: 0 }) }
+      for (const a of s.balls) {
         if (a.pop) { a.pop += dt; continue }
         a.life -= dt
         if (nose && hit(nose.x, nose.y, a.x, a.y, 50)) { a.pop = 0.001; setScore((v) => v + 1) }
       }
-      s.stars = s.stars.filter((a) => a.life > 0 && a.pop < 0.4)
+      s.balls = s.balls.filter((a) => a.life > 0 && a.pop < 0.4)
     }
-    for (const a of s.stars) emoji(ctx, a.pop ? '✨' : '⭐', a.x, a.y, a.pop ? 70 + a.pop * 80 : 56 + Math.sin(t * 6) * 4)
+    for (const a of s.balls) { if (a.pop) emoji(ctx, '❄️', a.x, a.y, 60 + a.pop * 90); else snowball(ctx, a.x, a.y + Math.sin(t * 3 + a.x) * 4, 30) }
     if (nose) { dot(ctx, nose.x, nose.y, 16, 'rgba(250,204,21,.95)'); dot(ctx, nose.x, nose.y, 6, '#7a4426') }
   })
-  const start = () => { st.current.stars = []; st.current.spawn = 0; setScore(0); round.begin() }
+  const start = () => { st.current.balls = []; st.current.spawn = 0; setScore(0); round.begin() }
   return (
     <CameraShell lang={lang} {...g}>
       {g.phase === 'on' && (
         <div className="gz-hud">
-          <div className="gz-hud-box"><small>{T(lang, 'Toplanan yıldız', 'Stars caught')}</small><b className="gz-emoji">⭐ {score}</b></div>
+          <div className="gz-hud-box"><small>{T(lang, 'Toplanan kar topu', 'Snowballs caught')}</small><b className="gz-emoji">⛄ {score}</b></div>
           <div className="gz-hud-box"><small>{T(lang, 'Kalan süre', 'Time left')}</small><b className="gz-emoji">⏱ {round.left}</b></div>
           <StartBtn lang={lang} round={round} onStart={start} />
         </div>
