@@ -92,3 +92,7 @@
   .eng-level-go { display: none; }
   .eng-lv-head { grid-template-columns: minmax(0, 1fr); }
 }
+.eng-course { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 20px; align-items: center; padding: 20px 24px; border-radius: var(--radius); background: var(--eng-soft); border: 1px solid color-mix(in srgb, var(--eng) 40%, var(--border)); color: var(--text); }
+.eng-course:hover { text-decoration: none; box-shadow: var(--shadow); }
+.eng-course-code { font-family: var(--mono); font-weight: 800; font-size: 1.5rem; color: var(--eng); line-height: 1; }
+@media (max-width: 640px) { .eng-course { grid-template-columns: minmax(0, 1fr); gap: 8px; } }

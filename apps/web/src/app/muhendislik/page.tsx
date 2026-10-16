@@ -28,6 +28,15 @@ export default function Muhendislik() {
         </dl>
       </header>
 
+      <Link href="/muhendislik/robotik" className="eng-course" data-testid="eng-course">
+        <span className="eng-course-code">ESOF 323</span>
+        <span className="eng-level-body">
+          <b>Üniversite dersi: Robotik</b>
+          <span className="eng-level-text">14 hafta: gömülü programlama, sensör ve filtreler, PID, kinematik, planlama, bilgisayarlı görü, derin öğrenme, ROS 2 ve drone&apos;lar. Tarayıcıda 11 simülasyon, Webots ve Gazebo projeleri.</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <section aria-labelledby="eng-levels">
         <h2 id="eng-levels" className="sr-only">Seviyeler</h2>
         <ol className="eng-path">

@@ -1,0 +1,847 @@
+[
+ {
+  "n": 1,
+  "sims": [
+   "line"
+  ],
+  "simCfg": {},
+  "parts": [
+   "arduino-uno-atmega328p",
+   "l298n",
+   "bo-motor-sari",
+   "ldr"
+  ],
+  "kits": [
+   "l298n",
+   "arduino-uno-atmega328p"
+  ],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Introduction to robotics",
+   "tools": "This platform (Uno lab, line follower simulation), Arduino",
+   "goals": [
+    "Describe a robot as a sense, think, act loop",
+    "Name the main classes of robots and their components",
+    "Explain how a two-sensor line follower decides where to turn"
+   ],
+   "notes": "<p>A robot is a machine that <b>senses</b> its environment, <b>decides</b> what to do and <b>acts</b> on the world, repeating this loop many times per second. Software engineers mostly live in the middle step, but good robot software only exists when you understand the sensors and actuators on either side.</p>\n<h3>Kinds of robots</h3>\n<ul><li><b>Manipulators</b>: fixed-base arms in factories and labs.</li><li><b>Mobile ground robots</b>: wheeled and legged robots, warehouse AGVs, vacuum cleaners.</li><li><b>Aerial robots</b>: multirotors and fixed-wing drones (week 13).</li><li><b>Marine robots</b>: surface vessels and underwater vehicles.</li></ul>\n<h3>Building blocks</h3>\n<p>Every robot combines sensors (what it can measure), a controller (a microcontroller or computer running your code), actuators (motors, servos, propellers), a power system and a mechanical structure. A design choice in one block always constrains the others: heavier batteries need stronger motors, and faster loops need faster processors.</p>\n<h3>The line follower</h3>\n<p>A line follower uses infrared reflectance sensors aimed at the floor. A black line absorbs infrared light, a white floor reflects it. With two sensors straddling the line the decision rule is simple:</p>\n<ul><li>both sensors see the line: drive straight</li><li>only the left sensor sees it: turn left</li><li>only the right sensor sees it: turn right</li><li>neither sees it: the line is lost, so recover (keep turning the last way)</li></ul>\n<p>This is a <b>bang-bang</b> controller: the output jumps between fixed values. It works, but the robot zig-zags. In week 6 we replace it with a PD controller that steers in proportion to how far the line is from the centre.</p>",
+   "code": [
+    {
+     "title": "Arduino: two-sensor line follower with an L298N driver",
+     "src": "const int L_IR = 2, R_IR = 3;\nconst int ENA = 5, IN1 = 6, IN2 = 7, IN3 = 8, IN4 = 9, ENB = 10;\n\nvoid drive(int left, int right) {\n  digitalWrite(IN1, left >= 0);  digitalWrite(IN2, left < 0);\n  digitalWrite(IN3, right >= 0); digitalWrite(IN4, right < 0);\n  analogWrite(ENA, abs(left));   analogWrite(ENB, abs(right));\n}\n\nvoid setup() {\n  pinMode(L_IR, INPUT); pinMode(R_IR, INPUT);\n  for (int p = 5; p <= 10; p++) pinMode(p, OUTPUT);\n}\n\nvoid loop() {\n  bool l = digitalRead(L_IR) == LOW;   // LOW = line detected on most IR modules\n  bool r = digitalRead(R_IR) == LOW;\n  if (l && r)   drive(150, 150);       // straight\n  else if (l)   drive(0, 150);         // turn left\n  else if (r)   drive(150, 0);         // turn right\n  else          drive(0, 0);           // line lost\n}"
+    }
+   ],
+   "lab": "Build the same line follower in Tinkercad Circuits or Wokwi with two IR sensors and an L298N. Then run the simulator above in bang-bang mode and raise the base speed until the robot leaves the track. Note the speed.",
+   "hw": "Draw a state diagram for the line follower with four states (straight, left, right, lost). Add a recovery strategy for the lost state and explain why it works."
+  },
+  "tr": {
+   "title": "Robotiğe giriş",
+   "tools": "Bu platform (Uno laboratuvarı, çizgi izleyen simülasyonu), Arduino",
+   "goals": [
+    "Robotu bir algıla, düşün, uygula (sense, think, act) döngüsü olarak tanımlamak",
+    "Robotların başlıca sınıflarını ve bileşenlerini adlandırmak",
+    "İki sensörlü bir çizgi izleyicinin nereye döneceğine nasıl karar verdiğini açıklamak"
+   ],
+   "notes": "<p>Robot, çevresini <b>algılayan</b>, ne yapacağına <b>karar veren</b> ve dünya üzerinde <b>eylemde bulunan</b>, bu döngüyü saniyede pek çok kez tekrarlayan bir makinedir. Yazılım mühendisleri çoğunlukla ortadaki adımda çalışır, ancak iyi robot yazılımı ancak iki yandaki sensörleri ve eyleyicileri (actuators) anladığınızda ortaya çıkar.</p>\n<h3>Robot türleri</h3>\n<ul><li><b>Manipülatörler</b>: fabrikalarda ve laboratuvarlarda sabit tabanlı kollar.</li><li><b>Mobil kara robotları</b>: tekerlekli ve bacaklı robotlar, depo AGV'leri, robot süpürgeler.</li><li><b>Hava robotları</b>: çok rotorlu (multirotor) ve sabit kanatlı dronlar (13. hafta).</li><li><b>Deniz robotları</b>: su üstü araçları ve su altı araçları.</li></ul>\n<h3>Yapı taşları</h3>\n<p>Her robot; sensörleri (neyi ölçebildiği), bir denetleyiciyi (kodunuzu çalıştıran bir mikrodenetleyici veya bilgisayar), eyleyicileri (motorlar, servolar, pervaneler), bir güç sistemini ve mekanik bir yapıyı bir araya getirir. Bir bloktaki tasarım kararı her zaman diğerlerini kısıtlar: daha ağır piller daha güçlü motorlar, daha hızlı döngüler daha hızlı işlemciler gerektirir.</p>\n<h3>Çizgi izleyici</h3>\n<p>Çizgi izleyici, zemine doğrultulmuş kızılötesi yansıma sensörleri kullanır. Siyah çizgi kızılötesi ışığı soğurur, beyaz zemin ise yansıtır. Çizginin iki yanına yerleştirilmiş iki sensörle karar kuralı basittir:</p>\n<ul><li>iki sensör de çizgiyi görüyor: düz git</li><li>yalnızca sol sensör görüyor: sola dön</li><li>yalnızca sağ sensör görüyor: sağa dön</li><li>hiçbiri görmüyor: çizgi kayboldu, toparlan (son döndüğün yöne dönmeye devam et)</li></ul>\n<p>Bu bir <b>aç-kapa (bang-bang)</b> denetleyicidir: çıkış sabit değerler arasında sıçrar. Çalışır, ancak robot zikzak çizer. 6. haftada bunu, çizginin merkezden ne kadar uzak olduğuyla orantılı olarak yön veren bir PD denetleyiciyle değiştireceğiz.</p>",
+   "code": [
+    {
+     "title": "Arduino: L298N sürücülü, iki sensörlü çizgi izleyici",
+     "src": "const int L_IR = 2, R_IR = 3;\nconst int ENA = 5, IN1 = 6, IN2 = 7, IN3 = 8, IN4 = 9, ENB = 10;\n\nvoid drive(int left, int right) {\n  digitalWrite(IN1, left >= 0);  digitalWrite(IN2, left < 0);\n  digitalWrite(IN3, right >= 0); digitalWrite(IN4, right < 0);\n  analogWrite(ENA, abs(left));   analogWrite(ENB, abs(right));\n}\n\nvoid setup() {\n  pinMode(L_IR, INPUT); pinMode(R_IR, INPUT);\n  for (int p = 5; p <= 10; p++) pinMode(p, OUTPUT);\n}\n\nvoid loop() {\n  bool l = digitalRead(L_IR) == LOW;   // LOW = çoğu IR modülünde çizgi algılandı\n  bool r = digitalRead(R_IR) == LOW;\n  if (l && r)   drive(150, 150);       // düz\n  else if (l)   drive(0, 150);         // sola dön\n  else if (r)   drive(150, 0);         // sağa dön\n  else          drive(0, 0);           // çizgi kayboldu\n}"
+    }
+   ],
+   "lab": "Aynı çizgi izleyiciyi Tinkercad Circuits veya Wokwi'de iki IR sensör ve bir L298N ile kurun. Ardından yukarıdaki simülatörü aç-kapa (bang-bang) modunda çalıştırın ve robot pistten çıkana kadar temel hızı artırın. Bu hızı not edin.",
+   "hw": "Çizgi izleyici için dört durumlu (düz, sol, sağ, kayıp) bir durum diyagramı çizin. Kayıp durumu için bir toparlanma stratejisi ekleyin ve neden işe yaradığını açıklayın."
+  }
+ },
+ {
+  "n": 2,
+  "sims": [],
+  "simCfg": {},
+  "parts": [
+   "arduino-uno-atmega328p",
+   "arduino-uno-r4-wifi",
+   "arduino-nano-esp32",
+   "esp32-esp32-wroom-devkit",
+   "led",
+   "direnc",
+   "buton-anahtar"
+  ],
+  "kits": [
+   "led",
+   "buton-anahtar",
+   "ldr"
+  ],
+  "wokwi": [
+   "esp32"
+  ],
+  "exam": false,
+  "en": {
+   "title": "Embedded programming with Arduino",
+   "tools": "This platform (Uno lab), Wokwi (ESP32)",
+   "goals": [
+    "Explain the setup/loop execution model",
+    "Read digital and analog inputs and drive outputs",
+    "Write non-blocking code with millis() and finite state machines"
+   ],
+   "notes": "<p>A microcontroller is a small computer on one chip: CPU, flash memory for your program, RAM and peripherals such as timers, ADCs and serial ports. The Arduino Uno uses an ATmega328P running at 16 MHz with 32 KB of flash and 2 KB of RAM. There is no operating system: your <code>loop()</code> runs forever.</p>\n<h3>Inputs and outputs</h3>\n<ul><li><code>digitalRead</code> / <code>digitalWrite</code>: logic levels, 0 V or 5 V.</li><li><code>analogRead</code>: a 10-bit ADC returns 0 to 1023, so the voltage is <i>raw × 5 / 1023</i>.</li><li><code>analogWrite</code>: PWM output, 0 to 255 (week 5).</li><li><code>Serial</code>: your main debugging tool, and the Serial Plotter draws live graphs.</li></ul>\n<h3>Never block the loop</h3>\n<p><code>delay(1000)</code> freezes the whole robot for a second: it cannot read sensors or react. Robots do many things at once, so we check elapsed time with <code>millis()</code> and only act when it is due.</p>\n<h3>Finite state machines</h3>\n<p>Most robot behaviour is a state machine: a set of states, the action taken in each, and the events that cause transitions. Writing behaviour as an explicit <code>enum</code> plus a <code>switch</code> keeps it readable, testable and easy to extend. The same pattern scales to mission logic on drones.</p>",
+   "code": [
+    {
+     "title": "Non-blocking traffic light state machine",
+     "src": "enum State { GREEN, YELLOW, RED };\nState state = GREEN;\nunsigned long t0 = 0;\nconst unsigned long DUR[] = {4000, 1000, 3000};   // ms per state\nconst int PIN[] = {11, 12, 13};\n\nvoid setup() {\n  for (int i = 0; i < 3; i++) pinMode(PIN[i], OUTPUT);\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  if (millis() - t0 >= DUR[state]) {          // overflow-safe comparison\n    t0 = millis();\n    state = (State)((state + 1) % 3);\n    Serial.print(\"state -> \"); Serial.println(state);\n  }\n  for (int i = 0; i < 3; i++) digitalWrite(PIN[i], i == state);\n  // other tasks can run here without waiting\n}"
+    }
+   ],
+   "lab": "In Wokwi, build the traffic light state machine. Add a potentiometer on A0 and print its voltage to the Serial Plotter while the lights keep running.",
+   "hw": "Add a pedestrian button that requests a red light. Debounce the button in software and do not use delay() anywhere in the program."
+  },
+  "tr": {
+   "title": "Arduino ile gömülü programlama",
+   "tools": "Bu platform (Uno laboratuvarı), Wokwi (ESP32)",
+   "goals": [
+    "setup/loop yürütme modelini açıklamak",
+    "Dijital ve analog girişleri okumak, çıkışları sürmek",
+    "millis() ve sonlu durum makineleri (finite state machines) ile bloklamayan (non-blocking) kod yazmak"
+   ],
+   "notes": "<p>Mikrodenetleyici, tek bir yonga üzerindeki küçük bir bilgisayardır: CPU, programınız için flash bellek, RAM ve zamanlayıcılar, ADC'ler, seri portlar gibi çevre birimleri. Arduino Uno, 16 MHz'te çalışan, 32 KB flash ve 2 KB RAM'e sahip bir ATmega328P kullanır. İşletim sistemi yoktur: <code>loop()</code> fonksiyonunuz sonsuza dek çalışır.</p>\n<h3>Girişler ve çıkışlar</h3>\n<ul><li><code>digitalRead</code> / <code>digitalWrite</code>: mantık seviyeleri, 0 V veya 5 V.</li><li><code>analogRead</code>: 10 bitlik ADC 0 ile 1023 arasında değer döndürür, dolayısıyla gerilim <i>raw × 5 / 1023</i> olur.</li><li><code>analogWrite</code>: PWM çıkışı, 0 ile 255 arası (5. hafta).</li><li><code>Serial</code>: ana hata ayıklama (debugging) aracınızdır; Serial Plotter canlı grafikler çizer.</li></ul>\n<h3>Döngüyü asla bloklamayın</h3>\n<p><code>delay(1000)</code> tüm robotu bir saniyeliğine dondurur: sensör okuyamaz, tepki veremez. Robotlar aynı anda pek çok iş yapar; bu yüzden geçen süreyi <code>millis()</code> ile kontrol eder, yalnızca zamanı geldiğinde işlem yaparız.</p>\n<h3>Sonlu durum makineleri</h3>\n<p>Robot davranışlarının çoğu bir durum makinesidir (state machine): bir durumlar kümesi, her durumda yapılan eylem ve geçişlere yol açan olaylar. Davranışı açık bir <code>enum</code> ve bir <code>switch</code> ile yazmak, onu okunabilir, test edilebilir ve kolay genişletilebilir kılar. Aynı kalıp dronlardaki görev mantığına kadar ölçeklenir.</p>",
+   "code": [
+    {
+     "title": "Bloklamayan trafik ışığı durum makinesi",
+     "src": "enum State { GREEN, YELLOW, RED };\nState state = GREEN;\nunsigned long t0 = 0;\nconst unsigned long DUR[] = {4000, 1000, 3000};   // durum başına ms\nconst int PIN[] = {11, 12, 13};\n\nvoid setup() {\n  for (int i = 0; i < 3; i++) pinMode(PIN[i], OUTPUT);\n  Serial.begin(115200);\n}\n\nvoid loop() {\n  if (millis() - t0 >= DUR[state]) {          // taşmaya (overflow) karşı güvenli karşılaştırma\n    t0 = millis();\n    state = (State)((state + 1) % 3);\n    Serial.print(\"state -> \"); Serial.println(state);\n  }\n  for (int i = 0; i < 3; i++) digitalWrite(PIN[i], i == state);\n  // diğer görevler burada beklemeden çalışabilir\n}"
+    }
+   ],
+   "lab": "Wokwi'de trafik ışığı durum makinesini kurun. A0'a bir potansiyometre ekleyin ve ışıklar çalışmaya devam ederken gerilimini Serial Plotter'a yazdırın.",
+   "hw": "Kırmızı ışık talep eden bir yaya düğmesi ekleyin. Düğmenin arkını (debounce) yazılımla giderin ve programın hiçbir yerinde delay() kullanmayın."
+  }
+ },
+ {
+  "n": 3,
+  "sims": [],
+  "simCfg": {},
+  "parts": [
+   "mpu6050",
+   "bme280",
+   "oled-ssd1306-0-96",
+   "pcf8574-i2c-lcd-adaptoru",
+   "hc-05-bluetooth-modulu",
+   "ch340-usb-seri-cip",
+   "bss138-lojik-seviye-cevirici",
+   "logic-analyzer",
+   "st-link-j-link-debugger",
+   "stm32",
+   "esp32-esp32-wroom-devkit",
+   "mcp2551-can-transceiver"
+  ],
+  "kits": [
+   "mpu6050",
+   "pcf8574-i2c-lcd-adaptoru",
+   "16x2-lcd-paralel"
+  ],
+  "wokwi": [
+   "esp32",
+   "stm32"
+  ],
+  "exam": false,
+  "en": {
+   "title": "Embedded programming II: interrupts, timers and buses",
+   "tools": "This platform (Uno lab), Wokwi (ESP32, STM32)",
+   "goals": [
+    "Use interrupts and hardware timers without breaking the main loop",
+    "Talk to I²C, SPI and UART devices and read a datasheet register map",
+    "Structure firmware in layers (HAL, drivers, application) and unit-test the logic on a PC"
+   ],
+   "notes": "<p>Week 2 kept the robot responsive with <code>millis()</code>. Real firmware also has to react within microseconds and talk to many chips at once. This week covers the three tools for that: <b>interrupts</b>, <b>hardware timers</b> and <b>serial buses</b>, and how a software engineer keeps all of it testable.</p>\n<h3>Interrupts</h3>\n<p>An interrupt pauses the main program when a hardware event happens (a pin edge, a timer overflow, a byte arriving) and runs a short <b>interrupt service routine</b> (ISR). Rules that keep ISRs safe:</p>\n<ul><li>Keep the ISR tiny: set a flag or count, do the real work in <code>loop()</code>.</li><li>Variables shared with the ISR must be <code>volatile</code>, and multi-byte reads in <code>loop()</code> must be done with interrupts briefly disabled (atomic copy).</li><li>No <code>delay()</code>, no <code>Serial.print()</code> inside an ISR.</li></ul>\n<p>Wheel encoders are the classic use: every tick fires an interrupt, so no tick is missed even when the loop is busy.</p>\n<h3>Hardware timers</h3>\n<p>The ATmega328P has three timers. They generate PWM (week 5), measure pulse widths, and fire periodic interrupts so a control loop runs at a fixed rate (for example 200 Hz), which PID needs (week 6). On STM32 the timers are far richer: encoder mode counts quadrature ticks in hardware with no CPU load at all.</p>\n<h3>Serial buses</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Bus</th><th>Wires</th><th>Typical speed</th><th>Typical devices</th></tr></thead><tbody>\n<tr><td>UART</td><td>TX, RX (+GND)</td><td>9600 to 921600 baud</td><td>GPS, Bluetooth (HC-05), LiDAR (TF-Luna), debugging</td></tr>\n<tr><td>I²C</td><td>SDA, SCL, shared by many devices</td><td>100 / 400 kHz</td><td>IMU (MPU6050, BMI270), BME280, OLED, I²C LCD</td></tr>\n<tr><td>SPI</td><td>MOSI, MISO, SCK, one CS per device</td><td>1 to 50 MHz</td><td>TFT displays, SD cards, fast IMUs</td></tr>\n<tr><td>CAN</td><td>CANH, CANL (differential)</td><td>up to 1 Mbit/s</td><td>vehicles, motor controllers, drones (DroneCAN)</td></tr></tbody></table></div>\n<p>I²C devices have an <b>address</b> and a <b>register map</b>: you write a register number, then read or write bytes. The MPU6050 at 0x68 keeps acceleration in registers 0x3B to 0x40. Reading a datasheet register map is a core embedded skill. A <b>logic analyzer</b> shows the real bytes on the wire when something does not answer.</p>\n<p>Voltage levels matter: an ESP32 or STM32 runs at 3.3 V and a 5 V signal can damage it. A level shifter (BSS138) sits between them.</p>\n<h3>The board ladder</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Board</th><th>Core</th><th>Use in this course</th></tr></thead><tbody>\n<tr><td>Arduino Uno</td><td>8-bit AVR, 16 MHz, 2 KB RAM</td><td>learning I/O, our lab</td></tr>\n<tr><td>ESP32</td><td>2× 240 MHz, Wi-Fi, Bluetooth</td><td>connected robots, telemetry, ESP32-CAM</td></tr>\n<tr><td>STM32</td><td>32-bit ARM Cortex-M, real-time</td><td>motor control, flight controllers (PX4 runs on STM32)</td></tr>\n<tr><td>Raspberry Pi / Jetson</td><td>Linux computers, GPU on Jetson</td><td>vision, deep learning, ROS 2, mission computer</td></tr></tbody></table></div>\n<h3>Firmware as software engineering</h3>\n<p>Split firmware into a <b>hardware abstraction layer</b> (pins, buses), <b>drivers</b> (one per chip) and <b>application logic</b> (state machines, control). Logic that does not touch hardware (filters, PID, state machines, protocol parsing) can be compiled and unit-tested on your PC with any C++ test framework, so most bugs are found before flashing. The same idea scales to software-in-the-loop testing in weeks 12 and 13.</p>",
+   "code": [
+    {
+     "title": "Arduino: encoder ticks with an interrupt and an atomic copy",
+     "src": "volatile long ticks = 0;\n\nvoid onTick() {            // ISR: keep it tiny\n  ticks++;\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), onTick, RISING);\n}\n\nvoid loop() {\n  static unsigned long t0 = 0;\n  if (millis() - t0 >= 100) {          // report at 10 Hz\n    t0 = millis();\n    noInterrupts();\n    long copy = ticks;                 // a long is 4 bytes: copy atomically\n    interrupts();\n    Serial.println(copy);\n  }\n}"
+    },
+    {
+     "title": "C++: a state machine that is unit-tested on the PC",
+     "src": "// line_fsm.h: pure logic, no Arduino headers, so it compiles on the PC too\nenum class Mode { Straight, Left, Right, Lost };\n\ninline Mode decide(bool leftOnLine, bool rightOnLine, Mode last) {\n  if (leftOnLine && rightOnLine) return Mode::Straight;\n  if (leftOnLine) return Mode::Left;\n  if (rightOnLine) return Mode::Right;\n  return last == Mode::Left || last == Mode::Right ? last : Mode::Lost;\n}\n\n// test_line_fsm.cpp (host): g++ -std=c++17 test_line_fsm.cpp && ./a.out\n#include <cassert>\nint main() {\n  assert(decide(true, true, Mode::Lost) == Mode::Straight);\n  assert(decide(false, false, Mode::Left) == Mode::Left);   // keep turning\n  assert(decide(false, false, Mode::Straight) == Mode::Lost);\n}"
+    }
+   ],
+   "lab": "In our lab, open the MPU6050 kit and read the raw acceleration with Wire; change the address in the code to 0x69 and explain why the device stops answering. Then open the I²C LCD kit and print the pitch angle on it. In Wokwi, build the encoder interrupt counter on an ESP32 and on an STM32 Nucleo, and compare the code you had to change.",
+   "hw": "Move the line follower decision logic from week 1 into a pure C++ function, write at least six unit tests for it that run on your PC, and add them to a GitHub repository with a CI workflow that runs the tests on every push."
+  },
+  "tr": {
+   "title": "Gömülü programlama II: kesmeler, zamanlayıcılar ve veri yolları",
+   "tools": "Bu platform (Uno laboratuvarı), Wokwi (ESP32, STM32)",
+   "goals": [
+    "Ana döngüyü bozmadan kesme (interrupt) ve donanım zamanlayıcılarını kullanmak",
+    "I²C, SPI ve UART cihazlarıyla konuşmak ve veri sayfasındaki register haritasını okumak",
+    "Yazılımı katmanlara (HAL, sürücü, uygulama) ayırmak ve mantığı bilgisayarda birim testle doğrulamak"
+   ],
+   "notes": "<p>2. haftada robotu <code>millis()</code> ile tepkili tuttuk. Gerçek gömülü yazılım ise mikrosaniyeler içinde tepki vermek ve aynı anda birçok çiple konuşmak zorundadır. Bu hafta bunun üç aracını işliyoruz: <b>kesmeler</b>, <b>donanım zamanlayıcıları</b> ve <b>seri veri yolları</b>. Bir yazılım mühendisinin bunların hepsini nasıl test edilebilir tuttuğunu da göreceğiz.</p>\n<h3>Kesmeler (interrupts)</h3>\n<p>Kesme, bir donanım olayı olduğunda (pin kenarı, zamanlayıcı taşması, gelen bir bayt) ana programı duraklatır ve kısa bir <b>kesme servis rutini</b> (ISR) çalıştırır. ISR'leri güvenli tutan kurallar:</p>\n<ul><li>ISR'yi çok kısa tut: yalnız bir bayrak kaldır ya da say, asıl işi <code>loop()</code> içinde yap.</li><li>ISR ile paylaşılan değişkenler <code>volatile</code> olmalı; <code>loop()</code> içinde çok baytlı okumalar kesmeler kısa süre kapatılarak yapılmalı (atomik kopya).</li><li>ISR içinde <code>delay()</code> ve <code>Serial.print()</code> kullanma.</li></ul>\n<p>Klasik kullanım tekerlek enkoderleridir: her tık bir kesme üretir, döngü meşgulken bile hiçbir tık kaçmaz.</p>\n<h3>Donanım zamanlayıcıları (timers)</h3>\n<p>ATmega328P'de üç zamanlayıcı vardır. PWM üretir (5. hafta), darbe genişliği ölçer ve periyodik kesme üreterek denetim döngüsünün sabit bir hızda (örneğin 200 Hz) çalışmasını sağlar; PID bunu ister (6. hafta). STM32'de zamanlayıcılar çok daha zengindir: enkoder kipi kuadratür tıklarını hiç işlemci yükü olmadan donanımda sayar.</p>\n<h3>Seri veri yolları</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Veri yolu</th><th>Hatlar</th><th>Tipik hız</th><th>Tipik cihazlar</th></tr></thead><tbody>\n<tr><td>UART</td><td>TX, RX (+GND)</td><td>9600 ile 921600 baud</td><td>GPS, Bluetooth (HC-05), LiDAR (TF-Luna), hata ayıklama</td></tr>\n<tr><td>I²C</td><td>SDA, SCL; birçok cihaz paylaşır</td><td>100 / 400 kHz</td><td>IMU (MPU6050, BMI270), BME280, OLED, I²C LCD</td></tr>\n<tr><td>SPI</td><td>MOSI, MISO, SCK, her cihaza bir CS</td><td>1 ile 50 MHz</td><td>TFT ekranlar, SD kart, hızlı IMU'lar</td></tr>\n<tr><td>CAN</td><td>CANH, CANL (diferansiyel)</td><td>1 Mbit/s'ye kadar</td><td>araçlar, motor denetleyicileri, drone'lar (DroneCAN)</td></tr></tbody></table></div>\n<p>I²C cihazlarının bir <b>adresi</b> ve bir <b>register haritası</b> vardır: önce register numarasını yazarsın, sonra bayt okursun ya da yazarsın. 0x68 adresindeki MPU6050 ivmeyi 0x3B ile 0x40 arasındaki register'larda tutar. Veri sayfasındaki register haritasını okumak temel bir gömülü beceridir. Bir cihaz cevap vermediğinde <b>lojik analizör</b> hattaki gerçek baytları gösterir.</p>\n<p>Gerilim seviyeleri önemlidir: ESP32 ve STM32 3,3 V ile çalışır, 5 V'luk bir sinyal onlara zarar verebilir. Araya bir seviye çevirici (BSS138) konur.</p>\n<h3>Kart merdiveni</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Kart</th><th>Çekirdek</th><th>Bu dersteki yeri</th></tr></thead><tbody>\n<tr><td>Arduino Uno</td><td>8-bit AVR, 16 MHz, 2 KB RAM</td><td>G/Ç öğrenme, bizim laboratuvar</td></tr>\n<tr><td>ESP32</td><td>2× 240 MHz, Wi-Fi, Bluetooth</td><td>bağlantılı robotlar, telemetri, ESP32-CAM</td></tr>\n<tr><td>STM32</td><td>32-bit ARM Cortex-M, gerçek zamanlı</td><td>motor denetimi, uçuş kontrolcüleri (PX4 STM32 üzerinde çalışır)</td></tr>\n<tr><td>Raspberry Pi / Jetson</td><td>Linux bilgisayarlar, Jetson'da GPU</td><td>görü, derin öğrenme, ROS 2, görev bilgisayarı</td></tr></tbody></table></div>\n<h3>Yazılım mühendisliği olarak gömülü yazılım</h3>\n<p>Gömülü yazılımı bir <b>donanım soyutlama katmanına</b> (HAL: pinler, veri yolları), <b>sürücülere</b> (her çip için bir tane) ve <b>uygulama mantığına</b> (durum makineleri, denetim) ayır. Donanıma dokunmayan mantık (filtreler, PID, durum makineleri, protokol ayrıştırma) bilgisayarında herhangi bir C++ test çerçevesiyle derlenip birim testten geçirilebilir; böylece hataların çoğu karta yüklemeden önce bulunur. Aynı fikir 12. ve 13. haftalardaki yazılım-döngüde (SIL) testlere kadar büyür.</p>",
+   "code": [
+    {
+     "title": "Arduino: kesmeyle enkoder tıkları ve atomik kopya",
+     "src": "volatile long ticks = 0;\n\nvoid onTick() {            // ISR: çok kısa tut\n  ticks++;\n}\n\nvoid setup() {\n  Serial.begin(115200);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), onTick, RISING);\n}\n\nvoid loop() {\n  static unsigned long t0 = 0;\n  if (millis() - t0 >= 100) {          // 10 Hz'de raporla\n    t0 = millis();\n    noInterrupts();\n    long copy = ticks;                 // long 4 bayttır: atomik kopyala\n    interrupts();\n    Serial.println(copy);\n  }\n}"
+    },
+    {
+     "title": "C++: bilgisayarda birim testi yapılan durum makinesi",
+     "src": "// line_fsm.h: saf mantık, Arduino başlığı yok, bu yüzden bilgisayarda da derlenir\nenum class Mode { Straight, Left, Right, Lost };\n\ninline Mode decide(bool leftOnLine, bool rightOnLine, Mode last) {\n  if (leftOnLine && rightOnLine) return Mode::Straight;\n  if (leftOnLine) return Mode::Left;\n  if (rightOnLine) return Mode::Right;\n  return last == Mode::Left || last == Mode::Right ? last : Mode::Lost;\n}\n\n// test_line_fsm.cpp (bilgisayar): g++ -std=c++17 test_line_fsm.cpp && ./a.out\n#include <cassert>\nint main() {\n  assert(decide(true, true, Mode::Lost) == Mode::Straight);\n  assert(decide(false, false, Mode::Left) == Mode::Left);   // dönmeye devam et\n  assert(decide(false, false, Mode::Straight) == Mode::Lost);\n}"
+    }
+   ],
+   "lab": "Bizim laboratuvarda MPU6050 kitini aç ve ham ivmeyi Wire ile oku; koddaki adresi 0x69 yap ve cihazın neden cevap vermediğini açıkla. Sonra I²C LCD kitini aç ve eğim açısını ekrana yaz. Wokwi'de enkoder kesme sayacını önce ESP32, sonra STM32 Nucleo üzerinde kur ve değiştirmen gereken kodu karşılaştır.",
+   "hw": "1. haftadaki çizgi izleyen karar mantığını saf bir C++ fonksiyonuna taşı, bilgisayarında çalışan en az altı birim testi yaz ve bunları her push'ta testleri çalıştıran bir CI iş akışıyla birlikte bir GitHub deposuna koy."
+  }
+ },
+ {
+  "n": 4,
+  "sims": [
+   "filter"
+  ],
+  "simCfg": {},
+  "parts": [
+   "hc-sr04",
+   "jsn-sr04t",
+   "ir-mesafe-sharp",
+   "vl53l0x-tof",
+   "tf-luna-lidar",
+   "mpu6050",
+   "bmi270",
+   "bno085",
+   "ds18b20",
+   "dht22",
+   "mq-2"
+  ],
+  "kits": [
+   "hc-sr04",
+   "jsn-sr04t",
+   "ir-mesafe-sharp",
+   "mpu6050",
+   "dht22",
+   "mq-135"
+  ],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Sensors and signal filtering",
+   "tools": "This platform (Uno lab: HC-SR04, Sharp IR, MPU6050), Python",
+   "goals": [
+    "Choose a sensor for a task and describe its limits",
+    "Convert raw readings into physical units",
+    "Apply moving average, EMA and a 1D Kalman filter and compare them"
+   ],
+   "notes": "<p>Sensors are either <b>proprioceptive</b> (measuring the robot itself: encoders, IMU, battery voltage) or <b>exteroceptive</b> (measuring the world: distance sensors, cameras, LiDAR).</p>\n<h3>Common sensors</h3>\n<ul><li><b>IR reflectance</b>: cheap, short range, sensitive to ambient light. Good for line following.</li><li><b>Ultrasonic (HC-SR04)</b>: measures echo time. Sound travels about 343 m/s and goes there and back:</li></ul>\n<div class=\"eq\">d = v · t / 2 ≈ 0.0343 · t<sub>µs</sub> / 2 &nbsp;cm</div>\n<ul><li><b>IMU</b>: an accelerometer (measures gravity plus motion, noisy) and a gyroscope (measures angular rate, smooth but drifts when integrated).</li><li><b>Wheel encoders</b>: count ticks; distance is <i>2πr · ticks / N</i>.</li></ul>\n<h3>Noise and filters</h3>\n<p>Every measurement is the true value plus noise. Filters trade noise reduction against delay (lag).</p>\n<div class=\"eq\">Moving average: y<sub>k</sub> = (x<sub>k</sub> + … + x<sub>k−N+1</sub>) / N</div>\n<div class=\"eq\">EMA: y<sub>k</sub> = α x<sub>k</sub> + (1 − α) y<sub>k−1</sub></div>\n<div class=\"eq\">Complementary: θ = 0.98 (θ + ω<sub>gyro</sub> Δt) + 0.02 θ<sub>accel</sub></div>\n<p>The <b>Kalman filter</b> keeps an estimate and its uncertainty <i>P</i>. It predicts (uncertainty grows by <i>Q</i>) and then updates with the measurement, weighting it by the gain <i>K = P / (P + R)</i>. A large <i>R</i> means \"trust the sensor less\". We return to this idea for localization in week 9.</p>",
+   "code": [
+    {
+     "title": "Arduino: HC-SR04 distance with an EMA filter",
+     "src": "const int TRIG = 9, ECHO = 10;\nconst float ALPHA = 0.2;\nfloat filtered = 0;\n\nfloat readCm() {\n  digitalWrite(TRIG, LOW);  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH); delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long us = pulseIn(ECHO, HIGH, 30000);   // timeout ~5 m\n  return us * 0.0343 / 2.0;\n}\n\nvoid setup() { pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT); Serial.begin(115200); }\n\nvoid loop() {\n  float raw = readCm();\n  filtered = ALPHA * raw + (1 - ALPHA) * filtered;\n  Serial.print(raw); Serial.print(','); Serial.println(filtered);  // open Serial Plotter\n  delay(30);\n}"
+    },
+    {
+     "title": "Python: 1D Kalman filter",
+     "src": "def kalman_1d(zs, q=0.3, r=200.0):\n    x, p = zs[0], 100.0\n    out = []\n    for z in zs:\n        p += q                 # predict: uncertainty grows\n        k = p / (p + r)        # Kalman gain\n        x += k * (z - x)       # update with measurement\n        p *= (1 - k)\n        out.append(x)\n    return out"
+    }
+   ],
+   "lab": "In the simulator, find the settings that give the lowest error for each filter at noise σ = 14 and σ = 30. Which filter reacts fastest to the step changes? Then wire an HC-SR04 in Wokwi and compare raw and filtered values in the Serial Plotter.",
+   "hw": "Implement a complementary filter for an MPU6050 in Wokwi and plot the pitch angle from the accelerometer only, the gyro only and the filter. Explain each curve in a few sentences."
+  },
+  "tr": {
+   "title": "Sensörler ve sinyal filtreleme",
+   "tools": "Bu platform (Uno laboratuvarı: HC-SR04, Sharp IR, MPU6050), Python",
+   "goals": [
+    "Bir görev için sensör seçmek ve sınırlarını açıklamak",
+    "Ham okumaları fiziksel birimlere dönüştürmek",
+    "Hareketli ortalama, EMA ve 1B Kalman filtresini uygulamak ve karşılaştırmak"
+   ],
+   "notes": "<p>Sensörler ya <b>iç algılayıcı (proprioceptive)</b> (robotun kendisini ölçer: enkoderler, IMU, pil gerilimi) ya da <b>dış algılayıcı (exteroceptive)</b> (dünyayı ölçer: mesafe sensörleri, kameralar, LiDAR) olarak sınıflandırılır.</p>\n<h3>Yaygın sensörler</h3>\n<ul><li><b>IR yansıma</b>: ucuz, kısa menzilli, ortam ışığına duyarlı. Çizgi izleme için uygundur.</li><li><b>Ultrasonik (HC-SR04)</b>: yankı süresini ölçer. Ses yaklaşık 343 m/s hızla yayılır ve gidip geri döner:</li></ul>\n<div class=\"eq\">d = v · t / 2 ≈ 0.0343 · t<sub>µs</sub> / 2 &nbsp;cm</div>\n<ul><li><b>IMU</b>: bir ivmeölçer (yerçekimi artı hareketi ölçer, gürültülüdür) ve bir jiroskop (açısal hızı ölçer, pürüzsüzdür ancak integrali alındığında kayar (drift)).</li><li><b>Tekerlek enkoderleri</b>: tik sayar; mesafe <i>2πr · ticks / N</i> olur.</li></ul>\n<h3>Gürültü ve filtreler</h3>\n<p>Her ölçüm, gerçek değer artı gürültüdür. Filtreler, gürültü azaltımı ile gecikme (lag) arasında bir ödünleşim yapar.</p>\n<div class=\"eq\">Hareketli ortalama: y<sub>k</sub> = (x<sub>k</sub> + … + x<sub>k−N+1</sub>) / N</div>\n<div class=\"eq\">EMA: y<sub>k</sub> = α x<sub>k</sub> + (1 − α) y<sub>k−1</sub></div>\n<div class=\"eq\">Tümleyen (complementary): θ = 0.98 (θ + ω<sub>gyro</sub> Δt) + 0.02 θ<sub>accel</sub></div>\n<p><b>Kalman filtresi</b> bir kestirim ve onun belirsizliği <i>P</i>'yi tutar. Önce tahmin yapar (belirsizlik <i>Q</i> kadar artar), ardından ölçümü <i>K = P / (P + R)</i> kazancıyla ağırlıklandırarak günceller. Büyük bir <i>R</i>, \"sensöre daha az güven\" anlamına gelir. Bu fikre 9. haftada konumlandırma (localization) için geri döneceğiz.</p>",
+   "code": [
+    {
+     "title": "Arduino: EMA filtreli HC-SR04 mesafe ölçümü",
+     "src": "const int TRIG = 9, ECHO = 10;\nconst float ALPHA = 0.2;\nfloat filtered = 0;\n\nfloat readCm() {\n  digitalWrite(TRIG, LOW);  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH); delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long us = pulseIn(ECHO, HIGH, 30000);   // zaman aşımı ~5 m\n  return us * 0.0343 / 2.0;\n}\n\nvoid setup() { pinMode(TRIG, OUTPUT); pinMode(ECHO, INPUT); Serial.begin(115200); }\n\nvoid loop() {\n  float raw = readCm();\n  filtered = ALPHA * raw + (1 - ALPHA) * filtered;\n  Serial.print(raw); Serial.print(','); Serial.println(filtered);  // Serial Plotter'ı açın\n  delay(30);\n}"
+    },
+    {
+     "title": "Python: 1B Kalman filtresi",
+     "src": "def kalman_1d(zs, q=0.3, r=200.0):\n    x, p = zs[0], 100.0\n    out = []\n    for z in zs:\n        p += q                 # tahmin: belirsizlik artar\n        k = p / (p + r)        # Kalman kazancı\n        x += k * (z - x)       # ölçümle güncelle\n        p *= (1 - k)\n        out.append(x)\n    return out"
+    }
+   ],
+   "lab": "Simülatörde, σ = 14 ve σ = 30 gürültü düzeylerinde her filtre için en düşük hatayı veren ayarları bulun. Basamak değişimlerine en hızlı hangi filtre tepki veriyor? Ardından Wokwi'de bir HC-SR04 bağlayın ve ham ile filtrelenmiş değerleri Serial Plotter'da karşılaştırın.",
+   "hw": "Wokwi'de bir MPU6050 için tümleyen filtre (complementary filter) uygulayın ve yalnızca ivmeölçerden, yalnızca jiroskoptan ve filtreden elde edilen yunuslama (pitch) açısını çizdirin. Her eğriyi birkaç cümleyle açıklayın."
+  }
+ },
+ {
+  "n": 5,
+  "sims": [
+   "pwm"
+  ],
+  "simCfg": {},
+  "parts": [
+   "l298n",
+   "tb6612fng",
+   "drv8833",
+   "bts7960",
+   "cytron-md10c",
+   "sg90",
+   "mg996r",
+   "nema17-step-motor",
+   "tmc2209",
+   "esc-blheli-s-32",
+   "bldc-fircasiz-motor",
+   "lm2596-buck",
+   "lipo-batarya"
+  ],
+  "kits": [
+   "l298n",
+   "tb6612fng",
+   "drv8833",
+   "bts7960",
+   "cytron-md10c",
+   "sg90",
+   "tmc2209",
+   "esc-blheli-s-32"
+  ],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Actuators and motor control",
+   "tools": "This platform (Uno lab: L298N, TB6612, servo, step, ESC)",
+   "goals": [
+    "Explain PWM and compute average voltage from duty cycle",
+    "Drive DC motors in both directions with an H-bridge",
+    "Choose between DC motors, servos and steppers"
+   ],
+   "notes": "<p>Actuators turn electrical energy into motion. A microcontroller pin can supply only a few milliamps, so motors always need a driver and their own power supply, with a shared ground.</p>\n<h3>DC motors and PWM</h3>\n<p>A DC motor's speed is roughly proportional to its voltage, and its torque to its current. A microcontroller cannot output an arbitrary voltage, so it switches the supply on and off quickly. The fraction of time it is on is the <b>duty cycle</b> <i>D</i>:</p>\n<div class=\"eq\">V<sub>avg</sub> = D · V<sub>supply</sub></div>\n<p>On the Uno, <code>analogWrite(pin, 0…255)</code> produces PWM at about 490 Hz (980 Hz on pins 5 and 6).</p>\n<h3>H-bridge</h3>\n<p>Four switches let current flow through the motor in either direction. Modules like the L298N (simple, but loses about 2 V as heat) or the TB6612FNG (more efficient) take two direction pins and one PWM pin per motor. Motors are inductive loads, so drivers include flyback diodes.</p>\n<h3>Servos and steppers</h3>\n<ul><li><b>Hobby servo</b>: a motor, gearbox and position controller in one box. A 50 Hz signal with a 1 to 2 ms pulse sets the angle from 0° to 180°.</li><li><b>Stepper</b>: moves in fixed steps (often 200 per revolution) with no feedback needed for positioning. Used in 3D printers. Drivers such as the A4988 take step and direction pins.</li></ul>\n<p>Choose by asking what you need to control: speed (DC), angle within a range (servo), precise repeatable position (stepper), or high power density (brushless with an ESC, as on drones).</p>",
+   "code": [
+    {
+     "title": "Arduino: servo following a potentiometer",
+     "src": "#include <Servo.h>\nServo s;\n\nvoid setup() { s.attach(9); }\n\nvoid loop() {\n  int raw = analogRead(A0);              // 0..1023\n  int angle = map(raw, 0, 1023, 0, 180);\n  s.write(angle);\n  delay(15);\n}"
+    }
+   ],
+   "lab": "In Wokwi, control a servo with a potentiometer. Then drive a DC motor through an L298N and ramp the speed from 0 to full and back without using delay().",
+   "hw": "Write a function setMotor(int speed) that accepts −255 to 255, sets the direction pins, clamps the input and brakes at 0. Test it with a short sequence of speeds in Wokwi."
+  },
+  "tr": {
+   "title": "Eyleyiciler ve motor kontrolü",
+   "tools": "Bu platform (Uno laboratuvarı: L298N, TB6612, servo, step, ESC)",
+   "goals": [
+    "PWM'i açıklamak ve görev döngüsünden (duty cycle) ortalama gerilimi hesaplamak",
+    "DC motorları bir H köprüsüyle iki yönde sürmek",
+    "DC motorlar, servolar ve step motorlar arasında seçim yapmak"
+   ],
+   "notes": "<p>Eyleyiciler (actuators) elektrik enerjisini harekete dönüştürür. Bir mikrodenetleyici pini yalnızca birkaç miliamper sağlayabilir; bu nedenle motorlar her zaman bir sürücüye ve ortak toprağa bağlı ayrı bir güç kaynağına ihtiyaç duyar.</p>\n<h3>DC motorlar ve PWM</h3>\n<p>Bir DC motorun hızı kabaca gerilimiyle, torku ise akımıyla orantılıdır. Mikrodenetleyici keyfi bir gerilim üretemez; bu yüzden beslemeyi hızla açıp kapatır. Açık kaldığı sürenin oranı <b>görev döngüsü (duty cycle)</b> <i>D</i>'dir:</p>\n<div class=\"eq\">V<sub>avg</sub> = D · V<sub>supply</sub></div>\n<p>Uno'da <code>analogWrite(pin, 0…255)</code> yaklaşık 490 Hz'lik PWM üretir (5 ve 6 numaralı pinlerde 980 Hz).</p>\n<h3>H köprüsü</h3>\n<p>Dört anahtar, akımın motordan her iki yönde geçmesine izin verir. L298N (basit, ancak yaklaşık 2 V'u ısı olarak kaybeder) veya TB6612FNG (daha verimli) gibi modüller, motor başına iki yön pini ve bir PWM pini alır. Motorlar endüktif yüklerdir; bu nedenle sürücüler geri dönüş (flyback) diyotları içerir.</p>\n<h3>Servolar ve step motorlar</h3>\n<ul><li><b>Hobi servosu</b>: motor, dişli kutusu ve konum denetleyicisi tek kutuda. 1 ile 2 ms darbe genişliğine sahip 50 Hz'lik bir sinyal, açıyı 0° ile 180° arasında ayarlar.</li><li><b>Step motor</b>: sabit adımlarla (çoğunlukla tur başına 200) hareket eder, konumlandırma için geri besleme (feedback) gerekmez. 3B yazıcılarda kullanılır. A4988 gibi sürücüler adım ve yön pinleri alır.</li></ul>\n<p>Seçim yaparken neyi kontrol etmeniz gerektiğini sorun: hız (DC), belirli bir aralıkta açı (servo), hassas ve tekrarlanabilir konum (step) ya da yüksek güç yoğunluğu (dronlardaki gibi ESC'li fırçasız motor).</p>",
+   "code": [
+    {
+     "title": "Arduino: potansiyometreyi izleyen servo",
+     "src": "#include <Servo.h>\nServo s;\n\nvoid setup() { s.attach(9); }\n\nvoid loop() {\n  int raw = analogRead(A0);              // 0..1023\n  int angle = map(raw, 0, 1023, 0, 180);\n  s.write(angle);\n  delay(15);\n}"
+    }
+   ],
+   "lab": "Wokwi'de bir servoyu potansiyometreyle kontrol edin. Ardından bir DC motoru L298N üzerinden sürün ve delay() kullanmadan hızı 0'dan tam hıza çıkarıp geri indirin.",
+   "hw": "−255 ile 255 arasında değer alan, yön pinlerini ayarlayan, girişi sınırlayan (clamp) ve 0'da fren yapan bir setMotor(int speed) fonksiyonu yazın. Wokwi'de kısa bir hız dizisiyle test edin."
+  }
+ },
+ {
+  "n": 6,
+  "sims": [
+   "pid",
+   "line"
+  ],
+  "simCfg": {
+   "line": {
+    "mode": "pid"
+   }
+  },
+  "parts": [
+   "n20-mikro-motor",
+   "tb6612fng",
+   "stm32"
+  ],
+  "kits": [
+   "tb6612fng"
+  ],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Feedback control and PID",
+   "tools": "Python, this platform",
+   "goals": [
+    "Explain the effect of each PID term",
+    "Implement a discrete PID controller with anti-windup",
+    "Tune a controller by observing the step response"
+   ],
+   "notes": "<p>In <b>open-loop</b> control you send a command and hope. In <b>closed-loop</b> (feedback) control you measure the result, compute the error <i>e = r − y</i> between the reference and the measurement, and correct continuously.</p>\n<div class=\"eq\">u(t) = K<sub>p</sub> e(t) + K<sub>i</sub> ∫ e(t) dt + K<sub>d</sub> de(t)/dt</div>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Increase</th><th>Rise time</th><th>Overshoot</th><th>Steady-state error</th></tr></thead><tbody>\n<tr><td>K<sub>p</sub></td><td>shorter</td><td>larger</td><td>smaller</td></tr>\n<tr><td>K<sub>i</sub></td><td>shorter</td><td>larger</td><td>removed</td></tr>\n<tr><td>K<sub>d</sub></td><td>little change</td><td>smaller</td><td>no effect</td></tr></tbody></table></div>\n<h3>Implementation details that matter</h3>\n<ul><li><b>Discrete time</b>: the integral becomes a running sum <i>I += e·Δt</i>; the derivative a difference divided by <i>Δt</i>. Use a fixed loop period.</li><li><b>Derivative on measurement</b>: use <i>−dy/dt</i> instead of <i>de/dt</i> so a jump in the setpoint does not create a huge spike (\"derivative kick\").</li><li><b>Integral windup</b>: when the actuator saturates, the integral keeps growing and causes large overshoot later. Stop integrating while saturated.</li><li><b>Filtering</b>: the derivative amplifies noise, so filter it (week 4).</li></ul>\n<h3>Tuning</h3>\n<p>Manual: raise <i>K<sub>p</sub></i> until it oscillates, add <i>K<sub>d</sub></i> to damp, then add a little <i>K<sub>i</sub></i> for the remaining error. Ziegler–Nichols: find the gain <i>K<sub>u</sub></i> where oscillation is sustained with period <i>T<sub>u</sub></i>, then set <i>K<sub>p</sub> = 0.6K<sub>u</sub></i>, <i>T<sub>i</sub> = T<sub>u</sub>/2</i>, <i>T<sub>d</sub> = T<sub>u</sub>/8</i>.</p>\n<h3>Back to the line follower</h3>\n<p>With a five-sensor array, the error is the weighted average position of the sensors that see the line (−2 to +2). A PD controller on that error steers smoothly instead of zig-zagging.</p>",
+   "code": [
+    {
+     "title": "Python: PID with derivative on measurement and anti-windup",
+     "src": "class PID:\n    def __init__(self, kp, ki, kd, u_min=-255, u_max=255):\n        self.kp, self.ki, self.kd = kp, ki, kd\n        self.u_min, self.u_max = u_min, u_max\n        self.i = 0.0\n        self.prev_y = None\n\n    def update(self, setpoint, y, dt):\n        e = setpoint - y\n        d = 0.0 if self.prev_y is None else -(y - self.prev_y) / dt\n        self.prev_y = y\n        u = self.kp * e + self.ki * (self.i + e * dt) + self.kd * d\n        if self.u_min < u < self.u_max:    # integrate only when not saturated\n            self.i += e * dt\n        return max(self.u_min, min(self.u_max, u))"
+    }
+   ],
+   "lab": "PID simulator: (1) P only, find the Kp where it starts to oscillate. (2) Add Kd until overshoot is below 10%. (3) Set the disturbance to 4 and add Ki to remove the error. (4) Turn anti-windup off and compare. Then switch the line follower to PD mode and find the fastest stable speed.",
+   "hw": "Submit screenshots of four step responses with different gains and a short explanation of each. Include your best gains for the line follower and the speed you reached."
+  },
+  "tr": {
+   "title": "Geri beslemeli kontrol ve PID",
+   "tools": "Python, bu platform",
+   "goals": [
+    "Her PID teriminin etkisini açıklamak",
+    "Integral doyumu önlemeli (anti-windup) ayrık bir PID denetleyici uygulamak",
+    "Basamak yanıtını gözlemleyerek bir denetleyiciyi ayarlamak"
+   ],
+   "notes": "<p><b>Açık döngü (open-loop)</b> kontrolde bir komut gönderir ve umut edersiniz. <b>Kapalı döngü (closed-loop)</b>, yani geri beslemeli (feedback) kontrolde sonucu ölçer, referans ile ölçüm arasındaki <i>e = r − y</i> hatasını hesaplar ve sürekli olarak düzeltirsiniz.</p>\n<div class=\"eq\">u(t) = K<sub>p</sub> e(t) + K<sub>i</sub> ∫ e(t) dt + K<sub>d</sub> de(t)/dt</div>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Artırılan</th><th>Yükselme süresi</th><th>Aşım</th><th>Kalıcı durum hatası</th></tr></thead><tbody>\n<tr><td>K<sub>p</sub></td><td>kısalır</td><td>artar</td><td>azalır</td></tr>\n<tr><td>K<sub>i</sub></td><td>kısalır</td><td>artar</td><td>ortadan kalkar</td></tr>\n<tr><td>K<sub>d</sub></td><td>az değişir</td><td>azalır</td><td>etkisi yok</td></tr></tbody></table></div>\n<h3>Önemli uygulama ayrıntıları</h3>\n<ul><li><b>Ayrık zaman</b>: integral, birikimli bir toplama <i>I += e·Δt</i> dönüşür; türev ise <i>Δt</i>'ye bölünen bir farka. Sabit bir döngü periyodu kullanın.</li><li><b>Ölçüm üzerinden türev</b>: <i>de/dt</i> yerine <i>−dy/dt</i> kullanın; böylece referans değerdeki (setpoint) bir sıçrama devasa bir sivri tepe (\"türev tekmesi\", derivative kick) oluşturmaz.</li><li><b>İntegral doyumu (windup)</b>: eyleyici doyuma ulaştığında integral büyümeye devam eder ve daha sonra büyük bir aşıma yol açar. Doyumdayken integral almayı durdurun.</li><li><b>Filtreleme</b>: türev gürültüyü büyütür, bu yüzden onu filtreleyin (4. hafta).</li></ul>\n<h3>Ayarlama</h3>\n<p>Elle ayarlama: <i>K<sub>p</sub></i>'yi salınım başlayana kadar artırın, sönümlemek için <i>K<sub>d</sub></i> ekleyin, ardından kalan hata için biraz <i>K<sub>i</sub></i> ekleyin. Ziegler–Nichols: salınımın <i>T<sub>u</sub></i> periyoduyla sürdüğü <i>K<sub>u</sub></i> kazancını bulun, sonra <i>K<sub>p</sub> = 0.6K<sub>u</sub></i>, <i>T<sub>i</sub> = T<sub>u</sub>/2</i>, <i>T<sub>d</sub> = T<sub>u</sub>/8</i> olarak ayarlayın.</p>\n<h3>Çizgi izleyiciye dönüş</h3>\n<p>Beş sensörlü bir dizide hata, çizgiyi gören sensörlerin ağırlıklı ortalama konumudur (−2 ile +2 arası). Bu hata üzerinde çalışan bir PD denetleyici, zikzak çizmek yerine yumuşak bir şekilde yön verir.</p>",
+   "code": [
+    {
+     "title": "Python: ölçüm üzerinden türevli ve integral doyumu önlemeli PID",
+     "src": "class PID:\n    def __init__(self, kp, ki, kd, u_min=-255, u_max=255):\n        self.kp, self.ki, self.kd = kp, ki, kd\n        self.u_min, self.u_max = u_min, u_max\n        self.i = 0.0\n        self.prev_y = None\n\n    def update(self, setpoint, y, dt):\n        e = setpoint - y\n        d = 0.0 if self.prev_y is None else -(y - self.prev_y) / dt\n        self.prev_y = y\n        u = self.kp * e + self.ki * (self.i + e * dt) + self.kd * d\n        if self.u_min < u < self.u_max:    # yalnızca doyumda değilken integral al\n            self.i += e * dt\n        return max(self.u_min, min(self.u_max, u))"
+    }
+   ],
+   "lab": "PID simülatörü: (1) Yalnızca P ile salınımın başladığı Kp değerini bulun. (2) Aşım %10'un altına inene kadar Kd ekleyin. (3) Bozucuyu (disturbance) 4'e ayarlayın ve hatayı gidermek için Ki ekleyin. (4) Integral doyumu önlemeyi (anti-windup) kapatıp karşılaştırın. Ardından çizgi izleyiciyi PD moduna alın ve en hızlı kararlı hızı bulun.",
+   "hw": "Farklı kazançlarla elde edilmiş dört basamak yanıtının ekran görüntülerini, her biri için kısa bir açıklamayla birlikte teslim edin. Çizgi izleyici için en iyi kazançlarınızı ve ulaştığınız hızı da ekleyin."
+  }
+ },
+ {
+  "n": 7,
+  "sims": [
+   "diff",
+   "arm"
+  ],
+  "simCfg": {},
+  "parts": [
+   "metal-disli-dc-motor",
+   "n20-mikro-motor",
+   "mg996r",
+   "ds3218",
+   "ds3225",
+   "nema17-step-motor",
+   "t8-vidali-mil-lead-screw",
+   "gt2-kayis-kasnak-20-dis"
+  ],
+  "kits": [
+   "mg996r",
+   "nema17-step-motor"
+  ],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Mobile robot and manipulator kinematics",
+   "tools": "Python (NumPy, Matplotlib), this platform",
+   "goals": [
+    "Derive differential drive forward and inverse kinematics",
+    "Compute pose from encoder ticks (odometry)",
+    "Explain why odometry drifts",
+    "Compute forward kinematics of a planar arm",
+    "Solve two-link inverse kinematics and handle multiple solutions",
+    "Describe a joint with Denavit–Hartenberg parameters"
+   ],
+   "notes": "<p>Kinematics describes motion without asking which forces cause it. A differential drive robot has two independently driven wheels separated by the wheel base <i>L</i>. It is <b>non-holonomic</b>: it cannot move sideways directly.</p>\n<h3>Forward kinematics</h3>\n<div class=\"eq\">v = (v<sub>R</sub> + v<sub>L</sub>) / 2 &nbsp;&nbsp;&nbsp; ω = (v<sub>R</sub> − v<sub>L</sub>) / L &nbsp;&nbsp;&nbsp; R = v / ω</div>\n<p>The robot rotates about the <b>instantaneous centre of rotation</b> (ICR) at distance <i>R</i>. Equal wheel speeds give a straight line (R = ∞); opposite speeds spin it in place (R = 0).</p>\n<div class=\"eq\">ẋ = v cos θ &nbsp;&nbsp; ẏ = v sin θ &nbsp;&nbsp; θ̇ = ω</div>\n<h3>Inverse kinematics</h3>\n<p>Planners and ROS output a desired (v, ω), usually as a <code>Twist</code> message. Convert it to wheel speeds:</p>\n<div class=\"eq\">v<sub>R</sub> = v + ωL/2 &nbsp;&nbsp;&nbsp; v<sub>L</sub> = v − ωL/2</div>\n<h3>Odometry and drift</h3>\n<p>Integrating encoder readings gives a pose estimate. Small errors (unequal wheel radii, slip, wrong wheel base) accumulate without bound, especially in heading. This is why robots need external references and localization (week 9).</p>\n<p>Other drive types: Ackermann steering (cars), mecanum and omni wheels (holonomic, can move sideways), tracked and legged robots.</p>\n<h2>Additional reading: manipulator kinematics</h2>\n<p>A manipulator is a chain of rigid <b>links</b> connected by <b>joints</b> (revolute or prismatic). The number of independent joints is its degrees of freedom (DOF). Joint angles form the <b>configuration space</b>; the position of the gripper lives in <b>task space</b>.</p>\n<h3>Forward kinematics (FK)</h3>\n<div class=\"eq\">x = l<sub>1</sub> cos θ<sub>1</sub> + l<sub>2</sub> cos(θ<sub>1</sub> + θ<sub>2</sub>) &nbsp;&nbsp; y = l<sub>1</sub> sin θ<sub>1</sub> + l<sub>2</sub> sin(θ<sub>1</sub> + θ<sub>2</sub>)</div>\n<h3>Inverse kinematics (IK)</h3>\n<p>Given a target (x, y), the law of cosines gives the elbow angle:</p>\n<div class=\"eq\">cos θ<sub>2</sub> = (x² + y² − l<sub>1</sub>² − l<sub>2</sub>²) / (2 l<sub>1</sub> l<sub>2</sub>)</div>\n<div class=\"eq\">θ<sub>1</sub> = atan2(y, x) − atan2(l<sub>2</sub> sin θ<sub>2</sub>, l<sub>1</sub> + l<sub>2</sub> cos θ<sub>2</sub>)</div>\n<ul><li>Two solutions exist (elbow up and elbow down) for most targets.</li><li>No solution exists outside the workspace ring <i>|l<sub>1</sub> − l<sub>2</sub>| ≤ r ≤ l<sub>1</sub> + l<sub>2</sub></i>.</li><li>At θ<sub>2</sub> = 0° or 180° the arm is <b>singular</b>: it loses the ability to move in one direction.</li></ul>\n<h3>DH parameters and transforms</h3>\n<p>For arms with more joints we chain 4×4 homogeneous transforms. The Denavit–Hartenberg convention describes each joint with four numbers (a, α, d, θ). Multiplying the transforms from base to tip gives the full FK. Velocities are related by the Jacobian: <i>ẋ = J(q) q̇</i>.</p>",
+   "code": [
+    {
+     "title": "Python: odometry update from wheel travel",
+     "src": "import math\n\nTICKS_PER_REV, WHEEL_R = 360, 0.033          # encoder, metres\nTICKS_TO_M = 2 * math.pi * WHEEL_R / TICKS_PER_REV\n\ndef odom_step(x, y, th, dl, dr, L):\n    \"\"\"dl, dr: distance each wheel travelled since the last step (m).\"\"\"\n    dc = (dr + dl) / 2.0\n    dth = (dr - dl) / L\n    x += dc * math.cos(th + dth / 2)          # midpoint integration\n    y += dc * math.sin(th + dth / 2)\n    th = (th + dth + math.pi) % (2 * math.pi) - math.pi\n    return x, y, th"
+    },
+    {
+     "title": "Python: FK, IK and a DH transform",
+     "src": "import numpy as np\n\nL1, L2 = 0.15, 0.11\n\ndef fk(q1, q2):\n    x = L1*np.cos(q1) + L2*np.cos(q1 + q2)\n    y = L1*np.sin(q1) + L2*np.sin(q1 + q2)\n    return x, y\n\ndef ik(x, y, elbow_up=True):\n    D = (x**2 + y**2 - L1**2 - L2**2) / (2*L1*L2)\n    if abs(D) > 1:\n        raise ValueError(\"target out of reach\")\n    q2 = np.arccos(D) * (-1 if elbow_up else 1)\n    q1 = np.arctan2(y, x) - np.arctan2(L2*np.sin(q2), L1 + L2*np.cos(q2))\n    return q1, q2\n\ndef dh(a, alpha, d, theta):\n    ca, sa, ct, st = np.cos(alpha), np.sin(alpha), np.cos(theta), np.sin(theta)\n    return np.array([[ct, -st*ca,  st*sa, a*ct],\n                     [st,  ct*ca, -ct*sa, a*st],\n                     [0,      sa,     ca,    d],\n                     [0,       0,      0,    1]])"
+    }
+   ],
+   "lab": "In the simulator, find wheel speeds that (a) drive straight, (b) spin in place, (c) make a circle of radius 100 px. Then set the wheel radius error to 5% and measure the odometry error after one full circle. Check that fk(ik(x, y)) returns (x, y) for 100 random reachable points, for both elbow solutions. In the simulator, find two singular configurations and describe what the arm can no longer do there.",
+   "hw": "Write a Python function that converts (v, ω) to wheel speeds and use it to drive a simulated robot around a 1 m square. Plot the true path and the odometry path with a 2% wheel radius error. Make the end effector draw a circle: generate points on the circle, solve IK for each, and animate the arm with Matplotlib. Handle points that fall outside the workspace."
+  },
+  "tr": {
+   "title": "Mobil robot ve manipülatör kinematiği",
+   "tools": "Python (NumPy, Matplotlib), bu platform",
+   "goals": [
+    "Diferansiyel sürüşün ileri ve ters kinematiğini türetmek",
+    "Enkoder tiklerinden pozu hesaplamak (odometri)",
+    "Odometrinin neden kaydığını (drift) açıklamak",
+    "Düzlemsel bir kolun ileri kinematiğini hesaplamak",
+    "İki uzuvlu ters kinematiği çözmek ve çoklu çözümleri ele almak",
+    "Bir eklemi Denavit–Hartenberg parametreleriyle tanımlamak"
+   ],
+   "notes": "<p>Kinematik, hareketi hangi kuvvetlerin oluşturduğunu sormadan tanımlar. Diferansiyel sürüşlü (differential drive) bir robotun, aralarında tekerlek açıklığı <i>L</i> bulunan, bağımsız olarak sürülen iki tekerleği vardır. Bu robot <b>holonomik olmayan (non-holonomic)</b> bir sistemdir: doğrudan yana doğru hareket edemez.</p>\n<h3>İleri kinematik (forward kinematics)</h3>\n<div class=\"eq\">v = (v<sub>R</sub> + v<sub>L</sub>) / 2 &nbsp;&nbsp;&nbsp; ω = (v<sub>R</sub> − v<sub>L</sub>) / L &nbsp;&nbsp;&nbsp; R = v / ω</div>\n<p>Robot, <b>anlık dönme merkezi (instantaneous centre of rotation, ICR)</b> etrafında döner; bu merkez robottan <i>R</i> uzaklıktadır. Eşit tekerlek hızları düz bir çizgi verir (R = ∞); zıt hızlar robotu yerinde döndürür (R = 0).</p>\n<div class=\"eq\">ẋ = v cos θ &nbsp;&nbsp; ẏ = v sin θ &nbsp;&nbsp; θ̇ = ω</div>\n<h3>Ters kinematik (inverse kinematics)</h3>\n<p>Planlayıcılar ve ROS, genellikle bir <code>Twist</code> mesajı olarak istenen (v, ω) değerini üretir. Bunu tekerlek hızlarına dönüştürün:</p>\n<div class=\"eq\">v<sub>R</sub> = v + ωL/2 &nbsp;&nbsp;&nbsp; v<sub>L</sub> = v − ωL/2</div>\n<h3>Odometri ve kayma</h3>\n<p>Enkoder okumalarının integrali alınarak bir poz kestirimi elde edilir. Küçük hatalar (eşit olmayan tekerlek yarıçapları, patinaj, yanlış tekerlek açıklığı) özellikle yönelimde sınırsızca birikir. Robotların dış referanslara ve konumlandırmaya (localization) ihtiyaç duymasının nedeni budur (9. hafta).</p>\n<p>Diğer sürüş türleri: Ackermann direksiyonu (otomobiller), mekanum ve omni tekerlekler (holonomik, yana hareket edebilir), paletli ve bacaklı robotlar.</p>\n<h2>Ek okuma: manipülatör kinematiği</h2>\n<p>Manipülatör, <b>eklemlerle</b> (döner veya prizmatik) birbirine bağlanmış rijit <b>uzuvlardan</b> (links) oluşan bir zincirdir. Bağımsız eklemlerin sayısı, serbestlik derecesini (degrees of freedom, DOF) verir. Eklem açıları <b>konfigürasyon uzayını</b> oluşturur; tutucunun (gripper) konumu ise <b>görev uzayında</b> (task space) yer alır.</p>\n<h3>İleri kinematik (forward kinematics, FK)</h3>\n<div class=\"eq\">x = l<sub>1</sub> cos θ<sub>1</sub> + l<sub>2</sub> cos(θ<sub>1</sub> + θ<sub>2</sub>) &nbsp;&nbsp; y = l<sub>1</sub> sin θ<sub>1</sub> + l<sub>2</sub> sin(θ<sub>1</sub> + θ<sub>2</sub>)</div>\n<h3>Ters kinematik (inverse kinematics, IK)</h3>\n<p>Bir (x, y) hedefi verildiğinde, kosinüs teoremi dirsek açısını verir:</p>\n<div class=\"eq\">cos θ<sub>2</sub> = (x² + y² − l<sub>1</sub>² − l<sub>2</sub>²) / (2 l<sub>1</sub> l<sub>2</sub>)</div>\n<div class=\"eq\">θ<sub>1</sub> = atan2(y, x) − atan2(l<sub>2</sub> sin θ<sub>2</sub>, l<sub>1</sub> + l<sub>2</sub> cos θ<sub>2</sub>)</div>\n<ul><li>Çoğu hedef için iki çözüm vardır (dirsek yukarı ve dirsek aşağı).</li><li><i>|l<sub>1</sub> − l<sub>2</sub>| ≤ r ≤ l<sub>1</sub> + l<sub>2</sub></i> çalışma alanı halkasının dışında çözüm yoktur.</li><li>θ<sub>2</sub> = 0° veya 180° olduğunda kol <b>tekil (singular)</b> konumdadır: bir yönde hareket etme yeteneğini kaybeder.</li></ul>\n<h3>DH parametreleri ve dönüşümler</h3>\n<p>Daha çok eklemi olan kollar için 4×4 homojen dönüşümleri zincirleriz. Denavit–Hartenberg gösterimi her eklemi dört sayıyla (a, α, d, θ) tanımlar. Tabandan uca kadar dönüşümleri çarpmak tam FK'yı verir. Hızlar Jacobian ile ilişkilendirilir: <i>ẋ = J(q) q̇</i>.</p>",
+   "code": [
+    {
+     "title": "Python: tekerlek yolundan odometri güncellemesi",
+     "src": "import math\n\nTICKS_PER_REV, WHEEL_R = 360, 0.033          # enkoder, metre\nTICKS_TO_M = 2 * math.pi * WHEEL_R / TICKS_PER_REV\n\ndef odom_step(x, y, th, dl, dr, L):\n    \"\"\"dl, dr: her tekerleğin son adımdan bu yana aldığı yol (m).\"\"\"\n    dc = (dr + dl) / 2.0\n    dth = (dr - dl) / L\n    x += dc * math.cos(th + dth / 2)          # orta nokta integrasyonu\n    y += dc * math.sin(th + dth / 2)\n    th = (th + dth + math.pi) % (2 * math.pi) - math.pi\n    return x, y, th"
+    },
+    {
+     "title": "Python: FK, IK ve bir DH dönüşümü",
+     "src": "import numpy as np\n\nL1, L2 = 0.15, 0.11\n\ndef fk(q1, q2):\n    x = L1*np.cos(q1) + L2*np.cos(q1 + q2)\n    y = L1*np.sin(q1) + L2*np.sin(q1 + q2)\n    return x, y\n\ndef ik(x, y, elbow_up=True):\n    D = (x**2 + y**2 - L1**2 - L2**2) / (2*L1*L2)\n    if abs(D) > 1:\n        raise ValueError(\"target out of reach\")\n    q2 = np.arccos(D) * (-1 if elbow_up else 1)\n    q1 = np.arctan2(y, x) - np.arctan2(L2*np.sin(q2), L1 + L2*np.cos(q2))\n    return q1, q2\n\ndef dh(a, alpha, d, theta):\n    ca, sa, ct, st = np.cos(alpha), np.sin(alpha), np.cos(theta), np.sin(theta)\n    return np.array([[ct, -st*ca,  st*sa, a*ct],\n                     [st,  ct*ca, -ct*sa, a*st],\n                     [0,      sa,     ca,    d],\n                     [0,       0,      0,    1]])"
+    }
+   ],
+   "lab": "Simülatörde (a) düz giden, (b) yerinde dönen, (c) 100 px yarıçaplı bir çember çizen tekerlek hızlarını bulun. Ardından tekerlek yarıçapı hatasını %5'e ayarlayın ve tam bir turdan sonraki odometri hatasını ölçün. Rastgele seçilmiş 100 erişilebilir nokta için, her iki dirsek çözümünde de fk(ik(x, y)) ifadesinin (x, y) döndürdüğünü doğrulayın. Simülatörde iki tekil konfigürasyon bulun ve kolun o noktalarda artık neyi yapamadığını açıklayın.",
+   "hw": "(v, ω) değerini tekerlek hızlarına dönüştüren bir Python fonksiyonu yazın ve bunu kullanarak simüle edilmiş bir robotu 1 m'lik bir karenin çevresinde sürün. %2 tekerlek yarıçapı hatasıyla gerçek yolu ve odometri yolunu çizdirin. Uç işlevcinin (end effector) bir çember çizmesini sağlayın: çember üzerinde noktalar üretin, her biri için IK çözün ve kolu Matplotlib ile canlandırın. Çalışma alanının dışında kalan noktaları ele alın."
+  }
+ },
+ {
+  "n": 8,
+  "sims": [],
+  "simCfg": {},
+  "parts": [],
+  "kits": [],
+  "wokwi": [],
+  "exam": true,
+  "en": {
+   "title": "Midterm exam",
+   "tools": "Covers weeks 1 to 7",
+   "goals": [
+    "Review sensing, actuation, control and kinematics",
+    "Practise short derivations and code reading"
+   ],
+   "notes": "<p>The midterm covers weeks 1 to 7. The term project proposal is also due this week (see below). Expect a mix of short conceptual questions, small calculations and code reading.</p>\n<h3>Topics to review</h3>\n<ul><li>The sense, think, act loop and robot components</li><li>Arduino execution model, millis() timing, state machines</li><li>Sensor conversions (ultrasonic distance, ADC to voltage, encoder ticks to distance)</li><li>Moving average, EMA and the 1D Kalman update</li><li>PWM duty cycle and average voltage, H-bridge directions, servo pulses</li><li>The effect of P, I and D; windup; reading a step response</li><li>Differential drive forward and inverse kinematics, ICR, odometry drift</li><li>Two-link FK and IK, workspace, singularities (additional reading)</li><li>Interrupts, timers, I²C / SPI / UART basics</li></ul>\n<h3>Example question types</h3>\n<ul><li>An HC-SR04 echo lasts 1750 µs. How far is the obstacle?</li><li>A robot with L = 0.2 m has v<sub>L</sub> = 0.3 m/s and v<sub>R</sub> = 0.5 m/s. Find v, ω and R.</li><li>Given a step response plot, say which gain you would change and why.</li><li>Find the bug in a short Arduino sketch that uses delay() in a control loop.</li></ul>\n<h3>Term project proposal</h3>\n<p>Submit a two-page proposal: the chosen project track, the team, the requirements as testable acceptance criteria, a first architecture sketch (state machine or ROS 2 graph), the simulator (Webots or Gazebo) and a week-by-week plan up to week 14.</p>",
+   "code": [],
+   "lab": "",
+   "hw": ""
+  },
+  "tr": {
+   "title": "Ara sınav",
+   "tools": "1. ile 7. haftaları kapsar",
+   "goals": [
+    "Algılama, eyleyiciler, kontrol ve kinematik konularını tekrar etmek",
+    "Kısa türetmeler ve kod okuma alıştırmaları yapmak"
+   ],
+   "notes": "<p>Ara sınav 1. ile 7. haftaları kapsar. Kısa kavramsal sorular, küçük hesaplamalar ve kod okuma sorularından oluşan bir karışım bekleyin.</p>\n<h3>Tekrar edilecek konular</h3>\n<ul><li>Algıla, düşün, uygula döngüsü ve robot bileşenleri</li><li>Arduino yürütme modeli, millis() ile zamanlama, durum makineleri</li><li>Sensör dönüşümleri (ultrasonik mesafe, ADC'den gerilime, enkoder tiklerinden mesafeye)</li><li>Hareketli ortalama, EMA ve 1B Kalman güncellemesi</li><li>PWM görev döngüsü ve ortalama gerilim, H köprüsü yönleri, servo darbeleri</li><li>P, I ve D'nin etkisi; integral doyumu; basamak yanıtı okuma</li><li>Diferansiyel sürüş ileri ve ters kinematiği, ICR, odometri kayması</li><li>İki uzuvlu FK ve IK, çalışma alanı, tekillikler (ek okuma)</li><li>Kesmeler, zamanlayıcılar, I²C / SPI / UART temelleri</li></ul>\n<h3>Örnek soru tipleri</h3>\n<ul><li>Bir HC-SR04 yankısı 1750 µs sürüyor. Engel ne kadar uzakta?</li><li>L = 0,2 m olan bir robotta v<sub>L</sub> = 0,3 m/s ve v<sub>R</sub> = 0,5 m/s'dir. v, ω ve R'yi bulun.</li><li>Verilen bir basamak yanıtı grafiğine göre hangi kazancı değiştireceğinizi ve nedenini söyleyin.</li><li>Kontrol döngüsünde delay() kullanan kısa bir Arduino programındaki hatayı bulun.</li></ul>\n<h3>Dönem projesi önerisi</h3>\n<p>Bu hafta dönem projesi önerisi de teslim edilir. İki sayfalık öneride şunlar olmalı: seçilen proje kolu, takım, test edilebilir kabul ölçütleri biçiminde gereksinimler, ilk mimari taslağı (durum makinesi ya da ROS 2 grafiği), simülatör (Webots ya da Gazebo) ve 14. haftaya kadar haftalık plan.</p>",
+   "code": [],
+   "lab": "",
+   "hw": ""
+  }
+ },
+ {
+  "n": 9,
+  "sims": [
+   "path",
+   "pf"
+  ],
+  "simCfg": {},
+  "parts": [
+   "tf-luna-lidar",
+   "bno085",
+   "raspberry-pi-4b"
+  ],
+  "kits": [],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Path planning and localization",
+   "tools": "Python (NumPy), this platform",
+   "goals": [
+    "Represent a map as a graph or grid",
+    "Implement BFS, greedy best-first and A*",
+    "Explain heuristics, admissibility and optimality",
+    "Explain belief, prediction and correction",
+    "Implement a particle filter for landmark-based localization",
+    "Describe what SLAM solves and the tools used for it"
+   ],
+   "notes": "<p>A planner answers: how do I get from here to the goal without hitting anything? First we turn the world into something we can search.</p>\n<h3>Configuration space</h3>\n<p>Instead of planning for the robot's full shape, we shrink the robot to a point and grow every obstacle by the robot's radius (obstacle inflation). Now planning for a point is enough. ROS costmaps do exactly this.</p>\n<h3>Graph search on a grid</h3>\n<ul><li><b>Breadth-first search</b> explores in rings. It finds the shortest path on an unweighted grid but expands many cells.</li><li><b>Dijkstra</b> generalises BFS to weighted edges (for example, mud costs more than tiles).</li><li><b>Greedy best-first</b> always expands the cell that looks closest to the goal. Fast, but the path can be far from optimal.</li><li><b>A*</b> combines both:</li></ul>\n<div class=\"eq\">f(n) = g(n) + h(n)</div>\n<p><i>g</i> is the cost so far and <i>h</i> estimates the remaining cost. If <i>h</i> never overestimates (it is <b>admissible</b>), A* returns an optimal path. On a 4-connected grid use Manhattan distance; on an 8-connected grid use octile distance.</p>\n<h3>Beyond grids</h3>\n<p>For arms and high-dimensional spaces, grids explode in size. Sampling-based planners such as <b>RRT</b> and <b>RRT*</b> grow a tree of random collision-free samples instead. Real robots also pair a global planner with a local planner (for example DWA) that reacts to moving obstacles.</p>\n<h2>Localization and SLAM</h2>\n<p>Odometry drifts (week 7), and planning (week 9) assumes we know where we are. <b>Localization</b> estimates the robot's pose from motion and sensor data, and keeps track of how uncertain that estimate is.</p>\n<h3>The Bayes filter</h3>\n<p>The robot keeps a <b>belief</b>: a probability distribution over possible poses. Each cycle has two steps:</p>\n<ul><li><b>Predict</b>: move the belief using the motion command. Uncertainty grows.</li><li><b>Correct</b>: weight the belief by how well each pose explains the measurement. Uncertainty shrinks.</li></ul>\n<p>The <b>Kalman filter</b> (week 4) is the Bayes filter for Gaussian beliefs and linear models; the <b>EKF</b> linearises nonlinear models.</p>\n<h3>Particle filter (Monte Carlo localization)</h3>\n<p>Represent the belief with many samples (particles). Move each with noisy motion, give each a weight from the measurement likelihood, then resample so likely particles multiply and unlikely ones disappear. It handles multimodal beliefs, such as a robot that could be in one of two identical corridors.</p>\n<p>The <b>kidnapped robot</b> problem: if the robot is moved without knowing, all particles are wrong. Injecting a few random particles every cycle lets the filter recover.</p>\n<h3>SLAM</h3>\n<p>Simultaneous Localization and Mapping builds the map while localizing in it. LiDAR SLAM matches consecutive scans and corrects accumulated error when the robot recognises a place it has seen (<b>loop closure</b>). Common tools: slam_toolbox and Cartographer for LiDAR, ORB-SLAM3 for cameras.</p>",
+   "code": [
+    {
+     "title": "Python: A* on an occupancy grid",
+     "src": "import heapq\n\ndef astar(grid, start, goal):\n    rows, cols = len(grid), len(grid[0])\n    h = lambda p: abs(p[0] - goal[0]) + abs(p[1] - goal[1])\n    open_ = [(h(start), 0, start)]\n    came, g = {start: None}, {start: 0}\n    while open_:\n        _, cost, cur = heapq.heappop(open_)\n        if cur == goal:\n            path = []\n            while cur:\n                path.append(cur)\n                cur = came[cur]\n            return path[::-1]\n        if cost > g[cur]:\n            continue                       # stale queue entry\n        r, c = cur\n        for nb in ((r+1, c), (r-1, c), (r, c+1), (r, c-1)):\n            if 0 <= nb[0] < rows and 0 <= nb[1] < cols and not grid[nb[0]][nb[1]]:\n                ng = cost + 1\n                if ng < g.get(nb, float('inf')):\n                    g[nb], came[nb] = ng, cur\n                    heapq.heappush(open_, (ng + h(nb), ng, nb))\n    return None"
+    },
+    {
+     "title": "Python: one particle filter step with range measurements",
+     "src": "import numpy as np\n\ndef pf_step(P, u, z, landmarks, dt, sig_z=10.0):\n    \"\"\"P: (N, 3) particles [x, y, th]; u = (v, w); z: measured ranges (M,).\"\"\"\n    v, w = u\n    N = len(P)\n    P[:, 2] += (w + np.random.randn(N) * 0.05) * dt\n    step = (v + np.random.randn(N) * v * 0.08) * dt\n    P[:, 0] += step * np.cos(P[:, 2])\n    P[:, 1] += step * np.sin(P[:, 2])\n    d = np.linalg.norm(P[:, None, :2] - landmarks[None], axis=2)   # (N, M)\n    logw = -((d - z) ** 2).sum(axis=1) / (2 * sig_z ** 2)\n    wts = np.exp(logw - logw.max())\n    wts /= wts.sum()\n    idx = np.random.choice(N, N, p=wts)                               # resample\n    return P[idx].copy()"
+    }
+   ],
+   "lab": "Generate three random maps in the simulator. For each, record expanded cells and path length for BFS, greedy and A*. Find a map where greedy returns a clearly longer path than A*. In the simulator, measure the estimate error with 100, 500 and 2000 particles, and with range noise 5 and 30. Kidnap the robot and time how long the filter takes to recover.",
+   "hw": "Extend the Python A* to 8-connectivity with diagonal cost √2 and the octile heuristic. Compare node expansions with the Manhattan version on the same maps. Write a short report: why does the filter fail with too few particles, and what does random injection cost you? Propose two improvements and justify them."
+  },
+  "tr": {
+   "title": "Yol planlama ve konum belirleme",
+   "tools": "Python (NumPy), bu platform",
+   "goals": [
+    "Bir haritayı çizge (graph) veya ızgara (grid) olarak temsil etmek",
+    "BFS, açgözlü en iyi öncelikli (greedy best-first) arama ve A* algoritmalarını uygulamak",
+    "Sezgisel fonksiyonları (heuristics), kabul edilebilirliği (admissibility) ve optimalliği açıklamak",
+    "İnanç (belief), tahmin ve düzeltme kavramlarını açıklamak",
+    "Yer imi (landmark) tabanlı konumlandırma için bir parçacık filtresi (particle filter) uygulamak",
+    "SLAM'in neyi çözdüğünü ve bunun için kullanılan araçları açıklamak"
+   ],
+   "notes": "<p>Bir planlayıcı şu soruyu yanıtlar: hiçbir şeye çarpmadan buradan hedefe nasıl giderim? Önce dünyayı üzerinde arama yapabileceğimiz bir yapıya dönüştürürüz.</p>\n<h3>Konfigürasyon uzayı</h3>\n<p>Robotun tam şekli için plan yapmak yerine robotu bir noktaya küçültür ve her engeli robotun yarıçapı kadar büyütürüz (engel şişirme, obstacle inflation). Artık bir nokta için plan yapmak yeterlidir. ROS maliyet haritaları (costmaps) tam olarak bunu yapar.</p>\n<h3>Izgara üzerinde çizge araması</h3>\n<ul><li><b>Genişlik öncelikli arama (breadth-first search)</b> halkalar halinde keşfeder. Ağırlıksız bir ızgarada en kısa yolu bulur, ancak pek çok hücreyi genişletir.</li><li><b>Dijkstra</b>, BFS'i ağırlıklı kenarlara genelleştirir (örneğin çamur, fayanstan daha maliyetlidir).</li><li><b>Açgözlü en iyi öncelikli (greedy best-first)</b> arama, her zaman hedefe en yakın görünen hücreyi genişletir. Hızlıdır, ancak yol optimal olmaktan çok uzak olabilir.</li><li><b>A*</b> ikisini birleştirir:</li></ul>\n<div class=\"eq\">f(n) = g(n) + h(n)</div>\n<p><i>g</i> o ana kadarki maliyettir, <i>h</i> ise kalan maliyeti kestirir. <i>h</i> hiçbir zaman fazla tahmin etmiyorsa (yani <b>kabul edilebilir (admissible)</b> ise), A* optimal bir yol döndürür. 4 bağlantılı bir ızgarada Manhattan uzaklığını, 8 bağlantılı bir ızgarada oktil (octile) uzaklığı kullanın.</p>\n<h3>Izgaraların ötesi</h3>\n<p>Kollar ve yüksek boyutlu uzaylar için ızgaraların boyutu patlar. Bunun yerine <b>RRT</b> ve <b>RRT*</b> gibi örnekleme tabanlı planlayıcılar, rastgele seçilmiş çarpışmasız örneklerden bir ağaç büyütür. Gerçek robotlar ayrıca küresel bir planlayıcıyı, hareketli engellere tepki veren yerel bir planlayıcıyla (örneğin DWA) eşleştirir.</p>\n<h2>Konum belirleme ve SLAM</h2>\n<p>Odometri kayar (7. hafta) ve planlama (9. hafta) nerede olduğumuzu bildiğimizi varsayar. <b>Konumlandırma (localization)</b>, robotun pozunu hareket ve sensör verilerinden kestirir ve bu kestirimin ne kadar belirsiz olduğunu izler.</p>\n<h3>Bayes filtresi</h3>\n<p>Robot bir <b>inanç (belief)</b> tutar: olası pozlar üzerinde bir olasılık dağılımı. Her çevrimin iki adımı vardır:</p>\n<ul><li><b>Tahmin (predict)</b>: inancı hareket komutunu kullanarak ilerlet. Belirsizlik artar.</li><li><b>Düzeltme (correct)</b>: inancı, her pozun ölçümü ne kadar iyi açıkladığına göre ağırlıklandır. Belirsizlik azalır.</li></ul>\n<p><b>Kalman filtresi</b> (4. hafta), Gauss dağılımlı inançlar ve doğrusal modeller için Bayes filtresidir; <b>EKF</b> ise doğrusal olmayan modelleri doğrusallaştırır.</p>\n<h3>Parçacık filtresi (Monte Carlo konumlandırma)</h3>\n<p>İnancı çok sayıda örnekle (parçacıkla) temsil edin. Her birini gürültülü hareketle ilerletin, her birine ölçüm olabilirliğinden (likelihood) bir ağırlık verin, ardından yeniden örnekleyin; böylece olası parçacıklar çoğalır, olası olmayanlar kaybolur. Bu yöntem, iki özdeş koridordan birinde olabilecek bir robot gibi çok modlu (multimodal) inançları ele alabilir.</p>\n<p><b>Kaçırılmış robot (kidnapped robot)</b> problemi: robot haberi olmadan başka bir yere taşınırsa tüm parçacıklar yanlış olur. Her çevrimde birkaç rastgele parçacık eklemek, filtrenin toparlanmasını sağlar.</p>\n<h3>SLAM</h3>\n<p>Eşzamanlı Konumlandırma ve Haritalama (Simultaneous Localization and Mapping), haritayı oluştururken aynı zamanda o harita içinde konumlanır. LiDAR SLAM ardışık taramaları eşleştirir ve robot daha önce gördüğü bir yeri tanıdığında birikmiş hatayı düzeltir (<b>döngü kapatma, loop closure</b>). Yaygın araçlar: LiDAR için slam_toolbox ve Cartographer, kameralar için ORB-SLAM3.</p>",
+   "code": [
+    {
+     "title": "Python: doluluk ızgarası (occupancy grid) üzerinde A*",
+     "src": "import heapq\n\ndef astar(grid, start, goal):\n    rows, cols = len(grid), len(grid[0])\n    h = lambda p: abs(p[0] - goal[0]) + abs(p[1] - goal[1])\n    open_ = [(h(start), 0, start)]\n    came, g = {start: None}, {start: 0}\n    while open_:\n        _, cost, cur = heapq.heappop(open_)\n        if cur == goal:\n            path = []\n            while cur:\n                path.append(cur)\n                cur = came[cur]\n            return path[::-1]\n        if cost > g[cur]:\n            continue                       # eskimiş kuyruk kaydı\n        r, c = cur\n        for nb in ((r+1, c), (r-1, c), (r, c+1), (r, c-1)):\n            if 0 <= nb[0] < rows and 0 <= nb[1] < cols and not grid[nb[0]][nb[1]]:\n                ng = cost + 1\n                if ng < g.get(nb, float('inf')):\n                    g[nb], came[nb] = ng, cur\n                    heapq.heappush(open_, (ng + h(nb), ng, nb))\n    return None"
+    },
+    {
+     "title": "Python: mesafe ölçümleriyle tek bir parçacık filtresi adımı",
+     "src": "import numpy as np\n\ndef pf_step(P, u, z, landmarks, dt, sig_z=10.0):\n    \"\"\"P: (N, 3) parçacıklar [x, y, th]; u = (v, w); z: ölçülen mesafeler (M,).\"\"\"\n    v, w = u\n    N = len(P)\n    P[:, 2] += (w + np.random.randn(N) * 0.05) * dt\n    step = (v + np.random.randn(N) * v * 0.08) * dt\n    P[:, 0] += step * np.cos(P[:, 2])\n    P[:, 1] += step * np.sin(P[:, 2])\n    d = np.linalg.norm(P[:, None, :2] - landmarks[None], axis=2)   # (N, M)\n    logw = -((d - z) ** 2).sum(axis=1) / (2 * sig_z ** 2)\n    wts = np.exp(logw - logw.max())\n    wts /= wts.sum()\n    idx = np.random.choice(N, N, p=wts)                               # yeniden örnekle\n    return P[idx].copy()"
+    }
+   ],
+   "lab": "Simülatörde üç rastgele harita oluşturun. Her biri için BFS, açgözlü arama ve A*'ın genişlettiği hücre sayısını ve yol uzunluğunu kaydedin. Açgözlü aramanın A*'tan belirgin şekilde daha uzun bir yol döndürdüğü bir harita bulun. Simülatörde 100, 500 ve 2000 parçacıkla ve 5 ile 30 mesafe gürültüsüyle kestirim hatasını ölçün. Robotu kaçırın ve filtrenin toparlanmasının ne kadar sürdüğünü ölçün.",
+   "hw": "Python A* kodunu, çapraz maliyeti √2 olan 8 bağlantılı komşuluğa ve oktil sezgisel fonksiyona genişletin. Aynı haritalarda düğüm genişletme sayılarını Manhattan sürümüyle karşılaştırın. Kısa bir rapor yazın: parçacık sayısı çok az olduğunda filtre neden başarısız olur ve rastgele parçacık eklemenin size maliyeti nedir? İki iyileştirme önerin ve gerekçelendirin."
+  }
+ },
+ {
+  "n": 10,
+  "sims": [],
+  "simCfg": {},
+  "parts": [
+   "esp32-cam",
+   "huskylens",
+   "pixy2-cmucam5",
+   "grove-vision-ai-v2",
+   "raspberry-pi-4b"
+  ],
+  "kits": [],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Computer vision for robots",
+   "tools": "Python (OpenCV), this platform, Webots camera",
+   "goals": [
+    "Explain the pinhole camera model and why calibration matters",
+    "Segment objects by colour in HSV and turn their position into a control error",
+    "Detect lane lines and fiducial markers (ArUco) and use them for navigation"
+   ],
+   "notes": "<p>A camera is the richest sensor a robot can carry, and the hardest to use: a 640×480 colour image is almost a million numbers, thirty times a second. Robot vision turns those numbers into a few useful quantities: where is the line, where is the target, how far is the marker.</p>\n<h3>The pinhole model</h3>\n<p>A 3D point (X, Y, Z) in the camera frame lands on pixel (u, v):</p>\n<div class=\"eq\">u = f<sub>x</sub> · X / Z + c<sub>x</sub> &nbsp;&nbsp;&nbsp; v = f<sub>y</sub> · Y / Z + c<sub>y</sub></div>\n<p>f<sub>x</sub>, f<sub>y</sub> (focal length in pixels) and c<sub>x</sub>, c<sub>y</sub> (principal point) form the <b>intrinsic matrix</b>. Calibration with a checkerboard estimates them and the lens distortion. Without calibration, distances measured from images are wrong.</p>\n<h3>Colour segmentation</h3>\n<p>RGB mixes colour and brightness, so a shadow changes all three channels. <b>HSV</b> separates hue (which colour), saturation and value (brightness), so a hue range finds an object under changing light. The pipeline: blur → HSV → threshold (mask) → morphological opening to remove specks → largest contour → centroid. The centroid's horizontal offset from the image centre is an error signal for a PID: this is <b>visual servoing</b>.</p>\n<h3>Lane detection</h3>\n<ul><li>Crop a <b>region of interest</b> in front of the vehicle.</li><li>Find edges (Canny) or threshold the lane colour.</li><li>Fit lines (Hough transform) or a polynomial, often after a <b>bird's-eye</b> perspective warp.</li><li>The lateral offset and heading error of the lane centre drive the steering controller, exactly like the line follower of week 1, but with a camera instead of IR sensors.</li></ul>\n<h3>Fiducial markers</h3>\n<p>ArUco and AprilTag markers are printed square codes. OpenCV finds them and, with a calibrated camera, returns their full 3D pose. Drones use them for precision landing and robot arms for locating objects.</p>\n<h3>Where vision runs</h3>\n<p>Classical vision runs on a Raspberry Pi; deep networks need an accelerator (week 11). Smart camera modules (HuskyLens, Pixy2, Grove Vision AI) run detection on board and send only coordinates over UART or I²C, so even an Uno can use them. ESP32-CAM streams images over Wi-Fi to a more capable computer.</p>",
+   "code": [
+    {
+     "title": "Python (OpenCV): track a red object and compute the steering error",
+     "src": "import cv2\nimport numpy as np\n\ncap = cv2.VideoCapture(0)\nlo, hi = np.array([0, 120, 70]), np.array([10, 255, 255])   # red range in HSV\n\nwhile True:\n    ok, frame = cap.read()\n    if not ok:\n        break\n    mask = cv2.inRange(cv2.cvtColor(frame, cv2.COLOR_BGR2HSV), lo, hi)\n    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))\n    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)\n    if cnts:\n        c = max(cnts, key=cv2.contourArea)\n        M = cv2.moments(c)\n        if M[\"m00\"] > 500:\n            cx, cy = int(M[\"m10\"] / M[\"m00\"]), int(M[\"m01\"] / M[\"m00\"])\n            err = cx - frame.shape[1] // 2        # feed to a PID -> turn rate\n            cv2.circle(frame, (cx, cy), 8, (0, 255, 0), -1)\n            cv2.putText(frame, f\"error {err}\", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)\n    cv2.imshow(\"tracking\", frame)\n    if cv2.waitKey(1) == 27:\n        break"
+    },
+    {
+     "title": "Python (OpenCV): lane offset from a road image",
+     "src": "import cv2\nimport numpy as np\n\ndef lane_offset(frame):\n    h, w = frame.shape[:2]\n    roi = frame[int(h * 0.6):, :]                      # road in front of the car\n    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)\n    edges = cv2.Canny(cv2.GaussianBlur(gray, (5, 5), 0), 60, 150)\n    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 40, minLineLength=40, maxLineGap=20)\n    if lines is None:\n        return None\n    xs = [x for l in lines for x in (l[0][0], l[0][2])]\n    left = [x for x in xs if x < w / 2]\n    right = [x for x in xs if x >= w / 2]\n    if not left or not right:\n        return None\n    centre = (max(left) + min(right)) / 2\n    return (centre - w / 2) / (w / 2)                   # -1 .. +1, feed to the steering PID"
+    }
+   ],
+   "lab": "Run the colour-tracking simulator in your browser, then the OpenCV tracker with your webcam: tune the HSV range for an object you choose and print the error at 10 Hz. In Webots, add a camera to the project vehicle and print the lane offset from the lane_offset() function every frame.",
+   "hw": "Connect the lane offset to the PID class from week 6 and make the Webots vehicle complete one lap of the track without leaving the lane. Submit a short video and a plot of the offset over time."
+  },
+  "tr": {
+   "title": "Robotlar için bilgisayarlı görü",
+   "tools": "Python (OpenCV), bu platform, Webots kamerası",
+   "goals": [
+    "İğne deliği (pinhole) kamera modelini ve kalibrasyonun neden önemli olduğunu açıklamak",
+    "Nesneleri HSV'de renge göre ayırmak ve konumlarını bir denetim hatasına çevirmek",
+    "Şerit çizgilerini ve işaretçileri (ArUco) bulup gezinmede kullanmak"
+   ],
+   "notes": "<p>Kamera, bir robotun taşıyabileceği en zengin ve kullanması en zor sensördür: 640×480'lik renkli bir görüntü neredeyse bir milyon sayıdır ve saniyede otuz kez gelir. Robot görüsü bu sayıları birkaç kullanışlı büyüklüğe çevirir: çizgi nerede, hedef nerede, işaretçi ne kadar uzakta.</p>\n<h3>İğne deliği modeli</h3>\n<p>Kamera çerçevesindeki bir 3B nokta (X, Y, Z) şu piksele düşer (u, v):</p>\n<div class=\"eq\">u = f<sub>x</sub> · X / Z + c<sub>x</sub> &nbsp;&nbsp;&nbsp; v = f<sub>y</sub> · Y / Z + c<sub>y</sub></div>\n<p>f<sub>x</sub>, f<sub>y</sub> (piksel cinsinden odak uzaklığı) ve c<sub>x</sub>, c<sub>y</sub> (ana nokta) birlikte <b>iç parametre matrisini</b> oluşturur. Satranç tahtası deseniyle kalibrasyon bunları ve mercek bozulmasını kestirir. Kalibrasyon yapılmazsa görüntüden ölçülen mesafeler yanlış olur.</p>\n<h3>Renge göre ayırma (segmentasyon)</h3>\n<p>RGB rengi ve parlaklığı birbirine karıştırır; bir gölge üç kanalı da değiştirir. <b>HSV</b> ise renk tonunu (hangi renk), doygunluğu ve parlaklığı ayırır; bu yüzden bir ton aralığı nesneyi değişen ışıkta da bulur. Akış: bulanıklaştır → HSV → eşikle (maske) → küçük lekeleri silmek için morfolojik açma → en büyük kontur → ağırlık merkezi. Ağırlık merkezinin görüntü merkezinden yatay sapması bir PID için hata sinyalidir: buna <b>görsel servo</b> (visual servoing) denir.</p>\n<h3>Şerit tespiti</h3>\n<ul><li>Aracın önünde bir <b>ilgi bölgesi</b> (ROI) kırp.</li><li>Kenarları bul (Canny) ya da şerit rengini eşikle.</li><li>Çizgi (Hough dönüşümü) ya da polinom uydur; çoğu zaman önce <b>kuş bakışı</b> perspektif dönüşümü yapılır.</li><li>Şerit merkezinin yanal sapması ve yön hatası direksiyon denetleyicisini sürer; tıpkı 1. haftadaki çizgi izleyen gibi, ama IR sensör yerine kamerayla.</li></ul>\n<h3>İşaretçiler (fiducial markers)</h3>\n<p>ArUco ve AprilTag basılı kare kodlardır. OpenCV onları bulur ve kalibre edilmiş bir kamerayla tam 3B pozlarını verir. Drone'lar bunları hassas iniş için, robot kollar nesnenin yerini bulmak için kullanır.</p>\n<h3>Görü nerede çalışır?</h3>\n<p>Klasik görü bir Raspberry Pi'de çalışır; derin ağlar bir hızlandırıcı ister (11. hafta). Akıllı kamera modülleri (HuskyLens, Pixy2, Grove Vision AI) tespiti kartın üzerinde yapar ve UART ya da I²C üzerinden yalnız koordinat gönderir, böylece bir Uno bile onları kullanabilir. ESP32-CAM görüntüyü Wi-Fi ile daha güçlü bir bilgisayara aktarır.</p>",
+   "code": [
+    {
+     "title": "Python (OpenCV): kırmızı bir nesneyi izle ve direksiyon hatasını hesapla",
+     "src": "import cv2\nimport numpy as np\n\ncap = cv2.VideoCapture(0)\nlo, hi = np.array([0, 120, 70]), np.array([10, 255, 255])   # HSV'de kırmızı aralığı\n\nwhile True:\n    ok, frame = cap.read()\n    if not ok:\n        break\n    mask = cv2.inRange(cv2.cvtColor(frame, cv2.COLOR_BGR2HSV), lo, hi)\n    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones((5, 5), np.uint8))\n    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)\n    if cnts:\n        c = max(cnts, key=cv2.contourArea)\n        M = cv2.moments(c)\n        if M[\"m00\"] > 500:\n            cx, cy = int(M[\"m10\"] / M[\"m00\"]), int(M[\"m01\"] / M[\"m00\"])\n            err = cx - frame.shape[1] // 2        # PID'e ver -> dönüş hızı\n            cv2.circle(frame, (cx, cy), 8, (0, 255, 0), -1)\n            cv2.putText(frame, f\"error {err}\", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 0), 2)\n    cv2.imshow(\"tracking\", frame)\n    if cv2.waitKey(1) == 27:\n        break"
+    },
+    {
+     "title": "Python (OpenCV): yol görüntüsünden şerit sapması",
+     "src": "import cv2\nimport numpy as np\n\ndef lane_offset(frame):\n    h, w = frame.shape[:2]\n    roi = frame[int(h * 0.6):, :]                      # aracın önündeki yol\n    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)\n    edges = cv2.Canny(cv2.GaussianBlur(gray, (5, 5), 0), 60, 150)\n    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 40, minLineLength=40, maxLineGap=20)\n    if lines is None:\n        return None\n    xs = [x for l in lines for x in (l[0][0], l[0][2])]\n    left = [x for x in xs if x < w / 2]\n    right = [x for x in xs if x >= w / 2]\n    if not left or not right:\n        return None\n    centre = (max(left) + min(right)) / 2\n    return (centre - w / 2) / (w / 2)                   # -1 .. +1, direksiyon PID'ine ver"
+    }
+   ],
+   "lab": "Önce tarayıcıdaki renk izleme simülasyonunu çalıştır, sonra OpenCV izleyicisini kendi kameranla: seçtiğin bir nesne için HSV aralığını ayarla ve hatayı 10 Hz'de yazdır. Webots'ta proje aracına bir kamera ekle ve lane_offset() fonksiyonunun verdiği şerit sapmasını her karede yazdır.",
+   "hw": "Şerit sapmasını 6. haftadaki PID sınıfına bağla ve Webots aracının şeritten çıkmadan pistte bir tur atmasını sağla. Kısa bir video ve sapmanın zamana göre grafiğini teslim et."
+  }
+ },
+ {
+  "n": 11,
+  "sims": [],
+  "simCfg": {},
+  "parts": [
+   "jetson-orin-nano",
+   "nvidia-jetson-orin-nx-16gb",
+   "google-coral-dev-board",
+   "raspberry-pi-ai-hat-hailo-8l",
+   "esp32-s3-tinyml",
+   "qualcomm-iq9-qcs8550"
+  ],
+  "kits": [],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Deep learning and edge AI on robots",
+   "tools": "Python (PyTorch or Keras), this platform, Webots",
+   "goals": [
+    "Explain how a neural network learns from data (loss, gradient descent, overfitting)",
+    "Train a small image classifier and evaluate it with a confusion matrix",
+    "Choose an edge accelerator and describe a detection pipeline from camera to controller"
+   ],
+   "notes": "<p>Classical vision (week 10) works when you can write the rule: \"the object is red\". Deep learning is for when you cannot: \"this is a stop sign\", \"this is a person\". Instead of writing the rule, you collect labelled examples and let a network learn it.</p>\n<h3>How a network learns</h3>\n<ul><li>A <b>neuron</b> computes a weighted sum of its inputs plus a bias and applies a non-linearity (ReLU). Layers of neurons form a network.</li><li>A <b>loss function</b> measures how wrong the predictions are (cross-entropy for classification).</li><li><b>Gradient descent</b> nudges every weight against the gradient of the loss; backpropagation computes those gradients efficiently. The learning rate sets the step size: too large diverges, too small crawls.</li><li>Data is split into <b>training</b>, <b>validation</b> and <b>test</b> sets. When training accuracy keeps rising but validation accuracy falls, the network is <b>overfitting</b>: memorising instead of learning. More data, augmentation (flips, brightness, noise) and smaller models help.</li></ul>\n<h3>Convolutional networks</h3>\n<p>A <b>convolution</b> slides a small filter (for example 3×3) over the image, so the same edge detector is reused everywhere. Stacked convolutions learn edges, then shapes, then objects. CNNs are the backbone of image classifiers and detectors.</p>\n<h3>Detection</h3>\n<p>Classifiers answer \"what is in the image\". <b>Detectors</b> such as YOLO answer \"what and where\": a list of bounding boxes with class and confidence. On a robot the pipeline is the same as week 10: camera → detector → choose a target → error → controller.</p>\n<h3>Measuring a model</h3>\n<p>Accuracy alone hides mistakes. A <b>confusion matrix</b> shows which classes are confused. For safety-relevant classes (person, stop sign) <b>recall</b> matters more than precision: missing a person is worse than a false alarm.</p>\n<h3>Edge AI hardware</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Platform</th><th>Typical use</th></tr></thead><tbody>\n<tr><td>ESP32-S3 (TinyML)</td><td>tiny models: keyword spotting, simple gestures, under 1 MB</td></tr>\n<tr><td>Raspberry Pi + Hailo-8L / Coral</td><td>real-time detection at low power</td></tr>\n<tr><td>Jetson Orin Nano / NX</td><td>several networks at once, ROS 2, the usual choice on research robots and drones</td></tr></tbody></table></div>\n<p>Models are made smaller for the edge by <b>quantisation</b> (32-bit floats to 8-bit integers) and exported to a runtime (TensorRT, TFLite, ONNX).</p>\n<h3>Learning to act</h3>\n<ul><li><b>Reinforcement learning</b>: an agent learns a policy from rewards, usually in simulation first, then transfers to the real robot (sim-to-real).</li><li><b>Imitation learning</b>: learn from human demonstrations.</li><li><b>Vision-language-action models and LLM agents</b>: high-level task planning from natural language, calling classical controllers underneath.</li></ul>",
+   "code": [
+    {
+     "title": "Python (PyTorch): a small CNN for traffic sign classes",
+     "src": "import torch\nimport torch.nn as nn\n\nclass SignNet(nn.Module):\n    def __init__(self, n_classes=4):          # stop, left, right, speed limit\n        super().__init__()\n        self.features = nn.Sequential(\n            nn.Conv2d(3, 16, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),   # 64 -> 32\n            nn.Conv2d(16, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),  # 32 -> 16\n        )\n        self.head = nn.Sequential(nn.Flatten(), nn.Linear(32 * 16 * 16, 64), nn.ReLU(), nn.Linear(64, n_classes))\n\n    def forward(self, x):\n        return self.head(self.features(x))\n\nmodel = SignNet()\nopt = torch.optim.Adam(model.parameters(), lr=1e-3)\nloss_fn = nn.CrossEntropyLoss()\n\ndef train_epoch(loader):\n    model.train()\n    for images, labels in loader:             # images: (B, 3, 64, 64)\n        opt.zero_grad()\n        loss = loss_fn(model(images), labels)\n        loss.backward()                       # backpropagation\n        opt.step()                            # gradient descent step"
+    }
+   ],
+   "lab": "In the browser neural network simulator, train the shape classifier: find a learning rate that diverges and one that is too slow, then remove augmentation and watch the gap between training and validation accuracy grow. Record the confusion matrix of your best run.",
+   "hw": "Collect at least 200 images of traffic signs from the Webots world (or a public dataset), train the SignNet above, and report validation accuracy, the confusion matrix and the per-class recall. Explain one failure case."
+  },
+  "tr": {
+   "title": "Robotlarda derin öğrenme ve uçta yapay zekâ",
+   "tools": "Python (PyTorch ya da Keras), bu platform, Webots",
+   "goals": [
+    "Bir sinir ağının veriden nasıl öğrendiğini açıklamak (kayıp, gradyan inişi, aşırı öğrenme)",
+    "Küçük bir görüntü sınıflandırıcı eğitmek ve karışıklık matrisiyle değerlendirmek",
+    "Bir uç hızlandırıcı seçmek ve kameradan denetleyiciye bir tespit akışını tarif etmek"
+   ],
+   "notes": "<p>Klasik görü (10. hafta) kuralı yazabildiğinde işe yarar: \"nesne kırmızıdır\". Derin öğrenme yazamadığında devreye girer: \"bu bir dur işareti\", \"bu bir insan\". Kuralı yazmak yerine etiketli örnekler toplar ve ağın kuralı öğrenmesini sağlarsın.</p>\n<h3>Bir ağ nasıl öğrenir?</h3>\n<ul><li>Bir <b>nöron</b> girdilerinin ağırlıklı toplamını ve bir sapmayı (bias) hesaplar, sonra doğrusal olmayan bir fonksiyon (ReLU) uygular. Nöron katmanları bir ağ oluşturur.</li><li><b>Kayıp fonksiyonu</b> tahminlerin ne kadar yanlış olduğunu ölçer (sınıflandırmada çapraz entropi).</li><li><b>Gradyan inişi</b> her ağırlığı kaybın gradyanının tersi yönünde biraz kaydırır; geri yayılım (backpropagation) bu gradyanları verimli hesaplar. Öğrenme oranı adım boyunu belirler: çok büyükse ıraksar, çok küçükse sürünür.</li><li>Veri <b>eğitim</b>, <b>doğrulama</b> ve <b>test</b> kümelerine ayrılır. Eğitim doğruluğu artmaya devam ederken doğrulama doğruluğu düşüyorsa ağ <b>aşırı öğreniyor</b> (overfitting): öğrenmek yerine ezberliyor. Daha fazla veri, veri çoğaltma (çevirme, parlaklık, gürültü) ve daha küçük modeller yardımcı olur.</li></ul>\n<h3>Evrişimli ağlar (CNN)</h3>\n<p><b>Evrişim</b> küçük bir filtreyi (örneğin 3×3) görüntü üzerinde kaydırır; böylece aynı kenar bulucu her yerde yeniden kullanılır. Üst üste evrişimler önce kenarları, sonra şekilleri, sonra nesneleri öğrenir. CNN'ler görüntü sınıflandırıcıların ve dedektörlerin omurgasıdır.</p>\n<h3>Tespit (detection)</h3>\n<p>Sınıflandırıcılar \"görüntüde ne var\" sorusunu cevaplar. YOLO gibi <b>dedektörler</b> \"ne var ve nerede\" sorusunu: sınıf ve güven puanıyla bir sınırlayıcı kutu listesi. Robotta akış 10. haftadakiyle aynıdır: kamera → dedektör → hedef seç → hata → denetleyici.</p>\n<h3>Bir modeli ölçmek</h3>\n<p>Doğruluk tek başına hataları gizler. <b>Karışıklık matrisi</b> hangi sınıfların karıştırıldığını gösterir. Güvenlik açısından önemli sınıflarda (insan, dur işareti) <b>duyarlılık</b> (recall) kesinlikten (precision) daha önemlidir: bir insanı kaçırmak, yanlış alarmdan daha kötüdür.</p>\n<h3>Uçta yapay zekâ donanımı</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Platform</th><th>Tipik kullanım</th></tr></thead><tbody>\n<tr><td>ESP32-S3 (TinyML)</td><td>çok küçük modeller: anahtar sözcük tanıma, basit hareketler, 1 MB altı</td></tr>\n<tr><td>Raspberry Pi + Hailo-8L / Coral</td><td>düşük güçte gerçek zamanlı tespit</td></tr>\n<tr><td>Jetson Orin Nano / NX</td><td>aynı anda birkaç ağ, ROS 2; araştırma robotlarında ve drone'larda olağan seçim</td></tr></tbody></table></div>\n<p>Modeller uç cihazlar için <b>nicemleme</b> (quantisation: 32-bit kayan noktadan 8-bit tam sayıya) ile küçültülür ve bir çalışma ortamına (TensorRT, TFLite, ONNX) aktarılır.</p>\n<h3>Eylemi öğrenmek</h3>\n<ul><li><b>Pekiştirmeli öğrenme</b> (reinforcement learning): bir ajan ödüllerden bir politika öğrenir; genellikle önce simülasyonda, sonra gerçek robota aktarılır (sim-to-real).</li><li><b>Taklit öğrenme</b> (imitation learning): insan gösterimlerinden öğrenmek.</li><li><b>Görme-dil-eylem modelleri ve LLM ajanları</b>: doğal dilden üst düzey görev planlama; altta klasik denetleyicileri çağırır.</li></ul>",
+   "code": [
+    {
+     "title": "Python (PyTorch): trafik işareti sınıfları için küçük bir CNN",
+     "src": "import torch\nimport torch.nn as nn\n\nclass SignNet(nn.Module):\n    def __init__(self, n_classes=4):          # dur, sol, sağ, hız sınırı\n        super().__init__()\n        self.features = nn.Sequential(\n            nn.Conv2d(3, 16, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),   # 64 -> 32\n            nn.Conv2d(16, 32, 3, padding=1), nn.ReLU(), nn.MaxPool2d(2),  # 32 -> 16\n        )\n        self.head = nn.Sequential(nn.Flatten(), nn.Linear(32 * 16 * 16, 64), nn.ReLU(), nn.Linear(64, n_classes))\n\n    def forward(self, x):\n        return self.head(self.features(x))\n\nmodel = SignNet()\nopt = torch.optim.Adam(model.parameters(), lr=1e-3)\nloss_fn = nn.CrossEntropyLoss()\n\ndef train_epoch(loader):\n    model.train()\n    for images, labels in loader:             # images: (B, 3, 64, 64)\n        opt.zero_grad()\n        loss = loss_fn(model(images), labels)\n        loss.backward()                       # geri yayılım\n        opt.step()                            # gradyan inişi adımı"
+    }
+   ],
+   "lab": "Tarayıcıdaki sinir ağı simülasyonunda şekil sınıflandırıcıyı eğit: ıraksayan bir öğrenme oranı ve çok yavaş kalan bir öğrenme oranı bul, sonra veri çoğaltmayı kapat ve eğitim ile doğrulama doğruluğu arasındaki farkın büyüdüğünü izle. En iyi çalıştırmanın karışıklık matrisini kaydet.",
+   "hw": "Webots dünyasından (ya da açık bir veri kümesinden) en az 200 trafik işareti görüntüsü topla, yukarıdaki SignNet'i eğit ve doğrulama doğruluğunu, karışıklık matrisini ve sınıf başına duyarlılığı raporla. Bir başarısızlık örneğini açıkla."
+  }
+ },
+ {
+  "n": 12,
+  "sims": [
+   "ros"
+  ],
+  "simCfg": {},
+  "parts": [
+   "raspberry-pi-4b",
+   "jetson-orin-nano",
+   "sn65hvd230-can-transceiver",
+   "tja1050-can-transceiver"
+  ],
+  "kits": [],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "ROS 2 and simulation",
+   "tools": "ROS 2 Jazzy (Docker or Ubuntu 24.04), turtlesim, Gazebo, this platform",
+   "goals": [
+    "Explain nodes, topics, services and actions",
+    "Write a publisher and a subscriber in Python",
+    "Use the ROS 2 command line tools to inspect a running system"
+   ],
+   "notes": "<p>ROS 2 (Robot Operating System) is not an operating system: it is middleware plus tools and libraries that let many small programs work together. Almost every research and many industrial robots use it.</p>\n<h3>Core concepts</h3>\n<ul><li><b>Node</b>: one process with one job (a camera driver, a planner).</li><li><b>Topic</b>: a named stream of typed messages. Many publishers, many subscribers, no direct coupling. Example: <code>/cmd_vel</code> carries <code>geometry_msgs/Twist</code>.</li><li><b>Service</b>: request and response, for quick calls (\"reset the map\").</li><li><b>Action</b>: long-running goals with feedback and cancel (\"navigate to the kitchen\").</li><li><b>Parameters</b> and <b>launch files</b> configure and start many nodes together.</li></ul>\n<p>Under the hood ROS 2 uses DDS for discovery and transport, with Quality of Service settings (reliable or best effort, history depth).</p>\n<h3>Connecting the course</h3>\n<p>Everything we built maps onto ROS 2 packages: sensor drivers publish <code>/scan</code> and <code>/image_raw</code>; slam_toolbox does week 9; Nav2 does week 9 path planning and outputs <code>/cmd_vel</code>; a motor controller applies week 7 inverse kinematics and week 6 PID. For drones, PX4 and ArduPilot both have ROS 2 interfaces.</p>\n<h3>Getting started without installing</h3>\n<p>Use the official ROS 2 Docker images, or a browser-based environment such as The Construct. Start with turtlesim, then TurtleBot3 in Gazebo.</p>",
+   "code": [
+    {
+     "title": "Python (rclpy): publish velocity commands at 10 Hz",
+     "src": "import rclpy\nfrom rclpy.node import Node\nfrom geometry_msgs.msg import Twist\n\nclass CircleDriver(Node):\n    def __init__(self):\n        super().__init__('circle_driver')\n        self.pub = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)\n        self.create_timer(0.1, self.tick)          # 10 Hz\n\n    def tick(self):\n        msg = Twist()\n        msg.linear.x = 1.0\n        msg.angular.z = 0.8\n        self.pub.publish(msg)\n\ndef main():\n    rclpy.init()\n    rclpy.spin(CircleDriver())\n\nif __name__ == '__main__':\n    main()"
+    },
+    {
+     "title": "Command line tools",
+     "src": "ros2 run turtlesim turtlesim_node\nros2 node list\nros2 topic list\nros2 topic echo /turtle1/pose\nros2 topic hz /turtle1/pose\nros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist \"{linear: {x: 1.0}, angular: {z: 0.5}}\"\nros2 node info /turtlesim\nrqt_graph"
+    }
+   ],
+   "lab": "Start turtlesim and run the circle driver. Inspect the system with ros2 topic and rqt_graph. In the graph simulator, stop /lidar_driver and explain which nodes stop producing output and why.",
+   "hw": "Write a go-to-goal node for turtlesim: subscribe to /turtle1/pose, publish /turtle1/cmd_vel, and use the PID class from week 6 for heading and distance."
+  },
+  "tr": {
+   "title": "ROS 2 ve simülasyon",
+   "tools": "ROS 2 Jazzy (Docker ya da Ubuntu 24.04), turtlesim, Gazebo, bu platform",
+   "goals": [
+    "Düğümleri (nodes), konuları (topics), servisleri ve eylemleri (actions) açıklamak",
+    "Python'da bir yayıncı (publisher) ve bir abone (subscriber) yazmak",
+    "Çalışan bir sistemi incelemek için ROS 2 komut satırı araçlarını kullanmak"
+   ],
+   "notes": "<p>ROS 2 (Robot Operating System) bir işletim sistemi değildir: çok sayıda küçük programın birlikte çalışmasını sağlayan bir ara katman yazılımı (middleware) ile araç ve kütüphanelerden oluşur. Neredeyse tüm araştırma robotları ve pek çok endüstriyel robot onu kullanır.</p>\n<h3>Temel kavramlar</h3>\n<ul><li><b>Düğüm (node)</b>: tek bir işi olan tek bir süreç (bir kamera sürücüsü, bir planlayıcı).</li><li><b>Konu (topic)</b>: tiplendirilmiş mesajlardan oluşan, adlandırılmış bir akış. Çok sayıda yayıncı, çok sayıda abone, doğrudan bağımlılık yok. Örnek: <code>/cmd_vel</code>, <code>geometry_msgs/Twist</code> taşır.</li><li><b>Servis (service)</b>: hızlı çağrılar için istek ve yanıt (\"haritayı sıfırla\").</li><li><b>Eylem (action)</b>: geri bildirim ve iptal olanağı sunan uzun süreli hedefler (\"mutfağa git\").</li><li><b>Parametreler</b> ve <b>başlatma dosyaları (launch files)</b> çok sayıda düğümü birlikte yapılandırır ve başlatır.</li></ul>\n<p>Arka planda ROS 2, keşif ve iletim için DDS kullanır; Hizmet Kalitesi (Quality of Service) ayarlarıyla birlikte (güvenilir veya en iyi çaba, geçmiş derinliği).</p>\n<h3>Dersin parçalarını birleştirmek</h3>\n<p>Kurduğumuz her şey ROS 2 paketlerine karşılık gelir: sensör sürücüleri <code>/scan</code> ve <code>/image_raw</code> yayınlar; slam_toolbox 9. haftanın işini yapar; Nav2 9. haftanın yol planlamasını yapar ve <code>/cmd_vel</code> çıktısı verir; bir motor denetleyicisi 7. haftanın ters kinematiğini ve 6. haftanın PID'ini uygular. Dronlar için hem PX4 hem de ArduPilot'un ROS 2 arayüzleri vardır.</p>\n<h3>Kurulum yapmadan başlamak</h3>\n<p>Resmi ROS 2 Docker imajlarını veya The Construct gibi tarayıcı tabanlı bir ortamı kullanın. turtlesim ile başlayın, ardından Gazebo'da TurtleBot3'e geçin.</p>",
+   "code": [
+    {
+     "title": "Python (rclpy): 10 Hz'te hız komutları yayınlama",
+     "src": "import rclpy\nfrom rclpy.node import Node\nfrom geometry_msgs.msg import Twist\n\nclass CircleDriver(Node):\n    def __init__(self):\n        super().__init__('circle_driver')\n        self.pub = self.create_publisher(Twist, '/turtle1/cmd_vel', 10)\n        self.create_timer(0.1, self.tick)          # 10 Hz\n\n    def tick(self):\n        msg = Twist()\n        msg.linear.x = 1.0\n        msg.angular.z = 0.8\n        self.pub.publish(msg)\n\ndef main():\n    rclpy.init()\n    rclpy.spin(CircleDriver())\n\nif __name__ == '__main__':\n    main()"
+    },
+    {
+     "title": "Komut satırı araçları",
+     "src": "ros2 run turtlesim turtlesim_node\nros2 node list\nros2 topic list\nros2 topic echo /turtle1/pose\nros2 topic hz /turtle1/pose\nros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist \"{linear: {x: 1.0}, angular: {z: 0.5}}\"\nros2 node info /turtlesim\nrqt_graph"
+    }
+   ],
+   "lab": "turtlesim'i başlatın ve çember sürücüsünü çalıştırın. Sistemi ros2 topic ve rqt_graph ile inceleyin. Çizge simülatöründe /lidar_driver düğümünü durdurun ve hangi düğümlerin çıktı üretmeyi bıraktığını ve nedenini açıklayın.",
+   "hw": "turtlesim için hedefe giden (go-to-goal) bir düğüm yazın: /turtle1/pose konusuna abone olun, /turtle1/cmd_vel konusuna yayın yapın ve yönelim ile mesafe için 6. haftadaki PID sınıfını kullanın."
+  }
+ },
+ {
+  "n": 13,
+  "sims": [
+   "drone",
+   "swarm"
+  ],
+  "simCfg": {
+   "drone": {
+    "mode": "mission"
+   }
+  },
+  "parts": [
+   "esc-blheli-s-32",
+   "bldc-fircasiz-motor",
+   "lipo-batarya",
+   "max17048-max17043-yakit-gostergesi",
+   "pesd5v0s1ub-tvs-diyot",
+   "stm32",
+   "bmi270",
+   "tf-luna-lidar"
+  ],
+  "kits": [
+   "esc-blheli-s-32"
+  ],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Aerial robots: flight control, autonomy and swarms",
+   "tools": "This platform, PX4 SITL + Gazebo, MAVSDK",
+   "goals": [
+    "Explain how four rotors produce thrust, roll, pitch and yaw",
+    "Describe motor mixing and cascaded flight control",
+    "Tune a position and attitude controller in simulation",
+    "Run an autonomous mission in software-in-the-loop simulation",
+    "Control a drone from code through MAVLink",
+    "Explain decentralised swarm behaviour"
+   ],
+   "notes": "<p>A quadrotor has four fixed-pitch propellers: two spin clockwise and two counter-clockwise so their reaction torques cancel. Each produces thrust <i>T = k<sub>f</sub> ω²</i>.</p>\n<h3>From four motors to four commands</h3>\n<ul><li><b>Throttle</b>: all motors faster, the drone climbs.</li><li><b>Roll / pitch</b>: one side faster than the other, the drone tilts.</li><li><b>Yaw</b>: the clockwise pair faster than the counter-clockwise pair, the drone turns.</li></ul>\n<p>The drone is <b>underactuated</b>: 6 degrees of freedom but only 4 inputs. To move sideways it must first tilt, so position control has to work through attitude control.</p>\n<h3>Cascaded control</h3>\n<div class=\"eq\">position → velocity → attitude angle → angular rate → motor mixer</div>\n<p>Each loop sends a setpoint to the one inside it. Inner loops must be much faster (typically 5 to 10 times) than outer loops; flight controllers run the rate loop at 1 kHz or more. In the simulator, lowering the attitude gains makes the inner loop too slow and the whole drone oscillates.</p>\n<h3>Hardware and software</h3>\n<p>A flight controller (Pixhawk, Matek and similar) reads the IMU, barometer, GPS and compass, fuses them with an EKF, and runs the control loops. The two main open-source firmwares are <b>PX4</b> and <b>ArduPilot</b>. Common flight modes: Stabilize (pilot controls angles), Altitude hold, Position hold / Loiter, and Auto (missions).</p>\n<p>Safety: remove propellers during bench tests, always configure failsafes, and follow local regulations (SHGM in Türkiye).</p>\n<h2>Autonomy and swarms</h2>\n<p>Autonomous drones usually split work between a <b>flight controller</b> (stabilisation, real time) and a <b>companion computer</b> such as a Raspberry Pi or Jetson (vision, planning, AI). They talk through <b>MAVLink</b>, a lightweight message protocol.</p>\n<h3>Software-in-the-loop (SITL)</h3>\n<p>PX4 and ArduPilot can run on your laptop with a simulated vehicle in Gazebo. Your code connects exactly as it would to a real drone, so you can test missions with no hardware and no risk. Libraries: <b>MAVSDK</b> (simple, Python and C++), <b>pymavlink</b> (low level), <b>MAVROS</b> (ROS bridge).</p>\n<h3>Missions and safety</h3>\n<ul><li>Waypoint missions with takeoff, goto, loiter and land items</li><li>Geofences that the drone will not cross</li><li>Failsafes: return to launch on low battery or lost link</li><li>Offboard mode: your program streams position or velocity setpoints</li></ul>\n<h3>Swarms</h3>\n<p>Centralised control of many drones does not scale and has a single point of failure. In decentralised swarms each agent follows local rules using only its neighbours. Reynolds' <b>boids</b> use three:</p>\n<ul><li><b>Separation</b>: steer away from neighbours that are too close.</li><li><b>Alignment</b>: match the average heading of neighbours.</li><li><b>Cohesion</b>: move towards the neighbours' centre.</li></ul>\n<p>Formation flying and consensus algorithms build on the same idea.</p>",
+   "code": [
+    {
+     "title": "Quad X motor mixer (PX4 numbering)",
+     "src": "// M1 front-right (CCW), M2 rear-left (CCW), M3 front-left (CW), M4 rear-right (CW)\n// roll > 0: roll right, pitch > 0: nose up, yaw > 0: clockwise seen from above\nfloat m1 = thrust - roll + pitch + yaw;\nfloat m2 = thrust + roll - pitch + yaw;\nfloat m3 = thrust + roll + pitch - yaw;\nfloat m4 = thrust - roll - pitch - yaw;\n// Sign conventions differ between firmwares; always check your flight controller docs."
+    },
+    {
+     "title": "Python (MAVSDK): take off, fly, return home in PX4 SITL",
+     "src": "import asyncio\nfrom mavsdk import System\n\nasync def main():\n    drone = System()\n    await drone.connect(system_address=\"udp://:14540\")      # PX4 SITL default\n    async for state in drone.core.connection_state():\n        if state.is_connected:\n            break\n    await drone.action.arm()\n    await drone.action.set_takeoff_altitude(5.0)\n    await drone.action.takeoff()\n    await asyncio.sleep(8)\n    # latitude, longitude, absolute altitude (m AMSL), yaw (deg)\n    await drone.action.goto_location(47.3980, 8.5460, 500.0, 0)\n    await asyncio.sleep(15)\n    await drone.action.return_to_launch()\n\nasyncio.run(main())"
+    }
+   ],
+   "lab": "(1) Fly to several targets with the default gains. (2) Set wind to 2 N with position Ki = 0 and measure the steady offset; then raise Ki. (3) Lower the attitude Kd and Kp until the drone oscillates and explain why. Plan a five-waypoint mission in the drone simulator (switch to mission mode) and fly it with and without wind. In the swarm simulator, find weights that produce tight flocking and weights that make the swarm scatter. Optional: run PX4 SITL in Docker and fly the MAVSDK script.",
+   "hw": "Derive the planar quadrotor equations used in the simulator (x, z, φ) from Newton's laws, and show how the controller computes the desired tilt angle from the desired acceleration. Implement boids in Python (Matplotlib or pygame) and add a fourth rule: avoid circular obstacles. Submit a short video or GIF."
+  },
+  "tr": {
+   "title": "Hava robotları: uçuş denetimi, otonomi ve sürüler",
+   "tools": "Bu platform, PX4 SITL + Gazebo, MAVSDK",
+   "goals": [
+    "Dört rotorun itki, yuvarlanma (roll), yunuslama (pitch) ve sapma (yaw) hareketlerini nasıl ürettiğini açıklamak",
+    "Motor karıştırmayı (motor mixing) ve kademeli (cascaded) uçuş kontrolünü açıklamak",
+    "Simülasyonda bir konum ve yönelim (attitude) denetleyicisini ayarlamak",
+    "Döngüde yazılım (software-in-the-loop) simülasyonunda otonom bir görev çalıştırmak",
+    "Bir dronu MAVLink üzerinden koddan kontrol etmek",
+    "Merkeziyetsiz sürü davranışını açıklamak"
+   ],
+   "notes": "<p>Dört rotorlu bir hava aracında dört adet sabit hatveli pervane bulunur: reaksiyon torklarının birbirini sıfırlaması için ikisi saat yönünde, ikisi saat yönünün tersine döner. Her biri <i>T = k<sub>f</sub> ω²</i> itkisi üretir.</p>\n<h3>Dört motordan dört komuta</h3>\n<ul><li><b>Gaz (throttle)</b>: tüm motorlar hızlanır, dron yükselir.</li><li><b>Yuvarlanma / yunuslama (roll / pitch)</b>: bir taraf diğerinden hızlı döner, dron eğilir.</li><li><b>Sapma (yaw)</b>: saat yönündeki çift, saat yönünün tersindeki çiftten hızlı döner, dron kendi ekseni etrafında döner.</li></ul>\n<p>Dron <b>eksik eyleyicili (underactuated)</b> bir sistemdir: 6 serbestlik derecesi vardır ama yalnızca 4 girişi vardır. Yana hareket etmek için önce eğilmesi gerekir; bu yüzden konum kontrolü yönelim kontrolü üzerinden çalışmak zorundadır.</p>\n<h3>Kademeli kontrol</h3>\n<div class=\"eq\">konum → hız → yönelim açısı → açısal hız → motor karıştırıcı</div>\n<p>Her döngü, içindeki döngüye bir referans değer (setpoint) gönderir. İç döngüler, dış döngülerden çok daha hızlı (tipik olarak 5 ila 10 kat) olmalıdır; uçuş denetleyicileri açısal hız döngüsünü 1 kHz veya daha yüksek frekansta çalıştırır. Simülatörde yönelim kazançlarını düşürmek iç döngüyü fazla yavaşlatır ve tüm dron salınıma girer.</p>\n<h3>Donanım ve yazılım</h3>\n<p>Bir uçuş denetleyicisi (Pixhawk, Matek ve benzerleri) IMU, barometre, GPS ve pusulayı okur, bunları bir EKF ile birleştirir ve kontrol döngülerini çalıştırır. İki ana açık kaynak donanım yazılımı (firmware) <b>PX4</b> ve <b>ArduPilot</b>'tur. Yaygın uçuş modları: Stabilize (pilot açıları kontrol eder), Altitude hold (irtifa tutma), Position hold / Loiter (konum tutma) ve Auto (görevler).</p>\n<p>Güvenlik: tezgâh testlerinde pervaneleri sökün, arıza emniyetlerini (failsafe) her zaman yapılandırın ve yerel mevzuata uyun (Türkiye'de SHGM).</p>\n<h2>Otonomi ve sürüler</h2>\n<p>Otonom dronlar işi genellikle bir <b>uçuş denetleyicisi</b> (dengeleme, gerçek zamanlı) ile Raspberry Pi veya Jetson gibi bir <b>yardımcı bilgisayar (companion computer)</b> (görü, planlama, yapay zekâ) arasında paylaştırır. Bunlar hafif bir mesaj protokolü olan <b>MAVLink</b> üzerinden haberleşir.</p>\n<h3>Döngüde yazılım (SITL)</h3>\n<p>PX4 ve ArduPilot, Gazebo'daki simüle edilmiş bir araçla dizüstü bilgisayarınızda çalışabilir. Kodunuz gerçek bir drona bağlanır gibi bağlanır; böylece görevleri donanım olmadan ve risk almadan test edebilirsiniz. Kütüphaneler: <b>MAVSDK</b> (basit, Python ve C++), <b>pymavlink</b> (düşük seviye), <b>MAVROS</b> (ROS köprüsü).</p>\n<h3>Görevler ve güvenlik</h3>\n<ul><li>Kalkış, hedefe gitme (goto), bekleme (loiter) ve iniş öğelerinden oluşan ara nokta (waypoint) görevleri</li><li>Dronun geçmeyeceği sanal çitler (geofence)</li><li>Arıza emniyetleri (failsafe): düşük pilde veya bağlantı kaybında kalkış noktasına dönüş</li><li>Offboard modu: programınız konum veya hız referans değerlerini sürekli gönderir</li></ul>\n<h3>Sürüler</h3>\n<p>Çok sayıda dronun merkezi kontrolü ölçeklenmez ve tek bir hata noktası barındırır. Merkeziyetsiz sürülerde her ajan, yalnızca komşularını kullanarak yerel kurallara uyar. Reynolds'ın <b>boids</b> modeli üç kural kullanır:</p>\n<ul><li><b>Ayrılma (separation)</b>: çok yakındaki komşulardan uzaklaş.</li><li><b>Hizalanma (alignment)</b>: komşuların ortalama yönelimine uy.</li><li><b>Birlik (cohesion)</b>: komşuların merkezine doğru hareket et.</li></ul>\n<p>Kol uçuşu (formation flying) ve uzlaşı (consensus) algoritmaları da aynı fikir üzerine kuruludur.</p>",
+   "code": [
+    {
+     "title": "Quad X motor karıştırıcı (PX4 numaralandırması)",
+     "src": "// M1 sağ ön (CCW), M2 sol arka (CCW), M3 sol ön (CW), M4 sağ arka (CW)\n// roll > 0: sağa yuvarlanma, pitch > 0: burun yukarı, yaw > 0: yukarıdan bakıldığında saat yönünde\nfloat m1 = thrust - roll + pitch + yaw;\nfloat m2 = thrust + roll - pitch + yaw;\nfloat m3 = thrust + roll + pitch - yaw;\nfloat m4 = thrust - roll - pitch - yaw;\n// İşaret kuralları firmware'ler arasında farklılık gösterir; uçuş denetleyicinizin dokümantasyonunu mutlaka kontrol edin."
+    },
+    {
+     "title": "Python (MAVSDK): PX4 SITL'de kalkış, uçuş ve eve dönüş",
+     "src": "import asyncio\nfrom mavsdk import System\n\nasync def main():\n    drone = System()\n    await drone.connect(system_address=\"udp://:14540\")      # PX4 SITL varsayılanı\n    async for state in drone.core.connection_state():\n        if state.is_connected:\n            break\n    await drone.action.arm()\n    await drone.action.set_takeoff_altitude(5.0)\n    await drone.action.takeoff()\n    await asyncio.sleep(8)\n    # enlem, boylam, mutlak irtifa (m AMSL), yaw (derece)\n    await drone.action.goto_location(47.3980, 8.5460, 500.0, 0)\n    await asyncio.sleep(15)\n    await drone.action.return_to_launch()\n\nasyncio.run(main())"
+    }
+   ],
+   "lab": "(1) Varsayılan kazançlarla birkaç hedefe uçun. (2) Konum Ki = 0 iken rüzgârı 2 N'a ayarlayın ve kalıcı sapmayı ölçün; ardından Ki'yi artırın. (3) Dron salınıma girene kadar yönelim Kd ve Kp değerlerini düşürün ve nedenini açıklayın. Dron simülatöründe beş ara noktalı bir görev planlayın (görev moduna geçin) ve bunu rüzgârlı ve rüzgârsız olarak uçurun. Sürü simülatöründe sıkı bir sürü oluşumu sağlayan ağırlıkları ve sürünün dağılmasına yol açan ağırlıkları bulun. İsteğe bağlı: PX4 SITL'i Docker'da çalıştırın ve MAVSDK betiğiyle uçuş yapın.",
+   "hw": "Simülatörde kullanılan düzlemsel dört rotor denklemlerini (x, z, φ) Newton yasalarından türetin ve denetleyicinin istenen ivmeden istenen eğim açısını nasıl hesapladığını gösterin. Boids modelini Python'da (Matplotlib veya pygame) uygulayın ve dördüncü bir kural ekleyin: dairesel engellerden kaçınma. Kısa bir video veya GIF teslim edin."
+  }
+ },
+ {
+  "n": 14,
+  "sims": [],
+  "simCfg": {},
+  "parts": [],
+  "kits": [],
+  "wokwi": [],
+  "exam": false,
+  "en": {
+   "title": "Project demos",
+   "tools": "Webots, your repository",
+   "goals": [
+    "Present the problem, the architecture and the results of your term project",
+    "Show evidence: tests, logs, plots and a live or recorded simulation run",
+    "Answer questions about the design decisions and their trade-offs"
+   ],
+   "notes": "<p>Each team presents for 10 minutes, then answers questions for 5 minutes.</p>\n<h3>Structure of the presentation</h3>\n<ul><li><b>Problem</b>: what the robot must do and how success is measured (the acceptance criteria from your proposal).</li><li><b>Architecture</b>: the state machine or ROS 2 graph, which node or module does what, and where each Hyvex component would sit on a real build.</li><li><b>Approach</b>: the perception, planning and control methods, and why you chose them over the alternatives.</li><li><b>Evidence</b>: the Webots run (live or recorded), plots (error over time, accuracy, confusion matrix), and the CI test results.</li><li><b>Next steps</b>: what fails today and what you would do with two more weeks.</li></ul>\n<h3>Grading of the term project (15% of the course grade)</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Part</th><th>Weight</th></tr></thead><tbody>\n<tr><td>Proposal and requirements (week 8)</td><td>15%</td></tr>\n<tr><td>Progress check (week 11)</td><td>15%</td></tr>\n<tr><td>Working system in simulation</td><td>30%</td></tr>\n<tr><td>Software quality: architecture, tests, CI, repository history</td><td>20%</td></tr>\n<tr><td>Report and presentation</td><td>20%</td></tr></tbody></table></div>",
+   "code": [],
+   "lab": "",
+   "hw": "Submit the final report and the repository link before your demo."
+  },
+  "tr": {
+   "title": "Proje sunumları",
+   "tools": "Webots, proje deponuz",
+   "goals": [
+    "Dönem projesinin problemini, mimarisini ve sonuçlarını sunmak",
+    "Kanıt göstermek: testler, kayıtlar, grafikler ve canlı ya da kaydedilmiş bir simülasyon çalıştırması",
+    "Tasarım kararları ve ödünleşimleri hakkındaki soruları cevaplamak"
+   ],
+   "notes": "<p>Her takım 10 dakika sunum yapar, ardından 5 dakika soruları cevaplar.</p>\n<h3>Sunumun yapısı</h3>\n<ul><li><b>Problem</b>: robot ne yapmalı ve başarı nasıl ölçülüyor (öneri belgesindeki kabul ölçütleri).</li><li><b>Mimari</b>: durum makinesi ya da ROS 2 grafiği, hangi düğüm ya da modül ne yapıyor ve gerçek bir yapımda her Hyvex bileşeni nerede durur.</li><li><b>Yaklaşım</b>: algılama, planlama ve denetim yöntemleri ve neden alternatiflerine tercih edildikleri.</li><li><b>Kanıt</b>: Webots çalıştırması (canlı ya da kayıt), grafikler (zamana göre hata, doğruluk, karışıklık matrisi) ve CI test sonuçları.</li><li><b>Sonraki adımlar</b>: bugün neyin başarısız olduğu ve iki hafta daha olsa ne yapacağınız.</li></ul>\n<h3>Dönem projesinin notlandırılması (ders notunun %15'i)</h3>\n<div class=\"scroll\"><table class=\"t\"><thead><tr><th>Bölüm</th><th>Ağırlık</th></tr></thead><tbody>\n<tr><td>Öneri ve gereksinimler (8. hafta)</td><td>%15</td></tr>\n<tr><td>Ara kontrol (11. hafta)</td><td>%15</td></tr>\n<tr><td>Simülasyonda çalışan sistem</td><td>%30</td></tr>\n<tr><td>Yazılım kalitesi: mimari, testler, CI, depo geçmişi</td><td>%20</td></tr>\n<tr><td>Rapor ve sunum</td><td>%20</td></tr></tbody></table></div>",
+   "code": [],
+   "lab": "",
+   "hw": "Final raporunu ve depo bağlantısını sunumundan önce teslim et."
+  }
+ }
+]

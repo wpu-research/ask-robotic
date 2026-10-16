@@ -54,6 +54,7 @@ export const shell = {
     league: 'Sınıf ligi',
     pricing: 'Planlar ve fiyatlar',
     engineering: 'Mühendislik yolu',
+    robotics: 'Robotik dersi (ESOF 323)',
   },
   /** Alt sekme çubuğundaki kısa adlar. */
   tab: {

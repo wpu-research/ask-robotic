@@ -39,6 +39,7 @@ export const NAV: NavGroup[] = [
     title: 'Büyükler için', key: 'shell.groups.adults',
     items: [
       { href: '/muhendislik', label: 'Mühendislik yolu', key: 'shell.nav.engineering', icon: 'drone' },
+      { href: '/muhendislik/robotik', label: 'Robotik dersi', key: 'shell.nav.robotics', icon: 'book' },
     ],
   },
   {
@@ -59,5 +60,7 @@ export function isActive(href: string, pathname: string): boolean {
   // Panel: giriş yapmış kullanıcıda "/" da paneldir
   if (href === '/panel') return pathname === '/panel' || pathname === '/'
   if (href === '/konular') return pathname.startsWith('/konular') || pathname.startsWith('/moduller') || pathname.startsWith('/ders')
+  // Robotik dersi kendi menü öğesinde işaretlenir, üst "Mühendislik yolu" değil
+  if (href === '/muhendislik' && pathname.startsWith('/muhendislik/robotik')) return false
   return pathname === href || pathname.startsWith(`${href}/`)
 }

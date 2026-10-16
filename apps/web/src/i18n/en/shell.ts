@@ -55,6 +55,7 @@ export const shell: typeof Tr = {
     league: 'Class league',
     pricing: 'Plans & pricing',
     engineering: 'Engineering path',
+    robotics: 'Robotics course (ESOF 323)',
   },
   tab: {
     lab: 'Lab',
