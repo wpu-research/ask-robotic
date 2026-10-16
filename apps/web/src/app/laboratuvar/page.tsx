@@ -5,6 +5,8 @@ import { Icon } from '@/components/shell/icons'
 import type { Circuit } from '@/lib/lab/contract'
 import { kitOf, partBySlug } from '@/lib/muhendislik/catalog'
 import { SKETCHES } from '@/lib/muhendislik/sketches'
+import { courseKitOf } from '@/lib/robotik/kits'
+import { getLocale } from '@/i18n/server'
 import '../muhendislik/muhendislik.css'
 
 const BLINK = `// LED'i saniyede bir yakıp söndür
@@ -22,7 +24,8 @@ void loop() {
 
 const START: Circuit = { parts: [{ id: 'uno', type: 'uno', x: 40, y: 40, rotation: 0, props: {} }], wires: [] }
 
-type Search = Promise<{ parca?: string | string[] }>
+type Search = Promise<{ parca?: string | string[]; kit?: string | string[] }>
+const courseKit = async (sp: Search) => { const k = (await sp).kit; return typeof k === 'string' ? { name: k, kit: courseKitOf(k) } : null }
 const engPart = async (sp: Search) => {
   const raw = (await sp).parca
   const p = typeof raw === 'string' ? partBySlug(raw) : undefined
@@ -32,10 +35,32 @@ const engPart = async (sp: Search) => {
 
 export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
   const e = await engPart(searchParams)
-  return { title: e ? `Laboratuvar: ${e.p.name}` : 'Laboratuvar' }
+  const ck = await courseKit(searchParams)
+  return { title: e ? `Laboratuvar: ${e.p.name}` : ck?.kit ? `Laboratuvar: ${ck.kit.title}` : 'Laboratuvar' }
 }
 
 export default async function Laboratuvar({ searchParams }: { searchParams: Search }) {
+  const ck = await courseKit(searchParams)
+  if (ck?.kit) {
+    const { kit, name } = ck
+    const en = (await getLocale()) === 'en'
+    return (
+      <div className="page page-tool">
+        <header className="page-title">
+          <nav aria-label="Konum" className="crumbs">
+            <Link href="/muhendislik/robotik">ESOF 323</Link><Icon name="chevronRight" size={14} />
+            <Link href={`/muhendislik/robotik/hafta/${kit.week}`}>{en ? `Week ${kit.week}` : `${kit.week}. hafta`}</Link><Icon name="chevronRight" size={14} />
+            <span aria-current="page">{en ? 'Lab' : 'Laboratuvar'}</span>
+          </nav>
+          <h1>{en ? kit.en.title : kit.title}</h1>
+          <p className="muted eng-lab-watch" data-testid="eng-lab-watch">{en ? kit.en.watch : kit.watch}</p>
+        </header>
+        <div className="tool-body">
+          <LabEditor key={name} initial={kit.circuit()} initialCode={SKETCHES[kit.sketch]} storageKey={`ask:lab:esof:${name}`} />
+        </div>
+      </div>
+    )
+  }
   const e = await engPart(searchParams)
   if (e) {
     const { p, kit } = e

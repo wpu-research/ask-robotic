@@ -4,21 +4,10 @@ import { SIM_META } from '@/components/robotik/sim-meta'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
 import { COURSE, WEEKS } from '@/lib/robotik/course'
+import { PROJECTS } from '@/lib/robotik/projects'
 
 export const metadata: Metadata = { title: `${COURSE.code} Robotik`, description: 'ESOF 323 Robotics: üniversite robotik dersi, 14 hafta, tarayıcıda simülasyonlar.' }
 
-const TRACKS = {
-  tr: [
-    ['Otonom kara aracı', 'Webots', 'Şerit takibi, engelden kaçınma ve trafik işareti sınıflandırma (CV + DL), PID direksiyon.'],
-    ['Otonom drone görevi', 'Gazebo + PX4 SITL', 'Kaskad denetim, MAVLink ile ara nokta görevi ve işaretçiyle (ArUco) hassas iniş.'],
-    ['Görsel kılavuzlu robot kol', 'Webots', 'Kamerayla nesne bulma, ters kinematik ve al-bırak; durum makinesiyle görev akışı.'],
-  ],
-  en: [
-    ['Autonomous ground vehicle', 'Webots', 'Lane following, obstacle avoidance and traffic sign classification (CV + DL) with PID steering.'],
-    ['Autonomous drone mission', 'Gazebo + PX4 SITL', 'Cascaded control, a waypoint mission over MAVLink and precision landing on a marker (ArUco).'],
-    ['Vision-guided robot arm', 'Webots', 'Find objects with a camera, solve inverse kinematics and pick and place, with a state machine for the task flow.'],
-  ],
-} as const
 
 export default async function Robotik() {
   const lang = await getLocale()
@@ -88,8 +77,8 @@ export default async function Robotik() {
         <h2 id="rb-proj">{en ? 'Term project tracks' : 'Dönem projesi kolları'}</h2>
         <p className="muted">{en ? 'Teams of three or four choose one track. Milestones: proposal in week 8, progress check in week 11, demo and report in week 14.' : 'Üç-dört kişilik takımlar bir kol seçer. Ara teslimler: öneri 8. hafta, ara kontrol 11. hafta, sunum ve rapor 14. hafta.'}</p>
         <ul className="eng-grid">
-          {TRACKS[lang].map(([title, sim, desc]) => (
-            <li key={title}><div className="eng-card"><span className="eng-card-top"><span className="eng-tag eng-tag-lab">{sim}</span></span><b>{title}</b><span className="eng-card-use">{desc}</span></div></li>
+          {PROJECTS.map((p) => (
+            <li key={p.slug}><Link href={`/muhendislik/robotik/proje/${p.slug}`} className="eng-card" data-testid={`rb-proj-${p.slug}`}><span className="eng-card-top"><span className="eng-tag eng-tag-lab">{p.simulator}</span></span><b>{p[lang].title}</b><span className="eng-card-use">{p[lang].summary}</span></Link></li>
           ))}
         </ul>
       </section>

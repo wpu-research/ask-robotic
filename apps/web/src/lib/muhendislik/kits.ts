@@ -18,10 +18,10 @@ export interface Kit {
 }
 
 const UNO: PartInstance = { id: 'uno', type: 'uno', x: 40, y: 40, rotation: 0, props: {} }
-const part = (id: string, type: PartType, x: number, y: number, props: Record<string, PropValue> = {}, rotation: PartInstance['rotation'] = 0): PartInstance =>
+export const part = (id: string, type: PartType, x: number, y: number, props: Record<string, PropValue> = {}, rotation: PartInstance['rotation'] = 0): PartInstance =>
   ({ id, type, x, y, rotation, props })
 const ref = (s: string): PinRef => { const i = s.indexOf('.'); return { part: s.slice(0, i), pin: s.slice(i + 1) } }
-const build = (parts: PartInstance[], wires: Array<[string, string]>): Circuit => ({
+export const build = (parts: PartInstance[], wires: Array<[string, string]>): Circuit => ({
   parts: [{ ...UNO, props: {} }, ...parts],
   wires: wires.map(([a, b], i) => ({ id: `k${i + 1}`, a: ref(a), b: ref(b) })),
 })

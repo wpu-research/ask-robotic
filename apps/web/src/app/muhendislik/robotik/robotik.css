@@ -105,3 +105,15 @@
 .rb-pager a { color: var(--text); font-weight: 700; }
 .rb-pager a.r { text-align: right; }
 .rb-pager small { display: block; color: var(--muted); font-weight: 400; }
+.rb-kitbox { margin: 28px 0 8px; } .rb-kitbox h2 { font-size: 1.1rem; margin: 0 0 6px; }
+.rb-steps { list-style: decimal; padding-left: 22px; display: grid; gap: 6px; }
+.rb-small { font-size: .85rem; }
+.rb-milestones { display: grid; gap: 10px; }
+.rb-milestones li { display: grid; grid-template-columns: 90px minmax(0, 1fr); gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); }
+.rb-milestones p { margin: 2px 0; }
+.rb-ms-week { font-family: var(--mono); font-weight: 800; color: var(--eng); }
+.rb-proj-step { margin: 20px 0; padding: 14px 18px; border-radius: 12px; border: 1px dashed color-mix(in srgb, var(--primary) 45%, var(--border)); background: var(--primary-soft); }
+.rb-proj-step h3 { margin: 0 0 8px; font-size: 1rem; }
+.rb-proj-step ul { display: grid; gap: 6px; }
+.rb-proj-step li { font-size: .92rem; }
+.eng .part-main > *, .rb-code, .rb-art > * { min-width: 0; } .rb-code pre { max-width: 100%; }

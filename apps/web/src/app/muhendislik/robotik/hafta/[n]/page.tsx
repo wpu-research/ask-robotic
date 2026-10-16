@@ -7,6 +7,8 @@ import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
 import { labHref } from '@/lib/muhendislik/catalog'
 import { COURSE, WEEKS, WOKWI, kitPartsOf, partsOf, weekOf } from '@/lib/robotik/course'
+import { courseKitOf } from '@/lib/robotik/kits'
+import { milestonesOfWeek } from '@/lib/robotik/projects'
 
 export async function generateMetadata({ params }: { params: Promise<{ n: string }> }): Promise<Metadata> {
   const w = weekOf(Number((await params).n))
@@ -22,6 +24,8 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
   const t = w[lang]
   const prev = weekOf(w.n - 1), next = weekOf(w.n + 1)
   const parts = partsOf(w), kits = kitPartsOf(w)
+  const ck = w.courseKit ? courseKitOf(w.courseKit) : undefined
+  const steps = milestonesOfWeek(w.n)
   return (
     <div className="page eng rb">
       <nav aria-label={en ? 'Breadcrumb' : 'Konum'} className="crumbs">
@@ -68,6 +72,14 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
             </>
           )}
 
+          {ck && (
+            <section className="eng-labbox rb-kitbox" aria-labelledby="rb-kit">
+              <h2 id="rb-kit">{en ? 'In the lab' : 'Laboratuvarda'}: {en ? ck.en.title : ck.title}</h2>
+              <p>{en ? ck.en.watch : ck.watch}</p>
+              <Link className="btn btn-primary" href={`/laboratuvar?kit=${w.courseKit}`} data-testid="rb-open-kit">{en ? 'Open in the lab' : 'Laboratuvarda aç'} <Icon name="arrowRight" size={16} /></Link>
+            </section>
+          )}
+
           {(t.lab || kits.length > 0 || w.wokwi.length > 0) && (
             <section className="rb-box">
               <h3>{en ? 'Lab task' : 'Laboratuvar görevi'}</h3>
@@ -78,6 +90,12 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
                   {w.wokwi.map((b) => <li key={b}><a href={WOKWI[b].href} target="_blank" rel="noreferrer">{WOKWI[b][lang]}</a></li>)}
                 </ul>
               )}
+            </section>
+          )}
+          {steps.length > 0 && (
+            <section className="rb-proj-step" aria-labelledby="rb-ps">
+              <h3 id="rb-ps">{en ? 'Term project this week' : 'Bu hafta dönem projesinde'}</h3>
+              <ul>{steps.map(({ project, m }) => <li key={project.slug}><Link href={`/muhendislik/robotik/proje/${project.slug}`}><b>{project[lang].title}</b></Link>: {m[lang].title}. {m[lang].deliver}</li>)}</ul>
             </section>
           )}
           {t.hw && <section className="rb-box rb-box-hw"><h3>{en ? 'Homework' : 'Ödev'}</h3><p>{t.hw}</p></section>}

@@ -17,6 +17,8 @@ export interface Week {
   kits: string[]
   /** Wokwi'de çalışılan kartlar. */
   wokwi: Array<'esp32' | 'stm32'>
+  /** Derse özel laboratuvar kiti (/laboratuvar?kit=). */
+  courseKit?: 'cizgi' | 'trafik' | 'kesme' | null
   exam: boolean
   tr: WeekText
   en: WeekText

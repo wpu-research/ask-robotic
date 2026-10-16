@@ -52,7 +52,8 @@
    ],
    "lab": "Aynı çizgi izleyiciyi Tinkercad Circuits veya Wokwi'de iki IR sensör ve bir L298N ile kurun. Ardından yukarıdaki simülatörü aç-kapa (bang-bang) modunda çalıştırın ve robot pistten çıkana kadar temel hızı artırın. Bu hızı not edin.",
    "hw": "Çizgi izleyici için dört durumlu (düz, sol, sağ, kayıp) bir durum diyagramı çizin. Kayıp durumu için bir toparlanma stratejisi ekleyin ve neden işe yaradığını açıklayın."
-  }
+  },
+  "courseKit": "cizgi"
  },
  {
   "n": 2,
@@ -113,7 +114,8 @@
    ],
    "lab": "Wokwi'de trafik ışığı durum makinesini kurun. A0'a bir potansiyometre ekleyin ve ışıklar çalışmaya devam ederken gerilimini Serial Plotter'a yazdırın.",
    "hw": "Kırmızı ışık talep eden bir yaya düğmesi ekleyin. Düğmenin arkını (debounce) yazılımla giderin ve programın hiçbir yerinde delay() kullanmayın."
-  }
+  },
+  "courseKit": "trafik"
  },
  {
   "n": 3,
@@ -188,7 +190,8 @@
    ],
    "lab": "Bizim laboratuvarda MPU6050 kitini aç ve ham ivmeyi Wire ile oku; koddaki adresi 0x69 yap ve cihazın neden cevap vermediğini açıkla. Sonra I²C LCD kitini aç ve eğim açısını ekrana yaz. Wokwi'de enkoder kesme sayacını önce ESP32, sonra STM32 Nucleo üzerinde kur ve değiştirmen gereken kodu karşılaştır.",
    "hw": "1. haftadaki çizgi izleyen karar mantığını saf bir C++ fonksiyonuna taşı, bilgisayarında çalışan en az altı birim testi yaz ve bunları her push'ta testleri çalıştıran bir CI iş akışıyla birlikte bir GitHub deposuna koy."
-  }
+  },
+  "courseKit": "kesme"
  },
  {
   "n": 4,
@@ -262,7 +265,8 @@
    ],
    "lab": "Simülatörde, σ = 14 ve σ = 30 gürültü düzeylerinde her filtre için en düşük hatayı veren ayarları bulun. Basamak değişimlerine en hızlı hangi filtre tepki veriyor? Ardından Wokwi'de bir HC-SR04 bağlayın ve ham ile filtrelenmiş değerleri Serial Plotter'da karşılaştırın.",
    "hw": "Wokwi'de bir MPU6050 için tümleyen filtre (complementary filter) uygulayın ve yalnızca ivmeölçerden, yalnızca jiroskoptan ve filtreden elde edilen yunuslama (pitch) açısını çizdirin. Her eğriyi birkaç cümleyle açıklayın."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 5,
@@ -332,7 +336,8 @@
    ],
    "lab": "Wokwi'de bir servoyu potansiyometreyle kontrol edin. Ardından bir DC motoru L298N üzerinden sürün ve delay() kullanmadan hızı 0'dan tam hıza çıkarıp geri indirin.",
    "hw": "−255 ile 255 arasında değer alan, yön pinlerini ayarlayan, girişi sınırlayan (clamp) ve 0'da fren yapan bir setMotor(int speed) fonksiyonu yazın. Wokwi'de kısa bir hız dizisiyle test edin."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 6,
@@ -390,7 +395,8 @@
    ],
    "lab": "PID simülatörü: (1) Yalnızca P ile salınımın başladığı Kp değerini bulun. (2) Aşım %10'un altına inene kadar Kd ekleyin. (3) Bozucuyu (disturbance) 4'e ayarlayın ve hatayı gidermek için Ki ekleyin. (4) Integral doyumu önlemeyi (anti-windup) kapatıp karşılaştırın. Ardından çizgi izleyiciyi PD moduna alın ve en hızlı kararlı hızı bulun.",
    "hw": "Farklı kazançlarla elde edilmiş dört basamak yanıtının ekran görüntülerini, her biri için kısa bir açıklamayla birlikte teslim edin. Çizgi izleyici için en iyi kazançlarınızı ve ulaştığınız hızı da ekleyin."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 7,
@@ -464,7 +470,8 @@
    ],
    "lab": "Simülatörde (a) düz giden, (b) yerinde dönen, (c) 100 px yarıçaplı bir çember çizen tekerlek hızlarını bulun. Ardından tekerlek yarıçapı hatasını %5'e ayarlayın ve tam bir turdan sonraki odometri hatasını ölçün. Rastgele seçilmiş 100 erişilebilir nokta için, her iki dirsek çözümünde de fk(ik(x, y)) ifadesinin (x, y) döndürdüğünü doğrulayın. Simülatörde iki tekil konfigürasyon bulun ve kolun o noktalarda artık neyi yapamadığını açıklayın.",
    "hw": "(v, ω) değerini tekerlek hızlarına dönüştüren bir Python fonksiyonu yazın ve bunu kullanarak simüle edilmiş bir robotu 1 m'lik bir karenin çevresinde sürün. %2 tekerlek yarıçapı hatasıyla gerçek yolu ve odometri yolunu çizdirin. Uç işlevcinin (end effector) bir çember çizmesini sağlayın: çember üzerinde noktalar üretin, her biri için IK çözün ve kolu Matplotlib ile canlandırın. Çalışma alanının dışında kalan noktaları ele alın."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 8,
@@ -501,7 +508,8 @@
    "code": [],
    "lab": "",
    "hw": ""
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 9,
@@ -567,7 +575,8 @@
    ],
    "lab": "Simülatörde üç rastgele harita oluşturun. Her biri için BFS, açgözlü arama ve A*'ın genişlettiği hücre sayısını ve yol uzunluğunu kaydedin. Açgözlü aramanın A*'tan belirgin şekilde daha uzun bir yol döndürdüğü bir harita bulun. Simülatörde 100, 500 ve 2000 parçacıkla ve 5 ile 30 mesafe gürültüsüyle kestirim hatasını ölçün. Robotu kaçırın ve filtrenin toparlanmasının ne kadar sürdüğünü ölçün.",
    "hw": "Python A* kodunu, çapraz maliyeti √2 olan 8 bağlantılı komşuluğa ve oktil sezgisel fonksiyona genişletin. Aynı haritalarda düğüm genişletme sayılarını Manhattan sürümüyle karşılaştırın. Kısa bir rapor yazın: parçacık sayısı çok az olduğunda filtre neden başarısız olur ve rastgele parçacık eklemenin size maliyeti nedir? İki iyileştirme önerin ve gerekçelendirin."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 10,
@@ -628,7 +637,8 @@
    ],
    "lab": "Önce tarayıcıdaki renk izleme simülasyonunu çalıştır, sonra OpenCV izleyicisini kendi kameranla: seçtiğin bir nesne için HSV aralığını ayarla ve hatayı 10 Hz'de yazdır. Webots'ta proje aracına bir kamera ekle ve lane_offset() fonksiyonunun verdiği şerit sapmasını her karede yazdır.",
    "hw": "Şerit sapmasını 6. haftadaki PID sınıfına bağla ve Webots aracının şeritten çıkmadan pistte bir tur atmasını sağla. Kısa bir video ve sapmanın zamana göre grafiğini teslim et."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 11,
@@ -682,7 +692,8 @@
    ],
    "lab": "Tarayıcıdaki sinir ağı simülasyonunda şekil sınıflandırıcıyı eğit: ıraksayan bir öğrenme oranı ve çok yavaş kalan bir öğrenme oranı bul, sonra veri çoğaltmayı kapat ve eğitim ile doğrulama doğruluğu arasındaki farkın büyüdüğünü izle. En iyi çalıştırmanın karışıklık matrisini kaydet.",
    "hw": "Webots dünyasından (ya da açık bir veri kümesinden) en az 200 trafik işareti görüntüsü topla, yukarıdaki SignNet'i eğit ve doğrulama doğruluğunu, karışıklık matrisini ve sınıf başına duyarlılığı raporla. Bir başarısızlık örneğini açıkla."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 12,
@@ -742,7 +753,8 @@
    ],
    "lab": "turtlesim'i başlatın ve çember sürücüsünü çalıştırın. Sistemi ros2 topic ve rqt_graph ile inceleyin. Çizge simülatöründe /lidar_driver düğümünü durdurun ve hangi düğümlerin çıktı üretmeyi bıraktığını ve nedenini açıklayın.",
    "hw": "turtlesim için hedefe giden (go-to-goal) bir düğüm yazın: /turtle1/pose konusuna abone olun, /turtle1/cmd_vel konusuna yayın yapın ve yönelim ile mesafe için 6. haftadaki PID sınıfını kullanın."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 13,
@@ -819,7 +831,8 @@
    ],
    "lab": "(1) Varsayılan kazançlarla birkaç hedefe uçun. (2) Konum Ki = 0 iken rüzgârı 2 N'a ayarlayın ve kalıcı sapmayı ölçün; ardından Ki'yi artırın. (3) Dron salınıma girene kadar yönelim Kd ve Kp değerlerini düşürün ve nedenini açıklayın. Dron simülatöründe beş ara noktalı bir görev planlayın (görev moduna geçin) ve bunu rüzgârlı ve rüzgârsız olarak uçurun. Sürü simülatöründe sıkı bir sürü oluşumu sağlayan ağırlıkları ve sürünün dağılmasına yol açan ağırlıkları bulun. İsteğe bağlı: PX4 SITL'i Docker'da çalıştırın ve MAVSDK betiğiyle uçuş yapın.",
    "hw": "Simülatörde kullanılan düzlemsel dört rotor denklemlerini (x, z, φ) Newton yasalarından türetin ve denetleyicinin istenen ivmeden istenen eğim açısını nasıl hesapladığını gösterin. Boids modelini Python'da (Matplotlib veya pygame) uygulayın ve dördüncü bir kural ekleyin: dairesel engellerden kaçınma. Kısa bir video veya GIF teslim edin."
-  }
+  },
+  "courseKit": null
  },
  {
   "n": 14,
@@ -864,6 +877,7 @@
    "code": [],
    "lab": "",
    "hw": "Final raporunu ve depo bağlantısını sunumundan önce teslim et."
-  }
+  },
+  "courseKit": null
  }
 ]
