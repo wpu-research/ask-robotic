@@ -5,7 +5,7 @@ export interface NavItem { href: string; /** Türkçe ad (testler ve dil bağım
 export interface NavGroup { title: string; key: MessageKey; items: NavItem[]; /** Atölyeler panelindeki alt başlık ve renk tonu. */ desc?: MessageKey; tone?: 'kids' | 'adults' | 'learning' }
 
 /** Macademia ana sitesi: MacademiaX onun robotik ve mühendislik programıdır. */
-export const MACADEMIA_URL = 'https://www.macademia.online/'
+export const MACADEMIA_URL = 'https://www.macademia.com.tr/'
 
 /**
  * Üst menü, macademia.online ile aynı sırada: Anasayfa · Hakkımızda · Yöntemimiz · Eğitimler ▾ · Kurumsal Eğitimler · İletişim.

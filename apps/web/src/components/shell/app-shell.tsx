@@ -114,7 +114,7 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
           </div>
           <div className="bottom">
             <span>{t('shell.foot.copy')}</span>
-            <a href={MACADEMIA_URL}>macademia.online</a>
+            <a href={MACADEMIA_URL}>macademia.com.tr</a>
           </div>
         </div>
       </footer>
