@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Success criterion",
+      "definition": "A condition that says with numbers whether the robot works or not: e.g. at least 3 m travelled and at most 3 collisions in 30-35 seconds.",
+      "example": "The robot travelled 4.2 m and collided once; the criterion was met.",
+      "pitfall": "Saying \"it is doing really well\" and giving no numbers at all."
+    },
+    {
+      "term": "Edge counting",
+      "definition": "Counting the moment a flag changes from false to true; staying true for a while counts as a single event.",
+      "example": "The moment collided becomes true, the counter goes up by one.",
+      "pitfall": "Counting on every pass for as long as the flag is true: one contact looks like hundreds of collisions."
+    },
+    {
+      "term": "Deriving a threshold",
+      "definition": "Setting the success limit a little below the measured results.",
+      "example": "The lowest distance measured was 4.0 m; the threshold was chosen as 3 m.",
+      "pitfall": "Setting the threshold, without measuring, to a number you want the robot to pass."
+    },
+    {
+      "term": "Stuck check",
+      "definition": "During ILERI, if the distance changes by less than a certain amount over a certain time, assuming the robot is caught and making it back off.",
+      "example": "If the distance has not changed by 6 cm for 1.5 seconds, SIKISTI is printed and it moves to GERI.",
+      "pitfall": "Doing the stuck check with delay: while the robot waits, it cannot look at anything."
+    },
+    {
+      "term": "Emergency stop command",
+      "definition": "A protection that stops the motors at once when a character arrives from the serial port.",
+      "example": "When x arrives, calisiyor = false and loop() says surus(0, 0) on every pass.",
+      "pitfall": "Not resetting the state machine when starting again: the robot carries on from the unfinished movement."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h2d5-q1",
+      "kind": "mcq",
+      "prompt": "Your friend says their robot is very good. Which two measurements would you ask for and read together?",
+      "options": [
+        "Battery voltage and wheel colour",
+        "Distance travelled and number of collisions",
+        "Only the number of collisions",
+        "The number of lines in the sketch and the serial speed"
+      ],
+      "answer": 1,
+      "explanation": "The distance shows that the robot really moves forward, and the number of collisions shows how safe it is. The number of collisions on its own is misleading: a robot that never moves has zero collisions. Battery, colour and number of lines do not measure the quality of the behaviour.",
+      "skills": [
+        "rob-measure"
+      ]
+    },
+    {
+      "id": "m5h2d5-q2",
+      "kind": "numeric",
+      "prompt": "The robot goes at 0.2 m/s. In a 35-second run there are 5 obstacle rounds, and each one stops the robot moving forward for 2.2 seconds. What is the greatest distance in metres the robot can travel?",
+      "answer": 4.8,
+      "tolerance": 0.01,
+      "unit": "m",
+      "explanation": "5 × 2.2 = 11 seconds are spent stopped; 35 − 11 = 24 seconds are spent moving forward. 24 × 0.2 = 4.8 m. In a real run, backing off and turning can also shorten the distance, so the calculation is an upper limit.",
+      "skills": [
+        "rob-measure",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h2d5-q3",
+      "kind": "numeric",
+      "prompt": "The stuck check looks for a 6 cm change in the distance. If the robot is moving towards an obstacle at 0.2 m/s, how many seconds does it take for the distance to change by 6 cm?",
+      "answer": 0.3,
+      "tolerance": 0.01,
+      "unit": "s",
+      "explanation": "Time = distance / speed = 0.06 m / 0.2 m/s = 0.3 s. Because the check waits for 1.5 seconds, a robot moving forward normally always stays well below this limit; only a robot that is really caught sees a fixed distance for 1.5 seconds.",
+      "skills": [
+        "rob-measure",
+        "rob-threshold"
+      ]
+    },
+    {
+      "id": "m5h2d5-q4",
+      "kind": "predict-output",
+      "prompt": "Measurements arrive every 50 ms, TAKILMA_MS = 200. What does this code print?\n\n```\nconst unsigned long TAKILMA_MS = 200;\nint olcum[6] = {60, 58, 59, 57, 58, 59};\nint ilerlemeCm = -100;\nunsigned long ilerlemeZaman = 0;\n\nfor (int i = 0; i < 6; i++) {\n  unsigned long simdi = i * 50UL;\n  int cm = olcum[i];\n  if (abs(cm - ilerlemeCm) >= 6) {\n    ilerlemeCm = cm;\n    ilerlemeZaman = simdi;\n  } else if (simdi - ilerlemeZaman >= TAKILMA_MS) {\n    Serial.println(i);\n    break;\n  }\n}\n```",
+      "options": [
+        "3",
+        "5",
+        "It prints nothing",
+        "4"
+      ],
+      "answer": 3,
+      "explanation": "At i = 0, ilerlemeCm is −100, so the difference is large: ilerlemeCm = 60 and ilerlemeZaman = 0. The following measurements differ from 60 by at most 3 cm, so they do not count as 'progress'. At i = 4, simdi = 200 and 200 − 0 >= 200 is true; 4 is printed. At i = 3, simdi = 150 is not yet enough.",
+      "skills": [
+        "rob-measure",
+        "rob-threshold",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d5-q5",
+      "kind": "find-bug",
+      "prompt": "The robot is stopped with x, but when it is started again with g it sometimes carries on from the middle of a turn and sometimes skips a state. There is one bug in the code. What is it?\n\n```\nvoid komutOku() {\n  while (Serial.available() > 0) {\n    char c = Serial.read();\n    if (c == 'x') { calisiyor = false; }\n    if (c == 'g') { calisiyor = true; }\n  }\n}\n```",
+      "options": [
+        "if should be used instead of while",
+        "A delay should be added after Serial.read()",
+        "The x command should set calisiyor = true",
+        "The g command does not reset the state machine; gec(ILERI) should be called"
+      ],
+      "answer": 3,
+      "explanation": "When it is stopped, durum and durumBasi stay as they are. When it starts again, the robot carries on from the unfinished state; because the time passed is calculated from durumBasi, a timed state may also count as finished straight away. If gec(ILERI) is called when g arrives, a clean start is made. The while loop is correct for reading all the incoming characters; no delay is needed.",
+      "skills": [
+        "rob-fsm",
+        "rob-measure",
+        "prog-debug"
+      ]
+    }
+  ]
+}

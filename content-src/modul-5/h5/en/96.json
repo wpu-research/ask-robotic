@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Setpoint",
+      "definition": "The value the control wants to reach; in line following, the line being exactly in the middle of the array.",
+      "example": "If the position is 0, the line is under sensor A2 and the robot is where it wants to be.",
+      "pitfall": "Confusing the setpoint with the sensor's raw value; the error is the difference between the setpoint and the measurement."
+    },
+    {
+      "term": "Error (e)",
+      "definition": "The difference between the setpoint and the measurement; if the error is 0, the robot is where it wants to be.",
+      "example": "If the line covers only A1, the position is 1.0, and because the line is on the left the error is +1.",
+      "pitfall": "Defining the sign of the error the wrong way round; the robot turns away from the line instead of towards it."
+    },
+    {
+      "term": "Position (weighted average)",
+      "definition": "The average of the weights of the sensors that see the line; the sensors have weights +2, +1, 0, -1, -2.",
+      "example": "If only A2 and A3 see the line, the position is (0 + (-1)) / 2 = -0.5.",
+      "pitfall": "Forgetting to divide the sum by the number of sensors; when two sensors see the line the position comes out doubled."
+    },
+    {
+      "term": "P control",
+      "definition": "Control that gives steering in direct proportion to the error: u = Kp x e.",
+      "example": "If Kp = 100 and e = 1.5, then u = 150 PWM.",
+      "pitfall": "Thinking P control will bring the error all the way to zero; when the error is zero, the steering is zero too."
+    },
+    {
+      "term": "Kp",
+      "definition": "The gain that turns the error into steering; the bigger it is, the harder the reaction to the same error.",
+      "example": "At Kp = 8 the robot lost the line; at Kp = 85 it finished the lap.",
+      "pitfall": "Making Kp very large in one go; the robot is thrown from side to side of the line and the steering jitters."
+    },
+    {
+      "term": "Line lost",
+      "definition": "When no sensor sees the line, a large value towards the last-seen side is used instead of the error.",
+      "example": "If the line was last on the left, the error is taken as +2 and the robot turns left to search for the line.",
+      "pitfall": "Skipping the sayi == 0 case; you get a division by zero, or the robot drives straight on."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h5d96-q1",
+      "kind": "numeric",
+      "prompt": "The weights of the five sensors are +2 for A0, +1 for A1, 0 for A2, -1 for A3 and -2 for A4. If only A2 and A3 see the line, what is the position of the line?",
+      "answer": -0.5,
+      "tolerance": 0.01,
+      "explanation": "The sum of the weights of the sensors that see it is 0 + (-1) = -1, and because two sensors see it the average is -1 / 2 = -0.5. The negative sign tells you the line is to the robot's right. If you forget to divide, you get -1, which is wrong.",
+      "skills": [
+        "ctl-proportional"
+      ]
+    },
+    {
+      "id": "m5h5d96-q2",
+      "kind": "numeric",
+      "prompt": "In a line follower, TABAN = 200, Kp = 100 and the error e = -1.5. What value is given to the right wheel (TABAN + u)?",
+      "answer": 50,
+      "tolerance": 0,
+      "explanation": "u = Kp x e = 100 x (-1.5) = -150. The right wheel gets TABAN + u = 200 - 150 = 50; the left wheel would get 200 + 150 = 350, so it is limited to 255. Because the line is on the right, the right wheel slows down and the robot turns right.",
+      "skills": [
+        "ctl-proportional"
+      ]
+    },
+    {
+      "id": "m5h5d96-q3",
+      "kind": "mcq",
+      "prompt": "In a P-controlled line follower, what is the most likely result in a bend if Kp is chosen too small?",
+      "options": [
+        "The robot keeps being thrown from one side of the line to the other",
+        "The steering is not enough and the robot loses the line",
+        "The robot does not move at all",
+        "The robot goes faster and more accurately"
+      ],
+      "answer": 1,
+      "explanation": "A small Kp reacts too weakly to the error; in the measurement with Kp = 8 the robot left the line in the bend and lost it. Being thrown around and jittering are signs of a large Kp, not a small one.",
+      "skills": [
+        "ctl-proportional"
+      ]
+    },
+    {
+      "id": "m5h5d96-q4",
+      "kind": "find-bug",
+      "prompt": "When the position is positive, the line is to the robot's left and the robot should turn left. In the code below the robot turns away from the line. Where is the single bug?\n\n```\nfloat e = hataOku();      // + : çizgi solda\nfloat u = KP * e;\nsurucu(SOL_EN, SOL_IN1, SOL_IN2, TABAN + u);\nsurucu(SAG_EN, SAG_IN1, SAG_IN2, TABAN - u);\n```",
+      "options": [
+        "KP + e should be written instead of KP * e",
+        "The hataOku() function should not be called",
+        "The TABAN constant should be 255",
+        "The left wheel should get TABAN - u and the right wheel TABAN + u; the signs are reversed"
+      ],
+      "answer": 3,
+      "explanation": "If the line is on the left, the left wheel should slow down and the right wheel should speed up. The code does exactly the opposite, so the robot turns away from the line. The multiplication, the function call and the TABAN value are correct.",
+      "skills": [
+        "ctl-proportional",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h5d96-q5",
+      "kind": "predict-output",
+      "prompt": "What does this code print to the serial monitor when it runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  int deger[5] = {100, 800, 900, 100, 100};\n  int sayi = 0;\n  int toplam = 0;\n  for (int i = 0; i < 5; i++) {\n    if (deger[i] > 500) {\n      sayi++;\n      toplam += 2 - i;\n    }\n  }\n  Serial.println((float)toplam / sayi, 1);\n}\nvoid loop() {}\n```",
+      "options": [
+        "0.5",
+        "1.5",
+        "-0.5",
+        "1.0"
+      ],
+      "answer": 0,
+      "explanation": "Only A1 (800) and A2 (900) pass the threshold. Their weights are 2 - 1 = 1 and 2 - 2 = 0; the sum is 1 and the number of sensors is 2, so the result is 0.5. The second argument of println prints 1 decimal place.",
+      "skills": [
+        "ctl-proportional",
+        "prog-debug"
+      ]
+    }
+  ]
+}

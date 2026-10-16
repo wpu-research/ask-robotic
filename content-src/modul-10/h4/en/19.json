@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Continuous sound",
+      "definition": "A sound that, once started, plays until the stop sound block.",
+      "example": "While you touch the logo the continuous sound rings; when you let go, stop sound runs.",
+      "pitfall": "Not putting in the stop sound block; the sound does not stop by itself."
+    },
+    {
+      "term": "Map (range conversion)",
+      "definition": "Scales a value from one range to another and rounds it to the nearest whole number.",
+      "example": "When the light is mapped from 0-255 to 200-1000 Hz, a light of 255 gives 1000 Hz.",
+      "pitfall": "Writing the ranges the wrong way round; the sensor's range comes first, then the sound's."
+    },
+    {
+      "term": "Light level",
+      "definition": "How bright the sensor reads; between 0 (dark) and 255 (very bright).",
+      "example": "When you pull the light slider up, the value gets bigger.",
+      "pitfall": "Playing the light level directly as a frequency; values between 0 and 255 sound very low."
+    },
+    {
+      "term": "every [N] ms",
+      "definition": "A timer hat block that runs what is inside it again and again at a set interval.",
+      "example": "An interval of 100 ms reads the light and updates the sound ten times a second.",
+      "pitfall": "Choosing an interval that is too long; the sound follows the light late."
+    },
+    {
+      "term": "Condition (if ... then)",
+      "definition": "Runs the blocks inside it only while the condition is true.",
+      "example": "If the logo is touched, play a sound; if not, do nothing.",
+      "pitfall": "Forgetting the condition and starting the sound on every round; the sound plays even if you do not touch the logo."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h4d19-q1",
+      "kind": "numeric",
+      "prompt": "When the light level is 255, how many Hz does the map( light, 0-255, 200-1000 ) block give?",
+      "answer": 1000,
+      "tolerance": 0,
+      "unit": "Hz",
+      "explanation": "The map block links the top end of one range to the top end of the other: 255 -> 1000. If the light were 0, you would get 200 Hz.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d19-q2",
+      "kind": "numeric",
+      "prompt": "When the light level is 128, how many Hz does the map( light, 0-255, 200-1000 ) block give? (Round the result to the nearest whole number.)",
+      "answer": 602,
+      "tolerance": 0,
+      "unit": "Hz",
+      "explanation": "200 + 128 × 800 / 255 = 200 + 401.57 = 601.57. Rounded to the nearest whole number, it is 602. Because the light is a little more than half of the range, the result is a little above 600.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d19-q3",
+      "kind": "find-bug",
+      "prompt": "A student wanted a sound when the logo is touched. But when they let go of the logo, the sound does not stop:\n\n```\nevery [100] ms:\n   if logo touched? then:\n      ring tone [map(light, 0-255, 200-1000)] Hz\n\nwhen logo is [released]:\n   (empty)\n```\n\nWhat is missing?",
+      "options": [
+        "The every [100] ms block",
+        "The stop sound block inside when logo is released",
+        "The if block",
+        "The light level block"
+      ],
+      "answer": 1,
+      "explanation": "A continuous sound does not end by itself; the stop sound block is needed. It must be added inside the released hat block. The other blocks start the sound but do not silence it.",
+      "skills": [
+        "prog-debug",
+        "prog-structure"
+      ]
+    },
+    {
+      "id": "m10h4d19-q4",
+      "kind": "predict-output",
+      "prompt": "The logo is held down. The light slider is pulled first to 0, then to 255:\n\n```\nevery [100] ms:\n   if logo touched? then:\n      ring tone [map(light, 0-255, 200-1000)] Hz\n```\n\nA little while after the slider reaches 255, how many Hz is the sound?",
+      "options": [
+        "200 Hz",
+        "255 Hz",
+        "1000 Hz",
+        "602 Hz"
+      ],
+      "answer": 2,
+      "explanation": "The timer looks at the light ten times a second and updates the sound. When the light is 255, the map block gives 1000. 200 Hz would play when the light is 0; 255 is the light value itself, without mapping.",
+      "skills": [
+        "prog-structure"
+      ]
+    },
+    {
+      "id": "m10h4d19-q5",
+      "kind": "mcq",
+      "prompt": "The sound plays even if you never touch the logo. Inside the timer there is a ring tone block. Which block is most likely missing?",
+      "options": [
+        "The if logo touched? then block",
+        "The tempo block",
+        "The rest block",
+        "The on button [A] hat block"
+      ],
+      "answer": 0,
+      "explanation": "Without the condition, the sound is started every 100 ms; it plays even if the logo is not touched. The condition block starts the sound only while the logo is being touched. The tempo and rest blocks have nothing to do with continuous sound.",
+      "skills": [
+        "prog-debug",
+        "prog-structure"
+      ]
+    }
+  ]
+}

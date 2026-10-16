@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Tool",
+      "definition": "A program that the application runs and that the model can ask to call by its name and input: a calculator, a search, reading a sensor, and so on.",
+      "example": "In the workshop, `hesapla(12*7)` calls the calculator tool and returns 84.",
+      "pitfall": "Thinking the model runs the tool itself; the model only asks for the call, and the application runs the tool."
+    },
+    {
+      "term": "Observation",
+      "definition": "The result a tool call returns; the agent looks at it to decide on the next step.",
+      "example": "The observation of the call `hesapla(12*7)` is 84.",
+      "pitfall": "Moving on to the next step without reading the observation; an error is an observation too."
+    },
+    {
+      "term": "Call format `arac(girdi)`",
+      "definition": "In the workshop each step is made of a tool name and the input in brackets.",
+      "example": "`hesapla($1+16)`, `ara(üye sayısı)`, `bitir($2)`.",
+      "pitfall": "Forgetting the brackets or the input; the call cannot be understood."
+    },
+    {
+      "term": "Carrying results with $1, $2",
+      "definition": "$n puts the observation of step n into the input of a later step; `$son` (\"last\") gives the latest successful result.",
+      "example": "`hesapla(12*7)` then `hesapla($1+16)` gives us 100.",
+      "pitfall": "Referring to a step that does not exist: writing $2 when there is no second step gives an empty text."
+    },
+    {
+      "term": "Tool error",
+      "definition": "An error observation the tool returns without crashing; the agent can read it and try another way.",
+      "example": "`hesapla(1/0)` gives a \"division by zero\" observation.",
+      "pitfall": "Using the error text of a failed step as if it were a number in the next step."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h6d26-q1",
+      "kind": "mcq",
+      "prompt": "Why is it safer for a language model to call a calculator tool than to do a multi-digit multiplication with its own guess?",
+      "options": [
+        "The tool always talks faster than the model",
+        "The model produces numbers the way it predicts words and can be wrong; the tool does a real calculation",
+        "The calculator extends the model's training data",
+        "When it uses a tool, the model can never make a mistake"
+      ],
+      "answer": 1,
+      "explanation": "The model produces an answer by predicting the next piece; on big operations there is no guarantee of correctness. A tool does a specific job deterministically. No method makes the model \"unable to make mistakes\": the tool call must be made with the right input.",
+      "skills": [
+        "agent-tools"
+      ]
+    },
+    {
+      "id": "m7h6d26-q2",
+      "kind": "predict-output",
+      "prompt": "In the workshop you wrote this script (world: calculator only):\n```\nhesapla(12*7)\nhesapla($1+16)\nbitir($2)\n```\nWhich answer does the agent finish with?",
+      "options": [
+        "84",
+        "16",
+        "100",
+        "Error: $2 does not exist yet"
+      ],
+      "answer": 2,
+      "explanation": "Step 1 gives 84; $1 = 84. Step 2 gives 84+16 = 100; $2 = 100. `bitir($2)` makes the answer 100. 84 is only the observation of the first step; $2 already exists after the second step.",
+      "skills": [
+        "agent-tools",
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d26-q3",
+      "kind": "numeric",
+      "prompt": "What does the calculator in the workshop return for the call `hesapla(2+3*4)`?",
+      "answer": 14,
+      "tolerance": 0,
+      "explanation": "Multiplication comes first: 3*4 = 12, then 2+12 = 14. Without the order of operations you would get 20 working left to right; the calculator gives 14, not 20.",
+      "skills": [
+        "agent-tools"
+      ]
+    },
+    {
+      "id": "m7h6d26-q4",
+      "kind": "find-bug",
+      "prompt": "Goal: find the total of 12 groups × 7 projects and give the answer (world: calculator only). Script:\n```\nhesapla(12*7)\nbitir($2)\n```\nThe agent's answer comes out empty. Where is the bug?",
+      "options": [
+        "Line 1: addition is needed instead of multiplication",
+        "Line 2: only one step was taken, so there is no $2; the first result is $1",
+        "Line 2: `dur()` is needed instead of `bitir`",
+        "Line 1: `hesapla` cannot be used in this world"
+      ],
+      "answer": 1,
+      "explanation": "Only one tool call was made, so the result is in $1. The non-existent $2 turns into an empty text and the answer stays empty. The multiplication is correct and the `hesapla` tool exists in this world; `dur()` (\"stop\") is a robot tool.",
+      "skills": [
+        "agent-tools",
+        "agent-loop",
+        "agent-limits"
+      ]
+    },
+    {
+      "id": "m7h6d26-q5",
+      "kind": "mcq",
+      "prompt": "Who decides on the tool calls in the workshop, and why should this be stated honestly?",
+      "options": [
+        "The tools decide themselves; there is no model and there is no need to say so",
+        "A real language model decides and runs in the background",
+        "You make the decision by writing a script; the \"model step\" is a simulation, while the tools really run",
+        "The browser picks a tool at random"
+      ],
+      "answer": 2,
+      "explanation": "There is no model in the workshop: you write the calls as a script. The tools (calculator, knowledge base, robot) really calculate. Knowing this shows that a real agent may behave differently, and that the result cannot be counted as \"the model's success\".",
+      "skills": [
+        "agent-tools",
+        "agent-loop"
+      ]
+    }
+  ]
+}

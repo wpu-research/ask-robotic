@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Order",
+      "definition": "The same blocks give a different result when they are lined up in a different order; the final state of the program depends on the last block that ran.",
+      "example": "Clear first, then show the square: the square stays on the screen; in the opposite order the screen stays empty.",
+      "pitfall": "Lining up the right blocks in the wrong order and thinking the program is broken."
+    },
+    {
+      "term": "Loop (repeat)",
+      "definition": "A block that runs the blocks inside it from start to finish as many times as the number typed in.",
+      "example": "Repeat 3: show square, pause, clear, pause. The square blinks three times.",
+      "pitfall": "Typing the wrong number; if you type 3, it goes round exactly three times, not two or four."
+    },
+    {
+      "term": "Inside and outside",
+      "definition": "The blocks inside repeat run in every round, while the blocks under it run once after the loop has finished.",
+      "example": "If the yes icon is under repeat, it appears only at the very end.",
+      "pitfall": "Attaching the block in the wrong place: a block attached inside repeats where you do not want it to."
+    },
+    {
+      "term": "Round time",
+      "definition": "The total of the pause times inside the loop; the total time is this multiplied by the number of rounds.",
+      "example": "A round of 300 + 300 ms makes 1800 ms in total for 3 rounds.",
+      "pitfall": "Thinking the time of one round is the total."
+    },
+    {
+      "term": "Counter (_i)",
+      "definition": "The variable used by the repeat block in the JavaScript tab; it starts at 0 and goes up towards the number of rounds.",
+      "example": "The line for (let _i = 0; _i < 3; _i++) goes round three times: 0, 1, 2.",
+      "pitfall": "Thinking _i < 3 means \"up to and including three\"; the value 3 is not included."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d4-q1",
+      "kind": "predict-output",
+      "prompt": "What is on the screen after this program has finished?\n\n```\ncard.onStart(() => {\n  screen.clear();\n  wait(300);\n  screen.showIcon(\"square\");\n  wait(300);\n});\n```",
+      "options": [
+        "The screen is empty",
+        "First the square, then an empty screen",
+        "The square icon is visible",
+        "An error happens"
+      ],
+      "answer": 2,
+      "explanation": "The screen is cleared first, then the square is shown. The pause after the square does not wipe the drawing, so the square stays on the screen. If the clear and show square blocks were the other way round, the screen would stay empty.",
+      "skills": [
+        "mk-flow",
+        "mk-images"
+      ]
+    },
+    {
+      "id": "m10h1d4-q2",
+      "kind": "numeric",
+      "prompt": "A repeat block runs 3 times. In each round there are the blocks pause 300 ms, clear screen, pause 300 ms. What is the total time of the loop in milliseconds? (The show and clear blocks do not wait.)",
+      "answer": 1800,
+      "unit": "ms",
+      "explanation": "One round takes 300 + 300 = 600 ms. Three rounds: 3 x 600 = 1800 ms (1.8 seconds). Writing only 600 means thinking the time of one round is the total.",
+      "skills": [
+        "mk-repeat",
+        "mk-timing"
+      ]
+    },
+    {
+      "id": "m10h1d4-q3",
+      "kind": "find-bug",
+      "prompt": "Ece wants the square to blink three times, but the square never goes off.\n\n```\n1  for (let _i = 0; _i < 3; _i++) {\n2    screen.showIcon(\"square\");\n3    wait(300);\n4    wait(300);\n5  }\n```\n\nWhat is the bug?",
+      "options": [
+        "Line 4 needs screen.clear() instead of wait; the screen is never cleared",
+        "Line 1: the loop should go round 4 times",
+        "Line 2: the square icon cannot blink",
+        "Line 3: the pause is too short"
+      ],
+      "answer": 0,
+      "explanation": "To blink, one round needs show, pause, clear, pause. Here there is no clearing, so after the first round the square stays on all the time. The number of rounds (3) is the number wanted and square is a valid icon; the pause time does not spoil the result, it only changes the speed.",
+      "skills": [
+        "mk-repeat",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d4-q4",
+      "kind": "mcq",
+      "prompt": "To show the \"yes\" icon, you attach the block UNDER (outside) the repeat block. What does this do?",
+      "options": [
+        "The icon is shown in every round",
+        "The icon is never shown",
+        "The loop goes on forever",
+        "The icon is shown only once, after the loop has completely finished"
+      ],
+      "answer": 3,
+      "explanation": "The block under repeat runs once when the loop has finished. If it were attached inside, it would try to run in every round. Attaching it underneath does not hide the icon and does not make the loop longer.",
+      "skills": [
+        "mk-repeat",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d4-q5",
+      "kind": "mcq",
+      "prompt": "The JavaScript tab has the line for (let _i = 0; _i < 5; _i++). How many times do the blocks inside it run?",
+      "options": [
+        "4 times",
+        "5 times",
+        "6 times",
+        "Forever"
+      ],
+      "answer": 1,
+      "explanation": "The value of _i becomes 0, 1, 2, 3, 4, and when it becomes 5 the condition is no longer true. That makes five rounds. Because it starts at 0, \"up to 5\" does not mean 5 is included; so it goes round 5 times, not 6.",
+      "skills": [
+        "mk-repeat"
+      ]
+    }
+  ]
+}

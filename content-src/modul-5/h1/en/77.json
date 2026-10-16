@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Motor driver",
+      "definition": "A board (L298N, TB6612) that turns the Arduino's weak signal into motor current from a separate battery. Inside it there is an H-bridge for each motor.",
+      "example": "A single driver board drives the robot's left and right motors independently.",
+      "pitfall": "Connecting the motor directly to an Arduino pin or to the 5V output."
+    },
+    {
+      "term": "Direction and speed inputs",
+      "definition": "IN1/IN2 set the direction of the current, EN (PWMA on the TB6612) sets the speed with PWM.",
+      "example": "If IN1 = HIGH, IN2 = LOW and EN is given analogWrite(150), the motor turns forward at medium speed.",
+      "pitfall": "Connecting EN to a pin that is not PWM; analogWrite only produces PWM on 3, 5, 6, 9, 10, 11."
+    },
+    {
+      "term": "Brake and coast",
+      "definition": "When braking (IN1 = IN2 = HIGH, EN high) the motor leads are shorted and the motor is forced to stop; when coasting, the motor is left disconnected and slows down on its own.",
+      "example": "Brake is used to hold the robot on a downhill slope, and coast to let it roll freely.",
+      "pitfall": "Thinking the two are the same; on a real robot the stopping distances are different."
+    },
+    {
+      "term": "STBY and the EN jumper",
+      "definition": "On the TB6612, if STBY is LOW the driver is in standby mode and the motor does not turn. On ready-made L298N boards, the jumper on ENA/ENB keeps the motor at full speed.",
+      "example": "To set the speed with PWM on the L298N, you remove the jumper and connect EN to D5.",
+      "pitfall": "Forgetting to connect STBY or to remove the EN jumper; the motor either does not turn at all or the speed setting has no effect."
+    },
+    {
+      "term": "Common GND",
+      "definition": "Connecting the motor battery's negative to the Arduino GND; it makes the signals use the same 0 V reference.",
+      "example": "The negative lead of the battery box, the driver's GND and the Arduino GND are joined together.",
+      "pitfall": "Not joining the GNDs; the driver cannot understand the direction and PWM signals and the motor behaves randomly."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d77-q1",
+      "kind": "mcq",
+      "prompt": "If the left motor is given IN1 = HIGH, IN2 = HIGH and EN = 255, what happens to the motor?",
+      "options": [
+        "It turns forward quickly",
+        "It turns backward quickly",
+        "It brakes and is forced to stop",
+        "It is left disconnected and spins freely"
+      ],
+      "answer": 2,
+      "explanation": "When the two direction inputs are the same and EN is high, the motor leads are shorted; this is the brake state. For coasting, the INs must be LOW and EN must be 0; for forward and backward, the INs must be opposite.",
+      "skills": [
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d77-q2",
+      "kind": "predict-output",
+      "prompt": "The left motor driver (EN D5, IN1 D7, IN2 D8) is given these commands. What does the motor do?\n\n```\ndigitalWrite(7, LOW);\ndigitalWrite(8, HIGH);\nanalogWrite(5, 100);\n```",
+      "options": [
+        "Forward, at full speed",
+        "Forward, slowly",
+        "Backward, with a duty cycle of about 39 percent",
+        "It stops, because the two pins are different"
+      ],
+      "answer": 2,
+      "explanation": "IN1 LOW and IN2 HIGH give the backward direction. Because EN is given 100, the PWM duty cycle is 100/255, about 39 percent. Because the direction inputs are different, the motor does not stop; what stops it is them being the same (brake).",
+      "skills": [
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d77-q3",
+      "kind": "numeric",
+      "prompt": "analogWrite(EN, 191) was written to the EN pin. About what percentage is the PWM duty cycle?",
+      "answer": 75,
+      "tolerance": 1,
+      "unit": "%",
+      "explanation": "Duty cycle = 191 / 255, about 0.749, so 75 percent. The analogWrite value is in the range 0-255; 255 means 100 percent. Reading the value directly as a percentage (191 percent) is impossible.",
+      "skills": [
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d77-q4",
+      "kind": "find-bug",
+      "prompt": "The right motor's speed never changes; whatever analogWrite is given, the motor either does not turn at all or always turns at the same speed. The driver pins are connected like this: EN D4, IN3 D9, IN4 D10. What is the most likely bug?\n\n```\nconst int SAG_EN = 4;\nconst int SAG_IN1 = 9;\nconst int SAG_IN2 = 10;\n...\nanalogWrite(SAG_EN, 180);\n```",
+      "options": [
+        "SAG_EN = 4: EN must be connected to a pin that supports PWM",
+        "SAG_IN1 should not be 9",
+        "digitalWrite should be written instead of analogWrite",
+        "The value 180 is too large; it must be less than 255"
+      ],
+      "answer": 0,
+      "explanation": "analogWrite only produces real PWM on the Uno's PWM pins (3, 5, 6, 9, 10, 11); on D4 it behaves only like HIGH/LOW. 180 is a valid value, and 9 and 10 are fine as direction pins.",
+      "skills": [
+        "prog-debug",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m5h1d77-q5",
+      "kind": "mcq",
+      "prompt": "What happens if the motor battery's negative is not connected to the Arduino GND?",
+      "options": [
+        "The motor turns faster",
+        "The driver signals have no common reference and the motor behaves randomly",
+        "Only the brake stops working",
+        "Nothing happens; the signals travel through the air"
+      ],
+      "answer": 1,
+      "explanation": "Signals only make sense relative to the same 0 V reference. If the GNDs are not common, the driver cannot reliably tell HIGH from LOW. This is a problem of uncertainty, not of speed; the problem is not limited to braking.",
+      "skills": [
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

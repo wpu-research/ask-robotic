@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Relative humidity",
+      "definition": "What percentage of the most water vapour the air can hold at that temperature it is holding now.",
+      "example": "At 100 % relative humidity the air is saturated; 30 % shows a fairly dry room.",
+      "pitfall": "Thinking relative humidity is the amount of water in the air itself; the same amount of water gives a higher percentage in cold air."
+    },
+    {
+      "term": "DHT11 and DHT22",
+      "definition": "Two sensor models that give temperature and humidity over a single data line; the DHT22 gives a more detailed (decimal) result.",
+      "example": "In the lab, a real temperature of 23.5 °C is printed as \"23.5\" by the DHT22 and \"24.0\" by the DHT11.",
+      "pitfall": "Thinking that seeing many digits means measuring correctly; you need to find the accuracy in the datasheet."
+    },
+    {
+      "term": "NaN and isnan()",
+      "definition": "NaN means \"not a number\"; the library returns it when it cannot read the sensor. isnan(x) asks whether the value is invalid.",
+      "example": "if (isnan(nem)) { Serial.println(\"Okuma hatasi\"); return; }",
+      "pitfall": "Skipping the check and calculating with NaN; the result is NaN too and nan appears on the screen."
+    },
+    {
+      "term": "Reading interval",
+      "definition": "The DHT sensor must be given at least 2 seconds between two readings.",
+      "example": "You set up delay(2000) or a 2000 ms timer with millis().",
+      "pitfall": "Writing short intervals such as delay(500); the sensor cannot keep up and the same value repeats."
+    },
+    {
+      "term": "Consecutive error counter",
+      "definition": "A variable that counts how many readings in a row have failed; a successful reading resets it to zero.",
+      "example": "When the counter reaches 3, the screen prints \"SENSOR YOK\" and stops showing the old value.",
+      "pitfall": "Raising the alarm straight away on a single bad reading, or never resetting the counter."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h3d46-q1",
+      "kind": "mcq",
+      "prompt": "If the DHT library fails to take a reading, what does readTemperature() return, and what should the program do about it?",
+      "options": [
+        "It returns 0; nothing needs to be done",
+        "It returns half of the previous value",
+        "It stops the program; the sensor has to be restarted",
+        "It returns NaN; the value must be checked with isnan() before it is used"
+      ],
+      "answer": 3,
+      "explanation": "When a reading fails, the library returns NaN (not a number). If you calculate with NaN, the result is NaN too and nan appears on the screen; that is why you check with isnan() first. It does not return zero, and it does not stop the program.",
+      "skills": [
+        "sens-dht-read"
+      ]
+    },
+    {
+      "id": "m4h3d46-q2",
+      "kind": "predict-output",
+      "prompt": "The DATA wire of the DHT22 module is NOT connected to the Uno. If this code runs for 4.5 seconds, what appears in the serial monitor?\n\n```\n#include <DHT.h>\nDHT dht(5, DHT22);\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  delay(2000);\n  float t = dht.readTemperature();\n  if (isnan(t)) Serial.println(\"HATA\");\n  else Serial.println(t * 2);\n}\n```",
+      "options": [
+        "Two lines: HATA and HATA",
+        "Nothing is printed",
+        "Two lines: 0.00 and 0.00",
+        "Two lines: nan and nan"
+      ],
+      "answer": 0,
+      "explanation": "Because the sensor does not answer, readTemperature() returns NaN. Since isnan(t) is true, \"HATA\" (error) is printed at the 2nd and 4th second (two rounds finish within 4.5 seconds). The t * 2 line is never reached, so neither nan nor 0.00 appears.",
+      "skills": [
+        "sens-dht-read",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h3d46-q3",
+      "kind": "find-bug",
+      "prompt": "This code is meant to print the humidity safely every 2 seconds. Which line has the bug?\n\n```\n1 void loop() {\n2   delay(500);\n3   float nem = dht.readHumidity();\n4   if (isnan(nem)) { Serial.println(\"Okuma hatasi\"); return; }\n5   Serial.println(nem);\n6 }\n```",
+      "options": [
+        "Line 2: the DHT must be read at most once every 2 seconds; 500 ms is too short",
+        "Line 3: readTemperature should be written instead of readHumidity",
+        "Line 4: the isnan check is unnecessary",
+        "Line 5: print should be written instead of println"
+      ],
+      "answer": 0,
+      "explanation": "The bug is in the interval: the DHT needs at least 2 seconds between two readings, so delay(2000) is needed. At 500 ms the sensor cannot keep up, and the library usually repeats the old value. The isnan check on line 4 is, on the contrary, necessary.",
+      "skills": [
+        "sens-dht-read",
+        "prog-timing",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h3d46-q4",
+      "kind": "numeric",
+      "prompt": "In the program at the end of the lesson, readings are taken 2000 ms apart, and \"SENSOR YOK\" is printed after 3 errors in a row. The sensor was disconnected just after the last valid reading (t = 0). How many seconds after the disconnection does the \"SENSOR YOK\" message appear?",
+      "answer": 6,
+      "tolerance": 0,
+      "unit": "s",
+      "explanation": "The failed readings are taken at the 2nd, 4th and 6th second. In the first two the counter becomes 1 and 2, and the old value is still shown. At the 6th second the counter reaches 3 and the message appears: 3 errors × 2 s = 6 s.",
+      "skills": [
+        "sens-dht-read",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h3d46-q5",
+      "kind": "mcq",
+      "prompt": "A friend says: \"The DHT22 shows one digit after the decimal point and the DHT11 does not; so the DHT22 must measure more accurately.\" What do you say?",
+      "options": [
+        "They are right; the number of digits proves accuracy",
+        "They are right; the DHT11 does not work anyway",
+        "They are wrong; the number of digits on the screen and accuracy are different things, and accuracy is found in the datasheet",
+        "They are wrong; the two models always give the same output"
+      ],
+      "answer": 2,
+      "explanation": "The number of digits shows how much detail the sensor gives, not how close the measurement is to reality. The two models do not give the same output either (23.5 appears as 23.5 on the DHT22 and 24.0 on the DHT11), but for accuracy you look at the datasheet.",
+      "skills": [
+        "sens-dht-read"
+      ]
+    }
+  ]
+}

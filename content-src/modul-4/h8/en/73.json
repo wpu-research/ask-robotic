@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Two-point calibration",
+      "definition": "Measuring two known ends (for example dry and wet) and mapping the raw values to a meaningful range such as 0-100 with map.",
+      "example": "KURU = 921 and ISLAK = 307 were measured; map(614, 921, 307, 0, 100) gives about 50.",
+      "pitfall": "Calibrating at one supply voltage and using it with another supply; the numbers drift."
+    },
+    {
+      "term": "constrain()",
+      "definition": "Keeps a value between the given lower and upper limits.",
+      "example": "constrain(yuzde, 0, 100) fixes a measurement drier than dry at 0%.",
+      "pitfall": "Forgetting to add constrain and letting the percentage go above 100 or below zero."
+    },
+    {
+      "term": "The pin's internal resistance",
+      "definition": "The series resistance of about 25 Ω of an Uno output pin; as it takes load, the pin voltage drops from 5 V.",
+      "example": "When 220 Ω is connected to D13, the pin voltage becomes 5 x 220 / 245 ≈ 4.49 V.",
+      "pitfall": "Thinking the pin is an ideal 5 V supply and driving a motor or relay straight from the pin."
+    },
+    {
+      "term": "Brown-out",
+      "definition": "The microcontroller restarting itself when the supply goes below a certain threshold.",
+      "example": "When a powerful motor starts on a weak supply, the board goes back to the start and the setup() message is printed again.",
+      "pitfall": "Thinking it will not happen in a real circuit because there is no reset in the lab."
+    },
+    {
+      "term": "Fail-safe (safe default)",
+      "definition": "The rule of keeping a dangerous or costly output off when the situation is unknown.",
+      "example": "If pulseIn returns 0, YOK is printed and the alarm LED is switched off.",
+      "pitfall": "Counting a sensor that does not answer as \"value 0\" and setting off the alarm."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d3-q1",
+      "kind": "numeric",
+      "prompt": "The soil moisture module is powered with 5 V, and AO = VCC x (0.9 - 0.6 x moisture). With moisture = 0.25, about what does analogRead read? (Take 5 V = 1023.)",
+      "answer": 767,
+      "tolerance": 1,
+      "explanation": "AO = 5 x (0.9 - 0.15) = 3.75 V. ADC = 3.75 / 5 x 1023 ≈ 767. If you use 1024 instead of scaling the voltage with 1023, you get 768; that is why there is a small tolerance.",
+      "skills": [
+        "sens-supply",
+        "sens-adc"
+      ]
+    },
+    {
+      "id": "m4h8d3-q2",
+      "kind": "predict-output",
+      "prompt": "What does the Serial monitor show when this code runs?\n\n```cpp\nvoid setup() {\n  Serial.begin(9600);\n  int y = map(768, 921, 307, 0, 100);\n  Serial.println(y);\n  Serial.println(constrain(map(300, 921, 307, 0, 100), 0, 100));\n}\nvoid loop() {}\n```",
+      "options": [
+        "24 and 101",
+        "75 and 0",
+        "24 and 100",
+        "25 and 100"
+      ],
+      "answer": 2,
+      "explanation": "map(768, 921, 307, 0, 100) = (768 - 921) x 100 / (307 - 921) = 24.9; map uses integer division and throws away the fraction: 24. On the second line the raw value 300 is wetter than wet (307). map gives about 101, and constrain cuts it to 100.",
+      "skills": [
+        "sens-calibration"
+      ]
+    },
+    {
+      "id": "m4h8d3-q3",
+      "kind": "mcq",
+      "prompt": "A learner powered a small DC motor from the Uno's 5V pin in the lab, and the board never reset. What can you conclude from this?",
+      "options": [
+        "There will be no problem in a real circuit either",
+        "Because the lab does not model the 5V collapse or brown-out, it is unknown whether the board would reset in a real circuit",
+        "The lab reset it because the motor current was very low",
+        "In a real circuit the board will certainly reset"
+      ],
+      "answer": 1,
+      "explanation": "The lab's 5V line is an ideal supply; whatever the motor draws, the voltage does not drop. That is why the result proves nothing. Whether there is a problem in a real circuit depends on the supply and the motor; saying \"certainly\" or \"no problem\" are both wrong.",
+      "skills": [
+        "sens-sim-limits",
+        "sens-supply"
+      ]
+    },
+    {
+      "id": "m4h8d3-q4",
+      "kind": "find-bug",
+      "prompt": "This program lights the alarm LED when the HC-SR04 is not powered (when no echo comes). What is the real bug?\n\n```cpp\nlong sure = pulseIn(ECHO, HIGH, 30000);\nfloat cm = sure / 58.0;\ndigitalWrite(LED, cm < 20 ? HIGH : LOW);\n```",
+      "options": [
+        "The 30000 timeout is too big",
+        "The case where pulseIn returns 0 (no answer) is not separated out; it is taken as 0 cm, and because that is less than 20, the LED lights",
+        "58 should be written instead of 58.0",
+        "analogWrite should be used instead of digitalWrite"
+      ],
+      "answer": 1,
+      "explanation": "If no echo comes, pulseIn returns 0, 0 / 58 = 0 cm, and because 0 < 20 the LED lights. The right way is first to separate out the no-answer case with if (sure == 0) and switch the LED off (fail-safe). The other options do not change this behaviour.",
+      "skills": [
+        "sens-failsafe",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d3-q5",
+      "kind": "numeric",
+      "prompt": "You calibrated with KURU = 921 and ISLAK = 307. Then you moved the module's VCC to 3.3 V. With moisture = 0.25, the raw value reads 506. What percentage does map(506, 921, 307, 0, 100) show?",
+      "answer": 67,
+      "tolerance": 1,
+      "unit": "%",
+      "explanation": "(506 - 921) x 100 / (307 - 921) = 67.6; map throws away the fraction: 67. Yet with the real moisture at 0.25 and a 5 V supply, the raw value would be 767, so the percentage should be about 25. When the supply changes, the old calibration gives the wrong result.",
+      "skills": [
+        "sens-calibration",
+        "sens-supply"
+      ]
+    }
+  ]
+}

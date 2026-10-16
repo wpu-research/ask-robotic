@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Edge case",
+      "definition": "An input right next to the limit where the rule changes its decision.",
+      "example": "If the threshold is 20, the distances 19 and 20 are edge cases.",
+      "pitfall": "Trying only the \"comfortable\" values in the middle; mistakes hide at the limit."
+    },
+    {
+      "term": "Threshold value",
+      "definition": "The number at which the output switches from one label to another.",
+      "example": "In the robot rule, it switches from \"stop\" to \"slow down\" at 20 cm, and from \"slow down\" to \"continue\" at 50 cm.",
+      "pitfall": "Mixing up the phrases \"less than 20\" and \"20 or below\"."
+    },
+    {
+      "term": "Missing input (speed)",
+      "definition": "A variable the system does not take into account but that should affect the decision.",
+      "example": "If the distance is 40 cm and the speed is 100 cm/s, this rule still says \"slow down\".",
+      "pitfall": "Assuming the rule uses every input; only paired cases show this."
+    },
+    {
+      "term": "Data leakage",
+      "definition": "Also using the test cases while tuning the system, which makes the measurement look better than it is.",
+      "example": "If you fix the rule to suit 6 cases and measure with the same 6 cases, it comes out at 100%.",
+      "pitfall": "Doing the tuning and the measurement on the same set; the tuning set and the final measurement set should be separate."
+    },
+    {
+      "term": "Paired (comparison) cases",
+      "definition": "Two cases in which only one input changes; they test the effect of that input.",
+      "example": "(`mesafe=35 hız=10`) and (`mesafe=35 hız=90`) show the effect of the speed on its own.",
+      "pitfall": "Changing more than one input at a time; then it is not clear which is the cause."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d19-q1",
+      "kind": "mcq",
+      "prompt": "Which pair of cases is best for finding out whether the robot rule takes the speed into account?",
+      "options": [
+        "distance 35, speed 10 and distance 35, speed 90",
+        "distance 10, speed 10 and distance 60, speed 90",
+        "distance 35, speed 10 and distance 36, speed 10",
+        "distance 35, speed 10 and a repeat of the same case"
+      ],
+      "answer": 0,
+      "explanation": "Only the speed changes, and the distance stays fixed; if the rule uses the speed, the two results can be different. In the second option two inputs change at once and the cause is not clear. In the third only the distance changes, and in the fourth nothing changes.",
+      "skills": [
+        "eval-edge",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d19-q2",
+      "kind": "numeric",
+      "prompt": "The robot rule: if distance < 20, \"stop\"; if distance < 50, \"slow down\"; otherwise \"continue\". For how many of the whole-number distances from 0 to 60 (0 and 60 included) does the system say \"slow down\"?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "values",
+      "explanation": "For \"slow down\" it must be 20 ≤ distance < 50: 20, 21, ..., 49. That is 49 - 20 + 1 = 30 values. 20 is included and 50 is not; which side the limit belongs to is what edge case tests are about.",
+      "skills": [
+        "eval-edge"
+      ]
+    },
+    {
+      "id": "m7h4d19-q3",
+      "kind": "predict-output",
+      "prompt": "The rule looks only at the distance; it ignores the speed:\n\n```\nkarar(d):\n  d < 20    -> \"stop\"\n  d < 50    -> \"slow down\"\n  otherwise -> \"continue\"\n\nkarar_ver(\"mesafe=60 hız=300\")\n```\n\nWhat does the system return?",
+      "options": [
+        "stop",
+        "slow down",
+        "error",
+        "continue"
+      ],
+      "answer": 3,
+      "explanation": "The distance is 60, so it is not less than 50; the rule says \"continue\". Even though the speed is 300, the rule does not use it. At this speed a person would want to slow down even at a greater distance; evals are there to catch this missing behaviour.",
+      "skills": [
+        "eval-edge",
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d19-q4",
+      "kind": "find-bug",
+      "prompt": "Specification: \"If the distance is LESS THAN 20, stop; at 20 and above, slow down (up to 50)\". There is one bug in the code. Which line?\n\n```\n1: if d <= 20: stop\n2: else if d < 50: slow down\n3: else: continue\n```",
+      "options": [
+        "Line 2: it should be d <= 50 instead of d < 50",
+        "Line 1: it should be d < 20 instead of d <= 20",
+        "Line 3: it should be stop instead of continue",
+        "There is no bug"
+      ],
+      "answer": 1,
+      "explanation": "Line 1 also says \"stop\" at exactly 20 cm, but the specification wants \"slow down\" at 20. It should be d < 20. The bug only shows up with a limit input such as d = 20; someone who tries 5 or 35 never notices it.",
+      "skills": [
+        "eval-edge",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d19-q5",
+      "kind": "mcq",
+      "prompt": "What happens if you also do the final measurement with the cases you used while fixing the rule?",
+      "options": [
+        "The measurement becomes more reliable",
+        "The measurement does not change",
+        "The accuracy looks better than it is; this is called data leakage",
+        "The system runs faster"
+      ],
+      "answer": 2,
+      "explanation": "Because you fitted the rule to these cases, the system looks good on them; on new cases it may not show the same success. That is why one set is kept for tuning and a separate set for the final measurement.",
+      "skills": [
+        "eval-method"
+      ]
+    }
+  ]
+}

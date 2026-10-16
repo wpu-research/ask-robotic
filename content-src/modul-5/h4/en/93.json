@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Tick difference",
+      "definition": "The difference between the left and right counters; it shows whether the robot is going straight.",
+      "example": "If the left is 205 and the right 185, the difference is 20 ticks and the left is ahead.",
+      "pitfall": "Looking at the counter of a single wheel and thinking the robot is going straight."
+    },
+    {
+      "term": "Build-up",
+      "definition": "A small heading error growing as the robot keeps going in that direction.",
+      "example": "A wheel that is 10% slow makes the robot drift 137 cm sideways after 2 m.",
+      "pitfall": "Thinking a small difference will give a small result."
+    },
+    {
+      "term": "P (proportional) correction",
+      "definition": "A rule in which the correction is proportional to the error: correction = KP · error.",
+      "example": "If the error is 3 ticks and KP is 20, a correction of 60 PWM is made.",
+      "pitfall": "Writing the sign the wrong way round; the slow wheel slows down even more."
+    },
+    {
+      "term": "KP",
+      "definition": "The coefficient that sets how much PWM correction to make per unit of error.",
+      "example": "With KP = 20, a 1-tick difference asks for a correction of 20 PWM.",
+      "pitfall": "Choosing KP too small and thinking the correction does not work."
+    },
+    {
+      "term": "constrain",
+      "definition": "A function that keeps a value between a given lower and upper limit.",
+      "example": "The result of constrain(260, 0, 255) is 255.",
+      "pitfall": "Forgetting to clip and sending the PWM a value above 255 or a negative one."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h4d93-q1",
+      "kind": "numeric",
+      "prompt": "In a run without correction, the left counter showed 205 ticks and the right counter 185. If the tick distance is 1.037 cm, what is the path difference between the two wheels in cm?",
+      "answer": 20.7,
+      "tolerance": 0.2,
+      "unit": "cm",
+      "explanation": "The difference is 20 ticks; 20 · 1.037 = 20.7 cm. This difference changes the robot's heading and builds up along the way.",
+      "skills": [
+        "rob-ticks-distance",
+        "rob-straight-p"
+      ]
+    },
+    {
+      "id": "m5h4d93-q2",
+      "kind": "numeric",
+      "prompt": "If the path difference is 20.7 cm and the distance between the two wheels is L = 12 cm, about how many degrees does the robot turn? (Angle = difference / L, then convert to degrees.)",
+      "answer": 99,
+      "tolerance": 1,
+      "unit": "degrees",
+      "explanation": "Angle = 20.7 / 12 = 1.73 rad; multiplying this by 180/π gives about 99°. Keep both lengths in the same unit so you do not mix up centimetres and metres.",
+      "skills": [
+        "rob-straight-p",
+        "rob-drift"
+      ]
+    },
+    {
+      "id": "m5h4d93-q3",
+      "kind": "predict-output",
+      "prompt": "BAZ_PWM is 200, KP is 20 and the error is 3 (left ahead). What does this code print?\n\n```\nint hata = 3;\nint pwmSol = constrain(200 - 20 * hata, 0, 255);\nint pwmSag = constrain(200 + 20 * hata, 0, 255);\nSerial.print(pwmSol);\nSerial.print(\" \");\nSerial.println(pwmSag);\n```",
+      "options": [
+        "260 140",
+        "140 260",
+        "140 255",
+        "200 200"
+      ],
+      "answer": 2,
+      "explanation": "The left becomes 200 - 60 = 140. The right comes out as 200 + 60 = 260, but constrain clips it to 255. So the output is 140 255; the PWM cannot go above 255.",
+      "skills": [
+        "rob-straight-p",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h4d93-q4",
+      "kind": "find-bug",
+      "prompt": "The left wheel is ahead (hata = sol - sag is positive), but instead of correcting itself the robot drifts even more. What is the one bug?\n\n```\nint hata = sol - sag;\nint pwmSol = constrain(BAZ + KP * hata, 0, 255);\nint pwmSag = constrain(BAZ - KP * hata, 0, 255);\n```",
+      "options": [
+        "constrain should not be used",
+        "The sign of the correction is the wrong way round: the left motor, which is ahead, is turned up and the right is turned down",
+        "The error should be calculated from the PWM values, not from the counters",
+        "The BAZ value should be 255"
+      ],
+      "answer": 1,
+      "explanation": "If the left is ahead, the left motor should be turned down and the right turned up. Here the opposite is done and the difference grows. The error is already calculated correctly from the counters, and constrain is needed and correct; the problem is only the sign.",
+      "skills": [
+        "rob-straight-p",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h4d93-q5",
+      "kind": "mcq",
+      "prompt": "Even with P correction switched on, the robot drifts a few centimetres sideways after 2 m. What is the basic reason for this?",
+      "options": [
+        "The correction steps in after the error has appeared; the error builds up first, then is reduced",
+        "The encoders do not count any ticks",
+        "KP must be negative",
+        "P correction does not work while the robot is going straight"
+      ],
+      "answer": 0,
+      "explanation": "P correction reacts after the error has been measured, so a small drift in the first moments cannot be avoided. The correction does work and makes the drift about 20 times smaller; a negative KP would flip the sign and make it worse.",
+      "skills": [
+        "rob-straight-p",
+        "rob-drift"
+      ]
+    }
+  ]
+}

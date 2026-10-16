@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "UART and the baud rate",
+      "definition": "Two-line (RX, TX) serial communication with no clock line; the baud rate of the two ends must be chosen the same in advance.",
+      "example": "At 9600 baud one bit takes about 104 µs, and one byte (10 bits) about 1.04 ms.",
+      "pitfall": "Choosing different baud rates at the two ends; meaningless characters appear on the screen."
+    },
+    {
+      "term": "I2C: SDA, SCL and the address",
+      "definition": "A two-line protocol with a clock line; devices on the same line are chosen by address.",
+      "example": "The RTC (0x68) and an I2C LCD (0x27) share the same SDA and SCL wires.",
+      "pitfall": "Two devices using the same address (such as the RTC and the MPU6050)."
+    },
+    {
+      "term": "SPI and the CS line",
+      "definition": "A fast protocol that uses three shared lines (SCK, MOSI, MISO) and a CS (select) line for each device.",
+      "example": "The SD card's CS line is D10; the device whose CS is LOW listens.",
+      "pitfall": "Forgetting the CS line, or making the CS of two devices LOW at the same time."
+    },
+    {
+      "term": "Bit time and transfer time",
+      "definition": "The time of one bit is 1/speed; transfer time = number of bits ÷ speed.",
+      "example": "100 bytes × 10 bits ÷ 9600 baud ≈ 104 ms.",
+      "pitfall": "Counting 8 bits per byte; in UART, with the start and stop bits, it is 10 bits."
+    },
+    {
+      "term": "SPI speed divider",
+      "definition": "On the Uno, SCK is 16 MHz divided by 2, 4, 8 ...; SPISettings picks the highest value that does not go above the requested speed.",
+      "example": "When 3 MHz is requested, 2 MHz is used.",
+      "pitfall": "Thinking the speed that is set is the same as the speed requested."
+    },
+    {
+      "term": "Wire.setClock()",
+      "definition": "Sets the speed of the I2C clock line (100 kHz, 400 kHz).",
+      "example": "At 400 kHz, an address + 1 data byte takes about 45 µs.",
+      "pitfall": "Raising the speed without checking that every device on the line supports it."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d69-q1",
+      "kind": "numeric",
+      "prompt": "With UART at 19200 baud, if each byte takes 10 bits, about how many milliseconds does sending 100 bytes take?",
+      "answer": 52.1,
+      "tolerance": 0.3,
+      "unit": "ms",
+      "explanation": "The total number of bits is 100 × 10 = 1000. Time = 1000 ÷ 19200 s ≈ 0.0521 s ≈ 52.1 ms. If you assumed 8 bits, you would get 41.7 ms; this is wrong, because the start and stop bits also take time.",
+      "skills": [
+        "serial-protocols"
+      ]
+    },
+    {
+      "id": "m4h7d69-q2",
+      "kind": "numeric",
+      "prompt": "The I2C speed is 400 kHz. An address byte and 4 data bytes are sent. If each byte takes 9 clock pulses, how many microseconds does the transfer take, not counting the start and stop conditions?",
+      "answer": 112.5,
+      "tolerance": 0.5,
+      "unit": "µs",
+      "explanation": "Total bytes 1 + 4 = 5; clock pulses 5 × 9 = 45. One pulse takes 1 ÷ 400000 s = 2.5 µs. 45 × 2.5 = 112.5 µs.",
+      "skills": [
+        "serial-protocols"
+      ]
+    },
+    {
+      "id": "m4h7d69-q3",
+      "kind": "predict-output",
+      "prompt": "On the Uno (16 MHz), about how many Hz is SCK when this code runs?\n\n```\nSPI.begin();\nSPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE0));\n```",
+      "options": [
+        "5000000 Hz",
+        "8000000 Hz",
+        "4000000 Hz",
+        "2500000 Hz"
+      ],
+      "answer": 2,
+      "explanation": "On the Uno, SCK can only take values such as 8, 4, 2, 1 MHz ... SPISettings picks the highest value that does not go above the requested speed: without going above 5 MHz, it drops to 4 MHz. 8 MHz is bigger than requested; 5 MHz and 2.5 MHz are not in this halving sequence.",
+      "skills": [
+        "serial-protocols"
+      ]
+    },
+    {
+      "id": "m4h7d69-q4",
+      "kind": "find-bug",
+      "prompt": "The terminal on the computer is set to 115200 baud. The code below is running on the Arduino and meaningless characters appear in the terminal. Where is the problem?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"Merhaba\");\n}\n```",
+      "options": [
+        "print should be used instead of println",
+        "The baud rate is not the same as the terminal's; it should be Serial.begin(115200), or the terminal should be set to 9600",
+        "loop() should be used instead of setup()",
+        "Because the text is Turkish"
+      ],
+      "answer": 1,
+      "explanation": "In UART there is no clock line; both sides know the bit time from the baud rate. If the Arduino sends at 9600 and the terminal expects 115200, it samples the bits at the wrong times and you see meaningless characters. The only difference between print and println is the end of line.",
+      "skills": [
+        "serial-protocols",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d69-q5",
+      "kind": "mcq",
+      "prompt": "In the data logger, the time will be read from the RTC, written to an LCD, and many rows saved to the SD card. Which pairing makes the most sense?",
+      "options": [
+        "I2C for the RTC and the LCD (two wires, by address), SPI for the SD card (fast)",
+        "UART for all three",
+        "SPI for the RTC, I2C for the SD card",
+        "The same CS line for all of them"
+      ],
+      "answer": 0,
+      "explanation": "The RTC and the LCD carry little data and can share the same two wires with different addresses; I2C suits them. The SD card carries a lot of data and needs SPI's high speed. UART is for one-to-one links; two SPI devices using the same CS line get mixed up.",
+      "skills": [
+        "serial-protocols",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

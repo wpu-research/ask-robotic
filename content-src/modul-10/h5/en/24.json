@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Protocol (shared table)",
+      "definition": "A table of rules that both sides agree on: which number means what.",
+      "example": "The table 1 = heart, 2 = happy face, 3 = sad face.",
+      "pitfall": "Changing the table on only one side; the other side misunderstands the message."
+    },
+    {
+      "term": "Chain of if blocks inside each other",
+      "definition": "if blocks that ask about three or more options in order; each one is in the else branch of the one before.",
+      "example": "It asks: is the message 1, if not is it 2, if not (then it is 3).",
+      "pitfall": "Putting the second if outside the else branch; the order breaks."
+    },
+    {
+      "term": "Putting the message into a variable",
+      "definition": "Copying the number that arrives into a variable and using it in many places.",
+      "example": "set mesaj to received number; then the comparisons mesaj = 1, mesaj = 2.",
+      "pitfall": "Not filling in the variable: its value stays 0 and the last branch always runs."
+    },
+    {
+      "term": "Receive queue",
+      "definition": "Messages that arrive while the receive hat block is busy join a queue; at most 3 messages wait.",
+      "example": "While a 1.25-second melody is playing, the first 3 messages that arrive wait in the queue, and any more are lost.",
+      "pitfall": "Thinking every message will be handled when sending messages very quickly."
+    },
+    {
+      "term": "play melody block",
+      "definition": "A block that waits until the melody ends; it keeps the hat block busy during this time.",
+      "example": "Birdsong lasts 1250 ms at 120 beats per minute.",
+      "pitfall": "Thinking the melody plays in the background and does not make the program wait."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d24-q1",
+      "kind": "predict-output",
+      "prompt": "The receiving card's program is below. Card 1 sends 1 by radio. What appears on Card 2's screen?\n\n```\non radio received:\n    set mesaj to 0\n    if mesaj = 1 then\n        show icon heart\n    else\n        if mesaj = 2 then\n            show icon happy face\n        else\n            show icon sad face\n```",
+      "options": [
+        "heart",
+        "happy face",
+        "sad face",
+        "Nothing"
+      ],
+      "answer": 2,
+      "explanation": "A fixed 0 has been put into the mesaj variable instead of the received number. So mesaj is always 0; it is equal to neither 1 nor 2, and the last else branch runs and shows the sad face. The number that arrived was never copied into the variable.",
+      "skills": [
+        "mk-conditions",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h5d24-q2",
+      "kind": "numeric",
+      "prompt": "The receive hat block is busy playing a melody. Before the melody ends, 5 more messages arrive. For the same hat block, at most how many messages can wait in the queue?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "messages",
+      "explanation": "The queue takes at most 3 messages; the first three messages join the queue, and the other two are thrown away.",
+      "skills": [
+        "mk-message-flow"
+      ]
+    },
+    {
+      "id": "m10h5d24-q3",
+      "kind": "mcq",
+      "prompt": "Following the chat table, Card 1 expects a happy face when it sends 2, but in Card 2's program the branch for number 2 has a sad face. What happens on the receiving card to the message of the user who pressed B?",
+      "options": [
+        "The radio message never arrives",
+        "The message arrives, but a different icon from the expected one is shown",
+        "The card gives an error message",
+        "Both cards show the same icon, and this is expected"
+      ],
+      "answer": 1,
+      "explanation": "The two sides are not using the same table. The sender thinks 2 is a happy face, and the receiver shows a sad face; the meaning of the message is broken not on the way but by the difference between the two tables. The radio has not been cut off; the message arrived correctly.",
+      "skills": [
+        "mk-protocol"
+      ]
+    },
+    {
+      "id": "m10h5d24-q4",
+      "kind": "find-bug",
+      "prompt": "Whichever button is pressed, Card 2 always shows a heart. The receiving card's if chain is correct. Find the mistake.\n\n```\non button A pressed:    radio send number 1\non button B pressed:    radio send number 1\non button A+B pressed:  radio send number 1\n```",
+      "options": [
+        "B and A+B also send 1; they should be 2 and 3 from the table",
+        "The A+B block is inside the wrong hat block",
+        "The if chain on the receiving side is too short",
+        "The radio group should be 255"
+      ],
+      "answer": 0,
+      "explanation": "All three buttons send 1. According to the table, 2 should have been sent for B and 3 for A+B. The receiving side can only tell which key was pressed from the number. There is no mistake in the if chain, the group or the hat blocks.",
+      "skills": [
+        "mk-protocol",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d24-q5",
+      "kind": "numeric",
+      "prompt": "The Birdsong melody lasts 1.25 seconds. If the receiving card handles 3 messages one after another and plays the melody for each one, how many seconds does it play in total?",
+      "answer": 3.75,
+      "tolerance": 0.01,
+      "unit": "seconds",
+      "explanation": "The melody block waits until it ends, and the messages are handled in turn: 3 × 1.25 = 3.75 seconds.",
+      "skills": [
+        "mk-message-flow"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Encryption",
+      "definition": "Scrambling information before sending it so that others do not understand it.",
+      "example": "The digit 3 is turned into 10 with the key 7 and sent.",
+      "pitfall": "Thinking encryption means real security; a simple addition cipher is easily broken."
+    },
+    {
+      "term": "Key",
+      "definition": "A secret number that both sides know; it is used for encrypting and decrypting.",
+      "example": "If the key is 7, the sender does +7 and the receiver does −7.",
+      "pitfall": "Forgetting to set the key on the receiving side: the variable stays 0 and the decrypting comes out wrong."
+    },
+    {
+      "term": "Plain message and encrypted message",
+      "definition": "The plain message is the real information; the encrypted message is the number travelling on the way, changed with the key.",
+      "example": "If the plain message is 3 and the key is 7, the encrypted message is 10.",
+      "pitfall": "Thinking the number shown in the Radio section is the real information; it is encrypted."
+    },
+    {
+      "term": "Opposite operation",
+      "definition": "The opposite of addition is subtraction; an operation that undoes another one.",
+      "example": "The sender adds (3 + 7 = 10), the receiver subtracts (10 − 7 = 3).",
+      "pitfall": "Using the same operation on both sides; if both add, the result comes out as 17."
+    },
+    {
+      "term": "Key in a variable",
+      "definition": "Keeping the key in a variable lets you change the value in one place.",
+      "example": "In on start, set anahtar to 7; both sending and receiving use the key.",
+      "pitfall": "Writing the key by hand in two places; you might change one and forget the other."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d23-q1",
+      "kind": "numeric",
+      "prompt": "The plain message is 5 and the key is 12. The sender encrypts by adding. Which number goes by radio?",
+      "answer": 17,
+      "tolerance": 0,
+      "explanation": "Encrypted message = plain message + key = 5 + 12 = 17. The receiving side finds the real digit with 17 − 12 = 5.",
+      "skills": [
+        "mk-cipher",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h5d23-q2",
+      "kind": "numeric",
+      "prompt": "The sender encrypted the digit 5 with the key 12 and sent 17. The receiving card wrongly thinks the key is 7. Which number does the receiving card show on the screen?",
+      "answer": 10,
+      "tolerance": 0,
+      "explanation": "The receiving side works out 17 − 7 = 10. If the key were the correct 12, it would find 5. A wrong key does not give an error message; it quietly produces a wrong result.",
+      "skills": [
+        "mk-cipher",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d23-q3",
+      "kind": "predict-output",
+      "prompt": "Both cards run this program (group 1). On Card 1, A is pressed 4 times, then B once. What appears in the \"Last received\" box in the Radio section and on Card 2's screen?\n\n```\non start:\n    set radio group to 1\n    set gizli to 0\n    set anahtar to 7\n\non button A pressed:\n    change gizli by 1\n    show number gizli\n\non button B pressed:\n    radio send number (gizli + anahtar)\n\non radio received:\n    show number (received number − anahtar)\n```",
+      "options": [
+        "Last received 4, screen 4",
+        "Last received 11, screen 11",
+        "Last received 4, screen 11",
+        "Last received 11, screen 4"
+      ],
+      "answer": 3,
+      "explanation": "When A is pressed four times, gizli = 4. With B, 4 + 7 = 11 is sent; the box shows 11. Card 2's key is also 7, so it shows 11 − 7 = 4. So on the way there is 11, and on the screen there is 4.",
+      "skills": [
+        "mk-cipher",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h5d23-q4",
+      "kind": "find-bug",
+      "prompt": "The sender sends \"gizli + anahtar\". The receiving card wants to find the real digit, but the result always comes out too big (for example 17 instead of 3). Find the mistake.\n\n```\non radio received:\n    show number (received number + anahtar)\n```",
+      "options": [
+        "The key was not set in on start",
+        "The receiving side adds instead of subtracting",
+        "The radio group is missing",
+        "A show text block is needed instead of show number"
+      ],
+      "answer": 1,
+      "explanation": "Because the sender adds, the receiver must subtract. If the receiver adds too, 10 + 7 = 17 comes out. Setting the key in on start or the group block does not produce this result.",
+      "skills": [
+        "mk-cipher",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d23-q5",
+      "kind": "mcq",
+      "prompt": "Why is this addition cipher not a strong cipher?",
+      "options": [
+        "Radio messages travel very slowly",
+        "The addition cannot be undone",
+        "Because the key is a small number, it can be found by trying",
+        "The receiving card cannot receive the message"
+      ],
+      "answer": 2,
+      "explanation": "The key is a small number; someone listening on the way finds it quickly by trying 1, 2, 3 ... Addition is an operation that can be undone; that is the property the cipher needs in order to work, so it is not the problem. The speed of the radio has nothing to do with security either.",
+      "skills": [
+        "mk-cipher"
+      ]
+    }
+  ]
+}

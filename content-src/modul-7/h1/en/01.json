@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Artificial intelligence",
+      "definition": "The broad name for systems that do jobs thought to need intelligence; hand-written rules count too.",
+      "example": "A list of rules that says \"if the distance is less than 10 cm, stop\" can count as a simple artificial intelligence.",
+      "pitfall": "Thinking artificial intelligence and machine learning are the same thing; the second is a family of methods inside the first."
+    },
+    {
+      "term": "Machine learning",
+      "definition": "Methods that learn patterns from examples instead of having their rules written by hand.",
+      "example": "Showing hundreds of \"positive\" and \"negative\" reviews and letting the system work out how to classify them.",
+      "pitfall": "Thinking the system knows everything on its own; it learns only from the examples it has seen."
+    },
+    {
+      "term": "Language model",
+      "definition": "A model that learns from text and predicts the next piece by looking at what has been written so far.",
+      "example": "A model that gives the word \"right\" a high probability after \"robot turns\".",
+      "pitfall": "Thinking it is a list of rules or an encyclopaedia; its probabilities were learned from text."
+    },
+    {
+      "term": "Token",
+      "definition": "The piece a model uses when it processes text; it can be a word, part of a word or punctuation.",
+      "example": "In one model, `robotlar` (robots) may be split into two pieces such as `robot` and `lar`.",
+      "pitfall": "Treating a token as the same as a word; a token is often smaller than a word."
+    },
+    {
+      "term": "Prediction loop",
+      "definition": "The model produces a list of probabilities at each step, picks one piece, adds it to the text and repeats.",
+      "example": "An answer of five pieces is produced by five predictions in a row.",
+      "pitfall": "Thinking the model knows the whole answer from start to finish in advance; the text forms piece by piece."
+    },
+    {
+      "term": "Simulation label",
+      "definition": "On the portal, a warning that marks a hand-written or scripted step standing in for a real model.",
+      "example": "The \"model step\" in the agent activity is not real Claude but a scripted example.",
+      "pitfall": "Thinking the output of a labelled step is a real model's answer."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d1-q1",
+      "kind": "mcq",
+      "prompt": "What do we call methods that find the pattern themselves from given examples, instead of having their rules written by hand?",
+      "options": [
+        "Compiling",
+        "Network routing",
+        "Machine learning",
+        "Encryption"
+      ],
+      "answer": 2,
+      "explanation": "In machine learning you do not write the rule; you give examples and the system extracts the pattern. The other options are names of other jobs.",
+      "skills": [
+        "ai-concepts"
+      ]
+    },
+    {
+      "id": "m7h1d1-q2",
+      "kind": "mcq",
+      "prompt": "Which of these is a language model's basic task?",
+      "options": [
+        "Finding the correct answer to every question in a database",
+        "Looking at what has been written and predicting the next piece",
+        "Only translating",
+        "Deleting spelling mistakes"
+      ],
+      "answer": 1,
+      "explanation": "The basic task is to work out the probability of the next piece and choose one; translation, summaries and chat are built on top of this task. Looking up the answer in a database is not a model's job.",
+      "skills": [
+        "ai-concepts",
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d1-q3",
+      "kind": "predict-output",
+      "prompt": "This code imitates the generation loop. What does it print when it runs?\n\n```\nlet metin = \"robot\"\nconst tahmin = [\"turns\", \"right\", \".\"]\nfor (const parca of tahmin) {\n  metin = metin + \" \" + parca\n}\nconsole.log(metin)\n```",
+      "options": [
+        "robot",
+        "turns right .",
+        "robot turns right .",
+        "robot turns"
+      ],
+      "answer": 2,
+      "explanation": "Each round adds one piece to the text: robot, robot turns, robot turns right, robot turns right . The starting word is not deleted; only new pieces are added.",
+      "skills": [
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d1-q4",
+      "kind": "numeric",
+      "prompt": "You put only \"robot\" in the context (1 piece) and asked the model to generate 6 more pieces. One piece is added at each step. When generation ends, how many pieces does the text have in total?",
+      "answer": 7,
+      "unit": "pieces",
+      "explanation": "6 separate predictions add 6 pieces to the 1 starting piece: 1 + 6 = 7. Six predictions produce six pieces; the starting word is part of the text too.",
+      "skills": [
+        "ai-next-token",
+        "ai-concepts"
+      ]
+    },
+    {
+      "id": "m7h1d1-q5",
+      "kind": "mcq",
+      "prompt": "On the portal you see a \"simulation\" label next to a step. What does it mean?",
+      "options": [
+        "A question was sent to real Claude",
+        "The step is a hand-written or scripted example standing in for a large model",
+        "The step gave an error",
+        "The result is always correct"
+      ],
+      "answer": 1,
+      "explanation": "The label tells you that the step is not a real model's output: it is a template or script standing in for a large model. There are no real model calls on this portal, and the label does not guarantee correctness either.",
+      "skills": [
+        "ai-simulation-literacy"
+      ]
+    }
+  ]
+}

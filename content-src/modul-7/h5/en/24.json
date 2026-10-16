@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Retrieval",
+      "definition": "The step that turns the question into a vector, ranks the chunks by similarity and picks the best-fitting ones.",
+      "example": "For \"How quickly do the mentors reply?\", the chunk \"the mentors ... two days\" rises to the top.",
+      "pitfall": "Thinking the model does the retrieval; the ranking is a search calculation that happens before the model."
+    },
+    {
+      "term": "Top-K",
+      "definition": "Taking the best K chunks from the list ranked by similarity.",
+      "example": "If K = 2, the best two chunks get into the context.",
+      "pitfall": "Thinking a larger K is always better; the context gets longer and unrelated text gets in."
+    },
+    {
+      "term": "Context",
+      "definition": "The text of the retrieved chunks, inserted into the prompt with numbers.",
+      "example": "The line \"[1] The mentors ... reply within two days.\" is part of the context.",
+      "pitfall": "Thinking the context is factually correct; if the source document is wrong, the context is wrong too."
+    },
+    {
+      "term": "Prompt template",
+      "definition": "A text pattern into which you insert the context and the question, together with fixed instructions.",
+      "example": "\"Answer based on the context below. If it is not there, say you do not know.\"",
+      "pitfall": "Leaving the context slot in the template empty or never filling it; the model answers the question without context."
+    },
+    {
+      "term": "Template answer (simulation)",
+      "definition": "A labelled box in the workshop that stands in for step 5 and quotes the best-matching sentence in the context.",
+      "example": "The box quotes the \"two days\" sentence; no model interprets it.",
+      "pitfall": "Thinking the box is a real model's answer; the interface labels it as a template output."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d24-q1",
+      "kind": "mcq",
+      "prompt": "If the retrieval step brings back the wrong chunk, what happens in the next step?",
+      "options": [
+        "The model fixes the missing information by itself",
+        "The system automatically makes the chunk size bigger",
+        "The model has to write an answer without ever seeing the right information; a wrong answer or \"I don't know\" may come out",
+        "The prompt template is switched off"
+      ],
+      "answer": 2,
+      "explanation": "The model only relies on the context put into the prompt. If the right chunk is not in the context, the model either answers wrongly or follows the instruction and says \"I don't know\". The system settings do not change by themselves, and the template keeps working.",
+      "skills": [
+        "ai-retrieval",
+        "ai-rag-pipeline"
+      ]
+    },
+    {
+      "id": "m7h5d24-q2",
+      "kind": "predict-output",
+      "prompt": "What does this code print when it runs?\n\n```\nskorlar = {\"p1\": 0.10, \"p2\": 0.45, \"p3\": 0.30, \"p4\": 0.0}\nsirali = sorted(skorlar, key=skorlar.get, reverse=True)\nprint(sirali[:2])\n```",
+      "options": [
+        "['p1', 'p2']",
+        "['p2', 'p3']",
+        "['p3', 'p2']",
+        "['p4', 'p1']"
+      ],
+      "answer": 1,
+      "explanation": "The scores are sorted from largest to smallest: p2 (0.45), p3 (0.30), p1 (0.10), p4 (0). The first two elements are p2 and p3. Without reverse=True they would be sorted from smallest to largest and p4, p1 would come out: in retrieval, that means taking the least relevant chunks.",
+      "skills": [
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d24-q3",
+      "kind": "numeric",
+      "prompt": "The similarities of five chunks are 0.52 / 0.31 / 0 / 0 / 0.18. Retrieval first picks the best K = 4 chunks, then drops those with a similarity of 0. How many chunks get into the prompt?",
+      "answer": 3,
+      "unit": "chunks",
+      "explanation": "The sorted list is 0.52 · 0.31 · 0.18 · 0 · 0. Picking the first four gives 0.52, 0.31, 0.18 and one 0; dropping the 0 leaves 3 chunks. Making K bigger does not increase the number of relevant chunks: only chunks with a shared term can get in.",
+      "skills": [
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d24-q4",
+      "kind": "find-bug",
+      "prompt": "This function builds the RAG prompt, but the model always answers without context.\n\n```\ndef prompt_kur(baglam, soru):\n    return \"Bağlama dayanarak yanıtla.\\nSoru: \" + soru\n```\n\nWhat is the bug?",
+      "options": [
+        "The baglam parameter is never used; it does not get into the prompt",
+        "The question is not added to the text",
+        "The newline character is wrong",
+        "The function does not return anything"
+      ],
+      "answer": 0,
+      "explanation": "The function takes baglam (context), but the returned text only contains the question. The model sees the instruction to answer \"based on the context\", but there is no context. The question is added, \"\\n\" is correct and there is a return.",
+      "skills": [
+        "ai-rag-pipeline",
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d24-q5",
+      "kind": "mcq",
+      "prompt": "Why is the template output box in the workshop clearly labelled?",
+      "options": [
+        "Because a real model is running, but slowly",
+        "Because the answer is always correct",
+        "Because the box calculates the retrieval",
+        "Because a simple template that quotes a sentence from the context is used instead of the synthesis step; it is not a real model's answer"
+      ],
+      "answer": 3,
+      "explanation": "There is no model in the workshop; the box quotes the best-matching sentence in the context. A real model interprets and can also be wrong. The label is there so this difference is not hidden. Retrieval, on the other hand, is the real calculation that comes before the box.",
+      "skills": [
+        "ai-rag-grounding"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Odometry",
+      "definition": "A method of working out the robot's position and heading step by step from its wheel turns.",
+      "example": "x, y and θ are found from the counters; the starting point is taken as (0, 0).",
+      "pitfall": "Thinking odometry gives an absolute position; it is only an estimate relative to the start."
+    },
+    {
+      "term": "Distance of the centre (Δs)",
+      "definition": "The distance travelled by the robot's centre; the average of the distances of the two wheels.",
+      "example": "If ΔsL = 2 cm and ΔsR = 3 cm, Δs = 2.5 cm.",
+      "pitfall": "Thinking the distance of one wheel alone is the distance of the centre."
+    },
+    {
+      "term": "Turning angle (Δθ)",
+      "definition": "(ΔsR − ΔsL) / L; if the right wheel goes further, the robot turns left (in radians).",
+      "example": "If the difference is 1 cm and L = 12 cm, Δθ ≈ 0.083 rad ≈ 4.8°.",
+      "pitfall": "Using L/2 instead of L; the angle comes out wrong by a factor of two."
+    },
+    {
+      "term": "Radian",
+      "definition": "A unit that measures an angle as the ratio of the arc length to the radius; sin and cos want it.",
+      "example": "90° = π/2 ≈ 1.571 rad.",
+      "pitfall": "Putting degrees straight into cos()."
+    },
+    {
+      "term": "Systematic error",
+      "definition": "An error that repeats in the same direction at every step and grows as the path gets longer, such as a wrong radius or axle track.",
+      "example": "If the axle track is 4% wrong, about 16° of drift builds up on every full turn.",
+      "pitfall": "Thinking all errors will go away when you increase the tick resolution."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h4d94-q1",
+      "kind": "numeric",
+      "prompt": "In a small step, the left wheel travelled 2.0 cm and the right wheel 3.0 cm. If the axle track is L = 12 cm, how many degrees does the robot turn to the left?",
+      "answer": 4.77,
+      "tolerance": 0.05,
+      "unit": "degrees",
+      "explanation": "Δθ = (3.0 - 2.0) / 12 = 0.0833 rad; multiplying by 180/π gives 4.77°. Because the right wheel went further, the turn is to the left and positive.",
+      "skills": [
+        "rob-odometry"
+      ]
+    },
+    {
+      "id": "m5h4d94-q2",
+      "kind": "numeric",
+      "prompt": "The robot is facing θ = 60° and moves Δs = 10 cm forward without turning. By how many cm does y increase in this step?",
+      "answer": 8.66,
+      "tolerance": 0.02,
+      "unit": "cm",
+      "explanation": "The increase in y is Δs · sin(60°) = 10 · 0.866 = 8.66 cm; the increase in x is 10 · cos(60°) = 5 cm. If you mix them up, x and y swap places.",
+      "skills": [
+        "rob-odometry"
+      ]
+    },
+    {
+      "id": "m5h4d94-q3",
+      "kind": "mcq",
+      "prompt": "You set the interrupt to CHANGE instead of RISING and halved the tick distance. Which error REMAINS?",
+      "options": [
+        "The uncertainty of about 5 degrees from the tick resolution does not change at all",
+        "The systematic error that appears if the axle track or the radius was measured wrongly",
+        "Both errors disappear completely",
+        "Counter overflow"
+      ],
+      "answer": 1,
+      "explanation": "CHANGE doubles the resolution and roughly halves the resolution error, but if the constants in the formula are wrong, the estimate is still wrong. The first option is wrong because the uncertainty does change; the third is wrong because the constants have not been fixed.",
+      "skills": [
+        "rob-quantization",
+        "rob-drift"
+      ]
+    },
+    {
+      "id": "m5h4d94-q4",
+      "kind": "numeric",
+      "prompt": "In the software the axle track is set as 12 cm, but the robot's real axle track is 12.5 cm. When odometry sees a 360° turn, how many degrees has the robot really turned?",
+      "answer": 345.6,
+      "tolerance": 0.5,
+      "unit": "degrees",
+      "explanation": "The difference in the wheels' distances is the same, but the real angle = difference / 12.5, while the estimate is difference / 12. The ratio is 12 / 12.5 = 0.96, so 360 · 0.96 = 345.6°. The heading error builds up like this on every turn.",
+      "skills": [
+        "rob-drift",
+        "rob-odometry"
+      ]
+    },
+    {
+      "id": "m5h4d94-q5",
+      "kind": "find-bug",
+      "prompt": "The position estimate gives nonsense results as the robot turns. Where is the one bug?\n\n```\nfloat th = 0;   // derece cinsinden tutuluyor\n\nvoid guncelle(float ds, float dth_rad) {\n  th += dth_rad * 180 / PI;\n  x += ds * cos(th);\n  y += ds * sin(th);\n}\n```",
+      "options": [
+        "th is kept in degrees, but cos and sin expect radians",
+        "ds is never calculated",
+        "PI is not defined in Arduino",
+        "x and y should not be float"
+      ],
+      "answer": 0,
+      "explanation": "cos() and sin() want radians; when they are given degrees, 90 degrees is handled like 90 radians and the position drifts randomly. The fix is to keep th in radians, or multiply the degrees by PI/180 before calling them. PI is defined in Arduino, and float is fine for x and y.",
+      "skills": [
+        "rob-odometry",
+        "prog-debug"
+      ]
+    }
+  ]
+}

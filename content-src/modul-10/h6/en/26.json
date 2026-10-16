@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Short measurement and multiplying",
+      "definition": "Estimating a one-minute value by counting for a short time and multiplying the result.",
+      "example": "If you count 14 beats in 10 seconds, you get 14 x 6 = 84 beats per minute.",
+      "pitfall": "Forgetting the multiplier: the number of beats stays on the screen, not the beats per minute."
+    },
+    {
+      "term": "Flag",
+      "definition": "A variable that holds 0 or 1 and answers the question \"is this action valid right now?\".",
+      "example": "While olcum = 1, A counts; while olcum = 0, A does nothing.",
+      "pitfall": "Forgetting to set the flag to 1: the measurement never starts and A never counts."
+    },
+    {
+      "term": "pause and hat blocks",
+      "definition": "The pause block only stops its own hat block; the other hat blocks keep running.",
+      "example": "While B waits for 10 seconds, button A keeps counting presses.",
+      "pitfall": "Thinking the pause block stops the whole card."
+    },
+    {
+      "term": "Resetting",
+      "definition": "Setting the counter to 0 at the start of a new measurement.",
+      "example": "The first block of the B hat block is set sayac to 0.",
+      "pitfall": "Not resetting: in the second measurement the earlier beats are added too, and the result is inflated."
+    },
+    {
+      "term": "Millisecond",
+      "definition": "The unit of the pause block; 1000 ms = 1 second.",
+      "example": "For 10 seconds you write pause [10000] ms.",
+      "pitfall": "Writing pause [10]: this is only 10 ms, which you cannot notice by eye."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d26-q1",
+      "kind": "numeric",
+      "prompt": "On the pulse meter you counted 14 beats in 10 seconds. Which number should the card show?",
+      "answer": 84,
+      "unit": "beats/min",
+      "explanation": "6 times 10 seconds is one minute. 14 x 6 = 84. Showing the number of beats (14) or multiplying by 10 (140) does not give the beats per minute.",
+      "skills": [
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d26-q2",
+      "kind": "mcq",
+      "prompt": "If button A is pressed while the B hat block is waiting at the pause [10000] ms block, what happens?",
+      "options": [
+        "Button A does not work, because the card is waiting",
+        "The card gives an error",
+        "The A hat block runs, because hat blocks carry on independently of each other",
+        "The A presses are handled all together after 10 seconds"
+      ],
+      "answer": 2,
+      "explanation": "pause only stops its own hat block. The A hat block is a separate task and runs straight away on every press. That is why counting can happen while waiting.",
+      "skills": [
+        "mk-concurrency",
+        "mk-events"
+      ]
+    },
+    {
+      "id": "m10h6d26-q3",
+      "kind": "find-bug",
+      "prompt": "This program always shows 0, even if A is pressed 12 times in 10 seconds. Which is the mistake?\n\n```\non button B pressed:\n  set sayac to 0\n  pause 10000 ms\n  set olcum to 1\n  show number (sayac x 6)\n\non button A pressed:\n  if olcum = 1 then:\n    change sayac by 1\n```",
+      "options": [
+        "In the A hat block, sayac should go up by 2 instead of 1",
+        "The set olcum to 1 block comes after the pause block; because olcum is 0 during the wait, A never counts",
+        "The multiplier should be 10, not 6",
+        "sayac was not reset at the start"
+      ],
+      "answer": 1,
+      "explanation": "The flag must be set to 1 before the wait starts. Here it becomes 1 after the wait has finished, so the counting window never opens and sayac stays 0. The multiplier and the reset are correct.",
+      "skills": [
+        "mk-debug",
+        "mk-concurrency",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d26-q4",
+      "kind": "predict-output",
+      "prompt": "The program below is used. 12 beats were counted in the first measurement, and right after that 9 beats in the second measurement. What does the card show at the end of the second measurement?\n\n```\non start:\n  set sayac to 0\n  set olcum to 0\n\non button B pressed:\n  set olcum to 1\n  pause 10000 ms\n  set olcum to 0\n  show number (sayac x 6)\n\non button A pressed:\n  if olcum = 1 then:\n    change sayac by 1\n```",
+      "options": [
+        "54",
+        "72",
+        "126",
+        "0"
+      ],
+      "answer": 2,
+      "explanation": "The program does not reset sayac in B. In the second measurement sayac becomes 12 + 9 = 21, and 21 x 6 = 126 is shown. 54 would be the result of the second measurement alone; but there is no reset.",
+      "skills": [
+        "mk-variables",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h6d26-q5",
+      "kind": "numeric",
+      "prompt": "You increased the measurement time to 15 seconds and made the multiplier 4. You counted 17 beats in 15 seconds. How many beats per minute is that?",
+      "answer": 68,
+      "unit": "beats/min",
+      "explanation": "4 times 15 seconds is 60 seconds. 17 x 4 = 68. The multiplier is chosen from the time: time x multiplier = 60.",
+      "skills": [
+        "mk-variables"
+      ]
+    }
+  ]
+}

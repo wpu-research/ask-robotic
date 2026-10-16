@@ -53,6 +53,7 @@ interface Props {
 // "Anlatım" (Merak'tan sonra) ve "Test" (Etkinlik'ten sonra) adımları eklenir; yoksa eski 4 adım aynen kalır.
 type StepId = 'merak' | 'anlatim' | 'etkinlik' | 'test' | 'konusalim' | 'bitti'
 const STEP_LABEL: Record<StepId, string> = { merak: 'Merak', anlatim: 'Anlatım', etkinlik: 'Etkinlik', test: 'Test', konusalim: 'Konuşalım', bitti: 'Bitti' }
+const STEP_LABEL_EN: Record<StepId, string> = { merak: 'Wonder', anlatim: 'Explainer', etkinlik: 'Activity', test: 'Quiz', konusalim: 'Discuss', bitti: 'Done' }
 
 export function LessonPlayer(p: Props) {
   const en = useLocale() === 'en'
@@ -127,15 +128,15 @@ export function LessonPlayer(p: Props) {
       const res = await fetch('/api/progress', {
         method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ lessonId: p.lesson.id }),
       }).catch(() => null)
-      if (!res?.ok) setError('Sunucuya kaydedilemedi; ilerleme bu tarayıcıda saklandı.')
+      if (!res?.ok) setError(en ? 'Could not save to the server; your progress is kept in this browser.' : 'Sunucuya kaydedilemedi; ilerleme bu tarayıcıda saklandı.')
     }
   }
 
   const wide = hasApp && cur === 'etkinlik'
   return (
     <div className={`page page-lesson ${hasApp ? 'has-app' : ''} ${wide ? 'wide-step' : ''} ${p.trackClass}`}>
-      <nav aria-label="Konum" className="crumbs">
-        <Link href="/moduller">Modüller</Link><Icon name="chevronRight" size={14} />
+      <nav aria-label={en ? 'Breadcrumb' : 'Konum'} className="crumbs">
+        <Link href="/moduller">{en ? 'Modules' : 'Modüller'}</Link><Icon name="chevronRight" size={14} />
         <Link href={`/moduller/${p.moduleSlug}`}>{p.moduleTitle}</Link><Icon name="chevronRight" size={14} />
         <span>{p.weekLabel}</span><Icon name="chevronRight" size={14} />
         <span aria-current="page" className="crumb-now">{p.lesson.title}</span>
@@ -149,25 +150,25 @@ export function LessonPlayer(p: Props) {
               <LessonKindBadge kind={kind} />
               <span className="meta-i"><Icon name="clock" size={16} />~{p.lesson.durationMin} dakika</span>
               <span>Ders {p.position.index} / {p.position.total}</span>
-              {done && <span className="chip chip-ok">Tamamlandı</span>}
+              {done && <span className="chip chip-ok">{en ? 'Completed' : 'Tamamlandı'}</span>}
             </div>
           </header>
 
-          <ol className="stepper" aria-label="Ders adımları">
+          <ol className="stepper" aria-label={en ? 'Lesson steps' : 'Ders adımları'}>
             {STEPS.map((s, i) => (
               <li key={s}>
                 <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined} className={i < step ? 'done' : undefined}>
-                  <span className="n">{i < step ? <Icon name="check" size={13} /> : i + 1}</span><span className="label">{STEP_LABEL[s]}</span>
+                  <span className="n">{i < step ? <Icon name="check" size={13} /> : i + 1}</span><span className="label">{(en ? STEP_LABEL_EN : STEP_LABEL)[s]}</span>
                 </button>
               </li>
             ))}
           </ol>
 
       <section className={`stage${wide ? '' : ' stage-read'}`} aria-live="polite">
-        {cur === 'merak' && (<><div className="stage-label">Merak</div><p className="stage-big">{p.lesson.problem}</p></>)}
+        {cur === 'merak' && (<><div className="stage-label">{en ? 'Wonder' : 'Merak'}</div><p className="stage-big">{p.lesson.problem}</p></>)}
         {cur === 'anlatim' && (
           <div className="lesson-explainer">
-            <div className="stage-label">Konu anlatımı</div>
+            <div className="stage-label">{en ? 'Explainer' : 'Konu anlatımı'}</div>
             {p.lesson.explainerMd && <LessonMarkdown>{p.lesson.explainerMd}</LessonMarkdown>}
             {p.lesson.concepts && p.lesson.concepts.length > 0 && <ConceptCards concepts={p.lesson.concepts} />}
           </div>
@@ -178,7 +179,7 @@ export function LessonPlayer(p: Props) {
             <div>
               {p.callout && (
                 <details className="callout" style={{ marginTop: 0 }}>
-                  <summary style={{ cursor: 'pointer', fontWeight: 700 }}>Bu ders hakkında bilmen gerekenler</summary>
+                  <summary style={{ cursor: 'pointer', fontWeight: 700 }}>{en ? 'What you need to know about this lesson' : 'Bu ders hakkında bilmen gerekenler'}</summary>
                   <p style={{ margin: '8px 0 0' }}>{p.callout}</p>
                 </details>
               )}
@@ -271,29 +272,29 @@ export function LessonPlayer(p: Props) {
             )}
           </div>
         )}
-        {cur === 'konusalim' && (<><div className="stage-label">Birlikte konuşun</div><p className="stage-big">{p.lesson.question}</p></>)}
+        {cur === 'konusalim' && (<><div className="stage-label">{en ? 'Talk it over together' : 'Birlikte konuşun'}</div><p className="stage-big">{p.lesson.question}</p></>)}
         {cur === 'bitti' && (
           <div className="done-box">
             {done ? (
               <>
                 <div className="check big-check">✓</div>
-                <h2>Ders tamamlandı</h2>
+                <h2>{en ? 'Lesson complete' : 'Ders tamamlandı'}</h2>
                 {error && <p role="alert" className="error">{error}</p>}
                 <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', marginTop: 14 }}>
                   {p.nextLessonId
                     ? <Link className="btn btn-primary btn-lg" href={`/ders/${p.nextLessonId}`}>{en ? 'Next lesson →' : 'Sonraki ders →'}</Link>
-                    : <Link className="btn btn-primary btn-lg" href={`/moduller/${p.moduleSlug}`}>Modül sayfasına dön</Link>}
-                  <button type="button" className="btn btn-ghost" onClick={() => unmarkDone(p.lesson.id)}>Tamamlanmadı olarak işaretle</button>
+                    : <Link className="btn btn-primary btn-lg" href={`/moduller/${p.moduleSlug}`}>{en ? 'Back to the module page' : 'Modül sayfasına dön'}</Link>}
+                  <button type="button" className="btn btn-ghost" onClick={() => unmarkDone(p.lesson.id)}>{en ? 'Mark as not completed' : 'Tamamlanmadı olarak işaretle'}</button>
                 </div>
               </>
             ) : (
               <>
-                <h2>Etkinliği bitirdin mi?</h2>
+                <h2>{en ? 'Have you finished the activity?' : 'Etkinliği bitirdin mi?'}</h2>
                 {hasApp && (
-                  <p className="muted">{goalsDone ? 'Uygulamadaki tüm hedefleri tamamladın.' : 'Uygulamadaki hedeflerin hepsi henüz tamamlanmadı; yine de devam edebilirsin.'}</p>
+                  <p className="muted">{en ? (goalsDone ? 'You completed every goal in the activity.' : 'Not all goals in the activity are complete yet; you can still continue.') : goalsDone ? 'Uygulamadaki tüm hedefleri tamamladın.' : 'Uygulamadaki hedeflerin hepsi henüz tamamlanmadı; yine de devam edebilirsin.'}</p>
                 )}
-                <p className="muted">Tamamladığında ilerlemene işlenir.</p>
-                <button type="button" className="btn btn-primary btn-lg" onClick={finish}>Dersi tamamladım</button>
+                <p className="muted">{en ? 'When you complete it, it is added to your progress.' : 'Tamamladığında ilerlemene işlenir.'}</p>
+                <button type="button" className="btn btn-primary btn-lg" onClick={finish}>{en ? 'I completed the lesson' : 'Dersi tamamladım'}</button>
               </>
             )}
           </div>
@@ -302,38 +303,38 @@ export function LessonPlayer(p: Props) {
 
           <div className="player-nav">
             {step > 0
-              ? <button type="button" className="btn btn-ghost" onClick={() => go(step - 1)}><Icon name="arrowLeft" size={18} />Geri</button>
+              ? <button type="button" className="btn btn-ghost" onClick={() => go(step - 1)}><Icon name="arrowLeft" size={18} />{en ? 'Back' : 'Geri'}</button>
               : p.prevLessonId ? <Link className="btn btn-ghost" href={`/ders/${p.prevLessonId}`}><Icon name="arrowLeft" size={18} />{en ? 'Previous lesson' : 'Önceki ders'}</Link> : <span />}
             {step < STEPS.length - 1
-              ? <button type="button" className="btn btn-primary" onClick={() => go(step + 1)}>İleri<Icon name="arrowRight" size={18} /></button>
+              ? <button type="button" className="btn btn-primary" onClick={() => go(step + 1)}>{en ? 'Next' : 'İleri'}<Icon name="arrowRight" size={18} /></button>
               : <span />}
           </div>
-          <p className="kbd-hint">Klavyede ← → tuşlarıyla adımlar arasında gezebilirsin.</p>
+          <p className="kbd-hint">{en ? 'You can move between steps with the ← → keys.' : 'Klavyede ← → tuşlarıyla adımlar arasında gezebilirsin.'}</p>
         </div>
 
         <aside className="lesson-aside" aria-labelledby="bu-derste">
-          <h2 id="bu-derste">Bu derste</h2>
+          <h2 id="bu-derste">{en ? 'In this lesson' : 'Bu derste'}</h2>
           <ol className="aside-steps">
             {STEPS.map((s, i) => (
               <li key={s} data-state={i === step ? 'now' : i < step ? 'done' : 'todo'}>
                 <button type="button" onClick={() => go(i)} aria-current={i === step ? 'step' : undefined}>
-                  <span className="n" aria-hidden="true">{i < step ? <Icon name="check" size={12} /> : i + 1}</span>{STEP_LABEL[s]}
+                  <span className="n" aria-hidden="true">{i < step ? <Icon name="check" size={12} /> : i + 1}</span>{(en ? STEP_LABEL_EN : STEP_LABEL)[s]}
                 </button>
               </li>
             ))}
           </ol>
           {goalTexts.length > 0 && (
             <>
-              <h3>Hedefler</h3>
+              <h3>{en ? 'Goals' : 'Hedefler'}</h3>
               <ul className="aside-goals">
                 {goalTexts.map((t) => <li key={t} data-done={goalsDone}><span className="g" aria-hidden="true">{goalsDone ? <Icon name="check" size={12} /> : null}</span>{t}</li>)}
               </ul>
-              <p className="aside-note">{goalsDone ? 'Tüm hedefler tamam.' : 'Hedeflerin durumunu Etkinlik adımında canlı görürsün.'}</p>
+              <p className="aside-note">{en ? (goalsDone ? 'All goals complete.' : 'You see the goals live in the Activity step.') : goalsDone ? 'Tüm hedefler tamam.' : 'Hedeflerin durumunu Etkinlik adımında canlı görürsün.'}</p>
             </>
           )}
-          <h3>Modülde</h3>
+          <h3>{en ? 'In the module' : 'Modülde'}</h3>
           <div className="progress">
-            <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={modCount.total} aria-valuenow={modCount.done} aria-label="Modül ilerlemesi"><div className="progress-fill" style={{ width: `${modCount.pct}%` }} /></div>
+            <div className="progress-track" role="progressbar" aria-valuemin={0} aria-valuemax={modCount.total} aria-valuenow={modCount.done} aria-label={en ? 'Module progress' : 'Modül ilerlemesi'}><div className="progress-fill" style={{ width: `${modCount.pct}%` }} /></div>
             <span className="progress-label">{modCount.done} / {modCount.total}</span>
           </div>
           <div className="aside-nav">

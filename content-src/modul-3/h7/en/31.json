@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Segment and byte pattern",
+      "definition": "On a 7-segment display each bar matches one bit: bit 0 = a, bit 1 = b, ... bit 6 = g, bit 7 = dp. A digit is a byte that shows which bits are 1.",
+      "example": "For the digit 1 only b and c light up: 0b00000110, that is 0x06.",
+      "pitfall": "Mixing up the bit order: if you think bit 0 is g, the digits look reversed or broken."
+    },
+    {
+      "term": "74HC595",
+      "definition": "Shift register: a chip that takes bits arriving one after another and drives eight outputs (QA-QH) at once. Three Uno pins are enough.",
+      "example": "Driving the eight LEDs of a 7-segment display with three pins (SER, SRCLK, RCLK).",
+      "pitfall": "Leaving the OE or SRCLR pin unconnected or connecting it wrongly: the chip gives no output or keeps clearing the register."
+    },
+    {
+      "term": "shiftOut()",
+      "definition": "Sends a byte bit by bit: for each bit it sets the data pin and gives the clock pin a pulse.",
+      "example": "shiftOut(VERI, SAAT, MSBFIRST, 0x06); sends the byte with the most significant bit first.",
+      "pitfall": "Calling only shiftOut and not using the latch: the bits shift into the chip but the outputs do not change."
+    },
+    {
+      "term": "Latch (RCLK)",
+      "definition": "The pin that copies the byte inside the 74HC595 to the output pins. On the change from LOW to HIGH, the outputs are updated together.",
+      "example": "First latch LOW, then shiftOut, then latch HIGH: the display shows the new digit in one go.",
+      "pitfall": "Never setting the latch HIGH: the display stays blank or shows the old pattern."
+    },
+    {
+      "term": "Common cathode and common anode",
+      "definition": "A display whose bars have their negative legs joined is called common cathode; one with the positive legs joined is called common anode. On a common anode display COM goes to 5V and a bar whose bit is 0 lights up.",
+      "example": "On a common anode display the digit pattern is inverted: ~RAKAM[i].",
+      "pitfall": "Sending a common cathode pattern to a common anode display: the lit bars look off and the off bars look lit."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h7d31-q1",
+      "kind": "numeric",
+      "prompt": "On a common cathode display you want to light only bars a, d and g (three horizontal lines). If bit 0 = a, bit 3 = d and bit 6 = g, what is the decimal value of the byte you send?",
+      "answer": 73,
+      "tolerance": 0,
+      "explanation": "Bit 0 is worth 1, bit 3 is worth 8, bit 6 is worth 64. The total is 1 + 8 + 64 = 73 (0b01001001, 0x49 in hexadecimal). The other bits are 0, so the other bars stay off.",
+      "skills": [
+        "bits-bytes"
+      ]
+    },
+    {
+      "id": "m3h7d31-q2",
+      "kind": "mcq",
+      "prompt": "What is the job of the RCLK (latch) pin on a 74HC595?",
+      "options": [
+        "Carrying the data bits from the Uno to the chip",
+        "Producing the clock pulse that shifts each bit in",
+        "Copying the shifted-in byte to the output pins all together",
+        "Giving the chip its 5 V power"
+      ],
+      "answer": 2,
+      "explanation": "The data pin carries the bits over the SER wire; the SRCLK clock pin shifts each bit. RCLK goes from LOW to HIGH after the eight bits are in and copies the byte to the QA-QH outputs. Power comes from the VCC pin.",
+      "skills": [
+        "shift-register"
+      ]
+    },
+    {
+      "id": "m3h7d31-q3",
+      "kind": "predict-output",
+      "prompt": "The VERI (data), SAAT (clock) and MANDAL (latch) pins are correctly connected to the 74HC595 (QA is the first LED, QH the eighth). Which LEDs light up when these commands run?\n\n```\ndigitalWrite(MANDAL, LOW);\nshiftOut(VERI, SAAT, MSBFIRST, 0b00000101);\ndigitalWrite(MANDAL, HIGH);\n```",
+      "options": [
+        "QF and QH",
+        "QA and QC",
+        "QB and QD",
+        "Only QC"
+      ],
+      "answer": 1,
+      "explanation": "In 0b00000101, bit 0 and bit 2 are 1. With MSBFIRST, bit 0 goes last and lands on QA, and bit 2 lands on QC. QF and QH are the outputs that would light if LSBFIRST were used (the bit order would be reversed).",
+      "skills": [
+        "shift-register",
+        "bits-bytes"
+      ]
+    },
+    {
+      "id": "m3h7d31-q4",
+      "kind": "numeric",
+      "prompt": "Three 74HC595s are chained one after the other. How many outputs do you get in total?",
+      "answer": 24,
+      "tolerance": 0,
+      "unit": "outputs",
+      "explanation": "Each chip gives 8 outputs: 3 × 8 = 24. The Uno still uses only three pins (data, clock, latch). The pin count does not grow with the number of chips, but you have to send 3 bytes for every update.",
+      "skills": [
+        "shift-register"
+      ]
+    },
+    {
+      "id": "m3h7d31-q5",
+      "kind": "find-bug",
+      "prompt": "The circuit is built correctly, but the display never changes. What is the problem?\n\n```\nvoid yaz(byte desen) {\n  digitalWrite(MANDAL, LOW);\n  shiftOut(VERI, SAAT, MSBFIRST, desen);\n}\n```",
+      "options": [
+        "LSBFIRST should be written instead of MSBFIRST",
+        "The digitalWrite(MANDAL, LOW) line is not needed",
+        "There is no line at the end that sets the latch HIGH; the byte is not copied to the outputs",
+        "The desen parameter should not be a byte"
+      ],
+      "answer": 2,
+      "explanation": "The bits shift into the chip, but the outputs are only updated when the latch goes from LOW to HIGH. There should be digitalWrite(MANDAL, HIGH) at the end of the function. If MSBFIRST were wrong, the display would change but the pattern would look reversed. byte is exactly the right type for this job.",
+      "skills": [
+        "shift-register",
+        "prog-debug"
+      ]
+    }
+  ]
+}

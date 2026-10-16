@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Frequency",
+      "definition": "The number of times a sound vibrates per second; its unit is hertz (Hz).",
+      "example": "The note A is 440 Hz: the speaker moves back and forth 440 times a second.",
+      "pitfall": "Thinking frequency is how loud a sound is; frequency sets how high the sound is, while the volume sets how loud it is."
+    },
+    {
+      "term": "Hertz (Hz)",
+      "definition": "The unit that shows how many times something repeats per second.",
+      "example": "262 Hz means 262 vibrations per second.",
+      "pitfall": "Thinking Hz is a count per minute; Hz is always per second."
+    },
+    {
+      "term": "Octave",
+      "definition": "The same note with its frequency halved or doubled.",
+      "example": "If C is 262 Hz, Low C is 131 Hz and High C is about 523 Hz.",
+      "pitfall": "Adding a fixed number to the frequency to go up an octave; the frequency is multiplied by two."
+    },
+    {
+      "term": "Note block",
+      "definition": "Plays the chosen note and does not move on to the next block until its time is up.",
+      "example": "When the C, D, E blocks are placed one under the other, they are heard in turn.",
+      "pitfall": "Thinking the notes overlap; the blocks run in order, and each one waits for the previous one to finish."
+    },
+    {
+      "term": "Hat block",
+      "definition": "A block that runs the blocks under it when an event happens, for example on button [A] pressed.",
+      "example": "When the note blocks are put inside the on button [A] pressed block, they play when you press A.",
+      "pitfall": "Leaving the blocks outside the hat block; they look faded and never run."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h4d16-q1",
+      "kind": "mcq",
+      "prompt": "You want a speaker to play a note higher. Which one do you need to increase?",
+      "options": [
+        "The frequency",
+        "The volume",
+        "The number of blocks",
+        "How long you press the button"
+      ],
+      "answer": 0,
+      "explanation": "How high a sound is depends on its frequency; as the number of vibrations per second goes up, the sound gets higher. The volume only changes how loud the sound is, not its pitch.",
+      "skills": [
+        "prog-structure"
+      ]
+    },
+    {
+      "id": "m10h4d16-q2",
+      "kind": "numeric",
+      "prompt": "With the tempo at 120 (1/4 beat = 500 ms), three [1/4] beat note blocks placed one under the other are run. How many milliseconds pass until they have all finished?",
+      "answer": 1500,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "Each note block waits until it finishes; the notes do not overlap. 500 + 500 + 500 = 1500 ms. If they played at the same time, the total would be 500 ms, but the blocks run in order.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d16-q3",
+      "kind": "numeric",
+      "prompt": "On the card the note C is 262 Hz. Low C has half the frequency of C. How many Hz is Low C?",
+      "answer": 131,
+      "tolerance": 0,
+      "unit": "Hz",
+      "explanation": "To go down one octave, the frequency is divided by two: 262 / 2 = 131 Hz. In the same way, to go up one octave it is multiplied by two (about 524; on the card 523).",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d16-q4",
+      "kind": "find-bug",
+      "prompt": "A student wanted the card to play C, D, E when A is pressed. They ran it, but no sound came when they pressed A. In the editor the note blocks look faded.\n\n```\non button [A] pressed\n   (empty)\n\nplay note [C] for [1/4] beat\nplay note [D] for [1/4] beat\nplay note [E] for [1/4] beat\n```\n\nWhat is the mistake?",
+      "options": [
+        "The frequency of the note C is wrong",
+        "The note blocks have been left outside the on button [A] pressed hat block",
+        "The note E cannot be played",
+        "The tempo is too high"
+      ],
+      "answer": 1,
+      "explanation": "A faded block is a block that does not run because it is not attached to a hat block. The blocks need to be moved inside on button [A] pressed. The frequency, the note or the tempo are not the problem here.",
+      "skills": [
+        "prog-debug",
+        "prog-structure"
+      ]
+    },
+    {
+      "id": "m10h4d16-q5",
+      "kind": "predict-output",
+      "prompt": "The order is written with blocks as below, and A is pressed:\n\n```\non button [A] pressed\n   play note [G] for [1/4] beat\n   play note [C] for [1/4] beat\n```\n\nIn what order do the frequencies appear in the Speaker section?",
+      "options": [
+        "392 Hz, then 262 Hz",
+        "262 Hz, then 392 Hz",
+        "Both at the same time: 654 Hz",
+        "Only 262 Hz"
+      ],
+      "answer": 0,
+      "explanation": "The blocks run from top to bottom: first G (392 Hz), and when it finishes, C (262 Hz). The frequencies are not added together; the two do not play at the same time.",
+      "skills": [
+        "prog-structure"
+      ]
+    }
+  ]
+}

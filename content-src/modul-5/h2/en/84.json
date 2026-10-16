@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "State",
+      "definition": "A single label that describes what the robot is doing at the moment; only one is valid at a time.",
+      "example": "ILERI, DUR, TARA, DON and GERI are the robot's five states.",
+      "pitfall": "Trying to do the work of two states at once and ignoring the state variable."
+    },
+    {
+      "term": "Transition condition",
+      "definition": "The event that triggers a move from one state to another: a time running out, a distance threshold, a bumper being pressed.",
+      "example": "In ILERI, if the median distance is less than 25 cm, it moves to DUR.",
+      "pitfall": "Forgetting to write an exit for a state: the robot stays in that state forever."
+    },
+    {
+      "term": "durumBasi",
+      "definition": "The millis() value at the moment a state was entered; simdi - durumBasi is the time spent in that state.",
+      "example": "In the DUR state, when simdi - durumBasi >= 250, it moves to TARA.",
+      "pitfall": "Not updating durumBasi: because of the old value, the time looks as if it has already run out."
+    },
+    {
+      "term": "gec()",
+      "definition": "The single function that changes the state, updates durumBasi and prints to the serial port.",
+      "example": "gec(DUR) both changes the state and records the start time for the 250 ms wait.",
+      "pitfall": "Assigning the state directly with durum = DUR;: durumBasi stays old."
+    },
+    {
+      "term": "Backup protection",
+      "definition": "A second sensor or check added for cases that one sensor cannot see.",
+      "example": "Even if the ultrasonic beam passes through a 3 cm slit, the bumpers put the robot into the GERI state.",
+      "pitfall": "Trusting a single sensor and skipping the backup; the beam cannot see some obstacles."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h2d4-q1",
+      "kind": "mcq",
+      "prompt": "What is the main benefit of not using delay in the state blocks?",
+      "options": [
+        "The robot goes faster",
+        "The compiler does not give an error",
+        "The robot can check the bumpers and commands even while it is waiting",
+        "Less battery is used"
+      ],
+      "answer": 2,
+      "explanation": "During delay, loop() stops and no sensor is checked. In code that checks time with millis(), loop() runs on every pass; even while a turn is going on, the bumper can be read. The robot's speed and battery use do not change because of this.",
+      "skills": [
+        "rob-fsm",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h2d4-q2",
+      "kind": "numeric",
+      "prompt": "Calculate the time of one obstacle round: DUR 250 ms, in TARA 5 directions × 300 ms of servo waiting (not counting the measuring times), in DON |fark| × 5 ms for 60°. How many ms in total?",
+      "answer": 2050,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "250 + 5 × 300 + 60 × 5 = 250 + 1500 + 300 = 2050 ms. With the measuring times added, it rises to about 2.2 seconds. During this time the robot does not move forward; that is why it is included in the distance calculation in the project lesson.",
+      "skills": [
+        "rob-fsm",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h2d4-q3",
+      "kind": "predict-output",
+      "prompt": "When TARA finished, the farthest measurement came out at 26 cm. ACIK_CM = 35. Every gec() call prints \"DURUM ...\" on the serial port. Which DURUM lines appear in order on the Serial monitor after this?\n\n```\nif (mesafeler[en] < ACIK_CM) {\n  donYon = 1;\n  gec(GERI);\n} else {\n  int fark = ACILAR[en] - 90;\n  don(fark >= 0 ? 1 : -1, (unsigned long)abs(fark) * MS_DERECE);\n}\n// GERI: 400 ms geri gider, sonra don(donYon, 90UL * MS_DERECE)\n// DON: süre dolunca gec(ILERI)\n```",
+      "options": [
+        "DURUM DON, DURUM ILERI",
+        "DURUM ILERI",
+        "DURUM GERI, DURUM DON, DURUM ILERI",
+        "DURUM DUR, DURUM TARA"
+      ],
+      "answer": 2,
+      "explanation": "Because 26 is less than 35, the first branch runs: the robot is stuck and moves to GERI first. When the GERI time runs out, don() is called and it moves to DON, and when the turn ends, to ILERI. \"DURUM DON, DURUM ILERI\" is the output of the else branch; it is not right for a stuck robot.",
+      "skills": [
+        "rob-fsm",
+        "rob-scan"
+      ]
+    },
+    {
+      "id": "m5h2d4-q4",
+      "kind": "find-bug",
+      "prompt": "When the robot sees an obstacle, it seems to stop but starts scanning straight away; the 250 ms stop wait does not work, and there is no \"DURUM DUR\" line on the serial port either. There is one bug in the code. What is it?\n\n```\ncase ILERI:\n  surus(HIZ, HIZ);\n  if (simdi - sonOlcum >= OLCUM_ARALIK) {\n    sonOlcum = simdi;\n    if (medyan3() < ESIK_CM) durum = DUR;\n  }\n  break;\n```",
+      "options": [
+        "mesafeOlc() should be called instead of medyan3()",
+        "durum is assigned directly; durumBasi is not updated and the DUR wait is skipped; it should be gec(DUR)",
+        "The ESIK_CM comparison should be >",
+        "The break line should be deleted"
+      ],
+      "answer": 1,
+      "explanation": "The assignment durum = DUR; does not change durumBasi. Because durumBasi stays at the old time when ILERI was entered, the condition simdi - durumBasi >= 250 is met at once in DUR and it jumps to TARA; nothing is printed on the serial port either. gec(DUR) both updates durumBasi and prints the DURUM line. We saw the same symptom when we tested it in the simulation.",
+      "skills": [
+        "rob-fsm",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d4-q5",
+      "kind": "mcq",
+      "prompt": "Why does the robot still have bumpers when it has an ultrasonic sensor?",
+      "options": [
+        "The bumper measures distance more accurately than the sensor",
+        "The sensor is a single beam and cannot see some obstacles, such as a thin slit; the bumper is a backup",
+        "The Arduino does not work without bumpers",
+        "The bumpers turn the servo"
+      ],
+      "answer": 1,
+      "explanation": "Because the beam is narrow, it can, for example, pass through a 3 cm slit and see far away. The bumper steps in on contact and rescues the robot. The bumper does not measure distance (it only knows about contact), the Arduino working does not depend on it, and it does not turn the servo.",
+      "skills": [
+        "rob-bumper",
+        "rob-fsm"
+      ]
+    }
+  ]
+}

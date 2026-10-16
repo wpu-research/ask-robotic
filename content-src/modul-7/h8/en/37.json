@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Anonymising",
+      "definition": "Removing or changing the names and identifying details in personal data so the person cannot be recognised.",
+      "example": "Writing \"Student A\" instead of \"Ali Veli\".",
+      "pitfall": "Only changing the name and leaving details such as age, school and neighbourhood; the person can still be recognised."
+    },
+    {
+      "term": "Privacy policy",
+      "definition": "The rules that explain how a service stores and uses the data you type.",
+      "example": "Reading the policy before typing a project text into a service.",
+      "pitfall": "Assuming every service behaves the same way."
+    },
+    {
+      "term": "Saying you used AI",
+      "definition": "Clearly writing at which stage of your homework or project you had help from AI.",
+      "example": "\"I got a draft suggestion for the opening paragraph, edited it and checked the sources myself.\"",
+      "pitfall": "Presenting work you had a model do as your own work."
+    },
+    {
+      "term": "Bias",
+      "definition": "A model systematically giving worse or stereotyped results for some groups.",
+      "example": "90% accuracy in group A, 60% in group B.",
+      "pitfall": "Only looking at the overall accuracy and not measuring the groups separately."
+    },
+    {
+      "term": "Group-based eval",
+      "definition": "Building groups of similar cases and working out the accuracy of each group separately.",
+      "example": "Group A has 36 correct out of 40 cases, group B 12 correct out of 20.",
+      "pitfall": "Choosing very different numbers of cases for the groups and making the results impossible to compare."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d2-q1",
+      "kind": "mcq",
+      "prompt": "Which of these is the least risky to type into an AI service?",
+      "options": [
+        "The password of your email account",
+        "Your friend's phone number",
+        "Nameless sensor experiment results labelled \"Student A\"",
+        "Your home address"
+      ],
+      "answer": 2,
+      "explanation": "Sharing anonymised experiment data that contains no identity details is the least risky. A password, someone else's phone number and a home address are personal or secret information; they should not be typed into a service.",
+      "skills": [
+        "ai-privacy"
+      ]
+    },
+    {
+      "id": "m7h8d2-q2",
+      "kind": "numeric",
+      "prompt": "A model's accuracy is 45 correct out of 50 cases in group A, and 12 correct out of 20 cases in group B. What is the accuracy difference between the groups in percentage points?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "points",
+      "explanation": "A: 45 / 50 = 90%. B: 12 / 20 = 60%. The difference is 90 - 60 = 30 points. The total accuracy is 57 / 70 = 81%, which hides the problem in group B.",
+      "skills": [
+        "ai-bias",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d2-q3",
+      "kind": "find-bug",
+      "prompt": "This code prepares a request to a model to write a reminder for a customer. From a privacy point of view, which line is the problem?\n\n```\nimport os\nanahtar = os.environ[\"MODEL_ANAHTARI\"]\nmusteri = {\"ad\": \"Ayşe Y.\", \"tel\": \"0555 000 00 00\"}\nistek = \"Hatırlatma yaz: \" + musteri[\"ad\"] + \" \" + musteri[\"tel\"]\n```",
+      "options": [
+        "`anahtar = os.environ[\"MODEL_ANAHTARI\"]`",
+        "`musteri = {\"ad\": \"Ayşe Y.\", \"tel\": \"0555 000 00 00\"}`",
+        "`istek = \"Hatırlatma yaz: \" + musteri[\"ad\"] + \" \" + musteri[\"tel\"]`",
+        "`import os`"
+      ],
+      "answer": 2,
+      "explanation": "The phone number is not needed for the reminder text and should not be sent to the service. Reading the key from an environment variable is the right way; writing it into the code would be wrong. The problem is adding unneeded personal data to the request.",
+      "skills": [
+        "ai-privacy",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m7h8d2-q4",
+      "kind": "mcq",
+      "prompt": "You got draft help from an AI service for your homework. Which behaviour is the honest one?",
+      "options": [
+        "Presenting the output and saying you wrote it",
+        "Saying what help you used, and checking the sources yourself",
+        "Leaving the sources as the model gave them",
+        "Hiding that you had help, because nobody will notice"
+      ],
+      "answer": 1,
+      "explanation": "Saying what help you had, following the homework rules and checking quotes and sources yourself is honest behaviour. Presenting the output as your own work or using sources without checking them is wrong; a model can also make up sources.",
+      "skills": [
+        "ai-attribution"
+      ]
+    },
+    {
+      "id": "m7h8d2-q5",
+      "kind": "predict-output",
+      "prompt": "What is the output of this code that changes names in a data set?\n\n```\nmetin = \"Ali Veli 14 yaşında\"\nprint(metin.replace(\"Ali Veli\", \"Öğrenci A\"))\n```",
+      "options": [
+        "`Ali Veli 14 yaşında`",
+        "`Öğrenci A`",
+        "It gives an error",
+        "`Öğrenci A 14 yaşında`"
+      ],
+      "answer": 3,
+      "explanation": "replace changes `Ali Veli` to `Öğrenci A` (Student A) and leaves the rest as it is; the output is `Öğrenci A 14 yaşında` (\"Student A is 14 years old\"). Because details such as age are left, this method on its own may not give full anonymisation.",
+      "skills": [
+        "ai-privacy",
+        "prog-debug"
+      ]
+    }
+  ]
+}

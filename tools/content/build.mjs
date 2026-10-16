@@ -4,6 +4,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ROOT, SRC, loadWeek } from '../sim/lessons.mjs'
 import { loadLessonExtras, loadParts, loadPartsEn, loadWeekGuide } from './ek.mjs'
+import { loadLessonEn, loadWeekGuideEn } from './en.mjs'
 
 const moduleDir = process.argv[2]
 if (!moduleDir) { console.error('Kullanım: node tools/content/build.mjs modul-3 | parcalar'); process.exit(2) }
@@ -41,13 +42,18 @@ const weeks = meta.weeks.map((w) => {
   const lessons = loadWeek(moduleDir, w.dir)
   if (lessons.length !== w.lessons) throw new Error(`${w.dir}: ${w.lessons} ders bekleniyordu, ${lessons.length} var`)
   const guideMd = loadWeekGuide(moduleDir, w.dir)
+  const guideMdEn = loadWeekGuideEn(moduleDir, w.dir, guideMd)
   return {
     title: w.title,
     project: w.project,
     ...(guideMd ? { guideMd } : {}),
-    lessons: lessons.map(({ title, durationMin, problem, contentMd, question, number }) => ({
-      title, durationMin, problem, contentMd, question, ...loadLessonExtras(moduleDir, w.dir, number, skillIds),
-    })),
+    ...(guideMdEn ? { guideMdEn } : {}),
+    lessons: lessons.map(({ title, durationMin, problem, contentMd, question, number }) => {
+      const tr = { title, durationMin, problem, contentMd, question, ...loadLessonExtras(moduleDir, w.dir, number, skillIds) }
+      // İngilizce (content-src/<modül>/<hafta>/en/): aynı yapı, yalnız insan metni çevrilir
+      const contentEn = loadLessonEn(moduleDir, w.dir, number, tr, skillIds)
+      return contentEn ? { ...tr, contentEn } : tr
+    }),
   }
 })
 const mod = { slug: meta.slug, title: meta.title, track: meta.track, position: meta.position, minAge: meta.minAge, weeks }

@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "when card is shaken",
+      "definition": "An event hat block that runs once on every shake of the card.",
+      "example": "If you put change adim by 1 inside the hat block, every shake counts as one step.",
+      "pitfall": "Leaving the hat block empty: shaking does not increase any variable."
+    },
+    {
+      "term": "Equal and greater-than-or-equal",
+      "definition": "\"Equal\" is only true at exactly that number; \"greater-than-or-equal\" is true at every number from that one on.",
+      "example": "adim = 10 does the celebration once; adim >= 10 repeats it on every step.",
+      "pitfall": "Using greater-than-or-equal for something that should happen once: the celebration plays on the 11th and 12th steps too."
+    },
+    {
+      "term": "Remainder (mod)",
+      "definition": "The number left over from a division. The remainder of adim ÷ 10 is 0 at multiples of 10.",
+      "example": "The remainder of 30 ÷ 10 is 0, and the remainder of 23 ÷ 10 is 3.",
+      "pitfall": "Mixing up the quotient and the remainder: for 23 ÷ 10 the quotient is 2 and the remainder is 3."
+    },
+    {
+      "term": "Counting order",
+      "definition": "You count first, then you check. The counting block must be outside the condition.",
+      "example": "The change adim by 1 block comes before the if block.",
+      "pitfall": "Putting the counting block inside the if: the condition is never true and the variable does not go up."
+    },
+    {
+      "term": "Event queue",
+      "definition": "New events that arrive at a busy hat block join a queue, but at most 3 of them are kept.",
+      "example": "Of 5 shakes that arrive while Fanfare is playing, only 3 are handled.",
+      "pitfall": "Thinking every shake will definitely be counted: on a busy hat block, the extra ones are lost."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d27-q1",
+      "kind": "predict-output",
+      "prompt": "The card is shaken 12 times (adim starts at 0, and after each shake you wait until the melody ends). How many times does the Fanfare melody play?\n\n```\nwhen card is shaken:\n  change adim by 1\n  if adim >= 10 then:\n    play melody [Fanfare]\n```",
+      "options": [
+        "1 time",
+        "2 times",
+        "3 times",
+        "12 times"
+      ],
+      "answer": 2,
+      "explanation": "The condition is true when adim is 10, 11 and 12: 3 times. If \"adim = 10\" had been written, it would play only once. For it to play 12 times, it would have to be true from the first shake.",
+      "skills": [
+        "mk-conditions",
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d27-q2",
+      "kind": "find-bug",
+      "prompt": "However many times you shake the card, there is no celebration on the 10th step. Which is the mistake?\n\n```\non start:\n  set adim to 0\n\nwhen card is shaken:\n  if adim = 10 then:\n    change adim by 1\n    show icon [happy face]\n    play melody [Fanfare]\n```",
+      "options": [
+        "The change adim by 1 block is inside the if; because adim is 0, the condition is never true and adim never goes up",
+        "The melody name is wrong",
+        "adim should not be set to 0 in on start",
+        "< should be used instead of = in the condition"
+      ],
+      "answer": 0,
+      "explanation": "The counting block should be put outside the condition, before it. If it stays inside, adim gets stuck at 0, and \"adim = 10\" never becomes true. Setting it to 0 in on start and the melody name are correct.",
+      "skills": [
+        "mk-debug",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d27-q3",
+      "kind": "numeric",
+      "prompt": "Your step is 70 cm. The step counter shows 50 steps. How many metres have you walked?",
+      "answer": 35,
+      "unit": "m",
+      "explanation": "70 cm = 0.7 m. 50 x 0.7 = 35 m. In blocks it can also be written as adim x 7 ÷ 10. The answer 3500 is in centimetres.",
+      "skills": [
+        "mk-variables"
+      ]
+    },
+    {
+      "id": "m10h6d27-q4",
+      "kind": "mcq",
+      "prompt": "The condition \"remainder of adim ÷ 10 = 0\" is used to celebrate every 10 steps. On which steps does the celebration happen?",
+      "options": [
+        "Only on the 10th step",
+        "On all the steps 1, 2, 3 ...",
+        "On steps 10, 20, 30 ...",
+        "On steps 5, 15, 25 ..."
+      ],
+      "answer": 2,
+      "explanation": "The remainder is only 0 at multiples of 10: 10, 20, 30 ... To celebrate only on the 10th step, you would write adim = 10.",
+      "skills": [
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d27-q5",
+      "kind": "numeric",
+      "prompt": "In a correctly built step counter, the 10th shake starts the Fanfare melody (2.75 seconds). While the melody is playing, the card is shaken 5 more times. When the melody ends and the queued events are handled, what is adim?",
+      "answer": 13,
+      "explanation": "At most 3 events join the queue of a busy hat block; of the 5 shakes, 3 are kept and 2 are lost. adim becomes 10 + 3 = 13. We checked this number by running it on the virtual card.",
+      "skills": [
+        "mk-events",
+        "mk-concurrency"
+      ]
+    }
+  ]
+}

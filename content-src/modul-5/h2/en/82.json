@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Echo time",
+      "definition": "The time the ECHO pin stays HIGH after the TRIG pulse; it is the time the sound takes to reach the obstacle and come back.",
+      "example": "pulseIn(ECHO, HIGH, 30000) gives this time in microseconds.",
+      "pitfall": "Thinking the time is the distance itself; because it is there and back, you need to divide by 58."
+    },
+    {
+      "term": "58 µs = 1 cm",
+      "definition": "Going there and back, sound spends about 58 µs for each 1 cm; distance = time / 58.",
+      "example": "An echo time of 2900 µs means 2900 / 58 = 50 cm.",
+      "pitfall": "Forgetting that it is there and back and calculating one way with the speed of sound: the result comes out twice as large."
+    },
+    {
+      "term": "Median filter",
+      "definition": "Sorting several measurements and taking the middle one; it throws out outlier measurements.",
+      "example": "The median of the measurements 44, 41, 90, 45, 43 is 44.",
+      "pitfall": "Taking the average instead of the median: a single outlier spoils the result."
+    },
+    {
+      "term": "Stop threshold",
+      "definition": "The limit (ESIK_CM) below which the robot stops if the measured distance is smaller.",
+      "example": "With ESIK_CM = 25, the robot stops when the sensor is 25 cm from the obstacle.",
+      "pitfall": "Thinking of the threshold relative to the robot's centre; the sensor is at the front of the robot and the robot also travels some distance while stopping."
+    },
+    {
+      "term": "Braking margin",
+      "definition": "The distance the robot slides after the stop command; it is taken into account when choosing the threshold.",
+      "example": "Because the motor lag is 80 ms, the robot moves about 1.5 cm after the stop command.",
+      "pitfall": "Thinking the threshold is the exact stopping point and not calculating the margin."
+    },
+    {
+      "term": "No echo (timeout)",
+      "definition": "When no echo comes back, pulseIn returns 0; this is not a distance.",
+      "example": "In the lesson, if there is no echo mesafeOlc() returns 400, meaning very far.",
+      "pitfall": "Thinking a result of 0 is 0 cm and stopping the robot in an open space."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h2d2-q1",
+      "kind": "numeric",
+      "prompt": "pulseIn measured that the ECHO pin stayed HIGH for 1740 µs. With the time / 58 calculation, as in the lesson, how many cm away is the obstacle?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "1740 / 58 = 30. Because the time covers there and back, 58 µs comes to about 1 cm. Dividing the time by 29 and getting 60 cm is a wrong use of the one-way calculation.",
+      "skills": [
+        "rob-ultrasonic"
+      ]
+    },
+    {
+      "id": "m5h2d2-q2",
+      "kind": "predict-output",
+      "prompt": "Here is a function that finds the median of three measurements. What does Serial.println(medyan3(30, 400, 28)); print?\n\n```\nint medyan3(int a, int b, int c) {\n  if (a > b) { int t = a; a = b; b = t; }\n  if (b > c) { int t = b; b = c; c = t; }\n  if (a > b) { int t = a; a = b; b = t; }\n  return b;\n}\n```",
+      "options": [
+        "400",
+        "152",
+        "28",
+        "30"
+      ],
+      "answer": 3,
+      "explanation": "After the three swaps, a, b, c are in order from smallest to largest: 28, 30, 400. The middle one, b, is 30. The average (about 152) would be spoilt by the outlier 400; the median ignores 400.",
+      "skills": [
+        "rob-noise",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d2-q3",
+      "kind": "find-bug",
+      "prompt": "The robot keeps stopping while it drives through an open hall; there is no obstacle in front of it. There is one bug in the code. What is it?\n\n```\nint mesafeOlc() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  long sure = pulseIn(ECHO, HIGH, 30000);\n  if (sure == 0) return 0;\n  return sure / 58;\n}\n// loop: if (mesafeOlc() < 25) dur\n```",
+      "options": [
+        "The TRIG pulse should be 2 µs instead of 10 µs",
+        "0 is returned when no echo comes back; because 0 < 25, the robot thinks \"there is an obstacle\" and stops",
+        "pulseIn should not be given a timeout",
+        "It should divide by 29 instead of 58"
+      ],
+      "answer": 1,
+      "explanation": "In an open space the echo does not come back and pulseIn gives 0. The function returns this as 0 cm and the condition 0 < 25 is met. It needs to return 400 (very far), as in the lesson. The timeout is useful; without it, a measurement with no echo would wait for 1 second. The 10 µs pulse and the divisor 58 are correct.",
+      "skills": [
+        "rob-ultrasonic",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d2-q4",
+      "kind": "numeric",
+      "prompt": "ESIK_CM = 25. The robot gets the stop command the moment the sensor reads exactly 25 cm, but because of motor lag it moves about 1.5 cm further. When the robot stops, how many cm is the sensor from the obstacle?",
+      "answer": 23.5,
+      "tolerance": 0.1,
+      "unit": "cm",
+      "explanation": "25 − 1.5 = 23.5 cm. The threshold is not the stopping point; it is the point where the decision to stop is made, and the braking margin is taken away from it. If you want the robot to stop very close, choose the threshold with the margin in mind.",
+      "skills": [
+        "rob-threshold"
+      ]
+    },
+    {
+      "id": "m5h2d2-q5",
+      "kind": "mcq",
+      "prompt": "Five measurements are: 44, 41, 400, 45, 43 (one came out with no echo). Why is the median used instead of the average?",
+      "options": [
+        "The median is always faster to calculate than the average",
+        "A single outlier spoils the average a lot, but does not spoil the median",
+        "The average does not give a whole number",
+        "The median always gives the smallest value"
+      ],
+      "answer": 1,
+      "explanation": "The average (114.6) rises far above the real distance because of the outlier 400; the median is 44 and close to the truth. The difference in speed does not matter here, and the median is the middle value, not the smallest.",
+      "skills": [
+        "rob-noise"
+      ]
+    }
+  ]
+}

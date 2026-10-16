@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Drift",
+      "definition": "The robot going slowly in the same direction without falling, when the point the sensor calls 0° is not the real balance point.",
+      "example": "With the sensor 4° off, the robot with an angle PD only drifted about 16.6 cm in 15 seconds.",
+      "pitfall": "Thinking the drift is PD's fault: without the offset, the same code stays in place."
+    },
+    {
+      "term": "Cascade control",
+      "definition": "Chaining two controllers: the output of the outer loop becomes the target of the inner loop.",
+      "example": "The outer loop produces a target angle from the position, and the inner loop turns that angle into a motor command.",
+      "pitfall": "Expecting the outer loop to drive the motor directly: it only sets the target angle."
+    },
+    {
+      "term": "Target angle",
+      "definition": "The angle produced by the outer loop that the inner loop tries to hold. Command = KP·(angle − target angle) + KD·angle speed.",
+      "example": "If the robot is drifting forwards, the target angle becomes negative and the robot leans back and comes back.",
+      "pitfall": "Working out the target but not using it in the inner loop: the cascade then has no effect."
+    },
+    {
+      "term": "Speed of the outer loop",
+      "definition": "The outer loop should run about 5-10 times slower than the inner loop, so that the inner loop can settle at the target.",
+      "example": "A 5 ms inner loop and a 20 ms outer loop (DIS_ORAN = 4).",
+      "pitfall": "Running the outer loop at the same speed as the inner loop: the two chase each other and the robot rocks."
+    },
+    {
+      "term": "Target angle limit",
+      "definition": "Restricting the outer loop's output to a range such as ±6° prevents a lean the inner loop cannot recover from.",
+      "example": "If KX·position + KV·speed = -9°, the limit brings it down to -6°.",
+      "pitfall": "Not limiting the target or choosing the limit too wide: if the sensor offset is large, the robot leans more than it should."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d4-q1",
+      "kind": "mcq",
+      "prompt": "In cascade balance control, what is the output of the outer loop?",
+      "options": [
+        "The PWM value going to the motors",
+        "The gyroscope bias",
+        "The target angle; the inner loop tries to hold this angle",
+        "The outer loop's own period"
+      ],
+      "answer": 2,
+      "explanation": "The outer loop looks at the position and speed and sets the target angle; the inner loop turns that angle into a motor command. The inner loop produces the motor PWM; the outer loop does not talk to the motor directly.",
+      "skills": [
+        "ctrl-cascade"
+      ]
+    },
+    {
+      "id": "m5h6d4-q2",
+      "kind": "predict-output",
+      "prompt": "One round of the inner loop runs. What does this code print?\n\n```\nfloat KP = 0.15, KD = 0.02;\nfloat aci = 2.0, hedefAci = -1.0, hiz = 10.0;\nfloat komut = KP * (aci - hedefAci) + KD * hiz;\nSerial.println(komut, 2);\n```",
+      "options": [
+        "0.35",
+        "0.45",
+        "0.50",
+        "0.65"
+      ],
+      "answer": 3,
+      "explanation": "aci - hedefAci = 2 - (-1) = 3 and KP·3 = 0.45. KD·hiz = 0.02·10 = 0.20. The total is 0.65. 0.35 would be taking the sign of the target angle wrongly, 0.50 would be not using the target angle at all (0.15·2 + 0.20), and 0.45 would be forgetting the KD term.",
+      "skills": [
+        "ctrl-cascade"
+      ]
+    },
+    {
+      "id": "m5h6d4-q3",
+      "kind": "numeric",
+      "prompt": "KX = -60 degrees/metre, KV = -150 degrees/(m/s), HEDEF_SINIR = 6°. With the position at 0.05 m and the speed at 0.04 m/s, how many degrees is the target angle given by the outer loop?",
+      "answer": -6,
+      "tolerance": 0,
+      "unit": "°",
+      "explanation": "KX·position = -3° and KV·speed = -6°; the total is -9°. Because this value goes past the ±6° limit, constrain squeezes it to -6°. Without the limit, it would ask the inner loop for a lean too large to recover from.",
+      "skills": [
+        "ctrl-cascade",
+        "robot-tuning"
+      ]
+    },
+    {
+      "id": "m5h6d4-q4",
+      "kind": "find-bug",
+      "prompt": "The outer loop works out the target angle, but the robot keeps drifting. Which line is wrong?\n\n```\n1  hedefAci = constrain(KX * konumTahmin + KV * hizTahmin, -HEDEF_SINIR, HEDEF_SINIR);\n2  sonKomut = KP * aci + KD * hiz;\n3  motorSur(sonKomut);\n```",
+      "options": [
+        "Line 1: constrain should be removed",
+        "Line 2: hedefAci is not used in the inner loop; it should be KP * (aci - hedefAci)",
+        "Line 3: motorSur should not be called",
+        "Line 1: KX should be positive"
+      ],
+      "answer": 1,
+      "explanation": "The target angle is worked out but does not go into the command; the inner loop still aims at zero degrees and the cascade has no effect. The inner loop should use KP * (aci - hedefAci). constrain is needed for safety; KX being negative is correct.",
+      "skills": [
+        "ctrl-cascade",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d4-q5",
+      "kind": "mcq",
+      "prompt": "If you run the outer loop at the same speed as the inner loop (every 5 ms), what do you expect?",
+      "options": [
+        "The two loops chase each other; the robot may stay upright but keeps rocking",
+        "The robot settles faster and the drift ends completely",
+        "It makes no difference",
+        "The robot falls at once, because the target angle always stays at the limit"
+      ],
+      "answer": 0,
+      "explanation": "The target changes again before the inner loop can settle at the new one. In the simulation the robot did not fall in this case, but the angle oscillation was 2.14° RMS; with an outer loop 4 times slower it was 0.30°. That is why the outer loop must be slower than the inner loop.",
+      "skills": [
+        "ctrl-cascade",
+        "robot-tuning"
+      ]
+    }
+  ]
+}

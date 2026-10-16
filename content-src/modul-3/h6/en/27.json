@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "millis()",
+      "definition": "A function that gives the time since the board started running, in milliseconds. It goes up by 1 every millisecond.",
+      "example": "3 seconds after the board is switched on, millis() gives about 3000.",
+      "pitfall": "Expecting millis() to show the time of day; it only gives the time since start-up."
+    },
+    {
+      "term": "The is-the-time-up pattern",
+      "definition": "The expression `simdi - son >= aralik`: if enough time has passed since the last job, do the job and update `son`.",
+      "example": "if (simdi - son >= 500) { son = simdi; digitalWrite(13, !digitalRead(13)); }",
+      "pitfall": "Forgetting the line `son = simdi` inside the if: once the condition is true it stays true, and the job is done every round."
+    },
+    {
+      "term": "A separate clock for each job",
+      "definition": "Giving each of several jobs its own last-time variable.",
+      "example": "`son1` is used for LED 1 and `son2` for LED 2; when one is updated, the other's timing is not spoiled.",
+      "pitfall": "Giving all jobs one shared `son` variable: the jobs reset each other's timing."
+    },
+    {
+      "term": "unsigned long",
+      "definition": "A 32-bit whole-number type that holds no negative values (0 to 4 294 967 295). The value of millis() is of this type.",
+      "example": "unsigned long simdi = millis();",
+      "pitfall": "Putting the value of millis() into an int: an int overflows in about 32.8 seconds."
+    },
+    {
+      "term": "Overflow (rollover)",
+      "definition": "A counter going back to 0 when it reaches its largest value. For millis() this happens after about 49.7 days.",
+      "example": "If `simdi = 10` and `son = 4 294 967 000`, subtraction gives 306 ms; no mistake is made.",
+      "pitfall": "Checking the time by adding (`simdi >= son + aralik`): it gives the wrong result at the moment of overflow."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d27-q1",
+      "kind": "mcq",
+      "prompt": "What does the millis() function return?",
+      "options": [
+        "The current hour and minute of the clock",
+        "How many times loop() has run",
+        "The length of the last delay()",
+        "The milliseconds since the board started running"
+      ],
+      "answer": 3,
+      "explanation": "millis() is the number of milliseconds since start-up; it does not know the real time of day. It has nothing to do with the last delay or the number of rounds.",
+      "skills": [
+        "prog-millis"
+      ]
+    },
+    {
+      "id": "m3h6d27-q2",
+      "kind": "numeric",
+      "prompt": "The value of millis() is of type unsigned long (at most 4 294 967 295) and goes up by 1 every millisecond. After how many days does the counter go back to zero? (A day is 86 400 000 ms. Round to one decimal place.)",
+      "answer": 49.7,
+      "tolerance": 0.1,
+      "unit": "days",
+      "explanation": "2^32 = 4 294 967 296 ms. Dividing this by 86 400 000 gives about 49.71 days. The overflow happens at around 49.7 days.",
+      "skills": [
+        "prog-millis",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d27-q3",
+      "kind": "numeric",
+      "prompt": "A friend keeps the time in an int: int simdi = millis(); On the Uno an int is 16 bits and holds at most 32 767. About how many seconds after the program starts does this variable overflow? (Round to one decimal place.)",
+      "answer": 32.8,
+      "tolerance": 0.1,
+      "unit": "s",
+      "explanation": "32 767 ms = 32.767 s, so about 32.8 seconds. That is why time variables must be unsigned long, not int.",
+      "skills": [
+        "prog-millis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d27-q4",
+      "kind": "predict-output",
+      "prompt": "What does the Serial monitor show when this code runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long onceki = 4294967000UL;\n  unsigned long simdi = 100;\n  Serial.println(simdi - onceki);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "396",
+        "-4294966900",
+        "100",
+        "It gives a compile error"
+      ],
+      "answer": 0,
+      "explanation": "The counter wrapped round from 4 294 967 000 to 100. The remaining 296 ms (up to the limit) + 100 ms = 396. Unsigned subtraction gives this difference correctly; no negative number appears, because an unsigned long cannot hold negative values.",
+      "skills": [
+        "prog-millis",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d27-q5",
+      "kind": "find-bug",
+      "prompt": "This program toggles the LED every half second. But when the board has been on for about 49 days, the behaviour goes wrong for a while. Which line causes the bug?\n\n```\nunsigned long onceki = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  if (simdi >= onceki + 500) {\n    onceki = simdi;\n    digitalWrite(13, !digitalRead(13));\n  }\n}\n```",
+      "options": [
+        "unsigned long onceki = 0;",
+        "unsigned long simdi = millis();",
+        "if (simdi >= onceki + 500) {",
+        "digitalWrite(13, !digitalRead(13));"
+      ],
+      "answer": 2,
+      "explanation": "Checking by addition breaks at the moment of overflow: onceki + 500 goes past the limit and wraps round to a small number, and the condition becomes true before the time is up. The right way is to write simdi - onceki >= 500. The variable types are correct, and the line that toggles the LED is fine too.",
+      "skills": [
+        "prog-millis",
+        "prog-debug"
+      ]
+    }
+  ]
+}

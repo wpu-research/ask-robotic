@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "World and screen",
+      "definition": "The world is the whole map; the screen is a 160 x 120 pixel window onto the world.",
+      "example": "The 30-tile plain is 480 pixels wide, three times the screen.",
+      "pitfall": "Thinking the screen is the world: the screen only shows one part of the world."
+    },
+    {
+      "term": "Camera following",
+      "definition": "The `camera follows sprite [kedi]` block scrolls the view so that it keeps the sprite in the middle of the screen.",
+      "example": "If the cat is at 200 pixels, the camera x is 200 - 80 = 120.",
+      "pitfall": "Not adding the camera block: the cat goes off the screen and disappears."
+    },
+    {
+      "term": "Camera limit",
+      "definition": "The camera stops at the edge of the world; it does not show the empty space outside the world.",
+      "example": "In a 480 pixel world, the camera x is at most 480 - 160 = 320.",
+      "pitfall": "Expecting the cat to still be in the middle of the screen at the edge: at the edge, the cat slides away from the middle."
+    },
+    {
+      "term": "Turning tiles into sprites",
+      "definition": "Clears one type of tile on the map and puts a sprite in the place of each one.",
+      "example": "Seven apple tiles turn into seven Food sprites.",
+      "pitfall": "Forgetting to turn them: the apple stays only a picture and the collision event does not run."
+    },
+    {
+      "term": "Sprite kind",
+      "definition": "A label of the sprite (player, food and so on); events work by kind.",
+      "example": "The collecting code waits for the `Food` kind.",
+      "pitfall": "Choosing the wrong kind when turning them: the apples cannot be collected."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d14-q1",
+      "kind": "numeric",
+      "prompt": "The plain map is 30 tiles wide (480 pixels). The camera follows the cat and the cat's centre is at x = 200 pixels. The screen is 160 pixels wide. What is the camera's x value?",
+      "answer": 120,
+      "unit": "pixels",
+      "explanation": "The camera keeps the sprite in the middle: 200 - 160 / 2 = 120. This value is between 0 and 480 - 160 = 320, so it does not hit the limit. Working out just 200 - 160 = 40 is forgetting to use half the screen.",
+      "skills": [
+        "oyun-kamera",
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d14-q2",
+      "kind": "mcq",
+      "prompt": "The cat has walked to the far right end of the plain (x = 470 pixels) and the camera is following the cat. What do you see?",
+      "options": [
+        "The camera stops at the right edge of the world; the cat slides a little to the right of the middle of the screen",
+        "The camera shows the outside of the world",
+        "The cat disappears",
+        "The camera goes back to the left"
+      ],
+      "answer": 0,
+      "explanation": "The camera does not go past the limit of the world: x is at most 480 - 160 = 320. In this case the cat slides from the middle towards the right of the screen. No empty space is shown, the cat does not disappear and the camera does not go back to the left.",
+      "skills": [
+        "oyun-kamera"
+      ]
+    },
+    {
+      "id": "m11h3d14-q3",
+      "kind": "find-bug",
+      "prompt": "The camera follows the cat, but when the cat touches an apple, the score does not go up and the apple is not deleted. The collecting code is correct: when `Player` and `Food` collide, the score goes up by 1.\n\n```\n1  when game starts\n2      load map: [ova]\n3      make the cat and put it on tile column [1] row [4]\n4      the cat moves with player keys\n5      camera follows sprite [kedi]\n```\n\nWhat is the bug?",
+      "options": [
+        "There is no block that turns the apple tiles into Food sprites",
+        "The camera in line 5 is wrong",
+        "The cat should not be put on column 1",
+        "The map name is wrong"
+      ],
+      "answer": 0,
+      "explanation": "The collision event waits for a Food sprite; the apple tiles, though, are only pictures. The turn-into block is missing, so the event is never triggered. The camera and the cat work, and the map has been loaded.",
+      "skills": [
+        "oyun-karo-sprite",
+        "oyun-hata-ayiklama"
+      ]
+    },
+    {
+      "id": "m11h3d14-q4",
+      "kind": "predict-output",
+      "prompt": "The plain is 30 tiles wide. There is no camera block in the blocks:\n\n```\nload map: [ova]\nput the cat on tile column [1] row [4]\nthe cat moves with player keys\n```\n\nThe player walks the cat to the column 12 tile (x = 200 pixels). What can be seen on the screen?",
+      "options": [
+        "The camera follows the cat by itself",
+        "The cat stops at column 9",
+        "The camera does not move (x = 0); after 160 pixels the cat leaves through the right of the screen and cannot be seen",
+        "The map shrinks"
+      ],
+      "answer": 2,
+      "explanation": "Without the follow block the camera stays still, and the screen shows the first 160 pixels of the world. At 200 pixels the cat is outside the screen. The camera does not follow by itself, and the map does not shrink.",
+      "skills": [
+        "oyun-kamera",
+        "oyun-hata-ayiklama"
+      ]
+    },
+    {
+      "id": "m11h3d14-q5",
+      "kind": "mcq",
+      "prompt": "Why do we turn the apple tiles into `Food` sprites?",
+      "options": [
+        "Because the tiles are not coloured",
+        "The camera only shows sprites",
+        "To make the map smaller",
+        "Sprites can take part in collision events, move and be deleted; a tile is only a picture on the map"
+      ],
+      "answer": 3,
+      "explanation": "An apple that is a sprite takes part in the collecting event, can be made to move and can be deleted. The colour, or what the camera shows, is not the reason for turning them; the map does not shrink either when they are turned, only the apple tiles are cleared.",
+      "skills": [
+        "oyun-karo-sprite"
+      ]
+    }
+  ]
+}

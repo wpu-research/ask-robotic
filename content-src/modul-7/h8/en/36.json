@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Hallucination",
+      "definition": "A model producing information that looks fluent and reasonable but has no source, or is wrong.",
+      "example": "Adding a date that is not in the source to a summary.",
+      "pitfall": "Thinking a well-written answer is a correct one."
+    },
+    {
+      "term": "Not in the source",
+      "definition": "A made-up detail that does not contradict the source but never appears in it.",
+      "example": "The source gives the club's meeting time, but the summary talks about a monthly fee.",
+      "pitfall": "Not checking it because it looks reasonable."
+    },
+    {
+      "term": "Contradiction",
+      "definition": "A claim writing the opposite of what the source says, or a different value.",
+      "example": "The source says \"Tuesday\" but the summary says \"Monday\".",
+      "pitfall": "Missing a reversed relationship (such as saying the object is closer the longer the time) because the sentence is fluent."
+    },
+    {
+      "term": "Exaggeration",
+      "definition": "Adding certainty that is not in the source: \"always\", \"definitely\".",
+      "example": "The source says \"usually\" but the summary says \"always\".",
+      "pitfall": "Thinking a sentence that speaks with certainty is more trustworthy."
+    },
+    {
+      "term": "Hallucination rate",
+      "definition": "The percentage of the checked outputs that contain at least one made-up detail.",
+      "example": "If 4 of 50 summaries are wrong, the rate is 8%.",
+      "pitfall": "Giving a single percentage without writing which outputs, and how many, you looked at."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d1-q1",
+      "kind": "mcq",
+      "prompt": "Source: \"The robot club meets on Saturdays.\" A summary says \"The club meets on Sundays.\" Which type is this claim?",
+      "options": [
+        "Matches the source",
+        "Contradicts the source",
+        "Not in the source (made-up detail)",
+        "Exaggeration"
+      ],
+      "answer": 1,
+      "explanation": "The source says Saturday and the claim says Sunday: it contradicts what the source says. If it were \"not in the source\", the source would not mention the meeting day at all; in an exaggeration, the certainty would be increased.",
+      "skills": [
+        "ai-hallucination"
+      ]
+    },
+    {
+      "id": "m7h8d1-q2",
+      "kind": "mcq",
+      "prompt": "A model wrote an answer in very confident language. Why does this not show that the answer is right?",
+      "options": [
+        "Models always say wrong things",
+        "Producing language that looks fluent and certain does not guarantee that the information is right",
+        "Confident answers are always long",
+        "Checking is only needed for numerical answers"
+      ],
+      "answer": 1,
+      "explanation": "The model chooses words by probability in order to write fluently; confident-looking language does not prove that the information has a source. Correctness is checked by comparing with the source or with a tool. Wrong information can be written with the same fluency.",
+      "skills": [
+        "ai-hallucination",
+        "ai-verify"
+      ]
+    },
+    {
+      "id": "m7h8d1-q3",
+      "kind": "numeric",
+      "prompt": "A team compared 80 summaries with their sources and found at least one made-up detail in 12 summaries. What is the hallucination rate as a percentage?",
+      "answer": 15,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Rate = 12 / 80 x 100 = 15%. The rate of summaries without hallucination is 85%; the question asks for the rate of the wrong ones.",
+      "skills": [
+        "ai-eval-rate",
+        "ai-hallucination"
+      ]
+    },
+    {
+      "id": "m7h8d1-q4",
+      "kind": "predict-output",
+      "prompt": "A model said \"the output of this code is 5\". What does the code print when you run it?\n\n```\nliste = [2, 7, 9, 4]\nprint(sum(liste) / len(liste))\n```",
+      "options": [
+        "5.5",
+        "5",
+        "22",
+        "It gives an error"
+      ],
+      "answer": 0,
+      "explanation": "The total is 2+7+9+4 = 22 and there are 4 elements; 22 / 4 = 5.5. In Python 3 division gives a decimal and does not round to 5. The model's \"5\" should not be accepted without checking: running the code is the most reliable check.",
+      "skills": [
+        "ai-verify",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m7h8d1-q5",
+      "kind": "find-bug",
+      "prompt": "This code was written to calculate the accuracy rate (85%) when 6 wrong summaries are found in 40, but it prints 15.0. Which line is wrong?\n\n```\ntoplam = 40\nyanlis = 6\nprint(\"Doğruluk:\")\ndogruluk = yanlis / toplam * 100\nprint(dogruluk)\n```",
+      "options": [
+        "`toplam = 40`",
+        "`yanlis = 6`",
+        "`print(\"Doğruluk:\")`",
+        "`dogruluk = yanlis / toplam * 100`"
+      ],
+      "answer": 3,
+      "explanation": "Accuracy is the rate of correct summaries: (toplam - yanlis) / toplam x 100 = 85. The code divides the number of wrong ones and gives the error rate (15.0). The other lines cause no problem.",
+      "skills": [
+        "ai-eval-rate",
+        "prog-debug"
+      ]
+    }
+  ]
+}

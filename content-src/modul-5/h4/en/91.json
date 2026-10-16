@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Encoder disc",
+      "definition": "A disc with slots around its edge that turns together with the wheel; each slot passing produces an electrical pulse.",
+      "example": "A 20-slot disc gives 20 pulses when the wheel turns once.",
+      "pitfall": "Thinking the encoder measures the wheel's speed directly; it only counts pulses, and you work out the speed."
+    },
+    {
+      "term": "Tick",
+      "definition": "A single pulse counted by the counter; here, every change from LOW to HIGH (RISING).",
+      "example": "When the wheel turns one full turn, 20 ticks are counted.",
+      "pitfall": "Setting the interrupt to CHANGE and thinking the number of ticks is 20; each slot gives two edges and the number becomes 40."
+    },
+    {
+      "term": "Tick distance",
+      "definition": "The distance one tick is worth: 2·π·r divided by the number of slots.",
+      "example": "For r = 3.3 cm and 20 slots, 20.73 / 20 = 1.037 cm.",
+      "pitfall": "Putting the diameter into the formula instead of the radius; the distance comes out twice as large."
+    },
+    {
+      "term": "volatile",
+      "definition": "A keyword that tells the compiler a variable can change outside the normal program flow, for example in an interrupt.",
+      "example": "volatile unsigned int tikSol; the interrupt increases the counter and loop() reads it.",
+      "pitfall": "Forgetting to write volatile; loop() may see an old copy of the counter."
+    },
+    {
+      "term": "Safe reading",
+      "definition": "Reading a 2-byte counter by copying it between noInterrupts() and interrupts().",
+      "example": "Putting the command unsigned int kopya = sayac; between the two calls.",
+      "pitfall": "If an interrupt comes in during the read, a half-read, nonsense number can come out."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h4d91-q1",
+      "kind": "numeric",
+      "prompt": "A robot's wheel radius is 4 cm and its encoder disc has 24 slots. Only the RISING edge is counted. How many centimetres is one tick worth?",
+      "answer": 1.05,
+      "tolerance": 0.01,
+      "unit": "cm",
+      "explanation": "The circumference is 2·π·4 = 25.13 cm; divided by 24 slots it gives 1.047 cm, so about 1.05. If you had used the diameter (8 cm) instead of the radius, you would have got 2.09; this is a common mistake.",
+      "skills": [
+        "rob-encoder",
+        "rob-ticks-distance"
+      ]
+    },
+    {
+      "id": "m5h4d91-q2",
+      "kind": "numeric",
+      "prompt": "On a robot with a tick distance of 1.037 cm, the left counter shows 150 ticks. About how many centimetres has the robot travelled?",
+      "answer": 155.5,
+      "tolerance": 0.2,
+      "unit": "cm",
+      "explanation": "Distance = number of ticks · tick distance = 150 · 1.037 = 155.5 cm. If the wheel does not slip, the counter gives the distance this closely.",
+      "skills": [
+        "rob-ticks-distance"
+      ]
+    },
+    {
+      "id": "m5h4d91-q3",
+      "kind": "find-bug",
+      "prompt": "The code was written as below to make the robot stop at 97 ticks, but sometimes it never stops. Where is the one bug?\n\n```\nunsigned int tikSol = 0;\n\nvoid sayiSol() { tikSol++; }\n\nvoid setup() {\n  attachInterrupt(digitalPinToInterrupt(2), sayiSol, RISING);\n}\n\nvoid loop() {\n  if (tikSol >= 97) { dur(); }\n}\n```",
+      "options": [
+        "The tikSol variable is not volatile; loop() may not see the value the interrupt increases",
+        "attachInterrupt should not be called in setup()",
+        "LOW should be written instead of RISING",
+        "Pin D2 cannot take an interrupt"
+      ],
+      "answer": 0,
+      "explanation": "Because the counter changes inside the interrupt, it must be volatile; otherwise the compiler may keep the value in a register and always read the old value in loop(). The place for attachInterrupt is setup(), D2 is an interrupt pin on the Uno, and RISING is the right edge for counting.",
+      "skills": [
+        "rob-interrupt-count",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h4d91-q4",
+      "kind": "mcq",
+      "prompt": "The robot was given the stop command at 97 ticks, but the counter ends up showing 98. What is the real reason for this?",
+      "options": [
+        "The counter code is wrong",
+        "The motor does not stop instantly when told to; it slides and turns one more tick, and the counter counts that too",
+        "The encoder disc has the wrong number of slots",
+        "The interrupt counted one tick twice"
+      ],
+      "answer": 1,
+      "explanation": "Because of the inertia of the motor and the robot, the wheel turns a little more after the stop command. The counter counts the real rotation correctly; the measured distance ends up a small amount more than requested. Neither the code nor the disc is wrong.",
+      "skills": [
+        "rob-encoder",
+        "rob-interrupt-count"
+      ]
+    },
+    {
+      "id": "m5h4d91-q5",
+      "kind": "predict-output",
+      "prompt": "What does this code print on the Serial monitor? (tick distance 1.037 cm)\n\n```\nconst float TIK_CM = 2 * PI * 3.3 / 20;\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println((int)(30.0 / TIK_CM + 0.5));\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "28",
+        "29",
+        "30",
+        "31"
+      ],
+      "answer": 1,
+      "explanation": "30 / 1.0367 = 28.94; adding 0.5 gives 29.44, and the (int) conversion cuts it to 29. This is the pattern for rounding a target distance to the nearest whole number of ticks.",
+      "skills": [
+        "rob-ticks-distance",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -61,6 +61,8 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
   const wkTitle = weekTitle(slug, ctx.week.position, ctx.week.title, locale)
   // Arayüz İngilizceyse ve dersin İngilizcesi varsa onu; yoksa Türkçe adımlar + küçük not
   const english = locale === 'en' && !!ctx.lesson.stepsEn?.length
+  // Klasik dersin İngilizcesi (content_en): arayüz İngilizceyse ve çeviri varsa
+  const en = locale === 'en' ? ctx.lesson.contentEn ?? null : null
   const steps = english ? ctx.lesson.stepsEn : ctx.lesson.steps
   if (steps?.length && !classic) {
     return (
@@ -81,18 +83,18 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
 
   return (
     <>
-      {locale === 'en' && <p className="lesson-lang-note" role="note">{t('common.lessonOnlyTurkish')}</p>}
+      {locale === 'en' && !en && <p className="lesson-lang-note" role="note">{t('common.lessonOnlyTurkish')}</p>}
       <LessonPlayer
         lesson={{
           id: ctx.lesson.id,
           title,
           durationMin: ctx.lesson.durationMin,
-          problem: ctx.lesson.problem ?? '',
-          contentMd: ctx.lesson.contentMd ?? '',
-          question: ctx.lesson.question ?? '',
-          explainerMd: ctx.lesson.explainerMd ?? null,
-          concepts: ctx.lesson.concepts ?? null,
-          quiz: ctx.lesson.quiz ?? null,
+          problem: (en ?? ctx.lesson).problem ?? '',
+          contentMd: (en ?? ctx.lesson).contentMd ?? '',
+          question: (en ?? ctx.lesson).question ?? '',
+          explainerMd: en ? (en.explainerMd ?? null) : (ctx.lesson.explainerMd ?? null),
+          concepts: en ? (en.concepts ?? null) : (ctx.lesson.concepts ?? null),
+          quiz: en ? (en.quiz ?? null) : (ctx.lesson.quiz ?? null),
         }}
         moduleTitle={modTitle}
         moduleSlug={ctx.module.slug}

@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Bang-bang control",
+      "definition": "A type of control where the output is only one of a few fixed options, with no values in between.",
+      "example": "In line following the options are turn left, go straight, turn right; a thermostat is also either fully on or fully off.",
+      "pitfall": "Driving too fast: the robot crosses the line before it starts turning, and bang-bang cannot keep up."
+    },
+    {
+      "term": "Zigzag",
+      "definition": "The robot drifting to each side of the line in turn; the natural result of bang-bang control.",
+      "example": "With only the middle sensor, the robot can never go straight and keeps turning right and left; with five sensors the zigzag shrinks a lot.",
+      "pitfall": "Thinking the zigzag is a bug; in bang-bang it is expected, and the aim is to keep it small."
+    },
+    {
+      "term": "Memory of the last direction (sonYon)",
+      "definition": "A variable that holds which side the line was last seen on: −1 left, 0 middle, +1 right.",
+      "example": "If the line is seen on a left sensor and then disappears, the robot keeps turning left.",
+      "pitfall": "Resetting sonYon when the line is not seen; the memory is wiped and the robot goes straight and misses the bend."
+    },
+    {
+      "term": "Hysteresis (two thresholds)",
+      "definition": "Stopping a decision from flickering by using an upper threshold to switch on and a separate lower threshold to switch off.",
+      "example": "Switch on at 600, switch off at 420: even if the reading wobbles between 500 and 550, the decision stays the same.",
+      "pitfall": "Choosing the two thresholds too close together; if the noise is larger than the gap between them, the flicker goes on."
+    },
+    {
+      "term": "Line lost time",
+      "definition": "The total time during which no sensor sees the line; a measure of how well a line follower holds the line.",
+      "example": "In the simulation the program with memory loses about 3.9 s and the one without memory about 12 s.",
+      "pitfall": "Looking only at the lap time; a robot that is fast but keeps losing the line is really out of control."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d3-q1",
+      "kind": "mcq",
+      "prompt": "Why can a bang-bang robot that uses only the middle sensor (if I am on the line turn right, if not turn left) never go straight?",
+      "options": [
+        "Because the motors can only turn in one direction",
+        "Because five sensors are not connected, the robot cannot find its way",
+        "Because the threshold value is always calculated wrongly",
+        "The rule has only two outputs (turn right, turn left); there is no \"go straight\" option at all"
+      ],
+      "answer": 3,
+      "explanation": "A bang-bang output is limited to the options the rule offers. A single sensor can only say \"I am on the line / I am not\", which gives two options, and both of them turn. To go straight, you need extra sensors that can tell the line is in the middle, and a third rule.",
+      "skills": [
+        "rob-bangbang"
+      ]
+    },
+    {
+      "id": "m5h3d3-q2",
+      "kind": "predict-output",
+      "prompt": "Steps: 1 = line seen on the left, 2 = in the middle, 3 = on the right, 0 = no sensor sees it. What does this code print?\n\n```\nint sonYon = 0;\nint adim[] = {1, 0, 0, 2, 0, 3, 0};\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 7; i++) {\n    if (adim[i] == 1) sonYon = -1;\n    else if (adim[i] == 3) sonYon = 1;\n    else if (adim[i] == 2) sonYon = 0;\n    Serial.print(sonYon + 1);\n  }\n  Serial.println();\n}\nvoid loop() {}\n```",
+      "options": [
+        "0111121",
+        "0001122",
+        "0001111",
+        "0001021"
+      ],
+      "answer": 1,
+      "explanation": "sonYon becomes −1, −1, −1, 0, 0, 1, 1 in turn; adding +1 gives 0001122. Step 0 (no line) does not change sonYon: that is the memory. In a version without memory, sonYon would be reset at every 0 step and 0111121 would come out.",
+      "skills": [
+        "rob-line-memory",
+        "rob-bangbang"
+      ]
+    },
+    {
+      "id": "m5h3d3-q3",
+      "kind": "numeric",
+      "prompt": "The LED is off at the start. A two-threshold decision: it switches on when the value goes above 600, switches off when it drops below 420, and keeps its state in between. The values read in order are: 300, 620, 560, 450, 500, 430, 610, 580, 410, 400. How many times does the LED change state?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "times",
+      "explanation": "It switches on at 620 (1). Through 560, 450, 500, 430, 610, 580 it never drops below 420 and does not need switching on again; the LED stays on. It switches off at 410 (2). 400 is already off. With a single threshold (512) it would change 4 times in the same sequence: 620, 450, 610, 410.",
+      "skills": [
+        "rob-line-memory"
+      ]
+    },
+    {
+      "id": "m5h3d3-q4",
+      "kind": "find-bug",
+      "prompt": "The robot does well on a straight line, but in a bend, when the line disappears, it always goes straight and misses the bend. Which part is wrong?\n\n```\nif (sol) {\n  sonYon = -1;\n} else if (sag) {\n  sonYon = 1;\n} else {\n  sonYon = 0;\n}\n```",
+      "options": [
+        "The sol variable should be s[0] && s[1]",
+        "The sonYon variable should not be an int; it should be a bool",
+        "The last else also sets sonYon to 0 when no sensor sees the line; the memory is wiped. It should be `else if (orta)`",
+        "The parameter order of the motor() function is the wrong way round"
+      ],
+      "answer": 2,
+      "explanation": "When the line disappears, sol and sag are false and the last else runs: sonYon goes back to 0 and the robot thinks \"the line was in the middle\" and goes straight. The purpose of the memory is to keep the old value in this case; `else if (orta) sonYon = 0;` should be written, for when only the middle sensor sees the line. The other options do not explain the symptom of the bug.",
+      "skills": [
+        "rob-line-memory",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d3-q5",
+      "kind": "mcq",
+      "prompt": "Which of these is a two-threshold (hysteresis) decision?",
+      "options": [
+        "If the reading is greater than 512 switch on, otherwise switch off",
+        "Switch on when the reading goes above 600, switch off when it drops below 420; keep the old state in between",
+        "Take a reading every 100 ms and always switch on",
+        "Take the average of three sensors and compare it with a threshold"
+      ],
+      "answer": 1,
+      "explanation": "What sets hysteresis apart is that the switch-on and switch-off thresholds are different, and the old decision is kept in the region between them. The first option is a single threshold and flickers near it; the third and fourth options are about sampling and averaging.",
+      "skills": [
+        "rob-line-memory"
+      ]
+    }
+  ]
+}

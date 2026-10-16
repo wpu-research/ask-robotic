@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "on start and forever",
+      "definition": "on start runs once, while forever keeps repeating until you stop it.",
+      "example": "The greeting text goes inside on start, the heartbeat inside forever.",
+      "pitfall": "Putting the text inside forever: it scrolls again in every round and spoils the heartbeat."
+    },
+    {
+      "term": "Rhythm",
+      "definition": "The series of pause times in a movement; their total is the time of one round.",
+      "example": "Pauses of 150, 100, 150 and 400 ms give a heartbeat round of 800 ms.",
+      "pitfall": "Leaving out the pauses in between; you cannot tell the big and the small heart apart."
+    },
+    {
+      "term": "Brightness",
+      "definition": "The set screen brightness block sets the light of the LEDs between 0 (off) and 255 (brightest).",
+      "example": "When you set the brightness to 200, the screen is turned down a little.",
+      "pitfall": "Setting the brightness to 0 and thinking the program is broken; the screen works, but it is dark."
+    },
+    {
+      "term": "Number of rounds and speed",
+      "definition": "The shorter one round is, the more rounds are done in the same time; the number of rounds per minute is 60 000 / round time.",
+      "example": "With an 800 ms round, there are about 75 rounds a minute.",
+      "pitfall": "Thinking the time is in seconds; pause blocks are in milliseconds."
+    },
+    {
+      "term": "Plan table",
+      "definition": "A small table that writes down the project step by step (which part, which job).",
+      "example": "Step 1: set the brightness, step 2: show the text, step 3: beat the heart inside forever.",
+      "pitfall": "Starting without a plan; dragging blocks at random and forgetting where they belong."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d5-q1",
+      "kind": "numeric",
+      "prompt": "In the beating heart, the pauses are 150, 100, 150 and 400 ms in order. What is the total pause time of one heartbeat round in milliseconds?",
+      "answer": 800,
+      "unit": "ms",
+      "explanation": "150 + 100 + 150 + 400 = 800 ms. The drawing blocks do not wait, so only the pause blocks decide the round time.",
+      "skills": [
+        "mk-timing",
+        "mk-planning"
+      ]
+    },
+    {
+      "id": "m10h1d5-q2",
+      "kind": "numeric",
+      "prompt": "If one round takes 800 ms, about how many times does the heart beat in 1 minute (60 000 ms)? (Count each round as one beat.)",
+      "answer": 75,
+      "tolerance": 2,
+      "unit": "rounds",
+      "explanation": "60 000 / 800 = 75 rounds. On the actual virtual card, the forever block takes a breather of about 20 ms at the end of every round; so in practice there are about 73 rounds, and a small difference is accepted.",
+      "skills": [
+        "mk-timing",
+        "mk-repeat"
+      ]
+    },
+    {
+      "id": "m10h1d5-q3",
+      "kind": "predict-output",
+      "prompt": "The greeting text has been put in the forever block by mistake. What happens when this program runs?\n\n```\ncard.forever(() => {\n  screen.showText(\"Sev\");\n  screen.showIcon(\"heart\");\n  wait(500);\n});\n```",
+      "options": [
+        "The text scrolls once, then the heart is visible all the time",
+        "Only the text scrolls; the heart does not appear",
+        "The heart is visible for half a second, then the text scrolls again; this goes on and on",
+        "The program shows an error and stops"
+      ],
+      "answer": 2,
+      "explanation": "Everything in the forever block runs again in every round. The text scrolls for about 2 seconds, then the heart is visible for 500 ms, and the round starts again. That is why the text needs to go in the on start block. The program does not show an error.",
+      "skills": [
+        "mk-flow",
+        "mk-repeat"
+      ]
+    },
+    {
+      "id": "m10h1d5-q4",
+      "kind": "find-bug",
+      "prompt": "Zeynep cannot see anything on the screen while the heartbeat is running.\n\n```\n1  card.onStart(() => {\n2    screen.setBrightness(0);\n3    screen.showText(\"Sev\");\n4  });\n```\n\nWhich line is the problem on?",
+      "options": [
+        "Line 3: the text is too short",
+        "Line 1: forever is needed instead of onStart",
+        "Line 4: there is one closing bracket too many",
+        "Line 2: brightness 0 makes the screen dark; a value between 0 and 255 that is greater than zero is needed"
+      ],
+      "answer": 3,
+      "explanation": "If the brightness is 0, the LEDs stay dark even when something is drawn. The program is not broken; raising the number is enough (for example 200). The start block is in the right place, and the length of the text does not affect whether it is visible.",
+      "skills": [
+        "mk-debug",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d5-q5",
+      "kind": "mcq",
+      "prompt": "You want a faster beat, like the heart of someone who is running. What should you do?",
+      "options": [
+        "Make the pause times longer",
+        "Make the pause times shorter",
+        "Set the brightness to 255",
+        "Change the heart icon to the small heart"
+      ],
+      "answer": 1,
+      "explanation": "The round time is the total of the pause blocks; if it gets shorter, more rounds are done in the same time and the heart speeds up. Making them longer slows it down. The brightness and the choice of icon affect the picture, not the rhythm.",
+      "skills": [
+        "mk-timing",
+        "mk-planning"
+      ]
+    }
+  ]
+}

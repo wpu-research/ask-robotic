@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Agent",
+      "definition": "A system that moves step by step towards a goal by calling tools and observing the results.",
+      "example": "Finding the number of groups by searching for the number of members and the group size, then dividing.",
+      "pitfall": "Thinking an agent is a \"smarter chatbot\"; the difference is the loop it builds with tools instead of giving one answer."
+    },
+    {
+      "term": "Think-act-observe loop",
+      "definition": "Choose the next step, call the tool, read the result, decide whether you are done.",
+      "example": "ara -> ara -> hesapla -> bitir: a four-step loop.",
+      "pitfall": "Not setting an end condition; the loop can go on for ever."
+    },
+    {
+      "term": "`$son`",
+      "definition": "The result of the latest successful step (`son` means \"last\"); $n is the result of step n.",
+      "example": "After `ara(üye sayısı)`, `hesapla($son/4)` gives 24/4 = 6.",
+      "pitfall": "Using $n after a failed step too carries an error text instead of a number."
+    },
+    {
+      "term": "Knowledge base",
+      "definition": "In the workshop, the small hand-made key-value list that the `ara()` tool looks in.",
+      "example": "It returns 24 for `üye sayısı` (number of members) and 4 for `grup büyüklüğü` (group size).",
+      "pitfall": "Thinking a query that is not in the list will find an answer; it returns `bulunamadı` (not found)."
+    },
+    {
+      "term": "Scripted agent",
+      "definition": "An agent whose decisions are written in advance; the \"model step\" in the workshop is an example of this and is not a real model.",
+      "example": "The thought texts in the ready-made \"scripted demo\" were written by hand.",
+      "pitfall": "Thinking the script will change its plan by itself based on the observation; it does not."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h6d27-q1",
+      "kind": "mcq",
+      "prompt": "Which is the correct order of the agent loop?",
+      "options": [
+        "Finish, think, act, observe",
+        "Act, think, finish, observe",
+        "Think, act, observe, check whether you are done; if not, go back to the start",
+        "Observe, finish, think, act"
+      ],
+      "answer": 2,
+      "explanation": "The agent first chooses the next step (think), calls the tool (act), reads the result (observe) and asks whether it is done. If not, the loop repeats; finish only comes at the end.",
+      "skills": [
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d27-q2",
+      "kind": "predict-output",
+      "prompt": "In the knowledge base world (`üye sayısı` = 24) this script runs:\n```\nara(üye sayısı)\nhesapla($son/4)\nbitir($son)\n```\nWhich answer does the agent finish with?",
+      "options": [
+        "24",
+        "`bulunamadı`",
+        "6",
+        "Error: $son is undefined"
+      ],
+      "answer": 2,
+      "explanation": "`ara` gives 24; $son = 24, `hesapla` gives 24/4 = 6 and $son becomes 6. `bitir($son)` finishes with 6. 24 is only the first observation; $son is updated on every successful step.",
+      "skills": [
+        "agent-loop",
+        "agent-tools"
+      ]
+    },
+    {
+      "id": "m7h6d27-q3",
+      "kind": "numeric",
+      "prompt": "In the workshop this script runs (world: calculator):\n```\ntekrar 3: hesapla(1+1)\nbitir($son)\n```\nHow many tool calls (steps) does the agent make in total?",
+      "answer": 4,
+      "tolerance": 0,
+      "unit": "steps",
+      "explanation": "The line `tekrar 3` (\"repeat 3\") runs the call `hesapla(1+1)` 3 times (3 steps), and `bitir` adds one more step: 4 in total. `bitir($son)` finishes with 2.",
+      "skills": [
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d27-q4",
+      "kind": "find-bug",
+      "prompt": "In the knowledge base world, an agent wants to multiply the number of stars by two:\n```\nara(yıldız sayısı)\nhesapla($1*2)\nbitir($2)\n```\nThe final answer is a meaningless error text. What is the real problem?",
+      "options": [
+        "`ara` cannot be used in this world",
+        "`dur()` should be used instead of `bitir`",
+        "The multiplication sign is wrong",
+        "The first step gave a `bulunamadı` (not found) observation, and the script used it in the next steps without checking it"
+      ],
+      "answer": 3,
+      "explanation": "There is no `yıldız sayısı` (number of stars) in the knowledge base, so `ara` returns `bulunamadı`. The script does not notice that this observation failed and passes $1 to `hesapla`; the calculator finds no number and the chain of errors goes on until `bitir`. `ara` exists in this world, and the multiplication is correct.",
+      "skills": [
+        "agent-loop",
+        "agent-limits"
+      ]
+    },
+    {
+      "id": "m7h6d27-q5",
+      "kind": "mcq",
+      "prompt": "What is the main difference between an agent that uses a real language model and the scripted agent in the workshop?",
+      "options": [
+        "The scripted agent's tools are fake, the real agent's tools are real",
+        "A real agent can choose each step by looking at the observations and change its plan; in the script the lines are written in advance",
+        "The scripted agent never gives an error",
+        "A real agent does not use tools"
+      ],
+      "answer": 1,
+      "explanation": "The tools in the workshop do real calculations; the limitation is in who decides. In a real agent the model decides based on the observation, while in the script the decision is written in advance. A script can give errors too (not found, multiplication).",
+      "skills": [
+        "agent-loop",
+        "agent-tools"
+      ]
+    }
+  ]
+}

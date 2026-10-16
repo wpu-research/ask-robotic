@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Human in the loop",
+      "definition": "A design in which the model makes a suggestion and a human approves the final decision.",
+      "example": "The model prepares the message, and you read it before sending.",
+      "pitfall": "Reducing the human's approval to pressing \"OK\" without reading the output."
+    },
+    {
+      "term": "Safe default",
+      "definition": "When the system is not sure, it stops or asks a human.",
+      "example": "If the confidence is 0.55 and the threshold is 0.80, \"ask a human\".",
+      "pitfall": "Applying it automatically even when it is not sure."
+    },
+    {
+      "term": "Audit trail",
+      "definition": "A record of what was done, and why; it can be reviewed later.",
+      "example": "The robot writes down every decision to stop, together with the reason.",
+      "pitfall": "Only recording the result and not writing the reason."
+    },
+    {
+      "term": "Reversibility",
+      "definition": "A wrong decision being easy to fix.",
+      "example": "If a music suggestion is wrong, you skip to the next one.",
+      "pitfall": "Thinking every decision can be undone, and leaving irreversible decisions such as braking automatic."
+    },
+    {
+      "term": "Responsibility",
+      "definition": "The duty to answer for the outcomes; it is carried not by the model but by the people who use and build it.",
+      "example": "A team cannot hand over responsibility for a wrong output by saying \"the model said so\".",
+      "pitfall": "Saying \"the model said so\"."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d4-q1",
+      "kind": "mcq",
+      "prompt": "Which of these is an example of a \"human in the loop\" design?",
+      "options": [
+        "The model sends the answer straight to everyone",
+        "The model writes an email draft, and you read it and press send",
+        "The model makes the decision, and nobody keeps a record",
+        "A human never sees the output at any stage"
+      ],
+      "answer": 1,
+      "explanation": "The model prepares the draft, and a human reads and approves it. In a human-in-the-loop design, the final decision is with the human. The model applying the decision directly, or the human never seeing it, is the opposite of this design.",
+      "skills": [
+        "ai-human-oversight"
+      ]
+    },
+    {
+      "id": "m7h8d4-q2",
+      "kind": "numeric",
+      "prompt": "A system makes 500 decisions a day, and its error rate in the eval came out at 2%. What is the expected number of wrong decisions per day?",
+      "answer": 10,
+      "tolerance": 0,
+      "unit": "decisions",
+      "explanation": "500 x 0.02 = 10. Even if the percentage looks small, the daily number of wrong decisions may not be acceptable for jobs where the harm is large.",
+      "skills": [
+        "ai-risk-assess",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d4-q3",
+      "kind": "mcq",
+      "prompt": "Which of these decisions needs the most human oversight?",
+      "options": [
+        "A music playlist suggestion",
+        "A wallpaper suggestion",
+        "A robot arm moving next to a person",
+        "An app's colour theme"
+      ],
+      "answer": 2,
+      "explanation": "The decision for a robot arm to move next to a person both carries a risk of irreversible harm and affects someone else. A music playlist, a colour choice or a wallpaper suggestion can easily be fixed if it is wrong.",
+      "skills": [
+        "ai-risk-assess",
+        "ai-human-oversight"
+      ]
+    },
+    {
+      "id": "m7h8d4-q4",
+      "kind": "predict-output",
+      "prompt": "What does this code print when it runs?\n\n```\nguven = 0.55\nesik = 0.80\nif guven >= esik:\n    print(\"otomatik uygula\")\nelse:\n    print(\"insana sor\")\n```",
+      "options": [
+        "otomatik uygula",
+        "insana sor",
+        "0.55",
+        "It gives an error"
+      ],
+      "answer": 1,
+      "explanation": "0.55 >= 0.80 is false, so the else branch runs and `insana sor` (\"ask a human\") is printed. If the confidence is below the threshold, the safe default is to ask a human.",
+      "skills": [
+        "ai-human-oversight",
+        "ai-safety-layer"
+      ]
+    },
+    {
+      "id": "m7h8d4-q5",
+      "kind": "find-bug",
+      "prompt": "This function should limit the speed so that it does not go above 30, but print shows 80. Which line is wrong?\n\n```\ndef hiz_ayarla(model_hizi):\n    # güvenli üst sınır: 30\n    return model_hizi\nprint(hiz_ayarla(80))\n```",
+      "options": [
+        "`def hiz_ayarla(model_hizi):`",
+        "`# güvenli üst sınır: 30`",
+        "`return model_hizi`",
+        "`print(hiz_ayarla(80))`"
+      ],
+      "answer": 2,
+      "explanation": "The limit is only written in the comment line (\"safe upper limit: 30\"); it is not applied in the code. It should have been return min(model_hizi, 30). A hard limit must be applied independently of the model's output.",
+      "skills": [
+        "ai-safety-layer",
+        "prog-debug"
+      ]
+    }
+  ]
+}

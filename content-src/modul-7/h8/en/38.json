@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Rule",
+      "definition": "A clear, fixed decision step that goes from input to action.",
+      "example": "\"If the remaining distance is less than 50 cm, stop.\"",
+      "pitfall": "Trying to tie every job to a rule; jobs such as image recognition are very hard to write as rules."
+    },
+    {
+      "term": "Learned model",
+      "definition": "A system that learns its decision rules from data; for example a vision model that recognises obstacles from a camera.",
+      "example": "Predicting whether there is a person in a camera image.",
+      "pitfall": "Assuming it cannot be wrong and that its reasons can be explained."
+    },
+    {
+      "term": "Deterministic",
+      "definition": "Giving the same result every time with the same input.",
+      "example": "The script and the tools in the workshop always give the same result for the same script.",
+      "pitfall": "Thinking a real model-based decision will always be the same too."
+    },
+    {
+      "term": "Threshold",
+      "definition": "The boundary value at which a condition becomes true or false.",
+      "example": "In the line `eğer $son < 50: dur()` the threshold is 50.",
+      "pitfall": "Choosing the threshold without taking the step size into account; the robot can jump over the threshold."
+    },
+    {
+      "term": "Hard limit",
+      "definition": "A safety rule that is independent of the model, runs after it and cannot be broken.",
+      "example": "A layer that blocks the command 20 cm from the wall even if the model says \"forward\".",
+      "pitfall": "Writing the safety rule into the model's prompt and thinking that is enough."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d3-q1",
+      "kind": "predict-output",
+      "prompt": "In the virtual corridor the wall is 100 cm away. When this script runs, what is the agent's final answer (`bitir`)?\n\n```\nileri(30)\nileri(30)\nmesafe()\neğer $son < 50: dur()\nbitir($son)\n```",
+      "options": [
+        "40",
+        "60",
+        "`ÇARPTI` (crashed)",
+        "durdu"
+      ],
+      "answer": 3,
+      "explanation": "After two steps the robot has moved 60 cm; `mesafe()` gives 40. Since 40 < 50 is true, `dur()` runs and its result is `durdu` (\"stopped\"). $son is the result of the latest successful call; that is why `bitir($son)` gives `durdu`, not 40.",
+      "skills": [
+        "ai-agent-script",
+        "ai-rule-vs-model"
+      ]
+    },
+    {
+      "id": "m7h8d3-q2",
+      "kind": "numeric",
+      "prompt": "The wall is 100 cm away. The robot takes 35 cm steps; after each step it measures the remaining distance and stops if less than 50 cm remains. How many cm has the robot moved when it stops?",
+      "answer": 70,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "First step: it moved 35 cm, 65 remain (not less than 50). Second step: it has moved 70 cm, 30 < 50 remain; the robot stops. The answer is 70.",
+      "skills": [
+        "ai-rule-vs-model",
+        "ai-agent-script"
+      ]
+    },
+    {
+      "id": "m7h8d3-q3",
+      "kind": "find-bug",
+      "prompt": "The wall is 100 cm away, and the robot should stop when the remaining distance drops below 30 cm, but it hits the wall. Which line is wrong?\n\n```\nileri(40)\nileri(40)\nmesafe()\neğer $son > 30: dur()\nileri(40)\n```",
+      "options": [
+        "`ileri(40)` (line 1)",
+        "`mesafe()` (line 3)",
+        "`eğer $son > 30: dur()` (line 4)",
+        "`ileri(40)` (line 5)"
+      ],
+      "answer": 2,
+      "explanation": "After two steps the distance is 20. The condition says \"stop if greater\"; 20 > 30 is false, so `dur()` does not run and the last `ileri(40)` crashes the robot into the wall. The condition should be '<'. The other lines are correctly written steps that the rule needs to work.",
+      "skills": [
+        "ai-agent-script",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m7h8d3-q4",
+      "kind": "mcq",
+      "prompt": "A language model translated the command \"go forward\" for the robot, but there is a wall in front of it. Where should the rule that protects the robot live?",
+      "options": [
+        "Only inside the model's prompt",
+        "In a separate hard-limit layer that works independently of the model",
+        "Only in the user's attention",
+        "Nowhere; the model makes the right decision anyway"
+      ],
+      "answer": 1,
+      "explanation": "The safety limit must be outside the model, in a layer that runs after the model's output. A model can be wrong or be steered; a rule behaves the same way every time. A rule kept in the model's own prompt gives no guarantee.",
+      "skills": [
+        "ai-safety-layer"
+      ]
+    },
+    {
+      "id": "m7h8d3-q5",
+      "kind": "mcq",
+      "prompt": "Why is the rule \"stop if the remaining distance is 40 cm\" a good choice for safety decisions?",
+      "options": [
+        "A rule is always better than a model at image recognition",
+        "A rule gives the same result for the same input and can be tested",
+        "A rule never makes mistakes and knows every situation",
+        "A rule is a magic solution that never needs writing or changing"
+      ],
+      "answer": 1,
+      "explanation": "A rule is predictable, testable and explainable; it gives the same result for the same input. This matters for safety. It is not true that a rule is always \"smarter\" than a model; for jobs such as image recognition, a model is more useful.",
+      "skills": [
+        "ai-rule-vs-model"
+      ]
+    }
+  ]
+}

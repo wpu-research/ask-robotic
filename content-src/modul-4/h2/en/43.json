@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Reed switch",
+      "definition": "A switch made of two metal reeds in a glass tube, whose contact closes when a magnet comes near.",
+      "example": "In a window alarm, the reed is stuck to the frame and the magnet to the window.",
+      "pitfall": "Thinking a particular pole of the magnet is needed; a plain reed closes for both poles."
+    },
+    {
+      "term": "Limit switch",
+      "definition": "A micro switch whose contact changes when a lever is pressed mechanically.",
+      "example": "In a 3D printer, when the axis reaches the end point it hits the lever and triggers a stop.",
+      "pitfall": "Thinking it is a special sensor; electrically it is an ordinary button."
+    },
+    {
+      "term": "Reading with INPUT_PULLUP",
+      "definition": "One pin of the switch is connected to the board pin and the other to GND; it reads LOW when the contact is closed and HIGH when it is open.",
+      "example": "pinMode(4, INPUT_PULLUP); kapali = (digitalRead(4) == LOW);",
+      "pitfall": "Forgetting the pull-up: when the contact is open, the pin floats and the reading is random."
+    },
+    {
+      "term": "NO and NC",
+      "definition": "NO (normally open) closes when pressed; NC (normally closed) opens when pressed.",
+      "example": "If an alarm door contact is connected as NC, a broken wire also opens the contact and sets off the alarm.",
+      "pitfall": "Mixing up NO and NC: the logic works the wrong way round, or a broken wire goes unnoticed."
+    },
+    {
+      "term": "Contact bounce",
+      "definition": "As a mechanical contact closes, it opens and closes for a moment, and one event looks like several events.",
+      "example": "When the door rattles, the reed can give LOW-HIGH-LOW for a moment.",
+      "pitfall": "Not adding debounce: false events and false alarms are produced."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d3-q1",
+      "kind": "mcq",
+      "prompt": "One pin of the reed switch is connected to D4, the other to GND, and the pin is INPUT_PULLUP. What does digitalRead(4) give when a magnet comes near the reed?",
+      "options": [
+        "HIGH",
+        "The reading is unstable, random",
+        "LOW",
+        "About 2.5 V and undefined"
+      ],
+      "answer": 2,
+      "explanation": "The magnet closes the contact, the pin is connected to GND and reads LOW. When the magnet is far away the contact is open and the internal pull-up pulls the pin to 5 V (HIGH). A plain reed does not care which pole of the magnet comes near.",
+      "skills": [
+        "sensor-contact"
+      ]
+    },
+    {
+      "id": "m4h2d3-q2",
+      "kind": "mcq",
+      "prompt": "You connected the door contact as NC and applied the rule \"contact opened = breach\". A burglar cuts the contact's wire without touching the door. What happens?",
+      "options": [
+        "Nothing happens, the system thinks the door is closed",
+        "The pin reads LOW and the system thinks the door is closed",
+        "The pin reads HIGH and the system counts it as a breach",
+        "The Arduino restarts"
+      ],
+      "answer": 2,
+      "explanation": "When the wire breaks, the circuit opens, the pin reads HIGH thanks to INPUT_PULLUP, and the system sees this as the contact opening, that is, a breach. The alarm sounds. If the contact were connected as NO and the rule were \"breach when the contact closes\", a cut wire would change nothing and the system would stay silent.",
+      "skills": [
+        "design-failsafe",
+        "sensor-contact"
+      ]
+    },
+    {
+      "id": "m4h2d3-q3",
+      "kind": "numeric",
+      "prompt": "In the reed_kapi sketch, KARARLI_MS = 20. As the reed closes, the raw reading changes like this at 1 ms intervals: LOW at t = 0, HIGH at 3, LOW at 6, HIGH at 9, LOW at 12, and then it stays LOW. At which millisecond does the program accept the door as \"closed\"?",
+      "answer": 32,
+      "tolerance": 1,
+      "unit": "ms",
+      "explanation": "sonDegisim is refreshed at every raw change. The last change is at t = 12 and the value must stay the same for 20 ms: 12 + 20 = 32 ms. Before that, no value stays stable for 20 ms, so there is no early acceptance.",
+      "skills": [
+        "prog-debounce",
+        "sensor-contact"
+      ]
+    },
+    {
+      "id": "m4h2d3-q4",
+      "kind": "predict-output",
+      "prompt": "In the lab, the Magnet nearby box starts unticked. After the program has printed two lines, you tick the box. What do you see in the four lines in total?\n\n```\nvoid setup() {\n  pinMode(4, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(digitalRead(4) ? \"acik\" : \"kapali\");\n  delay(500);\n}\n```",
+      "options": [
+        "kapali, kapali, acik, acik",
+        "acik, acik, kapali, kapali",
+        "acik all the time",
+        "kapali all the time"
+      ],
+      "answer": 1,
+      "explanation": "While unticked, the contact is open, the pin reads HIGH (the expression counts as true) and \"acik\" (open) is printed. When the box is ticked, the contact closes, the pin goes LOW (the expression counts as false) and \"kapali\" (closed) is printed. The order: acik, acik, kapali, kapali.",
+      "skills": [
+        "sensor-contact",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d3-q5",
+      "kind": "find-bug",
+      "prompt": "One pin of the reed is on D4 and the other on GND. Even though the magnet is far away, the LED now and then flickers on by itself. Which line is the problem?\n\n```\nconst int REED = 4;\n\nvoid setup() {\n  pinMode(REED, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, digitalRead(REED) == LOW);\n}\n```",
+      "options": [
+        "const int REED = 4;",
+        "pinMode(REED, INPUT);",
+        "pinMode(13, OUTPUT);",
+        "digitalWrite(13, digitalRead(REED) == LOW);"
+      ],
+      "answer": 1,
+      "explanation": "When the reed is open, the pin is not connected to anything (a floating input) and the reading is random. `INPUT_PULLUP` pulls the pin to 5 V when the contact is open. The comparison (`== LOW` means the contact is closed) is correct.",
+      "skills": [
+        "sensor-contact",
+        "prog-debug"
+      ]
+    }
+  ]
+}

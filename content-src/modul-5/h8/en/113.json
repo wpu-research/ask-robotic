@@ -1,0 +1,118 @@
+{
+  "concepts": [
+    {
+      "term": "State machine (integration)",
+      "definition": "A decision layer in which a single behaviour runs in each state and transitions depend on a sensor or time condition.",
+      "example": "The CIZGI_IZLE, SERBEST, SOLA_DON, YANA_GIT, SAGA_DON and BITTI states run path A.",
+      "pitfall": "Using `delay()` inside states: sensing stops and the robot is left blind."
+    },
+    {
+      "term": "Test matrix",
+      "definition": "A table made of scenario, expected result and measured result columns.",
+      "example": "T5: for \"the target suddenly disappears\", the expected result is \"moves less than 3 cm\".",
+      "pitfall": "Writing the expected column after measuring and talking yourself into the result."
+    },
+    {
+      "term": "Safe default (fail-safe)",
+      "definition": "Switching off a dangerous output in a situation you cannot be sure about.",
+      "example": "In path C, if there is no target the motors stop at once; when the counter fills up, KAYIP is written.",
+      "pitfall": "Carrying on with \"the last known command\" when the target disappears."
+    },
+    {
+      "term": "State start time",
+      "definition": "The `millis()` value recorded at every transition; timed states are counted with it.",
+      "example": "`durumBasla = millis();` is written inside `durumDegis()`.",
+      "pitfall": "Not resetting the timer: the next state ends at once."
+    },
+    {
+      "term": "Transferring a tuning",
+      "definition": "A gain (such as KP) being valid only for the set-up on which it was found.",
+      "example": "When the sensor spacing goes from 2.0 cm to 2.4 cm, KP should drop from 55 to 55 / 1.2 ≈ 46.",
+      "pitfall": "Copying a number found on another set-up as it is."
+    },
+    {
+      "term": "Step-limited movement",
+      "definition": "The arm's joints moving at most a certain angle in each period.",
+      "example": "At 1.5° / 20 ms, a 90° movement takes 60 steps, that is, 1200 ms.",
+      "pitfall": "Going to the target by jumping: the servo draws current, the arm jolts and the part falls."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d3-q1",
+      "kind": "mcq",
+      "prompt": "When should the \"expected\" column of the test matrix be filled in?",
+      "options": [
+        "After the measurement, by looking at the results",
+        "Before the measurement, starting from the criteria",
+        "Only when a test fails",
+        "It is never filled in; the measured column is enough"
+      ],
+      "answer": 1,
+      "explanation": "If the expected value is written before the measurement, the result confirms or disproves it. If it is written afterwards, it becomes easy to fit it to the result, and the matrix stops being proof.",
+      "skills": [
+        "bit-test-matrix"
+      ]
+    },
+    {
+      "id": "m5h8d3-q2",
+      "kind": "numeric",
+      "prompt": "In path A, KP = 55 was found with the line sensors 2.0 cm apart. In the arena the spacing is 2.4 cm. If the gain is reduced in the same proportion, what is the new KP (round to the nearest whole number)?",
+      "answer": 46,
+      "tolerance": 0.5,
+      "explanation": "The spacing grew by 2.4 / 2.0 = 1.2 times. 55 / 1.2 = 45.8 ≈ 46. The measurement in the arena also confirmed 46; 55, on the other hand, made it lose the line.",
+      "skills": [
+        "rob-tuning-transfer"
+      ]
+    },
+    {
+      "id": "m5h8d3-q3",
+      "kind": "numeric",
+      "prompt": "The robot arm moves each joint at most 1.5° every 20 ms. At least how many ms does it take to turn a joint 90°?",
+      "answer": 1200,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "90 / 1.5 = 60 steps. Because each step is 20 ms, 60 × 20 = 1200 ms. To make it faster, either the step is made bigger or the period smaller; both reduce the smoothness of the movement.",
+      "skills": [
+        "prog-timing",
+        "rob-fsm"
+      ]
+    },
+    {
+      "id": "m5h8d3-q4",
+      "kind": "predict-output",
+      "prompt": "The empty-measurement counter in path C works like this. What does it print when the code finishes?\n```\nbool hedefVar[] = {false, false, true, false, false, false};\nint bosSayac = 0;\nfor (int i = 0; i < 6; i++) {\n  if (hedefVar[i]) bosSayac = 0;\n  else bosSayac++;\n}\nSerial.println(bosSayac);\n```",
+      "options": [
+        "5",
+        "0",
+        "3",
+        "6"
+      ],
+      "answer": 2,
+      "explanation": "The counter goes like this: 1, 2, then 0 because the target was seen, then 1, 2, 3. The last value printed is 3. 5 is the total number of empty measurements; but the counter only counts empty ones IN A ROW. That is why a single full measurement prevents a false alarm (KAYIP).",
+      "skills": [
+        "rob-fsm",
+        "rob-failsafe",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d3-q5",
+      "kind": "find-bug",
+      "prompt": "Timed states are counted with `durumBasla`, but SOLA_DON, YANA_GIT and SAGA_DON end one after the other at once. There is a single bug in the code; which is it?\n```\nvoid durumDegis(Durum yeni) {\n  durum = yeni;\n}\n// ...\ncase YANA_GIT:\n  surus(TABAN, TABAN);\n  if (simdi - durumBasla >= YAN_MS) durumDegis(SAGA_DON);\n  break;\n```",
+      "options": [
+        "It should be `surus(0, 0)` instead of `surus(TABAN, TABAN)`",
+        "It should be `<=` instead of `>=`",
+        "There should be no `break` inside the `case`",
+        "There is no `durumBasla = millis();` inside `durumDegis`; the old timestamp counts as already run out"
+      ],
+      "answer": 3,
+      "explanation": "`durumBasla` is only assigned in the first state; in the later states the difference has long since gone past YAN_MS, so the transition happens at once. Adding `durumBasla = millis();` to the transition function fixes the problem. `<=`, on the other hand, would reverse the condition.",
+      "skills": [
+        "rob-fsm",
+        "prog-timing",
+        "prog-debug"
+      ]
+    }
+  ]
+}

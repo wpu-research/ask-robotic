@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Complementary filter",
+      "definition": "A filter that moves the angle forward with the gyroscope and pulls it a little towards the accelerometer angle every round: aci = α(aci + hiz·dt) + (1 − α)·ivmeAci.",
+      "example": "α = 0.98: 98% of the estimate comes from the gyroscope and 2% from the accelerometer.",
+      "pitfall": "Forgetting the gyroscope term (hiz·dt): the filter then only smooths the accelerometer and follows fast movements late."
+    },
+    {
+      "term": "α (alpha)",
+      "definition": "The share of trust given to the gyroscope. (1 − α) is the accelerometer's share; the two must add up to 1.",
+      "example": "When α grows, the angle gets smoother but the drift is corrected later; when it shrinks, accelerometer noise passes into the angle.",
+      "pitfall": "Choosing the α and (1 − α) shares so that they do not add up to 1: the filter swells up or dies away."
+    },
+    {
+      "term": "Time constant τ",
+      "definition": "The approximate time for the accelerometer's lasting information to show up in the angle: τ = α·dt / (1 − α).",
+      "example": "For α = 0.98 and dt = 0.01 s, τ = 0.49 s.",
+      "pitfall": "Thinking τ depends only on α: when dt changes, the effect of the same α changes too."
+    },
+    {
+      "term": "Initialising the filter",
+      "definition": "Starting the filter angle from the accelerometer angle in the first round removes the time needed to settle at the correct value.",
+      "example": "If the robot starts tilted by 15°, the filter starts at 15°, not at 0°.",
+      "pitfall": "Starting the angle from 0: the filter gives a wrong angle for several τ."
+    },
+    {
+      "term": "Kalman filter",
+      "definition": "Uses the same idea as the complementary filter, but works out the correction share (gain) itself at every step by looking at the uncertainty.",
+      "example": "If the measurement is noisy, the gain shrinks; if the estimate is uncertain, it grows.",
+      "pitfall": "Thinking Kalman is \"always better\": it needs matrix operations and settings; for simple robots the complementary filter is enough."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d2-q1",
+      "kind": "mcq",
+      "prompt": "The robot is standing on a floor with motor vibration. Which statement is true for the accelerometer and the gyroscope?",
+      "options": [
+        "The accelerometer can be trusted over a short time, the gyroscope over a long time",
+        "The gyroscope can be trusted over a short time, the accelerometer over a long time",
+        "Both can always be trusted equally",
+        "Vibration increases the gyroscope's long-term drift"
+      ],
+      "answer": 1,
+      "explanation": "Because the accelerometer is tied to gravity, it is correct on average, but it jumps with vibration. When the gyroscope's speed is added up, you get a smooth angle, but the bias builds up. That is why the filter uses the two on opposite time scales.",
+      "skills": [
+        "filter-complementary",
+        "imu-tilt"
+      ]
+    },
+    {
+      "id": "m5h6d2-q2",
+      "kind": "predict-output",
+      "prompt": "One step of the filter runs. What does this code print?\n\n```\nfloat aci = 10.0;\nfloat hiz = 20.0;        // °/s\nfloat dt = 0.01;         // s\nfloat ivmeAci = 12.0;\naci = 0.98 * (aci + hiz * dt) + 0.02 * ivmeAci;\nSerial.println(aci, 2);\n```",
+      "options": [
+        "10.24",
+        "10.20",
+        "12.00",
+        "9.80"
+      ],
+      "answer": 0,
+      "explanation": "First it moves forward with the gyroscope: 10 + 20·0.01 = 10.2; multiplied by 0.98 that is 9.996. The accelerometer share is 0.02·12 = 0.24. The total is 10.236, and with two decimals 10.24. 10.20 would be using only the gyroscope, 12.00 only the accelerometer.",
+      "skills": [
+        "filter-complementary"
+      ]
+    },
+    {
+      "id": "m5h6d2-q3",
+      "kind": "numeric",
+      "prompt": "The robot is still (real angle 0°), the accelerometer reads 0°, and the gyroscope has a bias of 2 °/s. α = 0.98 and dt = 0.01 s. After a long time, how many degrees does the filter show?",
+      "answer": 0.98,
+      "tolerance": 0.02,
+      "unit": "°",
+      "explanation": "In the steady state, the error is the bias times the time constant. τ = 0.98·0.01 / 0.02 = 0.49 s and error = 2·0.49 = 0.98°. A pure gyroscope integral, with the same bias, builds up 2° every second and never stops; the filter limits this growth.",
+      "skills": [
+        "filter-complementary",
+        "imu-gyro"
+      ]
+    },
+    {
+      "id": "m5h6d2-q4",
+      "kind": "find-bug",
+      "prompt": "This filter follows the angle late when the robot tilts fast, and behaves as if the gyroscope were not used. Which line is wrong?\n\n```\n1  float ivmeAci, hiz;\n2  imuOku(ivmeAci, hiz);\n3  aci = ALFA * aci + (1 - ALFA) * ivmeAci;\n```",
+      "options": [
+        "Line 1: ivmeAci and hiz should not be float",
+        "Line 2: imuOku should be called twice",
+        "Line 3: the hiz * dt term is missing; the filter only smooths the accelerometer",
+        "Line 3: ALFA and (1 - ALFA) should not add up to 1"
+      ],
+      "answer": 2,
+      "explanation": "The gyroscope speed is not used at all: the formula should have been ALFA * (aci + hiz * dt). As it is, it only takes a slow average of the accelerometer. ALFA and (1 - ALFA) already add up to 1; that is the correct part.",
+      "skills": [
+        "filter-complementary",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d2-q5",
+      "kind": "mcq",
+      "prompt": "In what way does the Kalman filter differ from the complementary filter?",
+      "options": [
+        "It does not use the gyroscope",
+        "It works only with the accelerometer",
+        "It needs less calculation",
+        "It works out the correction share itself at every step by looking at the uncertainty; in the complementary filter α is fixed"
+      ],
+      "answer": 3,
+      "explanation": "Both move forward with the gyroscope and correct with the measurement. In the complementary filter you choose α and it always stays the same; the Kalman gain, however, changes according to the uncertainty of the estimate and of the sensors. The cost is more calculation and more settings.",
+      "skills": [
+        "filter-complementary"
+      ]
+    }
+  ]
+}

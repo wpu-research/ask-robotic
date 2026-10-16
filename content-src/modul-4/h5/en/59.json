@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Gyroscope",
+      "definition": "A sensor that measures the rate of turn (°/s). To get an angle, the rate has to be added up over time.",
+      "example": "A chip turning at gy = 10 °/s for 3 seconds turns 30 degrees.",
+      "pitfall": "Thinking the gyroscope value is the angle itself."
+    },
+    {
+      "term": "Integral (angle = angle + rate x dt)",
+      "definition": "Finding the angle by multiplying the rate by small time steps and adding them up.",
+      "example": "With aci += gy * dt; dt is calculated in seconds.",
+      "pitfall": "Writing dt in milliseconds: the result is 1000 times too big."
+    },
+    {
+      "term": "Bias",
+      "definition": "The small constant value a still gyroscope shows. It is found by taking an average while the chip is not moving.",
+      "example": "If the bias is 2 °/s, a fake rotation of 20 degrees builds up in 10 seconds.",
+      "pitfall": "Moving the chip while measuring the bias: the bias is measured wrongly."
+    },
+    {
+      "term": "Complementary filter",
+      "definition": "A filter that adds the gyroscope and the accelerometer together with weights, trusting the gyroscope in the short run and the accelerometer in the long run.",
+      "example": "aci = 0.98 x (aci + gy x dt) + 0.02 x ivmeAci",
+      "pitfall": "Bringing ALFA very close to 1: the accelerometer has no effect and the drift comes back."
+    },
+    {
+      "term": "ALFA (alpha)",
+      "definition": "The weight given to the gyroscope in the filter. Usually 0.98.",
+      "example": "If ALFA = 0.98, every step is 98% gyroscope, 2% accelerometer.",
+      "pitfall": "Being surprised that vibration spoils the angle when ALFA is small."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d59-q1",
+      "kind": "numeric",
+      "prompt": "The chip is not moving at all on the table, but the gyroscope shows a bias of 1.5 °/s, and the angle is added up as rate x time without subtracting the bias. After 20 seconds, how many degrees has the calculated angle wandered away?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "degrees",
+      "explanation": "Drift = bias x time = 1.5 x 20 = 30 degrees. The angle wanders away even though the chip did not move; that is why the bias is measured and subtracted, and corrected with the accelerometer.",
+      "skills": [
+        "gyro-drift"
+      ]
+    },
+    {
+      "id": "m4h5d59-q2",
+      "kind": "mcq",
+      "prompt": "Which statement is true?",
+      "options": [
+        "The gyroscope is right in the long run; the accelerometer drifts",
+        "The accelerometer is noisy in the short run but does not drift in the long run; the gyroscope is good in the short run but drifts",
+        "Both drift in the long run",
+        "The accelerometer gives the rate of turn, and the gyroscope gives the angle directly"
+      ],
+      "answer": 1,
+      "explanation": "The accelerometer looks at gravity, so it does not drift, but it also measures vibration. The gyroscope measures the rate; it catches fast changes well, but the bias builds up. Combining the two is the complementary filter's job.",
+      "skills": [
+        "gyro-drift",
+        "complementary-filter"
+      ]
+    },
+    {
+      "id": "m4h5d59-q3",
+      "kind": "numeric",
+      "prompt": "One step of the complementary filter: previous aci = 10, corrected gy = 20 °/s, dt = 0.01 s, accelerometer angle = 12 and ALFA = 0.98. What is the new aci?",
+      "answer": 10.236,
+      "tolerance": 0.01,
+      "unit": "degrees",
+      "explanation": "aci + gy x dt = 10 + 0.2 = 10.2. 0.98 x 10.2 = 9.996 and 0.02 x 12 = 0.24. The total is 10.236. The gyroscope alone would give 10.2; the accelerometer pulls the result a little towards 12.",
+      "skills": [
+        "complementary-filter"
+      ]
+    },
+    {
+      "id": "m4h5d59-q4",
+      "kind": "predict-output",
+      "prompt": "The gyroscope of a still chip shows a bias of 2.0 °/s, and the bias is not subtracted. What does this code print?\n\n```\nfloat aci = 0;\nfloat gy = 2.0;\nfloat dt = 0.5;\nfor (int i = 0; i < 10; i++) {\n  aci += gy * dt;\n}\nSerial.println(aci, 1);\n```",
+      "options": [
+        "0.0",
+        "2.0",
+        "20.0",
+        "10.0"
+      ],
+      "answer": 3,
+      "explanation": "On every pass 2.0 x 0.5 = 1.0 is added, and after 10 passes it is 10.0. The angle wandered away by 10 degrees even though the chip never turned: the bias built up. If the bias had been subtracted, the result would be about 0.",
+      "skills": [
+        "gyro-drift"
+      ]
+    },
+    {
+      "id": "m4h5d59-q5",
+      "kind": "find-bug",
+      "prompt": "The filter angle is very different from what it should be, and it shoots off quickly during a rotation. Which line is wrong?\n\n```\nunsigned long simdi = micros();\nfloat dt = (simdi - sonUs) / 1000.0;\nsonUs = simdi;\naci = 0.98 * (aci + gy * dt) + 0.02 * acc;\n```",
+      "options": [
+        "unsigned long simdi = micros();",
+        "sonUs = simdi;",
+        "float dt = (simdi - sonUs) / 1000.0;",
+        "aci = 0.98 * (aci + gy * dt) + 0.02 * acc;"
+      ],
+      "answer": 2,
+      "explanation": "micros() gives microseconds; to convert to seconds you must divide by 1000000.0. Dividing by 1000.0 makes dt milliseconds, and the integral comes out 1000 times too big. The filter formula is correct.",
+      "skills": [
+        "gyro-drift",
+        "prog-debug"
+      ]
+    }
+  ]
+}

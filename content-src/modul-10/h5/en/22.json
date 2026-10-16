@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Number, text, name = value",
+      "definition": "The three message types the radio can carry.",
+      "example": "A number is used for a command, text for a greeting, and a name = value pair for a reading such as \"sicak = 28\".",
+      "pitfall": "Trying to send everything as a number; the receiving side cannot tell what was measured."
+    },
+    {
+      "term": "Name = value pair",
+      "definition": "A message made of a label (name) and a number (value).",
+      "example": "radio send [sicak] = [28]; the receiving side reads received name and received value.",
+      "pitfall": "Writing the name differently on the two sides; \"sicak\" and `sıcak` do not match."
+    },
+    {
+      "term": "Length limits",
+      "definition": "A text can be at most 32 characters and a name at most 12 characters; anything longer is cut off.",
+      "example": "Of a 40-letter text, only the first 32 letters arrive on the receiving card.",
+      "pitfall": "Choosing a long name; the cut-off name does not match the full name on the receiving side."
+    },
+    {
+      "term": "received [name] check",
+      "definition": "A simple way to tell whether the message that arrived is a name = value message. In number and text messages the name is empty.",
+      "example": "if received name = sicak then show the value, else show the text.",
+      "pitfall": "Reading the same block for every message; you need to choose the block that fits the message type."
+    },
+    {
+      "term": "signal strength",
+      "definition": "A block that gives how strongly the message arrived. In the virtual radio it is always 200.",
+      "example": "On a real radio, the value drops as the cards move further apart.",
+      "pitfall": "Expecting the signal strength to change in the virtual portal; there is no distance."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d22-q1",
+      "kind": "mcq",
+      "prompt": "A card wants to send the temperature, the light and the sound level to the other card at the same time. Which is the best method?",
+      "options": [
+        "Sending the three numbers one after another as plain numbers",
+        "Writing them all in one text",
+        "Using a different name for each reading and sending name = value messages",
+        "Using three different groups"
+      ],
+      "answer": 2,
+      "explanation": "To tell the three readings apart, each one is given its own name (sicak, isik, ses) and name = value messages are used; the receiving side looks at the name and puts the value in the right place. If you send three plain numbers, it gets mixed up which one measures what.",
+      "skills": [
+        "mk-radio-types"
+      ]
+    },
+    {
+      "id": "m10h5d22-q2",
+      "kind": "numeric",
+      "prompt": "A card sends a 40-character text by radio. How many characters of the text arrive on the receiving card?",
+      "answer": 32,
+      "tolerance": 0,
+      "unit": "characters",
+      "explanation": "A text can be at most 32 characters; anything longer is cut off while being sent, without an error. 40 − 32 = 8 characters are lost.",
+      "skills": [
+        "mk-radio-types"
+      ]
+    },
+    {
+      "id": "m10h5d22-q3",
+      "kind": "predict-output",
+      "prompt": "The receiving card's program is below. The sending card sends radio send [isik] = [90]. What happens on the receiving card?\n\n```\non radio received:\n    if received name = sicak then\n        show number received value\n    else\n        show text received text\n```",
+      "options": [
+        "The then branch runs and 90 appears",
+        "The else branch runs, because the name is isik and not sicak",
+        "The program gives an error",
+        "Nothing happens"
+      ],
+      "answer": 1,
+      "explanation": "The name of the message that arrived is isik, but the name being checked is sicak; they are not equal, so the else branch runs. Even if the message is a name = value message, the then branch is skipped if the name does not match. No error appears, and the answer \"nothing happens\" is wrong too: the else branch shows something.",
+      "skills": [
+        "mk-radio-types",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "The sender sends the temperature reading, but the receiving card always shows text on the screen (the then branch never runs). Find the mistake.\n\n```\nsender:    radio send [sıcak] = [temperature]\nreceiver:  if received name = sicak then ...\n```",
+      "options": [
+        "The name is written differently on the two sides: `sıcak` and `sicak` are not the same",
+        "The sending block was taken from the wrong category",
+        "The value must be a number, and temperature is not a number",
+        "The radio group is above 255"
+      ],
+      "answer": 0,
+      "explanation": "The sender writes `sıcak` (with the letter `ı`), and the receiver writes `sicak` (with the letter `i`). Names must be exactly the same, letter for letter; a difference of one letter breaks the equality. The groups and the value block are not the cause of the problem.",
+      "skills": [
+        "mk-radio-types",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d22-q5",
+      "kind": "mcq",
+      "prompt": "The sender sends radio send [sicaklik_olcum] = [25]. The receiving side compares \"received name = sicaklik_olcum\". What is the result?",
+      "options": [
+        "Equal, because the name is the same",
+        "An error message is shown",
+        "Equal, but the value becomes 0",
+        "Not equal, because the name is cut off to 12 characters"
+      ],
+      "answer": 3,
+      "explanation": "sicaklik_olcum is 14 characters, but the name limit is 12. While being sent, it is cut off to \"sicaklik_olc\". Because the cut-off name does not match the full name on the receiving side, the comparison comes out false, and no error message is given.",
+      "skills": [
+        "mk-radio-types",
+        "prog-debug"
+      ]
+    }
+  ]
+}

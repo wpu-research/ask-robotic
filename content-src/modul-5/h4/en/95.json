@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Absolute angle target",
+      "definition": "Doing a turn towards a fixed target (90°, 180°, ...) rather than by adding to the current angle.",
+      "example": "The targets of the four corners are 90°, 180°, 270°, 360°.",
+      "pitfall": "Making the target 'current angle + 90°'; the error at each corner is added to the next."
+    },
+    {
+      "term": "Turning on the spot",
+      "definition": "The two wheels travelling the same distance in opposite directions; each draws an arc of a circle with a radius of L/2.",
+      "example": "For 90°, the arc is (π/2) · 6 cm ≈ 9.42 cm, that is, about 9 ticks.",
+      "pitfall": "Turning with a fixed number of ticks; the 5° uncertainty comes out differently every time."
+    },
+    {
+      "term": "Inner and outer wheel",
+      "definition": "In a circle, if the radius of the centre line is R, the inner wheel moves with a radius of R − L/2 and the outer wheel with R + L/2.",
+      "example": "For R = 25 cm, the inner path is 119.4 cm and the outer path 194.8 cm.",
+      "pitfall": "Giving both wheels the same speed and expecting a circle."
+    },
+    {
+      "term": "Dead zone",
+      "definition": "The smallest PWM needed for the motor to start turning; about 51 here.",
+      "example": "PWM = 51 + (v − 51) · oran scales the inner wheel's speed.",
+      "pitfall": "Multiplying the PWM directly by the ratio; a small value falls into the dead zone and the wheel does not turn."
+    },
+    {
+      "term": "Return-to-start error",
+      "definition": "The robot's distance from its starting point when the shape is finished; a measure of how well the odometry and the correction work.",
+      "example": "In the simulation, about 2 cm for the square, 1% of the perimeter.",
+      "pitfall": "Looking only at the robot's own estimate and saying 'the square closed'."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h4d95-q1",
+      "kind": "numeric",
+      "prompt": "A robot with L = 12 cm and a tick distance of 1.037 cm is going to turn 90° on the spot. About how many ticks should each wheel make?",
+      "answer": 9.1,
+      "tolerance": 0.1,
+      "unit": "ticks",
+      "explanation": "Each wheel draws a quarter of a circle with a radius of L/2 = 6 cm: (π/2) · 6 = 9.42 cm. 9.42 / 1.037 = 9.1 ticks. If you forget to halve L, you get 18 ticks.",
+      "skills": [
+        "rob-turn-geometry",
+        "rob-ticks-distance"
+      ]
+    },
+    {
+      "id": "m5h4d95-q2",
+      "kind": "numeric",
+      "prompt": "A circle is drawn whose centre line has a radius of R = 0.20 m, and L = 12 cm. How many centimetres does the outer wheel travel?",
+      "answer": 163.4,
+      "tolerance": 0.2,
+      "unit": "cm",
+      "explanation": "The outer wheel's radius is R + L/2 = 0.26 m; the path is 2π · 0.26 = 1.634 m, that is, 163.4 cm. The inner wheel travels 2π · 0.14 = 88.0 cm.",
+      "skills": [
+        "rob-turn-geometry"
+      ]
+    },
+    {
+      "id": "m5h4d95-q3",
+      "kind": "numeric",
+      "prompt": "The inner wheel must turn at 0.613 times the speed of the outer wheel. If the outer wheel is at PWM 200 and the dead zone is 51, what should the inner PWM be? Use the formula PWM = 51 + (v - 51) · ratio.",
+      "answer": 142.3,
+      "tolerance": 0.5,
+      "unit": "PWM",
+      "explanation": "51 + (200 - 51) · 0.613 = 51 + 91.3 = 142.3. If you had multiplied the PWM directly by 0.613, you would have got 122.6; because of the dead zone, this value would spoil the speed ratio.",
+      "skills": [
+        "rob-turn-geometry",
+        "rob-proj-square"
+      ]
+    },
+    {
+      "id": "m5h4d95-q4",
+      "kind": "find-bug",
+      "prompt": "The robot draws the square, but at each corner it turns a little too much or too little, and the last side ends far from the start. What is the one bug?\n\n```\nfor (int i = 1; i <= 4; i++) {\n  ileri(0.5);\n  yonuHedefle(th + PI / 2);\n}\n```",
+      "options": [
+        "ileri(0.5) is 0.5 cm",
+        "The turning target is given relative to the current th; the error of each corner is added to the next. The target should be i · PI / 2",
+        "The loop should run 3 times instead of 4",
+        "The yonuHedefle function should not be called at all"
+      ],
+      "answer": 1,
+      "explanation": "th + PI/2 is a relative target: if you turn 4° too little at one corner, the next target also starts with that shortfall. The absolute target i · PI / 2 makes up for the error at each corner. ileri(0.5) is in metres, and the loop is correct for four corners.",
+      "skills": [
+        "rob-turn-geometry",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h4d95-q5",
+      "kind": "mcq",
+      "prompt": "The square is finished and odometry says it is within 1 cm of the start. Why is this information not enough?",
+      "options": [
+        "Odometry can never work out a return to the start",
+        "Odometry cannot see its own systematic error (wrong radius, axle track, slipping); the real position must be measured from outside",
+        "A square always closes",
+        "Odometry only works for circles"
+      ],
+      "answer": 1,
+      "explanation": "The estimate and the real position can be different: if the constants are wrong or the wheel slips, the ticks are counted correctly but the position is worked out wrongly. That is why we measure with a tape measure or a trail record and compare with a tolerance.",
+      "skills": [
+        "rob-proj-square",
+        "rob-drift",
+        "prog-planning"
+      ]
+    }
+  ]
+}

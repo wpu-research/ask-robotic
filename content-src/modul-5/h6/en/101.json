@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Tilt",
+      "definition": "How many degrees the robot is leaning from the vertical. This week, leaning forwards counts as positive.",
+      "example": "If the robot leans 30° forwards, the tilt is +30°; if it leans backwards, -30°.",
+      "pitfall": "Mounting the sensor the wrong way round and forgetting to flip the sign: instead of correcting, the robot falls over faster."
+    },
+    {
+      "term": "Accelerometer angle: atan2(ax, az)",
+      "definition": "A still sensor measures gravity; the tilt angle is worked out from the shares on the X and Z axes.",
+      "example": "If ax = 0.5 g and az = 0.866 g, the angle comes out as 30°.",
+      "pitfall": "Writing the arguments the wrong way round (atan2(az, ax)): the result is off by 90°. Do not forget to convert radians to degrees either."
+    },
+    {
+      "term": "Integer division",
+      "definition": "When the raw acceleration is an int16_t, dividing it by the integer 16384 throws away the fraction; a decimal number (16384.0) is needed.",
+      "example": "For axHam = 8192, 8192 / 16384.0 = 0.5 g; integer division gives 0.",
+      "pitfall": "Writing axHam / 16384: the result is always 0 and the angle comes out wrong."
+    },
+    {
+      "term": "Gyroscope speed and scale",
+      "definition": "The gyroscope gives the rotation speed (°/s). The raw number is divided by 131 for ±250 °/s and by 65.5 for ±500 °/s.",
+      "example": "In the ±500 °/s range, a raw value of 6550 is 100 °/s.",
+      "pitfall": "Changing the range without changing the scale: the speed is halved or doubled."
+    },
+    {
+      "term": "Bias",
+      "definition": "The small constant value a still gyroscope reads. Its average is taken at start-up and subtracted from the readings.",
+      "example": "A 2 °/s bias, if not corrected, builds up an error of about 40° in 20 seconds.",
+      "pitfall": "Holding or shaking the robot while measuring the bias: a wrong bias spoils all later measurements."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d1-q1",
+      "kind": "mcq",
+      "prompt": "The robot is still and leaning 30° forwards. Roughly what share of gravity (in g) appears on the sensor's X and Z axes?",
+      "options": [
+        "ax = 0.5 and az = 0.866",
+        "ax = 0.866 and az = 0.5",
+        "ax = 1 and az = 0",
+        "ax = 0 and az = 1"
+      ],
+      "answer": 0,
+      "explanation": "The X axis sees sin θ of gravity and the Z axis sees cos θ. For 30°, sin = 0.5 and cos = 0.866. The second option is for 60°, the third for 90° (a robot lying down), the fourth for 0° (an upright robot).",
+      "skills": [
+        "imu-tilt"
+      ]
+    },
+    {
+      "id": "m5h6d1-q2",
+      "kind": "numeric",
+      "prompt": "In one round the raw values axHam = 8192 and azHam = 14189 were read (±2 g range, 16384 counts/g). How many degrees is atan2(ax, az)?",
+      "answer": 30,
+      "tolerance": 0.5,
+      "unit": "°",
+      "explanation": "ax = 8192 / 16384 = 0.5 g and az = 14189 / 16384 = 0.866 g. atan2(0.5, 0.866) = 30°. The ratio of the two raw values gives the same result; but in code, converting to g is both meaningful and needed in other calculations.",
+      "skills": [
+        "imu-tilt"
+      ]
+    },
+    {
+      "id": "m5h6d1-q3",
+      "kind": "numeric",
+      "prompt": "The gyroscope is in the ±500 °/s range (65.5 counts/(°/s)). A raw gyHam = 6550 was read. What is the rotation speed in °/s?",
+      "answer": 100,
+      "tolerance": 0.5,
+      "unit": "°/s",
+      "explanation": "6550 / 65.5 = 100 °/s. If you wrongly divide the same raw value by 131, you get 50 °/s; when the range changes, the scale must change too.",
+      "skills": [
+        "imu-gyro"
+      ]
+    },
+    {
+      "id": "m5h6d1-q4",
+      "kind": "find-bug",
+      "prompt": "When the robot leans forwards, this code prints the difference between 90° and the angle instead of the angle (at a 30° tilt it shows 60°). Which line is wrong?\n\n```\n1  float ax = axHam / 16384.0;\n2  float az = azHam / 16384.0;\n3  float aci = atan2(az, ax) * 57.2958;\n4  float hiz = gyHam / 65.5;     // ±500 °/s aralığı\n```",
+      "options": [
+        "Line 1: 16384 should be written instead of 16384.0",
+        "Line 2: az should be taken as negative",
+        "Line 3: the atan2 arguments are reversed; it should be (ax, az)",
+        "Line 4: the scale should be 131"
+      ],
+      "answer": 2,
+      "explanation": "ax, which is proportional to sin θ, must be the first argument. Writing (az, ax) gives 90° - θ: 60° at a 30° tilt. The 16384.0 on line 1 is already correct; on line 4, 65.5 is correct because the range is ±500 °/s.",
+      "skills": [
+        "imu-tilt",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d1-q5",
+      "kind": "predict-output",
+      "prompt": "The bias measured at start-up is 1.8 °/s. While the robot is still, a raw gyHam = 262 is read (65.5 counts/(°/s)). What does this code print?\n\n```\nfloat sapma = 1.8;\nint16_t gyHam = 262;\nfloat hiz = gyHam / 65.5 - sapma;\nSerial.println(hiz, 2);\n```",
+      "options": [
+        "4.00",
+        "1.80",
+        "-1.80",
+        "2.20"
+      ],
+      "answer": 3,
+      "explanation": "262 / 65.5 = 4.00 °/s; after subtracting the bias, 4.00 - 1.80 = 2.20 °/s is printed. 4.00 would mean not subtracting the bias; 1.80 and -1.80 are the bias itself, not the result of the measurement.",
+      "skills": [
+        "imu-gyro"
+      ]
+    }
+  ]
+}

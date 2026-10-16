@@ -24,13 +24,16 @@ export async function loadTutorLesson(db: Db, lessonId: number): Promise<TutorLe
 }
 
 /** Sayfa yolundan Mac bağlamı: ders/parça/kurs içeriği sunucuda yüklenir; bulunamazsa genel bölüm. */
-export async function loadPageSource(db: Db, path: string, loggedIn: boolean): Promise<PageSource> {
+/** `locale` 'en' ise ve dersin İngilizcesi (content_en) varsa bağlam İngilizce metinlerle kurulur. */
+export async function loadPageSource(db: Db, path: string, loggedIn: boolean, locale: 'tr' | 'en' = 'tr'): Promise<PageSource> {
   const r = routeForPath(path, loggedIn)
   if (r.kind === 'lesson') {
     const ctx = await getLessonContext(db, r.id)
     if (ctx) {
       const l = ctx.lesson
-      return { kind: 'lesson', lessonId: l.id, title: l.title, moduleTitle: ctx.module.title, weekTitle: ctx.week.title, minAge: ctx.module.minAge, problem: l.problem, contentMd: l.contentMd, explainerMd: l.explainerMd, question: l.question }
+      const en = locale === 'en' ? l.contentEn : null
+      const t = en ?? l
+      return { kind: 'lesson', lessonId: l.id, title: en?.title ?? l.title, moduleTitle: ctx.module.title, weekTitle: ctx.week.title, minAge: ctx.module.minAge, problem: t.problem, contentMd: t.contentMd, explainerMd: en ? (en.explainerMd ?? null) : l.explainerMd, question: t.question }
     }
     return { kind: 'section', key: 'courses' }
   }

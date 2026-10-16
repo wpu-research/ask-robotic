@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Air pressure",
+      "definition": "The pressure created by the weight of the air above us; it gets lower as you go higher.",
+      "example": "As a drone climbs, the pressure the BMP280 reads drops.",
+      "pitfall": "Thinking pressure is fixed; it changes with the weather every day."
+    },
+    {
+      "term": "Pa and hPa",
+      "definition": "Pascals and hectopascals are units of pressure; 1 hPa = 100 Pa.",
+      "example": "If readPressure() gives 101325, that is 1013.25 hPa.",
+      "pitfall": "Giving readAltitude a value in Pa (101325); the function expects hPa, and the result is very wrong."
+    },
+    {
+      "term": "I2C address (0x76 / 0x77)",
+      "definition": "The BMP280's name on the I2C bus; the address given in begin() in the code must be the same as the sensor's.",
+      "example": "When the sensor is at 0x76, you write bmp.begin(0x76).",
+      "pitfall": "Using begin() without a parameter; the default is 0x77, so a sensor at 0x76 is not found."
+    },
+    {
+      "term": "Altitude formula",
+      "definition": "An approximate formula that works out altitude from the measured pressure P and the sea-level pressure P0: 44330 × (1 − (P/P0)^(1/5.255)).",
+      "example": "With P0 = 1013.25 hPa, 954.5 hPa is about 500 m.",
+      "pitfall": "Giving P and P0 in different units (one in Pa, the other in hPa)."
+    },
+    {
+      "term": "P0 (sea-level pressure)",
+      "definition": "The reference for the altitude calculation; it changes with the weather.",
+      "example": "If P0 is 10 hPa wrong, the altitude drifts by about 84 m.",
+      "pitfall": "Treating the altitude reading as exact; when the weather changes, the value drifts even if you do not move."
+    },
+    {
+      "term": "Was the sensor found? (the result of begin)",
+      "definition": "begin() returns true if it succeeds and false if there is no sensor.",
+      "example": "If bmpHazir is false, the program skips reading and prints \"BMP280 bulunamadi\".",
+      "pitfall": "Not checking the result; meaningless numbers are read from a sensor that is not there."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h3d47-q1",
+      "kind": "mcq",
+      "prompt": "The I2C address of the BMP280 module is 0x76. What happens if the code just says bmp.begin()?",
+      "options": [
+        "The sensor is found without any problem",
+        "A compile error happens",
+        "The sensor automatically switches to 0x77",
+        "The library tries the default address 0x77, cannot find the sensor and returns false"
+      ],
+      "answer": 3,
+      "explanation": "The library's default address is 0x77. If the sensor is at 0x76, begin() cannot see it and returns false; you need to write bmp.begin(0x76). The sensor does not change its address, and the code compiles.",
+      "skills": [
+        "sens-i2c-bmp"
+      ]
+    },
+    {
+      "id": "m4h3d47-q2",
+      "kind": "numeric",
+      "prompt": "readPressure() returns the value 98500 (in Pa). How many hPa is this pressure?",
+      "answer": 985,
+      "tolerance": 0,
+      "unit": "hPa",
+      "explanation": "Since 1 hPa = 100 Pa, 98500 / 100 = 985 hPa. You need to divide, not multiply; the number of Pa is always 100 times bigger than the number of hPa.",
+      "skills": [
+        "sens-altitude"
+      ]
+    },
+    {
+      "id": "m4h3d47-q3",
+      "kind": "predict-output",
+      "prompt": "There is NO BMP280 in the circuit at all. If this code runs for 3.5 seconds, what appears in the serial monitor?\n\n```\nbool hazir = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  hazir = bmp.begin(0x76);\n  if (!hazir) { Serial.println(\"BMP280 bulunamadi\"); }\n}\n\nvoid loop() {\n  delay(1000);\n  if (!hazir) { return; }\n  Serial.println(bmp.readPressure() / 100.0, 1);\n}\n```",
+      "options": [
+        "Only once: BMP280 bulunamadi",
+        "0.0 every second",
+        "Every second: BMP280 bulunamadi",
+        "Nothing is printed"
+      ],
+      "answer": 0,
+      "explanation": "The message is printed once in setup(). On every round, loop() leaves with return because hazir is false, and no reading is taken; so no number is printed and the message is not repeated.",
+      "skills": [
+        "sens-i2c-bmp",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h3d47-q4",
+      "kind": "find-bug",
+      "prompt": "This code wants to print the altitude in metres, but the result is nonsense. Which line has the bug?\n\n```\n1 float hpa = bmp.readPressure() / 100.0;\n2 float rakim = bmp.readAltitude(101325);\n3 Serial.print(\"Rakim: \");\n4 Serial.println(rakim, 1);\n```",
+      "options": [
+        "Line 1: / 100.0 is unnecessary",
+        "Line 2: readAltitude expects hPa, but 101325 is written in Pa; it should be 1013.25",
+        "Line 3: it should be println instead of print",
+        "Line 4: hpa should be printed instead of rakim"
+      ],
+      "answer": 1,
+      "explanation": "readAltitude wants the sea-level pressure in hPa. When 101325 is written, the P/P0 ratio becomes very small and the altitude makes no sense; the right value is 1013.25. The division on line 1, on the other hand, is the correct conversion from Pa to hPa.",
+      "skills": [
+        "sens-altitude",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h3d47-q5",
+      "kind": "numeric",
+      "prompt": "The pressure is 1000 hPa. If P0 is given by mistake as 1008.25 hPa instead of 1013.25, how many metres does the altitude drift? Rule: near sea level, 1 hPa is about 8 m. (Give the size of the drift as an absolute value.)",
+      "answer": 40,
+      "tolerance": 4,
+      "unit": "m",
+      "explanation": "The P0 difference is 1013.25 − 1008.25 = 5 hPa, and 5 × 8 = 40 m. Working it out with the formula gives about 41.6 m too; the rule is a rough estimate, so a tolerance of 4 m is allowed.",
+      "skills": [
+        "sens-altitude"
+      ]
+    }
+  ]
+}

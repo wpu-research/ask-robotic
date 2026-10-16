@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "RAG pipeline",
+      "definition": "The end-to-end flow made of the steps chunk, vectorize, retrieve, insert and synthesise.",
+      "example": "For the club guide, the settings size 20, overlap 5, K = 2 bring back the \"two projects\" sentence.",
+      "pitfall": "Thinking the pipeline is one piece; a mistake happens in one of the steps, and you need to find that step."
+    },
+    {
+      "term": "Retrieval accuracy",
+      "definition": "The share of questions for which the right chunk is in the top K.",
+      "example": "If the right chunk came back for 14 of 20 questions, the accuracy is 70%.",
+      "pitfall": "Only looking at whether the answer is correct; the model may just be lucky while retrieval is still poor."
+    },
+    {
+      "term": "Faithfulness (groundedness)",
+      "definition": "The answer being based only on the retrieved context, without adding information that is not in the context.",
+      "example": "If the context says \"two days\" and the answer says \"one hour\", that is a faithfulness error.",
+      "pitfall": "Mixing up faithfulness and correctness; if the source is wrong, a faithful answer is wrong too."
+    },
+    {
+      "term": "Eval set",
+      "definition": "The list of questions and expected answers you prepare to measure the pipeline.",
+      "example": "Three groups: questions whose answer is in one chunk, spread over two chunks, and not in the document.",
+      "pitfall": "Building it only from easy questions; without a \"not in the document\" case, \"I don't know\" is never tested."
+    },
+    {
+      "term": "Source quality",
+      "definition": "How correct and up to date the document RAG relies on is.",
+      "example": "If the guide has an old due date, the pipeline finds it and brings it back as correct.",
+      "pitfall": "Thinking RAG will correct wrong information; it only brings back what is in the source."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d25-q1",
+      "kind": "mcq",
+      "prompt": "In one test, the right chunk got into the context, but the answer contains a number that is not in the context. Which measurement catches this mistake?",
+      "options": [
+        "Retrieval accuracy",
+        "Faithfulness (the answer being based on the context)",
+        "Number of chunks",
+        "Overlap ratio"
+      ],
+      "answer": 1,
+      "explanation": "Retrieval worked correctly: the right chunk is in the context. The problem is that the answer adds something that is not in the context; that is a faithfulness problem. The number of chunks and the overlap are settings that come before retrieval and do not show the mistake here.",
+      "skills": [
+        "ai-rag-eval",
+        "ai-rag-grounding"
+      ]
+    },
+    {
+      "id": "m7h5d25-q2",
+      "kind": "numeric",
+      "prompt": "The eval set has 20 questions. For 14 questions the right chunk comes back in the top K. What is the retrieval accuracy as a percentage?",
+      "answer": 70,
+      "unit": "%",
+      "explanation": "14 / 20 = 0.70, that is 70%. For the other 6 questions the right chunk did not come back, so the model cannot see the right information. This ratio is not the same as the answer's correctness; faithfulness is measured separately.",
+      "skills": [
+        "ai-rag-eval",
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d25-q3",
+      "kind": "predict-output",
+      "prompt": "For each chunk, the code counts how many of the question's words appear in the chunk. What does this code print when it runs?\n\n```\nrehber = [\"Bronz rozet için iki proje gerekir.\", \"Altın rozet için sunum gerekir.\"]\nsoru = \"altın rozet için ne gerekir\"\nsayac = [len(set(p.lower().replace(\".\", \"\").split()) & set(soru.split())) for p in rehber]\nprint(sayac)\n```",
+      "options": [
+        "[3, 4]",
+        "[4, 3]",
+        "[2, 2]",
+        "[5, 5]"
+      ],
+      "answer": 0,
+      "explanation": "The words of the first chunk share `rozet`, `için` and `gerekir` with the question: 3 (`altın`, gold, is missing). The second chunk also has `altın`: `altın`, `rozet`, `için`, `gerekir`, so 4. The result is [3, 4]; for the gold badge question the second chunk gets ahead. `ne` (what) is in neither chunk.",
+      "skills": [
+        "ai-retrieval",
+        "ai-rag-pipeline"
+      ]
+    },
+    {
+      "id": "m7h5d25-q4",
+      "kind": "find-bug",
+      "prompt": "This code wants to pick the K most similar chunks, but unrelated chunks come back.\n\n```\ndef en_iyi(parcalar, k):\n    sirali = sorted(parcalar, key=lambda p: p.skor)\n    return sirali[:k]\n```\n\nWhat is the bug?",
+      "options": [
+        "sorted sorts in ascending order; reverse=True is needed for the highest score",
+        "The slice boundary is wrong",
+        "A number should be given instead of lambda",
+        "k should be negative"
+      ],
+      "answer": 0,
+      "explanation": "By default sorted sorts from smallest to largest; in that case sirali[:k] gives the k chunks with the lowest scores. The fix is reverse=True. The slice [:k] correctly takes the first k elements; the lambda correctly picks the score.",
+      "skills": [
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d25-q5",
+      "kind": "mcq",
+      "prompt": "The due date is written wrongly in the club guide. What happens if the RAG pipeline works perfectly?",
+      "options": [
+        "The pipeline notices the mistake and corrects it",
+        "The pipeline says \"I don't know\"",
+        "It brings back the right chunk and the answer still comes out wrong, because the source is wrong",
+        "The pipeline checks the date on the internet"
+      ],
+      "answer": 2,
+      "explanation": "RAG only brings back the information in the given document. If the source is wrong, perfect retrieval carries the mistake too; even if the answer is faithful to the source, it is wrong. In the workshop there is no external source, internet or fact-checking; everything runs locally.",
+      "skills": [
+        "ai-rag-grounding",
+        "ai-rag-eval"
+      ]
+    }
+  ]
+}

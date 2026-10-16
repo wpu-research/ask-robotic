@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "The LiquidCrystal object",
+      "definition": "The library object that lets you talk to the LCD. When you create it, you give the connection pins in the order RS, E, D4, D5, D6, D7.",
+      "example": "LiquidCrystal lcd(12, 11, 5, 4, 3, 2); means RS = D12, E = D11, D4 = D5 ... D7 = D2.",
+      "pitfall": "Writing the pin order so that it does not match the wires: the display stays blank or shows meaningless characters."
+    },
+    {
+      "term": "lcd.begin()",
+      "definition": "Starts the display and tells it the number of columns and rows. It is called once inside setup().",
+      "example": "lcd.begin(16, 2); means a display with 16 columns and 2 rows.",
+      "pitfall": "Forgetting to call begin: the display is not started and no text appears."
+    },
+    {
+      "term": "setCursor(column, row)",
+      "definition": "Moves the cursor; the next text starts from there. Counting starts from 0, and the column comes first.",
+      "example": "lcd.setCursor(0, 1); goes to the start of the bottom row.",
+      "pitfall": "Counting rows from 1 or mixing up the order of column and row."
+    },
+    {
+      "term": "Contrast (V0)",
+      "definition": "The pin that decides how visible the text is. It is usually adjusted with a potentiometer.",
+      "example": "In the lab model, if V0 goes above about 1.6 V, the display looks blank.",
+      "pitfall": "Never adjusting the contrast: the text may not be visible even when the backlight is on."
+    },
+    {
+      "term": "Old text staying behind",
+      "definition": "The LCD does not automatically delete a character written in a box; new text is written over the old one.",
+      "example": "If the display shows 250 and 7 is written in the same place, you see 750; adding spaces with lcd.print(\"7  \") solves this.",
+      "pitfall": "Writing a number that has become shorter without clearing: the old digits stay on the display."
+    },
+    {
+      "term": "Custom character",
+      "definition": "With createChar you save your own 5x8-dot symbol in a slot from 0 to 7; you can have at most 8 symbols.",
+      "example": "Defining a degree sign and writing it to the display with lcd.write(byte(0)).",
+      "pitfall": "Not calling clear() or setCursor() after createChar: the text does not appear on the display."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h7d32-q1",
+      "kind": "mcq",
+      "prompt": "The program says LiquidCrystal lcd(9, 8, 7, 6, 5, 4);. Which Uno pin should the LCD's E pin be connected to?",
+      "options": [
+        "D9",
+        "D7",
+        "D8",
+        "D4"
+      ],
+      "answer": 2,
+      "explanation": "The parameter order is RS, E, D4, D5, D6, D7. The second number is E, that is 8: the E pin connects to D8. D9 goes to RS, and D4 goes to the D7 pin.",
+      "skills": [
+        "lcd-display",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m3h7d32-q2",
+      "kind": "numeric",
+      "prompt": "After the command lcd.setCursor(5, 1);, lcd.print(\"Merhaba\"); runs. Which column is the last letter of the text (a) in? (Columns start from 0.)",
+      "answer": 11,
+      "tolerance": 0,
+      "explanation": "The text starts at column 5. Merhaba (hello) has 7 letters; they go into columns 5, 6, 7, 8, 9, 10, 11. The last letter is in column 11. So 5 + 7 − 1 = 11. The answer 12 comes from counting one column too many in 5 + 7.",
+      "skills": [
+        "lcd-display"
+      ]
+    },
+    {
+      "id": "m3h7d32-q3",
+      "kind": "predict-output",
+      "prompt": "The display has been started and is empty. When these commands run, what appears at the start of row 1?\n\n```\nlcd.setCursor(0, 0);\nlcd.print(\"250\");\nlcd.setCursor(0, 0);\nlcd.print(\"7\");\n```",
+      "options": [
+        "7",
+        "750",
+        "250",
+        "257"
+      ],
+      "answer": 1,
+      "explanation": "The LCD does not delete the old character. After 250 is written, the cursor goes back to the start and 7 is written only into the first box: the boxes become 7, 5, 0 and you see 750. To see only 7, you need lcd.clear() or lcd.print(\"7  \").",
+      "skills": [
+        "lcd-display"
+      ]
+    },
+    {
+      "id": "m3h7d32-q4",
+      "kind": "find-bug",
+      "prompt": "The pins are connected correctly and the contrast is set, but nothing appears on the display. What is the problem?\n\n```\n#include <LiquidCrystal.h>\nLiquidCrystal lcd(12, 11, 5, 4, 3, 2);\n\nvoid setup() {\n  lcd.print(\"Merhaba\");\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "The lcd.print command should be inside loop()",
+        "The #include line is wrong",
+        "The pin order should not be RS, E, D4, D5, D6, D7",
+        "The lcd.begin(16, 2) call is missing"
+      ],
+      "answer": 3,
+      "explanation": "Creating the object does not start the display. lcd.begin(16, 2) must be called inside setup(). print() works inside setup() too; the include and the pin order are also correct.",
+      "skills": [
+        "lcd-display",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h7d32-q5",
+      "kind": "mcq",
+      "prompt": "The LCD's backlight is on but no text appears on the display; the wires and the code are correct. Which setting should you check first?",
+      "options": [
+        "Contrast (the voltage on the V0 pin)",
+        "The colour of the backlight resistor",
+        "The number of rows",
+        "The baud rate"
+      ],
+      "answer": 0,
+      "explanation": "The backlight is independent of the text; whether the text shows depends on the contrast. If the V0 voltage is not right (in the lab, above about 1.6 V), the display looks blank. The baud rate is a serial communication setting and does not affect the LCD.",
+      "skills": [
+        "lcd-display",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

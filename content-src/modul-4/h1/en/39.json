@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Sonar scan",
+      "definition": "Turning an ultrasonic sensor with a servo and taking a measurement at each angle to get a cross-section of the surroundings.",
+      "example": "7 measuring points are taken from 0° to 180° in 30° steps.",
+      "pitfall": "Measuring while the servo is still turning: the measurement belongs to another angle."
+    },
+    {
+      "term": "Servo waiting time",
+      "definition": "The time you wait for the servo to reach the new angle (300 ms in this lesson).",
+      "example": "servo.write(aci); delay(300); then the measurement, in that order.",
+      "pitfall": "Skipping the wait: the angle and the distance do not match."
+    },
+    {
+      "term": "Keeping the smallest",
+      "definition": "Storing the smallest value seen so far and its position, and comparing it with each new value.",
+      "example": "if (cm < enYakin) { enYakin = cm; enYakinAci = aci; }",
+      "pitfall": "Making the starting value 0: no measurement can be smaller than 0, so the object is never found."
+    },
+    {
+      "term": "Beam cone",
+      "definition": "The HC-SR04 looks at a cone typically about 15° wide, not at a single line.",
+      "example": "A 30° step can leave gaps that the cone does not cover.",
+      "pitfall": "Thinking a thin object will always be found."
+    },
+    {
+      "term": "aci:mesafe format",
+      "definition": "Printing each measurement as \"angle:distance\"; another program can read the data by splitting at the \":\" sign.",
+      "example": "The line 120:35.0 means 35 cm in the 120° direction.",
+      "pitfall": "Printing every output as free text: it becomes hard to pick apart later."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d39-q1",
+      "kind": "numeric",
+      "prompt": "A scan loop was written like this: for (int aci = 0; aci <= 180; aci += 20). How many measuring points (angles) are taken per scan?",
+      "answer": 10,
+      "tolerance": 0,
+      "explanation": "The angles are 0, 20, 40, ... 180: 180 / 20 + 1 = 10 points. Because the starting point (0°) is counted too, 1 is added to the division.",
+      "skills": [
+        "prog-loops-arrays",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q2",
+      "kind": "numeric",
+      "prompt": "In the scan you made the servo wait 300 ms at each step, then put two 30 ms pauses between the three measurements (ignore the measurement times). About how many milliseconds does a 0-180° scan with a 30° step (7 points) take?",
+      "answer": 2520,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "At one point there is 300 + 2 × 30 = 360 ms of waiting. For 7 points, 7 × 360 = 2520 ms. A real scan is a little longer because of the measurement times; if you make the step smaller, the time grows in proportion to the number of points.",
+      "skills": [
+        "prog-timing",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q3",
+      "kind": "predict-output",
+      "prompt": "This is the formula that finds the middle of three measurements. What is printed when this code runs?\n\n```\nfloat a = 400, b = 35, c = 36;\nSerial.println(max(min(a, b), min(max(a, b), c)), 0);\n```",
+      "options": [
+        "35",
+        "36",
+        "157",
+        "400"
+      ],
+      "answer": 1,
+      "explanation": "min(400, 35) = 35; max(400, 35) = 400 and min(400, 36) = 36; max(35, 36) = 36. The middle of the three numbers is 36. 157 is the average; 400 is the outlier and the median does not choose it.",
+      "skills": [
+        "sens-filter",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q4",
+      "kind": "find-bug",
+      "prompt": "The scan program never finds the nearest object; enYakinAci always stays -1. Which line is wrong?\n\n```\nfloat enYakin = 0;\nint enYakinAci = -1;\nfor (int aci = 0; aci <= 180; aci += 30) {\n  servo.write(aci);\n  delay(300);\n  float cm = olc();\n  if (cm < enYakin) {\n    enYakin = cm;\n    enYakinAci = aci;\n  }\n}\n```",
+      "options": [
+        "float enYakin = 0;",
+        "servo.write(aci);",
+        "delay(300);",
+        "if (cm < enYakin) {"
+      ],
+      "answer": 0,
+      "explanation": "Because enYakin starts at 0, no measurement can be smaller than 0 and the condition is never true. The starting value must be large (for example 400.0). The comparison line is correct.",
+      "skills": [
+        "prog-debug",
+        "sens-servo-scan"
+      ]
+    },
+    {
+      "id": "m4h1d39-q5",
+      "kind": "mcq",
+      "prompt": "Why can a sonar that scans in 30° steps miss a thin pencil?",
+      "options": [
+        "The servo never stops at a 30° step",
+        "The sensor looks at a cone about 15° wide, not a single line; gaps the cone does not cover can be left between the steps",
+        "The HC-SR04 always shows very thin objects as 400 cm",
+        "delay(300) cancels the measurement"
+      ],
+      "answer": 1,
+      "explanation": "The beam is cone-shaped, and when the steps are bigger than the cone, a blind area is left between two directions; a thin object can fall right there. Making the step smaller lowers this risk, but makes the scan longer. The servo does stop at the steps; delay does not cancel the measurement.",
+      "skills": [
+        "sens-servo-scan",
+        "sens-ultrasonic"
+      ]
+    }
+  ]
+}

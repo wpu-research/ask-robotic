@@ -1,0 +1,118 @@
+{
+  "concepts": [
+    {
+      "term": "Splitting into states",
+      "definition": "Dividing the project into separate states such as waiting, playing and end, and writing down beforehand what will happen in each state.",
+      "example": "In the music box, if the button is pressed we are in the playing state, otherwise in the waiting state.",
+      "pitfall": "Starting to write code without a plan; because it is not clear what happens in which state, the bugs get tangled."
+    },
+    {
+      "term": "loop() makes decisions",
+      "definition": "When you split the work into functions, loop() only decides which function to call.",
+      "example": "if (button pressed) melodiCal(bpm); else bekleNefesi();",
+      "pitfall": "Piling every command into loop(); the program gets long, hard to read, and bugs are harder to find."
+    },
+    {
+      "term": "Beat length",
+      "definition": "The length of one beat in milliseconds, worked out from the beats per minute (bpm): 60000 / bpm.",
+      "example": "At 140 bpm one beat lasts about 428 ms.",
+      "pitfall": "Thinking the beat gets longer when the tempo goes up; the faster the tempo, the shorter the beat."
+    },
+    {
+      "term": "switch and break",
+      "definition": "switch runs one of several branches of code depending on a value; every branch needs a break at the end.",
+      "example": "The colour is chosen from the note frequency, as in case 262: red; case 294: orange;.",
+      "pitfall": "Not writing break; the code falls through into the next case and the colours get mixed up."
+    },
+    {
+      "term": "The cost of delay",
+      "definition": "While delay is running, the program does not run any other line; during this time the button or pot cannot be watched.",
+      "example": "Pressing the button while the melody plays does not reach the program; it is read when the melody ends.",
+      "pitfall": "Expecting a program stuck inside a delay to react to the button at the same time."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h4d5-q1",
+      "kind": "numeric",
+      "prompt": "The music box is playing at 120 beats per minute. The melody is 16 beats long (two notes of 2 beats, twelve notes of 1 beat). How many milliseconds does one round of the melody take?",
+      "answer": 8000,
+      "unit": "ms",
+      "explanation": "One beat is 60000 / 120 = 500 ms. 16 beats × 500 ms = 8000 ms. If you mix up the number of notes, 14, with the beats, you get a wrong result such as 7000 ms.",
+      "skills": [
+        "prog-timing",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m3h4d5-q2",
+      "kind": "mcq",
+      "prompt": "In the music box, why does the blue channel in the note colours only take the value 0 or 255?",
+      "options": [
+        "The blue LED does not support brightness control",
+        "analogWrite resets itself to zero after 255",
+        "The RGB LED's blue cannot be controlled because of the value of the resistor it is connected to",
+        "The blue channel is on D11, and PWM on D11 breaks while tone is playing"
+      ],
+      "answer": 3,
+      "explanation": "tone and the PWM on D3 and D11 use the same timer (Timer2); while tone is playing, an in-between brightness cannot be set on D11, and fully on or off is safe. Red (D9) and green (D10) are not affected. Neither the blue LED itself nor the resistor setting is what stops it.",
+      "skills": [
+        "sound-tone",
+        "pwm-output",
+        "rgb-color"
+      ]
+    },
+    {
+      "id": "m3h4d5-q3",
+      "kind": "find-bug",
+      "prompt": "The note Do (262 Hz) should light red and Re (294 Hz) orange. But while Do is playing, the LED looks orange. Where is the bug?\n\n```\nvoid notaRengi(int frekans) {\n  switch (frekans) {\n    case 262: renkAyarla(255, 0, 0);\n    case 294: renkAyarla(255, 80, 0); break;\n    default:  renkAyarla(255, 255, 255);\n  }\n}\n```",
+      "options": [
+        "The default branch should not be written at the end",
+        "There is no break; at the end of the case 262 line, so the code falls through into the next case",
+        "In the renkAyarla(255, 80, 0) line it should say 0 instead of 80",
+        "for should be used instead of switch"
+      ],
+      "answer": 1,
+      "explanation": "case 262 sets red, but because there is no break the flow falls through into case 294 and the colour is changed to orange. Adding break; at the end of the 262 line fixes it. default is in the right place, 80 is needed for orange, and switch is the right tool for this job.",
+      "skills": [
+        "prog-debug",
+        "rgb-color"
+      ]
+    },
+    {
+      "id": "m3h4d5-q4",
+      "kind": "predict-output",
+      "prompt": "This is part of the brightness logic of the waiting breath. What is printed on the Serial Monitor when it runs?\n\n```\nint parlak = 250;\nint yon = 5;\n\nvoid adim() {\n  parlak = parlak + yon;\n  if (parlak >= 255) {\n    parlak = 255;\n    yon = -5;\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  adim();\n  adim();\n  adim();\n  Serial.println(parlak);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "255",
+        "260",
+        "250",
+        "245"
+      ],
+      "answer": 3,
+      "explanation": "In the first step 250 + 5 = 255, the condition is met and the direction is set to -5. In the second step 255 - 5 = 250, and in the third step 250 - 5 = 245. The brightness does not stay at 255; because the direction changed, it goes back down. It cannot be 260 because it is set equal to the upper limit of 255.",
+      "skills": [
+        "prog-functions",
+        "prog-scope",
+        "pwm-output"
+      ]
+    },
+    {
+      "id": "m3h4d5-q5",
+      "kind": "mcq",
+      "prompt": "In the music box, if you let go of the button and press it again while the melody is playing, the program does not react at once. Why?",
+      "options": [
+        "The button is not set up as INPUT_PULLUP",
+        "The tone command switches the button off",
+        "Because delay is running during the melody, the program cannot reach the line that reads the button",
+        "loop() only runs once"
+      ],
+      "answer": 2,
+      "explanation": "The delay inside notaCal makes the program wait for the length of the note; the line that reads the button only runs when the melody ends. The button is set up correctly, tone does not affect the button, and loop() repeats all the time. Later you will get past this limit with non-blocking timing.",
+      "skills": [
+        "prog-timing",
+        "prog-planning"
+      ]
+    }
+  ]
+}

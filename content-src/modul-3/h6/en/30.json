@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Task",
+      "definition": "A small job the program runs independently: blinking an LED, the buzzer, reading a button. Each task has its own time variable.",
+      "example": "The pulse LED is managed with `ledZaman` and the buzzer with `buzzerZaman`.",
+      "pitfall": "Giving two tasks one shared time variable: when one is updated, the other loses its timing."
+    },
+    {
+      "term": "Non-waiting loop",
+      "definition": "A loop() with no delay at all that takes a quick look at every task in each round and goes straight back to the start.",
+      "example": "Each round takes a few microseconds; the button, the LED and the buzzer are checked in every round.",
+      "pitfall": "Adding a small delay to one task: all the other tasks wait just as long."
+    },
+    {
+      "term": "ISR + flag",
+      "definition": "Only a volatile flag is raised in the interrupt function; the real work is done in loop().",
+      "example": "Inside `modTusu()`, `modIstegi = true;` is set; when loop() sees the flag, it calls `modGec()`.",
+      "pitfall": "Changing the mode, driving LEDs or using Serial.print inside the ISR."
+    },
+    {
+      "term": "Timeout",
+      "definition": "Logic that puts the output into a safe state by itself if no command or event arrives for a certain time.",
+      "example": "If no command arrives for 700 ms, output D7 goes LOW and the motor stops.",
+      "pitfall": "Leaving the output on when the link is lost while the last command was \"run\"; the motor turns out of control."
+    },
+    {
+      "term": "Task table",
+      "definition": "A planning table that lists the tasks, triggers, methods and variables before the code is written.",
+      "example": "Mode change: trigger the D2 button, method interrupt + flag, variable `modIstegi`.",
+      "pitfall": "Starting to write code without planning: you only notice later that the tasks spoil each other's variables."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d30-q1",
+      "kind": "mcq",
+      "prompt": "In the multitasking panel, why does the MOD button's interrupt (ISR) only write modIstegi = true; instead of changing the mode itself?",
+      "options": [
+        "Interrupts cannot write variables",
+        "The mode variable can only be written in setup()",
+        "The ISR must stay short; the real work is done in loop()",
+        "Reading a button is only possible in loop()"
+      ],
+      "answer": 2,
+      "explanation": "An ISR must be short; changing the mode includes jobs such as resetting the LED and buzzer counters, and it could clash with the main program. Interrupts can write variables (they need to be volatile), and a button can be read with an interrupt too.",
+      "skills": [
+        "prog-multitask",
+        "prog-interrupts"
+      ]
+    },
+    {
+      "id": "m3h6d30-q2",
+      "kind": "find-bug",
+      "prompt": "Pressing the SUSTUR button (D3, INPUT_PULLUP) should end ALARM. But as soon as ALARM starts, it goes straight back to BEKLE. Which line is wrong?\n\n```\nif (mod == ALARM) {\n  if (digitalRead(3) == HIGH || simdi - modBasi >= 5000) {\n    modGec(BEKLE);\n  }\n}\n```",
+      "options": [
+        "if (mod == ALARM) {",
+        "if (digitalRead(3) == HIGH || simdi - modBasi >= 5000) {",
+        "modGec(BEKLE);",
+        "The code is correct; the problem is in the circuit"
+      ],
+      "answer": 1,
+      "explanation": "With INPUT_PULLUP, a button that is not pressed reads HIGH, and a pressed button reads LOW. Because the condition is == HIGH, it becomes true at once without the button being pressed. It should be == LOW. The other lines are correct.",
+      "skills": [
+        "prog-multitask",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d30-q3",
+      "kind": "numeric",
+      "prompt": "In ALARM mode the buzzer sounds for 200 ms and is silent for 200 ms; when the mode starts, buzzerZaman is reset to modBasi and the buzzer is silent for 200 ms first. ALARM lasts 5 seconds (it goes back to BEKLE at 5000 ms). How many times does the buzzer start sounding in this time?",
+      "answer": 12,
+      "tolerance": 0,
+      "unit": "beeps",
+      "explanation": "The beeps start at 200, 600, 1000, ... ms (every 400 ms). The condition 200 + 400k < 5000 is met for k = 0...11: 12 beeps. At 5000 ms, the check for leaving the alarm is done before the buzzer check, so the 13th beep does not start.",
+      "skills": [
+        "prog-multitask",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d30-q4",
+      "kind": "numeric",
+      "prompt": "An output is protected with a 700 ms timeout: each '1' command renews the counter, and if no command arrives for 700 ms, the output switches off. The last '1' command arrived at t = 600 ms, and no more came after it. At which millisecond does the output switch off?",
+      "answer": 1300,
+      "tolerance": 10,
+      "unit": "ms",
+      "explanation": "The timeout is counted from the last command: 600 + 700 = 1300 ms. Looking at the time of the first command (700 ms) or adding 700 to the total time would be wrong; the counter is renewed with every command.",
+      "skills": [
+        "prog-multitask",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d30-q5",
+      "kind": "mcq",
+      "prompt": "In a remote-controlled system, why do we want the output to switch off automatically when the link is lost?",
+      "options": [
+        "So the code is shorter",
+        "So the buzzer keeps sounding",
+        "The board switches itself off anyway when the link is lost",
+        "To stop the output staying on for ever if the last command was \"run\""
+      ],
+      "answer": 3,
+      "explanation": "If the link is lost, the last command may still be treated as valid and the motor may turn out of control. The timeout moves to the safe state (off). The board does nothing by itself when the link is lost; you write the logic.",
+      "skills": [
+        "prog-multitask"
+      ]
+    }
+  ]
+}

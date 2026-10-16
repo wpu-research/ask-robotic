@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Rule table",
+      "definition": "The plan in which you write what will happen when each tile is touched.",
+      "example": "Key: the key and the door are deleted. Diamond: score +1. Lava: lives -1 and back to the start. Chest: win the game.",
+      "pitfall": "Starting on the blocks without a plan: you forget a rule or make two rules clash."
+    },
+    {
+      "term": "Key and door system",
+      "definition": "Touching one tile opens a new way by deleting a tile somewhere else.",
+      "example": "When you touch the key, the tile at column 10 row 5 (the door) is cleared.",
+      "pitfall": "Writing the wrong column and row for the door: the door does not open, or another tile is deleted."
+    },
+    {
+      "term": "Door tile",
+      "definition": "A tile with its wall box ticked; when it is deleted, the wall goes too and the way through opens.",
+      "example": "The only way through the wall in the middle of the island is the door.",
+      "pitfall": "Never deleting the door: you cannot get to the half where the chest is."
+    },
+    {
+      "term": "Adding the score to a message",
+      "definition": "The `create text with` block joins text and the score block into one message.",
+      "example": "`You found the treasure! Score: ` + score; if the score is 3, it writes `You found the treasure! Score: 3`.",
+      "pitfall": "Not filling the slots of the create text block: the message comes out incomplete."
+    },
+    {
+      "term": "Tile rules",
+      "definition": "The game's rules live in the events of the tiles on the map; for a new rule, a new tile and event are added.",
+      "example": "Drawing a new lava tile on the map adds more danger; no new event is needed, the existing lava event is enough.",
+      "pitfall": "Drawing a new kind of tile and not writing an event for it: the tile does nothing."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d15-q1",
+      "kind": "numeric",
+      "prompt": "The treasure island map is 20 x 10 tiles (a tile is 16 pixels). The screen is 160 x 120 pixels. What is the largest value the camera's x can be?",
+      "answer": 160,
+      "unit": "pixels",
+      "explanation": "The world width is 20 x 16 = 320 pixels. The camera scrolls at most the world minus the screen: 320 - 160 = 160. If you write 320, you have let the camera go outside the world.",
+      "skills": [
+        "oyun-kamera",
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d15-q2",
+      "kind": "find-bug",
+      "prompt": "The hero gets the key and the key disappears, but the door does not open. The door is on the tile at column 10, row 5.\n\n```\n1  when a [Player] sprite touches tile [Key]\n2      clear tile at column [event tile column] row [event tile row]\n3      clear tile at column [5] row [10]\n4      show [The door is open!] on screen for [2] seconds\n```\n\nWhich line is wrong?",
+      "options": [
+        "Line 1",
+        "Line 2",
+        "Line 3: the column and row have been swapped",
+        "Line 4"
+      ],
+      "answer": 2,
+      "explanation": "The door is at column 10, row 5, but line 3 says column 5, row 10. The island has 10 rows (0-9), so row 10 is outside the map and no tile is deleted. The key being deleted shows that line 2 works correctly.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-olay-karosu"
+      ]
+    },
+    {
+      "id": "m11h3d15-q3",
+      "kind": "mcq",
+      "prompt": "Which best explains why the door opens when the key is taken?",
+      "options": [
+        "Because the hero walks faster",
+        "The door opens by itself because its wall box is not ticked",
+        "The camera hides the door",
+        "The key event deletes the door tile from the map; when a tile with a ticked wall box is deleted, the wall goes too"
+      ],
+      "answer": 3,
+      "explanation": "The door is drawn as a wall, and the way only opens when the tile is deleted. If the door could be passed from the start, the lock would be pointless. The speed and the camera have nothing to do with the door opening.",
+      "skills": [
+        "oyun-olay-karosu",
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h3d15-q4",
+      "kind": "numeric",
+      "prompt": "You changed the diamond event to `change score by [2]`. The hero collected all three diamonds, never touched lava and reached the chest. The chest message joins `You found the treasure! Score: ` and the score block. What score does the message show?",
+      "answer": 6,
+      "unit": "points",
+      "explanation": "Three diamonds x 2 points = 6. The message reads the score itself, so when you change the event, the message updates by itself. Forgetting the diamond's value and writing 3 is using the old rule.",
+      "skills": [
+        "oyun-kural-planlama",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d15-q5",
+      "kind": "predict-output",
+      "prompt": "There are three lava tiles on the island. The lava event does `change lives by -1` and sends the hero to the start tile (column 1, row 1). At the start the lives are 3. The hero touches three different lava tiles in turn. No other blocks have been written. What happens?",
+      "options": [
+        "The lives become 0 and the game is lost",
+        "The lives stay at 3",
+        "The lives become -3 and the game goes on",
+        "The game is won"
+      ],
+      "answer": 0,
+      "explanation": "On each lava the lives go down by 1: 3 - 3 = 0. When the lives reach 0, if no `when lives run out` event has been written, the game is lost by itself. The lives are not expected to go below zero with the game carrying on; to win, you need to reach the chest.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-kazanma-kosulu"
+      ]
+    }
+  ]
+}

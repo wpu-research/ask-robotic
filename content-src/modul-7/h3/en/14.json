@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Iteration loop",
+      "definition": "The loop of write, try, judge, change one thing, try again.",
+      "example": "Write v1, look at the result against the goal, add one sentence in v2.",
+      "pitfall": "Saying \"done\" at the first attempt; a prompt does not mature until the real result has been seen."
+    },
+    {
+      "term": "One-change rule",
+      "definition": "Changing only one thing in each round, so the cause of the result can be understood.",
+      "example": "First adding only the format sentence, then only the role.",
+      "pitfall": "Changing five things at once and not being able to tell which one worked."
+    },
+    {
+      "term": "Version record",
+      "definition": "Writing down each prompt version, the change made and the result.",
+      "example": "v1: 20 points; v2: format sentence added, 50 points.",
+      "pitfall": "Deleting the old version; if things get worse, you cannot go back."
+    },
+    {
+      "term": "Checklist score",
+      "definition": "The number the Workshop checker gives based on whether the parts are there; it is not a model.",
+      "example": "Writing \"at most 3 bullet points\" fills the format and constraint boxes.",
+      "pitfall": "Thinking the score is quality; the checker does not understand meaning, it looks for words and patterns."
+    },
+    {
+      "term": "Real success rate",
+      "definition": "The rate of correct answers after trying the prompt with example inputs.",
+      "example": "If 5 of 8 attempts are correct, 62.5 per cent.",
+      "pitfall": "Drawing a conclusion from too few examples (for example 1-2)."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d14-q1",
+      "kind": "mcq",
+      "prompt": "When improving a prompt, why should you change only one thing in each round?",
+      "options": [
+        "Because only this way can you understand which change the result came from",
+        "Because the model cannot read more than one change",
+        "Because the score only goes up with a single change",
+        "Because keeping a version record is not allowed"
+      ],
+      "answer": 0,
+      "explanation": "With a single change, cause and effect are visible; if it does not work, you undo it. The model can read several changes; the problem is that you cannot explain the result. On the contrary, keeping a version record is recommended.",
+      "skills": [
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d14-q2",
+      "kind": "predict-output",
+      "prompt": "You tried a prompt on 8 examples and listed the results as true (correct) and false (wrong). What does the code print when it runs?\n\n```\nconst sonuclar = [true, false, false, true, true, false, true, true]\nconst dogru = sonuclar.filter((s) => s).length\nconsole.log(dogru / sonuclar.length * 100)\n```",
+      "options": [
+        "5",
+        "37.5",
+        "62.5",
+        "8"
+      ],
+      "answer": 2,
+      "explanation": "filter keeps only the true ones: 5 of them. length gives 8. 5 / 8 × 100 = 62.5. 37.5 is the rate of wrong answers (3 / 8); 5 is just the number of correct answers.",
+      "skills": [
+        "ai-prompt-iterate",
+        "ai-honest-measure"
+      ]
+    },
+    {
+      "id": "m7h3d14-q3",
+      "kind": "numeric",
+      "prompt": "You tried the v1 prompt on 10 real examples: 5 correct. You tried v2 on the same 10 examples: 7 correct. By how many percentage points did the rate of correct answers go up?",
+      "answer": 20,
+      "unit": "percentage points",
+      "explanation": "v1: 5 / 10 = 50%, v2: 7 / 10 = 70%. The difference is 20 percentage points. Because you compared on the same set of examples, the cause of the result is the prompt change; if you had compared with different examples, the result would be misleading.",
+      "skills": [
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d14-q4",
+      "kind": "mcq",
+      "prompt": "In the Workshop the check score went up from 50 to 80, but on a real model the answers got worse. How can this happen?",
+      "options": [
+        "The checker is also a language model and it got it wrong",
+        "The checker looks at keywords; when words are added the score goes up, but it does not measure meaning or model behaviour",
+        "The score never changes",
+        "A real model always follows the score"
+      ],
+      "answer": 1,
+      "explanation": "The checker is rule-based, not a model. It gives points when it sees the words for the parts; instructions contradicting each other, or the answer getting worse, do not affect it. For proof you need measurement on real examples.",
+      "skills": [
+        "ai-honest-measure",
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d14-q5",
+      "kind": "mcq",
+      "prompt": "Going from v1 to v2, you added the role, format and constraint sentences together; success went up from 40 per cent to 80. What can you say?",
+      "options": [
+        "The role sentence worked",
+        "The format sentence worked",
+        "You cannot know which of the three changes had the effect",
+        "The constraint sentence did harm"
+      ],
+      "answer": 2,
+      "explanation": "Because three things changed together, you cannot separate the effect. Adding them one at a time, or undoing them, would show which one worked. The three changes together may have been good; but which one contributed most is unknown.",
+      "skills": [
+        "ai-prompt-iterate"
+      ]
+    }
+  ]
+}

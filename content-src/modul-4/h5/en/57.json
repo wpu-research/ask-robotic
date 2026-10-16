@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Quadrature (quarter phase)",
+      "definition": "Two signals that are not simultaneous but shifted 90 degrees from each other. Together they give both the step and the direction.",
+      "example": "Clockwise, the states change in the order 11, 01, 00, 10 (CLK, DT).",
+      "pitfall": "Looking only at CLK: it falls the same way in both directions, so you cannot tell the direction."
+    },
+    {
+      "term": "Direction rule",
+      "definition": "When CLK falls, look at DT: if DT is 1 it is one direction (sayac++), if it is 0 the other direction (sayac--).",
+      "example": "If DT is still 1 when CLK falls from 1 to 0, sayac goes up.",
+      "pitfall": "Mixing up CLK and DT: the direction comes out reversed."
+    },
+    {
+      "term": "Interrupt (attachInterrupt)",
+      "definition": "Running a short function (ISR) as soon as a pin edge happens, without waiting for loop().",
+      "example": "attachInterrupt(digitalPinToInterrupt(2), adim, FALLING); when CLK falls, adim() runs.",
+      "pitfall": "Connecting CLK to a pin other than D2 or D3: on the Uno the interrupt does not work."
+    },
+    {
+      "term": "volatile",
+      "definition": "Tells the compiler that the variable can change outside the normal program flow, for example in an interrupt.",
+      "example": "volatile int sayac = 0; is used both in the ISR and in loop().",
+      "pitfall": "Not writing volatile: loop() may not see the change."
+    },
+    {
+      "term": "Bounce filter",
+      "definition": "Ignoring an edge if at least a certain time has not passed between two edges.",
+      "example": "If the micros() difference is less than 2000 µs, the edge is skipped.",
+      "pitfall": "Making the threshold too large: when you turn fast, real ticks are thrown away too."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d57-q1",
+      "kind": "predict-output",
+      "prompt": "The encoder is connected with CLK=D2, DT=D3, and sayac starts at 5. The encoder is turned 2 ticks in the opposite direction (each tick goes through the states 11, 10, 00, 01, 11). In the end, what does the last line on the Serial monitor say?\n\n```\nvolatile int sayac = 5;\n\nvoid adim() {\n  if (digitalRead(3) == HIGH) {\n    sayac++;\n  } else {\n    sayac--;\n  }\n}\n// setup: attachInterrupt(digitalPinToInterrupt(2), adim, FALLING);\n// loop: when sayac changes, prints Serial.print(\"Sayac: \") and the value\n```",
+      "options": [
+        "Sayac: 7",
+        "Sayac: 5",
+        "Sayac: 3",
+        "Sayac: 1"
+      ],
+      "answer": 2,
+      "explanation": "In the opposite direction, when CLK falls from 10 to 00, DT is already 0, so sayac-- runs on every tick: 5 - 2 = 3. Clockwise, DT would be 1 and sayac would be 7.",
+      "skills": [
+        "quadrature",
+        "interrupts"
+      ]
+    },
+    {
+      "id": "m4h5d57-q2",
+      "kind": "numeric",
+      "prompt": "The lab's encoder applies one state change every simulated millisecond, and one tick is 4 changes. If you move the Position property from 0 to 30 in one go, in how many ms does the encoder finish its movement?",
+      "answer": 120,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "30 ticks x 4 changes = 120 changes, and each takes 1 ms: 120 ms. That means 4 ms per tick (at most 250 ticks/s); the bounce threshold must be chosen smaller than these 4 ms.",
+      "skills": [
+        "debounce",
+        "quadrature"
+      ]
+    },
+    {
+      "id": "m4h5d57-q3",
+      "kind": "find-bug",
+      "prompt": "You connected the CLK wire to D4, and the program does not count or give a direction. The counter never changes. Which line is wrong?\n\n```\nconst int CLK = 4;\nconst int DT = 3;\nvolatile int sayac = 0;\n\nvoid adim() {\n  if (digitalRead(DT) == HIGH) sayac++; else sayac--;\n}\n\nvoid setup() {\n  pinMode(CLK, INPUT_PULLUP);\n  pinMode(DT, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(CLK), adim, FALLING);\n}\n```",
+      "options": [
+        "const int CLK = 4;",
+        "volatile int sayac = 0;",
+        "pinMode(DT, INPUT_PULLUP);",
+        "if (digitalRead(DT) == HIGH) sayac++; else sayac--;"
+      ],
+      "answer": 0,
+      "explanation": "On the Uno only D2 and D3 are interrupt pins. digitalPinToInterrupt(4) does not give a valid interrupt, so the ISR never runs. CLK must be connected to D2 (or D3). volatile and INPUT_PULLUP are correct.",
+      "skills": [
+        "interrupts",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h5d57-q4",
+      "kind": "mcq",
+      "prompt": "Why can a program that looks only at the CLK signal not find the direction of rotation?",
+      "options": [
+        "The CLK signal is too fast",
+        "CLK falls in the same way in both directions; the state of DT at that moment decides the direction",
+        "CLK only reads the button",
+        "The encoder only turns in one direction"
+      ],
+      "answer": 1,
+      "explanation": "CLK falls from 1 to 0 both clockwise and in the opposite direction. The difference is whether DT is 1 or 0 at the moment of the fall; that is why both signals are read together.",
+      "skills": [
+        "quadrature"
+      ]
+    },
+    {
+      "id": "m4h5d57-q5",
+      "kind": "numeric",
+      "prompt": "The encoder is turned fast and CLK falls every 4 ms. The threshold ARALIK_US = 6000 was chosen. Over 20 falls in a row, how many ticks does the program count? (The first edge is accepted.)",
+      "answer": 10,
+      "tolerance": 1,
+      "explanation": "The accepted edge is at t = 0; the next one comes 4 ms later and is thrown away because it is less than 6 ms; the one that comes 8 ms later is accepted. Every second edge is counted: 20 / 2 = 10. If the threshold were smaller than 4 ms (for example 2 ms), 20 would be counted; when the threshold is too large, real ticks are lost.",
+      "skills": [
+        "debounce"
+      ]
+    }
+  ]
+}

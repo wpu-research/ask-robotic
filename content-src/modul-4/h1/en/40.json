@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Threshold and zone",
+      "definition": "Splitting a measurement into zones with boundary values and linking a different behaviour to each zone.",
+      "example": "Below 20 cm red, 20-50 cm yellow, above 50 cm green.",
+      "pitfall": "Leaving the boundary value unclear: nobody has decided which zone exactly 20 cm is in."
+    },
+    {
+      "term": "map()",
+      "definition": "Turns a number in one range into another range in a straight line; it works with whole numbers and throws away the fraction.",
+      "example": "map(60, 20, 100, 100, 800) gives 450: at 60 cm the beep interval is 450 ms.",
+      "pitfall": "Passing a distance with a fraction without converting it with (long), or expecting the result to have decimals."
+    },
+    {
+      "term": "Non-blocking multitasking",
+      "definition": "The measurement, the beep and the screen run on their own clocks with millis(); none of them waits for another.",
+      "example": "The measurement runs every 60 ms, the screen every 250 ms.",
+      "pitfall": "Using delay() for the beep: the measurement and the screen stop for that time."
+    },
+    {
+      "term": "Hysteresis",
+      "definition": "Preventing flicker at a boundary by choosing different thresholds for entering and leaving a state.",
+      "example": "Switch to red at 20 cm, leave red at 25 cm.",
+      "pitfall": "Using a single threshold: when the measurement goes back and forth at the boundary, the colour keeps changing."
+    },
+    {
+      "term": "Padding the screen line",
+      "definition": "Writing the line to the LCD with exactly 16 characters every time; short text does not wipe out old letters.",
+      "example": "lcd.print(\"DUR!            \"); pads the line out to 16 characters with spaces.",
+      "pitfall": "Writing a short text and seeing the old characters stay on the screen."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d40-q1",
+      "kind": "numeric",
+      "prompt": "In the parking sensor, the beep interval is worked out with map((long)mesafe, 20, 100, 100, 800). When the distance is 75 cm, how many milliseconds is the beep interval? (map works with whole numbers and throws away the fraction.)",
+      "answer": 581,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "map = (75 − 20) × (800 − 100) / (100 − 20) + 100. In order: 55 × 700 = 38500; 38500 / 80 = 481 (the fraction is thrown away); 481 + 100 = 581 ms.",
+      "skills": [
+        "sens-thresholds"
+      ]
+    },
+    {
+      "id": "m4h1d40-q2",
+      "kind": "mcq",
+      "prompt": "What happens if the parking sensor's beep is made with delay(40), holding the buzzer pin HIGH for 40 ms and then silencing it?",
+      "options": [
+        "Nothing changes",
+        "The program stops during every beep; the measurement and the screen update are delayed",
+        "The buzzer sounds all the time",
+        "The measurement becomes more accurate"
+      ],
+      "answer": 1,
+      "explanation": "delay() blocks the program. During the beep, the measurement and the screen cannot run, and as the beeps get faster, the program spends almost all its time waiting. The fix is to keep the beep's start time and look at the millis() difference (lesson 27).",
+      "skills": [
+        "prog-nonblocking"
+      ]
+    },
+    {
+      "id": "m4h1d40-q3",
+      "kind": "find-bug",
+      "prompt": "In the parking sensor, the yellow LED is always on, whatever the distance. Which line is wrong?\n\n```\nvoid ledGuncelle() {\n  digitalWrite(LED_YESIL,   mesafe >= 50);\n  digitalWrite(LED_SARI,    mesafe >= 20 || mesafe < 50);\n  digitalWrite(LED_KIRMIZI, mesafe < 20);\n}\n```",
+      "options": [
+        "digitalWrite(LED_YESIL,   mesafe >= 50);",
+        "digitalWrite(LED_KIRMIZI, mesafe < 20);",
+        "digitalWrite(LED_SARI,    mesafe >= 20 || mesafe < 50);"
+      ],
+      "answer": 2,
+      "explanation": "For yellow, two conditions must be true at the same time: 20 cm and above AND below 50 cm. When || (\"or\") is used, every number meets at least one of them, so the condition is always true. It should be &&. The other two lines match the green and red zones in the table.",
+      "skills": [
+        "sens-thresholds",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h1d40-q4",
+      "kind": "numeric",
+      "prompt": "A measurement is taken every 60 ms and the filter is a 7-element median. If the distance changes suddenly just after a measurement, after how many milliseconds at the earliest does the filter output give the new value?",
+      "answer": 240,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "In a 7-element window, 4 new readings (a majority) are needed for the new value to be the median. 4 × 60 = 240 ms. In a 5-element window this would be 3 × 60 = 180 ms; the bigger the window, the slower the reaction.",
+      "skills": [
+        "sens-filter",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h1d40-q5",
+      "kind": "predict-output",
+      "prompt": "On the LCD's second line, first \"YAKLASIYOR\" is written, then \"DUR!\" starting from the same position. What appears on the screen?\n\n```\nlcd.setCursor(0, 1);\nlcd.print(\"YAKLASIYOR\");\nlcd.setCursor(0, 1);\nlcd.print(\"DUR!\");\n```",
+      "options": [
+        "DUR!",
+        "DUR!ASIYOR",
+        "YAKLASIYOR",
+        "DUR!KLASIYOR"
+      ],
+      "answer": 1,
+      "explanation": "The LCD writes over the characters already there; it does not wipe the rest. \"DUR!\" overwrites the first four letters (YAKL), and the remaining \"ASIYOR\" stays on the screen: DUR!ASIYOR. The fix is to pad the line out to 16 characters with spaces.",
+      "skills": [
+        "sens-thresholds",
+        "prog-debug"
+      ]
+    }
+  ]
+}

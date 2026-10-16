@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Intensity (a direction-free value)",
+      "definition": "A value that turns the raw reading round so that \"big number = strong flame\".",
+      "example": "On a module whose value drops with a flame, siddet(ham) = 1023 - ham; if ham is 700, the intensity is 323.",
+      "pitfall": "Not checking the ALEVDE_DUSER value: the alarm always goes off or never does."
+    },
+    {
+      "term": "Level (enum)",
+      "definition": "An ordered type that holds the state with names like NORMAL, UYARI, TEHLIKE.",
+      "example": "enum Seviye { NORMAL, UYARI, TEHLIKE }; its values are 0, 1, 2 in order.",
+      "pitfall": "Using bare numbers like 0, 1, 2 for the levels: the code becomes hard to read and mistakes are easy to make."
+    },
+    {
+      "term": "Several thresholds",
+      "definition": "Four thresholds for three levels: UYARI on/off and TEHLIKE on/off.",
+      "example": "For the flame, the pairs 300 / 250 and 600 / 500 are used.",
+      "pitfall": "Writing the off threshold bigger than the on threshold: the level never drops or keeps swinging."
+    },
+    {
+      "term": "Reuse with a function that takes parameters",
+      "definition": "Putting the same decision logic into a function and giving the thresholds as parameters.",
+      "example": "seviyeBul is called with fixed numbers for the flame and with multiples of the baseline for the gas.",
+      "pitfall": "Copying and pasting the same logic for two sensors: a bug fixed in one place stays in the other."
+    },
+    {
+      "term": "Worst level (enKotu)",
+      "definition": "Making the highest of several sensors' levels the overall state.",
+      "example": "If the gas is UYARI and the flame is TEHLIKE, the overall state is TEHLIKE.",
+      "pitfall": "Making only the last sensor read the overall state: the earlier sensor's danger is lost."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d4-q1",
+      "kind": "numeric",
+      "prompt": "The virtual flame module's value drops with a flame, and siddet(ham) = 1023 - ham is used. When the raw reading is 700, what is the intensity?",
+      "answer": 323,
+      "tolerance": 0,
+      "explanation": "1023 - 700 = 323. This value goes above the UYARI on threshold (300); the flame is not ignored. If the module works the other way round, ALEVDE_DUSER is set to false and the intensity is simply 700.",
+      "skills": [
+        "sens-direction"
+      ]
+    },
+    {
+      "id": "m4h4d4-q2",
+      "kind": "predict-output",
+      "prompt": "seviyeBul is called with the thresholds 300 / 250 / 600 / 500. The level starts as NORMAL. Six measurements arrive in order, and after each step the letter of the new level (N, U or T) is printed. What does this code print?\n\n```\nenum Seviye { NORMAL, UYARI, TEHLIKE };\n\nSeviye seviyeBul(Seviye simdiki, int deger,\n                 int uyariAc, int uyariKapat,\n                 int tehlikeAc, int tehlikeKapat) {\n  if (simdiki == NORMAL) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger >= uyariAc) return UYARI;\n    return NORMAL;\n  }\n  if (simdiki == UYARI) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger < uyariKapat) return NORMAL;\n    return UYARI;\n  }\n  if (deger < tehlikeKapat) {\n    return (deger >= uyariKapat) ? UYARI : NORMAL;\n  }\n  return TEHLIKE;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  int olcum[] = {320, 280, 240, 650, 520, 480};\n  Seviye s = NORMAL;\n  for (int i = 0; i < 6; i++) {\n    s = seviyeBul(s, olcum[i], 300, 250, 600, 500);\n    Serial.print(s == NORMAL ? 'N' : (s == UYARI ? 'U' : 'T'));\n  }\n}\n```",
+      "options": [
+        "UNNTUU",
+        "UUUTTT",
+        "UUNTTU",
+        "UUNTTN"
+      ],
+      "answer": 2,
+      "explanation": "320 takes NORMAL to UYARI (U). 280 does not drop below 250, so it stays in UYARI (U). 240 < 250, so NORMAL (N). 650 goes straight to TEHLIKE (T). 520 ≥ 500, so TEHLIKE continues (T). 480 < 500 and ≥ 250, so it drops to UYARI (U). The first option behaves like a single threshold with no hysteresis, the second assumes the level never drops, and the fourth drops from TEHLIKE straight to NORMAL.",
+      "skills": [
+        "sens-levels",
+        "sens-hysteresis"
+      ]
+    },
+    {
+      "id": "m4h4d4-q3",
+      "kind": "find-bug",
+      "prompt": "The flame intensity stays steady at 320, but the yellow UYARI LED blinks very fast. Where is the mistake?\n\n```\nSeviye yeni = seviyeBul(seviye, s, 300, 350, 600, 500);\n```\n(Argument order: uyariAc, uyariKapat, tehlikeAc, tehlikeKapat.)",
+      "options": [
+        "uyariAc (300) is too small",
+        "uyariKapat (350) has been written bigger than uyariAc (300)",
+        "tehlikeKapat (500) should not be smaller than tehlikeAc (600)",
+        "The seviye variable should not be global"
+      ],
+      "answer": 1,
+      "explanation": "In NORMAL, 320 ≥ 300, so it moves to UYARI. In UYARI, 320 < 350, so it goes straight back to NORMAL, and so on: the LED changes on every pass. The off threshold must be smaller than the on threshold (for example 250). tehlikeKapat < tehlikeAc is written correctly, and uyariAc is not the problem either.",
+      "skills": [
+        "sens-levels",
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d4-q4",
+      "kind": "mcq",
+      "prompt": "A flame module from another brand RAISES its value when a flame comes close. To use the same program as in the lesson, which change is enough?",
+      "options": [
+        "Only setting the ALEVDE_DUSER constant to false",
+        "Rewriting the seviyeBul function from scratch",
+        "Flipping every threshold one by one",
+        "Writing two separate programs for flame and gas"
+      ],
+      "answer": 0,
+      "explanation": "The direction difference is sorted out in one place, inside siddet(). When ALEVDE_DUSER is false, intensity = ham and the rest of the code (seviyeBul, the thresholds, the outputs) works unchanged. Thinking about the direction separately in every comparison means both mistakes and repetition.",
+      "skills": [
+        "sens-direction",
+        "prog-reuse-functions"
+      ]
+    },
+    {
+      "id": "m4h4d4-q5",
+      "kind": "mcq",
+      "prompt": "The gas level is UYARI and the flame level is TEHLIKE. enum Seviye { NORMAL, UYARI, TEHLIKE } and enKotu(a, b) returns \"the bigger one\". What is the overall state?",
+      "options": [
+        "NORMAL",
+        "UYARI",
+        "An error, because an enum cannot be compared",
+        "TEHLIKE"
+      ],
+      "answer": 3,
+      "explanation": "The enum values are 0, 1, 2 in order; TEHLIKE (2) is bigger than UYARI (1), so enKotu returns TEHLIKE. If one of the sensors is in danger, the system is in danger. enum values are compared like numbers; there is no compile error.",
+      "skills": [
+        "sens-levels"
+      ]
+    }
+  ]
+}

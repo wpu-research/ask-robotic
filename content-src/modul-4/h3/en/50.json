@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "State",
+      "definition": "A variable that holds which mode the system is in right now; in this project it is uyari (true/false).",
+      "example": "While uyari is true, the LED is on, the buzzer keeps beeping and the screen says SULAMA GEREKLI.",
+      "pitfall": "Not storing the state and deciding again on every round; the changes and the messages get mixed up."
+    },
+    {
+      "term": "Hysteresis (two thresholds)",
+      "definition": "Using different thresholds for switching on and switching off; between the two thresholds the current state is kept.",
+      "example": "When the moisture drops below 30 %, the alert switches on, and it does not switch off until the moisture rises to 40 %.",
+      "pitfall": "Using a single threshold; when the reading wobbles around the threshold, the LED and the buzzer switch on and off quickly."
+    },
+    {
+      "term": "Message on a change of state",
+      "definition": "Writing the alert line to the serial port only once, at the moment the state changes, not on every round.",
+      "example": "When uyari changes from false to true, \"UYARI: toprak nemi %29\" is written once.",
+      "pitfall": "Printing the same message on every round; the Serial monitor fills up and the important line gets lost."
+    },
+    {
+      "term": "Non-blocking buzzer (with tone)",
+      "definition": "tone(pin, frequency, duration) starts the sound and returns without waiting; the repeat interval is counted with millis().",
+      "example": "tone(8, 1000, 200) plays a 200 ms beep, repeated every 2 seconds.",
+      "pitfall": "Using delay(200) for the beep; the page change, the button and the measurement freeze during that time."
+    },
+    {
+      "term": "Fault-tolerant design",
+      "definition": "The program keeps running without crashing even when a sensor is missing or broken.",
+      "example": "When the DHT gives NaN, -- appears on the screen and the soil alert still works.",
+      "pitfall": "Not preparing for NaN or a missing sensor; nan appears on the screen and the threshold comparisons go wrong."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h3d50-q1",
+      "kind": "mcq",
+      "prompt": "Why do we use two thresholds (30 % to switch on, 40 % to switch off) for the watering alert instead of a single threshold (30 %)?",
+      "options": [
+        "To make the code shorter",
+        "Because the LCD screen has two rows",
+        "To stop the alert switching on and off quickly while the moisture wobbles around 30 %",
+        "Because the buzzer beeps at two frequencies"
+      ],
+      "answer": 2,
+      "explanation": "In the zone between the two thresholds the state is kept: if the alert is on, it does not switch off until the moisture rises to 40 %. So the LED and the buzzer do not flicker while the moisture moves around 30 %. It makes the code longer, not shorter; it has nothing to do with the screen or the buzzer.",
+      "skills": [
+        "sens-threshold-hyst",
+        "proj-integration"
+      ]
+    },
+    {
+      "id": "m4h3d50-q2",
+      "kind": "numeric",
+      "prompt": "The alert rule: when it is normal and the moisture drops below 30 %, the alert switches on (and 1 line is written to the serial port); when it is on and the moisture rises to 40 % or above, it switches off (and 1 line is written). At the start the alert is off. The measurements arrive in this order: 45, 32, 29, 33, 38, 41, 36, 28. How many alert/back-to-normal lines are written to the serial port in total?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "lines",
+      "explanation": "At 45 and 32 the alert stays off (it did not go below 30). At 29 the alert switches on: line 1. At 33 and 38 the alert continues. At 41 it switches off: line 2. At 36 it stays off. At 28 it switches on again: line 3. Total 3.",
+      "skills": [
+        "sens-threshold-hyst",
+        "proj-integration"
+      ]
+    },
+    {
+      "id": "m4h3d50-q3",
+      "kind": "find-bug",
+      "prompt": "This alert check should have hysteresis, but when the moisture moves around 30 % the alert switches on and off quickly. ESIK_ALT = 30 and ESIK_UST = 40 are constants. Which line has the bug?\n\n```\n1 if (!uyari && toprakYuzde < ESIK_ALT) {\n2   uyari = true;\n3 }\n4 else if (uyari && toprakYuzde >= ESIK_ALT) {\n5   uyari = false;\n6 }\n```",
+      "options": [
+        "Line 1: ESIK_UST should be written",
+        "Line 2: it should be uyari = false",
+        "Line 4: the switch-off condition should compare with ESIK_UST",
+        "Line 6: the closing bracket is missing"
+      ],
+      "answer": 2,
+      "explanation": "When ESIK_ALT (30) is used as the switch-off threshold, switching on and switching off happen at the same value and the hysteresis disappears. The switch-off condition should be toprakYuzde >= ESIK_UST (40). The switch-on condition (line 1) is right.",
+      "skills": [
+        "sens-threshold-hyst",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h3d50-q4",
+      "kind": "numeric",
+      "prompt": "The moment the alert switches on, the first beep plays straight away, and after that a new beep plays every 2 seconds (with tone, without the program waiting). The alert switches off 9 seconds after it switched on. How many beeps have played in that time?",
+      "answer": 5,
+      "tolerance": 0,
+      "unit": "beeps",
+      "explanation": "The beeps play at the 0th, 2nd, 4th, 6th and 8th second of the alert; the next one would have been at the 10th second, but the alert switched off at the 9th. Total 5 beeps. These times were also measured on the real program in the lab.",
+      "skills": [
+        "proj-integration",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h3d50-q5",
+      "kind": "mcq",
+      "prompt": "A friend suggests writing tone(8, 1000); delay(200); noTone(8); to play the buzzer. What would be the biggest problem in this project?",
+      "options": [
+        "The buzzer makes no sound at all",
+        "The serial port closes",
+        "The LED goes off",
+        "During every beep, the button, the measurement and the page change stop for 200 ms"
+      ],
+      "answer": 3,
+      "explanation": "delay makes the program wait; during that time the button is not read and the timers are not checked. tone(pin, frequency, 200), on the other hand, returns without waiting, and the sound finishes in the background. The buzzer does make a sound; the problem is that the other jobs stop.",
+      "skills": [
+        "proj-integration",
+        "prog-timing"
+      ]
+    }
+  ]
+}

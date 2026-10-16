@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Tempo",
+      "definition": "The speed of the music; on the card it is given as beats per minute and starts at 120.",
+      "example": "At tempo 60 a 1/4 beat lasts 1000 ms; at tempo 240 it lasts 250 ms.",
+      "pitfall": "Thinking the notes get longer when you raise the tempo; as the tempo goes up, the notes get shorter."
+    },
+    {
+      "term": "Beat duration",
+      "definition": "A 1/4 beat lasts 60000 / tempo milliseconds; the other values are multiples of it.",
+      "example": "At tempo 120 a 1/2 beat lasts 2 × 500 = 1000 ms.",
+      "pitfall": "Thinking the beat value is directly in milliseconds; it is first converted using the tempo."
+    },
+    {
+      "term": "Rest block",
+      "definition": "A block that makes no sound but waits for the chosen time.",
+      "example": "By putting a 1/4 beat rest between three notes, you make the rhythm clear.",
+      "pitfall": "Forgetting the rests; the same notes run into each other and the rhythm is lost."
+    },
+    {
+      "term": "Tempo block",
+      "definition": "Changes the speed of all the notes and rests after it; it works between 20 and 400.",
+      "example": "After the set tempo to [240] block, every 1/4 beat lasts 250 ms.",
+      "pitfall": "Thinking the tempo block only affects the next note; it stays in force until a new tempo block comes."
+    },
+    {
+      "term": "pause (ms)",
+      "definition": "A block that waits for real milliseconds; it ignores the tempo completely.",
+      "example": "pause [500] ms always lasts half a second, whatever the tempo is.",
+      "pitfall": "Using the pause block in a rhythm and expecting its time to change when you change the tempo."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h4d17-q1",
+      "kind": "numeric",
+      "prompt": "The tempo is 60. How many milliseconds does a [1/2] beat note last? (1/4 beat = 60000 / tempo, 1/2 beat = 2 units)",
+      "answer": 2000,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "At tempo 60 one unit is 60000 / 60 = 1000 ms. A 1/2 beat is two units, so it lasts 2 × 1000 = 2000 ms.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d17-q2",
+      "kind": "numeric",
+      "prompt": "With the tempo at 240, how many milliseconds does a [1/8] beat note last? (1/8 beat = half a unit)",
+      "answer": 125,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "At tempo 240 one unit is 60000 / 240 = 250 ms. A 1/8 beat is half a unit, so it is 250 / 2 = 125 ms.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d17-q3",
+      "kind": "predict-output",
+      "prompt": "The tempo starts at 120. When A is pressed, the program below runs. How many milliseconds do the notes take in total?\n\n```\nset tempo to [60]\nplay note [G] for [1/4] beat\nrest for [1/4] beat\nset tempo to [240]\nplay note [G] for [1/4] beat\nrest for [1/4] beat\nplay note [G] for [1/4] beat\n```",
+      "options": [
+        "1500 ms",
+        "2750 ms",
+        "3500 ms",
+        "1750 ms"
+      ],
+      "answer": 1,
+      "explanation": "The first G and the first rest are 1000 ms each at tempo 60: 2000 ms. Then the tempo becomes 240; the three blocks are 250 ms each: 750 ms. Total 2000 + 750 = 2750 ms. If you think it is all at tempo 240 you get 1500; if you think it is all at tempo 60 you get 5000.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d17-q4",
+      "kind": "find-bug",
+      "prompt": "To speed up the song, a student set the tempo to 240. The notes got shorter, but the pause after each note stayed the same:\n\n```\nset tempo to [240]\nplay note [C] for [1/4] beat\npause [500] ms\nplay note [D] for [1/4] beat\n```\n\nWhat is the problem?",
+      "options": [
+        "The note C does not support tempo 240",
+        "The pause ms block does not listen to the tempo; a rest block should be used for the pause",
+        "The tempo block should be written twice",
+        "The note D cannot be a 1/4 beat"
+      ],
+      "answer": 1,
+      "explanation": "pause [500] ms waits for real milliseconds and does not change with the tempo. To tie the pause to the tempo, use the rest for [1/4] beat block; then the pause is 250 ms.",
+      "skills": [
+        "prog-debug",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d17-q5",
+      "kind": "mcq",
+      "prompt": "If you try to set the tempo to 500 in the program, what happens on the card?",
+      "options": [
+        "The tempo becomes 500",
+        "The tempo becomes 400; the card pulls the value to the upper limit",
+        "It gives an error and the program stops",
+        "The tempo goes back to 120"
+      ],
+      "answer": 1,
+      "explanation": "The card keeps the tempo between 20 and 400. 500 is outside the limit, so it is pulled to 400; at this speed a 1/4 beat lasts 150 ms. The program does not stop.",
+      "skills": [
+        "prog-timing"
+      ]
+    }
+  ]
+}

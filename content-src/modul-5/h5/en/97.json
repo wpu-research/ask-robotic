@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Derivative (D)",
+      "definition": "The rate of change of the error: (e - sonHata) / dt.",
+      "example": "If the error went from 9 cm to 12 cm in 50 ms, the derivative is +60 cm/s.",
+      "pitfall": "Forgetting to divide by dt; the derivative then depends on the control period and is scaled wrongly."
+    },
+    {
+      "term": "PD control",
+      "definition": "Control that looks at both the error and the rate of change of the error: u = Kp x e + Kd x turev.",
+      "example": "When the robot approaches the wall fast, D brakes while the error is still small.",
+      "pitfall": "Writing the sign of Kd the wrong way round; instead of damping, D makes the oscillation bigger."
+    },
+    {
+      "term": "Overshoot",
+      "definition": "The robot going past the target and spilling over to the other side; the distance between the target and the furthest point.",
+      "example": "With P alone at Kp = 48, the robot went 7.5 cm beyond the target and touched the wall.",
+      "pitfall": "Increasing Kp to reduce overshoot; with P alone, a large Kp increases overshoot."
+    },
+    {
+      "term": "Damping",
+      "definition": "The effect that reduces oscillation and overshoot; the D term provides it.",
+      "example": "At Kp = 32, adding Kd = 4.8 brought the overshoot down from 6.5 cm to 1.0 cm.",
+      "pitfall": "Making Kd far too large; the error grows again and the robot spends little time in the target band."
+    },
+    {
+      "term": "Derivative filter",
+      "definition": "A simple low-pass filter that smooths the derivative with turevSuz = ALFA * turevSuz + (1 - ALFA) * turev.",
+      "example": "When ALFA = 0.8, only 20% of each new derivative is taken.",
+      "pitfall": "Using unfiltered D with a noisy measurement; the motor jitters and buzzes."
+    },
+    {
+      "term": "Fake speed",
+      "definition": "A rate of change in the derivative that is not real, created by measurement noise.",
+      "example": "A 1 cm wobble over a 50 ms interval produces a fake speed of about 20 cm/s.",
+      "pitfall": "Mistaking the wobble of the measurement for real movement of the robot."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h5d97-q1",
+      "kind": "numeric",
+      "prompt": "In a wall follower, the error was 9 cm in the previous round and is 12 cm now. If the control period is DT = 50 ms, what is the derivative in cm/s?",
+      "answer": 60,
+      "tolerance": 0,
+      "unit": "cm/s",
+      "explanation": "Derivative = (e - sonHata) / dt = (12 - 9) / 0.05 = 60 cm/s. If you forget to convert 50 ms to 0.05 s and divide by 50, you get 0.06, which is wrong.",
+      "skills": [
+        "ctl-derivative"
+      ]
+    },
+    {
+      "id": "m5h5d97-q2",
+      "kind": "numeric",
+      "prompt": "In the derivative filter, if turevSuz = 0, ALFA = 0.8 and the newly measured derivative is 30 cm/s, what is turevSuz after the update?",
+      "answer": 6,
+      "tolerance": 0.01,
+      "unit": "cm/s",
+      "explanation": "turevSuz = 0.8 x 0 + (1 - 0.8) x 30 = 6 cm/s. Because the filter takes only 20% of the new derivative, the sudden jump is smoothed; even though the code works exactly right, D reacts late here.",
+      "skills": [
+        "ctl-derivative"
+      ]
+    },
+    {
+      "id": "m5h5d97-q3",
+      "kind": "mcq",
+      "prompt": "In wall following with P control only, if Kp is tripled from 16 to 48, how does the overshoot change?",
+      "options": [
+        "The overshoot shrinks and the robot settles more easily",
+        "The overshoot grows and the robot may touch the wall",
+        "The overshoot does not change at all",
+        "The overshoot becomes zero"
+      ],
+      "answer": 1,
+      "explanation": "In the measurement the overshoot went from 3.8 cm up to 7.5 cm and the robot touched the wall. A large Kp reacts hard to the error, but because the effects are delayed the robot overshoots the target; what reduces overshoot is Kd.",
+      "skills": [
+        "ctl-derivative"
+      ]
+    },
+    {
+      "id": "m5h5d97-q4",
+      "kind": "find-bug",
+      "prompt": "A PD-controlled wall-following robot goes well at first, then gets more and more jerky. Where is the single bug?\n\n```\nvoid loop() {\n  float e = mesafe - HEDEF;\n  float turev = (e - sonHata) / dt;\n  float u = KP * e + KD * turev;\n  // ... motorlara u uygulanır\n}\n```",
+      "options": [
+        "It should not divide by dt",
+        "The KD * turev term should be removed",
+        "sonHata is never updated; the derivative shows the total change since the first error",
+        "HEDEF should not be used in working out e"
+      ],
+      "answer": 2,
+      "explanation": "If sonHata = e is not assigned at the end of each round, the derivative is always compared with the error at the start and keeps growing. Dividing the derivative by dt and working out e relative to HEDEF are correct; removing the KD term does not fix the problem, it gets rid of D.",
+      "skills": [
+        "ctl-derivative",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h5d97-q5",
+      "kind": "mcq",
+      "prompt": "What was measured when 1 cm of noise was added to the ultrasonic measurement and Kd = 3 was used without a filter?",
+      "options": [
+        "The jitter decreased because D damps",
+        "Nothing changed",
+        "Both the error and the jitter increased",
+        "The error RMS dropped, but the steering jitter went up about 4 times"
+      ],
+      "answer": 3,
+      "explanation": "The error RMS dropped from 1.21 cm to 0.49 cm, but the jitter went from 0.29 up to 1.21: D passed the fake speed created by the noise on to the motor. The filter (ALFA = 0.8) brought the jitter down to 0.51.",
+      "skills": [
+        "ctl-derivative"
+      ]
+    }
+  ]
+}

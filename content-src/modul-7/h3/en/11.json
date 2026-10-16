@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Zero-shot prompt",
+      "definition": "A prompt that contains only instructions and shows no examples.",
+      "example": "Classify the comment as positive or negative.",
+      "pitfall": "If the format or the way labels are written matters, it may not be enough on its own; the model may choose an unexpected tone."
+    },
+    {
+      "term": "Few-shot prompt",
+      "definition": "A prompt that shows a few input-output examples alongside the instructions.",
+      "example": "Adding two Input/Output pairs to make the label names and format clear.",
+      "pitfall": "Thinking giving examples trains the model; the examples are read again with every request and take up space in the context."
+    },
+    {
+      "term": "Input-output pair",
+      "definition": "A single example that tells the model \"this input gets this output\".",
+      "example": "Input: I really loved the lesson. Output: positive",
+      "pitfall": "Labelling the pair wrongly; the model continues the wrong pattern."
+    },
+    {
+      "term": "Balanced labels",
+      "definition": "The examples include at least one of each label.",
+      "example": "One positive and one negative example.",
+      "pitfall": "Writing all the examples with the same label; the model may start to give that label to everything."
+    },
+    {
+      "term": "Fine-tuning",
+      "definition": "Training the model's weights again with extra data.",
+      "example": "Retraining the model on a company's own support conversations.",
+      "pitfall": "Mixing it up with few-shot prompting; few-shot does not change the weights, it only adds examples to the context."
+    },
+    {
+      "term": "The checker's limit",
+      "definition": "The Prompt checker in the Workshop counts patterns; it cannot know the quality of an example or the model's answer.",
+      "example": "When you write two Input/Output pairs, the matching goal turns green.",
+      "pitfall": "Treating a green goal as proof that \"my examples are good\"; it only says the format is there."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d11-q1",
+      "kind": "mcq",
+      "prompt": "Which is true about a few-shot prompt?",
+      "options": [
+        "It retrains the model's weights with new data",
+        "It means giving a few input-output examples along with the instructions; the examples go into the context with every request",
+        "It means writing only instructions and giving no examples",
+        "It is a kind of prompt that asks only for JSON output"
+      ],
+      "answer": 1,
+      "explanation": "Few-shot means showing examples inside the prompt. The model reads them for that request. Retraining the weights is fine-tuning. Giving only instructions is a zero-shot prompt.",
+      "skills": [
+        "ai-fewshot"
+      ]
+    },
+    {
+      "id": "m7h3d11-q2",
+      "kind": "find-bug",
+      "prompt": "Which line in this comment classification prompt is wrong?\n\n```\n1 Classify the comment: positive or negative.\n2 Input: I really loved the robot lesson.\n3 Output: positive\n4 Input: The book was really boring, I didn't understand a thing.\n5 Output: positive\n6 Input: The circuit didn't work, I got really annoyed.\n7 Output: negative\n```",
+      "options": [
+        "Line 2: the input should be very short",
+        "Line 3: the label should be negative",
+        "Line 5: a boring comment that was not understood should be labelled \"negative\"",
+        "Line 7: the last example should not be labelled"
+      ],
+      "answer": 2,
+      "explanation": "The comment on line 4 is negative, but line 5 says \"positive\". An example with the wrong label teaches the model the wrong pattern. The other lines are consistent: a comment showing love is positive, and a circuit that does not work is negative.",
+      "skills": [
+        "ai-fewshot"
+      ]
+    },
+    {
+      "id": "m7h3d11-q3",
+      "kind": "numeric",
+      "prompt": "In a few-shot prompt, the instructions take 30 tokens, three examples take 25 tokens each, and the new comment to be classified at the end takes 15 tokens. The context window is 200 tokens. At most how many tokens of space are left for the answer?",
+      "answer": 80,
+      "unit": "tokens",
+      "explanation": "Prompt: 30 + 3 × 25 + 15 = 120 tokens. The window is 200, so 200 − 120 = 80 tokens are left. Examples take up space in the context; adding many examples reduces the space left for the answer.",
+      "skills": [
+        "ai-fewshot",
+        "ai-prompt-parts"
+      ]
+    },
+    {
+      "id": "m7h3d11-q4",
+      "kind": "mcq",
+      "prompt": "In a comment classifier, all three of the three examples are labelled \"positive\". What is the most likely problem in this case?",
+      "options": [
+        "The model may tend to say \"positive\" to every new comment",
+        "The prompt will not work because there are too many examples",
+        "The model stops producing JSON",
+        "The model counts as fine-tuned"
+      ],
+      "answer": 0,
+      "explanation": "Unbalanced examples can teach the pattern wrongly: the model gets the impression that \"the output is always positive\". This is a risk, not a certainty. Three is a normal number of examples; and fine-tuning is not done with examples.",
+      "skills": [
+        "ai-fewshot"
+      ]
+    },
+    {
+      "id": "m7h3d11-q5",
+      "kind": "mcq",
+      "prompt": "When you wrote two \"Input:\" and two \"Output:\" lines in the Prompt checker, the matching goal turned green. What does this show?",
+      "options": [
+        "That the examples are of good quality",
+        "That the model will give the correct label",
+        "That the examples are balanced",
+        "Only that the tool found those patterns"
+      ],
+      "answer": 3,
+      "explanation": "The checker is rule-based and counts patterns. It cannot know whether an example is correct, balanced or of good quality; and there is no model answer in the Workshop. You test quality on a real model and with measurement (week 4).",
+      "skills": [
+        "ai-fewshot",
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       lesson = await loadTutorLesson(db, lessonReq.lessonId)
       if (!lesson) return json({ error: 'Ders bulunamadı' }, 404)
       if (lessonReq.stepIndex >= lesson.steps.length) return json({ error: 'Geçersiz adım' }, 400)
-    } else source = await loadPageSource(db, pageReq!.page, !!user)
+    } else source = await loadPageSource(db, pageReq!.page, !!user, q.locale === 'en' ? 'en' : 'tr')
     gate = await tutorGate(db, user?.id ?? null)
   } catch {
     return json({ error: 'tutor_unavailable' }, 503)

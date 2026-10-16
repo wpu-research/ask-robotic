@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import { SKILLS_EN } from '@/lib/skills-en'
 import { useMemo } from 'react'
 import { useActivity } from '@/lib/activity-store'
 import { useConsent } from '@/lib/consent'
@@ -77,10 +78,10 @@ export function ProgressView({ quizLessons }: { quizLessons: QuizLessonInfo[] })
               const s = SKILLS.find((x) => x.id === m.skill)!
               return (
                 <li key={m.skill} data-level={m.level}>
-                  <div className="skill-top"><b>{s.label}</b><span className="chip">{locale === 'en' ? AREA_EN[s.area] ?? s.area : s.area}</span></div>
-                  <div className="progress-track" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(m.score * 100)} aria-label={t('content.progress.mastery', { skill: s.label })}><div className="progress-fill" style={{ width: `${Math.round(m.score * 100)}%` }} /></div>
+                  <div className="skill-top"><b>{locale === 'en' ? SKILLS_EN[s.id]?.label ?? s.label : s.label}</b><span className="chip">{locale === 'en' ? AREA_EN[s.area] ?? s.area : s.area}</span></div>
+                  <div className="progress-track" role="meter" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(m.score * 100)} aria-label={t('content.progress.mastery', { skill: locale === 'en' ? SKILLS_EN[s.id]?.label ?? s.label : s.label })}><div className="progress-fill" style={{ width: `${Math.round(m.score * 100)}%` }} /></div>
                   <p className="skill-meta">{t('content.progress.skillMeta', { pct: Math.round(m.score * 100), level: t(`content.level.${m.level}` as MessageKey), n: m.attempts })}{m.confidence < 1 ? t('content.progress.lowData') : ''}</p>
-                  <p className="skill-desc">{s.description}</p>
+                  <p className="skill-desc">{locale === 'en' ? SKILLS_EN[s.id]?.description ?? s.description : s.description}</p>
                 </li>
               )
             })}

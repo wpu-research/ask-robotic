@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "The synonym problem",
+      "definition": "Words that mean the same but are spelt differently count as separate terms in a count vector.",
+      "example": "The query \"how does it find the range\" does not match the sentence \"works out the distance\"; the similarity comes out 0.",
+      "pitfall": "Searching for every query word in the document, not finding it, and deciding the document has no information; the information is there, the word is different."
+    },
+    {
+      "term": "Stemming",
+      "definition": "Reducing words to a shared root so that \"distance\" and \"distances\" become the same term.",
+      "example": "The workshop keeps the first five letters: Turkish \"mesafeyi\" and \"mesafe\" both become \"mesaf\".",
+      "pitfall": "Thinking stemming links meaning too; \"far\" and \"distance\" still stay separate."
+    },
+    {
+      "term": "Query expansion",
+      "definition": "Adding synonyms to the query to raise the chance of a match.",
+      "example": "\"task\" and \"project\" are added to the query \"homework\".",
+      "pitfall": "Writing the list in one direction only, or leaving the original word out of the list; then the query loses its own word."
+    },
+    {
+      "term": "Embedding model",
+      "definition": "A model learned from huge amounts of text that places texts close in meaning on close vectors.",
+      "example": "The texts \"car\" and \"vehicle\", which share no words, can get close vectors.",
+      "pitfall": "Thinking an embedding model is always right; it can also make wrong matches and must be tested with an eval."
+    },
+    {
+      "term": "Missing the relevant document",
+      "definition": "A search system failing to bring back the right document even though it exists.",
+      "example": "The user writes \"range\", the document says \"distance\"; the result list comes back empty.",
+      "pitfall": "Reading an empty result as \"there is no answer anyway\"; the system may have made a silent mistake."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d22-q1",
+      "kind": "mcq",
+      "prompt": "The query only contains `uzaklık` (distance) and the document only contains `mesafe` (distance). Why does the similarity come out 0 in a count-based system?",
+      "options": [
+        "Because the document is very short",
+        "Because the two words are separate terms; with no shared term the dot product is 0",
+        "Because cosine always starts at 0",
+        "Because the word `mesafe` is one of the linking words that are thrown away"
+      ],
+      "answer": 1,
+      "explanation": "In a count vector each word is a separate column. When no column has a value in both vectors, the sum of the products is 0. The document being short, or a starting value of the cosine, does not explain this; `mesafe` is not one of the linking words that are thrown away either.",
+      "skills": [
+        "ai-embed-limit",
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d22-q2",
+      "kind": "predict-output",
+      "prompt": "As in the workshop, a stemmer was written that keeps the first five letters of words longer than 5 letters. What does this code print?\n\n```\ndef govde(w):\n    return w[:5] if len(w) > 5 else w\n\nprint(govde(\"mesafeyi\"), govde(\"mesafe\"), govde(\"uzak\"))\n```",
+      "options": [
+        "mesaf mesaf uzak",
+        "mesafeyi mesafe uzak",
+        "mesaf mesafe uzak",
+        "mesaf mesaf uza"
+      ],
+      "answer": 0,
+      "explanation": "`mesafeyi` has 8 letters and `mesafe` has 6; both are longer than 5, so both become `mesaf`. `uzak` has 4 letters and stays as it is. So the stemmer merges `mesafe` and `mesafeyi`, but `uzak` (far) and `mesaf` still stay separate.",
+      "skills": [
+        "ai-embed-limit"
+      ]
+    },
+    {
+      "id": "m7h5d22-q3",
+      "kind": "numeric",
+      "prompt": "A query has 3 terms (a, b, c). A document has 4 terms (a, b, d, e). Each term appears once and count vectors are used. What is the cosine similarity? (two decimal places)",
+      "answer": 0.58,
+      "tolerance": 0.01,
+      "explanation": "The shared terms are a and b; the dot product is 2. The query's length is √3, the document's length is √4 = 2. Similarity is 2 / (√3 × 2) = 1 / √3, about 0.577. Taking the number of shared terms (2) as the similarity is a common mistake.",
+      "skills": [
+        "ai-vektor-kosinus",
+        "ai-embed-limit"
+      ]
+    },
+    {
+      "id": "m7h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "A school search box expands the query so that people searching for `ödev` (homework) also see the `görev` (task) and `proje` (project) documents. For the query `yarın ödev` (homework tomorrow) the expansion does not work.\n\n```\nesanlamli = {\"ödev\": [\"ödev\", \"görev\", \"proje\"]}\n\ndef genislet(sorgu):\n    sonuc = []\n    for kelime in sorgu.split():\n        sonuc = esanlamli.get(kelime, [kelime])\n    return sonuc\n```\n\nWhat is the bug?",
+      "options": [
+        "split() cannot separate the words",
+        "sonuc is overwritten on every pass; the lists of earlier words are lost (+= or extend is needed)",
+        "The dictionary is defined wrongly",
+        "The for loop is unnecessary and should be removed"
+      ],
+      "answer": 1,
+      "explanation": "For `yarın ödev` the loop first handles `yarın` (tomorrow), then `ödev`. The assignment (=) replaces the sonuc list with a new one on every pass; `yarın` is lost. In the buggy code only the last word's list is left, such as `[\"ödev\", \"görev\", \"proje\"]`. The correct code writes sonuc += .... split() and the dictionary are correct, and the loop is needed.",
+      "skills": [
+        "ai-embed-limit",
+        "ai-retrieval"
+      ]
+    },
+    {
+      "id": "m7h5d22-q5",
+      "kind": "mcq",
+      "prompt": "Which of these gets past the synonym limit of count vectors most fundamentally?",
+      "options": [
+        "Converting the query to capital letters",
+        "Writing longer documents",
+        "Using an embedding model that has learned to place texts close in meaning on close vectors",
+        "Using a plain sum instead of cosine"
+      ],
+      "answer": 2,
+      "explanation": "The limit comes from the vector holding the spelling of the word, not its meaning. Learned embedding models target exactly this. Capital letters, longer documents or a different sum do not solve the problem; an embedding model is not perfect either and is tested with an eval.",
+      "skills": [
+        "ai-embed-limit"
+      ]
+    }
+  ]
+}

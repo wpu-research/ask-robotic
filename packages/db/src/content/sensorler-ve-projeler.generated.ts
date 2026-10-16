@@ -12,6 +12,7 @@ export const modul4: ModuleContent = {
       "title": "Mesafe",
       "project": "Park sensörü",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. HC-SR04'ün sesin gidiş-dönüş süresiyle mesafe ölçtüğünü anlatabilir; süreden santimetreyi (süre × 0,0343 / 2) hesaplayabilir.\n2. TRIG'e doğru tetik darbesi verip `pulseIn` ile ECHO süresini zaman aşımıyla ölçebilir; `0` dönüşünü \"yankı yok\" diye yorumlar.\n3. Aykırı değerin ne olduğunu, ortalama ile medyanın farkını söyler; kayan pencereli medyan filtre yazabilir.\n4. Servo ve sensörle açı açı tarama yapıp en yakın nesnenin yönünü bulabilir.\n5. Mesafe sensörünü LED, buzzer ve I2C LCD ile birleştirerek `millis()` ile bloklamayan bir park sensörü kurabilir.\n\n### Haftanın planı\nHafta beş derstir; ilk dört ders yaklaşık 20-25 dakika, proje dersi yaklaşık 35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Ultrasonik prensip: ses, süre, mesafe | ~20 dk | Anlatımı oku, formülü elle uygula, sıcaklık tablosunu çalıştırıp yorumla, mini testi çöz. |\n| 2 | pulseIn, trig/echo ve santimetre hesabı | ~25 dk | HC-SR04'ü bağla, Mesafe değerini değiştirerek ölçümü izle, \"yankı yok\" durumunu dene. |\n| 3 | Gürültü, yansıma açısı ve medyan filtre | ~25 dk | Ortalama ve medyanı aykırı değerli dizilerde karşılaştır, kayan pencereyi canlı sensörle dene. |\n| 4 | Servo ile tarama (sonar) | ~25 dk | Servoyu ekle, taramayı çalıştır; Mesafe'yi açıya göre elle değiştirip en yakın yönü bul. |\n| 5 | Proje: Park sensörü (LED + buzzer + LCD) | ~35 dk | Davranış tablosunu oku, devreyi kur, programı çalıştır, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Modül 1-3'ten şunlar gerekir. Başlamadan kısaca kontrol et:\n- `for` döngüsü, diziler ve fonksiyon yazma (Modül 3, ders 4 ve 19).\n- `millis()` ile bloklamayan zamanlama (ders 27); projede üç iş birlikte yürür.\n- `map()` (ders 14), buzzer (ders 18), servo (ders 21) ve I2C LCD (ders 32-33).\n- Seri Monitor'a yazdırma (ders 9).\n- Ondalık sayılarla çarpma ve bölme; birim çevirme (m/s'den cm/µs'ye).\n\n### Kavram haritası\n- **Fizik:** ses → yankı → gidiş-dönüş süresi → mesafe = süre × 0,0343 / 2 → sıcaklığın ses hızına etkisi\n- **Ölçüm:** TRIG darbesi (10 µs) → ECHO süresi → `pulseIn` → zaman aşımı → `0` = yankı yok\n- **Veri kalitesi:** yansıma açısı ve yüzey → aykırı değer → ortalama / medyan → kayan pencere → filtre gecikmesi\n- **Sistem:** servo + sensör = tarama → en küçüğü tutma → eşikler → `map()` → `millis()` ile çok görev\n\n### Sık yapılan hatalar\n- **İkiye bölmeyi unutmak.** Süre gidiş + dönüş olduğu için mesafe iki kat çıkar.\n- **Birim karıştırmak.** 343 m/s değerini 0,0343 cm/µs yapmadan formüle koymak.\n- **Zaman aşımı yazmamak ve 0'ı mesafe sanmak.** Program takılır ya da \"0 cm\" sanılır; LED veya buzzer yanlış çalışır.\n- **`delay(10)` ile `delayMicroseconds(10)` karıştırmak.** Biri milisaniye, öbürü mikrosaniyedir.\n- **Ortalamayla aykırı değeri temizlediğini sanmak.** Medyan yanlışları atar, ortalama kendine katar.\n- **Pencereyi doldurmamak ya da `% N` unutmak.** Başlangıçta sıfırlar medyanı bozar, indeks diziden taşar.\n- **En yakın nesne aramasında başlangıcı 0 yapmak.** Hiçbir ölçüm 0'dan küçük olmaz.\n- **Bip için `delay()` kullanmak.** Ölçüm ve ekran bip süresince durur.\n- **LCD satırını 16 karaktere tamamlamamak.** Eski harfler ekranda kalır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Süre × 0,0343 / 2 formülünü bakmadan yaz; 1750 µs, 5830 µs ve 11660 µs için santimetreyi hesapla (yaklaşık 30, 100 ve 200 cm).\n4. `100, 100, 100, 350, 100` dizisinin ortalamasını ve medyanını kâğıtta bul; sonra iki yanlışlı bir dizi kendin yaz.\n5. Kendi cümlelerinle şunu cevapla: \"Park sensöründe pencereyi büyütünce ne kazanır, ne kaybedersin?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Park sensörü)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | HC-SR04, LED, buzzer ya da LCD eksik veya yanlış pine bağlı | Tüm parçalar doğru pinlerde (TRIG D9, ECHO D10, buzzer D8, LED D11-D13, LCD A4/A5) | Bağlantılar düzenli, buzzer türü ve LCD adresi bilinçli seçilmiş |\n| Ölçüm ve filtre | Ham ölçümle karar veriyor; yankı yok durumu işlenmemiş | Medyan filtre ve geçersiz ölçüm ele alınmış | Pencere boyunun gecikme etkisini açıklıyor, deneyle gösteriyor |\n| Eşikler ve davranış | LED, bip ya da ekran tabloyla uyuşmuyor | Dört bölge tabloya uygun çalışıyor | Sınırda titremeyi histerezisle çözmüş |\n| Zamanlama | Bip için `delay()` kullanılmış, ölçüm duruyor | Ölçüm, bip ve ekran `millis()` ile ayrı çalışıyor | Süreleri değiştirip etkisini açıklıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor ve gerçek bir arabadaki farkları sayıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta bir sensörün \"mesafeyi bilmediğini, bir süre ölçtüğünü\" anlamak ve gerçek dünyadaki ölçümün gürültülü olduğunu görmek. Formülü ezberletmek yerine \"ses gidip dönüyor, bu yüzden ikiye bölüyoruz\" sorusunu öğrencinin kendi cümleleriyle söylemesini bekle.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şu soruları sor: \"ECHO ne kadar HIGH kalıyor?\", \"Süre gidiş mi, gidiş-dönüş mü?\", \"Yankı gelmezse ne okuyor?\", \"Bu okuma bir aykırı değer olabilir mi?\"\n- **Sanal laboratuvar ve gerçek sensör.** Laboratuvardaki sensör kusursuzdur: Mesafe özelliğine ne yazılırsa onu okur ve ses hızı sabittir. Gerçek HC-SR04 eğik yüzeylerde, yumuşak malzemelerde ve sıcaklık değişince yanlış okuyabilir; medyan filtre bu yüzden öğretilir.\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Medyan dersi ve proje yeni bir düşünce biçimi içerir; gerekirse bir gün ara ver.\n- **Güvenlik.** Servo ve motorlar gerçek devrede ayrı bir 5 V kaynaktan beslenir ve GND'ler ortak yapılır. Şebeke gerilimiyle (220 V) hiçbir devre kurulmaz; pil kullanılırsa kısa devre ve ters bağlamaya dikkat edilir.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can explain that the HC-SR04 measures distance from the there-and-back time of sound; can work out centimetres from the time (time × 0.0343 / 2).\n2. Can give TRIG the right trigger pulse and measure the ECHO time with `pulseIn` and a timeout; reads a return value of `0` as \"no echo\".\n3. Can say what an outlier is and how the average and the median differ; can write a median filter with a sliding window.\n4. Can scan angle by angle with a servo and a sensor and find the direction of the nearest object.\n5. Can combine the distance sensor with LEDs, a buzzer and an I2C LCD to build a non-blocking parking sensor with `millis()`.\n\n### Plan for the week\nThe week has five lessons; the first four take about 20-25 minutes each, and the project lesson about 35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | The ultrasonic principle: sound, time, distance | ~20 min | Read the explainer, apply the formula by hand, run the temperature table and interpret it, do the mini quiz. |\n| 2 | pulseIn, trig/echo and working out centimetres | ~25 min | Connect the HC-SR04, watch the measurement while changing the Distance value, try the \"no echo\" case. |\n| 3 | Noise, reflection angle and the median filter | ~25 min | Compare the average and the median on arrays with outliers, try the sliding window with the live sensor. |\n| 4 | Scanning with a servo (sonar) | ~25 min | Add the servo, run the scan; change Distance by hand to match the angle and find the nearest direction. |\n| 5 | Project: Parking sensor (LED + buzzer + LCD) | ~35 min | Read the behaviour table, build the circuit, run the program, assess it with the rubric. |\n\n### Prerequisite check\nThis week needs the following from Modules 1-3. Check them briefly before you start:\n- The `for` loop, arrays and writing functions (Module 3, lessons 4 and 19).\n- Non-blocking timing with `millis()` (lesson 27); in the project three jobs run together.\n- `map()` (lesson 14), the buzzer (lesson 18), the servo (lesson 21) and the I2C LCD (lessons 32-33).\n- Printing to the Serial Monitor (lesson 9).\n- Multiplying and dividing with decimal numbers; converting units (from m/s to cm/µs).\n\n### Concept map\n- **Physics:** sound → echo → there-and-back time → distance = time × 0.0343 / 2 → how temperature affects the speed of sound\n- **Measurement:** TRIG pulse (10 µs) → ECHO time → `pulseIn` → timeout → `0` = no echo\n- **Data quality:** reflection angle and surface → outlier → average / median → sliding window → filter delay\n- **System:** servo + sensor = scan → keeping the smallest → thresholds → `map()` → multitasking with `millis()`\n\n### Common mistakes\n- **Forgetting to divide by two.** Because the time is there + back, the distance comes out doubled.\n- **Mixing up units.** Putting 343 m/s into the formula without turning it into 0.0343 cm/µs.\n- **Not writing a timeout and treating 0 as a distance.** The program hangs or it is taken as \"0 cm\"; the LED or buzzer works wrongly.\n- **Mixing up `delay(10)` and `delayMicroseconds(10)`.** One is milliseconds, the other microseconds.\n- **Thinking the average has cleaned up the outlier.** The median throws wrong values away; the average takes them in.\n- **Not filling the window, or forgetting `% N`.** The zeros at the start spoil the median, and the index runs off the end of the array.\n- **Starting at 0 when searching for the nearest object.** No measurement is smaller than 0.\n- **Using `delay()` for the beep.** The measurement and the screen stop for the length of the beep.\n- **Not padding the LCD line out to 16 characters.** Old letters stay on the screen.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Re-read the explanations of the questions you got wrong in the mini quizzes, then do the question again.\n3. Write the formula time × 0.0343 / 2 without looking; work out the centimetres for 1750 µs, 5830 µs and 11660 µs (about 30, 100 and 200 cm).\n4. Find the average and the median of the sequence `100, 100, 100, 350, 100` on paper; then write a sequence with two wrong values yourself.\n5. Answer this in your own words: \"What do you gain, and what do you lose, when you make the parking sensor's window bigger?\"\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. The target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Parking sensor)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The HC-SR04, LED, buzzer or LCD is missing or connected to the wrong pin | All parts on the right pins (TRIG D9, ECHO D10, buzzer D8, LEDs D11-D13, LCD A4/A5) | The wiring is tidy, the buzzer type and LCD address are chosen knowingly |\n| Measurement and filter | Decides with the raw measurement; the no-echo case is not handled | The median filter and the invalid measurement are handled | Explains how the window size affects the delay and shows it with an experiment |\n| Thresholds and behaviour | The LED, beep or screen does not match the table | The four zones work as in the table | Has solved the flicker at the boundary with hysteresis |\n| Timing | `delay()` is used for the beep and the measurement stops | The measurement, beep and screen run separately with `millis()` | Changes the timings and explains the effect |\n| Explanation | Cannot explain what they did | Explains the circuit and the code step by step | Explains a mistake they made and how they found it, and lists the differences in a real car |\n\n### Note for parents and teachers\n- **Aim.** This week is about understanding that a sensor \"does not know the distance, it measures a time\", and seeing that measurement in the real world is noisy. Instead of making the learner memorise the formula, expect them to say in their own words \"the sound goes there and comes back, so we divide by two\".\n- **How to help.** When the learner gets stuck, instead of giving the answer, ask these questions: \"How long does ECHO stay HIGH?\", \"Is the time one way, or there and back?\", \"What does it read if no echo comes back?\", \"Could this reading be an outlier?\"\n- **Virtual lab and real sensor.** The sensor in the lab is perfect: it reads whatever is typed into the Distance property, and the speed of sound is fixed. A real HC-SR04 can read wrongly on slanted surfaces, on soft materials and when the temperature changes; that is why the median filter is taught.\n- **Time.** Spacing the lessons out, instead of doing them one after another on the same day, helps the learning stick. The median lesson and the project involve a new way of thinking; take a day's break if needed.\n- **Safety.** In a real circuit, servos and motors are powered from a separate 5 V supply and the GNDs are joined together. No circuit is ever built with mains voltage (220 V); if batteries are used, watch out for short circuits and connecting them the wrong way round.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Ultrasonik prensip: ses, süre, mesafe",
@@ -125,7 +126,120 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The ultrasonic principle: sound, time, distance",
+            "problem": "A bat flies in the dark without hitting the wall. It sees with its ears, not its eyes: it makes a sound and waits for it to bounce back from the wall. The later the echo returns, the farther away the wall is. The HC-SR04 sensor does the same thing. So how do we turn \"how late\" into centimetres?",
+            "contentMd": "### How does the sensor work?\nThe HC-SR04 has two \"eyes\": one sends sound like a speaker (T), the other listens like a microphone (R). The sound it sends is **ultrasonic**: a sound with a frequency too high for the human ear to hear (40 kHz on this sensor).\n\nA measurement goes like this:\n1. The board gives the sensor's **TRIG** pin a very short HIGH pulse. This pulse is the \"measure\" command.\n2. The sensor sends out a short burst of 40 kHz sound.\n3. The sound hits an object and bounces back.\n4. The sensor holds its **ECHO** pin HIGH from the moment it sends the sound until the moment it comes back.\n\nSo the sensor does not give you a distance. It gives you a **time**: how long ECHO stays HIGH. We work out the distance from that time.\n\n### The formula\nSound travels through air at about **343 m/s** (at about 20 °C). Let's convert it to centimetres and microseconds:\n\n343 m/s = 34 300 cm/s = 34 300 / 1 000 000 cm/µs = **0.0343 cm/µs**\n\nThe sound travels to the object and back. The time we measure is the **there-and-back** time. The distance is only the way there, so we divide by two:\n\n**distance (cm) = time (µs) × 0.0343 / 2**\n\nShortcut: a distance of 1 cm takes about 58 µs there and back. Dividing the time by 58 also gives you centimetres.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| HC-SR04 VCC | Uno **5V** |\n| HC-SR04 TRIG | Uno **D9** |\n| HC-SR04 ECHO | Uno **D10** |\n| HC-SR04 GND | Uno **GND** |\n\nThe programs in this lesson do not touch the sensor yet; they only do the maths. Build the circuit now anyway, you will use it in lesson 37. When you select the HC-SR04, a **Distance** property appears in the right panel (2-400 cm). You can change it while the circuit runs; the sensor measures the distance of \"the object in front of it\" accordingly. The module's datasheet gives a typical range of 2 cm to 400 cm. Outside this range, or when the sound bounces off in a way that does not return to the sensor, you do not get a valid measurement.\n\nNote: what ECHO does when there is no echo differs from module to module. Some modules keep ECHO HIGH for about 38 ms when no echo comes back. The 30 ms timeout we will see in lesson 37 turns both cases into the same \"no measurement\" (0).\n\n### Program 1: from time to distance\nLet's apply the formula to five different times.\n\n```cpp\n// sketch: ses_mesafe_tablosu\nconst float SES_CM_US = 0.0343;   // 343 m/s = 0,0343 cm/us\nunsigned long sureler[] = {583, 2915, 5830, 11660, 23320};   // mikrosaniye\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    float cm = sureler[i] * SES_CM_US / 2.0;\n    Serial.print(\"sure=\");\n    Serial.print(sureler[i]);\n    Serial.print(\" us -> \");\n    Serial.print(cm, 1);\n    Serial.println(\" cm\");\n  }\n}\n\nvoid loop() {\n}\n```\n\nIn the output you see about 10 cm for 583 µs, about 100 cm for 5830 µs and about 400 cm for 23 320 µs. 400 cm is the sensor's far limit: the sound goes 4 metres and comes back 4 metres, which takes about 23 milliseconds. Sound is fast, but it is not light: even a 1 metre measurement takes 5.8 milliseconds.\n\n### Temperature and the speed of sound\n343 m/s is not always right. The speed of sound depends on the air temperature. In dry air it is roughly:\n\n**c ≈ 331.3 + 0.606 × T** (c: m/s, T: °C)\n\nSound travels faster in hot air and slower in cold air. Because the sensor's calculation always assumes 343 m/s, the measurement drifts when the temperature changes. If the sound really travels at 331.3 m/s while the sensor assumes 343 m/s, it finds the distance larger than it is; if the sound travels at 355 m/s, it finds it smaller. The program below works out what the sensor reads at each temperature for an object that is really 100 cm away:\n\n```cpp\n// sketch: ses_sicaklik\nfloat sesHizi(float sicaklikC) {          // m/s\n  return 331.3 + 0.606 * sicaklikC;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  float sicakliklar[] = {0, 10, 20, 30, 40};\n  for (int i = 0; i < 5; i++) {\n    float c = sesHizi(sicakliklar[i]);\n    float okunan = 100.0 * 343.0 / c;     // sensör 343 m/s sanıyor\n    Serial.print(\"T=\");\n    Serial.print(sicakliklar[i], 0);\n    Serial.print(\" C  c=\");\n    Serial.print(c, 2);\n    Serial.print(\" m/s  gercek 100 cm -> \");\n    Serial.print(okunan, 1);\n    Serial.println(\" cm\");\n  }\n}\n\nvoid loop() {\n}\n```\n\nLet's check with numbers: at 20 °C, c = 331.3 + 0.606 × 20 = 343.42 m/s; that is very close to 343, an error of about 0.1 cm. At 0 °C, c = 331.3 m/s and the sensor reads 100 cm as 103.5 cm. At 40 °C, c = 355.54 m/s and the sensor reads 96.5 cm. So a 40 degree change in temperature makes a difference of about 7 cm over 1 metre. For jobs like a parking sensor this is usually acceptable. If you need centimetre accuracy, you measure the temperature and put it into the formula (the NTC from lesson 13 helps).\n\n### How does it work?\n1. `SES_CM_US` holds the speed of sound in centimetres per microsecond. Doing the unit conversion in one place lowers the risk of mistakes.\n2. `sureler[i] * SES_CM_US / 2.0` turns the there-and-back time into a one-way distance. We wrote `2.0` so the division is done with decimals (integer division throws the fraction away).\n3. `Serial.print(cm, 1)` prints the number with 1 digit after the decimal point.\n4. The `sesHizi` function takes the temperature and returns c in m/s. The ratio `okunan = 100 × 343 / c` is the result of the sensor's wrong assumption.\n\n### Try it\n- For an object 2 metres away, how many µs does ECHO stay HIGH? Work it out yourself first, then put it into the `sureler` array and compare with the program.\n- Put 35 into the `sicakliklar` array. How many centimetres does a real 100 cm read as?\n- Write and run the `ses_mesafe_tablosu` program in the lab; in the serial monitor, compare the centimetres for 583, 5830 and 23 320 µs with the formula.\n- Do the same temperature calculation for a distance of 250 cm. Does the error in centimetres grow or shrink?\n\n### Common mistakes\n- Forgetting the `/ 2`: the distance comes out twice as large, because the sound went there and came back.\n- Mixing up units: putting 343 m/s into the cm/µs formula as 343. Convert to the same unit first.\n- Not knowing about temperature at all: a parking sensor that works on a hot day can drift a few centimetres in a cold garage. (The HC-SR04 in the lab works with a fixed speed of sound (about 58 µs/cm); this drift only shows up on a real sensor.)\n- Dividing with integers instead of `100 * 343 / c`: the result has no fraction. Write it with decimals (`100.0`).",
+            "question": "If an object is 10 cm from the sensor, about how many µs does ECHO stay HIGH? If there is no object, so the sound never comes back, what happens to ECHO?",
+            "explainerMd": "### What you will learn in this lesson\n- How an ultrasonic sensor measures distance with sound\n- That the HC-SR04 gives us a **time**, not a distance\n- The formula that turns the time into centimetres, and why it is divided by two\n- How temperature shifts the speed of sound, and so the measurement\n\n### What you should know first\nHIGH and LOW from lesson 1; printing to the Serial Monitor from lesson 9; writing functions from lesson 19. Also arrays and the `for` loop from lesson 4.\n\n### Sound measures distance\nWhen you shout \"hey!\" in the mountains, the echo comes back a little later. The later the echo returns, the farther away the mountain is. The **HC-SR04** does the same job with a sound too high for people to hear (**ultrasonic**, 40 kHz on this sensor). It has two cylinders on it: one sends the sound (T), the other listens (R).\n\n### Four pins, two jobs\n| Pin | Job |\n|---|---|\n| VCC, GND | The sensor's 5 V supply |\n| TRIG | From the board to the sensor: \"measure now\" (a short HIGH pulse) |\n| ECHO | From the sensor to the board: HIGH until the echo arrives |\n\nThe sensor does not tell you centimetres. The ECHO pin stays HIGH from the moment the sound goes out until the echo returns. You work out the distance from this **time**.\n\n### The formula\nSound travels through air at about 343 m/s. Let's convert that to cm/µs:\n\n```\n343 m/s = 34 300 cm/s = 0.0343 cm/µs\ndistance (cm) = time (µs) × 0.0343 / 2\n```\n\nWhy divide by two? The time you measure is the **there-and-back** time, while the distance is only the way there. Example: if ECHO stayed HIGH for 2000 µs, 2000 × 0.0343 = 68.6; divided by two that is 34.3 cm. Shortcut: 1 cm takes about 58 µs there and back; dividing the time by 58 also gives you centimetres.\n\n### Not everything is 343 m/s\nThe speed of sound changes with temperature. In dry air it is roughly:\n\n```\nc ≈ 331.3 + 0.606 × T      (c: m/s, T: °C)\n```\n\nAt 0 °C, c = 331.3 m/s; at 40 °C it is 355.5 m/s. If your program always assumes 343 m/s, in the cold you find the distance **larger** than it is, and in the heat **smaller**. A real 100 cm looks like about 103.5 cm at 0 °C and about 96.5 cm at 40 °C. For a parking sensor this difference is usually acceptable; if you need centimetre accuracy, you measure the temperature and put it into the formula.\n\n### Limits\nThe HC-SR04's typical range is 2 cm to 400 cm. At 400 cm the sound travels 8 metres, which takes about 23 ms. Outside this range, or when the sound scatters in a way that does not return to the sensor, there is no valid measurement.\n\n### Summary\nThe HC-SR04 gives the there-and-back time of the sound as the time the ECHO pin stays HIGH. The distance is found with distance = time × 0.0343 / 2; we divide by two because the sound covers the path twice. Since the speed of sound depends on temperature, assuming a fixed 343 m/s can cause a drift of a few centimetres.",
+            "concepts": [
+              {
+                "term": "Ultrasonic sound",
+                "definition": "Sound with a frequency too high for the human ear to hear; the HC-SR04 uses 40 kHz.",
+                "example": "The sensor sends a short burst of 40 kHz sound and listens for its echo.",
+                "pitfall": "Thinking the sensor \"knows\" the distance directly; it only measures a time."
+              },
+              {
+                "term": "TRIG and ECHO",
+                "definition": "TRIG is the \"measure\" command from the board to the sensor; ECHO is the pin that stays HIGH from the sensor to the board until the echo arrives.",
+                "example": "When TRIG gets a short HIGH, the sound goes out; ECHO is held HIGH until the echo returns.",
+                "pitfall": "Mixing up the two pins' roles: thinking TRIG is an input and ECHO an output."
+              },
+              {
+                "term": "There-and-back time",
+                "definition": "The time ECHO stays HIGH; the total time for the sound to reach the object and come back.",
+                "example": "If ECHO stayed HIGH for 5830 µs, the sound was on its way for 5830 µs.",
+                "pitfall": "Treating the time as one way and forgetting to divide by two: the distance comes out doubled."
+              },
+              {
+                "term": "Distance formula",
+                "definition": "distance (cm) = time (µs) × 0.0343 / 2; roughly time / 58 gives the same result.",
+                "example": "2915 µs × 0.0343 / 2 is about 50 cm.",
+                "pitfall": "Putting 343 m/s into the cm/µs formula without converting the units."
+              },
+              {
+                "term": "Speed of sound and temperature",
+                "definition": "The speed of sound rises with temperature: c ≈ 331.3 + 0.606 × T (m/s, T: °C).",
+                "example": "At 0 °C, c = 331.3 m/s; a program that assumes a fixed 343 m/s reads 100 cm as about 103.5 cm.",
+                "pitfall": "Never thinking about temperature: in a cold garage the measurement can drift a few centimetres."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h1d36-q1",
+                "kind": "numeric",
+                "prompt": "The ECHO pin stayed HIGH for 3500 µs. Taking the speed of sound as 0.0343 cm/µs, how many centimetres away is the object? (Round to the nearest whole number.)",
+                "answer": 60,
+                "tolerance": 0.5,
+                "unit": "cm",
+                "explanation": "Distance = 3500 × 0.0343 / 2 = 60.0 cm. The value 3500 × 0.0343 = 120.05 is the there-and-back path; if you leave it undivided you get 120 cm, which is wrong.",
+                "skills": [
+                  "sens-ultrasonic"
+                ]
+              },
+              {
+                "id": "m4h1d36-q2",
+                "kind": "numeric",
+                "prompt": "The object is 150 cm from the sensor. About how many microseconds does ECHO stay HIGH? (You can use 0.0343 cm/µs or 58 µs/cm.)",
+                "answer": 8746,
+                "tolerance": 50,
+                "unit": "µs",
+                "explanation": "The sound travels 150 cm there and 150 cm back, 300 cm in total. Time = 300 / 0.0343, about 8746 µs. If you only use 150 cm you get half of that, about 4373 µs; that is forgetting the return trip.",
+                "skills": [
+                  "sens-ultrasonic"
+                ]
+              },
+              {
+                "id": "m4h1d36-q3",
+                "kind": "mcq",
+                "prompt": "In the formula that turns the time into centimetres, why do we divide the result by two?",
+                "options": [
+                  "The sensor measures two separate objects at the same time",
+                  "The measured time covers the sound's way there and back, while the distance is only the way there",
+                  "Sound travels at half speed in air",
+                  "The ECHO pin shows the time twice as long"
+                ],
+                "answer": 1,
+                "explanation": "The sound goes to the object and comes back; ECHO stays HIGH for the total time of both trips. The distance to the object is only the way there, so we divide by two. The speed of sound does not halve, and the sensor does not double the time on its own.",
+                "skills": [
+                  "sens-ultrasonic"
+                ]
+              },
+              {
+                "id": "m4h1d36-q4",
+                "kind": "predict-output",
+                "prompt": "At 0 °C the object is really 100 cm away, but the program assumes the sensor works with 343 m/s. What does this code print to the Serial Monitor?\n\n```\nfloat c = 331.3 + 0.606 * 0;       // 0 °C\nfloat okunan = 100.0 * 343.0 / c;\nSerial.println(okunan, 1);\n```",
+                "options": [
+                  "96.5",
+                  "100.0",
+                  "103.5",
+                  "106.2"
+                ],
+                "answer": 2,
+                "explanation": "At 0 °C sound travels at 331.3 m/s, slower than 343 m/s. In reality the sound returns later, but the program calculates with 343 m/s, so it finds the distance too large: 100 × 343 / 331.3, about 103.5. 96.5 would come out in hot air (40 °C).",
+                "skills": [
+                  "sens-sound-speed"
+                ]
+              },
+              {
+                "id": "m4h1d36-q5",
+                "kind": "find-bug",
+                "prompt": "A student wants to work out the distance from a time of 5830 µs, but the result is a meaningless number instead of centimetres. Which line is wrong?\n\n```\nunsigned long sure = 5830;            // µs\nfloat cm = sure * 343.0 / 2.0;\nSerial.println(cm);\n```",
+                "options": [
+                  "unsigned long sure = 5830;",
+                  "float cm = sure * 343.0 / 2.0;",
+                  "Serial.println(cm);"
+                ],
+                "answer": 1,
+                "explanation": "The 343 m/s value was used without converting it to cm/µs. The right factor is 0.0343 cm/µs: sure * 0.0343 / 2.0 gives about 100 cm. Skipping the conversion makes the result about 10 000 times too large. The other two lines are correct.",
+                "skills": [
+                  "sens-ultrasonic",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "pulseIn, trig/echo ve santimetre hesabı",
@@ -243,7 +357,124 @@ export const modul4: ModuleContent = {
                 "sens-pulsein"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "pulseIn, trig/echo and working out centimetres",
+            "problem": "In the last lesson you learnt that the sensor gives us a time, not a distance: how many microseconds the ECHO pin stays HIGH. But `loop()` goes round thousands of times a second. How does the board measure the time between a pin going HIGH and dropping back to LOW, accurate to the microsecond? And if no echo ever comes back, won't it wait for ever?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| HC-SR04 VCC | Uno **5V** |\n| HC-SR04 TRIG | Uno **D9** |\n| HC-SR04 ECHO | Uno **D10** |\n| HC-SR04 GND | Uno **GND** |\n| LED + 330 Ω resistor (second program) | Uno **D13** → resistor **1**; resistor **2** → LED **A**; LED **K** → Uno **GND** |\n\nSelect the sensor and change the **Distance** value in the right panel to move \"the object\" closer or farther away; you can do this while the program is running, too.\n\n### The three steps of a measurement\n1. **Trigger:** hold TRIG LOW for 2 µs (a clean start), then HIGH for 10 µs, then LOW again. This 10 µs pulse tells the sensor \"measure\". For waiting in microseconds you use `delayMicroseconds()` (`delay` works in milliseconds).\n2. **Measure the time:** `pulseIn(pin, HIGH, zamanAsimi)` waits for the pin to go HIGH and returns how long it stayed HIGH, in microseconds.\n3. **Convert:** time × 0.0343 / 2 = centimetres (lesson 36).\n\nThe third parameter of `pulseIn` is the **timeout**: if the pulse does not finish within this time, `pulseIn` returns **0**. This is what stops the program hanging for ever when there is no object or the echo does not return to the sensor. We chose 30 000 µs (30 ms); this matches about 5 metres and comfortably covers the sensor's 4 metre limit.\n\n### Program 1: the first measurement\n```cpp\n// sketch: mesafe_pulsein\nconst int TRIG = 9;\nconst int ECHO = 10;\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);       // 10 us'lik tetik darbesi\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n\n  unsigned long sure = pulseIn(ECHO, HIGH, 30000);   // us; en çok 30 ms bekle\n\n  if (sure == 0) {\n    Serial.println(\"Yansima yok (menzil disi)\");\n  } else {\n    float cm = sure * 0.0343 / 2.0;\n    Serial.print(\"sure=\");\n    Serial.print(sure);\n    Serial.print(\" us  mesafe=\");\n    Serial.print(cm, 1);\n    Serial.println(\" cm\");\n  }\n  delay(200);\n}\n```\n\n### How does it work?\n1. `TRIG` is an output and `ECHO` is an input. The board gives the command, the sensor gives the answer.\n2. The three-line trigger (LOW, HIGH for 10 µs, LOW) starts the sensor measuring. Inside, the sensor sends out its burst of sound and raises ECHO.\n3. `pulseIn(ECHO, HIGH, 30000)` returns how long ECHO stays HIGH. In a typical 100 cm measurement this is about 5800 µs.\n4. If `sure == 0`, no echo came back. Working out 0 as a distance would print \"0 cm\", which would be wrong.\n5. `delay(200)` puts a pause between measurements. A pause is left between measurements so that a new one does not start before the echo of the previous one has died away; datasheets usually suggest about 60 ms between measurements.\n\n`pulseIn` is **blocking**: until the measurement finishes, the program does nothing else. At 100 cm it takes 6 ms, but with no echo it waits the full 30 ms. Remember the `millis()` idea from lesson 27: if you measure often, there is less time left for buttons and the screen. That is why we will put the measurement in a function and call it at set intervals with `millis()`.\n\nThe type of the time variable matters: `pulseIn` returns an `unsigned long`. If you use `int`, it overflows at 32 767 µs and large distances become negative numbers.\n\n### Program 2: a function and an LED\nLet's move the measurement into a function called `mesafeOku()` (read distance). If there is no echo, it returns `-1`. The main program measures every 100 ms and lights the LED if the object is closer than 30 cm.\n\n```cpp\n// sketch: mesafe_fonksiyon_led\nconst int TRIG = 9;\nconst int ECHO = 10;\nconst int LED = 13;\nconst unsigned long OLCUM_ARALIGI = 100;   // ms\n\nunsigned long sonOlcum = 0;\n\nfloat mesafeOku() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long sure = pulseIn(ECHO, HIGH, 30000);\n  if (sure == 0) return -1;                 // yansıma yok\n  return sure * 0.0343 / 2.0;\n}\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    float cm = mesafeOku();\n    digitalWrite(LED, cm >= 0 && cm < 30);  // yakın ve geçerli ölçüm\n    Serial.println(cm);\n  }\n}\n```\n\nThe condition `cm >= 0 && cm < 30` stops the value `-1` (no echo) from counting as \"less than 30\" and lighting the LED. This small detail can be vital in safety jobs like a parking sensor.\n\n### A ready-made library: NewPing\nThere is also a library that does this job for you: **NewPing**. You tell it the TRIG and ECHO pins and the largest distance, then call `ping()`; it returns the time in microseconds (0 if there is no echo).\n\n```cpp\n// sketch: newping_ornek\n#include <NewPing.h>\n\nNewPing sonar(9, 10, 400);   // TRIG, ECHO, en büyük mesafe (cm)\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  delay(100);\n  unsigned int sure = sonar.ping();          // us; yansıma yoksa 0\n  Serial.print(\"sure=\");\n  Serial.print(sure);\n  Serial.print(\" us  mesafe=\");\n  Serial.print(sure * 0.0343 / 2.0, 1);\n  Serial.println(\" cm\");\n}\n```\n\nNewPing's `ping_cm()` function gives whole centimetres directly; because it uses its own fixed 57 µs per 1 cm, its result can differ from our 0.0343 formula by a few per cent (in the lab, `ping_cm()` gave 102 for a distance of 100 cm). In this module we will carry on with `pulseIn`, because the real goal is to see the time, trigger and conversion steps. A library makes the job shorter, but knowing what is inside it is your job.\n\n### Try it\n- While the `mesafe_pulsein` program is running, set Distance in the properties panel to 5 cm first, then to the lowest value, 2 cm. Is the reading right? According to the datasheet, objects closer than 2 cm cannot be measured; the panel does not go below 2 cm anyway.\n- To see the \"no echo\" case, stop the program with ■, delete the ECHO wire and press ▶ again. What does it print? What would happen without the timeout?\n- Write `delay(20)` instead of `delay(200)`. Does the measurement change in the lab? On a real sensor, why does the pause between measurements matter? (If a new measurement starts before the echo of the previous one has faded, the two can get mixed up.)\n- In the `mesafe_fonksiyon_led` program, make the LED's threshold 15 cm. Then write the threshold as a constant so you can change it from outside the code.\n\n### Common mistakes\n- Not setting a timeout: `pulseIn(ECHO, HIGH)` waits 1 second by default; with no echo, the program looks as if it has frozen.\n- Making the trigger pulse too short or too long: the sensor may not measure. Stick to 10 µs.\n- Not checking for `sure == 0`: the distance shows as \"0 cm\" and the LED or buzzer behaves wrongly.\n- Using `int` for `sure`: it overflows above 32 767 µs.\n- Swapping TRIG and ECHO: no measurement comes in and you always read 0.\n- Connecting ECHO straight to a 3.3 V board: the HC-SR04's ECHO output is 5 V. That is fine on the Uno, but if you move to other boards you need a voltage divider.",
+            "question": "`pulseIn` makes the program wait during a measurement. If you also had to manage a button and a screen in the same program, how would you take the measurement? What would be the cost of measuring less often?",
+            "explainerMd": "### What you will learn in this lesson\n- How to give the right trigger pulse on the TRIG pin\n- How to measure how long a pin stays HIGH with `pulseIn()`\n- Why a timeout is needed, and how to interpret a return value of `0`\n- How to put the measurement in a function and tell an invalid measurement apart\n\n### What you should know first\nThe distance formula from lesson 36 (time × 0.0343 / 2); `pinMode` from lesson 3, `digitalRead` from lesson 6; functions from lesson 19; `millis()` from lesson 27.\n\n### A measurement in three steps\n1. **Trigger.** Hold TRIG LOW for 2 µs, make it HIGH for 10 µs, then pull it LOW again. For waiting in microseconds you use `delayMicroseconds()`; `delay()` works in milliseconds and is far too slow here.\n2. **Measure the time.** You read how long ECHO stays HIGH, in microseconds.\n3. **Convert.** You turn the time into centimetres (lesson 36).\n\n```\ndigitalWrite(TRIG, LOW);\ndelayMicroseconds(2);\ndigitalWrite(TRIG, HIGH);\ndelayMicroseconds(10);\ndigitalWrite(TRIG, LOW);\nunsigned long sure = pulseIn(ECHO, HIGH, 30000);\n```\n\n### How does pulseIn work?\n`pulseIn(pin, HIGH, zamanAsimi)` waits for the pin to go HIGH, then returns the time that passes until it goes LOW again, in microseconds. The third parameter is the **timeout** (µs). If the pulse does not finish within this time, the function returns `0`. If you do not write a timeout, the default is 1 second: with no echo, the program hangs for a second.\n\nChoosing 30 000 µs matches about 514 cm (30 000 × 0.0343 / 2); it covers the sensor's 400 cm limit.\n\n### Zero is not a distance\nIf `pulseIn` returned 0, no echo came back. If you put this into the formula you get \"0 cm\", and the program behaves as if the object were sitting on the sensor. That is why `sure == 0` is checked first:\n\n```\nif (sure == 0) return -1;            // invalid measurement\nreturn sure * 0.0343 / 2.0;\n```\n\nAfter that, a condition such as `cm >= 0 && cm < 30` does not count an invalid measurement as \"close\".\n\n### Type and pause\n`pulseIn` returns an `unsigned long`; keep the variable in this type too. A pause is left between measurements; datasheets usually suggest about 60 ms, so the echo of the previous measurement does not get mixed into the new one.\n\n### The cost of blocking\n`pulseIn` makes the program wait until the measurement finishes. At 100 cm this is about 6 ms; with no echo, it is the full timeout: 30 ms. If you have other jobs, such as watching a button, a screen or a buzzer, measure less often and time it with `millis()` (lesson 27).\n\n### Summary\nFor a measurement, a 10 µs pulse is given on TRIG, and `pulseIn` returns the ECHO time in microseconds. The timeout stops the program hanging; if it returns 0, there is no echo and it must not be used as a distance. Measuring is blocking, so how often you measure is chosen with care.",
+            "concepts": [
+              {
+                "term": "Trigger pulse",
+                "definition": "A short HIGH pulse (10 µs) given on the TRIG pin; it tells the sensor to start measuring.",
+                "example": "The sequence LOW (2 µs), HIGH (10 µs), LOW triggers the sensor.",
+                "pitfall": "Making the pulse too short or putting it on the wrong pin: the sensor does not measure and you always read 0."
+              },
+              {
+                "term": "delayMicroseconds()",
+                "definition": "Makes the program wait for the given number of microseconds; delay(), on the other hand, works in milliseconds.",
+                "example": "delayMicroseconds(10); waits exactly 10 µs.",
+                "pitfall": "Writing delay(10) and thinking it is 10 µs: it is 10 milliseconds, a thousand times longer."
+              },
+              {
+                "term": "pulseIn()",
+                "definition": "Measures how long a pin stays HIGH (or LOW) and returns it in microseconds.",
+                "example": "pulseIn(ECHO, HIGH, 30000) gives how long ECHO stays HIGH.",
+                "pitfall": "Thinking the returned number is centimetres: it is a time and must be converted with the formula."
+              },
+              {
+                "term": "Timeout",
+                "definition": "The third parameter, which sets the longest time pulseIn will wait; if the pulse does not finish in this time, it returns 0.",
+                "example": "30000 µs matches about 514 cm; it covers the 400 cm limit.",
+                "pitfall": "Not writing a timeout: the default is 1 second, and with no echo the program looks frozen."
+              },
+              {
+                "term": "Invalid measurement (0)",
+                "definition": "If pulseIn returned 0, no echo came back; this does not mean 0 cm.",
+                "example": "If sure == 0, mesafeOku() returns -1 and the LED does not light.",
+                "pitfall": "Putting 0 into the formula: the distance comes out as 0 cm and the LED or buzzer behaves wrongly."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h1d37-q1",
+                "kind": "mcq",
+                "prompt": "In the call pulseIn(ECHO, HIGH, 30000), 30 ms have passed and ECHO has not gone HIGH and finished. What does the function return?",
+                "options": [
+                  "30000",
+                  "-1",
+                  "0",
+                  "The program waits for ever"
+                ],
+                "answer": 2,
+                "explanation": "When the timeout runs out, pulseIn returns 0; this means \"no measurement\". It is not 30000, and it is not -1 either. The program does not wait for ever; stopping that is the whole point of the timeout.",
+                "skills": [
+                  "sens-pulsein"
+                ]
+              },
+              {
+                "id": "m4h1d37-q2",
+                "kind": "numeric",
+                "prompt": "A timeout of 30000 µs was chosen for pulseIn. At a speed of 0.0343 cm/µs, about how many centimetres is the farthest distance the sound can travel to and back from?",
+                "answer": 514.5,
+                "tolerance": 5,
+                "unit": "cm",
+                "explanation": "If the there-and-back time is 30000 µs, the one-way distance = 30000 × 0.0343 / 2 = 514.5 cm. This is above the sensor's 400 cm limit, so no valid measurement gets caught by the timeout.",
+                "skills": [
+                  "sens-pulsein",
+                  "sens-ultrasonic"
+                ]
+              },
+              {
+                "id": "m4h1d37-q3",
+                "kind": "find-bug",
+                "prompt": "This code lights the LED if the object is closer than 30 cm. When there is nothing in front of the sensor (no echo), the LED lights. Why?\n\n```\nunsigned long sure = pulseIn(ECHO, HIGH, 30000);\nfloat cm = sure * 0.0343 / 2.0;\ndigitalWrite(LED, cm < 30);\n```",
+                "options": [
+                  "The timeout of 30000 is too small",
+                  "When sure is 0, cm is also 0 and 0 < 30 counts as true; the no-echo case is not checked",
+                  "The LED pin must not have been made an output",
+                  "0.343 should be written instead of 0.0343"
+                ],
+                "answer": 1,
+                "explanation": "If no echo comes back, pulseIn returns 0. The formula produces 0 cm and the condition cm < 30 is true. The fix: handle the sure == 0 case separately. The timeout value is big enough; the problem is not in the constant or the LED pin.",
+                "skills": [
+                  "sens-pulsein",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h1d37-q4",
+                "kind": "predict-output",
+                "prompt": "What is printed to the Serial Monitor when this code runs?\n\n```\nunsigned long sure = 4372;   // µs\nSerial.println(sure * 0.0343 / 2.0, 1);\n```",
+                "options": [
+                  "150.0",
+                  "37.5",
+                  "74.9",
+                  "75.0"
+                ],
+                "answer": 3,
+                "explanation": "4372 × 0.0343 = 149.96; divided by two that is 74.98. println rounds to one decimal place: 75.0. 150.0 is forgetting to divide by two. 74.9 would be cutting off instead of rounding; Arduino rounds.",
+                "skills": [
+                  "sens-pulsein",
+                  "sens-ultrasonic"
+                ]
+              },
+              {
+                "id": "m4h1d37-q5",
+                "kind": "numeric",
+                "prompt": "A program takes a measurement every 100 ms. Because there is no object in front of it, pulseIn waits until the timeout (30 ms). For what percentage of this 100 ms round is the program busy waiting for the measurement?",
+                "answer": 30,
+                "tolerance": 0,
+                "unit": "%",
+                "explanation": "pulseIn is blocking: for 30 ms the program cannot do any other work. 30 / 100 = 30%. That is why measurements are taken less often with millis(), and when there is a lot to do, the timing is chosen with care.",
+                "skills": [
+                  "prog-nonblocking",
+                  "sens-pulsein"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Gürültü, yansıma açısı ve medyan filtre",
@@ -360,7 +591,123 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Noise, reflection angle and the median filter",
+            "problem": "The parking sensor shows 100 cm to the wall behind you. A moment later, 350 flashes up on the screen, then 100 again. The wall did not suddenly move 2.5 metres away. The sensor measured wrongly once. If every reading from the sensor matters enough to make the car brake or let it go, how do we ignore this single wrong reading?",
+            "contentMd": "### Where does a wrong measurement come from?\nSound bounces back like a ball. That is why the measurement depends on the object's **surface and angle**:\n- **A flat object facing the sensor straight on** sends the sound straight back to the sensor: the best measurement.\n- **A slanted surface** reflects the sound off to the side. Either the echo never returns (`pulseIn` gives 0), or the sound hits another surface in the room and comes back the long way round, so the distance looks larger than it is. This angle limit changes with the sensor and the object; the datasheet gives a typical value for the measuring angle.\n- **Soft and fluffy surfaces** (fabric, sponge, a jumper) absorb much of the sound; the echo gets weaker.\n- **Very thin or very small objects** (a cable, a chair leg) send back only a small part of the sound.\n- **Electrical noise:** if a motor or servo is powered from the same supply, voltage drops can upset the sensor's timing.\n- **Other sensors:** if two ultrasonic sensors measure at the same time, one can hear the other's sound.\n\nThe result: the sensor measures correctly most of the time, but now and then it gives an **outlier**: a single reading very different from its neighbours. The first way that comes to mind to clean this up is to take an average. Let's see if it works.\n\n### Average or median?\n**Average (mean):** add up all the values and divide by how many there are. **Median:** sort the values from smallest to largest and take the one in the middle.\n\nFive readings: 100, 100, 100, 350, 100.\n- Average: (100 + 100 + 100 + 350 + 100) / 5 = **150**. A single wrong reading spoilt the result by 50 cm.\n- Median: sort → 100, 100, 100, 100, 350 → the middle (3rd) value = **100**. The outlier went to the end of the sorted list and was never chosen.\n\nThis program applies the two functions to the same arrays. When we pass an array to a function, we pass the array itself and the number of elements separately (`float a[], int n`).\n\n```cpp\n// sketch: ortalama_medyan_dizi\nfloat ortalama(float a[], int n) {\n  float toplam = 0;\n  for (int i = 0; i < n; i++) toplam += a[i];\n  return toplam / n;\n}\n\nfloat medyan(float a[], int n) {\n  float b[9];                          // kopya (en çok 9 eleman)\n  for (int i = 0; i < n; i++) b[i] = a[i];\n  for (int i = 1; i < n; i++) {        // ekleme sıralaması\n    float x = b[i];\n    int j = i - 1;\n    while (j >= 0 && b[j] > x) {\n      b[j + 1] = b[j];\n      j--;\n    }\n    b[j + 1] = x;\n  }\n  return b[n / 2];                     // ortadaki\n}\n\nvoid raporla(const char* ad, float a[], int n) {\n  Serial.print(ad);\n  Serial.print(\" ortalama=\");\n  Serial.print(ortalama(a, n), 1);\n  Serial.print(\" medyan=\");\n  Serial.println(medyan(a, n), 1);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  float temiz[5] = {100, 101, 99, 100, 100};\n  float bir[5]   = {100, 100, 100, 350, 100};\n  float iki[5]   = {100, 350, 100, 350, 100};\n  float uc[5]    = {100, 350, 350, 350, 100};\n  raporla(\"temiz\", temiz, 5);\n  raporla(\"bir aykiri\", bir, 5);\n  raporla(\"iki aykiri\", iki, 5);\n  raporla(\"uc aykiri\", uc, 5);\n}\n\nvoid loop() {\n}\n```\n\nRead the output: with one outlier, the average is 150 and the median is 100. With two outliers, the average is 200 and the median is still 100. With three outliers, though, the median is fooled too (350), because three of the five values are wrong and the middle one comes out wrong. The rule: **in a window of N elements, the median throws away at most (N−1)/2 outliers.** A window of five forgives two wrong values.\n\n### A sliding median with a live sensor\nIn a real system the readings do not arrive all at once; they keep flowing. We keep the last 5 readings in a **sliding window**: when a new reading comes in, the oldest one leaves. Each time, we work out the window's average and median.\n\nCircuit (the same all week). Pick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| HC-SR04 VCC | Uno **5V** |\n| HC-SR04 GND | Uno **GND** |\n| HC-SR04 TRIG | Uno **D9** |\n| HC-SR04 ECHO | Uno **D10** |\n\nThe sensor in the lab measures perfectly: it reads whatever you type into the Distance property. You make the outlier yourself: while the program is running, you set Distance to 350 cm for a short moment and then put it back. Because the program measures every 55 ms, it is hard to make such a short jump; to try it, change `delay(50)` to `delay(400)` for now. If you keep the jump shorter than half a second, only 1-2 wrong measurements get into the window.\n\n```cpp\n// sketch: medyan_kayan\nconst int TRIG = 9;\nconst int ECHO = 10;\nconst int N = 5;                      // pencere boyu (tek sayı)\nconst float MENZIL = 400.0;           // yankı yoksa \"uzak\" say\n\nfloat pencere[N];\nint sira = 0;\n\nfloat tekOlcum() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long sure = pulseIn(ECHO, HIGH, 30000);\n  if (sure == 0) return MENZIL;       // yankı yok: yansıma kaçtı ya da çok uzak\n  float cm = sure * 0.0343 / 2.0;\n  return cm > MENZIL ? MENZIL : cm;\n}\n\nfloat ortalama(float a[], int n) {\n  float toplam = 0;\n  for (int i = 0; i < n; i++) toplam += a[i];\n  return toplam / n;\n}\n\nfloat medyan(float a[], int n) {\n  float b[N];\n  for (int i = 0; i < n; i++) b[i] = a[i];\n  for (int i = 1; i < n; i++) {\n    float x = b[i];\n    int j = i - 1;\n    while (j >= 0 && b[j] > x) {\n      b[j + 1] = b[j];\n      j--;\n    }\n    b[j + 1] = x;\n  }\n  return b[n / 2];\n}\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  Serial.begin(9600);\n  float ilk = tekOlcum();\n  for (int i = 0; i < N; i++) pencere[i] = ilk;   // pencereyi ilk okumayla doldur\n}\n\nvoid loop() {\n  float ham = tekOlcum();\n  pencere[sira] = ham;                // en eski değerin yerine yaz\n  sira = (sira + 1) % N;              // 0,1,2,3,4,0,1,... döner\n\n  Serial.print(\"ham=\");\n  Serial.print(ham, 1);\n  Serial.print(\" ort=\");\n  Serial.print(ortalama(pencere, N), 1);\n  Serial.print(\" med=\");\n  Serial.println(medyan(pencere, N), 1);\n  delay(50);\n}\n```\n\n### How does it work?\n1. `pencere[N]` (window) holds the last N readings. `sira` (position) is the next place to write; `(sira + 1) % N` sends it back to 0 after 4.\n2. `setup` fills the window with the first reading; otherwise the window would be full of zeros in the first seconds and the median would come out close to 0.\n3. `tekOlcum` returns 400 if there is no echo. This is on purpose: when sound escapes off a slanted surface, it looks like \"very far away\". The median throws this value away as an outlier too.\n4. `medyan` first copies the window, sorts the copy and returns the middle value. The real window keeps its order; if we did not copy it, we would lose the information about which value is the oldest.\n\n### The cost: delay\nThe median filter is not free. If the distance really drops from 100 cm to 50 cm, the filter output does not give 50 straight away: the median stays at 100 until three 50s have built up in the window. In a five-element window that is 3 measurements, which here means a delay of about 3 × 55 ms ≈ 165 ms. If you make the window bigger, you are more resistant to noise but the delay grows. If you make the window smaller, you are faster but you throw away fewer wrong values.\n\nThe NewPing library offers the same idea: `sonar.ping_median(5)` takes five measurements and returns the middle time in microseconds. We wrote our own filter so that we know the logic.\n\n### Try it\n- In the `medyan_kayan` program, try `N = 3` and `N = 7`. How do the power to throw out outliers and the delay change? Write down a guess first, then work it out.\n- Put values you make up into the `ortalama_medyan_dizi` arrays. In which array do the average and the median differ the most?\n- In `medyan_kayan`, write `delay(400)` instead of `delay(50)`. While it is running, set Distance to 350 cm for half a second and put it back, then lower it permanently from 100 cm to 50 cm. How do the `ort` and `med` columns in the serial monitor behave in the two cases?\n- Think of a case where the average is useful too: if the readings wobble only a little, like 100 ± 1 cm, which one comes out smoother? Try it out with the arrays.\n\n### Common mistakes\n- Not filling the window with the first reading: the zeros at the start spoil the median.\n- Choosing an even window size: the middle value is unclear. Use an odd number (3, 5, 7).\n- Not copying the array before sorting it: the window's order gets mixed up and you cannot tell which element is the oldest.\n- Treating 0 as a distance when `pulseIn` returns 0: a \"0 cm\" reading can land right in the middle of the median and spoil the result.\n- Thinking the median solves every problem: if the wrong readings are more than half the window, the median is fooled too. Remove the real cause (angle, surface, power noise).",
+            "question": "If you raise the window size of the parking sensor from 5 to 15, the screen becomes very steady, but what happens when the car is coming closer fast? How do you decide the right balance between noise and delay?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a distance sensor sometimes reads wrongly\n- What an outlier is\n- The difference between the average and the **median**, and why the median is robust\n- How to keep the last N readings in a sliding window, and the delay cost of the filter\n\n### What you should know first\nThe `pulseIn` measurement and the invalid measurement (0) rule from lesson 37; arrays and `for` from lesson 4; the idea of smoothing from lesson 14; functions with array parameters from lesson 19.\n\n### Where does a wrong reading come from?\nSound bounces back; the result depends on the surface. A flat wall facing the sensor sends the sound back to it. A slanted surface sends the sound off to the side: either the echo never arrives, or it goes round via another surface and arrives late. Fabric and sponge swallow the sound. Very thin objects (a cable, a chair leg) reflect very little. If a motor powered from the same line makes the voltage drop, the measurement can go wrong too. In the end, a sensor that measures correctly most of the time now and then gives a value very different from its neighbours: an **outlier**.\n\n### Average or median?\nThe **average** adds up all the values and divides by how many there are. The **median** sorts the values and picks the one in the middle. Five readings: 100, 100, 100, 350, 100.\n\n```\naverage = (100+100+100+350+100) / 5 = 150\nmedian  : 100,100,100,100,350  ->  middle = 100\n```\n\nA single wrong value spoilt the average by 50 cm and did not affect the median at all, because the outlier goes to the end of the sorted list and is not chosen. The rule: in a window of N elements, the median forgives at most (N − 1) / 2 outliers. A window of five stands up to 2 wrong values, a window of seven to 3. If the wrong values are more than half, the median is fooled too.\n\n### The sliding window\nThe readings keep flowing past, and you store the last N of them. When a new reading arrives, it is written in place of the oldest one:\n\n```\npencere[sira] = yeniOkuma;\nsira = (sira + 1) % N;      // 0,1,2,3,4,0,1,...\n```\n\n`% N` stops the index running off the end of the array. The window must be filled with the first reading at the start of the program; otherwise the zeros at the start spoil the median. When you take the median, you first **copy** the array and sort the copy; the real window's order keeps showing which value is the oldest.\n\n### The cost: delay\nIf the distance really drops from 100 cm to 50 cm, a five-element median stays at the old value until 3 new values have built up in the window. If a measurement is taken every 55 ms, that means about 165 ms. The bigger the window, the more robust it is, but the slower it reacts. The window size is chosen **odd**; if it is even, the middle is unclear.\n\n### Summary\nSensors produce an outlier now and then. The average takes it in, while the median throws it away. With a sliding window and `% N`, the last N readings are kept; the median forgives at most (N − 1) / 2 wrong values. The price is reacting late to a real change.",
+            "concepts": [
+              {
+                "term": "Outlier",
+                "definition": "A single wrong reading that is very different from the readings next to it.",
+                "example": "In the sequence 100, 100, 350, 100, the 350 is an outlier.",
+                "pitfall": "Accepting every reading as correct and making a decision from it straight away."
+              },
+              {
+                "term": "Average",
+                "definition": "The sum of all the values divided by how many there are; it takes the outlier into itself.",
+                "example": "The average of 100, 100, 100, 350, 100 is 150.",
+                "pitfall": "Thinking the average has cleaned up the outlier: a wrong reading spoils the result."
+              },
+              {
+                "term": "Median",
+                "definition": "The middle value once the values are sorted; outliers at the ends are not chosen.",
+                "example": "In the sorted list 100, 100, 100, 100, 350, the middle one is 100.",
+                "pitfall": "Forgetting that the median is fooled too if the wrong values are more than half the window."
+              },
+              {
+                "term": "Sliding window",
+                "definition": "An array that holds the last N readings; a new reading is written in place of the oldest one.",
+                "example": "pencere[sira] = x; sira = (sira + 1) % N; goes back to the start when it reaches the end of the array.",
+                "pitfall": "Forgetting % N, or not filling the window with the first reading."
+              },
+              {
+                "term": "Filter delay",
+                "definition": "The median filter does not react to a real change straight away; the old value stays until the new value is the majority of the window.",
+                "example": "If N = 5 and a measurement is taken every 55 ms, the reaction comes after about 3 × 55 = 165 ms.",
+                "pitfall": "Making the window needlessly large: the noise goes down but the system gets slow."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h1d38-q1",
+                "kind": "numeric",
+                "prompt": "Five readings: 80, 82, 81, 400, 80 cm. What is the average of these readings in centimetres?",
+                "answer": 144.6,
+                "tolerance": 0.1,
+                "unit": "cm",
+                "explanation": "The sum is 80 + 82 + 81 + 400 + 80 = 723; 723 / 5 = 144.6. A single outlier (400) pulled the average up by about 64 cm.",
+                "skills": [
+                  "sens-filter"
+                ]
+              },
+              {
+                "id": "m4h1d38-q2",
+                "kind": "numeric",
+                "prompt": "What is the median of the same five readings (80, 82, 81, 400, 80) in centimetres?",
+                "answer": 81,
+                "tolerance": 0,
+                "unit": "cm",
+                "explanation": "Sorted, they become 80, 80, 81, 82, 400; the middle (3rd) value is 81. The outlier 400 goes to the end of the sorted list and does not affect the median. Compare this with the average (144.6).",
+                "skills": [
+                  "sens-filter"
+                ]
+              },
+              {
+                "id": "m4h1d38-q3",
+                "kind": "mcq",
+                "prompt": "A 7-element median filter still gives the right result with at most how many outliers in the window?",
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "6"
+                ],
+                "answer": 2,
+                "explanation": "In a window of N elements, the median forgives at most (N − 1) / 2 outliers: (7 − 1) / 2 = 3. If there are four wrong values, the wrong values are the majority and the middle value comes out wrong too.",
+                "skills": [
+                  "sens-filter"
+                ]
+              },
+              {
+                "id": "m4h1d38-q4",
+                "kind": "predict-output",
+                "prompt": "The window starts as {50, 50, 50}. If three new readings arrive (200, 200, 50), what does the median print?\n\n```\nfloat p[3] = {50, 50, 50};\nint s = 0;\nfloat yeni[] = {200, 200, 50};\nfor (int i = 0; i < 3; i++) {\n  p[s] = yeni[i];\n  s = (s + 1) % 3;\n}\nfloat a = p[0], b = p[1], c = p[2];\nSerial.println(max(min(a, b), min(max(a, b), c)), 0);\n```",
+                "options": [
+                  "50",
+                  "100",
+                  "150",
+                  "200"
+                ],
+                "answer": 3,
+                "explanation": "At the end of the loop, p = {200, 200, 50}. The median of the three values is 200, because in a 3-element window two wrong values are the majority and the median is fooled too (a 3-element window forgives at most 1 wrong value). The average would be 150; the code works out the median.",
+                "skills": [
+                  "sens-filter",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m4h1d38-q5",
+                "kind": "find-bug",
+                "prompt": "A program with a sliding window starts crashing and reading nonsense values after a while. Which line is wrong?\n\n```\nconst int N = 5;\nfloat pencere[N];\nint sira = 0;\n\nvoid ekle(float x) {\n  pencere[sira] = x;\n  sira = sira + 1;\n}\n```",
+                "options": [
+                  "const int N = 5;",
+                  "float pencere[N];",
+                  "pencere[sira] = x;",
+                  "sira = sira + 1;"
+                ],
+                "answer": 3,
+                "explanation": "sira never goes back to the start; after N rounds, pencere[5], pencere[6]... are written outside the array. It should be sira = (sira + 1) % N;. The line pencere[sira] = x; is correct on its own; the overflow comes from the value of sira there.",
+                "skills": [
+                  "sens-filter",
+                  "prog-loops-arrays",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Servo ile tarama (sonar)",
@@ -478,7 +825,124 @@ export const modul4: ModuleContent = {
                 "sens-ultrasonic"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Scanning with a servo (sonar)",
+            "problem": "In submarine films there is a sonar that goes \"beep... beep...\" as it sweeps round the screen. A sonar does not look in just one direction; it sends sound in every direction in turn and maps what is where. Our HC-SR04 only measures the direction it is facing. So what if we put it on top of a servo, made it scan the surroundings and found which direction the nearest object is in?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| HC-SR04 VCC | Uno **5V** |\n| HC-SR04 GND | Uno **GND** |\n| HC-SR04 TRIG | Uno **D9** |\n| HC-SR04 ECHO | Uno **D10** |\n| Servo SIG | Uno **D6** |\n| Servo VCC | Uno **5V** |\n| Servo GND | Uno **GND** |\n\nNote (from lesson 21): a servo draws a sudden current while it moves. In a real circuit this current can pull down the Uno's 5 V line and reset the board, or spoil the sensor's measurements; that is why in real projects the servo is powered from a separate 5 V supply and the GNDs are joined together. There is no external power supply in the lab, so you connect the servo to the Uno's 5V and GND pins.\n\n**In the lab, the sensor does not turn with the servo.** In a real sonar, the HC-SR04 is fixed to the servo's arm and faces different directions as the servo turns. In the lab, the sensor has a single **Distance** value. To pretend there are different objects in different directions, you change Distance yourself while the program is running. For example, when the servo is around 120°, set Distance to 35 cm, then bring it back to 200 cm. In the serial monitor you see the line `120:35.0`.\n\n### The idea\nWe increase the servo angle from 0° to 180° in 30° steps. At each step:\n1. `servo.write(aci)` sends the servo to the angle.\n2. We wait until the servo gets there (`delay(300)`; a typical value for small servos, it changes with the load and the servo).\n3. We measure the distance with the sensor. Instead of a single measurement, we use the median idea from lesson 38: the middle of three measurements.\n4. We print the result in the form **\"angle:distance\"**, for example `120:35.0`.\n5. We keep the smallest distance and the angle at that moment.\n\nWhen the scan is finished, the \"EN YAKIN\" (nearest) line is printed. If no object is found (all 400 cm or no echo), \"nesne yok\" (no object) is printed.\n\n### Program 1: the scan and the nearest object\n```cpp\n// sketch: sonar_tarama\n#include <Servo.h>\n\nconst int TRIG = 9;\nconst int ECHO = 10;\nconst int SERVO_PIN = 6;\nconst int ADIM = 30;                  // derece\nconst float MENZIL = 400.0;           // yankı yok: uzak say\n\nServo servo;\n\nfloat tekOlcum() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long sure = pulseIn(ECHO, HIGH, 30000);\n  if (sure == 0) return MENZIL;\n  float cm = sure * 0.0343 / 2.0;\n  return cm > MENZIL ? MENZIL : cm;\n}\n\n// Üç sayının ortancası: ne en küçük ne en büyük olan\nfloat medyan3(float a, float b, float c) {\n  return max(min(a, b), min(max(a, b), c));\n}\n\nfloat olc() {\n  float a = tekOlcum(); delay(30);\n  float b = tekOlcum(); delay(30);\n  float c = tekOlcum();\n  return medyan3(a, b, c);\n}\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  servo.attach(SERVO_PIN);\n  Serial.begin(9600);\n  servo.write(0);\n  delay(600);                         // başlangıç konumuna git\n}\n\nvoid loop() {\n  float enYakin = MENZIL;\n  int enYakinAci = -1;\n\n  for (int aci = 0; aci <= 180; aci += ADIM) {\n    servo.write(aci);\n    delay(300);                       // servo varsın\n    float cm = olc();\n    Serial.print(aci);\n    Serial.print(\":\");\n    Serial.println(cm, 1);\n    if (cm < enYakin) {\n      enYakin = cm;\n      enYakinAci = aci;\n    }\n  }\n\n  if (enYakinAci < 0) {\n    Serial.println(\"EN YAKIN: nesne yok\");\n  } else {\n    Serial.print(\"EN YAKIN: \");\n    Serial.print(enYakinAci);\n    Serial.print(\" derece, \");\n    Serial.print(enYakin, 1);\n    Serial.println(\" cm\");\n  }\n  servo.write(0);                     // başa dön\n  delay(800);\n}\n```\n\n### How does it work?\n1. The `for` loop sets the angle to 0, 30, 60, ... 180. `aci += ADIM` adds 30 each time round.\n2. `delay(300)` waits for the servo to move. If you do not wait, the sensor measures while the servo is still turning and it gets unclear which angle the measurement belongs to.\n3. `medyan3` throws away the oddest of three measurements. The formula: `max(min(a,b), min(max(a,b),c))`. It finds the middle of three numbers without sorting.\n4. The comparison `cm < enYakin` catches the smallest distance. Because `enYakin` (nearest) starts at `MENZIL`, measurements with no echo (400) can never be \"the nearest\".\n5. The result lines are in the form `aci:mesafe` (angle:distance). This format is a good habit: a PC program or a plotting tool can read the data by splitting at the `:` sign.\n\nA servo angle is really a **pulse width** (lesson 21): about 544 µs matches 0° and about 2400 µs matches 180°. For `write(90)`, the Servo library sends a pulse of about 1472 µs every 20 ms.\n\n### Program 2: point at the nearest object\nThis time, let the scan happen only once. Then the servo turns towards the nearest object, stays there and prints the distance in that direction live.\n\n```cpp\n// sketch: sonar_isaret\n#include <Servo.h>\n\nconst int TRIG = 9;\nconst int ECHO = 10;\nconst int SERVO_PIN = 6;\nconst int ADIM = 30;\nconst float MENZIL = 400.0;\n\nServo servo;\nint hedefAci = 90;\n\nfloat tekOlcum() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long sure = pulseIn(ECHO, HIGH, 30000);\n  if (sure == 0) return MENZIL;\n  float cm = sure * 0.0343 / 2.0;\n  return cm > MENZIL ? MENZIL : cm;\n}\n\nfloat medyan3(float a, float b, float c) {\n  return max(min(a, b), min(max(a, b), c));\n}\n\nfloat olc() {\n  float a = tekOlcum(); delay(30);\n  float b = tekOlcum(); delay(30);\n  float c = tekOlcum();\n  return medyan3(a, b, c);\n}\n\n// Tarama yapar, en yakın nesnenin açısını döndürür (yoksa -1)\nint enYakinAciBul() {\n  float enYakin = MENZIL;\n  int aciEn = -1;\n  for (int aci = 0; aci <= 180; aci += ADIM) {\n    servo.write(aci);\n    delay(300);\n    float cm = olc();\n    if (cm < enYakin) {\n      enYakin = cm;\n      aciEn = aci;\n    }\n  }\n  return aciEn;\n}\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  servo.attach(SERVO_PIN);\n  Serial.begin(9600);\n  servo.write(0);\n  delay(600);\n\n  int aci = enYakinAciBul();\n  if (aci >= 0) hedefAci = aci;       // nesne bulunduysa oraya dön\n  else hedefAci = 90;                 // yoksa ortada dur\n  servo.write(hedefAci);\n  delay(500);\n}\n\nvoid loop() {\n  Serial.print(\"isaret=\");\n  Serial.print(hedefAci);\n  Serial.print(\" mesafe=\");\n  Serial.println(olc(), 1);\n  delay(500);\n}\n```\n\nHere the scan has been moved into a function: `enYakinAciBul()` (find the nearest angle) returns the angle. `setup()` calls it once, then the servo stays at that angle. If we call this \"pointing at the object\", the next step would be **following the object**: narrowing the scan range and updating it all the time.\n\n### Try it\n- Set `ADIM` to 15 and to 10. How many seconds does the scan take? What do you lose as the resolution goes up? (Work it out: number of steps × about 400 ms.)\n- Scan on the way back too (from 180° to 0°) and compare the results of the two directions. Do they come out the same?\n- Paste the `sonar_tarama` output into a spreadsheet program and draw a graph: angle on the horizontal axis, distance on the vertical axis. Where does the object show up as a \"dip\"?\n\n### Common mistakes\n- Forgetting to wire the servo's VCC or GND: the servo does not move at all, and the lab gives a \"not powered\" warning.\n- Forgetting the line `servo.attach(SERVO_PIN)`: the `servo.write` calls do not move the servo.\n- In a real circuit, powering the servo and the sensor from the same weak 5 V line and forgetting the common GND: the board resets and the sensor talks nonsense.\n- Measuring before the movement has finished: the angle and the distance do not match. That is what `delay(300)` is for.\n- Forgetting the sensor's beam width: the datasheet typically gives a measuring angle of about 15°, so the sensor looks at a cone, not a single line. 30° steps can show some objects at two neighbouring angles at once, or not at all.\n- Not starting `enYakin` with a very large value (starting with 0, for example): no measurement can be \"smaller\".",
+            "question": "If an object moves during the scan, will the result of the scan be right? If a 180° scan takes 3 seconds, does it make sense to use this sensor on a fast-moving vehicle?",
+            "explainerMd": "### What you will learn in this lesson\n- How to turn a sensor that faces one direction into a scanning sonar with a servo\n- How to build the loop: change the angle, wait, measure, record\n- How to find the smallest value (the nearest object) with the right starting value\n- How the sensor's beam cone limits the scan resolution\n\n### What you should know first\nThe servo from lesson 21 (`attach`, `write`, pulse width); the `pulseIn` measurement from lesson 37; the median filter from lesson 38; the `for` loop from lesson 4; functions from lesson 19.\n\n### The idea: turning the sensor\nThe HC-SR04 only measures the direction it is facing. If you fix the sensor to the servo's arm, the sensor faces a different direction as the servo angle changes. If you take a measurement at each angle, you get a cross-section of the room. This is the logic of a submarine's sonar.\n\n### The scan loop\nFor each angle, the same four steps are repeated:\n\n```\nfor (int aci = 0; aci <= 180; aci += 30) {\n  servo.write(aci);        // 1. go to the angle\n  delay(300);              // 2. let the servo get there\n  float cm = olc();        // 3. measure\n  // 4. print as aci:cm, update the smallest\n}\n```\n\nThe waiting step is a must: if you measure while the servo is still turning, it gets unclear which angle the measurement belongs to. With a 30° step there are 7 measuring points: 0, 30, ... 180.\n\n### Finding the smallest value\nTo find the nearest object, you keep \"the smallest so far\". The starting value must be **large**:\n\n```\nfloat enYakin = 400.0;     // the largest in range\nint enYakinAci = -1;       // -1: not found yet\nif (cm < enYakin) { enYakin = cm; enYakinAci = aci; }\n```\n\nIf you made the start 0, no measurement could be smaller than 0 and you would never find the object. If `enYakinAci` is still -1 when the scan ends, there is no object.\n\n### Writing the data neatly\nPrinting each measurement in the form `aci:mesafe` (for example `120:35.0`) is a good habit. A spreadsheet program or PC code can read the data by splitting at the `:` sign.\n\n### The beam is like a cone\nThe HC-SR04 looks at a cone, not a single line; the datasheet typically gives a measuring angle of about 15°. 30° steps can leave gaps in some directions that the cone does not cover, and a thin object can fall between two steps and be missed. If you make the step smaller, the resolution goes up but the scan takes longer: if each step takes about 400 ms, 7 steps take about 2.8 s and 19 steps (10°) about 7.6 s.\n\n### Summary\nA servo and an ultrasonic sensor scan together: set the angle, wait for the servo, measure, record. The nearest object is found with \"keep the smallest\" logic that starts from a large value. As the step gets smaller, the resolution goes up but the scan takes longer; because of the beam cone, very small objects can be missed.",
+            "concepts": [
+              {
+                "term": "Sonar scan",
+                "definition": "Turning an ultrasonic sensor with a servo and taking a measurement at each angle to get a cross-section of the surroundings.",
+                "example": "7 measuring points are taken from 0° to 180° in 30° steps.",
+                "pitfall": "Measuring while the servo is still turning: the measurement belongs to another angle."
+              },
+              {
+                "term": "Servo waiting time",
+                "definition": "The time you wait for the servo to reach the new angle (300 ms in this lesson).",
+                "example": "servo.write(aci); delay(300); then the measurement, in that order.",
+                "pitfall": "Skipping the wait: the angle and the distance do not match."
+              },
+              {
+                "term": "Keeping the smallest",
+                "definition": "Storing the smallest value seen so far and its position, and comparing it with each new value.",
+                "example": "if (cm < enYakin) { enYakin = cm; enYakinAci = aci; }",
+                "pitfall": "Making the starting value 0: no measurement can be smaller than 0, so the object is never found."
+              },
+              {
+                "term": "Beam cone",
+                "definition": "The HC-SR04 looks at a cone typically about 15° wide, not at a single line.",
+                "example": "A 30° step can leave gaps that the cone does not cover.",
+                "pitfall": "Thinking a thin object will always be found."
+              },
+              {
+                "term": "aci:mesafe format",
+                "definition": "Printing each measurement as \"angle:distance\"; another program can read the data by splitting at the \":\" sign.",
+                "example": "The line 120:35.0 means 35 cm in the 120° direction.",
+                "pitfall": "Printing every output as free text: it becomes hard to pick apart later."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h1d39-q1",
+                "kind": "numeric",
+                "prompt": "A scan loop was written like this: for (int aci = 0; aci <= 180; aci += 20). How many measuring points (angles) are taken per scan?",
+                "answer": 10,
+                "tolerance": 0,
+                "explanation": "The angles are 0, 20, 40, ... 180: 180 / 20 + 1 = 10 points. Because the starting point (0°) is counted too, 1 is added to the division.",
+                "skills": [
+                  "prog-loops-arrays",
+                  "sens-servo-scan"
+                ]
+              },
+              {
+                "id": "m4h1d39-q2",
+                "kind": "numeric",
+                "prompt": "In the scan you made the servo wait 300 ms at each step, then put two 30 ms pauses between the three measurements (ignore the measurement times). About how many milliseconds does a 0-180° scan with a 30° step (7 points) take?",
+                "answer": 2520,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "At one point there is 300 + 2 × 30 = 360 ms of waiting. For 7 points, 7 × 360 = 2520 ms. A real scan is a little longer because of the measurement times; if you make the step smaller, the time grows in proportion to the number of points.",
+                "skills": [
+                  "prog-timing",
+                  "sens-servo-scan"
+                ]
+              },
+              {
+                "id": "m4h1d39-q3",
+                "kind": "predict-output",
+                "prompt": "This is the formula that finds the middle of three measurements. What is printed when this code runs?\n\n```\nfloat a = 400, b = 35, c = 36;\nSerial.println(max(min(a, b), min(max(a, b), c)), 0);\n```",
+                "options": [
+                  "35",
+                  "36",
+                  "157",
+                  "400"
+                ],
+                "answer": 1,
+                "explanation": "min(400, 35) = 35; max(400, 35) = 400 and min(400, 36) = 36; max(35, 36) = 36. The middle of the three numbers is 36. 157 is the average; 400 is the outlier and the median does not choose it.",
+                "skills": [
+                  "sens-filter",
+                  "sens-servo-scan"
+                ]
+              },
+              {
+                "id": "m4h1d39-q4",
+                "kind": "find-bug",
+                "prompt": "The scan program never finds the nearest object; enYakinAci always stays -1. Which line is wrong?\n\n```\nfloat enYakin = 0;\nint enYakinAci = -1;\nfor (int aci = 0; aci <= 180; aci += 30) {\n  servo.write(aci);\n  delay(300);\n  float cm = olc();\n  if (cm < enYakin) {\n    enYakin = cm;\n    enYakinAci = aci;\n  }\n}\n```",
+                "options": [
+                  "float enYakin = 0;",
+                  "servo.write(aci);",
+                  "delay(300);",
+                  "if (cm < enYakin) {"
+                ],
+                "answer": 0,
+                "explanation": "Because enYakin starts at 0, no measurement can be smaller than 0 and the condition is never true. The starting value must be large (for example 400.0). The comparison line is correct.",
+                "skills": [
+                  "prog-debug",
+                  "sens-servo-scan"
+                ]
+              },
+              {
+                "id": "m4h1d39-q5",
+                "kind": "mcq",
+                "prompt": "Why can a sonar that scans in 30° steps miss a thin pencil?",
+                "options": [
+                  "The servo never stops at a 30° step",
+                  "The sensor looks at a cone about 15° wide, not a single line; gaps the cone does not cover can be left between the steps",
+                  "The HC-SR04 always shows very thin objects as 400 cm",
+                  "delay(300) cancels the measurement"
+                ],
+                "answer": 1,
+                "explanation": "The beam is cone-shaped, and when the steps are bigger than the cone, a blind area is left between two directions; a thin object can fall right there. Making the step smaller lowers this risk, but makes the scan longer. The servo does stop at the steps; delay does not cancel the measurement.",
+                "skills": [
+                  "sens-servo-scan",
+                  "sens-ultrasonic"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Park sensörü (LED + buzzer + LCD)",
@@ -594,7 +1058,122 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Parking sensor (LED + buzzer + LCD)",
+            "problem": "You have probably heard the \"beep... beep... beep.beep.beep.beeeep\" sound as a car reverses into a garage. As the beeps get closer together, you know you are getting nearer the wall; when it sounds without stopping, it means stop. Being able to sense distance just by sound, without looking at a screen at all, is a brilliant idea. Now you are going to build this system yourself.",
+            "contentMd": "### What are we going to make?\nThis project brings together pieces from this week and from earlier modules:\n- **This week (36-38):** the `pulseIn` measurement with the HC-SR04, working out centimetres and the 5-element **median filter**.\n- **Module 3, week 6:** non-blocking code with `millis()`. The measurement, the screen and the beep do not wait for one another.\n- **Module 3, week 7:** the I2C LCD screen (0x27).\n- **Module 3, week 3:** turning one range into another with `map()`.\n\nHow the system behaves:\n\n| Distance | LED | Buzzer (D8) | LCD bottom line |\n|---|---|---|---|\n| 100 cm and above | Green | Silent | GUVENLI |\n| 50 - 100 cm | Green | Slow beep | GUVENLI |\n| 20 - 50 cm | Yellow | Beeps getting faster | YAKLASIYOR |\n| Less than 20 cm | Red | Continuous sound | DUR! |\n\n(On the screen, GUVENLI means \"safe\", YAKLASIYOR means \"getting close\" and DUR! means \"stop!\".)\n\nThe beep interval depends on the distance: 800 ms at 100 cm, 100 ms at 20 cm. In between, it is worked out in proportion with `map()`. Each beep lasts 40 ms.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| HC-SR04 VCC | Uno **5V** |\n| HC-SR04 GND | Uno **GND** |\n| HC-SR04 TRIG | Uno **D9** |\n| HC-SR04 ECHO | Uno **D10** |\n| Buzzer **+** | Uno **D8** |\n| Buzzer **-** | Uno **GND** |\n| Green LED + 330 Ω resistor | Uno **D11** → resistor **1**; resistor **2** → LED **A**; LED **K** → Uno **GND** |\n| Yellow LED + 330 Ω resistor | Uno **D12** → resistor **1**; resistor **2** → LED **A**; LED **K** → Uno **GND** |\n| Red LED + 330 Ω resistor | Uno **D13** → resistor **1**; resistor **2** → LED **A**; LED **K** → Uno **GND** |\n| I2C LCD 16x2 | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → Uno **5V**, **GND** → Uno **GND** |\n\nSelect the buzzer and set **Type** to **Active** in the right panel (the default is \"Passive\", which needs `tone()`). Set the LED colours in the properties panel too (green, yellow, red). The LCD's I2C address is shown in the panel; it must be the same as in the code (0x27).\n\nAn active buzzer has its own oscillator inside: it sounds when you give the pin HIGH and goes quiet when you give it LOW. If you are using a passive buzzer, you need `tone()` instead of `digitalWrite` (lesson 18). Note: the current of a real buzzer can be close to the pin's limits; a module with a driver or a resistor that suits the datasheet is used.\n\n### Program\nThe system does five jobs, and none of them has a long `delay`:\n1. It measures the distance every 60 ms.\n2. It puts the measurement in the window and takes the median (the filtered distance).\n3. It chooses the LEDs according to the filtered distance.\n4. It makes the buzzer silent, beeping or continuous according to the distance.\n5. It updates the LCD every 250 ms.\n\n```cpp\n// sketch: park_sensoru\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nconst int TRIG = 9;\nconst int ECHO = 10;\nconst int BUZZER = 8;\nconst int LED_YESIL = 11;\nconst int LED_SARI = 12;\nconst int LED_KIRMIZI = 13;\n\nconst float MENZIL = 400.0;               // yankı yok: uzak say\nconst float BIP_BASLANGIC = 100.0;        // bundan yakında bip başlar\nconst float SARI_MESAFE = 50.0;           // bundan yakında sarı\nconst float DUR_MESAFE = 20.0;            // bundan yakında sürekli ses\nconst unsigned long OLCUM_ARALIGI = 60;   // ms\nconst unsigned long EKRAN_ARALIGI = 250;  // ms\nconst unsigned long BIP_SURESI = 40;      // ms\nconst int N = 5;\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nfloat pencere[N];\nint sira = 0;\nfloat mesafe = MENZIL;                    // filtreli mesafe\n\nunsigned long sonOlcum = 0;\nunsigned long sonEkran = 0;\nunsigned long bipBasla = 0;\nbool bipAcik = false;\n\nfloat tekOlcum() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  unsigned long sure = pulseIn(ECHO, HIGH, 30000);\n  if (sure == 0) return MENZIL;\n  float cm = sure * 0.0343 / 2.0;\n  return cm > MENZIL ? MENZIL : cm;\n}\n\nfloat medyan(float a[], int n) {\n  float b[N];\n  for (int i = 0; i < n; i++) b[i] = a[i];\n  for (int i = 1; i < n; i++) {\n    float x = b[i];\n    int j = i - 1;\n    while (j >= 0 && b[j] > x) {\n      b[j + 1] = b[j];\n      j--;\n    }\n    b[j + 1] = x;\n  }\n  return b[n / 2];\n}\n\nvoid ledGuncelle() {\n  digitalWrite(LED_YESIL, mesafe >= SARI_MESAFE);\n  digitalWrite(LED_SARI, mesafe >= DUR_MESAFE && mesafe < SARI_MESAFE);\n  digitalWrite(LED_KIRMIZI, mesafe < DUR_MESAFE);\n}\n\nvoid buzzerGuncelle(unsigned long simdi) {\n  if (mesafe >= BIP_BASLANGIC) {          // uzak: sessiz\n    digitalWrite(BUZZER, LOW);\n    bipAcik = false;\n    return;\n  }\n  if (mesafe < DUR_MESAFE) {              // çok yakın: sürekli ses\n    digitalWrite(BUZZER, HIGH);\n    bipAcik = true;\n    return;\n  }\n  // 20-100 cm arası: bip aralığı 100-800 ms\n  unsigned long aralik = map((long)mesafe, 20, 100, 100, 800);\n  if (bipAcik) {\n    if (simdi - bipBasla >= BIP_SURESI) {\n      digitalWrite(BUZZER, LOW);\n      bipAcik = false;\n    }\n  } else if (simdi - bipBasla >= aralik) {\n    digitalWrite(BUZZER, HIGH);\n    bipAcik = true;\n    bipBasla = simdi;\n  }\n}\n\nvoid ekranGuncelle() {\n  char sayi[8];\n  lcd.setCursor(0, 0);\n  lcd.print(\"Mesafe:\");\n  if (mesafe >= MENZIL) {\n    lcd.print(\"   ---\");\n  } else {\n    dtostrf(mesafe, 6, 1, sayi);          // 6 karakter genişlikte, 1 ondalık\n    lcd.print(sayi);\n  }\n  lcd.print(\" cm\");                       // toplam tam 16 karakter\n\n  lcd.setCursor(0, 1);\n  if (mesafe < DUR_MESAFE) lcd.print(\"DUR!            \");\n  else if (mesafe < SARI_MESAFE) lcd.print(\"YAKLASIYOR      \");\n  else lcd.print(\"GUVENLI         \");\n}\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  pinMode(BUZZER, OUTPUT);\n  pinMode(LED_YESIL, OUTPUT);\n  pinMode(LED_SARI, OUTPUT);\n  pinMode(LED_KIRMIZI, OUTPUT);\n  digitalWrite(BUZZER, LOW);\n\n  lcd.init();\n  lcd.backlight();\n\n  float ilk = tekOlcum();\n  for (int i = 0; i < N; i++) pencere[i] = ilk;   // pencereyi ilk okumayla doldur\n  mesafe = ilk;\n  ledGuncelle();\n  ekranGuncelle();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    pencere[sira] = tekOlcum();\n    sira = (sira + 1) % N;\n    mesafe = medyan(pencere, N);\n    ledGuncelle();\n  }\n\n  buzzerGuncelle(simdi);                  // her turda: bip zamanlaması hassas\n\n  if (simdi - sonEkran >= EKRAN_ARALIGI) {\n    sonEkran = simdi;\n    ekranGuncelle();\n  }\n}\n```\n\n### How does it work?\n1. **Three clocks, three jobs:** `sonOlcum` (last measurement) runs the measurement, `sonEkran` (last screen) the screen and `bipBasla` (beep start) the beep. Each one checks its own interval with `millis()` (lesson 27). None of them waits for another.\n2. **Filter:** the raw measurement is not used directly. The median of five measurements becomes `mesafe` (distance) (lesson 38). This way a single wrong reading does not spoil the beep.\n3. **Beep interval:** `map((long)mesafe, 20, 100, 100, 800)` turns 20 cm into 100 ms and 100 cm into 800 ms. For 60 cm the result is 450 ms: the beeps start 450 ms apart.\n4. **Beep length:** each beep stays on for 40 ms, then the buzzer goes quiet. The next beep starts `aralik` (interval) after `bipBasla`.\n5. **Continuous sound:** if the distance is less than 20 cm, the buzzer pin stays HIGH all the time; there are no edges, so it is a steady sound.\n6. **Screen:** `dtostrf(mesafe, 6, 1, sayi)` turns the decimal number into right-aligned text 6 characters wide. Because the line is exactly 16 characters every time, old characters do not stay on the screen. We update the screen every 250 ms; an LCD is a slow device, and writing to it every time round would upset the beep timing.\n7. **No echo:** `tekOlcum` returns 400 if no echo comes back; in this case the screen shows `---`, the system is silent and green lights up.\n\nReaction time: because of the median filter, if the distance changes suddenly, the system reacts after 3 measurements, so about 180 ms later. At parking speeds (around walking speed) this is an acceptable price.\n\n### Try it\n- Set `BIP_SURESI` (beep length) to 100 ms. Do the beeps run into each other at around 20 cm?\n- What happens if the LED flickers at the yellow and red boundaries (if the measurement goes back and forth between 19.9 and 20.1)? Apply the hysteresis idea from the thermostat here: switch to red at 20 cm, and leave red at 25 cm.\n- Build the NTC circuit from lesson 13 (10 kΩ and NTC, middle point to A2) and correct the speed of sound for the temperature (the formula from lesson 36). Set the NTC's Temperature property to 0 °C and 35 °C and print the corrected distance in the serial monitor. The HC-SR04 in the lab works with a fixed speed of sound; this correction really makes a difference on a real sensor, and here you are only trying out the calculation.\n- Slowly slide the Distance property from 150 cm down to 15 cm. At what distances do the LED colours, the beep rate and the LCD text change? Do they match the table?\n- For a passive buzzer, use `tone(BUZZER, 2000)` instead of `digitalWrite(BUZZER, HIGH)`, and `noTone(BUZZER)` to silence it.\n\n### Common mistakes\n- Using `delay()` for the beep: the measurement, the screen and the other jobs stop for the length of the beep. Every job should run on its own clock with `millis()`.\n- Updating the LCD every time round: I2C communication takes a long time and the beep rhythm gets upset.\n- Not padding the LCD line out to exactly 16 characters: when it goes down from \"100.0 cm\" to \"45.3 cm\", old characters stay on the screen.\n- Deciding with the raw measurement without a filter: a single outlier brings a short silence or the wrong colour.\n- Treating the no-echo case (`0`) as a distance: the system says \"0 cm\" and sounds all the time. We left it silent by making it 400 cm; but in a real vehicle it is safer to give a separate warning that \"the sensor cannot measure\".\n- Not setting the buzzer's Type property to \"Active\": a passive buzzer makes no sound with `digitalWrite`.\n- Note: in a real vehicle, a surface closer than 2 cm to the sensor (the bumper, a cable) causes constant wrong measurements. Also, powering loads such as a servo, motor or fan from the same power line as the sensor spoils the measurement with voltage drops; they are powered separately and the GNDs are joined together.",
+            "question": "A real car would have four sensors side by side on the rear bumper. If the sensors measure at the same time, they can hear each other's sound. How would you prevent this? What would be the cost of making the sensors measure one after another?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine several sensor and output jobs in one program\n- How to split the distance into zones with thresholds and link a behaviour to each zone\n- How to turn the distance into a beep interval in proportion with `map()`\n- How to run the measurement, the beep and the screen with `millis()` without them waiting for one another\n\n### What you should know first\nThe measurement and median filter from lessons 37-38; `map()` from lesson 14; the buzzer from lesson 18; `millis()` from lesson 27; the I2C LCD from lessons 32-33.\n\n### Design the system: the table first\nBefore writing code, put the behaviour into a table:\n\n| Distance | LED | Buzzer | Screen |\n|---|---|---|---|\n| 100 cm and above | Green | Silent | GUVENLI |\n| 50-100 cm | Green | Slow beep | GUVENLI |\n| 20-50 cm | Yellow | Beeps getting faster | YAKLASIYOR |\n| Less than 20 cm | Red | Continuous sound | DUR! |\n\nEach row in the table turns into a condition in the code. Make the rule at the boundaries clear: which row is \"exactly 20\" in? In this project `>= 20` is yellow and `< 20` is red.\n\n### From distance to beep interval\nLet the beep rate change in direct proportion to the distance: 800 ms at 100 cm, 100 ms at 20 cm. `map(girdi, girdiMin, girdiMaks, çıktıMin, çıktıMaks)` (input, input min, input max, output min, output max) turns one range into another in a straight line:\n\n```\naralik = map(60, 20, 100, 100, 800);   // 60 cm\n// (60-20) * (800-100) / (100-20) + 100 = 450 ms\n```\n\n`map()` works with whole numbers and throws away the fraction. That is why the distance is turned into a whole number with `(long)`.\n\n### Three jobs, three clocks\nThe measurement runs every 60 ms, the screen every 250 ms, and the beep on its own timing. Each job has its own `son...` (last...) variable and looks at the `millis()` difference. There is no long `delay()` anywhere; if you used `delay()` for the beep, the measurement and the screen would stop for the length of the beep.\n\n### The measurement goes through the filter\nThe raw measurement does not make the decision directly. The median of the last 5 measurements is used; a single wrong reading does not produce the wrong colour or a silence. The price is a reaction delay of about 3 measurements, so 180 ms. If there is no echo, the measurement counts as 400 cm: the system stays silent.\n\n### The screen needs small details\nAn LCD is slow; writing to it every time round upsets the beep rhythm. Pad every line out to exactly 16 characters: if you write \"DUR!\" after writing \"YAKLASIYOR\", the old letters stay on the screen. If there is flicker at a boundary (if the measurement goes back and forth between 19.9 and 20.1), the colour keeps changing; the fix is to separate the entry and exit thresholds (hysteresis).\n\n### Summary\nThe project combines the ideas of a sensor, a filter, thresholds, `map()` and `millis()`. First the behaviour table is written, then each row turns into a condition. The measurement, the beep and the screen run on their own clocks; the median filter weeds out wrong readings and brings a short delay in return.",
+            "concepts": [
+              {
+                "term": "Threshold and zone",
+                "definition": "Splitting a measurement into zones with boundary values and linking a different behaviour to each zone.",
+                "example": "Below 20 cm red, 20-50 cm yellow, above 50 cm green.",
+                "pitfall": "Leaving the boundary value unclear: nobody has decided which zone exactly 20 cm is in."
+              },
+              {
+                "term": "map()",
+                "definition": "Turns a number in one range into another range in a straight line; it works with whole numbers and throws away the fraction.",
+                "example": "map(60, 20, 100, 100, 800) gives 450: at 60 cm the beep interval is 450 ms.",
+                "pitfall": "Passing a distance with a fraction without converting it with (long), or expecting the result to have decimals."
+              },
+              {
+                "term": "Non-blocking multitasking",
+                "definition": "The measurement, the beep and the screen run on their own clocks with millis(); none of them waits for another.",
+                "example": "The measurement runs every 60 ms, the screen every 250 ms.",
+                "pitfall": "Using delay() for the beep: the measurement and the screen stop for that time."
+              },
+              {
+                "term": "Hysteresis",
+                "definition": "Preventing flicker at a boundary by choosing different thresholds for entering and leaving a state.",
+                "example": "Switch to red at 20 cm, leave red at 25 cm.",
+                "pitfall": "Using a single threshold: when the measurement goes back and forth at the boundary, the colour keeps changing."
+              },
+              {
+                "term": "Padding the screen line",
+                "definition": "Writing the line to the LCD with exactly 16 characters every time; short text does not wipe out old letters.",
+                "example": "lcd.print(\"DUR!            \"); pads the line out to 16 characters with spaces.",
+                "pitfall": "Writing a short text and seeing the old characters stay on the screen."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h1d40-q1",
+                "kind": "numeric",
+                "prompt": "In the parking sensor, the beep interval is worked out with map((long)mesafe, 20, 100, 100, 800). When the distance is 75 cm, how many milliseconds is the beep interval? (map works with whole numbers and throws away the fraction.)",
+                "answer": 581,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "map = (75 − 20) × (800 − 100) / (100 − 20) + 100. In order: 55 × 700 = 38500; 38500 / 80 = 481 (the fraction is thrown away); 481 + 100 = 581 ms.",
+                "skills": [
+                  "sens-thresholds"
+                ]
+              },
+              {
+                "id": "m4h1d40-q2",
+                "kind": "mcq",
+                "prompt": "What happens if the parking sensor's beep is made with delay(40), holding the buzzer pin HIGH for 40 ms and then silencing it?",
+                "options": [
+                  "Nothing changes",
+                  "The program stops during every beep; the measurement and the screen update are delayed",
+                  "The buzzer sounds all the time",
+                  "The measurement becomes more accurate"
+                ],
+                "answer": 1,
+                "explanation": "delay() blocks the program. During the beep, the measurement and the screen cannot run, and as the beeps get faster, the program spends almost all its time waiting. The fix is to keep the beep's start time and look at the millis() difference (lesson 27).",
+                "skills": [
+                  "prog-nonblocking"
+                ]
+              },
+              {
+                "id": "m4h1d40-q3",
+                "kind": "find-bug",
+                "prompt": "In the parking sensor, the yellow LED is always on, whatever the distance. Which line is wrong?\n\n```\nvoid ledGuncelle() {\n  digitalWrite(LED_YESIL,   mesafe >= 50);\n  digitalWrite(LED_SARI,    mesafe >= 20 || mesafe < 50);\n  digitalWrite(LED_KIRMIZI, mesafe < 20);\n}\n```",
+                "options": [
+                  "digitalWrite(LED_YESIL,   mesafe >= 50);",
+                  "digitalWrite(LED_KIRMIZI, mesafe < 20);",
+                  "digitalWrite(LED_SARI,    mesafe >= 20 || mesafe < 50);"
+                ],
+                "answer": 2,
+                "explanation": "For yellow, two conditions must be true at the same time: 20 cm and above AND below 50 cm. When || (\"or\") is used, every number meets at least one of them, so the condition is always true. It should be &&. The other two lines match the green and red zones in the table.",
+                "skills": [
+                  "sens-thresholds",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h1d40-q4",
+                "kind": "numeric",
+                "prompt": "A measurement is taken every 60 ms and the filter is a 7-element median. If the distance changes suddenly just after a measurement, after how many milliseconds at the earliest does the filter output give the new value?",
+                "answer": 240,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "In a 7-element window, 4 new readings (a majority) are needed for the new value to be the median. 4 × 60 = 240 ms. In a 5-element window this would be 3 × 60 = 180 ms; the bigger the window, the slower the reaction.",
+                "skills": [
+                  "sens-filter",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h1d40-q5",
+                "kind": "predict-output",
+                "prompt": "On the LCD's second line, first \"YAKLASIYOR\" is written, then \"DUR!\" starting from the same position. What appears on the screen?\n\n```\nlcd.setCursor(0, 1);\nlcd.print(\"YAKLASIYOR\");\nlcd.setCursor(0, 1);\nlcd.print(\"DUR!\");\n```",
+                "options": [
+                  "DUR!",
+                  "DUR!ASIYOR",
+                  "YAKLASIYOR",
+                  "DUR!KLASIYOR"
+                ],
+                "answer": 1,
+                "explanation": "The LCD writes over the characters already there; it does not wipe the rest. \"DUR!\" overwrites the first four letters (YAKL), and the remaining \"ASIYOR\" stays on the screen: DUR!ASIYOR. The fix is to pad the line out to 16 characters with spaces.",
+                "skills": [
+                  "sens-thresholds",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -602,6 +1181,7 @@ export const modul4: ModuleContent = {
       "title": "Varlık ve engel",
       "project": "Hırsız alarmı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. PIR sensörünün ısı ışınımındaki değişimi algıladığını, ısınma ve tutma süresinin ne olduğunu açıklayabilir; ısınmayı bekleyen ve son hareket zamanını tutan bir program yazabilir.\n2. IR engel sensörünün \"var/yok\" bilgisi verdiğini, eşiğin dijital çıkışta vidada, analog çıkışta kodda olduğunu bilir; iki eşikle (histerezis) titremesiz karar verebilir.\n3. Reed ve limit anahtarını `INPUT_PULLUP` ile okuyabilir, NO ve NC farkını güvenlik açısından açıklayabilir, kontak titreşimini debounce ile eleyebilir.\n4. VL53L0X'i (ToF, I2C, 0x29) tanır; `init()`, `timeoutOccurred()` ve `Wire.begin()` ile hata kontrolü yapan kod yazabilir (laboratuvarda parça yok, yalnız derleme).\n5. PIR, reed ve butonu birleştiren, `enum` ve `millis()` ile yazılmış dört durumlu bir hırsız alarmı kurabilir ve zayıf noktalarını tartışabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20 dakika, proje yaklaşık 35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | PIR: hareket algılama ve ısınma süresi | ~20 dk | Anlatımı oku, `pir_isinma` ve `pir_oda_dolu` sketch'lerini çalıştır, Hareket kutusunu ısınma sırasında ve sonrasında dene, mini testi çöz. |\n| 2 | IR engel sensörü ve eşik ayarı | ~20 dk | Yakınlık ve Eşik kaydırıcılarını oynat, analog sketch'te histerezisi gözle, mini testi çöz. |\n| 3 | Reed anahtarı ve limit anahtarı | ~20 dk | Reed ve butonu aynı mantıkla oku, NO/NC ve debounce üzerine düşün, mini testi çöz. |\n| 4 | VL53L0X (I2C ToF): hassas mesafe | ~20 dk | Kodu yaz ve derle, sensörsüz çalıştırıp hata mesajını gör, eşik hesaplarını yap, mini testi çöz. |\n| 5 | Proje: Hırsız alarmı (durum makineli) | ~35 dk | Durum tablosunu çiz, devreyi kur, programı çalıştır, durumların hepsini gez, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Modül 3 ve ilk haftanın bilgilerine dayanır. Başlamadan önce şunları kontrol et:\n- `INPUT_PULLUP` ile buton okuyabiliyor mu ve basılı = LOW olduğunu biliyor mu? (6. ders)\n- Kenar algılama ve debounce fikrini hatırlıyor mu? (8. ders)\n- `millis()` ile `delay()` kullanmadan süre ölçebiliyor mu? (27. ders)\n- `enum` ve `switch` ile durum makinesi yazabiliyor mu? (28. ders)\n- I2C'nin SDA ve SCL ile çalıştığını, her cihazın bir adresi olduğunu biliyor mu? (33. ders)\n- İki eşikli (histerezisli) karar fikrini hatırlıyor mu? (35. ders)\n- Ultrasonik sensörün ses gönderip yankıyı beklediğini biliyor mu? (36. ders)\n\n### Kavram haritası\n- **Varlık:** PIR (ısı değişimi) → ısınma süresi → tutma süresi → son hareket zamanı → oda dolu/boş\n- **Engel:** IR engel (yansıma) → dijital OUT (vida eşiği) ve analog AO (kod eşiği) → histerezis → kenar sayma\n- **Kontak:** reed ve limit anahtarı → `INPUT_PULLUP` → NO ve NC → debounce → arızaya karşı güvenlik\n- **Mesafe (ışık):** VL53L0X → I2C 0x29 → `init()` ve `timeoutOccurred()` → milimetre eşiği\n- **Proje:** durum tablosu → `enum` ve `switch` → çıkış gecikmesi → mandal → şifre penceresi → bloklamayan döngü\n\n### Sık yapılan hatalar\n- **Isınmayı beklememek.** PIR açıldıktan sonra yalancı HIGH verir; alarm hemen çalar.\n- **PIR için `INPUT_PULLUP` kullanmak ya da LOW'u hareket saymak.** PIR'da hareket = HIGH.\n- **PIR'ın hemen LOW olacağını sanmak.** Tutma süresi nedeniyle OUT hareket bittikten sonra bir süre HIGH kalır.\n- **Her IR modülünün engelde LOW verdiğini varsaymak.** Seviyeyi bir sabite yaz.\n- **Tek eşik kullanmak.** Değer eşik civarında dalgalanınca çıktı titrer; iki eşik kullan.\n- **Cisim sayarken seviyeyi saymak.** Duran cisim her turda yeniden sayılır; kenarı say.\n- **Reed ve limit anahtarında pull-up'ı unutmak.** Açık kontakta pin yüzer, okuma rastgele olur.\n- **NO ile NC'yi karıştırmak.** Mantık tersine çalışır; kopan kablo fark edilmeyebilir.\n- **VL53L0X'te `Wire.begin()` ya da `timeoutOccurred()` kontrolünü atlamak.** Hatalı okuma gerçek mesafe sanılır.\n- **mm ile cm'yi karıştırmak.** 300 mm = 30 cm.\n- **Alarm projesinde `delay()` kullanmak.** Buton ve sensörler o sürede kaçırılır.\n- **Şifre sayacını durum değişince sıfırlamamak.** Önceki durumdaki basışlar yenisini bozar.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. `pir_oda_dolu` sketch'ini bakmadan yaz; sonra bekleme süresini değiştirip etkisini açıkla.\n4. Kâğıda, hırsız alarmı için durum geçiş şemasını (ok ve koşullarla) çiz; sonra projedeki koddan kontrol et.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Alarm kapı kontağını neden NC bağlamak, NO bağlamaktan daha güvenli olabilir?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Hırsız alarmı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | PIR, reed ya da buton eksik veya yanlış pinde | Üç giriş ve çıkışlar doğru pinlerde, GND'ler bağlı | Bağlantılar düzenli, her sensörün çalışması tek tek denenmiş |\n| Durum tasarımı | Durum tablosu yok, bayraklarla karışık | Dört durum ve geçişleri tabloda var, kod `enum` ve `switch` kullanıyor | Geçiş koşulları şemayla birebir uyuyor, giriş gecikmesi gibi bir ek durum düşünülmüş |\n| Zamanlama | `delay()` kullanılıyor, düğme ya da sensör kaçırılıyor | Çıkış gecikmesi, alarm süresi ve şifre penceresi `millis()` ile ölçülüyor | Süreler sabitlerde toplanmış, değiştirilince etkisi açıklanıyor |\n| Sensör güvenilirliği | Isınma ve tutma süresi hesaba katılmamış, yalancı alarm çıkıyor | Çıkış gecikmesi PIR'ın sakinleşmesine izin veriyor, reed mantığı doğru | NC/NO ve debounce seçimleri gerekçelendirilmiş |\n| Anlatım | Ne yaptığını anlatamıyor | Durumları ve geçişleri adım adım anlatıyor | Zayıf noktaları (kablo kesme, PIR'ı kapatma) ve çözümleri tartışıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta, sensörlerin \"doğru cevap\" vermediğini; yorumlanması, süzülmesi ve güvenlik için tasarlanması gereken sinyaller verdiğini göstermektir. Isınma, titreşim ve eşik gibi kavramlar gerçek mühendisliğin gündelik sorunlarıdır.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şunları sor: \"Sensör o anda ne okuyor?\", \"Bu durum hangi koşulla değişiyor?\", \"Kablo kopsaydı ne olurdu?\"\n- **Laboratuvar sınırı.** VL53L0X parçası laboratuvarda yoktur; bu ders yalnız kod yazma ve derleme üzerinedir. Ölçüm değerleri sanal olarak doğrulanamaz.\n- **Güvenlik.** Platformdaki her şey sanaldır. Gerçek kartla çalışılırsa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz; röle ve sirenler için harici besleme ve ortak GND kuralı unutulmaz.\n- **Etik.** Alarm ve hareket algılama kendi odan ve eşyaların için kullanılır. Başkalarının odasına izinsiz sensör koymak, birini gizlice izlemek yanlıştır; bu konuyu öğrenciyle konuşmak iyi olur.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner:\n1. Can explain that a PIR sensor detects changes in heat radiation, and what the warm-up and hold times are; can write a program that waits for the warm-up and keeps the time of the last motion.\n2. Knows that an IR obstacle sensor gives \"yes/no\" information, and that the threshold is on the screw for the digital output and in the code for the analogue output; can make flicker-free decisions with two thresholds (hysteresis).\n3. Can read reed and limit switches with `INPUT_PULLUP`, explain the difference between NO and NC in terms of safety, and filter out contact bounce with debounce.\n4. Knows the VL53L0X (ToF, I2C, 0x29); can write code that checks for errors with `init()`, `timeoutOccurred()` and `Wire.begin()` (there is no part in the lab, compiling only).\n5. Can build a four-state burglar alarm, written with `enum` and `millis()`, that combines a PIR, a reed and a button, and can discuss its weak points.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20 minutes and the project about 35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | PIR: motion detection and warm-up time | ~20 min | Read the explainer, run the `pir_isinma` and `pir_oda_dolu` sketches, try the Motion box during and after the warm-up, do the mini quiz. |\n| 2 | The IR obstacle sensor and setting the threshold | ~20 min | Play with the Proximity and Threshold sliders, watch the hysteresis in the analogue sketch, do the mini quiz. |\n| 3 | The reed switch and the limit switch | ~20 min | Read the reed and the button with the same logic, think about NO/NC and debounce, do the mini quiz. |\n| 4 | VL53L0X (I2C ToF): precise distance | ~20 min | Write and compile the code, run it without a sensor and see the error message, do the threshold calculations, do the mini quiz. |\n| 5 | Project: Burglar alarm (with a state machine) | ~35 min | Draw the state table, build the circuit, run the program, go through all the states, assess with the rubric. |\n\n### Prerequisite check\nThis week builds on Module 3 and the first week. Before you start, check:\n- Can they read a button with `INPUT_PULLUP`, and do they know that pressed = LOW? (lesson 6)\n- Do they remember the ideas of edge detection and debounce? (lesson 8)\n- Can they measure time with `millis()` without using `delay()`? (lesson 27)\n- Can they write a state machine with `enum` and `switch`? (lesson 28)\n- Do they know that I2C works with SDA and SCL, and that each device has an address? (lesson 33)\n- Do they remember the idea of a two-threshold (hysteresis) decision? (lesson 35)\n- Do they know that the ultrasonic sensor sends out sound and waits for the echo? (lesson 36)\n\n### Concept map\n- **Presence:** PIR (heat change) → warm-up time → hold time → time of the last motion → room occupied/empty\n- **Obstacle:** IR obstacle (reflection) → digital OUT (screw threshold) and analogue AO (code threshold) → hysteresis → counting edges\n- **Contact:** reed and limit switch → `INPUT_PULLUP` → NO and NC → debounce → fail-safe design\n- **Distance (light):** VL53L0X → I2C 0x29 → `init()` and `timeoutOccurred()` → millimetre threshold\n- **Project:** state table → `enum` and `switch` → exit delay → latch → code window → non-blocking loop\n\n### Common mistakes\n- **Not waiting for the warm-up.** After it is switched on, a PIR gives false HIGHs; the alarm goes off straight away.\n- **Using `INPUT_PULLUP` for a PIR, or counting LOW as motion.** On a PIR, motion = HIGH.\n- **Thinking the PIR goes LOW straight away.** Because of the hold time, OUT stays HIGH for a while after the motion ends.\n- **Assuming every IR module gives LOW for an obstacle.** Put the level into a constant.\n- **Using a single threshold.** When the value wobbles around the threshold, the output flickers; use two thresholds.\n- **Counting the level when counting objects.** An object that stays still is counted again on every pass; count the edge.\n- **Forgetting the pull-up on reed and limit switches.** When the contact is open the pin floats, and the reading is random.\n- **Mixing up NO and NC.** The logic works the wrong way round; a broken wire may go unnoticed.\n- **Skipping `Wire.begin()` or the `timeoutOccurred()` check with the VL53L0X.** A faulty reading is taken for a real distance.\n- **Mixing up mm and cm.** 300 mm = 30 cm.\n- **Using `delay()` in the alarm project.** The button and the sensors are missed during that time.\n- **Not resetting the code counter when the state changes.** Presses from the previous state spoil the new one.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Re-read the explanations for the questions you got wrong in the mini quizzes, then do the questions again.\n3. Write the `pir_oda_dolu` sketch without looking; then change the waiting time and explain its effect.\n4. On paper, draw the state transition diagram for the burglar alarm (with arrows and conditions); then check it against the code in the project.\n5. Answer this question in your own words: \"Why might connecting the alarm door contact as NC be safer than connecting it as NO?\"\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions per lesson, 25 questions in total. Target: at least 4 correct for each lesson. Go back to the explainer of any lesson where you fell short.\n\n### Project assessment rubric (Burglar alarm)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The PIR, reed or button is missing or on the wrong pin | The three inputs and the outputs are on the right pins, the GNDs are connected | The wiring is tidy, each sensor has been tested one by one |\n| State design | No state table, mixed up with flags | The four states and their transitions are in a table, the code uses `enum` and `switch` | The transition conditions match the diagram exactly, an extra state such as an entry delay has been considered |\n| Timing | `delay()` is used, the button or a sensor is missed | The exit delay, the alarm time and the code window are measured with `millis()` | The times are gathered in constants, and the effect of changing them is explained |\n| Sensor reliability | The warm-up and hold times are not taken into account, false alarms occur | The exit delay lets the PIR settle, the reed logic is correct | The NC/NO and debounce choices are justified |\n| Explanation | Cannot explain what they did | Explains the states and transitions step by step | Discusses the weak points (cutting the wire, covering the PIR) and their solutions |\n\n### Note for parents and teachers\n- **Aim.** This week shows that sensors do not give \"the right answer\"; they give signals that have to be interpreted, filtered and designed around for safety. Ideas such as warm-up, bounce and thresholds are everyday problems in real engineering.\n- **How to help.** When the learner gets stuck, instead of giving the answer, ask: \"What is the sensor reading at that moment?\", \"Which condition changes this state?\", \"What would happen if the wire broke?\"\n- **Lab limit.** There is no VL53L0X part in the lab; this lesson is only about writing and compiling code. The measured values cannot be checked virtually.\n- **Safety.** Everything on the platform is virtual. If you work with a real board, never build any circuit with mains voltage (220 V); for relays and sirens, remember the rule of an external supply and a common GND.\n- **Ethics.** Alarms and motion detection are for your own room and your own things. Putting a sensor in someone else's room without permission, or secretly watching someone, is wrong; it is a good idea to talk about this with the learner.\n- **Progress.** The mini quiz results at the end of each lesson appear skill by skill on the \"My progress\" page (a draft/pilot feature; saved only if consent has been given).",
       "lessons": [
         {
           "title": "PIR: hareket algılama ve ısınma süresi",
@@ -724,7 +1304,129 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "PIR: motion detection and warm-up time",
+            "problem": "You have seen lights at a shop entrance that switch on by themselves as you approach the door, and lamps in a corridor that light up as you walk past. There is no button and no camera. How does this device \"notice\" you? And why does it sometimes react in silly ways just after it is plugged in?",
+            "contentMd": "### What is a PIR?\nA PIR (passive infrared) sensor detects **changes in the infrared (heat) radiation** around it. When a warm object (a person, an animal) moves in the sensor's field of view, the radiation changes and the sensor sets its output HIGH. An object that stands still, or a room temperature that changes slowly, does not create this change. \"Passive\" means it sends no light itself, it only listens (the ultrasonic sensor in lesson 36, on the other hand, sent out sound and waited for it to come back).\n\nA PIR module has three pins: VCC, OUT, GND. On real modules the supply voltage depends on the module (check the datasheet); the PIR in the lab works on 5 V. For the Arduino, the OUT pin is just a simple digital input: HIGH when there is motion, LOW when there is none.\n\nMost real modules have two adjustment screws and a jumper. The screws usually set the detection sensitivity and how long the output stays HIGH; the jumper turns on or off whether the output is extended while motion continues (\"retriggering\"). Which screw does what **depends on the module**. The PIR in the lab has no screws; it holds its output HIGH for **3 seconds** after the motion ends.\n\n**Warm-up time:** When a PIR is switched on, it waits for a while to get used to its surroundings. During this time its output can go HIGH and LOW at random. On real modules this time is usually around half a minute to a minute, but it **depends on the module**. To speed up the lesson, the lab shortens it to **2 seconds**: in the first 2 seconds after you press ▶, the output jumps about noisily and the **Motion** box is ignored. That is why, in applications such as alarms, we ignore the PIR for a while after start-up.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| PIR | VCC → 5V, GND → GND, OUT → **D2** |\n| Resistor (330 Ω) | 1 → **D13**, 2 → LED A |\n| LED | A → resistor pin 2, K → GND |\n\nTo give the PIR some motion, select the part and tick the **Motion** box in the properties panel; when you untick the box, the motion ends. You can also change it while the circuit runs.\n\nBecause the PIR's OUT pin carries its own voltage, we do not use `INPUT_PULLUP`; plain `INPUT` is enough.\n\n### Program\nFirst the warm-up, then edge detection (the \"catch the change\" idea from lessons 6 and 8 still applies). In the lesson's sketch we set the warm-up to 5 seconds; since the lab's own warm-up is 2 seconds, the sketch's wait is enough. On a real module you need to make this time longer.\n\n```cpp\n// sketch: pir_isinma\nconst int PIR = 2;\nconst int LED = 13;\nconst unsigned long ISINMA_MS = 5000;   // gerçek modülde daha uzun tut\n\nbool oncekiHareket = false;\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n  Serial.println(\"Isiniyor...\");\n  while (millis() < ISINMA_MS) {              // ısınma bitene kadar PIR'ı yok say\n    digitalWrite(LED, (millis() / 250) % 2);  // LED hızlı yanıp söner\n  }\n  digitalWrite(LED, LOW);\n  Serial.println(\"Hazir\");\n}\n\nvoid loop() {\n  bool hareket = (digitalRead(PIR) == HIGH);\n  if (hareket && !oncekiHareket) {\n    Serial.println(\"Hareket var\");\n  }\n  if (!hareket && oncekiHareket) {\n    Serial.println(\"Hareket bitti\");\n  }\n  oncekiHareket = hareket;\n  digitalWrite(LED, hareket);\n}\n```\n\nA PIR stays HIGH for a while after motion. Sometimes this time is too short or too long for us. If we want to know whether a room is occupied or empty, we can check the condition \"no new motion for 3 seconds after the last motion\" in software ourselves. This is the `millis()` method from lesson 27:\n\n```cpp\n// sketch: pir_oda_dolu\nconst int PIR = 2;\nconst int LED = 13;\nconst unsigned long BOS_SURE = 3000;   // ms: bu kadar sessizlikten sonra oda \"boş\"\n\nbool odaDolu = false;\nunsigned long sonHareket = 0;\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (digitalRead(PIR) == HIGH) {\n    sonHareket = simdi;                 // hareket sürdükçe sayacı yenile\n    if (!odaDolu) {\n      odaDolu = true;\n      Serial.println(\"Oda dolu\");\n    }\n  }\n\n  if (odaDolu && simdi - sonHareket >= BOS_SURE) {\n    odaDolu = false;\n    Serial.println(\"Oda bos\");\n  }\n\n  digitalWrite(LED, odaDolu);\n}\n```\n\n### How does it work?\n1. In `pir_isinma`, `setup()` does not return until the warm-up has finished. Meanwhile the LED blinks quickly; the user gets the message \"do not move now\".\n2. In `loop()` only the **edges** are printed: the change from LOW to HIGH prints \"Hareket var\" (motion detected), the change from HIGH to LOW prints \"Hareket bitti\" (motion ended). Otherwise a message would be printed on every pass.\n3. `pir_oda_dolu` does not send the sensor output straight to the LED. Every time motion is seen, `sonHareket` is refreshed. The room only becomes \"empty\" if no motion is seen for `BOS_SURE`. Even if the sensor output drops to LOW for a moment, the room is not counted as empty straight away.\n4. The time comparison uses subtraction (`simdi - sonHareket`). You saw why in lesson 27.\n\n### Try it\n- With `pir_isinma`, tick the **Motion** box within the first 5 seconds after pressing ▶. Is anything printed? Tick it after the warm-up has finished; what happens now?\n- Delete the warm-up waiting loop in `pir_isinma` and watch the serial monitor during the first 2 seconds. You will see \"Hareket var\" even when there is no motion; this is warm-up noise.\n- Set `BOS_SURE` to 1 second and to 10 seconds. Because the PIR in the lab already holds its output HIGH for 3 seconds after the motion ends, `BOS_SURE` is added **on top** of that. Which value suits someone sitting in a room and moving very little?\n- Measure the gap between the moment you untick the box and the moment the \"Hareket bitti\" message arrives, using `Serial.println(millis())`. How many seconds is it?\n\n### Common mistakes\n- Not waiting for the warm-up: the false HIGHs just after start-up set off the alarm.\n- Reading the PIR with `INPUT_PULLUP`, or writing the logic the wrong way round: on a PIR the output is HIGH when there is motion, not LOW as with a button.\n- Printing a message on every pass: without an edge check the Serial Monitor overflows.\n- Placing the sensor at a sunny window, or in front of a radiator or air conditioner: heat changes can look like motion.\n- Not connecting the PIR's VCC or GND pin: the module gets no power, its output stays LOW all the time and the lab shows a \"not powered\" warning.",
+            "question": "If someone is sleeping in their room without moving at all, does that mean \"nobody is there\" for the PIR? What other situations might a PIR not see, and how could an alarm system make up for this?",
+            "explainerMd": "### What you will learn in this lesson\n- That a PIR sensor detects **changes in heat radiation**, not temperature\n- The module's three pins (VCC, OUT, GND) and how the OUT pin is read on the Arduino\n- Why the warm-up time is needed and how the program waits for it\n- How to decide using \"the time since the last motion\" instead of relying on how long the sensor stays HIGH\n\n### What you should know first\n- Lesson 6: `digitalRead` and input pins\n- Lesson 8: edge detection (catching the change from LOW to HIGH)\n- Lesson 27: non-blocking timing with `millis()`\n- Lesson 36: the ultrasonic sensor that sends out sound (the PIR, by contrast, only listens)\n\n### Warm objects give off radiation\nThe human body and every warm object give off invisible **infrared** radiation. A **PIR** (passive infrared) sensor listens for this radiation. \"Passive\" means it sends nothing itself. Inside the sensor there is a detector that splits the field of view into two halves, and the sensor looks at the **difference in radiation between the two halves**.\n\nA person standing still in a room gives off the same radiation in both halves, so the difference is zero. A person moving from one half to the other creates a difference, and the sensor counts this as \"motion\". That is why a PIR may not notice someone who is **standing still**.\n\n### A module with three pins\nA PIR module has three pins:\n\n| Pin | Job |\n|---|---|\n| VCC | Supply (the PIR in the lab works on 5 V) |\n| OUT | HIGH when there is motion, LOW when there is none |\n| GND | Ground |\n\nThe module drives the OUT pin itself. That is why on the Arduino you use plain `INPUT`, not `INPUT_PULLUP`. The reversed logic of a button does not apply here: motion = HIGH.\n\n### Warm-up time\nWhen a PIR is switched on, it waits for a while to get used to the heat balance around it. During this time OUT can give random HIGHs and LOWs. On real modules the time is usually from half a minute up to a minute, and it depends on the module. The lab shortens it to 2 seconds.\n\n```\nt = 0 s     power on             OUT noisy (ignore it)\nt = 2 s     warm-up finished     OUT now reliable\n```\n\nIn applications such as alarms, the PIR is not read for this long after start-up.\n\n### Hold time and the occupied/empty decision\nEven when the motion has ended, a PIR keeps OUT HIGH for a while. In the lab this time is 3 seconds. If you accept this time as the sensor's own decision, you may get \"room empty\" for someone sitting without moving. The solution: every time you see HIGH, record a timestamp with `millis()`, and only say \"empty\" once a certain time has passed since that timestamp.\n\nExample: if the last HIGH was seen at t = 23 s and the waiting time is 5 s, the \"empty\" decision is made at t = 28 s.\n\n```\nif (digitalRead(PIR) == HIGH) sonHareket = millis();\nbool bos = (millis() - sonHareket >= BOS_SURE);\n```\n\n### Summary\nA PIR is a passive sensor that detects changes in infrared radiation; its OUT pin goes HIGH when there is motion and is read with plain `INPUT`. After it is switched on, its output cannot be trusted until it has warmed up, so readings are ignored during that time. Instead of treating the output directly as \"room occupied\", it is more robust to keep the time of the last motion and say \"empty\" once enough quiet time has passed.",
+            "concepts": [
+              {
+                "term": "PIR sensor",
+                "definition": "A passive sensor that detects changes in the infrared (heat) radiation in its field of view and sends no light itself.",
+                "example": "The sensor that switches on the light for someone walking down a corridor: the walking person shifts the radiation from one half to the other.",
+                "pitfall": "Thinking it will also see someone standing still; because the radiation does not change, the PIR may not notice them."
+              },
+              {
+                "term": "The OUT pin and INPUT",
+                "definition": "A PIR's OUT pin is HIGH when there is motion and LOW when there is none; because the module drives its own voltage, the pin is set to plain INPUT.",
+                "example": "pinMode(2, INPUT); if digitalRead(2) == HIGH, there is motion.",
+                "pitfall": "Using INPUT_PULLUP, or counting LOW as motion as with a button; the logic ends up the wrong way round."
+              },
+              {
+                "term": "Warm-up time",
+                "definition": "The waiting time after a PIR is switched on, while it gets used to its surroundings and its output cannot be trusted.",
+                "example": "On the PIR in the lab the output jumps randomly between HIGH and LOW for the first 2 seconds; on real modules it is around half a minute to a minute.",
+                "pitfall": "Starting to read without waiting for the warm-up: a false HIGH arrives at start-up and the alarm goes off for no reason."
+              },
+              {
+                "term": "Hold time",
+                "definition": "The time a PIR keeps its OUT pin HIGH after the motion has ended.",
+                "example": "The lab PIR keeps its output HIGH for 3 more seconds once the motion ends.",
+                "pitfall": "Expecting OUT to go LOW the moment you untick the Motion box."
+              },
+              {
+                "term": "Time of the last motion",
+                "definition": "Storing the millis() value each time HIGH is seen and saying \"empty\" once enough quiet time has passed.",
+                "example": "sonHareket = millis(); ... if (millis() - sonHareket >= BOS_SURE) the room is empty.",
+                "pitfall": "Treating the sensor output directly as room-occupied information; someone sitting still may be counted as \"not there\"."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h2d1-q1",
+                "kind": "mcq",
+                "prompt": "What does a PIR sensor detect?",
+                "options": [
+                  "The time it takes for a sound wave it sends to echo back",
+                  "Changes in the infrared radiation in its field of view",
+                  "The colour and brightness of an object",
+                  "The field of a nearby magnet"
+                ],
+                "answer": 1,
+                "explanation": "A PIR is passive: it sends nothing itself, it only listens for changes in the infrared radiation in its field of view. The sensor that sends sound and waits for the echo is the HC-SR04; a PIR does not detect colour or magnets.",
+                "skills": [
+                  "sensor-pir"
+                ]
+              },
+              {
+                "id": "m4h2d1-q2",
+                "kind": "mcq",
+                "prompt": "When the alarm board is plugged in, the PIR gives random HIGHs and LOWs in the first few seconds and the siren goes off for no reason. Which is the right fix?",
+                "options": [
+                  "Setting the pin to INPUT_PULLUP",
+                  "Shortening the siren time",
+                  "Ignoring the PIR reading until the warm-up time is over",
+                  "Putting delay(1000) in every pass"
+                ],
+                "answer": 2,
+                "explanation": "During the warm-up the PIR's output is not reliable. The program does not read the PIR (or ignores the reading) until the warm-up time is over. INPUT_PULLUP does not help the pin; the module drives the output. Putting delay(1000) in every pass does not solve the problem, it only blocks the program.",
+                "skills": [
+                  "sensor-pir",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h2d1-q3",
+                "kind": "numeric",
+                "prompt": "In the pir_oda_dolu sketch, BOS_SURE is set to 5000 ms. On the PIR in the lab you tick the Motion box at t = 20 s and untick it at t = 23 s. OUT stays HIGH for 3 more seconds after the motion ends. At which second does the sketch say \"Oda bos\" (room empty)?",
+                "answer": 31,
+                "tolerance": 0.2,
+                "unit": "s",
+                "explanation": "The box is unticked at t = 23 s; OUT stays HIGH for 3 more seconds, so sonHareket is refreshed until t = 26 s. After that the room needs 5 s of quiet: 26 + 5 = 31 s. The sensor's own hold time is added on top of BOS_SURE in the software.",
+                "skills": [
+                  "sensor-pir",
+                  "prog-millis",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h2d1-q4",
+                "kind": "predict-output",
+                "prompt": "The PIR OUT pin, read once per pass, is LOW, HIGH, HIGH, HIGH, LOW, LOW in turn. What does the serial monitor show when this code runs?\n\n```\nbool onceki = false;\n\nvoid setup() {\n  pinMode(2, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool h = (digitalRead(2) == HIGH);\n  if (h && !onceki) Serial.println(\"A\");\n  if (!h && onceki) Serial.println(\"B\");\n  onceki = h;\n}\n```",
+                "options": [
+                  "A, A, A, B (an A for every pass it stays HIGH)",
+                  "A and B, once each",
+                  "B and A, once each",
+                  "Nothing is printed"
+                ],
+                "answer": 1,
+                "explanation": "The code only prints changes (edges). On the change from LOW to HIGH it prints \"A\" once, and on the change from HIGH to LOW it prints \"B\" once. HIGH lasting three passes does not produce three lines; it prints the edge, not the level.",
+                "skills": [
+                  "prog-edge-detect",
+                  "sensor-pir"
+                ]
+              },
+              {
+                "id": "m4h2d1-q5",
+                "kind": "find-bug",
+                "prompt": "We want the LED to light when there is motion. The PIR module is wired correctly, but when the Motion box is ticked the LED is off, and when it is unticked the LED is on. Which line is wrong?\n\n```\nconst int PIR = 2;\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, digitalRead(PIR) == LOW);\n}\n```",
+                "options": [
+                  "const int PIR = 2;",
+                  "pinMode(PIR, INPUT);",
+                  "pinMode(13, OUTPUT);",
+                  "digitalWrite(13, digitalRead(PIR) == LOW);"
+                ],
+                "answer": 3,
+                "explanation": "A PIR gives HIGH when there is motion; because the code compares with LOW, the LED lights when there is no motion. The correct version is `digitalRead(PIR) == HIGH`. pinMode(PIR, INPUT) is correct: the module drives OUT, so no pull-up is needed.",
+                "skills": [
+                  "sensor-pir",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "IR engel sensörü ve eşik ayarı",
@@ -851,7 +1553,133 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The IR obstacle sensor and setting the threshold",
+            "problem": "Who counts the boxes passing along a conveyor belt in a factory? And how does an automatic soap dispenser know your hand is there? Most of them have the same cheap part: an infrared LED and a receiver waiting for its reflection. This part answers the question \"how close?\" with yes or no. Who decides the threshold?",
+            "contentMd": "### What is an IR obstacle sensor?\nAn IR obstacle (obstacle avoidance) module sends out infrared light and catches the reflected light with a receiver. If there is an object in front of it, the light comes back and the module changes its output. The ultrasonic sensor in lesson 36 measured distance **in centimetres**; this module only says \"obstacle / no obstacle\".\n\nOn the real module there is a small adjustment screw (a trimpot). This screw sets **how much reflection counts as an \"obstacle\"**, that is, it sets the threshold in hardware. The detection distance depends on the screw, the surroundings and the colour and surface of the object; light-coloured, matt surfaces are usually detected more easily, while dark and shiny surfaces can be hard. The exact values **depend on the module**.\n\nThe IR obstacle part in the lab has two sliders instead of a distance: **Proximity** (0-1, how much reflection the object gives; as it grows, the AO voltage rises) and **Threshold (trimmer)** (0-1). When the proximity reaches or passes the threshold, an obstacle is detected. Raising the threshold makes the screw \"less sensitive\".\n\n**Output level:** On common modules the output is LOW when there is an obstacle and HIGH when there is none. But this **can depend on the module**: some modules do the opposite. That is why we will put the level into a constant in the code. The part in the lab follows the common layout: OUT is LOW when there is an obstacle and HIGH when there is none.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| IR obstacle | VCC → 5V, GND → GND, OUT → **D3** |\n| Resistor (330 Ω) | 1 → **D13**, 2 → LED A |\n| LED | A → resistor pin 2, K → GND |\n| (For the analogue program) IR obstacle | AO → **A0** |\n\nBecause the module drives its output itself, we use `INPUT`.\n\n### Program\n```cpp\n// sketch: ir_engel\nconst int IR = 3;\nconst int LED = 13;\nconst int ENGEL_SEVIYESI = LOW;   // modülüne göre HIGH olabilir\n\nvoid setup() {\n  pinMode(IR, INPUT);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool engel = (digitalRead(IR) == ENGEL_SEVIYESI);\n  digitalWrite(LED, engel);\n  Serial.println(engel ? \"Engel var\" : \"Engel yok\");\n  delay(200);\n}\n```\n\nThe module's output sometimes jitters for a moment at the edge. If we want to **count** objects, we use the idea from lesson 8: a change is only accepted if it stays stable for a certain time. After that, one object passing becomes a single count:\n\n```cpp\n// sketch: ir_sayac_kararli\nconst int IR = 3;\nconst int ENGEL_SEVIYESI = LOW;\nconst unsigned long KARARLI_MS = 30;\n\nbool kararliEngel = false;      // kabul edilmiş durum\nbool sonOkunan = false;         // en son okunan ham durum\nunsigned long sonDegisim = 0;\nint sayac = 0;\n\nvoid setup() {\n  pinMode(IR, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  bool engel = (digitalRead(IR) == ENGEL_SEVIYESI);\n\n  if (engel != sonOkunan) {          // ham okuma değişti: sayacı başa al\n    sonOkunan = engel;\n    sonDegisim = simdi;\n  }\n\n  if (sonOkunan != kararliEngel && simdi - sonDegisim >= KARARLI_MS) {\n    kararliEngel = sonOkunan;        // yeterince kararlı: kabul et\n    if (kararliEngel) {              // engel geldi: bir cisim say\n      sayac++;\n      Serial.print(\"Sayac: \");\n      Serial.println(sayac);\n    }\n  }\n}\n```\n\nSome modules also have an **analogue output (AO)** as well as the digital output. Then you choose the threshold yourself in software. Which way it changes (whether the value rises or falls when there is an obstacle) depends on the module. In the example below we assumed \"high value = obstacle close\"; the part in the lab works this way too. On a real module you need to look with `Serial.println(analogRead(A0))` and swap the conditions if it is the other way round. We use two separate thresholds (**hysteresis**, like the thermostat in lesson 35): even if the value wobbles around the threshold, the output does not flicker.\n\n```cpp\n// sketch: ir_analog_esik\nconst int AO = A0;\nconst int LED = 13;\nconst int ESIK_YUKSEK = 600;   // bunun üstünde engel var say\nconst int ESIK_ALCAK = 500;    // bunun altında engel yok say\n\nbool engel = false;\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int deger = analogRead(AO);\n  if (!engel && deger >= ESIK_YUKSEK) {\n    engel = true;\n    Serial.println(\"Engel var\");\n  } else if (engel && deger <= ESIK_ALCAK) {\n    engel = false;\n    Serial.println(\"Engel yok\");\n  }\n  digitalWrite(LED, engel);\n  delay(20);\n}\n```\n\n### How does it work?\n1. `ir_engel`: the `ENGEL_SEVIYESI` (obstacle level) constant tells you the module's \"obstacle\" level. The rest of the code relies on this constant; if your module is the other way round, you change a single line.\n2. `ir_sayac_kararli`: the moment the raw reading changes, the timer is reset. If the change lasts for 30 ms, it is accepted. Counting is done only on the \"obstacle arrived\" edge; so an object that stays for a long time is counted once.\n3. `ir_analog_esik`: if the value stays between the two thresholds, the previous state is kept. So even if the value wobbles around 550, the output does not change.\n4. The hardware screw and the software threshold are two separate places. For the digital output the threshold is set on the screw; for the analogue output it is set in the code.\n\n### Try it\n- While the `ir_engel` program runs, select the IR obstacle part and slowly drag the **Proximity** slider from 0 towards 1. At which value do the LED and the serial monitor change? Is this value equal to the **Threshold** value?\n- Set the proximity to 0.6, then raise **Threshold (trimmer)** to 0.8. Is the obstacle ignored? A shiny black surface behaves like this in real life too: it gives little reflection, so it may not pass the threshold.\n- With `ir_analog_esik`, set the proximity to 0.3 - 0.5 - 0.7. What happens to the state at 0.5? First go from 0.7 to 0.5, then from 0.3 to 0.5, and compare the results; this is hysteresis.\n- Set `KARARLI_MS` in `ir_sayac_kararli` to 0. Because the lab model produces no jitter, the counter does not go wrong. On a real module it could; write in your own words why this waiting time is still needed for a real circuit.\n\n### Common mistakes\n- Thinking \"the output is LOW when there is an obstacle\" is true for every module: check the documentation of your real module.\n- On real hardware, pointing the sensor straight at sunlight or a strong lamp: the infrared in the ambient light can spoil the measurement (the lab does not model this).\n- Using a single threshold for the analogue value: when the value wobbles around the threshold, the output keeps changing.\n- Counting the level instead of the edge when counting: an object that stays still is counted again and again.\n- Expecting a single threshold to sort out both distance and colour: an IR sensor is sensitive to the colour and surface of the object.",
+            "question": "When counting on a conveyor belt, if two boxes pass very close together, the sensor counts them as one box. How could you solve this: with software, or by moving the sensor?",
+            "explainerMd": "### What you will learn in this lesson\n- How an IR obstacle sensor works and why it says \"yes/no\"\n- The difference between the digital output (OUT) and the analogue output (AO)\n- Where the threshold is set: a screw in hardware, a number in software\n- How to stop flickering around the threshold with **hysteresis**\n- Counting the **edge** instead of the level to count objects\n\n### What you should know first\n- Lesson 8: debounce and edge detection\n- Lesson 11: `analogRead` (0-1023)\n- Lesson 35: the two-threshold (hysteresis) decision in the thermostat\n- Lesson 36: the ultrasonic sensor measures distance in centimetres\n\n### Send light, listen for the reflection\nAn IR obstacle module sends out light with an infrared LED and catches the reflected light with a receiver. If there is an object in front of it, more light comes back. Unlike the ultrasonic sensor, it does not measure distance: it decides whether the reflection has passed a certain level or not.\n\nThe strength of the reflection depends not only on the distance but also on the object's **colour and surface**. A light-coloured matt surface sends back a lot of light. A dark or shiny surface sends back little and may not be detected even when it is closer.\n\n### Digital and analogue output\nThe module can have two outputs:\n\n| Output | What it gives | Where the threshold is |\n|---|---|---|\n| OUT | Obstacle / no obstacle (digital) | On the adjustment screw on the module |\n| AO | Reflection strength (analogue) | In the number you write |\n\nOn the module in the lab, OUT is LOW when there is an obstacle and HIGH when there is none. On other modules it may be the other way round. That is why it is a good habit to put the level into a constant such as `const int ENGEL_SEVIYESI = LOW;`.\n\nThe lab model raises the AO voltage in a straight line with proximity: about 0.25 V at proximity 0 and about 4.75 V at proximity 1. So the `analogRead` value moves between about 51 and 972. At proximity 0.4 you read about 419, and at 0.8 about 788.\n\n### A single threshold flickers\nIf the AO value is wobbling around 550 and the single threshold is 550, the output keeps switching on and off. The solution is two thresholds:\n\n```\nhigh threshold = 600   (go above this: \"obstacle\")\nlow threshold  = 500   (go below this: \"no obstacle\")\n```\n\nIn the 500-600 zone in between, the state **does not change**. This is called hysteresis. If the readings come in as 450, 620, 550, 520, 480, 590, there are only two changes: \"obstacle\" at 620 and \"no obstacle\" at 480.\n\n### Count the edge\nIf you are counting boxes on a conveyor belt and you count on every pass while a box stands in front of the sensor, the counter shoots up. The right way is to count once at \"the moment it changes from no obstacle to obstacle\"; this is an **edge**. On real modules, to filter out the jitter around the edge, you wait for the change to stay stable for a short time (debounce).\n\n### Summary\nAn IR obstacle sensor looks at reflected infrared light and says \"obstacle / no obstacle\"; it does not measure distance and it is sensitive to the object's colour. For the digital output the threshold is on the screw on the module; for the analogue output it is set in the code with two thresholds (hysteresis). To count objects, you need to count the change from no obstacle to obstacle, not the level.",
+            "concepts": [
+              {
+                "term": "IR obstacle sensor",
+                "definition": "A module that sends out infrared light and catches its reflection to tell you whether there is an obstacle in front of it; it does not measure distance.",
+                "example": "An automatic soap dispenser notices your hand this way.",
+                "pitfall": "Expecting a distance in centimetres from it; it only gives \"yes/no\" information."
+              },
+              {
+                "term": "Reflection and surface",
+                "definition": "Detection depends on how much light the object sends back; colour and surface change this.",
+                "example": "A white matt box reflects a lot; a shiny black surface reflects little and may not be detected even when it is closer.",
+                "pitfall": "Thinking every object at the same distance will give the same result."
+              },
+              {
+                "term": "Threshold",
+                "definition": "The level the reflection must pass to count as an \"obstacle\". For the digital output it is set with the screw on the module; for the analogue output it is set in the code.",
+                "example": "In the lab, with the Threshold slider at 0.5, a Proximity of 0.5 or more counts as an obstacle.",
+                "pitfall": "Thinking the screw and the code do the same job; with the digital output the code never sees the threshold."
+              },
+              {
+                "term": "Output level constant",
+                "definition": "Writing once, with const int, which level the module gives when it says \"obstacle\", and using that everywhere in the code.",
+                "example": "const int ENGEL_SEVIYESI = LOW; ... digitalRead(IR) == ENGEL_SEVIYESI",
+                "pitfall": "Assuming every module gives LOW for an obstacle; some modules do the opposite."
+              },
+              {
+                "term": "Hysteresis",
+                "definition": "Using two separate thresholds for the on and off decisions and keeping the previous state in the zone between them.",
+                "example": "With thresholds of 600 and 500, an AO value wobbling around 550 does not make the output flicker.",
+                "pitfall": "Using a single threshold: when the value wobbles around the threshold, the output keeps changing."
+              },
+              {
+                "term": "Counting edges",
+                "definition": "Counting an object only once, at the moment it changes from \"no obstacle\" to \"obstacle\".",
+                "example": "A box that stays in front of the sensor on the belt for 3 seconds is counted once.",
+                "pitfall": "Counting the level: a box that stays still is counted again on every pass."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h2d2-q1",
+                "kind": "mcq",
+                "prompt": "What is the most important difference between the IR obstacle module and the HC-SR04?",
+                "options": [
+                  "The IR obstacle module gives distance in centimetres, the HC-SR04 does not",
+                  "The IR obstacle module only says obstacle/no obstacle, the HC-SR04 measures distance",
+                  "The IR obstacle module uses sound, the HC-SR04 uses light",
+                  "The IR obstacle module is not sensitive to surface colour at all"
+                ],
+                "answer": 1,
+                "explanation": "The IR obstacle module's digital output only says \"obstacle / no obstacle\"; the threshold is set with the screw. The one that gives distance in centimetres is the HC-SR04. Both sensors are affected by the surface; neither is passive, because both send out their own signal.",
+                "skills": [
+                  "sensor-ir-obstacle"
+                ]
+              },
+              {
+                "id": "m4h2d2-q2",
+                "kind": "mcq",
+                "prompt": "You hold a shiny black box in front of the IR obstacle module but it does not detect it at all; a white box, on the other hand, is detected easily. What is the most likely explanation?",
+                "options": [
+                  "The box is too far away, so the sound does not come back",
+                  "The black surface reflects little, so the reflection cannot pass the threshold",
+                  "INPUT_PULLUP has not been used",
+                  "A magnetic field forms in the black box"
+                ],
+                "answer": 1,
+                "explanation": "A dark, shiny surface does not send the light back to the sensor; the reflection cannot pass the threshold. The solution is to make the threshold (the screw) more sensitive, or to calibrate the measurement for the surface. The sensor is not broken and there is no need to look for a code error; the surface effect is a well-known feature of real hardware.",
+                "skills": [
+                  "sensor-ir-obstacle"
+                ]
+              },
+              {
+                "id": "m4h2d2-q3",
+                "kind": "numeric",
+                "prompt": "In ir_analog_esik, ESIK_YUKSEK = 600, ESIK_ALCAK = 500 and the starting state is \"no obstacle\". The AO readings are 450, 620, 550, 520, 480, 590 in turn. How many times is an \"Engel var\" or \"Engel yok\" line printed?",
+                "answer": 2,
+                "tolerance": 0,
+                "unit": "lines",
+                "explanation": "450: stays no obstacle. 620 >= 600: \"Engel var\" (1). 550 and 520 are in between, so the state is kept. 480 <= 500: \"Engel yok\" (2). 590 < 600, still no obstacle. 2 lines in total. With a single threshold of 550, three changes would be printed, at 620, 520 and 590; hysteresis brings this down to two.",
+                "skills": [
+                  "prog-hysteresis",
+                  "sensor-ir-obstacle"
+                ]
+              },
+              {
+                "id": "m4h2d2-q4",
+                "kind": "predict-output",
+                "prompt": "On the IR obstacle part in the lab, the AO pin is connected to A0. The AO voltage rises in a straight line with proximity (a reading of about 51 for proximity 0 and about 972 for proximity 1). You set the proximity first to 0.4, then to 0.8. What do you see in the serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (analogRead(A0) >= 600) Serial.println(\"Y\");\n  else Serial.println(\"N\");\n  delay(500);\n}\n```",
+                "options": [
+                  "Y all the time first, then N all the time",
+                  "N all the time",
+                  "Y all the time",
+                  "N all the time first, then Y all the time"
+                ],
+                "answer": 3,
+                "explanation": "At proximity 0.4 the AO reading is about 419, below 600: N is printed. At proximity 0.8 it is about 788, above 600: Y is printed. Because AO rises with proximity, the order from N to Y is correct.",
+                "skills": [
+                  "sensor-ir-obstacle",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h2d2-q5",
+                "kind": "find-bug",
+                "prompt": "You want to count the boxes on a conveyor belt. A single box stays in front of the sensor for one second and the counter goes up to 10 (it rises every 100 ms). Which line is the problem?\n\n```\nint sayac = 0;\n\nvoid setup() {\n  pinMode(3, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool engel = (digitalRead(3) == LOW);\n  if (engel) {\n    sayac++;\n    Serial.println(sayac);\n  }\n  delay(100);\n}\n```",
+                "options": [
+                  "pinMode(3, INPUT);",
+                  "bool engel = (digitalRead(3) == LOW);",
+                  "if (engel) {",
+                  "delay(100);"
+                ],
+                "answer": 2,
+                "explanation": "`if (engel)` tests the level: as long as there is an obstacle, the counter rises on every pass. The right way is to test the edge \"there was no obstacle on the previous pass, now there is\" (keep a bool onceki and use `engel && !onceki`). The reading line and pinMode are correct.",
+                "skills": [
+                  "prog-edge-detect",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Reed anahtarı ve limit anahtarı",
@@ -973,7 +1801,128 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The reed switch and the limit switch",
+            "problem": "A window alarm at home has two small parts: one is stuck to the frame, the other to the window. While the window is closed nothing happens between them, but when it opens the alarm sounds. There is not even a wire between them. And a printer head, or the axis of a 3D printer, stops when it reaches the end point; how does it know?",
+            "contentMd": "### Two switches, the same logic\n**Reed switch:** two thin metal reeds inside a glass tube. When a magnet comes near, the reeds' contact **closes**; when the magnet moves away, it opens. Electrically it is a button; what presses it is a magnet instead of a finger.\n\n**Limit switch (micro switch):** a switch whose contact changes when a small lever or button is pressed mechanically. When a moving part reaches the end point, it hits the lever. Electrically this is a button too. There is no separate limit switch part in the lab; use the **button** part instead of a limit switch. The **Pressed** box means \"the lever has been pressed\".\n\nBoth are read in the same way as the button in lesson 6: one pin to the board pin, the other to GND, and the pin set to `INPUT_PULLUP`. When the contact closes, the pin is connected to GND and reads `LOW`; when the contact is open, it reads `HIGH`.\n\n| Switch | When the contact is closed (LOW) | In the lab |\n|---|---|---|\n| Reed | Magnet nearby (door closed, magnet and reed facing each other) | **Magnet nearby** box ticked |\n| Limit | Lever pressed | The button's **Pressed** box ticked |\n\nReal limit switches usually have three pins: common (COM), normally open (NO) and normally closed (NC). If you use the NO pin, the contact closes when pressed, as above. If you use the **NC pin**, it is the other way round: the contact is closed when not pressed and opens when pressed. The button in the lab only works like NO. In safety applications an NC connection may be preferred, because even if the wire breaks, the pin goes HIGH and the system sees this as \"contact opened\". So a fault does not stay silent. But you then need to reverse this logic in the code.\n\n**Debounce reminder:** as you learnt in lesson 8, real mechanical contacts bounce for a short moment as they close. The reeds of a reed switch and the lever of a limit switch bounce too. If we take the bouncing for a change and create an event, we get a false alarm. That is why we only accept a change if it stays stable for a short time. The reed and button in the lab change cleanly and do not bounce; the debounce part of the code is still the right habit for a real circuit.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Reed | A → **D4**, B → GND (`INPUT_PULLUP`) |\n| Button (instead of a limit switch) | A → **D3**, B → GND (`INPUT_PULLUP`) |\n| Resistor (330 Ω) | 1 → **D13**, 2 → LED A |\n| LED | A → resistor pin 2, K → GND |\n\nReal ready-made reed modules may have their own resistor and output on them; the reed in the lab is like a bare reed, so `INPUT_PULLUP` is a must.\n\n### Program\n```cpp\n// sketch: reed_kapi\nconst int REED = 4;\nconst int LED = 13;\nconst unsigned long KARARLI_MS = 20;\n\nbool kararliKapali = false;    // kapı kapalı mı (mıknatıs yakın)?\nbool sonOkunan = false;\nunsigned long sonDegisim = 0;\n\nvoid setup() {\n  pinMode(REED, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  bool kapali = (digitalRead(REED) == LOW);      // LOW = kontak kapalı = mıknatıs yakın\n\n  if (kapali != sonOkunan) {\n    sonOkunan = kapali;\n    sonDegisim = simdi;\n  }\n  if (sonOkunan != kararliKapali && simdi - sonDegisim >= KARARLI_MS) {\n    kararliKapali = sonOkunan;\n    Serial.println(kararliKapali ? \"Kapi kapali\" : \"Kapi acik\");\n  }\n\n  digitalWrite(LED, !kararliKapali);             // kapı açıkken LED yansın\n}\n```\n\nTo read both switches together with the same logic, we can use arrays (you saw arrays and the `for` loop in lesson 4). Here each switch keeps its own \"last change\" time:\n\n```cpp\n// sketch: kontak_debounce\nconst int PIN_SAYISI = 2;\nconst int PINLER[PIN_SAYISI] = {4, 3};     // 0: reed (D4), 1: limit (D3)\nconst unsigned long KARARLI_MS = 20;\n\nbool kararli[PIN_SAYISI];\nbool sonOkunan[PIN_SAYISI];\nunsigned long sonDegisim[PIN_SAYISI];\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < PIN_SAYISI; i++) {\n    pinMode(PINLER[i], INPUT_PULLUP);\n    kararli[i] = false;                   // false = kontak açık\n    sonOkunan[i] = false;\n    sonDegisim[i] = 0;\n  }\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  for (int i = 0; i < PIN_SAYISI; i++) {\n    bool kapali = (digitalRead(PINLER[i]) == LOW);\n    if (kapali != sonOkunan[i]) {\n      sonOkunan[i] = kapali;\n      sonDegisim[i] = simdi;\n    }\n    if (sonOkunan[i] != kararli[i] && simdi - sonDegisim[i] >= KARARLI_MS) {\n      kararli[i] = sonOkunan[i];\n      Serial.print(i == 0 ? \"Reed: \" : \"Limit: \");\n      Serial.println(kararli[i] ? \"kapali\" : \"acik\");\n    }\n  }\n}\n```\n\n### How does it work?\n1. Because the pin is `INPUT_PULLUP`, it reads `HIGH` when the contact is open and `LOW` when it is closed. By writing \"kapali = (digitalRead(...) == LOW)\" (kapali means closed) in the code, we flip this reversed logic once.\n2. When the raw reading changes, `sonDegisim` is refreshed. If the change lasts for `KARARLI_MS`, the new state is accepted and a message is printed. Shorter bounces do not produce a message.\n3. `reed_kapi` keeps track of the door state; the LED lights while the door is open. This is the basic idea of the alarm in the project.\n4. `kontak_debounce` repeats the same logic with arrays. To add a new switch, you just write its pin into the `PINLER` array and increase `PIN_SAYISI`.\n\n### Try it\n- While `reed_kapi` runs, select the reed part and tick the **Magnet nearby** box, then untick it. How do the LED and the serial monitor change? Note: a plain reed switch does not care which pole of the magnet comes near; it closes for both.\n- While it runs, select the reed and read the voltage across its pins with the **Virtual meter** in the right panel. How many volts do you see when the contact is open, and when it is closed? Explain these values with `INPUT_PULLUP`.\n- With `kontak_debounce`, operate the button (limit) and the reed one after the other. Do the messages get mixed up?\n- If you had connected the limit switch to its NC pin, which line in the code would you need to change? There is no NC in the lab; write your answer by studying the code.\n\n### Common mistakes\n- Connecting the reed switch without `INPUT_PULLUP`: when the contact is open, the pin floats and gives random readings.\n- Thinking \"magnet nearby = HIGH\": with `INPUT_PULLUP` the pin goes LOW when the contact closes.\n- Not adding debounce: in a real circuit, when the door rattles or the lever bounces, false events appear.\n- Forgetting to connect the reed's second pin to GND: even when the contact closes, the pin never goes LOW and \"Kapi kapali\" (door closed) is never printed.\n- Mixing up NO and NC: the circuit works the wrong way round.",
+            "question": "Why might connecting the door contact as NC in an alarm system be safer than connecting it as NO? If a burglar cuts the wire, what happens with each connection?",
+            "explainerMd": "### What you will learn in this lesson\n- That a reed switch and a limit switch are each a button, electrically\n- How to read these switches with `INPUT_PULLUP` and why LOW = contact closed\n- The difference between NO and NC connections and why it matters for safety\n- How to filter out contact bounce with debounce\n\n### What you should know first\n- Lesson 6: `INPUT_PULLUP` and pressed = LOW\n- Lesson 8: debounce\n- Lesson 4: arrays and the `for` loop\n- Lesson 27: measuring time with `millis()`\n\n### Contact switches\nA **reed switch** is made of two thin metal reeds inside a glass tube. When a magnet comes near, the reeds touch and the contact **closes**. A **limit switch** (micro switch), on the other hand, is a lever: when a moving part reaches the end point and presses the lever, the contact changes. Both are buttons; what presses them is a magnet or a part instead of a finger.\n\n| Switch | What closes the contact | In the lab |\n|---|---|---|\n| Reed | A nearby magnet | **Magnet nearby** on the reed part |\n| Limit | A part pressing the lever | **Pressed** on the button part |\n\n### Reading with INPUT_PULLUP\nOne pin of the switch goes to the board pin, the other to GND, and the pin is set to `INPUT_PULLUP`:\n\n```\ncontact open   -> pin pulled up to 5 V by the internal resistor -> HIGH\ncontact closed -> pin connected to GND                          -> LOW\n```\n\nIf you forget the pull-up, the pin is left floating when the contact is open (a floating input) and the reading is random. It is a good idea to flip the reversed logic once in the code: `bool kapali = (digitalRead(REED) == LOW);`.\n\n### NO and NC\nReal limit switches have three pins: common (COM), normally open (NO) and normally closed (NC).\n\n| Connection | At rest | When pressed / when the magnet comes |\n|---|---|---|\n| NO | Contact open | Closes |\n| NC | Contact closed | Opens |\n\nIn alarm systems the rule is: **make the alarm condition \"the contact opens\"**. With the contact normally closed (NC connection), when the door opens the contact opens and the pin reads HIGH. Even if the burglar cuts the wire, the contact opens, the pin still reads HIGH and the alarm sounds; the fault does not stay silent. If the alarm condition were \"the contact closes\" (NO connection), a cut wire would change nothing and the system would be blind. The price is that the logic is reversed in the code: with NC, HIGH = breach, LOW = all is well.\n\n### Bounce and debounce\nMechanical contacts open and close for a short moment as they close. Here is an example timeline (in ms, with a 20 ms stability condition):\n\n```\nt=0 LOW, t=3 HIGH, t=6 LOW, t=9 HIGH, t=12 LOW, then stays LOW\n```\n\nThe timer is reset at every change; since the last change is at t = 12, it is accepted at t = 12 + 20 = 32 ms. Instead of four changes you get one clean event. If there are several switches, each one keeps its own \"last change\" time; you do this with an array.\n\n### Summary\nReed and limit switches are contacts and are read with `INPUT_PULLUP`: LOW when the contact is closed, HIGH when it is open. Because an NC connection shows even a broken wire as an event, it is preferred in safety applications, but the logic has to be reversed in the code. To filter out contact bounce, a change is accepted only after it has stayed stable for a certain time.",
+            "concepts": [
+              {
+                "term": "Reed switch",
+                "definition": "A switch made of two metal reeds in a glass tube, whose contact closes when a magnet comes near.",
+                "example": "In a window alarm, the reed is stuck to the frame and the magnet to the window.",
+                "pitfall": "Thinking a particular pole of the magnet is needed; a plain reed closes for both poles."
+              },
+              {
+                "term": "Limit switch",
+                "definition": "A micro switch whose contact changes when a lever is pressed mechanically.",
+                "example": "In a 3D printer, when the axis reaches the end point it hits the lever and triggers a stop.",
+                "pitfall": "Thinking it is a special sensor; electrically it is an ordinary button."
+              },
+              {
+                "term": "Reading with INPUT_PULLUP",
+                "definition": "One pin of the switch is connected to the board pin and the other to GND; it reads LOW when the contact is closed and HIGH when it is open.",
+                "example": "pinMode(4, INPUT_PULLUP); kapali = (digitalRead(4) == LOW);",
+                "pitfall": "Forgetting the pull-up: when the contact is open, the pin floats and the reading is random."
+              },
+              {
+                "term": "NO and NC",
+                "definition": "NO (normally open) closes when pressed; NC (normally closed) opens when pressed.",
+                "example": "If an alarm door contact is connected as NC, a broken wire also opens the contact and sets off the alarm.",
+                "pitfall": "Mixing up NO and NC: the logic works the wrong way round, or a broken wire goes unnoticed."
+              },
+              {
+                "term": "Contact bounce",
+                "definition": "As a mechanical contact closes, it opens and closes for a moment, and one event looks like several events.",
+                "example": "When the door rattles, the reed can give LOW-HIGH-LOW for a moment.",
+                "pitfall": "Not adding debounce: false events and false alarms are produced."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h2d3-q1",
+                "kind": "mcq",
+                "prompt": "One pin of the reed switch is connected to D4, the other to GND, and the pin is INPUT_PULLUP. What does digitalRead(4) give when a magnet comes near the reed?",
+                "options": [
+                  "HIGH",
+                  "The reading is unstable, random",
+                  "LOW",
+                  "About 2.5 V and undefined"
+                ],
+                "answer": 2,
+                "explanation": "The magnet closes the contact, the pin is connected to GND and reads LOW. When the magnet is far away the contact is open and the internal pull-up pulls the pin to 5 V (HIGH). A plain reed does not care which pole of the magnet comes near.",
+                "skills": [
+                  "sensor-contact"
+                ]
+              },
+              {
+                "id": "m4h2d3-q2",
+                "kind": "mcq",
+                "prompt": "You connected the door contact as NC and applied the rule \"contact opened = breach\". A burglar cuts the contact's wire without touching the door. What happens?",
+                "options": [
+                  "Nothing happens, the system thinks the door is closed",
+                  "The pin reads LOW and the system thinks the door is closed",
+                  "The pin reads HIGH and the system counts it as a breach",
+                  "The Arduino restarts"
+                ],
+                "answer": 2,
+                "explanation": "When the wire breaks, the circuit opens, the pin reads HIGH thanks to INPUT_PULLUP, and the system sees this as the contact opening, that is, a breach. The alarm sounds. If the contact were connected as NO and the rule were \"breach when the contact closes\", a cut wire would change nothing and the system would stay silent.",
+                "skills": [
+                  "design-failsafe",
+                  "sensor-contact"
+                ]
+              },
+              {
+                "id": "m4h2d3-q3",
+                "kind": "numeric",
+                "prompt": "In the reed_kapi sketch, KARARLI_MS = 20. As the reed closes, the raw reading changes like this at 1 ms intervals: LOW at t = 0, HIGH at 3, LOW at 6, HIGH at 9, LOW at 12, and then it stays LOW. At which millisecond does the program accept the door as \"closed\"?",
+                "answer": 32,
+                "tolerance": 1,
+                "unit": "ms",
+                "explanation": "sonDegisim is refreshed at every raw change. The last change is at t = 12 and the value must stay the same for 20 ms: 12 + 20 = 32 ms. Before that, no value stays stable for 20 ms, so there is no early acceptance.",
+                "skills": [
+                  "prog-debounce",
+                  "sensor-contact"
+                ]
+              },
+              {
+                "id": "m4h2d3-q4",
+                "kind": "predict-output",
+                "prompt": "In the lab, the Magnet nearby box starts unticked. After the program has printed two lines, you tick the box. What do you see in the four lines in total?\n\n```\nvoid setup() {\n  pinMode(4, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println(digitalRead(4) ? \"acik\" : \"kapali\");\n  delay(500);\n}\n```",
+                "options": [
+                  "kapali, kapali, acik, acik",
+                  "acik, acik, kapali, kapali",
+                  "acik all the time",
+                  "kapali all the time"
+                ],
+                "answer": 1,
+                "explanation": "While unticked, the contact is open, the pin reads HIGH (the expression counts as true) and \"acik\" (open) is printed. When the box is ticked, the contact closes, the pin goes LOW (the expression counts as false) and \"kapali\" (closed) is printed. The order: acik, acik, kapali, kapali.",
+                "skills": [
+                  "sensor-contact",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h2d3-q5",
+                "kind": "find-bug",
+                "prompt": "One pin of the reed is on D4 and the other on GND. Even though the magnet is far away, the LED now and then flickers on by itself. Which line is the problem?\n\n```\nconst int REED = 4;\n\nvoid setup() {\n  pinMode(REED, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, digitalRead(REED) == LOW);\n}\n```",
+                "options": [
+                  "const int REED = 4;",
+                  "pinMode(REED, INPUT);",
+                  "pinMode(13, OUTPUT);",
+                  "digitalWrite(13, digitalRead(REED) == LOW);"
+                ],
+                "answer": 1,
+                "explanation": "When the reed is open, the pin is not connected to anything (a floating input) and the reading is random. `INPUT_PULLUP` pulls the pin to 5 V when the contact is open. The comparison (`== LOW` means the contact is closed) is correct.",
+                "skills": [
+                  "sensor-contact",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "VL53L0X (I2C ToF): hassas mesafe",
@@ -1092,7 +2041,125 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "VL53L0X (I2C ToF): precise distance",
+            "problem": "You measured the length of the room with the HC-SR04, but sometimes the sensor did not see the object at all, or the sound bounced off in the wrong direction. To measure a part that comes right up to the tip of a thin cable, would you like to use light instead of sound? There is a sensor on a small board that measures the there-and-back time of a pulse of light: the VL53L0X.",
+            "contentMd": "### What is ToF?\nToF (Time of Flight) means the sensor sends out a pulse of light and measures how long its reflection takes to come back. The VL53L0X does this with an infrared laser and gives the result in **millimetres**. It sends the data to the Arduino over **I2C** (the `Wire` from lesson 33). Its default I2C address is **0x29**.\n\nFor the limits, check the sensor's datasheet. The measuring range, the accuracy and how it reacts to ambient light **depend on the model and the conditions of use**.\n\n**Important:** there is **no** VL53L0X part in the lab. In this lesson you will not build a circuit; you will write and compile the sensor code and see what your program does when the lab cannot find the sensor. A good program notices when the sensor is missing and reports it.\n\nReal hardware note: most ready-made breakout boards have a regulator that steps down 5 V, but the bare chip is not 5 V tolerant; you need to check the board's documentation.\n\n### ToF compared with ultrasonic\nLet's compare the HC-SR04 from lessons 36-39 with the VL53L0X in broad terms. For exact numbers, check the datasheets of both.\n\n| Topic | HC-SR04 (ultrasonic) | VL53L0X (ToF) |\n|---|---|---|\n| Measuring method | The echo of a sound pulse | The reflection of a light pulse |\n| Connection | Two digital pins for TRIG and ECHO, `pulseIn` | I2C (SDA and SCL), a library |\n| Range | Offers a longer range | Usually a shorter range |\n| Speed | Measuring is slow because sound is slow | Measuring can be fast because light is fast |\n| Surface dependence | Soft (fabric, sponge) and slanted surfaces can scatter the sound, as in lesson 38 | Dark and shiny surfaces and strong ambient light can affect the result |\n| Beam width | A cone of sound that can spread widely across the surface | Light also has a certain field of view; compare the angles in the datasheets |\n| Number of pins | Uses up pins | Two I2C pins, shared with other I2C devices |\n\nWhich one is \"better\"? That is the wrong question. To measure a far wall in a large room where the surface does not matter, ultrasonic may suit. If you need a small, fast measurement with a narrow angle, ToF suits. Because it is cheap and simple, the HC-SR04 is still common.\n\n### Circuit\nBecause there is no VL53L0X part in the lab, no circuit is built in this lesson. In a real circuit the connection would be as follows (for information):\n\n| Part | Connection |\n|---|---|\n| VL53L0X board | VCC → 5V (check the board's documentation), GND → GND, SDA → **A4**, SCL → **A5** |\n| Resistor (330 Ω) + LED | **D13** → resistor → LED A; LED K → GND |\n\nThe I2C address is 0x29. In a real circuit, to be sure, you run the address scanner program from lesson 33; 0x29 should appear in the output. Another I2C device (for example an LCD at 0x27) can be connected to the same bus; their addresses are different.\n\n### Program\nThe sketches below use the **Pololu VL53L0X** library. The header file is `#include <VL53L0X.h>`. Because there is no sensor part in the lab, these sketches are only **compiled**; the measuring behaviour (mm values, threshold crossings) has not been checked here. If you run the program with ▶, `init()` cannot find the sensor and the serial monitor shows \"VL53L0X bulunamadi\" (VL53L0X not found); this is the expected behaviour and shows that the error check works.\n\nFirst, the simplest reading. `readRangeContinuousMillimeters()` returns the result in millimetres in continuous measuring mode:\n\n```cpp\n// sketch: tof_okuma\n#include <Wire.h>\n#include <VL53L0X.h>\n\nVL53L0X sensor;\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  sensor.setTimeout(500);               // ms\n  if (!sensor.init()) {\n    Serial.println(\"VL53L0X bulunamadi\");\n    while (true) {}                     // sensör yoksa burada dur\n  }\n  sensor.startContinuous();             // sürekli ölçüm başlat\n}\n\nvoid loop() {\n  int mm = sensor.readRangeContinuousMillimeters();\n  if (sensor.timeoutOccurred()) {\n    Serial.println(\"Zaman asimi\");\n  } else {\n    Serial.print(mm);\n    Serial.println(\" mm\");\n  }\n  delay(100);\n}\n```\n\nNow let's add a threshold: if an object is closer than 300 mm, the LED lights. So that it does not flicker around the threshold, we used the hysteresis idea from lesson 35:\n\n```cpp\n// sketch: tof_esik\n#include <Wire.h>\n#include <VL53L0X.h>\n\nVL53L0X sensor;\n\nconst int LED = 13;\nconst int YAKIN_MM = 300;      // bunun altında \"yakın\"\nconst int UZAK_MM = 340;       // bunun üstünde \"uzak\"\n\nbool yakin = false;\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n  Wire.begin();\n  sensor.setTimeout(500);\n  if (!sensor.init()) {\n    Serial.println(\"VL53L0X bulunamadi\");\n    while (true) {}\n  }\n  sensor.startContinuous();\n}\n\nvoid loop() {\n  int mm = sensor.readRangeContinuousMillimeters();\n  if (!sensor.timeoutOccurred()) {\n    if (!yakin && mm < YAKIN_MM) {\n      yakin = true;\n      Serial.println(\"Yakin\");\n    } else if (yakin && mm > UZAK_MM) {\n      yakin = false;\n      Serial.println(\"Uzak\");\n    }\n  }\n  digitalWrite(LED, yakin);\n}\n```\n\n### How does it work?\n1. `Wire.begin()` starts the I2C bus. `sensor.init()` returns true if it can reach the sensor and false if it cannot. This is how we catch wiring errors.\n2. `setTimeout(500)` makes sure that, if a reading does not finish within 500 ms, you are told via `timeoutOccurred()`. If a reading fails, do not trust the number it returns; do this check first.\n3. `startContinuous()` makes the sensor measure again and again. `readRangeContinuousMillimeters()` gives the result in mm.\n4. `tof_esik` has two thresholds. When the distance drops below 300 mm it becomes \"close\", and when it rises above 340 mm it becomes \"far\". If it stays in between, the previous state is kept. The median filter you used with the HC-SR04 (lesson 38) can be used here too.\n\n### Try it\n- Run the `tof_okuma` program in the lab. What does the serial monitor show? What happens if you delete the `init()` check and run it? (Write in your own words why the check is needed.)\n- Set `YAKIN_MM` and `UZAK_MM` in `tof_esik` to 200 and 260 and compile. Explain why the gap between them (the hysteresis margin) should not be zero.\n- Write the same threshold logic with the HC-SR04 (with the Distance slider in the lab, lesson 37): the LED lights if closer than 30 cm and goes off if farther than 34 cm. How is it different from the ToF code?\n- Look up in the datasheet how dark and shiny surfaces can affect a ToF measurement, and write it in one sentence.\n\n### Common mistakes\n- Connecting the SDA and SCL wires the wrong way round (or not having the sensor at all): `init()` fails.\n- On real hardware, connecting a bare chip with 3.3 V logic to 5 V: do not connect it without checking the board's documentation.\n- Not checking `timeoutOccurred()`: you take a faulty reading for a real distance.\n- Using a long `delay` or writing blocking code: use the `millis()` method from lesson 27.\n- Using the function names of a different VL53L0X library instead of the Pololu library: the names differ between libraries.",
+            "question": "To detect an obstacle in front of a robot, would you use the HC-SR04 or the VL53L0X? Does your choice change if the robot is outdoors, if the surfaces are soft, or if the robot is very fast?",
+            "explainerMd": "### What you will learn in this lesson\n- How a **ToF** (time of flight) measurement is made with light\n- That the VL53L0X gives distance in millimetres over I2C and that its address is 0x29\n- Catching error situations with `init()` and `timeoutOccurred()`\n- In which ways to compare ToF with the HC-SR04\n- Working out the hysteresis margin for millimetre thresholds\n\n### What you should know first\n- Lesson 33: I2C, `Wire` and the address scan\n- Lesson 35: the two-threshold (hysteresis) decision\n- Lessons 36-38: ultrasonic measurement, how the surface affects measurement, filtering\n- Lesson 27: `millis()` instead of `delay`\n\n### The there-and-back time of light\n**ToF** (Time of Flight) means the sensor sends out a short pulse of light and measures how long the reflection takes to come back. The distance is worked out from the speed of light and this time. The VL53L0X does this with an infrared laser and gives the result in **millimetres**. Since 1 cm = 10 mm, 300 mm means 30 cm.\n\nThere is an important note here: there is no VL53L0X part in the lab. In this lesson you write and compile the code; you cannot see the measured values virtually. If you run it without a sensor, the program prints \"VL53L0X bulunamadi\" (VL53L0X not found), and this is proof that the error check works.\n\n### I2C and the address\nThe sensor is connected to the Arduino with two wires: SDA (A4) and SCL (A5). There can be other I2C devices on the same bus; each one has a different address.\n\n| Device | Address |\n|---|---|\n| I2C LCD (in this course) | 0x27 |\n| VL53L0X | 0x29 |\n| MPU6050, RTC | 0x68 |\n| BMP280 | 0x76 |\n\nTo be sure of the connection, you run the address scanner program from lesson 33 and look for 0x29 in the output. Bare chips work on 3.3 V; ready-made boards usually have a regulator, but you check the board's documentation before connecting power.\n\n### Defending against errors\nLibrary calls need two checks:\n\n```\nif (!sensor.init()) { ...sensor not found... }\nint mm = sensor.readRangeContinuousMillimeters();\nif (sensor.timeoutOccurred()) { ...reading invalid... }\n```\n\n`init()` returns `false` if it cannot reach the sensor. `timeoutOccurred()`, on the other hand, becomes `true` if the reading did not finish in time. You must also call `Wire.begin()`; if the I2C bus is not started, you cannot talk to the sensor. Taking the number returned by a failed reading for a real distance is the most common mistake.\n\n### Threshold and hysteresis\nAs in the HC-SR04 lesson, two values are used for the distance threshold. Example: below 300 mm is \"close\", above 340 mm is \"far\". The gap between them is 40 mm, that is, 4 cm.\n\n```\nreadings: 350, 295, 305, 296, 310, 345, 330, 290 (mm)\nsingle threshold (300): close-far-close-far ... the state changes 5 times\ntwo thresholds (300/340): only \"close\" at 295, \"far\" at 345, \"close\" at 290: 3 changes\n```\n\n### ToF and ultrasonic\nToF uses light, the HC-SR04 uses sound. The HC-SR04 needs two digital pins and `pulseIn`; the VL53L0X uses two I2C pins and shares them with other I2C devices. Both are sensitive to the surface: sound can scatter on soft surfaces, and light can be affected by dark and shiny surfaces or by strong ambient light. For the exact range and accuracy, check the datasheet.\n\n### Summary\nThe VL53L0X measures distance in millimetres from the time of flight of light and talks over I2C at address 0x29. In the code, errors must be caught with `Wire.begin()`, `init()` and `timeoutOccurred()`. In threshold decisions, keeping the close and far values apart stops the state from flickering.",
+            "concepts": [
+              {
+                "term": "ToF (time of flight)",
+                "definition": "The sensor sends out a pulse of light and works out the distance from the time the reflection takes to come back.",
+                "example": "The VL53L0X measures with an infrared laser and gives the result in millimetres.",
+                "pitfall": "Thinking it works with sound like the ultrasonic sensor; ToF uses light."
+              },
+              {
+                "term": "The VL53L0X and address 0x29",
+                "definition": "A ToF distance sensor that talks over I2C; its default address is 0x29.",
+                "example": "Seeing 0x29 in the address scan output shows that the sensor is connected to the bus.",
+                "pitfall": "Mixing up the sensor's address with the LCD's 0x27."
+              },
+              {
+                "term": "init() and timeoutOccurred()",
+                "definition": "init() tells you whether the sensor was found, and timeoutOccurred() tells you whether the reading finished in time.",
+                "example": "if (!sensor.init()) { Serial.println(\"VL53L0X bulunamadi\"); }",
+                "pitfall": "Taking the number returned by a failed reading for a real distance."
+              },
+              {
+                "term": "Wire.begin()",
+                "definition": "The call that starts the I2C bus; it is done in setup() before talking to the sensor.",
+                "example": "Wire.begin(); sensor.init();",
+                "pitfall": "Forgetting Wire.begin(): no communication with the sensor is possible and init() fails."
+              },
+              {
+                "term": "Millimetres and the threshold margin",
+                "definition": "The VL53L0X gives mm (10 mm = 1 cm); the gap between the close and far thresholds is the hysteresis margin.",
+                "example": "The margin between the 300 mm and 340 mm thresholds is 40 mm, that is, 4 cm.",
+                "pitfall": "Mixing up mm and cm: taking 300 mm for 300 cm."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h2d4-q1",
+                "kind": "mcq",
+                "prompt": "If the same I2C bus has an I2C LCD (0x27), an MPU6050 (0x68) and a BMP280 (0x76), at which address does the VL53L0X appear in the address scan?",
+                "options": [
+                  "0x76",
+                  "0x68",
+                  "0x27",
+                  "0x29"
+                ],
+                "answer": 3,
+                "explanation": "The VL53L0X's default address is 0x29. 0x27 belongs to the LCD, 0x68 to the MPU6050 and the RTC, and 0x76 to the BMP280. Because the addresses are different, they can all be on the same bus.",
+                "skills": [
+                  "sensor-tof",
+                  "circuit-wiring"
+                ]
+              },
+              {
+                "id": "m4h2d4-q2",
+                "kind": "numeric",
+                "prompt": "In the tof_esik sketch, YAKIN_MM = 300 and UZAK_MM = 340. How many centimetres is the hysteresis margin between the two thresholds?",
+                "answer": 4,
+                "tolerance": 0,
+                "unit": "cm",
+                "explanation": "The gap is 340 − 300 = 40 mm. Since 10 mm = 1 cm, the margin is 40 / 10 = 4 cm. This margin stops the state from flickering even if the distance wobbles around the threshold.",
+                "skills": [
+                  "prog-hysteresis",
+                  "sensor-tof"
+                ]
+              },
+              {
+                "id": "m4h2d4-q3",
+                "kind": "numeric",
+                "prompt": "With the tof_esik logic (YAKIN_MM = 300, UZAK_MM = 340, starting as \"far\"), the sensor reads 350, 295, 305, 296, 310, 345, 330, 290 mm in turn. How many times in total is a \"Yakin\" (close) or \"Uzak\" (far) message printed?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "messages",
+                "explanation": "350: no change. 295 < 300: \"Yakin\" (1). 305, 296 and 310 are in between, so the state is kept (310 is still below 340). 345 > 340: \"Uzak\" (2). 330: no change. 290 < 300: \"Yakin\" (3). 3 messages in total. With a single threshold, the state would change 5 times.",
+                "skills": [
+                  "prog-hysteresis",
+                  "sensor-tof"
+                ]
+              },
+              {
+                "id": "m4h2d4-q4",
+                "kind": "find-bug",
+                "prompt": "Even though the VL53L0X is wired correctly, init() always returns false and the serial monitor shows \"VL53L0X bulunamadi\". What is missing from the code?\n\n```\n#include <VL53L0X.h>\n\nVL53L0X sensor;\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.setTimeout(500);\n  if (!sensor.init()) {\n    Serial.println(\"VL53L0X bulunamadi\");\n    while (true) {}\n  }\n  sensor.startContinuous();\n}\n```",
+                "options": [
+                  "The sensor.setTimeout(500) call is unnecessary",
+                  "startContinuous() should be called before init()",
+                  "The Wire.begin() call is missing",
+                  "Serial.begin(9600) switches off I2C"
+                ],
+                "answer": 2,
+                "explanation": "The library does not start the I2C bus itself; in the usage examples, Wire.begin() is called first in setup(). Without this call the sensor cannot be reached. The setTimeout(500) and startContinuous() calls are in the right place.",
+                "skills": [
+                  "sensor-tof",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h2d4-q5",
+                "kind": "mcq",
+                "prompt": "After calling sensor.readRangeContinuousMillimeters(), sensor.timeoutOccurred() returned true. What should you do with the number you have?",
+                "options": [
+                  "Accept it as the real distance and compare it with the threshold",
+                  "Treat the reading as invalid and skip the decision for that pass",
+                  "Multiply the value by two and use it",
+                  "Divide by 10 to convert the sensor to centimetres"
+                ],
+                "answer": 1,
+                "explanation": "If timeoutOccurred() is true, the reading did not finish in time; the number returned is not a real distance. The right thing is to skip this pass or report an error. Accepting the number as mm leads to wrong threshold decisions.",
+                "skills": [
+                  "sensor-tof",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Hırsız alarmı (durum makineli)",
@@ -1217,7 +2284,131 @@ export const modul4: ModuleContent = {
                 "design-failsafe"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Burglar alarm (with a state machine)",
+            "problem": "You have put one sensor on the front door and one in the room, set the alarm, and now you are going to close the door and leave. Does the alarm go off straight away? When you come back into your own home, does it stay quiet until you enter the code? Does a silenced alarm still remember that \"something happened\"? What answers these questions is not so much the sensors as the **states** and the **transitions** between them.",
+            "contentMd": "### What are we going to do?\nThis project brings together this week's lessons and earlier topics:\n- **Lesson 41:** motion detection with a PIR (D2).\n- **Lesson 43:** a door contact with a reed switch (D4) and debounce.\n- **Lesson 18:** an alarm sound with a buzzer (D8).\n- **Lessons 27-28:** non-blocking timing with `millis()` and a state machine with `enum`.\n\nThe alarm works with four states (in the code: `DEVRE_DISI` = disarmed, `HAZIR` = armed, `ALARM`, `SUSTURULDU` = silenced):\n\n| State | Meaning | LED (D13) | Buzzer (D8) |\n|---|---|---|---|\n| `DEVRE_DISI` | The system is off, the sensors are ignored | Off | Silent |\n| `HAZIR` | Armed, waiting for a breach | A short flash every 2 s | Silent |\n| `ALARM` | A breach has happened | Blinks quickly | Siren sound |\n| `SUSTURULDU` | The alarm has been silenced but the event is remembered | Blinks slowly | Silent |\n\nWhen arming, there is a 5-second **exit delay**: you press the button and the LED blinks quickly; in a real home you would leave and close the door during this time. When the time is up, the system becomes `HAZIR`. The exit delay is not a separate state; it is tracked with a flag inside `DEVRE_DISI`.\n\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| PIR | VCC → 5V, GND → GND, OUT → **D2** |\n| \"Arm / code\" button | A → **D3**, B → GND (`INPUT_PULLUP`) |\n| Reed | A → **D4**, B → GND (`INPUT_PULLUP`) |\n| Buzzer (Type: Passive) | + → **D8**, − → GND (the same connection as in lesson 18) |\n| Resistor (330 Ω) | 1 → **D13**, 2 → LED A |\n| LED | A → resistor pin 2, K → GND |\n\nThe IR obstacle sensor from lesson 42 is not used in this project; we use D3 for the code button. The reed's **Magnet nearby** box stands for the door: when it is ticked, the door is closed and D4 reads `LOW`; when it is unticked, the door is open and D4 reads `HIGH` (lesson 43). The box starts unticked, so the door is open; tick it before arming. For the **code**, press and release the button three times within 3 seconds.\n\n### Arming and the code\n- **Arming:** in the `DEVRE_DISI` state, press the button **once**. If the door is open, the system is not armed and prints the message \"Kapi acik\" (door open). If the door is closed, a 5-second exit delay starts.\n- During the **exit delay**, the PIR is ignored. If the door is still open at the end of the 5 seconds, arming is cancelled. Otherwise the system becomes `HAZIR`.\n- **Code:** pressing the button **three times** within 3 seconds is the code. We chose this so that a single accidental press does not switch the system off. If the time runs out, the counter is reset.\n- If you enter the code in the **`HAZIR`** state you go to `DEVRE_DISI`; in **`ALARM`** you go to `SUSTURULDU`; in **`SUSTURULDU`** you go to `DEVRE_DISI`.\n- Even if no code is entered, `ALARM` moves to `SUSTURULDU` at the end of `ALARM_SURESI` (10 seconds). This way the alarm does not sound for ever, but the LED shows a trace of the event.\n\n### Program\n```cpp\n// sketch: hirsiz_alarmi\nconst int PIR = 2;\nconst int BUTON = 3;\nconst int REED = 4;\nconst int BUZZER = 8;\nconst int LED = 13;\n\nconst unsigned long CIKIS_GECIKMESI = 5000;   // ms\nconst unsigned long ALARM_SURESI = 10000;     // ms\nconst unsigned long SIFRE_PENCERESI = 3000;   // ms\nconst unsigned long BUTON_KARARLI = 30;       // ms: debounce\nconst int SIFRE_BASIS = 3;                    // şifre: 3 basış\n\nenum Durum { DEVRE_DISI, HAZIR, ALARM, SUSTURULDU };\nconst char* DURUM_ADI[] = { \"DEVRE_DISI\", \"HAZIR\", \"ALARM\", \"SUSTURULDU\" };\n\nDurum durum = DEVRE_DISI;\nbool cikisBekliyor = false;\nunsigned long cikisBasla = 0;\nunsigned long alarmBasla = 0;\n\nbool oncekiBasili = false;\nunsigned long sonBasis = 0;\nunsigned long ilkBasis = 0;\nint basisSayisi = 0;\n\nbool sirenFaz = false;\n\nvoid durumDegistir(Durum yeni) {\n  durum = yeni;\n  basisSayisi = 0;                 // yeni durumda şifre sayacı sıfırlansın\n  cikisBekliyor = false;\n  noTone(BUZZER);\n  sirenFaz = false;\n  Serial.print(\"Durum: \");\n  Serial.println(DURUM_ADI[durum]);\n}\n\n// Butonun yeni basışını bir kez bildirir (kenar + debounce).\nbool yeniBasis(unsigned long simdi) {\n  bool basili = (digitalRead(BUTON) == LOW);\n  bool yeni = basili && !oncekiBasili && (simdi - sonBasis > BUTON_KARARLI);\n  oncekiBasili = basili;\n  if (yeni) sonBasis = simdi;\n  return yeni;\n}\n\n// Şifre girildi mi? Her yeni basış için bir kez çağrılır.\nbool sifreTamam(unsigned long simdi) {\n  if (basisSayisi == 0 || simdi - ilkBasis > SIFRE_PENCERESI) {\n    basisSayisi = 1;               // pencere dışında: yeni deneme başlat\n    ilkBasis = simdi;\n  } else {\n    basisSayisi++;\n  }\n  if (basisSayisi >= SIFRE_BASIS) {\n    basisSayisi = 0;\n    return true;\n  }\n  return false;\n}\n\nbool ihlalVar() {\n  bool hareket = (digitalRead(PIR) == HIGH);\n  bool kapiAcik = (digitalRead(REED) == HIGH);\n  return hareket || kapiAcik;\n}\n\n// LED desenini durumdan üretir.\nvoid ledGuncelle(unsigned long simdi) {\n  bool yanik = false;\n  if (durum == DEVRE_DISI) {\n    yanik = cikisBekliyor && (simdi % 500 < 250);     // çıkış gecikmesinde hızlı\n  } else if (durum == HAZIR) {\n    yanik = (simdi % 2000 < 100);                     // 2 sn'de bir kısa parlama\n  } else if (durum == ALARM) {\n    yanik = (simdi % 200 < 100);                      // çok hızlı\n  } else {\n    yanik = (simdi % 1000 < 500);                     // yavaş\n  }\n  digitalWrite(LED, yanik);\n}\n\n// Siren: 250 ms'de bir 1 kHz ile 2 kHz arasında geçiş yapar.\nvoid sirenGuncelle(unsigned long simdi) {\n  bool faz = (simdi / 250) % 2;\n  if (faz != sirenFaz) {\n    sirenFaz = faz;\n    tone(BUZZER, faz ? 2000 : 1000);\n  }\n}\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(BUTON, INPUT_PULLUP);\n  pinMode(REED, INPUT_PULLUP);\n  pinMode(BUZZER, OUTPUT);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n  Serial.println(\"Durum: DEVRE_DISI\");\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  bool basis = yeniBasis(simdi);\n\n  switch (durum) {\n    case DEVRE_DISI:\n      if (basis && !cikisBekliyor) {\n        if (digitalRead(REED) == HIGH) {\n          Serial.println(\"Kapi acik, kurulamadi\");\n        } else {\n          cikisBekliyor = true;\n          cikisBasla = simdi;\n          Serial.println(\"Cikis gecikmesi basladi\");\n        }\n      }\n      if (cikisBekliyor && simdi - cikisBasla >= CIKIS_GECIKMESI) {\n        if (digitalRead(REED) == HIGH) {\n          cikisBekliyor = false;\n          Serial.println(\"Kapi kapanmadi, kurma iptal\");\n        } else {\n          durumDegistir(HAZIR);\n        }\n      }\n      break;\n\n    case HAZIR:\n      if (basis && sifreTamam(simdi)) {\n        durumDegistir(DEVRE_DISI);\n      } else if (ihlalVar()) {\n        alarmBasla = simdi;\n        durumDegistir(ALARM);\n      }\n      break;\n\n    case ALARM:\n      sirenGuncelle(simdi);\n      if (basis && sifreTamam(simdi)) {\n        durumDegistir(SUSTURULDU);\n      } else if (simdi - alarmBasla >= ALARM_SURESI) {\n        durumDegistir(SUSTURULDU);\n      }\n      break;\n\n    case SUSTURULDU:\n      if (basis && sifreTamam(simdi)) {\n        durumDegistir(DEVRE_DISI);\n      }\n      break;\n  }\n\n  ledGuncelle(simdi);\n}\n```\n\n### How does it work?\n1. The state machine (lesson 28) is written with `enum Durum` and a `switch`. `loop()` contains no `delay` at all, and each pass is very short; the exit delay, the alarm time, the code window and the LED patterns are measured with `millis()` (lesson 27).\n2. `durumDegistir()` does the same clean-up at every transition: the code counter is reset, the buzzer goes quiet and a message is printed. This way leftovers from one state are not carried over into another.\n3. `yeniBasis()` reports a button press once, using an **edge** and **debounce** (lesson 8). `sifreTamam()` counts these presses. If 3 seconds have passed since the first press, the counter starts again.\n4. In the `HAZIR` state, `ihlalVar()` checks whether the PIR is HIGH or the reed is HIGH (the door has opened). Either one is enough. Once the alarm starts, it works like a **latch**: even if the PIR goes LOW again and the door closes, `ALARM` continues until the time runs out or the code is entered.\n5. In the `SUSTURULDU` state the sensors are not checked at all. So a silenced alarm does not sound again with new motion; only the slow LED reminds you that the event happened. To arm the system again, you first go to `DEVRE_DISI` with the code, then arm it again with the button.\n6. A PIR can stay HIGH for a while after motion (lesson 41). The PIR in the lab holds it for 3 seconds. One purpose of the exit delay is to give the PIR time to settle: if you untick the **Motion** box 3 seconds after pressing the arm button, the output stays HIGH until second 6, and the alarm goes off as soon as the system becomes `HAZIR`. The hold time of a real PIR module depends on the module; if needed, make `CIKIS_GECIKMESI` longer.\n\n### Try it\n- Try the sequence of arming, breach, silencing and switching off with the code in the lab: change the reed's and the PIR's boxes and watch the LED and buzzer pattern of each state.\n- **Add an entry delay:** when the door opens, instead of an instant alarm, give 10 seconds to enter the code. Would you add a new state for this, or a flag?\n- During the alarm, make the LED blink in the same rhythm as the buzzer. Which function would you change?\n- If you wanted to use the IR obstacle sensor from lesson 42 (D3), which pin would you move the code button to? Is there a free pin in the standard connections table?\n- Set `SIFRE_BASIS` to 4 and change `SIFRE_PENCERESI`. Think about the balance between a hard code and ease of use.\n\n### Common mistakes\n- Setting up the reed logic the wrong way round: it reads LOW (contact closed) when the door is closed and HIGH when it is open. In the `HAZIR` state, `HIGH` is a breach.\n- Arming without closing the door: the code catches this and refuses to arm. If you remove this check, the system becomes `HAZIR` with an open door and goes off straight away.\n- Finding the PIR HIGH just after the exit delay: you walked past the sensor on your way out. Place the sensor out of your exit path, not outside the door.\n- Not resetting the code counter when the state changes: presses from the previous state spoil the new one.\n- Using `delay()`: code presses and sensors are missed.",
+            "question": "What are the weak points of this alarm? What happens if someone covers the PIR, sticks a magnet to the door frame or cuts the wires? What would a real alarm do about these situations?",
+            "explainerMd": "### What you will learn in this lesson\n- Designing an alarm as **states and transitions** rather than as sensors\n- Turning a state table into a program with `enum` and `switch`\n- Real alarm ideas such as the exit delay, the latch and the code window\n- Why non-blocking (`millis()`) timing is essential in the project\n- Thinking about the weak points of the alarm\n\n### What you should know first\n- Lesson 41: the PIR, warm-up, hold time\n- Lesson 43: the reed switch, `INPUT_PULLUP`, LOW = door closed\n- Lesson 18: the buzzer and `tone`/`noTone`\n- Lessons 27-28: `millis()`, a state machine with `enum`\n- Lesson 8: edges and debounce\n\n### States first, then code\nFour states are enough:\n\n| State | Meaning | Buzzer |\n|---|---|---|\n| `DEVRE_DISI` (disarmed) | The sensors are ignored | Silent |\n| `HAZIR` (armed) | Armed, waiting for a breach | Silent |\n| `ALARM` | A breach has happened | Siren |\n| `SUSTURULDU` (silenced) | The alarm has been silenced, the event is remembered | Silent |\n\nTransitions: pressing the button starts the arming process from `DEVRE_DISI`; when the 5-second exit delay ends, the state becomes `HAZIR`. In `HAZIR`, if the PIR goes HIGH or the door opens, `ALARM` starts. The code or the time running out moves `ALARM` to `SUSTURULDU`.\n\n### The exit delay\nIf the alarm went off straight after arming, you could not leave the house. That is why, after you press the arm button, the sensors are not listened to for 5 seconds. If the door is still open when the time is up, arming is cancelled. The PIR's hold time matters here too: if you untick the motion box 3 seconds after the button, OUT stays HIGH for another 3 seconds, that is, until second 6; the alarm goes off as soon as the system becomes `HAZIR` at second 5.\n\n### The latch and the silenced state\n`ALARM` behaves like a **latch**: even if the PIR goes back to LOW and the door closes, the alarm continues until the code is entered or 10 seconds have passed. When the time is up, it moves to `SUSTURULDU`, not `DEVRE_DISI`; this way the sound stops, but the slowly blinking LED reminds you that the event happened. In `SUSTURULDU` the sensors are not checked, so new motion does not set the alarm off again.\n\n### The code window\nThe code: three presses within 3 seconds. The window is counted **from the first press**. If the presses come at t = 0, 1500, 3200, 3500, 4000 ms, the press at 3200 falls outside the window, so the counter starts again from 1; three presses are only completed at 4000. This is how the code stops the alarm from being switched off by a single accidental press.\n\n### The non-blocking loop\nThere is no `delay()` anywhere in the program. On every pass, `loop()` checks the button, the sensors and the timers; the LED patterns are produced with expressions such as `simdi % 500 < 250`. If `delay(5000)` had been written, the button and the door could not be checked during the exit delay.\n\n### Summary\nAn alarm is a table of four states and the transitions between them; the code writes this table with `enum` and `switch`. The exit delay, the latch and the code window protect the user while keeping the system reliable. All of them are measured with `millis()`; there is no `delay()` anywhere.",
+            "concepts": [
+              {
+                "term": "State machine",
+                "definition": "A design that describes a system with a few named states and the rules for moving between them.",
+                "example": "The alarm: the DEVRE_DISI, HAZIR, ALARM and SUSTURULDU states.",
+                "pitfall": "Mixing states up with flags: it becomes unclear which state you are in."
+              },
+              {
+                "term": "Exit delay",
+                "definition": "The time after arming the alarm when the sensors are not listened to, so the user can leave the house.",
+                "example": "In the project, the sensors are ignored for 5 seconds after the arm button; if the door is still open, arming is cancelled.",
+                "pitfall": "Skipping the delay: the alarm goes off as soon as it is armed."
+              },
+              {
+                "term": "Latch",
+                "definition": "Keeping the state after a breach, even when the condition that triggered it has ended.",
+                "example": "Even if the PIR goes back to LOW and the door closes, ALARM continues until the code is entered or the time runs out.",
+                "pitfall": "Tying ALARM directly to the sensor level: when the burglar leaves, the alarm goes quiet by itself."
+              },
+              {
+                "term": "Code window",
+                "definition": "The condition that the code must be entered within a certain time (counted from the first press).",
+                "example": "3 presses within 3 seconds. If 3 seconds pass after the first press, the counter starts again.",
+                "pitfall": "Counting the window from the last press; accidental presses add up."
+              },
+              {
+                "term": "Non-blocking timing",
+                "definition": "Measuring the time that has passed with millis() instead of delay(); this way loop() runs on every pass.",
+                "example": "The alarm time is measured with simdi - alarmBasla >= ALARM_SURESI.",
+                "pitfall": "Using delay(): the button and the sensors are missed during that time."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h2d5-q1",
+                "kind": "mcq",
+                "prompt": "hirsiz_alarmi is in the ALARM state. The burglar moves away from the PIR and closes the door again (PIR LOW, reed LOW). What does the alarm do?",
+                "options": [
+                  "It goes back to HAZIR straight away",
+                  "It moves to DEVRE_DISI straight away",
+                  "It keeps sounding until the code is entered or the time runs out",
+                  "It lowers the siren's frequency"
+                ],
+                "answer": 2,
+                "explanation": "ALARM works like a latch: once it has started, it continues even if the sensors return to normal, until the code is entered or ALARM_SURESI (10 s) runs out. This stops the alarm from switching off quietly just because the burglar escapes and closes the door.",
+                "skills": [
+                  "prog-state-machine",
+                  "design-failsafe"
+                ]
+              },
+              {
+                "id": "m4h2d5-q2",
+                "kind": "numeric",
+                "prompt": "The door is closed (Magnet nearby ticked) and the program is running. 1 s after pressing the arm button you tick the Motion box, and you untick it 3 s after the button press (the lab PIR holds OUT HIGH for 3 s after the motion ends; the warm-up has finished). How many seconds after the button press does the system move to the ALARM state?",
+                "answer": 5,
+                "tolerance": 0.2,
+                "unit": "s",
+                "explanation": "The exit delay lasts 5 s and the PIR is ignored during this time. The Motion box is unticked 3 s after the button; OUT stays HIGH until 6 s. At second 5 the system becomes HAZIR, ihlalVar() sees the PIR HIGH straight away and ALARM starts: 5 seconds.",
+                "skills": [
+                  "prog-state-machine",
+                  "sensor-pir",
+                  "prog-millis"
+                ]
+              },
+              {
+                "id": "m4h2d5-q3",
+                "kind": "predict-output",
+                "prompt": "The code window is 3000 ms and the code is 3 presses. Presses come at t = 0, 1500, 3200, 3500 and 4000 ms, and tamam() is called for each of them. What is the output?\n\n```\nconst unsigned long PENCERE = 3000;\nint basis = 0;\nunsigned long ilk = 0;\n\nbool tamam(unsigned long t) {\n  if (basis == 0 || t - ilk > PENCERE) {\n    basis = 1;\n    ilk = t;\n  } else {\n    basis++;\n  }\n  return basis >= 3;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long zamanlar[] = {0, 1500, 3200, 3500, 4000};\n  for (int i = 0; i < 5; i++) {\n    Serial.print(tamam(zamanlar[i]) ? \"E \" : \"H \");\n  }\n  Serial.println();\n}\n\nvoid loop() {}\n```",
+                "options": [
+                  "H H E H H",
+                  "E E E E E",
+                  "H H H H E",
+                  "H H H E E"
+                ],
+                "answer": 2,
+                "explanation": "t = 0: basis 1. t = 1500: basis 2. t = 3200: 3200 − 0 > 3000, outside the window, so the counter starts from 1 (ilk = 3200). t = 3500: basis 2. t = 4000: 4000 − 3200 = 800 < 3000, basis 3 and E. The output is \"H H H H E\". Expecting E on the third press means forgetting that the window is counted from the first press.",
+                "skills": [
+                  "prog-state-machine",
+                  "prog-millis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h2d5-q4",
+                "kind": "find-bug",
+                "prompt": "The alarm goes off as soon as it becomes HAZIR, even when the door is closed and nobody is moving. Which line is wrong?\n\n```\nbool ihlalVar() {\n  bool hareket = (digitalRead(PIR) == HIGH);\n  bool kapiAcik = (digitalRead(REED) == LOW);\n  return hareket || kapiAcik;\n}\n```",
+                "options": [
+                  "bool hareket = (digitalRead(PIR) == HIGH);",
+                  "bool kapiAcik = (digitalRead(REED) == LOW);",
+                  "return hareket || kapiAcik;",
+                  "bool ihlalVar() {"
+                ],
+                "answer": 1,
+                "explanation": "The reed is connected with INPUT_PULLUP: when the door is closed (magnet nearby), the contact is closed and it reads LOW. `== LOW` counts the door as \"open\" while it is closed. The correct version is `kapiAcik = (digitalRead(REED) == HIGH)`. The PIR line and `||` are correct: either of the two breaches is enough.",
+                "skills": [
+                  "sensor-contact",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h2d5-q5",
+                "kind": "mcq",
+                "prompt": "When ALARM_SURESI runs out, why does the system move to SUSTURULDU rather than straight to DEVRE_DISI?",
+                "options": [
+                  "To protect the buzzer",
+                  "To remind you of the event with the LED",
+                  "To reset the code counter",
+                  "To avoid using delay()"
+                ],
+                "answer": 1,
+                "explanation": "In SUSTURULDU the sound stops, but the slowly blinking LED reminds the home owner that an event happened. If it went straight to DEVRE_DISI, the trace of the event would be lost and the home owner could not know what happened during the night. Because the sensors are not checked, new motion does not set the alarm off again.",
+                "skills": [
+                  "prog-state-machine",
+                  "design-failsafe"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1225,6 +2416,7 @@ export const modul4: ModuleContent = {
       "title": "Ortam",
       "project": "Hava istasyonu",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. DHT11/DHT22 ile sıcaklık ve nemi okuyabilir; `NaN` değerini `isnan` ile yakalayıp okuma aralığının (en az 2 saniye) neden gerekli olduğunu açıklayabilir.\n2. BMP280'i I2C adresiyle bulabilir, basıncı Pa'dan hPa'ya çevirebilir ve rakımın deniz seviyesi basıncına (P0) neden bağlı olduğunu söyleyebilir.\n3. Toprak nemi, yağmur ve su seviyesi sensörlerinin yönünü ölçerek bulabilir; `map` ve `constrain` ile ham değeri yüzdeye çevirebilir.\n4. Birden çok değeri çok sayfalı bir LCD ekranda `delay` kullanmadan gösterebilir.\n5. Hava istasyonu ve sulama uyarısı projesini plan tablosundan yola çıkarak kurabilir; iki eşikle (histerezis) uyarının titremesini önleyebilir.\n\n### Haftanın planı\nHafta beş derstir; ilk dört ders yaklaşık 25 dakika, proje yaklaşık 35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | DHT11 ve DHT22: sıcaklık ve nem | ~25 dk | Anlatımı oku, DHT'yi D5'e bağla, sıcaklık ve nem kaydırıcılarını oynat, DATA kablosunu çıkarıp hata yolunu dene, mini testi çöz. |\n| 2 | BMP280: basınç ve rakım (I2C) | ~25 dk | Basınç kaydırıcısıyla rakımın değiştiğini gör, formülü elle hesapla ve kütüphaneyle karşılaştır, adres hatasını dene. |\n| 3 | Toprak nemi, yağmur ve su seviyesi (analog) | ~25 dk | Üç sensörün yönünü ham sayılardan bul, kalibrasyon uçlarını kaydet, eşiklerle durum yazdır. |\n| 4 | Çok sayfalı ekran arayüzü (LCD/OLED) | ~25 dk | Üç sayfalı ekranı kur, butonla sayfa çevir, dolgusuz yazının artık bıraktığını gör. |\n| 5 | Proje: Hava istasyonu ve sulama uyarısı | ~35 dk | Durum tablosunu yaz, devreyi kur, programı çalıştır, toprak nemini düşürüp uyarıyı sına, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBaşlamadan önce öğrenci şunları yapabilmeli:\n- `millis()` ile `delay` kullanmadan iki işi birlikte yürütmek (27. ders).\n- I2C hattında SDA/SCL bağlantısını ve cihaz adresi kavramını tanımak (33. ders).\n- Bir kütüphaneyi `#include` ile kullanmak (34. ders).\n- `analogRead`, `map` ve `constrain` ile ham değeri yüzdeye çevirmek (11. ve 14. dersler).\n- Histerezis fikrini (iki eşik) bilmek (35. ders).\n- `tone` ile buzzer çalmak (18. ders).\n\nEksik varsa ilgili Modül 3 dersine dönülmeli; özellikle 27. ve 35. dersler bu haftanın temelidir.\n\n### Kavram haritası\n- **Ortam sensörleri:** DHT (sıcaklık, bağıl nem) → `NaN` ve `isnan` → 2 saniye kuralı → ardışık hata sayacı\n- **Basınç:** BMP280 → I2C adresi (0x76/0x77) → Pa ve hPa → rakım formülü → P0 ve hava durumu\n- **Analog sensörler:** toprak nemi, yağmur, su seviyesi → yön → kalibrasyon uçları → `map` ve `constrain` → eşik ve histerezis\n- **Arayüz:** sayfa değişkeni → `%` işleci → satırı 16 karaktere tamamlama → `snprintf` ve `dtostrf` → OLED\n- **Proje:** durum tablosu → `uyari` durumu → iki eşik → bloklamayan buzzer → arızaya dayanıklılık\n\n### Sık yapılan hatalar\n- **`isnan` denetimini atlamak.** DHT okuyamazsa `NaN` döner; hesap ve ekran `nan` olur.\n- **DHT'yi 2 saniyeden sık okumak.** Aynı eski değer tekrarlanır.\n- **BMP280'i parametresiz `begin()` ile aramak.** Varsayılan adres 0x77'dir; 0x76'daki sensör bulunamaz.\n- **Pa ile hPa'yı karıştırmak.** `readAltitude` hPa bekler; `101325` yazılırsa rakım anlamsız çıkar.\n- **Sensör yönünü bilmeden \"büyük sayı = ıslak\" varsaymak.** Toprak ve yağmur sensörlerinde ıslandıkça değer düşer.\n- **`constrain` unutmak.** Yüzde %-26 ya da %130 gibi değerler çıkar.\n- **Satırı 16 karaktere tamamlamamak.** Ekranda eski yazının artıkları kalır.\n- **`snprintf` ile `%f` kullanmak.** Uno'da ondalık sayı yerine `?` yazılır; `dtostrf` kullanılır.\n- **Tek eşik kullanmak ve bip için `delay` kullanmak.** Uyarı titrer ve program donar.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. DHT'yi bağla ve kaydırıcıları çalışırken oynat; sonra DATA kablosunu çıkarıp programın ne yazdığını açıkla.\n4. BMP280 basıncını 1013,25 hPa'dan 1003,25 hPa'ya çek ve rakımın kaç metre kaydığını hesaplayıp ölç.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Uyarı için neden iki eşik kullandık?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Hava istasyonu ve sulama uyarısı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Birkaç parça bağlı değil ya da LED dirençsiz | DHT, BMP280, LCD, toprak sensörü, LED ve buzzer doğru pinlerde | Bağlantılar düzenli; LCD ve BMP280 aynı I2C hattını adresleriyle paylaşıyor |\n| Plan | Durum tablosu yok | Normal ve uyarı durumları ile eşikler tabloda yazılı | Tablo kodla birebir uyuyor ve her geçiş açıklanmış |\n| Ölçüm | Değerler yanlış birimde ya da `nan` görünüyor | Sıcaklık, nem, basınç, rakım ve toprak yüzdesi doğru | Kalibrasyon uçları kendi sensöründen ölçülmüş |\n| Uyarı | Uyarı titriyor ya da hiç çalışmıyor | İki eşikle uyarı doğru açılıp kapanıyor; mesaj yalnız durum değişince yazılıyor | Ek bir geliştirme var (örneğin susturma butonu) |\n| Dayanıklılık | Sensör çıkarılınca program çöküyor | DHT ya da BMP280 yokken ekranda `--` ve \"BMP280 yok\" görünüyor | Bozuk sensörü anlamak için ek bir kontrol eklenmiş |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta sensör okumanın yalnızca bir sayıyı almak olmadığını, o sayıya güvenmeden önce denetlemek ve yorumlamak gerektiğini öğrenmektir. \"Sensör yoksa ne olur?\" sorusu haftanın ortak sorusudur.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şu soruları sor: \"Bu sayının birimi ne?\", \"Sensör cevap vermezse ne olur?\", \"Bu değer hangi yönde artıyor?\"\n- **Doğruluk uyarısı.** Ekranda çok basamak görmek doğru ölçmek demek değildir. Sensörün gerçek doğruluğu için veri sayfasına bakılır; derslerdeki sayılar laboratuvar modelinindir.\n- **Güvenlik.** Platformdaki her şey sanaldır. Proje bir pompa içermez; gerçek bir pompa için transistör ya da röle ve ayrı güç kaynağı gerekir ve şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner can:\n1. Read temperature and humidity with the DHT11/DHT22; catch the `NaN` value with `isnan` and explain why the reading interval (at least 2 seconds) is needed.\n2. Find the BMP280 by its I2C address, convert the pressure from Pa to hPa and say why the altitude depends on the sea-level pressure (P0).\n3. Find the direction of soil moisture, rain and water level sensors by measuring; turn the raw value into a percentage with `map` and `constrain`.\n4. Show several values on a multi-page LCD screen without using `delay`.\n5. Build the weather station and watering alert project starting from a plan table; stop the alert from flickering with two thresholds (hysteresis).\n\n### Plan for the week\nThe week has five lessons; the first four lessons take about 25 minutes, and the project about 35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | DHT11 and DHT22: temperature and humidity | ~25 min | Read the explainer, connect the DHT to D5, move the temperature and humidity sliders, remove the DATA wire to try the error path, do the mini test. |\n| 2 | BMP280: pressure and altitude (I2C) | ~25 min | See the altitude change with the pressure slider, work out the formula by hand and compare it with the library, try the address mistake. |\n| 3 | Soil moisture, rain and water level (analogue) | ~25 min | Find the direction of the three sensors from the raw numbers, save the calibration ends, print the state with thresholds. |\n| 4 | A multi-page screen interface (LCD/OLED) | ~25 min | Set up the three-page screen, turn pages with the button, see the leftovers that unpadded text leaves behind. |\n| 5 | Project: weather station and watering alert | ~35 min | Write the state table, build the circuit, run the program, test the alert by lowering the soil moisture, assess it with the project rubric. |\n\n### Prerequisite check\nBefore starting, the learner should be able to:\n- Run two jobs together without `delay`, using `millis()` (lesson 27).\n- Recognise the SDA/SCL connection on the I2C bus and the idea of a device address (lesson 33).\n- Use a library with `#include` (lesson 34).\n- Turn a raw value into a percentage with `analogRead`, `map` and `constrain` (lessons 11 and 14).\n- Know the idea of hysteresis (two thresholds) (lesson 35).\n- Play a buzzer with `tone` (lesson 18).\n\nIf anything is missing, go back to the matching Module 3 lesson; lessons 27 and 35 in particular are the foundation of this week.\n\n### Concept map\n- **Environment sensors:** DHT (temperature, relative humidity) → `NaN` and `isnan` → the 2-second rule → consecutive error counter\n- **Pressure:** BMP280 → I2C address (0x76/0x77) → Pa and hPa → altitude formula → P0 and the weather\n- **Analogue sensors:** soil moisture, rain, water level → direction → calibration ends → `map` and `constrain` → threshold and hysteresis\n- **Interface:** page variable → the `%` operator → padding the line to 16 characters → `snprintf` and `dtostrf` → OLED\n- **Project:** state table → the `uyari` (alert) state → two thresholds → non-blocking buzzer → fault tolerance\n\n### Common mistakes\n- **Skipping the `isnan` check.** If the DHT cannot read, it returns `NaN`; the calculation and the screen become `nan`.\n- **Reading the DHT more often than every 2 seconds.** The same old value is repeated.\n- **Looking for the BMP280 with `begin()` without a parameter.** The default address is 0x77; a sensor at 0x76 is not found.\n- **Mixing up Pa and hPa.** `readAltitude` expects hPa; if `101325` is written, the altitude makes no sense.\n- **Assuming \"big number = wet\" without knowing the sensor's direction.** On the soil and rain sensors the value drops as they get wetter.\n- **Forgetting `constrain`.** The percentage comes out as values such as -26 % or 130 %.\n- **Not padding the line to 16 characters.** Leftovers of the old text stay on the screen.\n- **Using `%f` with `snprintf`.** On the Uno, `?` is printed instead of the decimal number; `dtostrf` is used.\n- **Using a single threshold and using `delay` for the beep.** The alert flickers and the program freezes.\n\n### End-of-week review\n1. Look at the concept cards of each lesson once more and read the \"common mistake\" lines out loud.\n2. Read the explanations of the mini test questions you got wrong again, then answer the question again.\n3. Connect the DHT and move the sliders while it runs; then remove the DATA wire and explain what the program prints.\n4. Pull the BMP280 pressure from 1013.25 hPa to 1003.25 hPa, work out how many metres the altitude drifts, and measure it.\n5. Answer this question in your own words: \"Why did we use two thresholds for the alert?\"\n\nThe mini tests of the five lessons are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct from each lesson. Go back to the explainer of any lesson where you fell short.\n\n### Project rubric (Weather station and watering alert)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | Some parts are not connected, or the LED has no resistor | DHT, BMP280, LCD, soil sensor, LED and buzzer on the right pins | Tidy connections; the LCD and the BMP280 share the same I2C bus with their addresses |\n| Plan | No state table | The normal and alert states and the thresholds are written in the table | The table matches the code exactly and every change of state is explained |\n| Measurement | Values in the wrong unit, or `nan` appears | Temperature, humidity, pressure, altitude and soil percentage are correct | The calibration ends were measured on their own sensor |\n| Alert | The alert flickers or does not work at all | With two thresholds the alert switches on and off correctly; the message is written only when the state changes | There is an extra improvement (for example a silence button) |\n| Robustness | The program crashes when a sensor is removed | With no DHT or BMP280, `--` and \"BMP280 yok\" (no BMP280) appear on the screen | An extra check has been added to detect a broken sensor |\n| Explanation | Cannot explain what they did | Explains the circuit and the code step by step | Explains a mistake they made and how they found it |\n\n### Note for parents and teachers\n- **Aim.** This week is about learning that reading a sensor is not just getting a number; you need to check and interpret that number before you trust it. \"What happens if there is no sensor?\" is the shared question of the week.\n- **How can you help?** When the learner gets stuck, instead of giving the answer, ask these questions: \"What is the unit of this number?\", \"What happens if the sensor does not answer?\", \"In which direction does this value rise?\"\n- **A note on accuracy.** Seeing many digits on the screen does not mean measuring correctly. For a sensor's real accuracy you look at the datasheet; the numbers in the lessons belong to the lab model.\n- **Safety.** Everything on this platform is virtual. The project has no pump; a real pump needs a transistor or a relay and a separate power supply, and no circuit is ever built with mains voltage (220 V).\n- **Progress.** The mini test results appear by skill on the \"My progress\" page (draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "DHT11 ve DHT22: sıcaklık ve nem",
@@ -1346,7 +2538,128 @@ export const modul4: ModuleContent = {
                 "sens-dht-read"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "DHT11 and DHT22: temperature and humidity",
+            "problem": "A weather app says \"temperature 24 degrees, humidity 60 per cent\". Is the air in the room dry or muggy? Temperature alone cannot tell you; you need humidity too. One small sensor can measure both. And it does it over a single data wire. In this lesson you will read the DHT sensor, compare the two models by measuring, and learn how to stop your program from crashing when the sensor does not answer.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| DHT sensor | VCC → 5V, GND → GND, DATA → **D5** |\n\nThe **Type** property of the DHT part in the right panel can be DHT22 or DHT11; the **Temperature** and **Humidity** sliders set the air the sensor \"measures\", and you can change them while the program runs. The part in the lab is the 3-leg module; the pull-up resistor needed for the data line counts as being on the module.\n\nInfo note: You can also buy bare 4-leg DHT sensors; on those you need a resistor between DATA and VCC (its value is in the datasheet). The module in the lab does not need one.\n\n### New ideas\n- **Relative humidity:** Tells you what percentage of the most water vapour the air can hold at that temperature it is holding now. 0 % means very dry, 100 % means saturated.\n- **Library:** You met this in lesson 34. The DHT sensor talks with its own communication rules; instead of writing them by hand, we use the `DHT sensor library` (Adafruit). You write `#include <DHT.h>` at the top of the sketch.\n- **`isnan(x)`:** This asks \"Is this number valid?\". `isnan` stands for \"is not a number\" (NaN). If the library cannot read the sensor, it returns `NaN`. If you calculate with `NaN`, the result is `NaN` too, so check the reading with `isnan` **before you use it**.\n\n### Program 1: temperature and humidity\n```cpp\n// sketch: dht_oku\n#include <DHT.h>\n\n#define DHT_PIN 5\n#define DHT_TIP DHT22        // DHT11 kullanıyorsan burayı DHT11 yap\n\nDHT dht(DHT_PIN, DHT_TIP);\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  delay(2000);                          // okumalar arası en az 2 sn\n  float nem = dht.readHumidity();\n  float sicaklik = dht.readTemperature();   // santigrat\n\n  if (isnan(nem) || isnan(sicaklik)) {\n    Serial.println(\"Okuma hatasi\");\n    return;\n  }\n\n  Serial.print(\"Sicaklik: \");\n  Serial.print(sicaklik, 1);\n  Serial.print(\" C  Nem: \");\n  Serial.print(nem, 1);\n  Serial.println(\" %\");\n}\n```\n\n### How does it work?\n1. `DHT dht(DHT_PIN, DHT_TIP)` tells the library which pin the sensor is on and which model it is. If the model is wrong, the values make no sense.\n2. `delay(2000)` was not chosen at random. DHT sensors are slow: you must wait at least 2 seconds between two readings. If you ask more often, the library usually gives you the previous value again.\n3. `readHumidity()` returns the humidity in per cent, and `readTemperature()` returns the temperature in degrees Celsius.\n4. `if (isnan(...))` sets up the error path. If the DATA wire is not connected or the sensor does not answer, the program prints `Okuma hatasi` (reading error) and moves on to the next round.\n\n### Measure the difference between the DHT11 and the DHT22\nChange one line in the program: `#define DHT_TIP DHT11`. Set the sensor part's **Type** property to DHT11 as well (stop with ■ first). With the Temperature slider at 23.5 °C and the Humidity slider at 55 %, we read this in the lab:\n\n| Model | Serial output |\n|---|---|\n| DHT22 | `Sicaklik: 23.5 C  Nem: 55.0 %` |\n| DHT11 | `Sicaklik: 24.0 C  Nem: 55.0 %` |\n\nThe DHT22 gives one digit after the decimal point, the DHT11 gives only whole numbers (23.5 was rounded to 24). But be careful: seeing decimals on the screen does **not** mean the sensor measures correctly. For how accurately the two models measure, what range they work in and how fast they measure, look at the datasheets of the real sensors.\n\n### Program 2: non-blocking reading and behaviour with no sensor\n`delay(2000)` stops the whole program for 2 seconds. Let's time the reading with `millis()`, which you learned in lesson 27. This version also stops showing the old value after 3 errors in a row and says `SENSOR YOK` (no sensor), because showing an old temperature for hours as if it were up to date is misleading.\n\n```cpp\n// sketch: dht_millis\n#include <DHT.h>\n\nDHT dht(5, DHT22);\n\nconst unsigned long ARALIK = 2000;   // ms\nunsigned long sonOlcum = 0;\n\nfloat sicaklik = NAN;                // NAN: henüz geçerli değer yok\nfloat nem = NAN;\nint ardisikHata = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - sonOlcum >= ARALIK) {\n    sonOlcum = simdi;\n\n    float n = dht.readHumidity();\n    float s = dht.readTemperature();\n\n    if (isnan(n) || isnan(s)) {\n      ardisikHata++;\n      if (ardisikHata >= 3) {        // eski değeri artık gösterme\n        sicaklik = NAN;\n        nem = NAN;\n      }\n    } else {\n      sicaklik = s;\n      nem = n;\n      ardisikHata = 0;\n    }\n\n    if (isnan(sicaklik)) {\n      Serial.print(\"SENSOR YOK  Ardisik hata: \");\n      Serial.println(ardisikHata);\n    } else {\n      Serial.print(\"T=\");\n      Serial.print(sicaklik, 1);\n      Serial.print(\" N=\");\n      Serial.println(nem, 1);\n    }\n  }\n  // burada başka işler de yapılabilir; loop() beklemez\n}\n```\n\nWe also ran this program **without** the DATA wire (to delete the wire, press ■ first, select the wire and press **Delete**). The lab gives the warning \"DHT sensor DATA is not connected: the sensor won’t work.\" Because there had not been a single valid reading yet, the lines `SENSOR YOK  Ardisik hata: 1`, `... 2`, `... 3` appeared from the first round on; the program did not crash, and `loop()` kept running. When you draw the DATA wire again and press ▶, the `T=...  N=...` lines begin. If the sensor stops answering after reading well for a while, the code keeps showing the last valid value for the first two errors and gives up at the third.\n\n### Try it\n- In the `dht_oku` program, change the `DHT_TIP` line to DHT11, set the sensor's **Type** property to DHT11 too, and compare with the table. While it runs, move the temperature slider slowly: how does the DHT11 output change step by step?\n- Change `delay(2000)` to 500. Do the values in the serial output change every round, or is the same value repeated a few times?\n- In the `dht_millis` program, stop with ■, delete the DATA wire and press ▶. On which line do you see `SENSOR YOK`? What happens when you draw the wire again?\n\n### Common mistakes\n- Leaving out the `isnan` check: if the reading fails, you calculate with `NaN` and see `nan` on the screen.\n- Writing the wrong model (calling a DHT11 sensor `DHT22`): the values come out strange.\n- Trying to read more often than every 2 seconds.\n- Reading straight after powering up: give the sensor a little time after it switches on (for real sensors, look up the time in the datasheet).\n- Forgetting the DATA wire or (on a bare sensor) the pull-up resistor: you keep seeing `Okuma hatasi`.",
+            "question": "The DHT22 shows a digit after the decimal point and the DHT11 does not. So does showing more digits prove that the measurement is more accurate? Explain the difference between a computer or a screen \"showing many digits\" and \"showing the right value\" with an example.",
+            "explainerMd": "### What you will learn in this lesson\n- What the DHT11 and DHT22 sensors measure, and how they are read over a single data wire\n- What relative humidity means\n- How to catch the `NaN` value with `isnan` when a reading fails\n- Why you must wait at least 2 seconds between readings\n- How to make the program say \"no sensor\" without crashing if the sensor is disconnected\n\n### What you should know first\n- Printing to the serial monitor: `Serial.begin`, `Serial.print` (Module 3)\n- Non-blocking timing with `millis()` (lesson 27)\n- Using a library: `#include` (lesson 34)\n- Small conditions: `if` and the `||` (or) operator\n\n### Two measurements in one sensor\nThe **DHT** family (DHT11 and DHT22) measures both temperature and **relative humidity**. Relative humidity tells you what percentage of the most water vapour the air can hold at that temperature it is holding: 0 % means very dry air, 100 % means saturated air. The sensor sends both values as digital packets over **a single data line** (DATA). Decoding this packet by hand is hard, so we use the `DHT.h` library. You only tell it the pin and the model.\n\n```\nDHT dht(5, DHT22);        // pin D5, model DHT22\nfloat nem = dht.readHumidity();\nfloat sic = dht.readTemperature();\n```\n\n### Choosing a model\nBoth models are read with the same library; the difference is in resolution and detail. In the lab the DHT22 gives the temperature with one decimal place (23.5), while the DHT11 gives it as a whole number (24). But seeing more digits on the screen does not mean **more accurate**. Accuracy is how close the sensor gets to the real value, and you find it in the datasheet. The model in the code must match the sensor; with the wrong model the values make no sense.\n\n### A reading can fail\nIf a wire is loose or the sensor does not answer, the library returns **NaN** (\"not a number\"). Every calculation with NaN gives NaN again, and the screen shows `nan`. The fix is to ask before you use the value:\n\n```\nif (isnan(nem) || isnan(sic)) {\n  Serial.println(\"Okuma hatasi\");\n  return;\n}\n```\n\n`||` means \"or\": if either of the two values is broken, the reading is thrown away.\n\n### A slow sensor\nThe DHT is not a fast sensor. You must wait **at least 2 seconds** between two readings. If you ask more often, you usually get the same old value. `delay(2000)` is the simple fix; if you count the 2-second interval with `millis()`, the program can do other jobs without waiting.\n\n### What if there is no sensor?\nA good program keeps working even with a broken sensor. The version at the end of the lesson has a **consecutive error counter**: it goes up with every failed reading and goes back to zero with a successful one. When the counter reaches 3, the program stops showing the old value and says `SENSOR YOK` (no sensor). Showing an old temperature for hours as if it were up to date would be misleading.\n\n### Summary\nThe DHT sensor gives temperature and relative humidity over a single data line. If the library cannot read it, it returns `NaN`, so the value is checked with `isnan` before it is used. You wait at least 2 seconds between readings. A consecutive error counter lets the program report the problem without crashing when the sensor is disconnected.",
+            "concepts": [
+              {
+                "term": "Relative humidity",
+                "definition": "What percentage of the most water vapour the air can hold at that temperature it is holding now.",
+                "example": "At 100 % relative humidity the air is saturated; 30 % shows a fairly dry room.",
+                "pitfall": "Thinking relative humidity is the amount of water in the air itself; the same amount of water gives a higher percentage in cold air."
+              },
+              {
+                "term": "DHT11 and DHT22",
+                "definition": "Two sensor models that give temperature and humidity over a single data line; the DHT22 gives a more detailed (decimal) result.",
+                "example": "In the lab, a real temperature of 23.5 °C is printed as \"23.5\" by the DHT22 and \"24.0\" by the DHT11.",
+                "pitfall": "Thinking that seeing many digits means measuring correctly; you need to find the accuracy in the datasheet."
+              },
+              {
+                "term": "NaN and isnan()",
+                "definition": "NaN means \"not a number\"; the library returns it when it cannot read the sensor. isnan(x) asks whether the value is invalid.",
+                "example": "if (isnan(nem)) { Serial.println(\"Okuma hatasi\"); return; }",
+                "pitfall": "Skipping the check and calculating with NaN; the result is NaN too and nan appears on the screen."
+              },
+              {
+                "term": "Reading interval",
+                "definition": "The DHT sensor must be given at least 2 seconds between two readings.",
+                "example": "You set up delay(2000) or a 2000 ms timer with millis().",
+                "pitfall": "Writing short intervals such as delay(500); the sensor cannot keep up and the same value repeats."
+              },
+              {
+                "term": "Consecutive error counter",
+                "definition": "A variable that counts how many readings in a row have failed; a successful reading resets it to zero.",
+                "example": "When the counter reaches 3, the screen prints \"SENSOR YOK\" and stops showing the old value.",
+                "pitfall": "Raising the alarm straight away on a single bad reading, or never resetting the counter."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h3d46-q1",
+                "kind": "mcq",
+                "prompt": "If the DHT library fails to take a reading, what does readTemperature() return, and what should the program do about it?",
+                "options": [
+                  "It returns 0; nothing needs to be done",
+                  "It returns half of the previous value",
+                  "It stops the program; the sensor has to be restarted",
+                  "It returns NaN; the value must be checked with isnan() before it is used"
+                ],
+                "answer": 3,
+                "explanation": "When a reading fails, the library returns NaN (not a number). If you calculate with NaN, the result is NaN too and nan appears on the screen; that is why you check with isnan() first. It does not return zero, and it does not stop the program.",
+                "skills": [
+                  "sens-dht-read"
+                ]
+              },
+              {
+                "id": "m4h3d46-q2",
+                "kind": "predict-output",
+                "prompt": "The DATA wire of the DHT22 module is NOT connected to the Uno. If this code runs for 4.5 seconds, what appears in the serial monitor?\n\n```\n#include <DHT.h>\nDHT dht(5, DHT22);\n\nvoid setup() {\n  Serial.begin(9600);\n  dht.begin();\n}\n\nvoid loop() {\n  delay(2000);\n  float t = dht.readTemperature();\n  if (isnan(t)) Serial.println(\"HATA\");\n  else Serial.println(t * 2);\n}\n```",
+                "options": [
+                  "Two lines: HATA and HATA",
+                  "Nothing is printed",
+                  "Two lines: 0.00 and 0.00",
+                  "Two lines: nan and nan"
+                ],
+                "answer": 0,
+                "explanation": "Because the sensor does not answer, readTemperature() returns NaN. Since isnan(t) is true, \"HATA\" (error) is printed at the 2nd and 4th second (two rounds finish within 4.5 seconds). The t * 2 line is never reached, so neither nan nor 0.00 appears.",
+                "skills": [
+                  "sens-dht-read",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d46-q3",
+                "kind": "find-bug",
+                "prompt": "This code is meant to print the humidity safely every 2 seconds. Which line has the bug?\n\n```\n1 void loop() {\n2   delay(500);\n3   float nem = dht.readHumidity();\n4   if (isnan(nem)) { Serial.println(\"Okuma hatasi\"); return; }\n5   Serial.println(nem);\n6 }\n```",
+                "options": [
+                  "Line 2: the DHT must be read at most once every 2 seconds; 500 ms is too short",
+                  "Line 3: readTemperature should be written instead of readHumidity",
+                  "Line 4: the isnan check is unnecessary",
+                  "Line 5: print should be written instead of println"
+                ],
+                "answer": 0,
+                "explanation": "The bug is in the interval: the DHT needs at least 2 seconds between two readings, so delay(2000) is needed. At 500 ms the sensor cannot keep up, and the library usually repeats the old value. The isnan check on line 4 is, on the contrary, necessary.",
+                "skills": [
+                  "sens-dht-read",
+                  "prog-timing",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d46-q4",
+                "kind": "numeric",
+                "prompt": "In the program at the end of the lesson, readings are taken 2000 ms apart, and \"SENSOR YOK\" is printed after 3 errors in a row. The sensor was disconnected just after the last valid reading (t = 0). How many seconds after the disconnection does the \"SENSOR YOK\" message appear?",
+                "answer": 6,
+                "tolerance": 0,
+                "unit": "s",
+                "explanation": "The failed readings are taken at the 2nd, 4th and 6th second. In the first two the counter becomes 1 and 2, and the old value is still shown. At the 6th second the counter reaches 3 and the message appears: 3 errors × 2 s = 6 s.",
+                "skills": [
+                  "sens-dht-read",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h3d46-q5",
+                "kind": "mcq",
+                "prompt": "A friend says: \"The DHT22 shows one digit after the decimal point and the DHT11 does not; so the DHT22 must measure more accurately.\" What do you say?",
+                "options": [
+                  "They are right; the number of digits proves accuracy",
+                  "They are right; the DHT11 does not work anyway",
+                  "They are wrong; the number of digits on the screen and accuracy are different things, and accuracy is found in the datasheet",
+                  "They are wrong; the two models always give the same output"
+                ],
+                "answer": 2,
+                "explanation": "The number of digits shows how much detail the sensor gives, not how close the measurement is to reality. The two models do not give the same output either (23.5 appears as 23.5 on the DHT22 and 24.0 on the DHT11), but for accuracy you look at the datasheet.",
+                "skills": [
+                  "sens-dht-read"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "BMP280: basınç ve rakım (I2C)",
@@ -1468,7 +2781,128 @@ export const modul4: ModuleContent = {
                 "sens-altitude"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "BMP280: pressure and altitude (I2C)",
+            "problem": "How do smartwatches and drones know which floor they are on or how high they have climbed? By looking at the weight of the air. The higher you go, the less air there is above you, and the air pressure drops. That is why a pressure sensor is also a height meter. In this lesson you will read the pressure with the BMP280, calculate the altitude from the pressure and see why the \"sea-level pressure\" setting matters.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| BMP280 | VCC → 5V, GND → GND |\n| | SDA → **A4**, SCL → **A5** |\n\nThe BMP280 talks over I2C, which you learned in lesson 33. Its address is **0x76** or **0x77**. In the lab, when you select the part you see the **I2C address** property in the right panel (default 0x76); if the sensor does not work, this address and the address in your code must be the same. If you are not sure, run the address scanner program from lesson 33. The right panel also has **Temperature** and **Pressure** (hPa) sliders; you can change them while the program runs.\n\nInfo note: In the real world some bare BMP280 modules want 3.3 V only (the lab powers it from 5V or 3V3); look at the datasheet when you connect a real module. On real modules the address is chosen with the SDO leg. A sister sensor called the BME280 looks the same but also measures humidity; the BMP280 library may not recognise it.\n\n### New ideas\n- **Unit of pressure:** The library gives the pressure in **pascals (Pa)**. Weather reports use **hPa** (hectopascals): 1 hPa = 100 Pa. Standard pressure at sea level is about 101 325 Pa, that is **1013.25 hPa**.\n- **Altitude:** The height of where you are above sea level (in metres).\n- **Altitude formula:** A common approximate formula for working out height from pressure (`rakım` means altitude):\n\n`rakım = 44330 · (1 − (P / P0) ^ (1 / 5,255))`\n\nHere `P` is the pressure you measure and `P0` is **the current pressure at sea level**. Both must be in the same unit (both hPa or both Pa). The formula is based on the standard atmosphere assumption, so it gives a good result for differences of a few hundred metres and an approximate one very high up.\n\n### Program 1: pressure, temperature and the library's altitude\n```cpp\n// sketch: bmp_oku\n#include <Wire.h>\n#include <Adafruit_BMP280.h>\n\nAdafruit_BMP280 bmp;\nbool bmpHazir = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  bmpHazir = bmp.begin(0x76);          // modülün adresi 0x77 ise burayı değiştir\n  if (!bmpHazir) {\n    Serial.println(\"BMP280 bulunamadi\");\n  }\n}\n\nvoid loop() {\n  delay(1000);\n  if (!bmpHazir) {\n    return;                            // sensör yoksa okuma yapma\n  }\n  float sicaklik = bmp.readTemperature();         // santigrat\n  float hpa = bmp.readPressure() / 100.0;         // Pa -> hPa\n  float rakim = bmp.readAltitude(1013.25);        // P0 hPa cinsinden\n\n  Serial.print(\"Sicaklik: \");\n  Serial.print(sicaklik, 1);\n  Serial.print(\" C  Basinc: \");\n  Serial.print(hpa, 1);\n  Serial.print(\" hPa  Rakim: \");\n  Serial.print(rakim, 1);\n  Serial.println(\" m\");\n}\n```\n\n### How does it work?\n1. `bmp.begin(0x76)` looks for the sensor at its address and sets it up. The library's default address is 0x77. So if you call `bmp.begin()` without a parameter on a 0x76 module, the sensor is not found. We tried this in the lab too: when we set the BMP280's address to 0x77, `begin(0x76)` printed `BMP280 bulunamadi` (BMP280 not found), while `begin()` without a parameter found the sensor.\n2. `readPressure()` gives Pa. For hPa you divide by 100.\n3. `readAltitude(1013.25)` works out the formula above for you. The parameter is the sea-level pressure `P0`, given in **hPa**.\n4. The `bmpHazir` (BMP ready) flag sets up the error path: if the sensor is not found, the program prints `BMP280 bulunamadi` and never tries to read.\n\n### Program 2: work out the formula yourself\nInstead of trusting the library's function, write the formula yourself too; put the two results side by side and compare.\n\n```cpp\n// sketch: bmp_rakim_formul\n#include <Wire.h>\n#include <Adafruit_BMP280.h>\n\nAdafruit_BMP280 bmp;\nconst float P0_HPA = 1013.25;          // deniz seviyesi basinci, hPa\n\nfloat rakimHesapla(float pHpa, float p0Hpa) {\n  return 44330.0 * (1.0 - pow(pHpa / p0Hpa, 1.0 / 5.255));\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!bmp.begin(0x76)) {\n    Serial.println(\"BMP280 bulunamadi\");\n  }\n}\n\nvoid loop() {\n  delay(1000);\n  float hpa = bmp.readPressure() / 100.0;\n  Serial.print(\"Basinc: \");\n  Serial.print(hpa, 1);\n  Serial.print(\" hPa  Formul: \");\n  Serial.print(rakimHesapla(hpa, P0_HPA), 1);\n  Serial.print(\" m  Kutuphane: \");\n  Serial.print(bmp.readAltitude(P0_HPA), 1);\n  Serial.println(\" m\");\n}\n```\n\nWe moved the BMP280's **Pressure** slider to these values in turn and measured this in the lab (P0 = 1013.25 hPa):\n\n| Pressure on the slider | On screen | Formula | Library |\n|---|---|---|---|\n| 1013.25 hPa | 1013.2 hPa | 0.0 m | 0.0 m |\n| 954.5 hPa | 954.5 hPa | 501.0 m | 501.0 m |\n| 898.75 hPa | 898.8 hPa | 1000.1 m | 1000.1 m |\n\nWe chose these pressures by working out the formula by hand: about 954.5 hPa gives 500 m, and about 898.75 hPa gives 1000 m. Your formula and the library gave the same result (the 1013.2 on screen is because the sensor prints the pressure rounded to 0.1 hPa). The two methods give the same result; the library uses the same formula too.\n\n### The P0 setting: why does it matter?\nThe pressure at sea level is not fixed; it changes with the weather. A P0 of 1013 hPa today can be 1003 hPa tomorrow. If you give the wrong `P0` in the formula, **the altitude of where you are drifts**. We measured the size of this drift in the lab: with the Pressure slider at 1000 hPa, lowering `P0` from 1013.25 to 1003.25 dropped the altitude from 110.9 m to 27.4 m; a difference of about 84 m. So near sea level, **1 hPa is about 8 m**.\n\nThat is why there are two ways to use it:\n- If you want the altitude as an absolute value, give that day's sea-level pressure (weather data) as `P0`.\n- If you already know the real altitude, turn the formula around and find `P0` yourself:\n\n`P0 = P / (1 − rakım / 44330) ^ 5,255`\n\n```cpp\n// sketch: bmp_p0_ayar\n#include <Wire.h>\n#include <Adafruit_BMP280.h>\n\nAdafruit_BMP280 bmp;\nconst float BILINEN_RAKIM = 100.0;     // metre: bulundugun yerin gercek rakimi\nfloat p0 = 1013.25;\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!bmp.begin(0x76)) {\n    Serial.println(\"BMP280 bulunamadi\");\n    return;\n  }\n  float hpa = bmp.readPressure() / 100.0;\n  p0 = hpa / pow(1.0 - BILINEN_RAKIM / 44330.0, 5.255);\n  Serial.print(\"P0: \");\n  Serial.print(p0, 1);\n  Serial.println(\" hPa\");\n}\n\nvoid loop() {\n  delay(1000);\n  Serial.print(\"Rakim: \");\n  Serial.print(bmp.readAltitude(p0), 1);\n  Serial.println(\" m\");\n}\n```\n\nThis program does a one-time setting at start-up: it takes the current pressure as \"the altitude is 100 m now\". After that, if the pressure changes, the altitude changes. This is not a bug; the sensor cannot tell a change in height from a change in the weather. In the lab we did the setting at 1000 hPa (P0 = 1011.9 hPa, altitude 100.0 m); when we pulled the pressure slider down to 999 hPa, the altitude became 108.4 m, so it rose by about 8 m. If the result does not stay steady when you measure the altitude in a real room, the reason is usually the air itself.\n\n### Try it\n- While `bmp_oku` runs, select the BMP280 and move the **Temperature** and **Pressure** sliders. How do the temperature, pressure and altitude in the serial output change?\n- In the `bmp_rakim_formul` program, set `P0_HPA` to 1003.25. How far does the altitude drift? Does it match the \"1 hPa is about 8 m\" rule above?\n- Set the sensor's I2C address to 0x77 (■ first) and run it with `bmp.begin(0x76)`. What does it print? Then change the code to `bmp.begin(0x77)`.\n- Set `BILINEN_RAKIM` (known altitude) in the `bmp_p0_ayar` program to 300. Then, while it runs, lower the pressure slider by 2 hPa: how many metres did the altitude change? Why might the altitude reading change an hour later in a real place?\n\n### Common mistakes\n- Forgetting the address: getting `bulunamadi` (not found) with `begin()` (default 0x77) when the sensor is at 0x76.\n- Mixing up Pa and hPa: `readAltitude` expects hPa. If you write `readAltitude(101325)`, the result is very wrong.\n- Connecting SDA and SCL the wrong way round: the sensor is never found. The scanner program from lesson 33 helps.\n- Carrying on reading when the sensor is not found: it prints meaningless numbers.\n- Treating the altitude as \"exact\": when the weather changes, `P0` changes too. For real measurement accuracy, look at the datasheet.",
+            "question": "A drone uses the altitude from the sensor to hold its height. If the altitude reading drifts when the weather changes, how does that affect the drone's behaviour? To answer the question \"How much higher have I climbed since now?\", what value would you use instead of `P0`?",
+            "explainerMd": "### What you will learn in this lesson\n- Why air pressure drops with height\n- How to convert between pascals (Pa) and hectopascals (hPa)\n- How to find the BMP280 sensor by its I2C address, and how to keep the program from crashing if it is missing\n- How to work out altitude from pressure, and why the sea-level pressure (P0) matters\n\n### What you should know first\n- The I2C bus, SDA/SCL and the device address (lesson 33)\n- Using a library (lesson 34)\n- Decimal numbers (`float`) and division\n- The idea \"protect the program if there is no sensor\" from the previous lesson (lesson 46)\n\n### The weight of the air\nThere are kilometres of air above us, and the weight of this air creates **air pressure**. As you go higher, there is less air above you and the pressure drops. That is why a pressure sensor is also a height meter. Standard pressure at sea level is about 1013.25 hPa.\n\n### Units\nThe library gives the pressure in **pascals (Pa)**. Weather reports use **hPa**, and 1 hPa = 100 Pa. For example, 101 325 Pa is 1013.25 hPa. In the code, `readPressure() / 100.0` does this conversion. Mixing up the units is the most common mistake in this lesson.\n\n### Finding the BMP280\nThe BMP280 sits at address **0x76** or **0x77** on I2C. The library's default address is 0x77. If the sensor is at 0x76, `bmp.begin()` cannot find it; you need to write `bmp.begin(0x76)`. `begin` returns `true` if it succeeds and `false` if there is no sensor. If you keep this result in a variable, the program never tries to read when there is no sensor; you just print an error message.\n\n```\nbool hazir = bmp.begin(0x76);\nif (!hazir) { Serial.println(\"BMP280 bulunamadi\"); }\n```\n\n### Altitude from pressure\nA common approximate formula is:\n\n```\naltitude = 44330 × (1 − (P / P0) ^ (1 / 5.255))\n```\n\n`P` is the pressure you measure and `P0` is the **current** pressure at sea level; both must be in the same unit. `readAltitude(P0)` in the library does the same calculation and expects P0 in **hPa**.\n\n| Measured pressure | Altitude with P0 = 1013.25 hPa |\n|---|---|\n| 1013.25 hPa | 0 m |\n| 954.5 hPa | about 500 m |\n| 898.75 hPa | about 1000 m |\n\n### When the weather changes, the altitude drifts\nSea-level pressure changes with the weather. If you give the wrong P0, the altitude drifts: near sea level, 1 hPa is about 8 m. The sensor cannot tell \"the height changed\" from \"the weather changed\". If you know your real altitude, you can turn the formula around and find P0 yourself.\n\n### Summary\nAir pressure drops as you go higher, so the BMP280 is used to work out altitude. The library gives Pa; divide by 100 for hPa. The sensor's I2C address must match the code, and the result of `begin` is checked. The altitude formula depends on P0; when the weather changes, P0 changes and the altitude drifts.",
+            "concepts": [
+              {
+                "term": "Air pressure",
+                "definition": "The pressure created by the weight of the air above us; it gets lower as you go higher.",
+                "example": "As a drone climbs, the pressure the BMP280 reads drops.",
+                "pitfall": "Thinking pressure is fixed; it changes with the weather every day."
+              },
+              {
+                "term": "Pa and hPa",
+                "definition": "Pascals and hectopascals are units of pressure; 1 hPa = 100 Pa.",
+                "example": "If readPressure() gives 101325, that is 1013.25 hPa.",
+                "pitfall": "Giving readAltitude a value in Pa (101325); the function expects hPa, and the result is very wrong."
+              },
+              {
+                "term": "I2C address (0x76 / 0x77)",
+                "definition": "The BMP280's name on the I2C bus; the address given in begin() in the code must be the same as the sensor's.",
+                "example": "When the sensor is at 0x76, you write bmp.begin(0x76).",
+                "pitfall": "Using begin() without a parameter; the default is 0x77, so a sensor at 0x76 is not found."
+              },
+              {
+                "term": "Altitude formula",
+                "definition": "An approximate formula that works out altitude from the measured pressure P and the sea-level pressure P0: 44330 × (1 − (P/P0)^(1/5.255)).",
+                "example": "With P0 = 1013.25 hPa, 954.5 hPa is about 500 m.",
+                "pitfall": "Giving P and P0 in different units (one in Pa, the other in hPa)."
+              },
+              {
+                "term": "P0 (sea-level pressure)",
+                "definition": "The reference for the altitude calculation; it changes with the weather.",
+                "example": "If P0 is 10 hPa wrong, the altitude drifts by about 84 m.",
+                "pitfall": "Treating the altitude reading as exact; when the weather changes, the value drifts even if you do not move."
+              },
+              {
+                "term": "Was the sensor found? (the result of begin)",
+                "definition": "begin() returns true if it succeeds and false if there is no sensor.",
+                "example": "If bmpHazir is false, the program skips reading and prints \"BMP280 bulunamadi\".",
+                "pitfall": "Not checking the result; meaningless numbers are read from a sensor that is not there."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h3d47-q1",
+                "kind": "mcq",
+                "prompt": "The I2C address of the BMP280 module is 0x76. What happens if the code just says bmp.begin()?",
+                "options": [
+                  "The sensor is found without any problem",
+                  "A compile error happens",
+                  "The sensor automatically switches to 0x77",
+                  "The library tries the default address 0x77, cannot find the sensor and returns false"
+                ],
+                "answer": 3,
+                "explanation": "The library's default address is 0x77. If the sensor is at 0x76, begin() cannot see it and returns false; you need to write bmp.begin(0x76). The sensor does not change its address, and the code compiles.",
+                "skills": [
+                  "sens-i2c-bmp"
+                ]
+              },
+              {
+                "id": "m4h3d47-q2",
+                "kind": "numeric",
+                "prompt": "readPressure() returns the value 98500 (in Pa). How many hPa is this pressure?",
+                "answer": 985,
+                "tolerance": 0,
+                "unit": "hPa",
+                "explanation": "Since 1 hPa = 100 Pa, 98500 / 100 = 985 hPa. You need to divide, not multiply; the number of Pa is always 100 times bigger than the number of hPa.",
+                "skills": [
+                  "sens-altitude"
+                ]
+              },
+              {
+                "id": "m4h3d47-q3",
+                "kind": "predict-output",
+                "prompt": "There is NO BMP280 in the circuit at all. If this code runs for 3.5 seconds, what appears in the serial monitor?\n\n```\nbool hazir = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  hazir = bmp.begin(0x76);\n  if (!hazir) { Serial.println(\"BMP280 bulunamadi\"); }\n}\n\nvoid loop() {\n  delay(1000);\n  if (!hazir) { return; }\n  Serial.println(bmp.readPressure() / 100.0, 1);\n}\n```",
+                "options": [
+                  "Only once: BMP280 bulunamadi",
+                  "0.0 every second",
+                  "Every second: BMP280 bulunamadi",
+                  "Nothing is printed"
+                ],
+                "answer": 0,
+                "explanation": "The message is printed once in setup(). On every round, loop() leaves with return because hazir is false, and no reading is taken; so no number is printed and the message is not repeated.",
+                "skills": [
+                  "sens-i2c-bmp",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d47-q4",
+                "kind": "find-bug",
+                "prompt": "This code wants to print the altitude in metres, but the result is nonsense. Which line has the bug?\n\n```\n1 float hpa = bmp.readPressure() / 100.0;\n2 float rakim = bmp.readAltitude(101325);\n3 Serial.print(\"Rakim: \");\n4 Serial.println(rakim, 1);\n```",
+                "options": [
+                  "Line 1: / 100.0 is unnecessary",
+                  "Line 2: readAltitude expects hPa, but 101325 is written in Pa; it should be 1013.25",
+                  "Line 3: it should be println instead of print",
+                  "Line 4: hpa should be printed instead of rakim"
+                ],
+                "answer": 1,
+                "explanation": "readAltitude wants the sea-level pressure in hPa. When 101325 is written, the P/P0 ratio becomes very small and the altitude makes no sense; the right value is 1013.25. The division on line 1, on the other hand, is the correct conversion from Pa to hPa.",
+                "skills": [
+                  "sens-altitude",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d47-q5",
+                "kind": "numeric",
+                "prompt": "The pressure is 1000 hPa. If P0 is given by mistake as 1008.25 hPa instead of 1013.25, how many metres does the altitude drift? Rule: near sea level, 1 hPa is about 8 m. (Give the size of the drift as an absolute value.)",
+                "answer": 40,
+                "tolerance": 4,
+                "unit": "m",
+                "explanation": "The P0 difference is 1013.25 − 1008.25 = 5 hPa, and 5 × 8 = 40 m. Working it out with the formula gives about 41.6 m too; the rule is a rough estimate, so a tolerance of 4 m is allowed.",
+                "skills": [
+                  "sens-altitude"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Toprak nemi, yağmur ve su seviyesi (analog)",
@@ -1594,7 +3028,132 @@ export const modul4: ModuleContent = {
                 "sens-threshold-hyst"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Soil moisture, rain and water level (analogue)",
+            "problem": "The geranium at home is watered once a week, but some weeks it gets water while the soil is still wet, and other weeks it dries out and turns yellow. Instead of poking your finger into the soil to check, a sensor can turn the moisture into a number. The same method also measures rain and how full a tank is. All three are analogue sensors: you read them with `analogRead`, just as you did with the potentiometer in lesson 11. The real job is turning the raw number into a meaningful percentage.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Soil moisture module | VCC → 5V, GND → GND, AO → **A2** |\n| Rain sensor | VCC → 5V, GND → GND, AO → **A0** |\n| Water level sensor | VCC → 5V, GND → GND, AO → **A1** |\n\nAll three modules have an analogue output (AO). The sliders in the right panel set the physical quantity: **Soil moisture** (how wet the surface is), **Wetness (rain)** (how much rain has fallen on the board) and **Water level** (how much of the stick is in water). All of them go from 0 to 1. We do not use the modules' DO outputs in this lesson.\n\nThe three sensors work in different directions; you will read this from the raw numbers:\n- **Soil moisture** and **rain sensor:** the wetter they get, the more AO **drops** (high when dry, low when wet).\n- **Water level:** the higher the water rises, the more AO **rises** (as the bare tracks on the stick go under water).\n\n### Two kinds of soil moisture sensor\n- **Resistive sensor:** It has two bare metal prongs that go into the soil. When the soil is moist, the resistance between the prongs changes, and you read that. Because current keeps flowing through the prongs, the metal **wears away and rusts** over time; these sensors do not last long. A common way to reduce the current is to power the sensor only at the moment of measuring instead of all the time; look at the datasheet for the module's supply current.\n- **Capacitive sensor:** The prongs are covered with an insulator and do not pass current straight into the soil. It measures the effect of the soil's moisture on capacitance. It usually lasts longer.\n\n**The output direction depends on the module.** Most ready-made modules give a high value when dry and a low value when wet; but on some it can be the other way round, and the numbers differ from maker to maker. So there is no rule like \"wet = big number\". You must learn the direction and the numbers for each sensor by measuring it dry and wet. On the Soil moisture module in the lab, the raw value is about 921 with the slider at 0 (dry) and about 307 at 1 (wet); so it is high when dry and low when wet. We assume this direction in this lesson too; we will also adapt the code for a sensor that works the other way.\n\n### Program 1: percentage from the dry and wet ends\nThe idea of calibration (lesson 14): measure the two end values, turn them into a percentage with `map`, and keep it between 0 and 100 with `constrain`. `map` also works with ends in reverse order: whether `KURU` (dry) is bigger or smaller than the wet value, the same code gives the right percentage.\n\n```cpp\n// sketch: toprak_yuzde\nconst int KURU = 800;                 // sensör havada/kuru toprakta okunan ham değer\nconst int ISLAK = 350;                // sensör suda okunan ham değer\n\nint ortalamaOku(int pin) {\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(pin);\n  }\n  return toplam / 8;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = ortalamaOku(A2);\n  int yuzde = map(ham, KURU, ISLAK, 0, 100);\n  yuzde = constrain(yuzde, 0, 100);\n\n  Serial.print(\"Toprak ham=\");\n  Serial.print(ham);\n  Serial.print(\" nem=%\");\n  Serial.println(yuzde);\n  delay(500);\n}\n```\n\nIn the lab we moved the **Soil moisture** slider and measured this:\n\n| Slider | Raw value | In the serial monitor |\n|---|---|---|\n| 0 (driest) | 921 | 0 % (drier than the dry end: clamped) |\n| 0.2 | 798 | 0 % (close to KURU = 800) |\n| 0.4 | 675 | 27 % |\n| 0.6 | 552 | 55 % |\n| 0.8 | 430 | 82 % |\n| 1 (wettest) | 307 | 100 % (wetter than the wet end: clamped) |\n\nWe chose `KURU = 800` and `ISLAK = 350` (dry and wet); because the ends the module reaches (921 and 307) lie outside these, `constrain` holds the ends at 0 % and 100 %. Without `constrain` you would see about -26 % with the slider at 0.\n\nIf the sensor works the other way (low when dry, high when wet), you only change the two constants; for example `KURU = 300`, `ISLAK = 700`. Because `map` also works with ends in reverse order, the same code gives the right percentage on that sensor too. The module in the lab always works in the same direction, so to try the reversed case here, you just swap the `KURU` and `ISLAK` values (see \"Try it\" below).\n\n### Program 2: calibrate over the serial port\nInstead of burying the constants in the code, it is more reliable to measure the sensor dry and wet and save the values. In this program, if you send `k` from the serial monitor, the current raw value is saved as the **dry** end, and if you send `i`, as the **wet** end. If the two ends are very close to each other, no percentage is calculated, because `map` divides, and when the difference gets close to zero the result becomes meaningless.\n\n```cpp\n// sketch: toprak_kalibre\nint kuru = 800;\nint islak = 350;\n\nunsigned long sonYazi = 0;\n\nint ortalamaOku(int pin) {\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(pin);\n  }\n  return toplam / 8;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"k: kuru uc, i: islak uc\");\n}\n\nvoid loop() {\n  while (Serial.available() > 0) {\n    char komut = Serial.read();\n    if (komut == 'k') {\n      kuru = ortalamaOku(A2);\n      Serial.print(\"Kuru kaydedildi: \");\n      Serial.println(kuru);\n    } else if (komut == 'i') {\n      islak = ortalamaOku(A2);\n      Serial.print(\"Islak kaydedildi: \");\n      Serial.println(islak);\n    }\n  }\n\n  unsigned long simdi = millis();\n  if (simdi - sonYazi >= 500) {\n    sonYazi = simdi;\n    int ham = ortalamaOku(A2);\n    if (abs(kuru - islak) < 50) {\n      Serial.println(\"Kalibrasyon gecersiz: uclar cok yakin\");\n    } else {\n      int yuzde = constrain(map(ham, kuru, islak, 0, 100), 0, 100);\n      Serial.print(\"nem=%\");\n      Serial.println(yuzde);\n    }\n  }\n}\n```\n\nIn the lab we sent `k` with the slider at 0 (`Kuru kaydedildi: 921`, dry saved) and `i` with the slider at 1 (`Islak kaydedildi: 307`, wet saved); then, when we set the slider to 0.5, it printed `nem=%50`. When we sent both `k` and `i` with the slider at 0.5 (both ends 614), it printed `Kalibrasyon gecersiz: uclar cok yakin` (calibration invalid: the ends are too close).\n\n### Program 3: rain and water level\nOn the rain sensor, drops falling on the board bridge the gap between two copper tracks and the reading drops; on the water level sensor, the value grows as the water covers the bare tracks. The directions depend on the module. In this example the rain sensor gives a **high value when dry and a low value when wet**, and the water level sensor gives a **higher value as the water rises**. You must set the thresholds by measuring a real sensor; the thresholds below were measured for the models in the lab.\n\n```cpp\n// sketch: yagmur_su\nconst int YAGMUR_ESIK = 600;          // altı: yagmur var\nconst int SEVIYE_ORTA = 300;          // bunun altı: bos\nconst int SEVIYE_DOLU = 600;          // bunun ustu: dolu\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int yagmur = analogRead(A0);\n  int seviye = analogRead(A1);\n\n  Serial.print(\"Yagmur: \");\n  Serial.print(yagmur < YAGMUR_ESIK ? \"VAR\" : \"YOK\");\n  Serial.print(\"  Su: \");\n  if (seviye < SEVIYE_ORTA) {\n    Serial.print(\"BOS\");\n  } else if (seviye < SEVIYE_DOLU) {\n    Serial.print(\"ORTA\");\n  } else {\n    Serial.print(\"DOLU\");\n  }\n  Serial.print(\"  (A0=\");\n  Serial.print(yagmur);\n  Serial.print(\" A1=\");\n  Serial.print(seviye);\n  Serial.println(\")\");\n  delay(500);\n}\n```\n\nIn the lab we moved the rain sensor's **Wetness (rain)** slider and measured:\n\n| Wetness | A0 | In the serial monitor |\n|---|---|---|\n| 0 (dry board) | 972 | `YOK` |\n| 0.2 | 798 | `YOK` |\n| 0.4 | 624 | `YOK` (just above the threshold of 600) |\n| 0.5 | 537 | `VAR` |\n| 0.8 | 276 | `VAR` |\n| 1 (downpour) | 102 | `VAR` |\n\nWith the water level sensor's **Water level** slider:\n\n| Water level | A1 | In the serial monitor |\n|---|---|---|\n| 0 (empty) | 51 | `BOS` |\n| 0.2 | 204 | `BOS` |\n| 0.4 | 358 | `ORTA` |\n| 0.7 | 588 | `ORTA` (just below the DOLU threshold of 600) |\n| 0.8 | 665 | `DOLU` |\n| 1 (stick fully in water) | 819 | `DOLU` |\n\n(`VAR` means yes, `YOK` means no; `BOS`, `ORTA` and `DOLU` mean empty, half and full.)\n\nCareful: at 5 V the water level sensor does not reach full scale (1023); the stick's top value stays at about 819. That is why we chose the thresholds by the sensor's real range, not by 1023. In the lab, as you move the slider, also watch the drops and the water level in the drawing of the **board** or the **stick** change with the slider.\n\n### How does it work?\n1. All three sensors produce a voltage, and `analogRead` turns it into a number from 0 to 1023 (lesson 11).\n2. On the soil sensor, `map` carries the raw number over to a percentage; `constrain` cuts off overflows at the ends. The average of 8 measurements reduces noise (lesson 14).\n3. Rain and water level are compared with simple thresholds. For readings close to the limit values, the state can flip back and forth quickly; the cure for this is the hysteresis you used in the thermostat in lesson 35.\n4. Because the direction and the numbers change from sensor to sensor, these numbers may not be right for another sensor. Always calibrate with the sensor you are using.\n\n### Try it\n- In the `toprak_yuzde` program, swap the `KURU` and `ISLAK` values. What happens to the percentage? How can you tell which direction a sensor works in by pulling the slider from 0 to 1 and watching how the raw number changes?\n- While running the `toprak_kalibre` program, send `k` with the slider at 0 and `i` with the slider at 1. Then set the slider to 0.3: what percentage comes out?\n- If the sensor works the other way (low when dry), how would you change the rain comparison in the `yagmur_su` program?\n- Move the rain slider slowly between 0.4 and 0.5: where does it switch between `YOK` and `VAR`? If you set the threshold to 700, at what wetness would the switch happen?\n\n### Common mistakes\n- Assuming \"big number = wet\" without knowing the sensor's direction.\n- Forgetting `constrain`: readings outside the calibration range give silly values such as -20 % or 130 %.\n- Leaving a resistive sensor in the soil and switched on all the time: the prongs rust and the reading drifts over time (the lab does not model this; it is real-world knowledge).\n- Interpreting the sensor output from a single measurement: take an average because of noise.",
+            "question": "You left a resistive soil moisture sensor in the soil for a year, and the readings slowly drifted. What could be the reason? How often would you redo the calibration, and could there be a way to do it automatically?",
+            "explainerMd": "### What you will learn in this lesson\n- How to read the analogue output of soil moisture, rain and water level sensors\n- That each sensor's direction (does the value go up or down?) can be different\n- How to turn the raw number into a percentage with `map` and `constrain`\n- How to calibrate by measuring the dry and wet ends\n- That a reading near a threshold flickers, and how to cure it\n\n### What you should know first\n- `analogRead` and the 0-1023 range (lesson 11)\n- Calibration with `map` and `constrain` (lesson 14)\n- Hysteresis, that is the idea of two thresholds (lesson 35)\n- An `if / else if` chain\n\n### Three sensors, one method\nThe soil moisture, rain and water level modules all give an **analogue output** (AO). The sensor produces a voltage, and `analogRead` turns it into a number from 0 to 1023. The real job is turning this **raw number** into something meaningful (a percentage, \"it is raining\", \"the tank is full\").\n\n### The direction is not the same for every sensor\nOn the modules used in this lesson, the directions are:\n\n| Sensor | Dry / empty | Wet / full | Direction |\n|---|---|---|---|\n| Soil moisture | raw ≈ 921 | raw ≈ 307 | drops as it gets wetter |\n| Rain | raw ≈ 972 | raw ≈ 102 | drops as it gets wetter |\n| Water level | raw ≈ 51 | raw ≈ 819 | rises as the water rises |\n\nThere is no rule that says \"wet means a big number\". You learn the numbers and the direction of every new sensor by measuring it dry and wet. Even at 5 V the water level stick does not reach 1023; its highest value is about 819. You need to choose the thresholds by the sensor's real range.\n\n### Turning it into a percentage\nIn calibration you measure two ends: the dry end and the wet end. `map(ham, KURU, ISLAK, 0, 100)` turns a value between these two into 0-100. `map` also works with ends in reverse order. But `map` also stretches values outside the ends in proportion, so the result is cut with `constrain(yuzde, 0, 100)`. `map` does integer division and throws away the fraction: 66.7 becomes 66.\n\n```\nint yuzde = map(ham, 800, 350, 0, 100);\nyuzde = constrain(yuzde, 0, 100);\n```\n\n### Noise and averaging\nAn analogue reading can wobble by a few units each time. Taking the average of eight measurements calms the reading. Instead of burying the calibration as fixed numbers, saving it with a command over the serial port (`k` for dry, `i` for wet) is more reliable. If the two ends are very close to each other, `map` gives a meaningless result; in that case no calculation is done.\n\n### Threshold and flicker\nIf you use a single threshold for rain or level, the state changes quickly when the reading goes back and forth just above and below the threshold. The fix is to use two thresholds (hysteresis), as in lesson 35. The bare metal prongs of a resistive soil sensor rust over time; on the capacitive kind the prongs are insulated, and it usually lasts longer.\n\n### Summary\nAll three sensors give an analogue number, but their directions and numbers are different. You measure the dry and wet ends, turn the reading into a percentage with `map` and keep it between 0 and 100 with `constrain`. Averaging reduces noise, and hysteresis stops threshold flicker.",
+            "concepts": [
+              {
+                "term": "Sensor direction",
+                "definition": "Whether the raw value goes up as the physical quantity goes up; it changes from sensor to sensor.",
+                "example": "On the soil moisture module the raw value drops from 921 to 307 as it gets wetter; on the water level stick it rises from 51 to 819.",
+                "pitfall": "Assuming \"wet = big number\"; you need to learn the direction of each sensor by measuring it dry and wet."
+              },
+              {
+                "term": "Calibration ends",
+                "definition": "The two raw values the sensor gives when dry and when wet; they are the limits of the percentage calculation.",
+                "example": "With KURU = 800 and ISLAK = 350, a raw value of 575 is 50 %.",
+                "pitfall": "Using numbers taken from someone else's sensor; every sensor's ends are different."
+              },
+              {
+                "term": "map() and constrain()",
+                "definition": "map converts the raw value to another range in proportion; constrain keeps the result between the given lower and upper limits.",
+                "example": "constrain(map(ham, 800, 350, 0, 100), 0, 100) gives the percentage between 0 and 100.",
+                "pitfall": "Forgetting constrain; readings outside the calibration range give values such as -26 % or 130 %."
+              },
+              {
+                "term": "Averaging",
+                "definition": "Reducing noise by adding up several measurements and dividing by how many there are.",
+                "example": "Eight analogRead values are added up and divided by 8.",
+                "pitfall": "Deciding from a single measurement; a momentary jump leads to a false warning."
+              },
+              {
+                "term": "Threshold flicker",
+                "definition": "The state changing quickly when the reading wobbles around the threshold; it is prevented with two thresholds (hysteresis).",
+                "example": "With a rain threshold of 600, if the reading goes back and forth between 595 and 605, the state keeps flipping between VAR and YOK.",
+                "pitfall": "Thinking a single threshold is enough."
+              },
+              {
+                "term": "Resistive and capacitive soil sensors",
+                "definition": "The resistive kind measures with bare prongs that touch the soil; on the capacitive kind the prongs are covered with an insulator.",
+                "example": "For a sensor that will stay in the soil for a long time, the capacitive kind is preferred.",
+                "pitfall": "Leaving a resistive sensor in the soil and switched on all the time; the prongs rust and the reading drifts."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h3d48-q1",
+                "kind": "mcq",
+                "prompt": "You connected a soil moisture module. As you pull the slider from dry to wet, the raw value goes down from 921 to 307. What do you conclude from this?",
+                "options": [
+                  "The sensor is broken, because the value should go up when wet",
+                  "Whatever the raw value is, the percentage stays the same",
+                  "On this module the value drops as it gets wetter; the percentage calculation must follow this direction",
+                  "The sensor can only give 0 and 1023"
+                ],
+                "answer": 2,
+                "explanation": "The sensor direction changes from module to module; this module is the kind that drops as it gets wetter, and it is not broken. For the right percentage, the KURU and ISLAK ends are given according to this direction. Calculating without knowing the direction gives the opposite result.",
+                "skills": [
+                  "sens-analog-calib"
+                ]
+              },
+              {
+                "id": "m4h3d48-q2",
+                "kind": "numeric",
+                "prompt": "With KURU = 800 and ISLAK = 350, a raw value of 500 was read. What does the code below print to the serial monitor?\n\n```\nint yuzde = map(500, 800, 350, 0, 100);\nSerial.println(yuzde);\n```",
+                "answer": 66,
+                "tolerance": 0,
+                "unit": "%",
+                "explanation": "The map formula: (500 − 800) × (100 − 0) / (350 − 800) = (−300 × 100) / (−450) = 66.67. Because map does integer division, the fraction is thrown away and the result is 66 (not 67).",
+                "skills": [
+                  "sens-analog-calib"
+                ]
+              },
+              {
+                "id": "m4h3d48-q3",
+                "kind": "predict-output",
+                "prompt": "The rain sensor is on A0 and the water level sensor is on A1. The readings are A0 = 700 and A1 = 450. What does this code print?\n\n```\nint yagmur = analogRead(A0);\nint seviye = analogRead(A1);\nSerial.print(yagmur < 600 ? \"VAR\" : \"YOK\");\nSerial.print(\" \");\nif (seviye < 300) Serial.println(\"BOS\");\nelse if (seviye < 600) Serial.println(\"ORTA\");\nelse Serial.println(\"DOLU\");\n```",
+                "options": [
+                  "VAR ORTA",
+                  "YOK ORTA",
+                  "YOK DOLU",
+                  "VAR BOS"
+                ],
+                "answer": 1,
+                "explanation": "Because 700 is not less than 600, \"YOK\" (no) is printed for rain (on this sensor the value drops in rain). Since 450 is between 300 and 600, the level is \"ORTA\" (half). Result: YOK ORTA.",
+                "skills": [
+                  "sens-analog-calib",
+                  "sens-threshold-hyst"
+                ]
+              },
+              {
+                "id": "m4h3d48-q4",
+                "kind": "find-bug",
+                "prompt": "When the soil is wet and the raw value is 350, you expect 100 % on the screen, but this code prints 0 %. The KURU raw value is 800 and the ISLAK raw value is 350. Which line has the bug?\n\n```\n1 const int KURU = 800;\n2 const int ISLAK = 350;\n3 int yuzde = map(analogRead(A2), ISLAK, KURU, 0, 100);\n4 Serial.println(yuzde);\n```",
+                "options": [
+                  "Line 1: the KURU value is wrong",
+                  "Line 2: the ISLAK value should be zero",
+                  "Line 3: the order of the ends inside map is reversed; KURU should come first, then ISLAK",
+                  "Line 4: print should be written instead of println"
+                ],
+                "answer": 2,
+                "explanation": "map(x, a, b, 0, 100) links the value a to 0 and the value b to 100. When ISLAK is written first, the value 350 becomes 0 %. Since 0 % should be dry and 100 % wet, the right version is map(analogRead(A2), KURU, ISLAK, 0, 100).",
+                "skills": [
+                  "sens-analog-calib",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d48-q5",
+                "kind": "mcq",
+                "prompt": "The rain threshold is 600. When the reading flickers between 595 and 605, the output flips quickly between VAR and YOK. Which is the best fix?",
+                "options": [
+                  "Use two thresholds: for example VAR below 550, YOK above 650, and keep the state in between",
+                  "Set the threshold to 601",
+                  "Remove the delay",
+                  "Connect the sensor the other way round"
+                ],
+                "answer": 0,
+                "explanation": "The problem is that the state keeps changing around a single threshold. With two thresholds (hysteresis), the old state is kept in the zone between them and the flicker stops. Moving the threshold by 1 unit just causes the same problem at another value.",
+                "skills": [
+                  "sens-threshold-hyst"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Çok sayfalı ekran arayüzü (LCD/OLED)",
@@ -1709,7 +3268,121 @@ export const modul4: ModuleContent = {
                 "ui-paging"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "A multi-page screen interface (LCD/OLED)",
+            "problem": "The screen of a small weather station has 16 characters and 2 rows. But what you want to show is the temperature, humidity, pressure, altitude and soil moisture. You cannot fit them all at once. We will solve it with \"pages\", as on phones: the screen changes page every few seconds, and if you like you turn the page yourself with a button. While doing this, your program will not stop with `delay` anywhere.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| I2C LCD (address 0x27) | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND |\n| BMP280 (address 0x76) | SDA → **A4**, SCL → **A5** (same bus as the LCD), VCC → 5V, GND → GND |\n| DHT (DHT22) | DATA → **D5**, VCC → 5V, GND → GND |\n| Soil moisture module | AO → **A2**, VCC → 5V, GND → GND |\n| \"Next page\" button | A → **D2**, B → GND (`INPUT_PULLUP`) |\n\nBecause the LCD (0x27) and the BMP280 (0x76) are at different addresses, they share the same two wires (SDA, SCL) (lesson 33). You can draw two separate wires to pins A4 and A5, or you can connect the second device's SDA/SCL pin to the same pin on the first device. While it runs you can move the sensors' sliders and press the Button part by holding it down.\n\n### The idea: a page number and a timer\nA `sayfa` (page) variable holds which page is being shown. When the time is up, the variable goes up by one, and when it reaches the end it goes back to the start:\n\n```cpp\nsayfa = (sayfa + 1) % SAYFA_SAYISI;   // 0, 1, 2, 0, 1, 2, ...\n```\n\n`%` gives the remainder of a division: after 2, 3 % 3 = 0. For the time we use the `millis()` pattern from lesson 27: `simdi - sonSayfa >= 3000`.\n\n### Updating the screen without flicker\nIf you call `lcd.clear()` on every update, the screen goes blank for a moment and flickers. A better way: write each line **always padded to 16 characters**. If the new text is shorter than the old one, the leftover spaces cover the old characters. We write a small helper for this. We will also use two new tools:\n\n- **`snprintf(tampon, boyut, biçim, ...)`:** Writes formatted text into a character array (a buffer). `%s` means text, `%d` a whole number, `%-16s` \"text left-aligned, 16 characters wide\". `%%` prints a per cent sign. On the Arduino Uno, `snprintf` does not print decimal numbers (`%f`); you get `?` instead of the number.\n- **`dtostrf(sayi, genislik, basamak, tampon)`:** Turns a decimal number into text (number, width, digits, buffer). `dtostrf(23.4, 1, 1, tampon)` writes `\"23.4\"` into the buffer. This way we put the decimal number into `snprintf` as text.\n\n### Program: a 3-page weather screen\nPage 1 shows the temperature and humidity, page 2 the pressure and altitude, page 3 the soil moisture. The page number, such as `1/3`, sits in the top right corner. The sensors are read every 2 seconds (the time the DHT needs), the page changes every 3 seconds, and the button changes the page straight away and restarts the 3-second timer.\n\n```cpp\n// sketch: ekran_sayfalar\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <Adafruit_BMP280.h>\n#include <DHT.h>\n\nconst int BUTON = 2;\nconst int SAYFA_SAYISI = 3;\nconst unsigned long SAYFA_SURESI = 3000;   // ms\nconst unsigned long OLCUM_ARALIGI = 2000;  // ms\nconst int KURU = 800;\nconst int ISLAK = 350;\nconst float P0_HPA = 1013.25;\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\nAdafruit_BMP280 bmp;\nDHT dht(5, DHT22);\n\nint sayfa = 0;\nunsigned long sonSayfa = 0;\nunsigned long sonOlcum = 0;\nunsigned long sonBasis = 0;\nbool oncekiBasili = false;\nbool bmpHazir = false;\n\nfloat sicaklik = NAN;\nfloat nem = NAN;\nfloat hpa = NAN;\nfloat rakim = NAN;\nint toprakHam = 0;\nint toprakYuzde = 0;\n\n// Sayiyi metne cevirir; gecersizse \"--\" verir.\nconst char* sayi(float v, int basamak, char* tampon) {\n  if (isnan(v)) {\n    return \"--\";\n  }\n  dtostrf(v, 1, basamak, tampon);\n  return tampon;\n}\n\n// Bir satiri her zaman 16 karaktere tamamlayarak yazar.\nvoid satirYaz(int satir, const char* metin) {\n  char tampon[17];\n  snprintf(tampon, sizeof(tampon), \"%-16s\", metin);\n  lcd.setCursor(0, satir);\n  lcd.print(tampon);\n}\n\nvoid sayfaCiz() {\n  char ust[17];\n  char alt[17];\n  char a[10];\n  char b[10];\n\n  if (sayfa == 0) {\n    snprintf(ust, sizeof(ust), \"Sic: %s C\", sayi(sicaklik, 1, a));\n    snprintf(alt, sizeof(alt), \"Nem: %s %%\", sayi(nem, 1, b));\n  } else if (sayfa == 1) {\n    if (bmpHazir) {\n      snprintf(ust, sizeof(ust), \"P:%s hPa\", sayi(hpa, 1, a));\n      snprintf(alt, sizeof(alt), \"Rakim: %s m\", sayi(rakim, 0, b));\n    } else {\n      snprintf(ust, sizeof(ust), \"BMP280 yok\");\n      snprintf(alt, sizeof(alt), \" \");\n    }\n  } else {\n    snprintf(ust, sizeof(ust), \"Toprak: %%%d\", toprakYuzde);\n    snprintf(alt, sizeof(alt), \"Ham: %d\", toprakHam);\n  }\n\n  char baslik[17];\n  snprintf(baslik, sizeof(baslik), \"%-13s%d/%d\", ust, sayfa + 1, SAYFA_SAYISI);\n  satirYaz(0, baslik);\n  satirYaz(1, alt);\n}\n\nvoid olcumYap() {\n  float n = dht.readHumidity();\n  float s = dht.readTemperature();\n  sicaklik = s;                         // okunamazsa NAN kalir, ekran \"--\" yazar\n  nem = n;\n\n  if (bmpHazir) {\n    hpa = bmp.readPressure() / 100.0;\n    rakim = bmp.readAltitude(P0_HPA);\n  }\n\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(A2);\n  }\n  toprakHam = toplam / 8;\n  toprakYuzde = constrain(map(toprakHam, KURU, ISLAK, 0, 100), 0, 100);\n}\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  lcd.init();\n  lcd.backlight();\n  dht.begin();\n  bmpHazir = bmp.begin(0x76);\n  delay(1500);                          // DHT sensoru acilsin\n  olcumYap();\n  sayfaCiz();\n  sonOlcum = millis();\n  sonSayfa = millis();                  // sayfa suresi simdi baslasin\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // Butona basilinca hemen sonraki sayfa\n  bool basili = (digitalRead(BUTON) == LOW);\n  if (basili && !oncekiBasili && simdi - sonBasis > 50) {\n    sonBasis = simdi;\n    sayfa = (sayfa + 1) % SAYFA_SAYISI;\n    sonSayfa = simdi;                   // 3 saniyelik sure bastan\n    sayfaCiz();\n  }\n  oncekiBasili = basili;\n\n  // Sensorler 2 saniyede bir\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    olcumYap();\n    sayfaCiz();\n  }\n\n  // Sayfa 3 saniyede bir\n  if (simdi - sonSayfa >= SAYFA_SURESI) {\n    sonSayfa = simdi;\n    sayfa = (sayfa + 1) % SAYFA_SAYISI;\n    sayfaCiz();\n  }\n}\n```\n\n### How does it work?\n1. `sayfa` takes the values 0, 1 and 2. `sayfaCiz()` (draw page) looks at the page number and prepares the matching two lines. The only place that touches the screen is `satirYaz` (write line).\n2. The `sayi()` helper function writes `\"--\"` if the measurement is invalid. So when the DHT or BMP280 is missing, you see `--` on the screen instead of `nan`.\n3. Three jobs run on separate clocks: checking the button, reading the sensors (2 s) and turning the page (3 s). None of them uses `delay` (lesson 27).\n4. At the end of `setup` we wrote `sonSayfa = millis()`. If we had not done this, because `millis()` counts from start-up, the 1.5-second `delay` in `setup` and the LCD start-up time would have been eaten out of the page time, and the first page would have appeared very briefly.\n5. If there is no BMP280 on page 2, the screen says `BMP280 yok` (no BMP280); the program still runs.\n\nThe behaviour we saw in the lab: the screen changed every 3 seconds in the order `1/3`, `2/3`, `3/3`, `1/3` (the interval was very close to 3000 ms). With the DHT temperature at 25 °C and the humidity at 50 %, the first page showed `Sic: 25.0 C` and `Nem: 50.0 %`. The button turned the page straight away, and the next automatic change came 3 seconds after the button. The LCD and the BMP280 worked together on the same I2C bus. When we changed the temperature slider while it was running, the first page showed the new value within 2 seconds at most. With the Soil moisture module's **Soil moisture** slider at 0.5, the third page shows `Toprak: %41` and `Ham: 614` (the measurement from lesson 48).\n\n### The OLED screen (a short introduction)\n**There is no OLED part in the lab**; this section is for you to learn by reading, and only the LCD is used in the activity.\n\nAn OLED is a small screen where every pixel makes its own light. Common modules are 128x64 pixels and connect over I2C (the address is usually 0x3C; check the label). The difference from the LCD: you draw **pixels**, not characters, you can choose the text size, and you can also draw lines and shapes. The libraries used are Adafruit SSD1306 and Adafruit GFX.\n\nCareful: the image buffer of a 128x64 screen is 1024 bytes. That is half of the Uno's 2048 bytes of SRAM (lesson 34). Together with big text arrays and other libraries, make sure the memory does not fill up.\n\nThe example below applies the same page logic to an OLED. This sketch was only tried by compiling it; because there is no OLED in the lab, the screen behaviour was not checked. For how to use the library, look at the Adafruit SSD1306 and GFX documentation and examples.\n\n```cpp\n// sketch: oled_sayfalar\n#include <Wire.h>\n#include <Adafruit_GFX.h>\n#include <Adafruit_SSD1306.h>\n\nAdafruit_SSD1306 oled(128, 64, &Wire, -1);   // genislik, yukseklik, I2C, reset yok\n\nconst int SAYFA_SAYISI = 3;\nconst unsigned long SAYFA_SURESI = 3000;\nint sayfa = 0;\nunsigned long sonSayfa = 0;\nbool oledHazir = false;\n\nvoid sayfaCiz() {\n  oled.clearDisplay();\n  oled.setTextSize(2);\n  oled.setTextColor(SSD1306_WHITE);\n  oled.setCursor(0, 0);\n  if (sayfa == 0) {\n    oled.println(\"Sicaklik\");\n    oled.print(23.4, 1);\n    oled.println(\" C\");\n  } else if (sayfa == 1) {\n    oled.println(\"Basinc\");\n    oled.print(1013.2, 1);\n    oled.println(\" hPa\");\n  } else {\n    oled.println(\"Toprak\");\n    oled.println(\"%45\");\n  }\n  oled.display();                       // cizdiklerini ekrana gonder\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  oledHazir = oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);\n  if (!oledHazir) {\n    Serial.println(\"OLED bulunamadi\");\n    return;\n  }\n  sayfaCiz();\n}\n\nvoid loop() {\n  if (!oledHazir) {\n    return;\n  }\n  unsigned long simdi = millis();\n  if (simdi - sonSayfa >= SAYFA_SURESI) {\n    sonSayfa = simdi;\n    sayfa = (sayfa + 1) % SAYFA_SAYISI;\n    sayfaCiz();\n  }\n}\n```\n\nOn an OLED, what you draw does not go to the screen until `oled.display()` is called; you first draw into the buffer, then send it all in one go. On real modules, if the address is not 0x3C, you need to change the address inside `begin`.\n\n### Try it\n- Set `SAYFA_SURESI` (page time) to 1500. Can you read the text? Which time do you think is long enough for reading?\n- Add a fourth page (for example how many seconds the program has been running, with `millis() / 1000`). What needs to change in `SAYFA_SAYISI` and `sayfaCiz`?\n- Remove the padding inside `satirYaz` and write `lcd.print(metin)` directly instead. When the page changes, are there leftovers of the old text on the screen?\n\n### Common mistakes\n- Waiting on the page with `delay(3000)`: you miss button presses and the sensors stop.\n- Not padding the line to 16 characters: when short text is written over a long one, the old characters stay on the screen.\n- Using `%f` with `snprintf`: on the Uno it does not print decimal numbers; use `dtostrf`.\n- Not limiting the `sayfa` variable: if you write `sayfa++` and forget to go back to the start, the page number goes past the limit.\n- Making the buffer too small: long text can overflow and corrupt other variables; `snprintf` limits the size, `sprintf` does not.",
+            "question": "While a user is trying to read a value on the screen, the page changes when the 3 seconds are up. Do you think the page time should be fixed, or should it wait longer when the user presses the button? If there is a critical warning that must be shown (for example \"watering needed\"), what place should you give it in the page cycle?",
+            "explainerMd": "### What you will learn in this lesson\n- How to show many values on a small screen with \"pages\"\n- How to send the page number back to the start with the `%` (mod) operator\n- How to update the screen without `clear()` flicker, by padding each line to 16 characters\n- How to format text with `snprintf` and `dtostrf`\n- How to run the page change, the button and the measurement together without `delay`\n\n### What you should know first\n- Non-blocking timing with `millis()` (lesson 27)\n- The I2C bus and using the LCD (lesson 33)\n- Reading a button: `INPUT_PULLUP` and edge detection\n- DHT, BMP280 and soil moisture measurements (lessons 46, 47 and 48)\n\n### A small screen, a lot of data\nA 16x2 LCD has 2 rows with 16 characters per row; that is 32 characters. Temperature, humidity, pressure, altitude and soil moisture do not fit at once. The fix is the phone idea: you split the information into **pages**, and the screen shows them one at a time.\n\n### The page number and the mod operator\nA variable holds which page you are on. When the time is up or the button is pressed, the variable goes up by one, and when it reaches the end it goes back to the start. `%` (the remainder of a division) does this:\n\n```\nsayfa = (sayfa + 1) % 3;    // 0, 1, 2, 0, 1, 2 ...\n```\n\nWhen the page is 2, 3 % 3 = 0, so you go back to the start. If you change the number of pages, only the `3` changes.\n\n### Flicker-free updating\nIf you call `lcd.clear()` on every update, the screen goes blank for a moment and flickers. A better way is to **always pad the line to 16 characters**. If the new text is short, the spaces at its end cover the old characters. A format specifier does this: `%-16s` means \"left-align the text and write it 16 characters wide\".\n\n### Formatting text\n`snprintf(tampon, boyut, biçim, ...)` puts formatted text into a character array and does not let it go past the size. `%d` is a whole number, `%s` is text, and `%%` is a per cent sign. On the Uno, `%f` does **not** print a decimal number; you get `?` instead. For a decimal number, `dtostrf(23.4, 1, 1, tampon)` first turns the number into text, and then you place it with `%s`.\n\n| Command | Result |\n|---|---|\n| `snprintf(t, 17, \"Nem: %d %%\", 55)` | `Nem: 55 %` |\n| `snprintf(t, 17, \"Sic: %f C\", 23.4)` | `Sic: ? C` (on the Uno) |\n| Turn it into text with `dtostrf`, then `%s` | `Sic: 23.4 C` |\n\n### Running three jobs together\nThe program checks the button, reads the sensors every 2 seconds and turns the page every 3 seconds, all at the same time. None of them uses `delay`; each job has its own `millis()` timer. When you press the button, the page changes straight away and the 3-second timer starts again. If a measurement is invalid, showing `--` instead of `nan` on the screen protects the user.\n\n### Another screen: the OLED\nAn OLED is a screen where every pixel makes its own light. You draw pixels instead of characters; you can choose the text size and draw lines and shapes. The image buffer of a 128x64 OLED is 1024 bytes. That is half of the Uno's 2048 bytes of memory. There is no OLED in this lab; you learn about it only by reading.\n\n### Summary\nYou fit a lot of data onto a small screen with pages. The page number goes back to the start with `%`. Padding the line to 16 characters updates the screen without flicker. `snprintf` formats text, and you turn decimal numbers into text with `dtostrf`. The page change, the button and the measurement work together with `millis()`.",
+            "concepts": [
+              {
+                "term": "Page variable",
+                "definition": "The number that holds which page is shown on the screen; it changes when the time is up or the button is pressed.",
+                "example": "sayfa takes the values 0, 1 and 2; sayfaCiz() prepares the two lines to match.",
+                "pitfall": "Writing sayfa++ and forgetting to go back to the start; the number goes past the limit and no page is drawn."
+              },
+              {
+                "term": "The % (mod) operator",
+                "definition": "Gives the remainder of a division; it is used to keep a counter going round within a set range.",
+                "example": "The expression (sayfa + 1) % 3 gives 0 after 2.",
+                "pitfall": "Thinking the % sign means per cent; to write a per cent sign inside text you need %%."
+              },
+              {
+                "term": "Padding the line to 16 characters",
+                "definition": "Adding spaces to the end of short text to cover the old characters on the screen; it flickers less than calling clear().",
+                "example": "snprintf(tampon, 17, \"%-16s\", metin) fills the line to 16 characters.",
+                "pitfall": "Not padding; when short text is written over a long one, the old characters stay on the screen."
+              },
+              {
+                "term": "snprintf and dtostrf",
+                "definition": "snprintf formats text and writes it into a buffer without going past the size; dtostrf turns a decimal number into text.",
+                "example": "dtostrf(23.4, 1, 1, t) gives the text \"23.4\", which is put into the line with %s.",
+                "pitfall": "Using %f inside snprintf on the Uno; you get ? instead of the number."
+              },
+              {
+                "term": "Non-blocking page cycle",
+                "definition": "The page change, the button and the measurement each run with their own millis() timer and without delay.",
+                "example": "When simdi - sonSayfa >= 3000, the page is turned; the button turns it straight away in between.",
+                "pitfall": "Waiting on the page with delay(3000); the button and the sensor do not work at all during that time."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h3d49-q1",
+                "kind": "numeric",
+                "prompt": "On a 4-page screen, the page variable is 3 right now. The button was pressed 6 times in a row, and the line below ran on each press. What is the page variable now?\n\n```\nsayfa = (sayfa + 1) % 4;\n```",
+                "answer": 1,
+                "tolerance": 0,
+                "explanation": "The order: 3 → 0 → 1 → 2 → 3 → 0 → 1. Shortcut: (3 + 6) % 4 = 9 % 4 = 1. Every 4 presses the page returns to its own value, which leaves 2 presses: two steps after 3 is 1.",
+                "skills": [
+                  "ui-paging"
+                ]
+              },
+              {
+                "id": "m4h3d49-q2",
+                "kind": "predict-output",
+                "prompt": "On the Uno, which two lines does this code print to the serial monitor?\n\n```\nchar t[17];\nsnprintf(t, sizeof(t), \"Nem: %d %%\", 55);\nSerial.println(t);\nsnprintf(t, sizeof(t), \"Sic: %f C\", 23.4);\nSerial.println(t);\n```",
+                "options": [
+                  "Nem: 55 %  and  Sic: 23.4 C",
+                  "Nem: %d %  and  Sic: %f C",
+                  "Nem: 55  and  Sic: 23.4 C",
+                  "Nem: 55 %  and  Sic: ? C"
+                ],
+                "answer": 3,
+                "explanation": "%d writes the whole number 55, and %% writes a single % sign. The Uno's snprintf cannot write a decimal number with %f and puts ? instead; for a decimal number you first need to turn it into text with dtostrf.",
+                "skills": [
+                  "ui-text-format"
+                ]
+              },
+              {
+                "id": "m4h3d49-q3",
+                "kind": "find-bug",
+                "prompt": "In this code, pressing the button usually does not change the page, and the sensor is updated late. Which line has the bug?\n\n```\n1 void loop() {\n2   if (digitalRead(BUTON) == LOW) sayfa = (sayfa + 1) % 3;\n3   sayfaCiz();\n4   delay(3000);\n5 }\n```",
+                "options": [
+                  "Line 2: % 2 should be written instead of % 3",
+                  "Line 3: sayfaCiz() should not be called",
+                  "Line 4: delay(3000) stops the program for 3 seconds; the button and the measurement do not work during that time",
+                  "Line 5: the closing bracket is extra"
+                ],
+                "answer": 2,
+                "explanation": "delay(3000) makes the program wait 3 seconds on every round; during that time the button is not read and the sensor is not updated. The fix is to time the page with millis(). The % 3 on line 2 is right for three pages.",
+                "skills": [
+                  "ui-paging",
+                  "prog-timing",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d49-q4",
+                "kind": "mcq",
+                "prompt": "What is the point of writing each line padded to 16 characters instead of wiping the LCD with lcd.clear() on every update?",
+                "options": [
+                  "To stop the screen going blank and flickering, and to let short text cover the old characters",
+                  "To make the screen look brighter",
+                  "To free up memory",
+                  "To speed up the serial port"
+                ],
+                "answer": 0,
+                "explanation": "clear() makes the screen blank for a moment and causes flicker. When the line is padded to 16 characters with spaces, the new text completely covers the old one and the screen never goes blank. It has nothing to do with brightness, memory or serial port speed.",
+                "skills": [
+                  "ui-text-format"
+                ]
+              },
+              {
+                "id": "m4h3d49-q5",
+                "kind": "numeric",
+                "prompt": "An OLED screen uses 1 bit of memory for each pixel. How many bytes does the image buffer of a 128x32-pixel screen take up? (1 byte = 8 bits)",
+                "answer": 512,
+                "tolerance": 0,
+                "unit": "bytes",
+                "explanation": "128 × 32 = 4096 pixels = 4096 bits; divided by 8 that is 512 bytes. With the same calculation a 128x64 screen holds 1024 bytes, which is half of the Uno's 2048 bytes of memory.",
+                "skills": [
+                  "ui-paging"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Hava istasyonu ve sulama uyarısı",
@@ -1828,7 +3501,125 @@ export const modul4: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: weather station and watering alert",
+            "problem": "Nobody could water the tomato seedlings on the balcony during a weekend away. When everyone came back, the leaves were drooping. What if the board could have watched them and said \"the soil has dried out, time to water\"? In this project you will build a weather station: it will measure the temperature, humidity, pressure and altitude and show them page by page on a screen; and when the soil dries out, it will light an LED and warn you with a buzzer.",
+            "contentMd": "### What will we do?\nThis project brings together what you have learned:\n- **Module 3, lesson 18:** `tone` with a buzzer (D8).\n- **Module 3, lessons 14 and 35:** calibration with `map`/`constrain`, and hysteresis.\n- **Module 3, lessons 27 and 33:** non-blocking code with `millis()`, several devices on the I2C bus.\n- **Lessons 46-49:** the DHT22, the BMP280, the soil moisture sensor and the multi-page LCD.\n\nThe system works like this: every 2 seconds the DHT22, the BMP280 and the soil moisture are read. The LCD shows three pages, changing every 3 seconds. When the soil moisture drops **below 30 %**, the watering alert starts: the LED lights up, the buzzer gives a short beep every 2 seconds and one line is written to the serial port. The alert ends when the soil rises to **40 %**. We use two separate thresholds (the hysteresis from lesson 35), so the alert does not keep switching on and off while the moisture wobbles around 30 %.\n\n### Circuit\nThere is no pump or valve in this project; only an LED and a buzzer. Info note: if you add a real watering pump, you need a transistor or a relay and a separate power supply, as in lessons 22 and 24; no circuit is ever built with mains voltage (220 V).\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| DHT (DHT22) | DATA → **D5**, VCC → 5V, GND → GND |\n| BMP280 (address 0x76) | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND |\n| I2C LCD (address 0x27) | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND |\n| Soil moisture module | AO → **A2**, VCC → 5V, GND → GND |\n| LED + 330 Ω resistor | **D13** → resistor pin 1; resistor pin 2 → LED A (anode); LED K (cathode) → GND |\n| Passive buzzer | **D8** → buzzer +, buzzer − → GND (Type property Passive) |\n| \"Next page\" button | A → **D2**, B → GND (`INPUT_PULLUP`) |\n\nThe LCD and the BMP280 share the same two wires (SDA, SCL); because their addresses are different (0x27, 0x76), they do not get mixed up. For the soil moisture, the numbers from lesson 48 apply: with the **Soil moisture** slider at 0 the raw value is about 921, and at 1 about 307; the program below assumes `KURU = 800` and `ISLAK = 350` (dry and wet). In that case the alert starts with the slider at about 0.41 and below (29 % and below), and ends at 0.5 and above (41 %).\n\n### The alert logic\n| State | Condition | Action |\n|---|---|---|\n| Normal | Soil moisture `%30` or above | LED off, buzzer silent |\n| Normal → ALERT | If the moisture drops **below** `%30` | LED on, buzzer beeps, **one** line is written to the serial port |\n| ALERT | Moisture between `%30` and `%40` | The alert continues (hysteresis) |\n| ALERT → Normal | If the moisture rises to `%40` or above | LED off, buzzer silent, one line is written to the serial port |\n\n### Program\n```cpp\n// sketch: hava_istasyonu\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <Adafruit_BMP280.h>\n#include <DHT.h>\n\nconst int LED = 13;\nconst int BUZZER = 8;\nconst int BUTON = 2;\n\nconst int KURU = 800;                       // ham deger: kuru toprak\nconst int ISLAK = 350;                      // ham deger: islak toprak\nconst int ESIK_ALT = 30;                    // % - altina inince uyari\nconst int ESIK_UST = 40;                    // % - ustune cikinca uyari biter\nconst float P0_HPA = 1013.25;               // deniz seviyesi basinci\n\nconst int SAYFA_SAYISI = 3;\nconst unsigned long OLCUM_ARALIGI = 2000;   // ms (DHT icin en az 2 sn)\nconst unsigned long SAYFA_SURESI = 3000;    // ms\nconst unsigned long BIP_ARALIGI = 2000;     // ms\nconst unsigned long BIP_SURESI = 200;       // ms\nconst int BIP_HZ = 1000;\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\nAdafruit_BMP280 bmp;\nDHT dht(5, DHT22);\n\nfloat sicaklik = NAN;\nfloat nem = NAN;\nfloat hpa = NAN;\nfloat rakim = NAN;\nint toprakHam = 0;\nint toprakYuzde = 0;\n\nbool bmpHazir = false;\nbool uyari = false;\nint sayfa = 0;\nbool oncekiBasili = false;\nunsigned long sonOlcum = 0;\nunsigned long sonSayfa = 0;\nunsigned long sonBip = 0;\nunsigned long sonBasis = 0;\n\n// Sayiyi metne cevirir; gecersizse \"--\" verir.\nconst char* sayi(float v, int basamak, char* tampon) {\n  if (isnan(v)) {\n    return \"--\";\n  }\n  dtostrf(v, 1, basamak, tampon);\n  return tampon;\n}\n\n// Seri porta sayi yazar; gecersizse \"--\".\nvoid seriSayi(const char* ad, float v, int basamak) {\n  Serial.print(ad);\n  if (isnan(v)) {\n    Serial.print(\"--\");\n  } else {\n    Serial.print(v, basamak);\n  }\n}\n\nvoid satirYaz(int satir, const char* metin) {\n  char tampon[17];\n  snprintf(tampon, sizeof(tampon), \"%-16s\", metin);\n  lcd.setCursor(0, satir);\n  lcd.print(tampon);\n}\n\nvoid sayfaCiz() {\n  char ust[17];\n  char alt[17];\n  char a[10];\n  char b[10];\n\n  if (sayfa == 0) {\n    snprintf(ust, sizeof(ust), \"Sic: %s C\", sayi(sicaklik, 1, a));\n    snprintf(alt, sizeof(alt), \"Nem: %s %%\", sayi(nem, 1, b));\n  } else if (sayfa == 1) {\n    if (bmpHazir) {\n      snprintf(ust, sizeof(ust), \"P:%s hPa\", sayi(hpa, 1, a));\n      snprintf(alt, sizeof(alt), \"Rakim: %s m\", sayi(rakim, 0, b));\n    } else {\n      snprintf(ust, sizeof(ust), \"BMP280 yok\");\n      snprintf(alt, sizeof(alt), \" \");\n    }\n  } else {\n    snprintf(ust, sizeof(ust), \"Toprak: %%%d\", toprakYuzde);\n    snprintf(alt, sizeof(alt), \"%s\", uyari ? \"SULAMA GEREKLI\" : \"Durum: NORMAL\");\n  }\n\n  char baslik[17];\n  char sonSatir[17];\n  snprintf(baslik, sizeof(baslik), \"%-13s%d/%d\", ust, sayfa + 1, SAYFA_SAYISI);\n  snprintf(sonSatir, sizeof(sonSatir), \"%-15s%c\", alt, uyari ? '!' : ' ');\n  satirYaz(0, baslik);\n  satirYaz(1, sonSatir);\n}\n\nvoid olcumYap() {\n  nem = dht.readHumidity();\n  sicaklik = dht.readTemperature();\n  if (bmpHazir) {\n    hpa = bmp.readPressure() / 100.0;\n    rakim = bmp.readAltitude(P0_HPA);\n  }\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(A2);\n  }\n  toprakHam = toplam / 8;\n  toprakYuzde = constrain(map(toprakHam, KURU, ISLAK, 0, 100), 0, 100);\n}\n\n// Toprak nemine gore uyariyi acar/kapatir (histerezisli).\nvoid uyariKontrol(unsigned long simdi) {\n  if (!uyari && toprakYuzde < ESIK_ALT) {\n    uyari = true;\n    sonBip = simdi - BIP_ARALIGI;           // ilk bip hemen calsin\n    digitalWrite(LED, HIGH);\n    Serial.print(\"UYARI: toprak nemi %\");\n    Serial.print(toprakYuzde);\n    Serial.println(\" - sulama gerekli\");\n  } else if (uyari && toprakYuzde >= ESIK_UST) {\n    uyari = false;\n    digitalWrite(LED, LOW);\n    noTone(BUZZER);\n    Serial.print(\"Toprak nemi normale dondu: %\");\n    Serial.println(toprakYuzde);\n  }\n}\n\nvoid seriDurum() {\n  seriSayi(\"T=\", sicaklik, 1);\n  seriSayi(\" N=\", nem, 1);\n  seriSayi(\" P=\", hpa, 1);\n  seriSayi(\" R=\", rakim, 0);\n  Serial.print(\" Toprak=%\");\n  Serial.print(toprakYuzde);\n  Serial.print(\" Uyari=\");\n  Serial.println(uyari ? 1 : 0);\n}\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  pinMode(BUTON, INPUT_PULLUP);\n  digitalWrite(LED, LOW);\n  Serial.begin(9600);\n\n  lcd.init();\n  lcd.backlight();\n  dht.begin();\n  bmpHazir = bmp.begin(0x76);\n  if (!bmpHazir) {\n    Serial.println(\"BMP280 bulunamadi\");\n  }\n  delay(1500);                              // DHT sensoru acilsin\n\n  olcumYap();\n  uyariKontrol(millis());\n  seriDurum();\n  sayfaCiz();\n  sonOlcum = millis();\n  sonSayfa = millis();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Buton: hemen sonraki sayfa\n  bool basili = (digitalRead(BUTON) == LOW);\n  if (basili && !oncekiBasili && simdi - sonBasis > 50) {\n    sonBasis = simdi;\n    sayfa = (sayfa + 1) % SAYFA_SAYISI;\n    sonSayfa = simdi;\n    sayfaCiz();\n  }\n  oncekiBasili = basili;\n\n  // 2) Olcum, uyari ve seri cikti: 2 saniyede bir\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    olcumYap();\n    uyariKontrol(simdi);\n    seriDurum();\n    sayfaCiz();\n  }\n\n  // 3) Sayfa degisimi: 3 saniyede bir\n  if (simdi - sonSayfa >= SAYFA_SURESI) {\n    sonSayfa = simdi;\n    sayfa = (sayfa + 1) % SAYFA_SAYISI;\n    sayfaCiz();\n  }\n\n  // 4) Uyari sirasinda buzzer: 2 saniyede bir kisa bip\n  if (uyari && simdi - sonBip >= BIP_ARALIGI) {\n    sonBip = simdi;\n    tone(BUZZER, BIP_HZ, BIP_SURESI);\n  }\n}\n```\n\n### How does it work?\n1. `olcumYap()` (take measurements) reads the three sensors and puts the values into global variables. If the DHT cannot be read, the value stays `NaN`; the screen and the serial port show it as `--`, and the program does not stop. If the BMP280 is not found, `bmpHazir` becomes false and the pressure page says `BMP280 yok` (no BMP280) (lesson 47).\n2. As in lesson 48, the soil moisture is turned into a percentage from the average of 8 measurements with `map` and `constrain`.\n3. `uyariKontrol()` (check alert) keeps a **state**: `uyari` (alert). When it is normal and the moisture drops below 30 per cent, it switches on; when it is on and the moisture rises to 40, it switches off. The alert line is written to the serial port only once, **when the state changes**; this way the Serial monitor does not fill up with the same message. The `T=... Uyari=1` status line, written every 2 seconds, keeps flowing, though.\n4. The buzzer sounds for 200 ms with `tone(BUZZER, 1000, 200)`, and the program does not wait. It is repeated every 2 seconds with `sonBip` (last beep) (lesson 27). When the alert switches on, we wrote `sonBip = simdi - BIP_ARALIGI` so that the first beep plays straight away.\n5. While there is an alert, a `!` appears in the bottom right corner of every LCD page; page 3 says `SULAMA GEREKLI` (watering needed). This way the user sees the alert whichever page they are on.\n6. The four jobs (button, measurement, page, buzzer) each run on their own clock; there is no `delay` in `loop()`.\n\n### What we checked in the lab\n- With the Soil moisture slider at 0.6 (55 %), the LED is off, the buzzer is silent and only status lines flow on the serial port (`T=25.0 N=50.0 P=990.0 R=195 Toprak=%55 Uyari=0`; with the BMP280 slider at 990 hPa and the DHT at 25 °C and 50 %). The LCD pages turn every 3 seconds as `1/3`, `2/3`, `3/3`. The LCD and the BMP280 work on the same I2C bus.\n- When you pull the slider down to 0.1 (0 %), within 2 seconds the LED lights up, a single `UYARI: toprak nemi %0 - sulama gerekli` line (alert: soil moisture 0 % - watering needed) is written to the serial port, and the buzzer plays beeps of about 200 ms at 1 kHz, 2 seconds apart. Page 3 shows `SULAMA GEREKLI`.\n- When you raise the slider to 0.45 (34 %, between 30 and 40), the alert continues. When you raise it to 0.5 (41 %), the LED goes off, the buzzer goes quiet and the \"normale dondu\" (back to normal) line is written to the serial port.\n- Right at the threshold: with the slider at 0.42 (30 %) there is no alert, and at 0.41 (29 %) there is.\n- When the DHT and the BMP280 are not in the circuit (without adding these two parts to the canvas at all), the program does not crash: the screen shows `--` and `BMP280 yok`, the serial port shows `--`, and the soil alert still works.\n\n### Try it\n- Set `ESIK_ALT` and `ESIK_UST` (lower and upper threshold) to 30 % and 32 %. Move the Soil moisture slider back and forth between 0.42 and 0.44 (about 30 %-33 %): how many times does the alert switch on and off? Why are two thresholds better?\n- Add a second button on D3: when pressed, it should silence the buzzer for 10 minutes while the LED stays on. Which variables do you need for this?\n- Connect a Rain sensor to A0, as in lesson 48: when it is raining, do not give the watering alert even if the soil is dry. Where would you write this condition?\n\n### Common mistakes\n- Using a single threshold: when the moisture wobbles around the threshold, the LED and the buzzer switch on and off quickly, and the serial port fills up with lines.\n- Writing the serial alert on every round: instead of catching the change of state, you keep printing the same message.\n- Playing the buzzer with `delay`: the page change, the button and the measurement stop.\n- Reading the DHT more often than every 2 seconds.\n- Not measuring the soil sensor's dry/wet ends for the sensor you are using: the percentage calculation comes out wrong.\n- Not being ready for the DHT22 to return `NaN`: `nan` appears on the screen, and the threshold comparisons go wrong.",
+            "question": "If the soil moisture sensor breaks and always reads \"dry\", the system gives an alert for ever; if it always reads \"wet\", it never gives an alert. What check would you add to tell that the sensor has broken? What are the pros and cons of watering by time (twice a week) instead of by the sensor?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine several sensors and outputs in a single project\n- How to design a system with \"states\" (normal / alert) and rules for moving between them\n- How to make the alert switch on and off without flicker using hysteresis\n- How to run several jobs without `delay`, each with its own timer\n- How to write a program that does not crash even when a sensor is missing\n\n### What you should know first\n- Reading the DHT, `isnan` and the 2-second rule (lesson 46)\n- The BMP280 and checking the result of `begin` (lesson 47)\n- Soil moisture, and a percentage with `map` and `constrain` (lesson 48)\n- The paged LCD screen and `snprintf` (lesson 49)\n- A buzzer with `tone` (lesson 18), `millis()` (lesson 27), hysteresis (lesson 35)\n\n### What is the project?\nThis project is a **weather station** and a **watering alert**. The system measures the temperature, humidity, pressure, altitude and soil moisture, and shows them page by page on the LCD. When the soil dries out, the LED lights up, the buzzer starts beeping and a line is written to the serial port. There is no pump; a real pump needs a transistor or a relay and a separate power supply.\n\n### Plan first: states and rules\nPutting the behaviour into a table before you write the code makes the job easier:\n\n| State | When | Action |\n|---|---|---|\n| Normal | soil moisture 30 % or above | LED off, buzzer silent |\n| Normal → Alert | moisture drops below 30 % | LED on, buzzer beeps, one line is written |\n| Alert | moisture between 30 % and 40 % | the alert continues |\n| Alert → Normal | moisture rises to 40 % or above | LED off, buzzer silent, one line is written |\n\nThe `uyari` (alert) variable in the project holds this state. The changes only happen when a threshold is crossed.\n\n### Why two thresholds?\nIf you used a single threshold (for example 30 %), the alert would keep switching on and off when the moisture wobbled between 29 and 31. Between two thresholds (lower: 30, upper: 40), the state is kept. This is called **hysteresis**. A thermostat works the same way.\n\n### Four jobs, no delay at all\nInside `loop()`, four jobs run on their own clocks: the button (straight away), the measurement (2 seconds), the page (3 seconds) and the buzzer (a short beep every 2 seconds during the alert). For the buzzer, `tone(pin, frekans, süre)` (pin, frequency, duration) is used; this command does not wait, and the sound plays in the background. A `delay` would stop all the other jobs.\n\n### Write the message only when the state changes\nThe alert message is written to the serial port only once, **not on every round but only when the state changes**; this way the Serial monitor does not fill up with the same line. Writing `sonBip = simdi - BIP_ARALIGI` when the alert switches on makes the first beep play straight away.\n\n### If a sensor breaks\nA broken DHT produces `NaN`, and a BMP280 that is not found produces `bmpHazir = false`; the screen writes `--` and `BMP280 yok` (no BMP280), and the program carries on. But what if the soil sensor always reads \"dry\" or always reads \"wet\"? You get an endless alert or no alert at all. In reliable systems, the health of the sensor is checked separately.\n\n### Summary\nThe project combines pieces from the earlier lessons: the DHT, the BMP280, soil moisture, LCD pages, an LED and a buzzer. First you put the states and the changes between them into a table. Two thresholds stop the alert from flickering. Each job runs with its own timer without `delay`, and a sensor fault does not crash the program.",
+            "concepts": [
+              {
+                "term": "State",
+                "definition": "A variable that holds which mode the system is in right now; in this project it is uyari (true/false).",
+                "example": "While uyari is true, the LED is on, the buzzer keeps beeping and the screen says SULAMA GEREKLI.",
+                "pitfall": "Not storing the state and deciding again on every round; the changes and the messages get mixed up."
+              },
+              {
+                "term": "Hysteresis (two thresholds)",
+                "definition": "Using different thresholds for switching on and switching off; between the two thresholds the current state is kept.",
+                "example": "When the moisture drops below 30 %, the alert switches on, and it does not switch off until the moisture rises to 40 %.",
+                "pitfall": "Using a single threshold; when the reading wobbles around the threshold, the LED and the buzzer switch on and off quickly."
+              },
+              {
+                "term": "Message on a change of state",
+                "definition": "Writing the alert line to the serial port only once, at the moment the state changes, not on every round.",
+                "example": "When uyari changes from false to true, \"UYARI: toprak nemi %29\" is written once.",
+                "pitfall": "Printing the same message on every round; the Serial monitor fills up and the important line gets lost."
+              },
+              {
+                "term": "Non-blocking buzzer (with tone)",
+                "definition": "tone(pin, frequency, duration) starts the sound and returns without waiting; the repeat interval is counted with millis().",
+                "example": "tone(8, 1000, 200) plays a 200 ms beep, repeated every 2 seconds.",
+                "pitfall": "Using delay(200) for the beep; the page change, the button and the measurement freeze during that time."
+              },
+              {
+                "term": "Fault-tolerant design",
+                "definition": "The program keeps running without crashing even when a sensor is missing or broken.",
+                "example": "When the DHT gives NaN, -- appears on the screen and the soil alert still works.",
+                "pitfall": "Not preparing for NaN or a missing sensor; nan appears on the screen and the threshold comparisons go wrong."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h3d50-q1",
+                "kind": "mcq",
+                "prompt": "Why do we use two thresholds (30 % to switch on, 40 % to switch off) for the watering alert instead of a single threshold (30 %)?",
+                "options": [
+                  "To make the code shorter",
+                  "Because the LCD screen has two rows",
+                  "To stop the alert switching on and off quickly while the moisture wobbles around 30 %",
+                  "Because the buzzer beeps at two frequencies"
+                ],
+                "answer": 2,
+                "explanation": "In the zone between the two thresholds the state is kept: if the alert is on, it does not switch off until the moisture rises to 40 %. So the LED and the buzzer do not flicker while the moisture moves around 30 %. It makes the code longer, not shorter; it has nothing to do with the screen or the buzzer.",
+                "skills": [
+                  "sens-threshold-hyst",
+                  "proj-integration"
+                ]
+              },
+              {
+                "id": "m4h3d50-q2",
+                "kind": "numeric",
+                "prompt": "The alert rule: when it is normal and the moisture drops below 30 %, the alert switches on (and 1 line is written to the serial port); when it is on and the moisture rises to 40 % or above, it switches off (and 1 line is written). At the start the alert is off. The measurements arrive in this order: 45, 32, 29, 33, 38, 41, 36, 28. How many alert/back-to-normal lines are written to the serial port in total?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "lines",
+                "explanation": "At 45 and 32 the alert stays off (it did not go below 30). At 29 the alert switches on: line 1. At 33 and 38 the alert continues. At 41 it switches off: line 2. At 36 it stays off. At 28 it switches on again: line 3. Total 3.",
+                "skills": [
+                  "sens-threshold-hyst",
+                  "proj-integration"
+                ]
+              },
+              {
+                "id": "m4h3d50-q3",
+                "kind": "find-bug",
+                "prompt": "This alert check should have hysteresis, but when the moisture moves around 30 % the alert switches on and off quickly. ESIK_ALT = 30 and ESIK_UST = 40 are constants. Which line has the bug?\n\n```\n1 if (!uyari && toprakYuzde < ESIK_ALT) {\n2   uyari = true;\n3 }\n4 else if (uyari && toprakYuzde >= ESIK_ALT) {\n5   uyari = false;\n6 }\n```",
+                "options": [
+                  "Line 1: ESIK_UST should be written",
+                  "Line 2: it should be uyari = false",
+                  "Line 4: the switch-off condition should compare with ESIK_UST",
+                  "Line 6: the closing bracket is missing"
+                ],
+                "answer": 2,
+                "explanation": "When ESIK_ALT (30) is used as the switch-off threshold, switching on and switching off happen at the same value and the hysteresis disappears. The switch-off condition should be toprakYuzde >= ESIK_UST (40). The switch-on condition (line 1) is right.",
+                "skills": [
+                  "sens-threshold-hyst",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h3d50-q4",
+                "kind": "numeric",
+                "prompt": "The moment the alert switches on, the first beep plays straight away, and after that a new beep plays every 2 seconds (with tone, without the program waiting). The alert switches off 9 seconds after it switched on. How many beeps have played in that time?",
+                "answer": 5,
+                "tolerance": 0,
+                "unit": "beeps",
+                "explanation": "The beeps play at the 0th, 2nd, 4th, 6th and 8th second of the alert; the next one would have been at the 10th second, but the alert switched off at the 9th. Total 5 beeps. These times were also measured on the real program in the lab.",
+                "skills": [
+                  "proj-integration",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h3d50-q5",
+                "kind": "mcq",
+                "prompt": "A friend suggests writing tone(8, 1000); delay(200); noTone(8); to play the buzzer. What would be the biggest problem in this project?",
+                "options": [
+                  "The buzzer makes no sound at all",
+                  "The serial port closes",
+                  "The LED goes off",
+                  "During every beep, the button, the measurement and the page change stop for 200 ms"
+                ],
+                "answer": 3,
+                "explanation": "delay makes the program wait; during that time the button is not read and the timers are not checked. tone(pin, frequency, 200), on the other hand, returns without waiting, and the sound finishes in the background. The buzzer does make a sound; the problem is that the other jobs stop.",
+                "skills": [
+                  "proj-integration",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1836,6 +3627,7 @@ export const modul4: ModuleContent = {
       "title": "Işık, ses, gaz",
       "project": "Yangın ve gaz alarmı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Bir LDR bölücüsünde ışığın okuma yönünü söyleyebilir; iki eşikli histerezisle titremeyi önleyebilir.\n2. Ses sensöründe baz seviyeyi ölçüp sapmayı hesaplayabilir; sesi yüksekliğine ve süresine göre sınıflandırabilir.\n3. MQ-2 için ısınma ve temiz havada baz değer fikrini açıklayabilir; eşiği bazın katı olarak yazabilir ve neden ppm yazılmadığını söyleyebilir.\n4. Alev sensörünün yönünü tek yerde çözebilir; `enum` ve parametreli `seviyeBul` ile üç seviyeli karar mekanizması kurabilir.\n5. Gaz, alev ve ısı sensörlerinden bir yangın ve gaz alarm paneli kurup test edebilir; panelin eğitim amaçlı olduğunu ve sınırlarını açıklayabilir.\n\n### Haftanın planı\nHafta beş derstir. Aşağıdaki plan günde bir ders içindir; proje günü daha uzundur.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Işık sensörü hassasiyeti ve histerezis | ~25 dk | Anlatımı oku, tek eşikle titremeyi gör, iki eşikle gider, mini testi çöz. |\n| 2 | Ses sensörü: alkış anahtarı | ~30 dk | Baz seviyeyi ölç, tepeyi yazdır, alkışı süre ve yükseklikle tanıt, iki alkışla LED aç/kapat. |\n| 3 | MQ-2 gaz sensörü: ısınma ve kalibrasyon | ~25 dk | Isınmayı bekle, baz ölç, bazın katıyla alarm kur. Gazı Gaz düzeyi ile taklit et. |\n| 4 | Alev sensörü ve çoklu eşik yönetimi | ~30 dk | Yönü `siddet()` ile çöz, üç seviyeyi dene, iki sensörde aynı fonksiyonu kullan. |\n| 5 | Proje: Yangın ve gaz alarm paneli | ~35 dk | Devreyi kur, test tablosunu uygula, çıkışları ve ekranı kontrol et, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Modül 3'ün bazı konuları gerekir. Başlamadan önce kontrol et:\n- `analogRead` ile 0-1023 arası okuma yapıp Serial Monitor'a yazdırabiliyor musun? (11. ve 9. dersler)\n- LDR ile gerilim bölücü kurmayı ve ışığa göre değerin yönünü söyleyebiliyor musun? (12. ders)\n- Yumuşatmanın ne işe yaradığını biliyor musun? (14. ders)\n- Parametre alan ve değer döndüren bir fonksiyon yazabiliyor musun? (19. ders)\n- `millis()` ile `delay` kullanmadan zaman ölçebiliyor musun? (27. ders)\n- `enum` ile durum tutmayı biliyor musun? (28. ders)\n- Projede ayrıca röle (24. ders), buzzer (18. ders), NTC (13. ders) ve I2C LCD (32-33. dersler) kullanılır.\n\n### Kavram haritası\n- **Okuma:** sensör → ham sayı → yön → gürültü → baz değer\n- **Karar:** eşik → histerezis (iki eşik) → göreli eşik (bazın katı) → yumuşatma → çoklu seviye (NORMAL, UYARI, TEHLIKE)\n- **Olay:** baz seviye → sapma (`abs`) → tepe → süre → sessizlik payı → sınıflandırma\n- **Yapı:** parametreli fonksiyon → `enum` → `enKotu` → çıkışları seviyeden türetmek\n- **Proje:** üç sensör → genel durum → LED, buzzer, röle, ekran → güvenlik ve sınırlar\n\n### Sık yapılan hatalar\n- **Açma ve kapama eşiğini aynı yapmak.** Bu tek eşiktir; titreme geri gelir. Eşikleri ters yazmak da (açma > kapama) ölü bölgede her turda değişim üretir.\n- **Eşiğin yönünü devreye bakmadan yazmak.** LDR 5V tarafındaysa karanlıkta değer küçüktür.\n- **Baz seviyeyi varsaymak ya da yanlış ortamda ölçmek.** Ses modülünde baz 512 değildir (sanal modülde yaklaşık 256); MQ-2 bazı gazlı ortamda ölçülürse eşikler yukarı kayar.\n- **Isınmayı atlamak.** Gerçek MQ-2'de baz yanlış çıkar.\n- **Sadece yüksekliğe bakmak.** Kapı çarpması da alkışa benzer; süre de kontrol edilmelidir.\n- **Tamsayı bölmesi.** `int` / `int` küsuratı atar: 160 / 100 sonucu 1 olur.\n- **Kapama eşiğini açma eşiğinden büyük yazmak.** Seviye titrer ya da hiç düşmez.\n- **Bir sensörü genel duruma katmamak.** `enKotu` her sensörü kapsamalıdır.\n- **Çıkışları farklı yerlerden sürmek.** LED, buzzer ve ekran birbirinden kopar.\n- **Röleyi şebeke gerilimiyle kullanmak.** Bu projede kesinlikle yapılmaz.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. `seviyeBul` fonksiyonunu bakmadan, kâğıda yaz. Sonra 300 / 250 / 600 / 500 eşikleriyle 320, 280, 240, 650, 520, 480 dizisini elle izle.\n4. Isı için üçüncü bir sensör eklemeyi dene: eşikleri değiştir, fonksiyona dokunma.\n5. Kendi cümlelerinle şu soruları cevapla: \"Histerezis neden gerekir?\" ve \"MQ-2 için neden ppm yazmıyoruz?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Yangın ve gaz alarm paneli)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Sensörlerden biri ya da çıkışlardan biri bağlı değil | Gaz, alev, LED'ler, buzzer, röle ve ekran doğru bağlı | Bağlantılar düzenli; NTC de bağlı ve çalışıyor |\n| Isınma ve baz | Isınma yok ya da baz gazlı ortamda ölçülüyor | Isınma bekleniyor, baz temiz havada ölçülüyor | Baz çok küçükse koruma var ve süre gerçek donanım için tartışılmış |\n| Seviyeler | Seviyeler titriyor ya da yanlış sensörden çıkıyor | Üç sensör için histerezisli NORMAL, UYARI, TEHLIKE çalışıyor | Yeni bir sensör tek satırla ekleniyor, `seviyeBul` değişmiyor |\n| Çıkışlar | Çıkışlar seviyeyle uyuşmuyor | LED, buzzer, röle ve ekran tabloya göre davranıyor | Buzzer deseni değiştirilmiş (örneğin iki kısa bip) ve nedeni açıklanmış |\n| Test | Test yapılmamış | Test tablosundaki değerler denenmiş ve sonuçlar yazılmış | Kenar durumlar (histerezis bandı, sensör kopması) denenmiş |\n| Güvenlik ve anlatım | Sınırlar söylenmiyor | Eğitim amaçlı olduğunu ve röle sınırını söylüyor | Panelin gerçek hayatta neden yetmeyeceğini örneklerle anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta öğrencinin \"sensör bir sayı verir, karar bizim\" fikrini kavraması hedeflenir. Titremeyi görüp çözmesi, ezberlemekten daha değerlidir.\n- **Güvenlik.** Bu platformdaki gaz, alev ve ısı sanaldır. Gerçek gaz, alev ya da ısıtıcıyla deney yapılmaz. Röle yalnızca 5 V'luk bir LED sürer; şebeke gerilimiyle (220 V) hiçbir devre kurulmaz. Bu panel sertifikalı bir gaz ya da yangın dedektörünün yerini tutmaz; evdeki gerçek koruma için uygun cihazlar kullanılmalıdır.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şunları sor: \"Sensör ışıkla artıyor mu azalıyor mu?\", \"Temiz havada kaç okuyor?\", \"Seri monitör ne yazıyor?\", \"Hangi çıkış hangi seviyeden geliyor?\"\n- **Tartışma sorusu.** Konuşalım bölümündeki soruları sohbetle işleyin: Gaz varken fan çalışsın mı, alev varken de çalışsın mı? Gerçek panolarda bu kuralları kim belirler?\n- **Süre.** Proje dersi uzundur; gerekirse iki oturuma bölünebilir. Isınma süresini beklemek sabır ister, gerçek donanımda çok daha uzundur.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Say which way light changes the reading in an LDR divider, and prevent flicker with two-threshold hysteresis.\n2. Measure the baseline of a sound sensor and work out the deviation; classify a sound by its loudness and duration.\n3. Explain the idea of warm-up and a clean-air baseline for the MQ-2; write the threshold as a multiple of the baseline and say why ppm is not written.\n4. Sort out the flame sensor's direction in one place; build a three-level decision system with `enum` and a `seviyeBul` function that takes parameters.\n5. Build and test a fire and gas alarm panel from gas, flame and heat sensors; explain that the panel is for learning and what its limits are.\n\n### Plan for the week\nThe week has five lessons. The plan below is for one lesson a day; the project day is longer.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | Light sensor sensitivity and hysteresis | ~25 min | Read the explainer, see the flicker with one threshold, remove it with two thresholds, do the mini quiz. |\n| 2 | Sound sensor: clap switch | ~30 min | Measure the baseline, print the peak, recognise a clap by duration and height, toggle an LED with two claps. |\n| 3 | MQ-2 gas sensor: warm-up and calibration | ~25 min | Wait for the warm-up, measure the baseline, build an alarm on a multiple of the baseline. Imitate gas with Gas level. |\n| 4 | Flame sensor and managing several thresholds | ~30 min | Sort out the direction with `siddet()`, try the three levels, use the same function for two sensors. |\n| 5 | Project: Fire and gas alarm panel | ~35 min | Build the circuit, work through the test table, check the outputs and the screen, assess with the rubric. |\n\n### Prerequisite check\nThis week needs some topics from Module 3. Check before you start:\n- Can you read a value from 0 to 1023 with `analogRead` and print it to the Serial Monitor? (Lessons 11 and 9)\n- Can you build a voltage divider with an LDR and say which way the value goes with light? (Lesson 12)\n- Do you know what smoothing is for? (Lesson 14)\n- Can you write a function that takes parameters and returns a value? (Lesson 19)\n- Can you measure time with `millis()` without using `delay`? (Lesson 27)\n- Do you know how to keep a state with `enum`? (Lesson 28)\n- The project also uses the relay (lesson 24), the buzzer (lesson 18), the NTC (lesson 13) and the I2C LCD (lessons 32-33).\n\n### Concept map\n- **Reading:** sensor → raw number → direction → noise → baseline value\n- **Decision:** threshold → hysteresis (two thresholds) → relative threshold (multiple of the baseline) → smoothing → several levels (NORMAL, UYARI, TEHLIKE)\n- **Event:** baseline level → deviation (`abs`) → peak → duration → quiet margin → classification\n- **Structure:** function with parameters → `enum` → `enKotu` → working out the outputs from the level\n- **Project:** three sensors → overall state → LEDs, buzzer, relay, screen → safety and limits\n\n### Common mistakes\n- **Making the on and off thresholds the same.** That is a single threshold; the flicker comes back. Writing the thresholds the wrong way round (on > off) also produces a change on every pass in the dead band.\n- **Writing the direction of the threshold without looking at the circuit.** If the LDR is on the 5V side, the value is small in the dark.\n- **Assuming the baseline or measuring it in the wrong surroundings.** On the sound module the baseline is not 512 (about 256 on the virtual module); if the MQ-2 baseline is measured in air containing gas, the thresholds move up.\n- **Skipping the warm-up.** On a real MQ-2 the baseline comes out wrong.\n- **Looking only at loudness.** A door slam also looks like a clap; the duration must be checked too.\n- **Integer division.** `int` / `int` throws the fraction away: 160 / 100 gives 1.\n- **Writing the off threshold bigger than the on threshold.** The level flickers or never drops.\n- **Leaving a sensor out of the overall state.** `enKotu` must cover every sensor.\n- **Driving the outputs from different places.** The LEDs, buzzer and screen get out of step.\n- **Using the relay with mains voltage.** Never do this in this project.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Reread the explanations for the mini quiz questions you got wrong, then do those questions again.\n3. Write the `seviyeBul` function on paper without looking. Then trace the sequence 320, 280, 240, 650, 520, 480 by hand with the thresholds 300 / 250 / 600 / 500.\n4. Try adding a third sensor for heat: change the thresholds, do not touch the function.\n5. Answer these questions in your own words: \"Why do we need hysteresis?\" and \"Why don't we write ppm for the MQ-2?\"\n\nThe mini quizzes of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct in each lesson. Go back to the explainer of any lesson where you fall short.\n\n### Project rubric (Fire and gas alarm panel)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | One of the sensors or one of the outputs is not connected | Gas, flame, LEDs, buzzer, relay and screen are connected correctly | The wiring is tidy; the NTC is connected and works too |\n| Warm-up and baseline | No warm-up, or the baseline is measured in air containing gas | The warm-up is waited for and the baseline is measured in clean air | There is protection for a very small baseline, and the time for real hardware has been discussed |\n| Levels | The levels flicker or come from the wrong sensor | NORMAL, UYARI, TEHLIKE with hysteresis work for three sensors | A new sensor is added with one line, and `seviyeBul` does not change |\n| Outputs | The outputs do not match the level | The LEDs, buzzer, relay and screen behave as in the table | The buzzer pattern has been changed (for example two short beeps) and the reason explained |\n| Testing | No testing done | The values in the test table have been tried and the results written down | Edge cases (the hysteresis band, a disconnected sensor) have been tried |\n| Safety and explanation | The limits are not mentioned | Says it is for learning and states the relay limit | Explains with examples why the panel would not be enough in real life |\n\n### Note for parents and teachers\n- **Aim.** This week the aim is for the learner to grasp the idea that \"a sensor gives a number, the decision is ours\". Seeing the flicker and fixing it is worth more than memorising.\n- **Safety.** The gas, flame and heat on this platform are virtual. No experiments are done with real gas, flames or heaters. The relay only drives a 5 V LED; no circuit is ever built with mains voltage (220 V). This panel does not replace a certified gas or fire detector; proper devices must be used for real protection at home.\n- **How can you help?** When the learner gets stuck, instead of giving the answer, ask: \"Does the sensor go up or down with light?\", \"What does it read in clean air?\", \"What does the serial monitor print?\", \"Which output comes from which level?\"\n- **Discussion question.** Work through the questions in the Discuss section as a conversation: Should the fan run when there is gas, and should it also run when there is a flame? Who sets these rules in real panels?\n- **Time.** The project lesson is long; it can be split into two sessions if needed. Waiting for the warm-up takes patience, and on real hardware it is much longer.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; saved only if consent has been given).",
       "lessons": [
         {
           "title": "Işık sensörü hassasiyeti ve histerezis",
@@ -1957,7 +3749,128 @@ export const modul4: ModuleContent = {
                 "sens-noise"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Light sensor sensitivity and hysteresis",
+            "problem": "At dusk, street lamps sometimes switch on, go off and come on again before they finally stay on. As the light slowly fades, the sensor sits right on the threshold and says \"dark\" one moment and \"bright\" the next. The same thing happens with your night light: when the value wobbles near the threshold, the LED flickers. In this lesson you will first see the flicker, then get rid of it with two thresholds (hysteresis).",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| LDR (photoresistor) | Lead **1** → Uno **5V**, lead **2** → Uno **A1** |\n| Resistor (set it to **10000 Ω** in the properties panel) | Lead **1** → **A1**, lead **2** → **GND** |\n| Resistor (330 Ω) + LED | **D13** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n\nThis is the same LDR divider as in lesson 12: the LDR has a low resistance in bright light, so the voltage on A1 rises in bright light. So the `analogRead` value **grows in bright light and shrinks in the dark**. If you connect the LDR on the GND side, the direction flips; then you have to flip the direction of your comparisons too.\n\nIn the lab you set the LDR's light by selecting the LDR and using the **Light** value in the right panel (0 = dark, 1 = very bright). You can also change it while the circuit runs. In this circuit the approximate values are:\n\n| Light | 0.1 | 0.2 | 0.5 | 0.9 |\n|---|---|---|---|---|\n| `analogRead(A1)` | 23 | 53 | 424 | 977 |\n\nThe thresholds we use in this lesson match these Light values: 423 is about 0.50; 473 is about 0.52; 523 is about 0.55. So the threshold sits in a very narrow part of the slider.\n\n### Program 1: one threshold\nIn this lesson the LED will light up in the dark. The simplest version compares with a single threshold. Every second, the sketch also counts and prints how many times it has crossed the threshold.\n\n```cpp\n// sketch: ldr_tek_esik\nconst int LDR = A1;\nconst int LED = 13;\nconst int ESIK = 473;\n\nbool onceki = false;\nint gecis = 0;\nunsigned long sonYazma = 0;\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int deger = analogRead(LDR);\n  bool karanlik = (deger < ESIK);   // karanlıkta değer küçüktür\n  digitalWrite(LED, karanlik);\n\n  if (karanlik != onceki) {\n    gecis++;\n    onceki = karanlik;\n  }\n\n  if (millis() - sonYazma >= 1000) {\n    sonYazma = millis();\n    Serial.print(\"gecis=\");\n    Serial.println(gecis);\n  }\n}\n```\n\nIf the room light is right next to the threshold (a value of about 473) and the reading wobbles a little, the LED switches on and off dozens of times a second. The wobble comes from the light itself, a shadow, a wire or small drifts in the ADC. In a real circuit this wobble happens on its own.\n\nThe LDR in the lab does not wobble on its own; you make the flicker yourself. While the program runs, move the **Light** value back and forth between 0.51 and 0.53 a few times: the value, swinging between 445 and 488, crosses the threshold (473) on every swing, the LED changes each time and the `gecis` (crossings) count rises quickly.\n\n### Program 2: two thresholds (hysteresis)\nThe fix is to use **two separate thresholds** for switching on and switching off. The LED lights up in the dark and only goes off when the room gets **clearly** brighter. The region between the two thresholds is called the **dead band** or **hysteresis band**. It is the same idea as the thermostat (lesson 35) with 0.5 degrees below and above the target.\n\n```cpp\n// sketch: ldr_histerezis\nconst int LDR = A1;\nconst int LED = 13;\nconst int ACMA = 423;     // bunun altında: karanlık, LED yansın\nconst int KAPAMA = 523;   // bunun üstünde: aydınlık, LED sönsün\n\nbool yanik = false;\nbool onceki = false;\nint gecis = 0;\nunsigned long sonYazma = 0;\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int deger = analogRead(LDR);\n\n  if (!yanik && deger < ACMA) {\n    yanik = true;\n  } else if (yanik && deger > KAPAMA) {\n    yanik = false;\n  }\n  digitalWrite(LED, yanik);\n\n  if (yanik != onceki) {\n    gecis++;\n    onceki = yanik;\n  }\n\n  if (millis() - sonYazma >= 1000) {\n    sonYazma = millis();\n    Serial.print(\"gecis=\");\n    Serial.println(gecis);\n  }\n}\n```\n\nFor values between 423 and 523 the program does nothing: the LED stays as it is. The decision depends on the sensor's current value **and** the LED's current state.\n\nHow wide should you make the band? It must be wider than the peak-to-peak width of the noise. If the noise swings by 80 units, the band can be 100 units. With a band that is too wide, though, the lamp comes on late and goes off late; in other words the system becomes **less sensitive**. You strike a balance between sensitivity and stability.\n\n### Program 3: find the threshold yourself\nInstead of writing the thresholds as fixed numbers, you can learn them from the surroundings. In the first 3 seconds (right after you press ▶, set the **Light** value once to 0.1 and once to 0.9) the program measures the smallest and largest value. Then it puts the thresholds at 40% (on) and 60% (off) of that range.\n\n```cpp\n// sketch: ldr_otomatik_esik\nconst int LDR = A1;\nconst int LED = 13;\nconst unsigned long OGRENME_MS = 3000;\n\nint enAz = 1023;\nint enCok = 0;\nint acma;\nint kapama;\nbool yanik = false;\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n\n  unsigned long bas = millis();\n  while (millis() - bas < OGRENME_MS) {\n    int d = analogRead(LDR);\n    if (d < enAz) enAz = d;\n    if (d > enCok) enCok = d;\n  }\n\n  int aralik = enCok - enAz;\n  acma = enAz + aralik * 4 / 10;     // bunun altı: karanlık\n  kapama = enAz + aralik * 6 / 10;   // bunun üstü: aydınlık\n\n  Serial.print(\"enAz=\");\n  Serial.print(enAz);\n  Serial.print(\" enCok=\");\n  Serial.print(enCok);\n  Serial.print(\" acma=\");\n  Serial.print(acma);\n  Serial.print(\" kapama=\");\n  Serial.println(kapama);\n  if (aralik < 100) {\n    Serial.println(\"UYARI: isik degisimi cok az, sensoru kontrol et\");\n  }\n}\n\nvoid loop() {\n  int deger = analogRead(LDR);\n  if (!yanik && deger < acma) {\n    yanik = true;\n  } else if (yanik && deger > kapama) {\n    yanik = false;\n  }\n  digitalWrite(LED, yanik);\n}\n```\n\n### How does it work?\n1. With one threshold, the LED's state is only the result of `deger > ESIK`. If the value swings back and forth across the threshold, the LED swings too.\n2. In the hysteresis version, the `yanik` (lit) variable is the system's \"memory\". Crossing the threshold is not enough; it has to cross the **opposite** threshold.\n3. The `gecis` counter turns the flicker into a number. A sign of a good solution is that this number does not grow, even in a noisy room.\n4. The third version sets the band to fit the range of the surroundings. That way the same code works with different LDRs and in different rooms.\n\n### Try it\n- In the `ldr_histerezis` program, set `ACMA = 453`, `KAPAMA = 493` (a narrow band). First set the light to 0.9, then move it between 0.50 and 0.55 a few times (about 424 to 532). Does the flicker come back? With the band at 423-523, does the same movement change the LED?\n- Make the band very wide (`ACMA = 200`, `KAPAMA = 800`). When does the night light come on and when does it go off?\n- In the `ldr_otomatik_esik` program, try 30/70 instead of 40/60 percent. Does the lamp come on later?\n\n### Common mistakes\n- Making the on and off thresholds the same: that is a single threshold.\n- Writing the thresholds the wrong way round (`ACMA > KAPAMA`): the LED never comes on or never goes off.\n- Choosing a band narrower than the noise: the flicker does not go away completely.\n- Connecting the LDR on the GND side and not flipping the direction: the lamp comes on in daytime.\n- Not changing the light at all during the learning time (not touching the Light value): the range stays very small, the thresholds become meaningless and the program prints a warning.",
+            "question": "Would you like a light sensor to react quickly and also not flicker? Explain why these two wishes pull against each other, using the width of the hysteresis band.",
+            "explainerMd": "### What you will learn in this lesson\n- Which way light changes the `analogRead` value in an LDR divider\n- Why a single-threshold comparison causes flicker (blinking on and off)\n- How the two separate thresholds (on and off) for **hysteresis** are chosen\n- How the band width affects noise and sensitivity\n\n### What you should know first\n- Lesson 11: `analogRead` gives a number from 0 to 1023 (0 V = 0, 5 V = 1023).\n- Lesson 12: an LDR and a resistor form a **voltage divider**; the voltage on pin A1 changes with the light.\n- Lesson 7: `if` / `else if` and logic operators (`&&`, `!`).\n\n### The sensor gives a number, the decision is yours\nA light sensor does not say \"dark\"; it only gives a number. Your program answers the question \"Is this number dark?\". To do that, you pick a **threshold** and compare the reading with it.\n\n### Know the direction\nIn the lesson the LDR is connected between 5V and A1, and the 10 kΩ resistor between A1 and GND. When the light increases, the LDR's resistance drops and the voltage reaching A1 rises. So in this circuit:\n\n```\nLight:         0.1   0.2   0.5   0.9\nanalogRead:     23    53   424   977\n```\n\nAs the light increases, the value **grows**. If you swap the two parts, the direction flips. Always write the direction of the comparison by looking at the circuit.\n\n### The problem with one threshold\nThe shortest decision is: `karanlik = (deger < 473)`. If the reading is far from 473, there is no problem. If the reading wobbles around 473 (light, shadow, ADC drift), the result changes on every pass and the LED switches on and off dozens of times a second. Even if the wobble is only between 445 and 488, it crosses the threshold on every swing.\n\n### Hysteresis: two thresholds, one memory\nThe fix is to use **different** thresholds for switching on and switching off:\n\n```\nif (!yanik && deger < ACMA) yanik = true;\nelse if (yanik && deger > KAPAMA) yanik = false;\n```\n\nHere `ACMA = 423`, `KAPAMA = 523`. The range between them (423-523) is the **dead band**: the LED stays as it is. The `yanik` variable is the system's memory; the decision depends on both the reading and the current state. A thermostat uses the same idea (lesson 35).\n\n### How wide should the band be?\n- It must be **wider** than the peak-to-peak width of the noise. If the noise swings by 80 units, a 100-unit band is enough.\n- It must not be too wide. With a band of 200-800 the lamp comes on only when it is very dark and goes off only when it is very bright: the system becomes **less sensitive**.\n\nYou strike a balance between sensitivity and stability. Instead of writing the thresholds as fixed numbers, you can also learn them from the surroundings: measure the smallest and largest value, and put the on threshold at 40% of the range and the off threshold at 60%.\n\n### Summary\nA light sensor produces a number; the circuit decides its direction. A single threshold flickers when there is noise near the threshold. Two-threshold hysteresis ends this flicker thanks to the dead band. The band must be wider than the noise, but narrow enough not to spoil the sensitivity.",
+            "concepts": [
+              {
+                "term": "Threshold",
+                "definition": "The number at which a sensor reading splits into \"yes\" and \"no\".",
+                "example": "If you write analogRead(A1) < 473 for dark, the threshold is 473.",
+                "pitfall": "Writing the direction of the threshold without looking at the circuit: if the LDR is on the 5V side the value is small in the dark, if it is on the GND side it is large."
+              },
+              {
+                "term": "Flicker (threshold noise)",
+                "definition": "The output switching on and off quickly when the reading wobbles near the threshold.",
+                "example": "If the value swings between 445 and 488, it crosses the 473 threshold on every swing and the LED blinks.",
+                "pitfall": "Blaming the flicker on a broken sensor; the problem is the single threshold, in the code."
+              },
+              {
+                "term": "Hysteresis",
+                "definition": "Using two separate thresholds for switching on and off, and making the decision depend on the current state as well.",
+                "example": "Light up below 423, go off above 523; in between, nothing changes.",
+                "pitfall": "Writing the on and off thresholds the same: that is still a single threshold and the flicker comes back."
+              },
+              {
+                "term": "Dead band (band)",
+                "definition": "The range between the two thresholds; the output does not change inside this range.",
+                "example": "If the noise is 80 units, a 100-unit band ends the flicker.",
+                "pitfall": "Choosing a band wider than needed: the lamp comes on late, goes off late and the system is less sensitive."
+              },
+              {
+                "term": "Balance of sensitivity and stability",
+                "definition": "A narrow band reacts quickly but may flicker; a wide band is stable but reacts late.",
+                "example": "For a night light, the 423-523 band is more sensitive than the 200-800 band.",
+                "pitfall": "Wanting a system that is both very fast and never flickers; you cannot have both at once."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h4d1-q1",
+                "kind": "mcq",
+                "prompt": "The LDR is connected between 5V and A1, and a 10 kΩ resistor between A1 and GND. As the room gets brighter, what does the analogRead(A1) value do?",
+                "options": [
+                  "It grows",
+                  "It shrinks",
+                  "It does not change",
+                  "It grows first, then shrinks"
+                ],
+                "answer": 0,
+                "explanation": "When the light increases, the LDR's resistance drops, the voltage from the divider to A1 rises and analogRead grows (23 at a light of 0.1, 977 at 0.9). If you move the LDR to the GND side, the direction flips; that is why you write the comparison to suit the circuit.",
+                "skills": [
+                  "sens-ldr-divider"
+                ]
+              },
+              {
+                "id": "m4h4d1-q2",
+                "kind": "numeric",
+                "prompt": "The LED starts off. The program uses two thresholds: it lights up when the value drops below 423 and goes off when it rises above 523. The readings arrive in this order: 500, 460, 480, 450, 490, 440, 400, 510, 540. How many times in total does the LED change state?",
+                "answer": 2,
+                "tolerance": 0,
+                "unit": "times",
+                "explanation": "The value 400 is below 423, so the LED lights up (1). Then 510 stays in the dead band and the LED stays lit. The value 540 is above 523, so the LED goes off (2). If the same sequence were tried with a single threshold (473), the LED would change state 6 times: hysteresis removes the flicker.",
+                "skills": [
+                  "sens-hysteresis",
+                  "sens-noise"
+                ]
+              },
+              {
+                "id": "m4h4d1-q3",
+                "kind": "predict-output",
+                "prompt": "Someone wrote the on and off thresholds the wrong way round by mistake. The light is steady and analogRead(A1) always reads 480. When this code runs, what does the LED on D13 do?\n\n```\nconst int ACMA = 523;\nconst int KAPAMA = 423;\nbool yanik = false;\n\nvoid loop() {\n  int d = analogRead(A1);\n  if (!yanik && d < ACMA) yanik = true;\n  else if (yanik && d > KAPAMA) yanik = false;\n  digitalWrite(13, yanik);\n}\n```",
+                "options": [
+                  "It stays lit all the time",
+                  "It stays off all the time",
+                  "It switches on and off on every pass (flickers very fast)",
+                  "There is a compile error"
+                ],
+                "answer": 2,
+                "explanation": "The value 480 is less than 523, so when the LED is off it lights up; when it is lit, 480 is greater than 423, so it goes off. So the dead band works backwards and the LED changes on every pass. Staying lit or staying off only happens below 423 or above 523. The code compiles; the mistake is only in the behaviour.",
+                "skills": [
+                  "sens-hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h4d1-q4",
+                "kind": "find-bug",
+                "prompt": "The circuit is the same as in the lesson (LDR on the 5V side). The night light comes on in the daytime and goes off at night. Where is the mistake?\n\n```\nconst int ESIK = 473;\n\nvoid loop() {\n  int deger = analogRead(A1);\n  bool karanlik = (deger > ESIK);\n  digitalWrite(13, karanlik);\n}\n```",
+                "options": [
+                  "The ESIK constant should be float instead of int",
+                  "analogWrite should be used instead of digitalWrite",
+                  "digitalRead(A1) should be used instead of analogRead(A1)",
+                  "The comparison is the wrong way round: in this circuit the value is small in the dark"
+                ],
+                "answer": 3,
+                "explanation": "In this circuit the value grows as the light increases and shrinks in the dark. For dark you must write deger < ESIK; deger > ESIK catches brightness. The other options do not fix the mistake: the number type is right, the LED is a digital output and the sensor is read as analog.",
+                "skills": [
+                  "sens-ldr-divider",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h4d1-q5",
+                "kind": "mcq",
+                "prompt": "The light noise in the room makes the reading swing by about 80 units peak to peak. Which choice is best for the hysteresis band?",
+                "options": [
+                  "0 units (single threshold)",
+                  "30 units",
+                  "100 units",
+                  "900 units"
+                ],
+                "answer": 2,
+                "explanation": "The band must be wider than the peak-to-peak width of the noise: 100 > 80 ends the flicker. 0 and 30 units are narrower than the noise, so the flicker continues. 900 units covers everything; the lamp hardly reacts at all, so the system becomes far too insensitive.",
+                "skills": [
+                  "sens-hysteresis",
+                  "sens-noise"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Ses sensörü: alkış anahtarı",
@@ -2084,7 +3997,133 @@ export const modul4: ModuleContent = {
                 "sens-noise"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Sound sensor: clap switch",
+            "problem": "The \"clap-on lamp\" is a classic: clap twice and it comes on; clap twice more and it goes off. But what if the lamp also comes on when a door slams, when someone laughs loudly or during a long piece of music? A reliable clap switch does not only check whether a sound is \"there\" or \"not there\"; it also checks how **loud** and how **long** it is.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Sound sensor module | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A0** (**DO** stays unconnected) |\n| Resistor (330 Ω) + LED | **D13** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n\nA real module has a microphone and an amplifier. When the room is quiet, the analog output sits at a certain **baseline level**; when a sound arrives, it swings above and below that level. The baseline level and the sensitivity differ from module to module (most have an adjustment screw). That is why we do not write the baseline as a fixed number; we **measure** it.\n\nThe module in the lab has no microphone; you provide the sound with the **Sound level** property (0-1) in the right panel. In this module, when it is quiet (level 0) AO gives about 1.25 V, so `analogRead` reads about **256** (not 512). As the level rises, AO rises: about 327 for 0.1, about 614 for 0.5, about 829 for 0.8. The value in the lab only goes up; a real microphone swings both above and below the baseline, and `abs()` covers both.\n\nA clap is a very short event: it suddenly moves away from the baseline, stays there for a moment and comes back. In the lab you imitate it like this: while the program runs, set the **Sound level** to 0.8 and immediately set it back to 0. Even at its fastest, this hand movement takes much longer than a real clap; that is why in the programs below we chose an upper time limit (`SURE_MAX`) of 500 ms and a gap between two claps (`ARALIK`) of 3000 ms. In a real circuit these values would be much smaller.\n\n### Program 1: baseline and peak\nFirst measure the room. At start-up the sketch takes an average for about a third of a second (64 readings, 5 ms apart) to find the baseline. Then, every half second, it prints the **largest deviation** (peak) from the baseline.\n\n```cpp\n// sketch: ses_baz_tepe\nconst int SES = A0;\n\nint baz;\nint tepe = 0;\nunsigned long sonYazma = 0;\n\nint bazOlc() {\n  long toplam = 0;\n  for (int i = 0; i < 64; i++) {\n    toplam += analogRead(SES);\n    delay(5);\n  }\n  return toplam / 64;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  baz = bazOlc();\n  Serial.print(\"baz=\");\n  Serial.println(baz);\n}\n\nvoid loop() {\n  int fark = abs(analogRead(SES) - baz);\n  if (fark > tepe) tepe = fark;\n\n  if (millis() - sonYazma >= 500) {\n    sonYazma = millis();\n    Serial.print(\"tepe=\");\n    Serial.println(tepe);\n    tepe = 0;\n  }\n}\n```\n\nThe `delay` in the setup is acceptable: the measurement is done only once, when the program starts. Keep the **Sound level** at 0 during the measurement.\n\n### Program 2: recognising a clap\nA sound event is recognised in three steps:\n1. **Peak height:** if the deviation goes above `TEPE_ESIK`, an event starts. Weaker sounds (talking, whispering) do not count.\n2. **Duration:** the event ends when the deviation stays below the threshold for `SESSIZ_PAY`. The duration is the time between the start of the event and the last loud sample. Because the microphone signal swings, the deviation is sometimes close to zero; so we do not end the event at once but wait for a short \"quiet margin\".\n3. **Classification:** if the duration is very short it is interference; if it is very long (music, shouting, a motor) it is not a clap. A clap is in between.\n\n```cpp\n// sketch: alkis_tani\nconst int SES = A0;\nconst int TEPE_ESIK = 150;          // baz seviyeden en az bu kadar sapma\nconst unsigned long SURE_MIN = 10;  // ms: bundan kısa = parazit\nconst unsigned long SURE_MAX = 500; // ms: bundan uzun = alkış değil\nconst unsigned long SESSIZ_PAY = 20; // ms\n\nint baz;\nbool sesVar = false;\nunsigned long baslangic = 0;\nunsigned long sonYuksek = 0;\nint tepe = 0;\nunsigned long sure = 0;\n\nint bazOlc() {\n  long toplam = 0;\n  for (int i = 0; i < 64; i++) {\n    toplam += analogRead(SES);\n    delay(5);\n  }\n  return toplam / 64;\n}\n\n// Olay bittiğinde türünü döndürür: 'A' alkış, 'U' uzun ses, 'K' kısa parazit.\n// Olay yoksa ya da sürüyorsa 0 döner.\nchar olayOku() {\n  unsigned long simdi = millis();\n  int fark = abs(analogRead(SES) - baz);\n\n  if (fark >= TEPE_ESIK) {\n    if (!sesVar) {\n      sesVar = true;\n      baslangic = simdi;\n      tepe = 0;\n    }\n    sonYuksek = simdi;\n    if (fark > tepe) tepe = fark;\n  } else if (sesVar && simdi - sonYuksek >= SESSIZ_PAY) {\n    sesVar = false;\n    sure = sonYuksek - baslangic;\n    if (sure < SURE_MIN) return 'K';\n    if (sure > SURE_MAX) return 'U';\n    return 'A';\n  }\n  return 0;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  baz = bazOlc();\n  Serial.print(\"baz=\");\n  Serial.println(baz);\n}\n\nvoid loop() {\n  char olay = olayOku();\n  if (olay == 0) return;\n\n  if (olay == 'A') Serial.print(\"ALKIS\");\n  if (olay == 'U') Serial.print(\"UZUN\");\n  if (olay == 'K') Serial.print(\"KISA\");\n  Serial.print(\" sure=\");\n  Serial.print(sure);\n  Serial.print(\" tepe=\");\n  Serial.println(tepe);\n}\n```\n\n`olayOku()` (read event) keeps a **state** (`sesVar`, sound present). The function is called on every pass of `loop()`, returns `0` on most passes and finishes very quickly. It is the non-blocking code idea from lesson 27.\n\n### Program 3: toggle the LED with two claps\nThe clap switch looks at the time between two claps. If there is at most `ARALIK` (here 3 seconds) between the **starts** of two claps, the LED's state is flipped. A single clap does nothing, but it is remembered as the \"first clap\". If a long sound comes in between, the memory is wiped.\n\n```cpp\n// sketch: alkis_anahtar\nconst int SES = A0;\nconst int LED = 13;\nconst int TEPE_ESIK = 150;\nconst unsigned long SURE_MIN = 10;\nconst unsigned long SURE_MAX = 500;\nconst unsigned long SESSIZ_PAY = 20;\nconst unsigned long ARALIK = 3000;   // iki alkış arası en çok\n\nint baz;\nbool sesVar = false;\nunsigned long baslangic = 0;\nunsigned long sonYuksek = 0;\nint tepe = 0;\nunsigned long sure = 0;\n\nbool ledAcik = false;\nint alkisSay = 0;\nunsigned long ilkAlkis = 0;\n\nint bazOlc() {\n  long toplam = 0;\n  for (int i = 0; i < 64; i++) {\n    toplam += analogRead(SES);\n    delay(5);\n  }\n  return toplam / 64;\n}\n\nchar olayOku() {\n  unsigned long simdi = millis();\n  int fark = abs(analogRead(SES) - baz);\n\n  if (fark >= TEPE_ESIK) {\n    if (!sesVar) {\n      sesVar = true;\n      baslangic = simdi;\n      tepe = 0;\n    }\n    sonYuksek = simdi;\n    if (fark > tepe) tepe = fark;\n  } else if (sesVar && simdi - sonYuksek >= SESSIZ_PAY) {\n    sesVar = false;\n    sure = sonYuksek - baslangic;\n    if (sure < SURE_MIN) return 'K';\n    if (sure > SURE_MAX) return 'U';\n    return 'A';\n  }\n  return 0;\n}\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n  baz = bazOlc();\n  Serial.print(\"baz=\");\n  Serial.println(baz);\n}\n\nvoid loop() {\n  char olay = olayOku();\n\n  if (olay == 'A') {\n    if (alkisSay == 1 && baslangic - ilkAlkis <= ARALIK) {\n      ledAcik = !ledAcik;\n      digitalWrite(LED, ledAcik);\n      alkisSay = 0;\n      Serial.println(ledAcik ? \"LED acik\" : \"LED kapali\");\n    } else {\n      alkisSay = 1;\n      ilkAlkis = baslangic;\n    }\n  } else if (olay == 'U') {\n    alkisSay = 0;              // uzun ses: alkış dizisini sıfırla\n  }\n}\n```\n\n### How does it work?\n1. `bazOlc()` finds the average of the quiet room. All deviations are worked out from this value.\n2. `abs(analogRead(SES) - baz)` counts swings above and below the baseline in the same way.\n3. When an event starts, `baslangic` (start) is saved, and `sonYuksek` (last loud) is updated on every loud sample. The duration is `sonYuksek - baslangic`.\n4. A single loud sound is one clap, but on its own it does not change the LED: `alkisSay` (clap count) becomes 1 and the program waits for a second clap.\n5. If the second clap comes later than `ARALIK` (3 seconds), that clap becomes a new \"first clap\".\n6. If the sounds are too weak (below `TEPE_ESIK`), too short or too long, they are not counted as claps at all.\n\n### Try it\n- Imitate talking with **Sound level = 0.1** (a deviation of about 71). With `TEPE_ESIK` at 150, is it counted as an event? What about at 50? Then set it to 400 and try levels of 0.5 (deviation about 358) and 0.8 (about 573): which claps are missed?\n- Set `ARALIK = 1000` and wait about 2 seconds between two claps. What happens?\n- Add a third clap: on three claps, sound an active buzzer (D8) briefly. Pick the buzzer from the **Add part** menu and set its **Type** to **Active** in the properties panel. How should the `alkisSay` variable change?\n\n### Common mistakes\n- Assuming the baseline is 512: the module's baseline is different (about 256 on the lab module). Always measure it.\n- Measuring the baseline while the **Sound level** is not 0: the baseline comes out wrong and claps are either always recognised or never recognised.\n- Ending the event on a single sample: the swinging signal sometimes passes through the baseline, and one clap looks like two events. The quiet margin solves this.\n- Looking only at peak height: a very loud door slam also looks like a clap. Check the duration too.\n- In a real circuit, loose or wobbly wires also move the signal and create false events (the lab does not model this, but keep it in mind).",
+            "question": "Why does a clap switch struggle in a crowded room? Which other check would you add to the duration and height checks (for example, limiting the time between two claps) to reduce false triggers?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a sound sensor swings around a \"baseline level\"\n- How to measure the baseline and work out the deviation from it (`abs`)\n- How to classify a sound event by its **height** and its **duration**\n- The \"toggle on two claps\" logic with a non-blocking state variable\n\n### What you should know first\n- Lesson 11: `analogRead` gives a number from 0 to 1023.\n- Lesson 19: writing a function that returns a value.\n- Lesson 27: measuring time with `millis()` without waiting.\n- Lesson 51: thresholds, noise and deciding with two thresholds.\n\n### What does a sound sensor measure?\nA sound module has a microphone and an amplifier. When the room is quiet, the analog output (AO) sits at a steady **baseline level**. When a sound arrives, the output swings both above and below this level. The baseline differs from module to module: our virtual module reads about 256 when quiet, not 512. So instead of assuming the baseline, you **measure** it.\n\n```\nint baz = average(64 readings);        // when quiet, at start-up\nint fark = abs(analogRead(A0) - baz);  // deviation\n```\n\n`abs()` ignores the direction of the deviation: a swing above the baseline and one below it are deviations of the same size. At a Sound level of 0.5 the virtual module reads about 614; since the baseline is 256, the deviation comes out as 358.\n\n### Height alone is not enough\nWhen the deviation goes above a threshold (for example 150), an **event** starts. But a door slam, shouting and music also go above this threshold. What sets a clap apart is its **duration**:\n\n```\nDuration < 10 ms     -> short interference\n10 ms - 500 ms       -> clap\nDuration > 500 ms    -> long sound (music, shouting)\n```\n\nThe duration is the difference between the start of the event and the **last loud sample**. For this you save a `baslangic` (start) when the event begins and a `sonYuksek` (last loud) on every loud sample.\n\n### The quiet margin\nA real microphone signal swings; while it swings it sometimes passes through the baseline and the deviation briefly gets close to zero. If you end the event at once, one clap looks like two events. So you end the event when the deviation has stayed below the threshold for `SESSIZ_PAY` (20 ms).\n\n### Non-blocking code that keeps a state\nThe `olayOku()` function is called on every pass of `loop()`. On most passes it returns `0` straight away. Because it has a state variable called `sesVar`, it remembers whether it is in the middle of an event. Since `delay()` is not used, the program keeps measuring all the time.\n\n### Toggle with two claps\nThe clap switch looks at the time between the **starts** of two claps. If the gap is shorter than `ARALIK`, the LED's state is flipped. A single clap is only remembered as the \"first clap\". If the second clap comes late, it counts as a new first clap. If a long sound comes in between, the memory is wiped.\n\n### Summary\nA sound sensor swings around a baseline; you measure the baseline and work out the deviation with `abs`. To recognise a clap, you look at both the height and the duration of the deviation. The quiet margin stops the swinging signal from splitting one event into pieces. Non-blocking code with a state variable runs the two-clap logic without `delay`.",
+            "concepts": [
+              {
+                "term": "Baseline level",
+                "definition": "The steady value read on the sound module's analog output when the room is quiet.",
+                "example": "On the virtual module, analogRead gives about 256 when quiet; you measure it by taking an average at start-up.",
+                "pitfall": "Assuming the baseline is 512, or measuring it while the Sound level is not 0: all deviations are worked out wrongly."
+              },
+              {
+                "term": "Deviation and abs()",
+                "definition": "How far the reading is from the baseline; abs() turns this distance into a positive number, whatever its direction.",
+                "example": "abs(614 - 256) gives 358; abs(100 - 256) gives 156.",
+                "pitfall": "Not using abs(): a real microphone also swings below the baseline, so some sounds are missed."
+              },
+              {
+                "term": "Peak (peak value)",
+                "definition": "The largest deviation seen during an event.",
+                "example": "A clap can have a peak of about 348; a whisper stays around 20-30.",
+                "pitfall": "Looking only at the peak: a very loud door slam also looks like a clap, so the duration must be checked too."
+              },
+              {
+                "term": "Event duration and classification",
+                "definition": "Sorting a sound into short interference, a clap or a long sound by the time between the start of the event and the last loud sample.",
+                "example": "5 ms is short interference, 40 ms is a clap, 800 ms is a long sound.",
+                "pitfall": "Thinking the duration limits are fixed without looking at the real hardware; the limits are tuned to the module and the room."
+              },
+              {
+                "term": "Quiet margin",
+                "definition": "Waiting for the deviation to stay below the threshold for a short time before ending the event.",
+                "example": "SESSIZ_PAY = 20 ms: if the signal stays calm for 20 ms, the event ends.",
+                "pitfall": "Ending the event on a single sample: when the swinging signal passes through the baseline, one clap looks like two events."
+              },
+              {
+                "term": "State variable (sesVar)",
+                "definition": "A variable that lets the program remember whether it is in the middle of an event.",
+                "example": "While sesVar is true, the function does not start a new event; it continues the current one.",
+                "pitfall": "Keeping the state in a local variable: it is reset every time the function is called and the event never ends."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h4d2-q1",
+                "kind": "numeric",
+                "prompt": "On the virtual sound module, AO = 5 V × (0.25 + 0.7 × Sound level) and analogRead = AO / 5 × 1023. When quiet, the baseline was measured as 256. At a Sound level of 0.5, about what does abs(analogRead - baz) come to?",
+                "answer": 358,
+                "tolerance": 2,
+                "explanation": "For a level of 0.5, AO = 5 × (0.25 + 0.35) = 3.0 V, so analogRead is about 614. The deviation is 614 - 256 = 358. If TEPE_ESIK is 150, this sound counts as an event; at a level of 0.1 the deviation would be about 71 and it would not count.",
+                "skills": [
+                  "sens-noise",
+                  "sens-event-detect"
+                ]
+              },
+              {
+                "id": "m4h4d2-q2",
+                "kind": "predict-output",
+                "prompt": "Three sound events last 5 ms, 40 ms and 800 ms. The letter 'K' is printed for short interference, 'A' for a clap and 'U' for a long sound. What does this code print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long sureler[] = {5, 40, 800};\n  for (int i = 0; i < 3; i++) {\n    char tur;\n    if (sureler[i] < 10) tur = 'K';\n    else if (sureler[i] > 500) tur = 'U';\n    else tur = 'A';\n    Serial.print(tur);\n  }\n}\n```",
+                "options": [
+                  "AAU",
+                  "KAU",
+                  "KAA",
+                  "UAK"
+                ],
+                "answer": 1,
+                "explanation": "5 ms is shorter than 10 ms, so 'K'; 40 ms is in between, so 'A'; 800 ms is longer than 500 ms, so 'U'. The output is KAU. The first option counts 5 ms as a clap, the third counts 800 ms as a clap, and the fourth reads the order backwards.",
+                "skills": [
+                  "sens-event-detect"
+                ]
+              },
+              {
+                "id": "m4h4d2-q3",
+                "kind": "find-bug",
+                "prompt": "Every clap is printed in the serial monitor as 'KISA sure=0'. When the event ends, sure = sonYuksek - baslangic is worked out. There is one mistake in the event-catching code. Where is it?\n\n```\nif (fark >= TEPE_ESIK) {\n  if (!sesVar) {\n    sesVar = true;\n    baslangic = simdi;\n    sonYuksek = simdi;\n  }\n  if (fark > tepe) tepe = fark;\n}\n```",
+                "options": [
+                  "TEPE_ESIK has been chosen too small",
+                  "abs() is missing, so the deviation comes out negative",
+                  "sonYuksek is only set when the event starts; because it is not updated on every loud sample, the duration is always 0",
+                  "SURE_MAX has been chosen too large"
+                ],
+                "answer": 2,
+                "explanation": "The duration is the difference between the last loud sample and the start. If sonYuksek is only set when the event starts, sonYuksek and baslangic always stay the same and the difference is 0; since that is shorter than 10 ms, everything is printed as KISA (short). The fix is to move the sonYuksek = simdi line outside the sesVar check, to a place where it runs on every loud sample.",
+                "skills": [
+                  "sens-event-detect",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h4d2-q4",
+                "kind": "mcq",
+                "prompt": "In the two-clap switch, ARALIK is 3000 ms. The second clap comes 5 seconds after the first. What happens?",
+                "options": [
+                  "The LED does not change; the second clap counts as a new 'first clap'",
+                  "The LED changes its state",
+                  "The LED does not change and the second clap is completely forgotten",
+                  "The program gives an error"
+                ],
+                "answer": 0,
+                "explanation": "The time between the starts is 5000 ms, longer than ARALIK (3000), so the LED does not change. But the second clap is still a clap: it is saved as ilkAlkis and can form a pair with a clap that follows within 3 seconds.",
+                "skills": [
+                  "sens-event-detect",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h4d2-q5",
+                "kind": "mcq",
+                "prompt": "If the quiet margin (SESSIZ_PAY) is removed from the clap-recognition code and the event is ended on the first sample where the deviation drops below the threshold, what can happen with a real microphone?",
+                "options": [
+                  "No clap is detected at all",
+                  "The LED stays lit all the time",
+                  "The baseline drifts",
+                  "As the swinging signal passes through the baseline, one clap can be split into several short events"
+                ],
+                "answer": 3,
+                "explanation": "A real microphone signal swings on both sides of the baseline; as it passes through the baseline, the deviation briefly gets close to zero. If the event is ended at once, one clap looks like several short events and the duration/height check breaks. The quiet margin ignores these short gaps. The other options have nothing to do with the code.",
+                "skills": [
+                  "sens-event-detect",
+                  "sens-noise"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "MQ-2 gaz sensörü: ısınma ve kalibrasyon",
@@ -2211,7 +4250,133 @@ export const modul4: ModuleContent = {
                 "safety-sensors"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "MQ-2 gas sensor: warm-up and calibration",
+            "problem": "The gas leak alarm in the kitchen waits quietly, but one day it goes off. So does the alarm decide by \"how many ppm of gas there is\"? With most cheap sensors, no: it only says \"the value has risen a lot compared with clean air\". In this lesson you will learn why the MQ-2 gas sensor first has to warm up, how to take a measurement in clean air to find a **baseline value**, and how to raise an alarm based on that value.",
+            "contentMd": "### Safety note\n- Gas leaks and flammable gases are dangerous. There is no gas in this lesson: you will imitate a rise in gas with the MQ-2's **Gas level** property in the lab.\n- A real MQ-2 has a heater inside; it gets hot while it works.\n- This circuit does **not** replace a certified gas or smoke detector. It is for learning only.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| MQ-2 gas sensor module | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A3** (**DO** stays unconnected) |\n| Resistor (330 Ω) + LED (status) | **D12** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| Resistor (330 Ω) + LED (alarm) | **D13** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n\nConnect the MQ-2 module to 5 V; in the lab, if you connect it to 3.3 V the module counts as unpowered (the heater of a real MQ-2 also needs 5 V). On most MQ-2 modules the analog output voltage rises as the gas rises; the module in the lab works the same way. The MQ-2 is sensitive to flammable gases and smoke, but it **cannot tell** which gas it is.\n\nIn the lab, the **Gas level** property goes from 0 (clean air) to 1 and can be changed while the circuit runs. On this module the AO voltage is 5 V × (0.1 + 0.9 × level):\n\n| Gas level | 0 | 0.03 | 0.1 | 0.3 | 1 |\n|---|---|---|---|---|---|\n| `analogRead(A3)` | 102 | 130 | 194 | 379 | 1023 |\n\n### Warm-up and calibration\nThe MQ-2's heater brings the sensing element up to its working temperature. When it is cold or has just been switched on, the readings are unsteady and settle slowly. On first use, and after being switched off for a long time, this takes a **long** time; how long depends on the module and the maker, so check your own datasheet. In this lesson we use **5 seconds** so we do not have to wait in the lab; in a real circuit this time must be much longer. The MQ-2 in the lab does not model the warm-up effect (the readings are steady from the start); we still write the warm-up wait in the code, because the real module behaves that way.\n\nAfter it has warmed up, you take a measurement in **clean air** (in the lab with Gas level at 0, so `analogRead` is about 102): this is your **baseline** value. The baseline changes from place to place, from module to module and over time. That is why, for the alarm, we use a threshold **relative to the baseline** instead of a fixed number (for example 1.5 times the baseline).\n\nTo convert to a unit like ppm (parts per million), you need the curve from the datasheet, the type of gas and the sensor's calibration data. Without these, the number you get is not reliable. That is why in these lessons **we do not write ppm**; we only look at \"how many times the clean-air value\" it is.\n\n### Program 1: warm up and measure the baseline\nThe LED (D12) blinks while warming up. When the warm-up is over, the sensor is measured 32 times and the average becomes the baseline.\n\n```cpp\n// sketch: mq2_isinma_baz\nconst int GAZ = A3;\nconst int DURUM_LED = 12;\nconst unsigned long ISINMA_MS = 5000;   // ders için kısa; gerçekte çok daha uzun\n\nint baz;\nunsigned long sonYazma = 0;\n\nint bazOlc() {\n  long toplam = 0;\n  for (int i = 0; i < 32; i++) {\n    toplam += analogRead(GAZ);\n    delay(20);\n  }\n  return toplam / 32;\n}\n\nvoid setup() {\n  pinMode(DURUM_LED, OUTPUT);\n  Serial.begin(9600);\n\n  Serial.println(\"Isiniyor...\");\n  while (millis() < ISINMA_MS) {\n    digitalWrite(DURUM_LED, (millis() / 250) % 2);   // yanıp söner\n  }\n  digitalWrite(DURUM_LED, LOW);\n\n  baz = bazOlc();\n  Serial.print(\"baz=\");\n  Serial.println(baz);\n}\n\nvoid loop() {\n  if (millis() - sonYazma >= 500) {\n    sonYazma = millis();\n    int okuma = analogRead(GAZ);\n    Serial.print(\"okuma=\");\n    Serial.print(okuma);\n    Serial.print(\" fark=\");\n    Serial.println(okuma - baz);\n  }\n}\n```\n\n### Program 2: an alarm relative to the baseline\nThe alarm looks at **how many times** the baseline the reading is. As in lesson 51, we use two thresholds: the alarm starts when the ratio rises to 1.5, but only ends when it drops below 1.2. We also smooth the reading (lesson 14): a sample is taken every 50 ms and mixed with the old average. That way a single spike does not raise the alarm.\n\n```cpp\n// sketch: mq2_bagil_alarm\nconst int GAZ = A3;\nconst int DURUM_LED = 12;\nconst int ALARM_LED = 13;\nconst unsigned long ISINMA_MS = 5000;\nconst float ALARM_ORAN = 1.5;   // bazın 1,5 katı: alarm başlar\nconst float BIRAK_ORAN = 1.2;   // bazın 1,2 katının altı: alarm biter\n\nfloat baz;\nfloat ort;\nbool alarm = false;\nunsigned long sonOrnek = 0;\nunsigned long sonYazma = 0;\n\nfloat bazOlc() {\n  long toplam = 0;\n  for (int i = 0; i < 32; i++) {\n    toplam += analogRead(GAZ);\n    delay(20);\n  }\n  return toplam / 32.0;\n}\n\nvoid setup() {\n  pinMode(DURUM_LED, OUTPUT);\n  pinMode(ALARM_LED, OUTPUT);\n  Serial.begin(9600);\n\n  while (millis() < ISINMA_MS) {\n    digitalWrite(DURUM_LED, (millis() / 250) % 2);\n  }\n  digitalWrite(DURUM_LED, LOW);\n\n  baz = bazOlc();\n  if (baz < 20) baz = 20;   // çok küçük baz, oranı anlamsız büyütür\n  ort = baz;\n  Serial.print(\"baz=\");\n  Serial.println(baz, 0);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - sonOrnek >= 50) {\n    sonOrnek = simdi;\n    ort = 0.8 * ort + 0.2 * analogRead(GAZ);\n    float oran = ort / baz;\n\n    if (!alarm && oran >= ALARM_ORAN) {\n      alarm = true;\n    } else if (alarm && oran < BIRAK_ORAN) {\n      alarm = false;\n    }\n    digitalWrite(ALARM_LED, alarm);\n  }\n\n  if (simdi - sonYazma >= 500) {\n    sonYazma = simdi;\n    Serial.print(\"oran=\");\n    Serial.print(ort / baz, 2);\n    Serial.print(\" alarm=\");\n    Serial.println(alarm ? 1 : 0);\n  }\n}\n```\n\n### How does it work?\n1. Until `ISINMA_MS` (warm-up time) is up, the program uses no measurements; only the status LED blinks.\n2. After the warm-up, the average of 32 readings becomes `baz` (baseline). During this time there must be **no** gas, smoke or alcohol vapour in the air (in the lab, Gas level must stay at 0).\n3. `ort` (average) is the sum of 80% of the old average and 20% of the new reading. Even if the reading jumps suddenly, `ort` rises over a few samples.\n4. `oran = ort / baz` (ratio) tells you how many times the baseline the value is. 1.0 means clean air; 2.0 means the value has doubled.\n5. The two thresholds keep the alarm steady: while the ratio is between 1.2 and 1.5, the alarm state does not change.\n6. The `baz < 20` check stops the ratio coming out meaninglessly large when the baseline is very small.\n\n### Try it\n- Set the gas level to 0.03 (reading about 130, ratio about 1.27). With `ALARM_ORAN = 1.5`, is there an alarm? What about with `ALARM_ORAN = 1.2`? Then set it to 3.0: when does it raise the alarm?\n- Set the warm-up time to 1000 ms. Does the `baz` value change? (In the lab it does not, because the warm-up is not modelled. On a real sensor, measuring before the warm-up is over makes a big difference.)\n- Add `Serial.println(okuma)` to the sketch and print the raw values next to the smoothed `ort` value. Which one is steadier?\n\n### Common mistakes\n- Not waiting for the warm-up: the baseline comes out wrong, and the alarm goes off wrongly or never goes off.\n- Measuring the baseline in air that contains gas (starting the program in the lab while Gas level is not 0): the alarm threshold moves up and a real danger is missed.\n- Comparing with a fixed number (`okuma > 400`): it becomes meaningless with another module or in different air.\n- Converting the reading to a unit like ppm and believing it is correct.\n- Tying the alarm to a single reading: one spike causes a false alarm.\n- Using this circuit on its own to protect real lives.",
+            "question": "Is it a good idea to measure the baseline again every time it is switched on? What happens if the sensor is switched on in a room full of gas? How would you notice this problem?",
+            "explainerMd": "### What you will learn in this lesson\n- Why the MQ-2 gas sensor needs a **warm-up** wait\n- How to measure a **baseline value** in clean air and write the threshold as a multiple of the baseline\n- Why we do not write a unit like \"ppm\"\n- How to build a steady alarm with smoothing and two thresholds\n\n### What you should know first\n- Lesson 11: `analogRead` and the 0-1023 range.\n- Lesson 14: smoothing (mixing the new reading with the old average).\n- Lesson 27: non-blocking code with `millis()`.\n- Lesson 51: hysteresis (two thresholds).\n- Lesson 52: measuring a baseline by taking an average.\n\n### Safety first\nGas leaks and flammable gases are dangerous. There is no real gas in this lesson: you imitate gas with the **Gas level** value on the virtual module. This circuit does **not** replace a certified gas or smoke detector; it is for learning only.\n\n### What does the MQ-2 do?\nInside the MQ-2 module there is a heated sensing element. Flammable gases and smoke change this element's resistance; the module gives this out as a voltage on the analog output (AO). As the gas rises, AO rises. On the virtual module AO = 5 V × (0.1 + 0.9 × level):\n\n```\nGas level:    0     0.03   0.1   0.3    1\nanalogRead:  102    130    194   379   1023\n```\n\nThe MQ-2 **cannot tell** which gas it is. It only says \"it has risen compared with clean air\".\n\n### Warm-up\nUntil the heater brings the element up to its working temperature, the readings are unsteady. On a real module this takes a long time and is given in the datasheet. In the lesson we use 5 seconds so we do not have to wait. The virtual module does not model the warm-up, but we still wait in the code because the real module behaves that way.\n\n### Baseline and relative threshold\nAfter the warm-up, you take the average of a few readings in **clean air**: this is `baz`. The baseline is different for every module and every place. So instead of writing the threshold as a fixed number (`okuma > 400`), you write it as a multiple of the baseline:\n\n```\nfloat oran = ort / baz;     // 1.0 = clean air\n```\n\nCareful: if `ort` and `baz` are both `int`, `ort / baz` does integer division. 160 / 100 gives 1, not 1.6. That is why `baz` or `ort` is kept as a `float`.\n\n### Why don't we write ppm?\nTo convert to ppm, you need the curve from the datasheet, the type of gas and a calibration. Without these, the number you get looks reliable but is not. We only look at \"how many times the clean-air value\" it is.\n\n### A steady alarm\nThe alarm must not depend on a single spike:\n1. Smooth the reading: `ort = 0.8 * ort + 0.2 * okuma`.\n2. Use two thresholds: start when the ratio rises to 1.5, end when it drops below 1.2.\n\n### Summary\nAfter the MQ-2 has warmed up, a baseline is measured in clean air. The alarm threshold is not a fixed number but a multiple of the baseline. ppm is not written because there is no calibration. Smoothing and two thresholds make the alarm steady. This circuit is for learning and is not used to protect real lives.",
+            "concepts": [
+              {
+                "term": "Warm-up time",
+                "definition": "The time you wait for the heater inside the MQ-2 to bring the sensing element up to its working temperature.",
+                "example": "In the lesson we wait 5 seconds; for a real module you use the time given in the datasheet.",
+                "pitfall": "Not waiting for the warm-up: the baseline comes out wrong, and the alarm goes off wrongly or never goes off."
+              },
+              {
+                "term": "Baseline value",
+                "definition": "The average reading measured in clean air after the warm-up.",
+                "example": "On the virtual module the baseline is about 102 when Gas level is 0.",
+                "pitfall": "Measuring the baseline in air that contains gas: the thresholds move up and a real rise is missed."
+              },
+              {
+                "term": "Relative threshold (ratio)",
+                "definition": "Writing the threshold as a multiple of the baseline instead of a fixed number.",
+                "example": "If ALARM_ORAN = 1.5 and the baseline is 120, the alarm starts at 180 and above.",
+                "pitfall": "Using a fixed number like okuma > 400: it becomes meaningless with another module or in different air."
+              },
+              {
+                "term": "Smoothing",
+                "definition": "Mixing each new reading with the old average to soften sudden spikes.",
+                "example": "The line ort = 0.8 * ort + 0.2 * okuma stops a single spike from raising the alarm.",
+                "pitfall": "Tying the alarm to a single raw reading: one spike produces a false alarm."
+              },
+              {
+                "term": "The integer division trap",
+                "definition": "Dividing two int numbers throws the fraction away: 160 / 100 gives 1.",
+                "example": "If you write float oran = ort / 100.0; the ratio comes out as 1.6.",
+                "pitfall": "Putting the ratio into a float variable and thinking it is correct; if the division was done with int, the fraction is already lost."
+              },
+              {
+                "term": "A relative reading instead of a ppm number",
+                "definition": "ppm needs the gas type, the curve and a calibration; without them you can only say how many times the baseline it is.",
+                "example": "\"1.6 times clean air\" is a correct statement; \"500 ppm\" is made up in this circuit.",
+                "pitfall": "Converting the reading to ppm and believing it, or using the circuit on its own to protect real lives."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h4d3-q1",
+                "kind": "numeric",
+                "prompt": "On another MQ-2 module, the baseline in clean air was measured as 120. If the alarm ratio is 1.5, what is the smallest reading at which the alarm starts?",
+                "answer": 180,
+                "tolerance": 0,
+                "explanation": "The threshold is a multiple of the baseline: 120 × 1.5 = 180. If you ran the same code on the virtual module with a baseline of 102, the threshold would be 153. That is why it matters that you do not write the threshold as a fixed number.",
+                "skills": [
+                  "sens-baseline"
+                ]
+              },
+              {
+                "id": "m4h4d3-q2",
+                "kind": "predict-output",
+                "prompt": "The baseline is 100, smoothing is ort = 0.8 * ort + 0.2 * okuma. The reading suddenly jumps to 300 and stays there. What does this code print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  float ort = 100;\n  for (int i = 1; i <= 3; i++) {\n    ort = 0.8 * ort + 0.2 * 300;\n    Serial.println(ort, 0);\n  }\n}\n```\n(The second println parameter is 0: no digits after the decimal point.)",
+                "options": [
+                  "300, 300, 300",
+                  "140, 172, 198",
+                  "120, 136, 149",
+                  "140, 140, 140"
+                ],
+                "answer": 1,
+                "explanation": "The first step is 0.8 × 100 + 60 = 140, the second 0.8 × 140 + 60 = 172, the third 0.8 × 172 + 60 = 197.6 and println prints 198. The average only passes 150 (1.5 times the baseline) at the second step. That is why smoothing raises the alarm on a lasting rise, not on a single spike.",
+                "skills": [
+                  "sens-smoothing",
+                  "sens-baseline"
+                ]
+              },
+              {
+                "id": "m4h4d3-q3",
+                "kind": "mcq",
+                "prompt": "You have just connected a real MQ-2 module and you measure the baseline straight away. Why is this not a good idea?",
+                "options": [
+                  "Until the heater has warmed up, the readings are unsteady; this baseline comes out wrong",
+                  "The MQ-2 never gives an analog output",
+                  "The baseline is only measured in the factory",
+                  "analogRead does not work before the warm-up"
+                ],
+                "answer": 0,
+                "explanation": "Until the MQ-2's heater brings the sensing element up to its working temperature, the readings settle slowly. A baseline measured during that time is very different from later readings, and the ratio calculation breaks. The other options are wrong: the module has an AO output, analogRead always works and the baseline is measured where the sensor is.",
+                "skills": [
+                  "sens-baseline",
+                  "safety-sensors"
+                ]
+              },
+              {
+                "id": "m4h4d3-q4",
+                "kind": "find-bug",
+                "prompt": "When the real ratio is 1.6 (ort = 160, baz = 100), the alarm never starts. Where is the mistake?\n\n```\nint baz = 100;\nint ort = 160;\nfloat oran = ort / baz;\nif (oran >= 1.5) alarm = true;\n```",
+                "options": [
+                  "The line int ort = 160;",
+                  "The line if (oran >= 1.5)",
+                  "The line int baz = 100;",
+                  "The line float oran = ort / baz; : when two ints are divided the result is 1"
+                ],
+                "answer": 3,
+                "explanation": "Because ort and baz are both int, 160 / 100 is integer division and the result is 1; putting it into a float variable does not bring the fraction back. The fix is to write ort / (float)baz or ort / 100.0. The other lines are correct.",
+                "skills": [
+                  "prog-debug",
+                  "sens-baseline"
+                ]
+              },
+              {
+                "id": "m4h4d3-q5",
+                "kind": "mcq",
+                "prompt": "The MQ-2 reading is 500. A friend asks: \"How many ppm of gas does that mean?\" Which answer is the most correct?",
+                "options": [
+                  "500 ppm",
+                  "5 ppm, because 500 / 100",
+                  "In this circuit you cannot say ppm; you can only say how many times it has risen compared with the clean-air baseline",
+                  "Zero ppm, because there is no gas"
+                ],
+                "answer": 2,
+                "explanation": "ppm needs the curve from the datasheet, the type of gas and the sensor's calibration. The MQ-2 cannot tell gases apart and no calibration has been done. So only the ratio (reading / baseline) is given. The other options make up a conversion.",
+                "skills": [
+                  "sens-baseline",
+                  "safety-sensors"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Alev sensörü ve çoklu eşik yönetimi",
@@ -2332,7 +4497,127 @@ export const modul4: ModuleContent = {
                 "sens-levels"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Flame sensor and managing several thresholds",
+            "problem": "A fire alarm does not just say \"fire\" or \"no fire\". First it gives a small warning (\"something is getting hot, take a look\"); if things get worse it switches to a danger alarm, and when things improve it goes back from danger to warning and then to normal. In this lesson you will get to know the flame sensor, write a three-level (`NORMAL`, `UYARI` = warning, `TEHLIKE` = danger) decision system and learn to reuse the same code for more than one sensor.",
+            "contentMd": "### Safety note\nThere is no flame in this lesson: you will imitate a flame in the lab with the flame sensor's **Flame intensity** property. Experimenting with real flames is dangerous.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Flame sensor module | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A1** (**DO** stays unconnected) |\n| MQ-2 gas sensor module (for the last sketch) | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A3** |\n| Resistor (330 Ω) + LED (warning; set its colour to yellow in the properties panel) | **D12** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| Resistor (330 Ω) + LED (danger; red) | **D13** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| Buzzer (**Type: Active** in the properties panel) | **+** → **D8**, **-** → **GND** |\n\nThis week we used pin A1 for the LDR in lesson 51; here the flame sensor is connected in place of the LDR (you can delete the LDR and its resistor from the canvas). Flame sensors are sensitive to the **infrared (IR) light** that a flame gives off. On many modules the analog value **drops** when a strong IR source comes close, but this depends on the module; it can be the other way round. Sunlight and some lamps also give off IR, so false alarms can happen. The sensor's viewing angle and range are limited.\n\nOn the flame module in the lab, AO **drops** as the flame grows (AO = 5 V × (1 − 0.95 × intensity)); so `ALEVDE_DUSER = true` is correct. When **Flame intensity** is 0, `analogRead` reads 1023 (an intensity value of 0). Comparison table for this lesson:\n\n| Flame intensity | 0 | 0.31 | 0.4 | 0.62 | 0.8 |\n|---|---|---|---|---|---|\n| `siddet()` | 0 | about 300 (`UYARI` threshold) | about 389 | about 600 (`TEHLIKE` threshold) | about 777 |\n\nFor the MQ-2, `analogRead(A3)` is about 102 in clean air (Gas level 0); so `gazBaz` is about 102. To reach `UYARI` it has to go above about 153, and for `TEHLIKE` above about 255: a Gas level of 0.06 gives `UYARI`, 0.3 gives `TEHLIKE`.\n\n### Sort out the direction in one place\nThe module's value may drop or rise with a flame. Instead of thinking about this difference everywhere in the program, you turn the raw reading into a single number called **intensity** (`siddet`): the bigger the intensity, the stronger the flame.\n\n```cpp\nconst bool ALEVDE_DUSER = true;   // modülün alevde değer düşüyorsa true\n\nint siddet(int ham) {\n  return ALEVDE_DUSER ? 1023 - ham : ham;\n}\n```\n\nFrom now on, every threshold is written in terms of \"intensity\". If your module works the other way round, you only change this line.\n\n### Several thresholds: level and hysteresis\nThree levels (`NORMAL`, `UYARI`, `TEHLIKE`) need four thresholds:\n\n| Transition | Threshold |\n|---|---|\n| NORMAL → UYARI | `uyariAc` |\n| UYARI → NORMAL | `uyariKapat` (smaller) |\n| UYARI → TEHLIKE | `tehlikeAc` |\n| TEHLIKE → UYARI | `tehlikeKapat` (smaller) |\n\nEach level has different on and off thresholds; that way the hysteresis from lesson 51 works in two places at once. We keep the levels in an `enum`, as in lesson 28. The decision depends on the **current level** and the **current value**.\n\n### Repeated code\nIf you copy and paste the same logic for two sensors (flame and gas), the program turns into this:\n\n```cpp\n// alev için\nif (alevSeviye == NORMAL && a >= 300) alevSeviye = UYARI;\nelse if (alevSeviye == UYARI && a < 250) alevSeviye = NORMAL;\n// ... TEHLIKE için de aynısı ...\n\n// gaz için aynı kodun kopyası, farklı sayılarla\nif (gazSeviye == NORMAL && g >= 276) gazSeviye = UYARI;\nelse if (gazSeviye == UYARI && g < 230) gazSeviye = NORMAL;\n// ... TEHLIKE için de aynısı ...\n```\n\nIf you find a bug, you have to fix it in two places (later three, four places). The fix is to put the shared logic **into a function** (lesson 19). The function takes the thresholds as parameters and returns the new level.\n\n### Program 1: flame level\n```cpp\n// sketch: alev_seviye\nconst int ALEV = A1;\nconst int LED_UYARI = 12;\nconst int LED_TEHLIKE = 13;\nconst int BUZZER = 8;\nconst bool ALEVDE_DUSER = true;\n\nenum Seviye { NORMAL, UYARI, TEHLIKE };\n\nSeviye seviye = NORMAL;\n\nint siddet(int ham) {\n  return ALEVDE_DUSER ? 1023 - ham : ham;\n}\n\nSeviye seviyeBul(Seviye simdiki, int deger,\n                 int uyariAc, int uyariKapat,\n                 int tehlikeAc, int tehlikeKapat) {\n  if (simdiki == NORMAL) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger >= uyariAc) return UYARI;\n    return NORMAL;\n  }\n  if (simdiki == UYARI) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger < uyariKapat) return NORMAL;\n    return UYARI;\n  }\n  // simdiki == TEHLIKE\n  if (deger < tehlikeKapat) {\n    return (deger >= uyariKapat) ? UYARI : NORMAL;\n  }\n  return TEHLIKE;\n}\n\nconst char* seviyeAdi(Seviye s) {\n  if (s == UYARI) return \"UYARI\";\n  if (s == TEHLIKE) return \"TEHLIKE\";\n  return \"NORMAL\";\n}\n\nvoid setup() {\n  pinMode(LED_UYARI, OUTPUT);\n  pinMode(LED_TEHLIKE, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int s = siddet(analogRead(ALEV));\n  Seviye yeni = seviyeBul(seviye, s, 300, 250, 600, 500);\n\n  if (yeni != seviye) {\n    seviye = yeni;\n    Serial.print(\"ALEV: \");\n    Serial.print(seviyeAdi(seviye));\n    Serial.print(\" siddet=\");\n    Serial.println(s);\n  }\n\n  digitalWrite(LED_UYARI, seviye == UYARI);\n  digitalWrite(LED_TEHLIKE, seviye == TEHLIKE);\n  digitalWrite(BUZZER, seviye == TEHLIKE);\n}\n```\n\nFrom `NORMAL`, the function can jump straight to `TEHLIKE` (if a flame appears suddenly). From `TEHLIKE`, it can also drop straight to `NORMAL` (if the flame disappears suddenly). We did not make the middle level a step you must pass through.\n\n### Program 2: two sensors, one function\nNow let's use the same `seviyeBul` (find level) function for both the flame (A1) and the gas (A3). The gas thresholds are not fixed numbers; as in lesson 53, they are worked out **relative to the baseline**: 1.5 times the baseline for warning, 2.5 times for danger (the off thresholds are 1.25 and 2 times). We kept the warm-up wait short here; in a real circuit you must warm it up for a long time, as in lesson 53.\n\n```cpp\n// sketch: iki_kanal_seviye\nconst int ALEV = A1;\nconst int GAZ = A3;\nconst int LED_UYARI = 12;\nconst int LED_TEHLIKE = 13;\nconst int BUZZER = 8;\nconst bool ALEVDE_DUSER = true;\n\nenum Seviye { NORMAL, UYARI, TEHLIKE };\n\nSeviye alevSeviye = NORMAL;\nSeviye gazSeviye = NORMAL;\nint gazBaz;\n\nint siddet(int ham) {\n  return ALEVDE_DUSER ? 1023 - ham : ham;\n}\n\nSeviye seviyeBul(Seviye simdiki, int deger,\n                 int uyariAc, int uyariKapat,\n                 int tehlikeAc, int tehlikeKapat) {\n  if (simdiki == NORMAL) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger >= uyariAc) return UYARI;\n    return NORMAL;\n  }\n  if (simdiki == UYARI) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger < uyariKapat) return NORMAL;\n    return UYARI;\n  }\n  if (deger < tehlikeKapat) {\n    return (deger >= uyariKapat) ? UYARI : NORMAL;\n  }\n  return TEHLIKE;\n}\n\nconst char* seviyeAdi(Seviye s) {\n  if (s == UYARI) return \"UYARI\";\n  if (s == TEHLIKE) return \"TEHLIKE\";\n  return \"NORMAL\";\n}\n\nSeviye enKotu(Seviye a, Seviye b) {\n  return (a > b) ? a : b;\n}\n\nvoid gecisYaz(const char* ad, Seviye eski, Seviye yeni, int deger) {\n  if (eski == yeni) return;\n  Serial.print(ad);\n  Serial.print(\": \");\n  Serial.print(seviyeAdi(yeni));\n  Serial.print(\" deger=\");\n  Serial.println(deger);\n}\n\nint bazOlc(int pin) {\n  long toplam = 0;\n  for (int i = 0; i < 16; i++) {\n    toplam += analogRead(pin);\n    delay(10);\n  }\n  return toplam / 16;\n}\n\nvoid setup() {\n  pinMode(LED_UYARI, OUTPUT);\n  pinMode(LED_TEHLIKE, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  Serial.begin(9600);\n  gazBaz = bazOlc(GAZ);\n  Serial.print(\"gazBaz=\");\n  Serial.println(gazBaz);\n}\n\nvoid loop() {\n  int a = siddet(analogRead(ALEV));\n  int g = analogRead(GAZ);\n\n  Seviye yeniAlev = seviyeBul(alevSeviye, a, 300, 250, 600, 500);\n  Seviye yeniGaz = seviyeBul(gazSeviye, g,\n                             gazBaz * 3 / 2, gazBaz * 5 / 4,\n                             gazBaz * 5 / 2, gazBaz * 2);\n\n  gecisYaz(\"ALEV\", alevSeviye, yeniAlev, a);\n  gecisYaz(\"GAZ\", gazSeviye, yeniGaz, g);\n  alevSeviye = yeniAlev;\n  gazSeviye = yeniGaz;\n\n  Seviye genel = enKotu(alevSeviye, gazSeviye);\n  digitalWrite(LED_UYARI, genel == UYARI);\n  digitalWrite(LED_TEHLIKE, genel == TEHLIKE);\n  digitalWrite(BUZZER, genel == TEHLIKE);\n}\n```\n\nBecause the `enum` values are 0, 1, 2 in order, the comparison `NORMAL < UYARI < TEHLIKE` works. `enKotu` (worst) gives the bigger of two levels: if one of the sensors is in danger, the system is in danger.\n\n### How does it work?\n1. `siddet()` turns the raw reading into the \"bigger = stronger flame\" form. Whatever the module's direction, the rest of the code does not change.\n2. `seviyeBul()` gathers the three levels into one function. The two sensors call the same function **with different thresholds**.\n3. Because `uyariKapat < uyariAc` and `tehlikeKapat < tehlikeAc`, each transition has a hysteresis band. Even if the value wobbles near the threshold, the level does not flicker.\n4. `gecisYaz()` (write transition) only prints when the level changes. The serial monitor does not scroll non-stop, so you can read the events.\n5. The outputs (LEDs, buzzer) are worked out from the level on every pass. That way the outputs and the level never get out of step.\n\n### Try it\n- Make `uyariKapat` the same as `uyariAc`. Change the **Flame intensity** back and forth across the threshold a few times (for example between 0.29 and 0.33): does the level flicker? With the old values (300 and 250), does the same movement change the level?\n- Add a third sensor (for example, for the NTC on A2, give the temperature as a whole number; connect the NTC and a 10 kΩ resistor as in lesson 13). Does it work without changing the `seviyeBul` function?\n- If your flame sensor's value rises with a flame, which line would you change? Do you need to touch anywhere else in the program?\n\n### Common mistakes\n- Writing the off threshold bigger than the on threshold: the level never drops or keeps swinging.\n- Not checking the `ALEVDE_DUSER` value: the alarm always goes off or never does.\n- Copying the same logic twice: a bug fixed in one place stays in the other.\n- Using numbers (`0`, `1`, `2`) instead of `NORMAL`, `UYARI`, `TEHLIKE`: the code becomes hard to read.\n- In a real circuit, a sensor that looks straight at sunlight: the IR can cause a false alarm (the lab does not model this).",
+            "question": "Why is there a `UYARI` (warning) level? What would we lose if there were only `NORMAL` and `TEHLIKE`? When would you find three levels too many?",
+            "explainerMd": "### What you will learn in this lesson\n- How to sort out the flame sensor's direction (the value drops with a flame) in a single function\n- How to build a three-level (`NORMAL`, `UYARI`, `TEHLIKE`) decision system with four thresholds\n- How to name the levels with an `enum`\n- How to use the same logic for several sensors with a function that takes parameters, instead of copying it\n\n### What you should know first\n- Lesson 19: functions that take parameters and return a value.\n- Lesson 28: a state machine with `enum`.\n- Lesson 51: hysteresis (separate on and off thresholds).\n- Lesson 53: the MQ-2 baseline and thresholds as multiples of the baseline.\n\n### What does a flame sensor read?\nA flame sensor is sensitive to the **infrared (IR) light** that a flame gives off. On many modules the analog value **drops** when a flame comes close; on some it rises. The virtual module drops: AO = 5 V × (1 - 0.95 × intensity). Sunlight and some lamps also give off IR, so in a real circuit false alarms can happen.\n\n### Sort out the direction in one place\nInstead of thinking about the direction in every comparison, you turn the raw reading into an **intensity** number: a big number means a strong flame.\n\n```\nint siddet(int ham) {\n  return ALEVDE_DUSER ? 1023 - ham : ham;\n}\n```\n\nFor example, if the raw reading is 700, the intensity is 323. If the module works the other way round, only `ALEVDE_DUSER` changes.\n\n### Three levels, four thresholds\nEvery transition between levels has its own threshold:\n\n```\nNORMAL  -> UYARI    : deger >= uyariAc\nUYARI   -> NORMAL   : deger <  uyariKapat   (smaller than uyariAc)\nUYARI   -> TEHLIKE  : deger >= tehlikeAc\nTEHLIKE -> UYARI    : deger <  tehlikeKapat (smaller than tehlikeAc)\n```\n\nThat way the hysteresis from lesson 51 works in two places. Example: if the thresholds are 300/250/600/500, a system that has entered `UYARI` stays in `UYARI` at an intensity of 280; when it drops to 240 it becomes `NORMAL`.\n\nYou do not name the levels with numbers like `0, 1, 2` but with `enum Seviye { NORMAL, UYARI, TEHLIKE }`. Because the values are 0, 1, 2, comparisons like `UYARI < TEHLIKE` also work.\n\n### The decision depends on the current level\nThe `seviyeBul(simdiki, deger, ...)` function takes both the current level and the reading, and returns the **new level**. It can go from `NORMAL` straight to `TEHLIKE` (if a flame appears suddenly) or from `TEHLIKE` straight down to `NORMAL`.\n\n### Put an end to repeated code\nIf you copy the same `if` chain twice for flame and gas, you have to fix a bug in two places. The fix: call the same function **with different thresholds**. For the flame, fixed thresholds are used; for the gas, multiples of the baseline (1.5; 1.25; 2.5; 2).\n\nTo find the overall state from the two sensors' levels, you take the worst one:\n\n```\nSeviye enKotu(Seviye a, Seviye b) { return (a > b) ? a : b; }\n```\n\nIf one of the sensors is `TEHLIKE`, the system is `TEHLIKE`.\n\n### Summary\nThe flame sensor's direction is sorted out in a single function. Three levels need four thresholds, and the decision depends on the current level. An `enum` makes the levels readable. The `seviyeBul` function with parameters lets you use the same logic for several sensors; the overall state is the worst of the sensor levels.",
+            "concepts": [
+              {
+                "term": "Intensity (a direction-free value)",
+                "definition": "A value that turns the raw reading round so that \"big number = strong flame\".",
+                "example": "On a module whose value drops with a flame, siddet(ham) = 1023 - ham; if ham is 700, the intensity is 323.",
+                "pitfall": "Not checking the ALEVDE_DUSER value: the alarm always goes off or never does."
+              },
+              {
+                "term": "Level (enum)",
+                "definition": "An ordered type that holds the state with names like NORMAL, UYARI, TEHLIKE.",
+                "example": "enum Seviye { NORMAL, UYARI, TEHLIKE }; its values are 0, 1, 2 in order.",
+                "pitfall": "Using bare numbers like 0, 1, 2 for the levels: the code becomes hard to read and mistakes are easy to make."
+              },
+              {
+                "term": "Several thresholds",
+                "definition": "Four thresholds for three levels: UYARI on/off and TEHLIKE on/off.",
+                "example": "For the flame, the pairs 300 / 250 and 600 / 500 are used.",
+                "pitfall": "Writing the off threshold bigger than the on threshold: the level never drops or keeps swinging."
+              },
+              {
+                "term": "Reuse with a function that takes parameters",
+                "definition": "Putting the same decision logic into a function and giving the thresholds as parameters.",
+                "example": "seviyeBul is called with fixed numbers for the flame and with multiples of the baseline for the gas.",
+                "pitfall": "Copying and pasting the same logic for two sensors: a bug fixed in one place stays in the other."
+              },
+              {
+                "term": "Worst level (enKotu)",
+                "definition": "Making the highest of several sensors' levels the overall state.",
+                "example": "If the gas is UYARI and the flame is TEHLIKE, the overall state is TEHLIKE.",
+                "pitfall": "Making only the last sensor read the overall state: the earlier sensor's danger is lost."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h4d4-q1",
+                "kind": "numeric",
+                "prompt": "The virtual flame module's value drops with a flame, and siddet(ham) = 1023 - ham is used. When the raw reading is 700, what is the intensity?",
+                "answer": 323,
+                "tolerance": 0,
+                "explanation": "1023 - 700 = 323. This value goes above the UYARI on threshold (300); the flame is not ignored. If the module works the other way round, ALEVDE_DUSER is set to false and the intensity is simply 700.",
+                "skills": [
+                  "sens-direction"
+                ]
+              },
+              {
+                "id": "m4h4d4-q2",
+                "kind": "predict-output",
+                "prompt": "seviyeBul is called with the thresholds 300 / 250 / 600 / 500. The level starts as NORMAL. Six measurements arrive in order, and after each step the letter of the new level (N, U or T) is printed. What does this code print?\n\n```\nenum Seviye { NORMAL, UYARI, TEHLIKE };\n\nSeviye seviyeBul(Seviye simdiki, int deger,\n                 int uyariAc, int uyariKapat,\n                 int tehlikeAc, int tehlikeKapat) {\n  if (simdiki == NORMAL) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger >= uyariAc) return UYARI;\n    return NORMAL;\n  }\n  if (simdiki == UYARI) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger < uyariKapat) return NORMAL;\n    return UYARI;\n  }\n  if (deger < tehlikeKapat) {\n    return (deger >= uyariKapat) ? UYARI : NORMAL;\n  }\n  return TEHLIKE;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  int olcum[] = {320, 280, 240, 650, 520, 480};\n  Seviye s = NORMAL;\n  for (int i = 0; i < 6; i++) {\n    s = seviyeBul(s, olcum[i], 300, 250, 600, 500);\n    Serial.print(s == NORMAL ? 'N' : (s == UYARI ? 'U' : 'T'));\n  }\n}\n```",
+                "options": [
+                  "UNNTUU",
+                  "UUUTTT",
+                  "UUNTTU",
+                  "UUNTTN"
+                ],
+                "answer": 2,
+                "explanation": "320 takes NORMAL to UYARI (U). 280 does not drop below 250, so it stays in UYARI (U). 240 < 250, so NORMAL (N). 650 goes straight to TEHLIKE (T). 520 ≥ 500, so TEHLIKE continues (T). 480 < 500 and ≥ 250, so it drops to UYARI (U). The first option behaves like a single threshold with no hysteresis, the second assumes the level never drops, and the fourth drops from TEHLIKE straight to NORMAL.",
+                "skills": [
+                  "sens-levels",
+                  "sens-hysteresis"
+                ]
+              },
+              {
+                "id": "m4h4d4-q3",
+                "kind": "find-bug",
+                "prompt": "The flame intensity stays steady at 320, but the yellow UYARI LED blinks very fast. Where is the mistake?\n\n```\nSeviye yeni = seviyeBul(seviye, s, 300, 350, 600, 500);\n```\n(Argument order: uyariAc, uyariKapat, tehlikeAc, tehlikeKapat.)",
+                "options": [
+                  "uyariAc (300) is too small",
+                  "uyariKapat (350) has been written bigger than uyariAc (300)",
+                  "tehlikeKapat (500) should not be smaller than tehlikeAc (600)",
+                  "The seviye variable should not be global"
+                ],
+                "answer": 1,
+                "explanation": "In NORMAL, 320 ≥ 300, so it moves to UYARI. In UYARI, 320 < 350, so it goes straight back to NORMAL, and so on: the LED changes on every pass. The off threshold must be smaller than the on threshold (for example 250). tehlikeKapat < tehlikeAc is written correctly, and uyariAc is not the problem either.",
+                "skills": [
+                  "sens-levels",
+                  "sens-hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h4d4-q4",
+                "kind": "mcq",
+                "prompt": "A flame module from another brand RAISES its value when a flame comes close. To use the same program as in the lesson, which change is enough?",
+                "options": [
+                  "Only setting the ALEVDE_DUSER constant to false",
+                  "Rewriting the seviyeBul function from scratch",
+                  "Flipping every threshold one by one",
+                  "Writing two separate programs for flame and gas"
+                ],
+                "answer": 0,
+                "explanation": "The direction difference is sorted out in one place, inside siddet(). When ALEVDE_DUSER is false, intensity = ham and the rest of the code (seviyeBul, the thresholds, the outputs) works unchanged. Thinking about the direction separately in every comparison means both mistakes and repetition.",
+                "skills": [
+                  "sens-direction",
+                  "prog-reuse-functions"
+                ]
+              },
+              {
+                "id": "m4h4d4-q5",
+                "kind": "mcq",
+                "prompt": "The gas level is UYARI and the flame level is TEHLIKE. enum Seviye { NORMAL, UYARI, TEHLIKE } and enKotu(a, b) returns \"the bigger one\". What is the overall state?",
+                "options": [
+                  "NORMAL",
+                  "UYARI",
+                  "An error, because an enum cannot be compared",
+                  "TEHLIKE"
+                ],
+                "answer": 3,
+                "explanation": "The enum values are 0, 1, 2 in order; TEHLIKE (2) is bigger than UYARI (1), so enKotu returns TEHLIKE. If one of the sensors is in danger, the system is in danger. enum values are compared like numbers; there is no compile error.",
+                "skills": [
+                  "sens-levels"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Yangın ve gaz alarm paneli",
@@ -2460,7 +4745,134 @@ export const modul4: ModuleContent = {
                 "safety-sensors"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Fire and gas alarm panel",
+            "problem": "When you look at a building's fire panel, you see green, yellow and red lights; close by you hear a beep. Inside the panel there are sensors, decision logic and outputs. They all answer the same question: \"What is the situation right now, and what should I do?\" This week you will combine what you have learnt and build a panel like this. The gas and flame sensors will work together, the panel will give a three-level alarm and show the situation on a screen.",
+            "contentMd": "### What are we going to do?\nThis project combines what you have learnt:\n- **Lesson 51:** hysteresis with two thresholds, so the state values do not flicker.\n- **Lesson 53:** warm-up for the MQ-2 and a baseline in clean air; thresholds as multiples of the baseline.\n- **Lesson 54:** `enum Seviye` and the same `seviyeBul` function for every sensor.\n- **Module 3:** non-blocking code with `millis()` (27), the relay (24), the I2C LCD (32-33), the buzzer (18), temperature with an NTC (13).\n\nThe panel makes the **worst** of the levels from the three sensors the overall state. The overall state drives three things: the LEDs, the buzzer and the screen. The relay also depends on the gas level.\n\n### Safety note\n- Never build a circuit with mains voltage (220 V) on a real relay. In this project the relay only drives a 5 V LED; this LED stands for the ventilation fan.\n- There is no real gas or flame in this lesson; you give the sensor values from the properties panel. Certified alarm devices are used to protect real lives and property; this project is for learning.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| MQ-2 gas sensor module | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A3** |\n| Flame sensor module | **VCC** → Uno **5V**, **GND** → Uno **GND**, **AO** → Uno **A1** |\n| NTC thermistor (optional) | Lead **1** → **A2**, lead **2** → **GND** |\n| Resistor (10000 Ω; for the NTC) | Lead **1** → **5V**, lead **2** → **A2** |\n| Resistor (330 Ω) + LED (normal; green) | **D11** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| Resistor (330 Ω) + LED (warning; yellow) | **D12** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| Resistor (330 Ω) + LED (danger; red) | **D13** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| Buzzer (**Type: Active** in the properties panel) | **+** → **D8**, **-** → **GND** |\n| Relay module | **VCC** → **5V**, **GND** → **GND**, **IN** → **D7** |\n| Resistor (330 Ω) + LED in place of the ventilation fan | Relay **COM** → **5V**; relay **NO** → resistor lead **1**; resistor lead **2** → LED **A**; LED **K** → **GND** |\n| I2C LCD 16x2 | **SDA** → **A4**, **SCL** → **A5**, **VCC** → **5V**, **GND** → **GND** (address 0x27) |\n\nIf you are not adding the NTC to the canvas, set `ISI_VAR = false` in the program; if A2 is left unconnected, random values are read and the lab gives a \"floating input\" warning. If your flame sensor works the other way round, change the `ALEVDE_DUSER` value as in lesson 54; on the lab's flame module the value drops with a flame, so `true` is correct. If the relay works backwards, swap `HIGH` and `LOW`, or check the relay's **Trigger** property.\n\n### Levels and outputs\n| Overall state | LED | Buzzer (D8) | Relay (D7, fan) | Screen line |\n|---|---|---|---|---|\n| NORMAL | Green | Silent | Off if gas is NORMAL | `DURUM: NORMAL` |\n| UYARI | Yellow | Slow beep (one short beep a second) | On if gas is UYARI/TEHLIKE | `DURUM: UYARI` |\n| TEHLIKE | Red | Continuous | On if gas is UYARI/TEHLIKE | `DURUM: TEHLIKE` |\n\nThe levels of the three sensors are found separately with `seviyeBul`:\n\n| Sensor | Quantity | UYARI on / off | TEHLIKE on / off |\n|---|---|---|---|\n| Gas (A3) | reading, relative to the baseline | baseline×1.5 / baseline×1.25 | baseline×2.5 / baseline×2 |\n| Flame (A1) | intensity (lesson 54) | 300 / 250 | 600 / 500 |\n| Heat (A2, optional) | °C (whole number) | 45 / 42 | 60 / 55 |\n\nThe relay depends on the gas level: the fan runs until the gas is back to clean air (until the gas level is NORMAL). The relay does not need a separate hysteresis, because the gas level itself already has hysteresis.\n\nWhen the panel is switched on, it first **warms up** (`ISINMA` on the screen), then measures the gas baseline in clean air. In the lab we kept the warm-up short (4 seconds); for a real MQ-2 use a much longer time. Until the warm-up and the baseline measurement are over (about 5 seconds), the **Gas level** must stay at 0; then `gazBaz` is about 102.\n\nTo test the panel, give these values from the properties panel after the warm-up is over:\n\n| What you want to do | Value |\n|---|---|\n| Gas UYARI | MQ-2 **Gas level** 0.1 (reading about 194; threshold about 153) |\n| Gas TEHLIKE | MQ-2 **Gas level** 0.3 (reading about 379; threshold about 255) |\n| Flame UYARI | Flame sensor **Flame intensity** 0.4 (intensity about 389; threshold 300) |\n| Flame TEHLIKE | Flame sensor **Flame intensity** 0.8 (intensity about 777; threshold 600) |\n| Heat UYARI / TEHLIKE | NTC **Temperature** 50 °C / 70 °C |\n\n### Program\n```cpp\n// sketch: yangin_gaz_paneli\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nconst int ALEV_PIN = A1;\nconst int NTC_PIN = A2;\nconst int GAZ_PIN = A3;\nconst int LED_YESIL = 11;\nconst int LED_SARI = 12;\nconst int LED_KIRMIZI = 13;\nconst int BUZZER = 8;\nconst int ROLE = 7;\n\nconst bool ALEVDE_DUSER = true;\nconst bool ISI_VAR = true;\nconst unsigned long ISINMA_MS = 4000;     // ders için kısa; gerçekte çok daha uzun\nconst unsigned long OLCUM_ARALIGI = 100;  // ms\nconst unsigned long EKRAN_ARALIGI = 250;  // ms\n\nenum Seviye { NORMAL, UYARI, TEHLIKE };\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nSeviye gaz = NORMAL;\nSeviye alev = NORMAL;\nSeviye isi = NORMAL;\nSeviye genel = NORMAL;\nint gazBaz = 100;\nint gazDeger = 0;\nint alevDeger = 0;\nint isiDeger = 25;\nunsigned long sonOlcum = 0;\nunsigned long sonEkran = 0;\n\nint ortalama(int pin) {\n  long toplam = 0;\n  for (int i = 0; i < 4; i++) {\n    toplam += analogRead(pin);\n  }\n  return toplam / 4;\n}\n\nint alevSiddeti() {\n  int ham = ortalama(ALEV_PIN);\n  return ALEVDE_DUSER ? 1023 - ham : ham;\n}\n\nint sicaklikOku() {\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(NTC_PIN);\n  }\n  float adc = toplam / 8.0;\n  if (adc < 1.0) adc = 1.0;\n  if (adc > 1022.0) adc = 1022.0;\n  float direnc = 10000.0 * adc / (1023.0 - adc);\n  float kelvin = 1.0 / (log(direnc / 10000.0) / 3950.0 + 1.0 / 298.15);\n  return (int)(kelvin - 273.15 + 0.5);\n}\n\nSeviye seviyeBul(Seviye simdiki, int deger,\n                 int uyariAc, int uyariKapat,\n                 int tehlikeAc, int tehlikeKapat) {\n  if (simdiki == NORMAL) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger >= uyariAc) return UYARI;\n    return NORMAL;\n  }\n  if (simdiki == UYARI) {\n    if (deger >= tehlikeAc) return TEHLIKE;\n    if (deger < uyariKapat) return NORMAL;\n    return UYARI;\n  }\n  if (deger < tehlikeKapat) {\n    return (deger >= uyariKapat) ? UYARI : NORMAL;\n  }\n  return TEHLIKE;\n}\n\nSeviye enKotu(Seviye a, Seviye b) {\n  return (a > b) ? a : b;\n}\n\nconst char* seviyeAdi(Seviye s) {\n  if (s == UYARI) return \"UYARI  \";\n  if (s == TEHLIKE) return \"TEHLIKE\";\n  return \"NORMAL \";\n}\n\nchar seviyeHarfi(Seviye s) {\n  if (s == UYARI) return 'U';\n  if (s == TEHLIKE) return 'T';\n  return 'N';\n}\n\nvoid gecisYaz(const char* ad, Seviye eski, Seviye yeni, int deger) {\n  if (eski == yeni) return;\n  Serial.print(ad);\n  Serial.print(\": \");\n  Serial.print(seviyeAdi(yeni));\n  Serial.print(\" deger=\");\n  Serial.println(deger);\n}\n\nvoid seviyeleriGuncelle() {\n  gazDeger = ortalama(GAZ_PIN);\n  alevDeger = alevSiddeti();\n\n  Seviye yeniGaz = seviyeBul(gaz, gazDeger,\n                             gazBaz * 3 / 2, gazBaz * 5 / 4,\n                             gazBaz * 5 / 2, gazBaz * 2);\n  Seviye yeniAlev = seviyeBul(alev, alevDeger, 300, 250, 600, 500);\n  Seviye yeniIsi = isi;\n  if (ISI_VAR) {\n    isiDeger = sicaklikOku();\n    yeniIsi = seviyeBul(isi, isiDeger, 45, 42, 60, 55);\n  }\n\n  gecisYaz(\"GAZ\", gaz, yeniGaz, gazDeger);\n  gecisYaz(\"ALEV\", alev, yeniAlev, alevDeger);\n  gecisYaz(\"ISI\", isi, yeniIsi, isiDeger);\n  gaz = yeniGaz;\n  alev = yeniAlev;\n  isi = yeniIsi;\n\n  Seviye yeniGenel = enKotu(gaz, enKotu(alev, isi));\n  if (yeniGenel != genel) {\n    genel = yeniGenel;\n    Serial.print(\"DURUM: \");\n    Serial.println(seviyeAdi(genel));\n  }\n}\n\nvoid ciktilariSur(unsigned long simdi) {\n  digitalWrite(LED_YESIL, genel == NORMAL);\n  digitalWrite(LED_SARI, genel == UYARI);\n  digitalWrite(LED_KIRMIZI, genel == TEHLIKE);\n\n  bool bip = false;\n  if (genel == TEHLIKE) {\n    bip = true;                          // sürekli\n  } else if (genel == UYARI) {\n    bip = (simdi % 1000) < 150;          // saniyede bir kısa bip\n  }\n  digitalWrite(BUZZER, bip);\n\n  digitalWrite(ROLE, gaz != NORMAL);     // fan: gaz temizlenene kadar\n}\n\nvoid ekranYaz() {\n  lcd.setCursor(0, 0);\n  lcd.print(\"DURUM: \");\n  lcd.print(seviyeAdi(genel));\n  lcd.print(\"  \");\n  lcd.setCursor(0, 1);\n  lcd.print(\"G:\");\n  lcd.print(seviyeHarfi(gaz));\n  lcd.print(\" A:\");\n  lcd.print(seviyeHarfi(alev));\n  lcd.print(\" I:\");\n  lcd.print(ISI_VAR ? seviyeHarfi(isi) : '-');\n  lcd.print(\"     \");\n}\n\nvoid setup() {\n  pinMode(LED_YESIL, OUTPUT);\n  pinMode(LED_SARI, OUTPUT);\n  pinMode(LED_KIRMIZI, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  pinMode(ROLE, OUTPUT);\n  digitalWrite(ROLE, LOW);\n  Serial.begin(9600);\n\n  lcd.init();\n  lcd.backlight();\n  lcd.setCursor(0, 0);\n  lcd.print(\"ISINMA...       \");\n  lcd.setCursor(0, 1);\n  lcd.print(\"Temiz havada kal\");\n\n  while (millis() < ISINMA_MS) {\n    digitalWrite(LED_YESIL, (millis() / 250) % 2);   // yanıp söner\n  }\n\n  long toplam = 0;\n  for (int i = 0; i < 32; i++) {\n    toplam += analogRead(GAZ_PIN);\n    delay(20);\n  }\n  gazBaz = toplam / 32;\n  if (gazBaz < 20) gazBaz = 20;\n  Serial.print(\"gazBaz=\");\n  Serial.println(gazBaz);\n\n  seviyeleriGuncelle();\n  ciktilariSur(millis());\n  ekranYaz();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    seviyeleriGuncelle();\n  }\n\n  ciktilariSur(simdi);\n\n  if (simdi - sonEkran >= EKRAN_ARALIGI) {\n    sonEkran = simdi;\n    ekranYaz();\n  }\n}\n```\n\n### How does it work?\n1. `setup` first switches on the screen and waits for the warm-up. Meanwhile the green LED blinks. Then the average of 32 readings in clean air becomes `gazBaz` (gas baseline).\n2. Every 100 ms, `seviyeleriGuncelle()` (update levels) reads the three sensors and calls the **same** `seviyeBul` function three times with different thresholds. Adding a new sensor takes one line.\n3. `genel` (overall) is the `enKotu` value of the three levels. If one sensor says TEHLIKE, the panel becomes TEHLIKE; when they are all NORMAL, the panel becomes NORMAL.\n4. The levels decide the outputs directly (`ciktilariSur`, drive outputs). There is no code that changes the outputs anywhere else; this reduces bugs in state machines.\n5. The slow beep is made with `simdi % 1000 < 150`: the buzzer sounds in the first 150 ms of every second. There is no `delay`, so `loop` keeps going round.\n6. Coming back down (TEHLIKE → UYARI → NORMAL) happens with hysteresis for every sensor. If the value wobbles near a threshold, the level and the outputs do not flicker.\n7. The relay depends only on the **gas** level. Even if the panel is TEHLIKE, if the gas is NORMAL (for example there is a flame but no gas), the fan does not run.\n8. The screen is refreshed every 250 ms; `lcd.print` prints spaces at the end of each line so that no old characters are left behind.\n9. The serial monitor only prints when a level changes; it reads like an event log.\n\n### Try it\n- Set `ISI_VAR = false` and delete the NTC (and its resistor) from the canvas. Does the panel work with just gas and flame? What do you see on the second line of the screen?\n- Break the flame sensor's direction by setting `ALEVDE_DUSER = false`. How does the panel behave in a normal room?\n- Change the buzzer pattern for UYARI: on for 100 ms, off for 400 ms (`simdi % 500 < 100`). Can you write a \"two short beeps, one pause\" pattern for TEHLIKE?\n- What happens if you delete the NTC's A2 wire? (Hint: check the extreme values of `adc`.) Would you add a `SENSOR HATASI` (sensor error) level to the panel?\n\n### Common mistakes\n- Skipping the warm-up and the baseline: the panel either alarms all the time or never alarms.\n- Measuring the baseline in air that contains gas: the thresholds end up far too high, and a real rise in gas does not raise the alarm.\n- Making the off threshold the same as the on threshold: the level and the buzzer flicker.\n- Using the same output for `NORMAL` and `UYARI`, so you cannot tell one from the other.\n- Using the relay with mains voltage: never do this in this project.\n- Driving the outputs (LEDs, buzzer, relay) from different places: the level and the outputs get out of step.\n- In a real circuit, placing the sensor so that it looks straight at sunlight or a heater: it gives false alarms (the lab does not model this).",
+            "question": "Running the fan when gas is detected makes sense, but when there is a fire (flame TEHLIKE), should the fan behave the same way? Who sets the rules in a real panel? What information do you need before you can answer these questions?",
+            "explainerMd": "### What you will learn in this lesson\n- How to split an alarm panel into **input, decision, output** layers\n- How to find the overall state from the levels of three sensors with `enKotu`\n- Why it is safe to work out all the outputs (LEDs, buzzer, relay, screen) from the level\n- How to test the panel with a test table and state its limits clearly\n\n### What you should know first\n- Lesson 51: hysteresis, two thresholds.\n- Lesson 53: MQ-2 warm-up, baseline, thresholds as multiples of the baseline.\n- Lesson 54: `enum Seviye`, `seviyeBul` and `enKotu`.\n- Lesson 13: temperature with an NTC. Lesson 18: the buzzer. Lesson 24: the relay. Lesson 27: `millis()`. Lessons 32-33: the I2C LCD.\n\n### The panel's three layers\nYou can picture the inside of a fire panel like this:\n\n```\nINPUT         DECISION           OUTPUT\nGas (A3)   -> seviyeBul -> gaz   \\\nFlame (A1) -> seviyeBul -> alev   > enKotu -> genel -> LED, buzzer, screen\nHeat (A2)  -> seviyeBul -> isi   /\n                           gaz -> relay (fan)\n```\n\nThe same `seviyeBul` function is called with different thresholds for each sensor. Adding a new sensor takes one line.\n\n### Thresholds\n| Sensor | Quantity | UYARI on / off | TEHLIKE on / off |\n|---|---|---|---|\n| Gas | reading, multiple of the baseline | baseline × 1.5 / × 1.25 | baseline × 2.5 / × 2 |\n| Flame | intensity | 300 / 250 | 600 / 500 |\n| Heat | °C | 45 / 42 | 60 / 55 |\n\nSince the baseline on the virtual gas module is about 102, the gas thresholds come to about 153 / 127 and 255 / 204.\n\n### The outputs are worked out from the level\nIf you change the outputs from different places in the code, one day the level and the outputs will get out of step: the screen says TEHLIKE while the buzzer is silent. That is why a single function (`ciktilariSur`) looks at the level on every pass and sets all the outputs.\n\n- **NORMAL:** green LED, silent.\n- **UYARI:** yellow LED, one short beep a second (`simdi % 1000 < 150`).\n- **TEHLIKE:** red LED, continuous sound.\n- **Relay (fan):** depends only on the **gas** level. The fan runs until the gas is NORMAL; a flame on its own does not switch the fan on.\n\nThe screen answers the panel's \"why\" question: the second line shows each sensor's letter, like `G:N A:U I:N`.\n\n### Non-blocking flow\nThe panel does not use `delay`. The measurement is refreshed every 100 ms and the screen every 250 ms; the rest of the time `loop` goes round and refreshes the outputs. That way the beep pattern, the screen and the measurement all work at the same time.\n\n### Safety and limits\nThe relay only drives a 5 V LED; no circuit is ever built with mains voltage (220 V). This panel is for learning and does not replace a certified gas or fire detector. You must wait for the warm-up and measure the baseline in clean air.\n\n### Summary\nThe panel finds a level from each sensor, makes the worst of the levels the overall state and works out all the outputs from that state. The relay is tied to the gas by a separate rule. Warm-up, baseline measurement and hysteresis reduce false alarms. The panel's limits (that it is for learning) must be stated clearly.",
+            "concepts": [
+              {
+                "term": "Input - decision - output",
+                "definition": "Splitting the alarm panel into three separate layers: reading the sensors, finding the level and driving the outputs.",
+                "example": "The analogRead values go into seviyeBul, and the overall level goes to ciktilariSur.",
+                "pitfall": "Mixing reading, deciding and output in the same block of code: changing one place breaks another."
+              },
+              {
+                "term": "Overall state (enKotu)",
+                "definition": "Making the highest of the three sensors' levels the panel's state.",
+                "example": "If gas is NORMAL, flame is UYARI and heat is TEHLIKE, the overall state is TEHLIKE.",
+                "pitfall": "Leaving a sensor out: even if that sensor is in danger, the panel shows NORMAL."
+              },
+              {
+                "term": "Working out the outputs from the level",
+                "definition": "Driving the LEDs, buzzer, relay and screen in a single function, looking only at the level.",
+                "example": "ciktilariSur() sets the LEDs, buzzer and relay from the overall level on every pass.",
+                "pitfall": "Driving the outputs from different places: the level and the outputs get out of step, and the buzzer is silent while the screen says TEHLIKE."
+              },
+              {
+                "term": "Non-blocking beep pattern",
+                "definition": "Making an on-off sound without delay, using the remainder of millis() (simdi % 1000 < 150).",
+                "example": "The buzzer sounds in the first 150 ms of every second and is silent for the other 850 ms.",
+                "pitfall": "Using delay for the beep: meanwhile the sensors are not read and the screen is not updated."
+              },
+              {
+                "term": "Relay rule (fan for gas)",
+                "definition": "The fan runs only until the gas level is NORMAL; a flame on its own does not switch the fan on.",
+                "example": "If flame is TEHLIKE and gas is NORMAL, the red LED lights up but the relay stays off.",
+                "pitfall": "Tying the relay to the overall state without thinking about this rule: you may not want the fan running in a fire; this is a design decision and should be questioned."
+              },
+              {
+                "term": "Limit: for learning only",
+                "definition": "This panel does not replace a certified gas or fire detector.",
+                "example": "The panel only drives a 5 V LED with the relay; mains voltage is not used.",
+                "pitfall": "Using the circuit on its own to protect real lives and property."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h4d5-q1",
+                "kind": "mcq",
+                "prompt": "On the panel, gas is NORMAL and heat is NORMAL, but the flame sensor is at the TEHLIKE level. What state are the outputs in?",
+                "options": [
+                  "Green LED lit, buzzer silent, relay on",
+                  "Yellow LED lit, one beep a second, relay on",
+                  "Red LED lit, buzzer continuous, relay off",
+                  "Red LED lit, buzzer silent, relay on"
+                ],
+                "answer": 2,
+                "explanation": "The overall state is the worst level: TEHLIKE. So the red LED lights up and the buzzer sounds continuously. The relay depends only on the gas level; because the gas is NORMAL, the fan does not run. The other options apply the overall state or the relay rule wrongly.",
+                "skills": [
+                  "alarm-design",
+                  "sens-levels"
+                ]
+              },
+              {
+                "id": "m4h4d5-q2",
+                "kind": "numeric",
+                "prompt": "For gas, the TEHLIKE off threshold is baseline × 2 (integer maths). On the virtual MQ-2 the baseline in clean air was measured as 102. Below which value must the reading fall for the gas to drop from TEHLIKE to UYARI?",
+                "answer": 204,
+                "tolerance": 0,
+                "explanation": "tehlikeKapat = gazBaz × 2 = 102 × 2 = 204. While at the TEHLIKE level, when the reading drops below 204 it moves to UYARI. The TEHLIKE on threshold is 102 × 5 / 2 = 255; the 204-255 region between the two thresholds is the hysteresis band.",
+                "skills": [
+                  "sens-levels",
+                  "sens-baseline"
+                ]
+              },
+              {
+                "id": "m4h4d5-q3",
+                "kind": "predict-output",
+                "prompt": "At the UYARI level, the buzzer pattern is set by (simdi % 1000) < 150. The buzzer state (1 = sounding) is printed while millis() is 2100, 2200, 2999 and 3050 in turn. What does this code print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long t[] = {2100, 2200, 2999, 3050};\n  for (int i = 0; i < 4; i++) {\n    bool bip = (t[i] % 1000) < 150;\n    Serial.print(bip ? 1 : 0);\n  }\n}\n```",
+                "options": [
+                  "0110",
+                  "1111",
+                  "0000",
+                  "1001"
+                ],
+                "answer": 3,
+                "explanation": "2100 % 1000 = 100 < 150, so 1. 2200 % 1000 = 200 ≥ 150, so 0. 2999 % 1000 = 999, so 0. 3050 % 1000 = 50 < 150, so 1. The output is 1001: the first 150 ms of every second is a beep, the rest is silent.",
+                "skills": [
+                  "alarm-design",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h4d5-q4",
+                "kind": "find-bug",
+                "prompt": "The NTC shows 70 °C and the heat level is found to be TEHLIKE, but the panel shows NORMAL and stays silent. Where is the mistake?\n\n```\ngaz = yeniGaz;\nalev = yeniAlev;\nisi = yeniIsi;\n\nSeviye yeniGenel = enKotu(gaz, alev);\nif (yeniGenel != genel) {\n  genel = yeniGenel;\n}\n```",
+                "options": [
+                  "The line gaz = yeniGaz; is not needed",
+                  "The genel variable should not be global",
+                  "enKotu cannot compare enums",
+                  "enKotu(gaz, alev) does not take the isi level into account"
+                ],
+                "answer": 3,
+                "explanation": "The overall state must be the worst of the three sensors: enKotu(gaz, enKotu(alev, isi)). Because the heat is not taken into account, the sensor at the TEHLIKE level does not show up in the overall state and the outputs stay silent. enum values can be compared like numbers, and the other lines are correct.",
+                "skills": [
+                  "alarm-design",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h4d5-q5",
+                "kind": "mcq",
+                "prompt": "The panel was switched on by mistake while Gas level was 0.3; the baseline was measured as about 379. Then the gas rose to 0.6 (reading about 655). If the baseline had been 102 in clean air, this reading would count as TEHLIKE (threshold 255). Which level does this panel show now?",
+                "options": [
+                  "NORMAL",
+                  "UYARI",
+                  "TEHLIKE",
+                  "It gives an error"
+                ],
+                "answer": 1,
+                "explanation": "If the baseline is 379, the UYARI on threshold is 379 × 3 / 2 = 568 and the TEHLIKE on threshold is 379 × 5 / 2 = 947. 655 only goes above the UYARI threshold. Because the baseline was measured in air containing gas, the thresholds move up and a real danger is underestimated. That is why the baseline is measured in clean air, after the warm-up; this panel is also for learning and is not used for real safety.",
+                "skills": [
+                  "sens-baseline",
+                  "safety-sensors"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -2468,6 +4880,7 @@ export const modul4: ModuleContent = {
       "title": "Hareket ve yön",
       "project": "Eğimle kontrol edilen servo",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Joystick'in iki potansiyometre ve bir düğmeden oluştuğunu söyleyebilir; orta noktayı ölçüp ölü bölge koyarak ham değeri -100...+100 aralığına çevirebilir.\n2. Döner enkoderde CLK ve DT sinyalinden dönüş yönünü bulabilir; sayacı kesme ve `volatile` ile tutabilir, sıçrama filtresinin neden gerektiğini açıklayabilir.\n3. MPU6050'yi yazmaçlarla okuyabilir, ham değeri g ve °/s'ye çevirebilir, `atan2` ile eğim açısı hesaplayabilir.\n4. Jiroskop sapmasının neden hata biriktirdiğini açıklayabilir ve tamamlayıcı filtreyle iki sensörü birleştirebilir.\n5. Eğimi ters yönde servoya çeviren, `millis` ile bloklamayan bir mini gimbal kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 25-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Joystick: iki eksen ve düğme | ~25 dk | Anlatımı oku, ham değerleri izle, merkezi ve ölü bölgeyi dene, mini testi çöz. |\n| 2 | Döner enkoder (quadrature) ve kesme | ~25 dk | CLK/DT durum tablosunu çiz, sayacı çalıştır, sıçrama eşiğini değiştir. |\n| 3 | MPU6050: ivmeölçer ve eğim açısı (I2C) | ~30 dk | Yazmaç okumayı dene, ham değeri g'ye çevir, pitch ve roll'u hesapla. |\n| 4 | Jiroskop sapması ve tamamlayıcı filtre | ~30 dk | Sapmayı ölç, integralin kaymasını gör, ALFA değerini değiştir. |\n| 5 | Proje: El eğimiyle kontrol edilen servo (mini gimbal) | ~35 dk | Devreyi kur, programı çalıştır, projeyi ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta önceki haftalardan şunlar gerekir. Başlamadan önce kontrol et:\n- `INPUT_PULLUP` ve basılı düğmenin `LOW` okunduğunu biliyor mu? (ders 6)\n- Kenar algılama ve buton sıçramasını anlıyor mu? (ders 8)\n- `analogRead` ile 0-1023 değerini okuyup `map` ile ölçekleyebiliyor mu? (ders 11 ve 14)\n- Servo açısını ve `millis` ile bloklamayan döngüyü biliyor mu? (ders 21 ve 27)\n- `attachInterrupt`, ISR ve `volatile` kavramlarını biliyor mu? (ders 29)\n- I2C'de SDA, SCL ve cihaz adresini biliyor mu? (ders 33)\n\n### Kavram haritası\n- **Analog girdi:** joystick (iki gerilim bölücü) → merkez → ölü bölge → `map` ile -100...+100\n- **Sayma:** enkoder → CLK ve DT (90 derece fark) → yön kuralı → kesme ve `volatile` → sıçrama filtresi\n- **Hareket algılama:** MPU6050 → yazmaç (0x6B, 0x3B) → ham → g ve °/s → `atan2` ile açı\n- **Sensör birleştirme:** ivmeölçer (kaymaz, gürültülü) + jiroskop (hızlı, kayar) → tamamlayıcı filtre (`ALFA`)\n- **Proje:** açı → ofset → servo = 90 − eğim → `constrain` → `millis` ile işler → açık çevrim\n\n### Sık yapılan hatalar\n- **Merkezi sabit 512 yazmak ya da ölü bölge koymamak.** Kol bırakılmışken değer dalgalanır.\n- **Kol itilmişken programı başlatmak.** Merkez yanlış ölçülür.\n- **CLK'yı kesme pinine (D2, D3) bağlamamak.** `attachInterrupt` çalışmaz.\n- **`sayac`'ı `volatile` yapmamak ya da ISR içinde `Serial.print` / `delay` kullanmak.**\n- **Sıçrama eşiğini çok büyük seçmek.** Hızlı çevirirken gerçek tıklar da atılır.\n- **MPU6050'yi `0x6B` yazmacına 0 yazmadan okumak.** Çip uykuda kalır.\n- **`ax / 16384` yazmak.** Tam sayı bölmesi 0 verir; `16384.0` yaz.\n- **Baytları işaretsiz birleştirmek.** Negatif değer 65000 gibi görünür; `int16_t` kullan.\n- **MPU6050 ile RTC'yi aynı hatta kullanmak.** İkisi de 0x68 adresindedir.\n- **Hareket anında ivmeölçer açısına güvenmek.** Çip eğilmeden `ax` = 0,3 g bile yaklaşık 16,7 derece gösterir.\n- **`dt`'yi milisaniye ya da sabit yazmak.** Integral 1000 kat bozulur ya da süre değişince kayar.\n- **Sapma ölçerken çipi oynatmak.** Bütün açı kayar.\n- **Gimbalde `delay` kullanmak ve servoyu sınırlamamak.** Düğme kaçar, servo mekanik uca dayanır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Joystick programını bakmadan yaz: merkez ölç, ölü bölge ekle, `map` ile ölçekle.\n4. Enkoder için kâğıda iki yönün 11, 01, 00, 10 tablosunu çiz ve \"CLK düşerken DT\" kuralını kendi cümlenle anlat.\n5. `ALFA` değerini 0,90, 0,98 ve 0,999 yaparak filtrenin titreşime ve kaymaya tepkisini karşılaştır; zaman sabitini `ALFA · dt / (1 − ALFA)` ile hesapla.\n6. Şu soruyu kendi cümlelerinle cevapla: \"İvmeölçer ve jiroskop neden birlikte kullanılır?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Mini gimbal)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | MPU6050 ya da servo çalışmıyor, SDA/SCL karışık | MPU6050, LCD, servo ve düğme doğru pinlerde; RTC yok | Düzenli bağlantılar, servo gücünün neden ayrı olması gerektiğini açıklıyor |\n| Ölçüm ve filtre | Yalnız ivmeölçer kullanıyor; açı titriyor | Sapma ölçülüyor, tamamlayıcı filtre çalışıyor | `ALFA` değerini deneyip etkisini açıklıyor |\n| Kontrol | Servo eğimle aynı yönde dönüyor ya da sınırsız | Servo ters yönde dönüyor, 10...170 ile sınırlı, düğme sıfırlıyor | Sınır LED'i çalışıyor, roll ekseni gibi bir geliştirme var |\n| Zamanlama | `delay` kullanıyor; düğme kaçıyor | `millis` ile bloklamayan döngü var | `dt`'yi `micros` ile hesaplıyor ve nedenini açıklıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Sensörden servoya veri akışını adım adım anlatıyor | Açık çevrimin sınırını ve nasıl iyileştirilebileceğini anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta formül ezberlemek değil, bir sensörün kusurlu olduğunu ve kusurunu başka bir sensörle kapatmayı görmektir. \"İvmeölçer neden yanılıyor?\" sorusu haftanın ana sorusudur.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine sor: \"Sensör şu an tam olarak neyi ölçüyor?\", \"Birimler uyumlu mu: derece mi radyan mı, ms mi s mi?\", \"Hangi satır çip uykudayken de çalışırdı?\"\n- **Matematik.** `atan2` ve filtre formülü zor görünebilir. Önce değerleri laboratuvardan değiştirip sonucu izlemek, sonra formüle bakmak daha kolaydır. Hesaplamalar dört işlem ve basit oran düzeyindedir.\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Haftanın 3. ve 4. dersi arasında bir gün ara vermek iyi olur.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Gerçek kartla çalışılırsa servoyu ayrı 5 V kaynaktan besle ve GND'leri ortak yap; şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can say that a joystick is made of two potentiometers and a button; can measure the centre and add a dead zone to turn the raw value into the range -100...+100.\n2. Can find the direction of rotation of a rotary encoder from the CLK and DT signals; can keep the counter with an interrupt and `volatile`, and can explain why a bounce filter is needed.\n3. Can read the MPU6050 through its registers, convert the raw value into g and °/s, and calculate the tilt angle with `atan2`.\n4. Can explain why gyroscope bias builds up error, and can combine the two sensors with a complementary filter.\n5. Can build a non-blocking mini gimbal with `millis` that turns a tilt into a servo movement in the opposite direction.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 25-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Joystick: two axes and a button | ~25 min | Read the explainer, watch the raw values, try the centre and the dead zone, do the mini quiz. |\n| 2 | Rotary encoder (quadrature) and interrupts | ~25 min | Draw the CLK/DT state table, run the counter, change the bounce threshold. |\n| 3 | MPU6050: accelerometer and tilt angle (I2C) | ~30 min | Try reading the registers, convert the raw value into g, calculate pitch and roll. |\n| 4 | Gyroscope bias and the complementary filter | ~30 min | Measure the bias, see the integral drift, change the ALFA value. |\n| 5 | Project: A servo controlled by hand tilt (mini gimbal) | ~35 min | Build the circuit, run the program, assess the project with the rubric. |\n\n### Prerequisite check\nThis week needs the following from earlier weeks. Check them before you start:\n- Does the learner know `INPUT_PULLUP` and that a pressed button reads `LOW`? (lesson 6)\n- Do they understand edge detection and button bounce? (lesson 8)\n- Can they read a 0-1023 value with `analogRead` and scale it with `map`? (lessons 11 and 14)\n- Do they know the servo angle and the non-blocking loop with `millis`? (lessons 21 and 27)\n- Do they know the ideas of `attachInterrupt`, the ISR and `volatile`? (lesson 29)\n- Do they know SDA, SCL and the device address in I2C? (lesson 33)\n\n### Concept map\n- **Analogue input:** joystick (two voltage dividers) → centre → dead zone → -100...+100 with `map`\n- **Counting:** encoder → CLK and DT (90 degrees apart) → direction rule → interrupt and `volatile` → bounce filter\n- **Motion sensing:** MPU6050 → registers (0x6B, 0x3B) → raw → g and °/s → angle with `atan2`\n- **Sensor fusion:** accelerometer (does not drift, noisy) + gyroscope (fast, drifts) → complementary filter (`ALFA`)\n- **Project:** angle → offset → servo = 90 − tilt → `constrain` → jobs with `millis` → open loop\n\n### Common mistakes\n- **Writing the centre as a fixed 512, or not adding a dead zone.** The value wobbles while the stick is released.\n- **Starting the program while the stick is pushed.** The centre is measured wrongly.\n- **Not connecting CLK to an interrupt pin (D2, D3).** `attachInterrupt` does not work.\n- **Not making `sayac` `volatile`, or using `Serial.print` / `delay` inside the ISR.**\n- **Choosing a bounce threshold that is too large.** When you turn fast, real ticks are thrown away too.\n- **Reading the MPU6050 without writing 0 to register `0x6B`.** The chip stays asleep.\n- **Writing `ax / 16384`.** Integer division gives 0; write `16384.0`.\n- **Joining the bytes as unsigned.** A negative value looks like 65000; use `int16_t`.\n- **Using the MPU6050 and the RTC on the same line.** Both are at address 0x68.\n- **Trusting the accelerometer angle during movement.** Even `ax` = 0.3 g without the chip tilting shows about 16.7 degrees.\n- **Writing `dt` in milliseconds or as a fixed value.** The integral is off by 1000 times, or it drifts when the timing changes.\n- **Moving the chip while measuring the bias.** The whole angle drifts.\n- **Using `delay` in the gimbal and not limiting the servo.** The button is missed and the servo pushes against its mechanical end.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the mini quiz questions you got wrong, then solve the question again.\n3. Write the joystick program without looking: measure the centre, add a dead zone, scale with `map`.\n4. For the encoder, draw the 11, 01, 00, 10 table for both directions on paper and explain the \"DT when CLK falls\" rule in your own words.\n5. Compare how the filter reacts to vibration and drift by setting `ALFA` to 0.90, 0.98 and 0.999; work out the time constant with `ALFA · dt / (1 − ALFA)`.\n6. Answer this question in your own words: \"Why are the accelerometer and the gyroscope used together?\"\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions per lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Mini gimbal)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The MPU6050 or the servo does not work, SDA/SCL mixed up | MPU6050, LCD, servo and button on the right pins; no RTC | Tidy connections; explains why the servo's power should be separate |\n| Measurement and filter | Uses the accelerometer only; the angle jitters | The bias is measured, the complementary filter works | Tries different `ALFA` values and explains their effect |\n| Control | The servo turns the same way as the tilt, or is unlimited | The servo turns the opposite way, limited to 10...170, the button resets | The limit LED works; there is an improvement such as a roll axis |\n| Timing | Uses `delay`; the button is missed | There is a non-blocking loop with `millis` | Calculates `dt` with `micros` and explains why |\n| Explanation | Cannot explain what they did | Explains the data flow from sensor to servo step by step | Explains the limit of open loop and how it could be improved |\n\n### Note for parents and teachers\n- **Aim.** This week is not about memorising formulas but about seeing that a sensor is flawed and covering its flaw with another sensor. \"Why does the accelerometer get it wrong?\" is the main question of the week.\n- **How to help.** When the learner gets stuck, ask instead of giving the answer: \"What exactly is the sensor measuring right now?\", \"Do the units match: degrees or radians, ms or s?\", \"Which line would still run while the chip is asleep?\"\n- **Maths.** `atan2` and the filter formula can look hard. It is easier to change the values in the lab first and watch the result, then look at the formula. The calculations stay at the level of the four operations and simple ratios.\n- **Time.** Spacing the lessons out, instead of doing them one after another on the same day, helps the learning stick. A day's break between lessons 3 and 4 of the week is a good idea.\n- **Safety.** Everything on this platform is virtual. If you work with a real board, power the servo from a separate 5 V supply and join the GNDs; no circuit is ever built with mains voltage (220 V).\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Joystick: iki eksen ve düğme",
@@ -2581,7 +4994,120 @@ export const modul4: ModuleContent = {
                 "axis-calibration"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Joystick: two axes and a button",
+            "problem": "When you hold a game controller, your thumb can move left-right and up-down, and how far you push it matters too. A button only says \"pressed / not pressed\". A joystick gives you two numbers and a button at the same time. So why do these two numbers, when you let go of the stick, come out as \"roughly the middle\" rather than exactly zero?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Joystick VCC | 5V |\n| Joystick GND | GND |\n| Joystick VRX (X axis) | **A0** |\n| Joystick VRY (Y axis) | **A1** |\n| Joystick SW (button) | **D2** (`INPUT_PULLUP`) |\n| Resistor (330 Ω) 1 | **D13** |\n| Resistor 2 | LED **A** (anode) |\n| LED **K** (cathode) | GND |\n\nWhen you select the joystick, the **X axis**, **Y axis** (between 0 and 1) and **Button pressed** properties appear in the right panel; you can change them while the program runs, too. Set the resistor's value to 330 Ω in the properties panel.\n\nA joystick is really two **potentiometers** at right angles to each other (lesson 11) plus a button you can press. With the stick in the middle, each potentiometer's wiper sits at about halfway, so `analogRead` gives about 512. Push the stick all the way and the value gets close to 0 or 1023. The SW button connects to GND when pressed; because we use `INPUT_PULLUP` (lesson 6), a pressed button reads `LOW`.\n\nOn real modules the direction labels vary from maker to maker; you find out which direction is positive by trying the first program. In the lab, as the X (or Y) property grows, the `analogRead` value grows too.\n\n### Program 1: Read the raw values\n```cpp\n// sketch: joystick_ham\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT_PULLUP);\n}\n\nvoid loop() {\n  int x = analogRead(A0);\n  int y = analogRead(A1);\n  int basili = (digitalRead(2) == LOW) ? 1 : 0;   // 1 = düğmeye basılı\n\n  Serial.print(\"X=\");\n  Serial.print(x);\n  Serial.print(\" Y=\");\n  Serial.print(y);\n  Serial.print(\" BUTON=\");\n  Serial.println(basili);\n  delay(200);\n}\n```\nPress ▶ and watch the Serial monitor. With the joystick's **X axis** property at 0.5, `X` comes out at about 512 (0.5 × 5 V = 2.5 V). Pull X down to 0: the value drops to 0; pull it up to 1: it rises to 1023. Try the same for Y. If you tick the **Button pressed** box, you get `BUTON=1`.\n\nOn a real module, with the stick released, X and Y are not exactly 512; you might get 497 or 530, for example, because neither potentiometer stops perfectly at halfway. You can imitate this in the lab: set the X axis property to 0.52 and the value becomes about 532.\n\n### Centre calibration and dead zone\nYou learnt about calibration in lesson 14. For a joystick you do two jobs:\n\n1. **Measure the centre.** When the program starts, it assumes the stick is released. The average of 16 readings is stored as the \"centre\".\n2. **Add a dead zone.** Within a small range around the centre (here ±40) the value counts as zero. That way a shaky hand or a small drift of the potentiometer does not move the robot or the servo.\n\nWe convert the distance from the centre into the range `-100 ... +100` with `map` (lesson 14). The part outside the dead zone is rescaled, so the value starts from 0 just outside the dead zone instead of suddenly jumping to 40.\n\n### Program 2: Calibrated axes and an LED on the button\n```cpp\n// sketch: joystick_kalibre\nconst int SW = 2;\nconst int LED = 13;\nconst int OLU_BOLGE = 40;          // merkezin ± bu kadarı sıfır sayılır\n\nint merkezX;\nint merkezY;\nbool ledAcik = false;\nbool oncekiBasili = false;\nunsigned long sonBasis = 0;\nunsigned long sonYazma = 0;\n\nint merkezOlc(int pin) {\n  long toplam = 0;\n  for (int i = 0; i < 16; i++) {\n    toplam += analogRead(pin);\n    delay(2);\n  }\n  return toplam / 16;\n}\n\n// ham değeri -100 ... +100 aralığına çevirir\nint eksen(int ham, int merkez) {\n  int fark = ham - merkez;\n  if (abs(fark) < OLU_BOLGE) return 0;\n  if (fark > 0) {\n    return constrain(map(fark, OLU_BOLGE, 1023 - merkez, 0, 100), 0, 100);\n  }\n  return constrain(map(fark, -OLU_BOLGE, -merkez, 0, -100), -100, 0);\n}\n\nconst char* yonAdi(int x, int y) {\n  if (abs(x) < 30 && abs(y) < 30) return \"ORTA\";\n  if (abs(x) >= abs(y)) return x > 0 ? \"SAG\" : \"SOL\";\n  return y > 0 ? \"YUKARI\" : \"ASAGI\";\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(SW, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  merkezX = merkezOlc(A0);          // kol bırakılmışken ölç\n  merkezY = merkezOlc(A1);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // Düğme: basıldığı an LED'in durumunu tersle (kenar algılama + sıçrama önleme)\n  bool basili = (digitalRead(SW) == LOW);\n  if (basili && !oncekiBasili && simdi - sonBasis > 30) {\n    sonBasis = simdi;\n    ledAcik = !ledAcik;\n    digitalWrite(LED, ledAcik);\n  }\n  oncekiBasili = basili;\n\n  // Saniyede beş kez yaz\n  if (simdi - sonYazma >= 200) {\n    sonYazma = simdi;\n    int x = eksen(analogRead(A0), merkezX);\n    int y = eksen(analogRead(A1), merkezY);\n    Serial.print(\"X=\");\n    Serial.print(x);\n    Serial.print(\" Y=\");\n    Serial.print(y);\n    Serial.print(\" YON=\");\n    Serial.println(yonAdi(x, y));\n  }\n}\n```\n\n### How does it work?\n1. `merkezOlc` (measure centre) reads 16 times while the stick is released and takes the average. Using an average instead of a single reading reduces noise (lesson 14).\n2. `eksen` (axis) first finds the difference from the centre. If the difference is inside the dead zone, it returns 0.\n3. If the difference is positive, `map` converts the range `OLU_BOLGE ... (1023 − merkez)` into `0 ... 100`. If it is negative, the range `-OLU_BOLGE ... -merkez` becomes `0 ... -100`. If the centre is not 512, the two halves have different lengths; doing it this way means you reach exactly ±100 at both ends.\n4. `constrain` cuts off small overshoots in the calculation.\n5. `yonAdi` (direction name) picks whichever axis is bigger. On real modules the positive direction of the Y axis changes from module to module; in the lab, \"YUKARI\" (up) is printed as Y grows. If it comes out the other way round on another module, you swap the labels.\n6. For the button, the edge detection from lesson 8 is used: it runs only once, at the moment of the press, so holding the button down does not make the LED blink.\n\n### Try it\n- Set `OLU_BOLGE` to 10, then to 120. Start the X axis property at 0.5 and raise it slowly: at what point does the value leave zero?\n- Set the X axis property to 0.8 and **then** press ▶ (the centre is measured wrongly). Then bring X back to 0.5. What happens? Why?\n- Change an LED's brightness according to the X axis (lesson 16): the LED should get brighter as the stick goes right and stay dim when it goes left. D13 is not a PWM pin; move the LED to D11 (the PWM pins are 3, 5, 6, 9, 10, 11).\n\n### Common mistakes\n- Writing the centre as a fixed 512: it works on one module, but on another the robot drifts while the stick is released.\n- Not adding a dead zone: with the stick released the value wobbles, 510, 514, 509; the servo or motor jitters.\n- Pressing ▶ while the stick is pushed (while X or Y is far from 0.5): the centre is measured wrongly.\n- Not setting the SW pin to `INPUT_PULLUP`: when the button is released the pin floats and random presses are read (lesson 6).\n- Connecting the module's VCC to 3V3 instead of 5V: the end value becomes about 675 instead of 1023 (3.3 / 5 × 1023), because the ADC measures against 5 V. Try it in the lab.",
+            "question": "A drone controller has two joysticks, and neither gives exactly \"zero\" in the middle. How might the maker solve this flaw? If we make the dead zone very large, how does the feel of the controller change?",
+            "explainerMd": "### What you will learn in this lesson\n- That a joystick is made of two potentiometers and a button\n- Why the `analogRead` value is about 512 when the stick is released\n- How to turn the raw value into a number between -100 and +100 by measuring the centre and adding a dead zone\n- How to read the joystick button with `INPUT_PULLUP`\n\n### What you should know first\nLesson 6: `INPUT_PULLUP` and a pressed button reading `LOW`; lesson 8: edge detection; lesson 11: the potentiometer and `analogRead`; lesson 14: calibration with `map`.\n\n### What is inside a joystick?\nA joystick is made of **two potentiometers** standing at right angles to each other and **a button** at the end of the stick. The module has five pins: VCC, GND, VRX (horizontal axis), VRY (vertical axis) and SW (button).\n\n```\n 5V ──┬── one end of VRX          Stick in middle: wiper halfway -> ~2.5 V -> ~512\n      │   wiper ──> VRX (A0)      Stick at end   : wiper at end  -> 0 V or 5 V\n GND ─┴── other end of VRX                                      -> 0 or 1023\n```\n\nEach axis is a voltage divider. With the stick in the middle, the wiper sits halfway along the track; the voltage is about 2.5 V and `analogRead` is about 512. Push it fully in one direction and it gets close to 0 V or 5 V, that is, 0 or 1023. In the lab, if the X axis property is 0.25, the voltage is 1.25 V and the reading is about 256.\n\n### Why is there no exact zero?\nA button has two states; a joystick has a continuous range. On top of that, the \"middle\" is not perfect: neither potentiometer stops at exactly halfway. On a real module with the stick released you read a value such as 497 or 530. This is not a fault; it is the nature of the part.\n\n### Measure the centre, add a dead zone\nYou do two steps:\n\n1. **Measuring the centre.** When the program starts, the stick is assumed to be released; the average of 16 readings is stored as the \"centre\". The average reduces noise.\n2. **Dead zone.** A small range around the centre (for example ±40) counts as zero. A shaky hand or a small drift does not move the robot.\n\nThen the difference is converted with `map` into the range -100...+100. Example: if the centre is 532 and the raw value is 600, the difference is 68; the part outside the dead zone is scaled from the range 40...491 to 0...100, and with integer division the result is 6. That way the value starts from 0 just outside the dead zone instead of suddenly jumping to 40.\n\n### The button\nThe SW pin connects to GND when the button is pressed. If you set the pin to `INPUT_PULLUP`, a released button reads `HIGH` and a pressed button reads `LOW`. To catch only the moment of the press, you store the previous state and detect the edge; holding the button down does not repeat the event.\n\n### Summary\nA joystick is two voltage dividers and a button. With the stick released, the value is about 512 but not exactly 512; that is why the centre is measured at start-up and a dead zone is put around it. The corrected value, in the range -100...+100, is ready to drive a robot or a servo. The button is read with `INPUT_PULLUP`, and `LOW` means pressed.",
+            "concepts": [
+              {
+                "term": "Joystick",
+                "definition": "An input part made of two potentiometers at right angles and a button; it has VRX, VRY and SW pins.",
+                "example": "With the X axis property at 0.25, VRX gives about 1.25 V and analogRead reads about 256.",
+                "pitfall": "Thinking the joystick is a single sensor: it needs two separate analogue pins (A0 and A1) and one digital pin."
+              },
+              {
+                "term": "Centre (middle point)",
+                "definition": "The value read while the stick is released. It is measured at start-up as the average of 16 readings.",
+                "example": "On one module the centre may be 532, on another 491.",
+                "pitfall": "Writing the centre as a fixed 512: the value drifts while the stick is released."
+              },
+              {
+                "term": "Dead zone",
+                "definition": "A small range around the centre in which the value counts as zero.",
+                "example": "With a dead zone of 40, a deviation of 25 from the centre is treated as 0.",
+                "pitfall": "Not adding a dead zone: the servo or motor jitters with a value that wobbles 510, 514, 509."
+              },
+              {
+                "term": "Scaling with map()",
+                "definition": "Converts a value from one range to another in a straight line; it uses integer division.",
+                "example": "map(68, 40, 491, 0, 100) gives 6.",
+                "pitfall": "Leaving the dead zone unscaled: the value jumps suddenly from 0 to 40."
+              },
+              {
+                "term": "Button with INPUT_PULLUP",
+                "definition": "Pulls the pin up to 5 V internally; a pressed button connects to GND, so it reads LOW.",
+                "example": "If digitalRead(2) == LOW, the joystick button is pressed.",
+                "pitfall": "Not writing INPUT_PULLUP: with the button released the pin floats and random presses are read."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h5d56-q1",
+                "kind": "numeric",
+                "prompt": "The joystick is powered from 5 V. You set the X axis property to 0.25 (the stick is about a quarter of the way). You connected the VRX pin to A0. About what does analogRead(A0) read?",
+                "answer": 256,
+                "tolerance": 2,
+                "explanation": "Voltage = 0.25 x 5 V = 1.25 V. analogRead = 1.25 / 5 x 1024, about 256 (255 or 256 on an Arduino). 512 comes with the stick in the middle, and 768 at 0.75.",
+                "skills": [
+                  "analog-read"
+                ]
+              },
+              {
+                "id": "m4h5d56-q2",
+                "kind": "mcq",
+                "prompt": "Why does the joystick read about 512 rather than \"0\" when the stick is released?",
+                "options": [
+                  "The program is wrong; it should read 0",
+                  "The wiper stops halfway along the track, so the voltage is about 2.5 V",
+                  "The button is stuck pressed",
+                  "The ADC starts at 512"
+                ],
+                "answer": 1,
+                "explanation": "Each axis is a voltage divider, and with the stick in the middle the wiper is halfway: half of 5 V, which is about 512. The button (SW) is a separate pin and does not affect the axis value. The ADC reads from 0 to 1023; it does not start at 512.",
+                "skills": [
+                  "analog-read",
+                  "axis-calibration"
+                ]
+              },
+              {
+                "id": "m4h5d56-q3",
+                "kind": "numeric",
+                "prompt": "The centre was measured as 532 and the dead zone is 40. When the stick is pushed right, the raw value reads 600. For the eksen() function in the lesson, the difference = 68 and map(fark, 40, 1023 - 532, 0, 100) is called. What is the result?",
+                "answer": 6,
+                "tolerance": 0,
+                "explanation": "The input range is 40...491. (68 - 40) x 100 / (491 - 40) = 2800 / 451 = 6.2; map uses integer division, so it is 6. Because the part outside the dead zone is rescaled, the value starts from 0; it does not come out as 68.",
+                "skills": [
+                  "axis-calibration"
+                ]
+              },
+              {
+                "id": "m4h5d56-q4",
+                "kind": "find-bug",
+                "prompt": "Even with the button released, the Serial monitor sometimes prints \"BASILDI\" (pressed). Which line is wrong?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {\n    Serial.println(\"BASILDI\");\n  }\n  delay(100);\n}\n```",
+                "options": [
+                  "Serial.begin(9600);",
+                  "delay(100);",
+                  "pinMode(2, INPUT);",
+                  "if (digitalRead(2) == LOW) {"
+                ],
+                "answer": 2,
+                "explanation": "The SW pin should be INPUT_PULLUP. With plain INPUT, a released button leaves the pin floating and it reads randomly. The LOW check is correct, because a pressed button connects to GND.",
+                "skills": [
+                  "input-pullup",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h5d56-q5",
+                "kind": "predict-output",
+                "prompt": "The centre is 512. The stick is pushed slightly and the raw value is 540. What does the Serial monitor show when this code runs?\n\n```\nint merkez = 512;\nint ham = 540;\nint fark = ham - merkez;\nif (abs(fark) < 40) {\n  Serial.println(\"ORTA\");\n} else if (fark > 0) {\n  Serial.println(\"SAG\");\n} else {\n  Serial.println(\"SOL\");\n}\n```",
+                "options": [
+                  "ORTA",
+                  "SAG",
+                  "SOL",
+                  "Nothing"
+                ],
+                "answer": 0,
+                "explanation": "fark (difference) = 28, and since 28 < 40 it is in the dead zone; \"ORTA\" (middle) is printed. For \"SAG\" (right) to be printed, the difference must be at least 40.",
+                "skills": [
+                  "axis-calibration"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Döner enkoder (quadrature) ve kesme",
@@ -2697,7 +5223,122 @@ export const modul4: ModuleContent = {
                 "debounce"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Rotary encoder (quadrature) and interrupts",
+            "problem": "The volume knob on an old radio turns forever; it has no end. A potentiometer, on the other hand, has a start and an end. So how does the radio know which way the knob turned and by how many steps? The answer is hidden in two signals that are shifted \"90 degrees\" from each other.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Rotary encoder CLK (A) | **D2** (`INPUT_PULLUP`, interrupt pin) |\n| Rotary encoder DT (B) | **D3** (`INPUT_PULLUP`) |\n| Rotary encoder SW (button) | **D4** (`INPUT_PULLUP`) |\n| Rotary encoder VCC | 5V (optional) |\n| Rotary encoder GND | GND |\n\nModules such as the KY-040 already have pull-up resistors; if you connect VCC, these resistors pull the lines up to 5 V. Even if you do not connect VCC, `INPUT_PULLUP` is enough, but GND must be connected in every case. When you select the encoder, the **Position (ticks)** and **Button pressed** properties appear in the right panel. Changing Position means turning the encoder by that many ticks (clockwise is positive). In this lesson we use pin D2 for CLK (the joystick button in lesson 56 was also on D2; the lab starts with a clean circuit for every activity).\n\n### What is quadrature?\nThere are two contacts inside the encoder. As the knob turns, these contacts close and open one by one, but **not at the same time**: one changes slightly before the other. That is why there is a quarter-period (90°) difference between the outputs of CLK and DT.\n\nDuring one \"tick\" the two pins change in this order (1 = HIGH, 0 = LOW, written as CLK, DT):\n\n| Direction | Order of states |\n|---|---|\n| One direction (here we will call it \"clockwise\") | 11 → 01 → 00 → 10 → 11 |\n| Opposite direction | 11 → 10 → 00 → 01 → 11 |\n\nLook at these two orders. At the moment CLK **falls** (from 1 to 0): clockwise, DT is still 1 at that moment (11 → 01); in the opposite direction, DT has already become 0 (10 → 00). So a single rule is enough to find the direction:\n\n> When CLK falls, look at DT. If DT = 1 we are going one way; if DT = 0 we are going the other way.\n\nOn modules, which direction counts as \"clockwise\" may come out reversed depending on the maker. If it does, swap `sayac++` and `sayac--`.\n\n### Program 1: The simplest version\nOn every fall of CLK we run an interrupt (lesson 29) and read DT.\n\n```cpp\n// sketch: enkoder_basit\nconst int CLK = 2;\nconst int DT = 3;\n\nvolatile int sayac = 0;\n\nvoid adim() {                          // kesme servis rutini (ISR)\n  if (digitalRead(DT) == HIGH) {\n    sayac++;\n  } else {\n    sayac--;\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(CLK, INPUT_PULLUP);\n  pinMode(DT, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(CLK), adim, FALLING);\n}\n\nvoid loop() {\n  static int onceki = 0;\n\n  noInterrupts();                      // 29. ders: okurken kesme araya girmesin\n  int kopya = sayac;\n  interrupts();\n\n  if (kopya != onceki) {\n    onceki = kopya;\n    Serial.print(\"Sayac: \");\n    Serial.println(kopya);\n  }\n}\n```\nPress ▶ and set the encoder's **Position (ticks)** property to 5: the counter becomes 5. Then set it to 2: the counter goes down to 2. If you set a negative value (for example -3), the counter goes negative. On a real encoder you may see one step skip several counts at once; the lab's encoder, however, works ideally and does not bounce. The reason for this problem on the real part is in the next section.\n\n### Bounce: the contacts chatter\nThe contacts are mechanical. When they close, they do not touch all at once; for a very short time (from less than a millisecond to a few milliseconds, depending on the module) they open and close. You saw a button bounce in lesson 8; the same thing happens here. An interrupt, however, is very fast: it counts every bounce as a separate edge. If CLK chatters `1 → 0 → 1 → 0 → 1 → 0` for a single tick, `adim()` runs three times and the counter goes up by 3.\n\nThe fix: if at least a certain time has not passed between two edges, ignore the edge. The time is on the scale of **microseconds**, not milliseconds, so we use `micros()`. Because the lab's encoder does not bounce, you cannot see the filter's real job there; but in the \"Try it\" section you can see what breaks when the filter's threshold is \"too large\".\n\n### Program 2: A bounce-filtered counter and reset with the button\n```cpp\n// sketch: enkoder_filtreli\nconst int CLK = 2;\nconst int DT = 3;\nconst int SW = 4;\nconst unsigned long ARALIK_US = 2000;   // iki kenar arası en az 2 ms\n\nvolatile int sayac = 0;\nvolatile unsigned long sonKenar = 0;\n\nvoid adim() {\n  unsigned long simdi = micros();\n  if (simdi - sonKenar < ARALIK_US) return;   // sıçrama: yok say\n  sonKenar = simdi;\n  if (digitalRead(DT) == HIGH) {\n    sayac++;\n  } else {\n    sayac--;\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(CLK, INPUT_PULLUP);\n  pinMode(DT, INPUT_PULLUP);\n  pinMode(SW, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(CLK), adim, FALLING);\n}\n\nvoid loop() {\n  static int onceki = 0;\n  static bool oncekiBasili = false;\n\n  // Düğme: basıldığı an sayacı sıfırla\n  bool basili = (digitalRead(SW) == LOW);\n  if (basili && !oncekiBasili) {\n    noInterrupts();\n    sayac = 0;\n    interrupts();\n  }\n  oncekiBasili = basili;\n\n  noInterrupts();\n  int kopya = sayac;\n  interrupts();\n\n  if (kopya != onceki) {\n    onceki = kopya;\n    Serial.print(\"Sayac: \");\n    Serial.println(kopya);\n  }\n}\n```\n\n### How does it work?\n1. `attachInterrupt(..., FALLING)` runs the `adim()` (step) function every time CLK falls from 1 to 0. D2 is an interrupt pin (lesson 29), which is why we connected CLK to D2.\n2. Inside `adim()`, DT is read: if it is HIGH, `sayac++`; if it is LOW, `sayac--`. That is how simply the direction is found.\n3. `sayac` (counter) and `sonKenar` (last edge) are declared `volatile` because they are shared between the interrupt and `loop()`. While `loop()` reads these values, it switches the interrupt off for a short moment.\n4. In Program 2, the time of the last accepted edge is stored with `micros()`. New edges that arrive in less than 2 ms count as bounce and are skipped. The threshold must be smaller than the time between ticks even when you turn the knob as fast as you can (the lab's encoder does at most 250 ticks per second, so at least 4 ms between ticks); 2 ms is a sensible starting point. On a real module you tune the threshold by trying.\n5. The SW button is a slow event and does not need an interrupt. Checking it inside `loop()` with edge detection (lesson 8) is enough.\n\n### Try it\n- Set `ARALIK_US` to 0 (switch the filter off). Increase Position by 1. In the lab the counter goes up by 1, because the virtual contact does not bounce; on a real encoder the same tick can skip 2-3 counts.\n- Set `ARALIK_US` to 50 000 (50 ms) and increase Position by 10 in one go (fast turning). What does the counter rise to? Why is making the threshold too large bad?\n- Keep the counter between 0 and 20 (`constrain`) and change an LED's brightness with `analogWrite` according to the value. Connect the LED (with a 330 Ω resistor) to D11: D13 is not a PWM pin, D11 can do PWM. That way you turn an endless knob into a volume knob.\n\n### Common mistakes\n- Connecting CLK to a pin that is not an interrupt pin (anything other than D2 or D3): `attachInterrupt` does not work.\n- Not making the `sayac` variable `volatile`: the compiler keeps a copy of the value and `loop()` does not see the change.\n- Using `Serial.print` or `delay` inside the ISR: an ISR must be very short. Printing is done by `loop()`.\n- Not adding a bounce filter: even when you turn slowly, the counter skips more than expected.\n- Choosing a threshold bigger than needed: when you turn fast, real steps are thrown away too.\n- Mixing up CLK and DT: the direction comes out reversed. You swap `++` and `--` in the code or swap the wire ends; both give the same result.",
+            "question": "A mouse wheel, a printer head, a robot wheel... They all have an encoder. Why is a single contact (CLK only) not enough to find the direction? What is the advantage of reading the encoder of a very fast motor with an interrupt instead of inside `loop()`?",
+            "explainerMd": "### What you will learn in this lesson\n- Why the rotary encoder's two signals (CLK and DT) are shifted by 90 degrees\n- How to find the direction of rotation with the rule \"look at DT when CLK falls\"\n- How to count the encoder with `attachInterrupt` and a `volatile` variable\n- How to filter out contact bounce with a time threshold\n\n### What you should know first\nLesson 6: `INPUT_PULLUP`; lesson 8: button bounce and edge detection; lesson 29: `attachInterrupt`, the ISR and `volatile`.\n\n### One tick, two signals\nThere are two contacts inside the encoder. As the knob turns, these contacts do not change at the same time; one changes before the other. If we write the pins in order (CLK, DT), one tick goes through these states:\n\n```\nClockwise : 11 -> 01 -> 00 -> 10 -> 11\nOpposite  : 11 -> 10 -> 00 -> 01 -> 11\n```\n\nFour state changes make one tick. A potentiometer has a start and an end; an encoder turns forever and knows its position only by counting.\n\n### The rule that finds the direction\nLook at the two orders: CLK falls from 1 to 0 in both directions, so CLK alone does not tell you the direction. The difference is in DT at that moment. Clockwise, when CLK falls, DT is still 1 (11 -> 01). In the opposite direction, DT has already become 0 (10 -> 00). The rule:\n\n```\nWhen CLK falls: if DT = 1 then sayac++, if DT = 0 then sayac--\n```\n\nWhich direction the module counts as positive may vary from maker to maker; if it is reversed, swap `++` and `--`.\n\n### Counting with an interrupt\nWhen you turn fast, constantly checking inside `loop()` can miss ticks. You connect CLK to an interrupt pin (D2 or D3 on the Uno) and write a short ISR that runs on the `FALLING` edge. The ISR only reads DT and changes the counter. `Serial.print` and `delay` are not used in the ISR. Because `sayac` is used both in the ISR and in `loop()`, it must be `volatile`; while `loop()` reads it, the interrupt is switched off for a short moment.\n\n### Bounce and the threshold\nReal contacts open and close for a very short time as they close. The interrupt counts each edge separately; one tick can skip 3 counts. The fix is to ignore an edge if at least a certain time has not passed since the previous one (with `micros()`, for example 2000 µs). If the threshold is too large, real ticks are thrown away too. The lab's encoder applies one state change every millisecond: 4 ms per tick, so at most 250 ticks/s. The threshold must be smaller than these 4 ms.\n\n### Summary\nAn encoder gives both the step and the direction with two signals shifted by 90 degrees. When CLK falls, if DT is 1 you are going one way, if it is 0 the other way. Counting is done with an interrupt, and the shared variable is `volatile`. A time threshold is added to filter out bounce, but the threshold must stay smaller than the fastest gap between ticks.",
+            "concepts": [
+              {
+                "term": "Quadrature (quarter phase)",
+                "definition": "Two signals that are not simultaneous but shifted 90 degrees from each other. Together they give both the step and the direction.",
+                "example": "Clockwise, the states change in the order 11, 01, 00, 10 (CLK, DT).",
+                "pitfall": "Looking only at CLK: it falls the same way in both directions, so you cannot tell the direction."
+              },
+              {
+                "term": "Direction rule",
+                "definition": "When CLK falls, look at DT: if DT is 1 it is one direction (sayac++), if it is 0 the other direction (sayac--).",
+                "example": "If DT is still 1 when CLK falls from 1 to 0, sayac goes up.",
+                "pitfall": "Mixing up CLK and DT: the direction comes out reversed."
+              },
+              {
+                "term": "Interrupt (attachInterrupt)",
+                "definition": "Running a short function (ISR) as soon as a pin edge happens, without waiting for loop().",
+                "example": "attachInterrupt(digitalPinToInterrupt(2), adim, FALLING); when CLK falls, adim() runs.",
+                "pitfall": "Connecting CLK to a pin other than D2 or D3: on the Uno the interrupt does not work."
+              },
+              {
+                "term": "volatile",
+                "definition": "Tells the compiler that the variable can change outside the normal program flow, for example in an interrupt.",
+                "example": "volatile int sayac = 0; is used both in the ISR and in loop().",
+                "pitfall": "Not writing volatile: loop() may not see the change."
+              },
+              {
+                "term": "Bounce filter",
+                "definition": "Ignoring an edge if at least a certain time has not passed between two edges.",
+                "example": "If the micros() difference is less than 2000 µs, the edge is skipped.",
+                "pitfall": "Making the threshold too large: when you turn fast, real ticks are thrown away too."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h5d57-q1",
+                "kind": "predict-output",
+                "prompt": "The encoder is connected with CLK=D2, DT=D3, and sayac starts at 5. The encoder is turned 2 ticks in the opposite direction (each tick goes through the states 11, 10, 00, 01, 11). In the end, what does the last line on the Serial monitor say?\n\n```\nvolatile int sayac = 5;\n\nvoid adim() {\n  if (digitalRead(3) == HIGH) {\n    sayac++;\n  } else {\n    sayac--;\n  }\n}\n// setup: attachInterrupt(digitalPinToInterrupt(2), adim, FALLING);\n// loop: when sayac changes, prints Serial.print(\"Sayac: \") and the value\n```",
+                "options": [
+                  "Sayac: 7",
+                  "Sayac: 5",
+                  "Sayac: 3",
+                  "Sayac: 1"
+                ],
+                "answer": 2,
+                "explanation": "In the opposite direction, when CLK falls from 10 to 00, DT is already 0, so sayac-- runs on every tick: 5 - 2 = 3. Clockwise, DT would be 1 and sayac would be 7.",
+                "skills": [
+                  "quadrature",
+                  "interrupts"
+                ]
+              },
+              {
+                "id": "m4h5d57-q2",
+                "kind": "numeric",
+                "prompt": "The lab's encoder applies one state change every simulated millisecond, and one tick is 4 changes. If you move the Position property from 0 to 30 in one go, in how many ms does the encoder finish its movement?",
+                "answer": 120,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "30 ticks x 4 changes = 120 changes, and each takes 1 ms: 120 ms. That means 4 ms per tick (at most 250 ticks/s); the bounce threshold must be chosen smaller than these 4 ms.",
+                "skills": [
+                  "debounce",
+                  "quadrature"
+                ]
+              },
+              {
+                "id": "m4h5d57-q3",
+                "kind": "find-bug",
+                "prompt": "You connected the CLK wire to D4, and the program does not count or give a direction. The counter never changes. Which line is wrong?\n\n```\nconst int CLK = 4;\nconst int DT = 3;\nvolatile int sayac = 0;\n\nvoid adim() {\n  if (digitalRead(DT) == HIGH) sayac++; else sayac--;\n}\n\nvoid setup() {\n  pinMode(CLK, INPUT_PULLUP);\n  pinMode(DT, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(CLK), adim, FALLING);\n}\n```",
+                "options": [
+                  "const int CLK = 4;",
+                  "volatile int sayac = 0;",
+                  "pinMode(DT, INPUT_PULLUP);",
+                  "if (digitalRead(DT) == HIGH) sayac++; else sayac--;"
+                ],
+                "answer": 0,
+                "explanation": "On the Uno only D2 and D3 are interrupt pins. digitalPinToInterrupt(4) does not give a valid interrupt, so the ISR never runs. CLK must be connected to D2 (or D3). volatile and INPUT_PULLUP are correct.",
+                "skills": [
+                  "interrupts",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h5d57-q4",
+                "kind": "mcq",
+                "prompt": "Why can a program that looks only at the CLK signal not find the direction of rotation?",
+                "options": [
+                  "The CLK signal is too fast",
+                  "CLK falls in the same way in both directions; the state of DT at that moment decides the direction",
+                  "CLK only reads the button",
+                  "The encoder only turns in one direction"
+                ],
+                "answer": 1,
+                "explanation": "CLK falls from 1 to 0 both clockwise and in the opposite direction. The difference is whether DT is 1 or 0 at the moment of the fall; that is why both signals are read together.",
+                "skills": [
+                  "quadrature"
+                ]
+              },
+              {
+                "id": "m4h5d57-q5",
+                "kind": "numeric",
+                "prompt": "The encoder is turned fast and CLK falls every 4 ms. The threshold ARALIK_US = 6000 was chosen. Over 20 falls in a row, how many ticks does the program count? (The first edge is accepted.)",
+                "answer": 10,
+                "tolerance": 1,
+                "explanation": "The accepted edge is at t = 0; the next one comes 4 ms later and is thrown away because it is less than 6 ms; the one that comes 8 ms later is accepted. Every second edge is counted: 20 / 2 = 10. If the threshold were smaller than 4 ms (for example 2 ms), 20 would be counted; when the threshold is too large, real ticks are lost.",
+                "skills": [
+                  "debounce"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "MPU6050: ivmeölçer ve eğim açısı (I2C)",
@@ -2812,7 +5453,121 @@ export const modul4: ModuleContent = {
                 "accel-angle"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "MPU6050: accelerometer and tilt angle (I2C)",
+            "problem": "When you turn your phone sideways, the screen rotates by itself. Inside the device there is a small chip that answers the question \"which way is up?\". This chip measures gravity. A phone lying on the table measures gravity; so does one held at a tilt. The difference is how much of the pull falls on which axis. Can we get an angle out of this difference?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| MPU6050 VCC | 5V |\n| MPU6050 GND | GND |\n| MPU6050 SDA | **A4** |\n| MPU6050 SCL | **A5** |\n| Resistor (330 Ω) 1 | **D13** |\n| Resistor 2 | LED **A** (anode) |\n| LED **K** (cathode) | GND |\n\nYou learnt I2C in lesson 33: many devices on two lines (SDA, SCL), each with its own address. The MPU6050's address is **0x68**; if the AD0 pin on the real module is connected to 5 V, the address becomes 0x69. In the lab this is the MPU6050's **I2C address (AD0)** property; if you choose 0x69, you must also change the `MPU` constant in the code to 0x69. The RTC (DS3231) module also uses 0x68, so do not add an RTC part to this week's circuit.\n\nWhen you select the MPU6050, the **Accel X, Y, Z** (in g) and **Gyro X, Y, Z** (in °/s) properties appear in the right panel. These are the values the chip \"measures\", and you can change them while the program runs too; instead of turning the chip by hand, you change these numbers. The lab chip's temperature is fixed at 25 °C.\n\n### Registers: reading without a library\nIn this lesson we will not use a ready-made library; we will talk to the chip itself. That way you will see what the `Wire` commands you met in lesson 33 really do. Inside, the MPU6050 is made of numbered cells called **registers**. The ones we need:\n\n| Register | Meaning |\n|---|---|\n| 0x6B | Power management. The chip is in sleep mode at start-up. Writing 0 here wakes it up. |\n| 14 bytes starting at 0x3B | Accel X, Y, Z (2 bytes each) · temperature (2 bytes) · gyro X, Y, Z (2 bytes each) |\n\nEach measurement is a **16-bit signed** number, and the high byte comes first. So you have to join the two bytes with `(yuksek << 8) | dusuk` (high, low) and keep the result as an `int16_t`.\n\nWith the default settings, the chip's measuring ranges are:\n\n- Accelerometer: ±2 g. To convert the raw value to g, you divide by **16384** (16384 LSB/g).\n- Gyroscope: ±250 °/s. To convert the raw value to °/s, you divide by **131** (131 LSB/(°/s)).\n- Temperature: `ham / 340 + 36,53` degrees (the formula from the datasheet).\n\ng is the Earth's gravitational acceleration: a chip lying on a table measures about 1 g on the axis that points up.\n\n### Program 1: Read the raw data and convert it\n```cpp\n// sketch: mpu_ham\n#include <Wire.h>\n\nconst int MPU = 0x68;\n\nint16_t oku16() {\n  int yuksek = Wire.read();\n  int dusuk = Wire.read();\n  return (int16_t)((yuksek << 8) | dusuk);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  Wire.beginTransmission(MPU);\n  Wire.write(0x6B);                 // güç yönetimi yazmacı\n  Wire.write(0);                    // 0 yaz: uyan\n  Wire.endTransmission(true);\n}\n\nvoid loop() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x3B);                 // okumaya başlanacak yazmaç\n  Wire.endTransmission(false);      // bağlantıyı bırakma (tekrar başlat)\n  Wire.requestFrom(MPU, 14, true);  // 14 bayt iste\n\n  int16_t ax = oku16();\n  int16_t ay = oku16();\n  int16_t az = oku16();\n  int16_t sicak = oku16();\n  int16_t gx = oku16();\n  int16_t gy = oku16();\n  int16_t gz = oku16();\n\n  Serial.print(\"HAM ax=\");\n  Serial.print(ax);\n  Serial.print(\" ay=\");\n  Serial.print(ay);\n  Serial.print(\" az=\");\n  Serial.println(az);\n\n  Serial.print(\"g ax=\");\n  Serial.print(ax / 16384.0, 2);\n  Serial.print(\" ay=\");\n  Serial.print(ay / 16384.0, 2);\n  Serial.print(\" az=\");\n  Serial.print(az / 16384.0, 2);\n  Serial.print(\" | dps gx=\");\n  Serial.print(gx / 131.0, 1);\n  Serial.print(\" gy=\");\n  Serial.print(gy / 131.0, 1);\n  Serial.print(\" gz=\");\n  Serial.print(gz / 131.0, 1);\n  Serial.print(\" | C=\");\n  Serial.println(sicak / 340.0 + 36.53, 1);\n\n  delay(500);\n}\n```\nFor a chip lying flat, the properties panel should show **Accel X = 0, Accel Y = 0, Accel Z = 1** (these are the default values). Press ▶: `az` comes out at about 1.00 g, and `ax` and `ay` are close to zero. Now imagine standing the chip up on one edge: set **Accel X = 1** and **Accel Z = 0**. The 1 g moves to another axis and the raw `ax` becomes 16384. To imitate the chip turning, set **Gyro X** to 20: `gx` reads about 20 °/s; bring it back to 0 and it returns to zero. A real chip does not show exactly zero on the gyro when it is still (the next lesson explains this); the lab chip, being ideal, shows zero.\n\n### Tilt angle\nWhen the chip is still, the only thing it measures is gravity: a **vector** of about 1 g. As you tilt the chip, this vector is shared between the axes in different amounts. When the X axis lifts up, `ax` grows and `az` shrinks. Think of a triangle: the horizontal side is `az`, the vertical side is `ax`. The angle is the arctangent of these two sides:\n\n```cpp\npitch = atan2(ax, az) * 180.0 / PI;   // öne-arkaya eğim\nroll  = atan2(ay, az) * 180.0 / PI;   // yana eğim\n```\n`atan2(y, x)` gives the angle from the two sides in **radians**. Multiplying by 180/π turns it into degrees. Example: if `ax = 0.5` and `az = 0.866`, then `atan2(0.5, 0.866) = 30°` (0.5 = sin 30°, 0.866 = cos 30°).\n\nWhich way pitch and roll are positive depends on how the real chip is mounted on its board (the X and Y arrows printed on the module show the direction). In the lab, pitch grows as Accel X grows, and roll grows as Accel Y grows. In this lesson we assume tilt on one axis; if both axes are tilted a lot at the same time, these simple formulas affect each other a little.\n\n### Program 2: Pitch, roll and a spirit level\n```cpp\n// sketch: mpu_egim\n#include <Wire.h>\n\nconst int MPU = 0x68;\nconst int LED = 13;\n\nfloat ax, ay, az;\n\nint16_t oku16() {\n  int yuksek = Wire.read();\n  int dusuk = Wire.read();\n  return (int16_t)((yuksek << 8) | dusuk);\n}\n\nvoid ivmeOku() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x3B);\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 6, true);   // yalnız ivme: 6 bayt\n  ax = oku16() / 16384.0;\n  ay = oku16() / 16384.0;\n  az = oku16() / 16384.0;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(LED, OUTPUT);\n  Wire.begin();\n  Wire.beginTransmission(MPU);\n  Wire.write(0x6B);\n  Wire.write(0);\n  Wire.endTransmission(true);\n}\n\nvoid loop() {\n  ivmeOku();\n  float pitch = atan2(ax, az) * 180.0 / PI;\n  float roll = atan2(ay, az) * 180.0 / PI;\n\n  digitalWrite(LED, (abs(pitch) < 2.0 && abs(roll) < 2.0) ? HIGH : LOW);   // terazi\n\n  Serial.print(\"pitch=\");\n  Serial.print(pitch, 1);\n  Serial.print(\" roll=\");\n  Serial.println(roll, 1);\n  delay(200);\n}\n```\n\n### How does it work?\n1. The chip is asleep at start-up. If you read without writing 0 to register `0x6B`, no meaningful data comes back.\n2. `beginTransmission` + `write(0x3B)` + `endTransmission(false)` means \"I am going to read from this register\". `requestFrom` then asks for the bytes that follow one after another. After each byte the chip adds one to the register number by itself, so 14 bytes arrive with a single request.\n3. The bytes are joined two by two: the high byte is shifted 8 bits to the left and the low byte is added. The `int16_t` type reads the sign correctly (a negative tilt becomes a negative number).\n4. Dividing by 16384 converts the raw number into g. Example: raw 8192 → 0.5 g.\n5. `atan2` gives the angle. When the chip is flat, `ax = 0` and `az = 1`, so `pitch = 0`.\n6. The LED lights if both angles are within ±2°: a digital spirit level.\n\n### Try it\n- Leave Accel X and Y at 0 and Accel Z at 1. What do `pitch` and `roll` come out as? In the lab they come out as exactly 0.0. If they are not exactly 0.0 on a real chip, is that a fault? (Answer: because of the angle at which the chip is mounted on the board and measurement error, a small offset is normal.) To imitate this, set Accel X to 0.02 and see how many degrees pitch is.\n- Without tilting the chip, set only **Accel X** to 0.3 (as if the chip were speeding up horizontally). What does `pitch` become? The chip did not tilt, yet the angle changed: when the chip is moving, is gravity the only thing it measures?\n- Make the LED's lighting range ±5°, then ±0.5°. Which one is more useful?\n\n### Common mistakes\n- Forgetting to write 0 to register `0x6B`: the chip stays asleep.\n- Joining the bytes as an `int` and leaving them unsigned: a negative tilt turns into a number like 65000. Use `int16_t`.\n- Writing `ax / 16384`: dividing two whole numbers gives a whole number. Write `16384.0`.\n- Forgetting to convert the result of `atan2` into degrees: the result is in radians.\n- Trusting the angle measured while the chip is moving: the accelerometer cannot tell gravity apart from the chip's own acceleration. If you speed the chip up horizontally (for example so that `ax = 0,3 g` and `az = 1 g`), `atan2` gives about 16.7°, yet the chip has not tilted.\n- Using the MPU6050 and an RTC (DS3231) module on the same line: both use address 0x68.",
+            "question": "A phone knows whether it is landscape or portrait with its accelerometer. So why does measuring a bicycle's lean in a bend, or a drone's tilt, with an accelerometer alone cause problems? What happens to the gravity vector in a swaying train carriage?",
+            "explainerMd": "### What you will learn in this lesson\n- That the MPU6050's accelerometer measures gravity, and how the value comes out in g\n- How to read data over I2C from registers without a library\n- How to join two bytes and turn them into a signed number with `int16_t`\n- How to calculate the tilt angle (pitch and roll) with `atan2`\n\n### What you should know first\nLesson 33: I2C, the SDA/SCL lines and the device address; lesson 14: converting a sensor value into a unit; lesson 32: I2C devices such as the LCD working on the same line.\n\n### The chip measures gravity\nA still accelerometer measures one thing: the gravity vector, about 1 g in size. When the chip is flat, this vector is on the Z axis (`az` = 1, `ax` = `ay` = 0). When you tilt the chip, the vector is shared between the axes. To find the angle, you read how it is shared.\n\n### Registers: the chip's numbered cells\nInside the MPU6050 there are numbered cells called registers:\n\n| Register | Job |\n|---|---|\n| 0x6B | Power management. The chip starts up asleep; if you write 0, it wakes up. |\n| 14 bytes from 0x3B | Accel X, Y, Z, temperature, gyro X, Y, Z (2 bytes each) |\n\nThe chip is at address 0x68 (0x69 if AD0 is connected to 5V). The RTC module also uses 0x68, so they cannot be used on the same line.\n\n### Turning bytes into a number\nEach measurement is 16-bit signed, and the high byte comes first:\n\n```\nint16_t ham = (int16_t)((yuksek << 8) | dusuk);\nfloat g = ham / 16384.0;\n```\n\nIn the default ±2 g range, 1 g = 16384 raw units. Raw 8192 is 0.5 g. You need to write `16384.0` instead of `16384`; dividing two whole numbers gives a whole number, and a result smaller than 1 becomes 0. `int16_t` reads a negative tilt correctly; an unsigned `int` turns a negative value into a number like 65000.\n\n### Tilt angle\nImagine a triangle whose horizontal side is `az` and whose vertical side is `ax`. The angle is the arctangent:\n\n```\npitch = atan2(ax, az) * 180.0 / PI;\n```\n\n`atan2` gives radians; multiplying by 180/π gives degrees. Example: if `ax` = 0.5 and `az` = 0.866, pitch is 30 degrees. For roll, `atan2(ay, az)` is used.\n\n### Know the limit\nThe accelerometer cannot tell gravity apart from the chip's own acceleration. If `ax` = 0.3 g without the chip tilting, `atan2(0.3, 1)` gives about 16.7 degrees, yet the chip is not tilted. That is why measuring an angle with an accelerometer alone is misleading on a moving device.\n\n### Summary\nThe raw value read from the MPU6050's registers becomes g when divided by 16384. If the chip is still, the tilt angle is found with `atan2` from how gravity is shared between the axes. You need to wake the chip by writing 0 to `0x6B`, join the bytes with `int16_t` and divide with decimals. Acceleration spoils the angle calculation.",
+            "concepts": [
+              {
+                "term": "Register",
+                "definition": "A numbered cell inside the chip. Over I2C you say which register to read from or write to.",
+                "example": "0x6B is power management; 0x3B is the register where the measurements start.",
+                "pitfall": "Writing the wrong register number: random or meaningless data comes back."
+              },
+              {
+                "term": "Sleep mode",
+                "definition": "The MPU6050 is asleep at start-up; it starts measuring when 0 is written to register 0x6B.",
+                "example": "Wire.write(0x6B); Wire.write(0); wakes the chip up.",
+                "pitfall": "Forgetting to wake it up: the sensor gives no meaningful data."
+              },
+              {
+                "term": "Raw value and g",
+                "definition": "The chip gives a 16-bit signed raw number; in the ±2 g range, g = raw / 16384.0.",
+                "example": "Raw 8192 is 0.5 g.",
+                "pitfall": "Writing ax / 16384: integer division gives 0; you must write 16384.0."
+              },
+              {
+                "term": "int16_t",
+                "definition": "A signed 16-bit whole-number type. When two bytes are joined, it reads negative values correctly.",
+                "example": "(int16_t)((yuksek << 8) | dusuk)",
+                "pitfall": "Using an unsigned type: a negative tilt turns into a number like 65000."
+              },
+              {
+                "term": "Tilt with atan2",
+                "definition": "Gives the angle from two sides in radians; multiplying by 180/PI gives degrees. Pitch = atan2(ax, az).",
+                "example": "For ax = 0.5 and az = 0.866, the angle is 30 degrees.",
+                "pitfall": "Forgetting to convert radians into degrees, or trusting the angle while the chip is accelerating."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h5d58-q1",
+                "kind": "numeric",
+                "prompt": "You set the MPU6050's Accel Z property to 0.25 g. In the default ±2 g range, what raw az value is read?",
+                "answer": 4096,
+                "tolerance": 1,
+                "explanation": "Raw = g x 16384 = 0.25 x 16384 = 4096. The reverse is also true: raw 4096 / 16384.0 = 0.25 g.",
+                "skills": [
+                  "accel-angle",
+                  "i2c-registers"
+                ]
+              },
+              {
+                "id": "m4h5d58-q2",
+                "kind": "mcq",
+                "prompt": "When you add an MPU6050 (default address) and a DS3231 RTC module to the circuit, neither of them works. What is the most likely reason?",
+                "options": [
+                  "Both use the same I2C address (0x68)",
+                  "The RTC does not need the SDA pin",
+                  "I2C supports at most one device at a time",
+                  "The MPU6050 only works with 3.3 V"
+                ],
+                "answer": 0,
+                "explanation": "The MPU6050 and the DS3231 are at address 0x68 by default; two devices on the same line cannot use the same address. If the MPU6050's AD0 pin is connected to 5 V, the address becomes 0x69. I2C supports many devices, as long as their addresses are different.",
+                "skills": [
+                  "i2c-registers"
+                ]
+              },
+              {
+                "id": "m4h5d58-q3",
+                "kind": "find-bug",
+                "prompt": "With the chip lying flat, the raw ax value is 8192 (0.5 g), but the screen shows 0.00. Which line is wrong?\n\n```\nint16_t ax = oku16();\nfloat g = ax / 16384;\nSerial.println(g, 2);\n```",
+                "options": [
+                  "int16_t ax = oku16();",
+                  "float g = ax / 16384;",
+                  "Serial.println(g, 2);",
+                  "No bug, 0.00 is correct"
+                ],
+                "answer": 1,
+                "explanation": "ax and 16384 are whole numbers; in integer division 8192 / 16384 becomes 0, and when it is assigned to a float, 0.00 is printed. You should write 16384.0. int16_t is the right type.",
+                "skills": [
+                  "i2c-registers",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h5d58-q4",
+                "kind": "predict-output",
+                "prompt": "The chip is speeding up horizontally without tilting: ax = 0.3 g and az = 1.0 g are read. What does this code print?\n\n```\nfloat pitch = atan2(0.3, 1.0) * 180.0 / PI;\nSerial.println(pitch, 1);\n```",
+                "options": [
+                  "0.0",
+                  "30.0",
+                  "73.3",
+                  "16.7"
+                ],
+                "answer": 3,
+                "explanation": "atan2(0.3, 1) is about 0.2915 radians; x 180/PI = 16.7 degrees. An angle came out even though the chip did not tilt, because the accelerometer cannot tell gravity apart from the chip's own acceleration.",
+                "skills": [
+                  "accel-angle"
+                ]
+              },
+              {
+                "id": "m4h5d58-q5",
+                "kind": "numeric",
+                "prompt": "Accel X = 0.26 g and Accel Z = 0.97 g are read. How many degrees is pitch = atan2(ax, az) x 180 / PI?",
+                "answer": 15,
+                "tolerance": 0.5,
+                "unit": "degrees",
+                "explanation": "ax / az = 0.268, and arctan(0.268) is about 15.0 degrees (tan 15 = 0.268). The result is in degrees, not radians, because we multiplied by 180/PI.",
+                "skills": [
+                  "accel-angle"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Jiroskop sapması ve tamamlayıcı filtre",
@@ -2928,7 +5683,122 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Gyroscope bias and the complementary filter",
+            "problem": "In lesson 58 we found the tilt angle with the accelerometer. But when the chip was shaken (the `ax = 0,3 g` experiment in lesson 58), the angle went wild. A gyroscope, on the other hand, says \"how fast am I turning\" and works brilliantly during movement. We have two sensors, and both are flawed. Can we combine them so that each one covers what the other is missing?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. The circuit is the same as the MPU6050 part of lesson 58; no LED is needed.\n\n| Part | Connection |\n|---|---|\n| MPU6050 VCC | 5V |\n| MPU6050 GND | GND |\n| MPU6050 SDA | **A4** |\n| MPU6050 SCL | **A5** |\n\n### What does a gyroscope measure?\nThe accelerometer gives the angle directly. The gyroscope gives the **rate of turn** (°/s). To find the angle, we add up the rate over time: if you turn at 10 °/s for one second, you have turned 10°. We do this in small steps:\n\n```cpp\naci = aci + hiz * dt;     // hiz: °/s, dt: son ölçümden bu yana geçen saniye\n```\nThis is called taking the **integral**. This week, pitch (forward-backward tilt) is the chip's rotation around its Y axis. That is why we will use the `gy` value from the gyroscope.\n\nNote: on a real MPU6050, a rotation around +Y usually makes the `atan2(ax, az)` angle from lesson 58 smaller; in other words, the two signs can come out opposite. In that case you flip the sign of `gy` (see \"Common mistakes\" below). In the lab, the accelerometer and gyroscope properties are independent of each other; you choose values that fit together.\n\n### Bias: not zero when still\nWhen the chip is standing still, `gy` should be exactly zero, right? It is not. Real chips show a small constant value (typically a few °/s; the datasheet allows a tolerance of up to ±20 °/s for the initial bias, so check your chip's datasheet for the exact value). This is called **bias**. Its value changes from chip to chip, and it can also drift with temperature.\n\nFinding the bias is easy: while the chip is **not moving**, take hundreds of measurements and calculate their average. That average is the bias. Then subtract the bias from every measurement.\n\nThe gyroscope properties of the virtual chip in the lab are 0 by default, so it has no bias. To imitate a real chip's bias, set the MPU6050's **Gyro Y** property to 2 before pressing ▶.\n\n### Program 1: Measure the bias and subtract it\n```cpp\n// sketch: mpu_sapma_olc\n#include <Wire.h>\n\nconst int MPU = 0x68;\nconst int ORNEK = 200;\nfloat sapmaGy = 0;\n\nfloat gyOku() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x45);                 // Y ekseni jiroskop (yüksek bayt)\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 2, true);\n  int yuksek = Wire.read();\n  int dusuk = Wire.read();\n  int16_t ham = (int16_t)((yuksek << 8) | dusuk);\n  return ham / 131.0;               // °/s\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  Wire.beginTransmission(MPU);\n  Wire.write(0x6B);\n  Wire.write(0);\n  Wire.endTransmission(true);\n  delay(100);\n\n  float toplam = 0;\n  for (int i = 0; i < ORNEK; i++) {\n    toplam += gyOku();\n    delay(5);\n  }\n  sapmaGy = toplam / ORNEK;         // durağan ortalama = sapma\n  Serial.print(\"Sapma gy = \");\n  Serial.print(sapmaGy, 2);\n  Serial.println(\" derece/sn\");\n}\n\nvoid loop() {\n  float gy = gyOku();\n  Serial.print(\"gy ham=\");\n  Serial.print(gy, 1);\n  Serial.print(\" duzeltilmis=\");\n  Serial.println(gy - sapmaGy, 1);\n  delay(500);\n}\n```\nAfter pressing ▶, do not change the properties for the first second (while the bias is being measured). First you see the line `Sapma gy = 2.00` (bias gy). Then set **Gyro Y** to 32 (a real rotation of 30 °/s + 2 °/s bias): `duzeltilmis` (corrected) shows about 30. When you go back to 2, `duzeltilmis` is close to zero.\n\n### If we add up the angle with the gyroscope: the bias builds up\nNow let's do an experiment. The chip is standing still, but the gyroscope shows a small bias of, say, 2 °/s. If we find the angle with the integral:\n\n- In 1 second: 2 × 1 = 2° of drift\n- In 10 seconds: 2 × 10 = **20° of drift**\n- In 1 minute: 120° of drift\n\nThe chip did not move at all, yet the calculated angle really wandered away. Each measurement adds a very small error, and when you add the errors up they grow. Even if you measure the bias and subtract it, a small leftover error (the bias can change over time or with heat) still builds up.\n\n### Program 2: The integral's drift\n```cpp\n// sketch: mpu_integral\n#include <Wire.h>\n\nconst int MPU = 0x68;\nconst int ORNEK = 200;\n\nfloat sapmaGy = 0;\nfloat gyroHam = 0;                  // sapma çıkarılmadan integral\nfloat gyroDuz = 0;                  // sapma çıkarılarak integral\nunsigned long sonUs = 0;\nunsigned long baslaMs = 0;\nunsigned long sonYazMs = 0;\n\nfloat gyOku() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x45);\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 2, true);\n  int yuksek = Wire.read();\n  int dusuk = Wire.read();\n  int16_t ham = (int16_t)((yuksek << 8) | dusuk);\n  return ham / 131.0;\n}\n\nfloat ivmeAci() {                   // 58. ders: pitch = atan2(ax, az)\n  Wire.beginTransmission(MPU);\n  Wire.write(0x3B);\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 6, true);\n  int axH = Wire.read(); int axL = Wire.read();\n  int ayH = Wire.read(); int ayL = Wire.read();\n  int azH = Wire.read(); int azL = Wire.read();\n  float ax = (int16_t)((axH << 8) | axL) / 16384.0;\n  float az = (int16_t)((azH << 8) | azL) / 16384.0;\n  return atan2(ax, az) * 180.0 / PI;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  Wire.beginTransmission(MPU);\n  Wire.write(0x6B);\n  Wire.write(0);\n  Wire.endTransmission(true);\n  delay(100);\n\n  float toplam = 0;\n  for (int i = 0; i < ORNEK; i++) {\n    toplam += gyOku();\n    delay(5);\n  }\n  sapmaGy = toplam / ORNEK;\n\n  gyroHam = ivmeAci();              // başlangıç açısı: ivmeölçerden\n  gyroDuz = gyroHam;\n  sonUs = micros();\n  baslaMs = millis();\n  sonYazMs = baslaMs;\n}\n\nvoid loop() {\n  float gy = gyOku();\n\n  unsigned long simdi = micros();\n  float dt = (simdi - sonUs) / 1000000.0;     // saniye\n  sonUs = simdi;\n\n  gyroHam += gy * dt;\n  gyroDuz += (gy - sapmaGy) * dt;\n\n  if (millis() - sonYazMs >= 1000) {\n    sonYazMs += 1000;\n    Serial.print(\"t=\");\n    Serial.print((millis() - baslaMs) / 1000.0, 1);\n    Serial.print(\" ham=\");\n    Serial.print(gyroHam, 1);\n    Serial.print(\" duz=\");\n    Serial.print(gyroDuz, 1);\n    Serial.print(\" acc=\");\n    Serial.println(ivmeAci(), 1);\n  }\n  delay(10);\n}\n```\nTo keep the chip tilted and still, set **Gyro Y = 2**, **Accel X = 0.17**, **Accel Z = 0.98** before pressing ▶ (about 10°). Look at the Serial monitor: `acc` always stays the same (the lab sensor has no noise). `ham` (raw) keeps walking away over time. `duz` (straight, corrected) stays constant because the bias was subtracted; if the bias changes later (you will see this in Try it below), it only drifts by the small leftover error.\n\n### The accelerometer's problem: noise and vibration\nThe accelerometer does not drift. If the chip stays at the same tilt, it tells you the same angle forever. But it also measures every acceleration other than gravity: motor vibration, a shaking hand, the bounce of a walking robot. (The lab chip does not produce this noise by itself; you make the vibration by changing Accel X quickly.) If an extra 0.3 g is added to `ax`, as in lesson 58, the angle is off by 16.7°. So the accelerometer is:\n\n- **Right in the long run** (it does not drift), **noisy in the short run**.\n\nThe gyroscope is the exact opposite:\n\n- **Right in the short run** (it catches fast changes well), **drifts in the long run** (the bias builds up).\n\n### The complementary filter\nThe two sensors complete each other. The idea: update the angle with the gyroscope (fast, calm), but at every step apply a small pull towards the accelerometer's angle (this stops the drift):\n\n```\nangle = α · (angle + gy · dt) + (1 − α) · accAngle\n```\n- `aci + gy · dt`: adds the rotation the gyroscope saw to the previous angle (`aci`).\n- `accAci`: the angle found from the accelerometer with atan2.\n- `α` (alpha): how much you trust the gyroscope. Usually **0.98**. So at every step it is 98% gyroscope, 2% accelerometer.\n\nThis very small 2% pull stops the drift because it builds up in a loop that takes a hundred steps per second. Think of it as a small \"pull back\" that keeps correcting the error. The vibrating accelerometer, meanwhile, always comes in with only a 2% weight, so its noise is filtered out.\n\nWith `dt = 10 ms` and `α = 0,98`, the filter's correction speed (time constant) is about `α · dt / (1 − α) = 0,98 · 0,01 / 0,02 ≈ 0,5 s`. So even if it starts wrong, the filter settles on the right angle within a few half-seconds.\n\n### Program 3: The complementary filter\n```cpp\n// sketch: mpu_tamamlayici\n#include <Wire.h>\n\nconst int MPU = 0x68;\nconst int ORNEK = 200;\nconst float ALFA = 0.98;\n\nfloat sapmaGy = 0;\nfloat aci = 0;                      // filtreli açı\nfloat saf = 0;                      // karşılaştırma: yalnız jiroskop integrali\nunsigned long sonUs = 0;\nunsigned long baslaMs = 0;\nunsigned long sonYazMs = 0;\n\nfloat gyOku() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x45);\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 2, true);\n  int yuksek = Wire.read();\n  int dusuk = Wire.read();\n  int16_t ham = (int16_t)((yuksek << 8) | dusuk);\n  return ham / 131.0;\n}\n\nfloat ivmeAci() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x3B);\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 6, true);\n  int axH = Wire.read(); int axL = Wire.read();\n  int ayH = Wire.read(); int ayL = Wire.read();\n  int azH = Wire.read(); int azL = Wire.read();\n  float ax = (int16_t)((axH << 8) | axL) / 16384.0;\n  float az = (int16_t)((azH << 8) | azL) / 16384.0;\n  return atan2(ax, az) * 180.0 / PI;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  Wire.beginTransmission(MPU);\n  Wire.write(0x6B);\n  Wire.write(0);\n  Wire.endTransmission(true);\n  delay(100);\n\n  float toplam = 0;\n  for (int i = 0; i < ORNEK; i++) {\n    toplam += gyOku();\n    delay(5);\n  }\n  sapmaGy = toplam / ORNEK;\n\n  aci = ivmeAci();\n  saf = aci;\n  sonUs = micros();\n  baslaMs = millis();\n  sonYazMs = baslaMs;\n}\n\nvoid loop() {\n  float gy = gyOku() - sapmaGy;\n  float acc = ivmeAci();\n\n  unsigned long simdi = micros();\n  float dt = (simdi - sonUs) / 1000000.0;\n  sonUs = simdi;\n\n  saf += gy * dt;\n  aci = ALFA * (aci + gy * dt) + (1.0 - ALFA) * acc;\n\n  if (millis() - sonYazMs >= 200) {\n    sonYazMs += 200;\n    Serial.print(\"t=\");\n    Serial.print((millis() - baslaMs) / 1000.0, 1);\n    Serial.print(\" acc=\");\n    Serial.print(acc, 1);\n    Serial.print(\" saf=\");\n    Serial.print(saf, 1);\n    Serial.print(\" filtre=\");\n    Serial.println(aci, 1);\n  }\n  delay(10);\n}\n```\n\n### How does it work?\n1. In `setup`, the average of 200 measurements is stored as the bias; the chip must not move during this time.\n2. The starting angle is taken from the accelerometer, because the integral only knows the **change**; it does not know the starting angle.\n3. On every pass, `loop` calculates `dt` from the `micros()` difference. Using the real time that has passed instead of writing a fixed 0.01 gives a correct integral even if the `delay` and I2C times change.\n4. `saf` (pure) adds up the gyroscope only. `aci` (angle) applies the formula. You see the two side by side on the Serial monitor.\n5. At a constant tilt, when the bias changes later (for example, you raised Gyro Y from 2 to 4 while it was running): `acc` stays constant, `saf` slowly drifts (because of the small error left after subtracting the bias), but `filtre` (filter) stays calm and correct.\n6. If you wiggle the accel properties quickly to make vibration, `acc` jumps around, but `filtre` moves very little because it is weighted towards the gyroscope. In a real rotation (when the accel and gyro change together), `filtre` reacts straight away thanks to the gyroscope.\n\nNotice, too, that the filter is not perfectly right. If a small error is still left between what the gyroscope measures and the real value (if the bias changed), `filtre` sits a tiny bit away from the correct value. The error is `α · hata · dt / (1 − α)` (error). For example, if the leftover error is 2 °/s, `dt = 0,01 s` and `α = 0,98`, it is about 1°. If you used the gyroscope alone, the same error would be 20° in 10 seconds.\n\n### Try it\n- Set `ALFA` to 0.90. Wiggle Accel X quickly between 0.17 and 0.35: does `filtre` move more or less? Does it catch fast movement better?\n- Set `ALFA` to 0.999. Why does the filter become very slow to settle on the right angle? (The time constant is about 0.999 · 0.01 / 0.001 ≈ 10 seconds.)\n- Start with the chip tilted: before pressing ▶, set Accel X = 0.5, Accel Z = 0.87 (about 30°). While it runs, set Accel X to 0 and Accel Z to 1. How do `filtre` and `saf` separate from each other? (`saf` looks only at the gyroscope; it does not see the accelerometer's new state.)\n- Let the bias change later: while it runs, raise Gyro Y from 2 to 4. How far do `saf` and `filtre` drift in 10 seconds?\n\n### Common mistakes\n- Changing the properties as if the chip were moving while the bias is being measured (in the first second of the program), or holding a real chip / knocking the table: the bias is measured wrongly and everything drifts.\n- Never subtracting the bias: `saf` and even `filtre` carry a small constant error.\n- Writing `dt` as a fixed value instead of using the real time: when the `delay` or printing time changes, the integral comes out wrong.\n- Mixing up the units: `gy` must be in °/s and `dt` in seconds. If you write milliseconds, you see a drift 1000 times bigger.\n- Choosing `α` very close to 1: the accelerometer has almost no effect and the drift comes back.\n- Taking the angle found with `atan2` and the gyroscope's rotation with opposite signs: the filter pulls the angle one way while it pushes it the other. If the sign comes out reversed, change the sign of the `gy` value.",
+            "question": "This idea (combining two sensors) is used everywhere in phones and drones. More advanced filters (such as the Kalman filter) solve the same problem more cleverly. Why do you think \"combining two flawed sensors\" makes more sense than looking for a single perfect sensor?",
+            "explainerMd": "### What you will learn in this lesson\n- That a gyroscope measures the rate of turn, and that the angle is found by adding up the rate over time\n- What bias is, how it is measured and subtracted, and why it builds up error\n- The strong and weak points of the accelerometer and the gyroscope\n- The complementary filter formula and the effect of the `α` value\n\n### What you should know first\nLesson 58: reading raw data from the MPU6050 and the accelerometer angle with `atan2`; lesson 27: measuring elapsed time with `millis`/`micros`; lesson 14: reducing noise by taking an average.\n\n### Add up the rate, find the angle\nA gyroscope does not give the angle; it gives the **rate of turn** (°/s). For the angle, the rate is multiplied by the elapsed time and added up:\n\n```\naci = aci + hiz * dt;     // hiz (rate): degrees/s, dt: seconds\n```\n\nExample: a chip turning at 10 °/s for 3 seconds turns 30 degrees. The units must match: if `dt` is in milliseconds, the result is 1000 times too big.\n\n### Bias builds up\nA still gyroscope does not show exactly zero; it reads a constant **bias** of a few °/s. You find the bias with the average of hundreds of readings while the chip is not moving, and you subtract it from every reading. If you do not subtract the bias, the error grows straight away; even if you do, the small leftover error (the bias can drift with heat) grows as it is added up. For an unsubtracted 2 °/s:\n\n```\nbias 2 °/s   1 s -> 2 degrees   10 s -> 20 degrees   1 min -> 120 degrees\n```\n\nThe calculated angle wanders away even though the chip never moved.\n\n### Two flawed sensors\n| Sensor | In the short run | In the long run |\n|---|---|---|\n| Accelerometer | noisy (vibration spoils it) | right, does not drift |\n| Gyroscope | right, fast | drifts |\n\nEach one covers what the other is missing.\n\n### The complementary filter\n```\naci = aci + hiz * dt;     // hiz: derece/sn, dt: saniye\n```\n\nAt every step the angle is updated with the gyroscope (fast, calm), then a small pull towards the accelerometer's angle is applied (this stops the drift). `ALFA` = 0.98 means 98% gyroscope, 2% accelerometer. A worked example: if `aci` = 10, `gy` = 20, `dt` = 0.01 and the accelerometer angle is 12, the new angle is 0.98 × 10.2 + 0.02 × 12 = 10.236.\n\nIf `ALFA` gets smaller, the accelerometer gains weight: the filter does not drift, but it is affected by vibration. If `ALFA` gets close to 1, the filter is calm, but the drift comes back and it is slow to settle on the right angle. With a leftover gyroscope error `b`, the filter's lasting error is about `ALFA · b · dt / (1 − ALFA)`: for 2 °/s, 0.01 s and 0.98, about 1 degree. With the integral alone, the same error would be 20 degrees in 10 seconds.\n\n### Summary\nA gyroscope gives the rate; the angle is found by adding up the rate, and the bias builds up and causes drift. An accelerometer does not drift but is sensitive to vibration. The complementary filter adds the two together with weights: it trusts the gyroscope in the short run and the accelerometer in the long run. `dt` is calculated on every pass from the real elapsed time.",
+            "concepts": [
+              {
+                "term": "Gyroscope",
+                "definition": "A sensor that measures the rate of turn (°/s). To get an angle, the rate has to be added up over time.",
+                "example": "A chip turning at gy = 10 °/s for 3 seconds turns 30 degrees.",
+                "pitfall": "Thinking the gyroscope value is the angle itself."
+              },
+              {
+                "term": "Integral (angle = angle + rate x dt)",
+                "definition": "Finding the angle by multiplying the rate by small time steps and adding them up.",
+                "example": "With aci += gy * dt; dt is calculated in seconds.",
+                "pitfall": "Writing dt in milliseconds: the result is 1000 times too big."
+              },
+              {
+                "term": "Bias",
+                "definition": "The small constant value a still gyroscope shows. It is found by taking an average while the chip is not moving.",
+                "example": "If the bias is 2 °/s, a fake rotation of 20 degrees builds up in 10 seconds.",
+                "pitfall": "Moving the chip while measuring the bias: the bias is measured wrongly."
+              },
+              {
+                "term": "Complementary filter",
+                "definition": "A filter that adds the gyroscope and the accelerometer together with weights, trusting the gyroscope in the short run and the accelerometer in the long run.",
+                "example": "aci = 0.98 x (aci + gy x dt) + 0.02 x ivmeAci",
+                "pitfall": "Bringing ALFA very close to 1: the accelerometer has no effect and the drift comes back."
+              },
+              {
+                "term": "ALFA (alpha)",
+                "definition": "The weight given to the gyroscope in the filter. Usually 0.98.",
+                "example": "If ALFA = 0.98, every step is 98% gyroscope, 2% accelerometer.",
+                "pitfall": "Being surprised that vibration spoils the angle when ALFA is small."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h5d59-q1",
+                "kind": "numeric",
+                "prompt": "The chip is not moving at all on the table, but the gyroscope shows a bias of 1.5 °/s, and the angle is added up as rate x time without subtracting the bias. After 20 seconds, how many degrees has the calculated angle wandered away?",
+                "answer": 30,
+                "tolerance": 0,
+                "unit": "degrees",
+                "explanation": "Drift = bias x time = 1.5 x 20 = 30 degrees. The angle wanders away even though the chip did not move; that is why the bias is measured and subtracted, and corrected with the accelerometer.",
+                "skills": [
+                  "gyro-drift"
+                ]
+              },
+              {
+                "id": "m4h5d59-q2",
+                "kind": "mcq",
+                "prompt": "Which statement is true?",
+                "options": [
+                  "The gyroscope is right in the long run; the accelerometer drifts",
+                  "The accelerometer is noisy in the short run but does not drift in the long run; the gyroscope is good in the short run but drifts",
+                  "Both drift in the long run",
+                  "The accelerometer gives the rate of turn, and the gyroscope gives the angle directly"
+                ],
+                "answer": 1,
+                "explanation": "The accelerometer looks at gravity, so it does not drift, but it also measures vibration. The gyroscope measures the rate; it catches fast changes well, but the bias builds up. Combining the two is the complementary filter's job.",
+                "skills": [
+                  "gyro-drift",
+                  "complementary-filter"
+                ]
+              },
+              {
+                "id": "m4h5d59-q3",
+                "kind": "numeric",
+                "prompt": "One step of the complementary filter: previous aci = 10, corrected gy = 20 °/s, dt = 0.01 s, accelerometer angle = 12 and ALFA = 0.98. What is the new aci?",
+                "answer": 10.236,
+                "tolerance": 0.01,
+                "unit": "degrees",
+                "explanation": "aci + gy x dt = 10 + 0.2 = 10.2. 0.98 x 10.2 = 9.996 and 0.02 x 12 = 0.24. The total is 10.236. The gyroscope alone would give 10.2; the accelerometer pulls the result a little towards 12.",
+                "skills": [
+                  "complementary-filter"
+                ]
+              },
+              {
+                "id": "m4h5d59-q4",
+                "kind": "predict-output",
+                "prompt": "The gyroscope of a still chip shows a bias of 2.0 °/s, and the bias is not subtracted. What does this code print?\n\n```\nfloat aci = 0;\nfloat gy = 2.0;\nfloat dt = 0.5;\nfor (int i = 0; i < 10; i++) {\n  aci += gy * dt;\n}\nSerial.println(aci, 1);\n```",
+                "options": [
+                  "0.0",
+                  "2.0",
+                  "20.0",
+                  "10.0"
+                ],
+                "answer": 3,
+                "explanation": "On every pass 2.0 x 0.5 = 1.0 is added, and after 10 passes it is 10.0. The angle wandered away by 10 degrees even though the chip never turned: the bias built up. If the bias had been subtracted, the result would be about 0.",
+                "skills": [
+                  "gyro-drift"
+                ]
+              },
+              {
+                "id": "m4h5d59-q5",
+                "kind": "find-bug",
+                "prompt": "The filter angle is very different from what it should be, and it shoots off quickly during a rotation. Which line is wrong?\n\n```\nunsigned long simdi = micros();\nfloat dt = (simdi - sonUs) / 1000.0;\nsonUs = simdi;\naci = 0.98 * (aci + gy * dt) + 0.02 * acc;\n```",
+                "options": [
+                  "unsigned long simdi = micros();",
+                  "sonUs = simdi;",
+                  "float dt = (simdi - sonUs) / 1000.0;",
+                  "aci = 0.98 * (aci + gy * dt) + 0.02 * acc;"
+                ],
+                "answer": 2,
+                "explanation": "micros() gives microseconds; to convert to seconds you must divide by 1000000.0. Dividing by 1000.0 makes dt milliseconds, and the integral comes out 1000 times too big. The filter formula is correct.",
+                "skills": [
+                  "gyro-drift",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: El eğimiyle kontrol edilen servo (mini gimbal)",
@@ -3043,7 +5913,121 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: A servo controlled by hand tilt (mini gimbal)",
+            "problem": "In systems that carry a camera (a handheld gimbal, a drone), the picture stays level however much the camera shakes. Inside them there are small motors and a tilt sensor: the sensor says \"the base has tilted 20°\", the motor turns 20° the opposite way, and the camera stays steady in place. In this project you will build a single-axis model of this idea that fits on a desk.",
+            "contentMd": "### What are we going to do?\nThis project brings together what you have learnt:\n- **Module 3, Week 5 (lesson 21):** The servo and angle → pulse width.\n- **Module 3, Week 6 (lesson 27):** A non-blocking loop with `millis()`.\n- **Module 3, Week 7 (lessons 32-33):** Showing the angle with the LCD and I2C.\n- **This week (lessons 58-59):** Raw data from the MPU6050, the pitch calculation, gyroscope bias and the complementary filter.\n\nThe MPU6050 measures the pitch angle, and the complementary filter calms it down. The servo turns by the pitch amount in the **opposite** direction: if pitch is +20°, the servo goes to 90 − 20 = 70°. If a platform were fixed to the servo arm, the platform would try to stay level when the base tilts. In the lab you tilt the base with the MPU6050's Accel X and Accel Z properties, and you follow the platform's angle from the servo arm's angle.\n\nThe button (D2) takes the current tilt as \"zero\": even if the base is not perfectly level, you can say \"this is level now\".\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. In the lab you power the servo from the Uno's 5V pin.\n\n| Part | Connection |\n|---|---|\n| MPU6050 VCC | 5V |\n| MPU6050 GND | GND |\n| MPU6050 SDA | **A4** (address 0x68) |\n| MPU6050 SCL | **A5** |\n| I2C LCD VCC | 5V |\n| I2C LCD GND | GND |\n| I2C LCD SDA | **A4** (address 0x27) |\n| I2C LCD SCL | **A5** |\n| Servo SIG | **D6** |\n| Servo VCC | 5V |\n| Servo GND | GND |\n| Button \"reset\" A | **D2** (`INPUT_PULLUP`) |\n| Button B | GND |\n| Resistor (330 Ω) 1 | **D13** |\n| Resistor 2 | LED **A** (anode) |\n| LED **K** (cathode) | GND (\"servo at limit\" light) |\n\nThe MPU6050 (0x68) and the LCD (0x27) work side by side on the same two wires, because their addresses are different (lesson 33). There must be no RTC (DS3231) part in the circuit; it uses 0x68 too.\n\nOn real hardware, however, the 5 V can drop when the servo is under load, and the MPU/LCD may misbehave; that is why in a real build the servo is powered from a separate 5 V supply and the supplies' GNDs are joined. The lab does not model this voltage drop.\n\n### Design\n- **Pitch:** `atan2(ax, az)` (lesson 58).\n- **Filter:** `aci = 0,98 · (aci + gy · dt) + 0,02 · accAci` (lesson 59). The bias is measured in `setup`, while the chip is not moving.\n- **Reset:** When the button is pressed, the current `aci` (angle) is stored as `ofset` (offset). The control angle becomes `egim = aci − ofset` (tilt).\n- **Servo angle:** `servo = 90 − egim`. It is limited to `10 ... 170°` so that the servo does not push against its mechanical ends. When it reaches the limit, the LED lights up.\n- **Timing:** The loop measures and updates the servo every 10 ms; the LCD and serial output are refreshed every 250 ms. There is no `delay` at all (lesson 27).\n\nThe servo does **not see** the result of the control: the MPU measures the tilt of the base, not whether the platform is really level. Control like this, with no sensor feedback, is called **open loop**. It is simple and good enough for most desktop models; measuring and correcting the platform's real angle is the next level.\n\n### Program\n```cpp\n// sketch: mini_gimbal\n#include <Wire.h>\n#include <Servo.h>\n#include <LiquidCrystal_I2C.h>\n\nconst int MPU = 0x68;\nconst int SERVO_PIN = 6;\nconst int SIFIRLA = 2;\nconst int LED = 13;\n\nconst float ALFA = 0.98;\nconst int SERVO_MERKEZ = 90;\nconst int SERVO_MIN = 10;\nconst int SERVO_MAX = 170;\nconst unsigned long DONGU_MS = 10;\nconst unsigned long EKRAN_MS = 250;\n\nServo servo;\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nfloat sapmaGy = 0;\nfloat aci = 0;                       // filtreli pitch (derece)\nfloat ofset = 0;                     // \"sıfır\" kabul edilen açı\nfloat ax, az, gy;                    // son ölçüm: g, g, °/s\nunsigned long sonDongu = 0;\nunsigned long sonEkran = 0;\nunsigned long sonUs = 0;\nbool oncekiBasili = false;\n\nint16_t oku16() {\n  int yuksek = Wire.read();\n  int dusuk = Wire.read();\n  return (int16_t)((yuksek << 8) | dusuk);\n}\n\nvoid mpuOku() {\n  Wire.beginTransmission(MPU);\n  Wire.write(0x3B);\n  Wire.endTransmission(false);\n  Wire.requestFrom(MPU, 14, true);\n  ax = oku16() / 16384.0;\n  oku16();                           // ay: kullanmıyoruz\n  az = oku16() / 16384.0;\n  oku16();                           // sıcaklık\n  oku16();                           // gx\n  gy = oku16() / 131.0;              // pitch: Y ekseni etrafında dönüş\n  oku16();                           // gz\n}\n\nfloat ivmeAci() {\n  return atan2(ax, az) * 180.0 / PI;\n}\n\nvoid ekranYaz(float egim, int servoAci) {\n  lcd.setCursor(0, 0);\n  lcd.print(\"Egim: \");\n  lcd.print(egim, 1);\n  lcd.print(\"      \");\n  lcd.setCursor(0, 1);\n  lcd.print(\"Servo: \");\n  lcd.print(servoAci);\n  lcd.print(\"      \");\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(SIFIRLA, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  servo.attach(SERVO_PIN);\n  servo.write(SERVO_MERKEZ);\n\n  Wire.begin();\n  Wire.beginTransmission(MPU);\n  Wire.write(0x6B);\n  Wire.write(0);                     // uyandır\n  Wire.endTransmission(true);\n  delay(100);\n\n  float toplam = 0;                  // sapma ölçümü: çip kıpırdamasın\n  for (int i = 0; i < 100; i++) {\n    mpuOku();\n    toplam += gy;\n    delay(5);\n  }\n  sapmaGy = toplam / 100;\n\n  mpuOku();\n  aci = ivmeAci();                   // başlangıç açısı ivmeölçerden\n  lcd.init();\n  lcd.backlight();\n  sonUs = micros();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Sıfırlama düğmesi: basıldığı an bir kez\n  bool basili = (digitalRead(SIFIRLA) == LOW);\n  if (basili && !oncekiBasili) {\n    ofset = aci;\n  }\n  oncekiBasili = basili;\n\n  // 2) Her 10 ms'de ölçüm, filtre ve servo\n  if (simdi - sonDongu >= DONGU_MS) {\n    sonDongu = simdi;\n\n    mpuOku();\n    unsigned long us = micros();\n    float dt = (us - sonUs) / 1000000.0;\n    sonUs = us;\n    aci = ALFA * (aci + (gy - sapmaGy) * dt) + (1.0 - ALFA) * ivmeAci();\n\n    float egim = aci - ofset;\n    int servoAci = SERVO_MERKEZ - (int)round(egim);   // ters yönde dön\n    bool sinirda = (servoAci <= SERVO_MIN || servoAci >= SERVO_MAX);\n    servoAci = constrain(servoAci, SERVO_MIN, SERVO_MAX);\n    servo.write(servoAci);\n    digitalWrite(LED, sinirda ? HIGH : LOW);\n\n    // 3) Ekran ve seri çıktı: 250 ms'de bir\n    if (simdi - sonEkran >= EKRAN_MS) {\n      sonEkran = simdi;\n      ekranYaz(egim, servoAci);\n      Serial.print(\"egim=\");\n      Serial.print(egim, 1);\n      Serial.print(\" servo=\");\n      Serial.println(servoAci);\n    }\n  }\n}\n```\n\n### How does it work?\n1. `setup` moves the servo to the middle (90°), wakes up the MPU and finds the gyroscope bias from the average of 100 measurements (lesson 59). After pressing ▶, do not change the MPU6050's properties for the first half second (while this measurement is running).\n2. `mpuOku` (read MPU) reads the 14 bytes in one go (lesson 58) but keeps only the ones we need: `ax`, `az` and `gy`.\n3. Every 10 ms the complementary filter runs. `dt` is calculated from the `micros()` difference; even if the loop's timing wobbles a little, the integral stays right.\n4. `egim = aci − ofset`: when you press the button, the current angle becomes zero.\n5. `servoAci = 90 − egim`: if the tilt is positive, the servo goes below 90, that is, it turns the opposite way. `constrain` keeps it between 10 and 170. When it reaches the limit, the LED lights up.\n6. `servo.write` sets the pulse width (lesson 21): 90° ≈ 1472 µs, 70° ≈ 1266 µs.\n7. `loop` never waits; it checks the button, the measurement and the screen with separate timestamps (`millis`).\n\nIf the platform turns the wrong way (this can happen depending on how the servo is mounted), change `SERVO_MERKEZ - ...` to `SERVO_MERKEZ + ...`.\n\n### Try it\n- Set `ALFA` to 0.90. Imitate vibration: change Accel X quickly between 0 and 0.2. How much does the servo jitter? With `ALFA` at 0.99, how late does the servo react?\n- Set `SERVO_MIN` and `SERVO_MAX` to 45 and 135. When does the LED light at the limit?\n- Add the roll axis too: connect a second servo to D9 and drive it with the angle `roll = atan2(ay, az)`. It becomes a two-axis gimbal (you need to keep the `ay` value inside `mpuOku`).\n- Let the bias change later: while it runs, raise Gyro Y from 0 to 3. Does the servo slowly drift, or does the filter hold it? Work out the leftover error with the formula from lesson 59 (`α · hata · dt / (1 − α)`, where `hata` is the error).\n\n### Common mistakes\n- On real hardware, powering the servo from the board's 5 V pin and being surprised when the MPU or LCD freezes as the servo takes load. In a real build, use an external supply and a common GND.\n- Moving the base while the bias is being measured (in the first half second of the program): the bias is measured wrongly and the servo keeps drifting.\n- Using an RTC (DS3231, the same 0x68 address) on the same line as the MPU6050.\n- Writing a fixed 0.01 instead of `dt`: when the loop time changes, the filter goes wrong.\n- Not limiting the servo angle: the servo pushes against its mechanical end, strains, makes a noise and heats up.\n- Using `delay`: it misses button presses and spoils the filter's `dt`.",
+            "question": "A real gimbal has a second sensor that measures the platform's own angle, and a control that keeps correcting the error. Our model has no such feedback. When the camera's base tilts slowly and when it tilts quickly, in which case does our model make more mistakes? Why?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine the pieces of earlier lessons (MPU6050, filter, servo, LCD, button) in a single project\n- How to turn a tilt into a servo movement \"in the opposite direction\" and limit the angle to a safe range\n- How to run several jobs at different speeds without blocking, using `millis`\n- What open-loop control means\n\n### What you should know first\nLesson 21: servo angle and pulse width; lesson 27: a non-blocking loop with `millis`; lesson 33: several devices on I2C; lessons 58 and 59: the MPU6050, pitch and the complementary filter.\n\n### The idea: reverse the tilt\nWhen a gimbal's base tilts, it tries to keep the platform level. In our model the MPU6050 measures the base's tilt, and the servo applies this angle in the opposite direction:\n\n```\negim  = aci - ofset          // the angle taken as \"level\" with the button is subtracted\nservo = 90 - egim            // middle is 90, turn the opposite way\nservo = constrain(servo, 10, 170)\n```\n\nIf the base tilts +20 degrees, the servo goes to 90 − 20 = 70 degrees. If the tilt were 85, you would get 90 − 85 = 5, but `constrain` raises it to 10; the LED lights at the limit.\n\n### Why do we limit it?\nIf the servo pushes right up to 0 or 180, it strains against its mechanical end, heats up and makes a noise. That is why the range 10...170 is a safe margin. `servo.write(70)` produces a pulse of about 1266 µs (linear between 544 µs and 2400 µs).\n\n### Every job at its own speed\nThe project has three jobs: catching the button, updating the filter and the servo every 10 ms, and refreshing the LCD and the serial output every 250 ms. `delay()` makes all of them wait: the button is missed and the filter's `dt` goes wrong. Instead, the last run time of each job is stored and the `millis()` difference is checked. The button updates `ofset` only at the moment of the press, using edge detection.\n\n### Open loop\nIn this system the MPU only measures the base; there is no sensor that checks whether the platform is really level. Control that does not measure the output and correct the error is called **open loop**. It is simple and good enough for a desktop model. In a real gimbal the platform's own angle is measured too, and the difference is corrected all the time (closed loop).\n\n### A note on real hardware\nWhen the servo takes load, the 5 V can drop, and the MPU and LCD may misbehave. In a real build the servo is powered from a separate 5 V supply and the GNDs are joined. The MPU6050 and the LCD work on the same two wires at different addresses (0x68 and 0x27); an RTC does not go on this line.\n\n### Summary\nThe mini gimbal turns a tilt measurement (MPU6050 and filter) into servo movement. The servo angle is 90 − tilt, limited to 10...170. All the jobs run at different speeds with `millis`. Because the sensor does not measure the output, it is open loop.",
+            "concepts": [
+              {
+                "term": "Offset (reset)",
+                "definition": "When the button is pressed, taking the current angle as \"level\" and subtracting it from the angles that follow.",
+                "example": "egim = aci - ofset; with ofset = 12, if aci is 12 then egim is 0.",
+                "pitfall": "Updating the offset on every pass: the tilt always looks like 0."
+              },
+              {
+                "term": "Compensation in the opposite direction",
+                "definition": "Keeping the platform level by turning by the tilt amount the other way. servo = 90 - egim.",
+                "example": "If egim = 20, the servo goes to 70 degrees.",
+                "pitfall": "Getting the sign the wrong way round: the platform doubles the tilt."
+              },
+              {
+                "term": "Limiting with constrain",
+                "definition": "Restricts the servo angle to a safe range (10...170).",
+                "example": "If egim = 85, you get 90 - 85 = 5, but constrain makes it 10.",
+                "pitfall": "Not limiting it: the servo pushes against its mechanical end, strains and heats up."
+              },
+              {
+                "term": "Non-blocking loop",
+                "definition": "Running each job at its own speed with a millis() difference instead of delay().",
+                "example": "The filter is updated every 10 ms, the LCD every 250 ms.",
+                "pitfall": "Using delay: button presses are missed and the filter's dt goes wrong."
+              },
+              {
+                "term": "Open loop",
+                "definition": "Control that does not measure the result of the output. In the mini gimbal there is no sensor measuring the platform's real angle.",
+                "example": "The MPU only measures the base; nobody knows whether the servo kept the platform level.",
+                "pitfall": "Thinking open loop is perfect: servo load or drift leaves the error unseen."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h5d60-q1",
+                "kind": "numeric",
+                "prompt": "When the button was pressed, ofset = 10. Right now the filtered angle is aci = 25. The mini gimbal works with the rules egim = aci - ofset and servo = 90 - egim. To how many degrees does the servo go? (The limits are not exceeded.)",
+                "answer": 75,
+                "tolerance": 0,
+                "unit": "degrees",
+                "explanation": "egim = 25 - 10 = 15 and servo = 90 - 15 = 75. Because the tilt is positive, the servo goes below 90, that is, the opposite way.",
+                "skills": [
+                  "servo-control"
+                ]
+              },
+              {
+                "id": "m4h5d60-q2",
+                "kind": "predict-output",
+                "prompt": "When egim = 85 degrees, what does this code print?\n\n```\nfloat egim = 85;\nint servoAci = 90 - (int)round(egim);\nbool sinirda = (servoAci <= 10 || servoAci >= 170);\nservoAci = constrain(servoAci, 10, 170);\nSerial.print(servoAci);\nSerial.print(\" \");\nSerial.println(sinirda ? 1 : 0);\n```",
+                "options": [
+                  "5 0",
+                  "5 1",
+                  "10 0",
+                  "10 1"
+                ],
+                "answer": 3,
+                "explanation": "90 - 85 = 5; because 5 <= 10, sinirda (at limit) becomes true. constrain raises 5 to 10. The output is \"10 1\": the servo goes to 10 degrees and the LED lights as a limit warning.",
+                "skills": [
+                  "servo-control"
+                ]
+              },
+              {
+                "id": "m4h5d60-q3",
+                "kind": "numeric",
+                "prompt": "The Servo library maps 0 degrees to 544 µs and 180 degrees to 2400 µs (linearly). About how many µs wide is the pulse produced by servo.write(70)?",
+                "answer": 1266,
+                "tolerance": 2,
+                "unit": "µs",
+                "explanation": "544 + 70 / 180 x (2400 - 544) = 544 + 721.8 = 1265.8, about 1266 µs (Arduino's integer map gives 1265). 90 degrees is 1472 µs.",
+                "skills": [
+                  "servo-control"
+                ]
+              },
+              {
+                "id": "m4h5d60-q4",
+                "kind": "mcq",
+                "prompt": "In the mini gimbal the MPU6050 only measures the tilt of the base; there is no sensor measuring the platform's real angle. What is this kind of control called?",
+                "options": [
+                  "Closed loop",
+                  "Open loop",
+                  "Interrupt-based control",
+                  "Non-blocking control"
+                ],
+                "answer": 1,
+                "explanation": "If the result of the output is not measured and the error corrected, the control is open loop. A system that also measures the platform's angle and keeps correcting the difference is closed loop. Non-blocking is a way of timing with millis; it is not a type of control.",
+                "skills": [
+                  "control-loop"
+                ]
+              },
+              {
+                "id": "m4h5d60-q5",
+                "kind": "find-bug",
+                "prompt": "The mini gimbal often misses button presses and the servo reacts very sluggishly. Which line is wrong?\n\n```\nvoid loop() {\n  bool basili = (digitalRead(SIFIRLA) == LOW);\n  if (basili && !oncekiBasili) ofset = aci;\n  oncekiBasili = basili;\n\n  mpuOku();\n  servo.write(servoAcisiHesapla());\n  delay(500);\n}\n```",
+                "options": [
+                  "delay(500);",
+                  "if (basili && !oncekiBasili) ofset = aci;",
+                  "mpuOku();",
+                  "servo.write(servoAcisiHesapla());"
+                ],
+                "answer": 0,
+                "explanation": "delay(500) makes the whole loop wait half a second: the button is missed, and the measurement and servo are updated only twice a second. Instead, a measurement is made every 10 ms with millis(). The edge-detection line is correct.",
+                "skills": [
+                  "nonblocking-timing",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -3051,6 +6035,7 @@ export const modul4: ModuleContent = {
       "title": "Girdi cihazları",
       "project": "Akıllı kapı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. IR kumandanın mesajı ışığın süreleriyle taşıdığını, NEC mesajının yapısını (ön darbe, 32 bit, ters kopyalar) ve bitleri boşluk süresinden okumayı açıklayabilir.\n2. 4x4 tuş takımının matris mantığıyla 8 pinle nasıl okunduğunu anlatabilir; `getKey()` ile rakam biriktirip `strcmp` ile PIN'i doğrulayan program yazabilir.\n3. RFID'in ve UID'nin ne olduğunu, SPI'nin dört telini ve UID'nin neden tek başına parola sayılmayacağını söyleyebilir; projenin pin ihtiyacını önceden hesaplayabilir.\n4. PIN ve kart listesini EEPROM'da sabit adreslerle tutabilir; kurulum işareti, `EEPROM.update` ve \"sayacı en son yaz\" kuralının nedenini açıklayabilir.\n5. KILITLI, ACIK ve BLOKE durumlarından oluşan, hiç `delay` kullanmayan bir kapı kilidini kurup test edebilir.\n\n### Haftanın planı\nHafta beş derstir; ilk dört ders 30-35 dakika, proje yaklaşık 40 dakika sürer. Plan günde bir ders içindir. Dördüncü dersten sonra bir gün ara vermek proje için iyi olur.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | IR alıcı ve kumanda kodları | ~30 dk | Anlatımı oku, NEC tablosunu incele, butonla darbe süresini ölç, çözücü sketch'ini çalıştır, mini testi çöz. |\n| 2 | Keypad 4x4: şifre girişi | ~30 dk | Tuş takımını kur, her tuşun harfini seri monitörde gör, PIN programını dene. |\n| 3 | RFID RC522 (SPI): kart okuma | ~30 dk | SPI pinlerini ve pin bütçesi tablosunu incele, `KART:AABBCCDD` ile seri taklidi dene. |\n| 4 | Yetki yönetimi: kart + şifre + EEPROM | ~35 dk | EEPROM haritasını çiz, `EKLE`, `SIL`, `LISTE` komutlarını dene, yeniden başlatıp listenin kaldığını gör. |\n| 5 | Proje: Akıllı kapı kilidi | ~40 dk | Devreyi kur, durum tablosunu kontrol et, deneme senaryosunun yedi adımını uygula, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBaşlamadan önce şunlara bak:\n- `INPUT_PULLUP` ile buton okumayı biliyor mu? (Modül 3, ders 6-7)\n- `millis()` ile bloklamayan zamanlamayı ve durum makinesini görmüş mü? (Ders 27-28)\n- Servoyu `write` ile döndürmeyi biliyor mu? (Ders 21)\n- I2C LCD'yi ve EEPROM'u daha önce kullandı mı? (Ders 32-34)\n- `pulseIn` ile süre ölçmeyi hatırlıyor mu? (Ders 37)\n- Seri monitörden satır gönderme kutusunu ve ▶ ile ■ düğmelerini kullanabiliyor mu?\n\n### Kavram haritası\n- **IR iletişim:** 38 kHz taşıyıcı → ters çıkış (darbe LOW) → NEC → boşlukla bit → `uint32_t` ve bit kaydırma → ters kopya ile hata denetimi\n- **Girdi:** tuş matrisi → tarama → `getKey()` → `char` dizisi ve `'\\0'` → `strcmp`\n- **Kimlik:** RFID → UID → SPI (SCK, MOSI, MISO, SS) → 3,3 V → seri taklit\n- **Kalıcılık:** EEPROM haritası → kurulum işareti → `EEPROM.update` → sayacı en son yaz → master PIN\n- **Proje:** kural → durum tablosu → `durum` değişkeni → `millis()` ile süre → ortak hata sayacı → ayrı servo beslemesi\n\n### Sık yapılan hatalar\n- **`pulseIn(LOW)` ve `pulseIn(HIGH)` karıştırmak.** IR alıcı ters çalışır: boşta HIGH, darbede LOW.\n- **32 bit için `int` kullanmak.** Uno'da `int` 16 bittir; `(uint32_t)1 << i` yaz.\n- **Tuş takımı satır ve sütunlarını ters yazmak.** Her tuşu sırayla seçip seri monitörde ne yazdığına bak.\n- **Yazıları `==` ile karşılaştırmak.** İçerik için `strcmp` (UID gibi baytlar için `memcmp`) kullanılır.\n- **Diziyi `'\\0'` için bir fazla boyutlandırmamak.** 4 haneli PIN için `char girilen[5]`.\n- **Gerçek RC522'yi 5 V ile beslemek.** Modül 3,3 V ister.\n- **UID'yi parola sanmak.** UID okunabilir ve taklit edilebilir; kart PIN ile birlikte kullanılır.\n- **Sayacı kayıttan önce artırmak.** Yarım yazılmış kart yetkili görünebilir.\n- **Servoyu D6 gibi keypad pinlerinde bırakmak.** D2-D9 bu hafta tuş takımına aittir; servo D10'a taşınır.\n- **`delay` ile kapıyı açık tutmak ya da bloke beklemek.** Tuşlar ve seri komutlar kaçar, ekran donar.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarını bir kez daha oku ve \"sık yapılan yanlış\" satırlarını yüksek sesle söyle.\n2. Yanlış yaptığın mini test sorularının açıklamasını oku, sonra soruyu yeniden çöz.\n3. Bir NEC mesajının neden her zaman yaklaşık 68 ms sürdüğünü kendi cümlelerinle açıkla.\n4. Bir EEPROM haritası çiz: 12 kart sığabilsin diye hangi adresleri değiştirmen gerekir? (İpucu: her kart 4 bayt.)\n5. Kendi evin için bir kapı kilidi kuralı yaz: kaç yanlışta, kaç saniye bloke olsun? Durum tablosuna dök.\n6. Kapı kilidi projesinde bloke süresini her seferinde iki katına çıkaracak bir değişiklik tasarla.\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir: her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Akıllı kapı kilidi)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Parçalar eksik ya da pinler keypad ile çakışıyor | Keypad, servo, buzzer, iki LED ve LCD doğru pinlerde; servo D10'da | Pin bütçesini ve neden kart okuyucunun seri taklit edildiğini açıklıyor |\n| Durum makinesi | Durumlar karışık, kapı açık kalıyor | KILITLI, ACIK ve BLOKE doğru geçişlerle çalışıyor | Durum tablosunu çizmiş ve kodla birebir uyuşuyor |\n| Zamanlama | `delay` kullanıyor, bloke sırasında tuşlar donuyor | Açık kalma 5 sn, bloke 30 sn, `millis()` ile | Süreleri değiştirip etkisini açıklıyor; taşmaya dayanıklı karşılaştırmayı biliyor |\n| Yetki | PIN ve kart ayrı sayaçlarla çalışıyor | PIN ve kart ortak sayaçta; yönetim komutları master PIN ister | Bloke süresini artıran bir kural ekledi ya da fabrika PIN'lerini değiştirdi |\n| Geri bildirim | Ekran ve buzzer olaylarla uyuşmuyor | LCD, LED ve buzzer her olayı gösteriyor | Mesajları Türkçe karaktersiz ve 16 karaktere sığacak biçimde tasarlamış |\n| Güvenlik bilinci | Açıkları düşünmedi | Seri portun yönetim açığı olduğunu fark etti | Gerçek üründe neyin değişeceğini (ayrı besleme, deneme sınırı, seri yönetimi kapatma) anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta birçok bilgiyi bir araya getirme haftasıdır: tuş takımı, kart, EEPROM, servo ve ekran. Öğrenci hepsini ezberlemek zorunda değildir; önemli olan planı yazılı bir tabloya dökmeyi ve parçaları tek tek sınayıp birleştirmeyi öğrenmesidir.\n- **Dürüstlük notu.** Laboratuvarda kart okuyucu ve IR kumanda parçası yoktur. Kart seri monitörden taklit edilir; IR için buton kullanılır. Bu, bilerek seçilmiş bir test yöntemidir ve gerçek donanım yerine geçmez. Öğrenciye bunu açıkça söyleyin.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şunu sorun: \"Şu an kapı hangi durumda?\", \"Seri monitör ne yazıyor?\", \"Hangi pini iki parçaya birden verdin?\"\n- **Güvenlik.** Her şey sanaldır. Gerçek bir kapıyı etkileyen sistem kurulacaksa şebeke gerilimiyle (220 V) doğrudan çalışılmaz; yönetim PIN'leri ve deneme sınırı gerçek üründe zorunludur. Fabrika PIN'lerinin (1234 ve 9999) gerçek bir kilitte kullanılmayacağını vurgulayın.\n- **Süre.** Dersleri aralıklı yapmak kalıcılığı artırır; dördüncü ders yoğundur, gerekirse iki oturuma bölün.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can explain that an IR remote carries its message in the durations of the light, the structure of an NEC message (leading pulse, 32 bits, inverse copies) and how to read the bits from the gap length.\n2. Can explain how a 4x4 keypad is read with 8 pins using the matrix idea; can write a program that collects digits with `getKey()` and checks the PIN with `strcmp`.\n3. Can say what RFID and a UID are, name the four wires of SPI and explain why a UID does not count as a password on its own; can work out a project's pin needs in advance.\n4. Can keep the PIN and the card list in EEPROM at fixed addresses; can explain the reasons for the setup marker, `EEPROM.update` and the \"write the counter last\" rule.\n5. Can build and test a door lock made of the KILITLI, ACIK and BLOKE states that uses no `delay` at all.\n\n### Plan for the week\nThe week has five lessons; the first four take 30-35 minutes, and the project about 40 minutes. The plan is for one lesson a day. A day's break after the fourth lesson is good for the project.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | IR receiver and remote control codes | ~30 min | Read the explainer, study the NEC table, measure the pulse length with a button, run the decoder sketch, do the mini quiz. |\n| 2 | 4x4 keypad: entering a password | ~30 min | Set up the keypad, see each key's letter on the Serial monitor, try the PIN program. |\n| 3 | RFID RC522 (SPI): reading a card | ~30 min | Study the SPI pins and the pin budget table, try the serial imitation with `KART:AABBCCDD`. |\n| 4 | Access management: card + password + EEPROM | ~35 min | Draw the EEPROM map, try the `EKLE`, `SIL`, `LISTE` commands, restart and see that the list is still there. |\n| 5 | Project: Smart door lock | ~40 min | Build the circuit, check the state table, carry out the seven steps of the test scenario, assess it with the rubric. |\n\n### Prerequisite check\nBefore you start, check these:\n- Does the learner know how to read a button with `INPUT_PULLUP`? (Module 3, lessons 6-7)\n- Have they seen non-blocking timing with `millis()` and the state machine? (Lessons 27-28)\n- Do they know how to turn a servo with `write`? (Lesson 21)\n- Have they used the I2C LCD and EEPROM before? (Lessons 32-34)\n- Do they remember measuring time with `pulseIn`? (Lesson 37)\n- Can they use the box for sending a line from the Serial monitor and the ▶ and ■ buttons?\n\n### Concept map\n- **IR communication:** 38 kHz carrier → inverted output (pulse LOW) → NEC → bit from the gap → `uint32_t` and bit shifting → error check with the inverse copy\n- **Input:** key matrix → scanning → `getKey()` → `char` array and `'\\0'` → `strcmp`\n- **Identity:** RFID → UID → SPI (SCK, MOSI, MISO, SS) → 3.3 V → serial imitation\n- **Persistence:** EEPROM map → setup marker → `EEPROM.update` → write the counter last → master PIN\n- **Project:** rule → state table → `durum` variable → timing with `millis()` → shared error counter → separate servo power\n\n### Common mistakes\n- **Mixing up `pulseIn(LOW)` and `pulseIn(HIGH)`.** The IR receiver works inverted: HIGH when idle, LOW during a pulse.\n- **Using `int` for 32 bits.** On the Uno, `int` is 16 bits; write `(uint32_t)1 << i`.\n- **Writing the keypad's rows and columns the wrong way round.** Pick each key in turn and see what the Serial monitor prints.\n- **Comparing texts with `==`.** For the contents, `strcmp` is used (`memcmp` for bytes such as a UID).\n- **Not making the array one bigger for the `'\\0'`.** For a 4-digit PIN, `char girilen[5]`.\n- **Powering a real RC522 with 5 V.** The module needs 3.3 V.\n- **Thinking the UID is a password.** A UID can be read and copied; the card is used together with a PIN.\n- **Raising the counter before the record.** A half-written card can look authorised.\n- **Leaving the servo on keypad pins such as D6.** D2-D9 belong to the keypad this week; the servo is moved to D10.\n- **Keeping the door open or waiting out the block with `delay`.** Keys and serial commands are missed, and the screen freezes.\n\n### End-of-week review\n1. Read each lesson's concept cards once more and say the \"common mistake\" lines out loud.\n2. Read the explanations of the mini quiz questions you got wrong, then solve the question again.\n3. Explain in your own words why an NEC message always lasts about 68 ms.\n4. Draw an EEPROM map: which addresses do you need to change so that 12 cards fit? (Hint: each card is 4 bytes.)\n5. Write a door lock rule for your own home: after how many wrong attempts, and for how many seconds, should it block? Put it into a state table.\n6. Design a change to the door lock project that doubles the block time every time.\n\nThe mini quizzes of the five lessons are enough as an end-of-week test: 5 questions per lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Smart door lock)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | Parts are missing or pins clash with the keypad | Keypad, servo, buzzer, two LEDs and LCD on the right pins; servo on D10 | Explains the pin budget and why the card reader is imitated over serial |\n| State machine | The states are mixed up; the door stays open | KILITLI, ACIK and BLOKE work with the right moves between them | Has drawn the state table, and it matches the code exactly |\n| Timing | Uses `delay`; the keys freeze during the block | Open for 5 s, block 30 s, with `millis()` | Changes the times and explains the effect; knows the overflow-proof comparison |\n| Access | The PIN and the card work with separate counters | The PIN and the card share a counter; management commands need the master PIN | Has added a rule that increases the block time, or has changed the factory PINs |\n| Feedback | The screen and buzzer do not match the events | The LCD, LEDs and buzzer show every event | Has designed the messages without Turkish characters and to fit in 16 characters |\n| Security awareness | Has not thought about weaknesses | Has noticed that the serial port is a management weakness | Explains what would change in a real product (separate power, attempt limit, switching off serial management) |\n\n### Note for parents and teachers\n- **Aim.** This week is about bringing a lot of knowledge together: the keypad, the card, EEPROM, the servo and the screen. The learner does not have to memorise all of it; what matters is learning to put the plan into a written table and to test the parts one by one before combining them.\n- **A note on honesty.** The lab has no card reader or IR remote part. The card is imitated from the Serial monitor; a button is used for IR. This is a deliberately chosen test method and does not replace real hardware. Tell the learner this clearly.\n- **How to help.** When they get stuck, ask instead of giving the answer: \"Which state is the door in right now?\", \"What does the Serial monitor say?\", \"Which pin did you give to two parts at once?\"\n- **Safety.** Everything is virtual. If a system that affects a real door is built, no one works directly with mains voltage (220 V); management PINs and an attempt limit are essential in a real product. Stress that the factory PINs (1234 and 9999) must never be used on a real lock.\n- **Time.** Spacing the lessons out helps the learning stick; the fourth lesson is dense, so split it into two sessions if needed.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "IR alıcı ve kumanda kodları",
@@ -3169,7 +6154,125 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "IR receiver and remote control codes",
+            "problem": "You cannot see the light at the tip of a TV remote with your eyes, but if you look through a phone camera, you can see it flashing. With every button, the remote sends a message with light. How does the TV understand this message as \"volume up\" or \"change channel\"? In this lesson you will open up the message and write your own decoder.",
+            "contentMd": "### Circuit\nThe lab has no IR receiver or remote control part. So first get to know the real circuit, then try the same idea in the lab with a button.\n\nIn a real circuit (for information):\n\n| Part | Connection |\n|---|---|\n| IR receiver module (VS1838B type, 38 kHz) | OUT → **D2**, VCC → 5 V, GND → GND |\n| IR remote control | Pointed at the receiver; sends a message when you press a button |\n\nThe pin order differs between modules; you need to look at the labels printed on it (OUT, GND, VCC).\n\nFor the lab experiment, pick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button (in place of the receiver's OUT output) | A → **D2**, B → **GND** |\n| LED | The Uno's built-in LED (**D13**) is enough; you do not need to add a part |\n\nWhen the button is not pressed, D2 reads HIGH thanks to `INPUT_PULLUP` (idle); when you hold the button down, it reads LOW (pulse). The IR receiver module's output works the same way: HIGH when idle, LOW while there is a carrier. If you measure how long the button stays pressed with `pulseIn`, you have rehearsed how to measure the length of an IR pulse. The difference is this: remote control pulses are at the millisecond and microsecond level, and you cannot press that fast by clicking.\n\n### What does the remote send?\nThe IR LED at the tip of the remote produces a \"carrier\" by flashing 38,000 times a second. The receiver module only recognises this 38 kHz; it filters out slowly changing light such as daylight. The module's output works **inverted**:\n\n- When there is no carrier, OUT = **HIGH** (idle).\n- When there is a carrier, OUT = **LOW** (pulse).\n\nSo the Arduino does not see the carrier; it only sees \"how long the LOW pulse lasted, how long the HIGH gap lasted\". The information is stored in the **durations**. Many remotes use a protocol called NEC:\n\n| Part | LOW (pulse) | HIGH (gap) |\n|---|---|---|\n| Leading pulse (start) | 9 ms | 4.5 ms |\n| Bit 0 | 562.5 µs | 562.5 µs |\n| Bit 1 | 562.5 µs | 1687.5 µs |\n| End | 562.5 µs | idle |\n\nThe bits are told apart by the **gap**, not the pulse: a short gap is 0, a long gap is 1. After the leading pulse come 32 bits, **least significant bit first**:\n\n1. Address (8 bits): which device?\n2. Inverse of the address (8 bits): the same with every bit flipped\n3. Command (8 bits): which button?\n4. Inverse of the command (8 bits)\n\nThe inverse copy is an error check: if the command and its inverse are not each other's complement, the message is corrupt. That is why every message has 16 bits that are 1 and 16 bits that are 0, and a message lasts about 68 ms whichever button it is (13.5 ms start part + 16 × 1.125 ms + 16 × 2.25 ms + a 0.56 ms end pulse).\n\nIf you hold a button down, the remote does not repeat the same message; instead it sends a short \"repeat\" message: a 9 ms pulse, a **2.25 ms** gap and a 562.5 µs end pulse. It typically comes about every 108 ms. Some remotes use NEC's \"extended\" form (16-bit address, no inverse copy); if your remote does not follow NEC, the decoder gives an error. What is in this lesson is for standard NEC.\n\n### Program 1: Measure the durations\nFirst let's see that the leading pulse really is 9 ms. The `pulseIn(pin, durum, zamanAşımı)` (pin, state, timeout) you learnt in lesson 37 waits for the level and returns how many microseconds that level lasted. Here we look at the LOW pulses.\n\n```cpp\n// sketch: nec_zamanlari\nconst int IR_PIN = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(IR_PIN, INPUT);\n}\n\nvoid loop() {\n  unsigned long on = pulseIn(IR_PIN, LOW, 200000);     // ön darbe (LOW)\n  if (on < 8000) return;                               // ön darbe değil, yok say\n  unsigned long ilkBit = pulseIn(IR_PIN, LOW, 20000);  // bir sonraki LOW darbe: ilk bitin darbesi\n  Serial.print(\"On darbe: \");\n  Serial.print(on);\n  Serial.print(\" us, ilk bit darbesi: \");\n  Serial.print(ilkBit);\n  Serial.println(\" us\");\n}\n```\n\nOn a real remote, when you press a button, the leading pulse comes out at around 9000 µs and the first bit's pulse at around 560 µs. On real remotes the values can wobble by a few hundred microseconds; the timing changes with the battery level and with manufacturing. Because there is no IR source in the lab, this sketch compiles but gives no output unless NEC pulses arrive at D2.\n\n### Program 2: Write the NEC decoder yourself\nNow read the 32 bits and find the command. An important detail: when `pulseIn(HIGH)` is called and the pin is already LOW, it waits for the next HIGH and measures that. Because a LOW pulse comes after each gap, when you make `pulseIn(IR_PIN, HIGH)` calls **one after another**, each call measures the next gap. The first call gives the leading gap (4.5 ms), and the next 32 calls give the gaps of the 32 bits.\n\n```cpp\n// sketch: nec_cozucu\nconst int IR_PIN = 2;\nconst int LED = 13;\nconst byte KOMUT_AC = 0x0C;      // kumandana göre değişir: önce yazdırıp bak\nconst byte KOMUT_KAPAT = 0x18;\nconst unsigned long BIT_ESIK = 1100;   // us: bundan uzun boşluk = 1\n\nvoid hexYaz(byte b) {\n  if (b < 16) Serial.print('0');\n  Serial.print(b, HEX);\n}\n\n// Bir mesaj okur. Başarılıysa true döner; tekrar mesajıysa tekrar = true olur.\nbool mesajOku(byte &adres, byte &komut, bool &tekrar) {\n  unsigned long bosluk = pulseIn(IR_PIN, HIGH, 100000);    // ön boşluk\n  if (bosluk == 0) return false;                           // sinyal yok\n  if (bosluk > 2000 && bosluk < 2600) {                    // 2,25 ms: tekrar mesajı\n    tekrar = true;\n    return true;\n  }\n  if (bosluk < 4000 || bosluk > 5000) return false;        // 4,5 ms değil: gürültü\n  tekrar = false;\n\n  uint32_t veri = 0;\n  for (int i = 0; i < 32; i++) {\n    unsigned long b = pulseIn(IR_PIN, HIGH, 3000);         // i. bitin boşluğu\n    if (b == 0 || b > 2200) return false;                  // beklenen süre dışında\n    if (b > BIT_ESIK) veri |= (uint32_t)1 << i;            // uzun boşluk: i. biti 1 yap\n  }\n\n  adres = veri & 0xFF;\n  byte adresTers = (veri >> 8) & 0xFF;\n  komut = (veri >> 16) & 0xFF;\n  byte komutTers = (veri >> 24) & 0xFF;\n  if (komut != (byte)~komutTers) return false;             // ters kopya tutmuyor: bozuk\n  (void)adresTers;                                         // genişletilmiş NEC'te tutmaz, denetlemiyoruz\n  return true;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(IR_PIN, INPUT);\n  pinMode(LED, OUTPUT);\n}\n\nvoid loop() {\n  byte adres, komut;\n  bool tekrar = false;\n  if (!mesajOku(adres, komut, tekrar)) return;\n\n  if (tekrar) {\n    Serial.println(\"tekrar\");\n    return;\n  }\n  Serial.print(\"Adres: 0x\");\n  hexYaz(adres);\n  Serial.print(\" Komut: 0x\");\n  hexYaz(komut);\n  Serial.println();\n\n  if (komut == KOMUT_AC) digitalWrite(LED, HIGH);\n  if (komut == KOMUT_KAPAT) digitalWrite(LED, LOW);\n}\n```\n\n### How does it work?\n1. `pulseIn(IR_PIN, HIGH, 100000)` waits while idle: while the pin is HIGH, it first waits for that level to end, that is, for the leading pulse to arrive. If no signal comes within 100 ms, it returns `0` and `loop` tries again.\n2. If the leading gap is not 4.5 ms, the message has not started (or it is noise); it returns `false`.\n3. The expression `veri |= (uint32_t)1 << i` is a new idea: `1 << i` shifts 1 to the left by `i` places (for i = 3, binary 1000, that is 8). With `|=`, this bit is set to 1 inside `veri` (data). `uint32_t` is a 32-bit unsigned whole number; `int` is only 16 bits, so it does not fit a 32-bit message.\n4. Because the bits arrive least significant bit first, the first bit that arrives is written to bit 0 of `veri`. Then we separate out the command with `veri >> 16` and the lowest 8 bits with `& 0xFF`.\n5. `~komutTers` flips every bit of the byte (`~` is the complement). If the command and its inverse match, the message is sound.\n6. `pulseIn` calls **block** (like the `delay` trap in lesson 26). This decoder cannot do any other job while it waits. It is enough for a small experiment, but in a program with many jobs a library is a better fit.\n\n### Program 3: The IRremote library\nIn real projects a library does this job. The library watches pin changes with interrupts and a timer, does not block and recognises dozens of protocols. In IRremote version 4.x, the header file is `IRremote.hpp`.\n\n```cpp\n// sketch: ir_kutuphane\n#include <IRremote.hpp>\n\nconst int IR_PIN = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  IrReceiver.begin(IR_PIN, ENABLE_LED_FEEDBACK);   // mesaj gelince dahili LED yanıp söner\n}\n\nvoid loop() {\n  if (IrReceiver.decode()) {                       // yeni mesaj çözüldü mü?\n    Serial.print(\"Protokol: \");\n    Serial.print(getProtocolString(IrReceiver.decodedIRData.protocol));\n    Serial.print(\" Adres: 0x\");\n    Serial.print(IrReceiver.decodedIRData.address, HEX);\n    Serial.print(\" Komut: 0x\");\n    Serial.println(IrReceiver.decodedIRData.command, HEX);\n    IrReceiver.resume();                           // bir sonraki mesaja hazırlan\n  }\n}\n```\n\nThis library sketch only compiles in the lab; because there is no IR receiver part, it gives no output. The library uses a timer inside; it can clash with other libraries that use the same timer (for example `tone()`). Check the documentation for the version you use.\n\n`decode()` returns `true` if there is a message, and the result is in `decodedIRData`. If you do not call `resume()` when you are done, the library does not take a new message.\n\n### Try it\n- In the lab, connect the button to D2 (`INPUT_PULLUP`) and print how long it stays pressed, in microseconds, with `pulseIn(2, LOW, 3000000)`. See how the measurement changes with a short and a long press.\n- In NEC, the leading pulse is always 9 ms and the leading gap 4.5 ms. So does a message last longer when the command is 0x00 or when it is 0xFF? Work it out from the bit durations in the lesson (hint: because of the inverse copy, how many bits are 1?).\n- If a button is held down, repeat messages arrive about every 108 ms. How many repeat messages would you expect in 2 seconds?\n\n### Common mistakes\n- Connecting the real module's legs the wrong way round: the module can be damaged. The pin order depends on the module.\n- Taking codes from another remote and expecting them to work with your remote: every remote's address and commands are different.\n- Mixing up the `pulseIn(LOW)` and `pulseIn(HIGH)` calls. When idle the pin is HIGH; the leading pulse is LOW.\n- Forgetting to write `INPUT_PULLUP` when trying it with a button: D2 floats and the measurement becomes meaningless (on the IR module this pull-up is inside the module).\n- Using `int` with `1 << i` and losing everything after bit 16: for 32 bits you need `uint32_t` and `(uint32_t)1 << i`.\n- In a real circuit, placing the IR receiver so that it looks straight at the sun or a bright lamp: the receiver can be triggered all the time.",
+            "question": "If you used the remotes of two different devices at the same time in the same room, would they get mixed up? How does the address field in an NEC message solve this problem? What do you think the inverse copies are for?",
+            "explainerMd": "### What you will learn in this lesson\n- That an infrared (IR) remote carries a message with invisible light\n- What the 38 kHz carrier and the inverted receiver output mean\n- The structure of an NEC message: leading pulse, 32 bits, inverse copies\n- How to read bits from **durations** and gather them into a number with bit shifting\n\n### What you should know first\n- Lesson 37: measuring the length of a pulse with `pulseIn`\n- Lesson 26: `delay` and the cost of a blocking wait\n- Lesson 6: reading HIGH when idle with `INPUT_PULLUP`\n\n### A message made of light\nThe IR LED at the tip of the remote cannot be seen with the eye, but it can be seen flashing through a phone camera. The message is coded by **how long the light is on and how long it is off**. The Arduino does not read the light; it reads these durations.\n\n### The carrier and the inverted output\nThe remote's LED flashes 38,000 times a second; this is called the **carrier**. The receiver module only recognises this speed, and filters out slowly changing light such as the sun or a lamp. The module's output works inverted:\n\n```\nno carrier  ->  OUT = HIGH (idle)\ncarrier     ->  OUT = LOW  (pulse)\n```\n\nThat is why you measure the leading pulse with `pulseIn(pin, LOW)` and the gaps with `pulseIn(pin, HIGH)`.\n\n### The NEC message\nThe widely used **NEC** protocol goes like this:\n\n| Part | Pulse (LOW) | Gap (HIGH) |\n|---|---|---|\n| Start | 9 ms | 4.5 ms |\n| Bit 0 | 562.5 µs | 562.5 µs |\n| Bit 1 | 562.5 µs | 1687.5 µs |\n\nThe pulse is always the same; the **length of the gap** tells you whether the bit is 0 or 1. After the leading pulse come 4 bytes: the address, the inverse of the address, the command, the inverse of the command. Each byte is sent least significant bit first. The inverse copy is a check: if the command and its inverse do not complement each other, the message is corrupt and is thrown away. That is why every message has 16 bits that are 1 and 16 bits that are 0, and it takes about 68 ms whichever button is pressed.\n\n### Gathering the bits into a number\nYou measure the 32 gaps one by one and write them into a number of type `uint32_t`. When a long gap arrives, you set the matching bit to 1:\n\n```\ntaşıyıcı yok  ->  OUT = HIGH (boşta)\ntaşıyıcı var  ->  OUT = LOW  (darbe)\n```\n\n`1 << i` shifts 1 to the left by `i` places; `|=` adds this bit to the number. Watch out: on the Uno, `int` is 16 bits. If you do not write `(uint32_t)`, everything after bit 16 is lost.\n\n### What is a library for?\n`pulseIn` calls make the program wait (they block). In real projects a library such as IRremote is used: it watches pin changes in the background and recognises many protocols. Writing your own decoder, on the other hand, shows you how the job works.\n\n### Summary\nAn IR remote sends a message in the form of durations by switching a 38 kHz carrier on and off. The receiver's output works inverted: the pulse is LOW, idle is HIGH. In NEC the bits are told apart by the gap; half of the 32 bits are inverse copies and give an error check. Measuring the durations and gathering the bits into a `uint32_t` is the heart of the decoder.",
+            "concepts": [
+              {
+                "term": "Carrier (38 kHz)",
+                "definition": "The flicker of light made by the IR LED flashing 38,000 times a second, which the receiver module recognises.",
+                "example": "When the receiver sees 38 kHz, it makes the OUT pin LOW; it ignores slow changes such as sunlight.",
+                "pitfall": "Pointing the receiver straight at the sun or a bright lamp; the receiver can be triggered all the time."
+              },
+              {
+                "term": "Inverted output (active-LOW)",
+                "definition": "The IR receiver module gives HIGH when there is no carrier and LOW when there is a carrier.",
+                "example": "When the remote is pressed, D2 first goes LOW for 9 ms, then stays HIGH for 4.5 ms.",
+                "pitfall": "Mixing up the pulseIn(LOW) and pulseIn(HIGH) calls: when idle the pin is HIGH, the leading pulse is LOW."
+              },
+              {
+                "term": "NEC protocol",
+                "definition": "A common IR coding that sends 32 bits after the leading pulse: the address, the inverse of the address, the command and the inverse of the command.",
+                "example": "If the command is 0x0C, 0xF3 (its inverse) follows; if the two match, the message is sound.",
+                "pitfall": "Expecting another remote's codes on your own remote; the address and commands change from remote to remote."
+              },
+              {
+                "term": "A bit from the gap length",
+                "definition": "In NEC the pulse is always 562.5 µs; a short gap (562.5 µs) means 0 and a long gap (1687.5 µs) means 1.",
+                "example": "A threshold of 1100 µs: if the measured gap is longer than this, a 1 bit is written.",
+                "pitfall": "Trying to read the bits from the pulse length; all the pulses are the same length."
+              },
+              {
+                "term": "Bit shifting and |=",
+                "definition": "1 << i shifts 1 to the left by i places; with veri |= ... this bit is set to 1 in the number.",
+                "example": "For i = 3, 1 << 3 is 8 (binary 1000).",
+                "pitfall": "Using int: on the Uno it is 16 bits, so the top half of a 32-bit message is lost. Write (uint32_t)1 << i."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h6d1-q1",
+                "kind": "mcq",
+                "prompt": "What does the IR receiver module's OUT pin read when no remote button is being pressed (when there is no carrier)?",
+                "options": [
+                  "LOW",
+                  "A random value that keeps changing",
+                  "HIGH",
+                  "Nothing; the pin floats"
+                ],
+                "answer": 2,
+                "explanation": "The receiver works inverted: when there is no carrier, OUT is HIGH (idle); when the carrier arrives, it goes LOW. That is why you measure the leading pulse as LOW. The pin does not float, because of the pull-up resistor inside the module.",
+                "skills": [
+                  "ir-nec"
+                ]
+              },
+              {
+                "id": "m4h6d1-q2",
+                "kind": "mcq",
+                "prompt": "In an NEC message, what decides whether a bit is 0 or 1?",
+                "options": [
+                  "The length of the pulse (LOW)",
+                  "The length of the gap (HIGH)",
+                  "The frequency of the carrier",
+                  "Where in the order the message comes"
+                ],
+                "answer": 1,
+                "explanation": "The pulse is 562.5 µs for every bit. A short gap (562.5 µs) means 0 and a long gap (1687.5 µs) means 1. The carrier frequency is always 38 kHz and carries no bit information.",
+                "skills": [
+                  "ir-nec"
+                ]
+              },
+              {
+                "id": "m4h6d1-q3",
+                "kind": "numeric",
+                "prompt": "In NEC, a repeat message is made of a 9 ms pulse, a 2.25 ms gap and a 0.5625 ms end pulse. How many milliseconds does it last in total?",
+                "answer": 11.8125,
+                "tolerance": 0.05,
+                "unit": "ms",
+                "explanation": "9 + 2.25 + 0.5625 = 11.8125 ms. A full message lasts about 68 ms, while a repeat message is much shorter; that is why, when a button is held down, short messages arrive about every 108 ms.",
+                "skills": [
+                  "ir-nec"
+                ]
+              },
+              {
+                "id": "m4h6d1-q4",
+                "kind": "predict-output",
+                "prompt": "What does the Serial monitor show when this code runs?\n\n```\nuint32_t veri = 0;\nveri |= (uint32_t)1 << 0;\nveri |= (uint32_t)1 << 3;\nSerial.println(veri);\n```",
+                "options": [
+                  "4",
+                  "8",
+                  "9",
+                  "10"
+                ],
+                "answer": 2,
+                "explanation": "1 << 0 is 1, and 1 << 3 is 8. With |= both bits are added: 1 + 8 = 9 (binary 1001). 8 would give only the third bit, and 4 the second bit.",
+                "skills": [
+                  "bit-ops"
+                ]
+              },
+              {
+                "id": "m4h6d1-q5",
+                "kind": "find-bug",
+                "prompt": "A friend gathered the 32 gaps like this, but the command always comes out wrong. Which line is the bug on?\n\n```\nuint32_t veri = 0;                  // line 1\nfor (int i = 0; i < 32; i++) {      // line 2\n  unsigned long b = pulseIn(2, HIGH, 3000);   // line 3\n  if (b > 1100) veri |= 1 << i;     // line 4\n}\n```",
+                "options": [
+                  "Line 1: veri is not declared as 32 bits",
+                  "Line 2: the loop runs 33 times",
+                  "Line 3: pulseIn should be LOW instead of HIGH",
+                  "Line 4: the number 1 is an int; on the Uno everything after bit 16 is lost, it should be (uint32_t)1 << i"
+                ],
+                "answer": 3,
+                "explanation": "On the Uno, the literal 1 is a 16-bit int; 1 << 16 and above overflow, and the top half of the message (the command and its inverse) is corrupted. Line 1 is already uint32_t, line 2 runs exactly 32 times, and measuring the gaps as HIGH is correct.",
+                "skills": [
+                  "bit-ops",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Keypad 4x4: şifre girişi",
@@ -3288,7 +6391,125 @@ export const modul4: ModuleContent = {
                 "keypad-matrix"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "4x4 keypad: entering a password",
+            "problem": "The keypad on a block of flats' front door has 16 keys, but it does not have 16 wires. Even if the Arduino had 16 pins, spending all of them on one keypad would be very costly. So how do we read 16 keys with only 8 wires? What is more, to write a program that opens something when you enter the right password and warns you when you enter the wrong one, you need to catch the \"moment of the press\" correctly.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| 4x4 keypad | Rows R1..R4 → **D9, D8, D7, D6**; columns C1..C4 → **D5, D4, D3, D2** |\n| LED (green) | **D13** → resistor (330 Ω) 1; resistor 2 → LED **A**; LED **K** → **GND** |\n| LED (red) | **D12** → resistor (330 Ω) 1; resistor 2 → LED **A**; LED **K** → **GND** |\n\nThis week all of pins D2-D9 go to the keypad. D2 and D3, which you used for buttons in earlier weeks, and D6, which you used for the servo, are not free this week; that is why in this week's project the servo will be moved to another pin.\n\nIn the lab, when you select the keypad, you pick a key from the **Pressed key** list in the right panel: the key you pick counts as pressed; if you choose **None**, it is released. The keypad can only hold one key pressed at a time. On the 8-wire ribbon of a real membrane keypad, which wire is a row and which is a column depends on the maker; on the lab part the pins are labelled R1-R4 and C1-C4.\n\n### How is a matrix read?\nInstead of reading 16 keys with 16 wires, we arrange the keys in a grid of 4 rows × 4 columns. When a key is pressed, it joins one row to one column. Reading is done like this:\n\n1. The row pins are inputs and wait at HIGH with `INPUT_PULLUP`.\n2. The Arduino makes the columns LOW in turn (only one at a time).\n3. When the column of a pressed key is LOW, that key's row also reads LOW.\n4. Whichever row reads LOW while whichever column is LOW, the key is the one where that row and column cross.\n\nWith 8 wires, 4 × 4 = 16 keys are read. The `Keypad` library does this scanning and the debouncing for you. On a real keypad, if several keys are pressed at the same time, some keys in the matrix may be detected wrongly (a known limit of matrices without diodes); when entering a password the keys are pressed one by one, so this is not a problem. In the lab you can only pick one key at a time anyway.\n\n### Program 1: Read a key\nWhen we set up the `Keypad` object, we give it the letter map of the keys and the row and column pins. `makeKeymap` turns the two-dimensional array into the form the library wants.\n\n```cpp\n// sketch: keypad_tus\n#include <Keypad.h>\n\nconst byte SATIR = 4;\nconst byte SUTUN = 4;\nchar tuslar[SATIR][SUTUN] = {\n  {'1', '2', '3', 'A'},\n  {'4', '5', '6', 'B'},\n  {'7', '8', '9', 'C'},\n  {'*', '0', '#', 'D'}\n};\nbyte satirPinleri[SATIR] = {9, 8, 7, 6};\nbyte sutunPinleri[SUTUN] = {5, 4, 3, 2};\n\nKeypad tusTakimi = Keypad(makeKeymap(tuslar), satirPinleri, sutunPinleri, SATIR, SUTUN);\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  char tus = tusTakimi.getKey();      // basılan tuş; basılmadıysa '\\0'\n  if (tus) {\n    Serial.print(\"Tus: \");\n    Serial.println(tus);\n  }\n}\n```\n\n`getKey()` returns the key **once** for each press; even if you hold the key down, it does not repeat (in the lab, leaving a key selected in the list means holding it down). If there is no press, it returns `0` (`'\\0'`), which counts as \"false\" in `if (tus)`.\n\n### Program 2: Entering a PIN\nNow let's write the first half of a door lock: a 4-digit PIN. The rules:\n\n- Digit keys are added to the PIN (at most 4 digits).\n- `*` deletes the last digit entered.\n- `#` confirms the entry.\n- Wrong entries are counted; after 3 wrong ones, a warning is given.\n\nWe do not show the PIN openly on the Serial monitor; we print a `*` for each digit.\n\n```cpp\n// sketch: keypad_sifre\n#include <Keypad.h>\n\nconst byte SATIR = 4;\nconst byte SUTUN = 4;\nchar tuslar[SATIR][SUTUN] = {\n  {'1', '2', '3', 'A'},\n  {'4', '5', '6', 'B'},\n  {'7', '8', '9', 'C'},\n  {'*', '0', '#', 'D'}\n};\nbyte satirPinleri[SATIR] = {9, 8, 7, 6};\nbyte sutunPinleri[SUTUN] = {5, 4, 3, 2};\nKeypad tusTakimi = Keypad(makeKeymap(tuslar), satirPinleri, sutunPinleri, SATIR, SUTUN);\n\nconst int YESIL = 13;\nconst int KIRMIZI = 12;\nconst int PIN_UZUNLUK = 4;\nconst int AZAMI_YANLIS = 3;\nconst unsigned long LED_SURESI = 1000;   // ms\n\nconst char DOGRU_PIN[] = \"1234\";\n\nchar girilen[PIN_UZUNLUK + 1];           // +1: dizinin sonundaki '\\0'\nint hane = 0;\nint yanlisSayisi = 0;\nunsigned long ledBitis = 0;\n\nvoid girisiTemizle() {\n  hane = 0;\n  girilen[0] = '\\0';\n}\n\nvoid yildizYaz() {\n  Serial.print(\"Girilen: \");\n  for (int i = 0; i < hane; i++) Serial.print('*');\n  Serial.println();\n}\n\nvoid onayla() {\n  if (hane < PIN_UZUNLUK) {\n    Serial.println(\"PIN 4 haneli olmali\");\n    return;\n  }\n  if (strcmp(girilen, DOGRU_PIN) == 0) {\n    Serial.println(\"PIN dogru\");\n    yanlisSayisi = 0;\n    digitalWrite(YESIL, HIGH);\n  } else {\n    yanlisSayisi++;\n    Serial.print(\"PIN yanlis (\");\n    Serial.print(yanlisSayisi);\n    Serial.print(\"/\");\n    Serial.print(AZAMI_YANLIS);\n    Serial.println(\")\");\n    digitalWrite(KIRMIZI, HIGH);\n    if (yanlisSayisi >= AZAMI_YANLIS) {\n      Serial.println(\"Cok fazla yanlis deneme\");\n      yanlisSayisi = 0;\n    }\n  }\n  ledBitis = millis() + LED_SURESI;\n  girisiTemizle();\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(YESIL, OUTPUT);\n  pinMode(KIRMIZI, OUTPUT);\n  girisiTemizle();\n}\n\nvoid loop() {\n  char tus = tusTakimi.getKey();\n  if (tus >= '0' && tus <= '9') {\n    if (hane < PIN_UZUNLUK) {\n      girilen[hane] = tus;\n      hane++;\n      girilen[hane] = '\\0';\n      yildizYaz();\n    }\n  } else if (tus == '*') {\n    if (hane > 0) {\n      hane--;\n      girilen[hane] = '\\0';\n      yildizYaz();\n    }\n  } else if (tus == '#') {\n    onayla();\n  }\n\n  if (ledBitis != 0 && (long)(millis() - ledBitis) >= 0) {   // LED süresi doldu\n    digitalWrite(YESIL, LOW);\n    digitalWrite(KIRMIZI, LOW);\n    ledBitis = 0;\n  }\n}\n```\n\n### How does it work?\n1. `girilen` (entered) is a character array that holds 4 digits and a `'\\0'` at the end. In C, a piece of text is a character array that ends with `'\\0'`. `strcmp(a, b)` returns `0` if the two texts are equal.\n2. When a digit arrives, it is written at position `hane` (digit count) in the array, `hane` goes up, and a `'\\0'` is put at the end again. `*` does the opposite: `hane` goes down and `'\\0'` is written in that place.\n3. The comparison `tus >= '0' && tus <= '9'` works with character codes; the digit characters have consecutive codes.\n4. When `#` is pressed, the length is checked first. If it is fewer than 4 digits, the attempt is **not counted**; the user only gets a warning, the digits they entered are not deleted, and they can carry on from where they were.\n5. On a wrong entry, `yanlisSayisi` (wrong count) goes up by one. When it reaches 3, a warning is printed and the counter is reset. In a real lock you would start a lockout time here; we will do that in the project lesson.\n6. When the LED goes off is worked out with `millis()`, not `delay` (lesson 27); that way keys are read while the LED is on, too. The expression `(long)(millis() - ledBitis) >= 0` is a comparison that works correctly even when `millis()` overflows.\n7. The `A`, `B`, `C`, `D` keys do nothing in this program. Later you can use them as menu keys.\n\n### Try it\n- Make the PIN 6 digits long: set `PIN_UZUNLUK` to 6 and choose a new 6-digit text for `DOGRU_PIN`.\n- Add a feature that clears the whole entry when you press the `D` key.\n- Set `AZAMI_YANLIS` to 5. Did you need to change anything else?\n\n### Common mistakes\n- Writing the row and column pins the wrong way round in the sketch or in the wiring: keys are not detected, or they give the wrong letter. Pick each key in turn and see what the Serial monitor prints.\n- Using the value returned by `getKey()` without checking it. If there is no press, it returns `'\\0'`.\n- Not leaving +1 for the `'\\0'` at the end when making room for the `girilen` array.\n- Comparing the PIN with `==`. With character arrays, `==` compares addresses; for the contents, use `strcmp`.\n- Holding the LED on with `delay()`: keys pressed during that time can be missed.",
+            "question": "Is it safe to write the PIN inside the program code? What would happen if someone could read the program's code? In the next lessons, why will we want to keep the PIN somewhere else?",
+            "explainerMd": "### What you will learn in this lesson\n- Why 16 keys are read with 8 wires instead of 16\n- How matrix scanning works with rows, columns and `INPUT_PULLUP`\n- How the `Keypad` library gives you the key with `getKey()`\n- How to collect digits in a character array and compare them with the PIN using `strcmp`\n\n### What you should know first\n- Lessons 6-7: reading a button with `INPUT_PULLUP` and `if` conditions\n- Lesson 27: non-blocking timing with `millis()`\n- Lesson 34: `char` arrays and the `'\\0'` at the end\n\n### Why a matrix?\nIf each of the 16 keys needed its own pin, the Uno would run out of pins. The solution is to arrange the keys as a **matrix**: 4 rows and 4 columns. When a key is pressed, it joins one row to one column. The number of pins is rows plus columns: 4 + 4 = 8. The bigger the matrix, the bigger the saving; in a 4x4 matrix, 16 keys are read with 8 pins.\n\n### How scanning works\nThe row pins wait at HIGH with `INPUT_PULLUP`. The board makes the columns LOW in turn, only one at a time:\n\n```\ncolumn 1 LOW  -> look at the rows\ncolumn 2 LOW  -> look at the rows\n...\n```\n\nWhile the column of a pressed key is LOW, that key's row also reads LOW. Whichever row reads LOW while whichever column is LOW, the key is where the two cross. You repeat this scan very fast; debouncing is the library's job too.\n\n### getKey and characters\nOn a new press, `getKey()` returns the key as a `char`; if there is no press, it returns `'\\0'`. Even if you hold the key down, it gives it once. That is why writing `if (tus)` means \"has a key just been pressed?\".\n\n### Collecting the PIN\nWhen digits arrive, they are added to a `char` array; after each addition a `'\\0'` is put at the end, because in C a piece of text ends with `'\\0'`:\n\n```\nsütun 1 LOW  -> satırlara bak\nsütun 2 LOW  -> satırlara bak\n...\n```\n\nThe array must be **one bigger** than the PIN length (5 for 4 digits). With `*`, `hane` is reduced by one and `'\\0'` is written in that place; that way the last digit is deleted.\n\n### Comparing and timing\nYou must not compare two texts with `==`. `==` compares memory addresses, not the contents, and nearly always comes out false. Compare the contents with `strcmp(a, b) == 0`. Manage the wrong-entry counter and the time the LED stays lit with `millis()`; if you use `delay`, keys pressed during that time can be missed.\n\n### Summary\nA matrix is the way to read 16 keys with 8 pins: a column is set LOW, and the row that reads LOW gives the key away. `getKey()` returns a character once per press. The PIN is collected in an array ending with `'\\0'` and compared with `strcmp`. Using `millis()` instead of a blocking `delay` stops keys from being missed.",
+            "concepts": [
+              {
+                "term": "Key matrix",
+                "definition": "A way of reading many keys with few pins by arranging the keys in a grid of rows and columns.",
+                "example": "4 rows and 4 columns read 16 keys with 8 pins; a 3-row, 4-column phone keypad needs 7 pins.",
+                "pitfall": "Thinking the number of pins is the number of keys; in a matrix the number of pins is rows plus columns."
+              },
+              {
+                "term": "Scanning",
+                "definition": "Making the columns LOW in turn and looking for a LOW on the rows; the row and column that cross give the pressed key.",
+                "example": "If row 2 reads LOW while column 3 is LOW, the key pressed is 6.",
+                "pitfall": "Writing the row and column pins in the sketch the opposite way to the wiring: the keys give the wrong letter."
+              },
+              {
+                "term": "getKey()",
+                "definition": "In the Keypad library, returns the newly pressed key as a char; if there is no press, it returns '\\0'.",
+                "example": "if (tus) { Serial.println(tus); } prints only on a new press.",
+                "pitfall": "Using the returned value without checking it; when there is no press, '\\0' comes back."
+              },
+              {
+                "term": "The terminator '\\0'",
+                "definition": "A special character that shows where a piece of text ends in C; room is kept for it in the array.",
+                "example": "For a 4-digit PIN, char girilen[5] is declared.",
+                "pitfall": "Declaring the array with 4 elements: the '\\0' overflows the array and corrupts the memory next to it."
+              },
+              {
+                "term": "strcmp",
+                "definition": "Compares the contents of two texts; returns 0 if they are equal.",
+                "example": "If strcmp(girilen, \"1234\") == 0, the PIN is correct.",
+                "pitfall": "Comparing with ==: it compares addresses, so it comes out false even when the contents are the same."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h6d2-q1",
+                "kind": "numeric",
+                "prompt": "You are going to read a 12-key phone keypad made of 3 rows and 4 columns using the matrix method. How many Arduino pins are needed?",
+                "answer": 7,
+                "unit": "pins",
+                "explanation": "In a matrix the number of pins is rows plus columns: 3 + 4 = 7. If each key had its own pin, 12 pins would be needed. 12 is the number of keys, not the number of pins.",
+                "skills": [
+                  "keypad-matrix"
+                ]
+              },
+              {
+                "id": "m4h6d2-q2",
+                "kind": "mcq",
+                "prompt": "During scanning, one column has been made LOW. If a key in that column is pressed, what does the row pin (with INPUT_PULLUP) read?",
+                "options": [
+                  "HIGH, because the pull-up always holds it HIGH",
+                  "LOW, because the pressed key connects the row to the LOW column",
+                  "It cannot be read",
+                  "The column has to be HIGH first"
+                ],
+                "answer": 1,
+                "explanation": "When the key is pressed, the row and the column are joined; because the column is LOW, the row also reads LOW. If it is not pressed, the pull-up holds the row HIGH. The difference gives away which key was pressed.",
+                "skills": [
+                  "keypad-matrix"
+                ]
+              },
+              {
+                "id": "m4h6d2-q3",
+                "kind": "predict-output",
+                "prompt": "The keys 4, 2, *, 7, 9 are pressed in turn. '*' deletes the last digit. What is printed on the screen at the end?\n\n```\nchar girilen[5] = \"\";\nint hane = 0;\nchar tuslar[] = {'4', '2', '*', '7', '9'};\nfor (int i = 0; i < 5; i++) {\n  char t = tuslar[i];\n  if (t == '*') {\n    if (hane > 0) { hane--; girilen[hane] = '\\0'; }\n  } else {\n    girilen[hane] = t;\n    hane++;\n    girilen[hane] = '\\0';\n  }\n}\nSerial.println(girilen);\n```",
+                "options": [
+                  "4279",
+                  "479",
+                  "47",
+                  "429"
+                ],
+                "answer": 1,
+                "explanation": "4 and 2 are entered (42); '*' deletes the last digit, 2 (4); 7 and 9 are added (479). 4279 would be forgetting to delete; 47 is missing the last digit, and 429 would have deleted the wrong digit.",
+                "skills": [
+                  "c-strings",
+                  "keypad-matrix"
+                ]
+              },
+              {
+                "id": "m4h6d2-q4",
+                "kind": "find-bug",
+                "prompt": "This code does not print \"dogru\" (correct) even when the right PIN is entered. Why?\n\n```\nchar girilen[5] = \"1234\";\nif (girilen == \"1234\") {\n  Serial.println(\"dogru\");\n}\n```",
+                "options": [
+                  "The char array must have at least 6 elements",
+                  "Println is spelt wrongly",
+                  "== compares addresses; for the contents you need strcmp(girilen, \"1234\") == 0",
+                  "There must be a '\\0' at the start of the array"
+                ],
+                "answer": 2,
+                "explanation": "In C, when two texts are compared with ==, their addresses in memory are compared, not their contents; the addresses are different, so the condition comes out false. An array size of 5 is enough (4 digits and '\\0').",
+                "skills": [
+                  "c-strings",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h6d2-q5",
+                "kind": "mcq",
+                "prompt": "If you hold a key down for 2 seconds, how many times does getKey() return that key?",
+                "options": [
+                  "On every loop pass, so thousands of times",
+                  "Only once, at the moment of the press",
+                  "It never returns it",
+                  "Once a second"
+                ],
+                "answer": 1,
+                "explanation": "getKey() gives the key once on a new press, then keeps returning '\\0'. That way a key held down is not added to the PIN again and again.",
+                "skills": [
+                  "keypad-matrix"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "RFID RC522 (SPI): kart okuma",
@@ -3409,7 +6630,127 @@ export const modul4: ModuleContent = {
                 "rfid-spi"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "RFID RC522 (SPI): reading a card",
+            "problem": "You hold your bus card up to the reader; the card has no battery, yet the reader recognises it. Where does the card get its energy from? And how does the reader find out \"who\" the card is? In this lesson you will get to know the card reader, but you will also run into an honest problem: this week the Arduino Uno does not have enough pins.",
+            "contentMd": "### What is RFID?\nRFID means reading an identity with radio waves. The RC522 module produces a 13.56 MHz field. The card (or key fob) has no battery inside; it only has an antenna and a small chip. When the card enters the reader's field, it takes energy from the field and sends back the data in its memory. The data we will read in this lesson is the card's **UID** (unique identification number). On common MIFARE cards the UID is 4 bytes; on some cards it is 7 or 10 bytes. We will handle a 4-byte UID.\n\n**Important:** A UID is not a password. Anyone who can read the card can learn the UID, and some special cards can copy a UID. That is why serious locks do not trust the UID alone. This week we will use the card together with a PIN.\n\n### What is SPI?\nThe RC522 talks to the Arduino over **SPI**. SPI is a fast, four-wire way of communicating (it uses four wires, compared with the two wires of I2C in lesson 33):\n\n| Wire | Job | Uno pin |\n|---|---|---|\n| SCK | Clock pulse (made by the Arduino) | **D13** |\n| MOSI | Data from the Arduino to the module | **D11** |\n| MISO | Data from the module to the Arduino | **D12** |\n| SS (SDA) | The \"I have chosen you\" line; the module listens while it is LOW | **D10** (can be changed) |\n\nOn top of these, the RC522 has an **RST** (reset) pin. On the Uno, the SCK, MOSI and MISO pins are fixed by the hardware and cannot be changed. SS and RST, however, can be connected to any pin you like.\n\n### Circuit\nThe lab has no RC522 part and no card. The real module is connected like this (for information):\n\n| Part | Connection |\n|---|---|\n| RC522 module | SDA(SS) → **D10**, SCK → **D13**, MOSI → **D11**, MISO → **D12**, RST → **D9**, GND → GND, 3.3V → **3.3 V** |\n\n**Power warning (for the real module):** The RC522 is a **3.3 V** module. Do not connect its 3.3V pin to the Uno's 5 V output; the module can be damaged. The module's data pins are also designed for 3.3 V. The Uno gives 5 V signals; although many people connect the module directly, the safe way is to use a level shifter or a resistor divider. Check the module's datasheet.\n\nIn the lab we will imitate the card from the Serial monitor. Pick the parts from the **Add part** menu in the lab and connect the pins by drawing wires:\n\n| Part | Connection |\n|---|---|\n| LED (green) | **D13** → resistor (330 Ω) 1; resistor 2 → LED **A**; LED **K** → **GND** |\n| LED (red) | **D12** → resistor (330 Ω) 1; resistor 2 → LED **A**; LED **K** → **GND** |\n\n### Program 1: Read the card\nA program that writes the card's UID to the serial port with the `MFRC522` library:\n\n```cpp\n// sketch: rc522_oku\n#include <SPI.h>\n#include <MFRC522.h>\n\nconst int SS_PIN = 10;\nconst int RST_PIN = 9;\n\nMFRC522 okuyucu(SS_PIN, RST_PIN);\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();               // SPI hattını başlat\n  okuyucu.PCD_Init();        // RC522'yi başlat\n}\n\nvoid loop() {\n  if (!okuyucu.PICC_IsNewCardPresent()) return;   // yeni kart yok\n  if (!okuyucu.PICC_ReadCardSerial()) return;     // UID okunamadı\n\n  Serial.print(\"KART:\");\n  for (byte i = 0; i < okuyucu.uid.size; i++) {\n    if (okuyucu.uid.uidByte[i] < 16) Serial.print('0');\n    Serial.print(okuyucu.uid.uidByte[i], HEX);\n  }\n  Serial.println();\n\n  okuyucu.PICC_HaltA();        // aynı kartı tekrar tekrar okumayı bırak\n}\n```\n\nThis sketch uses a library; it compiles in the lab, but because there is no RC522 part, it never finds a card while it runs and gives no output. `PICC_IsNewCardPresent()` returns `true` if there is a new card in the field, and `PICC_ReadCardSerial()` fills the UID into `okuyucu.uid` (reader). We deliberately print the output in the form `KART:AABBCCDD` (card); in a moment we will send this line to the program \"as if a card had arrived\".\n\n### An honest problem: the pins clash\nIn this week's project the keypad, servo, buzzer, LEDs and LCD will all be together. Put the pins side by side:\n\n| Pin | Keypad (62) | RC522 (this lesson) | Door lock project (65) |\n|---|---|---|---|\n| D9 | row 1 | RST | keypad row 1 |\n| D10 | none | SS | servo |\n| D11 | none | MOSI (fixed) | buzzer |\n| D12 | none | MISO (fixed) | red LED |\n| D13 | none | SCK (fixed) | green LED |\n\nThe D9 clash in the table only appears because we chose to connect RST to D9; SS and RST can go on any pin. The real problem is the total number of pins. The project needs: keypad 8, the RC522's three fixed SPI pins 3, SS and RST 2, servo 1, buzzer 1, two LEDs 2; a total of **17 pins**. On the Uno, D2-D13 (12 pins) and A0-A3 (4 pins) can be used (the I2C LCD takes A4 and A5): a total of **16 pins**. What is more, SPI's D11, D12 and D13 pins are fixed and are set aside for the buzzer and LEDs in the project. The keypad and the RC522 on their own fit on the Uno (8 + 5 = 13 pins), but all of them together do not. If you were making a real product, you would pick one of these ways:\n- A board with more pins (for example the Arduino Mega).\n- A way of reading the keypad with fewer pins (for example an I2C expander module).\n- Moving the LEDs and the buzzer to pins A0-A3 (the analogue pins can also be used as digital outputs). Even this is not enough, because 17 pins do not fit into 16; also, we have not tried it in this lesson.\n\nThis week we choose a different way: **in the project we will imitate the card from the serial port**. Instead of the reader, you will type `KART:AABBCCDD` into the lab's Serial monitor; the program will count this as a card being read. This is a **serial imitation for testing while there is no card reader**; it is not a real RC522. And because the `rc522_oku` program prints the same line, if you add the reader later, only the place the card data comes from changes; the permission logic stays exactly the same.\n\n### Program 2: Card test with a serial imitation\nThis program reads a line from the serial port. If the line starts with `KART:` followed by 8 hexadecimal digits (4 bytes), it decodes the UID and compares it with the list of authorised cards. We do not use `delay` or `readStringUntil`: we collect the line character by character, so the program can do other jobs while it waits.\n\n```cpp\n// sketch: kart_taklit\nconst int YESIL = 13;\nconst int KIRMIZI = 12;\nconst byte YETKILI_UID[4] = {0xAA, 0xBB, 0xCC, 0xDD};   // tek örnek yetkili kart\nconst unsigned long LED_SURESI = 1000;\n\nchar satir[24];\nint uzunluk = 0;\nunsigned long ledBitis = 0;\n\nint hexDeger(char c) {                      // '0'-'9','A'-'F','a'-'f' -> 0-15; olmazsa -1\n  if (c >= '0' && c <= '9') return c - '0';\n  if (c >= 'A' && c <= 'F') return c - 'A' + 10;\n  if (c >= 'a' && c <= 'f') return c - 'a' + 10;\n  return -1;\n}\n\n// Seri porttan karakterleri biriktirir. Satır bitince true döner.\nbool satirOku() {\n  while (Serial.available() > 0) {\n    char c = Serial.read();\n    if (c == '\\r') continue;\n    if (c == '\\n') {\n      satir[uzunluk] = '\\0';\n      uzunluk = 0;\n      return true;\n    }\n    if (uzunluk < (int)sizeof(satir) - 1) {\n      satir[uzunluk] = c;\n      uzunluk++;\n    }\n  }\n  return false;\n}\n\n// \"KART:AABBCCDD\" satırını 4 baytlık UID'ye çevirir. Biçim bozuksa false döner.\nbool uidCoz(const char* s, byte uid[4]) {\n  if (strncmp(s, \"KART:\", 5) != 0) return false;\n  s += 5;                                    // \"KART:\" kısmını atla\n  if (strlen(s) != 8) return false;\n  for (int i = 0; i < 4; i++) {\n    int yuksek = hexDeger(s[2 * i]);\n    int alcak = hexDeger(s[2 * i + 1]);\n    if (yuksek < 0 || alcak < 0) return false;\n    uid[i] = yuksek * 16 + alcak;\n  }\n  return true;\n}\n\nvoid uidYaz(const byte uid[4]) {\n  for (int i = 0; i < 4; i++) {\n    if (i > 0) Serial.print(' ');\n    if (uid[i] < 16) Serial.print('0');\n    Serial.print(uid[i], HEX);\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(YESIL, OUTPUT);\n  pinMode(KIRMIZI, OUTPUT);\n}\n\nvoid loop() {\n  if (satirOku() && satir[0] != '\\0') {\n    byte uid[4];\n    if (!uidCoz(satir, uid)) {\n      Serial.println(\"Gecersiz satir\");\n    } else {\n      Serial.print(\"UID: \");\n      uidYaz(uid);\n      Serial.println();\n      if (memcmp(uid, YETKILI_UID, 4) == 0) {\n        Serial.println(\"YETKILI\");\n        digitalWrite(YESIL, HIGH);\n      } else {\n        Serial.println(\"YETKISIZ\");\n        digitalWrite(KIRMIZI, HIGH);\n      }\n      ledBitis = millis() + LED_SURESI;\n    }\n  }\n\n  if (ledBitis != 0 && (long)(millis() - ledBitis) >= 0) {\n    digitalWrite(YESIL, LOW);\n    digitalWrite(KIRMIZI, LOW);\n    ledBitis = 0;\n  }\n}\n```\n\nFirst run the program with ▶. Then type `KART:AABBCCDD` into the box at the bottom of the Serial monitor and press **Send**. The lab adds the end of line (`\\n`) by itself; you do not need to change any setting.\n\n### How does it work?\n1. On every pass, `satirOku()` (read line) adds the incoming characters to the `satir` (line) array. When `\\n` arrives, it ends the line. A line that arrives half-way carries on in the next pass; the program never waits anywhere.\n2. `uidCoz` (decode UID) first checks the `KART:` prefix (`strncmp` compares the first 5 characters), then makes sure that all 8 characters are hexadecimal digits. Two hexadecimal digits make one byte: `yuksek * 16 + alcak` (high, low).\n3. `hexDeger` (hex value) produces the values 10-15 by subtracting the code of `'A'` from the character and adding 10. A UID typed in small letters, `aabbccdd`, is accepted too.\n4. `memcmp(a, b, 4)` compares 4 bytes of two memory areas; if they are all the same, it returns `0`. This is the shortest way to compare a 4-byte UID (`==` does not work on arrays).\n5. Badly formed lines (`KART:AABB`, `KART:ZZZZZZZZ`, `MERHABA` (hello)) are rejected as \"Gecersiz satir\" (invalid line); the part that opens the door never runs.\n\n### Try it\n- Write a different value in place of `YETKILI_UID` (for example `{0x01, 0x02, 0x03, 0x04}`), run the program again and send the new UID. Is the old UID now unauthorised?\n- Send a wrong UID: does the red LED light up?\n- Send the UID in capital and small letters (`AABBCCDD` and `aabbccdd`). Do both give the same result?\n\n### Common mistakes\n- Powering a real RC522 with 5 V.\n- In a real circuit, setting the SS and RST pins to one place in the sketch and wiring them to another.\n- Trying to send a line while the program is not running (before pressing ▶): the box is closed and shows \"Start first\".\n- Leaving out the `KART:` prefix or some of the 8 hexadecimal digits: the program says `Gecersiz satir`.\n- Thinking the UID is safe on its own: a UID can be read and copied with some cards.\n- Giving the same pins to two devices at once (this lesson's clash table).",
+            "question": "Why do you think it is a good idea to split the permission check into two parts, \"the part that reads the card\" and \"the part that opens the door\"? If you wanted to change the card reader later, which part would you change?",
+            "explainerMd": "### What you will learn in this lesson\n- How RFID reads a card with no battery using radio waves\n- What a UID is and why it does not count as a password on its own\n- The four wires of the SPI bus and their fixed pins on the Uno\n- How to work out the number of pins in advance and test with a serial imitation\n\n### What you should know first\n- Lesson 33: two-wire communication with I2C\n- Lesson 34: bytes and `char` arrays\n- Lesson 62: the keypad's pin needs\n\n### A card with no battery\nThe RC522 module produces a 13.56 MHz radio field. The small antenna in the card collects energy from this field and the chip wakes up. That is why the card has no battery. The chip sends back the **UID** (unique identification number) stored in its memory. On common cards the UID is 4 bytes; for example `AA BB CC DD`.\n\nA UID is not a password: anyone who can read the card learns it, and some special cards copy a UID. A serious lock does not trust the UID alone; this week we will use the card together with a PIN.\n\n### The SPI bus\nThe RC522 talks to the Arduino over four-wire **SPI**. I2C uses two wires; SPI is faster and needs four wires:\n\n| Wire | Job | Uno pin |\n|---|---|---|\n| SCK | Clock pulse | D13 |\n| MOSI | Data from the Arduino to the module | D11 |\n| MISO | Data from the module to the Arduino | D12 |\n| SS | Selects the module | D10 (can be changed) |\n\nAn RST pin is needed too, and it can go on any pin you like. SCK, MOSI and MISO are fixed by the hardware on the Uno: these three pins cannot be given another job. The real module runs on 3.3 V; connecting it to 5 V can damage it.\n\n### The pin budget\nBefore you start a project, count the pins. This week the keypad needs 8 pins, the RC522 5 (3 fixed SPI, SS and RST), the servo 1, the buzzer 1 and two LEDs 2; 17 in total. On the Uno, D2-D13 (12 pins) and A0-A3 (4 pins) can be used, and A4 and A5 go to the LCD: 16 pins. They do not all fit at once. In this situation an engineer picks a board with more pins, a pin expander or another solution.\n\n### Serial imitation\nWhile there is no card reader, we imitate a read by typing `KART:AABBCCDD` into the Serial monitor. The program collects the line character by character and checks the `KART:` prefix and the 8 hexadecimal digits. Two hexadecimal digits make one byte: `yüksek * 16 + alçak` (high × 16 + low). The permission decision looks at the UID; where the UID came from (the reader or the serial port) does not change the decision. That is why, when a real reader is added, only the data source changes.\n\n### Summary\nRFID reads a battery-free card with a radio field and gets its UID; the UID alone is not safe. The RC522 talks over SPI, and D11, D12, D13 are fixed. The number of pins must be worked out in advance; this project needs 17 pins, and the Uno has 16. Missing hardware is tested with a serial imitation, and the permission logic stays independent of the data source.",
+            "concepts": [
+              {
+                "term": "RFID and UID",
+                "definition": "RFID means reading a battery-free card with radio waves; the UID is the card's unique identification number (usually 4 bytes).",
+                "example": "If the card's UID is AA BB CC DD, it is compared with the four bytes in the authorised list.",
+                "pitfall": "Thinking the UID is a password; it can be read and copied with some cards."
+              },
+              {
+                "term": "SPI",
+                "definition": "A fast, four-wire way of communicating with SCK, MOSI, MISO and SS.",
+                "example": "For the RC522 on the Uno, SCK is D13, MOSI D11, MISO D12; SS can be chosen as D10.",
+                "pitfall": "Giving the SPI pins to another device: D11-D13 are fixed by the hardware."
+              },
+              {
+                "term": "3.3 V logic",
+                "definition": "The RC522 module runs on 3.3 V; if it is given 5 V, it can be damaged.",
+                "example": "In a real circuit, the module's 3.3V pin is connected to the Uno's 3.3 V output.",
+                "pitfall": "Connecting the 3.3V pin to the 5 V output."
+              },
+              {
+                "term": "Pin budget",
+                "definition": "Adding up the pin needs of all the parts in a project and comparing the total with the number of pins on the board.",
+                "example": "Keypad 8 + RC522 5 + servo 1 + buzzer 1 + LEDs 2 = 17 pins; the Uno has 16.",
+                "pitfall": "Connecting the parts one by one and only noticing at the end that you have run out of pins."
+              },
+              {
+                "term": "Serial imitation",
+                "definition": "Testing the logic by sending a line in the same format from the Serial monitor in place of the missing hardware.",
+                "example": "Typing KART:AABBCCDD behaves as if the reader had read that UID.",
+                "pitfall": "Thinking the serial imitation is a real RC522; it is only for testing."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h6d3-q1",
+                "kind": "numeric",
+                "prompt": "Imagine a project without a keypad: there is an RC522 (three fixed SPI pins, SS and RST), 1 servo, 1 buzzer and 2 LEDs. How many pins are needed in total?",
+                "answer": 9,
+                "unit": "pins",
+                "explanation": "3 + 2 = 5 for the RC522, servo 1, buzzer 1, LEDs 2: 5 + 1 + 1 + 2 = 9 pins. Taking away the keypad's 8 pins gives 17 - 8 = 9, and there is room left on the Uno.",
+                "skills": [
+                  "pin-budget",
+                  "rfid-spi"
+                ]
+              },
+              {
+                "id": "m4h6d3-q2",
+                "kind": "mcq",
+                "prompt": "Which Uno pin would you connect a real RC522 module's power pin to?",
+                "options": [
+                  "5V",
+                  "VIN",
+                  "3.3 V",
+                  "A0"
+                ],
+                "answer": 2,
+                "explanation": "The RC522 is a 3.3 V module. Connecting it to the 5V pin can damage the module. VIN is the board's input and its voltage depends on the supply; A0 is an input pin and does not give power.",
+                "skills": [
+                  "rfid-spi"
+                ]
+              },
+              {
+                "id": "m4h6d3-q3",
+                "kind": "predict-output",
+                "prompt": "hexDeger('C') returns 12 and hexDeger('5') returns 5. What does this code print?\n\n```\nint yuksek = hexDeger('C');\nint alcak = hexDeger('5');\nSerial.println(yuksek * 16 + alcak);\n```",
+                "options": [
+                  "125",
+                  "197",
+                  "205",
+                  "17"
+                ],
+                "answer": 1,
+                "explanation": "12 * 16 = 192, 192 + 5 = 197 (0xC5). 125 would be writing the digits side by side; 17 is the sum 12 + 5.",
+                "skills": [
+                  "c-strings",
+                  "rfid-spi"
+                ]
+              },
+              {
+                "id": "m4h6d3-q4",
+                "kind": "find-bug",
+                "prompt": "This function always returns 0 for the letter 'A', so UIDs like AA are read as 00. Which line is the bug on?\n\n```\nint hexDeger(char c) {\n  if (c >= '0' && c <= '9') return c - '0';        // line 1\n  if (c >= 'A' && c <= 'F') return c - 'A';        // line 2\n  return -1;                                       // line 3\n}\n```",
+                "options": [
+                  "Line 2: the result for 'A' should be 10, the + 10 is missing",
+                  "Line 1: '0' should not be subtracted",
+                  "Line 3: it should be 0 instead of -1",
+                  "No bug; 'A' really is 0"
+                ],
+                "answer": 0,
+                "explanation": "'A' - 'A' is zero; hexadecimal A has the value 10. The right version is c - 'A' + 10. Because of the bug, 'A' and '0' give the same value and different UIDs get mixed up.",
+                "skills": [
+                  "c-strings",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h6d3-q5",
+                "kind": "mcq",
+                "prompt": "A door lock looks only at the card's UID. Why is this a weak design?",
+                "options": [
+                  "The UID is 4 bytes, so it is very short and can never be read",
+                  "The UID can be read and copied; when the card is taken or copied, the lock opens",
+                  "The RC522 can never read the UID",
+                  "The UID changes on every read"
+                ],
+                "answer": 1,
+                "explanation": "A UID is not a hidden secret: anyone who gets close to the reader sees it, and some cards copy a UID. That is why a second factor (a PIN) is added. The UID can be read, and it stays the same on every read.",
+                "skills": [
+                  "access-security",
+                  "rfid-spi"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Yetki yönetimi: kart + şifre + EEPROM",
@@ -3525,7 +6866,122 @@ export const modul4: ModuleContent = {
                 "eeprom-store"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Access management: card + password + EEPROM",
+            "problem": "When a new tenant moves into a block of flats, the manager does not plug the door's program into a computer and upload it again. The tenant's card is added with a command, and the old tenant's card is deleted. What is more, the list is not lost even if the power goes off. In this lesson you will write a system that saves the authorised cards and the PIN to EEPROM and manages access with a **master PIN**.",
+            "contentMd": "### What are we going to do?\nWe will keep three things in EEPROM (lesson 34):\n- The user PIN (the PIN that opens the door)\n- The master PIN (the management PIN; for adding and deleting cards and changing the user PIN)\n- The list of authorised card UIDs (at most 8 cards)\n\nBecause the card reader, the keypad and the other parts do not fit on the Uno's pins together (lesson 63), we **imitate the cards and the PIN entry with serial commands**. In this lesson you do not build a circuit; in the lab the Uno and the Serial monitor are enough. Type the command into the box at the bottom of the Serial monitor and press **Send** (the program must be running); the lab adds the end of line by itself.\n\n### Commands\n| Command | What does it do? |\n|---|---|\n| `KART:AABBCCDD` | Acts as if a card had been read; if it is in the list, YETKILI (authorised) |\n| `GIRIS:1234` | Acts as if a PIN had been entered on the keypad |\n| `EKLE:9999:AABBCCDD` | If the master PIN is correct, adds the card to the list |\n| `SIL:9999:AABBCCDD` | If the master PIN is correct, deletes the card from the list |\n| `PINDEGIS:9999:4321` | If the master PIN is correct, changes the user PIN |\n| `LISTE` | Shows the saved cards |\n\nThe commands are split into fields with a colon (`:`). (`KART` means card, `GIRIS` entry, `EKLE` add, `SIL` delete, `PINDEGIS` change PIN, `LISTE` list.) Factory settings: user PIN `1234`, master PIN `9999`, no cards.\n\n### The EEPROM map\nEvery piece of information must have a fixed address; otherwise you write one on top of another:\n\n| Address | Size | Contents |\n|---|---|---|\n| 0 | 1 byte | Setup marker (`0xA5`) |\n| 1-4 | 4 bytes | User PIN (digit characters) |\n| 5-8 | 4 bytes | Master PIN |\n| 9 | 1 byte | Number of saved cards |\n| 10-41 | 8 × 4 bytes | Card UIDs |\n\nThe **setup marker** is important. A new EEPROM has `255` in every cell (lesson 34); the program must not mistake this for a PIN. At start-up, if `0xA5` is not there, the factory settings are written. We write the marker **last**: if setup is interrupted half-way (for example by a power cut), the marker will not have been written, and the program does the setup again at the next start-up.\n\n### EEPROM wear\nEach cell is guaranteed for about 100,000 writes (lesson 34). In this system the cells rarely change, but we still follow two rules:\n- For every write we use `EEPROM.update`. If the value is already the same, nothing is written.\n- **Reading** a card writes nothing. The `KART` and `GIRIS` commands do not write to EEPROM; writing only happens with `EKLE`, `SIL`, `PINDEGIS` and at the first setup.\n\nWhen deleting a card, instead of rewriting the list from the start, we **copy the last card into the deleted one's place** and reduce the counter by one. That way at most one card (4 bytes) and one counter are written.\n\n### Program\n```cpp\n// sketch: yetki_yonetimi\n#include <EEPROM.h>\n\nconst int ADR_ISARET = 0;\nconst int ADR_KULLANICI_PIN = 1;\nconst int ADR_MASTER_PIN = 5;\nconst int ADR_KART_SAYISI = 9;\nconst int ADR_KARTLAR = 10;\nconst int MAX_KART = 8;\nconst int PIN_UZUNLUK = 4;\nconst byte ISARET = 0xA5;\n\nchar satir[40];\nint uzunluk = 0;\n\n// ---- Yardımcılar ----\nint hexDeger(char c) {\n  if (c >= '0' && c <= '9') return c - '0';\n  if (c >= 'A' && c <= 'F') return c - 'A' + 10;\n  if (c >= 'a' && c <= 'f') return c - 'a' + 10;\n  return -1;\n}\n\nbool uidCoz(const char* hex, byte uid[4]) {      // \"AABBCCDD\" -> 4 bayt\n  if (strlen(hex) != 8) return false;\n  for (int i = 0; i < 4; i++) {\n    int yuksek = hexDeger(hex[2 * i]);\n    int alcak = hexDeger(hex[2 * i + 1]);\n    if (yuksek < 0 || alcak < 0) return false;\n    uid[i] = yuksek * 16 + alcak;\n  }\n  return true;\n}\n\nvoid uidYaz(const byte uid[4]) {\n  for (int i = 0; i < 4; i++) {\n    if (i > 0) Serial.print(' ');\n    if (uid[i] < 16) Serial.print('0');\n    Serial.print(uid[i], HEX);\n  }\n}\n\nbool pinGecerli(const char* s) {                 // tam 4 rakam mı?\n  if (strlen(s) != PIN_UZUNLUK) return false;\n  for (int i = 0; i < PIN_UZUNLUK; i++) {\n    if (s[i] < '0' || s[i] > '9') return false;\n  }\n  return true;\n}\n\n// ---- EEPROM işlemleri ----\nvoid pinOku(int adres, char pin[PIN_UZUNLUK + 1]) {\n  for (int i = 0; i < PIN_UZUNLUK; i++) pin[i] = EEPROM.read(adres + i);\n  pin[PIN_UZUNLUK] = '\\0';\n}\n\nvoid pinYaz(int adres, const char* pin) {\n  for (int i = 0; i < PIN_UZUNLUK; i++) EEPROM.update(adres + i, pin[i]);\n}\n\nbool pinEsit(int adres, const char* girilen) {\n  char kayitli[PIN_UZUNLUK + 1];\n  pinOku(adres, kayitli);\n  return strcmp(kayitli, girilen) == 0;\n}\n\nbyte kartSayisi() {\n  byte n = EEPROM.read(ADR_KART_SAYISI);\n  if (n > MAX_KART) n = 0;                       // bozuk ya da boş (255)\n  return n;\n}\n\nvoid kartOku(int sira, byte uid[4]) {\n  for (int j = 0; j < 4; j++) uid[j] = EEPROM.read(ADR_KARTLAR + sira * 4 + j);\n}\n\nvoid kartYaz(int sira, const byte uid[4]) {\n  for (int j = 0; j < 4; j++) EEPROM.update(ADR_KARTLAR + sira * 4 + j, uid[j]);\n}\n\nint kartBul(const byte uid[4]) {                 // sırası ya da -1\n  byte n = kartSayisi();\n  for (int i = 0; i < n; i++) {\n    byte kayitli[4];\n    kartOku(i, kayitli);\n    if (memcmp(kayitli, uid, 4) == 0) return i;\n  }\n  return -1;\n}\n\nvoid fabrikaAyari() {\n  pinYaz(ADR_KULLANICI_PIN, \"1234\");\n  pinYaz(ADR_MASTER_PIN, \"9999\");\n  EEPROM.update(ADR_KART_SAYISI, 0);\n  EEPROM.update(ADR_ISARET, ISARET);             // en son: kurulum tamamlandı\n}\n\n// ---- Komutlar ----\nvoid kartEkle(const char* hex) {\n  byte uid[4];\n  if (!uidCoz(hex, uid)) { Serial.println(\"Gecersiz UID\"); return; }\n  if (kartBul(uid) >= 0) { Serial.println(\"ZATEN VAR\"); return; }\n  byte n = kartSayisi();\n  if (n >= MAX_KART) { Serial.println(\"LISTE DOLU\"); return; }\n  kartYaz(n, uid);\n  EEPROM.update(ADR_KART_SAYISI, n + 1);         // sayaç en son: yarım kayıt görünmez\n  Serial.print(\"EKLENDI (\");\n  Serial.print(n + 1);\n  Serial.print(\"/\");\n  Serial.print(MAX_KART);\n  Serial.println(\")\");\n}\n\nvoid kartSil(const char* hex) {\n  byte uid[4];\n  if (!uidCoz(hex, uid)) { Serial.println(\"Gecersiz UID\"); return; }\n  int sira = kartBul(uid);\n  if (sira < 0) { Serial.println(\"BULUNAMADI\"); return; }\n  byte n = kartSayisi();\n  byte son[4];\n  kartOku(n - 1, son);\n  kartYaz(sira, son);                            // son kartı boşalan yere taşı\n  EEPROM.update(ADR_KART_SAYISI, n - 1);\n  Serial.print(\"SILINDI (\");\n  Serial.print(n - 1);\n  Serial.print(\"/\");\n  Serial.print(MAX_KART);\n  Serial.println(\")\");\n}\n\nvoid listele() {\n  byte n = kartSayisi();\n  Serial.print(\"Kart sayisi: \");\n  Serial.println(n);\n  for (int i = 0; i < n; i++) {\n    byte uid[4];\n    kartOku(i, uid);\n    Serial.print(i + 1);\n    Serial.print(\": \");\n    uidYaz(uid);\n    Serial.println();\n  }\n}\n\nvoid komutIsle(char* s) {\n  char* alan[3];\n  int adet = 0;\n  alan[adet++] = s;\n  for (char* p = s; *p != '\\0' && adet < 3; p++) {\n    if (*p == ':') {                             // ':' yerine bitiş işareti koy, yeni alan başlat\n      *p = '\\0';\n      alan[adet++] = p + 1;\n    }\n  }\n\n  if (strcmp(alan[0], \"KART\") == 0 && adet == 2) {\n    byte uid[4];\n    if (!uidCoz(alan[1], uid)) Serial.println(\"Gecersiz UID\");\n    else Serial.println(kartBul(uid) >= 0 ? \"YETKILI\" : \"YETKISIZ\");\n  } else if (strcmp(alan[0], \"GIRIS\") == 0 && adet == 2) {\n    Serial.println(pinEsit(ADR_KULLANICI_PIN, alan[1]) ? \"PIN DOGRU\" : \"PIN YANLIS\");\n  } else if (strcmp(alan[0], \"LISTE\") == 0 && adet == 1) {\n    listele();\n  } else if (adet == 3 && (strcmp(alan[0], \"EKLE\") == 0 || strcmp(alan[0], \"SIL\") == 0 || strcmp(alan[0], \"PINDEGIS\") == 0)) {\n    if (!pinEsit(ADR_MASTER_PIN, alan[1])) {     // üç yönetim komutu da master PIN ister\n      Serial.println(\"MASTER PIN YANLIS\");\n    } else if (strcmp(alan[0], \"EKLE\") == 0) {\n      kartEkle(alan[2]);\n    } else if (strcmp(alan[0], \"SIL\") == 0) {\n      kartSil(alan[2]);\n    } else {\n      if (!pinGecerli(alan[2])) {\n        Serial.println(\"PIN 4 rakam olmali\");\n      } else {\n        pinYaz(ADR_KULLANICI_PIN, alan[2]);\n        Serial.println(\"PIN DEGISTI\");\n      }\n    }\n  } else {\n    Serial.println(\"Bilinmeyen komut\");\n  }\n}\n\nbool satirOku() {\n  while (Serial.available() > 0) {\n    char c = Serial.read();\n    if (c == '\\r') continue;\n    if (c == '\\n') {\n      satir[uzunluk] = '\\0';\n      uzunluk = 0;\n      return true;\n    }\n    if (uzunluk < (int)sizeof(satir) - 1) {\n      satir[uzunluk] = c;\n      uzunluk++;\n    }\n  }\n  return false;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  if (EEPROM.read(ADR_ISARET) != ISARET) {\n    fabrikaAyari();\n    Serial.println(\"Fabrika ayari yazildi\");\n  }\n  Serial.print(\"Yetki sistemi hazir. Kart sayisi: \");\n  Serial.println(kartSayisi());\n}\n\nvoid loop() {\n  if (satirOku() && satir[0] != '\\0') {\n    komutIsle(satir);\n  }\n}\n```\n\n### How does it work?\n1. `setup` looks at the setup marker. At the first start-up it writes the factory settings; at later start-ups it **writes nothing** to EEPROM, it only reads.\n2. `komutIsle` (process command) cuts the line at the `:` signs. `alan[0]` (field) is the command, and `alan[1]` and `alan[2]` are the parameters. Because we put a `'\\0'` in place of each `:` inside the line, each field becomes a C text of its own (it can be compared with `strcmp` from lesson 62).\n3. The three management commands (`EKLE`, `SIL`, `PINDEGIS`) go through the same place, and all of them check the master PIN first. If the master PIN is wrong, the EEPROM is not touched.\n4. `kartEkle` (add card) first searches for the card; if it is already there, it does not write (`ZATEN VAR`, already there). It writes the new card at the end of the list and raises the **counter last**. If the power goes during writing, the counter has not gone up, so the half-written card does not appear in the list.\n5. `kartSil` (delete card) moves the last card into the deleted one's place. The counter goes down by one, so the last card's old bytes are no longer used. As a result, the list never has gaps.\n6. The `PIN` is stored in EEPROM as digit characters; the saved PIN and the incoming text are compared with `strcmp`.\n7. An empty (`255`) or corrupt card counter is counted as 0 inside `kartSayisi()` (number of cards); the list does not overflow.\n\n### Try it\n- `EKLE:9999:AABBCCDD`, then `LISTE`, then `EKLE` the card again. What does it print the second time? Was it written to EEPROM? (Answer: it was not written, because `kartBul` (find card) found the card.)\n- Add three cards, delete the middle one with `SIL`, and see the order with `LISTE`. Where did the last card go?\n- Add a card and change the PIN with `PINDEGIS`. Then stop with ■ and start again with ▶, and type `LISTE`. What do you see? The EEPROM in the lab is kept when the power goes off, just as on a real board: the card list stays in place, and `Fabrika ayari yazildi` (factory settings written) does not appear again at start-up (the marker byte is now written). To wipe the data, press ↺ Reset; the EEPROM is emptied and the factory settings are written again.\n\n### Common mistakes\n- Not adding a setup marker: you mistake the `255` values in an empty EEPROM for a PIN.\n- Using `EEPROM.write`: it writes the same value again every time and wears the cell out for nothing.\n- Raising the counter before writing the card: if the power goes during writing, a half card can look authorised.\n- Making the master PIN and the user PIN the same: management rights are opened to everyone.\n- Leaving the master PIN open to unlimited attempts. In this lesson there is no attempt limit for the master PIN; someone with a computer connected to the serial port can try more than anyone. In a real product this is limited, or the management commands are kept switched off.",
+            "question": "Is it enough to delete the card of someone who lost it from the list? Does the PIN need to be changed too? In which situation is which one needed?",
+            "explainerMd": "### What you will learn in this lesson\n- Why we keep the access information (PINs and cards) in EEPROM\n- How to draw up an EEPROM map that gives every piece of information a fixed address\n- How to survive a power cut with a setup marker and the order of writing\n- How to protect the management commands with a master PIN\n\n### What you should know first\n- Lesson 34: writing to EEPROM with `read` and `update`, and that an empty cell holds 255\n- Lesson 62: `char` arrays and `strcmp`\n- Lesson 63: that a UID is 4 bytes, and the serial imitation\n\n### Lasting memory\nA PIN written inside the code needs the program to be uploaded again to change it. Information in RAM is lost when the power goes off. **EEPROM**, however, keeps the information it holds even if the power is cut. If the authorised cards and the PINs live here, the manager can change them with a command, and the list is still there when the device starts up again.\n\n### The EEPROM map\nIf you do not give each piece of information a fixed address, you write one on top of another. In this lesson:\n\n| Address | Size | Contents |\n|---|---|---|\n| 0 | 1 byte | Setup marker (0xA5) |\n| 1-4 | 4 bytes | User PIN |\n| 5-8 | 4 bytes | Master PIN |\n| 9 | 1 byte | Number of cards |\n| 10-41 | 8 × 4 bytes | Card UIDs |\n\nThe address of the first byte of card `k` (counting from 0) is `10 + k * 4`. At most 8 cards fit, because 8 × 4 = 32 bytes are set aside.\n\n### The setup marker\nIn a new EEPROM every cell holds 255; the program must not mistake this for a PIN. At start-up, if `0xA5` is not at address 0, the device is running for the first time and the factory settings are written. We write the marker **last**: if setup is interrupted half-way, the marker is missing and setup is done again from the start at the next start-up.\n\n### The order of writing and wear\nWhen adding a card, you write the card's bytes first and the card counter **last**. If the power goes in the middle, the counter has not gone up and the half-written card does not appear in the list. Each cell is guaranteed for about 100,000 writes. `EEPROM.update` does not write if the value is the same; reading and checking use up no writes at all. When deleting a card, instead of rewriting the list from the start, you **copy the last card into the deleted one's place** and reduce the counter by one; the list stays without gaps and at most one card's worth of writing is done.\n\n### The master PIN\nAdding and deleting cards and changing the PIN are management jobs; they cannot be done with the ordinary user PIN. All these commands check the **master PIN** first. If the two are the same, management is open to everyone. Commands such as `EKLE:9999:AABBCCDD` are split into fields with `:`; when you put a `'\\0'` in place of each `:`, each field becomes a text of its own.\n\n### Summary\nEEPROM keeps the access information even when the power is cut. A map that gives every piece of information a fixed address is needed, and a setup marker tells the first start-up apart. When writing, the counter is updated last, so a half record does not show. On deletion, the last card is moved into the empty place. The management commands are protected with a master PIN.",
+            "concepts": [
+              {
+                "term": "EEPROM map",
+                "definition": "A written layout that gives every piece of information a fixed address and size; it stops you writing one on top of another.",
+                "example": "Address 9 is the number of cards; from 10 onwards come the 4-byte UIDs.",
+                "pitfall": "Writing the addresses as scattered numbers in the code; when one changes, you break the others."
+              },
+              {
+                "term": "Setup marker",
+                "definition": "A special byte (0xA5), written last, that tells the first start-up apart.",
+                "example": "If 0xA5 is not at address 0, the factory settings are written.",
+                "pitfall": "Not adding a marker: the 255 values in an empty EEPROM are mistaken for a PIN."
+              },
+              {
+                "term": "EEPROM.update",
+                "definition": "A write command that does nothing if the value already in the cell is the same as the one to be written.",
+                "example": "Saving the same card again does not wear the cells.",
+                "pitfall": "Using EEPROM.write: it writes the same value again every time and wears the cell out for nothing."
+              },
+              {
+                "term": "Writing the counter last",
+                "definition": "The record's bytes are written first, then the counter; a half record does not appear in the list.",
+                "example": "If the power goes while the card bytes are being written, the counter has not gone up.",
+                "pitfall": "Raising the counter before the record: a half-written card can look authorised."
+              },
+              {
+                "term": "Master PIN",
+                "definition": "A separate management PIN needed for adding and deleting cards and changing the user PIN.",
+                "example": "The command EKLE:9999:AABBCCDD adds the card if 9999 is correct.",
+                "pitfall": "Making the master PIN the same as the user PIN, or allowing unlimited attempts."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h6d4-q1",
+                "kind": "numeric",
+                "prompt": "The card UIDs start at address 10 and each card is 4 bytes. At which EEPROM address is the first byte of card 3 (the third in the list)?",
+                "answer": 18,
+                "tolerance": 0,
+                "explanation": "The third card's position is 2 (counting from 0): 10 + 2 × 4 = 18. The answer 22 belongs to the fourth card, and 14 to the second card.",
+                "skills": [
+                  "eeprom-store"
+                ]
+              },
+              {
+                "id": "m4h6d4-q2",
+                "kind": "mcq",
+                "prompt": "Why is the setup marker (0xA5) written at the very end of the factory settings?",
+                "options": [
+                  "The byte written last wears out less",
+                  "If setup is interrupted half-way, the marker is missing and setup is done again from the start at the next start-up",
+                  "Because 0xA5 is bigger than the other bytes",
+                  "The EEPROM cannot be read until the marker is written"
+                ],
+                "answer": 1,
+                "explanation": "The marker proves that setup has finished. If the power goes in the middle, the marker was never written; the program repeats the setup as if it were running for the first time. It has nothing to do with wear or the size of the value.",
+                "skills": [
+                  "eeprom-store"
+                ]
+              },
+              {
+                "id": "m4h6d4-q3",
+                "kind": "predict-output",
+                "prompt": "The cards are saved as 10, 20, 30, 40. While card 20 (position 1) is being deleted, the last card is moved into the empty place. What is printed when the code runs?\n\n```\nbyte kart[4] = {10, 20, 30, 40};\nbyte n = 4;\nint sira = 1;\nkart[sira] = kart[n - 1];\nn--;\nfor (int i = 0; i < n; i++) {\n  Serial.print(kart[i]);\n  Serial.print(' ');\n}\n```",
+                "options": [
+                  "10 30 40",
+                  "10 40 30",
+                  "10 20 30",
+                  "10 30 40 40"
+                ],
+                "answer": 1,
+                "explanation": "40, the last card, is written in place of kart[1]: 10, 40, 30, 40. n drops to 3 and only the first three positions are printed: 10 40 30. The order is not kept, but the list stays without gaps.",
+                "skills": [
+                  "eeprom-store",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m4h6d4-q4",
+                "kind": "find-bug",
+                "prompt": "With this function, a corrupt card can appear in the list if the power is cut while adding a card. Why?\n\n```\nvoid kartEkle(const byte uid[4]) {\n  byte n = kartSayisi();\n  EEPROM.update(ADR_KART_SAYISI, n + 1);   // line 1\n  kartYaz(n, uid);                          // line 2\n}\n```",
+                "options": [
+                  "Line 1: the counter goes up before the card bytes; if the power goes at line 2, a half card has entered the list",
+                  "Line 2: kartYaz should not be called",
+                  "It should be n - 1 instead of n + 1",
+                  "EEPROM.update should never be used"
+                ],
+                "answer": 0,
+                "explanation": "The counter must be written last. Here the counter has gone up but the card's bytes have not been written yet; if the power goes in between, a corrupt or old UID counts as authorised. Using update is correct.",
+                "skills": [
+                  "eeprom-store",
+                  "access-security",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h6d4-q5",
+                "kind": "numeric",
+                "prompt": "An EEPROM cell is guaranteed for about 100,000 writes. If a program writes this cell 50 times a day, in how many days does it reach the limit?",
+                "answer": 2000,
+                "tolerance": 0,
+                "unit": "days",
+                "explanation": "100,000 / 50 = 2000 days (about 5.5 years). That is why values that change often are written to RAM, not EEPROM, and unnecessary writes are avoided with EEPROM.update.",
+                "skills": [
+                  "eeprom-store"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Akıllı kapı kilidi",
@@ -3642,7 +7098,123 @@ export const modul4: ModuleContent = {
                 "servo-control"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Smart door lock",
+            "problem": "In a hotel you hold your card to the room door, a green light comes on, the lock opens, and a few seconds later it closes by itself. If you enter the wrong code three times, though, the door ignores you for a while. The parts you learnt about this week are exactly for this: the keypad, the card, the access list in EEPROM. Now you will combine all of them with a servo, a screen and a buzzer to make a working door lock.",
+            "contentMd": "### What are we going to do?\nThis project brings together these things from earlier lessons:\n- **This week:** PIN entry with the keypad (62), card reading with the serial imitation (63), the PIN and card list in EEPROM, management with the master PIN (64).\n- **Module 3, week 5:** A lock latch with a servo (lesson 21).\n- **Module 3, week 6:** Non-blocking timing and a state machine with `millis()` (lessons 27-28).\n- **Module 3, week 7:** The I2C LCD screen (lessons 32-33) and EEPROM (lesson 34).\n\nThe rule is:\n- The right PIN or an authorised card: the door opens for **5 seconds**, then locks by itself.\n- A wrong PIN or an unauthorised card uses up one attempt. After **3 wrong attempts**, the door accepts no input for **30 seconds**.\n- Every event is shown on the screen and turned into sound with the buzzer.\n\n### Circuit\nIn this project the lock is just a servo. In the lab it is enough to connect the servo's VCC pin to the Uno's 5V pin. In a real circuit even a small servo can draw too much current when it starts; that is why in real door projects the servo is powered from a separate 5 V supply, and the supply's GND is joined to the Arduino's GND (common GND). This is real-world knowledge, not something you need to do in the lab.\n\nThis week's pins are different from Module 4's standard table, because the keypad takes all of D2-D9. Pick the parts from the **Add part** menu in the lab and connect the pins by drawing wires:\n\n| Part | Connection |\n|---|---|\n| 4x4 keypad | Rows R1..R4 → **D9, D8, D7, D6**; columns C1..C4 → **D5, D4, D3, D2** |\n| Servo (lock latch) | SIG → **D10**; VCC → **5V**; GND → **GND** |\n| Buzzer (passive) | **+** → **D11**; **-** → **GND** |\n| Red LED (\"locked\") | **D12** → resistor (330 Ω) 1; resistor 2 → LED **A**; LED **K** → **GND** |\n| Green LED (\"open\") | **D13** → resistor (330 Ω) 1; resistor 2 → LED **A**; LED **K** → **GND** |\n| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → **5V**, GND → **GND** (address 0x27) |\n| Card reader | **None:** the card is imitated by typing `KART:AABBCCDD` in the Serial monitor |\n\nThe buzzer's **Type** property must be \"Passive\" (`tone()` works with a passive buzzer). There is no card reader in this project because everything together does not fit on the Uno's pins: the RC522 plus the keypad, servo, buzzer and two LEDs need 17 pins in total, and 16 pins can be used on the Uno (the calculation in lesson 63). The serial imitation is a method used **for testing while there is no card reader**; it is not a real RC522. On the day the reader is added, the `KART:...` line printed by the `rc522_oku` program takes the place of the line coming from the serial port here.\n\n### State machine\n| State | Servo | LED | Exit condition |\n|---|---|---|---|\n| KILITLI (locked) | 0° | Red on | Right PIN or authorised card: ACIK. 3rd wrong attempt: BLOKE |\n| ACIK (open) | 90° | Green on | When 5 s are up: KILITLI |\n| BLOKE (blocked) | 0° | Red flashes at 2 Hz | When 30 s are up: KILITLI (the wrong-attempt counter is reset) |\n\nIn the ACIK and BLOKE states, pressing keys and showing a card have no effect. There is no shortcut such as showing another card while the door is open to make the time longer; this simplicity is deliberate.\n\n### Program\n```cpp\n// sketch: akilli_kapi\n#include <Keypad.h>\n#include <Servo.h>\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <EEPROM.h>\n\n// ---- Pinler ----\nconst int SERVO_PIN = 10;\nconst int BUZZER = 11;\nconst int KIRMIZI = 12;\nconst int YESIL = 13;\n\n// ---- Ayarlar ----\nconst int ACIK_ACI = 90;\nconst int KILIT_ACI = 0;\nconst int PIN_UZUNLUK = 4;\nconst int AZAMI_YANLIS = 3;\nconst unsigned long ACIK_SURESI = 5000;        // ms\nconst unsigned long BLOK_SURESI = 30000;       // ms\nconst unsigned long MESAJ_SURESI = 1500;       // ms\nconst unsigned long GIRIS_ZAMAN_ASIMI = 10000; // ms: yarım kalan PIN silinir\n\n// ---- EEPROM haritası (64. ders) ----\nconst int ADR_ISARET = 0;\nconst int ADR_KULLANICI_PIN = 1;\nconst int ADR_MASTER_PIN = 5;\nconst int ADR_KART_SAYISI = 9;\nconst int ADR_KARTLAR = 10;\nconst int MAX_KART = 8;\nconst byte ISARET = 0xA5;\n\n// ---- Nesneler ----\nconst byte SATIR = 4;\nconst byte SUTUN = 4;\nchar tuslar[SATIR][SUTUN] = {\n  {'1', '2', '3', 'A'},\n  {'4', '5', '6', 'B'},\n  {'7', '8', '9', 'C'},\n  {'*', '0', '#', 'D'}\n};\nbyte satirPinleri[SATIR] = {9, 8, 7, 6};\nbyte sutunPinleri[SUTUN] = {5, 4, 3, 2};\nKeypad tusTakimi = Keypad(makeKeymap(tuslar), satirPinleri, sutunPinleri, SATIR, SUTUN);\nLiquidCrystal_I2C lcd(0x27, 16, 2);\nServo kilit;\n\n// ---- Durum ----\nenum Durum { KILITLI, ACIK, BLOKE };\nDurum durum = KILITLI;\n\nchar girilen[PIN_UZUNLUK + 1];\nint hane = 0;\nint yanlis = 0;\nunsigned long acikBitis = 0;\nunsigned long blokBitis = 0;\nunsigned long mesajBitis = 0;\nunsigned long sonTus = 0;\nbool mesajVar = false;\nchar mesajUst[17];\nchar mesajAlt[17];\nchar sonUst[17] = \"\";\nchar sonAlt[17] = \"\";\n\nchar satir[40];\nint uzunluk = 0;\n\nbool doldu(unsigned long simdi, unsigned long bitis) {\n  return (long)(simdi - bitis) >= 0;           // millis() taşsa da doğru\n}\n\n// ---- Yardımcılar (63-64. dersler) ----\nint hexDeger(char c) {\n  if (c >= '0' && c <= '9') return c - '0';\n  if (c >= 'A' && c <= 'F') return c - 'A' + 10;\n  if (c >= 'a' && c <= 'f') return c - 'a' + 10;\n  return -1;\n}\n\nbool uidCoz(const char* hex, byte uid[4]) {\n  if (strlen(hex) != 8) return false;\n  for (int i = 0; i < 4; i++) {\n    int yuksek = hexDeger(hex[2 * i]);\n    int alcak = hexDeger(hex[2 * i + 1]);\n    if (yuksek < 0 || alcak < 0) return false;\n    uid[i] = yuksek * 16 + alcak;\n  }\n  return true;\n}\n\nvoid uidYaz(const byte uid[4]) {\n  for (int i = 0; i < 4; i++) {\n    if (i > 0) Serial.print(' ');\n    if (uid[i] < 16) Serial.print('0');\n    Serial.print(uid[i], HEX);\n  }\n}\n\nbool pinGecerli(const char* s) {\n  if (strlen(s) != PIN_UZUNLUK) return false;\n  for (int i = 0; i < PIN_UZUNLUK; i++) {\n    if (s[i] < '0' || s[i] > '9') return false;\n  }\n  return true;\n}\n\n// ---- EEPROM işlemleri (64. ders) ----\nvoid pinOku(int adres, char pin[PIN_UZUNLUK + 1]) {\n  for (int i = 0; i < PIN_UZUNLUK; i++) pin[i] = EEPROM.read(adres + i);\n  pin[PIN_UZUNLUK] = '\\0';\n}\n\nvoid pinYaz(int adres, const char* pin) {\n  for (int i = 0; i < PIN_UZUNLUK; i++) EEPROM.update(adres + i, pin[i]);\n}\n\nbool pinEsit(int adres, const char* girilenPin) {\n  char kayitli[PIN_UZUNLUK + 1];\n  pinOku(adres, kayitli);\n  return strcmp(kayitli, girilenPin) == 0;\n}\n\nbyte kartSayisi() {\n  byte n = EEPROM.read(ADR_KART_SAYISI);\n  if (n > MAX_KART) n = 0;\n  return n;\n}\n\nvoid kartOku(int sira, byte uid[4]) {\n  for (int j = 0; j < 4; j++) uid[j] = EEPROM.read(ADR_KARTLAR + sira * 4 + j);\n}\n\nvoid kartYaz(int sira, const byte uid[4]) {\n  for (int j = 0; j < 4; j++) EEPROM.update(ADR_KARTLAR + sira * 4 + j, uid[j]);\n}\n\nint kartBul(const byte uid[4]) {\n  byte n = kartSayisi();\n  for (int i = 0; i < n; i++) {\n    byte kayitli[4];\n    kartOku(i, kayitli);\n    if (memcmp(kayitli, uid, 4) == 0) return i;\n  }\n  return -1;\n}\n\nvoid fabrikaAyari() {\n  pinYaz(ADR_KULLANICI_PIN, \"1234\");\n  pinYaz(ADR_MASTER_PIN, \"9999\");\n  EEPROM.update(ADR_KART_SAYISI, 0);\n  EEPROM.update(ADR_ISARET, ISARET);\n}\n\nvoid kartEkle(const char* hex) {\n  byte uid[4];\n  if (!uidCoz(hex, uid)) { Serial.println(\"Gecersiz UID\"); return; }\n  if (kartBul(uid) >= 0) { Serial.println(\"ZATEN VAR\"); return; }\n  byte n = kartSayisi();\n  if (n >= MAX_KART) { Serial.println(\"LISTE DOLU\"); return; }\n  kartYaz(n, uid);\n  EEPROM.update(ADR_KART_SAYISI, n + 1);\n  Serial.print(\"EKLENDI (\");\n  Serial.print(n + 1);\n  Serial.print(\"/\");\n  Serial.print(MAX_KART);\n  Serial.println(\")\");\n}\n\nvoid kartSil(const char* hex) {\n  byte uid[4];\n  if (!uidCoz(hex, uid)) { Serial.println(\"Gecersiz UID\"); return; }\n  int sira = kartBul(uid);\n  if (sira < 0) { Serial.println(\"BULUNAMADI\"); return; }\n  byte n = kartSayisi();\n  byte son[4];\n  kartOku(n - 1, son);\n  kartYaz(sira, son);\n  EEPROM.update(ADR_KART_SAYISI, n - 1);\n  Serial.print(\"SILINDI (\");\n  Serial.print(n - 1);\n  Serial.print(\"/\");\n  Serial.print(MAX_KART);\n  Serial.println(\")\");\n}\n\nvoid listele() {\n  byte n = kartSayisi();\n  Serial.print(\"Kart sayisi: \");\n  Serial.println(n);\n  for (int i = 0; i < n; i++) {\n    byte uid[4];\n    kartOku(i, uid);\n    Serial.print(i + 1);\n    Serial.print(\": \");\n    uidYaz(uid);\n    Serial.println();\n  }\n}\n\n// ---- Ekran ----\nvoid satirYaz(int sira, const char* metin) {\n  lcd.setCursor(0, sira);\n  int boy = strlen(metin);\n  for (int i = 0; i < 16; i++) lcd.print(i < boy ? metin[i] : ' ');\n}\n\nvoid ekran(const char* ust, const char* alt) {      // yalnız değişen satırı yeniden yazar\n  if (strcmp(ust, sonUst) != 0) {\n    satirYaz(0, ust);\n    strncpy(sonUst, ust, 16);\n    sonUst[16] = '\\0';\n  }\n  if (strcmp(alt, sonAlt) != 0) {\n    satirYaz(1, alt);\n    strncpy(sonAlt, alt, 16);\n    sonAlt[16] = '\\0';\n  }\n}\n\nvoid mesajGoster(const char* ust, const char* alt) {\n  strncpy(mesajUst, ust, 16);\n  mesajUst[16] = '\\0';\n  strncpy(mesajAlt, alt, 16);\n  mesajAlt[16] = '\\0';\n  mesajVar = true;\n  mesajBitis = millis() + MESAJ_SURESI;\n}\n\n// ---- Kilit mantığı ----\nvoid girisiTemizle() {\n  hane = 0;\n  girilen[0] = '\\0';\n}\n\nvoid erisimVer(const char* yontem) {\n  durum = ACIK;\n  yanlis = 0;\n  mesajVar = false;\n  girisiTemizle();\n  kilit.write(ACIK_ACI);\n  acikBitis = millis() + ACIK_SURESI;\n  tone(BUZZER, 2000, 300);\n  Serial.print(\"ACIK (\");\n  Serial.print(yontem);\n  Serial.println(\")\");\n}\n\nvoid kilitle() {\n  durum = KILITLI;\n  kilit.write(KILIT_ACI);\n  Serial.println(\"KILITLI\");\n}\n\nvoid bloke() {\n  durum = BLOKE;\n  mesajVar = false;\n  girisiTemizle();\n  blokBitis = millis() + BLOK_SURESI;\n  tone(BUZZER, 300, 1000);\n  Serial.println(\"BLOKE 30 sn\");\n}\n\nvoid erisimReddet(const char* yontem) {\n  yanlis++;\n  girisiTemizle();\n  Serial.print(\"YANLIS \");\n  Serial.print(yontem);\n  Serial.print(\" \");\n  Serial.print(yanlis);\n  Serial.print(\"/\");\n  Serial.println(AZAMI_YANLIS);\n  if (yanlis >= AZAMI_YANLIS) {\n    bloke();\n    return;\n  }\n  tone(BUZZER, 400, 500);\n  char alt[17];\n  snprintf(alt, sizeof(alt), \"Kalan hak: %d\", AZAMI_YANLIS - yanlis);\n  mesajGoster(strcmp(yontem, \"PIN\") == 0 ? \"YANLIS PIN\" : \"YETKISIZ KART\", alt);\n}\n\nvoid pinOnayla() {\n  if (hane < PIN_UZUNLUK) {\n    mesajGoster(\"PIN 4 haneli\", \"olmali\");\n    return;\n  }\n  if (pinEsit(ADR_KULLANICI_PIN, girilen)) erisimVer(\"PIN\");\n  else erisimReddet(\"PIN\");\n}\n\nvoid kartIsle(const char* hex) {\n  byte uid[4];\n  if (!uidCoz(hex, uid)) { Serial.println(\"Gecersiz UID\"); return; }\n  if (durum != KILITLI) { Serial.println(\"YOKSAYILDI\"); return; }\n  if (kartBul(uid) >= 0) erisimVer(\"KART\");\n  else erisimReddet(\"KART\");\n}\n\nvoid tuslariIsle(unsigned long simdi) {\n  char tus = tusTakimi.getKey();\n  if (!tus) return;\n  if (durum != KILITLI) return;                    // açıkken ve blokeyken tuşlar yok sayılır\n  sonTus = simdi;\n  mesajVar = false;\n  if (tus >= '0' && tus <= '9') {\n    if (hane < PIN_UZUNLUK) {\n      girilen[hane] = tus;\n      hane++;\n      girilen[hane] = '\\0';\n      tone(BUZZER, 1000, 40);\n    }\n  } else if (tus == '*') {\n    if (hane > 0) {\n      hane--;\n      girilen[hane] = '\\0';\n      tone(BUZZER, 700, 40);\n    }\n  } else if (tus == '#') {\n    pinOnayla();\n  }\n}\n\n// ---- Seri komutlar (kart taklidi + yönetim) ----\nvoid komutIsle(char* s) {\n  char* alan[3];\n  int adet = 0;\n  alan[adet++] = s;\n  for (char* p = s; *p != '\\0' && adet < 3; p++) {\n    if (*p == ':') {\n      *p = '\\0';\n      alan[adet++] = p + 1;\n    }\n  }\n\n  if (strcmp(alan[0], \"KART\") == 0 && adet == 2) {\n    kartIsle(alan[1]);\n  } else if (strcmp(alan[0], \"LISTE\") == 0 && adet == 1) {\n    listele();\n  } else if (adet == 3 && (strcmp(alan[0], \"EKLE\") == 0 || strcmp(alan[0], \"SIL\") == 0 || strcmp(alan[0], \"PINDEGIS\") == 0)) {\n    if (!pinEsit(ADR_MASTER_PIN, alan[1])) {\n      Serial.println(\"MASTER PIN YANLIS\");\n    } else if (strcmp(alan[0], \"EKLE\") == 0) {\n      kartEkle(alan[2]);\n    } else if (strcmp(alan[0], \"SIL\") == 0) {\n      kartSil(alan[2]);\n    } else if (!pinGecerli(alan[2])) {\n      Serial.println(\"PIN 4 rakam olmali\");\n    } else {\n      pinYaz(ADR_KULLANICI_PIN, alan[2]);\n      Serial.println(\"PIN DEGISTI\");\n    }\n  } else {\n    Serial.println(\"Bilinmeyen komut\");\n  }\n}\n\nbool satirOku() {\n  while (Serial.available() > 0) {\n    char c = Serial.read();\n    if (c == '\\r') continue;\n    if (c == '\\n') {\n      satir[uzunluk] = '\\0';\n      uzunluk = 0;\n      return true;\n    }\n    if (uzunluk < (int)sizeof(satir) - 1) {\n      satir[uzunluk] = c;\n      uzunluk++;\n    }\n  }\n  return false;\n}\n\n// ---- Zamana bağlı işler ----\nvoid durumGuncelle(unsigned long simdi) {\n  if (durum == ACIK && doldu(simdi, acikBitis)) {\n    kilitle();\n  }\n  if (durum == BLOKE && doldu(simdi, blokBitis)) {\n    yanlis = 0;\n    kilitle();\n    Serial.println(\"BLOKE bitti\");\n  }\n  if (durum == KILITLI && hane > 0 && doldu(simdi, sonTus + GIRIS_ZAMAN_ASIMI)) {\n    girisiTemizle();\n    Serial.println(\"Giris zaman asimi\");\n  }\n  if (mesajVar && doldu(simdi, mesajBitis)) {\n    mesajVar = false;\n  }\n}\n\nvoid ledGuncelle(unsigned long simdi) {\n  digitalWrite(YESIL, durum == ACIK ? HIGH : LOW);\n  if (durum == BLOKE) {\n    digitalWrite(KIRMIZI, (simdi / 250) % 2 == 0 ? HIGH : LOW);   // 2 Hz yanıp söner\n  } else {\n    digitalWrite(KIRMIZI, durum == KILITLI ? HIGH : LOW);\n  }\n}\n\nvoid ekranGuncelle(unsigned long simdi) {\n  char alt[17];\n  if (durum == ACIK) {\n    ekran(\"KAPI ACIK\", \"Hos geldiniz\");\n  } else if (durum == BLOKE) {\n    unsigned long kalan = (blokBitis - simdi + 999) / 1000;      // yukarı yuvarla\n    snprintf(alt, sizeof(alt), \"Bekle: %lu sn\", kalan);\n    ekran(\"KILITLENDI\", alt);\n  } else if (mesajVar) {\n    ekran(mesajUst, mesajAlt);\n  } else if (hane > 0) {\n    strcpy(alt, \"PIN: \");\n    for (int i = 0; i < hane; i++) alt[5 + i] = '*';\n    alt[5 + hane] = '\\0';\n    ekran(\"KAPI KILITLI\", alt);\n  } else {\n    ekran(\"KAPI KILITLI\", \"PIN veya kart\");\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(KIRMIZI, OUTPUT);\n  pinMode(YESIL, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  kilit.attach(SERVO_PIN);\n  kilit.write(KILIT_ACI);\n  girisiTemizle();\n\n  if (EEPROM.read(ADR_ISARET) != ISARET) {\n    fabrikaAyari();\n    Serial.println(\"Fabrika ayari yazildi\");\n  }\n\n  lcd.init();\n  lcd.backlight();\n  Serial.println(\"Akilli kapi hazir\");\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  tuslariIsle(simdi);\n  if (satirOku() && satir[0] != '\\0') komutIsle(satir);\n  durumGuncelle(simdi);\n  ledGuncelle(simdi);\n  ekranGuncelle(simdi);\n}\n```\n\n### How does it work?\n1. **Three states, one `durum` (state) variable.** On every pass, `loop` does five jobs: keys, serial line, time check, LEDs, screen. None of them has a `delay`; that is why, even during the 30-second wait, card reads and key presses are **listened to** (and ignored, because they count as having no effect).\n2. **The time check** is done with `doldu(simdi, bitis)` (is it up: now, end). The expression `(long)(simdi - bitis) >= 0` works correctly even when `millis()` goes back to zero and overflows after 49 days (the subtraction rule from lesson 27).\n3. **Both ways in lead to the same result.** The PIN goes through `pinOnayla()` (confirm PIN), and the card through `kartIsle()` (process card); both call `erisimVer()` (grant access) or `erisimReddet()` (deny access). That way the wrong-attempt counter is kept **shared**: two wrong PINs and one unauthorised card count as three attempts in total.\n4. **`erisimVer`** sets the state to ACIK, turns the servo to 90°, resets the counter and starts the 5-second timer. When the time is up, `durumGuncelle` (update state) locks the door again.\n5. **`erisimReddet`** raises the counter. If the attempts have run out, `bloke()` is called; if not, the user is shown \"Kalan hak\" (attempts left) on the LCD.\n6. **The LCD** is updated with the `ekran()` (screen) function; this function rewrites only the line that has **changed**. If you wrote 16 characters on every pass, the I2C line would be kept busy for nothing. The messages contain no Turkish characters; the 16x2 LCD's built-in character table does not have letters such as the Turkish c-cedilla, s-cedilla or soft g.\n7. **The buzzer** plays with `tone(pin, frekans, süre)` (pin, frequency, duration); this call does not wait for the time to run out (lesson 18). The key sound is short and high; the error sound is long and low.\n8. **A half-entered PIN is deleted.** If someone has entered 2 digits and walked away, we clear the entry after 10 seconds; the next person does not inherit someone else's half PIN.\n9. **The EEPROM** works with the same map and functions as in lesson 64. At start-up, the saved cards and PIN are kept; the factory settings are written only at the very first setup.\n\n### Test scenario\nRun the program with ▶ and try these in order. Type the commands into the Serial monitor's box and press **Send**. For the keypad keys, select the keypad and pick each key in turn from the **Pressed key** list in the right panel; after each key, set the list back to **None** (leaving a key selected means holding it down). Watch the text on the LCD and the servo's angle on the canvas.\n\n| Step | What do you do? | What should happen? |\n|---|---|---|\n| 1 | `EKLE:9999:AABBCCDD` | `EKLENDI (1/8)` (added). The card has entered the authorised list |\n| 2 | On the keypad, `1 2 3 4 #` | The servo goes to 90°, the green LED lights, the LCD says \"KAPI ACIK\" (door open), the Serial monitor shows `ACIK (PIN)` |\n| 3 | Wait 5 seconds | The servo returns to 0°, the red LED lights, `KILITLI` is printed |\n| 4 | `KART:AABBCCDD` | It opens in the same way; the Serial monitor shows `ACIK (KART)` |\n| 5 | On the keypad, `0 0 0 0 #`, then `KART:11223344`, then `1 1 1 1 #` | Three wrong attempts; on the third, the LCD says \"KILITLENDI\" (locked out) and the red LED flashes |\n| 6 | Enter the right PIN during the block | Nothing happens; the door does not open |\n| 7 | Wait 30 seconds | `BLOKE bitti` (block over), the door works normally again |\n\n### Try it\n- Set `ACIK_SURESI` (open time) to 10 seconds. Did you need to change anything else?\n- Add a rule that doubles the block time every time it blocks (30 s, 60 s, 120 s). Which variable do you need to keep?\n- While the door is open, make the green LED flash once a second. Which function will you write it in?\n\n### Common mistakes\n- In a real circuit, powering the servo from the Arduino's 5 V pin: the board can keep restarting, or the LCD can go wrong. In a real project a separate supply and a common GND are used. In the lab, though, do not forget to connect the servo's VCC and GND pins: if you do not, the servo does not move.\n- Leaving the servo on D6: this week D6 is one of the keypad's row pins. The keys are read wrongly and the servo jitters.\n- Keeping the door open with `delay(5000)`: during that time keys and serial commands are missed, and the blocking logic does not work either.\n- Keeping separate wrong-attempt counters for the PIN and the card: an attacker can make 3 attempts separately through each way.\n- Using the factory PINs (1234 and 9999) without changing them. Change the user PIN with `PINDEGIS`. There is no command in this program that changes the master PIN; if you were making a product, you would need to add one.\n- Waiting out the block time with `delay(30000)`: the door does not react to anything for 30 seconds, and the screen freezes too.",
+            "question": "If this door lock were fitted to a real front door, what weaknesses would you run into? What could someone who reaches the wires and the lock itself do? How should management through \"a serial port connected to a computer\" be protected?",
+            "explainerMd": "### What you will learn in this lesson\n- How to design a product in advance as a rule, a state table and a circuit plan\n- How to manage a three-state lock (KILITLI, ACIK, BLOKE) with a single variable\n- How to handle time, keys and serial input together without using `delay` anywhere\n- Why it matters that the two ways in (PIN and card) share one error counter\n\n### What you should know first\n- Lesson 21: setting an angle with a servo\n- Lessons 27-28: `millis()` and the state machine\n- Lessons 32-34: the LCD, I2C and EEPROM\n- Lessons 61-64: the keypad, the card imitation, access in EEPROM\n\n### Rule first, code second\nThe smart door lock's rule is short: the right PIN or an authorised card opens the door for 5 seconds; after three wrong attempts, the door accepts no input for 30 seconds. When you write this, the first job is to work out the states:\n\n| State | Servo | Exit |\n|---|---|---|\n| KILITLI (locked) | 0° | Right input: ACIK. 3rd wrong one: BLOKE |\n| ACIK (open) | 90° | When 5 s are up, KILITLI |\n| BLOKE (blocked) | 0° | When 30 s are up, KILITLI |\n\nBefore you write the code, the table shows where you can go from each state; the code is a translation of this table.\n\n### One variable, many jobs\nA single variable called `durum` (state) tells you where the door is. On every pass, `loop()` does five jobs: it reads the keys, handles the serial line, checks the times, updates the LEDs and updates the screen. None of them has a `delay`; that is why, even while the door is open or blocked, the program **listens** to the inputs (and ignores them if the state does not allow them).\n\n### Telling when the time is up\nThe end moment is worked out with `millis() + süre` (duration), and the check is done with `(long)(simdi - bitis) >= 0`. This subtraction gives the right result even when `millis()` goes back to zero and overflows after 49 days.\n\n### A shared attempt counter\nThe PIN and the card use the same `yanlis` (wrong) counter. Two wrong PINs and one unauthorised card make three attempts in total. If the counters were separate, an attacker would make three attempts separately through each way. A correct entry resets the counter.\n\n### Servo and power\nThe servo takes commands from its signal pin (D10); it draws its power from 5V and GND. In the lab it is enough to connect VCC and GND. In a real circuit, even a small servo draws a brief high current when it starts; a separate 5 V supply is used, and the supply's GND is joined to the Arduino's GND. For a servo at 90°, the library produces a pulse of about 1472 µs.\n\n### Summary\nWrite the rule and the state table first, then move on to the code. A single `durum` variable, checking times with `millis()` and not using `delay` keep the lock responsive all the time. The PIN and the card share one error counter. In a real circuit the servo is powered separately and the GNDs are joined.",
+            "concepts": [
+              {
+                "term": "State table",
+                "definition": "A planning table that shows the outputs in each state and the condition for the next state.",
+                "example": "In the BLOKE state the servo is at 0°, the red LED flashes, and when 30 s are up it goes to KILITLI.",
+                "pitfall": "Starting to code without drawing the table; some moves between states are left out."
+              },
+              {
+                "term": "Non-blocking timing",
+                "definition": "Working out the end moment with millis() and comparing it on every pass; the program keeps running without waiting.",
+                "example": "acikBitis = millis() + 5000; on every pass it checks whether the time is up.",
+                "pitfall": "Keeping the door open with delay(5000): keys and serial commands are missed."
+              },
+              {
+                "term": "Overflow-proof comparison",
+                "definition": "The expression (long)(simdi - bitis) >= 0 correctly finds when the time is up, even if millis() goes back to zero.",
+                "example": "doldu(millis(), blokBitis) answers the question \"is the block over?\".",
+                "pitfall": "Writing simdi >= bitis: it gives the wrong result when the counter overflows."
+              },
+              {
+                "term": "Shared error counter",
+                "definition": "The PIN and card inputs sharing the same wrong-attempt counter.",
+                "example": "Two wrong PINs and one unauthorised card use up the third attempt.",
+                "pitfall": "Keeping a separate counter for each way: an attacker makes 3 attempts separately through each way."
+              },
+              {
+                "term": "Separate servo power",
+                "definition": "In a real circuit, powering the servo from a 5 V supply separate from the Arduino; the GNDs are made common.",
+                "example": "The external 5 V supply's GND is connected to the Uno's GND.",
+                "pitfall": "Powering the servo from the Uno's 5 V pin: the board can restart or the screen can go wrong."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h6d5-q1",
+                "kind": "numeric",
+                "prompt": "12.3 seconds (12300 ms) have passed since the block started. The screen shows the time left with the calculation (30000 - 12300 + 999) / 1000, using integer division. How many seconds does the screen show?",
+                "answer": 18,
+                "unit": "s",
+                "explanation": "30000 - 12300 = 17700 ms; adding 999 makes 18699, and integer division gives 18. Thanks to the extra 999, 17.7 s is rounded up; otherwise it would show 17, and the countdown would show 0 in the last second.",
+                "skills": [
+                  "prog-millis",
+                  "state-machine"
+                ]
+              },
+              {
+                "id": "m4h6d5-q2",
+                "kind": "predict-output",
+                "prompt": "There are three attempts. A correct entry resets the counter. What do these calls print, in order?\n\n```\nint yanlis = 0;\nvoid reddet() { yanlis++; Serial.println(yanlis); }\nvoid kabul()  { yanlis = 0; }\n\nreddet();\nkabul();\nreddet();\nreddet();\n```",
+                "options": [
+                  "1, 1, 2",
+                  "1, 2, 3",
+                  "1, 2, 2",
+                  "1, 0, 1"
+                ],
+                "answer": 0,
+                "explanation": "The first reddet (deny) prints 1. kabul (accept) resets the counter, the next reddet prints 1 again, and the one after it prints 2. The kabul call prints nothing, so 0 does not appear; 1, 2, 3 would be forgetting the reset.",
+                "skills": [
+                  "access-security",
+                  "state-machine"
+                ]
+              },
+              {
+                "id": "m4h6d5-q3",
+                "kind": "find-bug",
+                "prompt": "The block should lock the door for 30 s, but during this time the card and keys do not react and the screen freezes too. Where is the problem?\n\n```\nvoid bloke() {\n  durum = BLOKE;            // line 1\n  delay(30000);             // line 2\n  durum = KILITLI;          // line 3\n}\n```",
+                "options": [
+                  "Line 1: the durum variable is not declared",
+                  "Line 2: delay stops the program for 30 s; the end moment should be worked out and checked inside loop",
+                  "Line 3: it should be ACIK instead of KILITLI",
+                  "Line 2: the time should be written in seconds, not milliseconds"
+                ],
+                "answer": 1,
+                "explanation": "While delay runs, loop() never comes round; keys, serial commands, LEDs and the screen are not updated. The right way is to write blokBitis = millis() + 30000 and check the time on every pass inside durumGuncelle. The unit of delay is already milliseconds.",
+                "skills": [
+                  "prog-millis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h6d5-q4",
+                "kind": "mcq",
+                "prompt": "In a real door project, why do you power the servo from a separate 5 V supply rather than the Arduino's 5 V pin?",
+                "options": [
+                  "The servo needs 12 V",
+                  "The servo draws a brief high current when it starts; the board can restart or the screen can go wrong. The GNDs are made common",
+                  "A separate supply makes the servo turn faster",
+                  "The Arduino's 5V pin can only power LEDs"
+                ],
+                "answer": 1,
+                "explanation": "Even a small servo draws more current than the board's 5 V line can give when it starts, and the voltage drops. If the separate supply's GND is not joined to the Arduino's, the signal loses its reference. A servo does not need 12 V; it works on 4-6 V.",
+                "skills": [
+                  "circuit-wiring",
+                  "servo-control"
+                ]
+              },
+              {
+                "id": "m4h6d5-q5",
+                "kind": "numeric",
+                "prompt": "The Servo library produces a 544 µs pulse for 0° and a 2400 µs pulse for 180°, and the values in between are linear. How many microseconds long is the pulse sent with write(90)?",
+                "answer": 1472,
+                "tolerance": 1,
+                "unit": "µs",
+                "explanation": "90° is exactly the middle of the range: 544 + (2400 - 544) / 2 = 544 + 928 = 1472 µs. 1500 is a round guess, but the library's value is 1472.",
+                "skills": [
+                  "servo-control"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -3650,6 +7222,7 @@ export const modul4: ModuleContent = {
       "title": "Zaman ve veri",
       "project": "Veri kaydedici",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. RTC modülünü I2C ile bağlayıp `rtc.now()` ile tarih ve saati okuyabilir, `rtc.adjust()` ile kurabilir ve basit bir alarm yazabilir.\n2. SD kartın SPI ile nasıl bağlandığını, 8.3 dosya adı kuralını ve `close()`/`flush()` ile verinin karta nasıl yazıldığını açıklayabilir.\n3. Zaman damgalı bir CSV satırı üreten, donanımdan bağımsız bir fonksiyon yazabilir; ondalık virgül ile sütun ayracı çatışmasını açıklayabilir.\n4. UART, I2C ve SPI protokollerini hat sayısı, hız ve cihaz seçimi bakımından karşılaştırabilir; bit sayısından aktarım süresini hesaplayabilir.\n5. RTC, DHT22, LCD ve butonu birleştiren bir sıcaklık ve nem veri kaydedicisi kurabilir.\n\n### Haftanın planı\nHafta beş derstir; ders süreleri 25-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | RTC: saat, tarih, alarm | ~25 dk | Anlatımı oku, RTC'yi kur, saati okut, `adjust` ile gece yarısına ayarla, alarmı dene, mini testi çöz. |\n| 2 | SD kart (SPI): dosyaya yazma | ~25 dk | Laboratuvarda SD yok: devreyi tablodan oku, kodu yaz ve derle, \"Dene\" sorularını kağıt üzerinde cevapla. |\n| 3 | Veri kaydı: CSV ve zaman damgası | ~30 dk | Satır fonksiyonunu sabit değerlerle dene, RTC + DHT22 ile canlı satır üret. |\n| 4 | Haberleşme protokolleri: UART, I2C, SPI karşılaştırması | ~30 dk | Üç ölçüm programını çalıştır, tabloları kendi hesabınla karşılaştır. |\n| 5 | Proje: Sıcaklık ve nem veri kaydedici | ~35 dk | Planı tabloya yaz, devreyi kur, kaydediciyi çalıştır, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta şunlar gerekir. Eksik olanın dersine dön:\n- `millis()` ile bloklamayan zamanlama (Modül 3, ders 27)\n- I2C, `Wire` ve adresler (ders 33); I2C LCD (ders 32)\n- Buton ve kenar algılama (ders 8)\n- DHT22 ile sıcaklık ve nem okumak (Modül 4, ders 46)\n- `String` ve SRAM sınırı (ders 34)\n- SPI'ya ilk giriş (ders 63)\n\n### Kavram haritası\n- **Zaman:** `millis()` → RTC → `DateTime` → `adjust` ve `lostPower` → alarm\n- **Depolama:** EEPROM (1 KB) → SD kart → SPI (SCK, MOSI, MISO, CS) → 8.3 ad → `close` ve `flush`\n- **Veri biçimi:** CSV → zaman damgası (ISO 8601) → satır fonksiyonu → `NaN` ve boş alan → ondalık ayırıcı\n- **Haberleşme:** UART (baud) → I2C (adres, SDA/SCL) → SPI (CS) → bit süresi ve aktarım süresi\n- **Proje:** RTC saniyesine bağlı kayıt → tekrar önleme bayrağı → butonla aç/kapat → hataya dayanıklı satır\n\n### Sık yapılan hatalar\n- **`adjust(__DATE__, __TIME__)` satırını koşulsuz bırakmak.** Her açılışta saat derleme anına döner; yalnız `lostPower()` doğruysa ayarla.\n- **MPU6050 ile RTC'yi aynı I2C hattına bağlamak.** İkisi de 0x68 kullanır.\n- **`close()` ya da `flush()` çağırmamak.** Gerçek cihazda son satırlar kaybolur.\n- **Dosya adını 8.3 kuralının dışında seçmek.** `sicaklik_kaydi.csv` gibi ad açılamaz.\n- **Ay ve günü iki haneli yazmamak.** Metin sıralaması zaman sırasını bozar.\n- **Ondalık virgül ve ayraç virgülü birlikte kullanmak.** `23,5` iki sütuna bölünür.\n- **Baud hızlarını farklı seçmek.** Karşı taraf anlamsız karakterler görür.\n- **Aynı saniyede satırı birden çok kez yazmak.** `u != sonKayit` bayrağı gerekir.\n- **`delay(10000)` ile kayıt aralığını beklemek.** Buton ve ekran donar.\n- **D11, D12, D13 pinlerine LED bağlayıp SD kartı da kullanmak.** Bu pinler SPI hatlarıdır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Kendi cümlelerinle cevapla: \"Veri kaydedicide neden `millis()` yerine RTC kullanıyoruz?\"\n4. 5 saniyelik aralıkla bir günde kaç satır yazılır? 60 saniyelik aralıkla bir haftada kaç? Hesapla ve dosya boyutunu tahmin et.\n5. Aynı anda RTC, LCD ve SD kullanan bir devrede hangi pinlerin hangi protokole ait olduğunu bir tabloya çiz.\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Sıcaklık ve nem veri kaydedici)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | RTC ya da LCD tepki vermiyor, SDA/SCL karışık | DHT22, RTC, LCD ve buton doğru pinlerde, RTC (0x68) ve LCD (0x27) çakışmıyor | Bağlantılar düzenli, adresler ve pin tablosu açıklanmış |\n| Kayıt biçimi | Satırlar bozuk ya da sütun sayısı tutmuyor | Başlık + zaman damgalı, iki haneli, 3 sütunlu CSV satırları | NaN durumunda boş alan yazılıyor ve denenmiş |\n| Zamanlama | `delay` kullanıyor ya da aynı saniyede çok satır yazıyor | Satırlar 10 saniyelik tam adımlarla, tekrarsız çıkıyor | Aralığı değiştirip etkisini açıklıyor |\n| Kontrol | Buton kaydı güvenilir biçimde durduramıyor | Buton kaydı aç/kapat yapıyor, ekranda durum görünüyor | Sıçrama ve kenar algılamayı açıklıyor, ek uyarı (örneğin buzzer) ekliyor |\n| Anlatım | Ne yaptığını anlatamıyor | Veri akışını (sensör → satır → kayıt) adım adım anlatıyor | Hata yapıp nasıl bulduğunu ve SD sürümünün farkını anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta öğrenci, ölçümün \"bir an\"dan çıkıp zamana bağlı bir veri kümesine dönüşmesini görür. Önemli olan mükemmel bir kayıt cihazı değil, verinin neden zaman damgasına ve düzenli bir biçime ihtiyaç duyduğunu anlamasıdır.\n- **SD kart.** Sanal laboratuvarda SD kart modülü yoktur; ikinci ders ve projenin SD sürümü okuma ve derleme çalışmasıdır. Gerçek bir kartla yapılacaksa FAT32 biçimli kart ve 3,3 V uyumlu bir modül gerekir.\n- **Nasıl destek olunur?** Takılınca cevabı söylemek yerine sor: \"Bu satırın kaç sütunu var?\", \"Saat hangi anda kuruldu?\", \"Aynı saniyede kaç kez yazıyor?\"\n- **Süre.** Dersleri aralıklı çalışmak kalıcılığı artırır. Protokol dersi (4. gün) sayı hesabı içerir; gerekirse hesap makinesi kullanılabilir.\n- **Güvenlik.** Şebeke gerilimiyle (220 V) hiçbir devre kurulmaz. Gerçek devrede kartı çıkarmadan önce dosyanın kapalı olması gerekir.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can connect the RTC module over I2C, read the date and time with `rtc.now()`, set them with `rtc.adjust()` and write a simple alarm.\n2. Can explain how the SD card is connected over SPI, the 8.3 file name rule and how data is written to the card with `close()`/`flush()`.\n3. Can write a function, independent of the hardware, that produces a timestamped CSV row; can explain the clash between the decimal comma and the column separator.\n4. Can compare the UART, I2C and SPI protocols in terms of the number of lines, speed and how a device is chosen; can work out the transfer time from the number of bits.\n5. Can build a temperature and humidity data logger that combines the RTC, the DHT22, the LCD and a button.\n\n### Plan for the week\nThe week has five lessons; the lessons take 25-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | RTC: time, date, alarm | ~25 min | Read the explainer, set up the RTC, read the time, set it to midnight with `adjust`, try the alarm, do the mini quiz. |\n| 2 | SD card (SPI): writing to a file | ~25 min | There is no SD in the lab: read the circuit from the table, write and compile the code, answer the \"Try it\" questions on paper. |\n| 3 | Data logging: CSV and timestamps | ~30 min | Try the row function with fixed values, produce live rows with the RTC + DHT22. |\n| 4 | Communication protocols: comparing UART, I2C and SPI | ~30 min | Run the three measurement programs, compare the tables with your own calculations. |\n| 5 | Project: Temperature and humidity data logger | ~35 min | Write the plan in a table, build the circuit, run the logger, assess it with the rubric. |\n\n### Prerequisite check\nThis week needs the following. Go back to the lesson for anything that is missing:\n- Non-blocking timing with `millis()` (Module 3, lesson 27)\n- I2C, `Wire` and addresses (lesson 33); the I2C LCD (lesson 32)\n- The button and edge detection (lesson 8)\n- Reading temperature and humidity with the DHT22 (Module 4, lesson 46)\n- `String` and the SRAM limit (lesson 34)\n- A first introduction to SPI (lesson 63)\n\n### Concept map\n- **Time:** `millis()` → RTC → `DateTime` → `adjust` and `lostPower` → alarm\n- **Storage:** EEPROM (1 KB) → SD card → SPI (SCK, MOSI, MISO, CS) → 8.3 name → `close` and `flush`\n- **Data format:** CSV → timestamp (ISO 8601) → row function → `NaN` and an empty field → decimal separator\n- **Communication:** UART (baud) → I2C (address, SDA/SCL) → SPI (CS) → bit time and transfer time\n- **Project:** logging linked to the RTC's seconds → repeat-stopping flag → on/off with a button → error-proof row\n\n### Common mistakes\n- **Leaving the `adjust(__DATE__, __TIME__)` line without a condition.** At every start-up the time goes back to the moment of compiling; only set it if `lostPower()` is true.\n- **Connecting the MPU6050 and the RTC to the same I2C line.** Both use 0x68.\n- **Not calling `close()` or `flush()`.** On a real device the last lines are lost.\n- **Choosing a file name outside the 8.3 rule.** A name such as `sicaklik_kaydi.csv` cannot be opened.\n- **Not writing the month and day with two digits.** Text order breaks time order.\n- **Using a decimal comma and a comma separator together.** `23,5` is split into two columns.\n- **Choosing different baud rates.** The other side sees meaningless characters.\n- **Writing the row more than once in the same second.** The `u != sonKayit` flag is needed.\n- **Waiting for the logging interval with `delay(10000)`.** The button and the screen freeze.\n- **Connecting LEDs to pins D11, D12, D13 and using the SD card as well.** These pins are the SPI lines.\n\n### End-of-week review\n1. Look at each lesson's concept cards and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the mini quiz questions you got wrong, then solve the question again.\n3. Answer in your own words: \"Why do we use an RTC instead of `millis()` in the data logger?\"\n4. How many rows are written in a day with a 5-second interval? How many in a week with a 60-second interval? Work it out and estimate the file size.\n5. In a circuit that uses the RTC, the LCD and SD at the same time, draw a table of which pins belong to which protocol.\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions per lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Temperature and humidity data logger)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The RTC or the LCD does not respond, SDA/SCL mixed up | DHT22, RTC, LCD and button on the right pins; the RTC (0x68) and the LCD (0x27) do not clash | Tidy connections; the addresses and the pin table are explained |\n| Log format | The rows are broken or the number of columns does not match | A header + timestamped, two-digit, 3-column CSV rows | An empty field is written for NaN, and this has been tested |\n| Timing | Uses `delay`, or writes many rows in the same second | The rows come out in exact 10-second steps, without repeats | Changes the interval and explains the effect |\n| Control | The button cannot reliably stop logging | The button switches logging on/off, and the state shows on the screen | Explains debouncing and edge detection; adds an extra warning (for example a buzzer) |\n| Explanation | Cannot explain what they did | Explains the data flow (sensor → row → log) step by step | Explains a mistake they made and how they found it, and the difference of the SD version |\n\n### Note for parents and teachers\n- **Aim.** This week the learner sees a measurement turn from \"a moment\" into a set of data linked to time. What matters is not a perfect logger, but understanding why data needs a timestamp and a tidy format.\n- **SD card.** There is no SD card module in the virtual lab; the second lesson and the SD version of the project are reading and compiling exercises. If it is done with a real card, a FAT32-formatted card and a 3.3 V-compatible module are needed.\n- **How to help.** When they get stuck, ask instead of giving the answer: \"How many columns does this row have?\", \"At what moment was the clock set?\", \"How many times is it writing in the same second?\"\n- **Time.** Spacing the lessons out helps the learning stick. The protocol lesson (day 4) involves calculations with numbers; a calculator can be used if needed.\n- **Safety.** No circuit is ever built with mains voltage (220 V). In a real circuit the file must be closed before the card is removed.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "RTC: saat, tarih, alarm",
@@ -3777,7 +7350,134 @@ export const modul4: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "RTC: time, date, alarm",
+            "problem": "`millis()` starts counting from zero when the board switches on, and forgets everything when you pull the plug. You cannot use it to answer the question \"what time did the temperature rise last night?\". You need a clock that knows the date and time and keeps running even when unplugged, like a wall clock. This job is done by an **RTC** (Real Time Clock) module. In this lesson you will connect it to the Arduino in the lab, read the time, set it and write your own alarm.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| RTC | SDA → Uno **A4**, SCL → Uno **A5**, VCC → **5V**, GND → **GND** |\n| Resistor (330 Ω from the properties panel) + LED | Uno **D13** → resistor **1**; resistor **2** → LED **A**; LED **K** → **GND** (alarm program only) |\n| Buzzer (Type: Passive) | **+** → Uno **D8**; **-** → **GND** (alarm program only) |\n\nThe RTC module talks over I2C (lesson 33) and its address is **0x68**. In the lab we connect the RTC to 5V; the supply range of real modules changes from model to model, so check the datasheet of the module you use.\n\n**For information:** A real module has a **backup battery holder**. When the main power is cut, this battery keeps the clock running; if there is no battery, or it is flat, the time is forgotten when the power is cut and has to be set again. The lab does not model the battery or power cuts: every time you press ▶ (or after ↺ Reset), the RTC starts from **2026-01-01 00:00:00** and `rtc.lostPower()` always returns `false`. You set the clock to any value you want with `rtc.adjust()` (below).\n\nWatch out: the MPU6050 acceleration sensor also uses address 0x68 by default. If you connect both to the same I2C line, they clash. (If the MPU6050's AD0 pin is connected to 5V, its address becomes 0x69 and the clash ends; in the lab, the part's \"I2C address\" property lets you choose this.) In this course we will not use the MPU6050 and the RTC in the same circuit.\n\n### Program: read the time\nWe use **RTClib** as the library. For the DS3231, the class name is `RTC_DS3231`.\n\n```cpp\n// sketch: rtc_saat\n#include <Wire.h>\n#include <RTClib.h>\n\nRTC_DS3231 rtc;\nunsigned long sonOkuma = 0;\n\nvoid iki(int n) {                     // 5 -> \"05\"\n  if (n < 10) Serial.print('0');\n  Serial.print(n);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!rtc.begin()) {                 // modül I2C hattında yoksa false\n    Serial.println(\"RTC bulunamadi\");\n    while (true) {}\n  }\n  if (rtc.lostPower()) {              // saat durmuşsa (pil bitti, hiç kurulmadı)\n    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));\n  }\n}\n\nvoid loop() {\n  if (millis() - sonOkuma >= 1000) {\n    sonOkuma = millis();\n    DateTime t = rtc.now();\n    Serial.print(t.year()); Serial.print('-'); iki(t.month()); Serial.print('-'); iki(t.day());\n    Serial.print(' ');\n    iki(t.hour()); Serial.print(':'); iki(t.minute()); Serial.print(':'); iki(t.second());\n    Serial.println();\n  }\n}\n```\n\n`rtc.now()` gives the current time as a `DateTime` object. You get its parts with `year()`, `month()`, `day()`, `hour()`, `minute()`, `second()`. The `iki()` (two) function, which puts a 0 in front of single-digit numbers, prints \"08:05:03\" instead of \"8:5:3\".\n\n`rtc.lostPower()` reads a flag kept by the chip: if the oscillator stopped, the flag is raised. Then we set the time with `DateTime(F(__DATE__), F(__TIME__))`. `__DATE__` and `__TIME__` are the date and time of the moment you **compiled** the program. On a real board, uploading takes a few seconds, so the time that is set is that much behind. In the lab `lostPower()` is always `false`, so this line does not run; the clock starts from 2026-01-01 00:00:00, and your output runs `2026-01-01 00:00:01`, `2026-01-01 00:00:02` ...\n\n### Program: set the time yourself\nYou set the clock to any value you want with `rtc.adjust()`. The program below first reads the time, then sets it to 5 seconds before midnight, then reads it again. You also see the change of day and the day of the week.\n\n```cpp\n// sketch: rtc_ayarla\n#include <Wire.h>\n#include <RTClib.h>\n\nRTC_DS3231 rtc;\nconst char* GUNLER[] = {\"Pazar\", \"Pazartesi\", \"Sali\", \"Carsamba\", \"Persembe\", \"Cuma\", \"Cumartesi\"};\nunsigned long sonOkuma = 0;\n\nvoid iki(int n) {\n  if (n < 10) Serial.print('0');\n  Serial.print(n);\n}\n\nvoid yaz(DateTime t) {\n  Serial.print(t.year()); Serial.print('-'); iki(t.month()); Serial.print('-'); iki(t.day());\n  Serial.print(' ');\n  iki(t.hour()); Serial.print(':'); iki(t.minute()); Serial.print(':'); iki(t.second());\n  Serial.print(' ');\n  Serial.println(GUNLER[t.dayOfTheWeek()]);   // 0 = Pazar\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n\n  Serial.print(\"Once:  \");\n  yaz(rtc.now());\n\n  rtc.adjust(DateTime(2026, 3, 14, 23, 59, 55));   // yıl, ay, gün, saat, dakika, saniye\n\n  Serial.print(\"Sonra: \");\n  yaz(rtc.now());\n}\n\nvoid loop() {\n  if (millis() - sonOkuma >= 1000) {\n    sonOkuma = millis();\n    yaz(rtc.now());\n  }\n}\n```\n\nThe start of the output looks like this: on the `Once:` (before) line you see the RTC's old value (in the lab `2026-01-01 00:00:00 Persembe`, Thursday), and on the `Sonra:` (after) line `2026-03-14 23:59:55 Cumartesi` (Saturday). A few seconds later the time goes from 23:59:59 to `2026-03-15 00:00:00`, and the day name becomes Pazar (Sunday). The RTC knows the calendar too: at the end of a month it changes the day by itself. It does not know about summer time or time zones; it only counts the numbers you give it.\n\n### Program: our own alarm\nSome RTC chips have a hardware alarm, but the DS1307 does not. We choose a way that works on both chips: read the time at regular intervals and compare it with the alarm time. We do the reading every quarter of a second with `millis()` (lesson 27); there is no `delay`, so `loop()` can look after other jobs too.\n\n```cpp\n// sketch: rtc_alarm\n#include <Wire.h>\n#include <RTClib.h>\n\nconst int LED = 13;\nconst int BUZZER = 8;\nconst int ALARM_SAAT = 7;\nconst int ALARM_DAKIKA = 30;\nconst unsigned long KONTROL_ARALIGI = 250;   // ms: RTC'ye çeyrek saniyede bir bak\nconst unsigned long ALARM_SURESI = 5000;     // ms: alarm 5 saniye çalsın\n\nRTC_DS3231 rtc;\nunsigned long sonKontrol = 0;\nunsigned long alarmBasla = 0;\nbool alarmCaliyor = false;\nint sonTetikGunu = -1;                       // alarmın son çaldığı ayın günü\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  Serial.begin(9600);\n  rtc.begin();\n  rtc.adjust(DateTime(2026, 3, 14, 7, 29, 55));   // gösteri için: alarmdan 5 sn önce\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - sonKontrol >= KONTROL_ARALIGI) {\n    sonKontrol = simdi;\n    DateTime t = rtc.now();\n    bool saatGeldi = (t.hour() == ALARM_SAAT && t.minute() == ALARM_DAKIKA);\n    if (saatGeldi && !alarmCaliyor && t.day() != sonTetikGunu) {\n      sonTetikGunu = t.day();\n      alarmCaliyor = true;\n      alarmBasla = simdi;\n      digitalWrite(LED, HIGH);\n      tone(BUZZER, 1000);\n      Serial.println(\"ALARM 07:30\");\n    }\n  }\n\n  if (alarmCaliyor && simdi - alarmBasla >= ALARM_SURESI) {\n    alarmCaliyor = false;\n    digitalWrite(LED, LOW);\n    noTone(BUZZER);\n  }\n}\n```\n\nWhen the program starts, it sets the clock to 07:29:55, so the alarm goes off 5 seconds later: the LED lights, a 1000 Hz tone starts on the buzzer pin (D8), and the Serial monitor shows `ALARM 07:30`. In a real alarm you would delete the `rtc.adjust` line inside `setup()`.\n\n### The difference from the DS1307\nThere are two common RTC chips on the market. Both use address **0x68** on I2C and are read in the same way with RTClib. The RTC part in the lab is a single type; you can also run DS1307 code with this part.\n\n| | DS3231 | DS1307 |\n|---|---|---|\n| RTClib class | `RTC_DS3231` | `RTC_DS1307` |\n| Clock crystal | Inside the chip, corrects itself for temperature (temperature-compensated) | A crystal fitted outside; affected by temperature |\n| Accuracy | Usually clearly better than the DS1307; check the datasheet for the exact value | Drifts more |\n| Alarm | Has a hardware alarm | None |\n| \"Has the clock stopped?\" | `lostPower()` | `isrunning()` |\n\nTo switch to the DS1307, you only change the class name and this check in the code:\n\n```cpp\n// sketch: rtc_ds1307\n#include <Wire.h>\n#include <RTClib.h>\n\nRTC_DS1307 rtc;                              // tek fark: sınıf adı\nunsigned long sonOkuma = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n  if (!rtc.isrunning()) {                    // DS1307'de \"saat çalışıyor mu?\" kontrolü\n    rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));\n  }\n}\n\nvoid loop() {\n  if (millis() - sonOkuma >= 1000) {\n    sonOkuma = millis();\n    Serial.println(rtc.now().timestamp());   // ISO 8601: 2026-03-14T08:30:01\n  }\n}\n```\n\n`timestamp()` gives the time as a single piece of text: year-month-dayThour:minute:second. You will see why this format is good in lesson 68.\n\n### How does it work?\n1. The RTC chip counts the seconds with its own crystal and keeps the date. The Arduino just asks it over I2C.\n2. `rtc.now()` reads the chip's registers and gives you a `DateTime`. Every call causes I2C traffic, so looking a few times a second inside `loop()` is enough.\n3. `rtc.adjust()` changes the chip's time. Thanks to the battery, the chip keeps this value even when the power is cut.\n4. The alarm is a comparison of the time read from the RTC with the target time. `sonTetikGunu` (day of last trigger) stops the alarm from going off again and again during the same minute, and lets it go off again the next day.\n\n### Try it\n- In the `rtc_ayarla` program, set the date to `DateTime(2027, 2, 28, 23, 59, 55)`. After midnight, what date and day name come out? Why? (2027 is not a leap year.)\n- In the `rtc_alarm` program, reduce the alarm time to 2 seconds, then change the alarm so that it only goes off on weekdays (Monday-Friday). Hint: `t.dayOfTheWeek()` must be between 1 and 5.\n- Run the `rtc_saat` program, wait 10 seconds, stop it with ■ and press ▶ again. Where does the clock start from? On a real module, what would the result be with the backup battery fitted, and without it?\n\n### Common mistakes\n- Putting the line `rtc.adjust(DateTime(F(__DATE__), F(__TIME__)))` in `setup()` without a condition: every time the board switches on, the time goes back to the moment of compiling. Only set it if `lostPower()` is true.\n- Connecting the MPU6050 and the RTC on the same line: both use 0x68.\n- Trying to keep the time with `millis()` and thinking the RTC is unnecessary: `millis()` resets when the power is cut; the RTC keeps going.\n- Writing the alarm with a `t.second() == 0` check and reading the RTC rarely: you miss that second. Keep the reading interval shorter than 1 second and use a \"has it gone off today?\" flag.\n- Connecting SDA and SCL the wrong way round, or leaving VCC/GND unconnected: the program prints \"RTC bulunamadi\" (RTC not found).",
+            "question": "If you made a school bell or a medicine reminder, would you link the alarm to the Arduino's `millis()` clock or to the RTC? What does each of them do when the power goes off and comes back?",
+            "explainerMd": "### What you will learn in this lesson\n- The difference between `millis()` and an RTC: one resets when the power is cut, the other keeps real time\n- How to connect the RTC module over I2C (SDA A4, SCL A5, address 0x68)\n- How to read the date and time with `rtc.now()` and set them with `rtc.adjust()`\n- How to write a non-blocking alarm with `millis()`\n\n### What you should know first\n- Lesson 27: non-blocking timing with `millis()`\n- Lesson 33: I2C, `Wire` and device addresses\n- Lesson 9: printing to the Serial Monitor\n\n### Why a separate clock?\n`millis()` starts counting from zero when the board switches on and forgets everything when the board switches off. You cannot answer the question \"what time was it last night?\" with it. An **RTC** (Real Time Clock) is a separate chip that counts seconds with its own crystal and knows the calendar. The Arduino just asks it.\n\n### Connecting over I2C\nThe RTC module uses two data lines: SDA and SCL. On the Uno these are A4 and A5. The module's address is **0x68**. There can be other devices on the same line too, but their addresses must be different. Because the MPU6050 also uses 0x68 by default, we do not connect the two to the same line.\n\n### Reading and setting the time\nThe library (RTClib) gives the time as a **DateTime** object:\n\n```\nDateTime t = rtc.now();\nSerial.println(t.hour());      // 0-23\nSerial.println(t.minute());    // 0-59\n```\n\nThere are also `year()`, `month()`, `day()`, `second()` and `dayOfTheWeek()`, which gives the day of the week (0 = Sunday). These functions return numbers and do not add a leading zero: for 5 March, `month()` gives 3, not \"03\". You add the leading zero yourself.\n\nTo set the time, you write `rtc.adjust(DateTime(2026, 3, 14, 23, 59, 55))` (year, month, day, hour, minute, second). The RTC knows the calendar itself: it handles the change of month and year properly. It does not know about summer time or time zones; it only counts the numbers you give it.\n\n`rtc.lostPower()` tells you whether the clock has stopped. If you set the time at every start-up, the time goes back to that moment every time the device restarts. That is why `adjust` is only called if `lostPower()` is true. On a real module, when the main power is cut, a backup battery keeps the clock running. The lab does not model the battery or power cuts; at every ▶ the clock starts from 2026-01-01 00:00:00.\n\n### Alarm = comparison\nAn alarm is a comparison of the time read from the RTC with the target time. You do the reading every quarter of a second with `millis()`, so that `loop()` can look after other jobs too. To stop the alarm starting again and again during the same minute, you keep \"has it gone off today?\" in a variable.\n\n### Summary\nAn RTC is an I2C device that keeps real time even if the plug is pulled. `rtc.now()` reads it and `rtc.adjust()` sets it; `adjust` is not called at every start-up, only when the time has been lost. An alarm is nothing more than comparing the time with a target. Two devices on the same I2C line cannot have the same address.",
+            "concepts": [
+              {
+                "term": "RTC (real time clock)",
+                "definition": "A separate chip that counts seconds with its own crystal and keeps the date; the Arduino asks it over I2C.",
+                "example": "Your data logger writes a real time such as \"2026-03-14 08:30:10\" next to each measurement.",
+                "pitfall": "Trying to keep the time with millis(); millis() resets when the power is cut, the RTC keeps going."
+              },
+              {
+                "term": "DateTime and rtc.now()",
+                "definition": "rtc.now() gives the current time as a DateTime object; you get its parts with year(), month(), day(), hour(), minute(), second().",
+                "example": "t.hour() returns 7; to show 07 on the screen, you add the leading zero yourself.",
+                "pitfall": "Thinking month() comes back with two digits; for month 3 it returns 3, not \"03\"."
+              },
+              {
+                "term": "rtc.adjust() and lostPower()",
+                "definition": "adjust() sets the time; lostPower() tells you whether the clock has stopped.",
+                "example": "if (rtc.lostPower()) { rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); } sets the time only when needed.",
+                "pitfall": "Putting the adjust(__DATE__, __TIME__) line in setup() without a condition; every time the board switches on, the time goes back to the moment of compiling."
+              },
+              {
+                "term": "I2C address 0x68",
+                "definition": "The RTC module's name on the I2C line; there cannot be two devices with the same address on the line.",
+                "example": "The RTC (0x68) and an I2C LCD (0x27) can share the same SDA and SCL wires.",
+                "pitfall": "Connecting the MPU6050 and the RTC on the same line; both use 0x68 and they clash."
+              },
+              {
+                "term": "Backup battery",
+                "definition": "A small battery in a real RTC module that keeps the clock running when the main power is cut.",
+                "example": "With the battery fitted, if you unplug it and plug it back in an hour later, the time has moved on correctly.",
+                "pitfall": "Thinking the time stays right when the battery is flat; when the power is cut, the time is forgotten and has to be set again."
+              },
+              {
+                "term": "Stopping repeats with a flag",
+                "definition": "The alarm condition stays true for a whole minute; a \"has it gone off today?\" variable makes the alarm go off once.",
+                "example": "The sonTetikGunu variable keeps the day of the month on which the alarm last went off.",
+                "pitfall": "Without a flag, restarting the alarm over and over during 07:30."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h7d66-q1",
+                "kind": "mcq",
+                "prompt": "Why is an RTC used instead of millis() so that a device can answer the question \"what time was it yesterday?\" even days later?",
+                "options": [
+                  "millis() starts from zero when the board switches on and is forgotten when the power is cut; the RTC keeps the real date and time",
+                  "millis() counts too slowly",
+                  "The RTC always measures more precisely",
+                  "millis() only counts seconds"
+                ],
+                "answer": 0,
+                "explanation": "millis() counts the time since the board switched on and resets at every restart. The RTC is a separate chip; it keeps the real date and time. Precision is not the real difference: millis() counts milliseconds, and there is no speed problem.",
+                "skills": [
+                  "rtc-time"
+                ]
+              },
+              {
+                "id": "m4h7d66-q2",
+                "kind": "predict-output",
+                "prompt": "An RTC is fitted. What appears on the Serial monitor when this code runs?\n\n```\nrtc.adjust(DateTime(2026, 12, 31, 23, 59, 58));\ndelay(3000);\nDateTime t = rtc.now();\nSerial.print(t.year());  Serial.print('-');\nSerial.print(t.month()); Serial.print('-');\nSerial.println(t.day());\n```",
+                "options": [
+                  "2026-12-31",
+                  "2027-01-01",
+                  "2027-1-1",
+                  "2026-12-34"
+                ],
+                "answer": 2,
+                "explanation": "3 seconds after 23:59:58 the time is 00:00:01, and the year moves to 2027 and the date to 1 January. The RTC knows the calendar itself, so a value such as 2026-12-34 never comes out. month() and day() return numbers and do not add a leading zero; the output is 2027-1-1. To print 2027-01-01 you need two-digit formatting.",
+                "skills": [
+                  "rtc-time",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d66-q3",
+                "kind": "find-bug",
+                "prompt": "Every time this program restarts, the time goes back to the moment the program was compiled. Which line is wrong?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));\n}\n```",
+                "options": [
+                  "The Serial.begin(9600); line",
+                  "The rtc.begin(); line",
+                  "The rtc.adjust(...) line, because it runs without a condition; it should only be called if rtc.lostPower() is true",
+                  "The void setup() line"
+                ],
+                "answer": 2,
+                "explanation": "Because the adjust line has no condition, every time the board switches on it pulls the time back to the moment of compiling; the RTC's job of keeping the time when the power is cut is wasted. The fix: if (rtc.lostPower()) { ... }. Serial.begin and rtc.begin do not change the time value.",
+                "skills": [
+                  "rtc-time",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d66-q4",
+                "kind": "numeric",
+                "prompt": "The alarm program sets the clock to 07:29:55. The alarm goes off at 07:30 and ALARM_SURESI lasts 5000 ms. About how many seconds after the program starts does the LED go off?",
+                "answer": 10,
+                "tolerance": 1,
+                "unit": "seconds",
+                "explanation": "There are 5 seconds to go until the alarm time (from 07:29:55 to 07:30:00). After it goes off, it stays lit for 5000 ms, that is 5 seconds. In total about 5 + 5 = 10 seconds. The real start of the alarm can be late by up to the quarter-second check interval; that is why there is a small margin.",
+                "skills": [
+                  "rtc-time",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h7d66-q5",
+                "kind": "mcq",
+                "prompt": "The same circuit has an RTC (DS3231) and an MPU6050, both at their default addresses. What happens?",
+                "options": [
+                  "No problem; I2C tells each device apart automatically",
+                  "Only the RTC works, the MPU6050 breaks",
+                  "The speed drops to 400 kHz",
+                  "They clash because both use 0x68"
+                ],
+                "answer": 3,
+                "explanation": "On I2C, devices are chosen by address. If both use 0x68, there is no telling which one will answer. The fix: as in this course, do not use the two in the same circuit, or change the MPU6050's address (0x69 with the AD0 pin).",
+                "skills": [
+                  "rtc-time",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "SD kart (SPI): dosyaya yazma",
@@ -3903,7 +7603,132 @@ export const modul4: ModuleContent = {
                 "sd-storage"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "SD card (SPI): writing to a file",
+            "problem": "Imagine you put a temperature meter in a garden and it stays there for three days. There is no computer and no Serial Monitor. Where will you write the measurements? EEPROM is only 1 KB (lesson 34); it fills up after a few hundred measurements. An SD card, however, gives you gigabytes of space, and you open the file on it directly on a computer. In this lesson you will learn how the Arduino writes a file to an SD card.",
+            "contentMd": "### Circuit\n**Lab note:** The lab has no SD card module part. In this lesson you write and compile the SD code; you cannot see a file actually being written to the card. In the lab, `SD.begin` gets stuck when it cannot find a card (on a real card it returns `false`). That is why, when you try the program, you print a progress message to the Serial monitor before `SD.begin`: if you see the message, the program has started but is waiting at `SD.begin`.\n\nSo there is no circuit to build in this lesson; you will not see an SD card in the **Add part** menu. The table below is information showing how the code would be connected to a real module (the pin names are the Uno's):\n\n| SD card module pin | Uno pin |\n|---|---|\n| CS | **D10** |\n| MOSI | **D11** |\n| MISO | **D12** |\n| SCK | **D13** |\n| VCC | **5V** (check the module's documentation) |\n| GND | **GND** |\n\n**Important:** The SD card talks over SPI. On the Uno, the SPI pins are fixed: D11, D12, D13 and (in this lesson) D10 for CS. These pins are also used by Module 4's standard LEDs (D13/D12/D11) and the HC-SR04's ECHO (D10). In a circuit with an SD card, do not connect these parts to the same pins.\n\n**For information:** SD cards work with 3.3 V logic. Most ready-made modules on the market have a voltage regulator and a level shifter, but you must check in the module's documentation that it is suitable for 5 V; a bare card slot is never connected directly to the Arduino's 5 V.\n\n### SPI in short\nSPI (you used it with the RC522 in lesson 63) has four lines:\n- **SCK:** the clock. The Arduino makes one pulse for each bit.\n- **MOSI:** data going from the Arduino to the card.\n- **MISO:** data coming from the card to the Arduino.\n- **CS:** the \"select\" line. There can be several devices on the line; the device whose CS is LOW listens.\n\nYou will measure their speed and how they differ from other protocols in lesson 69.\n\n### Card format: FAT and the 8.3 file name\nThe Arduino's `SD.h` library needs a card formatted as FAT16 or FAT32. Large cards may have been formatted differently on a computer; when using a real card, make sure it is FAT32. According to the library's documentation, file names must be in **8.3** form: at most 8 characters, a dot, and an extension of at most 3 characters. `VERI.CSV` and `LOG0001.TXT` are valid; `sicaklik_kaydi.csv` is too long, so do not use it. Do not use Turkish characters or spaces either.\n\n### Program: write to a file\nYou can paste the code into the editor in the lab and press ▶. Because there is no card, it waits at `SD.begin`; you only see the first message.\n\n```cpp\n// sketch: sd_yaz\n#include <SPI.h>\n#include <SD.h>\n\nconst int SD_CS = 10;\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.print(\"SD kart baslatiliyor... \");\n  if (!SD.begin(SD_CS)) {\n    Serial.println(\"HATA: kart yok ya da baglanti yanlis\");\n    while (true) {}\n  }\n  Serial.println(\"tamam\");\n\n  File dosya = SD.open(\"TEST.TXT\", FILE_WRITE);   // yoksa oluşturur, varsa sonuna ekler\n  if (dosya) {\n    dosya.println(\"Merhaba SD kart\");\n    dosya.println(millis());\n    dosya.close();                                // işin bitince mutlaka kapat\n    Serial.println(\"Yazildi\");\n  } else {\n    Serial.println(\"HATA: dosya acilamadi\");\n  }\n}\n\nvoid loop() {\n}\n```\n\n`SD.begin(10)` starts the card and returns `false` if it fails. This happens if no card is inserted, if the wiring is wrong or if the CS pin is different. `SD.open(\"TEST.TXT\", FILE_WRITE)` opens the file for writing. If the file does not exist, it is created; if it does, writing is **added to the end** and the old contents are not deleted. A `File` object comes back, and you write with `println` just as with `Serial.println`.\n\n### Program: read the file back\n```cpp\n// sketch: sd_oku\n#include <SPI.h>\n#include <SD.h>\n\nconst int SD_CS = 10;\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!SD.begin(SD_CS)) {\n    Serial.println(\"HATA: SD kart baslatilamadi\");\n    while (true) {}\n  }\n\n  File dosya = SD.open(\"TEST.TXT\");               // yalnız okumak için aç\n  if (!dosya) {\n    Serial.println(\"TEST.TXT bulunamadi\");\n    return;\n  }\n  while (dosya.available()) {                     // okunacak bayt kaldıkça\n    Serial.write(dosya.read());\n  }\n  dosya.close();\n}\n\nvoid loop() {\n}\n```\n\n### Closing and flush: where does the data go?\nWhen you say `dosya.println(...)`, the data may not go to the card straight away. The library first collects what you write in a small buffer in the Arduino's RAM. According to the Arduino documentation, the data is physically written to the card with **`close()` or `flush()`**. So:\n\n- When you are done, call `dosya.close()`.\n- If you are going to keep the file open for a long time, call `dosya.flush()` after every write.\n- **On a real device, the file must be closed (or last flushed) before you remove the card or cut the power.** If the card is removed without closing the file, the last lines can be lost or the file can be corrupted. The lab does not model removing the card or cutting the power.\n\nThe program below opens the file once, writes a line every second and calls `flush()` after every write.\n\n```cpp\n// sketch: sd_flush\n#include <SPI.h>\n#include <SD.h>\n\nconst int SD_CS = 10;\nconst unsigned long ARALIK = 1000;                // ms\n\nFile dosya;\nunsigned long sonYazma = 0;\nint sayac = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  if (!SD.begin(SD_CS)) {\n    Serial.println(\"HATA: SD kart baslatilamadi\");\n    while (true) {}\n  }\n  dosya = SD.open(\"SAYAC.TXT\", FILE_WRITE);\n  if (!dosya) {\n    Serial.println(\"HATA: dosya acilamadi\");\n    while (true) {}\n  }\n}\n\nvoid loop() {\n  if (millis() - sonYazma >= ARALIK) {\n    sonYazma = millis();\n    sayac++;\n    dosya.print(\"satir \");\n    dosya.println(sayac);\n    dosya.flush();                                // veriyi karta gönder, dosya açık kalsın\n    Serial.println(sayac);\n  }\n}\n```\n\nThe difference between the two methods: **open-write-close** opens the file again each time, so after every write the file is closed and it is in the safest state if the power is cut. **Keep open and flush** opens the file once. Both work; in lesson 68 you will use the first, because it is safe and simple.\n\n### How does it work?\n1. `SD.begin(10)` starts SPI and talks to the card. If it succeeds, it returns `true`.\n2. `SD.open(ad, FILE_WRITE)` (name) gives a `File` object. The `if (dosya)` check tells you whether it opened.\n3. `print` and `println` add text to the file. They write numbers as text too.\n4. `close()` and `flush()` send the data in the buffer to the card.\n5. When reading, `available()` checks whether there are bytes left to read, and `read()` gives one byte.\n\n### Try it\nThere is no SD in the lab; these tasks are exercises in reading and writing code.\n- If you ran the `sd_yaz` program twice, how many lines would there be in `TEST.TXT`? Does `FILE_WRITE` write the file from the start, or add to the end? Find the answer in the explanation above.\n- In the `sd_flush` program, if you commented out the `dosya.flush()` line and suddenly cut the power, which lines would be missing from the file? Why?\n- In the `sd_yaz` program, change the file name to `\"sicaklik_kaydi.csv\"`. According to the 8.3 rule, what does `SD.open` return with this name (does the file open)? Which line of the program catches this situation?\n- Run the `sd_yaz` program in the lab. Which text do you see on the Serial monitor, and which do you not see? Where is the program waiting?\n\n### Common mistakes\n- Removing the card or cutting the power without calling `close()` or `flush()` (on a real device): the last lines go missing or the file is corrupted.\n- Using a long file name, or one with Turkish characters: follow the 8.3 rule.\n- Writing the CS pin wrongly: `SD.begin(10)` must match the module's CS connection. Even if you make another pin CS, leave D10 as an output on the Uno; the Arduino SD documentation asks for this.\n- Leaving the card in a format other than FAT32: `SD.begin` can fail.\n- Forgetting the SD library's RAM use: in lesson 34 you saw that SRAM is only 2048 bytes. SD takes a serious share for its buffer; in lesson 70 you will see how much in the compile output.\n- Connecting LEDs to D13 and D11 and using SD at the same time: these pins are the SPI lines.",
+            "question": "Why is it risky to remove the SD card from a real device while the power is on? Why do you think it makes sense for real recording devices to have a \"safely remove card\" button or light?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a data logger needs an SD card instead of EEPROM\n- The four lines of SPI (SCK, MOSI, MISO, CS) and their pins on the Uno\n- The pattern for opening, writing and closing a file (`SD.open`, `println`, `close`)\n- The 8.3 file name rule and the difference between `close()` and `flush()`\n\n### What you should know first\n- Lesson 34: that EEPROM is only 1 KB and that SRAM is limited\n- Lesson 63: talking to a module (the RC522) over SPI\n- Lesson 66: real time with the RTC (for timestamps)\n\n### Why an SD card?\nSay you have a temperature logger that will run in the garden for three days. EEPROM is only 1 KB; it fills up after a few hundred measurements. An SD card gives you gigabytes of space, and you can take the card out and open it directly on a computer.\n\n### SPI: four lines\nThe SD card talks over **SPI**:\n- **SCK:** clock pulses. Made by the Arduino.\n- **MOSI:** data going from the Arduino to the card.\n- **MISO:** data coming from the card to the Arduino.\n- **CS:** the \"select\" line. The device whose CS is LOW listens.\n\nOn the Uno the SPI pins are fixed: SCK D13, MISO D12, MOSI D11. In this lesson we use D10 for CS. Do not connect LEDs to these pins and use SD at the same time. SD cards work with 3.3 V logic; a bare card slot is never connected directly to the Arduino's 5 V, so you check the ready-made module's documentation.\n\n### The file system and the 8.3 name\nThe library needs a card formatted as FAT16 or FAT32. File names must be in **8.3** form: at most 8 characters, a dot, and an extension of at most 3 characters. `VERI.CSV` is valid; `sicaklik_kaydi.csv` is too long.\n\n### The writing pattern\n\n```\nFile dosya = SD.open(\"VERI.CSV\", FILE_WRITE);\nif (dosya) {\n  dosya.println(\"23.5\");\n  dosya.close();\n}\n```\n\n`FILE_WRITE` opens the file **adding to the end**; the old contents are not deleted. If the file does not exist, it is created. If `SD.begin(10)` fails, it returns `false` (no card, wrong wiring, or a different CS). The `if (dosya)` check tells you whether the file really opened.\n\n### Where does the data go? close and flush\nWhen you say `println`, the data may not go to the card straight away; it first waits in a small buffer. The physical write to the card happens with `close()` or `flush()`. So there are two safe ways:\n1. **Open-write-close:** for every write, open the file, write and close. If the power is cut, the last state is safe.\n2. **Keep open and flush:** open the file once and call `flush()` after every write.\n\nOn a real device, the file must be closed (or last flushed) before you remove the card or cut the power. Otherwise the last lines can be lost.\n\n### Summary\nAn SD card gives large, lasting storage and talks over SPI. On the Uno the SPI pins are fixed (D11, D12, D13), and we use D10 for CS. The file name must be 8.3; `FILE_WRITE` adds to the end. The data is written to the card with `close()` or `flush()`.",
+            "concepts": [
+              {
+                "term": "SPI lines (SCK, MOSI, MISO, CS)",
+                "definition": "SPI works with four lines: the clock (SCK), data from the Arduino (MOSI), data from the device (MISO) and CS, which selects the device.",
+                "example": "On the Uno, SCK is D13, MISO D12, MOSI D11; in this lesson we connect the SD card's CS line to D10.",
+                "pitfall": "Connecting LEDs to the SPI pins D11-D13 and using an SD card at the same time."
+              },
+              {
+                "term": "SD.begin(CS)",
+                "definition": "Starts SPI and tries to talk to the card; returns true if it succeeds, false if not.",
+                "example": "if (!SD.begin(10)) { Serial.println(\"kart yok\"); } gives a warning if no card is found.",
+                "pitfall": "Writing a CS pin different from the module's real connection; begin returns false."
+              },
+              {
+                "term": "FILE_WRITE",
+                "definition": "Opens the file for writing; if the file does not exist, it creates it; if it does, it adds the text to the end.",
+                "example": "If you run the program twice, the second run's lines are added below the first run's.",
+                "pitfall": "Thinking FILE_WRITE writes the file from the start and deletes the old data."
+              },
+              {
+                "term": "8.3 file name",
+                "definition": "A name of at most 8 characters, a dot and an extension of at most 3 characters; Turkish characters and spaces are not used.",
+                "example": "VERI.CSV and LOG0001.TXT are valid names.",
+                "pitfall": "Using a long name such as sicaklik_kaydi.csv; the file does not open, and if (dosya) catches this."
+              },
+              {
+                "term": "close() and flush()",
+                "definition": "Two commands that physically write the data waiting in the buffer to the card; close also closes the file.",
+                "example": "In the open-write-close method, close() is called after every write, so the data is safe even if the power is cut.",
+                "pitfall": "Removing the card or cutting the power without calling close() or flush(); the last lines are lost."
+              },
+              {
+                "term": "3.3 V logic",
+                "definition": "SD cards work on 3.3 V; ready-made modules have a voltage regulator and a level shifter.",
+                "example": "If the module's documentation says it can be used with a 5 V Arduino, the level shifter is built in.",
+                "pitfall": "Connecting a bare SD card slot directly to the Arduino's 5 V pins."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h7d67-q1",
+                "kind": "mcq",
+                "prompt": "On the Arduino Uno, which pins are the SCK, MISO and MOSI lines for SPI on?",
+                "options": [
+                  "SCK D11, MISO D12, MOSI D13",
+                  "SCK D13, MISO D12, MOSI D11",
+                  "SCK D10, MISO D11, MOSI D12",
+                  "SCK A5, MISO A4, MOSI A3"
+                ],
+                "answer": 1,
+                "explanation": "On the Uno, SCK is D13, MISO D12 and MOSI D11; these pins are fixed. D10 was chosen for CS in this lesson; it is not an SPI line. A4 and A5 are the I2C lines (SDA, SCL).",
+                "skills": [
+                  "sd-storage",
+                  "serial-protocols"
+                ]
+              },
+              {
+                "id": "m4h7d67-q2",
+                "kind": "numeric",
+                "prompt": "Every time a program runs, it opens the file TEST.TXT with FILE_WRITE, writes two lines (println) and closes it. At the start the file does not exist. If the program is run three times, how many lines are in the file?",
+                "answer": 6,
+                "unit": "lines",
+                "explanation": "FILE_WRITE adds to the end of the file and does not delete the old contents. Each run adds 2 lines; 3 × 2 = 6 lines. If you assumed the file is written from the start, you would get 2; this is wrong.",
+                "skills": [
+                  "sd-storage"
+                ]
+              },
+              {
+                "id": "m4h7d67-q3",
+                "kind": "find-bug",
+                "prompt": "After the logger has run for an hour, the power cable is suddenly pulled out and the last lines are missing from the file. There is one bug in the code. Which is it?\n\n```\nFile dosya = SD.open(\"VERI.CSV\", FILE_WRITE);\nif (dosya) {\n  dosya.println(\"23.5\");\n}\n```",
+                "options": [
+                  "The file name does not follow the 8.3 rule",
+                  "FILE_READ should be used instead of FILE_WRITE",
+                  "There is no close() or flush(); the data stays in the buffer and is not written to the card",
+                  "print should be used instead of println"
+                ],
+                "answer": 2,
+                "explanation": "VERI.CSV follows the 8.3 rule (4 letters, a dot, 3 letters). The data first waits in the buffer in RAM; without close() or flush() it may not be written to the card. The only difference between print and println is the end of line; that is not the cause of the loss.",
+                "skills": [
+                  "sd-storage",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d67-q4",
+                "kind": "mcq",
+                "prompt": "You want to connect the VCC and data pins of a bare SD card slot directly to the Uno's 5 V. What should you do?",
+                "options": [
+                  "No problem, SD cards work on 5 V",
+                  "Connect only GND",
+                  "Connect the CS pin to 5 V",
+                  "Do not do this; the card works with 3.3 V logic. Use a ready-made module with a voltage regulator and a level shifter"
+                ],
+                "answer": 3,
+                "explanation": "SD cards work with 3.3 V logic. Ready-made modules have a voltage regulator and a level shifter; a bare slot is never connected directly to the Arduino's 5 V. Check in its documentation that the module is suitable for 5 V.",
+                "skills": [
+                  "sd-storage",
+                  "circuit-wiring"
+                ]
+              },
+              {
+                "id": "m4h7d67-q5",
+                "kind": "mcq",
+                "prompt": "Why is the \"open-write-close\" method counted as the safest against power cuts, compared with the \"keep open and flush\" method?",
+                "options": [
+                  "Because the file is closed after every write, so no data is left waiting in the buffer",
+                  "Because the file uses no RAM at all",
+                  "Because the card gets faster",
+                  "Because the 8.3 rule is relaxed"
+                ],
+                "answer": 0,
+                "explanation": "In the open-write-close method, close() is called after every line; no unwritten data is left in the buffer. In the keep open and flush method the data is also sent with flush; the difference is that the file stays open. It has nothing to do with speed or the file name rule.",
+                "skills": [
+                  "sd-storage"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Veri kaydı: CSV ve zaman damgası",
@@ -4025,7 +7850,128 @@ export const modul4: ModuleContent = {
                 "prog-planning"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Data logging: CSV and timestamps",
+            "problem": "You recorded the temperature of your room for a week. Now you want to draw a graph of it: does it get cold at night, does it warm up in the afternoon? For this the data needs to go into a table, that is, every row should say \"when, how many degrees, what percentage humidity\". The simplest form of this table file is **CSV**. In this lesson you will learn to produce tidy rows from the Arduino that any computer program can open.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| DHT22 (Type: DHT22) | **DATA** → Uno **D5** (as in lesson 46), **VCC** → **5V**, **GND** → **GND** |\n| RTC | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → **5V**, **GND** → **GND** |\n\nThis lesson's programs only write to Serial; no SD card is needed. The last program (`csv_sd`) also writes to the SD card; there is no SD card module part in the lab, so study that program as a reading example (there is a note below).\n\n### CSV and the timestamp\n**CSV** (Comma-Separated Values) is a plain text file. Each row is a record, and the columns are separated by commas. The first row holds the column names:\n\n```\nzaman,sicaklik_C,nem_yuzde\n2026-03-14 08:30:00,23.5,55.0\n2026-03-14 08:30:05,23.5,55.1\n```\n\nThe first column is the **timestamp**: the moment at which the measurement was made. We chose the format `yıl-ay-gün saat:dakika:saniye` (year-month-day hour:minute:second). This follows the international date format called ISO 8601 and is useful in two ways. First, it reads the same everywhere (one country reads 03.04.2026 as 3 April, another as 4 March). Second, **alphabetical order is time order**: because the year comes first, then the month, then the day, even if you sort the rows as text they line up in time order. For this to work, fields such as the month, day and hour must always be written with two digits (`03`, `08`).\n\n### The function that builds the row: independent of the hardware\nWe put the row formatting in a function separate from the SD card, the RTC and the DHT:\n\n`String satirOlustur(DateTime t, float sicak, float nem)`\n\nThe function takes a time and two numbers (temperature, humidity) and returns a piece of text. It touches no hardware. That is why it is easy to try with fixed values: first make sure the function produces the right row, then connect it to the real sensors. (We will use the same function when writing to SD, too.)\n\n```cpp\n// sketch: csv_fonksiyon\n#include <RTClib.h>\n\nString ikiHane(int n) {                  // 5 -> \"05\"\n  if (n < 10) return \"0\" + String(n);\n  return String(n);\n}\n\nString sayi(float x) {                   // 23.5 -> \"23.5\" (bir ondalık, nokta ile)\n  char tampon[12];\n  dtostrf(x, 1, 1, tampon);\n  return String(tampon);\n}\n\nString satirOlustur(DateTime t, float sicak, float nem) {\n  String s;\n  s.reserve(40);                         // yeri baştan ayır\n  s += t.year();\n  s += '-';\n  s += ikiHane(t.month());\n  s += '-';\n  s += ikiHane(t.day());\n  s += ' ';\n  s += ikiHane(t.hour());\n  s += ':';\n  s += ikiHane(t.minute());\n  s += ':';\n  s += ikiHane(t.second());\n  s += ',';\n  if (!isnan(sicak)) s += sayi(sicak);   // okuma başarısızsa alan boş kalır\n  s += ',';\n  if (!isnan(nem)) s += sayi(nem);\n  return s;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"zaman,sicaklik_C,nem_yuzde\");\n  Serial.println(satirOlustur(DateTime(2026, 3, 14, 8, 30, 5), 23.5, 55.0));\n  Serial.println(satirOlustur(DateTime(2026, 12, 1, 0, 0, 0), -2.5, 100.0));\n  Serial.println(satirOlustur(DateTime(2026, 7, 9, 23, 59, 59), NAN, NAN));\n}\n\nvoid loop() {\n}\n```\n\nThe output looks like this:\n\n```\nzaman,sicaklik_C,nem_yuzde\n2026-03-14 08:30:05,23.5,55.0\n2026-12-01 00:00:00,-2.5,100.0\n2026-07-09 23:59:59,,\n```\n\nIn the third row we acted as if the sensor could not be read (`NAN`, not a number). The timestamp is written and the sensor columns are left empty. An empty field means \"no value\" in CSV, and the columns do not shift.\n\n### Live data: RTC + DHT22\nNow let's connect the function to the sensors. Every 5 seconds we read the time from the RTC and the temperature and humidity from the DHT22, and write the row to Serial. You should wait at least about 2 seconds between two DHT22 readings; 5 seconds is a comfortable interval. Because the lab's RTC starts from 2026-01-01 00:00:00, the rows' dates run `2026-01-01 00:00:00`, `2026-01-01 00:00:05` ...; you can select the DHT and change the temperature and humidity from the right panel while it runs.\n\n```cpp\n// sketch: csv_satir\n#include <Wire.h>\n#include <RTClib.h>\n#include <DHT.h>\n\nconst int DHT_PIN = 5;\nconst unsigned long OLCUM_ARALIGI = 5000;   // ms\n\nRTC_DS3231 rtc;\nDHT dht(DHT_PIN, DHT22);\nunsigned long sonOlcum = 0;\nbool ilkOlcum = true;\n\nString ikiHane(int n) {\n  if (n < 10) return \"0\" + String(n);\n  return String(n);\n}\n\nString sayi(float x) {\n  char tampon[12];\n  dtostrf(x, 1, 1, tampon);\n  return String(tampon);\n}\n\nString satirOlustur(DateTime t, float sicak, float nem) {\n  String s;\n  s.reserve(40);\n  s += t.year();\n  s += '-';\n  s += ikiHane(t.month());\n  s += '-';\n  s += ikiHane(t.day());\n  s += ' ';\n  s += ikiHane(t.hour());\n  s += ':';\n  s += ikiHane(t.minute());\n  s += ':';\n  s += ikiHane(t.second());\n  s += ',';\n  if (!isnan(sicak)) s += sayi(sicak);\n  s += ',';\n  if (!isnan(nem)) s += sayi(nem);\n  return s;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n  dht.begin();\n  Serial.println(\"zaman,sicaklik_C,nem_yuzde\");\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  if (ilkOlcum || simdi - sonOlcum >= OLCUM_ARALIGI) {\n    ilkOlcum = false;\n    sonOlcum = simdi;\n    float sicak = dht.readTemperature();\n    float nem = dht.readHumidity();\n    Serial.println(satirOlustur(rtc.now(), sicak, nem));\n  }\n}\n```\n\n`satirOlustur` stayed exactly the same; only `loop()` gives it the values read from the sensors. If you like, you can copy the rows from the Serial monitor, paste them into a text file on your computer named `VERI.CSV` and open it in a spreadsheet program; this part is outside the lab.\n\n### The decimal separator and Excel\nIn CSV the comma separates the columns. So what if you also write the decimal number with a comma (`23,5`)? The row becomes `...,23,5,55,0` and a program takes it for 5 columns. The decimal separator changes from country to country: in Turkey it is a comma, in many countries it is a point. Depending on your computer's language setting, the spreadsheet program expects something different too. The general rule:\n\n- **Decimal point + comma separator** (`23.5,55.0`): the standard in the programming world and in programs set to English.\n- **Decimal comma + semicolon separator** (`23,5;55,0`): the format Excel usually expects on a computer set to Turkish.\n\nYou need to try on your own computer which one works for you, because this setting depends on the Excel version and the regional settings. Another way is to use the spreadsheet program's \"import from text/CSV\" feature instead of opening the file with a double click, and choose the separator yourself.\n\nTo produce the second format the function changes, but the logic is the same:\n\n```cpp\n// sketch: csv_tr\n#include <RTClib.h>\n\nconst char AYRAC = ';';                    // Türkçe Excel'in sütun ayracı\n\nString ikiHane(int n) {\n  if (n < 10) return \"0\" + String(n);\n  return String(n);\n}\n\nString sayiTR(float x) {\n  char tampon[12];\n  dtostrf(x, 1, 1, tampon);\n  String s(tampon);\n  s.replace('.', ',');                     // ondalık ayırıcı virgül\n  return s;\n}\n\nString satirOlusturTR(DateTime t, float sicak, float nem) {\n  String s;\n  s.reserve(40);\n  s += t.year();\n  s += '-';\n  s += ikiHane(t.month());\n  s += '-';\n  s += ikiHane(t.day());\n  s += ' ';\n  s += ikiHane(t.hour());\n  s += ':';\n  s += ikiHane(t.minute());\n  s += ':';\n  s += ikiHane(t.second());\n  s += AYRAC;\n  if (!isnan(sicak)) s += sayiTR(sicak);\n  s += AYRAC;\n  if (!isnan(nem)) s += sayiTR(nem);\n  return s;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"zaman;sicaklik_C;nem_yuzde\");\n  Serial.println(satirOlusturTR(DateTime(2026, 3, 14, 8, 30, 5), 23.5, 55.0));\n  Serial.println(satirOlusturTR(DateTime(2026, 12, 1, 0, 0, 0), -2.5, 100.0));\n}\n\nvoid loop() {\n}\n```\n\n### Write the same row to the SD card\nIn the last step we write the row both to Serial and to the SD card. The lab has no SD card module, and `SD.begin` gets stuck when it cannot find a card; so when you run this program in the lab, it writes nothing. Read it as an example of logging that works on a real card. As you learnt in lesson 67, for every row we open the file, write and close. If the file is new (checked with `SD.exists`), we write the header row first. If no SD card is inserted, the program does not stop; it just keeps writing to Serial.\n\n```cpp\n// sketch: csv_sd\n#include <Wire.h>\n#include <SPI.h>\n#include <SD.h>\n#include <RTClib.h>\n#include <DHT.h>\n\nconst int SD_CS = 10;\nconst int DHT_PIN = 5;\nconst unsigned long OLCUM_ARALIGI = 5000;   // ms\nconst char DOSYA_ADI[] = \"VERI.CSV\";        // 8.3 kuralı: en çok 8 harf + 3 harf uzantı\n\nRTC_DS3231 rtc;\nDHT dht(DHT_PIN, DHT22);\nunsigned long sonOlcum = 0;\nbool ilkOlcum = true;\nbool sdHazir = false;\n\nString ikiHane(int n) {\n  if (n < 10) return \"0\" + String(n);\n  return String(n);\n}\n\nString sayi(float x) {\n  char tampon[12];\n  dtostrf(x, 1, 1, tampon);\n  return String(tampon);\n}\n\nString satirOlustur(DateTime t, float sicak, float nem) {\n  String s;\n  s.reserve(40);\n  s += t.year();\n  s += '-';\n  s += ikiHane(t.month());\n  s += '-';\n  s += ikiHane(t.day());\n  s += ' ';\n  s += ikiHane(t.hour());\n  s += ':';\n  s += ikiHane(t.minute());\n  s += ':';\n  s += ikiHane(t.second());\n  s += ',';\n  if (!isnan(sicak)) s += sayi(sicak);\n  s += ',';\n  if (!isnan(nem)) s += sayi(nem);\n  return s;\n}\n\nbool sdyeYaz(const String& satir) {\n  File dosya = SD.open(DOSYA_ADI, FILE_WRITE);\n  if (!dosya) return false;\n  dosya.println(satir);\n  dosya.close();                            // kapatınca veri karta yazılır\n  return true;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n  dht.begin();\n\n  sdHazir = SD.begin(SD_CS);\n  if (!sdHazir) {\n    Serial.println(\"UYARI: SD kart yok, yalniz Serial'e yaziliyor\");\n  } else if (!SD.exists(DOSYA_ADI)) {\n    sdyeYaz(\"zaman,sicaklik_C,nem_yuzde\");    // dosya yeniyse başlığı yaz\n  }\n  Serial.println(\"zaman,sicaklik_C,nem_yuzde\");\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  if (ilkOlcum || simdi - sonOlcum >= OLCUM_ARALIGI) {\n    ilkOlcum = false;\n    sonOlcum = simdi;\n    String satir = satirOlustur(rtc.now(), dht.readTemperature(), dht.readHumidity());\n    Serial.println(satir);\n    if (sdHazir && !sdyeYaz(satir)) {\n      Serial.println(\"UYARI: SD'ye yazilamadi\");\n    }\n  }\n}\n```\n\n### How does it work?\n1. `ikiHane` (two digits) puts a 0 in front of single-digit numbers. That way `08:05:03` sorts properly.\n2. `dtostrf(x, 1, 1, tampon)` turns a `float` into text: a width of at least 1 character, 1 decimal place. The AVR compiler's `sprintf` function does not support `%f` by default; that is why `dtostrf` is used.\n3. `String s; s.reserve(40);` sets aside the room for the text from the start. In lesson 34 you saw that `String` can fragment the SRAM; a short-lived `String` with its room set aside from the start reduces this risk.\n4. When the DHT reading fails, `readTemperature()` returns `NaN`. We catch this with `isnan` and leave the field empty. The row's timestamp is still written.\n5. Because `satirOlustur` does not touch the hardware, we use the same function for both Serial and SD. When the place to write changes, the row format does not change.\n\n### Try it\n- Add a fourth test row to the `csv_fonksiyon` program: a temperature of 0.0 and a time whose seconds are 5. Are `0.0` and `05` written correctly in the output?\n- In the `csv_satir` program, set `OLCUM_ARALIGI` (measurement interval) to 2000. Look at the time between the rows. Why should you not go below 2 seconds?\n- If you like, copy the Serial monitor output and import it into a spreadsheet program on your computer. Were the columns separated correctly? If not, try the `csv_tr` format.\n- While `csv_satir` is running, set the DHT's temperature to -5 °C. Do you see a minus sign and one decimal place in the row? Then stop with ■, remove the DHT's DATA wire and press ▶ again: what do the sensor columns look like in the rows?\n- Add a third sensor column to the `satirOlustur` function: the temperature in Fahrenheit (`sicak * 9 / 5 + 32`). Do not forget to update the header row too.\n\n### Common mistakes\n- The number of columns in the header row being different from the number of columns in the data rows.\n- Using a decimal comma and leaving the separator as a comma too: the number is split into two columns.\n- Not writing fields such as the month, day and hour with two digits: the sorting goes wrong, and the spreadsheet program may not recognise the format.\n- Writing separate formatting code for each place instead of using the same function for both Serial and SD: the format comes out different in the two places.\n- Not closing the file when writing to SD (lesson 67).\n- Choosing a file name longer than the 8.3 form.",
+            "question": "Why does making the timestamp with `millis()` instead of the RTC (for example \"123456 ms\") not seem to do the job? How would someone who opens this file a year later know when the rows were written?",
+            "explainerMd": "### What you will learn in this lesson\n- What a CSV file is and why it is used in data logging\n- The ISO 8601 timestamp (year-month-day hour:minute:second) and why it is good\n- How to write a row-building function that is independent of the hardware\n- The clash between the decimal comma and the column separator\n\n### What you should know first\n- Lesson 66: reading a `DateTime` with the RTC\n- Lesson 67: adding a row to the SD card with open-write-close\n- Lesson 46: reading temperature and humidity with the DHT22\n- Lesson 34: using `String` and the SRAM limit\n\n### What is CSV?\n**CSV** (comma-separated values) is a plain text file. Each row is a record, the columns are separated by commas, and the first row holds the column names:\n\n```\nzaman,sicaklik_C,nem_yuzde\n2026-03-14 08:30:00,23.5,55.0\n```\n\nAny spreadsheet program can open this file; you draw the graph from there.\n\n### The timestamp\nThe first column of each row is the **timestamp** of when the measurement was made. The format `2026-03-14 08:30:00` follows ISO 8601. It has two advantages. First, it reads the same in every country (one person reads 03.04.2026 as 3 April, another as 4 March). Second, **alphabetical order is time order**: the year comes first, then the month, then the day. For this to work, the month, day, hour, minute and second must always be written with two digits (`03`, `08`). A `millis()` value does not do the job: it resets when the board restarts, and a year later nobody can tell when \"123456 ms\" was.\n\n### A separate function that builds the row\nPut the row formatting in a function:\n\n```\nString satirOlustur(DateTime t, float sicak, float nem)\n```\n\nThe function does not touch the hardware: it takes a time and two numbers and gives a piece of text. It can be tried with fixed values. You use the same function for both Serial and SD; the place it is written to changes, the format does not. When the sensor cannot be read, `NAN` comes in. Then you leave the field empty (`2026-03-14 08:30:00,,`); the number of columns does not change.\n\nTo turn a float into text on AVR, `dtostrf` is used, because `sprintf` does not support `%f` by default.\n\n### The decimal separator trap\nIf you write the decimal with a comma (`23,5`) and the separator is also a comma, the row becomes `...,23,5,55,0` and the spreadsheet program sees 5 columns. There are two fixes: a decimal point with a comma separator (`23.5,55.0`), or a decimal comma with a semicolon separator (`23,5;55,0`). On a computer set to Turkish, the second is usually expected; this depends on the Excel version, so try it on your own computer.\n\n### Summary\nCSV is a simple text table in which each row is a record. If the timestamp is written in ISO form and with two digits, it reads the same everywhere and sorts correctly. Separating row building from the hardware makes the code easy to try. The decimal separator and the column separator must not get mixed up.",
+            "concepts": [
+              {
+                "term": "CSV",
+                "definition": "A plain text table in which each row is a record and the columns are separated by commas; the first row is the column names.",
+                "example": "Under the header zaman,sicaklik_C,nem_yuzde, each measurement is added as one row.",
+                "pitfall": "Writing a different number of columns in the header row and the data rows."
+              },
+              {
+                "term": "Timestamp (ISO 8601)",
+                "definition": "A layout that writes the moment of the measurement as year-month-day hour:minute:second, with the month and day in two digits.",
+                "example": "2026-03-14 08:30:05 reads the same in every country and lines up in time order even when sorted as text.",
+                "pitfall": "Leaving the month and day as single digits (2026-3-9); the sorting goes wrong."
+              },
+              {
+                "term": "Row-building function",
+                "definition": "A function that builds a CSV row from a time and two numbers, without touching the hardware.",
+                "example": "The output of satirOlustur(DateTime(2026,1,5,7,8,9), 21.0, NAN) can be tried with fixed values.",
+                "pitfall": "Writing separate formatting code for each place (Serial, SD); the row format comes out different in the two places."
+              },
+              {
+                "term": "NaN and an empty field",
+                "definition": "When the sensor cannot be read, the float becomes NaN; in CSV this is shown by leaving the field empty.",
+                "example": "The third row is written as 2026-07-09 23:59:59,, so the timestamp stays and the columns do not shift.",
+                "pitfall": "Trying to turn NaN into text, or skipping that row and not keeping the record at all."
+              },
+              {
+                "term": "dtostrf()",
+                "definition": "An AVR function that turns a float into text with a given width and number of decimal places.",
+                "example": "dtostrf(23.5, 1, 1, tampon) writes \"23.5\" into the buffer.",
+                "pitfall": "Thinking sprintf works with %f; on AVR it is not supported by default."
+              },
+              {
+                "term": "Decimal separator and column separator",
+                "definition": "The decimal mark inside a number and the character that separates the columns must not get mixed up.",
+                "example": "For Excel set to Turkish, the format 23,5;55,0 (decimal comma, semicolon separator) can be used.",
+                "pitfall": "If a decimal comma and a comma separator are used together, 23,5 is split into two columns."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h7d68-q1",
+                "kind": "predict-output",
+                "prompt": "What appears on the Serial monitor when the call below runs? (satirOlustur is the function from the lesson: two-digit fields, numbers with one decimal place, an empty field for NaN.)\n\n```\nSerial.println(satirOlustur(DateTime(2026, 1, 5, 7, 8, 9), 21.0, NAN));\n```",
+                "options": [
+                  "2026-1-5 7:8:9,21.0,",
+                  "2026-01-05 07:08:09,21.0,",
+                  "2026-01-05 07:08:09,21.0,0",
+                  "2026-01-05 07:08:09,21,"
+                ],
+                "answer": 1,
+                "explanation": "ikiHane() pads the month, day, hour, minute and second to two digits. Because dtostrf gives 1 decimal place, 21.0 is written. Because the humidity is NaN, the last field stays empty; no zero is written, and the comma at the end of the row keeps the number of columns.",
+                "skills": [
+                  "data-logging",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d68-q2",
+                "kind": "find-bug",
+                "prompt": "When you sort the CSV file by time in a spreadsheet program, the 2026-12-01 row comes before the 2026-3-9 row. Which part of the row-building code is responsible?\n\n```\ns += t.year();\ns += '-';\ns += t.month();\ns += '-';\ns += t.day();\n```",
+                "options": [
+                  "The year should be two digits instead of year()",
+                  "A slash should be used instead of the dash",
+                  "s = should be used instead of s +=",
+                  "month() and day() are not written with two digits; ikiHane() should be used"
+                ],
+                "answer": 3,
+                "explanation": "month() and day() do not add a leading zero. When \"2026-3-9\" and \"2026-12-01\" are compared as text, \"2026-1\" is compared with \"2026-3\"; month 12 is sorted before month 3. Written with two digits it becomes \"2026-03-09\", and text order matches time order.",
+                "skills": [
+                  "data-logging",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d68-q3",
+                "kind": "numeric",
+                "prompt": "A logger writes the row with a comma separator and a decimal comma, like this: 2026-03-14 08:30:05,23,5,55,0. How many columns does a spreadsheet program read this row as?",
+                "answer": 5,
+                "unit": "columns",
+                "explanation": "The row is split at the commas: \"2026-03-14 08:30:05\", \"23\", \"5\", \"55\", \"0\". Instead of the expected 3 columns, there are 5. The fix is to use a point for the decimal or to make the separator a semicolon.",
+                "skills": [
+                  "data-logging"
+                ]
+              },
+              {
+                "id": "m4h7d68-q4",
+                "kind": "mcq",
+                "prompt": "Why is writing the millis() value (for example 123456) as the timestamp not good enough?",
+                "options": [
+                  "millis() resets every time the board switches on; it does not tell you the row's real date and time",
+                  "millis() cannot be written to CSV because it is a number",
+                  "millis() must always be divided by 1000",
+                  "CSV files can only contain text"
+                ],
+                "answer": 0,
+                "explanation": "millis() gives the time since the board switched on and starts from zero when the board restarts. Someone who opens the file a year later cannot find out when the row was written. The date and time taken from the RTC give the real time. There is no problem writing numbers to CSV.",
+                "skills": [
+                  "data-logging",
+                  "rtc-time"
+                ]
+              },
+              {
+                "id": "m4h7d68-q5",
+                "kind": "numeric",
+                "prompt": "The device writes a row every 5 seconds. If it runs for one day (24 hours) without stopping, how many data rows are added to the file? (Do not count the header row.)",
+                "answer": 17280,
+                "unit": "rows",
+                "explanation": "There are 24 × 60 × 60 = 86400 seconds in a day. 86400 ÷ 5 = 17280 rows. This calculation is used to estimate how fast the card fills up when choosing the measurement interval.",
+                "skills": [
+                  "data-logging",
+                  "prog-planning"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Haberleşme protokolleri: UART, I2C, SPI karşılaştırması",
@@ -4147,7 +8093,128 @@ export const modul4: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Communication protocols: comparing UART, I2C and SPI",
+            "problem": "This week you talked to your Arduino in three different ways: with the computer over Serial, with the RTC and the LCD over I2C, and with the SD card over SPI. They all \"carry data\", but one uses two wires and another four; one talks to one device, another to dozens. Which one is faster? Which should you choose, and when? In this lesson you will find the speed of each one in numbers and compare them.",
+            "contentMd": "### Circuit\nNo extra parts are needed in this lesson; in the lab we use only the Uno, and you type the programs into the editor and press ▶. The programs use **D4** as a \"measurement window\": they set D4 HIGH at the start of the job being measured and LOW at the end. We measure the time inside the program with `micros()`. (For information: in a real circuit, if an oscilloscope or a logic analyser were connected to D4, we would see the length of the same window from outside.) In the lab, the gap between windows that come one after another is very short, so D4 can look like one long HIGH; if you put a `delay(20)` between them, you see separate windows.\n\n| Pin | Job |\n|---|---|\n| D4 | Measurement window |\n| D0 (RX), D1 (TX) | UART |\n| A4 (SDA), A5 (SCL) | I2C |\n| D11 (MOSI), D12 (MISO), D13 (SCK), D10 (CS) | SPI |\n\nOn a real board, D0 and D1 are also used to talk to the computer over USB. If another device is connected to these pins, you can have trouble uploading a program or with the Serial Monitor. That is why you should avoid using D0 and D1 for anything else.\n\n### UART: two wires, an agreed speed\n**UART** (Serial) works with two lines: TX (send) from one end, RX (receive) at the other end. There is no shared clock line. That is why both sides have to choose the same **baud rate** (bits per second) in advance. A byte is sent like this: 1 start bit, 8 data bits, 1 stop bit. So one byte takes **10 bits**. The time of one bit is `1 / baud`.\n\nLet's measure it. The program sends 100 `'U'` characters at three speeds. `'U'` (0x55) is a character whose bits keep changing, with the pattern \"01010101\", and it is easy to recognise when you watch the line. During sending, D4 stays HIGH. We measure the same time inside the program with `micros()`; on a real board, a device connected to D4 sees the same window too.\n\n```cpp\n// sketch: uart_hiz\nconst int PENCERE = 4;                        // ölçüm penceresi: yazma süresince HIGH\nconst int BAYT = 100;\nconst long HIZLAR[] = {9600, 19200, 38400};\nunsigned long sureUs[3];\n\nvoid setup() {\n  pinMode(PENCERE, OUTPUT);\n\n  for (int i = 0; i < 3; i++) {\n    Serial.begin(HIZLAR[i]);\n    Serial.flush();\n    digitalWrite(PENCERE, HIGH);\n    unsigned long t0 = micros();\n    for (int k = 0; k < BAYT; k++) {\n      Serial.write('U');\n    }\n    Serial.flush();                           // son bit çıkana kadar bekle\n    sureUs[i] = micros() - t0;\n    digitalWrite(PENCERE, LOW);\n    Serial.end();\n  }\n\n  Serial.begin(9600);\n  Serial.println();\n  for (int i = 0; i < 3; i++) {\n    Serial.print(HIZLAR[i]);\n    Serial.print(\" baud: bit suresi \");\n    Serial.print(sureUs[i] / (BAYT * 10.0), 1);\n    Serial.println(\" us\");\n  }\n}\n\nvoid loop() {\n}\n```\n\nOn a real computer with the terminal at 9600, you would see meaningless characters on the screen during the 19200 and 38400 parts: the sending and receiving speeds were not the same. This is the nature of UART: the speed is agreed in advance. The lab's Serial monitor does not model the speed difference; the 100 `U` characters always look fine. At the end, the measurement table is printed at 9600.\n\nThe measurement result:\n\n| Baud | Bit time (worked out: 1/baud) | Measured bit time | Bytes/s (baud ÷ 10) |\n|---|---|---|---|\n| 9600 | 104.2 µs | 104.4 µs | 960 |\n| 19200 | 52.1 µs | 52.4 µs | 1920 |\n| 38400 | 26.0 µs | 26.4 µs | 3840 |\n\nThe measured values are a little bigger than the calculation (less than 2 per cent). The small difference comes from the measurement method: `micros()` counts in 4 µs steps, and the loop and the work of queuing the bytes also go into the time. For 115200 baud the calculation gives 8.7 µs; we did not measure it.\n\n### I2C: two wires, talking by address\n**I2C** also works with two lines: SDA (data) and SCL (clock). The difference from UART is that it has a **clock line** and the devices are chosen **by address** (lesson 33). The RTC (0x68), the LCD (0x27) and other devices are connected together to the same two wires. You choose the speed of the clock line with `Wire.setClock()`. On the Arduino Uno, this speed is set with a divider written to a register called `TWBR`: `SCL = 16 MHz / (16 + 2 × TWBR × ön bölücü)` (where `ön bölücü` is the prescaler).\n\nThe program reads the default speed, then sets 100 kHz and 400 kHz and works out the frequency that comes from the register. One I2C byte takes 9 clock pulses (8 data bits + 1 acknowledge bit). An address byte and one data byte make 18 pulses in total; we turn this into a time too.\n\n```cpp\n// sketch: i2c_hiz\n#include <Wire.h>\n\nconst long ISTENEN[] = {100000, 400000};\n\nlong sclHz() {\n  int onbolucu[] = {1, 4, 16, 64};\n  int p = onbolucu[TWSR & 0x03];\n  return F_CPU / (16L + 2L * TWBR * p);\n}\n\nvoid rapor(const char* etiket) {\n  Serial.print(etiket);\n  Serial.print(\": TWBR=\");\n  Serial.print(TWBR);\n  Serial.print(\"  SCL=\");\n  Serial.print(sclHz());\n  Serial.println(\" Hz\");\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  rapor(\"varsayilan\");\n\n  for (int i = 0; i < 2; i++) {\n    Wire.setClock(ISTENEN[i]);\n    rapor(\"setClock\");\n    // adres baytı + 1 veri baytı = 2 bayt = 18 saat darbesi\n    Serial.print(\"  2 baytlik aktarim ~ \");\n    Serial.print(18.0e6 / sclHz(), 0);\n    Serial.println(\" us\");\n  }\n}\n\nvoid loop() {\n}\n```\n\nThe result:\n\n| Setting | TWBR | SCL frequency | 2-byte transfer (worked out) |\n|---|---|---|---|\n| Default (`Wire.begin`) | 72 | 100 kHz | 180 µs |\n| `setClock(100000)` | 72 | 100 kHz | 180 µs |\n| `setClock(400000)` | 12 | 400 kHz | 45 µs |\n\nThe start and stop conditions are not included in the time; the real transfer takes a little longer. These values were **worked out** from the settings read from the register; in a real circuit you would need to check them by measuring the SCL line with an oscilloscope or a logic analyser. To use the 400 kHz speed, every device on the line must support it; check the device's datasheet.\n\n### SPI: four wires, very fast\n**SPI** has three shared lines (SCK, MOSI, MISO) and a **CS** line for each device (lesson 67). Because there is a clock line, the speed is free, and much higher than I2C. On the Uno the highest SCK is half the processor clock: 16 MHz ÷ 2 = 8 MHz. You choose the speed in two ways: the old `SPI.setClockDivider(...)` or the new `SPISettings(hız, bitSırası, mod)` (speed, bit order, mode). With each setting, the program works out the real SCK frequency from the SPI registers (`SPCR`, `SPSR`).\n\n```cpp\n// sketch: spi_hiz\n#include <SPI.h>\n\nlong sckHz() {\n  const int bolen[] = {4, 16, 64, 128, 2, 8, 32, 64};\n  int dizin = (SPCR & 0x03) | ((SPSR & 0x01) ? 4 : 0);   // SPR1:SPR0 ve SPI2X\n  return F_CPU / bolen[dizin];\n}\n\nvoid rapor(const char* etiket) {\n  Serial.print(etiket);\n  Serial.print(\" -> SCK=\");\n  Serial.print(sckHz());\n  Serial.println(\" Hz\");\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  SPI.begin();\n\n  SPI.setClockDivider(SPI_CLOCK_DIV4);\n  rapor(\"DIV4 \");\n  SPI.setClockDivider(SPI_CLOCK_DIV16);\n  rapor(\"DIV16\");\n  SPI.setClockDivider(SPI_CLOCK_DIV128);\n  rapor(\"DIV128\");\n\n  const long istenen[] = {250000, 1000000, 3000000, 8000000, 20000000};\n  for (int i = 0; i < 5; i++) {\n    SPI.beginTransaction(SPISettings(istenen[i], MSBFIRST, SPI_MODE0));\n    Serial.print(\"istenen \");\n    Serial.print(istenen[i]);\n    Serial.print(\" Hz\");\n    rapor(\"\");\n    SPI.endTransaction();\n  }\n}\n\nvoid loop() {\n}\n```\n\nThe result:\n\n| Requested | SCK used |\n|---|---|\n| `SPI_CLOCK_DIV4` | 4 MHz |\n| `SPI_CLOCK_DIV16` | 1 MHz |\n| `SPI_CLOCK_DIV128` | 125 kHz |\n| `SPISettings(250000, ...)` | 250 kHz |\n| `SPISettings(1000000, ...)` | 1 MHz |\n| `SPISettings(3000000, ...)` | **2 MHz** |\n| `SPISettings(8000000, ...)` | 8 MHz |\n| `SPISettings(20000000, ...)` | 8 MHz |\n\nNotice: when you asked for 3 MHz, it dropped to 2 MHz. On the Uno, SCK can only be the processor clock divided by 2, 4, 8, ... (8, 4, 2, 1 MHz ...). `SPISettings` chooses the highest value that does not go above the speed you asked for. When 20 MHz is asked for, it can go up to 8 MHz at most.\n\nA real SPI transfer is done with `SPI.transfer(değer)` (value); we did not need it in this program, because we were only reading the speed that was set.\n\n### Put the three side by side\nThe table below combines the numbers you read in this lesson with general knowledge.\n\n| | UART | I2C | SPI |\n|---|---|---|---|\n| Pins on the Uno | 2 (RX, TX) | 2 (SDA, SCL) | 3 shared (SCK, MOSI, MISO) + 1 CS for each device |\n| Clock line | None (the speed is agreed in advance) | Yes | Yes |\n| Speed read in this lesson | 9600-38400 baud | 100 kHz, 400 kHz | 125 kHz - 8 MHz |\n| Bits per byte | 10 | 9 | 8 |\n| Number of devices | Usually 2 ends (one to one) | Many devices on the same line, by address (7-bit address) | As many as there are CS pins |\n| Distance (general knowledge) | Short at TTL level; for long distances, other electrical standards such as RS-485 | Short; as the cable gets longer, the line capacitance causes problems | Short; the higher the speed, the more the cable length matters |\n\nHow long does it take to carry 100 bytes? The times below were **worked out** from the bit counts above (start/stop overhead and addressing not included):\n\n| Way | Calculation | Time |\n|---|---|---|\n| UART, 9600 baud | 100 × 10 bits ÷ 9600 | about 104 ms |\n| UART, 38400 baud | 100 × 10 bits ÷ 38400 | about 26 ms |\n| I2C, 100 kHz | 100 × 9 bits ÷ 100000 | 9 ms |\n| I2C, 400 kHz | 100 × 9 bits ÷ 400000 | about 2.3 ms |\n| SPI, 4 MHz | 100 × 8 bits ÷ 4000000 | 0.2 ms |\n| SPI, 8 MHz | 100 × 8 bits ÷ 8000000 | 0.1 ms |\n\nYour data logger will use all three: it writes rows to the computer with **UART**, reads/writes the RTC and the LCD with **I2C**, and writes a file to the SD card with **SPI**. The right way is different for each job: the clock and the screen carry little data, so I2C's two wires are enough. The SD card carries a lot of data and needs SPI's speed. And for talking to the computer, there is UART already.\n\n### Try it\n- In the `uart_hiz` program, set `BAYT` (bytes) to 200. Does the bit time change? Why should it not change? How does the length of the D4 window change?\n- In the `i2c_hiz` program, change the value 100000 in the `ISTENEN` (requested) array to 50000. What does `TWBR` become, and how many µs does a 2-byte transfer take? (Work it out with the formula first, then compare with ▶.)\n- In the `istenen` array in the `spi_hiz` program, write 500000 instead of 250000. Which SCK speed comes out? Work out what 16 MHz has been divided by.\n\n### Common mistakes\n- Choosing different baud rates at the two ends of a UART link: on a real connection, meaningless characters appear on the screen.\n- Connecting TX to TX on a UART link: one end's TX must go to the other end's RX.\n- Two devices on I2C using the same address (for example the RTC and the MPU6050, both 0x68).\n- Raising the speed on the I2C line without checking that every device supports it.\n- Forgetting the CS line on SPI, or making the CS of two devices LOW at the same time.\n- Thinking the speed set on SPI is the speed you asked for: `SPISettings` uses the nearest value **below** the requested speed.\n- Mixing up 3.3 V and 5 V levels: read the documentation of some SPI devices (such as the SD card).",
+            "question": "You have four sensors, an LCD and an SD card in a room. Which one would you connect with which protocol? Why does I2C make more sense for the RTC and SPI for the SD card?",
+            "explainerMd": "### What you will learn in this lesson\n- How many lines the UART, I2C and SPI protocols use, and how devices are chosen\n- How to work out the bit time and the byte rate from the baud rate in UART\n- That the clock speed is set in I2C and SPI, and that the value set can come out different from the one requested\n- How to choose the right protocol for a job (RTC, LCD, SD card, computer)\n\n### What you should know first\n- Lesson 9: the Serial Monitor and `Serial.begin`\n- Lesson 33: I2C, `Wire` and addresses\n- Lessons 63 and 67: the RC522 and the SD card over SPI\n\n### Three protocols, three ways of thinking\nThis week you talked to your Arduino in three ways. They all carry data; the difference is in the number of lines, the speed and how a device is chosen.\n\n| | UART | I2C | SPI |\n|---|---|---|---|\n| Lines | RX, TX | SDA, SCL | SCK, MOSI, MISO + a CS for each device |\n| Clock line | None | Yes | Yes |\n| Choosing a device | One to one | Address (7 bits) | CS pin |\n| Bits per byte | 10 | 9 | 8 |\n\n### UART: the speed is agreed in advance\nIn UART there is no shared clock line; both sides must choose the same **baud rate** (bits per second) in advance. A byte takes **10 bits**: 1 start, 8 data, 1 stop. The time of one bit is `1 / baud`. At 9600 baud a bit is about 104 µs, and the byte rate is baud ÷ 10 = 960 bytes/s. If the speeds are different, the other side sees meaningless characters. Also, one end's TX must go to the other end's RX.\n\n### I2C: talking by address\nI2C has a clock line, and the speed is chosen with `Wire.setClock()` (100 kHz or 400 kHz). A byte takes 9 clock pulses (8 data + 1 acknowledge). An address byte and one data byte make 18 pulses: 180 µs at 100 kHz, 45 µs at 400 kHz. The RTC (0x68) and the LCD (0x27) are connected together to the same two wires; if two devices have the same address, they clash. For 400 kHz, every device on the line must support it.\n\n### SPI: fast, more lines\nIn SPI the clock speed is free, and high. On the Uno the highest SCK is half the processor clock: 16 MHz ÷ 2 = 8 MHz. The values that can be set go down by halving: 8, 4, 2, 1 MHz ... So if you ask for 3 MHz, you get 2 MHz: the library picks the highest value that does not go above your request. Each device needs its own CS line, and only one CS may be LOW at a time.\n\n### Which one, and when?\nFor jobs with many devices that carry little data (RTC, LCD), I2C's two wires are enough. For jobs that carry a lot of data (SD card), SPI's speed is needed. And for talking to the computer, there is UART already.\n\n### Summary\nUART has two lines and no clock; the speed is agreed in advance. I2C has two lines, a clock and addresses. SPI is fast but needs a CS for each device. From the number of bits and the speed, you can work out how long a transfer takes.",
+            "concepts": [
+              {
+                "term": "UART and the baud rate",
+                "definition": "Two-line (RX, TX) serial communication with no clock line; the baud rate of the two ends must be chosen the same in advance.",
+                "example": "At 9600 baud one bit takes about 104 µs, and one byte (10 bits) about 1.04 ms.",
+                "pitfall": "Choosing different baud rates at the two ends; meaningless characters appear on the screen."
+              },
+              {
+                "term": "I2C: SDA, SCL and the address",
+                "definition": "A two-line protocol with a clock line; devices on the same line are chosen by address.",
+                "example": "The RTC (0x68) and an I2C LCD (0x27) share the same SDA and SCL wires.",
+                "pitfall": "Two devices using the same address (such as the RTC and the MPU6050)."
+              },
+              {
+                "term": "SPI and the CS line",
+                "definition": "A fast protocol that uses three shared lines (SCK, MOSI, MISO) and a CS (select) line for each device.",
+                "example": "The SD card's CS line is D10; the device whose CS is LOW listens.",
+                "pitfall": "Forgetting the CS line, or making the CS of two devices LOW at the same time."
+              },
+              {
+                "term": "Bit time and transfer time",
+                "definition": "The time of one bit is 1/speed; transfer time = number of bits ÷ speed.",
+                "example": "100 bytes × 10 bits ÷ 9600 baud ≈ 104 ms.",
+                "pitfall": "Counting 8 bits per byte; in UART, with the start and stop bits, it is 10 bits."
+              },
+              {
+                "term": "SPI speed divider",
+                "definition": "On the Uno, SCK is 16 MHz divided by 2, 4, 8 ...; SPISettings picks the highest value that does not go above the requested speed.",
+                "example": "When 3 MHz is requested, 2 MHz is used.",
+                "pitfall": "Thinking the speed that is set is the same as the speed requested."
+              },
+              {
+                "term": "Wire.setClock()",
+                "definition": "Sets the speed of the I2C clock line (100 kHz, 400 kHz).",
+                "example": "At 400 kHz, an address + 1 data byte takes about 45 µs.",
+                "pitfall": "Raising the speed without checking that every device on the line supports it."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h7d69-q1",
+                "kind": "numeric",
+                "prompt": "With UART at 19200 baud, if each byte takes 10 bits, about how many milliseconds does sending 100 bytes take?",
+                "answer": 52.1,
+                "tolerance": 0.3,
+                "unit": "ms",
+                "explanation": "The total number of bits is 100 × 10 = 1000. Time = 1000 ÷ 19200 s ≈ 0.0521 s ≈ 52.1 ms. If you assumed 8 bits, you would get 41.7 ms; this is wrong, because the start and stop bits also take time.",
+                "skills": [
+                  "serial-protocols"
+                ]
+              },
+              {
+                "id": "m4h7d69-q2",
+                "kind": "numeric",
+                "prompt": "The I2C speed is 400 kHz. An address byte and 4 data bytes are sent. If each byte takes 9 clock pulses, how many microseconds does the transfer take, not counting the start and stop conditions?",
+                "answer": 112.5,
+                "tolerance": 0.5,
+                "unit": "µs",
+                "explanation": "Total bytes 1 + 4 = 5; clock pulses 5 × 9 = 45. One pulse takes 1 ÷ 400000 s = 2.5 µs. 45 × 2.5 = 112.5 µs.",
+                "skills": [
+                  "serial-protocols"
+                ]
+              },
+              {
+                "id": "m4h7d69-q3",
+                "kind": "predict-output",
+                "prompt": "On the Uno (16 MHz), about how many Hz is SCK when this code runs?\n\n```\nSPI.begin();\nSPI.beginTransaction(SPISettings(5000000, MSBFIRST, SPI_MODE0));\n```",
+                "options": [
+                  "5000000 Hz",
+                  "8000000 Hz",
+                  "4000000 Hz",
+                  "2500000 Hz"
+                ],
+                "answer": 2,
+                "explanation": "On the Uno, SCK can only take values such as 8, 4, 2, 1 MHz ... SPISettings picks the highest value that does not go above the requested speed: without going above 5 MHz, it drops to 4 MHz. 8 MHz is bigger than requested; 5 MHz and 2.5 MHz are not in this halving sequence.",
+                "skills": [
+                  "serial-protocols"
+                ]
+              },
+              {
+                "id": "m4h7d69-q4",
+                "kind": "find-bug",
+                "prompt": "The terminal on the computer is set to 115200 baud. The code below is running on the Arduino and meaningless characters appear in the terminal. Where is the problem?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"Merhaba\");\n}\n```",
+                "options": [
+                  "print should be used instead of println",
+                  "The baud rate is not the same as the terminal's; it should be Serial.begin(115200), or the terminal should be set to 9600",
+                  "loop() should be used instead of setup()",
+                  "Because the text is Turkish"
+                ],
+                "answer": 1,
+                "explanation": "In UART there is no clock line; both sides know the bit time from the baud rate. If the Arduino sends at 9600 and the terminal expects 115200, it samples the bits at the wrong times and you see meaningless characters. The only difference between print and println is the end of line.",
+                "skills": [
+                  "serial-protocols",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d69-q5",
+                "kind": "mcq",
+                "prompt": "In the data logger, the time will be read from the RTC, written to an LCD, and many rows saved to the SD card. Which pairing makes the most sense?",
+                "options": [
+                  "I2C for the RTC and the LCD (two wires, by address), SPI for the SD card (fast)",
+                  "UART for all three",
+                  "SPI for the RTC, I2C for the SD card",
+                  "The same CS line for all of them"
+                ],
+                "answer": 0,
+                "explanation": "The RTC and the LCD carry little data and can share the same two wires with different addresses; I2C suits them. The SD card carries a lot of data and needs SPI's high speed. UART is for one-to-one links; two SPI devices using the same CS line get mixed up.",
+                "skills": [
+                  "serial-protocols",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Sıcaklık ve nem veri kaydedici",
@@ -4275,7 +8342,134 @@ export const modul4: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Temperature and humidity data logger",
+            "problem": "A greenhouse, an egg incubator, a medicine cabinet, a museum display case: in all of them, temperature and humidity are watched for days, even when nobody is looking. The answer to \"what happened on Tuesday night at 03:10?\" is in the log book, that is, in a data file. In this project you will make your own data logger: it takes a measurement every 10 seconds, produces a timestamped CSV row and shows the latest measurement on the screen.",
+            "contentMd": "### What are we going to do?\nThis project brings together what you have learnt:\n- **Week 3 of this module:** Temperature and humidity with the DHT22 (D5).\n- **Module 3:** Non-blocking code with `millis()` (lesson 27), edge detection and debouncing with a button (lesson 8), the I2C LCD screen (lessons 32 and 33).\n- **This week:** Time with the RTC (66), the SD card (67), the CSV row and timestamp (68), UART/I2C/SPI (69).\n\nThe logger produces a row at every moment when the RTC's seconds divide by 10: 08:30:10, 08:30:20, 08:30:30 ... These rows go to Serial. When you press the button (D2), logging stops; press it again and it carries on. The screen shows the latest measurement on top and the time and logging state underneath. The version that writes to the SD card is a separate copy of the project; because there is no SD card module in the lab, you study it as a reading example.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| DHT22 (Type: DHT22) | **DATA** → Uno **D5**, **VCC** → **5V**, **GND** → **GND** |\n| RTC (address 0x68) | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → **5V**, **GND** → **GND** |\n| I2C LCD 16x2 (I2C address property 0x27) | **SDA** → Uno **A4**, **SCL** → Uno **A5**, **VCC** → **5V**, **GND** → **GND** |\n| Button \"logging on/off\" | **A** → Uno **D2**, **B** → **GND** (`INPUT_PULLUP`) |\n\nAn SD card module is only needed for the SD version (on a real module CS → D10, MOSI → D11, MISO → D12, SCK → D13). There is no SD part in the lab, so it is not added to the circuit.\n\nThe RTC and the LCD share the same two wires (SDA, SCL); because their addresses (0x68 and 0x27) are different, they do not get mixed up (lesson 69). This week D11, D12, D13 are for the SD card; do not connect LEDs to those pins in this project. There is no MPU6050 in this circuit, so 0x68 belongs only to the RTC.\n\n### Program: a logger that writes CSV to Serial\n```cpp\n// sketch: veri_kaydedici\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <RTClib.h>\n#include <DHT.h>\n\nconst int DHT_PIN = 5;\nconst int BUTON = 2;                          // kaydı durdur / sürdür\nconst uint32_t KAYIT_ARALIGI = 10;            // saniye\nconst unsigned long KONTROL_ARALIGI = 200;    // ms: RTC'ye bu sıklıkta bak\n\nRTC_DS3231 rtc;\nDHT dht(DHT_PIN, DHT22);\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nbool kayitAcik = true;\nbool oncekiBasili = false;\nunsigned long sonButon = 0;\nunsigned long sonKontrol = 0;\nuint32_t sonKayit = 0;                        // son satırın RTC saniyesi (unixtime)\nuint32_t sonEkran = 0;                        // ekranın son güncellendiği saniye\nfloat sonSicak = NAN;\nfloat sonNem = NAN;\n\nString ikiHane(int n) {\n  if (n < 10) return \"0\" + String(n);\n  return String(n);\n}\n\nString sayi(float x) {\n  char tampon[12];\n  dtostrf(x, 1, 1, tampon);\n  return String(tampon);\n}\n\nString satirOlustur(DateTime t, float sicak, float nem) {\n  String s;\n  s.reserve(40);\n  s += t.year();\n  s += '-';\n  s += ikiHane(t.month());\n  s += '-';\n  s += ikiHane(t.day());\n  s += ' ';\n  s += ikiHane(t.hour());\n  s += ':';\n  s += ikiHane(t.minute());\n  s += ':';\n  s += ikiHane(t.second());\n  s += ',';\n  if (!isnan(sicak)) s += sayi(sicak);\n  s += ',';\n  if (!isnan(nem)) s += sayi(nem);\n  return s;\n}\n\nvoid kaydet(const String& satir) {\n  Serial.println(satir);\n}\n\nvoid ekranYaz(DateTime t) {\n  lcd.setCursor(0, 0);\n  lcd.print(\"T:\");\n  if (isnan(sonSicak)) lcd.print(\"--\"); else lcd.print(sonSicak, 1);\n  lcd.print(\"C N:%\");\n  if (isnan(sonNem)) lcd.print(\"--\"); else lcd.print(sonNem, 1);\n  lcd.print(\"      \");\n  lcd.setCursor(0, 1);\n  lcd.print(ikiHane(t.hour()));\n  lcd.print(':');\n  lcd.print(ikiHane(t.minute()));\n  lcd.print(':');\n  lcd.print(ikiHane(t.second()));\n  lcd.print(kayitAcik ? \" KAYIT    \" : \" DURDU    \");\n}\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  Serial.begin(9600);\n  rtc.begin();\n  dht.begin();\n  lcd.init();\n  lcd.backlight();\n  Serial.println(\"zaman,sicaklik_C,nem_yuzde\");\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // Buton: basıldığı an kaydı aç/kapat (50 ms sıçrama koruması)\n  bool basili = (digitalRead(BUTON) == LOW);\n  if (basili && !oncekiBasili && simdi - sonButon > 50) {\n    sonButon = simdi;\n    kayitAcik = !kayitAcik;\n    sonEkran = 0;                             // ekranı hemen yenile\n  }\n  oncekiBasili = basili;\n\n  if (simdi - sonKontrol >= KONTROL_ARALIGI) {\n    sonKontrol = simdi;\n    DateTime t = rtc.now();\n    uint32_t u = t.unixtime();\n\n    // RTC saniyesi aralığa tam bölünüyorsa ve bu saniye daha yazılmadıysa: satır üret\n    if (kayitAcik && u % KAYIT_ARALIGI == 0 && u != sonKayit) {\n      sonKayit = u;\n      sonSicak = dht.readTemperature();\n      sonNem = dht.readHumidity();\n      kaydet(satirOlustur(t, sonSicak, sonNem));\n    }\n\n    if (u != sonEkran) {\n      sonEkran = u;\n      ekranYaz(t);\n    }\n  }\n}\n```\n\nOn the Serial monitor you see output like this (because the lab's RTC starts from 2026-01-01 00:00:00, the rows run `2026-01-01 00:00:10`, `2026-01-01 00:00:20` ...):\n\n```\nzaman,sicaklik_C,nem_yuzde\n2026-03-14 08:30:10,23.5,55.0\n2026-03-14 08:30:20,23.5,55.0\n2026-03-14 08:30:30,23.5,55.0\n```\n\nOn the LCD you get something like `T:23.5C N:%55.0` on the top line and `08:30:34 KAYIT` (logging) on the bottom line.\n\n### Program: the version that also writes to the SD card\nThe program below is the same logger. The only difference is the `kaydet()` (save) function: as well as writing the row to Serial, it also adds it to the SD card. SD is also started inside `setup()`; if the file is new, the header row is written. If there is no SD card, or writing fails, the program keeps running and writes a warning to Serial.\n\n```cpp\n// sketch: veri_kaydedici_sd\n#include <Wire.h>\n#include <SPI.h>\n#include <SD.h>\n#include <LiquidCrystal_I2C.h>\n#include <RTClib.h>\n#include <DHT.h>\n\nconst int DHT_PIN = 5;\nconst int SD_CS = 10;\nconst char DOSYA_ADI[] = \"VERI.CSV\";          // 8.3 kuralı\nconst int BUTON = 2;                          // kaydı durdur / sürdür\nconst uint32_t KAYIT_ARALIGI = 10;            // saniye\nconst unsigned long KONTROL_ARALIGI = 200;    // ms: RTC'ye bu sıklıkta bak\n\nRTC_DS3231 rtc;\nDHT dht(DHT_PIN, DHT22);\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nbool kayitAcik = true;\nbool oncekiBasili = false;\nunsigned long sonButon = 0;\nunsigned long sonKontrol = 0;\nuint32_t sonKayit = 0;                        // son satırın RTC saniyesi (unixtime)\nuint32_t sonEkran = 0;                        // ekranın son güncellendiği saniye\nfloat sonSicak = NAN;\nfloat sonNem = NAN;\nbool sdHazir = false;\n\nString ikiHane(int n) {\n  if (n < 10) return \"0\" + String(n);\n  return String(n);\n}\n\nString sayi(float x) {\n  char tampon[12];\n  dtostrf(x, 1, 1, tampon);\n  return String(tampon);\n}\n\nString satirOlustur(DateTime t, float sicak, float nem) {\n  String s;\n  s.reserve(40);\n  s += t.year();\n  s += '-';\n  s += ikiHane(t.month());\n  s += '-';\n  s += ikiHane(t.day());\n  s += ' ';\n  s += ikiHane(t.hour());\n  s += ':';\n  s += ikiHane(t.minute());\n  s += ':';\n  s += ikiHane(t.second());\n  s += ',';\n  if (!isnan(sicak)) s += sayi(sicak);\n  s += ',';\n  if (!isnan(nem)) s += sayi(nem);\n  return s;\n}\n\nbool sdyeYaz(const String& satir) {\n  File dosya = SD.open(DOSYA_ADI, FILE_WRITE);\n  if (!dosya) return false;\n  dosya.println(satir);\n  dosya.close();                              // kapatınca veri karta yazılır\n  return true;\n}\n\nvoid kaydet(const String& satir) {\n  Serial.println(satir);\n  if (sdHazir && !sdyeYaz(satir)) {\n    Serial.println(\"UYARI: SD'ye yazilamadi\");\n  }\n}\n\nvoid ekranYaz(DateTime t) {\n  lcd.setCursor(0, 0);\n  lcd.print(\"T:\");\n  if (isnan(sonSicak)) lcd.print(\"--\"); else lcd.print(sonSicak, 1);\n  lcd.print(\"C N:%\");\n  if (isnan(sonNem)) lcd.print(\"--\"); else lcd.print(sonNem, 1);\n  lcd.print(\"      \");\n  lcd.setCursor(0, 1);\n  lcd.print(ikiHane(t.hour()));\n  lcd.print(':');\n  lcd.print(ikiHane(t.minute()));\n  lcd.print(':');\n  lcd.print(ikiHane(t.second()));\n  lcd.print(kayitAcik ? \" KAYIT    \" : \" DURDU    \");\n}\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  Serial.begin(9600);\n  rtc.begin();\n  dht.begin();\n  lcd.init();\n  lcd.backlight();\n  Serial.println(\"zaman,sicaklik_C,nem_yuzde\");\n\n  sdHazir = SD.begin(SD_CS);\n  if (!sdHazir) {\n    Serial.println(\"UYARI: SD kart yok, yalniz Serial'e yaziliyor\");\n  } else if (!SD.exists(DOSYA_ADI)) {\n    sdyeYaz(\"zaman,sicaklik_C,nem_yuzde\");    // dosya yeniyse başlığı yaz\n  }\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // Buton: basıldığı an kaydı aç/kapat (50 ms sıçrama koruması)\n  bool basili = (digitalRead(BUTON) == LOW);\n  if (basili && !oncekiBasili && simdi - sonButon > 50) {\n    sonButon = simdi;\n    kayitAcik = !kayitAcik;\n    sonEkran = 0;                             // ekranı hemen yenile\n  }\n  oncekiBasili = basili;\n\n  if (simdi - sonKontrol >= KONTROL_ARALIGI) {\n    sonKontrol = simdi;\n    DateTime t = rtc.now();\n    uint32_t u = t.unixtime();\n\n    // RTC saniyesi aralığa tam bölünüyorsa ve bu saniye daha yazılmadıysa: satır üret\n    if (kayitAcik && u % KAYIT_ARALIGI == 0 && u != sonKayit) {\n      sonKayit = u;\n      sonSicak = dht.readTemperature();\n      sonNem = dht.readHumidity();\n      kaydet(satirOlustur(t, sonSicak, sonNem));\n    }\n\n    if (u != sonEkran) {\n      sonEkran = u;\n      ekranYaz(t);\n    }\n  }\n}\n```\n\nThe SD library is not cheap for the Uno. The compile output of the same program showed about 570 bytes of global variables (RAM) for the version without SD, and about 1290 bytes for the version with SD. The Uno has 2048 bytes of SRAM in total (lesson 34). Flash use also went up from about 13 KB to 21 KB. The numbers change with the library and compiler version.\n\nBecause there is no SD module in the lab, if you run this version, `SD.begin` cannot find a card and gets stuck; after the header row, the screen and logging do not move on. On a real card, `SD.begin` returns `false`, and the program just writes a warning and keeps running.\n\n### How does it work?\n1. `loop()` never uses `delay` (lesson 27). The button is read on every pass, and the RTC every 200 ms.\n2. The condition for producing a row depends on the **RTC's seconds**: `u % 10 == 0`, that is, if `unixtime` (the seconds since 1970) divides exactly by 10. That is why the rows are produced in exact 10-second steps such as 08:30:10, 08:30:20, unaffected by `millis()` drift. `u != sonKayit` (last record) stops the row being written again and again during the 200 ms passes within the same second.\n3. For every row, the DHT22 is read again and `sonSicak` and `sonNem` (latest temperature, latest humidity) are updated. The screen shows this \"latest measurement\"; the time line is refreshed every second.\n4. `satirOlustur` is the same function as in lesson 68. The row format never changes; the `kaydet()` function decides where the row goes.\n5. The button works with the edge detection from lesson 8: only the \"not pressed → pressed\" change counts, and presses repeated within 50 ms are ignored. When logging stops, the screen shows `DURDU` (stopped) and no rows are produced.\n6. If the DHT reading fails, `NaN` comes back; the row is still written, the sensor fields stay empty, and `--` appears on the screen.\n\nOne note: we read the RTC only once per pass (`t`), for both the screen and the log. That is why the row written in a pass and the time on the screen show the same moment.\n\n### Try it\n- Set `KAYIT_ARALIGI` (logging interval) to 30. At which seconds do the rows come out? If you set it to 7, at which seconds do they come out? With values that divide 60 exactly, the rows always fall on the same seconds of the minute; why do they not with 7?\n- Print the date (`14.03`) instead of the time on the bottom line of the screen. Which line will you change?\n- What happens when the DHT22 reading fails? Stop the program with ■, remove the DHT's DATA wire and press ▶ again. What do you see on the screen and in the CSV?\n- In `veri_kaydedici_sd`, if you changed `DOSYA_ADI` (file name) to a name that does not follow the 8.3 rule, what would `sdyeYaz` (write to SD) return (on a real card), and which warning would the program write to Serial? Find out by reading the code.\n- Add a buzzer warning (D8) that sounds when the temperature goes above 30 degrees: add a buzzer to the lab, write the code, and set the DHT's temperature to 31 °C live. Which variable will you check?\n- Press the button to stop logging, wait 30 seconds, and press it again. What do the bottom line of the screen and the timestamps in the CSV show?\n\n### Common mistakes\n- Waiting 10 seconds with `delay(10000)`: the button and the screen freeze for 10 seconds. Use the RTC or `millis()` instead.\n- Reading the RTC on every pass of `loop()`, or never reading it: reading too often keeps the I2C line busy for nothing, and reading too rarely misses the second.\n- Writing the row more than once in the same second: if you forget the `u != sonKayit` check, a row comes out on every 200 ms pass.\n- Forgetting to set the RTC's time: the time in the rows comes out wrong. On a real module, add the `lostPower()` check from lesson 66; in the lab the clock starts from 2026-01-01, and you can set it with `rtc.adjust` if you like.\n- Not closing the file when writing to SD, or (on a real device) removing the card while writing (lesson 67).\n- Connecting LEDs to pins D11, D12, D13 and using the SD card as well: these pins are the SPI lines.\n- Assuming the LCD's address is 0x27: if it does not work, find the address with the address scanner program (lesson 33); in the lab, check that the LCD's \"I2C address\" property is 0x27.\n- Reading the DHT22 more often than every two seconds.",
+            "question": "You ran your logger for three days and the power went off one night. Think about what is in the file in the morning, whether the time is right, and what happens to the measurements during the power cut. What would you change to make the device reliable?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine the pieces of earlier lessons (DHT22, RTC, LCD, button, CSV) in a single project\n- How to link the logging time to the RTC's seconds instead of `millis()`\n- How to stop a row being written again in the same second with a flag\n- How to keep the device running when a reading fails (`NaN`)\n\n### What you should know first\n- Lesson 46: temperature and humidity with the DHT22 (D5)\n- Lessons 27 and 8: non-blocking code with `millis()`, edge detection with a button\n- Lessons 32 and 33: the I2C LCD\n- Lessons 66, 68 and 67: the RTC, the CSV row, open-write-close to SD\n\n### What does the project do?\nThe device takes a measurement every 10 seconds, produces a timestamped CSV row (writes it to Serial, and to the card as well in the SD version) and shows the latest measurement on the LCD. A button (D2) stops and restarts logging. First put the plan into a table:\n\n| Task | Part | How |\n|---|---|---|\n| Time | RTC (I2C, 0x68) | `rtc.now()` |\n| Measurement | DHT22 (D5) | `readTemperature()`, `readHumidity()` |\n| Display | I2C LCD (0x27) | Measurement on top, time and state underneath |\n| Control | Button (D2, `INPUT_PULLUP`) | Turns logging on/off when pressed |\n| Logging | Serial (SD in the SD version) | `satirOlustur()` |\n\nThe RTC and the LCD share the same two wires (A4, A5); because their addresses are different, they do not get mixed up.\n\n### The RTC decides the time\nIf you use `delay(10000)`, the button and the screen freeze during that time. Counting 10 seconds with `millis()` is better, but it can drift over time. In this project, a row is produced when the RTC's `unixtime()` value (the seconds since 1970) divides exactly by 10. That way the rows come out in exact steps such as 08:30:10, 08:30:20. The RTC is read every 200 ms; this is often enough not to miss a single second. Because the condition stays true on each 200 ms pass, the `u != sonKayit` flag is needed. Without it, five rows are written in the same second.\n\n### Do not stop when there is an error\nWhen the DHT reading fails, `NaN` comes back. You still write the row: the timestamp stays and the sensor fields are empty. `--` appears on the screen. In the SD version, if there is no card or writing fails, the device writes the warning to Serial and keeps running. Even when a logger cannot take a measurement, it should record the fact \"I could not take a measurement\".\n\n### Architecture: only `kaydet()` changes\nThe only difference between the Serial version and the SD version is the `kaydet()` (save) function. The row format never changes. The SD library increases RAM use a lot; the Uno has 2048 bytes of SRAM in total, so you should look at the RAM use in the compile output.\n\n### Summary\nThe data logger combines the RTC time, the DHT22 measurement, the CSV row and button control. The logging time is linked to the RTC's seconds, and a flag stops repeat writes in the same second. A reading error does not stop logging; the field is written empty. Only `kaydet()` decides where the row goes.",
+            "concepts": [
+              {
+                "term": "Logging linked to the RTC's seconds",
+                "definition": "A row is produced when the RTC's unixtime value divides exactly by the interval; that way the times always come out in the same steps, independent of millis() drift.",
+                "example": "When unixtime % 10 == 0, the rows 08:30:10, 08:30:20, 08:30:30 are produced.",
+                "pitfall": "Waiting for the logging interval with delay(); the button and the screen freeze during that time."
+              },
+              {
+                "term": "unixtime()",
+                "definition": "The number of seconds since 1970; it expresses the time as a single number.",
+                "example": "The condition u % 10 == 0 catches every moment whose seconds divide by 10.",
+                "pitfall": "Using the seconds value (0-59) on its own; if the interval does not divide 60 (such as 7), uneven steps come out at the change of minute."
+              },
+              {
+                "term": "Repeat-stopping flag (sonKayit)",
+                "definition": "A variable that keeps the second in which the last row was written; it blocks a second row in the same second.",
+                "example": "The condition u != sonKayit makes a row print on only one of the five 200 ms passes.",
+                "pitfall": "Forgetting the flag: a row with the same timestamp comes out on every 200 ms pass."
+              },
+              {
+                "term": "On/off with edge detection",
+                "definition": "Flips a state variable at the moment the button is pressed (the change from \"not pressed\" to \"pressed\").",
+                "example": "kayitAcik = !kayitAcik; logging switches off when it is on, and on when it is off.",
+                "pitfall": "Flipping the state on every pass for as long as the button is held: logging switches on and off out of control."
+              },
+              {
+                "term": "Error-proof logging",
+                "definition": "Even if the reading fails, the timestamp is written and the sensor fields stay empty; the device keeps running.",
+                "example": "If the DHT's DATA wire comes out, the row is written as 2026-01-01 00:00:20,,",
+                "pitfall": "Stopping the program when a reading fails (while(true) {}), or not writing the row at all."
+              },
+              {
+                "term": "The kaydet() split",
+                "definition": "Building the row and writing the row somewhere are in separate functions; when the place written to changes, the row format does not.",
+                "example": "When moving from the Serial version to the SD version, only SD writing is added inside kaydet().",
+                "pitfall": "Copying the formatting separately for each place it is written; different rows come out in the two places."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h7d70-q1",
+                "kind": "numeric",
+                "prompt": "The logger writes a row every 10 seconds and runs without stopping. How many data rows are written in 1 hour?",
+                "answer": 360,
+                "unit": "rows",
+                "explanation": "One hour is 3600 seconds. 3600 ÷ 10 = 360 rows. This calculation is used to estimate how long the card will take to fill up and to choose the logging interval.",
+                "skills": [
+                  "data-logging",
+                  "prog-planning"
+                ]
+              },
+              {
+                "id": "m4h7d70-q2",
+                "kind": "mcq",
+                "prompt": "If KAYIT_ARALIGI is set to 20, at which seconds of the minute are rows produced in this logging logic linked to the RTC's seconds (unixtime % 20 == 0)?",
+                "options": [
+                  "10, 30, 50",
+                  "5, 25, 45",
+                  "0, 20, 40",
+                  "0 and 30"
+                ],
+                "answer": 2,
+                "explanation": "60 seconds divide exactly by 20; that is why the same three seconds come up every minute: 0, 20 and 40 (such as 08:30:20, 08:30:40, 08:31:00). 0 and 30 would be an interval of 30 seconds; 10, 30, 50 are not seconds that divide by 20.",
+                "skills": [
+                  "data-logging",
+                  "rtc-time"
+                ]
+              },
+              {
+                "id": "m4h7d70-q3",
+                "kind": "find-bug",
+                "prompt": "The logging interval is 20 seconds. But the RTC is read every 200 ms, and the row with the same timestamp appears 5 times on the Serial monitor. Which condition is missing?\n\n```\nif (kayitAcik && u % KAYIT_ARALIGI == 0) {\n  kaydet(satirOlustur(t, sicak, nem));\n}\n```",
+                "options": [
+                  "The kayitAcik check is unnecessary",
+                  "Serial.println should be called instead of satirOlustur",
+                  "The u != sonKayit check is missing; all five passes within the same second meet the condition",
+                  "KAYIT_ARALIGI should be a float"
+                ],
+                "answer": 2,
+                "explanation": "When the RTC's seconds divide by 20, that second lasts 1000 ms, and the 200 ms passes find the condition true 5 times in that time. A flag such as u != sonKayit makes the row print once in the same second. The other changes do not stop the repeats.",
+                "skills": [
+                  "data-logging",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h7d70-q4",
+                "kind": "mcq",
+                "prompt": "Why is waiting for the logging interval with delay(10000) a bad idea in this project?",
+                "options": [
+                  "For 10 seconds the button is not read and the screen is not updated; the device does not respond",
+                  "delay() only works up to 1000 ms",
+                  "The RTC resets during this time",
+                  "The CSV row gets corrupted"
+                ],
+                "answer": 0,
+                "explanation": "delay() stops the program: even if the button is pressed, it is not noticed, and the time on the LCD freezes. The fix is a non-blocking check with the RTC's seconds or millis() (lesson 27). delay() is not limited to 1000 ms; the RTC and the CSV row are not affected either.",
+                "skills": [
+                  "prog-timing",
+                  "data-logging"
+                ]
+              },
+              {
+                "id": "m4h7d70-q5",
+                "kind": "mcq",
+                "prompt": "While the logger is running, the DHT22's DATA wire comes out and the reading returns NaN. With the design in the lesson, what appears in the log file?",
+                "options": [
+                  "The timestamp is written, and the temperature and humidity columns are left empty",
+                  "The device stops and no rows are written",
+                  "0 is written in the temperature column",
+                  "The previous measurement is repeated as it was"
+                ],
+                "answer": 0,
+                "explanation": "satirOlustur does not write a field that comes in as NaN and leaves it empty: a row such as 2026-03-14 08:30:20,, comes out. That way the log shows why the measurement is missing, and the columns do not shift. Writing zero would be confused with a real 0 °C measurement.",
+                "skills": [
+                  "data-logging",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -4283,6 +8477,7 @@ export const modul4: ModuleContent = {
       "title": "Simülasyondan gerçeğe",
       "project": "Akıllı oda",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Laboratuvarın hangi gerçek dünya etkilerini modellediğini (ADC basamağı, zamanlama, sensör besleme eşikleri), hangilerini modellemediğini (gürültü, buton sıçraması, 5V çökmesi) ayırt edebilir.\n2. Bir ADC basamağının yaklaşık 4,89 mV olduğunu söyler; ortalama ve histerezisle gürültülü okumadan kararlı bir karar çıkarır.\n3. Buton sıçramasını kararlı kalma süresiyle (debounce) ve `delay()` yüzünden kaçan basışı `millis()` ile giderir.\n4. Besleme değişince analog sensör sayılarının kaydığını bilir, `map` ve `constrain` ile iki nokta kalibrasyonu yapar ve sessiz kalan sensörde çıkışı güvenli tarafta bırakır.\n5. Hatayı alttan üste (fiziksel, adres, kimlik, veri) arar; XOR checksum ile bozuk çerçeveyi yakalar.\n6. PIR, LDR, DHT22, röle, LCD ve butonu tek bir durum makinesinde birleştirerek Akıllı oda projesini kurar.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 30-35 dakikadır. Aşağıdaki plan günde bir ders içindir. Laboratuvarın \"yalan söylediği\" yerler bu hafta bilerek öğretilir; öğrenciye \"laboratuvarda gördün mü, yoksa kodla mı taklit ettik?\" sorusunu sor.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Laboratuvar kusursuzdur: ADC basamağı ve gürültü | ~30 dk | Modellenen ve modellenmeyen etkiler tablosunu oku, ADC basamağını ve sahte gürültüyü dene, tek eşik ile histerezisi karşılaştır. |\n| 2 | Buton sıçraması ve tepki gecikmesi | ~30 dk | Sıçramalı sayacı ve debounce'u çalıştır, `delay` ve `millis` sürümlerinin tepkisini karşılaştır. |\n| 3 | Besleme düşmesi ve kalibrasyon | ~30 dk | Toprak nemini iki nokta ile kalibre et, VCC'yi 3V3'e al, pin yükünü sanal ölçümle oku, `YOK` durumunu üret. |\n| 4 | Hata ayıklama vakası: \"ping çalışıyor ama veri yok\" | ~30 dk | Dört katmanlı testi çalıştır, hata modlarını tek tek üret, XOR çerçevesini elle doğrula. |\n| 5 | Bitirme projesi: Akıllı oda | ~35 dk | Devreyi kur, programı yükle, \"Uçtan uca denemek\" adımlarını sırayla uygula, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Modül 3 ve Modül 4'ün ilk yedi haftasından bilgi gerekir. Başlamadan önce kontrol et:\n- `analogRead`, `map`, `constrain` ve yumuşatma (11. ve 14. dersler) biliniyor mu?\n- Buton, `INPUT_PULLUP` ve debounce (6. ve 8. dersler) biliniyor mu?\n- `millis()` ile bloklamayan kod ve durum makinesi (27. ve 28. dersler) yapılabiliyor mu?\n- PIR, DHT22, LDR ve röle ayrı ayrı kullanıldı mı (Hafta 2-4 ve 24. ders)? Proje bunların hepsini birleştirir.\n- I2C ve LCD (32. ve 33. dersler) kullanımı hatırlanıyor mu?\n\n### Kavram haritası\n- **Sınırlar:** laboratuvar neyi modeller → ADC basamağı, zamanlama, sensör besleme eşiği → neyi modellemez → gürültü, sıçrama, 5V çökmesi, referans kayması\n- **Gürültüye karşı:** ortalama (karekök N) → histerezis (iki eşik) → bant, gürültü genliğinden geniş\n- **Zamana karşı:** sıçrama → kararlı kalma süresi (debounce) → `delay` tuzağı → `millis()`\n- **Güce karşı:** AO = VCC x oran → koşula bağlı kalibrasyon → `map` + `constrain` → pin iç direnci → brown-out → fail-safe\n- **Hata ayıklamaya karşı:** fiziksel → adres → kimlik → veri makullüğü → XOR checksum\n- **Proje:** girdi → durum → çıkış → ISINMA / BOS / DOLU / KAPALI → iki histerezis → güvenli varsayılan\n\n### Sık yapılan hatalar\n- **\"Laboratuvarda sorun yoktu, gerçekte de olmaz\" demek.** Gürültü, sıçrama ve güç çökmesi laboratuvarda yoktur.\n- **Histerezis aralığını gürültüden dar seçmek.** Titreme geri gelir.\n- **Ortalamayı gereksiz büyütmek.** 64 okuma 64 kat iştir; kazanç karekökle artar.\n- **Debounce'ta bırakma sıçramasını unutmak.** Bekleme iki yönde de çalışmalıdır.\n- **Kararlı kalma süresini çok uzun seçmek.** Hızlı basışlar kaçar.\n- **`delay()` içinde butonu dinlemeyi beklemek.** Kısa basış iki okuma arasında kalır.\n- **`constrain` unutmak.** Kalibre edilmiş yüzde 0'ın altına ya da 100'ün üstüne çıkar.\n- **Kalibrasyonu başka beslemede kullanmak.** AO gerilimi VCC ile orantılıdır.\n- **`pulseIn` 0 döndüğünde \"mesafe 0\" sanmak.** Cevap yoktur; çıkışı güvenli tarafta bırak.\n- **Adres cevabını \"cihaz doğru\" saymak.** Kimlik ve veri katmanları ayrı sınanır.\n- **Fanı kartın 5V ucundan beslemek.** Gerçek devrede kart sıfırlanabilir; laboratuvar göstermez.\n- **Akıllı odada PIR ısınmasını hesaba katmamak.** Açılışta oda dolu sanılır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Laboratuvarın modellediği ve modellemediği etkileri kendi cümlelerinle bir tabloya yaz; her satıra gerçek devrede kullanacağın önlemi ekle.\n4. Hesabı elle yap: ADC basamağı kaç mV? 3V3 ile beslenen toprak nemi modülünde nem 0,5 iken ham değer ne olur?\n5. Akıllı oda programının üç durumunu kağıda çiz ve her oktaki koşulu yaz.\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Akıllı oda)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Birkaç parça bağlı değil ya da pinler karışmış | Tüm parçalar tabloya göre doğru bağlı | Bağlantılar düzenli ve her parçanın görevi açıklanıyor |\n| Durum makinesi | Durumlar yok, bayraklar dağınık | ISINMA, BOS, DOLU ve KAPALI durumları doğru geçiyor | Durumlar tablo ve kodla birebir uyuşuyor, yeni durum eklenmiş |\n| Eşikler | Tek eşik, lamba ya da fan titriyor | Işık ve fan histerezisle karar veriyor | Eşikler denemeyle seçilmiş ve nedenleri açıklanıyor |\n| Güvenli davranış | DHT hatasında fan açık kalıyor | DHT hatasında fan kapalı ve LCD hata yazıyor | Başka sensör arızaları da ele alınmış |\n| Zamanlama | `delay` kullanıyor, buton ve PIR geç tepki veriyor | `millis()` ile her iş kendi zamanında | Süreler ve DHT aralığı gerekçesiyle seçilmiş |\n| Gerçek dünya farkı | Laboratuvar farkından söz etmiyor | Gürültü, sıçrama ve güç farkını söylüyor | Gerçek devre için kalibrasyon ve önlem listesi yazıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta yeni bir sensör öğrenilmez; öğrencinin \"çalışıyor\" sözünün ne kadar kanıta dayandığını sorgulaması hedeflenir. Laboratuvarın sınırlarını bilmek, gerçek devreye geçişin en önemli hazırlığıdır.\n- **Nasıl destek olunur?** Öğrenciye cevabı söylemek yerine şunu sor: \"Bunu laboratuvar gerçekten üretti mi, yoksa biz mi taklit ettik?\", \"Bu hatayı hangi katmanda arıyorsun?\", \"Sensör cevap vermezse çıkış ne olmalı?\"\n- **Süre.** Dersler dolu (30-35 dk). Aynı gün iki ders yerine aralıklı çalışmak kalıcılığı artırır.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Ders gerçek kartla tekrarlanacaksa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz; motor, röle ve servo için ayrı güç kaynağı ve ortak GND kullanılır. Pil kullanılacaksa kısa devre ve ters bağlamaya dikkat edilir.\n- **Hyvex vakası.** 74. ders, Hyvex ekibinin staj programındaki bir vakaya dayanır; yalnızca programda yazılan bilgiler aktarılmıştır.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can tell apart which real-world effects the lab models (ADC step, timing, sensor supply thresholds) and which it does not (noise, button bounce, 5V collapse).\n2. Can say that one ADC step is about 4.89 mV; can get a steady decision out of a noisy reading with averaging and hysteresis.\n3. Can fix button bounce with a steady time (debouncing), and a press missed because of `delay()` with `millis()`.\n4. Knows that analogue sensor numbers drift when the supply changes, can do a two-point calibration with `map` and `constrain`, and can leave the output on the safe side when a sensor stays silent.\n5. Can look for a fault from the bottom up (physical, address, identity, data); can catch a corrupted frame with an XOR checksum.\n6. Can build the Smart room project by combining the PIR, LDR, DHT22, relay, LCD and button in a single state machine.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 30-35 minutes. The plan below is for one lesson a day. This week the places where the lab \"tells lies\" are taught on purpose; ask the learner the question \"did you see it in the lab, or did we imitate it in code?\".\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | The lab is perfect: ADC steps and noise | ~30 min | Read the table of modelled and unmodelled effects, try the ADC step and the fake noise, compare a single threshold with hysteresis. |\n| 2 | Button bounce and response delay | ~30 min | Run the bouncing counter and the debouncing, compare the response of the `delay` and `millis` versions. |\n| 3 | Supply drop and calibration | ~30 min | Calibrate soil moisture with two points, move VCC to 3V3, read the pin load with the virtual meter, produce the `YOK` case. |\n| 4 | A debugging case: \"ping works but there is no data\" | ~30 min | Run the four-layer test, produce the failure modes one by one, check the XOR frame by hand. |\n| 5 | Final project: Smart room | ~35 min | Build the circuit, upload the program, carry out the \"Testing from end to end\" steps in order, assess it with the project rubric. |\n\n### Prerequisite check\nThis week needs knowledge from Module 3 and the first seven weeks of Module 4. Check before you start:\n- Are `analogRead`, `map`, `constrain` and smoothing (lessons 11 and 14) known?\n- Are the button, `INPUT_PULLUP` and debouncing (lessons 6 and 8) known?\n- Can they write non-blocking code with `millis()` and a state machine (lessons 27 and 28)?\n- Have the PIR, DHT22, LDR and relay each been used on their own (Weeks 2-4 and lesson 24)? The project combines all of them.\n- Do they remember how to use I2C and the LCD (lessons 32 and 33)?\n\n### Concept map\n- **Limits:** what the lab models → ADC step, timing, sensor supply threshold → what it does not model → noise, bounce, 5V collapse, reference drift\n- **Against noise:** averaging (square root of N) → hysteresis (two thresholds) → a band wider than the noise\n- **Against time:** bounce → steady time (debouncing) → the `delay` trap → `millis()`\n- **Against power:** AO = VCC x ratio → calibration tied to conditions → `map` + `constrain` → pin internal resistance → brown-out → fail-safe\n- **Against faults:** physical → address → identity → data sensibility → XOR checksum\n- **Project:** input → state → output → ISINMA / BOS / DOLU / KAPALI → two hystereses → safe default\n\n### Common mistakes\n- **Saying \"there was no problem in the lab, so there will be none in reality\".** Noise, bounce and power collapse do not exist in the lab.\n- **Choosing a hysteresis band narrower than the noise.** The flicker comes back.\n- **Making the average needlessly large.** 64 readings are 64 times the work; the gain grows with the square root.\n- **Forgetting the release bounce when debouncing.** The wait must work in both directions.\n- **Choosing a steady time that is too long.** Fast presses are missed.\n- **Expecting the button to be listened to during `delay()`.** A short press falls between two readings.\n- **Forgetting `constrain`.** The calibrated percentage goes below 0 or above 100.\n- **Using a calibration with a different supply.** The AO voltage is in proportion to VCC.\n- **Taking it as \"distance 0\" when `pulseIn` returns 0.** There is no answer; leave the output on the safe side.\n- **Counting an answer at the address as \"the device is right\".** The identity and data layers are tested separately.\n- **Powering the fan from the board's 5V pin.** In a real circuit the board can reset; the lab does not show this.\n- **Not taking the PIR warm-up into account in the smart room.** At start-up the room is thought to be occupied.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the mini quiz questions you got wrong, then solve the question again.\n3. Write the effects the lab models and does not model in a table, in your own words; add to each row the measure you will use in a real circuit.\n4. Do the calculation by hand: how many mV is an ADC step? On a soil moisture module powered with 3V3, what is the raw value when the moisture is 0.5?\n5. Draw three states of the smart room program on paper and write the condition on each arrow.\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions per lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Smart room)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | Some parts are not connected, or the pins are mixed up | All parts connected correctly according to the table | Tidy connections, and the job of each part is explained |\n| State machine | No states, scattered flags | The ISINMA, BOS, DOLU and KAPALI states change correctly | The states match the table and the code exactly; a new state has been added |\n| Thresholds | A single threshold; the lamp or fan flickers | The light and the fan decide with hysteresis | The thresholds were chosen by trying, and the reasons are explained |\n| Safe behaviour | The fan stays on when the DHT fails | When the DHT fails, the fan is off and the LCD shows the error | Other sensor failures are handled too |\n| Timing | Uses `delay`; the button and the PIR react late | Every job at its own time with `millis()` | The times and the DHT interval were chosen with reasons |\n| Real-world difference | Does not mention the lab difference | Mentions the noise, bounce and power differences | Writes a calibration and precautions list for a real circuit |\n\n### Note for parents and teachers\n- **Aim.** No new sensor is learnt this week; the aim is for the learner to question how much evidence is behind the word \"it works\". Knowing the limits of the lab is the most important preparation for moving to a real circuit.\n- **How to help.** Instead of giving the learner the answer, ask: \"Did the lab really produce this, or did we imitate it?\", \"Which layer are you looking for this fault in?\", \"If the sensor does not answer, what should the output be?\"\n- **Time.** The lessons are full (30-35 min). Spacing them out, instead of doing two lessons on the same day, helps the learning stick.\n- **Safety.** Everything on this platform is virtual. If the lesson is repeated with a real board, no circuit is ever built with mains voltage (220 V); a separate power supply and a common GND are used for motors, relays and servos. If batteries are used, watch out for short circuits and connecting them the wrong way round.\n- **The Hyvex case.** Lesson 74 is based on a case from the Hyvex team's internship programme; only the information written in the programme has been passed on.\n- **Progress.** The results of the mini quiz at the end of each lesson appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Laboratuvar kusursuzdur: ADC basamağı ve gürültü",
@@ -4391,7 +8586,115 @@ export const modul4: ModuleContent = {
                 "sens-noise"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The lab is perfect: ADC steps and noise",
+            "problem": "In the lab you set the potentiometer to the middle, your threshold program lit the LED at exactly the right moment, and it never flickered. Someone who puts the same code into a real circuit sees the LED keep flashing on and off while the light is steady. Same code, same circuit. Where is the difference? The answer: the lab deliberately draws a **clean** world. This week you will separate what that clean world hides from the real-world effects the lab really does show.",
+            "contentMd": "### What does the lab model, and what does it not?\nThis week we set a rule: we will say \"you saw it in the lab\" only if the lab **really** produces an effect. If it does not, we will write that clearly and imitate the effect in code.\n\n| Real-world effect | In the lab |\n|---|---|\n| ADC step (10 bits, 1024 levels) | **Modelled.** Every voltage is rounded to the nearest step. |\n| Analogue noise (wires, power line, ADC jitter) | **Not modelled.** The lab's voltages are perfectly steady. |\n| ADC offset, gain error, drift of the reference voltage | **Not modelled.** The reference is exactly 5.00 V. |\n| Button bounce | **Not modelled** (lesson 72). |\n| Timing (`delay`, `millis`, the `pulseIn` time) | **Modelled.** The code runs with real Uno instructions at 16 MHz. |\n| PIR warm-up | **Modelled** (shortened; lesson 75). |\n| Sensors' minimum supply voltage | **Modelled** (lesson 73). |\n| The 5 V line collapsing, brown-out | **Not modelled** (lesson 73). |\n\nAll the \"Not modelled\" rows in this table are waiting for you in a real circuit. In this lesson we deal with the first one: **noise**, and together with it the **ADC step**.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Potentiometer | VCC → **5V**, SIG → **A0**, GND → **GND** |\n| Resistor (330 Ω) | 1 → **D13**, 2 → LED A |\n| LED | A → the resistor's pin 2, K → **GND** |\n\n### 1) The ADC step: this is modelled\n`analogRead` divides the 0-5 V range into 1024 steps (lesson 11). One step is about 5 V / 1023 = 4.9 mV. Voltages in between are rounded to the nearest step. This sketch converts the raw value into millivolts:\n\n```cpp\n// sketch: adc_basamak\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = analogRead(A0);\n  float mv = ham * 5000.0 / 1023.0;\n  Serial.print(\"ADC=\");\n  Serial.print(ham);\n  Serial.print(\" mV=\");\n  Serial.println(mv, 1);\n  delay(500);\n}\n```\n\nWhen you set the potentiometer's position to 0.51, the voltage at A0 becomes 2.550 V. The ADC gives 522 and the program prints 2551.3 mV. The 1.3 mV difference is not a measurement error; it is **step rounding**: step 522 corresponds to 2551.3 mV, and 2550 mV is rounded to this step. If you want a measurement that tells 1 mV apart, a 10-bit ADC is not enough. Also, when you move the position by 0.01, the ADC jumps about 10 steps; the steps in between only show up if the voltage is adjusted more finely.\n\n### 2) Noise: this is not modelled\nIn the lab, when you leave the potentiometer still, the ADC value does **not** move at all. In reality it does: wires work like aerials, the power line ripples, and the ADC itself jitters by a step or two. The ATmega328P datasheet gives the ADC's absolute accuracy as a few steps (about ±2); check your own datasheet for the exact number.\n\nBecause the lab produces no noise, we will **make** it: we will add a random number to the reading in code. This is an imitation; real noise has a different shape, but it is enough to see what your code must withstand. `random(-8, 9)` gives a whole number between -8 and +8 (9 not included). Because we fix the starting point with `randomSeed`, the same sequence comes out on every run.\n\nThe sketch below prints a single noisy reading and the average of 16 readings side by side (the smoothing idea from lesson 14):\n\n```cpp\n// sketch: gurultu_ortalama\nconst int SENSOR = A0;\n\nint gurultuluOku() {\n  return analogRead(SENSOR) + random(-8, 9);   // sahte gürültü: ±8 basamak\n}\n\nint ortalama(int adet) {\n  long toplam = 0;\n  for (int i = 0; i < adet; i++) {\n    toplam += gurultuluOku();\n  }\n  return toplam / adet;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  randomSeed(42);\n}\n\nvoid loop() {\n  Serial.print(\"Tek=\");\n  Serial.print(gurultuluOku());\n  Serial.print(\" Ort16=\");\n  Serial.println(ortalama(16));\n  delay(300);\n}\n```\n\nWith the potentiometer steady at 0.50, `Tek` (single) wanders between about 503 and 519 on each row, while `Ort16` (average of 16) stays in a much narrower range. Averaging does not remove noise; it shrinks it: with 16 readings the noise drops about 4 times (the square-root rule). The cost is time: 16 readings mean 16 times the work.\n\n### 3) Noise makes a threshold flicker\nA program that decides with a single threshold changes its decision on every wave of noise while the value is near the threshold. Let's add the same fake noise and link the LED on D13 to a threshold:\n\n```cpp\n// sketch: esik_ham\nconst int SENSOR = A0;\nconst int LED = 13;\nconst int ESIK = 512;\n\nint gurultuluOku() {\n  return analogRead(SENSOR) + random(-8, 9);\n}\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  randomSeed(42);\n}\n\nvoid loop() {\n  digitalWrite(LED, gurultuluOku() > ESIK ? HIGH : LOW);\n  delay(5);\n}\n```\n\nLeave the potentiometer at about the 0.50 position: the LED tries to flash on and off dozens of times a second. The fix is two thresholds (**hysteresis**, lesson 35): to switch on, go a little above the threshold; to switch off, go a little below it. The gap between the two thresholds must be bigger than the size of the noise; here the noise is ±8 and the gap ±12.\n\n```cpp\n// sketch: esik_histerezis\nconst int SENSOR = A0;\nconst int LED = 13;\nconst int ACMA = 524;\nconst int KAPAMA = 500;\nbool yanik = false;\n\nint gurultuluOku() {\n  return analogRead(SENSOR) + random(-8, 9);\n}\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  randomSeed(42);\n}\n\nvoid loop() {\n  int deger = gurultuluOku();\n  if (!yanik && deger > ACMA) yanik = true;\n  if (yanik && deger < KAPAMA) yanik = false;\n  digitalWrite(LED, yanik ? HIGH : LOW);\n  delay(5);\n}\n```\n\nWhen you hold the potentiometer around 0.50, the LED no longer flickers; when you slowly take it to 0.6 it lights **once**, and when you bring it back down it goes off **once**.\n\n### Extra real-world knowledge: reference drift\nThe `analogRead` value is the **ratio of the measured voltage to the supply voltage** (on the Uno the default reference is the supply line). If the supply is 4.70 V instead of 5.00 V, the same sensor voltage gives a bigger ADC value, and the calculation `ham * 5.0 / 1023.0` prints the wrong voltage. Because the lab's reference is always exactly 5.00 V, this drift does not show; the measurement needs to be checked in a real circuit.\n\n### How does it work?\n1. `adc_basamak` (ADC step) converts the raw value into millivolts; the small difference in the output comes from the ADC step.\n2. `gurultu_ortalama` (noise average) adds the noise that the lab does not have with `random`, and shows that the average is steadier than a single reading.\n3. `esik_ham` (raw threshold) decides with a single threshold and flickers because of the noise.\n4. `esik_histerezis` (hysteresis threshold) separates the switch-on and switch-off thresholds; the LED only changes when the value really crosses to the other side.\n\n### Try it\n- In `gurultu_ortalama`, change the range `random(-8, 9)` to `random(-30, 31)`. How much does `Ort16` move? What happens if you make the number of readings 64, and what does it cost in time?\n- In `esik_histerezis`, bring `ACMA` (switch on) and `KAPAMA` (switch off) very close together (510 and 514). Does the flicker come back? Why is a gap smaller than half the noise size not enough?\n- Move the potentiometer's position in steps of 0.01 and look at the `adc_basamak` output. How many steps does the value jump each time? How many mV is one step?\n\n### Common mistakes\n- Saying \"it did not flicker in the lab, so it will not flicker in reality either\". The lab's noise is zero.\n- Choosing a hysteresis gap narrower than the size of the noise.\n- Making the number of readings very large when averaging to reduce noise, and slowing the program down.\n- Converting the ADC value into a voltage assuming a 5.00 V reference, and thinking the result is exactly right.",
+            "question": "In this lesson you saw that there is no noise at all in the lab, but that your code has to withstand noise. Which part of your work that runs without problems in the lab would you not count as \"done\" without being sure it will work in a real circuit?",
+            "explainerMd": "### What you will learn in this lesson\n- How to tell apart which real-world effects the lab models and which it does not\n- What an ADC step is and how many millivolts one step corresponds to\n- What noise is and how averaging shrinks it\n- Why a single threshold flickers and how two thresholds (hysteresis) fix it\n\n### What you should know first\n- Lesson 11: `analogRead` and the 0-1023 range (10-bit ADC)\n- Lesson 14: `map`, `constrain` and smoothing (averaging)\n- Lesson 35: the idea of hysteresis and deciding with a threshold\n\n### The lab is a clean world\nThe lab does not imitate every side of a real circuit. This week we set a rule: you say \"I saw it in the lab\" only if the lab really produces an effect. If it does not, you know this clearly and imitate the effect in code.\n\n| Effect | In the lab |\n|---|---|\n| ADC step (1024 levels) | Modelled |\n| Timing (`delay`, `millis`) | Modelled |\n| Analogue noise | Not modelled |\n| Drift of the reference voltage | Not modelled |\n| Button bounce | Not modelled |\n\n### The ADC step\n`analogRead` divides the 0-5 V range into 1023 equal parts. One **step** is 5 V / 1023 ≈ 4.89 mV. Voltages in between are rounded to the nearest step. So at best, the ADC sees voltage in steps of 4.89 mV. For example, a voltage of 2.550 V is rounded to step 522, and converting it back gives 2551.3 mV. This 1.3 mV difference is not an error; it is rounding.\n\n### Noise\n**Noise** is the small, random wobbles that get mixed into the sensor voltage without anyone wanting them. Wires behave like aerials, the power line ripples, and the ADC itself jitters by a step or two. The lab's voltage, however, is perfectly steady, so when you leave the potentiometer still, the value does not move at all. In a real circuit it does.\n\nYou cannot remove noise, but you can shrink it: the average of N readings reduces the noise about square-root(N) times. 4 times with 16 readings, 8 times with 64 readings. The cost is time: 64 readings mean 64 times more work than 1 reading.\n\n### Noise makes a threshold flicker\nIf you decide with a single threshold (`deger > 512`), while the value is near the threshold the decision changes on every wave of noise and the LED flashes on and off. The fix is two thresholds:\n\n```\nto switch on:   value > 524\nto switch off:  value < 500\nin between:     the previous decision is kept\n```\n\nThe gap in between (24 here) must be bigger than the size of the noise. If the noise is ±8, a gap narrower than ±8 brings the flicker back.\n\n### Summary\nThe lab really models the ADC step and timing, but not noise, button bounce or reference drift. A reading is at most as accurate as one step. Against noise, you use averaging and a two-threshold decision (hysteresis). The sentence \"it did not flicker in the lab\" is not proof that it will not flicker in a real circuit.",
+            "concepts": [
+              {
+                "term": "ADC step",
+                "definition": "The smallest voltage step a 10-bit ADC can tell apart: 5 V / 1023, about 4.89 mV.",
+                "example": "2.550 V is rounded to step 522; converting it back gives 2551.3 mV, and the 1.3 mV in between is the rounding difference.",
+                "pitfall": "Thinking you can measure a 1 mV change with a 10-bit ADC; the step is 4.89 mV."
+              },
+              {
+                "term": "Noise",
+                "definition": "Small, random wobbles that get mixed into the measured voltage without anyone wanting them.",
+                "example": "With the potentiometer still, in a real circuit the analogRead value wobbles 510, 513, 509.",
+                "pitfall": "Assuming that because the value did not move in the lab, it will not move in a real circuit either."
+              },
+              {
+                "term": "Averaging",
+                "definition": "Shrinking noise by using the average of many readings; with N readings it drops about square-root(N) times.",
+                "example": "The average of 16 readings shrinks the noise about 4 times, the average of 64 readings 8 times.",
+                "pitfall": "Making the number of readings needlessly large and slowing the program down; 64 readings are 64 times the work of 1 reading."
+              },
+              {
+                "term": "Hysteresis",
+                "definition": "Using two separate thresholds for switching on and off, and keeping the previous decision in the region between them.",
+                "example": "The LED lights when the value goes above 524 and goes off when it drops below 500; in between it stays as it is.",
+                "pitfall": "Choosing a gap between the two thresholds narrower than the size of the noise; the flicker comes back."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h8d1-q1",
+                "kind": "mcq",
+                "prompt": "Which of these do you really see in the lab?",
+                "options": [
+                  "The ADC value jittering by a few steps while the potentiometer is still",
+                  "The voltage being rounded to the nearest ADC step",
+                  "The supply voltage drifting from 5.00 V to 4.70 V",
+                  "A button bouncing several times on one press"
+                ],
+                "answer": 1,
+                "explanation": "The lab models the ADC step: every voltage is rounded to the nearest step. Noise, reference drift and button bounce are not modelled; the lab's voltages are perfectly steady.",
+                "skills": [
+                  "sens-sim-limits",
+                  "sens-adc"
+                ]
+              },
+              {
+                "id": "m4h8d1-q2",
+                "kind": "numeric",
+                "prompt": "A 10-bit ADC divides the 0-5 V range into 1023 equal steps. About how many millivolts is one step? (Two decimal places are enough.)",
+                "answer": 4.89,
+                "tolerance": 0.05,
+                "unit": "mV",
+                "explanation": "5000 mV / 1023 ≈ 4.89 mV. That is why a 10-bit ADC cannot tell 1 mV changes apart; the result is always rounded to the nearest step.",
+                "skills": [
+                  "sens-adc"
+                ]
+              },
+              {
+                "id": "m4h8d1-q3",
+                "kind": "predict-output",
+                "prompt": "What does the Serial monitor show when this code runs?\n\n```cpp\nconst int ACMA = 524;\nconst int KAPAMA = 500;\nint okumalar[] = {510, 530, 515, 505, 495, 520};\nbool yanik = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 6; i++) {\n    int v = okumalar[i];\n    if (!yanik && v > ACMA) yanik = true;\n    if (yanik && v < KAPAMA) yanik = false;\n    Serial.print(yanik ? 1 : 0);\n  }\n}\nvoid loop() {}\n```",
+                "options": [
+                  "010100",
+                  "011110",
+                  "000000",
+                  "011100"
+                ],
+                "answer": 3,
+                "explanation": "510 is below the threshold: 0. 530 > 524: it lights, 1. 515 and 505 are between the two thresholds, so the decision is kept: 1, 1. 495 < 500: it goes off, 0. 520 is inside the band again and already off: 0. The output is 011100. If you used a single threshold (512), it would also light at 515 and 520.",
+                "skills": [
+                  "sens-hysteresis"
+                ]
+              },
+              {
+                "id": "m4h8d1-q4",
+                "kind": "find-bug",
+                "prompt": "The noise is ±8 steps. This program still makes the LED flicker. Where is the bug?\n\n```cpp\nconst int ACMA = 510;\nconst int KAPAMA = 514;\nbool yanik = false;\n// ...\nif (!yanik && deger > ACMA) yanik = true;\nif (yanik && deger < KAPAMA) yanik = false;\n```",
+                "options": [
+                  "The deger variable should not have been read with analogRead",
+                  "The constants should not have been const",
+                  "ACMA and KAPAMA are the wrong way round: KAPAMA is bigger than ACMA, so there is no band",
+                  "int should have been used instead of bool"
+                ],
+                "answer": 2,
+                "explanation": "The threshold to switch on is 510 and to switch off 514: when the value is 511 it lights, but in the same pass it goes off straight away because 511 < 514. For hysteresis, the switch-on threshold must be higher than the switch-off threshold (for example 524 and 500), and the gap between them must be bigger than the noise. The other options have nothing to do with the behaviour.",
+                "skills": [
+                  "sens-hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h8d1-q5",
+                "kind": "numeric",
+                "prompt": "With the average of N readings, noise drops about square-root(N) times. About how many times does the average of 64 readings shrink the noise?",
+                "answer": 8,
+                "tolerance": 0,
+                "explanation": "Square-root(64) = 8. But the cost is 64 times the work: it drops 4 times with 16 readings and 8 times with 64; the gain has diminishing returns, so making the number of readings needlessly large slows the program down.",
+                "skills": [
+                  "sens-noise"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Buton sıçraması ve tepki gecikmesi",
@@ -4503,7 +8806,118 @@ export const modul4: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Button bounce and response delay",
+            "problem": "You wrote a counter program: every time you press the button, the number goes up by one. It works perfectly in the lab. With a real button, the same program sometimes counts 1, sometimes 3, sometimes 7 for a single press. And there is another problem: when you add other jobs to the program, short presses are sometimes not noticed at all. Both are different faces of the same kind of bug: \"the code is right, but time and the input are dirty\".",
+            "contentMd": "### The lab button is clean\nA real button is a mechanical part. As the contacts touch each other, they chatter for a short time; the pin can go back and forth between HIGH and LOW several times on a single press (debouncing in lesson 8). **The button part in the lab does not do this:** when it is pressed, the pin goes LOW in one move; when it is released, it goes HIGH in one move. So bounce is **not modelled** in the lab.\n\nWe will add bounce in code. The `hamOku()` (raw read) function below imitates a real contact: every time the button's state changes, for 5 ms it gives the reading right, then reversed, in turn. You do not have to understand this function; its only job is to \"dirty\" the lab's clean button. Real bounce has a different length and number of chatters on every press; the imitation here is always the same.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button | A → **D2**, B → **GND** (`INPUT_PULLUP`) |\n| Resistor (330 Ω) | 1 → **D13**, 2 → LED A |\n| LED | A → the resistor's pin 2, K → **GND** |\n\n### 1) Count a bouncing button\nThe counter counts the falling edge (the change to LOW) but takes no account of bounce:\n\n```cpp\n// sketch: sayac_ham\nconst int BUTON = 2;\nconst int LED = 13;\nint sayac = 0;\nbool onceki = false;\nbool ledDurum = false;\n\n// Gerçek kontağın sıçramasını taklit eder: her değişimden sonraki 5 ms içinde tek ms'lerde ters okur.\nbool hamOku() {\n  static bool son = false;\n  static bool var = false;\n  static unsigned long degisim = 0;\n  bool temiz = (digitalRead(BUTON) == LOW);\n  if (temiz != son) {\n    son = temiz;\n    degisim = millis();\n    var = true;\n  }\n  unsigned long gecen = millis() - degisim;\n  if (var && gecen < 5 && gecen % 2 == 1) return !temiz;\n  return temiz;\n}\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool basili = hamOku();\n  if (basili && !onceki) {          // basılmaya yeni geçti\n    sayac++;\n    ledDurum = !ledDurum;\n    digitalWrite(LED, ledDurum);\n    Serial.print(\"Sayac: \");\n    Serial.println(sayac);\n  }\n  onceki = basili;\n}\n```\n\nPress the button **once** and release it. Because of the imitated bounce, you see 3 extra fake \"presses\" while pressing and 2 while releasing: the Serial monitor prints `Sayac: 5` (counter) and the LED changes state five times; the fact that it ends up \"on\" is just chance. The code had no bug; the input was dirty.\n\nThe fix: after the pin changes, wait for it to **stay calm** for a certain time. If the value has stayed the same for 20 ms, accept it:\n\n```cpp\n// sketch: sayac_temiz\nconst int BUTON = 2;\nconst int LED = 13;\nconst unsigned long SAKIN_SURE = 20;   // ms\nint sayac = 0;\nbool ledDurum = false;\nbool sonHam = false;\nbool kararli = false;\nunsigned long sonDegisim = 0;\n\n// Gerçek kontağın sıçramasını taklit eder (sayac_ham ile aynı).\nbool hamOku() {\n  static bool son = false;\n  static bool var = false;\n  static unsigned long degisim = 0;\n  bool temiz = (digitalRead(BUTON) == LOW);\n  if (temiz != son) {\n    son = temiz;\n    degisim = millis();\n    var = true;\n  }\n  unsigned long gecen = millis() - degisim;\n  if (var && gecen < 5 && gecen % 2 == 1) return !temiz;\n  return temiz;\n}\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool ham = hamOku();\n  if (ham != sonHam) {              // pin oynadı: sayacı sıfırla\n    sonHam = ham;\n    sonDegisim = millis();\n  }\n  if (millis() - sonDegisim >= SAKIN_SURE && ham != kararli) {\n    kararli = ham;                  // yeterince sakin kaldı: kabul et\n    if (kararli) {\n      sayac++;\n      ledDurum = !ledDurum;\n      digitalWrite(LED, ledDurum);\n      Serial.print(\"Sayac: \");\n      Serial.println(sayac);\n    }\n  }\n}\n```\n\nBecause the imitated bounce lasts 5 ms, the 20 ms calm wait swallows it completely: one press, one count. On real buttons the right time depends on the part; if you choose it too short, bounce leaks through; if you choose it too long, you miss fast presses.\n\n### 2) Response delay: the pin is not read during `delay`\nTiming effects are **real** in the lab, because the code runs at its real speed. During `delay(500)`, the program does not look at the pin. The program below waits half a second for \"another job\" and looks at the button only once in that interval:\n\n```cpp\n// sketch: tepki_delay\nconst int BUTON = 2;\nconst int LED = 13;\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTON) == LOW) {\n    Serial.println(\"BASILDI\");\n    digitalWrite(LED, HIGH);\n  } else {\n    digitalWrite(LED, LOW);\n  }\n  delay(500);                       // \"başka iş\" yerine geçen bekleme\n}\n```\n\nHold the button down for less than half a second: most of the time `BASILDI` (pressed) is never printed. If you press for longer, the response is up to 500 ms late. The fix is the `millis()` method from lesson 27: the \"other job\" keeps its own time, and the button is checked on every pass.\n\n```cpp\n// sketch: tepki_millis\nconst int BUTON = 2;\nconst int LED = 13;\nconst unsigned long ARALIK = 500;   // \"başka iş\" 500 ms'de bir\nunsigned long sonIs = 0;\n\nvoid setup() {\n  pinMode(BUTON, INPUT_PULLUP);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTON) == LOW) {\n    Serial.println(\"BASILDI\");\n    digitalWrite(LED, HIGH);\n  } else {\n    digitalWrite(LED, LOW);\n  }\n  if (millis() - sonIs >= ARALIK) {\n    sonIs = millis();\n    Serial.println(\"tik\");          // \"başka iş\"\n  }\n}\n```\n\nIn this version the LED responds to the button straight away. But watch out: because `BASILDI` is printed on every pass, the Serial monitor fills up if you hold the button down. You can fix this yourself with edge detection (lesson 8).\n\n### Delays and warm-up: sensors do not answer instantly\nReal sensors have their own timings. The lab **models** some of them and not others:\n\n| Time | In the lab |\n|---|---|\n| HC-SR04 measurement (in proportion to the distance, about 6 ms for 100 cm) | Modelled (the `pulseIn` time can be measured) |\n| DHT reading interval (at least 2 s) | Modelled (the library waits) |\n| I2C LCD start-up (about 1 s) | Modelled |\n| PIR warm-up | Modelled, but shortened: 2 s in the lab, typically between half a minute and a minute in reality (it depends on the module) |\n| Warm-up of the MQ-2 gas sensor | **Not modelled** (the waiting time in lesson 53 is only for a real circuit) |\n| Sensor lifetime, drift with temperature | **Not modelled** |\n\nThe \"modelled\" rows in the table mean that if you forget a waiting time in your code, the lab will catch you too. In the \"not modelled\" rows, however, the lab's silence is no guarantee.\n\n### How does it work?\n1. `sayac_ham` (raw counter) counts every time it sees a falling edge. Because bounce multiplies the edges, a single press and release produce 5 counts.\n2. `sayac_temiz` (clean counter) measures how long the pin stays steady; the 5 ms bounce sequence disappears within the 20 ms wait.\n3. `tepki_delay` looks at the pin every half second; a short press in between is not seen.\n4. `tepki_millis` looks at the pin on every pass; the slow job keeps its own clock.\n\n### Try it\n- Set `SAKIN_SURE` (calm time) in `sayac_temiz` to 0. Which sketch does it turn into like this?\n- Set `SAKIN_SURE` to 3: does the 5 ms imitated bounce leak through? Why?\n- In the `tepki_delay` program, change `delay(500)` to 50. Are short presses caught now? What if you make it 5?\n- Change `gecen < 5` inside `hamOku()` to 15. How does making the imitated bounce longer affect the 20 ms wait?\n\n### Common mistakes\n- Saying \"there was no bounce in the lab, so debouncing is unnecessary\". The lab's button is clean; the real one is not.\n- Trying to get rid of bounce with `delay(50)`: it works, but it makes the program wait, and the problem from `tepki_delay` appears.\n- Forgetting the bounce that happens on release: waiting when pressing but not when releasing brings fake counts.\n- Guessing the `SAKIN_SURE` value without measuring.",
+            "question": "Debouncing means accepting that the input is dirty and saying \"stay calm for a bit\". What does this cost? On a game button that is pressed very fast, would a 20 ms wait cause a problem, and if so, how would you solve it?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a real button \"bounces\" and why the lab button does not\n- How to debounce with a waiting margin (the time the pin stays steady) and what it costs\n- Why the pin is not read during `delay()` and how a short press gets missed\n- How `millis()` makes the response faster\n\n### What you should know first\n- Lesson 6: `digitalRead`, the button and `INPUT_PULLUP` (pressed = LOW)\n- Lesson 8: debouncing and edge detection\n- Lessons 26 and 27: the `delay` trap and `millis()`\n\n### A button is a mechanical part\nInside a real button there are metal contacts. When you press, these contacts hit each other and chatter for a very short time. On a single press the pin goes back and forth between HIGH and LOW several times. This is called **bounce**. Bounce usually lasts milliseconds, but because the processor works in microseconds, it sees each one as a separate press.\n\nThe button part in the lab does not do this: the pin goes LOW in one move. That is why we imitated bounce in code in the lesson. In the imitation, you saw one press and release as 5 counts in total.\n\n### Debouncing: wait for it to stay calm\nThe fix is to wait for the pin to **stay the same for a certain time**:\n\n```\non every change: \"time of last change\" = now\nif now - last change >= SAKIN_SURE:\n    accept the value\n```\n\nThat way the bounce sequence is swallowed within the waiting time. If `SAKIN_SURE` = 20 ms, a press released before 20 ms are up is never counted. This is the cost of the waiting time. If you choose it too short, bounce leaks through; if you choose it too long, you miss fast presses. Also, do not forget the bounce that happens on release: the wait must work in both directions.\n\n### The pin is not read during delay()\nWhile `delay(500)` runs, the program does nothing, and does not look at the pin either. The loop works like this: read the pin, wait 500 ms, read the pin. If you press the button briefly and release it between these two readings, the program never sees the press. Timing effects are real in the lab, because the code runs at its real speed. So you miss the press in the lab too.\n\nThe fix is to use `millis()`: the slow job keeps its own time, and `loop()` looks at the pin on every pass. A pass takes a few microseconds, so the press is seen straight away.\n\n### Sensors do not answer instantly\nSensors have their own timings: the DHT needs one reading every two seconds, and the I2C LCD about one second at start-up. The lab models these; if you forget the wait in your code, the lab catches you too. PIR warm-up is modelled as well, but it is shortened (2 s in the lab, much longer in reality).\n\n### Summary\nReal buttons bounce; the lab button does not. Debouncing swallows bounce by waiting for the pin to stay calm for a certain time; the cost is the risk of missing very short presses. The pin is not read during `delay()`, while `millis()` makes the response faster. The sentence \"there was no bounce in the lab\" does not show that debouncing is unnecessary.",
+            "concepts": [
+              {
+                "term": "Bounce",
+                "definition": "Mechanical contacts chattering for a short time as they close, making the pin go back and forth between HIGH and LOW several times.",
+                "example": "You press a real button once, and the counter goes up by 3 instead of 1.",
+                "pitfall": "Thinking debouncing is unnecessary because the lab button does not bounce."
+              },
+              {
+                "term": "Steady time",
+                "definition": "In debouncing, the time a pin value must stay unchanged before it is accepted (for example 20 ms).",
+                "example": "If the pin is still LOW 20 ms after the last change, the press is accepted.",
+                "pitfall": "Choosing the time too short lets bounce leak through; choosing it too long misses fast presses."
+              },
+              {
+                "term": "Response delay",
+                "definition": "The time between an event happening and the program responding to it.",
+                "example": "If there is a delay(500) inside loop, the button response can be up to 500 ms late.",
+                "pitfall": "Making another job wait with delay and expecting the button to be listened to during the same time."
+              },
+              {
+                "term": "Non-blocking code with millis()",
+                "definition": "The slow job keeping its own time with millis(), while the other inputs are read on every pass inside loop().",
+                "example": "\"tik\" is printed every 500 ms, but the button is checked on every pass.",
+                "pitfall": "Printing a message on every pass while the button is held and filling the Serial monitor; edge detection is needed."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h8d2-q1",
+                "kind": "mcq",
+                "prompt": "Why does a counter that does not prevent bounce make several counts on a single press of a real button?",
+                "options": [
+                  "During the press the pin goes back and forth between HIGH and LOW for a short time, and every change to LOW is counted",
+                  "The Arduino is designed to read the button twice",
+                  "INPUT_PULLUP connects both ends of the button to 5 V",
+                  "Because the counter is an int, it doubles the number"
+                ],
+                "answer": 0,
+                "explanation": "Because the contacts hit each other and chatter, the pin changes several times on a single press, and code that detects edges counts every falling edge. The Arduino does not read the button twice; INPUT_PULLUP pulls the pin up to 5 V, not the button's pin; an int does not multiply the number of counts.",
+                "skills": [
+                  "sens-debounce"
+                ]
+              },
+              {
+                "id": "m4h8d2-q2",
+                "kind": "numeric",
+                "prompt": "In the debounce code, SAKIN_SURE = 20 ms. For a press to be counted, for at least how many ms must the pin stay unchanged?",
+                "answer": 20,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "The code resets the time on every change and only accepts the value when it has stayed calm for 20 ms. That is why a press released before 20 ms are up is not counted; this is the cost of the waiting time.",
+                "skills": [
+                  "sens-debounce",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h8d2-q3",
+                "kind": "predict-output",
+                "prompt": "The button is on D2 (INPUT_PULLUP). Right after the program starts, the button is pressed for only 100 ms and released. What does this code print to the Serial monitor?\n\n```cpp\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\nvoid loop() {\n  if (digitalRead(2) == LOW) Serial.println(\"BASILDI\");\n  delay(500);\n}\n```",
+                "options": [
+                  "It prints BASILDI all the time",
+                  "It prints nothing",
+                  "It prints BASILDI once",
+                  "It prints BASILDI twice"
+                ],
+                "answer": 1,
+                "explanation": "After reading the pin, the program sleeps for 500 ms. Because the press starts and ends within the 500 ms between two readings, it is never seen. Unless a reading happens to fall exactly at the moment of the press, a short press is missed; if it were read on every pass with millis(), it would be caught.",
+                "skills": [
+                  "sens-nonblocking",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m4h8d2-q4",
+                "kind": "find-bug",
+                "prompt": "In this debounce code, bounce is still counted. Which line is missing?\n\n```cpp\nbool ham = digitalRead(2) == LOW;\nif (ham != sonHam) {\n  sonHam = ham;\n}\nif (millis() - sonDegisim >= 20 && ham != kararli) {\n  kararli = ham;\n  if (kararli) sayac++;\n}\n```",
+                "options": [
+                  "It should be sayac-- instead of sayac++",
+                  "analogRead should be used instead of digitalRead",
+                  "The value 20 should be 0",
+                  "In the if (ham != sonHam) block, sonDegisim = millis(); is missing"
+                ],
+                "answer": 3,
+                "explanation": "Because the time of the last change is never updated, millis() - sonDegisim always stays above 20; in practice there is no wait, and every bounce is accepted at once. In the correct code, the timer is reset every time the pin changes (sonDegisim = millis()). The other options do not fix the bug; making 20 into 0 removes the wait completely.",
+                "skills": [
+                  "sens-debounce",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h8d2-q5",
+                "kind": "numeric",
+                "prompt": "A program has a delay(50) inside loop(), and the pin is read only once per pass. For at least how many ms must you hold the button down to be sure it is caught?",
+                "answer": 50,
+                "tolerance": 5,
+                "unit": "ms",
+                "explanation": "The time between two readings is about 50 ms. A press shorter than this can fit between two readings and be missed; a press of 50 ms or longer falls on at least one reading. Reducing the delay to 5 or using millis() makes this gap smaller.",
+                "skills": [
+                  "sens-nonblocking",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Besleme düşmesi ve kalibrasyon",
@@ -4620,7 +9034,123 @@ export const modul4: ModuleContent = {
                 "sens-supply"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Supply drop and calibration",
+            "problem": "Real circuits have a strange habit: when a motor starts, the board restarts by itself, or as the battery gets weaker, the sensor numbers slowly drift. Nothing changed in the code; what changed is the **voltage that powers the sensor**. So how much of this can you see in the lab, and what should you do about the rest?",
+            "contentMd": "### The lab's power model\nThe lab really models some things about power:\n- **The sensors' minimum supply voltage.** Parts such as the HC-SR04 and the PIR do not respond if they are powered below 4 V. Parts such as the DHT, BMP280 and MPU6050 work from about 3 V. The MQ-2 module needs 4 V.\n- **The output of analogue modules is in proportion to the supply voltage.** On the soil moisture, sound, flame and MQ-2 modules, the AO output is the VCC voltage times a ratio. If VCC drops, AO drops too.\n- **The internal resistance of an Uno pin.** In the lab, an output pin behaves like an internal resistance of about 25 Ω; as it takes load, the pin's voltage drops from 5 V.\n- **The pin current limit.** If more than 40 mA flows through a pin, the lab gives a warning.\n\nThe lab does **not model**:\n- **The 5 V line collapsing.** In the lab, the Uno's 5V and 3V3 pins are ideal supplies: however much current a motor, servo or relay draws, the voltage does not drop.\n- **Brown-out reset.** The board does not restart itself because the supply dropped. (You press the ↺ Reset button yourself.)\n- **Power line noise, the effect of capacitors, wire resistance.**\n\nSo the sentence \"in the lab the board did not reset while the motor was running\" proves nothing for a real circuit. In reality, steps such as powering the motor and the relay from a separate supply, a common GND and a capacitor on the supply line are solutions outside the code. In the lab, in this section, we will only work with the parts that are modelled.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Soil moisture module | VCC → **5V**, GND → **GND**, AO → **A0** |\n\n### 1) The supply voltage spoils the measurement\nIn the lab, the soil moisture module's AO output has the form `VCC × (0,9 − 0,6 × nem)` (where `nem`, the moisture, is 0-1). With VCC left at 5V, AO gives 4.5 V in dry soil (moisture 0) and 1.5 V in wet soil (moisture 1). If you move VCC to **3V3**, the module still works (it is above the 3 V threshold), but in the same dry soil AO becomes 3.3 × 0.9 = 2.97 V and `analogRead` shows about 608. Same sensor, same soil; a very different number.\n\nThis gives us the first rule of calibration: **a calibration depends on the measuring conditions.** If the supply voltage changes, the old calibration gives the wrong result.\n\n### 2) Two-point calibration\nTo turn the raw ADC value into a meaningful unit, two known ends are measured: what does the sensor read when it is dry and when it is wet? Then these two ends are mapped to 0 and 100 with `map` (lesson 14).\n\n1. Select the sensor and set the **Soil moisture** value to 0 in the properties panel (completely dry), and write down the `Ham` (raw) value read on the Serial monitor.\n2. Set the soil moisture to 1 (completely wet), and write down the `Ham` value.\n3. Use these two values as constants in the code.\n\nThe sketch below works out a percentage with these constants. The constants were read in the lab with a 5V supply:\n\n```cpp\n// sketch: nem_kalibrasyon\nconst int SENSOR = A0;\nconst int KURU = 921;     // nem 0 iken okunan ham değer\nconst int ISLAK = 307;    // nem 1 iken okunan ham değer\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = analogRead(SENSOR);\n  int yuzde = map(ham, KURU, ISLAK, 0, 100);\n  yuzde = constrain(yuzde, 0, 100);       // uçların dışına taşan değerleri kırp\n  Serial.print(\"Ham=\");\n  Serial.print(ham);\n  Serial.print(\" Nem: \");\n  Serial.print(yuzde);\n  Serial.println(\"%\");\n  delay(500);\n}\n```\n\nBecause `KURU` (dry) is big and `ISLAK` (wet) is small, the first range of `map` was written \"backwards\": `map` handles backwards ranges correctly too. Without `constrain`, a value drier than dry would go below 0%, and a value wetter than wet would go above 100%. When you set the soil moisture to 0.5, the module's AO becomes 3.0 V, `Ham` reads about 614 and the program prints about 50%.\n\nNow move the VCC of the same sketch to 3V3 (■ Stop, move the wire, ▶). With the soil moisture at 0.5, `Ham` becomes about 405 and the program prints almost 84%: the calibration was made for the old condition. The fix is to repeat the calibration in the new condition, or to keep the supply voltage constant.\n\n### 3) Pin voltage under load\nIf you use one of the Uno's pins as a supply and connect a load to it, the pin voltage drops because of the internal resistance. Try it in the lab: connect D13 to a 220 Ω resistor and the other end of the resistor to GND; in the program, do `digitalWrite(13, HIGH)`. While it runs, select the resistor: the **Virtual meter** shows about 4.5 V across the resistor and about 20 mA. The pin's internal resistance (about 25 Ω) and the 220 Ω are in series, and the 5 V is shared between them: 5 × 220 / 245 ≈ 4.49 V. If you make the resistor 47 Ω, the pin voltage drops to about 3.26 V, the current becomes about 69 mA, and the lab gives a \"pin overcurrent\" warning (the limit is 40 mA).\n\n### 4) What happens if the sensor is not powered? Safe behaviour\nWhen the supply is missing or low, the sensor usually **does not give an error; it stays silent.** On the HC-SR04, this means `pulseIn` returns 0. The sketch below prints \"YOK\" (none) when 0 comes back and switches the LED off; in other words, in an unknown situation it keeps the dangerous output **off** (fail-safe):\n\n```cpp\n// sketch: mesafe_veya_yok\nconst int TRIG = 9;\nconst int ECHO = 10;\nconst int LED = 13;\n\nvoid setup() {\n  pinMode(TRIG, OUTPUT);\n  pinMode(ECHO, INPUT);\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(TRIG, LOW);\n  delayMicroseconds(2);\n  digitalWrite(TRIG, HIGH);\n  delayMicroseconds(10);\n  digitalWrite(TRIG, LOW);\n  long sure = pulseIn(ECHO, HIGH, 30000);     // 30 ms'de cevap gelmezse 0 döner\n  if (sure == 0) {\n    Serial.println(\"YOK\");\n    digitalWrite(LED, LOW);                   // bilinmiyorsa uyarı yakma, güvenli tarafta kal\n  } else {\n    float cm = sure / 58.0;\n    Serial.print(cm, 1);\n    Serial.println(\" cm\");\n    digitalWrite(LED, cm < 20 ? HIGH : LOW);\n  }\n  delay(100);\n}\n```\n\nTry it: connect the HC-SR04's VCC to **3V3** instead of 5V. Because the sensor stays below 4 V, it does not respond, and you see `YOK` all the time on the Serial monitor. In this case the lab also shows an \"unpowered\" warning on the sensor. In reality, though, a sensor sometimes works half-heartedly and gives strange values; that is why we will ask the question \"is the value sensible?\" separately in lesson 74.\n\n### Real-world knowledge: why does the board reset?\nA microcontroller has a circuit called a **brown-out detector**: when the supply goes below a certain threshold, it resets the processor, because below the threshold there is no guarantee that the code runs reliably. The big current a motor or relay draws as it starts can pull the voltage below this threshold on a weak supply. The sign is that the board goes back to the start every time the motor starts; on the Serial monitor you see the start-up message from `setup()` again and again. This is not a bug fixed with code; it is solved in the circuit with a separate supply, a capacitor and a common GND. This does not happen in the lab. An easy way to notice a restart in a real circuit is to print a start-up message inside `setup()`.\n\n### How does it work?\n1. `nem_kalibrasyon` (moisture calibration) maps the two measured ends to 0-100 with `map`; `constrain` cuts off overflows.\n2. The same constants give the wrong result at a different supply voltage, because the AO voltage is in proportion to VCC.\n3. The pin voltage is a voltage divider of the internal resistance and the load resistance (lesson 12).\n4. `mesafe_veya_yok` (distance or none) catches the silent sensor with the `pulseIn` timeout and leaves the output on the safe side.\n\n### Try it\n- In `nem_kalibrasyon`, raise the soil moisture from 0 to 1 in steps of 0.1. Does the percentage go up in a straight line?\n- Deliberately write the `KURU` and `ISLAK` constants wrongly (for example 800 and 400). At which soil moisture values do 0% and 100% now appear?\n- In `mesafe_veya_yok`, change the `30000` timeout to 3000 and set the distance to 100 cm. The sensor is working, so why does the program print \"YOK\"? (Hint: for 100 cm the echo time is about 5800 µs.)\n\n### Common mistakes\n- Calibrating under one supply condition and using it under another.\n- Not clipping the end values with `constrain`: the percentage goes below 0 or above 100.\n- Saying \"the 5V line did not collapse in the lab, so I can power the motor from the board\".\n- Taking it as a distance of 0 when the sensor does not respond (`pulseIn` 0) and setting off the alarm.",
+            "question": "In this lesson you saw that sensor numbers drift when the supply voltage changes. After calibrating a sensor, which conditions do you need to be sure have not changed? Which of them can you not control in your measuring set-up?",
+            "explainerMd": "### What you will learn in this lesson\n- Why analogue sensor numbers drift when the supply voltage changes\n- Two-point calibration (`map` + `constrain`) and why it depends on the conditions\n- Why an Uno pin does not give 5 V under load\n- How to behave safely (fail-safe) when a sensor does not respond\n\n### What you should know first\n- Lesson 12: the voltage divider\n- Lesson 14: `map`, `constrain` and calibration\n- Lesson 37: `pulseIn` and the HC-SR04 (`pulseIn` returns 0 if there is no answer)\n\n### The number depends on the supply voltage\nThe output (AO) of analogue modules such as soil moisture is in proportion to the supply voltage. In the lab the formula is:\n\n```\nAO = VCC x (0.9 - 0.6 x moisture)        moisture: 0 (dry) ... 1 (wet)\n```\n\nWith VCC = 5 V and moisture = 0, AO is 4.5 V and the ADC reads 921. In the same dry soil with VCC = 3.3 V, AO is 2.97 V and the ADC reads about 608. Same sensor, same soil, a very different number. That is why calibration depends on the measuring condition.\n\n### Two-point calibration\nTo turn the raw number into a percentage, you measure two known ends: dry and wet. Then you map them to 0 and 100 with `map`:\n\n```\nAO = VCC x (0,9 - 0,6 x nem)        nem: 0 (kuru) ... 1 (ıslak)\n```\n\n`map` also handles a backwards range (KURU > ISLAK) correctly. Without `constrain`, values outside the ends push the percentage below 0 or above 100. `map` works with whole numbers and throws away fractions.\n\n### A pin is not an ideal supply\nIn the lab, an Uno output pin comes with an internal resistance of about 25 Ω. If you connect a load to the pin, the 5 V is shared between the internal resistance and the load. For a 220 Ω load, the pin voltage is 5 x 220 / 245 ≈ 4.49 V, and for 47 Ω it is 5 x 47 / 72 ≈ 3.26 V. The current grows too: about 69 mA at 47 Ω, which is above the lab's 40 mA pin limit. That is why loads such as motors or relays are powered from a separate supply, not from a pin.\n\n### What the lab does not show: a collapsing supply\nThe lab's 5V line is an ideal supply; however much current the motor draws, the voltage does not drop. In reality, when a powerful load starts, the supply collapses and the **brown-out detector** in the microcontroller restarts the board. This does not happen in the lab, so the sentence \"the board did not reset while the motor was running\" proves nothing for a real circuit.\n\n### A sensor that does not answer\nWhen the supply is missing, the sensor usually does not give an error; it stays silent. On the HC-SR04, this is `pulseIn` returning 0. If you take 0 as \"a distance of 0 cm\", the alarm goes off wrongly. The right way is to separate out the 0 and leave the output on the **safe side** (off).\n\n### Summary\nThe number from analogue modules changes along with the supply voltage, so the calibration must be redone when the conditions change. Two-point calibration is done with `map` and `constrain`. The pin's internal resistance lowers the voltage under load. The lab does not show the 5V collapse or brown-out; if a sensor stays silent, you leave the outputs on the safe side in the unknown situation.",
+            "concepts": [
+              {
+                "term": "Two-point calibration",
+                "definition": "Measuring two known ends (for example dry and wet) and mapping the raw values to a meaningful range such as 0-100 with map.",
+                "example": "KURU = 921 and ISLAK = 307 were measured; map(614, 921, 307, 0, 100) gives about 50.",
+                "pitfall": "Calibrating at one supply voltage and using it with another supply; the numbers drift."
+              },
+              {
+                "term": "constrain()",
+                "definition": "Keeps a value between the given lower and upper limits.",
+                "example": "constrain(yuzde, 0, 100) fixes a measurement drier than dry at 0%.",
+                "pitfall": "Forgetting to add constrain and letting the percentage go above 100 or below zero."
+              },
+              {
+                "term": "The pin's internal resistance",
+                "definition": "The series resistance of about 25 Ω of an Uno output pin; as it takes load, the pin voltage drops from 5 V.",
+                "example": "When 220 Ω is connected to D13, the pin voltage becomes 5 x 220 / 245 ≈ 4.49 V.",
+                "pitfall": "Thinking the pin is an ideal 5 V supply and driving a motor or relay straight from the pin."
+              },
+              {
+                "term": "Brown-out",
+                "definition": "The microcontroller restarting itself when the supply goes below a certain threshold.",
+                "example": "When a powerful motor starts on a weak supply, the board goes back to the start and the setup() message is printed again.",
+                "pitfall": "Thinking it will not happen in a real circuit because there is no reset in the lab."
+              },
+              {
+                "term": "Fail-safe (safe default)",
+                "definition": "The rule of keeping a dangerous or costly output off when the situation is unknown.",
+                "example": "If pulseIn returns 0, YOK is printed and the alarm LED is switched off.",
+                "pitfall": "Counting a sensor that does not answer as \"value 0\" and setting off the alarm."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h8d3-q1",
+                "kind": "numeric",
+                "prompt": "The soil moisture module is powered with 5 V, and AO = VCC x (0.9 - 0.6 x moisture). With moisture = 0.25, about what does analogRead read? (Take 5 V = 1023.)",
+                "answer": 767,
+                "tolerance": 1,
+                "explanation": "AO = 5 x (0.9 - 0.15) = 3.75 V. ADC = 3.75 / 5 x 1023 ≈ 767. If you use 1024 instead of scaling the voltage with 1023, you get 768; that is why there is a small tolerance.",
+                "skills": [
+                  "sens-supply",
+                  "sens-adc"
+                ]
+              },
+              {
+                "id": "m4h8d3-q2",
+                "kind": "predict-output",
+                "prompt": "What does the Serial monitor show when this code runs?\n\n```cpp\nvoid setup() {\n  Serial.begin(9600);\n  int y = map(768, 921, 307, 0, 100);\n  Serial.println(y);\n  Serial.println(constrain(map(300, 921, 307, 0, 100), 0, 100));\n}\nvoid loop() {}\n```",
+                "options": [
+                  "24 and 101",
+                  "75 and 0",
+                  "24 and 100",
+                  "25 and 100"
+                ],
+                "answer": 2,
+                "explanation": "map(768, 921, 307, 0, 100) = (768 - 921) x 100 / (307 - 921) = 24.9; map uses integer division and throws away the fraction: 24. On the second line the raw value 300 is wetter than wet (307). map gives about 101, and constrain cuts it to 100.",
+                "skills": [
+                  "sens-calibration"
+                ]
+              },
+              {
+                "id": "m4h8d3-q3",
+                "kind": "mcq",
+                "prompt": "A learner powered a small DC motor from the Uno's 5V pin in the lab, and the board never reset. What can you conclude from this?",
+                "options": [
+                  "There will be no problem in a real circuit either",
+                  "Because the lab does not model the 5V collapse or brown-out, it is unknown whether the board would reset in a real circuit",
+                  "The lab reset it because the motor current was very low",
+                  "In a real circuit the board will certainly reset"
+                ],
+                "answer": 1,
+                "explanation": "The lab's 5V line is an ideal supply; whatever the motor draws, the voltage does not drop. That is why the result proves nothing. Whether there is a problem in a real circuit depends on the supply and the motor; saying \"certainly\" or \"no problem\" are both wrong.",
+                "skills": [
+                  "sens-sim-limits",
+                  "sens-supply"
+                ]
+              },
+              {
+                "id": "m4h8d3-q4",
+                "kind": "find-bug",
+                "prompt": "This program lights the alarm LED when the HC-SR04 is not powered (when no echo comes). What is the real bug?\n\n```cpp\nlong sure = pulseIn(ECHO, HIGH, 30000);\nfloat cm = sure / 58.0;\ndigitalWrite(LED, cm < 20 ? HIGH : LOW);\n```",
+                "options": [
+                  "The 30000 timeout is too big",
+                  "The case where pulseIn returns 0 (no answer) is not separated out; it is taken as 0 cm, and because that is less than 20, the LED lights",
+                  "58 should be written instead of 58.0",
+                  "analogWrite should be used instead of digitalWrite"
+                ],
+                "answer": 1,
+                "explanation": "If no echo comes, pulseIn returns 0, 0 / 58 = 0 cm, and because 0 < 20 the LED lights. The right way is first to separate out the no-answer case with if (sure == 0) and switch the LED off (fail-safe). The other options do not change this behaviour.",
+                "skills": [
+                  "sens-failsafe",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h8d3-q5",
+                "kind": "numeric",
+                "prompt": "You calibrated with KURU = 921 and ISLAK = 307. Then you moved the module's VCC to 3.3 V. With moisture = 0.25, the raw value reads 506. What percentage does map(506, 921, 307, 0, 100) show?",
+                "answer": 67,
+                "tolerance": 1,
+                "unit": "%",
+                "explanation": "(506 - 921) x 100 / (307 - 921) = 67.6; map throws away the fraction: 67. Yet with the real moisture at 0.25 and a 5 V supply, the raw value would be 767, so the percentage should be about 25. When the supply changes, the old calibration gives the wrong result.",
+                "skills": [
+                  "sens-calibration",
+                  "sens-supply"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Hata ayıklama vakası: \"ping çalışıyor ama veri yok\"",
@@ -4733,7 +9263,119 @@ export const modul4: ModuleContent = {
                 "dbg-layers"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "A debugging case: \"ping works but there is no data\"",
+            "problem": "You connect a gimbal camera to a laptop over USB-Ethernet. `ping` answers: the device is there. But the telemetry and the video stream keep dropping, and the application gets no data. It is very tempting to think \"there is a connection, so the problem is in the software\". The real cause, however, was not in the software. The lesson from this case is the same whether it is a network cable or an I2C sensor: look for the fault **layer by layer**.",
+            "contentMd": "### The case: the Hyvex gimbal\nThis section is based on a case from the Hyvex team's internship programme; I only pass on what is written there.\n- The gimbal connects to the laptop over Type-C like USB-Ethernet, and it is reached with a static IP.\n- **Symptom:** `ping` works, but the telemetry and the video (RTSP) keep dropping.\n- **Root cause:** NetworkManager was deleting the IP with DHCP. The fix was to set up a permanent static profile.\n- **Clue:** The sentence \"it sorts itself out now and then\" is a sign that one **layer is unstable**.\n- **Method:** Checking layer by layer to bring the symptom down to the root cause: physical connection, IP, port, application.\n\nThe programme's question is this: \"Before you say you have 'fixed' a fault, how do you make sure?\" First let's adapt the method to our world.\n\n### Our layers: an I2C sensor\nThe network \"ping\" here is an **I2C scan** (lesson 33): someone answers at the address. But a device answering at its address does not prove that it is the right device or that it gives the right data. We check four layers in order from the bottom up. Testing a higher layer only makes sense if the ones below it are fine:\n\n| Layer | Question | How to try it |\n|---|---|---|\n| 1. Physical | Are the lines (SDA/SCL) HIGH when idle, is there a short circuit? | `digitalRead(A4)` and `digitalRead(A5)` |\n| 2. Address | Is a device answering at the expected address? | `beginTransmission` / `endTransmission` |\n| 3. Protocol (identity) | Is the one answering the **right** device? | Read the identity register (WHO_AM_I), compare it with the expected one |\n| 4. Data logic | Is the value read **sensible**? | Range check |\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| MPU6050 | VCC → **5V**, GND → **GND**, SDA → **A4**, SCL → **A5** |\n\nOn the MPU6050 (the accelerometer you saw in lesson 58, address 0x68), the identity register is 0x75 and, according to the datasheet, it returns `0x68`. At rest, the total size of the acceleration should be about 1 g (gravity). This sketch tries the four layers in order and tells you the **first layer that fails**:\n\n```cpp\n// sketch: katman_testi\n#include <Wire.h>\n\nconst byte ADRES = 0x68;\nconst byte YAZMAC_KIMLIK = 0x75;      // WHO_AM_I\nconst byte BEKLENEN_KIMLIK = 0x68;\nconst byte YAZMAC_GUC = 0x6B;         // uyku/güç yazmacı\nconst byte YAZMAC_IVME = 0x3B;        // ivme verisinin başı\nconst float MIN_G = 0.8;              // hareketsiz ivme büyüklüğü için makul aralık\nconst float MAKS_G = 1.2;\n\nint sonSonuc = -1;\nfloat sonG = 0;\n\nbool hatlarBosta() {\n  return digitalRead(A4) == HIGH && digitalRead(A5) == HIGH;\n}\n\nbool cihazVar() {\n  Wire.beginTransmission(ADRES);\n  return Wire.endTransmission() == 0;\n}\n\nint kimlikOku() {\n  Wire.beginTransmission(ADRES);\n  Wire.write(YAZMAC_KIMLIK);\n  if (Wire.endTransmission(false) != 0) return -1;\n  if (Wire.requestFrom((int)ADRES, 1) != 1) return -1;\n  return Wire.read();\n}\n\nbool ivmeBuyuklugu(float &g) {\n  Wire.beginTransmission(ADRES);\n  Wire.write(YAZMAC_IVME);\n  if (Wire.endTransmission(false) != 0) return false;\n  if (Wire.requestFrom((int)ADRES, 6) != 6) return false;\n  int16_t ham[3];\n  for (int i = 0; i < 3; i++) {\n    int yuksek = Wire.read();\n    int dusuk = Wire.read();\n    ham[i] = (int16_t)((yuksek << 8) | dusuk);\n  }\n  float x = ham[0] / 16384.0;         // varsayılan aralıkta 16384 LSB = 1 g\n  float y = ham[1] / 16384.0;\n  float z = ham[2] / 16384.0;\n  g = sqrt(x * x + y * y + z * z);\n  return true;\n}\n\n// 0 = hepsi tamam, 1-4 = ilk hata veren katman\nint ilkHataKatmani() {\n  if (!hatlarBosta()) return 1;\n  if (!cihazVar()) return 2;\n  if (kimlikOku() != BEKLENEN_KIMLIK) return 3;\n  float g;\n  if (!ivmeBuyuklugu(g)) return 4;\n  sonG = g;\n  if (g < MIN_G || g > MAKS_G) return 4;\n  return 0;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  Wire.beginTransmission(ADRES);      // uykudan uyandır\n  Wire.write(YAZMAC_GUC);\n  Wire.write(0);\n  Wire.endTransmission();\n  delay(100);\n}\n\nvoid loop() {\n  int sonuc = ilkHataKatmani();\n  if (sonuc == 0) {\n    Serial.print(\"TAMAM g=\");\n    Serial.println(sonG, 2);\n  } else if (sonuc == 1) {\n    Serial.println(\"Katman 1 HATA: SDA/SCL LOW'da takili\");\n  } else if (sonuc == 2) {\n    Serial.println(\"Katman 2 HATA: adreste cihaz yok\");\n  } else if (sonuc == 3) {\n    Serial.println(\"Katman 3 HATA: adres cevap veriyor ama kimlik yanlis\");\n  } else {\n    Serial.println(\"Katman 4 HATA: deger makul degil\");\n  }\n  if (sonSonuc != -1 && sonuc != sonSonuc) {\n    Serial.println(\"DEGISTI: sonuc kararsiz\");\n  }\n  sonSonuc = sonuc;\n  delay(1000);\n}\n```\n\n### How does it work?\n1. `hatlarBosta()` (lines idle) checks that the I2C lines are HIGH when idle. Note: on the Uno, `Wire.begin()` switches on the internal pull-up resistors, so the line usually reads HIGH even if nothing is connected. This test only catches the case where the line is stuck LOW (such as a short circuit); the \"no wire at all\" case is found by layer 2.\n2. `cihazVar()` (device present) is the scan from lesson 33 reduced to a single address.\n3. `kimlikOku()` (read identity) asks the address for the identity register. This gives **more information than a ping**: if the wrong device answers at the address, or if the wires have swapped places, you catch it here.\n4. `ivmeBuyuklugu()` (acceleration size) reads six bytes (two bytes each for X, Y, Z), converts them into g and works out the size of the vector. For a sensor at rest, 0.8-1.2 g is a sensible range. If the sensor is shaking, this test gives a false alarm; the range needs you to know **under which condition** the test is valid.\n5. `ilkHataKatmani()` (first failing layer) tries from the bottom up in order and stops at the first fault. There is no point asking about a higher layer while a lower one is broken. The root cause is the **lowest** layer that fails.\n6. If the result changes between two measurements, it prints `DEGISTI` (changed). This is the code for the \"it sorts itself out now and then\" clue in the case.\n\n### Producing sensor failure modes in the lab\nNot all of the layers can be produced in the lab. Know which ones you can produce and which ones you will only see in a real circuit:\n\n| Failure mode | Which layer | How to produce it in the lab |\n|---|---|---|\n| SDA or SCL wire missing | 2 | Delete the wire (while the circuit is stopped), ▶ |\n| No power | 2 | Delete the MPU6050's VCC wire |\n| Different address | 2 | Select the part and set the **I2C address** property to `0x69` (while the circuit is stopped); the code still looks for `0x68` |\n| Data zero (frozen sensor) | 4 | While it runs, set the `ax`, `ay` and `az` properties to 0 |\n| Data saturated, or shaking | 4 | While it runs, set the `ax`, `ay` and `az` properties to 1.9 |\n| \"It sorts itself out now and then\" | `DEGISTI` | While it runs, set `az` to 0, then back to 1 |\n| SDA line stuck LOW (short circuit) | 1 | Connect the Uno's **A4** pin to **GND** with a wire (while the circuit is stopped), ▶ |\n| Wrong device at the address | 3 | **Cannot be produced.** In the lab you cannot put another device at the expected address; the MPU6050 can only be `0x68` or `0x69`. |\n\nLayer 3 is in the code, but because the lab cannot produce this fault, you have not tested it in the lab. In a real circuit you need to check separately that this line works as you expect.\n\n### Frame and checksum\nThere is one more layer: if the data is part of a long message, a **checksum** is used to tell whether it has been corrupted. In the Hyvex case, the checksum in the gimbal's UDP command frame is the **XOR** of certain bytes. The frame is made of these parts: sync (start), length, command, parameter, checksum and footer. If the receiver does not recalculate the checksum, it takes a corrupted frame for a valid one.\n\nOur small frame has this form: `0xAA` (sync), `N` (number of data bytes), `N` data bytes, last byte = the XOR of `N` and the data bytes. The first of the data bytes is the command: `0x01` = LED, and the second is the parameter (1 = on, 0 = off).\n\n```cpp\n// sketch: xor_cerceve\nconst byte SYNC = 0xAA;\nconst byte MAKS_VERI = 8;\nconst int LED = 13;\n\nenum Asama { BEKLE, UZUNLUK, VERI, SUM };\nAsama asama = BEKLE;\nbyte veri[MAKS_VERI];\nbyte n = 0;\nbyte alinan = 0;\nbyte xorHesap = 0;\n\nvoid setup() {\n  pinMode(LED, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  while (Serial.available()) {\n    byte b = Serial.read();\n    switch (asama) {\n      case BEKLE:\n        if (b == SYNC) asama = UZUNLUK;       // sync dışındaki baytlar yok sayılır\n        break;\n      case UZUNLUK:\n        if (b == 0 || b > MAKS_VERI) {\n          Serial.println(\"UZUNLUK HATA\");\n          asama = BEKLE;\n        } else {\n          n = b;\n          alinan = 0;\n          xorHesap = b;\n          asama = VERI;\n        }\n        break;\n      case VERI:\n        veri[alinan++] = b;\n        xorHesap ^= b;\n        if (alinan == n) asama = SUM;\n        break;\n      case SUM:\n        if (b == xorHesap) {\n          Serial.println(\"CERCEVE TAMAM\");\n          if (veri[0] == 0x01 && n >= 2) digitalWrite(LED, veri[1] ? HIGH : LOW);\n        } else {\n          Serial.print(\"CHECKSUM HATA: gelen=\");\n          Serial.print(b, HEX);\n          Serial.print(\" hesaplanan=\");\n          Serial.println(xorHesap, HEX);        // bozuk çerçeve uygulanmaz\n        }\n        asama = BEKLE;\n        break;\n    }\n  }\n}\n```\n\nIn this design, if the checksum does not match, the frame is **ignored**: the LED does not change. What the Hyvex device does with a frame that does not match is not written in the source; and that is the question for you: what would happen if a device carried out a corrupted command?\n\n### Try it\n- While `katman_testi` (layer test) is running, set the `ax` property to 0.8 (as if the sensor were speeding up sideways). The total size becomes about 1.28 g: which layer fails? Why is this not a sensor fault?\n- Make `MIN_G` and `MAKS_G` narrow, and keep them wide: which one produces false alarms, and which one missed faults?\n- For `xor_cerceve` (XOR frame), check for yourself by XOR-ing that the frame `AA 02 01 01 02` is valid (`02 ^ 01 ^ 01 = 02`). Then change the last byte.\n- Add these layers to your own sketch, to run at every start-up before you use a device.\n- Change the `az` property quickly between 0 and 1 and see when the `DEGISTI` message appears.\n\n### Common mistakes\n- Saying \"the ping (scan) answers, so the device works\". An answer at the address does not mean the identity and the data are right.\n- Changing the software as the first job when a fault is found; check the lower layers first.\n- Brushing a fault aside because \"it sorts itself out now and then\". Unstable behaviour shows that a layer is unhealthy.\n- Doing the range check without a condition: it gives false alarms while the sensor is moving.\n- Trusting the incoming byte without calculating the checksum.",
+            "question": "Before you say you have \"fixed\" a fault, how do you make sure? Is it enough to try all four layers in this lesson again before and after the fault, or do you need to wait a while to see that the problem does not come back \"now and then\"?",
+            "explainerMd": "### What you will learn in this lesson\n- The difference between \"the device answers\" and \"the device works correctly\"\n- How to look for a fault from the bottom up, in four layers\n- How to confirm the right device with the identity register (WHO_AM_I) and check that a value is sensible\n- How to catch a corrupted message with an XOR checksum\n\n### What you should know first\n- Lesson 33: I2C, `Wire` and address scanning\n- Lesson 58: the MPU6050 accelerometer (address 0x68, acceleration in g)\n- Lesson 28: a state machine with `enum`\n\n### Ping, but no data\nA gimbal camera was connected to a laptop over USB-Ethernet. `ping` was answering, but the telemetry and the video kept dropping. In this case from the Hyvex team's internship programme, the root cause was not the software: NetworkManager was deleting the device's IP with DHCP, and the fix was to set up a permanent static profile. The clue in the case is the sentence \"it sorts itself out now and then\": one layer is unstable.\n\nThe lesson is this: just because **one** layer of something works does not mean all of them work.\n\n### Four layers\nOn an I2C sensor, the \"ping\" is the address scan. We look for the fault from the bottom up, and the first layer that fails is the root cause:\n\n| Layer | Question | How to try it |\n|---|---|---|\n| 1. Physical | Are the SDA/SCL lines HIGH when idle? | `digitalRead(A4)`, `digitalRead(A5)` |\n| 2. Address | Does the expected address answer? | `beginTransmission` / `endTransmission` |\n| 3. Identity | Is the one answering the right device? | Read the WHO_AM_I register (0x75 on the MPU6050, expected 0x68) |\n| 4. Data | Is the value sensible? | Range check (acceleration at rest ≈ 1 g) |\n\nAn answer at the address does not prove the identity: another device can use the same address. Even if the identity is right, a frozen sensor can always give 0. That is why each layer is tested separately.\n\n### The limit of the sensibility check\nThe size of the vector of a resting accelerometer's three axes is about 1 g:\n\n```\ng = square-root(x*x + y*y + z*z)\n```\n\nIf you chose a range of 0.8-1.2 g and the sensor is tilted or moving, the total size can go outside this range (for example g ≈ 1.22 for x = 0.5, y = 0.5, z = 1). This is not a sensor fault; the condition under which the check is valid (at rest) has not been met.\n\n### Checksum\nIf a message travels a long way, it can get corrupted. To tell this, the receiver uses a **checksum**. A simple method is the **XOR** of certain bytes. Our frame: sync (0xAA), length N, N data bytes, last byte = the XOR of N and the data bytes. The receiver recalculates the XOR itself; if it does not match, it ignores the frame.\n\nExample: `AA 02 01 01 02`. N = 2, data 01 and 01. 2 XOR 1 XOR 1 = 2, which matches the last byte 2: the frame is valid.\n\n### Summary\nOne layer answering does not show that the system works; look for the fault in the physical, address, identity and data layers from the bottom up. The identity register gives much more information than a ping. A sensibility range only means something under the condition in which it is valid. A checksum stops you taking a corrupted message for a valid one. The sentence \"it sorts itself out now and then\" is a sign that a layer is unstable.",
+            "concepts": [
+              {
+                "term": "Layered debugging",
+                "definition": "Checking for a fault from the bottom up (physical, address, identity, data) in order and counting the first failing layer as the root cause.",
+                "example": "The address answers, but the identity register is different from what is expected: the root cause is in layer 3.",
+                "pitfall": "Starting to change the software without checking the lower layer."
+              },
+              {
+                "term": "The WHO_AM_I register",
+                "definition": "On many sensors, the register that gives the device's identity; on the MPU6050 its address is 0x75 and the expected value is 0x68.",
+                "example": "If you read 0x75 with Wire and 0x68 does not come back, there is a wrong or faulty device.",
+                "pitfall": "Taking the answer at the address to mean \"this is the right device\"."
+              },
+              {
+                "term": "Sensibility check",
+                "definition": "Checking whether the value read is in the physically expected range.",
+                "example": "On a resting MPU6050 the acceleration size should be about 1 g; 0 g or 1.9 g is suspicious.",
+                "pitfall": "Doing the check without a condition: it gives false alarms while the sensor is moving."
+              },
+              {
+                "term": "XOR checksum",
+                "definition": "A check byte made by taking the XOR of the bytes in a message, which the receiver recalculates and compares.",
+                "example": "In the frame AA 02 01 01 02, 02 ^ 01 ^ 01 = 02, and the last byte matches.",
+                "pitfall": "Thinking the incoming byte is right without calculating the checksum; a corrupted frame gets carried out."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h8d4-q1",
+                "kind": "mcq",
+                "prompt": "For the MPU6050, address 0x68 answers, but the identity register (WHO_AM_I) returns 0x70 (0x68 expected). Which layer is the fault in?",
+                "options": [
+                  "Layer 1 (physical lines)",
+                  "Layer 2 (address)",
+                  "Layer 3 (identity)",
+                  "Layer 4 (data sensibility)"
+                ],
+                "answer": 2,
+                "explanation": "The physical lines and the address are fine; the device answering does not give the expected identity, so it is a wrong or different device. The first failing layer is 3. There is no point testing layer 4, because it is not known who the device is.",
+                "skills": [
+                  "dbg-layers"
+                ]
+              },
+              {
+                "id": "m4h8d4-q2",
+                "kind": "numeric",
+                "prompt": "Frame: sync 0xAA, N = 3, data bytes 0x01, 0x01, 0x06. Last byte = the XOR of N and the data bytes. What is the value of the last byte (in decimal)?",
+                "answer": 5,
+                "tolerance": 0,
+                "explanation": "3 XOR 1 = 2, 2 XOR 1 = 3, 3 XOR 6 = 5. If the receiver does the same calculation and does not get 5, the frame is corrupted and is ignored.",
+                "skills": [
+                  "dbg-checksum"
+                ]
+              },
+              {
+                "id": "m4h8d4-q3",
+                "kind": "predict-output",
+                "prompt": "An MPU6050 thought to be at rest is being held tilted (x = 0.5, y = 0.5, z = 1.0 g). What does this code print?\n\n```cpp\nvoid setup() {\n  Serial.begin(9600);\n  float x = 0.5, y = 0.5, z = 1.0;\n  float g = sqrt(x * x + y * y + z * z);\n  if (g < 0.8 || g > 1.2) Serial.println(\"HATA\");\n  else Serial.println(\"TAMAM\");\n}\nvoid loop() {}\n```",
+                "options": [
+                  "TAMAM",
+                  "It prints nothing",
+                  "It gives a compile error",
+                  "HATA"
+                ],
+                "answer": 3,
+                "explanation": "g = square-root(0.25 + 0.25 + 1) ≈ 1.22, which is bigger than 1.2, so it prints HATA (error). The sensor is sound; because the sensibility range relies on the \"at rest\" condition, it gives a false alarm while the sensor is tilted or accelerating.",
+                "skills": [
+                  "dbg-layers",
+                  "dbg-plausibility"
+                ]
+              },
+              {
+                "id": "m4h8d4-q4",
+                "kind": "find-bug",
+                "prompt": "In this frame parser, valid frames (for example AA 02 01 01 02) always give CHECKSUM HATA. Which is the bug? (`satır` = line)\n\n```cpp\ncase UZUNLUK:\n  n = b;\n  alinan = 0;\n  xorHesap = 0;      // satır A\n  asama = VERI;\n  break;\ncase VERI:\n  xorHesap ^= b;     // satır B\n  alinan++;\n  if (alinan == n) asama = SUM;\n  break;\n```",
+                "options": [
+                  "The alinan++ line is unnecessary",
+                  "The n = b line is unnecessary",
+                  "Line A: the XOR should start with the length byte n (xorHesap = b)",
+                  "Line B: += should be used instead of ^="
+                ],
+                "answer": 2,
+                "explanation": "The frame's check byte is the XOR of N and the data bytes. If xorHesap starts from zero, N is not included: 01 ^ 01 = 0 comes out and does not match the incoming 02. The right version is xorHesap = b. Using addition instead of XOR is a different method and does not match the frame definition.",
+                "skills": [
+                  "dbg-checksum",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h8d4-q5",
+                "kind": "mcq",
+                "prompt": "A friend says \"the sensor sorts itself out now and then, it does not matter\". Which is the best approach?",
+                "options": [
+                  "It sorted itself out, so there is no problem; leave it",
+                  "Instability shows that a layer is unhealthy; test the layers again from the bottom up and keep watching until you are sure the problem does not come back",
+                  "Rewrite the code from scratch",
+                  "Throw the sensor away straight away"
+                ],
+                "answer": 1,
+                "explanation": "As in the Hyvex case, \"it sorts itself out now and then\" is the sign of an unstable layer. Brushing it aside without finding the root cause brings the fault back later. Rewriting the code or throwing the sensor away are over-the-top reactions made without knowing which layer is at fault.",
+                "skills": [
+                  "dbg-layers"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Bitirme projesi: Akıllı oda",
@@ -4845,7 +9487,118 @@ export const modul4: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Final project: Smart room",
+            "problem": "In a classroom, the lights stay on in an empty room, and the fan spins when nobody is there. A smart room, however, does not ask you: if nobody is there, it saves energy; when someone comes in and it is dark, it switches the light on; when it gets warm, it switches the fan on. This is the module's final project: you will combine the sensors you have learnt about in a single state machine, and you will know where what you see in the lab will be different in a real circuit.",
+            "contentMd": "### What are we going to do?\nThis project brings together what you have learnt:\n- **Week 2:** Motion detection with the PIR and its warm-up time (D2).\n- **Week 3:** Temperature and humidity with the DHT22 (D5).\n- **Week 4:** Light measurement with the LDR and hysteresis (A1).\n- **Week 5 and Module 3:** Fan control with a relay (D7), hysteresis.\n- **Week 6 and Module 3:** Non-blocking code with `millis()`, the state machine, the I2C LCD.\n- **Week 8:** Defence against real-world effects: a waiting margin for button bounce (D3), threshold hysteresis for noise, safe behaviour (fail-safe) when a sensor fails, and PIR warm-up.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. For the \"fan\" we use a second LED instead of a small motor.\n\n| Part | Connection |\n|---|---|\n| PIR | VCC → **5V**, GND → **GND**, OUT → **D2** |\n| DHT22 | VCC → **5V**, GND → **GND**, DATA → **D5** (Type property DHT22) |\n| LDR | 1 → **5V**, 2 → **A1** |\n| Resistor (10 kΩ) | 1 → **A1**, 2 → **GND** (A1 rises in the light) |\n| Relay | VCC → **5V**, GND → **GND**, IN → **D7**; COM → **5V**, NO → pin 1 of the fan resistor |\n| Resistor (330 Ω, fan) | 1 → the relay's NO pin, 2 → the A pin of the \"fan\" LED |\n| LED (\"fan\") | A → pin 2 of the fan resistor, K → **GND** |\n| Resistor (330 Ω, lamp) | 1 → **D13**, 2 → the A pin of the \"lamp\" LED |\n| LED (\"lamp\") | A → pin 2 of the lamp resistor, K → **GND** |\n| Button | A → **D3**, B → **GND** (`INPUT_PULLUP`) |\n| I2C LCD 16x2 | GND → **GND**, VCC → **5V**, SDA → **A4**, SCL → **A5** (address 0x27) |\n\nBecause the 5V line is ideal in the lab, powering the fan from the board causes no problem (lesson 73); in a real circuit it would. Safety: in this project no circuit is ever built with mains voltage (220 V); the relay only switches the low-voltage \"fan\" load.\n\nThe PIR output goes HIGH while there is motion, and stays HIGH for a while after the motion ends; in the lab the warm-up is 2 s and the hold time 3 s (lesson 41). On real modules these times depend on the model. Leave at least 2 seconds between DHT22 readings (lesson 46).\n\n### State machine\n| State | Lamp | Fan | LCD backlight | Leaving the state |\n|---|---|---|---|---|\n| ISINMA (warming up) | Off | Off | On | When `ISINMA_SURESI` is up, BOS. The PIR is ignored. |\n| BOS (empty) | Off | Off | **Off** (saving) | If the PIR sees motion, DOLU |\n| DOLU (occupied) | On if dark | On if warm | On | `BOS_SURESI` after the last motion, BOS |\n| KAPALI (off) | Off | Off | On | Button: switches between KAPALI and BOS |\n\n- **Light:** It lights only while the room is DOLU and it is dark. The dark/light decision is made **with hysteresis**: when the ADC value drops below 300 it is dark, and when it rises above 400 it is light. In between, the previous decision is kept (lesson 71). In the lab you try the thresholds with the LDR's **Light** property; in a real room you need to calibrate the thresholds for the light in that place (lesson 73).\n- **Fan:** It switches on only while the room is DOLU and the temperature reaches 28 °C, and switches off when it drops to 26 °C.\n- **Safe default:** If the DHT22 cannot be read, or the value is outside the sensible range (lesson 74), the fan stays **off** and the LCD shows `DHT HATA` (DHT error). Switching the fan off rather than keeping it on when the temperature is unknown is this project's answer to the question in the Hyvex case, \"what happens when control is lost?\": a dangerous or costly output is off by default.\n- **Times:** To try it quickly in the lesson, `ISINMA_SURESI` (warm-up time) was taken as 3 s and `BOS_SURESI` (empty time) as 8 s. The lab's PIR warm-up is 2 s, so `ISINMA_SURESI` must be above this. On a real module the warm-up is much longer, and the empty-room time is measured in minutes.\n\n### Program\n```cpp\n// sketch: akilli_oda\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <DHT.h>\n\nconst int PIR = 2;\nconst int DUGME = 3;\nconst int DHT_PIN = 5;\nconst int ROLE = 7;\nconst int LAMBA = 13;\nconst int LDR = A1;\n\nconst unsigned long ISINMA_SURESI = 3000;    // ms (gerçekte çok daha uzun)\nconst unsigned long BOS_SURESI = 8000;       // ms (gerçekte dakikalar)\nconst unsigned long OLCUM_ARALIGI = 2000;    // DHT22 için en az 2 sn\nconst unsigned long EKRAN_ARALIGI = 500;\nconst int KARANLIK_ALT = 300;                // bunun altı: karanlık\nconst int AYDINLIK_UST = 400;                // bunun üstü: aydınlık\nconst float FAN_ACIK = 28.0;\nconst float FAN_KAPAT = 26.0;\n\nenum Durum { ISINMA, BOS, DOLU, KAPALI };\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\nDHT dht(DHT_PIN, DHT22);\n\nDurum durum = ISINMA;\nbool karanlik = false;\nbool fan = false;\nbool olculdu = false;                // ilk DHT okuması yapıldı mı?\nbool sensorTamam = false;\nfloat sicaklik = 0;\nfloat nem = 0;\nbool arkaIsik = true;\nbool oncekiDugme = false;\nunsigned long sonDugme = 0;\nunsigned long sonHareket = 0;\nunsigned long sonOlcum = 0;\nunsigned long sonEkran = 0;\n\nconst char *durumAdi() {\n  if (durum == ISINMA) return \"ISINMA\";\n  if (durum == BOS) return \"BOS   \";\n  if (durum == DOLU) return \"DOLU  \";\n  return \"KAPALI\";\n}\n\nvoid gec(Durum yeni) {\n  durum = yeni;\n  Serial.print(\"durum=\");\n  Serial.println(durumAdi());\n}\n\nvoid ekranYaz() {\n  lcd.setCursor(0, 0);\n  if (!olculdu) {\n    lcd.print(\"Olcum bekleniyor\");\n  } else if (!sensorTamam) {\n    lcd.print(\"DHT HATA        \");\n  } else {\n    lcd.print(\"T:\");\n    lcd.print(sicaklik, 1);\n    lcd.print(\"C N:%\");\n    lcd.print((int)nem);\n    lcd.print(\"    \");\n  }\n  lcd.setCursor(0, 1);\n  lcd.print(durumAdi());\n  lcd.print(\" L\");\n  lcd.print(digitalRead(LAMBA) == HIGH ? 1 : 0);\n  lcd.print(\" F\");\n  lcd.print(fan ? 1 : 0);\n  lcd.print(\"   \");\n}\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(DUGME, INPUT_PULLUP);\n  pinMode(ROLE, OUTPUT);\n  pinMode(LAMBA, OUTPUT);\n  digitalWrite(ROLE, LOW);             // varsayılan: kapalı\n  digitalWrite(LAMBA, LOW);\n  Serial.begin(9600);\n  dht.begin();\n  lcd.init();\n  lcd.backlight();\n  ekranYaz();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Buton: basıldığı an bir kez, 50 ms sıçrama payıyla\n  bool basili = (digitalRead(DUGME) == LOW);\n  if (basili && !oncekiDugme && simdi - sonDugme > 50) {\n    sonDugme = simdi;\n    if (durum == KAPALI) gec(BOS); else gec(KAPALI);\n  }\n  oncekiDugme = basili;\n\n  // 2) PIR: ısınırken ve kapalıyken yok sayılır\n  bool hareket = (digitalRead(PIR) == HIGH);\n  if (hareket && (durum == BOS || durum == DOLU)) {\n    sonHareket = simdi;\n    if (durum == BOS) gec(DOLU);\n  }\n\n  // 3) Işık: her turda oku, histerezisle karar ver\n  int isik = analogRead(LDR);\n  if (!karanlik && isik < KARANLIK_ALT) karanlik = true;\n  if (karanlik && isik > AYDINLIK_UST) karanlik = false;\n\n  // 4) Sıcaklık ve nem: iki saniyede bir\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    float t = dht.readTemperature();\n    float h = dht.readHumidity();\n    olculdu = true;\n    sensorTamam = !isnan(t) && !isnan(h) && t > -40 && t < 80 && h >= 0 && h <= 100;\n    if (sensorTamam) {\n      sicaklik = t;\n      nem = h;\n    }\n  }\n\n  // 5) Durum geçişleri (zamana bağlı)\n  if (durum == ISINMA && simdi >= ISINMA_SURESI) gec(BOS);\n  if (durum == DOLU && simdi - sonHareket >= BOS_SURESI) gec(BOS);\n\n  // 6) Fan: histerezis; sensör bozuksa ya da oda DOLU değilse kapalı\n  if (durum != DOLU || !sensorTamam) {\n    fan = false;\n  } else if (sicaklik >= FAN_ACIK) {\n    fan = true;\n  } else if (sicaklik <= FAN_KAPAT) {\n    fan = false;\n  }\n\n  // 7) Çıkışlar\n  digitalWrite(LAMBA, (durum == DOLU && karanlik) ? HIGH : LOW);\n  digitalWrite(ROLE, fan ? HIGH : LOW);\n\n  // 8) Ekran ve arka ışık: BOS iken ışık kapalı (tasarruf)\n  bool arkaIstenen = (durum != BOS);\n  if (arkaIstenen != arkaIsik) {\n    arkaIsik = arkaIstenen;\n    if (arkaIsik) lcd.backlight(); else lcd.noBacklight();\n  }\n  if (simdi - sonEkran >= EKRAN_ARALIGI) {\n    sonEkran = simdi;\n    ekranYaz();\n  }\n}\n```\n\n### How does it work?\n1. `loop` never uses `delay`; every job keeps its own time with `millis()` (lesson 27). This way the button, the PIR and the light are watched on every pass, while the DHT is read every two seconds.\n2. On every pass, first the **inputs** (button, PIR, LDR, DHT) are worked out, then the **state changes**, then the **outputs** (lamp, relay, screen). The outputs are a direct result of the state.\n3. The PIR is only taken into account in the BOS and DOLU states: the fake motion the PIR gives while warming up is ignored (lesson 41). The PIR is also ignored while KAPALI.\n4. The fan condition is written with the \"safe side\" spelt out: if the room is not DOLU or the sensor is invalid, `fan = false`. Otherwise the temperature is checked.\n5. The DHT reading is checked with `isnan` and a range check (the \"is the value sensible?\" layer from lesson 74). If the sensor is broken, the last good value does not stay on the screen; `DHT HATA` is shown.\n6. The LCD backlight is only updated when the state changes; this way the I2C line is not kept busy for nothing.\n\n### Testing from end to end\nIn this section, try these in order in the lab; at each step, first guess for yourself what you expect. You change the part properties from the right panel while it runs:\n1. Press ▶ and, within the first 2 s, switch the PIR's **Motion** property on and off: during warm-up the PIR output wobbles with interference, but the state should stay ISINMA and the lamp off. The bottom line of the LCD shows `ISINMA`.\n2. After 3 s, set the LDR's **Light** property to 0.2 (dark). Switch the PIR's **Motion** property on and off: the state should become DOLU and the lamp should light.\n3. Set the **Light** property to 0.9: the lamp should go off. Then set it to about 0.46 (neither dark nor light): the lamp should stay at its previous decision.\n4. Set the DHT22's **Temperature** property to 29 °C: the fan LED (relay) should light within 2 s. Lower it to 27 °C: it should stay on. At 25 °C it should switch off. (The DHT22 is read at most once every 2 s; the response delay exists in the lab too.)\n5. Let there be no motion for 8 s: the state is BOS; the lamp and the fan should switch off, and the LCD backlight should go out.\n6. Press the button: KAPALI; trigger the PIR, and nothing should happen. Press it again: BOS. (The lab's button does not bounce; that is why the 50 ms margin in the code stays untested.)\n7. Stop with ■, delete the DHT22's DATA wire, and start again with ▶. After 3 s, trigger the PIR: the fan should be off and the LCD should show `DHT HATA`; the lamp keeps working.\n\n### Try it\n- Make the difference between `FAN_ACIK` (fan on) and `FAN_KAPAT` (fan off) 0.5 °C: how often does the fan switch on and off?\n- Run the fan if not only the temperature but also the humidity in the room is high (for example above 70%). Which section will you add it to?\n- When leaving the BOS state, write \"Hos geldin\" (welcome) on the LCD, and have it cleared after 2 s (without blocking).\n- Save `BOS_SURESI` to EEPROM and set it with the button.\n\n### Common mistakes\n- Not taking the PIR's warm-up time into account: at start-up the room is thought to be \"occupied\".\n- Building the LDR divider the wrong way round: \"dark\" and \"light\" swap places.\n- Using a single threshold and letting the lamp flicker.\n- Reading the DHT22 more often than every two seconds.\n- Leaving the fan on while the sensor is invalid.\n- Using mains voltage with the relay: this is never, ever done in this project.\n- Powering the fan from the board's 5 V pin: in a real circuit the board can reset; the lab does not show this (lesson 73).",
+            "question": "Even if this project works perfectly in the lab, which three things would surprise you when you move it into a real room? (Things to think about: button bounce, analogue noise, the supply voltage and the PIR's real warm-up time.) Which safety measure would you add before really leaving the room and walking out?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine several sensors in a single state machine\n- A program layout that keeps input, state and output separate\n- How to use two different hystereses (light and fan) in the same program\n- How to behave safely when a sensor fails, and how to know the limits of the lab\n\n### What you should know first\n- Lesson 41: the PIR (in the lab, 2 s warm-up and 3 s hold)\n- Lesson 46: the DHT22 (not read more often than every two seconds)\n- Lesson 51: the LDR and hysteresis\n- Lessons 24, 27, 28: the relay, `millis()` and the state machine\n- Lessons 71, 73 and 74: hysteresis, fail-safe and the sensibility check\n\n### What does the smart room do?\nThe smart room uses a PIR (motion), an LDR (light), a DHT22 (temperature), a relay (fan), an I2C LCD and a button together. The logic is simple: if the room is empty, save energy; when someone comes in and it is dark, switch the lamp on; if it is warm, switch the fan on.\n\n### Four states\n| State | Lamp | Fan | Exit condition |\n|---|---|---|---|\n| ISINMA (warming up) | Off | Off | When the warm-up time is up, BOS |\n| BOS (empty) | Off | Off | If the PIR sees motion, DOLU |\n| DOLU (occupied) | On if dark | On if warm | `BOS_SURESI` after the last motion, BOS |\n| KAPALI (off) | Off | Off | Button: between KAPALI and BOS |\n\nThe outputs are a direct result of the state. Each pass of the program has three steps: first read the **inputs** (button, PIR, LDR, DHT), then update the **state**, then write the **outputs** (lamp, relay, screen). `delay()` is not used; every job keeps its own time with `millis()`.\n\n### Two hystereses\nFor the light: when the ADC drops below 300 it is dark, when it rises above 400 it is light; in between, the decision is kept. For the fan: it switches on at 28 °C and off at 26 °C. The two bands stop flashing on and off with noise or small wobbles.\n\nThe LDR is between 5 V and A1, and the 10 kΩ resistor between A1 and GND. With the Light property at 0.5, the LDR is about 14.1 kΩ, the A1 voltage is about 2.07 V and the ADC reads about 424; so it is on the \"light\" side.\n\n### Safe defaults\nIf the DHT22 returns `isnan`, or the value is outside the sensible range (for example -40...80 °C), the sensor counts as invalid. In that case the fan stays **off** and the LCD shows `DHT HATA`. The PIR is ignored in the ISINMA and KAPALI states.\n\n### From the lab to reality\nThe lab models the ADC step and timing, but it does not show noise, button bounce or the 5V collapse. In a real room you calibrate the thresholds again for the light in that place, and you power the fan from a separate supply, not from the board. No circuit is ever built with mains voltage (220 V).\n\n### Summary\nThe smart room is a state machine that separates input, state and output. The light and fan decisions are made with hysteresis. If the sensor is invalid, the fan stays off. A design that works in the lab must be checked separately in a real circuit against noise, bounce and power effects.",
+            "concepts": [
+              {
+                "term": "Input - state - output layout",
+                "definition": "A program layout that, on every pass, first reads the inputs, then updates the state, and finally writes the outputs.",
+                "example": "First the button, PIR, LDR and DHT are read; then the DOLU/BOS decision is made; then the lamp and relay are written.",
+                "pitfall": "Writing an output where the input is read, with a half-finished state; the lamp and fan behave inconsistently."
+              },
+              {
+                "term": "State machine",
+                "definition": "A structure in which the program is in only one state at any moment and moves between states on events.",
+                "example": "The ISINMA, BOS, DOLU and KAPALI states; PIR motion moves it from BOS to DOLU.",
+                "pitfall": "Building scattered logic with flags (bool) without stating the state; it gets confusing which output is on and why."
+              },
+              {
+                "term": "Two-band decision",
+                "definition": "Using more than one hysteresis in the same program: each sensor has its own switch-on and switch-off thresholds.",
+                "example": "Light: below 300 is dark, above 400 is light. Fan: switches on at 28 °C, off at 26 °C.",
+                "pitfall": "Using a single threshold (28 °C) for the fan as well; when the temperature wobbles around the threshold, the relay clatters."
+              },
+              {
+                "term": "Safe default",
+                "definition": "Leaving a costly or dangerous output off if the sensor is invalid or the situation is uncertain.",
+                "example": "If the DHT22 gives isnan, fan = false and the LCD shows DHT HATA.",
+                "pitfall": "Taking an invalid temperature reading as the last good value and leaving the fan on."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m4h8d5-q1",
+                "kind": "predict-output",
+                "prompt": "The fan thresholds are 28 and 26 °C. The temperature is read as 25, 28, 27, 26, 29 in turn. What does this code print?\n\n```cpp\nfloat t[] = {25, 28, 27, 26, 29};\nbool fan = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    if (t[i] >= 28.0) fan = true;\n    else if (t[i] <= 26.0) fan = false;\n    Serial.print(fan ? 1 : 0);\n  }\n}\nvoid loop() {}\n```",
+                "options": [
+                  "01100",
+                  "01101",
+                  "01111",
+                  "01001"
+                ],
+                "answer": 1,
+                "explanation": "25: off (0). 28: switches on (1). 27: inside the band, stays on (1). 26: switches off (0). 29: switches on again (1). The output is 01101. Staying on at 27 °C is hysteresis; with a single threshold it would be off at 27.",
+                "skills": [
+                  "sens-hysteresis",
+                  "proj-statemachine"
+                ]
+              },
+              {
+                "id": "m4h8d5-q2",
+                "kind": "numeric",
+                "prompt": "The LDR is between 5 V and A1, and a 10 kΩ resistor is between A1 and GND. With Light = 0.5, the LDR is about 14.1 kΩ. About what does analogRead(A1) read? (Voltage divider: V = 5 x 10 / (10 + 14.1))",
+                "answer": 424,
+                "tolerance": 3,
+                "explanation": "V = 5 x 10 / 24.1 ≈ 2.07 V. ADC = 2.07 / 5 x 1023 ≈ 424. This value is above 400, so above the light threshold; if it were between 300 and 400, the previous decision would be kept.",
+                "skills": [
+                  "proj-integration",
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m4h8d5-q3",
+                "kind": "mcq",
+                "prompt": "The room is DOLU and the temperature is 30 °C, but the DHT22 connection has come off and the reading returns isnan. Which is the right behaviour?",
+                "options": [
+                  "The fan stays on, based on the last good reading",
+                  "The fan switches off and the LCD shows DHT HATA",
+                  "The temperature is taken as 0 °C and the fan switches off, with no error shown",
+                  "The program stops and no outputs are updated"
+                ],
+                "answer": 1,
+                "explanation": "If the sensor is invalid, the costly output (the fan) stays off in the unknown situation and the user is told about the error. Using the old value cuts the link with reality, quietly taking 0 °C hides the error, and stopping the program also breaks the lamp and the screen.",
+                "skills": [
+                  "sens-failsafe",
+                  "proj-integration"
+                ]
+              },
+              {
+                "id": "m4h8d5-q4",
+                "kind": "find-bug",
+                "prompt": "The lamp flashes quickly between dark and light. Where is the bug?\n\n```cpp\nint isik = analogRead(A1);\nif (!karanlik && isik < 300) karanlik = true;\nif (karanlik && isik > 300) karanlik = false;\n```",
+                "options": [
+                  "digitalRead should be used instead of analogRead",
+                  "karanlik should not be a bool",
+                  "The isik variable should be global",
+                  "Both thresholds are 300: there is no hysteresis band, so with wobbles around 300 the decision keeps changing"
+                ],
+                "answer": 3,
+                "explanation": "The same threshold is used for both dark and light, with no \"keep the previous decision\" region in between. The right way is separate thresholds, such as < 300 for dark and > 400 for light. The other options do not fix the bug.",
+                "skills": [
+                  "sens-hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m4h8d5-q5",
+                "kind": "numeric",
+                "prompt": "BOS_SURESI = 8000 ms. The last motion in the room was detected 12000 ms after the program started, and there was no more motion. At which millisecond does the room move to the BOS state?",
+                "answer": 20000,
+                "tolerance": 100,
+                "unit": "ms",
+                "explanation": "The state becomes BOS BOS_SURESI after the last motion: 12000 + 8000 = 20000 ms. Every new motion updates the sonHareket value, so the waiting time starts again each time.",
+                "skills": [
+                  "proj-statemachine",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         }
       ]
     }

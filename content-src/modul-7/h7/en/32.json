@@ -1,0 +1,97 @@
+{
+  "concepts": [
+    {
+      "term": "Fluency and correctness",
+      "definition": "An explanation being well written does not show that its content is correct.",
+      "example": "A confident paragraph may have missed a bug in the code.",
+      "pitfall": "Believing a text that sounds sure of itself."
+    },
+    {
+      "term": "Matches / contradicts / not in the source",
+      "definition": "The three classes used when comparing a claim with the code.",
+      "example": "The claim \"the list is sorted\" contradicts the source if there is no sorting in the code; \"it saves to a file\" is not in the source.",
+      "pitfall": "Only looking for contradictions and missing a made-up detail (something not in the source)."
+    },
+    {
+      "term": "Output prediction",
+      "definition": "Finding what will be printed by tracing the code step by step by hand, without running it.",
+      "example": "The average of the list [5, 7, 9, 11] is printed as 32 / 4 = 8.0.",
+      "pitfall": "Mixing up the total and the average and saying 32."
+    },
+    {
+      "term": "Edge case",
+      "definition": "Unusual inputs such as an empty list or a single element.",
+      "example": "Because `len([])` is zero, the average function gives a ZeroDivisionError on an empty list.",
+      "pitfall": "Only trying \"normal\" input."
+    },
+    {
+      "term": "Indentation and return",
+      "definition": "In Python, indentation decides which block a line belongs to.",
+      "example": "If return is inside the loop, the function ends on the first pass.",
+      "pitfall": "Thinking indentation is decoration and being fooled when the explanation says it \"adds them up\"."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d32-q1",
+      "kind": "predict-output",
+      "prompt": "An AI said \"this function returns the average of all the numbers\". Trace the code by hand and find what is printed.\n\n```\ndef ort(liste):\n    t = 0\n    for x in liste:\n        t += x\n        return t / len(liste)\nprint(ort([4, 8, 6]))\n```",
+      "options": [
+        "6.0",
+        "18",
+        "1.3333333333333333",
+        "An error happens"
+      ],
+      "answer": 2,
+      "explanation": "return is inside the loop: on the first pass t = 4 and 4 / 3 = 1.3333333333333333 is returned, and the function ends there. So the explanation contradicts the code. The correct average would be 6.0; but because of the indentation of return, that value is never calculated.",
+      "skills": [
+        "ai-code-review"
+      ]
+    },
+    {
+      "id": "m7h7d32-q2",
+      "kind": "numeric",
+      "prompt": "If this function is called with the list [5, 7, 9, 11], what number does it return?\n\n```\ndef ort(liste):\n    t = 0\n    for x in liste:\n        t += x\n    return t / len(liste)\n```",
+      "answer": 8,
+      "tolerance": 0,
+      "explanation": "The total is 5 + 7 + 9 + 11 = 32, the number of elements is 4, and 32 / 4 = 8.0. Working out the output yourself immediately shows that an explanation such as \"the average is 32\" is contradictory.",
+      "skills": [
+        "ai-code-review"
+      ]
+    },
+    {
+      "id": "m7h7d32-q3",
+      "kind": "mcq",
+      "prompt": "The code only adds up the elements of a list and divides by how many there are. The explanation says \"the result is written to a log file\". Which class is this claim in?",
+      "options": [
+        "Matches the source",
+        "Contradicts the source",
+        "Not in the source",
+        "Always true, because it is harmless"
+      ],
+      "answer": 2,
+      "explanation": "There is no file operation in the code at all; the claim is a made-up detail, so it is not in the source. Contradicting means saying the opposite of the code; here the code says nothing about it. For it to match, the code would need a line that writes a file.",
+      "skills": [
+        "ai-code-review",
+        "ai-verification"
+      ]
+    },
+    {
+      "id": "m7h7d32-q4",
+      "kind": "find-bug",
+      "prompt": "This function crashes when it is called with an empty list. What is the cause of the problem?\n\n```\ndef ort(liste):\n    toplam = 0\n    for x in liste:\n        toplam += x\n    return toplam / len(liste)\nprint(ort([]))\n```",
+      "options": [
+        "The for loop gives an error on an empty list",
+        "The return line divides by zero because len([]) is zero",
+        "The line toplam = 0 is a wrong initialisation",
+        "The print line cannot print a number"
+      ],
+      "answer": 1,
+      "explanation": "On an empty list, len(liste) is zero, and dividing by zero produces a ZeroDivisionError. The for loop never runs on an empty list, but that is not an error; the starting value toplam = 0 is correct too. The fix is to check whether the list is empty before dividing.",
+      "skills": [
+        "ai-code-review",
+        "ai-verification"
+      ]
+    }
+  ]
+}

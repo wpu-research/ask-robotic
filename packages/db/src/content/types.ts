@@ -86,6 +86,22 @@ export interface LessonContent {
    * cevap sıraları aynı kalır (tools/content/ek.mjs mirrorSteps doğrular). Arayüz dili 'en' iken ders sayfası bunu kullanır.
    */
   stepsEn?: LessonStep[]
+  /**
+   * Klasik dersin İngilizcesi (content-src/<modül>/<hafta>/en/): aynı yapı, kod blokları ve test cevapları aynı
+   * (tools/content/en.mjs doğrular). Arayüz dili 'en' iken ders sayfası bunu kullanır.
+   */
+  contentEn?: LessonTextEn
+}
+
+/** Klasik dersin İngilizce metinleri. */
+export interface LessonTextEn {
+  title: string
+  problem: string
+  contentMd: string
+  question: string
+  explainerMd?: string
+  concepts?: Concept[]
+  quiz?: QuizQuestion[]
 }
 
 export interface WeekContent {
@@ -94,6 +110,8 @@ export interface WeekContent {
   lessons: LessonContent[]
   /** Haftalık çalışma rehberi (Markdown), opsiyonel */
   guideMd?: string
+  /** Rehberin İngilizcesi (en/rehber.md) */
+  guideMdEn?: string
 }
 
 export interface ModuleContent {

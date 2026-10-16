@@ -1,0 +1,103 @@
+{
+  "concepts": [
+    {
+      "term": "ADC step",
+      "definition": "The smallest voltage step a 10-bit ADC can tell apart: 5 V / 1023, about 4.89 mV.",
+      "example": "2.550 V is rounded to step 522; converting it back gives 2551.3 mV, and the 1.3 mV in between is the rounding difference.",
+      "pitfall": "Thinking you can measure a 1 mV change with a 10-bit ADC; the step is 4.89 mV."
+    },
+    {
+      "term": "Noise",
+      "definition": "Small, random wobbles that get mixed into the measured voltage without anyone wanting them.",
+      "example": "With the potentiometer still, in a real circuit the analogRead value wobbles 510, 513, 509.",
+      "pitfall": "Assuming that because the value did not move in the lab, it will not move in a real circuit either."
+    },
+    {
+      "term": "Averaging",
+      "definition": "Shrinking noise by using the average of many readings; with N readings it drops about square-root(N) times.",
+      "example": "The average of 16 readings shrinks the noise about 4 times, the average of 64 readings 8 times.",
+      "pitfall": "Making the number of readings needlessly large and slowing the program down; 64 readings are 64 times the work of 1 reading."
+    },
+    {
+      "term": "Hysteresis",
+      "definition": "Using two separate thresholds for switching on and off, and keeping the previous decision in the region between them.",
+      "example": "The LED lights when the value goes above 524 and goes off when it drops below 500; in between it stays as it is.",
+      "pitfall": "Choosing a gap between the two thresholds narrower than the size of the noise; the flicker comes back."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d1-q1",
+      "kind": "mcq",
+      "prompt": "Which of these do you really see in the lab?",
+      "options": [
+        "The ADC value jittering by a few steps while the potentiometer is still",
+        "The voltage being rounded to the nearest ADC step",
+        "The supply voltage drifting from 5.00 V to 4.70 V",
+        "A button bouncing several times on one press"
+      ],
+      "answer": 1,
+      "explanation": "The lab models the ADC step: every voltage is rounded to the nearest step. Noise, reference drift and button bounce are not modelled; the lab's voltages are perfectly steady.",
+      "skills": [
+        "sens-sim-limits",
+        "sens-adc"
+      ]
+    },
+    {
+      "id": "m4h8d1-q2",
+      "kind": "numeric",
+      "prompt": "A 10-bit ADC divides the 0-5 V range into 1023 equal steps. About how many millivolts is one step? (Two decimal places are enough.)",
+      "answer": 4.89,
+      "tolerance": 0.05,
+      "unit": "mV",
+      "explanation": "5000 mV / 1023 ≈ 4.89 mV. That is why a 10-bit ADC cannot tell 1 mV changes apart; the result is always rounded to the nearest step.",
+      "skills": [
+        "sens-adc"
+      ]
+    },
+    {
+      "id": "m4h8d1-q3",
+      "kind": "predict-output",
+      "prompt": "What does the Serial monitor show when this code runs?\n\n```cpp\nconst int ACMA = 524;\nconst int KAPAMA = 500;\nint okumalar[] = {510, 530, 515, 505, 495, 520};\nbool yanik = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 6; i++) {\n    int v = okumalar[i];\n    if (!yanik && v > ACMA) yanik = true;\n    if (yanik && v < KAPAMA) yanik = false;\n    Serial.print(yanik ? 1 : 0);\n  }\n}\nvoid loop() {}\n```",
+      "options": [
+        "010100",
+        "011110",
+        "000000",
+        "011100"
+      ],
+      "answer": 3,
+      "explanation": "510 is below the threshold: 0. 530 > 524: it lights, 1. 515 and 505 are between the two thresholds, so the decision is kept: 1, 1. 495 < 500: it goes off, 0. 520 is inside the band again and already off: 0. The output is 011100. If you used a single threshold (512), it would also light at 515 and 520.",
+      "skills": [
+        "sens-hysteresis"
+      ]
+    },
+    {
+      "id": "m4h8d1-q4",
+      "kind": "find-bug",
+      "prompt": "The noise is ±8 steps. This program still makes the LED flicker. Where is the bug?\n\n```cpp\nconst int ACMA = 510;\nconst int KAPAMA = 514;\nbool yanik = false;\n// ...\nif (!yanik && deger > ACMA) yanik = true;\nif (yanik && deger < KAPAMA) yanik = false;\n```",
+      "options": [
+        "The deger variable should not have been read with analogRead",
+        "The constants should not have been const",
+        "ACMA and KAPAMA are the wrong way round: KAPAMA is bigger than ACMA, so there is no band",
+        "int should have been used instead of bool"
+      ],
+      "answer": 2,
+      "explanation": "The threshold to switch on is 510 and to switch off 514: when the value is 511 it lights, but in the same pass it goes off straight away because 511 < 514. For hysteresis, the switch-on threshold must be higher than the switch-off threshold (for example 524 and 500), and the gap between them must be bigger than the noise. The other options have nothing to do with the behaviour.",
+      "skills": [
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d1-q5",
+      "kind": "numeric",
+      "prompt": "With the average of N readings, noise drops about square-root(N) times. About how many times does the average of 64 readings shrink the noise?",
+      "answer": 8,
+      "tolerance": 0,
+      "explanation": "Square-root(64) = 8. But the cost is 64 times the work: it drops 4 times with 16 readings and 8 times with 64; the gain has diminishing returns, so making the number of readings needlessly large slows the program down.",
+      "skills": [
+        "sens-noise"
+      ]
+    }
+  ]
+}

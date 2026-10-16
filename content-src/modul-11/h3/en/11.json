@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Tile",
+      "definition": "A small 16 x 16 pixel square picture that makes up the map.",
+      "example": "Stone wall, grass and water are three separate tiles; the map builds the room by laying them side by side.",
+      "pitfall": "Mixing up a tile and a sprite: a tile is one cell of the map; it does not move by itself."
+    },
+    {
+      "term": "Map and grid",
+      "definition": "The grid in which tiles are laid out in columns and rows; its size is given as a number of tiles.",
+      "example": "A room with 10 columns and 7 rows makes 160 x 112 pixels.",
+      "pitfall": "Drawing the map in the Map tab and forgetting to load it into the game: if the `load map` block does not run, the map does not appear."
+    },
+    {
+      "term": "Column and row (counting from 0)",
+      "definition": "A tile's address: the column from left to right, the row from top to bottom. The top left tile is column 0, row 0.",
+      "example": "The centre of the tile at column 5, row 3 is at (5 x 16 + 8, 3 x 16 + 8) = (88, 56) pixels.",
+      "pitfall": "Counting from 1: the last column of a map with 10 columns is 9, not 10."
+    },
+    {
+      "term": "Wall box",
+      "definition": "The box next to each tile in the tile set; if it is ticked, a sprite cannot go into that tile.",
+      "example": "Stone wall and water are ticked, grass is not; the cat walks on grass but cannot get through stone.",
+      "pitfall": "Painting a tile like a wall but not ticking the box: the cat goes straight through it."
+    },
+    {
+      "term": "Tile set",
+      "definition": "The list of tiles you can use on the map, and the settings of each one.",
+      "example": "In this lesson the set has stone wall, grass and water.",
+      "pitfall": "Removing a tile from the tile set: all its copies on the map are deleted too."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d11-q1",
+      "kind": "numeric",
+      "prompt": "The room map has 10 columns and 7 rows, and each tile is 16 pixels. How many pixels high is the map?",
+      "answer": 112,
+      "unit": "pixels",
+      "explanation": "The height is the number of rows times the tile size: 7 x 16 = 112 pixels. The value 160 is the width (10 x 16); mixing up rows and columns is the most common mistake.",
+      "skills": [
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d11-q2",
+      "kind": "mcq",
+      "prompt": "You painted the stone wall tile but the cat goes through the wall. What is the most likely reason?",
+      "options": [
+        "The cat's speed is too high",
+        "The map is bigger than 10 columns",
+        "In the tile set, the stone wall tile's wall box is not ticked",
+        "The `moves with player keys` block is missing from the blocks"
+      ],
+      "answer": 2,
+      "explanation": "What stops the sprite is not the tile's picture but the wall box. If the box is not ticked, the tile is only decoration. The speed and the map size do not affect whether the wall works; if the movement block were missing, the cat would not walk at all.",
+      "skills": [
+        "oyun-karo-duvar"
+      ]
+    },
+    {
+      "id": "m11h3d11-q3",
+      "kind": "numeric",
+      "prompt": "You placed the cat with the `put sprite on tile column 5 row 3` block. At what x position in pixels is the cat's centre? (A tile is 16 pixels; the centre is the middle of the tile.)",
+      "answer": 88,
+      "unit": "pixels",
+      "explanation": "The column 5 tile starts at 5 x 16 = 80 pixels. The centre is half a tile (8 pixels) to the right: 80 + 8 = 88. If you multiply the column by 16 and forget to add the middle, you get 80.",
+      "skills": [
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d11-q4",
+      "kind": "find-bug",
+      "prompt": "You drew the map in the Map tab, but when you run the game the screen is empty and only the cat can be seen. The blocks are:\n\n```\n1  load map: [oda]\n2  when game starts\n3      make sprite [kedi]\n4      put sprite [kedi] on tile column [5] row [3]\n5      [kedi] moves with player keys\n```\n\nLine 1 stands on its own in the work area, not inside the `when game starts` block. What is the bug?",
+      "options": [
+        "The `load map` block is left outside the `when game starts` block, so it never runs",
+        "The cat's column and row are wrong",
+        "The movement block is linked to the wrong sprite",
+        "The map name is not written in capital letters"
+      ],
+      "answer": 0,
+      "explanation": "Blocks that should run at the start must be inside `when game starts`. A block left outside never runs, so the map is not loaded either. The cat's position and movement are correct; whether the map name is in capital or small letters is not the problem here.",
+      "skills": [
+        "oyun-hata-ayiklama"
+      ]
+    },
+    {
+      "id": "m11h3d11-q5",
+      "kind": "predict-output",
+      "prompt": "The room is closed. There is a stone wall (wall box ticked) on the tile at column 4, row 3. The cat is put on the tile at column 2, row 3, and the player holds the right arrow key down.\n\n```\nload map: [oda]\nput [kedi] on tile column [2] row [3]\n[kedi] moves in 4 directions with player keys, speed [60]\n```\n\nWhat happens after a few seconds?",
+      "options": [
+        "The cat goes through the wall to the right edge",
+        "The cat jumps over the wall",
+        "The wall disappears",
+        "The cat stops just to the left of the stone wall and cannot go on"
+      ],
+      "answer": 3,
+      "explanation": "A tile with a ticked wall box stops the sprite; the cat stays put when it touches the wall. No separate block is needed for this. The wall disappearing by itself or the cat jumping is not set up by any block in this lesson.",
+      "skills": [
+        "oyun-karo-duvar",
+        "oyun-harita-izgara"
+      ]
+    }
+  ]
+}

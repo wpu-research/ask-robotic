@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Chain of thought",
+      "definition": "The method of having the model write intermediate steps before the answer.",
+      "example": "\"First solve it step by step, then write the answer on a separate line.\"",
+      "pitfall": "Thinking it is needed for every question; for simple questions it only increases length and cost."
+    },
+    {
+      "term": "Intermediate step",
+      "definition": "A piece of working or logic on the way to the final answer; because it is written down, it becomes context for the next tokens.",
+      "example": "6 × 4 = 24, then 24 + 5 = 29.",
+      "pitfall": "A mistake in the first step being carried into all the later steps."
+    },
+    {
+      "term": "Separate answer line",
+      "definition": "Writing the final result on its own line with a fixed label such as \"Answer:\".",
+      "example": "Answer: 29",
+      "pitfall": "Burying the answer inside the steps; the program may take an intermediate number for the answer."
+    },
+    {
+      "term": "Fluent, but wrong",
+      "definition": "An explanation that looks logical does not have to be correct.",
+      "example": "The steps are written in neat sentences, but they say 6 × 4 = 20.",
+      "pitfall": "Not checking because the explanation is nice; work out every step again."
+    },
+    {
+      "term": "Cost",
+      "definition": "A longer answer means more tokens, time and money.",
+      "example": "A 130-token chain instead of a 10-token answer.",
+      "pitfall": "Adding a chain to every request without taking the cost into account."
+    },
+    {
+      "term": "Using a tool",
+      "definition": "Having an exact calculation done by a tool such as a calculator, not by the model.",
+      "example": "The calculator tool does the multiplication; the model only says what to call.",
+      "pitfall": "Treating the chain as a tool and expecting exactness."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d13-q1",
+      "kind": "mcq",
+      "prompt": "When you ask for a chain of thought, why do you want the final answer written on a separate line?",
+      "options": [
+        "So that a program can easily find and pull out the answer",
+        "So that the model produces fewer tokens",
+        "So that the steps are correct",
+        "So that the answer is definitely correct"
+      ],
+      "answer": 0,
+      "explanation": "A separate, labelled line makes parsing easier: the program looks for the line that starts with \"Answer:\". This does not guarantee correctness and does not reduce the number of tokens.",
+      "skills": [
+        "ai-reasoning-steps"
+      ]
+    },
+    {
+      "id": "m7h3d13-q2",
+      "kind": "predict-output",
+      "prompt": "A small piece of code that pulls the number out of the model's answer. What does it print when it runs?\n\n```\nconst metin = 'Steps: 12 x 7 = 84\\nAnswer: 84'\nconst satir = metin.split('\\n').find((s) => s.startsWith('Answer:'))\nconsole.log(Number(satir.replace('Answer:', '')) + 1)\n```",
+      "options": [
+        "84",
+        "85",
+        "Answer: 841",
+        "It gives an error"
+      ],
+      "answer": 1,
+      "explanation": "The code splits the text into lines and finds the line that starts with \"Answer:\". Deleting the \"Answer:\" part leaves \" 84\"; Number turns this into 84, and adding 1 makes 85. A result like \"Answer: 841\" would come out if the number were joined as text; Number prevents this.",
+      "skills": [
+        "ai-reasoning-steps",
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d13-q3",
+      "kind": "find-bug",
+      "prompt": "Question: Each robot has 4 servos. How many servos are needed in total for 6 robots and 5 spare servos? The model's solution:\n\n```\nStep 1: 6 × 4 = 20\nStep 2: 20 + 5 = 25\nAnswer: 25\n```\nWhere is the mistake, and how do you describe it?",
+      "options": [
+        "Step 2: 20 + 5 is added up wrongly",
+        "There is no mistake; the steps look logical",
+        "The answer should not have been written on a separate line",
+        "Step 1: it should be 6 × 4 = 24; the later steps have carried this mistake along consistently"
+      ],
+      "answer": 3,
+      "explanation": "Since 6 × 4 = 24, the correct answer is 24 + 5 = 29. The addition in step 2 is correct in itself (20 + 5 = 25); the mistake is in the first step and has been carried to the end. Steps looking fluent does not show that they are correct.",
+      "skills": [
+        "ai-reasoning-steps"
+      ]
+    },
+    {
+      "id": "m7h3d13-q4",
+      "kind": "numeric",
+      "prompt": "The answer without a chain takes 10 tokens, and the answer with a chain takes 130 tokens. How many times longer is the answer with the chain?",
+      "answer": 13,
+      "unit": "times",
+      "explanation": "130 / 10 = 13. Intermediate steps can improve the answer, but they also raise the cost: more tokens, more time. For simple questions this price is often unnecessary.",
+      "skills": [
+        "ai-reasoning-steps"
+      ]
+    },
+    {
+      "id": "m7h3d13-q5",
+      "kind": "mcq",
+      "prompt": "The result of a calculation has to be exactly right (e.g. a servo order). Which is the safest approach?",
+      "options": [
+        "Asking the model to write a very long chain",
+        "Raising the temperature",
+        "Having the calculation done by a calculator tool",
+        "Asking twice and choosing the longer answer"
+      ],
+      "answer": 2,
+      "explanation": "Using a tool for an exact calculation is safer; the tool works deterministically (lesson 26). A long chain or asking several times can reduce mistakes but does not remove them. Raising the temperature makes the answer more variable, not more correct.",
+      "skills": [
+        "ai-reasoning-steps",
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Order of tuning by hand",
+      "definition": "Kp first (Ki = Kd = 0), then Kd, Ki last; one change and one measurement at each step.",
+      "example": "Increase Kp until it overshoots the target slightly, then damp the overshoot with Kd, and close the remaining offset with Ki.",
+      "pitfall": "Changing all three numbers at once; you cannot tell which one had the effect."
+    },
+    {
+      "term": "Ziegler-Nichols",
+      "definition": "A method that increases Kp until permanent oscillation begins to find Ku and Pu, then gives Kc = 0.45 x Ku and Ti = Pu / 1.2.",
+      "example": "If Ku = 20 and Pu = 0.22 s, then Kc = 9 and Ti = 0.183 s.",
+      "pitfall": "Pushing the system to the stability limit on real hardware; a single wrong step can damage the vehicle."
+    },
+    {
+      "term": "Step response",
+      "definition": "A test that gives the input a sudden jump and records how the output changes over time.",
+      "example": "When PWM jumps from 100 to 180, the speed rises from 15.17 cm/s to 27.63 cm/s.",
+      "pitfall": "Starting the step when the system is not at rest; k and tau are measured wrongly."
+    },
+    {
+      "term": "k, tau, theta",
+      "definition": "A simple model: k is the gain, tau the time constant, theta the delay.",
+      "example": "In the simulation k = 0.156, tau = 77 ms, theta = 28 ms.",
+      "pitfall": "Mixing up the unit of k; the 1 / k in the formula must be in PWM / (cm/s)."
+    },
+    {
+      "term": "SIMC",
+      "definition": "A method that gives PI tuning with Kc = (1 / k) x tau / (tauc + theta) and Ti = min(tau, 4 x (tauc + theta)).",
+      "example": "For k = 0.2, tau = 0.1, theta = 0.05 and tauc = theta, Kc = 5.",
+      "pitfall": "Forgetting theta and using only tau; Kc comes out too large."
+    },
+    {
+      "term": "tauc",
+      "definition": "In SIMC, the time constant wanted from the closed loop; the single knob between speed and gentleness.",
+      "example": "Taking tauc = 3 theta brings Kc down from 6.49 to 3.25 and almost removes the overshoot.",
+      "pitfall": "Choosing tauc much smaller than theta; Kc gets very large and the system reacts harshly."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h5d99-q1",
+      "kind": "numeric",
+      "prompt": "In a step test, PWM jumps from 80 to 160 and the speed settles from 10 cm/s at 26 cm/s. What is the gain k in the SIMC model (cm/s per PWM unit)?",
+      "answer": 0.2,
+      "tolerance": 0.001,
+      "unit": "cm/s per PWM",
+      "explanation": "k = increase in speed / increase in PWM = (26 - 10) / (160 - 80) = 16 / 80 = 0.2. Dividing the speed itself by the PWM (26 / 160) gives a ratio, not the gain, and is wrong.",
+      "skills": [
+        "ctl-tuning"
+      ]
+    },
+    {
+      "id": "m5h5d99-q2",
+      "kind": "numeric",
+      "prompt": "In a step response, the speed reaches 28.3% of the total increase 40 ms after the step, and 63.2% after 100 ms. How many milliseconds is the time constant tau? (tau = 1.5 x (t63 - t28))",
+      "answer": 90,
+      "tolerance": 0.5,
+      "unit": "ms",
+      "explanation": "tau = 1.5 x (100 - 40) = 90 ms. Theta = t63 - tau = 10 ms, which is consistent with t28 = theta + tau / 3 = 10 + 30 = 40 ms. Taking t63 directly as tau gives 100 ms; that also includes the delay.",
+      "skills": [
+        "ctl-tuning"
+      ]
+    },
+    {
+      "id": "m5h5d99-q3",
+      "kind": "predict-output",
+      "prompt": "What does this code print to the serial monitor when it runs?\n\n```\nconst float K = 0.2, TAU = 0.1, THETA = 0.05, TAUC = 0.05;\nconst float KC = (1.0 / K) * TAU / (TAUC + THETA);\nconst float TI = min(TAU, 4.0 * (TAUC + THETA));\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.print(\"Kc=\");\n  Serial.print(KC, 1);\n  Serial.print(\" Ti=\");\n  Serial.println(TI, 2);\n}\nvoid loop() {}\n```",
+      "options": [
+        "Kc=5.0 Ti=0.10",
+        "Kc=10.0 Ti=0.20",
+        "Kc=0.5 Ti=0.10",
+        "Kc=5.0 Ti=0.40"
+      ],
+      "answer": 0,
+      "explanation": "(1 / 0.2) x 0.1 / (0.05 + 0.05) = 5 x 0.1 / 0.1 = 5.0. Ti = min(0.1, 4 x 0.1 = 0.4) = 0.1; because min picks the smaller one, 0.40 is not printed.",
+      "skills": [
+        "ctl-tuning",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h5d99-q4",
+      "kind": "mcq",
+      "prompt": "Why would a team like Hyvex choose SIMC instead of Ziegler-Nichols on a fragile and expensive vehicle?",
+      "options": [
+        "Z-N's formula gives the wrong result",
+        "For Z-N, finding Ku means deliberately bringing the system into permanent oscillation; SIMC asks for a single safe step test",
+        "SIMC only tunes the D term",
+        "SIMC needs no measurement at all"
+      ],
+      "answer": 1,
+      "explanation": "Z-N works (in the simulation it gave an error area close to SIMC's), but finding Ku means pushing the system to the stability limit. SIMC gets k, tau and theta from a safe step test; the option saying it needs no measurement is wrong.",
+      "skills": [
+        "ctl-tuning"
+      ]
+    },
+    {
+      "id": "m5h5d99-q5",
+      "kind": "find-bug",
+      "prompt": "In this SIMC calculation Kc comes out 25 times smaller than expected (k = 0.2). Where is the single bug?\n\n```\nconst float K = 0.2, TAU = 0.1, THETA = 0.05, TAUC = 0.05;\nconst float KC = K * TAU / (TAUC + THETA);\nconst float TI = min(TAU, 4.0 * (TAUC + THETA));\n```",
+      "options": [
+        "THETA should be used instead of TAU",
+        "The denominator should be TAUC - THETA",
+        "max should be used instead of min for TI",
+        "The KC calculation needs 1 / K instead of K"
+      ],
+      "answer": 3,
+      "explanation": "The SIMC formula has the form Kc = (1 / k) x tau / (tauc + theta). The code has k instead of 1 / k, so the result comes out as 0.2 when it should be 5 (a factor of 25). The numerator and denominator are correct; min is the right operator.",
+      "skills": [
+        "ctl-tuning",
+        "prog-debug"
+      ]
+    }
+  ]
+}

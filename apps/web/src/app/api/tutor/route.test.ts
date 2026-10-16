@@ -236,7 +236,7 @@ describe('POST /api/tutor — her sayfada Mac', () => {
     const r = await POST(req({ page: '/ders/9', messages: [{ role: 'user', content: 'Basitçe anlat' }] }))
     expect(r.status).toBe(200)
     expect(await r.text()).toBe('Sence ne olur?')
-    expect(h.server.loadPageSource).toHaveBeenCalledWith({}, '/ders/9', true)
+    expect(h.server.loadPageSource).toHaveBeenCalledWith({}, '/ders/9', true, 'tr')
     expect(h.server.loadTutorLesson).not.toHaveBeenCalled()
     const params = h.stream.mock.calls[0][0]
     expect(params.system[0].text).toBe(ROBI_PAGE_SYSTEM)

@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Joystick",
+      "definition": "An input part made of two potentiometers at right angles and a button; it has VRX, VRY and SW pins.",
+      "example": "With the X axis property at 0.25, VRX gives about 1.25 V and analogRead reads about 256.",
+      "pitfall": "Thinking the joystick is a single sensor: it needs two separate analogue pins (A0 and A1) and one digital pin."
+    },
+    {
+      "term": "Centre (middle point)",
+      "definition": "The value read while the stick is released. It is measured at start-up as the average of 16 readings.",
+      "example": "On one module the centre may be 532, on another 491.",
+      "pitfall": "Writing the centre as a fixed 512: the value drifts while the stick is released."
+    },
+    {
+      "term": "Dead zone",
+      "definition": "A small range around the centre in which the value counts as zero.",
+      "example": "With a dead zone of 40, a deviation of 25 from the centre is treated as 0.",
+      "pitfall": "Not adding a dead zone: the servo or motor jitters with a value that wobbles 510, 514, 509."
+    },
+    {
+      "term": "Scaling with map()",
+      "definition": "Converts a value from one range to another in a straight line; it uses integer division.",
+      "example": "map(68, 40, 491, 0, 100) gives 6.",
+      "pitfall": "Leaving the dead zone unscaled: the value jumps suddenly from 0 to 40."
+    },
+    {
+      "term": "Button with INPUT_PULLUP",
+      "definition": "Pulls the pin up to 5 V internally; a pressed button connects to GND, so it reads LOW.",
+      "example": "If digitalRead(2) == LOW, the joystick button is pressed.",
+      "pitfall": "Not writing INPUT_PULLUP: with the button released the pin floats and random presses are read."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d56-q1",
+      "kind": "numeric",
+      "prompt": "The joystick is powered from 5 V. You set the X axis property to 0.25 (the stick is about a quarter of the way). You connected the VRX pin to A0. About what does analogRead(A0) read?",
+      "answer": 256,
+      "tolerance": 2,
+      "explanation": "Voltage = 0.25 x 5 V = 1.25 V. analogRead = 1.25 / 5 x 1024, about 256 (255 or 256 on an Arduino). 512 comes with the stick in the middle, and 768 at 0.75.",
+      "skills": [
+        "analog-read"
+      ]
+    },
+    {
+      "id": "m4h5d56-q2",
+      "kind": "mcq",
+      "prompt": "Why does the joystick read about 512 rather than \"0\" when the stick is released?",
+      "options": [
+        "The program is wrong; it should read 0",
+        "The wiper stops halfway along the track, so the voltage is about 2.5 V",
+        "The button is stuck pressed",
+        "The ADC starts at 512"
+      ],
+      "answer": 1,
+      "explanation": "Each axis is a voltage divider, and with the stick in the middle the wiper is halfway: half of 5 V, which is about 512. The button (SW) is a separate pin and does not affect the axis value. The ADC reads from 0 to 1023; it does not start at 512.",
+      "skills": [
+        "analog-read",
+        "axis-calibration"
+      ]
+    },
+    {
+      "id": "m4h5d56-q3",
+      "kind": "numeric",
+      "prompt": "The centre was measured as 532 and the dead zone is 40. When the stick is pushed right, the raw value reads 600. For the eksen() function in the lesson, the difference = 68 and map(fark, 40, 1023 - 532, 0, 100) is called. What is the result?",
+      "answer": 6,
+      "tolerance": 0,
+      "explanation": "The input range is 40...491. (68 - 40) x 100 / (491 - 40) = 2800 / 451 = 6.2; map uses integer division, so it is 6. Because the part outside the dead zone is rescaled, the value starts from 0; it does not come out as 68.",
+      "skills": [
+        "axis-calibration"
+      ]
+    },
+    {
+      "id": "m4h5d56-q4",
+      "kind": "find-bug",
+      "prompt": "Even with the button released, the Serial monitor sometimes prints \"BASILDI\" (pressed). Which line is wrong?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {\n    Serial.println(\"BASILDI\");\n  }\n  delay(100);\n}\n```",
+      "options": [
+        "Serial.begin(9600);",
+        "delay(100);",
+        "pinMode(2, INPUT);",
+        "if (digitalRead(2) == LOW) {"
+      ],
+      "answer": 2,
+      "explanation": "The SW pin should be INPUT_PULLUP. With plain INPUT, a released button leaves the pin floating and it reads randomly. The LOW check is correct, because a pressed button connects to GND.",
+      "skills": [
+        "input-pullup",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h5d56-q5",
+      "kind": "predict-output",
+      "prompt": "The centre is 512. The stick is pushed slightly and the raw value is 540. What does the Serial monitor show when this code runs?\n\n```\nint merkez = 512;\nint ham = 540;\nint fark = ham - merkez;\nif (abs(fark) < 40) {\n  Serial.println(\"ORTA\");\n} else if (fark > 0) {\n  Serial.println(\"SAG\");\n} else {\n  Serial.println(\"SOL\");\n}\n```",
+      "options": [
+        "ORTA",
+        "SAG",
+        "SOL",
+        "Nothing"
+      ],
+      "answer": 0,
+      "explanation": "fark (difference) = 28, and since 28 < 40 it is in the dead zone; \"ORTA\" (middle) is printed. For \"SAG\" (right) to be printed, the difference must be at least 40.",
+      "skills": [
+        "axis-calibration"
+      ]
+    }
+  ]
+}

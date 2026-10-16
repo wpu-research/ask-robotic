@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "When touching a tile event",
+      "definition": "An event block that runs the blocks inside it when a sprite of a certain kind touches a certain tile.",
+      "example": "The `when a [Player] sprite touches tile [Door]` block runs when the cat touches the door.",
+      "pitfall": "Forgetting to choose a tile in the event, or choosing the wrong tile: it waits for the wrong tile."
+    },
+    {
+      "term": "Triggering once",
+      "definition": "The event runs once, at the moment the sprite first touches the tile; standing on it does not run it again.",
+      "example": "Even if you wait at the door for 3 seconds, `change score by 100` runs only once.",
+      "pitfall": "Thinking the points will go up if you wait."
+    },
+    {
+      "term": "End game",
+      "definition": "The block that finishes the game as won or lost.",
+      "example": "`end game: you win` goes at the end of the door event.",
+      "pitfall": "Forgetting this block: the message appears and the melody plays, but the game carries on."
+    },
+    {
+      "term": "Passable door tile",
+      "definition": "The exit tile's wall box is not ticked; that way the cat can go into the tile.",
+      "example": "In the tile set, the brick wall is ticked and the door is not.",
+      "pitfall": "Making the door tile a wall: the cat cannot go into the door."
+    },
+    {
+      "term": "Solvable maze",
+      "definition": "A maze with at least one open path from the start to the exit.",
+      "example": "After drawing a new wall, you try the maze by walking it yourself from start to finish.",
+      "pitfall": "Closing the path completely: the exit can never be reached and the game cannot be won."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d12-q1",
+      "kind": "mcq",
+      "prompt": "When does the `when a [Player] sprite touches tile [Door]` event run?",
+      "options": [
+        "As soon as the game starts",
+        "All the time, for as long as the player stands on the door",
+        "Only when the game ends",
+        "Once, at the moment the player first touches the door tile"
+      ],
+      "answer": 3,
+      "explanation": "The tile event runs once, at the moment the sprite goes into the tile. Standing on it does not trigger it again; coming out and going in again does. What runs at the start is the `when game starts` block.",
+      "skills": [
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h3d12-q2",
+      "kind": "predict-output",
+      "prompt": "With the score at 0, the player goes into the door tile and waits there for 3 seconds, then you close the game.\n\n```\nwhen a [Player] sprite touches tile [Door]\n    change score by [100]\n```\n\nWhat is the score?",
+      "options": [
+        "100",
+        "0",
+        "300",
+        "18000"
+      ],
+      "answer": 0,
+      "explanation": "The event runs once, at the moment of first touching: 0 + 100 = 100. Waiting does not repeat the event, so it is not 300 or 18000. For it to be 0, the event would have to never run.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d12-q3",
+      "kind": "find-bug",
+      "prompt": "When the cat goes into the door, the message appears and the victory melody plays, but the game does not end and the cat keeps walking.\n\n```\n1  when a [Player] sprite touches tile [Door]\n2      show [You found the exit!] on screen for [2] seconds\n3      play melody [victory]\n```\n\nWhich is the bug?",
+      "options": [
+        "The wrong sprite kind is chosen in line 1",
+        "The message time should not be 2 seconds",
+        "The `end game: you win` block is missing at the end of the event",
+        "The melody name should not be `victory`"
+      ],
+      "answer": 2,
+      "explanation": "The message and melody work, so the event is being triggered; that means the kind and the tile are right. The only block that ends the game is `end game`, and it is missing. The time and the melody name do not affect whether the game ends.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d12-q4",
+      "kind": "numeric",
+      "prompt": "The maze map has 12 columns and 9 rows. How many wall tiles are there in the outermost ring (the edge)? (Count the corners once.)",
+      "answer": 38,
+      "unit": "tiles",
+      "explanation": "There are 12 + 12 = 24 tiles in the top and bottom rows. In the left and right columns, without the corners, 7 + 7 = 14 tiles are left. The total is 24 + 14 = 38. If you add up the four sides as 12 + 12 + 9 + 9 = 42, you have counted the corners twice.",
+      "skills": [
+        "oyun-harita-izgara"
+      ]
+    },
+    {
+      "id": "m11h3d12-q5",
+      "kind": "mcq",
+      "prompt": "While editing the maze, you drew new walls. How do you make sure the game can still be won?",
+      "options": [
+        "I count the number of walls",
+        "I try the maze by walking it myself from the start to the exit",
+        "I delete the door event",
+        "I make the cat faster"
+      ],
+      "answer": 1,
+      "explanation": "The most reliable way to show whether there is an open path to the exit is to actually walk the maze. The number of walls does not tell you the path is open; deleting the event or raising the speed does not open a closed path.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-karo-duvar"
+      ]
+    }
+  ]
+}

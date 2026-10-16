@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Carrier (38 kHz)",
+      "definition": "The flicker of light made by the IR LED flashing 38,000 times a second, which the receiver module recognises.",
+      "example": "When the receiver sees 38 kHz, it makes the OUT pin LOW; it ignores slow changes such as sunlight.",
+      "pitfall": "Pointing the receiver straight at the sun or a bright lamp; the receiver can be triggered all the time."
+    },
+    {
+      "term": "Inverted output (active-LOW)",
+      "definition": "The IR receiver module gives HIGH when there is no carrier and LOW when there is a carrier.",
+      "example": "When the remote is pressed, D2 first goes LOW for 9 ms, then stays HIGH for 4.5 ms.",
+      "pitfall": "Mixing up the pulseIn(LOW) and pulseIn(HIGH) calls: when idle the pin is HIGH, the leading pulse is LOW."
+    },
+    {
+      "term": "NEC protocol",
+      "definition": "A common IR coding that sends 32 bits after the leading pulse: the address, the inverse of the address, the command and the inverse of the command.",
+      "example": "If the command is 0x0C, 0xF3 (its inverse) follows; if the two match, the message is sound.",
+      "pitfall": "Expecting another remote's codes on your own remote; the address and commands change from remote to remote."
+    },
+    {
+      "term": "A bit from the gap length",
+      "definition": "In NEC the pulse is always 562.5 µs; a short gap (562.5 µs) means 0 and a long gap (1687.5 µs) means 1.",
+      "example": "A threshold of 1100 µs: if the measured gap is longer than this, a 1 bit is written.",
+      "pitfall": "Trying to read the bits from the pulse length; all the pulses are the same length."
+    },
+    {
+      "term": "Bit shifting and |=",
+      "definition": "1 << i shifts 1 to the left by i places; with veri |= ... this bit is set to 1 in the number.",
+      "example": "For i = 3, 1 << 3 is 8 (binary 1000).",
+      "pitfall": "Using int: on the Uno it is 16 bits, so the top half of a 32-bit message is lost. Write (uint32_t)1 << i."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h6d1-q1",
+      "kind": "mcq",
+      "prompt": "What does the IR receiver module's OUT pin read when no remote button is being pressed (when there is no carrier)?",
+      "options": [
+        "LOW",
+        "A random value that keeps changing",
+        "HIGH",
+        "Nothing; the pin floats"
+      ],
+      "answer": 2,
+      "explanation": "The receiver works inverted: when there is no carrier, OUT is HIGH (idle); when the carrier arrives, it goes LOW. That is why you measure the leading pulse as LOW. The pin does not float, because of the pull-up resistor inside the module.",
+      "skills": [
+        "ir-nec"
+      ]
+    },
+    {
+      "id": "m4h6d1-q2",
+      "kind": "mcq",
+      "prompt": "In an NEC message, what decides whether a bit is 0 or 1?",
+      "options": [
+        "The length of the pulse (LOW)",
+        "The length of the gap (HIGH)",
+        "The frequency of the carrier",
+        "Where in the order the message comes"
+      ],
+      "answer": 1,
+      "explanation": "The pulse is 562.5 µs for every bit. A short gap (562.5 µs) means 0 and a long gap (1687.5 µs) means 1. The carrier frequency is always 38 kHz and carries no bit information.",
+      "skills": [
+        "ir-nec"
+      ]
+    },
+    {
+      "id": "m4h6d1-q3",
+      "kind": "numeric",
+      "prompt": "In NEC, a repeat message is made of a 9 ms pulse, a 2.25 ms gap and a 0.5625 ms end pulse. How many milliseconds does it last in total?",
+      "answer": 11.8125,
+      "tolerance": 0.05,
+      "unit": "ms",
+      "explanation": "9 + 2.25 + 0.5625 = 11.8125 ms. A full message lasts about 68 ms, while a repeat message is much shorter; that is why, when a button is held down, short messages arrive about every 108 ms.",
+      "skills": [
+        "ir-nec"
+      ]
+    },
+    {
+      "id": "m4h6d1-q4",
+      "kind": "predict-output",
+      "prompt": "What does the Serial monitor show when this code runs?\n\n```\nuint32_t veri = 0;\nveri |= (uint32_t)1 << 0;\nveri |= (uint32_t)1 << 3;\nSerial.println(veri);\n```",
+      "options": [
+        "4",
+        "8",
+        "9",
+        "10"
+      ],
+      "answer": 2,
+      "explanation": "1 << 0 is 1, and 1 << 3 is 8. With |= both bits are added: 1 + 8 = 9 (binary 1001). 8 would give only the third bit, and 4 the second bit.",
+      "skills": [
+        "bit-ops"
+      ]
+    },
+    {
+      "id": "m4h6d1-q5",
+      "kind": "find-bug",
+      "prompt": "A friend gathered the 32 gaps like this, but the command always comes out wrong. Which line is the bug on?\n\n```\nuint32_t veri = 0;                  // line 1\nfor (int i = 0; i < 32; i++) {      // line 2\n  unsigned long b = pulseIn(2, HIGH, 3000);   // line 3\n  if (b > 1100) veri |= 1 << i;     // line 4\n}\n```",
+      "options": [
+        "Line 1: veri is not declared as 32 bits",
+        "Line 2: the loop runs 33 times",
+        "Line 3: pulseIn should be LOW instead of HIGH",
+        "Line 4: the number 1 is an int; on the Uno everything after bit 16 is lost, it should be (uint32_t)1 << i"
+      ],
+      "answer": 3,
+      "explanation": "On the Uno, the literal 1 is a 16-bit int; 1 << 16 and above overflow, and the top half of the message (the command and its inverse) is corrupted. Line 1 is already uint32_t, line 2 runs exactly 32 times, and measuring the gaps as HIGH is correct.",
+      "skills": [
+        "bit-ops",
+        "prog-debug"
+      ]
+    }
+  ]
+}

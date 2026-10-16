@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Defence in depth",
+      "definition": "Not relying on a single measure, but putting several layers on top of each other.",
+      "example": "Data separation, instruction hierarchy and human approval are used together.",
+      "pitfall": "Thinking one strong measure will be enough."
+    },
+    {
+      "term": "Instruction hierarchy",
+      "definition": "The system rule counting as higher than the text in the document or from the user.",
+      "example": "Even if the document says \"forget the rules\", the system rule stays in force.",
+      "pitfall": "Writing the hierarchy down and assuming the model will always follow it."
+    },
+    {
+      "term": "Output filter",
+      "definition": "A check that removes secret data or suspicious links from the model's output.",
+      "example": "A sentence containing KIRMIZI-42 is replaced with ***.",
+      "pitfall": "It misses encoded output (for example the code written backwards)."
+    },
+    {
+      "term": "Least privilege",
+      "definition": "Never giving the model secret information or tools it does not need.",
+      "example": "The key is kept in a secure service, not in the system message.",
+      "pitfall": "Writing a secret key in the system message and saying \"do not tell\"."
+    },
+    {
+      "term": "Human approval",
+      "definition": "A human's approval before a risky action (deleting, emailing, paying).",
+      "example": "Before sending an email, the agent shows you the draft.",
+      "pitfall": "Clicking the approval box without reading it."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d34-q1",
+      "kind": "mcq",
+      "prompt": "What does \"defence in depth\" mean?",
+      "options": [
+        "Using several different measures on top of each other",
+        "Making a single measure very strong",
+        "Never trying the attack",
+        "Cutting the system off from the internet"
+      ],
+      "answer": 0,
+      "explanation": "It means using several different measures, so that if one layer is broken through, the next one steps in. A single strong measure becomes the system's single weak point. Repeating the same measure does not cover different types of attack either.",
+      "skills": [
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d34-q2",
+      "kind": "find-bug",
+      "prompt": "A developer wrote an assistant that connects to a bank. What is the real security flaw in the design? (`Kasa şifresi` means \"safe password\"; the rule says \"do not tell anyone\".)\n\n```\nSISTEM = \"Kasa şifresi: 4821. Bunu kimseye söyleme.\"\nyanit = model(SISTEM, kullanici_mesaji)\nprint(yanit)\n```",
+      "options": [
+        "The print line shows the output",
+        "The secret password is given to the model as a system message",
+        "The model function takes two parameters",
+        "The variable name is written in capital letters"
+      ],
+      "answer": 1,
+      "explanation": "The password is written in the system message. Because the model knows the information, a successful injection reveals it; the \"do not tell\" rule is not a guarantee. Never giving secret information to the model is the strongest measure. The print line and the model call are not a problem from this point of view.",
+      "skills": [
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d34-q3",
+      "kind": "predict-output",
+      "prompt": "An output filter was written. If the model answers by writing the code backwards, what appears on the screen?\n\n```\ndef cikti_suz(metin):\n    return metin.replace(\"KIRMIZI-42\", \"***\")\nprint(cikti_suz(\"Kod ters: 24-IZMIRIK\"))\n```",
+      "options": [
+        "Kod ters: ***",
+        "Kod ters: 24-***",
+        "An error happens",
+        "Kod ters: 24-IZMIRIK"
+      ],
+      "answer": 3,
+      "explanation": "replace only looks for the exact string \"KIRMIZI-42\". The backwards \"24-IZMIRIK\" is not that string, so it is not changed and is printed as it is. An output filter is useful but does not catch an encoded leak; that is why it is used together with the other layers.",
+      "skills": [
+        "ai-defense",
+        "ai-injection"
+      ]
+    },
+    {
+      "id": "m7h7d34-q4",
+      "kind": "numeric",
+      "prompt": "In the workshop table, if only \"Banned word list\" is chosen, how many of the six attacks stay open?",
+      "answer": 5,
+      "unit": "attacks",
+      "tolerance": 0,
+      "explanation": "The banned word list only stops the direct attack. Indirect, role-play, encoding, link exfiltration and tool misuse stay open: 6 - 1 = 5. The table is simplified for the lesson, but it shows that a single measure is not enough.",
+      "skills": [
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d34-q5",
+      "kind": "numeric",
+      "prompt": "What is the total cost of the cheapest set of defences that stops all six attacks in the workshop? (Instruction hierarchy, output filter and human approval cost 1 each; least privilege costs 3.)",
+      "answer": 3,
+      "unit": "cost",
+      "tolerance": 0,
+      "explanation": "The instruction hierarchy closes four attacks (direct, indirect, role-play, encoding), the output filter closes link exfiltration, and human approval closes tool misuse: 1 + 1 + 1 = 3. Least privilege (3) on its own closes encoding, link and tool, but the other three need one more measure; that makes at least 4.",
+      "skills": [
+        "ai-defense"
+      ]
+    }
+  ]
+}

@@ -12,6 +12,7 @@ export const modul3: ModuleContent = {
       "title": "Temeller",
       "project": "Trafik ışığı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Mikrodenetleyicinin ne olduğunu ve Arduino Uno üzerindeki pinleri (dijital, analog, 5V, GND) söyleyebilir.\n2. Ohm yasasıyla (V = I × R) gerilim, akım ve direnç hesaplayabilir; LED için seri direncin neden gerektiğini açıklayabilir.\n3. `setup()`, `loop()`, `pinMode`, `digitalWrite` ve `delay` ile bir LED'i yakıp söndüren program yazabilir.\n4. `for` döngüsü ve dizi ile birden çok LED'i sürebilir.\n5. Plan tablosundan yola çıkarak üç LED'li bir trafik ışığı kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-30 dakikadır. Aşağıdaki plan günde bir ders içindir. Daha yoğun bir takvim isteyenler iki dersi birleştirebilir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Mikrodenetleyici nedir? | ~20 dk | Anlatımı oku, Uno'yu laboratuvarda tanı, dahili L LED'ini yak, mini testi çöz. |\n| 2 | Elektrik: V, I, R ve Ohm yasası | ~20 dk | Hesapları elle yap, sanal ölçümle akımı oku, hesapla karşılaştır. |\n| 3 | İlk program: Blink | ~20 dk | İlk devreyi kur, programı çalıştır, bekleme sürelerini değiştir. |\n| 4 | Çoklu LED, for döngüsü ve diziler | ~25 dk | Dört LED kur, döngü ve dizi sürümlerini dene. |\n| 5 | Proje: Trafik ışığı | ~30 dk | Planı tabloya yaz, devreyi kur, programı yaz, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta özel bir ön bilgi gerekmez. Başlamadan önce şunları kontrol et:\n- Tarayıcıda devre laboratuvarı açılıyor mu? (Menüden \"Devre laboratuvarı\")\n- Öğrenci dört işlem ve ondalık sayılarla rahat mı? (Ohm yasası bölme ve çarpma içerir.)\n- Fare ile kablo çekmek ve parça seçmek konusunda sorun var mı?\n\n### Kavram haritası\n- **Donanım:** mikrodenetleyici → Arduino Uno → pinler (dijital, analog) → 5V ve GND\n- **Elektrik:** gerilim, akım, direnç → Ohm yasası → LED için seri direnç → kapalı devre\n- **Program:** sketch → `setup()` ve `loop()` → `pinMode`, `digitalWrite`, `delay` → `for` ve dizi\n- **Proje:** plan tablosu → aşamalar → söndür-yak-bekle kalıbı → tur süresi\n\n### Sık yapılan hatalar\n- **mA ile A'yı karıştırmak.** 20 mA = 0,02 A. Hesaptan önce ampere çevir.\n- **LED'i dirençsiz bağlamak.** Akım sınırlanmaz; laboratuvar uyarı verir.\n- **LED'i ters bağlamak ya da GND'yi unutmak.** Devre kapanmaz, LED yanmaz.\n- **`pinMode` unutmak.** LED çok sönük yanar ya da hiç yanmaz.\n- **Noktalı virgül unutmak.** Derleyici \"expected ';'\" der. Hata mesajını okumak çözümün yarısıdır.\n- **`delay` süresini saniye sanmak.** `delay(5)` 5 milisaniyedir.\n- **Dizide 1'den saymak.** İlk eleman `ledler[0]`'dır; 4 elemanlı dizide `ledler[4]` diziden taşar.\n- **Önceki aşamanın LED'ini söndürmemek.** Trafik ışığında iki LED birlikte yanar.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Blink programını sıfırdan, bakmadan yaz; sonra bekleme sürelerini değiştir.\n4. Kırmızı LED için 330 Ω yerine 1 kΩ ve 150 Ω kullanıldığında akımın nasıl değiştiğini hesapla ve laboratuvarda ölç.\n5. Kendi cümlelerinle şu soruyu cevapla: \"LED'in önündeki direnç ne işe yarar?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Trafik ışığı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | LED'lerden biri yanmıyor ya da dirençsiz | Üç LED kendi direnciyle ve doğru yönde bağlı | Renkler doğru seçilmiş, bağlantılar düzenli |\n| Plan | Tablo yok | Aşama, LED ve süre tablosu var | Tablo, kodla birebir uyuyor ve açıklanmış |\n| Program | Aynı anda birden çok LED yanıyor ya da program çalışmıyor | Üç aşama doğru sırada ve tek LED yanıyor | Kırmızı-sarı uyarı aşaması gibi bir geliştirme eklenmiş |\n| Zamanlama | Süreler yanlış (örneğin delay(5)) | Süreler tabloyla uyuşuyor | Süreleri değiştirip etkisini açıklıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta bir şey \"ezberletmek\" değil, öğrencinin devre kurmaya ve çalışan ilk programı görmeye alışmasıdır. Hata yapmak laboratuvarda güvenlidir; yanan LED ya da kısa devre sanaldır ve ↺ ile sıfırlanır.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şu soruları sor: \"Akım nereden girip nereden çıkıyor?\", \"Hata mesajı ne diyor?\", \"Hangi pinleri bağladın, kodda hangisini yazdın?\"\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Her ders arasında kısa bir tekrar yeterlidir.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Ders ilerleyip gerçek kart kullanılacaksa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner can:\n1. Say what a microcontroller is and name the pins on the Arduino Uno (digital, analogue, 5V, GND).\n2. Calculate voltage, current and resistance with Ohm's law (V = I × R), and explain why an LED needs a series resistor.\n3. Write a program that makes an LED blink using `setup()`, `loop()`, `pinMode`, `digitalWrite` and `delay`.\n4. Drive several LEDs with a `for` loop and an array.\n5. Build a traffic light with three LEDs, starting from a plan table.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-30 minutes. The plan below is for one lesson a day. Those who want a busier schedule can combine two lessons.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | What is a microcontroller? | ~20 min | Read the explainer, get to know the Uno in the lab, light the built-in L LED, do the mini test. |\n| 2 | Electricity: V, I, R and Ohm's law | ~20 min | Do the calculations by hand, read the current with virtual measurement, compare it with the calculation. |\n| 3 | First program: Blink | ~20 min | Build the first circuit, run the program, change the waiting times. |\n| 4 | Several LEDs, the for loop and arrays | ~25 min | Build four LEDs, try the loop and array versions. |\n| 5 | Project: Traffic light | ~30 min | Write the plan in a table, build the circuit, write the program, assess it with the project rubric. |\n\n### Prerequisite check\nNo special prior knowledge is needed this week. Before you start, check these:\n- Does the circuit lab open in the browser? (From the menu, \"Circuit lab\")\n- Is the learner comfortable with the four operations and decimal numbers? (Ohm's law involves division and multiplication.)\n- Are there any difficulties with drawing wires and selecting parts with the mouse?\n\n### Concept map\n- **Hardware:** microcontroller → Arduino Uno → pins (digital, analogue) → 5V and GND\n- **Electricity:** voltage, current, resistance → Ohm's law → series resistor for an LED → closed circuit\n- **Program:** sketch → `setup()` and `loop()` → `pinMode`, `digitalWrite`, `delay` → `for` and arrays\n- **Project:** plan table → stages → switch off-switch on-wait pattern → round time\n\n### Common mistakes\n- **Mixing up mA and A.** 20 mA = 0.02 A. Convert to amperes before calculating.\n- **Connecting an LED without a resistor.** The current is not limited; the lab gives a warning.\n- **Connecting the LED the wrong way round or forgetting GND.** The circuit is not closed and the LED does not light up.\n- **Forgetting `pinMode`.** The LED glows very dimly or not at all.\n- **Forgetting the semicolon.** The compiler says \"expected ';'\". Reading the error message is half of the solution.\n- **Thinking the `delay` time is in seconds.** `delay(5)` is 5 milliseconds.\n- **Counting from 1 in an array.** The first element is `ledler[0]`; in a 4-element array, `ledler[4]` goes past the end of the array.\n- **Not switching off the previous stage's LED.** In the traffic light, two LEDs are on together.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Reread the explanations for the questions you got wrong in the mini tests, then answer the question again.\n3. Write the Blink program from scratch without looking; then change the waiting times.\n4. Calculate how the current changes when 1 kΩ and 150 Ω are used instead of 330 Ω for the red LED, and measure it in the lab.\n5. Answer this question in your own words: \"What does the resistor in front of the LED do?\"\n\nThe mini tests of the five lessons are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that is still weak.\n\n### Project rubric (Traffic light)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | One of the LEDs does not light up or has no resistor | Three LEDs connected with their own resistors and the right way round | Colours chosen correctly, tidy connections |\n| Plan | No table | There is a table of stages, LEDs and times | The table matches the code exactly and is explained |\n| Program | More than one LED is on at the same time, or the program does not work | Three stages in the right order with a single LED on | An improvement has been added, such as a red-yellow warning stage |\n| Timing | Wrong times (for example delay(5)) | The times match the table | Changes the times and explains the effect |\n| Explanation | Cannot explain what they did | Explains the circuit and the code step by step | Explains a mistake they made and how they found it |\n\n### Note for parents and teachers\n- **Aim.** This week is not about making the learner \"memorise\" something; it is about getting used to building circuits and seeing a first working program. Making mistakes is safe in the lab; a burnt-out LED or a short circuit is virtual and is reset with ↺.\n- **How can you help?** When the learner gets stuck, instead of giving the answer, ask these questions: \"Where does the current go in and where does it come out?\", \"What does the error message say?\", \"Which pins did you connect, and which one did you write in the code?\"\n- **Time.** Spreading the lessons out, rather than doing them back to back on the same day, helps learning stick. A short review between lessons is enough.\n- **Safety.** Everything on this platform is virtual. If the lessons move on to using a real board, no circuit is ever built with mains voltage (220 V).\n- **Progress.** The results of the mini test at the end of each lesson appear by skill on the \"My progress\" page (draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Mikrodenetleyici nedir?",
@@ -429,7 +430,130 @@ export const modul3: ModuleContent = {
               "kind": "reflect",
               "prompt": "Which device in your home do you think has a microcontroller inside? How can you tell?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "What is a microcontroller?",
+            "problem": "How does a lift know which floor to go to? How does a washing machine know when to drain the water? Inside each one there is a tiny computer, and that computer is programmed for a single job. In this lesson you will learn what that tiny computer is and what you can find on an Arduino Uno board.",
+            "contentMd": "### Microcontroller and computer\nIn a computer, the processor, the memory and the input-output parts are separate. A **microcontroller** puts all of them inside one small chip. It has no screen and no keyboard. It has legs instead. You connect parts such as LEDs, buttons, sensors and motors to these legs.\n\nA microcontroller knows what to do thanks to its **program**. You upload the program once. Even if the power is cut and switched back on, the program stays on the chip, and it starts running as soon as the board gets power.\n\n### Anatomy of the Arduino Uno\nThe Arduino Uno is a development board built around a microcontroller called the ATmega328P. You can see these parts on the **Uno drawing** in the lab: when you open the lab, the Uno is already waiting on the canvas. Find the chip, the pin headers and the small L LED next to D13 on the drawing. The main parts of the board are these.\n\n| Part | What does it do? |\n|---|---|\n| ATmega328P chip | The microcontroller that runs the program |\n| Digital pins (0-13) | Output HIGH/LOW (5 V / 0 V) or read from outside |\n| Analogue input pins (A0-A5) | Measure a voltage between 0 and 5 V |\n| 5V and GND pins | Give parts a 5 V supply and ground (0 V) |\n| USB socket | On a real board, used to upload the program and power the board. In the lab, uploading and power are automatic |\n| Reset button | Starts the program again from the beginning. In the lab, the ↺ button does this job |\n| Built-in LED (L) connected to D13 | For experimenting without adding any parts |\n\nSome numbers for the ATmega328P: a 16 MHz clock speed, 32 KB of program memory (flash), 2 KB of working memory (SRAM) and 1 KB of EEPROM. These are tiny compared with a phone. But they are more than enough to light an LED or control a motor.\n\n### What does a digital pin do?\nA digital pin is in one of two states:\n- **HIGH:** The pin gives about 5 V.\n- **LOW:** The pin gives 0 V.\n\nA pin works either as an **output** (the board gives a voltage to the outside, for example to light an LED) or as an **input** (the board listens to the outside, for example to read a button). You make this setting in the program.\n\n### How does a program run?\nAn Arduino program is called a **sketch**. Every sketch has two parts:\n- `setup()`: Runs once when the board starts.\n- `loop()`: Repeats over and over.\n\nIn the next lessons you will write these yourself. For now, just get to know the pattern:\n\n```\nvoid setup() {\n  // commands that run once\n}\n\nvoid loop() {\n  // commands that repeat over and over\n}\n```\n\n### The working environment\nIn this module you will do everything in the platform's **circuit lab**. The code editor is on the left and the circuit canvas is on the right; the Uno is already on the canvas. You pick parts from the **Add part** menu and connect the pins by drawing wires. Then you press ▶ **Compile and run**, and the circuit comes to life. The lab powers the Uno's 5V, 3V3 and GND pins automatically. If you make a mistake, nothing breaks: stop with ■, fix it, and start again with ↺.\n\n### Try it\n- Look at the Uno drawing in the lab. Count the 14 digital pins and the 6 analogue pins.\n- Find the labels 5V, GND and D13 on the drawing. Point to the L LED next to D13.\n- Activity: without building a circuit, just by writing code, make the built-in L LED on D13 blink.\n- Write down three devices in your home that contain a microcontroller (e.g. a microwave oven, a remote control).\n\n### Common mistakes\n- Thinking a microcontroller is a \"small computer\" and expecting it to do everything: it is designed for single, simple jobs.\n- Mixing up the pin number with the label on the board: `A0` is an analogue pin, `0` is a digital pin.\n- Forgetting GND when building the circuit: the circuit is not complete and the parts do not work.",
+            "question": "Which device in your home do you think has a microcontroller inside, and how did you work that out? What would happen if we could program the same device for many jobs instead of just one?",
+            "explainerMd": "### What you will learn in this lesson\n- What a microcontroller is and how it differs from an ordinary computer\n- The main parts of the Arduino Uno board (pins, 5V, GND, the built-in L LED)\n- The HIGH and LOW states of a pin\n- The two parts of every program: `setup()` and `loop()`\n\n### What you should know first\nNothing. This lesson starts from zero. All you need is a computer and a browser that can open the lab.\n\n### The tiny computers around you\nA circuit \"knows\" how long the microwave oven should run, when the washing machine should drain the water, and which button on the remote control was pressed. At the heart of that circuit there is usually a **microcontroller**.\n\nA microcontroller fits the three basic parts of a computer (processor, memory, input-output) into **a single chip**. It has no screen or keyboard; instead it has **legs (pins)**. You connect parts such as LEDs, buttons, sensors and motors to these pins. A computer is designed to do any job. A microcontroller is programmed for **a single job** and does that job all the time.\n\n### The program stays on the chip\nYou upload the program to the board once. The program is written into the chip's **flash** memory and is not erased even if the power is cut. When you start the board again, the program starts by itself. That is why a device works straight away when you plug it in.\n\n### The Arduino Uno: a board built around the chip\nThe brain of the Arduino Uno is the **ATmega328P** chip. The board comes with parts that make the chip easy to use:\n\n- **Digital pins (0-13):** Output HIGH or LOW, or read from outside.\n- **Analogue input pins (A0-A5):** Measure a voltage between 0 and 5 V.\n- **5V and GND pins:** Give parts 5 volts and ground (0 V).\n- **Built-in L LED:** Connected to D13. You can experiment without adding any parts.\n\nYou can find these parts on the Uno drawing in the lab. The lab does the real board's USB jobs, uploading the program and supplying power, for you.\n\n### HIGH and LOW\nA digital pin is in one of two states. **HIGH** is when the pin gives about 5 V; **LOW** is when it gives 0 V. If a pin is set as an **output**, the board drives the pin itself (for example, it lights an LED). If it is set as an **input**, the board listens to the pin (for example, it reads a button). You make this setting in the program with the `pinMode` command.\n\n### The two parts of every program\nAn Arduino program is called a **sketch**. It has two parts:\n\n```\nvoid setup() {\n  // runs ONCE when the board starts\n}\n\nvoid loop() {\n  // runs over and over, from start to end, again and again\n}\n```\n\n`setup()` is for preparation (such as setting the direction of the pins). `loop()` is the main job, and when it reaches the end it goes back to the start. As long as the board has power, this loop never stops.\n\n### Summary\nA microcontroller is a tiny computer on a single chip, and it is programmed for a single job. The Arduino Uno makes this chip usable through its pins. Pins are HIGH or LOW; the `setup()` part of the program runs once, and the `loop()` part runs all the time. Now, in the activity, you will open the lab and get to know the Uno.",
+            "concepts": [
+              {
+                "term": "Microcontroller",
+                "definition": "A tiny computer that puts the processor, memory and input-output parts on one chip and is programmed for a single job.",
+                "example": "The chip inside a washing machine knows from its program when to drain the water.",
+                "pitfall": "Thinking it is a computer that can do any job; it is designed for single, simple jobs."
+              },
+              {
+                "term": "Sketch",
+                "definition": "The name for an Arduino program. It contains the setup() and loop() parts.",
+                "example": "You can write a ten-line sketch that makes the built-in LED blink.",
+                "pitfall": "Thinking a sketch is uploaded once and then disappears; it stays in the chip's flash memory even when the power is cut."
+              },
+              {
+                "term": "setup() and loop()",
+                "definition": "setup() runs once when the board starts; loop() starts again the moment it finishes and repeats over and over.",
+                "example": "You set the pin's direction once in setup(), and you switch the LED on and off in loop().",
+                "pitfall": "Putting a command that must repeat inside setup(): it runs only once."
+              },
+              {
+                "term": "HIGH and LOW",
+                "definition": "The two states of a digital pin. HIGH means about 5 V, LOW means 0 V.",
+                "example": "When D13 is HIGH, the connected LED lights up; when it is LOW, it goes out.",
+                "pitfall": "Always thinking HIGH means \"on\"; when reading a button (INPUT_PULLUP), pressed means LOW."
+              },
+              {
+                "term": "Output and input (pinMode)",
+                "definition": "The board drives an output pin; the board listens to an input pin. You set the direction with pinMode.",
+                "example": "For an LED you write pinMode(13, OUTPUT), for a button pinMode(2, INPUT_PULLUP).",
+                "pitfall": "Forgetting to write pinMode: the pin does not become an output, and the LED glows very dimly or not at all."
+              },
+              {
+                "term": "GND",
+                "definition": "The 0 V reference point of the circuit (ground). It is the path the current returns along.",
+                "example": "When the LED's cathode leg is connected to GND, the circuit is closed and current can flow.",
+                "pitfall": "Forgetting to connect GND: the circuit is not complete and the part does not work."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h1d1-q1",
+                "kind": "mcq",
+                "prompt": "Which is the most important feature that sets a microcontroller apart from an ordinary computer?",
+                "options": [
+                  "It must have a screen and a keyboard",
+                  "It puts the processor, memory and input-output on one chip and is usually programmed for a single job",
+                  "It can only connect to the internet",
+                  "It can work without electricity"
+                ],
+                "answer": 1,
+                "explanation": "A microcontroller fits the basic parts of a computer onto one chip and is usually programmed for a single job. It has no screen or keyboard; it has legs.",
+                "skills": [
+                  "mcu-board"
+                ]
+              },
+              {
+                "id": "m3h1d1-q2",
+                "kind": "mcq",
+                "prompt": "After the program is uploaded to the board, what happens if the power is cut and switched back on?",
+                "options": [
+                  "The program is erased and you have to upload it again",
+                  "The program stays on the chip and starts running by itself when the board gets power",
+                  "Only setup() runs",
+                  "The board waits for a new program"
+                ],
+                "answer": 1,
+                "explanation": "The program is written into flash memory and is not erased when the power is cut. When the power comes back, the board runs the program from the start.",
+                "skills": [
+                  "mcu-board"
+                ]
+              },
+              {
+                "id": "m3h1d1-q3",
+                "kind": "predict-output",
+                "prompt": "An LED is connected to pin D13. What does the LED do when this sketch runs?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n  digitalWrite(13, HIGH);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "It blinks",
+                  "It stays on all the time",
+                  "It never lights up",
+                  "There is a compile error"
+                ],
+                "answer": 1,
+                "explanation": "setup() runs once and makes D13 HIGH. Because loop() is empty, there is no other command that changes the pin; the pin stays HIGH and the LED stays on all the time.",
+                "skills": [
+                  "digital-out",
+                  "prog-structure"
+                ]
+              },
+              {
+                "id": "m3h1d1-q4",
+                "kind": "mcq",
+                "prompt": "Which of the following statements is true?",
+                "options": [
+                  "A0 and 0 are the same pin",
+                  "A0 is an analogue input pin, while 0 is a digital pin",
+                  "A0 is only for lighting LEDs",
+                  "The Uno has no analogue pins"
+                ],
+                "answer": 1,
+                "explanation": "A0-A5 are analogue input pins. Pins numbered 0-13 are digital. Carrying the same number does not make them the same.",
+                "skills": [
+                  "mcu-board"
+                ]
+              },
+              {
+                "id": "m3h1d1-q5",
+                "kind": "numeric",
+                "prompt": "How many digital pins does the Arduino Uno have, from D0 to D13?",
+                "answer": 14,
+                "unit": "pins",
+                "explanation": "Counting from D0 to D13 gives 0, 1, 2 ... 13, which is 14 pins. Because counting starts from 0, the last number (13) and the number of pins (14) are different.",
+                "skills": [
+                  "mcu-board"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Elektrik: V, I, R ve Ohm yasası",
@@ -914,7 +1038,127 @@ export const modul3: ModuleContent = {
               "kind": "reflect",
               "prompt": "How does a bigger resistor affect the LED? What would happen if we chose a really, really big resistor?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Electricity: V, I, R and Ohm's law",
+            "problem": "If you connect a real LED straight to 5 V, it can break very quickly. How does a small resistor in between save it? And can we calculate that resistor's value instead of guessing? The lab models this rule: if too much current goes to the LED, a warning appears. What's more, you can measure the current yourself.",
+            "contentMd": "### Three basic quantities\n| Quantity | Symbol | Unit | Water pipe comparison |\n|---|---|---|---|\n| Voltage | V | volt (V) | The pressure that pushes the water |\n| Current | I | ampere (A) | The amount of water flowing through the pipe |\n| Resistance | R | ohm (Ω) | How narrow the pipe is |\n\nThe water comparison is a simple model. Electricity is not like water, but the model helps you understand the idea: if the pressure rises, the flow rises; if the pipe gets narrower, the flow drops.\n\nWe write small currents in **milliamperes** (mA): 1 A = 1000 mA. We write large resistances in **kilohms** (kΩ): 1 kΩ = 1000 Ω.\n\n### Ohm's law\nThe voltage across a resistor is equal to the current through it multiplied by the resistance:\n\n**V = I × R**\n\nTwo more formulas come from this:\n- **I = V / R** (to find the current)\n- **R = V / I** (to find the resistance)\n\n### Example calculations\n1. 5 V and 1000 Ω (1 kΩ): I = 5 / 1000 = 0.005 A = **5 mA**.\n2. 5 V and 500 Ω: I = 5 / 500 = 0.01 A = **10 mA**. When the resistance is halved, the current doubles.\n3. 9 V and a load that needs 3 A: R = 9 / 3 = **3 Ω**.\n4. 20 mA flows through a 220 Ω resistor: V = 0.02 × 220 = **4.4 V**.\n\n### Working out the resistor for an LED\nAn LED is not a resistor. While it is lit, an almost constant voltage drops across it. For a red LED this value is typically about 2 V (the exact value is in the LED's datasheet). The rest of the voltage must drop across the series resistor.\n\nIf the supply is 5 V and the LED voltage is 2 V, then 5 − 2 = 3 V is left across the resistor.\n\nThis is an idealised calculation that ignores the internal resistance of the pin and of the LED:\n\n- Current for 330 Ω: I = 3 / 330 ≈ 0.0091 A ≈ **9 mA**. The LED lights safely.\n- Current for 150 Ω: I = 3 / 150 = 0.02 A = **20 mA**. It is brighter, but close to the limit.\n- Current for 100 Ω: I = 3 / 100 = **30 mA**. This is too much; the LED and the pin can be damaged.\n\nThe recommended maximum current for one Arduino Uno pin is about 20 mA; 40 mA is the absolute limit that must never be exceeded. That is why we use **330 Ω** with red LEDs in this module.\n\n### Virtual measurement: read the current and the voltage\nIn real circuits, a multimeter measures these values. In the lab, the equivalent is **virtual measurement**. While the circuit is running, select a part on the canvas (for example the resistor or the LED). The **voltage** across the part and the **current** through it appear in the properties panel. You must run the circuit with ▶ first; there is nothing to measure in a circuit that is not running.\n\nYou can test Ohm's law with this: connect D13 to an LED through a 330 Ω resistor, and let the code make D13 HIGH. When you select the resistor, you should see about 2.8 V and 8.6 mA. Our calculation said 3 V and 9 mA; the small difference is normal, because the lab also models the Uno pin's internal resistance (about 25 Ω) and the LED's internal resistance. These two resistances also take a share of the voltage, so not all of the 3 V drops across the series resistor. The difference grows with small resistor values: at 150 Ω you measure about 17 mA instead of 20 mA, and at 100 Ω about 24 mA instead of 30 mA. Then stop with ■, set the resistor to 1000 Ω in the properties panel, run it again and measure: the current should drop to about 3 mA (and the voltage gets closer to 3 V, because when the current is smaller, the share lost in the pin and the LED gets smaller).\n\n### Resistor colour code\nThe coloured bands on real resistors give their value. In the lab you type the value in the properties panel, but knowing the code is useful for reading real resistors. For 330 Ω the order is: orange, orange, brown. The first two bands are digits (3 and 3), and the third band is the multiplier (brown = ×10), so 33 × 10 = 330 Ω.\n\n### Try it\n- How much current flows through a 220 Ω resistor connected to 5 V? (Answer: about 22.7 mA)\n- If you want 10 mA to flow with the same 5 V, which resistor do you need? (Answer: 500 Ω)\n- With a red LED (2 V) and a 5 V supply, what happens to the current if you use 1 kΩ instead of 330 Ω? How does the LED look? (Answer: 3 mA; it glows dimly)\n- Build this circuit in the lab, change the resistor value and read the current with virtual measurement. Does the measured value match your calculation? Explain the reason for the small difference in your own words.\n\n### Common mistakes\n- Mixing up mA and A: 20 mA = 0.02 A. Convert to amperes before using the formula.\n- Not putting a resistor on the LED: nothing limits the current. The lab models this and gives a warning if the LED burns out; you can start again with ↺.\n- Thinking \"a bigger resistance means a bigger current\": it is the opposite; as the resistance grows, the current **drops**.",
+            "question": "If you double the resistance, how does the LED's brightness change, and why? Is playing with the resistor a good idea for a very bright but safe LED?",
+            "explainerMd": "### What you will learn in this lesson\n- What voltage, current and resistance are, and their units\n- Ohm's law (V = I × R) and how to calculate with it\n- Why an LED needs a series resistor and how to choose its value\n- How to read the current with virtual measurement in the lab\n\n### What you should know first\nThe idea of HIGH (≈ 5 V) and LOW (0 V) from lesson 1. The four operations and decimal numbers are enough.\n\n### Three basic quantities\nYou can think of an electric circuit as a **water pipe**. This comparison is not real, but it helps the idea sink in.\n\n| Quantity | Symbol | Unit | Comparison |\n|---|---|---|---|\n| Voltage | V | volt (V) | The pressure that pushes the water |\n| Current | I | ampere (A) | The amount of water flowing through the pipe |\n| Resistance | R | ohm (Ω) | How narrow the pipe is |\n\nWe write small currents in **milliamperes** (mA): 1 A = 1000 mA. We write large resistances in **kilohms** (kΩ): 1 kΩ = 1000 Ω.\n\n### Ohm's law\nThe voltage across a resistor is equal to the current through it multiplied by the resistance:\n\n**V = I × R**\n\nYou use it in three forms: `I = V / R` (find the current), `R = V / I` (find the resistance), `V = I × R` (find the voltage). Before calculating, **convert the units**: write the current in amperes and the resistance in ohms.\n\n**Example.** The current through a 1 kΩ resistor connected to 5 V: I = 5 / 1000 = 0.005 A = **5 mA**. If you make the resistor 500 Ω, the current becomes **10 mA**. The resistance was halved, and the current doubled.\n\n### Why do we put a resistor on an LED?\nUnlike a resistor, an LED does not limit the current by itself. While it is lit, an almost constant voltage drops across it (about 2 V for red). The remaining voltage has to drop somewhere. The **series resistor** in between takes that remaining voltage and sets the current:\n\n`I = (V besleme − V LED) / R`\n\nHere `V besleme` is the supply voltage. For a 5 V supply, a 2 V red LED and 330 Ω: I = (5 − 2) / 330 ≈ 0.009 A ≈ **9 mA**. This is a current at which the LED lights safely. If you had used 100 Ω, the current would be 30 mA; that is too much.\n\n### Calculation and measurement\nThis calculation is idealised. In reality (and in the lab), the Uno pin's internal resistance and the LED's internal resistance also take a share of the voltage. That is why the measured current comes out a little smaller than the calculation: about 8.6 mA at 330 Ω. The small difference is normal and is not a mistake; it shows that the model is more detailed.\n\n### Summary\nVoltage is the push, current is the flow, resistance is the obstacle. Ohm's law connects all three: V = I × R. The resistor sets the LED's current; that is why we always put a series resistor on an LED. In this module we use **330 Ω** for a red LED at 5 V.",
+            "concepts": [
+              {
+                "term": "Voltage (V)",
+                "definition": "The \"pressure\" that pushes the current; its unit is the volt. The electrical difference between two points.",
+                "example": "A HIGH pin on the Uno gives about 5 V.",
+                "pitfall": "Thinking voltage is \"something that flows through\"; voltage is measured between two points, while current flows through."
+              },
+              {
+                "term": "Current (I)",
+                "definition": "The flow of charge through the circuit; its unit is the ampere. In electronics we mostly use milliamperes (mA).",
+                "example": "A red LED with 330 Ω draws about 9 mA.",
+                "pitfall": "Mixing up mA and A: 20 mA = 0.02 A."
+              },
+              {
+                "term": "Resistance (R)",
+                "definition": "The property that opposes current; its unit is the ohm (Ω). As it grows, the current drops.",
+                "example": "At 5 V, 5 mA flows through 1 kΩ and 10 mA through 500 Ω.",
+                "pitfall": "Thinking \"a bigger resistance means a bigger current\"; it is the opposite, the current drops."
+              },
+              {
+                "term": "Ohm's law",
+                "definition": "V = I × R. If you know two of the three quantities, you can find the third.",
+                "example": "If 20 mA flows through 220 Ω, V = 0.02 × 220 = 4.4 V.",
+                "pitfall": "Putting values into the formula without converting the units (writing mA directly)."
+              },
+              {
+                "term": "Series resistor",
+                "definition": "A resistor connected one after the other with the LED that limits the current.",
+                "example": "In the connection D13 → 330 Ω → LED → GND, the 330 Ω is the series resistor.",
+                "pitfall": "Not putting a resistor on the LED: the current is not limited and the LED can burn out."
+              },
+              {
+                "term": "Virtual measurement",
+                "definition": "Seeing the voltage and current in the properties panel when you select a part while the circuit is running in the lab.",
+                "example": "When you select the 330 Ω resistor in a running circuit, you see about 2.8 V and 8.6 mA.",
+                "pitfall": "Trying to measure while the circuit is not running: run it with ▶ first."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h1d2-q1",
+                "kind": "numeric",
+                "prompt": "How many mA flow through a 1000 Ω (1 kΩ) resistor connected to 5 V?",
+                "answer": 5,
+                "tolerance": 0.01,
+                "unit": "mA",
+                "explanation": "I = V / R = 5 / 1000 = 0.005 A. 0.005 A = 5 mA.",
+                "skills": [
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h1d2-q2",
+                "kind": "numeric",
+                "prompt": "You want 10 mA to flow through a resistor at 5 V. How many ohms should the resistor be?",
+                "answer": 500,
+                "tolerance": 0.5,
+                "unit": "Ω",
+                "explanation": "First convert the current to amperes: 10 mA = 0.01 A. R = V / I = 5 / 0.01 = 500 Ω.",
+                "skills": [
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h1d2-q3",
+                "kind": "mcq",
+                "prompt": "If the voltage stays the same and you double a resistor's value, what happens to the current?",
+                "options": [
+                  "It doubles",
+                  "It halves",
+                  "It does not change",
+                  "It becomes zero"
+                ],
+                "answer": 1,
+                "explanation": "I = V / R. When the bottom of the fraction doubles, the result halves: as the resistance grows, the current drops.",
+                "skills": [
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h1d2-q4",
+                "kind": "mcq",
+                "prompt": "What happens if you connect an LED straight to 5 V, without a series resistor?",
+                "options": [
+                  "The LED lights more brightly and is not damaged",
+                  "Nothing limits the current; the LED draws too much current and can be damaged",
+                  "The LED never lights up",
+                  "Nothing changes"
+                ],
+                "answer": 1,
+                "explanation": "An LED does not limit the current by itself. Without a series resistor, the current rises and the LED (and the Uno pin) can be damaged. The lab models this and gives a warning.",
+                "skills": [
+                  "elec-led-resistor"
+                ]
+              },
+              {
+                "id": "m3h1d2-q5",
+                "kind": "mcq",
+                "prompt": "In the lab you measured 8.6 mA in the 330 Ω resistor; your calculation said 9 mA. Why is there a difference?",
+                "options": [
+                  "The lab is working wrongly",
+                  "The internal resistances of the Uno pin and the LED also take a share of the voltage, and the calculation ignored them",
+                  "Ohm's law does not apply here",
+                  "mA and A were mixed up"
+                ],
+                "answer": 1,
+                "explanation": "The calculation was idealised. The lab also models the pin's internal resistance (about 25 Ω) and the LED's internal resistance; not all of the 3 V drops across the series resistor, so the current comes out a little smaller.",
+                "skills": [
+                  "elec-ohm",
+                  "elec-led-resistor"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "İlk program: Blink",
@@ -1444,7 +1688,128 @@ export const modul3: ModuleContent = {
               "kind": "reflect",
               "prompt": "While `delay(1000)` is running, can the board do anything else? If someone pressed a button during that time, would the board notice?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "First program: Blink",
+            "problem": "Every program has its own \"hello world\". In hardware, it is making an LED blink. So how does a board know when an LED should switch on and when it should switch off?",
+            "contentMd": "### Circuit\n| Part | Connection |\n|---|---|\n| LED (red) | **A** (anode, long leg) → one end of the resistor; **K** (cathode, short leg) → GND |\n| 330 Ω resistor | One end to **D13**, the other end to the LED's **A** leg |\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. Set the resistor's value to 330 Ω in the properties panel.\n\nThe Uno's built-in L LED is also connected to D13; even without an external LED, the program makes it blink.\n\n### Program\n```cpp\n// sketch: blink\nvoid setup() {\n  pinMode(13, OUTPUT);      // 13. pini çıkış yap\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);   // LED yansın\n  delay(1000);              // 1000 ms bekle\n  digitalWrite(13, LOW);    // LED sönsün\n  delay(1000);\n}\n```\n\n### How does it work?\n1. `setup()` runs **once** when the board starts. This is where you set the direction of the pins.\n2. `loop()` **starts again** the moment it finishes, for ever.\n3. `HIGH` gives the pin 5 V, `LOW` gives 0 V. The LED lights up with this voltage through the resistor.\n4. `delay(1000)` makes the processor wait for 1000 milliseconds (1 second).\n\n### Try it\n- Change the waiting time to 200 ms and press ▶ again. Is the LED still blinking, or does it look as if it is on all the time?\n- Make the on time 100 ms and the off time 900 ms. Which one looks like a \"pulse\"?\n- S.O.S: write a program that blinks three short, three long, three short.\n\n### Common mistakes\n- Forgetting to write `pinMode`: the pin does not become an output, and the LED glows very dimly or not at all.\n- Forgetting the `;` at the end of each line: the compiler says \"expected ';'\".\n- Connecting the LED the wrong way round: an LED has a direction, and it does not light up if the A and K legs are swapped.\n- Not adding a resistor: in a real circuit, the LED and the pin can be damaged; the lab models this and gives a warning. The resistor limits the current.",
+            "question": "While `delay(1000)` is running, can the board do anything else? Would it make a difference if someone pressed a button during this program?",
+            "explainerMd": "### What you will learn in this lesson\n- How to make a pin an output (`pinMode`) and write HIGH/LOW to it (`digitalWrite`)\n- How to wait with `delay` and think about time in milliseconds\n- How to build your first circuit: the LED, the resistor and GND form a loop\n- How to recognise small program mistakes\n\n### What you should know first\nFrom lesson 1, `setup()` and `loop()`, HIGH and LOW; from lesson 2, why an LED needs a series resistor.\n\n### Blink, the \"hello world\" of hardware\nWhen you learn a new language, the first program you write prints \"Hello world\" on the screen. In hardware, the equivalent is making an LED **blink**. It is called **Blink**. It looks small, but it contains the basics of programming and of circuits.\n\n### A circuit is a loop\nFor current to flow, it needs a closed path: Uno pin → resistor → the LED's anode (A) → the LED's cathode (K) → GND. If the path is broken anywhere, the LED does not light up. An LED **has a direction**: current only passes from A to K. The resistor protects the LED; its value is 330 Ω (lesson 2).\n\n### The program: four commands\n```\npinMode(13, OUTPUT);     // make pin 13 an output\ndigitalWrite(13, HIGH);  // give the pin 5 V\ndigitalWrite(13, LOW);   // give the pin 0 V\ndelay(1000);             // wait 1000 ms\n```\n\n- `pinMode(pin, OUTPUT)` sets the pin's **direction**. You write it once inside `setup()`.\n- `digitalWrite(pin, HIGH/LOW)` sets the pin's **state**.\n- `delay(ms)` makes the program wait in **milliseconds**. 1000 ms = 1 second.\n\n### Order matters\nThe board runs the commands from top to bottom, **in order**. When `loop()` reaches the end, it goes back to the very start. In Blink the order is: switch on, wait, switch off, wait, start again. The waiting times set how long the LED stays on and off. If it is on for 1000 ms and off for 1000 ms, one full cycle takes 2000 ms.\n\n### Common small mistakes\n- If you forget the `;` at the end of a command, the compiler gives an error.\n- If you do not write `pinMode`, the pin does not become an output; the LED glows very dimly or not at all.\n- If the LED is connected the wrong way round, it does not light up. Making mistakes is safe here: you can stop with ■ and fix it, or start again with ↺.\n\n### Summary\nBlink brings three things together: a correctly built circuit, `pinMode` to set the pin's direction, and `digitalWrite` and `delay` to drive the pin and wait. The commands run in order, and `loop()` repeats all the time.",
+            "concepts": [
+              {
+                "term": "pinMode()",
+                "definition": "Sets whether a pin is an output or an input. You usually write it once inside setup().",
+                "example": "The command pinMode(13, OUTPUT); makes D13 an output.",
+                "pitfall": "Forgetting to write it: the pin does not become an output, and the LED glows very dimly or not at all."
+              },
+              {
+                "term": "digitalWrite()",
+                "definition": "Writes HIGH (≈ 5 V) or LOW (0 V) to a pin that has been made an output.",
+                "example": "digitalWrite(13, HIGH); switches the LED on, digitalWrite(13, LOW); switches it off.",
+                "pitfall": "Writing digitalWrite without making the pin an output first."
+              },
+              {
+                "term": "delay()",
+                "definition": "Makes the program wait for the given number of milliseconds. 1000 ms = 1 second.",
+                "example": "delay(500); waits for half a second.",
+                "pitfall": "Thinking the time is in seconds: delay(5) is not 5 seconds, it is 5 milliseconds."
+              },
+              {
+                "term": "Anode and cathode",
+                "definition": "The two legs of an LED. Current goes in at the anode (A) and comes out at the cathode (K). On a real LED, the long leg is the anode.",
+                "example": "In the Blink circuit, the anode connects to the resistor and the cathode to GND.",
+                "pitfall": "Connecting the LED the wrong way round: it does not light up."
+              },
+              {
+                "term": "Closed circuit",
+                "definition": "A circuit in which the current finds an unbroken path from the pin to GND. If the path is broken, no current flows.",
+                "example": "The path D13 → resistor → LED → GND forms a loop.",
+                "pitfall": "Forgetting the GND connection: the circuit is not closed and the LED does not light up."
+              },
+              {
+                "term": "Compile error",
+                "definition": "When the compiler refuses the program because it does not follow the language's rules.",
+                "example": "If the ';' is missing at the end of a line, the message \"expected ';'\" appears.",
+                "pitfall": "Changing the code at random without reading the error message; the message tells you where the error is."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h1d3-q1",
+                "kind": "numeric",
+                "prompt": "In the Blink program, the LED stays on for 1000 ms and off for 1000 ms. How many milliseconds does one full on-off cycle take?",
+                "answer": 2000,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "One cycle is the on time plus the off time: 1000 + 1000 = 2000 ms (2 seconds).",
+                "skills": [
+                  "prog-timing",
+                  "digital-out"
+                ]
+              },
+              {
+                "id": "m3h1d3-q2",
+                "kind": "find-bug",
+                "prompt": "This program gives an error when it is compiled. Which line is wrong?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH)\n  delay(500);\n  digitalWrite(13, LOW);\n  delay(500);\n}\n```",
+                "options": [
+                  "pinMode(13, OUTPUT);",
+                  "digitalWrite(13, HIGH)",
+                  "delay(500);",
+                  "digitalWrite(13, LOW);"
+                ],
+                "answer": 1,
+                "explanation": "There is no semicolon at the end of the digitalWrite(13, HIGH) line. The compiler gives the error \"expected ';'\". Every command must end with ';'.",
+                "skills": [
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h1d3-q3",
+                "kind": "find-bug",
+                "prompt": "The external LED is correctly connected to D13, but it glows very dimly or not at all. What is causing the problem?\n\n```\nvoid setup() {\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(1000);\n  digitalWrite(13, LOW);\n  delay(1000);\n}\n```",
+                "options": [
+                  "There is no pinMode(13, OUTPUT) inside setup()",
+                  "The delay values are too large",
+                  "loop() has been used",
+                  "HIGH is written in capital letters"
+                ],
+                "answer": 0,
+                "explanation": "Because the pin has not been set as an output, digitalWrite does not really drive the pin. pinMode(13, OUTPUT) must be written inside setup().",
+                "skills": [
+                  "prog-debug",
+                  "digital-out"
+                ]
+              },
+              {
+                "id": "m3h1d3-q4",
+                "kind": "mcq",
+                "prompt": "In the Blink circuit, where is the LED's cathode (K) leg connected?",
+                "options": [
+                  "Straight to D13",
+                  "To the 5V pin",
+                  "To GND",
+                  "To nowhere"
+                ],
+                "answer": 2,
+                "explanation": "The current enters from the pin through the resistor and the LED's anode, comes out of the cathode and returns to GND. If the cathode is not connected to GND, the circuit is not closed.",
+                "skills": [
+                  "circuit-wiring"
+                ]
+              },
+              {
+                "id": "m3h1d3-q5",
+                "kind": "numeric",
+                "prompt": "The LED will stay on for 100 ms and off for 900 ms. For what percentage of a cycle is the LED on?",
+                "answer": 10,
+                "tolerance": 0,
+                "unit": "%",
+                "explanation": "The cycle time is 100 + 900 = 1000 ms. The on time is 100 ms, so 100 / 1000 = 10%.",
+                "skills": [
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Çoklu LED, for döngüsü ve diziler",
@@ -1934,7 +2299,124 @@ export const modul3: ModuleContent = {
               "kind": "reflect",
               "prompt": "If there were thirty LEDs instead of four, what would the loop and the array save you? What would be enough to change in the program?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Several LEDs, the for loop and arrays",
+            "problem": "To light four LEDs one after another, you have to write the same lines four times. But what if there were 40 LEDs? Instead of writing the same job again and again, programmers make the board repeat it by itself.",
+            "contentMd": "### Circuit\n| Part | Connection |\n|---|---|\n| LED 1 (red) | Anode → 330 Ω → **D13**; cathode → GND |\n| LED 2 (yellow) | Anode → 330 Ω → **D12**; cathode → GND |\n| LED 3 (green) | Anode → 330 Ω → **D11**; cathode → GND |\n| LED 4 (blue) | Anode → 330 Ω → **D10**; cathode → GND |\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. Each LED has its own resistor. You can connect the four K legs to any of the Uno's GND pins. You choose the LED's colour in the properties panel.\n\n### The for loop\nA `for` loop repeats a job a set number of times. It has three parts:\n\n```\nfor (int i = 10; i <= 13; i++) {\n  // i takes the values 10, 11, 12, 13 in turn\n}\n```\n\n- `int i = 10`: the counter starts at 10.\n- `i <= 13`: carry on as long as the counter is less than or equal to 13.\n- `i++`: after each round, add 1 to the counter.\n\nInstead of writing four `pinMode` lines, you can use a loop:\n\n```\nfor (int pin = 10; pin <= 13; pin++) {\n  pinMode(pin, OUTPUT);\n}\n```\n\n### Program 1: LEDs that light up in turn\n```cpp\n// sketch: coklu_led\nvoid setup() {\n  for (int pin = 10; pin <= 13; pin++) {\n    pinMode(pin, OUTPUT);\n  }\n}\n\nvoid loop() {\n  for (int pin = 10; pin <= 13; pin++) {\n    digitalWrite(pin, HIGH);   // bu LED yansın\n    delay(300);\n    digitalWrite(pin, LOW);    // sonra sönsün\n  }\n}\n```\n\n### Array\nAn array stores many values of the same type under a single name. The elements are numbered starting **from 0**.\n\n```\nint ledler[] = {13, 12, 11, 10};\n// ledler[0] = 13, ledler[1] = 12, ledler[2] = 11, ledler[3] = 10\n```\n\nThanks to the array, the pin numbers do not have to be in order. You connect the LEDs to whichever pins you like and write the order in the array. (`ledler` means \"LEDs\".)\n\n### Program 2: A light that goes back and forth\n```cpp\n// sketch: dizi_led\nint ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i < 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n\nvoid loop() {\n  // ileri: 13, 12, 11, 10\n  for (int i = 0; i < 4; i++) {\n    digitalWrite(ledler[i], HIGH);\n    delay(200);\n    digitalWrite(ledler[i], LOW);\n  }\n  // geri: 11, 12\n  for (int i = 2; i >= 1; i--) {\n    digitalWrite(ledler[i], HIGH);\n    delay(200);\n    digitalWrite(ledler[i], LOW);\n  }\n}\n```\n\n### How does it work?\n1. Inside `setup()`, the loop makes all four pins outputs.\n2. In the forward loop, `i` goes from 0 to 3. `ledler[i]` becomes 13, 12, 11 and 10 in turn.\n3. In the backward loop, `i--` takes 1 off the counter; `i` goes down from 2 to 1. This way, the LEDs at the ends do not light up twice, and the light goes back and forth.\n4. Each LED is on for 200 ms, then goes out. One full round takes 6 × 200 = 1200 ms.\n\n### Try it\n- Change the `delay` values to 50 ms and press ▶ again. Can you still see the lights separately?\n- Add a new pin to the `ledler` array (e.g. D9) and change the loop limits to match.\n- Write a program that first switches them all on together and then switches them all off together.\n\n### Common mistakes\n- Writing `ledler[4]` for the array: the last element of a 4-element array is `ledler[3]`. Going past the end of the array leads to unexpected behaviour.\n- Mixing up `<` and `<=` in the loop condition: one element too many or too few is processed.\n- Putting a `;` at the end of the `for` line: the loop body does not run.\n- Thinking the array's elements start from 1: the first element is `ledler[0]`.",
+            "question": "If there were thirty LEDs instead of four, what would using a loop and an array gain you? How long would the same program be without an array?",
+            "explainerMd": "### What you will learn in this lesson\n- How to repeat a job with a `for` loop instead of writing it again and again\n- How to keep several values under one name with arrays and reach the elements by number\n- How to light four LEDs in turn\n- How to recognise loop and array mistakes\n\n### What you should know first\nLesson 3: `pinMode`, `digitalWrite`, `delay`, building a circuit. Lesson 2: each LED has its own series resistor.\n\n### A job that repeats\nTo light four LEDs in turn, you have to write the same three lines four times. With thirty LEDs, you would write ninety lines. Programmers leave jobs like this to the computer: \"Repeat these steps this many times.\"\n\n### The for loop\n`for` works with three parts:\n\n```\nfor (int i = 10; i <= 13; i++) {\n  // body: i becomes 10, 11, 12, 13 in turn\n}\n```\n\n1. **Start** (`int i = 10`): the counter is set up once, before the loop begins.\n2. **Condition** (`i <= 13`): checked before each round; if it is true, the body runs; if it is false, the loop ends.\n3. **Step** (`i++`): after each round, the counter goes up by 1. `i--` takes 1 off instead.\n\nIn this example the body runs for i = 10, 11, 12 and 13, so **4 rounds**. When i becomes 14, the condition is false and the loop ends.\n\n### Array\nAn **array** stores many values of the same type under a single name:\n\n```\nint ledler[] = {13, 12, 11, 10};\n```\n\nYou reach the elements **by number (index)**, and the numbering **starts from 0**:\n\n| Index | 0 | 1 | 2 | 3 |\n|---|---|---|---|---|\n| Value | 13 | 12 | 11 | 10 |\n\nThe value of `ledler[2]` is 11. In a 4-element array the valid indexes are 0, 1, 2 and 3; `ledler[4]` **goes past the end** of the array and leads to unexpected behaviour.\n\n### Loop and array together\nIf you walk through the array with `for`, you write the same code only once for every LED:\n\n```\nfor (int i = 0; i < 4; i++) {\n  digitalWrite(ledler[i], HIGH);\n}\n```\n\n`i < 4` and `i <= 3` give the same result. If the number of elements is N, an array loop usually uses `i < N`. The pin numbers do not have to be in order either; you set the order in the array.\n\n### Watch out\n- If you put a `;` at the end of the `for (...)` line, the loop body stays empty; the `{ }` block after it is not part of the loop.\n- The difference between `<` and `<=` means one round too many or too few.\n\n### Summary\n`for` repeats a job; an array keeps several values under one name. Indexes start from 0, and the last index of an N-element array is N − 1. Using the two together gives you short programs that are easy to change.",
+            "concepts": [
+              {
+                "term": "for loop",
+                "definition": "Repeats a job a set number of times using a counter: it is made of a start, a condition and a step.",
+                "example": "for (int pin = 10; pin <= 13; pin++) processes four pins in turn.",
+                "pitfall": "Putting a ';' at the end of the for line: the loop body stays empty."
+              },
+              {
+                "term": "Counter variable",
+                "definition": "The variable that keeps track of which round the loop is on. It is usually called i.",
+                "example": "In the loop, i takes the values 0, 1, 2, 3 in turn.",
+                "pitfall": "Changing the counter by mistake inside the loop."
+              },
+              {
+                "term": "Array",
+                "definition": "Stores many values of the same type under a single name.",
+                "example": "int ledler[] = {13, 12, 11, 10}; holds four pin numbers.",
+                "pitfall": "Thinking its elements start from 1."
+              },
+              {
+                "term": "Index",
+                "definition": "The position number of an element in the array. It starts from 0.",
+                "example": "ledler[0] = 13, ledler[3] = 10.",
+                "pitfall": "Writing ledler[4] for a 4-element array: it goes past the end of the array."
+              },
+              {
+                "term": "i++ and i--",
+                "definition": "Adds 1 to the counter or takes 1 off it.",
+                "example": "The loop for (int i = 2; i >= 1; i--) runs two rounds, with the values 2 and 1.",
+                "pitfall": "Writing the condition the wrong way round in a counting-down loop (for example i <= 1)."
+              },
+              {
+                "term": "The difference between < and <=",
+                "definition": "< means \"if less than\", <= means \"if less than or equal to\". It changes the number of rounds.",
+                "example": "With i < 4, i = 0, 1, 2, 3 (4 rounds); with i <= 4, it runs 5 rounds.",
+                "pitfall": "Using <= when walking through an array and going past its end in the last round."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h1d4-q1",
+                "kind": "predict-output",
+                "prompt": "In this array, what value does ledler[2] have?\n\n```\nint ledler[] = {13, 12, 11, 10};\n```",
+                "options": [
+                  "13",
+                  "12",
+                  "11",
+                  "10"
+                ],
+                "answer": 2,
+                "explanation": "Indexes start from 0: ledler[0] = 13, ledler[1] = 12, ledler[2] = 11, ledler[3] = 10.",
+                "skills": [
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m3h1d4-q2",
+                "kind": "numeric",
+                "prompt": "How many times does the body of this loop run?\n\n```\nfor (int pin = 10; pin <= 13; pin++) {\n  pinMode(pin, OUTPUT);\n}\n```",
+                "answer": 4,
+                "tolerance": 0,
+                "unit": "times",
+                "explanation": "pin becomes 10, 11, 12 and 13 in turn. At 14 the condition (pin <= 13) is false and the loop ends. 4 rounds in total.",
+                "skills": [
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m3h1d4-q3",
+                "kind": "find-bug",
+                "prompt": "The program wants to make four LEDs outputs, but it goes past the end of the array. Where is the mistake?\n\n```\nint ledler[] = {13, 12, 11, 10};\n\nvoid setup() {\n  for (int i = 0; i <= 4; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n```",
+                "options": [
+                  "int ledler[] = {13, 12, 11, 10};",
+                  "The condition i <= 4",
+                  "pinMode(ledler[i], OUTPUT);",
+                  "The i++ expression"
+                ],
+                "answer": 1,
+                "explanation": "The last index of the array is 3. Because of i <= 4, the loop runs 5 rounds and reaches ledler[4] in the last round; that is outside the array. The correct version is i < 4 (or i <= 3).",
+                "skills": [
+                  "prog-loops-arrays",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h1d4-q4",
+                "kind": "numeric",
+                "prompt": "In the \"light that goes back and forth\" program, 4 LEDs light up in turn for 200 ms on the way forward, and 2 LEDs on the way back. How many ms does one full round of loop take? (Ignore any waiting when the LEDs switch off.)",
+                "answer": 1200,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "There are 4 + 2 = 6 lightings in total, and each lasts 200 ms: 6 × 200 = 1200 ms.",
+                "skills": [
+                  "prog-timing",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m3h1d4-q5",
+                "kind": "numeric",
+                "prompt": "How many rounds does this loop run?\n\n```\nfor (int i = 2; i >= 1; i--) {\n  // ...\n}\n```",
+                "answer": 2,
+                "tolerance": 0,
+                "unit": "rounds",
+                "explanation": "For i = 2 the condition (i >= 1) is true, so the body runs. It is also true for i = 1. When i becomes 0, the condition is false. 2 rounds in total.",
+                "skills": [
+                  "prog-loops-arrays"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Trafik ışığı",
@@ -2399,7 +2881,119 @@ export const modul3: ModuleContent = {
               "kind": "reflect",
               "prompt": "At a real intersection, the lights for two directions work together. If you added a second set of lights, how would your plan table change? Why would it be dangerous for both directions to be green at the same time?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Traffic light",
+            "problem": "At every junction the lights come on in a set pattern: stop on red, go on green, get ready on amber. Can you build the same pattern with three LEDs and a few lines of code?",
+            "contentMd": "### Circuit\n| Part | Connection |\n|---|---|\n| Red LED | Anode → 330 Ω → **D13**; cathode → GND |\n| Yellow LED | Anode → 330 Ω → **D12**; cathode → GND |\n| Green LED | Anode → 330 Ω → **D11**; cathode → GND |\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. Set the LEDs' colours to red, yellow and green in the properties panel. Each LED must have its own resistor. For the red LED, 330 Ω at 5 V gives a current of about 9 mA (like the calculation in lesson 2). The yellow and green LEDs may have a slightly different voltage drop; even so, this resistor is a safe choice.\n\n### Plan\nFirst write the order of the lights in a table. Making a plan before you write the program means fewer mistakes.\n\n| Stage | LED that is on | Time |\n|---|---|---|\n| 1 | Red (D13) | 5 seconds |\n| 2 | Green (D11) | 5 seconds |\n| 3 | Yellow (D12) | 2 seconds |\n\nThen it goes back to the start. Only one LED is on at a time.\n\n### Program\n```cpp\n// sketch: trafik_isigi\nvoid setup() {\n  pinMode(13, OUTPUT);   // kırmızı\n  pinMode(12, OUTPUT);   // sarı\n  pinMode(11, OUTPUT);   // yeşil\n}\n\nvoid loop() {\n  // 1. aşama: kırmızı\n  digitalWrite(13, HIGH);\n  digitalWrite(12, LOW);\n  digitalWrite(11, LOW);\n  delay(5000);\n\n  // 2. aşama: yeşil\n  digitalWrite(13, LOW);\n  digitalWrite(11, HIGH);\n  delay(5000);\n\n  // 3. aşama: sarı\n  digitalWrite(11, LOW);\n  digitalWrite(12, HIGH);\n  delay(2000);\n\n  digitalWrite(12, LOW);\n}\n```\n\n### How does it work?\n1. `setup()` makes all three pins outputs.\n2. In each stage, `loop()` first decides which LEDs will be on, then waits with `delay`.\n3. When the stages are over, the yellow LED is switched off and `loop()` starts again. So the red one lights up again.\n4. One full round takes 5 + 5 + 2 = 12 seconds.\n\n### Rewrite it with an array\nYou can also build the same project with a `for` loop and an array. You can put the pin numbers in an array and make them outputs with a loop inside `setup()`. This is the method you learnt in lesson 4.\n\n```\nint ledler[] = {13, 12, 11};\n\nvoid setup() {\n  for (int i = 0; i < 3; i++) {\n    pinMode(ledler[i], OUTPUT);\n  }\n}\n```\n\n### Try it\n- At real junctions there can be a short warning stage before red changes to green. Add a 1-second stage that lights red and yellow together.\n- Make the green LED blink 3 times before it finishes.\n- Change the times: red 3 seconds, green 8 seconds. Which direction would have the heavier traffic?\n\n### Common mistakes\n- Forgetting to switch off the previous stage's LED: two LEDs are on together.\n- Connecting the LEDs to 5 V instead of GND: the LED does not light up, or lights up the wrong way.\n- Writing the wrong pin number: if you used D13 for red, you must also write 13 in `digitalWrite`.\n- Thinking the `delay` time is in seconds: `delay(5)` is not 5 seconds, it is 5 milliseconds.",
+            "question": "At a real junction, the lights for the two directions work together. If you added a second set of lights, how would you arrange the red and green stages? Why would it be dangerous for both directions to be green at the same time?",
+            "explainerMd": "### What you will learn in this lesson\n- How to start a project with a **plan**, not with code\n- How to put the stages into a table (which LED, for how long)\n- How to build the traffic light circuit and program\n- How to combine what you learnt in earlier lessons in a single project\n\n### What you should know first\n`pinMode`, `digitalWrite`, `delay` (lesson 3), a series resistor for each LED (lesson 2), connecting several LEDs (lesson 4). Arrays and loops are optional in this lesson.\n\n### The plan comes before the code\nEven a small project is made of several steps. If you jump straight into code, you get confused while writing which LED should be on when. First draw a **table**:\n\n| Stage | LED that is on | Time |\n|---|---|---|\n| 1 | Red (D13) | 5 seconds |\n| 2 | Green (D11) | 5 seconds |\n| 3 | Yellow (D12) | 2 seconds |\n\nOnce the table is right, the code becomes a line-by-line translation of the table.\n\n### From the table to the code\nIn the code, each stage is made of the same three steps:\n1. **Switch off** the LEDs that should not be on (`LOW`).\n2. **Switch on** the LED that should be on (`HIGH`).\n3. **Wait** for the stage's time (`delay`).\n\nIf you forget to switch off the previous LED in a stage, two LEDs are on together. At a real junction, both directions being green together would cause an accident.\n\n### Write the times correctly\n`delay` takes **milliseconds**. For 5 seconds you write `delay(5000)`. `delay(5)` waits for only 5 milliseconds. The time for the whole round is the total of the stage times: 5 + 5 + 2 = 12 seconds.\n\n### Circuit\nEach LED has its own series resistor. For the red LED, about 9 mA flows with 330 Ω at 5 V (lesson 2). The yellow and green LEDs have a slightly different voltage drop; the same resistor is a safe choice.\n\n### Summary\nProject = plan + circuit + code. Write the table first, then turn each stage into code with the \"switch off, switch on, wait\" pattern. Do not forget to convert the times to milliseconds and to switch off the previous LED.",
+            "concepts": [
+              {
+                "term": "Plan table",
+                "definition": "A table that lists the stages, the LEDs that will be on and the times, before you write the program.",
+                "example": "For the traffic light, a three-row table: red 5 s, green 5 s, yellow 2 s.",
+                "pitfall": "Skipping the plan and writing code straight away: finding mistakes takes longer."
+              },
+              {
+                "term": "Stage (state)",
+                "definition": "A step that describes which LEDs are on at a given moment. When its time is up, the next one begins.",
+                "example": "In the red stage, only D13 is HIGH and the others are LOW.",
+                "pitfall": "Forgetting to switch off the previous LED in a stage: two LEDs are on together."
+              },
+              {
+                "term": "Switch off - switch on - wait pattern",
+                "definition": "In each stage you first switch off the LEDs you do not need, then switch on the one that should be on, and then wait.",
+                "example": "digitalWrite(13, LOW); digitalWrite(11, HIGH); delay(5000);",
+                "pitfall": "Mixing up the order: waiting first and switching on afterwards."
+              },
+              {
+                "term": "Round time",
+                "definition": "The time it takes for loop() to run once from start to end; it is the total of the stage times.",
+                "example": "5 + 5 + 2 = 12 seconds.",
+                "pitfall": "Thinking the times are in seconds instead of milliseconds and writing delay(5)."
+              },
+              {
+                "term": "A separate resistor for each LED",
+                "definition": "Each LED's current is limited by its own series resistor.",
+                "example": "For three LEDs, three 330 Ω resistors are used.",
+                "pitfall": "Connecting an LED without a resistor: the current is not limited."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h1d5-q1",
+                "kind": "numeric",
+                "prompt": "In the traffic light, red is on for 5 s, green for 5 s and yellow for 2 s. How many seconds does one full round take?",
+                "answer": 12,
+                "tolerance": 0,
+                "unit": "s",
+                "explanation": "The round time is the total of the stage times: 5 + 5 + 2 = 12 seconds.",
+                "skills": [
+                  "prog-timing",
+                  "prog-planning"
+                ]
+              },
+              {
+                "id": "m3h1d5-q2",
+                "kind": "find-bug",
+                "prompt": "In this program, the red LED also stays on during the green stage. What is missing?\n\n```\ndigitalWrite(13, HIGH);   // red\ndelay(5000);\ndigitalWrite(11, HIGH);   // green\ndelay(5000);\n```",
+                "options": [
+                  "A digitalWrite(13, LOW) line that switches off red before the green stage",
+                  "A pinMode(13, OUTPUT) line",
+                  "delay(5000) is too short",
+                  "A digitalWrite(11, LOW) line"
+                ],
+                "answer": 0,
+                "explanation": "Once red has been made HIGH, it stays on unless it is made LOW. Before changing to green, you need digitalWrite(13, LOW).",
+                "skills": [
+                  "prog-debug",
+                  "digital-out"
+                ]
+              },
+              {
+                "id": "m3h1d5-q3",
+                "kind": "numeric",
+                "prompt": "Which number should you write inside delay() to wait for 5 seconds?",
+                "answer": 5000,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "delay waits in milliseconds. Since 1 second = 1000 ms, 5 seconds = 5000 ms. delay(5) waits for only 5 milliseconds.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h1d5-q4",
+                "kind": "mcq",
+                "prompt": "What is the biggest benefit of starting a project with a plan table instead of writing code?",
+                "options": [
+                  "The code runs faster",
+                  "It is clear from the start which LED is on in which stage and for how long; the code becomes a translation of the table and there are fewer mistakes",
+                  "The program will not compile without a table",
+                  "The LEDs light up more brightly"
+                ],
+                "answer": 1,
+                "explanation": "The plan makes it clear in advance what the program will do. If the table is right, the code is a line-by-line translation of it; finding mistakes also becomes easier.",
+                "skills": [
+                  "prog-planning"
+                ]
+              },
+              {
+                "id": "m3h1d5-q5",
+                "kind": "numeric",
+                "prompt": "For a red LED (about 2 V), a 5 V supply and a 330 Ω resistor, how many mA does the idealised calculation give? (Round to the nearest whole number.)",
+                "answer": 9,
+                "tolerance": 0.5,
+                "unit": "mA",
+                "explanation": "I = (5 − 2) / 330 ≈ 0.0091 A ≈ 9 mA. In the lab, the measurement comes out a little smaller (about 8.6 mA) because of the pin's and the LED's internal resistances.",
+                "skills": [
+                  "elec-led-resistor",
+                  "elec-ohm"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -2407,6 +3001,7 @@ export const modul3: ModuleContent = {
       "title": "Girdi ve mantık",
       "project": "Kapı zili ve sayaç",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Bir pini `INPUT_PULLUP` ile giriş yapıp `digitalRead` ile okuyabilir ve \"basılı = LOW\" mantığını açıklayabilir.\n2. `if`, `else if`, `else`, `switch` ile programa karar verdirebilir; `==` ile `=` arasındaki farkı bilir.\n3. `&&`, `||` ve `!` ile birden çok koşulu birleştirebilir.\n4. Buton sıçramasını (bounce) ve kenar algılamayı açıklayabilir; \"tek basış, tek işlem\" davranışını programlayabilir.\n5. `Serial.print`, `Serial.println`, `Serial.available`, `Serial.read` ve `Serial.parseInt` ile kartla konuşabilir.\n6. Plan tablosundan yola çıkarak kapı zili ve basış sayacı projesini kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Aşağıdaki plan günde bir ders içindir. Hafta 1'deki Blink ve LED bağlantılarına bu hafta sık sık geri dönülür.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | digitalRead, buton, INPUT_PULLUP | ~20 dk | Anlatımı oku, butonu D2 ve GND arasına bağla, LED'i butonla yak, `1 - durum` hilesini dene. |\n| 2 | if/else, switch, mantık işleçleri | ~22 dk | İki butonla `&&`, `\\|\\|` ve `!` programını dene, `switch` programına `case 0` ekle. |\n| 3 | Debounce ve kenar algılama | ~25 dk | Düşen kenarı yakala, basılı tutunca LED'in bir kez değiştiğini doğrula, bekleme süresiyle oyna. |\n| 4 | Serial Monitor: yazdır, oku, ayrıştır | ~25 dk | Buton durumunu yazdır, `A` ve `K` komutlarıyla LED'i uzaktan yönet, `B3` komutuyla yanıp söndür. |\n| 5 | Proje: Kapı zili ve basış sayacı | ~35 dk | Planı tabloya yaz, devreyi kur, programı çalıştır, `S` ve `R` komutlarını dene, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Hafta 1'in bilgileri gerekir. Başlamadan önce şunlara bak:\n- `setup()`, `loop()`, `pinMode`, `digitalWrite` ve `delay` ile LED yakıp söndürebiliyor mu? (Hafta 1, ders 3)\n- LED için seri direncin neden gerektiğini söyleyebiliyor mu? (Hafta 1, ders 2)\n- `for` döngüsü ve dizilerle bir LED grubunu sürebiliyor mu? (Hafta 1, ders 4)\n- Laboratuvarda parça ekleyip kablo çekmeyi ve butonun \"Basılı\" özelliğini değiştirmeyi biliyor mu?\n\nEksik varsa ilgili Hafta 1 anlatımına dönülür.\n\n### Kavram haritası\n- **Giriş:** pin → `INPUT_PULLUP` → yüzen giriş sorunu → `digitalRead` → basılı = LOW\n- **Karar:** koşul → `if` / `else if` / `else` → `==` ve `=` farkı → `switch`, `case`, `break`\n- **Mantık:** `bool` → `&&`, `||`, `!` → doğruluk tablosu\n- **Zaman ve olay:** sıçrama → seviye ve kenar → önceki durum değişkeni → debounce\n- **Haberleşme:** `Serial.begin` ve baud → `print` / `println` → `available` / `read` → `parseInt`\n- **Proje:** plan tablosu → durum değişkenleri (`sayac`, `onceki`) → `sayac++` → sessiz mod\n\n### Sık yapılan hatalar\n- **`INPUT_PULLUP` yerine `INPUT` yazmak.** Pin yüzer ve okuma rastgele olur.\n- **Basılı = HIGH sanmak.** `INPUT_PULLUP` ile basılı olan LOW'dur.\n- **`==` yerine `=` yazmak.** `if (durum = LOW)` koşulu hep yanlış olur ve program sessizce hatalı çalışır.\n- **`switch` içinde `break` unutmak.** Program bir sonraki `case`'in koduna da akar.\n- **`onceki = simdi;` satırını unutmak.** Kart aynı kenarı her turda yeniden görür.\n- **Kenar yerine seviye kullanmak.** Butonu basılı tutunca sayaç ya da LED sürekli değişir.\n- **`'A'` yerine `\"A\"` ya da `'a'` yazmak.** Tek ve çift tırnak farklıdır; büyük ve küçük harf de farklıdır.\n- **Sayıyı `read()` ile okumak.** Rakamın değerini değil karakter kodunu alırsın; `parseInt()` kullan.\n- **Sayacı `loop()` içinde tanımlamak.** Her turda 0'a döner ve hiç artmaz.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. İki butonlu bir devre kur ve `&&`, `||`, `!` için kendi doğruluk tablonu çıkar; sonucu laboratuvarda doğrula.\n4. Debounce'lu aç-kapa programını bakmadan sıfırdan yaz. Sonra \"bırakınca\" ters dönen sürümünü yaz.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Seviye ile kenar arasındaki fark nedir ve sayaçta hangisi lazım?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Kapı zili ve basış sayacı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Buton ya da buzzer yanlış bağlı, GND eksik | Zil butonu D2-GND, LED dirençli, aktif buzzer D8-GND doğru | İsteğe bağlı sessiz buton da bağlı ve düzenli |\n| Plan | Tablo yok | İşleri ve hangi dersten geldiğini gösteren tablo var | Tablo kodla birebir uyuyor ve açıklanmış |\n| Basış sayma | Basılı tutunca ya da sıçramada sayaç yanlış artıyor | Her basış tam bir kez sayılıyor | Kenar algılama ve debounce'u kendi cümleleriyle açıklıyor |\n| Seri iletişim | Hiçbir şey yazmıyor | `Zil: N` yazıyor, `S` ve `R` komutları çalışıyor | Yeni bir komut ekliyor (örneğin `T`) |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta kartın dış dünyayı \"duymasıdır\". Öğrencinin kafası en çok \"basınca neden LOW?\" ve \"neden bir basış birden çok sayılabilir?\" sorularında karışır; bunlar normal ve öğreticidir.\n- **Nasıl destek olunur?** Cevabı söylemek yerine sor: \"Butona basmadığında pin kaç volt?\", \"Kod bir önceki durumu nerede saklıyor?\", \"Seri monitörde ne görüyorsun?\" Seri monitör, ne olduğunu gözle görmenin en iyi yoludur.\n- **Sıçrama.** Laboratuvardaki buton temiz sinyal verir; öğrenci sıçramayı ekranda göremeyebilir. Gerçek bir butona geçildiğinde sorun ortaya çıkacağı için debounce'u yine de öğrenmek gerekir.\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Debounce ve seri iletişim dersleri yoğundur; gerekirse bir günde yalnız birini yapın.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Gerçek kart kullanılacaksa butonlar yalnızca düşük gerilimli hatlara bağlanır; şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can make a pin an input with `INPUT_PULLUP`, read it with `digitalRead` and explain the \"pressed = LOW\" logic.\n2. Can make the program decide with `if`, `else if`, `else` and `switch`; knows the difference between `==` and `=`.\n3. Can combine several conditions with `&&`, `||` and `!`.\n4. Can explain button bounce and edge detection; can program \"one press, one action\" behaviour.\n5. Can talk to the board with `Serial.print`, `Serial.println`, `Serial.available`, `Serial.read` and `Serial.parseInt`.\n6. Can build the doorbell and press counter project, starting from a plan table.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan below is for one lesson a day. This week often goes back to the Blink and LED connections from week 1.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | digitalRead, buttons, INPUT_PULLUP | ~20 min | Read the explainer, connect the button between D2 and GND, light the LED with the button, try the `1 - durum` trick. |\n| 2 | if/else, switch, logic operators | ~22 min | Try the `&&`, `\\|\\|` and `!` program with two buttons, add `case 0` to the `switch` program. |\n| 3 | Debounce and edge detection | ~25 min | Catch the falling edge, check that the LED changes once when you hold the button, play with the waiting time. |\n| 4 | Serial monitor: print, read, parse | ~25 min | Print the button state, control the LED remotely with the `A` and `K` commands, blink it with the `B3` command. |\n| 5 | Project: Doorbell and press counter | ~35 min | Write the plan in a table, build the circuit, run the program, try the `S` and `R` commands, assess with the rubric. |\n\n### Prerequisite check\nThis week needs what was learnt in week 1. Before you start, check these:\n- Can they switch an LED on and off with `setup()`, `loop()`, `pinMode`, `digitalWrite` and `delay`? (Week 1, lesson 3)\n- Can they say why an LED needs a series resistor? (Week 1, lesson 2)\n- Can they drive a group of LEDs with a `for` loop and arrays? (Week 1, lesson 4)\n- Do they know how to add parts and draw wires in the lab, and how to change the button's \"Pressed\" property?\n\nIf anything is missing, go back to the matching week 1 explainer.\n\n### Concept map\n- **Input:** pin → `INPUT_PULLUP` → the floating input problem → `digitalRead` → pressed = LOW\n- **Decision:** condition → `if` / `else if` / `else` → the difference between `==` and `=` → `switch`, `case`, `break`\n- **Logic:** `bool` → `&&`, `||`, `!` → truth table\n- **Time and events:** bounce → level and edge → previous state variable → debounce\n- **Communication:** `Serial.begin` and baud → `print` / `println` → `available` / `read` → `parseInt`\n- **Project:** plan table → state variables (`sayac`, `onceki`) → `sayac++` → silent mode\n\n### Common mistakes\n- **Writing `INPUT` instead of `INPUT_PULLUP`.** The pin floats and the reading is random.\n- **Thinking pressed = HIGH.** With `INPUT_PULLUP`, pressed is LOW.\n- **Writing `=` instead of `==`.** The condition `if (durum = LOW)` is always false and the program quietly does the wrong thing.\n- **Forgetting `break` inside `switch`.** The program falls through into the code of the next `case` too.\n- **Forgetting the `onceki = simdi;` line.** The board sees the same edge again on every pass.\n- **Using the level instead of the edge.** When the button is held down, the counter or the LED keeps changing.\n- **Writing `\"A\"` or `'a'` instead of `'A'`.** Single and double quotes are different; capital and small letters are different too.\n- **Reading the number with `read()`.** You get the character code, not the value of the digit; use `parseInt()`.\n- **Defining the counter inside `loop()`.** It goes back to 0 on every pass and never goes up.\n\n### End-of-week review\n1. Look at the concept cards of every lesson once more and read the \"common mistake\" lines out loud.\n2. Re-read the explanations of the mini-test questions you got wrong, then solve the question again.\n3. Build a circuit with two buttons and make your own truth table for `&&`, `||` and `!`; check the result in the lab.\n4. Write the debounced on-off program from scratch without looking. Then write the version that flips \"on release\".\n5. Answer this question in your own words: \"What is the difference between a level and an edge, and which one does a counter need?\"\n\nThe mini tests of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Target: at least 4 correct from each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Doorbell and press counter)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | Button or buzzer connected wrongly, GND missing | Bell button D2-GND, LED with resistor, active buzzer D8-GND correct | The optional mute button is connected too, and neatly |\n| Plan | No table | There is a table showing the jobs and which lesson each comes from | The table matches the code exactly and is explained |\n| Press counting | The counter goes up wrongly when the button is held or bounces | Every press is counted exactly once | Explains edge detection and debounce in their own words |\n| Serial communication | Prints nothing | Prints `Zil: N`, the `S` and `R` commands work | Adds a new command (for example `T`) |\n| Explanation | Cannot explain what they did | Explains the circuit and the code step by step | Explains a mistake they made and how they found it |\n\n### Note for parents and teachers\n- **Aim.** This week the board \"hears\" the outside world. Learners get most confused by the questions \"why LOW when pressed?\" and \"why can one press be counted more than once?\"; this is normal and instructive.\n- **How to help.** Instead of giving the answer, ask: \"How many volts is the pin when you are not pressing the button?\", \"Where does the code store the previous state?\", \"What do you see in the serial monitor?\" The serial monitor is the best way to see with your own eyes what is happening.\n- **Bounce.** The button in the lab gives a clean signal; the learner may not see bounce on the screen. Debounce still needs to be learnt, because the problem will appear when they move to a real button.\n- **Time.** Spreading the lessons out rather than doing them back to back on the same day helps learning stick. The debounce and serial communication lessons are dense; if needed, do only one of them in a day.\n- **Safety.** Everything on this platform is virtual. If a real board is used, buttons are connected only to low-voltage lines; no circuit is ever built with mains voltage (220 V).\n- **Progress.** The mini-test results at the end of each lesson appear skill by skill on the \"My progress\" page (draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "digitalRead, buton, INPUT_PULLUP",
@@ -2528,7 +3123,128 @@ export const modul3: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "digitalRead, buttons, INPUT_PULLUP",
+            "problem": "Until now the board has always done the talking: it switched an LED on and off. But how does the board listen to you? How does it know you pressed a button? In this lesson you will meet `digitalRead`, the board's \"ear\". There is a small surprise too: why does the pin go LOW when you press the button?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button | One end to **D2**, the other end to **GND** |\n| Second button | One end to **D3**, the other end to **GND** |\n| LED (red) + 330 Ω resistor | One end of the resistor to **D13**, the other end to the LED anode; LED cathode to GND |\n| LED (yellow) + 330 Ω resistor | One end of the resistor to **D12**, the other end to the LED anode; LED cathode to GND |\n\nThe button in the lab has two ends (A and B). If you select the button and switch on the **Pressed** property in the right panel, it is pressed; you can also press it by holding it down. You can change it while the circuit runs, too.\n\nSome real buttons and tilt switches work in the same way: they have two ends, and when they close, the two ends are joined. The board sees them all the same. In this lesson, use the second button in the lab for the second input on D3. The D3 input called \"tilt switch\" in the code is this second button for you.\n\nYou will do the lab activity in the section at the bottom of this page; press ▶ to run the program.\n\n### What is a digital input?\nA pin can work in two ways:\n- `OUTPUT`: The board drives the pin itself. You write HIGH or LOW with `digitalWrite`.\n- `INPUT`: The board only listens to the pin. You read it with `digitalRead`; the result is `HIGH` or `LOW`.\n\nWhen the button is pressed, it connects the pin to GND. But what is the pin connected to when the button is not pressed? Nothing. An input pin left unconnected (a floating input) picks up electrical noise from its surroundings in a real circuit, and it reads HIGH or LOW at random. The lab models this: you get a warning for an unconnected input. To prevent it, you need to \"pull\" the pin to a voltage.\n\n### INPUT_PULLUP\nInside every input pin of the Arduino there is a resistor you can switch on if you want (about 20-50 kΩ). This resistor pulls the pin towards 5 V. This is called a **pull-up**.\n\n```cpp\npinMode(2, INPUT_PULLUP);\n```\n\nThe result is:\n| Button | Pin voltage | digitalRead |\n|---|---|---|\n| Not pressed | The internal resistor pulls it to 5 V | `HIGH` (1) |\n| Pressed | The button connects the pin to GND | `LOW` (0) |\n\nSo **pressed = LOW**. It looks back to front, but all the buttons in this lesson work like this. You do not need an extra resistor outside, so the circuit stays simple.\n\n### Program\nFirst, let's write the value we read straight to the LED.\n\n```cpp\n// sketch: buton_led\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);   // D2 giriş, iç pull-up açık\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  int durum = digitalRead(2); // HIGH (1) ya da LOW (0)\n  digitalWrite(13, durum);    // okuduğunu LED'e yaz\n}\n```\n\nPress ▶ and watch carefully: the LED is on before you press the button and goes off when you press it. The opposite of what you expected! The reason is in the table above: when the button is not pressed, the pin is HIGH, and we write HIGH to the LED.\n\nTo fix it, let's flip the value. `HIGH` equals 1 and `LOW` equals 0. The operation `1 - durum` turns 1 into 0 and 0 into 1:\n\n```cpp\n// sketch: buton_led_duz\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  int durum = digitalRead(2);\n  digitalWrite(13, 1 - durum);  // basılıyken (0) LED'e 1 yaz\n}\n```\n\nNow the LED lights up when you press. In the next lesson you will write this much more readably with `if`.\n\nLet's read two inputs at once: the button on D2 lights the red LED, and the second button on D3 lights the yellow LED.\n\n```cpp\n// sketch: iki_giris\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);   // buton\n  pinMode(3, INPUT_PULLUP);   // eğim anahtarı\n  pinMode(13, OUTPUT);        // kırmızı LED\n  pinMode(12, OUTPUT);        // sarı LED\n}\n\nvoid loop() {\n  digitalWrite(13, 1 - digitalRead(2));\n  digitalWrite(12, 1 - digitalRead(3));\n}\n```\n\n### How does it work?\n1. `pinMode(2, INPUT_PULLUP)` makes the pin an input and switches on the internal pull-up resistor.\n2. `digitalRead(2)` looks at the voltage on the pin: if it is about 5 V it gives `HIGH`, if it is about 0 V it gives `LOW`.\n3. `loop()` runs thousands of times a second, so the board checks the button all the time.\n4. The second button also connects its pin to GND in the same way; the board cannot tell the two buttons apart, and it does not need to.\n\n### Try it\n- Write `durum` instead of `1 - durum`, then fix it again. In which version does the LED light while you hold the button down?\n- Switch the second button's **Pressed** property on and off. When does the yellow LED light?\n- Write `INPUT` instead of `INPUT_PULLUP` and look at the LED without pressing the button. What happens? (This is an experiment; it does no harm in the lab. Put it back afterwards.)\n\n### Common mistakes\n- Not writing `pinMode`, or writing `INPUT` and leaving it: the pin floats and the LED flickers at random.\n- Connecting the button between the pin and 5 V: in this lesson the button is always between the pin and **GND**.\n- Thinking \"pressed = HIGH\": with `INPUT_PULLUP`, pressed is LOW.\n- Connecting both ends of the button to the same node (for example both to GND): the button changes nothing. One end must go to the pin and the other to GND.",
+            "question": "Why does a pin left unconnected read random values? Can you find a similar situation from everyday life (e.g. the hiss from a microphone even when nobody is talking)?",
+            "explainerMd": "### What you will learn in this lesson\n- How to make a pin an input and read it with `digitalRead`\n- The problem called a **floating input** and why it gives random readings\n- How to read a button with only two wires (pin and GND) using `INPUT_PULLUP`\n- How to make sense of the back-to-front \"pressed = LOW\" logic\n\n### What you should know first\n`setup()`, `loop()`, HIGH and LOW from lesson 1; Ohm's law (V = I × R) from lesson 2; `pinMode`, `digitalWrite` and closed circuits from lesson 3.\n\n### The board is listening now\nUntil now the pins have always been **outputs**: the board wrote HIGH or LOW to the pin. For a button we want the opposite: the board should **read** the voltage coming from outside. For this the pin becomes an input, and `digitalRead(pin)` looks at the voltage on the pin and returns `HIGH` or `LOW`. In the lab model the threshold is 2.5 V: above it counts as HIGH, below it as LOW.\n\n### Floating input\nYou connected one end of the button to D2 and the other end to GND. While the button is open, D2 is not connected to anything. A pin left unconnected like this is called a **floating input**. In a real circuit, electrical noise from the surroundings makes it show HIGH sometimes and LOW at other times; the reading is random. The lab also gives a warning for an unconnected input. The solution: \"pull\" the pin to a known voltage while it is open.\n\n### Pull-up resistor\nInside every input pin of the Uno there is an optional resistor. `INPUT_PULLUP` switches it on and pulls the pin towards 5 V. In the lab model this resistor is 35 kΩ.\n\n```\n5 V ──[ internal pull-up, 35 kΩ ]──┬── D2 (digitalRead looks here)\n                                   │\n                               [ BUTTON ]\n                                   │\n                                  GND\n```\n\nState table:\n\n| Button | Voltage on D2 | digitalRead(2) |\n|---|---|---|\n| Not pressed | 5 V (the internal resistor pulls it up) | HIGH |\n| Pressed | about 0 V (connected to GND) | LOW |\n\nWhile the button is pressed, a small current flows from 5 V to GND through the internal resistor: 5 V ÷ 35 000 Ω ≈ 0.14 mA. This is very small and puts no strain on anything. You used Ohm's law here as well.\n\n### Back-to-front logic\nWith `INPUT_PULLUP`, **pressed = LOW**. It feels back to front at first, but it makes the circuit simpler because no outside resistor is needed. If you write the `digitalRead` result straight to an LED, the LED is on when you are not pressing. Because HIGH = 1 and LOW = 0, the operation `1 - durum` flips the value: 1 becomes 0 and 0 becomes 1. In the next lesson you will write this more readably with `if`.\n\nIn short, the reading pattern has three steps: `pinMode(pin, INPUT_PULLUP)` in `setup()`, `digitalRead(pin)` in `loop()`, then making sense of the result.\n\n### Summary\nInput pins read voltage, the opposite of output pins. A pin left unconnected floats and reads at random; `INPUT_PULLUP` prevents this by pulling the pin to 5 V through an internal resistor. Because the button connects the pin to GND, pressed reads LOW and not pressed reads HIGH.",
+            "concepts": [
+              {
+                "term": "digitalRead()",
+                "definition": "Looks at the voltage on a pin set as an input and returns HIGH (about 5 V) or LOW (about 0 V).",
+                "example": "The command int durum = digitalRead(2); puts the current value of D2 into the durum variable.",
+                "pitfall": "Reading the pin without making it an input in setup(), or calling it without using the result."
+              },
+              {
+                "term": "INPUT_PULLUP",
+                "definition": "Makes the pin an input, switches on the resistor inside the board and pulls the pin towards 5 V; no outside resistor is needed.",
+                "example": "You write pinMode(2, INPUT_PULLUP); and connect one end of the button to D2 and the other to GND.",
+                "pitfall": "Writing only INPUT: the pin floats and the reading is random."
+              },
+              {
+                "term": "Floating input",
+                "definition": "An input pin not connected to any voltage; it picks up noise from its surroundings and reads unreliably.",
+                "example": "You connected the button to D2 but there is no pull-up; while the button is open, digitalRead gives HIGH one moment and LOW the next.",
+                "pitfall": "Thinking the random reading is a bug in the code; the problem is usually in the circuit."
+              },
+              {
+                "term": "Back-to-front logic (pressed = LOW)",
+                "definition": "With INPUT_PULLUP the button is connected to GND, so it reads LOW when pressed and HIGH when not pressed.",
+                "example": "When not pressed, digitalRead(2) is HIGH; to make the LED light with the button you write 1 - durum.",
+                "pitfall": "Expecting HIGH when pressed; the program works the opposite way."
+              },
+              {
+                "term": "Threshold voltage",
+                "definition": "The voltage limit that decides whether the pin counts as HIGH or LOW. In the lab it is 2.5 V.",
+                "example": "If the pin is at 4.9 V it reads HIGH; at 0.1 V it reads LOW.",
+                "pitfall": "Thinking a digital input also measures in-between values; digitalRead gives only two results."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h2d6-q1",
+                "kind": "mcq",
+                "prompt": "One end of the button is connected to D2, the other to GND, and the code says pinMode(2, INPUT_PULLUP);. What does digitalRead(2) return while the button is NOT pressed?",
+                "options": [
+                  "LOW",
+                  "HIGH",
+                  "A random value",
+                  "-1"
+                ],
+                "answer": 1,
+                "explanation": "The internal pull-up resistor pulls the pin to 5 V; while the button is open the pin is not connected to anything else, so it reads HIGH. LOW only comes when the button connects the pin to GND. Random readings happen on a floating input without a pull-up.",
+                "skills": [
+                  "digital-in"
+                ]
+              },
+              {
+                "id": "m3h2d6-q2",
+                "kind": "predict-output",
+                "prompt": "The button is between D2 and GND, and two LEDs (D13 and D12) are connected with suitable resistors. Which LED is lit while the button is NOT pressed?\n\n```\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n  pinMode(12, OUTPUT);\n}\n\nvoid loop() {\n  int d = digitalRead(2);\n  digitalWrite(13, d);\n  digitalWrite(12, 1 - d);\n}\n```",
+                "options": [
+                  "Only the LED on D13",
+                  "Only the LED on D12",
+                  "Both",
+                  "Both are off"
+                ],
+                "answer": 0,
+                "explanation": "When not pressed, d = HIGH = 1. D13 gets 1 (it lights) and D12 gets 1 - 1 = 0 (it goes off). When you press the button, d = 0 and it flips: D12 lights and D13 goes off. The two LEDs are never lit together, because one gets d and the other gets the opposite of d.",
+                "skills": [
+                  "digital-in",
+                  "digital-out"
+                ]
+              },
+              {
+                "id": "m3h2d6-q3",
+                "kind": "find-bug",
+                "prompt": "The button is correctly connected between D2 and GND, and the LED is on D13. Even when you do not touch the button, the LED flickers at random. Which line is wrong?\n\n```\nvoid setup() {\n  pinMode(2, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, 1 - digitalRead(2));\n}\n```",
+                "options": [
+                  "pinMode(13, OUTPUT);",
+                  "pinMode(2, INPUT);",
+                  "digitalWrite(13, 1 - digitalRead(2));",
+                  "void loop() {"
+                ],
+                "answer": 1,
+                "explanation": "pinMode(2, INPUT) does not switch on the pull-up; while the button is open, D2 becomes a floating input and reads at random. It should say INPUT_PULLUP. The expression 1 - digitalRead(2) is not wrong; it only flips the value.",
+                "skills": [
+                  "digital-in",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h2d6-q4",
+                "kind": "numeric",
+                "prompt": "In the lab model the internal pull-up resistor is 35 kΩ. The button is pressed and the pin is connected to GND (ignore the button's resistance). How many mA flow from 5 V through this resistor to GND? (Give up to three decimal places.)",
+                "answer": 0.143,
+                "tolerance": 0.005,
+                "unit": "mA",
+                "explanation": "Ohm's law: I = V / R = 5 / 35 000 ≈ 0.000143 A = 0.143 mA. Remember to multiply by 1000 to convert the current to mA. This current is very small, so it causes no problem even while the button is pressed.",
+                "skills": [
+                  "elec-ohm",
+                  "digital-in"
+                ]
+              },
+              {
+                "id": "m3h2d6-q5",
+                "kind": "mcq",
+                "prompt": "What is a floating input?",
+                "options": [
+                  "Drawing too much current from the pin",
+                  "The button breaking mechanically",
+                  "The pin not being connected to any voltage, so its reading changes at random",
+                  "The pin staying LOW all the time"
+                ],
+                "answer": 2,
+                "explanation": "On a floating input the pin is connected neither to 5 V nor to GND; noise from the surroundings makes the reading HIGH or LOW at random. That is why INPUT_PULLUP is used. A pin that is always LOW means the pin is connected to GND.",
+                "skills": [
+                  "digital-in",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "if/else, switch, mantık işleçleri",
@@ -2648,7 +3364,126 @@ export const modul3: ModuleContent = {
                 "prog-conditions"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "if/else, switch, logic operators",
+            "problem": "What happens when someone rings the doorbell? If someone presses the button, a light comes on. But what if nobody is there? What if two people press at the same time? How does the board learn to make decisions? In this lesson you will learn how to tell your program \"if ... then ... otherwise ...\".",
+            "contentMd": "### Circuit\nThe same circuit as last lesson; we only add one more LED. Pick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button | One end to **D2**, the other end to **GND** |\n| Second button | One end to **D3**, the other end to **GND** |\n| LED (red) + 330 Ω resistor | **D13** → resistor → LED anode; cathode to GND |\n| LED (yellow) + 330 Ω resistor | **D12** → resistor → LED anode; cathode to GND |\n| LED (green) + 330 Ω resistor | **D11** → resistor → LED anode; cathode to GND |\n\nThe second button on D3 stands for the input called \"tilt switch\" in the code; there is no tilt switch in the lab, so we use a button. It makes no difference to the board.\n\n### if and else\n`if` looks at a condition. If the condition is true, it runs the code inside the curly brackets. `else` runs if the condition is not true.\n\n```cpp\n// sketch: if_else\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {   // buton basılı mı?\n    digitalWrite(13, HIGH);\n  } else {\n    digitalWrite(13, LOW);\n  }\n}\n```\n\nMuch more readable than last lesson's `1 - durum` trick: \"If D2 is LOW, switch the LED on; otherwise switch it off\".\n\nCareful: comparison uses **two** equals signs (`==`). A single `=` assigns a value; it does not compare.\n\nIf there are more than two possibilities, you can add `else if`:\n\n```cpp\nif (digitalRead(2) == LOW) {\n  // buton basılı\n} else if (digitalRead(3) == LOW) {\n  // buton basılı değil ama ikinci buton basılı\n} else {\n  // ikisi de açık\n}\n```\n\nThe chain checks in order from top to bottom, runs the first one that is true and does not look at the rest.\n\n### Comparison operators\n| Operator | Meaning |\n|---|---|\n| `==` | equal? |\n| `!=` | not equal? |\n| `<` `>` | less than, greater than? |\n| `<=` `>=` | less than or equal, greater than or equal? |\n\n### Logic operators\nTo combine more than one condition:\n| Operator | Read as | True if... |\n|---|---|---|\n| `&&` | and | both conditions are true |\n| `\\|\\|` | or | at least one is true |\n| `!` | not | the condition is NOT true |\n\nIn the program below, three LEDs show three different kinds of logic:\n\n```cpp\n// sketch: mantik\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(3, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n  pinMode(12, OUTPUT);\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  bool buton = (digitalRead(2) == LOW);   // true: buton basılı\n  bool egim  = (digitalRead(3) == LOW);   // true: eğim anahtarı kapalı\n\n  digitalWrite(13, buton && egim);        // kırmızı: ikisi birden\n  digitalWrite(12, buton || egim);        // sarı: en az biri\n  digitalWrite(11, !egim);                // yeşil: eğim anahtarı kapalı değil\n}\n```\n\n`bool` is a variable with two values: `true` or `false`. `digitalWrite` understands `true` as HIGH and `false` as LOW.\n\n### switch\nIf you are going to split into many paths depending on a number, `switch` is tidier. Below we turn the state of the two buttons into a single number: the first button gives 1 point and the second button gives 2 points.\n\n```cpp\n// sketch: switch_durum\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(3, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n  pinMode(12, OUTPUT);\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  int kod = 0;\n  if (digitalRead(2) == LOW) {\n    kod = kod + 1;\n  }\n  if (digitalRead(3) == LOW) {\n    kod = kod + 2;\n  }\n\n  switch (kod) {\n    case 1:                      // yalnız buton\n      digitalWrite(13, HIGH);\n      digitalWrite(12, LOW);\n      digitalWrite(11, LOW);\n      break;\n    case 2:                      // yalnız eğim anahtarı\n      digitalWrite(13, LOW);\n      digitalWrite(12, HIGH);\n      digitalWrite(11, LOW);\n      break;\n    case 3:                      // ikisi birden\n      digitalWrite(13, LOW);\n      digitalWrite(12, LOW);\n      digitalWrite(11, HIGH);\n      break;\n    default:                     // hiçbiri (kod = 0)\n      digitalWrite(13, LOW);\n      digitalWrite(12, LOW);\n      digitalWrite(11, LOW);\n      break;\n  }\n}\n```\n\n### How does it work?\n1. The `if` condition inside the brackets is evaluated; if it is true, the code inside `{ }` runs.\n2. `buton && egim` is true only if both sides are true; `buton || egim` is true if at least one is true.\n3. `switch (kod)` looks at the value of `kod` and jumps to the matching `case` line.\n4. `break` leaves the switch. If you forget it, the program falls through into the next `case` too.\n5. `default` runs if no `case` matches.\n\n### Try it\n- In the `mantik` program, change the yellow LED's condition from `||` to `&&`. Is there still any difference between the yellow LED and the red LED?\n- Add `case 0:` to the `switch_durum` program and make the green LED light when nothing is pressed.\n- In the `switch_durum` program, light all three LEDs for `case 3:`.\n- Delete the `break;` statements on the `case 1:` and `case 2:` lines and watch what happens.\n\n### Common mistakes\n- Writing `if (x = 5)`: this is an assignment. Use `==` to compare.\n- Writing a single `&` instead of `&&`: a single `&` is a different operation (a bit operation); do not use it for now.\n- Putting `;` straight after the brackets, as in `if (...);`: the `if` does nothing and ends, and the code inside the curly brackets always runs.\n- Forgetting `break` inside `switch`: the program runs the code of the next `case` as well.",
+            "question": "Think of a door or an alarm in your home. In which situations might it work with \"and\" logic, and in which with \"or\" logic? Example: does a lift door move only if it is closed and a button has also been pressed?",
+            "explainerMd": "### What you will learn in this lesson\n- How to make the program decide with `if`, `else if` and `else`\n- The difference between comparison (`==`, `!=`, `<`, `>`) and assignment (`=`)\n- How to combine several conditions with `&&`, `||` and `!`\n- How to choose between many paths with `switch`, `case` and `break`\n\n### What you should know first\n`digitalRead`, `INPUT_PULLUP` and \"pressed = LOW\" from lesson 6; `digitalWrite` from lesson 3; `loop()` from lesson 1.\n\n### The program decides\nUntil now every line of the program has run in order, without conditions. Real jobs need choices such as \"if the button is pressed, switch the LED on; otherwise switch it off\". You do this with **if**: if the condition is true, the code inside `{ }` runs; otherwise the `else` part runs.\n\n```\nif (digitalRead(2) == LOW) {\n  digitalWrite(13, HIGH);\n} else {\n  digitalWrite(13, LOW);\n}\n```\n\nIf there are three or more possibilities, you add `else if` in between. The chain checks from top to bottom, runs the code of the **first true** condition and does not look at the rest at all. That is why the order of the conditions matters: if `x > 3` is written first, the `x > 5` condition never gets its turn.\n\n### Comparison and assignment\nInside a condition you compare values: `==` equal?, `!=` not equal?, `<`, `>`, `<=`, `>=`. The most common mistake is writing a single `=` instead of `==`. A single `=` is an **assignment**: it puts the value on the right into the variable and gives that value itself as the result. If you write `if (durum = LOW)`, durum becomes 0 every time, the condition always counts as false and the program quietly does the wrong thing.\n\n### Logic operators\nTo combine two conditions there are logic operators. Let `a` and `b` be two pieces of state information (for example whether two buttons are pressed). These are variables of type **bool**, which means they hold only `true` or `false`.\n\n| a | b | a && b (and) | a \\|\\| b (or) | !a (not) |\n|---|---|---|---|---|\n| false | false | false | false | true |\n| false | true | false | true | true |\n| true | false | false | true | false |\n| true | true | true | true | false |\n\n`&&` is true only if both sides are true; `||` is true if at least one is true. `!` turns true into false and false into true. `digitalWrite` accepts a `bool` value: true becomes HIGH and false becomes LOW.\n\n### Choosing between many paths with switch\nIf you are going to split into many paths depending on the same variable, `switch` keeps things tidy. First you can turn the state of the two buttons into a single number: the first button gives 1 point and the second gives 2 points; the total is 0, 1, 2 or 3. Then `switch (kod)` jumps to the matching `case` line. Every `case` needs a **break** at the end; otherwise the program runs the code of the next `case` too (this is called \"falling through\"). If no `case` matches, `default` runs.\n\n### Summary\n`if/else if/else` makes the program decide; in a chain, the first true condition wins. Use `==` to compare and `=` to assign; mixing them up leads to quiet bugs. `&&`, `||` and `!` combine conditions. `switch` writes a choice between many paths neatly, but every `case` needs a `break` at the end.",
+            "concepts": [
+              {
+                "term": "if / else",
+                "definition": "Runs one block of code if a condition is true, and the other block if it is not.",
+                "example": "if (digitalRead(2) == LOW) { LED on } else { LED off } picks one of two paths depending on the button state.",
+                "pitfall": "Putting ';' at the end of the if (...) line: the if does nothing and ends, and the code inside the curly brackets always runs."
+              },
+              {
+                "term": "The difference between == and =",
+                "definition": "== compares two values and gives true or false; = assigns the value on the right to the variable.",
+                "example": "durum == LOW asks \"is durum LOW?\", while durum = LOW makes durum LOW.",
+                "pitfall": "Writing if (durum = LOW): durum is always 0, so the condition is never true."
+              },
+              {
+                "term": "&&, || and !",
+                "definition": "&& is true if both conditions are true, || is true if at least one is true; ! takes the opposite of the condition.",
+                "example": "buton && egim is true only while both inputs are pressed.",
+                "pitfall": "Mixing up \"and\" and \"or\" logic; the difference between them only shows when exactly one input is active."
+              },
+              {
+                "term": "bool",
+                "definition": "A variable type that holds only true or false.",
+                "example": "bool basili = (digitalRead(2) == LOW); stores whether the button is pressed.",
+                "pitfall": "Forgetting that pressed = LOW with INPUT_PULLUP and setting up the bool value the wrong way round."
+              },
+              {
+                "term": "switch / case / break",
+                "definition": "A choice between many paths that jumps to the case line matching a variable's value.",
+                "example": "switch (kod) { case 1: ... break; case 2: ... break; default: ... } picks a path depending on the value of kod.",
+                "pitfall": "Forgetting break: the program runs the code of the next case as well."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h2d7-q1",
+                "kind": "numeric",
+                "prompt": "a and b are two bool variables. In how many of the four possible combinations of a and b is the expression (a || b) && !(a && b) true?",
+                "answer": 2,
+                "tolerance": 0,
+                "explanation": "Try the four combinations one by one: for (false,false) the first part is false; for (false,true) and (true,false), a||b is true and a&&b is false, so the expression is true; for (true,true), a&&b is true, so the expression is false. There are 2 true combinations: the expression means \"exactly one is true\".",
+                "skills": [
+                  "prog-logic"
+                ]
+              },
+              {
+                "id": "m3h2d7-q2",
+                "kind": "predict-output",
+                "prompt": "Three LEDs (D13, D12, D11) start off. Only the second button on D3 is pressed, so kod = 2. Which LEDs stay lit when this program runs?\n\n```\nswitch (kod) {\n  case 1:\n    digitalWrite(13, HIGH);\n    break;\n  case 2:\n    digitalWrite(12, HIGH);\n  case 3:\n    digitalWrite(11, HIGH);\n    break;\n}\n```",
+                "options": [
+                  "Only D12",
+                  "D12 and D11",
+                  "Only D11",
+                  "None"
+                ],
+                "answer": 1,
+                "explanation": "The program enters the case 2 line and D12 lights. There is no break at the end of case 2, so the program falls through into the code of case 3 and lights D11 too; the break there stops it. To light only D12, a break would have to be added to case 2.",
+                "skills": [
+                  "prog-conditions",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h2d7-q3",
+                "kind": "find-bug",
+                "prompt": "The button is between D2 and GND (INPUT_PULLUP). Even when you press the button, the LED never lights. Which line is wrong?\n\n```\nint durum = digitalRead(2);\nif (durum = LOW) {\n  digitalWrite(13, HIGH);\n} else {\n  digitalWrite(13, LOW);\n}\n```",
+                "options": [
+                  "digitalWrite(13, HIGH);",
+                  "int durum = digitalRead(2);",
+                  "} else {",
+                  "if (durum = LOW) {"
+                ],
+                "answer": 3,
+                "explanation": "if (durum = LOW) is not a comparison but an assignment: it puts 0 into durum and the condition counts as 0, that is false. The else always runs and the LED never lights. It should be if (durum == LOW). The other lines are correct.",
+                "skills": [
+                  "prog-conditions",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h2d7-q4",
+                "kind": "mcq",
+                "prompt": "The button is between D2 and GND, and the pin is INPUT_PULLUP. Which of these means \"the button is NOT pressed\"?",
+                "options": [
+                  "digitalRead(2) == LOW",
+                  "!(digitalRead(2) == HIGH)",
+                  "digitalRead(2) = HIGH",
+                  "digitalRead(2) != LOW"
+                ],
+                "answer": 3,
+                "explanation": "When not pressed, the pin is HIGH, so it is not equal to LOW: digitalRead(2) != LOW is true. The first option says the button is pressed. The second option says it is not HIGH, which means it is pressed. The third option is an assignment.",
+                "skills": [
+                  "prog-logic",
+                  "digital-in"
+                ]
+              },
+              {
+                "id": "m3h2d7-q5",
+                "kind": "predict-output",
+                "prompt": "What value does the sonuc variable have after this code runs?\n\n```\nint x = 7;\nint sonuc = 0;\nif (x > 3) {\n  sonuc = 1;\n} else if (x > 5) {\n  sonuc = 2;\n} else {\n  sonuc = 3;\n}\n```",
+                "options": [
+                  "sonuc = 1",
+                  "sonuc = 2",
+                  "sonuc = 3",
+                  "It becomes 1 first, then 2"
+                ],
+                "answer": 0,
+                "explanation": "x = 7 meets both the x > 3 and the x > 5 conditions, but the chain stops at the first true condition. Because x > 3 comes first, sonuc = 1 and the else if is never evaluated. If you want the result 2, the order of the conditions must be changed.",
+                "skills": [
+                  "prog-conditions"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Debounce ve kenar algılama",
@@ -2770,7 +3605,128 @@ export const modul3: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Debounce and edge detection",
+            "problem": "You pressed a button once, but the board thought you pressed it two or three times. Or it thought you never pressed it at all. The program has no bugs and the circuit is correct. So why? The answer is inside the button: the metal contacts hit each other and bounce. In this lesson you will learn how to catch this \"bounce\".",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button | One end to **D2**, the other end to **GND** |\n| LED (red) + 330 Ω resistor | **D13** → resistor → LED anode; cathode to GND |\n\n**Important:** The button in the lab gives a perfectly clean signal; bounce is not modelled. So in this lesson you will not see the bounce problem on the screen. The explanation of bounce below is an information note about real buttons. Even so, you will see that the debounced program works correctly in the lab too: the goal is \"one press, one action\" behaviour.\n\nYou do the activity in the section at the bottom of this page.\n\n### What is bounce?\nWhen a button closes, two metal parts hit each other. The parts spring back; the contact opens and closes for a few milliseconds. Our eyes cannot see this, but the board can, because it reads thousands of times a second. On a real button a press looks like this (time runs from left to right):\n\n| | Values on the pin |\n|---|---|\n| Expected | HIGH, HIGH, HIGH, **LOW**, LOW, LOW, LOW |\n| Real | HIGH, HIGH, **LOW, HIGH, LOW, HIGH**, LOW, LOW, LOW |\n\n\nSo a single press produces a short sequence on the pin such as `HIGH, LOW, HIGH, LOW, ...`. The same thing happens when the button is released. This bounce usually lasts a few milliseconds; it depends on the quality of the button. When the ball in a tilt switch rolls about, its contact opens and closes in the same way.\n\n### What is an edge?\nAn **edge** happens when the button changes from one state to the other:\n- A change from HIGH to LOW: a **falling edge** (pressed).\n- A change from LOW to HIGH: a **rising edge** (released).\n\nThe question \"Is the button pressed?\" is about a **level**. The question \"Was the button pressed just now?\" is about an **edge**. If you are making a counter or an on-off switch, you need the edge: as long as you hold the button down, it must count only once.\n\nTo catch the edge, we store the previous state in a variable and compare it with the current one.\n\n### A program with a problem: no debounce\nLet the LED flip every time you press the button (if it is on, it goes off; if it is off, it comes on):\n\n```cpp\n// sketch: sicrama_var\nint onceki = HIGH;\nint ledDurum = LOW;\n\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  int simdi = digitalRead(2);\n\n  if (onceki == HIGH && simdi == LOW) {   // düşen kenar: basıldı\n    ledDurum = 1 - ledDurum;              // LED'in durumunu ters çevir\n    digitalWrite(13, ledDurum);\n  }\n  onceki = simdi;\n}\n```\n\nThe logic looks right. In the lab this program works properly with the clean signal. But on a real button, bounce sometimes makes one press produce two falling edges. The LED flips twice and stays in its old state as if you had never pressed. Sometimes there are three edges and everything looks fine. The result cannot be predicted.\n\n### The solution: debounce\nDebounce means \"I saw a change, but let me wait a moment and look again: has it really changed?\" The simplest way is to wait with `delay`.\n\n```cpp\n// sketch: debounce_ms\nint onceki = HIGH;\nint ledDurum = LOW;\n\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  int simdi = digitalRead(2);\n\n  if (simdi != onceki) {            // bir değişiklik var gibi\n    delay(20);                      // sıçrama bitsin diye 20 ms bekle\n    simdi = digitalRead(2);         // sakinleşmiş değeri tekrar oku\n    if (simdi != onceki) {          // değişiklik gerçekmiş\n      if (simdi == LOW) {           // düşen kenar: basıldı\n        ledDurum = 1 - ledDurum;\n        digitalWrite(13, ledDurum);\n      }\n      onceki = simdi;\n    }\n  }\n}\n```\n\n### How does it work?\n1. `onceki` (previous) holds the button's value from the previous pass. `simdi` (now) is the value in this pass.\n2. If the two are different, there is an edge. But it might be bounce.\n3. After waiting 20 ms the bounce is over. If you read the pin again and it is still different from `onceki`, the change is real.\n4. We flip the LED's state only on the change to `LOW` (the press). On the release edge we do nothing.\n5. Even if you hold the button down, it is not counted again and again, because `simdi == onceki`: one press, one action.\n6. The bounce when you release goes through the same check.\n\n20 ms is enough for most buttons. For a worse button you may need to raise it to 30-50 ms. If you make it too long, you will miss quick presses.\n\n### Try it\n- Delete the `delay(20)` line and press twenty times in the lab. You will see no difference, because the lab's button is clean; explain in your own words why there would be a difference on real buttons.\n- Hold the button down for a long time. Check that the LED changes only once (edge detection).\n- Make the debounce time 1 ms, then 200 ms. What goes wrong in each case?\n- Change the program so that it flips \"on release\" (rising edge).\n\n### Common mistakes\n- Forgetting the `onceki = simdi;` line: the board keeps seeing the same edge.\n- Using a level instead of an edge (flipping the LED inside `if (digitalRead(2) == LOW)`): as long as you hold the button, the LED flashes on and off like mad.\n- Forgetting debounce on release: pressing works fine, but you get a fake press when you let go.\n- A very long `delay`: during this time the board cannot look at anything else. So keep the time as short as it needs to be.",
+            "question": "When you press a lift button, the button lights once; it does not behave as if you had pressed it two or three times in a row. How do you think the program inside it might be using debounce and edge detection?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a real button **bounces** and which bug this causes\n- The difference between a **level** and an **edge**\n- How to store the previous state in a variable and catch the falling edge\n- How to get \"one press, one action\" behaviour with a simple **debounce** method\n\n### What you should know first\n`digitalRead`, `INPUT_PULLUP` and \"pressed = LOW\" from lesson 6; `if`, `&&` and `!=` from lesson 7; `delay` (milliseconds) from lesson 3.\n\n### Buttons bounce\nWhen a button closes, the two metal parts inside it hit each other and spring back. The contact opens and closes for a while, and for a few milliseconds the pin goes back and forth between HIGH and LOW. The board sees all of this because it reads thousands of times a second. A single press might be read like this:\n\n```\nExpected : HIGH HIGH HIGH LOW  LOW  LOW  LOW\nReal     : HIGH HIGH LOW  HIGH LOW  HIGH LOW  LOW\n```\n\nThe button in the lab gives a clean signal, so bounce is not modelled. The method you learn here protects you from bugs when you move to a real button.\n\n### Level and edge\n\"Is the button pressed right now?\" is a **level** question, and it gives the same answer on every pass. \"Was the button pressed just now?\" is an **edge** question, and it is true only at the moment of change:\n\n| Change | Name | Meaning (INPUT_PULLUP) |\n|---|---|---|\n| HIGH to LOW | falling edge | the button was pressed |\n| LOW to HIGH | rising edge | the button was released |\n\nIf you are making a counter or an on-off switch, you must use the edge, not the level. If you hold the button down, the level stays LOW for thousands of passes, but the falling edge happens only once.\n\n### Remembering the previous state\nTo find the edge you need two values: the current reading and the reading from the previous pass. You keep the previous value in a variable defined outside `loop()`, so that it is not wiped when the pass ends. At the end of every pass you update the variable by writing `onceki = simdi;`. If this line is forgotten, the board always compares with the old value and sees the same edge again and again.\n\n```\nif (onceki == HIGH && simdi == LOW) {\n  // falling edge: pressed just now\n}\nonceki = simdi;\n```\n\n### Debounce\nBecause of bounce, a single press produces more than one falling edge. For example, if three edges are counted, an on-off LED flips three times and the result becomes unpredictable. **Debounce** is the method of \"I saw a change, but let me wait a short time and look again\": when a change is noticed, you wait about 20 ms, read the pin again, and if the change is still there it counts as real. The bounce when you release goes through the same check.\n\nThe waiting time is a trade-off. If it is too short, you read before the bounce is over. If it is too long (for example half a second), you miss quick presses in a row, and the board cannot look after anything else during this time, because nothing runs during a `delay`. 20 to 50 ms is enough for most buttons.\n\n### Summary\nReal buttons bounce when they close, and a single press can produce several edges. A level describes a state, and an edge describes a change; counting jobs need the falling edge. You find the edge by storing the previous state in a variable, and you filter out bounce with a short wait and a second reading.",
+            "concepts": [
+              {
+                "term": "Bounce",
+                "definition": "The button contacts opening and closing for a few milliseconds as they close; it creates a short HIGH-LOW sequence on the pin.",
+                "example": "In a single press the pin might read HIGH, LOW, HIGH, LOW, LOW.",
+                "pitfall": "Thinking bounce is a bug in the code; even if the program is correct, the count comes out wrong on a real button."
+              },
+              {
+                "term": "Level and edge",
+                "definition": "The level is the pin's current value; an edge is the moment of change from one value to the other.",
+                "example": "While the button is held down, the level stays LOW, but the falling edge happens only at the moment it is pressed.",
+                "pitfall": "Using the level for a counter: the counter keeps going up as long as you hold the button."
+              },
+              {
+                "term": "Falling and rising edge",
+                "definition": "A change from HIGH to LOW is a falling edge; a change from LOW to HIGH is a rising edge.",
+                "example": "With INPUT_PULLUP, the falling edge means a press and the rising edge means a release.",
+                "pitfall": "Mixing up the direction of the edges: counting releases when you meant to count presses."
+              },
+              {
+                "term": "Previous state variable",
+                "definition": "A variable defined outside loop() that stores the reading from the previous pass.",
+                "example": "int onceki = HIGH; and onceki = simdi; at the end of every pass make it possible to find the edge.",
+                "pitfall": "Forgetting the onceki = simdi; line: the board sees the same edge again on every pass."
+              },
+              {
+                "term": "Debounce",
+                "definition": "Filtering out bounce by waiting a short time after seeing a change and reading the pin again.",
+                "example": "Doing delay(20) after a change and reading the pin again filters out the bouncing changes.",
+                "pitfall": "Making the waiting time too long: quick presses are missed and the board cannot do anything else during that time."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h2d8-q1",
+                "kind": "numeric",
+                "prompt": "A program without debounce reads the pin on every pass and counts falling edges (changes from HIGH to LOW). When a real button is pressed once, the readings arrive in this order:\n\nHIGH, LOW, HIGH, LOW, HIGH, LOW, HIGH, LOW, LOW\n\nHow many presses does the program count?",
+                "answer": 4,
+                "tolerance": 0,
+                "explanation": "The falling edges are the changes from the 1st reading to the 2nd, the 3rd to the 4th, the 5th to the 6th and the 7th to the 8th: 4 in total. Yet the user pressed only once. Debounce filters out these fake edges.",
+                "skills": [
+                  "input-debounce"
+                ]
+              },
+              {
+                "id": "m3h2d8-q2",
+                "kind": "mcq",
+                "prompt": "You are making a counter with a button that uses INPUT_PULLUP. The counter must go up only once, at the moment the button is pressed. What should you detect?",
+                "options": [
+                  "The level where the pin is LOW, on every pass",
+                  "The level where the pin is HIGH, on every pass",
+                  "The falling edge where the pin changes from HIGH to LOW",
+                  "The rising edge where the pin changes from LOW to HIGH"
+                ],
+                "answer": 2,
+                "explanation": "A press is the change from HIGH to LOW, the falling edge, and it happens only once. The level options are true on every pass as long as you hold the button, so the counter goes up many times. The rising edge catches the moment the button is released.",
+                "skills": [
+                  "input-debounce",
+                  "digital-in"
+                ]
+              },
+              {
+                "id": "m3h2d8-q3",
+                "kind": "find-bug",
+                "prompt": "The button is between D2 and GND (INPUT_PULLUP) and the LED is on D13. When you press the button and hold it down, the LED flashes like mad; the goal is for it to flip once per press. There is one bug in the code. What is it?\n\n```\nint onceki = HIGH;\nint ledDurum = LOW;\n\nvoid loop() {\n  int simdi = digitalRead(2);\n  if (onceki == HIGH && simdi == LOW) {\n    ledDurum = 1 - ledDurum;\n    digitalWrite(13, ledDurum);\n  }\n}\n```",
+                "options": [
+                  "The onceki variable is defined outside loop()",
+                  "The && in the condition should be ||",
+                  "The line ledDurum = 1 - ledDurum; is wrong",
+                  "The line onceki = simdi; is missing at the end of the loop"
+                ],
+                "answer": 3,
+                "explanation": "onceki is never updated, so it stays HIGH. As long as the button is held, onceki == HIGH && simdi == LOW is true on every pass and the LED flips on every pass. When onceki = simdi; is added at the end of the loop, the edge is seen only once. Having the variable outside loop() is correct; otherwise the value could not be stored.",
+                "skills": [
+                  "input-debounce",
+                  "prog-debug",
+                  "prog-state"
+                ]
+              },
+              {
+                "id": "m3h2d8-q4",
+                "kind": "predict-output",
+                "prompt": "The button is between D2 and GND (INPUT_PULLUP), and the LED is on D13 and starts off. In this debounced program you press the button, hold it for a while, then let go. When does the LED flip?\n\n```\nint onceki = HIGH;\nint ledDurum = LOW;\n\nvoid loop() {\n  int simdi = digitalRead(2);\n  if (simdi != onceki) {\n    delay(20);\n    simdi = digitalRead(2);\n    if (simdi != onceki) {\n      if (simdi == HIGH) {\n        ledDurum = 1 - ledDurum;\n        digitalWrite(13, ledDurum);\n      }\n      onceki = simdi;\n    }\n  }\n}\n```",
+                "options": [
+                  "At the moment the button is pressed",
+                  "Both when pressing and when releasing",
+                  "At the moment the button is released",
+                  "It never changes"
+                ],
+                "answer": 2,
+                "explanation": "The flip is done only when simdi == HIGH, that is on the rising edge (the release). When you press, onceki is updated but the LED is not touched. Nothing happens while you hold it either; the LED flips once, only at the moment of release.",
+                "skills": [
+                  "input-debounce",
+                  "prog-conditions"
+                ]
+              },
+              {
+                "id": "m3h2d8-q5",
+                "kind": "mcq",
+                "prompt": "If you make the delay time you use for debounce 500 ms instead of 20 ms, what is the most likely problem?",
+                "options": [
+                  "Bounce shows up more",
+                  "Quick presses in a row are missed, and the board cannot look at anything else during this time",
+                  "The LED stays on all the time",
+                  "The button wears out faster"
+                ],
+                "answer": 1,
+                "explanation": "During a delay the board does no other work. A second press made during those 500 ms cannot be caught. Waiting longer does not reduce bounce; instead, it causes problems. The LED state and the life of the button do not depend on the waiting time.",
+                "skills": [
+                  "input-debounce",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Serial Monitor: yazdır, oku, ayrıştır",
@@ -2898,7 +3854,134 @@ export const modul3: ModuleContent = {
                 "serial-io"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Serial monitor: print, read, parse",
+            "problem": "Until now we have only been able to guess what is going on inside the board from an LED blinking. But what if the board wrote text to you directly? What if it said \"You pressed the button 3 times\"? What if you could type commands to it from the computer? The serial port makes this possible.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button | One end to **D2**, the other end to **GND** |\n| LED (red) + 330 Ω resistor | **D13** → resistor → LED anode; cathode to GND |\n\nA real board talks over the same USB cable that connects it to the computer. In the lab this connection is ready: the **Serial monitor** at the bottom shows what the board writes and sends what you type to the board. Press ▶, and while the program runs, type into the serial monitor's input box and send it.\n\n### Serial communication\nThe board and the computer communicate by sending bits one after another (in series). Both sides must talk at the same speed. This speed is called **baud**. We will always use 9600 baud. The lab sets this by itself; in a real Serial Monitor you must choose the same speed too.\n\n```cpp\nSerial.begin(9600);        // setup() içinde bir kez\nSerial.print(\"merhaba\");   // satır sonu eklemeden yazar\nSerial.println(\"dunya\");   // yazar ve alt satıra geçer\nSerial.println(42);        // sayı da yazabilir\n```\n\nNote: Turkish letters (`ç, ğ, ı, ö, ş, ü`) may look garbled in the serial monitor. That is why we do not use these letters in the texts we print.\n\n### Print\nA program that prints the button state every half second:\n\n```cpp\n// sketch: seri_yazdir\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n  Serial.println(\"Hazir\");\n}\n\nvoid loop() {\n  int d = digitalRead(2);\n  Serial.print(\"D2 = \");\n  Serial.println(d);\n  delay(500);\n}\n```\n\nLines saying `D2 = 1` scroll past in the serial monitor. When you switch on the button's **Pressed** property or hold the button down, it becomes `D2 = 0`. Now you can see with your own eyes that pressed = LOW = 0.\n\nThis is the easiest way to debug: you look for answers to questions like \"Did the code reach this point? What value does the variable have?\" with `Serial.print`.\n\n### Read\nData coming from the computer collects in a buffer on the board. `Serial.available()` tells you how many bytes are waiting, and `Serial.read()` reads one byte.\n\n```cpp\n// sketch: seri_komut\nvoid setup() {\n  pinMode(13, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {       // gelen veri var mı?\n    char c = Serial.read();           // bir karakter oku\n    if (c == 'A') {\n      digitalWrite(13, HIGH);\n      Serial.println(\"LED acik\");\n    } else if (c == 'K') {\n      digitalWrite(13, LOW);\n      Serial.println(\"LED kapali\");\n    } else {\n      Serial.print(\"Bilinmeyen komut: \");\n      Serial.println(c);\n    }\n  }\n}\n```\n\nType `A` into the serial monitor's input box and send it: the LED lights. Send `K`: it goes off. `char` is a variable that holds a single character, and it is written with single quotes: `'A'`.\n\n### Parse\nSometimes the incoming data has the form \"command + number\", for example `B3`: \"blink 3 times\". Splitting data into parts is called **parsing**. `Serial.parseInt()` reads the next number coming from the serial port and gives it as an `int`.\n\n```cpp\n// sketch: seri_ayristir\nvoid setup() {\n  pinMode(13, OUTPUT);\n  Serial.begin(9600);\n  Serial.println(\"B ve bir sayi yaz, ornek: B3\");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    char komut = Serial.read();           // ilk karakter: komut\n    if (komut == 'B') {\n      int adet = Serial.parseInt();       // arkasından gelen sayi\n      Serial.print(\"Yanip sonme: \");\n      Serial.println(adet);\n      for (int i = 0; i < adet; i++) {\n        digitalWrite(13, HIGH);\n        delay(200);\n        digitalWrite(13, LOW);\n        delay(200);\n      }\n    }\n  }\n}\n```\n\nType `B3` in the serial monitor and send it: the LED blinks 3 times. In a real Serial Monitor, if the line ending setting is \"Newline\", a line-ending character is added to the end of what you send. The program reads this character and ignores it because it is not `B`.\n\nYou can also read more than one number in a row. Let's add two numbers separated by a space:\n\n```cpp\n// sketch: seri_toplam\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(\"Iki sayi yaz, ornek: 12 30\");\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    int a = Serial.parseInt();\n    int b = Serial.parseInt();\n    Serial.print(\"Toplam: \");\n    Serial.println(a + b);\n  }\n}\n```\n\n### How does it work?\n1. `Serial.begin(9600)` opens the serial port. A real Serial Monitor's speed must also be 9600; otherwise you see meaningless characters on the screen. The lab matches it by itself.\n2. `Serial.print` writes, and `Serial.println` writes and ends the line.\n3. `Serial.available()` gives the number of bytes waiting to be read. `read()` uses up one byte each time it is called.\n4. `parseInt()` skips characters that are not digits and reads until the number ends. If no data comes after the number, it waits about one second and gives up. Sending a line ending shortens this wait.\n5. Incoming data can be more than one byte at a time; while `loop()` goes round again, the remaining bytes wait in the buffer.\n\n### Try it\n- Change the `seri_yazdir` program so that it prints only when the state changes, not all the time. (Use the edge idea from last lesson.)\n- Add a `'T'` command to the `seri_komut` program: make it print the LED's current state.\n- In the `seri_ayristir` program, take the blink time from the command as well: like `B3 500`.\n\n### Common mistakes\n- Not writing `Serial.begin`: nothing appears.\n- Writing a different speed in `Serial.begin`: in a real Serial Monitor the screen fills with meaningless characters.\n- Calling `read()` directly instead of `if (Serial.available())`: it returns `-1` when there is no data.\n- Writing `\"A\"` instead of `'A'`: double quotes are text, single quotes are a single character. Use single quotes with `char`.\n- Printing too often and too much: writing is slow and slows the program down.",
+            "question": "Is the serial port only for talking to a computer? If two Arduino boards were connected to each other with just two wires (one writing, one listening), what kinds of messages could they send each other?",
+            "explainerMd": "### What you will learn in this lesson\n- How the board and the computer talk through the serial port, and what the **baud** rate means\n- How to print values to the screen with `Serial.print` and `Serial.println`\n- How to read a command from the computer with `Serial.available()` and `Serial.read()`\n- How to pick out the number inside a command with `Serial.parseInt()`\n\n### What you should know first\n`digitalRead` and \"pressed = LOW\" from lesson 6; `if`, `else if` and `==` from lesson 7; the `for` loop from lesson 4; `delay` from lesson 3.\n\n### What is serial communication?\nThe board and the computer talk over the USB cable by sending bits **one after another** (in series). Both sides must talk at the same speed; this speed is called **baud**. We always use 9600 baud. If a different speed is chosen in a real Serial Monitor, meaningless characters appear on the screen. At the start, `Serial.begin(9600);` is written once inside `setup()`.\n\n### Printing\n`Serial.print(x)` writes the value and leaves the cursor on the same line. `Serial.println(x)` writes and moves to the next line. For text you use double quotes; for numbers and variables you write the value directly. This is the easiest way to debug: you see the answer to \"did the code reach this point, and what value does the variable have?\" in the serial monitor.\n\n```\nSerial.print(\"D2 = \");\nSerial.println(digitalRead(2));   // on screen: D2 = 1\n```\n\nTurkish letters (`ç, ğ, ı, ö, ş, ü`) are not used in printed texts, because they may look garbled in the serial monitor.\n\n### Reading\nThe bytes coming from the computer line up in a buffer on the board. `Serial.available()` gives the number of bytes waiting to be read; 0 means nothing is waiting. `Serial.read()` takes one byte from the buffer. You must check with `available()` first; otherwise `read()` returns -1 when there is no data.\n\nA single character is stored in the `char` type and written with **single quotes**: `'A'`. `\"A\"` in double quotes is a piece of text and cannot be compared with a `char`. Capital and small letters are different characters: `'A'` and `'a'` are not equal.\n\n### Parsing\nThe incoming text often has the form \"command + number\", for example `B3`. Splitting this text into meaningful parts is called **parsing**. First you take the command letter with `read()`, then `Serial.parseInt()` reads the next number as an `int`. If the serial monitor adds \"Newline\", `B3` actually sends three bytes:\n\n| Order | Character | Meaning |\n|---|---|---|\n| 1 | B | command |\n| 2 | 3 | digit of the number |\n| 3 | line ending | shows that the message has ended |\n\nThe line-ending character is read with `read()` on the next pass, but it is ignored because it matches no command. If you read the number with `read()`, you get the character code, not the digit itself; use `parseInt()` for numbers. If no data comes after the number, `parseInt()` waits about one second and gives up.\n\n### Summary\nThe serial port is a two-way conversation between the board and the computer, and both sides' baud rates must be equal. `print` and `println` print, `available` and `read` read the incoming command, and `parseInt` picks out the number in the command. Single characters are written with single quotes, and capital and small letters are different.",
+            "concepts": [
+              {
+                "term": "Serial.begin() and baud",
+                "definition": "Opens the serial port and sets the communication speed (baud). These lessons always use 9600.",
+                "example": "You write Serial.begin(9600); inside setup(), and the monitor is set to 9600 as well.",
+                "pitfall": "Choosing different speeds in the code and in the monitor: the screen fills with meaningless characters."
+              },
+              {
+                "term": "print and println",
+                "definition": "print leaves the text on the same line; println writes and moves to the next line.",
+                "example": "Serial.print(\"D2 = \"); Serial.println(1); writes D2 = 1 on a single line on the screen.",
+                "pitfall": "Always using print and being surprised that all the output joins up on one line."
+              },
+              {
+                "term": "Serial.available() and read()",
+                "definition": "available() gives the number of bytes waiting to be read; read() reads one byte from the buffer.",
+                "example": "if (Serial.available() > 0) { char c = Serial.read(); } first checks whether there is any data.",
+                "pitfall": "Calling read() without checking with available(): it returns -1 when there is no data."
+              },
+              {
+                "term": "char and single quotes",
+                "definition": "A variable type that holds a single character; its value is written with single quotes and it is case-sensitive.",
+                "example": "The check if (c == 'A') is true only when a capital A arrives.",
+                "pitfall": "Writing \"A\" instead of 'A', or comparing with a small 'a' and expecting a capital A."
+              },
+              {
+                "term": "parseInt()",
+                "definition": "Reads the next whole number coming from the serial port and gives it as an int; it skips characters that are not digits.",
+                "example": "When B3 arrives, after 'B' has been read, parseInt() returns 3.",
+                "pitfall": "Reading the number with read(): you get the character code, not the value of the digit."
+              },
+              {
+                "term": "Parsing",
+                "definition": "The job of splitting incoming text into meaningful parts such as a command and a number.",
+                "example": "In the text B3, B is the command and 3 is the number of blinks.",
+                "pitfall": "Not taking the line-ending character into account; it is a byte too and waits to be read."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h2d9-q1",
+                "kind": "predict-output",
+                "prompt": "What does this program show in the serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  Serial.print(\"A\");\n  Serial.print(\"B\");\n  Serial.println(\"C\");\n  Serial.println(\"D\");\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "ABCD on a single line",
+                  "A, B, C and D on four separate lines",
+                  "ABC on the first line, D on the second line",
+                  "It prints nothing"
+                ],
+                "answer": 2,
+                "explanation": "print does not end the line: A and B are written, and println(\"C\") adds C to the same line and closes the line (ABC). println(\"D\") writes D on a new line. For four separate lines, all of them would need to be println.",
+                "skills": [
+                  "serial-io"
+                ]
+              },
+              {
+                "id": "m3h2d9-q2",
+                "kind": "numeric",
+                "prompt": "B4 is sent from the serial monitor (a line ending follows the command). For each blink the program switches the LED on for 150 ms and off for 100 ms. How many milliseconds does the blink loop take?\n\n```\nchar komut = Serial.read();\nif (komut == 'B') {\n  int adet = Serial.parseInt();\n  for (int i = 0; i < adet; i++) {\n    digitalWrite(13, HIGH);\n    delay(150);\n    digitalWrite(13, LOW);\n    delay(100);\n  }\n}\n```",
+                "answer": 1000,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "parseInt() gives 4, so the loop runs 4 times. Each pass takes 150 + 100 = 250 ms. The total is 4 × 250 = 1000 ms.",
+                "skills": [
+                  "serial-io",
+                  "prog-timing",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m3h2d9-q3",
+                "kind": "find-bug",
+                "prompt": "The LED should light when you send A from the serial monitor, but it does not. The monitor is at 9600 baud and the wiring is correct. Which line is wrong?\n\n```\nvoid loop() {\n  if (Serial.available() > 0) {\n    char c = Serial.read();\n    if (c == 'a') {\n      digitalWrite(13, HIGH);\n    } else if (c == 'K') {\n      digitalWrite(13, LOW);\n    }\n  }\n}\n```",
+                "options": [
+                  "char c = Serial.read();",
+                  "if (Serial.available() > 0) {",
+                  "digitalWrite(13, LOW);",
+                  "if (c == 'a') {"
+                ],
+                "answer": 3,
+                "explanation": "Capital and small letters are different characters: the incoming 'A' is not equal to 'a'. The condition should be if (c == 'A'). The other lines are correct: available() checks whether there is data and read() takes a single character.",
+                "skills": [
+                  "serial-io",
+                  "prog-debug",
+                  "prog-conditions"
+                ]
+              },
+              {
+                "id": "m3h2d9-q4",
+                "kind": "mcq",
+                "prompt": "If Serial.available() is 0, what does it mean?",
+                "options": [
+                  "The serial port has not been opened",
+                  "The last character read was '0'",
+                  "The baud rate is wrong",
+                  "No bytes are waiting to be read"
+                ],
+                "answer": 3,
+                "explanation": "available() gives the number of bytes in the buffer waiting to be read; 0 only says there is no data to read right now. Calling read() in this case would return -1. A wrong baud rate is a separate problem and does not change this number.",
+                "skills": [
+                  "serial-io"
+                ]
+              },
+              {
+                "id": "m3h2d9-q5",
+                "kind": "mcq",
+                "prompt": "The code says Serial.begin(9600); but 115200 is selected in the real Serial Monitor. What do you see on the screen?",
+                "options": [
+                  "Meaningless characters",
+                  "Nothing, and the board gets damaged",
+                  "The text scrolls twice as fast",
+                  "The text looks normal"
+                ],
+                "answer": 0,
+                "explanation": "When the two sides talk at different speeds, the bytes are misread and meaningless characters appear on the screen. This wrong setting does not damage the board; making the speeds equal solves the problem. The lab matches the two speeds by itself; in a real monitor you match them.",
+                "skills": [
+                  "serial-io"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Kapı zili ve basış sayacı",
@@ -3016,7 +4099,124 @@ export const modul3: ModuleContent = {
                 "prog-state"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Doorbell and press counter",
+            "problem": "Would you like to know how many people came when your doorbell rang? In this project you will make a simple but clever doorbell: on every press the bell rings, the number of rings is counted and written to the Serial Monitor. On top of that, you will have a second button that mutes the bell: if you hold it down, the bell is silent, but the counter keeps counting. Everything from this week comes together in this project.",
+            "contentMd": "### Goal\n- On every press of the bell button on D2: the LED lights, the bell (buzzer) rings, the counter goes up by one and `Zil: N` (Bell: N) is printed.\n- Holding the button down does not make the counter go up again and again (edge detection).\n- The button's bounce does not spoil the count (debounce).\n- While the mute button on D3 is pressed, \"silent mode\": the LED lights but the buzzer does not sound. (Optional: this is not an activity goal but an extra feature.)\n- If you send `S` from the serial port, it prints the counter; if you send `R`, it resets the counter.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Bell button | One end to **D2**, the other end to **GND** |\n| Mute button (optional) | One end to **D3**, the other end to **GND** |\n| LED (red) + 330 Ω resistor | **D13** → resistor → LED anode; cathode to GND |\n| Active buzzer | Plus (+) leg to **D8**, minus (-) leg to **GND** |\n\nAn active buzzer has its own sound generator inside: it beeps when you give the pin HIGH and goes quiet when you give it LOW. The buzzer's legs have a direction: the **+** leg goes to D8 and the **-** leg to GND. When you select the part, set **Type** to **Active** in the right panel (the default is passive). A passive buzzer does not make a sound with `digitalWrite`. Switch on the sound button at the top to hear it.\n\n### Program\n```cpp\n// sketch: kapi_zili\nint sayac = 0;          // kaç kez çalındı\nint onceki = HIGH;      // butonun bir önceki durumu\n\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);   // zil butonu\n  pinMode(3, INPUT_PULLUP);   // eğim anahtarı\n  pinMode(13, OUTPUT);        // LED\n  pinMode(8, OUTPUT);         // buzzer\n  Serial.begin(9600);\n  Serial.println(\"Kapi zili hazir\");\n}\n\nvoid loop() {\n  // 1) Zil butonu: kenar algılama + debounce\n  int simdi = digitalRead(2);\n  if (simdi != onceki) {\n    delay(20);                       // sıçrama bitsin\n    simdi = digitalRead(2);\n    if (simdi != onceki) {\n      onceki = simdi;\n      if (simdi == LOW) {            // basıldı\n        sayac++;\n        bool sessiz = (digitalRead(3) == LOW);   // eğim anahtarı kapalı mı?\n\n        digitalWrite(13, HIGH);\n        if (!sessiz) {\n          digitalWrite(8, HIGH);\n        }\n        delay(300);                  // zil 300 ms çalsın\n        digitalWrite(13, LOW);\n        digitalWrite(8, LOW);\n\n        Serial.print(\"Zil: \");\n        Serial.println(sayac);\n      }\n    }\n  }\n\n  // 2) Seri komutlar\n  if (Serial.available() > 0) {\n    char komut = Serial.read();\n    if (komut == 'S') {\n      Serial.print(\"Toplam: \");\n      Serial.println(sayac);\n    } else if (komut == 'R') {\n      sayac = 0;\n      Serial.println(\"Sayac sifirlandi\");\n    }\n  }\n}\n```\n\n### How does it work?\n1. `sayac` (counter) and `onceki` are defined outside `loop()`. That way they are not reset on every pass; they keep their values.\n2. The button part is the same as the debounced edge detection from lesson 8. The bell rings only on the falling edge, where `simdi == LOW`.\n3. `sayac++` does the same job as `sayac = sayac + 1`.\n4. `sessiz` (silent) is a `bool` (true if the mute button on D3 is pressed; the comment in the code says \"tilt switch\", but in the lab this is a button). `!sessiz` means \"if not silent\"; the buzzer beeps only then. The LED lights in every case.\n5. The serial part is the same as the command-reading pattern from lesson 9.\n6. During `delay(300)` the board does not look at anything else. This is not a problem for this project, because the bell is short anyway. A serial command that arrives while the bell is ringing waits in the buffer and is read afterwards.\n\n### Try it\n- Make the ring time 100 ms and 1000 ms. Which one feels more natural?\n- When the counter reaches 10, make the LED flash three times quickly (e.g. \"10th visitor!\") and print a message to the Serial Monitor.\n- Add the mute button and press the bell button while holding it down: does the counter go up in silent mode? Check by sending `S` from the serial monitor.\n- Split the bell into two \"tunes\": one long beep on a single press, two short beeps if the counter is even. (Hint: `sayac % 2 == 0`; `%` gives the remainder of a division.)\n\n### Common mistakes\n- Defining `sayac` inside `loop()`: it goes back to 0 on every pass and never goes up.\n- Connecting the buzzer's + and - legs the wrong way round: no sound comes out.\n- Leaving the buzzer type as Passive: no sound comes out with `digitalWrite`; producing a tone needs a different method (in the coming weeks).\n- Skipping debounce: the counter sometimes goes up by two and sometimes by zero.\n- Forgetting to write `Serial.begin(9600)`: nothing appears in the serial monitor.",
+            "question": "This bell only counts. What clever features could be added based on the number of visitors? For example, if silent mode switched on by itself at certain times of day, what else would the board need for that?",
+            "explainerMd": "### What you will learn in this lesson\n- How to **split a big project into parts** and think about each part separately\n- Why the **state variables** (`sayac`, `onceki`) that are the program's memory are defined outside `loop()`\n- How to combine edge detection, debounce, `bool` and serial commands in one program\n- How to work out the response time of a program that uses `delay`\n\n### What you should know first\n`INPUT_PULLUP` and \"pressed = LOW\" from lesson 6; `if`, `bool`, `&&` and `!` from lesson 7; edge detection and debounce from lesson 8; `Serial.print`, `available()` and `read()` from lesson 9; `digitalWrite` and `delay` from lesson 3.\n\n### Plan first, then code\nThe doorbell project looks like a single job, but it is really the sum of five small jobs. Writing down in a table which lesson each job comes from makes the program easier to write:\n\n| Job | What it does | Source |\n|---|---|---|\n| Reading | Reads the bell button with `INPUT_PULLUP` | Lesson 6 |\n| Press detection | Catches the falling edge and filters out bounce | Lesson 8 |\n| Response | Lights the LED, sounds the buzzer, increases the counter | Lessons 3, 7 |\n| Silent mode | The buzzer stays quiet if the mute button on D3 is pressed | Lesson 7 |\n| Reporting | Prints `Zil: N`; handles the `S` and `R` commands | Lesson 9 |\n\nFilling in this table first and trying each row separately is much safer than writing everything in one go.\n\n### The program's memory\n`sayac` holds how many times the bell has rung, and `onceki` holds the button's previous state. These two variables are defined outside `loop()`. `loop()` starts again from the top on every pass; a variable defined inside it is created again on every pass and reset to its starting value (for example 0). A variable defined outside keeps its value as long as the program runs. `sayac++` means `sayac = sayac + 1`.\n\n### Putting the parts together\nPress detection is done inside `loop()` with two nested `if`s: first it checks whether there is a change, then it waits 20 ms and checks whether the change is real. If it is real and the new value is LOW, the bell button has been pressed. For silent mode you write `bool sessiz = (digitalRead(3) == LOW);`, and the buzzer is sounded only when `!sessiz`: that is, \"if not silent\". The LED lights in every case.\n\nAn active buzzer has its own sound generator inside: it beeps when you give the pin HIGH and goes quiet when you give it LOW. Its legs have a direction: the + leg goes to D8 and the - leg to GND. In the lab, do not forget to set the part's type to Active.\n\n### The cost of waiting\nDuring a `delay` the board cannot look at anything else. While a press is being handled, the 20 ms debounce wait and the 300 ms ring time run one after the other: for about 20 + 300 = 320 ms the program is as good as frozen. This time is acceptable for a bell, because incoming serial commands wait in the buffer and are read afterwards. Much longer waits, however, make the project sluggish; in the coming weeks you will learn timing without using `delay`.\n\n### Summary\nA big project is split into small jobs with a plan table, and each job is solved with a pattern from earlier lessons. State variables defined outside `loop()` are kept from pass to pass. Edge detection and debounce make sure a press is counted only once. You can work out a program's response time by adding up its `delay` times.",
+            "concepts": [
+              {
+                "term": "Plan table",
+                "definition": "A table where you split the project into small jobs and write down what each job does and which pattern solves it.",
+                "example": "In the doorbell, reading, press detection, response, silent mode and reporting are five separate rows.",
+                "pitfall": "Writing everything in one go: when a bug appears, you cannot find which part it is in."
+              },
+              {
+                "term": "Global and local variables",
+                "definition": "A variable outside loop() keeps its value for the whole program; one inside loop() is created again on every pass.",
+                "example": "If int sayac = 0; is written outside loop(), the counter keeps going up from press to press.",
+                "pitfall": "Defining sayac inside loop(): it goes back to 0 on every pass and looks as if it never goes up."
+              },
+              {
+                "term": "sayac++",
+                "definition": "Increases a variable's value by 1; it does the same job as sayac = sayac + 1.",
+                "example": "If sayac++; runs on every bell press, the counter goes up 1, 2, 3.",
+                "pitfall": "Writing the increase outside the edge condition: the counter keeps going up while you hold the button."
+              },
+              {
+                "term": "Silent mode (bool and !)",
+                "definition": "A pattern for switching a feature (here the buzzer) on and off with a bool state variable.",
+                "example": "if (!sessiz) { digitalWrite(8, HIGH); } sounds the buzzer only when not silent.",
+                "pitfall": "Writing the condition the wrong way round: if you write if (sessiz), the buzzer beeps only in silent mode."
+              },
+              {
+                "term": "Active buzzer",
+                "definition": "A buzzer with a sound generator inside; it beeps when given HIGH and goes quiet when given LOW.",
+                "example": "The + leg is connected to D8 and the - leg to GND, and it is sounded with digitalWrite(8, HIGH);.",
+                "pitfall": "Leaving the type as passive or connecting the legs the wrong way round: no sound comes out."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h2d10-q1",
+                "kind": "predict-output",
+                "prompt": "You press and release the button three times (no bounce). What appears in the serial monitor, in order?\n\n```\nint onceki = HIGH;\n\nvoid loop() {\n  int sayac = 0;\n  int simdi = digitalRead(2);\n  if (onceki == HIGH && simdi == LOW) {\n    sayac++;\n    Serial.println(sayac);\n  }\n  onceki = simdi;\n}\n```",
+                "options": [
+                  "1, 2, 3",
+                  "1, 1, 1",
+                  "0, 0, 0",
+                  "It prints nothing"
+                ],
+                "answer": 1,
+                "explanation": "Because sayac is defined inside loop(), it starts from 0 on every pass. On the press pass it goes up to 1, is printed, and the pass ends; the value is not kept. For 1, 2, 3, sayac must be defined outside loop(). The edge condition is correct, so three presses print three lines.",
+                "skills": [
+                  "prog-state",
+                  "serial-io"
+                ]
+              },
+              {
+                "id": "m3h2d10-q2",
+                "kind": "numeric",
+                "prompt": "In the doorbell, while a press is being handled, delay(20) (debounce) and delay(300) (ring time) run one after the other. For how many milliseconds in total can loop() not look at anything else during these two waits?",
+                "answer": 320,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "The board waits during a delay. Because the waits run one after the other, they add up: 20 + 300 = 320 ms. Serial commands that arrive during this time are not lost; they wait in the buffer.",
+                "skills": [
+                  "prog-timing",
+                  "input-debounce"
+                ]
+              },
+              {
+                "id": "m3h2d10-q3",
+                "kind": "find-bug",
+                "prompt": "When you press the bell button without pressing the mute button (D3), the buzzer does not beep; when you press the bell while the mute button is held, it beeps. It should be the other way round. Which line is wrong?\n\n```\nbool sessiz = (digitalRead(3) == LOW);\ndigitalWrite(13, HIGH);\nif (sessiz) {\n  digitalWrite(8, HIGH);\n}\ndelay(300);\ndigitalWrite(13, LOW);\ndigitalWrite(8, LOW);\n```",
+                "options": [
+                  "bool sessiz = (digitalRead(3) == LOW);",
+                  "digitalWrite(13, HIGH);",
+                  "if (sessiz) {",
+                  "delay(300);"
+                ],
+                "answer": 2,
+                "explanation": "While the mute button is pressed, digitalRead(3) is LOW, so sessiz = true. if (sessiz) sounds the buzzer in exactly this case. It should be if (!sessiz). The bool line is correct: with INPUT_PULLUP, pressed = LOW.",
+                "skills": [
+                  "prog-debug",
+                  "prog-logic"
+                ]
+              },
+              {
+                "id": "m3h2d10-q4",
+                "kind": "mcq",
+                "prompt": "In the doorbell program you hold the bell button down for 5 seconds (falling-edge detection and debounce are used). What happens to the counter?",
+                "options": [
+                  "It goes up on every pass and reaches thousands in 5 seconds",
+                  "It goes up once a second",
+                  "It goes up only once",
+                  "It never goes up"
+                ],
+                "answer": 2,
+                "explanation": "The counter goes up only at the moment of the change from HIGH to LOW, that is on the falling edge. Holding the button keeps the level at LOW but creates no new edge. If the program looked at the level, the first option would be the answer.",
+                "skills": [
+                  "input-debounce",
+                  "prog-state"
+                ]
+              },
+              {
+                "id": "m3h2d10-q5",
+                "kind": "numeric",
+                "prompt": "You want a special alert for every 5th visitor. The condition is: sayac % 5 == 0 (% gives the remainder of a division). When the counter counts from 1 to 23 (checked once at each value), how many times is this condition true?",
+                "answer": 4,
+                "tolerance": 0,
+                "explanation": "The numbers whose remainder when divided by 5 is 0 are 5, 10, 15 and 20. 25 has not been counted yet. So the condition is true 4 times.",
+                "skills": [
+                  "prog-conditions",
+                  "prog-state"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -3024,6 +4224,7 @@ export const modul3: ModuleContent = {
       "title": "Analog dünya",
       "project": "Akıllı gece lambası",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Analog ve dijital sinyali ayırt eder; `analogRead` değerini (0-1023) gerilime (ham × 5,0 / 1024) çevirir.\n2. Gerilim bölücü formülüyle (Vout = Vin × R2 / (R1 + R2)) bir sensörün direncini gerilim ve ham değerden hesaplar.\n3. LDR ile ışığı, NTC ile sıcaklığı (beta formülü, Kelvin, `log`) ölçer ve geçersiz okumayı yakalar.\n4. `map`, `constrain`, kalibrasyon ve yumuşatmayla gürültülü sensör verisini kullanılır hâle getirir.\n5. Üç sensörü birleştirip akıllı bir gece lambası yapar.\n\n### Haftanın planı\nHafta beş derstir. Plan günde bir ders içindir; 5. gün proje dersi daha uzundur.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | analogRead, ADC ve potansiyometre | ~20 dk | Pot'u A0'a bağla, ham değeri ve gerilimi seri monitörde izle, LED parlaklığını ayarla. |\n| 2 | Gerilim bölücü ve LDR | ~25 dk | Bölücü hesaplarını yap, LDR'yi kur, ışık kaydırıcısıyla ham değeri oku, histerezisi dene. |\n| 3 | Termistör (NTC) ve sıcaklık hesabı | ~25 dk | NTC'yi kur, sıcaklık kaydırıcısıyla beta formülünün sonuçlarını tabloyla karşılaştır. |\n| 4 | map, constrain, kalibrasyon ve yumuşatma | ~25 dk | Sınırsız ve sınırlı `map` farkını gör, kalibrasyon ve ortalamayı çalıştır. |\n| 5 | Proje: Akıllı gece lambası | ~35 dk | Önce aşama 1, sonra tam sürüm; ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBaşlamadan önce şunları kontrol et:\n- Ohm yasası (V = I × R) ve mA/A, kΩ/Ω dönüşümü rahat mı? (Hafta 1, ders 2)\n- `if / else if` ve karşılaştırma işleçlerini yazabiliyor mu? (Hafta 2)\n- `Serial.begin`, `Serial.print` ve `Serial.println` ile değer yazdırabiliyor mu? (Hafta 2, ders 9)\n- `for` döngüsü ve dizi indeksleri (0 tabanlı) tanıdık mı? (Hafta 1, ders 4)\n- Laboratuvarda parça özelliklerini (Konum, Işık, Sıcaklık kaydırıcıları) değiştirebiliyor mu?\n\n### Kavram haritası\n- **Ölçme:** analog sinyal → ADC (10 bit, 1024 değer) → `analogRead` → ham değer → gerilim\n- **Sensör devresi:** gerilim bölücü → LDR (ışık arttıkça direnç azalır) ve NTC (sıcaklık arttıkça direnç azalır) → direnç hesabı → beta formülü\n- **Veriyi işleme:** `map` → `constrain` → kalibrasyon → ortalama ve üstel yumuşatma\n- **Karar:** eşik → histerezis → öncelik sırası (güvenlik normal davranışı ezer)\n- **Proje:** üç girdi (LDR, pot, NTC) → tek çıktı (PWM lamba) + uyarı LED'i\n\n### Sık yapılan hatalar\n- **`ham * 5 / 1024` yazmak.** Tam sayı bölmesi sonucu 0, 1, 2 gibi yuvarlar. `5.0` yaz.\n- **`analogRead` sayısını doğrudan `analogWrite`'a vermek.** 0-1023 ile 0-255 aralıkları farklıdır; `ham / 4` ya da `map` kullan.\n- **`10000 * ham` gibi tam sayı çarpımı.** `int` 16 bittir ve taşar. `10000.0` yaz.\n- **Bölücüde yer değiştirmek.** LDR ile sabit direncin yeri değişirse ışık yönü tersine döner.\n- **Tek eşik kullanmak.** Eşik civarında çıkış titreşir; iki eşik (histerezis) kullan.\n- **`log` yerine `log10` yazmak.** Beta formülü doğal logaritma ister.\n- **Kelvin'i Celsius'a çevirmemek.** 273,15 çıkarmayı unutma.\n- **`map` sonucunu kırpmamak.** `map` sınırlamaz; `constrain` ekle. `map` ondalık da vermez.\n- **Kalibrasyonda `enAz = 0`, `enCok = 1023` ile başlamak.** Tersi doğrudur.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Yanlış yaptığın mini test sorularının açıklamalarını oku, sonra soruyu yeniden çöz.\n3. Elle hesapla: ham = 300 için gerilim, ham = 300 için LDR direnci (LDR üstte), ham = 400 için NTC direnci.\n4. `map(250, 100, 500, 0, 255)` değerini elle hesapla, sonra laboratuvarda sketch ile doğrula.\n5. Kendi cümlelerinle cevapla: \"Gerilim bölücü neden gerekli?\" ve \"Histerezis neden kullanılır?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir: her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Akıllı gece lambası)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Sensörlerden biri bölücü olmadan bağlı ya da LED dirençsiz | LDR, pot, NTC ve iki LED doğru bağlı | Bağlantılar düzenli, direnç değerleri gerekçeli |\n| Parlaklık mantığı | Lamba karanlıkta sönük, aydınlıkta yanık | Karanlıkta parlak, aydınlıkta sönük; `constrain` var | Eşik değerleri kalibrasyonla ölçülmüş |\n| Potansiyometre ve yumuşatma | Pot etkisiz, lamba titriyor | Pot üst sınırı belirliyor, ortalama alınıyor | Yumuşatma yönteminin etkisini açıklıyor |\n| Sıcaklık koruması | Sıcaklık hesabı yanlış ya da koruma yok | 40 °C'de lamba kapanıyor, uyarı yanıyor | Sensör hatasını da ayrı ele alıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Girdi-çıktı tablosunu ve kodu anlatıyor | Hata yapıp nasıl bulduğunu ve bir geliştirmeyi anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta ölçmeyi öğretir: sensörler dünyayı gerilim olarak bildirir ve yazılım bu sayıları anlamlı hâle getirir. Formül ezberi değil, \"neden böyle?\" sorusu önemlidir.\n- **Zorluk.** Gerilim bölücü ve beta formülü matematik içerir. Öğrenci takılırsa önce kaydırıcıyı oynatıp seri monitördeki sayıların nasıl değiştiğine bakmasını, sonra hesabı yapmasını önerin.\n- **Nasıl destek olunur?** Cevabı söylemek yerine sor: \"Işık artınca ham değer hangi yöne gidiyor?\", \"Bu sayı 0-1023 mü, 0-255 mi?\", \"Hesap tam sayıyla mı ondalıkla mı yapılıyor?\"\n- **Gerçek donanım.** LDR ve NTC değerleri parçadan parçaya değişir; laboratuvardaki NTC B = 3950 ile modellenmiştir, gerçek parçanın veri sayfasına bakılmalıdır.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Gerçek kart kullanılırsa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz; gece lambası projesi yalnız 5 V'luk LED ile yapılır.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week, the student:\n1. Tells analog and digital signals apart; turns an `analogRead` value (0-1023) into a voltage (raw × 5.0 / 1024).\n2. Calculates a sensor's resistance from the voltage and raw value with the voltage divider formula (Vout = Vin × R2 / (R1 + R2)).\n3. Measures light with an LDR and temperature with an NTC (beta formula, Kelvin, `log`), and catches an invalid reading.\n4. Makes noisy sensor data usable with `map`, `constrain`, calibration and smoothing.\n5. Combines three sensors to make a smart night light.\n\n### The week's plan\nThe week has five lessons. The plan is for one lesson a day; the project lesson on day 5 is longer.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | analogRead, the ADC and the potentiometer | ~20 min | Connect the pot to A0, watch the raw value and the voltage in the Serial monitor, set the LED brightness. |\n| 2 | The voltage divider and the LDR | ~25 min | Do the divider calculations, build the LDR circuit, read the raw value with the light slider, try hysteresis. |\n| 3 | The thermistor (NTC) and calculating temperature | ~25 min | Build the NTC circuit, compare the results of the beta formula with the table using the temperature slider. |\n| 4 | map, constrain, calibration and smoothing | ~25 min | See the difference between unlimited and limited `map`, run calibration and averaging. |\n| 5 | Project: Smart night light | ~35 min | Stage 1 first, then the full version; assess with the rubric. |\n\n### Prerequisite check\nBefore you start, check the following:\n- Is the student comfortable with Ohm's law (V = I × R) and converting mA/A and kΩ/Ω? (Week 1, lesson 2)\n- Can they write `if / else if` and comparison operators? (Week 2)\n- Can they print values with `Serial.begin`, `Serial.print` and `Serial.println`? (Week 2, lesson 9)\n- Are the `for` loop and array indexes (starting at 0) familiar? (Week 1, lesson 4)\n- Can they change part properties in the lab (the Position, Light and Temperature sliders)?\n\n### Concept map\n- **Measuring:** analog signal → ADC (10-bit, 1024 values) → `analogRead` → raw value → voltage\n- **Sensor circuit:** voltage divider → LDR (resistance goes down as light increases) and NTC (resistance goes down as temperature rises) → calculating resistance → beta formula\n- **Processing the data:** `map` → `constrain` → calibration → averaging and exponential smoothing\n- **Decision:** threshold → hysteresis → order of priority (safety overrides normal behaviour)\n- **Project:** three inputs (LDR, pot, NTC) → one output (PWM lamp) + warning LED\n\n### Common mistakes\n- **Writing `ham * 5 / 1024`.** Integer division rounds the result to 0, 1, 2. Write `5.0`.\n- **Passing the `analogRead` number straight to `analogWrite`.** The ranges 0-1023 and 0-255 are different; use `ham / 4` or `map`.\n- **Integer multiplication such as `10000 * ham`.** `int` is 16-bit and overflows. Write `10000.0`.\n- **Swapping places in the divider.** If the LDR and the fixed resistor swap places, the light direction is reversed.\n- **Using a single threshold.** The output flickers around the threshold; use two thresholds (hysteresis).\n- **Writing `log10` instead of `log`.** The beta formula needs the natural logarithm.\n- **Not converting Kelvin to Celsius.** Do not forget to subtract 273.15.\n- **Not clipping the `map` result.** `map` does not limit; add `constrain`. `map` does not give decimals either.\n- **Starting calibration with `enAz = 0`, `enCok = 1023`.** The opposite is correct.\n\n### End-of-week review\n1. Look at each lesson's concept cards and read the \"common mistake\" lines out loud.\n2. Read the explanations of the mini quiz questions you got wrong, then solve the question again.\n3. Calculate by hand: the voltage for raw = 300, the LDR resistance for raw = 300 (LDR on top), the NTC resistance for raw = 400.\n4. Work out `map(250, 100, 500, 0, 255)` by hand, then check it with a sketch in the lab.\n5. Answer in your own words: \"Why do we need a voltage divider?\" and \"Why is hysteresis used?\"\n\nThe mini quizzes of the five lessons are enough as the end-of-week test: 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct from each lesson. Go back to the explainer of any lesson that is still weak.\n\n### Project rubric (Smart night light)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | One of the sensors is connected without a divider, or an LED has no resistor | LDR, pot, NTC and two LEDs connected correctly | Connections are tidy, resistor values are justified |\n| Brightness logic | The lamp is dim in the dark and on in the light | Bright in the dark, off in the light; `constrain` is used | Threshold values were measured with calibration |\n| Potentiometer and smoothing | The pot has no effect, the lamp flickers | The pot sets the upper limit, an average is taken | Explains the effect of the smoothing method |\n| Temperature protection | The temperature calculation is wrong or there is no protection | At 40 °C the lamp turns off and the warning turns on | Also handles a sensor error separately |\n| Explanation | Cannot explain what they did | Explains the input-output table and the code | Explains a mistake they made, how they found it, and an improvement |\n\n### Note for parents and teachers\n- **Purpose.** This week teaches measuring: sensors report the world as a voltage, and software makes these numbers meaningful. What matters is not memorising formulas but the question \"why is it like this?\"\n- **Difficulty.** The voltage divider and the beta formula involve maths. If the student gets stuck, suggest that they first move the slider and look at how the numbers in the Serial monitor change, and then do the calculation.\n- **How to help.** Instead of giving the answer, ask: \"When the light increases, which way does the raw value go?\", \"Is this number 0-1023 or 0-255?\", \"Is the calculation done with whole numbers or with decimals?\"\n- **Real hardware.** LDR and NTC values vary from part to part; the NTC in the lab is modelled with B = 3950, and for a real part you should check its datasheet.\n- **Safety.** Everything on this platform is virtual. If a real board is used, no circuit is ever built with mains voltage (220 V); the night light project is done only with a 5 V LED.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (draft/pilot feature; saved only if consent was given).",
       "lessons": [
         {
           "title": "analogRead, ADC ve potansiyometre",
@@ -3140,7 +4341,123 @@ export const modul3: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "analogRead, the ADC and the potentiometer",
+            "problem": "A button has two states: pressed or not. But how many states does a volume knob, a light sensor or a thermometer have? Infinitely many! How does a digital board understand these \"in-between values\"?",
+            "contentMd": "### Analog and digital\n`digitalRead` sorts the voltage on a pin into only two classes: HIGH or LOW. In the real world (and in the lab) the voltage can take any value between 0 V and 5 V. This is called an **analog** signal.\n\nInside the Arduino Uno there is an **ADC** (Analog-to-Digital Converter). The ADC measures the voltage on the pin and turns it into a number:\n\n- The measurement is **10-bit**: 2 to the power of 10 = **1024** different values (0 to 1023).\n- 0 V → 0, 5 V → about 1023. The reference voltage (the upper limit) is 5 V by default.\n- The width of one step: 5 V / 1024 ≈ **4.9 mV**.\n\nTo turn the number into a voltage:\n\n`gerilim = ham × 5,0 / 1024`\n\n| Voltage | `analogRead` value |\n|---|---|\n| 0 V | 0 |\n| 1.25 V | 256 |\n| 2.5 V | 512 |\n| 3.75 V | 768 |\n| 5 V | 1023 |\n\nThe analog inputs are pins **A0-A5**. You do not need to write `pinMode`; `analogRead(A0)` is enough.\n\n### Potentiometer\nA potentiometer is a three-terminal resistor whose position changes. The pot part in the lab has the terminals **VCC**, **SIG** and **GND**: you connect VCC to 5V and GND to GND. The middle terminal **SIG** moves between 0 V and 5 V as you drag the slider. If you connect SIG to A0, you read the slider's position as a number.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Potentiometer (10 kΩ) | **VCC** → 5V; **GND** → GND; **SIG** → **A0** |\n| LED (red) | **A** (anode) → leg 2 of the 330 Ω resistor; **K** (cathode) → GND |\n| 330 Ω resistor | Leg 1 to **D11**, leg 2 to the LED's **A** leg |\n\nWe chose D11 because this pin supports brightness control (PWM). D13 does not.\n\n### Program\nFirst, let's see the number we read and the voltage in the Serial monitor. `float` is the variable type that holds a decimal number. `Serial.print(volt, 2)` prints the number with 2 digits after the decimal point.\n\n```cpp\n// sketch: pot_oku\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = analogRead(A0);          // 0-1023\n  float volt = ham * 5.0 / 1024.0;   // gerilime çevir\n  Serial.print(\"ham=\");\n  Serial.print(ham);\n  Serial.print(\" volt=\");\n  Serial.println(volt, 2);\n  delay(500);\n}\n```\n\nNow let's set the LED's brightness with the knob. `analogWrite(pin, değer)` writes a \"brightness\" value from 0 to 255 to the pin: 0 is off, 255 is fully bright. You will learn how it works in lesson 16. For now, just take it as a tool to use.\n\nThe ADC gives 0-1023, but `analogWrite` wants 0-255. Since 1024 / 4 = 256, dividing the raw value by 4 is enough.\n\n```cpp\n// sketch: pot_parlaklik\nvoid setup() {\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  int ham = analogRead(A0);\n  analogWrite(11, ham / 4);   // 0-1023 -> 0-255\n}\n```\n\n### How does it work?\n1. `analogRead(A0)` measures the voltage on A0 and gives a whole number from 0 to 1023.\n2. In `ham * 5.0 / 1024.0` we wrote `5.0`, because integer division throws away everything after the decimal point. When you multiply by a decimal number, the result is a decimal.\n3. `ham / 4` is integer division. 1023 / 4 = 255, so it never goes above 255.\n4. When the slider is pulled to the end, the LED is at its brightest; when it is pulled to the start, the LED goes off.\n\n### Try it\n- Change `delay(500)` to 50. Do the numbers in the Serial monitor change smoothly as you drag the slider?\n- Bring the slider exactly to the middle (0.5). Is the number about 512? In real circuits the number can jitter by 1-2 units even when the pot does not move at all (noise); we will deal with this using smoothing in lesson 14. Why do you think it happens?\n- Write `255 - ham / 4` instead of `ham / 4`. How does the LED's behaviour change?\n\n### Common mistakes\n- Connecting the VCC or GND terminal of the potentiometer to A0 instead of SIG: the number never changes.\n- Leaving the VCC or GND terminal unconnected: the measurement becomes meaningless (in the lab the pin is left \"floating\").\n- Trying to read an analog pin with `digitalRead`: you only see 0 or 1.\n- Writing `ham * 5 / 1024`: because both sides are whole numbers, the result is rounded to 0, 1, 2... Write `5.0` to do a decimal calculation.",
+            "question": "If the ADC were 8-bit instead of 10-bit, how many different values could we read? Would the voltage width of one step get bigger or smaller?",
+            "explainerMd": "### What you will learn in this lesson\n- The difference between an analog and a digital signal\n- How the ADC (Analog-to-Digital Converter) turns a voltage into a number from 0 to 1023\n- Turning the `analogRead` number into a voltage: `ham × 5,0 / 1024`\n- Using a potentiometer as a voltage adjuster\n- How integer division spoils a decimal calculation\n\n### What you should know first\nFrom lesson 1, that analog pins (A0-A5) exist, plus 5V and GND; from lesson 2, the idea of voltage; from lesson 6, that `digitalRead` only gives HIGH or LOW; from lesson 9, printing with `Serial.print`.\n\n### Analog and digital: two classes, infinitely many values\n`digitalRead` puts the voltage on a pin into one of two classes: HIGH or LOW. But in the real world the voltage can take any value between 0 V and 5 V. This continuously changing signal is called **analog**. Sensors usually report light, temperature or the position of a knob with a voltage like this.\n\n### The ADC: a ruler that turns voltage into a number\nThe **ADC** inside the Uno measures the 0-5 V range with 10 bits. 10 bits means 2 to the power of 10 = **1024** different numbers (0-1023). The width of one step is 5 V / 1024 ≈ 4.9 mV. Think of a ruler: a length of 5 V divided into 1024 notches, and the ADC tells you which notch the voltage falls on.\n\n```\nvoltage = ham * 5.0 / 1024.0\n```\n\n| analogRead | Approximate voltage |\n|---|---|\n| 0 | 0 V |\n| 256 | 1.25 V |\n| 512 | 2.5 V |\n| 1023 | ≈ 5 V |\n\nFor `analogRead(A0)` you do not write `pinMode`; analog pins are already inputs.\n\n### The potentiometer: a voltage you set by hand\nThe two outer terminals of the potentiometer are connected to 5V and GND; the middle terminal (SIG) moves between 0-5 V as the slider turns. If you connect SIG to A0, you read the slider's position as a number. If the position is 0.5, the number is about 512.\n\n### Decimal maths and scaling\nIf you write `ham * 5 / 1024`, both sides are whole numbers; the result comes out as 0, 1, 2 with everything after the decimal point thrown away. That is why you write `5.0`. `analogWrite`, on the other hand, wants 0-255. Since 1024 / 4 = 256, the result of `ham / 4` is in the range 0-255.\n\n```\nfloat volt = ham * 5.0 / 1024.0;   // correct\nint yari = ham / 4;                // 0-255\n```\n\n### Summary\nThe ADC turns a voltage into a number from 0 to 1023; one step is about 4.9 mV. To go back from the number to a voltage, you calculate `ham × 5,0 / 1024`, and `5.0` must be written as a decimal. A potentiometer behaves like a voltage source you set by hand. `ham / 4` moves the 0-1023 range into the 0-255 range of `analogWrite`.",
+            "concepts": [
+              {
+                "term": "Analog signal",
+                "definition": "A continuously changing voltage that can take any value between 0 V and 5 V.",
+                "example": "The middle terminal of a potentiometer moves between 0-5 V as the slider turns.",
+                "pitfall": "Reading an analog pin with digitalRead: you only see 0 or 1 and lose the in-between values."
+              },
+              {
+                "term": "ADC",
+                "definition": "Analog-to-Digital Converter. On the Uno it turns the voltage on a pin into a number from 0 to 1023 with 10 bits.",
+                "example": "If the pin is at 2.5 V, analogRead gives about 512.",
+                "pitfall": "Thinking the number you read is the voltage itself. analogRead gives 0-1023; for volts you calculate ham * 5.0 / 1024.0."
+              },
+              {
+                "term": "analogRead()",
+                "definition": "Returns the voltage on an analog pin (A0-A5) as a whole number from 0 to 1023.",
+                "example": "int ham = analogRead(A0); gives the potentiometer's position as a number.",
+                "pitfall": "Writing an unnecessary pinMode(A0, OUTPUT) for an analog input: the pin becomes an output and the reading becomes meaningless."
+              },
+              {
+                "term": "Potentiometer",
+                "definition": "A three-terminal resistor whose position changes. The two outer terminals go to 5V and GND; the middle terminal (SIG) gives 0-5 V depending on the position.",
+                "example": "With the connections VCC → 5V, GND → GND, SIG → A0, the slider's position is read.",
+                "pitfall": "Connecting the VCC or GND terminal to A0 instead of SIG: the number never changes."
+              },
+              {
+                "term": "Integer division",
+                "definition": "When two whole numbers are divided, the result is also a whole number; everything after the decimal point is thrown away.",
+                "example": "5 / 2 gives 2; 5.0 / 2 gives 2.5.",
+                "pitfall": "Writing ham * 5 / 1024: the result is rounded to 0, 1, 2. Write 5.0 to do a decimal calculation."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h3d11-q1",
+                "kind": "numeric",
+                "prompt": "analogRead(A0) gave the value 820. About how many volts are on pin A0? (ham × 5.0 / 1024)",
+                "answer": 4,
+                "tolerance": 0.02,
+                "unit": "V",
+                "explanation": "820 × 5.0 / 1024 = 4.004 V, so about 4.0 V. If you divide by 1023 instead, the result is very close; here the lesson formula uses 1024.",
+                "skills": [
+                  "analog-adc"
+                ]
+              },
+              {
+                "id": "m3h3d11-q2",
+                "kind": "numeric",
+                "prompt": "How many millivolts is one step of a 10-bit ADC? (The 0-5 V range is divided into 1024 steps; round to the nearest 0.1.)",
+                "answer": 4.9,
+                "tolerance": 0.1,
+                "unit": "mV",
+                "explanation": "5000 mV / 1024 ≈ 4.88 mV. So when the voltage changes by about 4.9 mV, the number you read goes up or down by one.",
+                "skills": [
+                  "analog-adc"
+                ]
+              },
+              {
+                "id": "m3h3d11-q3",
+                "kind": "predict-output",
+                "prompt": "What appears in the Serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  int ham = 700;\n  float v = ham * 5 / 1024;\n  Serial.println(v);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "3.42",
+                  "3.00",
+                  "0.00",
+                  "3500.00"
+                ],
+                "answer": 1,
+                "explanation": "ham * 5 = 3500, and 3500 / 1024 is a division of two whole numbers: the result is 3, not 3.417. When this 3 is assigned to float v, 3.00 is printed. For the correct result, 5.0 should have been written.",
+                "skills": [
+                  "analog-adc",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d11-q4",
+                "kind": "find-bug",
+                "prompt": "The LED brightness is set with a potentiometer (the LED is on D11). Past the middle of the slider, the LED behaves unexpectedly. Which line has the bug?\n\n```\nvoid setup() {\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  int ham = analogRead(A0);\n  analogWrite(11, ham);\n}\n```",
+                "options": [
+                  "pinMode(11, OUTPUT);",
+                  "int ham = analogRead(A0);",
+                  "analogWrite(11, ham);",
+                  "void loop() {"
+                ],
+                "answer": 2,
+                "explanation": "ham is between 0-1023, but analogWrite wants 0-255. It should be ham / 4. The other lines are correct: D11 must be an output, and analogRead(A0) reads the raw value.",
+                "skills": [
+                  "analog-adc",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d11-q5",
+                "kind": "mcq",
+                "prompt": "When the potentiometer's slider is exactly in the middle, about what does analogRead(A0) give?",
+                "options": [
+                  "0",
+                  "256",
+                  "512",
+                  "1023"
+                ],
+                "answer": 2,
+                "explanation": "In the middle position SIG is about 2.5 V; this matches 512, the middle of the 0-1023 range. 0 and 1023 are the ends, and 256 is about 1.25 V.",
+                "skills": [
+                  "analog-adc",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Gerilim bölücü ve LDR",
@@ -3259,7 +4576,125 @@ export const modul3: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The voltage divider and the LDR",
+            "problem": "An Arduino cannot measure resistance; it can only measure voltage. So how will we tell whether a part whose resistance changes with light (an LDR) is in the dark or in the light? The answer is a small trick built with two resistors: the voltage divider.",
+            "contentMd": "### The voltage divider\nImagine two resistors connected in series. The top one, R1, is connected to 5 V and the bottom one, R2, to GND. We take the voltage from the point in the middle.\n\n- The current flowing through the circuit: I = Vin / (R1 + R2)\n- The voltage across R2: Vout = I × R2\n\nPutting these two together:\n\n`Vout = Vin × R2 / (R1 + R2)`\n\nExamples (Vin = 5 V, R1 = 10 kΩ):\n\n| R2 | Vout |\n|---|---|\n| 1 kΩ | 5 × 1 / 11 ≈ 0.45 V |\n| 10 kΩ | 5 × 10 / 20 = 2.50 V |\n| 100 kΩ | 5 × 100 / 110 ≈ 4.55 V |\n\nAs R2 gets bigger, the output voltage gets bigger. If the two resistors are equal, it is exactly in the middle, that is 2.5 V. You can check these numbers with the small sketch below.\n\n```cpp\n// sketch: bolucu_hesap\nfloat vin = 5.0;\nfloat r1 = 10000.0;\nfloat r2[] = {1000.0, 10000.0, 100000.0};\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 3; i++) {\n    float vout = vin * r2[i] / (r1 + r2[i]);\n    Serial.print(\"R2=\");\n    Serial.print(r2[i], 0);\n    Serial.print(\" Vout=\");\n    Serial.println(vout, 2);\n  }\n}\n\nvoid loop() {\n}\n```\n\n### LDR\nThe resistance of an LDR (light-dependent resistor) goes down as more light falls on it. The values vary from part to part; roughly, it is hundreds of kΩ in the dark, and between a few hundred Ω and a few kΩ in bright light. You can read the value of the LDR in the lab with the sketch below: when you move the light slider, the resistance changes.\n\nIf we make the LDR the top resistor (R1) of the divider, the fixed 10 kΩ resistor becomes R2:\n\n- Light: the LDR is small, R2 dominates, Vout is **high**.\n- Dark: the LDR is large, Vout is **low**.\n\nTo find the LDR's resistance from the measured Vout, we turn the formula around:\n\n`R_ldr = 10 kΩ × (5 − Vout) / Vout`\n\nWritten with the ADC value: `R_ldr = 10000 × (1024 − ham) / ham`.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. When you select the LDR and the resistor, you can set the LDR's **Light** slider and the resistor's value (10000 Ω) in the properties panel.\n\n| Part | Connection |\n|---|---|\n| LDR | Leg 1 → 5V; leg 2 → **A1** |\n| 10 kΩ resistor | Leg 1 to **A1**, leg 2 to GND |\n| LED (red) | **A** (anode) → leg 2 of the 330 Ω resistor; **K** (cathode) → GND |\n| 330 Ω resistor | Leg 1 to **D13**, leg 2 to the LED's **A** leg |\n\n### Program\nFirst, let's print the light and the LDR's resistance.\n\n```cpp\n// sketch: isik_oku\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = analogRead(A1);\n  float volt = ham * 5.0 / 1024.0;\n  float rLdr = 0;\n  if (ham > 0) {\n    rLdr = 10000.0 * (1024 - ham) / ham;\n  }\n  Serial.print(\"ham=\");\n  Serial.print(ham);\n  Serial.print(\" volt=\");\n  Serial.print(volt, 2);\n  Serial.print(\" R_ldr=\");\n  Serial.println(rLdr, 0);\n  delay(500);\n}\n```\n\nNow let's make a system that turns the LED on when it gets dark. Careful: if we use a single threshold, the LED keeps blinking on and off while the light is close to the threshold. To prevent this we use two thresholds: turn it on below 250, turn it off above 350. In the zone between them, the LED keeps its previous state. This is called **hysteresis**.\n\n```cpp\n// sketch: karanlik_esik\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  int ham = analogRead(A1);\n  if (ham < 250) {\n    digitalWrite(13, HIGH);   // karanlık: yak\n  } else if (ham > 350) {\n    digitalWrite(13, LOW);    // aydınlık: söndür\n  }\n  delay(50);\n}\n```\n\n### How does it work?\n1. The LDR and the 10 kΩ resistor form a voltage divider. A1 measures the voltage at the point between the two.\n2. When the light increases, the LDR's resistance drops, and the voltage on A1 and the `ham` value go up.\n3. In the `if / else if` chain, if neither of the two conditions is true (between 250 and 350), the pin is not touched and the LED stays as it was.\n4. If the fixed resistor is chosen close to the LDR's middle value (here 10 kΩ), the measuring range is at its widest.\n\n### Try it\n- Pull the LDR's **Light** slider all the way to the left (dark). How far does `ham` drop? Then pull it all the way to the right (light). What is the highest value?\n- Adjust the 250 and 350 thresholds yourself, based on the dark and light values you read with `isik_oku`.\n- Swap the places of the LDR and the 10 kΩ resistor in the circuit. How does `ham` change as the light increases? Why?\n\n### Common mistakes\n- Forgetting the fixed resistor: the LDR sits directly between 5 V and A1, the pin is left \"floating\" and the measurement becomes meaningless.\n- Swapping the places of the LDR and the fixed resistor: the circuit works, but the `ham` value goes down as the light increases. The program's logic is reversed, so watch out for this.\n- Choosing a very small fixed resistor (for example 100 Ω): Vout stays at almost 0 V all the time, and the range becomes narrow.\n- Using a single threshold and being surprised when the LED flickers at the threshold.",
+            "question": "If we made the fixed resistor 1 kΩ, what would the voltage on A1 be in the dark (when the LDR is very large)? Why would this divider be worse at telling differences in light apart?",
+            "explainerMd": "### What you will learn in this lesson\n- The formula of a voltage divider made of two series resistors\n- Why the Arduino measures only voltage, not resistance\n- How an LDR's resistance changes with light and how it is read with a divider\n- Working back from the ADC value to the LDR's resistance\n- Making a flickering decision stable with hysteresis (two thresholds)\n\n### What you should know first\nFrom lesson 2, Ohm's law and that the current is the same in series resistors; from lesson 7, `if / else if`; from lesson 11, `analogRead` and the raw value.\n\n### The voltage divider\nLet the top resistor R1 be connected to 5 V and the bottom resistor R2 to GND. The current is the same through both resistors: I = Vin / (R1 + R2). The voltage at the middle point is the voltage across R2:\n\n```\nVout = Vin * R2 / (R1 + R2)\n```\n\nWith two equal resistors, Vout is exactly in the middle: 2.5 V. Example: if R1 = 10 kΩ and R2 = 30 kΩ, then Vout = 5 × 30 / 40 = 3.75 V. As the bottom resistor gets bigger, Vout rises.\n\n### Why a divider?\nAn Arduino cannot measure a part's resistance directly; it only measures the voltage on the pin. If we connect a sensor whose resistance changes in series with a fixed resistor, the change in resistance turns into a change in voltage at the middle point. The ADC reads this.\n\n### LDR\nAn **LDR** is a resistor whose resistance goes down as the light increases. In the dark it is very large (hundreds of kΩ), and in bright light it is very small. If you put the LDR on top and the fixed 10 kΩ resistor at the bottom: in the light the LDR gets smaller, and Vout and `ham` rise; in the dark they fall.\n\nYou can also calculate in the other direction. With the LDR on top, from the `ham` value read on A1:\n\n```\nR_ldr = 10000.0 * (1024 - ham) / ham\n```\n\nExample: if ham = 256, then R_ldr = 10000 × 768 / 256 = 30 000 Ω.\n\n### Hysteresis\nWhen the light is exactly at the threshold value, `ham` wobbles around like 249, 251, 250; an LED with a single threshold keeps blinking on and off. The solution is two thresholds: turn it on below 250, turn it off above 350. Between the two, do nothing; the LED keeps its previous state.\n\n### Summary\nA voltage divider turns a change in resistance into a voltage you can measure: Vout = Vin × R2 / (R1 + R2). With the LDR on top and the fixed resistor at the bottom, `ham` rises as the light increases. To find the resistance again, the formula is turned around. Hysteresis prevents flickering near the threshold by using two thresholds.",
+            "concepts": [
+              {
+                "term": "Voltage divider",
+                "definition": "Taking part of a voltage from the middle point of two resistors in series: Vout = Vin × R2 / (R1 + R2).",
+                "example": "If R1 = 10 kΩ and R2 = 10 kΩ, a 5 V input gives a 2.5 V output.",
+                "pitfall": "Mixing up R1 and R2: R2 in the formula is the resistor on the GND side."
+              },
+              {
+                "term": "LDR",
+                "definition": "Light-dependent resistor. Its resistance goes down as the light increases.",
+                "example": "An LDR that is hundreds of kΩ in the dark can drop to a few hundred Ω in bright light.",
+                "pitfall": "Connecting the LDR directly between 5V and A1 without a fixed resistor: the pin is left floating and the measurement becomes meaningless."
+              },
+              {
+                "term": "Calculating the LDR's resistance",
+                "definition": "With the LDR on top, the resistance from the raw value: R_ldr = 10000 × (1024 − ham) / ham.",
+                "example": "If ham = 256, then R_ldr = 10000 × 768 / 256 = 30 000 Ω.",
+                "pitfall": "Writing 10000 instead of 10000.0: the int multiplication overflows and the result becomes meaningless."
+              },
+              {
+                "term": "Hysteresis",
+                "definition": "Using two separate thresholds for on and off; in the zone between them the state is kept.",
+                "example": "When ham drops below 250 the LED turns on; when it rises above 350 it turns off.",
+                "pitfall": "Using a single threshold: when the light is near the threshold, the LED keeps blinking on and off."
+              },
+              {
+                "term": "Light direction",
+                "definition": "If the LDR is on top and the fixed resistor at the bottom, the raw value rises as the light increases. If they swap places, the direction is reversed.",
+                "example": "LDR on the 5V side, 10 kΩ on the GND side: in the light, ham is large.",
+                "pitfall": "Swapping them and not updating the program's logic: the lamp turns off in the dark and on in the light."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h3d12-q1",
+                "kind": "numeric",
+                "prompt": "In a voltage divider, Vin = 5 V, the top resistor R1 = 10 kΩ and the bottom resistor R2 = 30 kΩ. How many volts are at the middle point?",
+                "answer": 3.75,
+                "tolerance": 0.01,
+                "unit": "V",
+                "explanation": "Vout = 5 × 30 / (10 + 30) = 3.75 V. Because the bottom resistor is large, the output is above the middle (2.5 V).",
+                "skills": [
+                  "volt-divider",
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h3d12-q2",
+                "kind": "numeric",
+                "prompt": "The LDR is on top, the 10 kΩ resistor at the bottom, and the raw value read on A1 is 256. How many ohms is the LDR's resistance? (R_ldr = 10000 × (1024 − ham) / ham)",
+                "answer": 30000,
+                "tolerance": 10,
+                "unit": "Ω",
+                "explanation": "10000 × (1024 − 256) / 256 = 10000 × 768 / 256 = 30 000 Ω. Because the raw value is below the middle (512), the LDR is bigger than the fixed resistor, so the surroundings are fairly dark.",
+                "skills": [
+                  "sensor-ldr",
+                  "volt-divider"
+                ]
+              },
+              {
+                "id": "m3h3d12-q3",
+                "kind": "mcq",
+                "prompt": "The LDR is between 5V and A1, and the 10 kΩ resistor between A1 and GND. What happens to the raw value on A1 when the surroundings get lighter?",
+                "options": [
+                  "It decreases",
+                  "It does not change",
+                  "It is always 512",
+                  "It increases"
+                ],
+                "answer": 3,
+                "explanation": "When the light increases, the LDR's resistance drops. When the top resistor gets smaller, the bottom resistor's share grows, and the voltage and the raw value on A1 go up. If they swap places, the direction is reversed.",
+                "skills": [
+                  "sensor-ldr",
+                  "volt-divider"
+                ]
+              },
+              {
+                "id": "m3h3d12-q4",
+                "kind": "predict-output",
+                "prompt": "The LED starts off. The A1 readings arrive in this order: 200, 300, 400, 300, and after each reading this code runs once. What is the LED like after the last reading?\n\n```\nif (ham < 250) {\n  digitalWrite(13, HIGH);\n} else if (ham > 350) {\n  digitalWrite(13, LOW);\n}\n```",
+                "options": [
+                  "On, because the last value is 300, which is less than 350",
+                  "Off, because the 400 reading turned the LED off, and since 300 is in between, the state is kept",
+                  "On, because the first reading was 200",
+                  "Off, because 300 < 350"
+                ],
+                "answer": 1,
+                "explanation": "200 turns the LED on. 300 is in between, so the state is kept (on). 400 > 350, so the LED turns off. The last 300 is again in between, so the LED stays off. The same value of 300 gave two different results: this is hysteresis.",
+                "skills": [
+                  "sensor-ldr",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d12-q5",
+                "kind": "find-bug",
+                "prompt": "The LDR's resistance is being calculated, but the result makes no sense. (On the Arduino Uno, int is 16-bit, at most 32767.) Where is the bug?\n\n```\nint ham = analogRead(A1);\nif (ham > 0) {\n  float rLdr = 10000 * (1024 - ham) / ham;\n  Serial.println(rLdr, 0);\n}\n```",
+                "options": [
+                  "A0 should be written instead of analogRead(A1)",
+                  "10000 * (1024 - ham) is calculated as a whole number and overflows because it does not fit in an int",
+                  "The if (ham > 0) condition is unnecessary",
+                  "Serial.println cannot print decimals"
+                ],
+                "answer": 1,
+                "explanation": "10000 and (1024 - ham) are whole numbers; for most raw values the product goes above 32767 and overflows. The fix is to write 10000.0. if (ham > 0) is correct because it prevents dividing by zero, and println(rLdr, 0) works without problems.",
+                "skills": [
+                  "sensor-ldr",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Termistör (NTC) ve sıcaklık hesabı",
@@ -3383,7 +4818,130 @@ export const modul3: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The thermistor (NTC) and calculating temperature",
+            "problem": "Inside a temperature sensor there is nothing that \"knows\" the temperature. There is only a part whose resistance changes. So how do we get from that resistance value to the result \"23.5 degrees\"?",
+            "contentMd": "### The NTC thermistor\nAn **NTC** (Negative Temperature Coefficient) thermistor is a resistor whose resistance **goes down** as the temperature rises. A very common type is the \"10k NTC\", which is 10 kΩ at 25 °C. The way the resistance changes with temperature is not linear; it follows an exponential curve.\n\nWe read the sensor with a voltage divider (previous lesson). The NTC becomes the bottom resistor (R2); the top resistor is a fixed 10 kΩ resistor:\n\n`Vout = 5 × R_ntc / (10 kΩ + R_ntc)`\n\nTurning it around with the ADC value, the NTC's resistance is:\n\n`R_ntc = 10000 × ham / (1024 − ham)`\n\nWhen the temperature rises, the NTC's resistance drops, and so does the voltage on A2.\n\n### From resistance to temperature: the beta formula\nThe most common method is the **beta** formula. You need two numbers for the part, and both are written in the datasheet:\n\n- R0: the resistance at the reference temperature (for us, 10 000 Ω at 25 °C)\n- B: the part's beta coefficient (on popular 10k NTCs it is often 3950, but there are other values such as 3435; for a real part you read the value from the datasheet. The NTC in the lab is modelled as 10 kΩ and B = 3950)\n\nWith T the temperature in Kelvin, and T0 = 25 + 273.15 = 298.15 K:\n\n`1/T = 1/T0 + ln(R / R0) / B`\n\nThen convert to Celsius: `°C = T − 273,15`. `ln` is the natural logarithm; on the Arduino the `log()` function gives it.\n\nThe values the formula gives for R0 = 10 kΩ, B = 3950:\n\n| Temperature | NTC resistance |\n|---|---|\n| 0 °C | ≈ 33.6 kΩ |\n| 25 °C | 10 kΩ |\n| 50 °C | ≈ 3.59 kΩ |\n| 100 °C | ≈ 0.70 kΩ |\n\nOn real parts these values can be off by a few per cent; the beta formula is an approximate model and it is most accurate around 25 °C. The NTC in the lab works directly with this beta model.\n\n### The Steinhart-Hart equation\nA more accurate model is the **Steinhart-Hart** equation:\n\n`1/T = A + B × ln(R) + C × (ln(R))³`\n\nA, B and C are three numbers specific to the part. You find them by choosing three points from the resistance-temperature table given by the manufacturer and solving the equation with three unknowns. The second sketch below does this for you inside `setup()`. As an example, it uses the points 0, 25 and 50 °C (here the R values were taken from the table above; for a real part you write the three values from your own datasheet).\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. When you select the NTC, a **Temperature** slider appears in the properties panel (-20 to 120 °C).\n\n| Part | Connection |\n|---|---|\n| NTC thermistor (10 kΩ) | Leg 1 → **A2**; leg 2 → GND |\n| 10 kΩ resistor | Leg 1 → 5V; leg 2 → **A2** |\n\n### Program\n```cpp\n// sketch: ntc_sicaklik\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = analogRead(A2);\n  if (ham <= 0 || ham >= 1023) {\n    Serial.println(\"sensor hatasi\");   // kopuk ya da kisa devre\n  } else {\n    float r = 10000.0 * ham / (1024.0 - ham);               // NTC direnci\n    float tK = 1.0 / (1.0 / 298.15 + log(r / 10000.0) / 3950.0);\n    float tC = tK - 273.15;\n    Serial.print(\"R=\");\n    Serial.print(r, 0);\n    Serial.print(\" T=\");\n    Serial.println(tC, 1);\n  }\n  delay(500);\n}\n```\n\nThe version that does the same measurement with Steinhart-Hart:\n\n```cpp\n// sketch: ntc_steinhart\nfloat A, B, C;\n\nvoid setup() {\n  Serial.begin(9600);\n  // Üç nokta: (direnç, sıcaklık)  0 C, 25 C, 50 C\n  float l1 = log(33620.0), l2 = log(10000.0), l3 = log(3588.0);\n  float y1 = 1.0 / 273.15, y2 = 1.0 / 298.15, y3 = 1.0 / 323.15;\n  float g2 = (y2 - y1) / (l2 - l1);\n  float g3 = (y3 - y1) / (l3 - l1);\n  C = (g3 - g2) / (l3 - l2) / (l1 + l2 + l3);\n  B = g2 - C * (l1 * l1 + l1 * l2 + l2 * l2);\n  A = y1 - (B + C * l1 * l1) * l1;\n}\n\nvoid loop() {\n  int ham = analogRead(A2);\n  if (ham <= 0 || ham >= 1023) {\n    Serial.println(\"sensor hatasi\");\n  } else {\n    float r = 10000.0 * ham / (1024.0 - ham);\n    float lr = log(r);\n    float tK = 1.0 / (A + B * lr + C * lr * lr * lr);\n    Serial.print(\"R=\");\n    Serial.print(r, 0);\n    Serial.print(\" T=\");\n    Serial.println(tK - 273.15, 1);\n  }\n  delay(500);\n}\n```\n\n### How does it work?\n1. From the `ham` value we calculate the NTC's resistance (the reverse of the voltage divider formula).\n2. The beta formula gives the temperature in Kelvin from the resistance; we subtract 273.15 to convert it to Celsius.\n3. If `ham` is 0 or 1023, the division goes to zero or the result becomes meaningless. These cases mean a broken connection or a short circuit; the sketch reports this as `sensor hatasi` (sensor error).\n4. The Steinhart-Hart version builds the curve that passes through the three points we gave it. Between the three points it gives the same result as beta; towards the ends the two can drift apart. The part's datasheet decides which one is more accurate.\n\nExpected temperatures for each voltage (beta formula, B = 3950):\n\n| Voltage on A2 | ham | Temperature |\n|---|---|---|\n| 1.0 V | 204 | ≈ 60.0 °C |\n| 1.5 V | 307 | ≈ 45.4 °C |\n| 2.0 V | 409 | ≈ 34.5 °C |\n| 2.5 V | 512 | 25.0 °C |\n| 3.0 V | 614 | ≈ 16.2 °C |\n| 4.0 V | 819 | ≈ −3.2 °C |\n\n### Try it\n- Pull the NTC's **Temperature** slider from 25 °C to 45 °C. Which way does the temperature in the Serial monitor change? How does the voltage on A2 (virtual measurement) change?\n- In the properties panel, change the fixed resistor's value from 10 kΩ to 4.7 kΩ. Which number should you change in the sketch? Is the result correct at room temperature?\n- Add an `if` that turns on the LED on D13 when the temperature goes above 30 °C.\n\n### Common mistakes\n- Mixing up Kelvin and Celsius: the formula gives Kelvin; if you forget to subtract 273.15, you will see numbers like 298.\n- Using `log10` instead of `log`: the formula needs the natural logarithm.\n- Writing a different value in the code from the fixed resistor's real value: if you write 10000 in the code and use 4.7 kΩ in the circuit, the result drifts.\n- Writing `10000 * ham`: the `int` overflows. Write `10000.0 *` to do a decimal calculation.",
+            "question": "Because the sensor's resistance does not change linearly, there is no straight line between the ADC value and the temperature. So why would turning the raw value directly into a temperature with `map()` not be a good idea?",
+            "explainerMd": "### What you will learn in this lesson\n- How the resistance of an NTC thermistor changes with temperature\n- Calculating the NTC's resistance from the ADC value\n- Going from resistance to temperature with the beta formula\n- Using Kelvin and Celsius and the natural logarithm (`log`)\n- Spotting a broken sensor or a short circuit inside the program\n\n### What you should know first\nFrom lesson 11, the raw value and converting it to voltage; from lesson 12, the voltage divider and going from resistance to raw value; from lesson 2, units (Ω, kΩ).\n\n### NTC: the part whose resistance drops as it warms up\nAn **NTC** (Negative Temperature Coefficient) thermistor is a resistor whose resistance goes down as the temperature rises. The common type is 10 kΩ at 25 °C. The change is not linear but an exponential curve; the beta coefficient of the NTC in the lab is taken as B = 3950.\n\n| Temperature | NTC resistance |\n|---|---|\n| 0 °C | ≈ 33.6 kΩ |\n| 25 °C | 10 kΩ |\n| 50 °C | ≈ 3.59 kΩ |\n| 100 °C | ≈ 0.70 kΩ |\n\n### The reading circuit\nThe top resistor is a fixed 10 kΩ, the bottom resistor is the NTC. When the temperature rises, the NTC gets smaller and the voltage on A2 drops. The NTC's resistance from the ADC value:\n\n```\nfloat r = 10000.0 * ham / (1024.0 - ham);\n```\n\n### The beta formula\nWith resistance R, reference R0 = 10 000 Ω (25 °C), and T0 = 298.15 K:\n\n```\n1/T = 1/T0 + log(R / R0) / B\n```\n\nT comes out in Kelvin; for Celsius you subtract 273.15. `log()` is the natural logarithm; it is not `log10()`. Check: if ham = 512, then R = 10 000 Ω, `log(1)` = 0, T = 298.15 K = 25 °C.\n\n### Safety: an invalid reading\nIf `ham` is 0 or 1023, the division goes to zero or the result becomes meaningless. These extremes suggest that the sensor is disconnected or has a short circuit. Check for this case with an `if` before calculating.\n\n### Summary\nThe NTC's resistance drops as it warms up, and not linearly. First the resistance is calculated from the raw value, then the temperature in Kelvin and Celsius with the beta formula. Do not forget to convert Kelvin to Celsius and to use the natural logarithm. A reading of 0 or 1023 is a sign of a sensor error.",
+            "concepts": [
+              {
+                "term": "NTC thermistor",
+                "definition": "A non-linear resistor whose resistance goes down as the temperature rises.",
+                "example": "A 10 kΩ NTC is 10 kΩ at 25 °C and about 3.59 kΩ at 50 °C.",
+                "pitfall": "Thinking the resistance changes linearly with temperature: there is no straight line between the raw value and the temperature."
+              },
+              {
+                "term": "Calculating the NTC's resistance",
+                "definition": "With the NTC at the bottom, the resistance from the raw value: R = 10000.0 × ham / (1024 − ham).",
+                "example": "If ham = 512, then R = 10 000 Ω (25 °C).",
+                "pitfall": "Not updating the 10000 value in the code when the fixed resistor is not 10 kΩ: the temperature is always wrong."
+              },
+              {
+                "term": "Beta formula",
+                "definition": "An approximate model that gives the temperature from the resistance: 1/T = 1/T0 + log(R/R0) / B (Kelvin).",
+                "example": "When R = R0, log(1) = 0 and T = T0 = 298.15 K = 25 °C.",
+                "pitfall": "Thinking the beta formula is perfect at every temperature: it is most accurate around 25 °C."
+              },
+              {
+                "term": "Kelvin and Celsius",
+                "definition": "Kelvin = Celsius + 273.15. The beta formula gives Kelvin.",
+                "example": "312.15 K = 39 °C.",
+                "pitfall": "Forgetting to subtract 273.15: you see numbers like 298 instead of 25."
+              },
+              {
+                "term": "log()",
+                "definition": "The natural logarithm (ln) function on the Arduino.",
+                "example": "log(1.0) gives 0.",
+                "pitfall": "Using log10(): the formula needs the natural logarithm, so the result is wrong."
+              },
+              {
+                "term": "Checking for sensor errors",
+                "definition": "If ham is 0 or 1023, treating the measurement as invalid and not calculating.",
+                "example": "if (ham <= 0 || ham >= 1023) { Serial.println(\"sensor hatasi\"); }",
+                "pitfall": "Dividing without checking: with a disconnected sensor you get division by zero and a meaningless temperature."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h3d13-q1",
+                "kind": "numeric",
+                "prompt": "The NTC is the bottom resistor and the fixed 10 kΩ resistor is on top. ham = 614 is read on A2. About how many ohms is the NTC's resistance? (R = 10000 × ham / (1024 − ham))",
+                "answer": 14976,
+                "tolerance": 5,
+                "unit": "Ω",
+                "explanation": "R = 10000 × 614 / (1024 − 614) = 6 140 000 / 410 ≈ 14 976 Ω. Because it is bigger than 10 kΩ, the surroundings are colder than 25 °C (about 16 °C).",
+                "skills": [
+                  "sensor-ntc",
+                  "volt-divider"
+                ]
+              },
+              {
+                "id": "m3h3d13-q2",
+                "kind": "numeric",
+                "prompt": "The beta formula gave 312.15 K in Kelvin. How many °C is this?",
+                "answer": 39,
+                "tolerance": 0.05,
+                "unit": "°C",
+                "explanation": "°C = K − 273.15 = 312.15 − 273.15 = 39 °C.",
+                "skills": [
+                  "sensor-ntc"
+                ]
+              },
+              {
+                "id": "m3h3d13-q3",
+                "kind": "mcq",
+                "prompt": "The NTC is the bottom resistor and the fixed 10 kΩ resistor is on top. What happens to the voltage on A2 when the surroundings warm up?",
+                "options": [
+                  "It increases, because the NTC gets bigger",
+                  "It decreases, because the NTC's resistance drops",
+                  "It does not change",
+                  "It first increases, then decreases"
+                ],
+                "answer": 1,
+                "explanation": "The NTC's resistance goes down with temperature. When the bottom resistor gets smaller, Vout = 5 × R_ntc / (10 kΩ + R_ntc) drops. So as the temperature rises, the raw value goes down.",
+                "skills": [
+                  "sensor-ntc",
+                  "volt-divider"
+                ]
+              },
+              {
+                "id": "m3h3d13-q4",
+                "kind": "predict-output",
+                "prompt": "What appears in the Serial monitor? (For ham = 512, R = 10000 Ω.)\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  float r = 10000.0;\n  float tK = 1.0 / (1.0 / 298.15 + log(r / 10000.0) / 3950.0);\n  Serial.println(tK - 273.15, 1);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "298.2",
+                  "0.0",
+                  "25.0",
+                  "sensor hatasi"
+                ],
+                "answer": 2,
+                "explanation": "r / 10000 = 1 and log(1) = 0, so the bracket becomes 1 / 298.15 and tK = 298.15 K. Subtracting 273.15, 25.0 °C is printed. If 298.2 were printed, we would have forgotten to convert to Celsius.",
+                "skills": [
+                  "sensor-ntc",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d13-q5",
+                "kind": "find-bug",
+                "prompt": "The temperature is being calculated, but the results are always wrong. Which line has the only bug?\n\n```\nint ham = analogRead(A2);\nfloat r = 10000.0 * ham / (1024.0 - ham);\nfloat tK = 1.0 / (1.0 / 298.15 + log10(r / 10000.0) / 3950.0);\nfloat tC = tK - 273.15;\n```",
+                "options": [
+                  "int ham = analogRead(A2);",
+                  "float r = 10000.0 * ham / (1024.0 - ham);",
+                  "float tK = ... log10(r / 10000.0) ...",
+                  "float tC = tK - 273.15;"
+                ],
+                "answer": 2,
+                "explanation": "The beta formula needs the natural logarithm; on the Arduino this is log(). log10() gives the base-10 logarithm, and the temperature is always off. The other lines are correct: 10000.0 is a decimal, and 273.15 is subtracted from Kelvin.",
+                "skills": [
+                  "sensor-ntc",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "map, constrain, kalibrasyon ve yumuşatma",
@@ -3504,7 +5062,127 @@ export const modul3: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "map, constrain, calibration and smoothing",
+            "problem": "The numbers a sensor gives are never \"clean\": your LDR may wobble between 120 and 880 in one room, and between 60 and 950 in another. On top of that, the number jitters all the time. How can your program behave steadily in this mess?",
+            "contentMd": "### map and constrain\n`map(x, girişMin, girişMax, çıkışMin, çıkışMax)` moves a number from one range to another range in proportion. For example, it turns a value between 0-1023 into a percentage from 0-100 (the Turkish names mean inMin, inMax, outMin, outMax):\n\n```cpp\nint yuzde = map(ham, 0, 1023, 0, 100);\n```\n\nYou need to know two things:\n1. `map` does **integer** maths. Everything after the decimal point in the result is thrown away.\n2. `map` does not limit the result. If the input goes outside the range you gave, the result goes outside too: it can be negative or above 100.\n\nTo limit it you use `constrain(x, alt, üst)` (low, high): if `x` is below `alt`, you get `alt`; if it is above `üst`, you get `üst`; if it is in between, you get `x`.\n\n```cpp\nint yuzde = map(ham, 200, 800, 0, 100);   // 200'ün altı negatif olur\nyuzde = constrain(yuzde, 0, 100);         // 0-100 arasında tut\n```\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Potentiometer (10 kΩ) | **VCC** → 5V; **GND** → GND; **SIG** → **A0** |\n| LDR + 10 kΩ resistor | 5V → LDR → **A1** → 10 kΩ → GND (as in lesson 12) |\n| LED (red) + 330 Ω | **D13** → 330 Ω → LED **A** (anode); LED **K** (cathode) → GND |\n\n### Program 1: map and constrain\nLet's turn the potentiometer's 200-800 range into a percentage; at the ends the result can overflow the range.\n\n```cpp\n// sketch: map_constrain\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int ham = analogRead(A0);\n  int p = map(ham, 200, 800, 0, 100);   // sınırsız\n  int k = constrain(p, 0, 100);         // sınırlı\n  Serial.print(\"ham=\");\n  Serial.print(ham);\n  Serial.print(\" p=\");\n  Serial.print(p);\n  Serial.print(\" k=\");\n  Serial.println(k);\n  delay(300);\n}\n```\n\nWhen you pull the slider fully to the left, `p` will be negative, and when you pull it to the right, it will go above 100; `k`, however, will stay at 0 and 100.\n\n### Calibration\nThe sensor's real smallest and largest values are different in every room. **Calibration** means measuring this range when the program starts. The sketch below watches the LDR for the first 3 seconds (while D13 is on). During this time, pull the LDR's **Light** slider first all the way to the left (dark), then all the way to the right (light). Then it uses the smallest and largest values it measured as the range and reports the light as a percentage from 0 to 100.\n\n```cpp\n// sketch: kalibrasyon\nint enAz = 1023;\nint enCok = 0;\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(13, OUTPUT);\n  digitalWrite(13, HIGH);              // kalibrasyon sürüyor\n  for (int i = 0; i < 300; i++) {      // 300 x 10 ms = 3 saniye\n    int ham = analogRead(A1);\n    if (ham < enAz) {\n      enAz = ham;\n    }\n    if (ham > enCok) {\n      enCok = ham;\n    }\n    delay(10);\n  }\n  if (enCok - enAz < 50) {             // aralık çok dar: bölme hatası olmasın\n    enCok = enAz + 50;\n  }\n  digitalWrite(13, LOW);\n}\n\nvoid loop() {\n  int ham = analogRead(A1);\n  int yuzde = map(ham, enAz, enCok, 0, 100);\n  yuzde = constrain(yuzde, 0, 100);\n  Serial.print(\"ham=\");\n  Serial.print(ham);\n  Serial.print(\" yuzde=\");\n  Serial.println(yuzde);\n  delay(300);\n}\n```\n\n### Smoothing\nEven in the same light, `analogRead` gives a slightly different number each time (noise). A simple solution: take a few measurements and use their **average**. Below we take the average of 16 measurements. In the average the noise is largely smoothed out. In return, one reading takes a little longer (16 × 3 ms ≈ 50 ms).\n\n```cpp\n// sketch: yumusatma\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  int toplam = 0;\n  for (int i = 0; i < 16; i++) {\n    toplam = toplam + analogRead(A0);\n    delay(3);\n  }\n  int ort = toplam / 16;\n  Serial.print(\"ham=\");\n  Serial.print(analogRead(A0));    // karşılaştırmak için tek ölçüm\n  Serial.print(\" ort=\");\n  Serial.println(ort);\n  delay(100);\n}\n```\n\nAnother method is **exponential smoothing**. Each round it keeps 90% of the old value and takes 10% from the new measurement; it is one line and needs no array:\n\n```cpp\nduzgun = duzgun * 0.9 + ham * 0.1;   // duzgun bir float değişkendir\n```\n\n### How does it work?\n1. `map(ham, 200, 800, 0, 100)`: 200 → 0, 800 → 100, 500 → 50. For out-of-range values you need `constrain`.\n2. In calibration, `enAz` (smallest) starts with a large number (1023) and `enCok` (largest) with a small number (0); this way even the first measurement updates both.\n3. The sum of 16 measurements is at most 16 × 1023 = 16368; it fits in an `int`.\n4. As you take averages, `ort` wobbles less than `ham`.\n\n### Try it\n- In the `map_constrain` sketch, delete the `constrain` line and see what happens at the ends.\n- While `kalibrasyon` is running, do not move the light slider at all. What happens? What is the 50 safety line at the bottom for?\n- In `yumusatma`, change 16 to 4. How jumpy does `ort` become? If you make it 64, what happens to the reading time?\n\n### Common mistakes\n- Using `map` while expecting a decimal result: `map(5, 0, 10, 0, 3)` gives 1, not 1.5.\n- Passing the `map` result to `analogWrite` without clipping it: a negative value or one greater than 255 gives unexpected brightness.\n- Starting `enAz` at 0 and `enCok` at 1023: the measurements never reach these ends, so the range never narrows.\n- Forgetting to move the light slider to the ends during calibration: the range stays narrow.\n- Forgetting to reset `toplam` (the sum): the average keeps growing.",
+            "question": "Is it better to calibrate once when the program starts, or to keep it up to date all the time? When the light changes during the day, what are the advantage and the risk of each?",
+            "explainerMd": "### What you will learn in this lesson\n- Moving a number to another range in proportion with `map`\n- That `map` does integer maths and does not limit the result\n- Clipping the result with `constrain`\n- Finding the sensor's real smallest and largest values with calibration\n- Reducing noise with averaging and exponential smoothing\n\n### What you should know first\nFrom lesson 4, the `for` loop; from lesson 11, the raw value range (0-1023); from lesson 12, reading an LDR with a divider; from lesson 7, comparisons.\n\n### map: from range to range\n`map(x, girişMin, girişMax, çıkışMin, çıkışMax)` moves a number in proportion. The formula:\n\n```\n(x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin\n```\n\nExample: `map(500, 200, 800, 0, 100)` = 300 × 100 / 600 = 50. It has two features: it is integer maths (everything after the decimal point is thrown away, 116.67 → 116), and if the input is outside the range, the output overflows the range too.\n\n### constrain: fix the limits\n`constrain(x, alt, üst)` keeps x between `alt` (low) and `üst` (high). It is used together with `map`: first `map`, then `constrain`. `map(100, 200, 800, 0, 100)` gives −16; `constrain(−16, 0, 100)` gives 0.\n\n### Calibration\nThe same sensor works in different ranges in different places. In **calibration**, the sensor is watched for a while when the program starts, and the smallest and largest values seen are saved. The starting values are chosen the opposite way round: `enAz = 1023`, `enCok = 0`; this way the first measurement updates both. If the range becomes too narrow, the `map` division breaks, so a minimum difference (for example 50) is enforced.\n\n### Smoothing\n`analogRead` wobbles a little even in the same light; this is called **noise**. There are two simple methods:\n\n```\nort = toplam / 16;                   // average of 16 measurements\nduzgun = duzgun * 0.9 + ham * 0.1;   // exponential smoothing\n```\n\nAveraging reduces noise, but the reading takes longer (16 measurements × 3 ms ≈ 48 ms). With exponential smoothing, a new value has an effect slowly.\n\n### Summary\n`map` moves a range in proportion, works with whole numbers and does not limit the result; `constrain` clips the result. Calibration learns the sensor's real range when the program starts. Averaging and exponential smoothing reduce noise, and in return they make the response a little slower.",
+            "concepts": [
+              {
+                "term": "map()",
+                "definition": "Moves a number from one range to another in proportion; it does integer maths.",
+                "example": "map(500, 200, 800, 0, 100) gives 50.",
+                "pitfall": "Expecting a decimal result: map(5, 0, 10, 0, 3) gives 1, not 1.5."
+              },
+              {
+                "term": "constrain()",
+                "definition": "Keeps a number between a lower and an upper limit.",
+                "example": "constrain(-16, 0, 100) gives 0, and constrain(116, 0, 100) gives 100.",
+                "pitfall": "Passing the map result to analogWrite without clipping it: a negative value or one greater than 255 produces unexpected brightness."
+              },
+              {
+                "term": "Calibration",
+                "definition": "Measuring the sensor's real smallest and largest values when the program starts.",
+                "example": "The LDR is watched for the first 3 seconds, enAz and enCok are saved, then map works with this range.",
+                "pitfall": "Not moving the sensor to its extremes during calibration: the range stays narrow."
+              },
+              {
+                "term": "Noise",
+                "definition": "analogRead wobbling by one or two units even under the same conditions.",
+                "example": "Even if the pot does not move at all, the reading can go back and forth between 511, 512 and 513.",
+                "pitfall": "Trusting a single measurement and deciding by a threshold: the value flickers around the threshold."
+              },
+              {
+                "term": "Averaging",
+                "definition": "Reducing noise by dividing the sum of several measurements by how many there are.",
+                "example": "16 measurements are added up and toplam / 16 is taken.",
+                "pitfall": "Forgetting to reset the sum: the average grows every round."
+              },
+              {
+                "term": "Exponential smoothing",
+                "definition": "Each round, keeping most of the old value and taking a small share from the new measurement.",
+                "example": "duzgun = duzgun * 0.9 + ham * 0.1; (duzgun must be a float)",
+                "pitfall": "Declaring duzgun as an int: small increases are rounded to whole numbers and lost."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h3d14-q1",
+                "kind": "numeric",
+                "prompt": "What does map(100, 200, 800, 0, 100) return? (map does integer maths; the result of (x − 200) × 100 / 600 is cut off towards zero.)",
+                "answer": -16,
+                "tolerance": 0,
+                "explanation": "(100 − 200) × 100 / 600 = −10000 / 600 = −16.67; in integer maths this becomes −16. Because the input is below the range (200-800), the result came out negative; map does not limit the result.",
+                "skills": [
+                  "map-constrain"
+                ]
+              },
+              {
+                "id": "m3h3d14-q2",
+                "kind": "predict-output",
+                "prompt": "What appears in the Serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  int p = map(900, 200, 800, 0, 100);\n  p = constrain(p, 0, 100);\n  Serial.println(p);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "116",
+                  "117",
+                  "100",
+                  "0"
+                ],
+                "answer": 2,
+                "explanation": "map: (900 − 200) × 100 / 600 = 116 (116.67 is cut off). Then constrain pulls 116 down to the upper limit, 100. Printing 116 would mean forgetting constrain; 117 means thinking it rounds, but map cuts off.",
+                "skills": [
+                  "map-constrain",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d14-q3",
+                "kind": "find-bug",
+                "prompt": "The calibration loop cannot find the sensor's range: enAz always stays 0 and enCok always 1023. Which line has the bug?\n\n```\nint enAz = 0;\nint enCok = 1023;\nfor (int i = 0; i < 300; i++) {\n  int ham = analogRead(A1);\n  if (ham < enAz) enAz = ham;\n  if (ham > enCok) enCok = ham;\n  delay(10);\n}\n```",
+                "options": [
+                  "The starting values: enAz = 0 and enCok = 1023 should be the other way round",
+                  "for (int i = 0; i < 300; i++)",
+                  "int ham = analogRead(A1);",
+                  "delay(10);"
+                ],
+                "answer": 0,
+                "explanation": "If enAz starts at 0, no measurement is ever smaller than 0; if enCok starts at 1023, none is ever larger than 1023. The right way is to start with enAz = 1023 and enCok = 0. The loop, reading and waiting lines are correct.",
+                "skills": [
+                  "calibration-smoothing",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d14-q4",
+                "kind": "numeric",
+                "prompt": "Before the line duzgun = duzgun * 0.9 + ham * 0.1; runs, duzgun = 100 and ham = 200. What is duzgun after the line?",
+                "answer": 110,
+                "tolerance": 0.01,
+                "explanation": "100 × 0.9 + 200 × 0.1 = 90 + 20 = 110. Even though the raw value jumped by 100 units, the smoothed value only moved by 10 units; this is the effect of smoothing.",
+                "skills": [
+                  "calibration-smoothing"
+                ]
+              },
+              {
+                "id": "m3h3d14-q5",
+                "kind": "mcq",
+                "prompt": "What does taking the average of 16 measurements give you, and what is the cost?",
+                "options": [
+                  "Reading gets faster, noise increases",
+                  "Noise decreases, reading takes a little longer",
+                  "Noise decreases, reading speed does not change",
+                  "The sensor range widens, noise stays the same"
+                ],
+                "answer": 1,
+                "explanation": "Averaging smooths out noise, but 16 measurements mean 16 waits and readings; in this lesson that takes 16 × 3 ms ≈ 48 ms. So it is more stable but a little slower.",
+                "skills": [
+                  "calibration-smoothing",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Akıllı gece lambası",
@@ -3623,7 +5301,125 @@ export const modul3: ModuleContent = {
                 "map-constrain"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Smart night light",
+            "problem": "What if a night light switched itself on when the room light went off, went out when the sun came up in the morning, and on top of that turned itself off if it got hot? We are going to combine this week's three sensors in one smart device.",
+            "contentMd": "### Goal\n- **LDR (A1):** as the room gets darker, the lamp gets brighter; when it gets light, the lamp goes off.\n- **Potentiometer (A0):** sets the lamp's maximum brightness (so it is not too bright at night).\n- **NTC (A2):** if the room goes above 40 °C, the warning LED (D13) turns on and the lamp turns off.\n- **Serial monitor:** each round, the light, brightness and temperature are printed.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Potentiometer (10 kΩ) | **VCC** → 5V; **GND** → GND; **SIG** → **A0** |\n| LDR | Leg 1 → 5V; leg 2 → **A1** |\n| 10 kΩ resistor (for the LDR) | Leg 1 to **A1**, leg 2 to GND |\n| NTC thermistor (10 kΩ) | Leg 1 → **A2**; leg 2 → GND |\n| 10 kΩ resistor (for the NTC) | Leg 1 to 5V, leg 2 to **A2** |\n| LED (yellow or white) = lamp | **D11** → 330 Ω resistor → LED **A**; LED **K** → GND |\n| LED (red) = warning | **D13** → 330 Ω resistor → LED **A**; LED **K** → GND |\n\nThe resistor value can depend on the LED's colour; 330 Ω is for a red LED. For yellow and white LEDs, 330 Ω is usually a safe starting point too (the lab warns you if the current limit is exceeded). A white LED looks a little less bright than a yellow one; this is because the LED's forward voltage is different.\n\n### Stage 1: Brightness by light\nFirst, only the LDR and the lamp. In the dark (when `ham` is small) the brightness should be high. We get this by writing the output range of `map` the other way round (from 255 to 0). We add `constrain` so that it does not overflow the range.\n\nYou can set the `KARANLIK` (dark) and `AYDINLIK` (light) values as in lesson 14, by moving the LDR's light slider to the ends and reading the Serial monitor.\n\n```cpp\n// sketch: lamba_adim1\nconst int KARANLIK = 150;   // bunun altı: tam karanlık\nconst int AYDINLIK = 700;   // bunun üstü: oda aydınlık\n\nvoid setup() {\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  int isik = analogRead(A1);\n  int parlaklik = map(isik, KARANLIK, AYDINLIK, 255, 0);\n  parlaklik = constrain(parlaklik, 0, 255);\n  analogWrite(11, parlaklik);\n  delay(50);\n}\n```\n\n`const int` defines a number whose value never changes. Putting the settings numbers at the top makes them easy to find and change later.\n\n### Stage 2: The full smart night light\nNow we add the potentiometer, NTC protection and smoothing:\n\n1. The potentiometer sets the `enYuksek` (maximum) value (0-255).\n2. The LDR is read as the average of 8 measurements; the lamp does not flicker.\n3. The temperature is calculated from the NTC (lesson 13). If the temperature limit is exceeded, the warning turns on and the lamp turns off.\n4. The `map` output now goes from `enYuksek` to 0 instead of from 255.\n\n```cpp\n// sketch: gece_lambasi\nconst int KARANLIK = 150;       // bunun altı: tam karanlık\nconst int AYDINLIK = 700;       // bunun üstü: oda aydınlık\nconst float SICAK_SINIR = 40.0; // bu sıcaklıkta lamba kapanır\n\nvoid setup() {\n  pinMode(11, OUTPUT);   // lamba (PWM)\n  pinMode(13, OUTPUT);   // sıcaklık uyarısı\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  // 1. Potansiyometre: en yüksek parlaklık (0-255)\n  int enYuksek = analogRead(A0) / 4;\n\n  // 2. LDR: 8 ölçümün ortalaması\n  int toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam = toplam + analogRead(A1);\n    delay(3);\n  }\n  int isik = toplam / 8;\n\n  // 3. NTC: sıcaklık (beta formülü, B = 3950)\n  float sicaklik = -99.0;                   // -99: geçerli ölçüm yok\n  int hamS = analogRead(A2);\n  if (hamS > 0 && hamS < 1023) {\n    float r = 10000.0 * hamS / (1024.0 - hamS);\n    float tK = 1.0 / (1.0 / 298.15 + log(r / 10000.0) / 3950.0);\n    sicaklik = tK - 273.15;\n  }\n\n  // 4. Karar: karanlıkta enYuksek, aydınlıkta 0\n  int parlaklik = map(isik, KARANLIK, AYDINLIK, enYuksek, 0);\n  parlaklik = constrain(parlaklik, 0, enYuksek);\n\n  if (sicaklik > SICAK_SINIR) {\n    parlaklik = 0;                          // çok sıcak: lamba kapansın\n    digitalWrite(13, HIGH);\n  } else {\n    digitalWrite(13, LOW);\n  }\n  analogWrite(11, parlaklik);\n\n  Serial.print(\"isik=\");\n  Serial.print(isik);\n  Serial.print(\" parlaklik=\");\n  Serial.print(parlaklik);\n  Serial.print(\" sicaklik=\");\n  Serial.println(sicaklik, 1);\n  delay(200);\n}\n```\n\n### How does it work?\n1. `analogRead(A0) / 4` brings the potentiometer down to 0-255, which is the range `analogWrite` wants.\n2. `map(isik, KARANLIK, AYDINLIK, enYuksek, 0)`: gives `enYuksek` in the dark, 0 in the light, and a proportional value in between. In `map` you are free to write the output range the other way round.\n3. `constrain` keeps the brightness at the limit if the light is darker than `KARANLIK` or lighter than `AYDINLIK`.\n4. While the temperature is `-99` (sensor disconnected), no warning is given. This choice is deliberate: the lamp never turning on because of a disconnected sensor would be a worse surprise. If you see `sicaklik=-99.0` in the Serial monitor, check the NTC connection.\n5. Because the total `delay` in each round is about 224 ms, the lamp responds quickly to changes in light.\n\nExpected behaviour (example):\n\n| Situation | Result |\n|---|---|\n| Potentiometer at the end, room dark | Lamp fully bright |\n| Potentiometer in the middle, room dark | Lamp at half brightness |\n| Room light | Lamp off |\n| NTC above 40 °C | Lamp goes off, D13 turns on |\n\n### Try it\n- Move the potentiometer's **Position** slider; does the lamp's maximum brightness in the dark change?\n- Slowly pull the LDR's **Light** slider to the left. Does the lamp get brighter step by step?\n- Lower `SICAK_SINIR` (the hot limit) to a little below room temperature and see the warning come on (or pull the NTC's **Temperature** slider to 45 °C).\n- Adjust the `AYDINLIK` value. At what light level does the lamp go completely off?\n- Challenge: instead of fixed `KARANLIK` and `AYDINLIK` values, add the calibration from lesson 14 inside `setup()`.\n\n### Common mistakes\n- Connecting the LDR and the resistor the wrong way round: the lamp goes off in the dark and turns on in the light. Fix it by reversing the output range of `map` or by correcting the wiring.\n- Forgetting `constrain`: outside the range, `map` produces a negative number or one greater than 255, and `analogWrite` turns this into a brightness you do not expect.\n- Connecting the NTC's fixed resistor with a value other than 10 kΩ and not changing the `10000.0` number in the code: the temperature is always wrong.\n- In a real night light, putting the lamp too close to the LDR: when the lamp turns on, the LDR sees its own light and the lamp starts going off and on. In the lab the LDR's light only comes from the slider, so this effect is not modelled; but that is why the question in \"Discuss\" matters.\n- Turning the potentiometer all the way to the left and thinking \"the lamp is broken\": if `enYuksek` is 0, the lamp never turns on.",
+            "question": "What happens if the LDR sees the lamp's own light, and how could you reduce this with software? If you added a button to the night light too, which lesson's method would you use to read it?",
+            "explainerMd": "### What you will learn in this lesson\n- Combining three sensors (LDR, potentiometer, NTC) in one program\n- Writing a small version (stage) first and then extending it\n- Getting \"bright in the dark\" behaviour by writing the `map` output range the other way round\n- Putting the settings numbers at the top with `const`\n- Setting the priority of several conditions (safety, then normal behaviour)\n\n### What you should know first\nFrom lesson 11, `analogRead` and `ham / 4`; from lesson 12, the LDR divider; from lesson 13, the NTC temperature; from lesson 14, `map`, `constrain` and averaging; from lesson 5, the project plan.\n\n### Plan first\nBefore writing the code, write down what each input affects:\n\n| Input | Pin | Effect |\n|---|---|---|\n| LDR | A1 | As the room gets darker, the lamp gets brighter |\n| Potentiometer | A0 | The lamp's maximum brightness |\n| NTC | A2 | If it goes above 40 °C, the lamp turns off and the warning LED turns on |\n\nOutputs: lamp D11 (PWM), warning D13.\n\n### Reverse map\nIn the dark `ham` is small, so the brightness should be large. For this, the `map` output range is written the other way round:\n\n```\nmap(isik, KARANLIK, AYDINLIK, enYuksek, 0)\n```\n\nExample: if KARANLIK = 150, AYDINLIK = 700, enYuksek = 200 and isik = 425, you get (425−150) × (0−200) / 550 + 200 = 100. At a light of 150 it is 200, at 700 it is 0. `constrain(…, 0, enYuksek)` prevents overflow.\n\n### Order of priority\nFirst the normal brightness is calculated, then the safety condition overrides it: if the temperature limit is exceeded, the brightness is set to 0 and the warning is turned on. Writing the safety check at the end stops the earlier steps from spoiling it.\n\n### Developing in stages\nFirst only the LDR and the lamp (stage 1). When that works, the potentiometer, averaging and the NTC are added (stage 2). If you watch the `isik`, `parlaklik` and `sicaklik` values in the Serial monitor after each addition, you find straight away which addition brought in the bug.\n\n### Summary\nThe project combines the three sensors of the analog week: the LDR sets the brightness, the potentiometer sets the upper limit, and the NTC provides safety. Reverse `map` gives the bright-in-the-dark behaviour. Plan first, then a small version, then additions: finding bugs becomes easier.",
+            "concepts": [
+              {
+                "term": "Reverse map",
+                "definition": "Making the output go down as the input goes up, by writing map's output range from large to small.",
+                "example": "map(isik, 150, 700, 200, 0): 200 in the dark, 0 in the light.",
+                "pitfall": "Forgetting to reverse the range: the lamp goes off in the dark and turns on in the light."
+              },
+              {
+                "term": "const",
+                "definition": "Defines a number whose value never changes; used to put the settings numbers at the top.",
+                "example": "const int KARANLIK = 150;",
+                "pitfall": "Writing the same number in many places in the code: later it becomes hard to find and change them all."
+              },
+              {
+                "term": "Developing in stages",
+                "definition": "Getting a small version working first and then adding features.",
+                "example": "First a lamp with only the LDR, then the potentiometer and the NTC.",
+                "pitfall": "Writing everything in one go: when a bug appears, finding its cause becomes hard."
+              },
+              {
+                "term": "Safety priority",
+                "definition": "Checking the safety condition after the normal calculation and letting it override the result.",
+                "example": "If the temperature goes above 40 °C, the brightness is set to 0 no matter what value was calculated.",
+                "pitfall": "Writing the safety check at the very start and then calculating the brightness again: the safety is overridden."
+              },
+              {
+                "term": "Invalid measurement marker",
+                "definition": "Giving the temperature an impossible value such as -99 when no measurement could be made.",
+                "example": "If you see sicaklik=-99.0 in the Serial monitor, check the NTC connection.",
+                "pitfall": "Thinking -99 is a real temperature, or making decisions with this value."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h3d15-q1",
+                "kind": "numeric",
+                "prompt": "KARANLIK = 150, AYDINLIK = 700, enYuksek = 200. When isik = 425, what does map(isik, KARANLIK, AYDINLIK, enYuksek, 0) return?",
+                "answer": 100,
+                "tolerance": 0,
+                "explanation": "(425 − 150) × (0 − 200) / (700 − 150) + 200 = 275 × (−200) / 550 + 200 = −100 + 200 = 100. 425 is exactly in the middle of the range, so the output is also halfway between 200 and 0.",
+                "skills": [
+                  "map-constrain",
+                  "analog-adc"
+                ]
+              },
+              {
+                "id": "m3h3d15-q2",
+                "kind": "find-bug",
+                "prompt": "The night light is on in the light and stays off in the dark. The wiring is correct (LDR on top, 10 kΩ at the bottom). Which line has the bug?\n\n```\nint isik = analogRead(A1);\nint parlaklik = map(isik, KARANLIK, AYDINLIK, 0, 255);\nparlaklik = constrain(parlaklik, 0, 255);\nanalogWrite(11, parlaklik);\n```",
+                "options": [
+                  "int isik = analogRead(A1);",
+                  "map(isik, KARANLIK, AYDINLIK, 0, 255)",
+                  "constrain(parlaklik, 0, 255)",
+                  "analogWrite(11, parlaklik);"
+                ],
+                "answer": 1,
+                "explanation": "As the light increases, isik gets bigger; because the output range is written from 0 to 255, the brightness also increases. Since we want it bright in the dark, the range must be reversed: map(isik, KARANLIK, AYDINLIK, 255, 0).",
+                "skills": [
+                  "map-constrain",
+                  "sensor-ldr",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h3d15-q3",
+                "kind": "predict-output",
+                "prompt": "SICAK_SINIR = 40.0, sicaklik = 42.5 and the calculated parlaklik = 120. When this code runs, what do the lamp (D11) and the warning LED (D13) do?\n\n```\nif (sicaklik > SICAK_SINIR) {\n  parlaklik = 0;\n  digitalWrite(13, HIGH);\n} else {\n  digitalWrite(13, LOW);\n}\nanalogWrite(11, parlaklik);\n```",
+                "options": [
+                  "The lamp goes off, and the warning goes off too",
+                  "The lamp is on at brightness 120, the warning goes off",
+                  "The lamp is on at brightness 120, and the warning is on too",
+                  "The lamp goes off, the warning turns on"
+                ],
+                "answer": 3,
+                "explanation": "Because 42.5 > 40, the if branch runs: parlaklik becomes 0 and D13 turns on. analogWrite(11, 0) turns the lamp off. The safety condition has overridden the 120 calculated earlier.",
+                "skills": [
+                  "prog-debug",
+                  "digital-out"
+                ]
+              },
+              {
+                "id": "m3h3d15-q4",
+                "kind": "numeric",
+                "prompt": "In the loop there is a delay(3) inside the 8-measurement average and a delay(200) at the end of the round. Based only on the total of the delays, how many milliseconds does one round take?",
+                "answer": 224,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "8 × 3 = 24 ms of measurement waiting, plus 200 ms of waiting at the end of the round: 224 ms. In reality the calculation time adds a little, but the delays dominate. About 4.5 rounds per second lets the lamp respond to the light quickly enough.",
+                "skills": [
+                  "prog-timing",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m3h3d15-q5",
+                "kind": "mcq",
+                "prompt": "In the night light project, the potentiometer has been turned all the way to the left (enYuksek = 0) and the room is dark. What does the lamp do?",
+                "options": [
+                  "It is fully bright",
+                  "It is at half brightness",
+                  "It does not turn on at all",
+                  "It blinks on and off"
+                ],
+                "answer": 2,
+                "explanation": "The map output range goes from 0 to 0, and constrain also keeps it between 0 and 0; the brightness is 0. The potentiometer sets the lamp's upper limit; if it is 0, the lamp is not broken, the maximum allowed brightness is simply zero.",
+                "skills": [
+                  "analog-adc",
+                  "map-constrain"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -3631,6 +5427,7 @@ export const modul3: ModuleContent = {
       "title": "PWM, renk, ses",
       "project": "Işıklı müzik kutusu",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. PWM'i ve `analogWrite` değerinden doluluk oranı ile ortalama gerilimi hesaplamayı anlatabilir; LED parlaklığını 0-255 arasında ayarlayabilir.\n2. Ortak katotlu RGB LED'i bağlayıp üç değerle (R, G, B) istediği rengi gösterebilir.\n3. Pasif buzzer ile `tone` kullanarak nota ve melodi çalabilir; frekans ve oktav ilişkisini söyleyebilir.\n4. Parametreli ve dönüş değerli kendi fonksiyonlarını yazabilir; yerel ve global değişken farkını açıklayabilir.\n5. Plan tablosundan yola çıkarak ışık, ses ve girdiyi birleştiren Işıklı müzik kutusunu kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | PWM ve analogWrite: nefes alan LED | ~22 dk | Anlatımı oku, parlaklık basamaklarını ve nefes programını çalıştır, potansiyometreyle parlaklık ayarla, mini testi çöz. |\n| 2 | RGB LED ve renk karıştırma | ~25 dk | Üç kanalı kur, renk paletini ve gökkuşağı geçişini dene, Serial Monitor'den renk gönder. |\n| 3 | Buzzer: tone ve nota frekansları | ~22 dk | Pasif buzzer'ı bağla, La notasını, gamı ve oktavı çal, D11 çakışmasını gözle. |\n| 4 | Fonksiyonlar, kapsam, parametreler | ~25 dk | Kendi fonksiyonlarını yaz, melodiyi fonksiyonlarla çal, kapsamı Serial Monitor'de izle. |\n| 5 | Proje: Işıklı müzik kutusu | ~35 dk | Planı durum tablosuna yaz, devreyi kur, programı çalıştır, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta önceki haftalardan şunlar gerekir. Başlamadan kontrol et:\n- `delay`, `for` döngüsü ve dizi (Hafta 1).\n- `INPUT_PULLUP` ile buton okuma, `if`/`else` ve `switch` (Hafta 2).\n- Serial Monitor'den sayı okuma, `parseInt` (Hafta 2).\n- `analogRead`, `map` ve `constrain` (Hafta 3).\n- LED için seri direnç ve Ohm yasası (Hafta 1).\n\n### Kavram haritası\n- **Çıkış kontrolü:** `digitalWrite` (yalnız 0/5 V) → PWM → `analogWrite` (0-255) → doluluk oranı → ortalama gerilim\n- **Işık:** LED parlaklığı → RGB LED (R, G, B) → toplamalı karışım → ortak katot ve ortak anot\n- **Ses:** titreşim → frekans (Hz) → oktav → aktif ve pasif buzzer → `tone`/`noTone` → Timer2 çakışması (D3, D11)\n- **Program düzeni:** fonksiyon → parametre → `return` → yerel ve global kapsam\n- **Proje:** durum tablosu → fonksiyonlara bölme → tempo ve vuruş süresi → `delay`'in sınırı\n\n### Sık yapılan hatalar\n- **`analogWrite`'a 0-1023 vermek.** Beklenen aralık 0-255'tir; `map` kullan.\n- **PWM'siz pine `analogWrite` yazmak.** Yalnız D3, D5, D6, D9, D10 ve D11 (`~`) PWM yapar.\n- **RGB'de COM ucunu yanlış bağlamak.** Ortak katotta COM GND'ye gider; ortak anotta 5V'a gider ve değerler ters yazılır.\n- **Üç renk için tek direnç kullanmak.** Her kanalın kendi direnci olmalı.\n- **Aktif buzzer ile nota çalmak.** Aktif buzzer hep aynı perdeyi verir; nota için pasif tür gerekir.\n- **Notalar arasına `delay` koymamak.** `tone` beklemez; yalnız son nota duyulur.\n- **`tone` çalarken D3 ya da D11'de parlaklık ayarlamak.** Bu pinlerde PWM bozulur; ayarlı LED'leri D9 ve D10'a bağla.\n- **Fonksiyonu tanımlayıp çağırmamak** ya da **yerel değişkeni başka fonksiyonda kullanmak.**\n- **`switch` içinde `break;` unutmak.** Renkler karışır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. `analogWrite(9, 64)`, `analogWrite(9, 128)` ve `analogWrite(9, 192)` için doluluk oranını ve ortalama gerilimi elle hesapla; laboratuvarda parlaklığı karşılaştır.\n4. Bir Do-Re-Mi melodisini `notaCal(frekans, süre)` fonksiyonuyla bakmadan yaz.\n5. Kendi cümlelerinle şu soruyu cevapla: \"`tone` çalarken neden D11'e bağlı LED'in parlaklığını ayarlayamıyoruz?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Işıklı müzik kutusu)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Buzzer, RGB LED, buton ya da pot eksik; kanallar dirençsiz | Tüm parçalar doğru pinlerde ve her kanalın kendi direnci var | Bağlantılar düzenli; mavi kanalın D11'de olma nedenini açıklıyor |\n| Plan | Durum tablosu yok | Bekleme, çalma, bitiş durumları tabloda | Tablo kodla birebir uyuyor ve fonksiyon ağacı çizilmiş |\n| Program | Melodi çalmıyor ya da renkler yanlış | Buton melodiyi başlatıyor, notalar doğru renkte yanıyor, bekleme nefesi çalışıyor | Yeni nota/renk (Si, üst Do) ya da bitiş efekti eklenmiş |\n| Fonksiyonlar | Her şey `loop()` içinde | İş anlamlı fonksiyonlara bölünmüş | Parametre ve `return` yerinde kullanılmış, global değişken sayısı az |\n| Tempo | Tempo sabit ya da pot etkisiz | Pot 80-200 bpm arasında tempoyu değiştiriyor | Tempoyu vuruş süresiyle hesaplayıp açıklıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Karşılaştığı hatayı ve nasıl bulduğunu anlatıyor; `delay` sınırını söylüyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta bir parçayı \"ezberlemek\" değil, ışık, ses ve girdiyi bir arada yönetmeyi denemektir. Öğrenci ilk kez kendi komutlarını (fonksiyonları) yazar; bu, sonraki haftalardaki büyük projelerin temelidir.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şunları sor: \"Hangi pine ne bağlı?\", \"Bu değer hangi aralıkta olmalı?\", \"Hangi fonksiyon çağrılmıyor olabilir?\", \"Ses nerede kesiliyor, ışık nerede değişiyor?\"\n- **Ses.** Laboratuvarda sesi duymak için ses düğmesi açık olmalıdır. Gerçek buzzer ile çalışılırken sesi uzun süre yüksek ve sürekli çaldırmak rahatsız edici olabilir; kısa süreli denemeler yeterlidir.\n- **Işık.** Parlak LED'e uzun süre doğrudan bakmak gözü yorar; gerçek devrede gerekirse bir kâğıtla yumuşatılabilir.\n- **Süre.** Proje dersi 35 dakikaya yaklaşabilir; gerekirse iki oturuma bölünebilir. Önce devre, sonra program.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Ders ilerleyip gerçek kart kullanılacaksa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can explain PWM and work out the duty cycle and average voltage from an `analogWrite` value; can set an LED's brightness from 0 to 255.\n2. Can connect a common cathode RGB LED and show any colour they like with three values (R, G, B).\n3. Can play notes and melodies with a passive buzzer using `tone`; can state how frequency and octaves are related.\n4. Can write their own functions with parameters and return values; can explain the difference between local and global variables.\n5. Starting from a plan table, can build the light-up music box that combines light, sound and input.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | PWM and analogWrite: the breathing LED | ~22 min | Read the explainer, run the brightness steps and the breathing program, set the brightness with a potentiometer, do the mini quiz. |\n| 2 | The RGB LED and mixing colours | ~25 min | Wire up the three channels, try the colour palette and the rainbow fade, send a colour from the Serial Monitor. |\n| 3 | The buzzer: tone and note frequencies | ~22 min | Connect the passive buzzer, play the note La, the scale and the octave, observe the D11 clash. |\n| 4 | Functions, scope and parameters | ~25 min | Write your own functions, play the melody with functions, watch scope on the Serial Monitor. |\n| 5 | Project: The light-up music box | ~35 min | Write the plan as a state table, build the circuit, run the program, assess it with the project rubric. |\n\n### Prerequisite check\nThis week needs the following from earlier weeks. Check them before you start:\n- `delay`, the `for` loop and arrays (Week 1).\n- Reading a button with `INPUT_PULLUP`, `if`/`else` and `switch` (Week 2).\n- Reading a number from the Serial Monitor, `parseInt` (Week 2).\n- `analogRead`, `map` and `constrain` (Week 3).\n- The series resistor for an LED and Ohm's law (Week 1).\n\n### Concept map\n- **Output control:** `digitalWrite` (only 0/5 V) → PWM → `analogWrite` (0-255) → duty cycle → average voltage\n- **Light:** LED brightness → RGB LED (R, G, B) → additive mixing → common cathode and common anode\n- **Sound:** vibration → frequency (Hz) → octave → active and passive buzzer → `tone`/`noTone` → Timer2 clash (D3, D11)\n- **Program structure:** function → parameter → `return` → local and global scope\n- **Project:** state table → splitting into functions → tempo and beat length → the limit of `delay`\n\n### Common mistakes\n- **Giving `analogWrite` 0-1023.** The expected range is 0-255; use `map`.\n- **Using `analogWrite` on a pin without PWM.** Only D3, D5, D6, D9, D10 and D11 (`~`) do PWM.\n- **Connecting the RGB LED's COM leg wrongly.** With a common cathode, COM goes to GND; with a common anode it goes to 5V and the values are written the other way round.\n- **Using a single resistor for all three colours.** Each channel must have its own resistor.\n- **Playing notes with an active buzzer.** An active buzzer always gives the same pitch; for notes you need the passive type.\n- **Not putting a `delay` between notes.** `tone` does not wait; only the last note is heard.\n- **Setting brightness on D3 or D11 while `tone` is playing.** PWM on these pins breaks; connect dimmable LEDs to D9 and D10.\n- **Defining a function and never calling it**, or **using a local variable in another function.**\n- **Forgetting `break;` in a `switch`.** The colours get mixed up.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Re-read the explanations of the questions you got wrong in the mini quizzes, then do the question again.\n3. Work out the duty cycle and average voltage by hand for `analogWrite(9, 64)`, `analogWrite(9, 128)` and `analogWrite(9, 192)`; compare the brightness in the lab.\n4. Without looking, write a Do-Re-Mi melody with the `notaCal(frekans, süre)` function (play note, with frequency and duration).\n5. Answer this in your own words: \"Why can we not set the brightness of an LED on D11 while `tone` is playing?\"\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. The target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (The light-up music box)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The buzzer, RGB LED, button or pot is missing; the channels have no resistors | All parts are on the right pins and each channel has its own resistor | The wiring is tidy; explains why the blue channel is on D11 |\n| Plan | No state table | The waiting, playing and end states are in the table | The table matches the code exactly and a function tree has been drawn |\n| Program | The melody does not play or the colours are wrong | The button starts the melody, the notes light up in the right colours, the waiting breath works | A new note/colour (Si, high Do) or an ending effect has been added |\n| Functions | Everything is inside `loop()` | The work is split into meaningful functions | Parameters and `return` are used where they fit, with few global variables |\n| Tempo | The tempo is fixed or the pot has no effect | The pot changes the tempo between 80 and 200 bpm | Works out the tempo through the beat length and explains it |\n| Explanation | Cannot explain what they did | Explains the circuit and the code step by step | Explains a mistake they made and how they found it; states the limit of `delay` |\n\n### Note for parents and teachers\n- **Aim.** This week is not about \"memorising\" a part, but about trying to manage light, sound and input together. For the first time, the learner writes their own commands (functions); this is the foundation for the big projects in the weeks ahead.\n- **How to help.** When the learner gets stuck, instead of giving the answer, ask these questions: \"What is connected to which pin?\", \"What range should this value be in?\", \"Which function might not be getting called?\", \"Where does the sound stop, and where does the light change?\"\n- **Sound.** To hear the sound in the lab, the sound button must be switched on. When working with a real buzzer, playing a loud, continuous sound for a long time can be annoying; short tests are enough.\n- **Light.** Looking straight at a bright LED for a long time tires the eyes; in a real circuit you can soften it with a piece of paper if needed.\n- **Time.** The project lesson may take close to 35 minutes; if needed, split it into two sessions. Circuit first, then the program.\n- **Safety.** Everything on this platform is virtual. If the lessons move on to a real board, no circuit is ever built with mains voltage (220 V).\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "PWM ve analogWrite: nefes alan LED",
@@ -3747,7 +5544,123 @@ export const modul3: ModuleContent = {
                 "prog-loops-arrays"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "PWM and analogWrite: the breathing LED",
+            "problem": "The Uno's pins only know two states: 0 V and 5 V. So how can you light an LED at \"half brightness\", or make it breathe like a phone's charging light? The answer lies in switching the pin on and off faster than the blink of an eye.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| LED (red) | **A** (anode) leg → resistor leg 2; **K** (cathode) leg → GND |\n| 330 Ω resistor | leg 1 to **D9**, leg 2 to the LED's A leg |\n| Potentiometer (last program only) | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |\n\nD9 is one of the pins that \"can do PWM\". On the Uno these pins have a `~` mark next to them: D3, D5, D6, D9, D10, D11. Type the program into the code editor and run it with ▶; watch the LED's brightness on the canvas.\n\n### What is PWM?\nPWM (pulse width modulation) means switching a pin on and off very quickly. The share of the whole period that the pin stays on is called the **duty cycle**.\n\n- Duty cycle 0%: the pin is always LOW, the LED is off.\n- Duty cycle 50%: the pin is HIGH half of the time, the LED looks half bright.\n- Duty cycle 100%: the pin is always HIGH, the LED is fully bright.\n\nOn the Uno, the `analogWrite(pin, değer)` command produces PWM. The value (`değer`) is between 0 and 255, and the duty cycle is `değer / 255`. The average voltage is about `5 V × değer / 255`. PWM on D9, D10 and D11 runs at about 490 Hz: the pin switches on and off about 490 times a second. Your eye cannot follow this speed; it only sees the average brightness.\n\n| `analogWrite` value | Duty cycle | Average voltage |\n|---|---|---|\n| 0 | 0% | 0 V |\n| 64 | about 25% | about 1.25 V |\n| 128 | about 50% | about 2.5 V |\n| 192 | about 75% | about 3.8 V |\n| 255 | 100% | 5 V |\n\n### Program 1: Brightness steps\n```cpp\n// sketch: pwm_basamak\nint seviye[] = {0, 64, 128, 192, 255};\n\nvoid setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  for (int i = 0; i < 5; i++) {\n    analogWrite(9, seviye[i]);   // 0-255 arası PWM değeri\n    delay(1000);\n  }\n}\n```\n\n### Program 2: The breathing LED\n```cpp\n// sketch: pwm_nefes\nvoid setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  for (int p = 0; p <= 255; p++) {    // yavaşça parlat\n    analogWrite(9, p);\n    delay(5);\n  }\n  for (int p = 255; p >= 0; p--) {    // yavaşça söndür\n    analogWrite(9, p);\n    delay(5);\n  }\n}\n```\n\n### Program 3: Brightness with a potentiometer\nThe `analogRead` (0-1023) and `map` you learnt in earlier weeks come in handy here: we convert the reading range into the `analogWrite` range (0-255).\n```cpp\n// sketch: pwm_pot\nvoid setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  int okunan = analogRead(A0);                 // 0-1023\n  int parlaklik = map(okunan, 0, 1023, 0, 255);  // 0-255\n  analogWrite(9, parlaklik);\n  delay(10);\n}\n```\n\n### How does it work?\n1. `analogWrite(9, 64)` switches the pin on and off with about 25% duty cycle. The pin does not really produce an \"analogue\" voltage; it switches on and off quickly and regularly.\n2. In Program 2 the value of `p` rises from 0 to 255, then falls back. Each step takes 5 ms; one full \"breath\" takes about 2.6 seconds.\n3. In Program 3, as you turn the potentiometer the `analogRead` value changes, `map` scales it to 0-255, and the LED brightness follows the pot.\n4. `analogWrite(pin, 0)` makes the pin LOW all the time, `analogWrite(pin, 255)` makes it HIGH all the time. At these two ends no PWM wave is produced.\n\n### Try it\n- In Program 2, change `delay(5)` to 2 and then to 15. How does the breathing speed change?\n- In Program 2, try `analogWrite(9, p * p / 255)`. Does the rise in brightness look more natural? The eye does not sense brightness linearly; in the dark it notices small changes better.\n- Move the wire on the resistor's D9 leg to D13 and write `analogWrite(13, 128)`. What happens? (Hint: D13 has no `~` next to it.)\n\n### Common mistakes\n- Using `analogWrite` on a pin that cannot do PWM: that pin only goes LOW or HIGH, you get no half brightness. Make sure the pin has a `~` next to it.\n- Writing a value bigger than 255 (e.g. 1023): `analogWrite` only expects 0-255. Convert the potentiometer value with `map` first.\n- Leaving out the LED's resistor: PWM does not limit the current, you still need the resistor. The lab models this: you get a warning for an LED without a resistor.\n- Explaining the LED's half brightness as \"the voltage dropped\": really the pin is switching on and off quickly, and the average goes down.",
+            "question": "If you switch an LED on and off 5 times a second, your eye sees it as \"blinking\". Why does it see \"half bright\" when you switch it on and off 490 times a second? How might televisions and screens use this?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a pin cannot give \"half brightness\" and how PWM solves this\n- The idea of the **duty cycle**, and how to work out the duty cycle and average voltage from an `analogWrite` value\n- Which Uno pins can do PWM (the `~` mark)\n- How to convert a potentiometer reading into the `analogWrite` range with `map`\n\n### What you should know first\n- Lesson 1: HIGH and LOW, a pin being at 0 V or 5 V\n- Lessons 3 and 4: waiting with `delay`, the `for` loop and arrays\n- Lessons 11 and 14: `analogRead` (0-1023) and `map`\n\n### Why is there no half brightness?\n`digitalWrite` only knows two values: HIGH (5 V) and LOW (0 V). There is no command that \"sets\" the LED to 2.5 V. The solution is to switch the pin on and off very quickly. The eye does not see this fast flicker as separate flashes; it only sees the average. The same would happen if you switched a torch on and off hundreds of times a second: the light would look half as strong.\n\n### PWM and duty cycle\n**PWM** (pulse width modulation) means the pin is HIGH for part of each short, repeating round and LOW for the rest. The fraction of a round that is HIGH is called the **duty cycle**.\n\n```\n25% :  ▀▁▁▁▀▁▁▁▀▁▁▁   (1 of 4 parts HIGH)\n50% :  ▀▀▁▁▀▀▁▁▀▀▁▁   (2 of 4 parts HIGH)\n75% :  ▀▀▀▁▀▀▀▁▀▀▀▁   (3 of 4 parts HIGH)\n```\n\nOn the Uno, the PWM frequency of D9, D10 and D11 is about 490 Hz. One round takes 1 / 490, about 2 ms. A 25% duty cycle means the pin is HIGH for about 0.5 ms of those 2 ms.\n\n### analogWrite and the maths\nIn the `analogWrite(pin, değer)` command, the value `değer` is between 0 and 255:\n\n- Duty cycle = `değer / 255`\n- Average voltage is about `5 V × değer / 255`\n\nExample: for `analogWrite(9, 102)` the duty cycle is 102 / 255 = 0.4, that is 40%, and the average voltage is 2 V. The ends are special: 0 makes the pin LOW all the time, 255 makes it HIGH all the time. No real wave is produced there.\n\n### Which pins? And the potentiometer\nNot every pin can do PWM. On the Uno the PWM pins are D3, D5, D6, D9, D10 and D11; on the board they have a `~` mark next to their numbers. On a pin without PWM, such as D13, `analogWrite` does not give half brightness; the pin only goes HIGH or LOW.\n\n`analogRead` gives 0-1023, while `analogWrite` takes 0-255. To connect the two, you write `map(okunan, 0, 1023, 0, 255)`. Now, as you turn the potentiometer, the LED brightness changes.\n\n### Summary\nPWM produces an average voltage by switching the pin on and off very quickly. With `analogWrite(pin, değer)` you give a value from 0 to 255, and the duty cycle is value / 255. Only pins marked `~` can do PWM. By converting a 0-1023 reading, such as a potentiometer's, into 0-255 with `map`, you can set the brightness by hand.",
+            "concepts": [
+              {
+                "term": "PWM",
+                "definition": "A way of getting an average voltage by switching a pin on and off very quickly (pulse width modulation).",
+                "example": "If the pin switches on and off 490 times a second and stays HIGH half the time, the LED looks half bright.",
+                "pitfall": "Thinking PWM really produces a steady voltage such as 2.5 V on the pin; the pin still only goes back and forth between 0 V and 5 V."
+              },
+              {
+                "term": "Duty cycle",
+                "definition": "How much of a PWM round is spent HIGH; given as a percentage or as a number between 0 and 1.",
+                "example": "If a quarter of a round is HIGH, the duty cycle is 25%.",
+                "pitfall": "Thinking duty cycle and brightness are the same thing; brightness depends on the duty cycle, but the eye does not sense it linearly."
+              },
+              {
+                "term": "analogWrite()",
+                "definition": "The command that sets the duty cycle of a PWM pin with a value from 0 to 255.",
+                "example": "analogWrite(9, 128) brings D9 to about 50% duty cycle.",
+                "pitfall": "Giving analogRead's 0-1023 value straight to analogWrite; you must convert it to 0-255 with map first."
+              },
+              {
+                "term": "PWM pins (~)",
+                "definition": "On the Uno: D3, D5, D6, D9, D10 and D11. On the board they have a ~ mark next to their numbers.",
+                "example": "D9 is a good choice for a breathing LED; D13 is not.",
+                "pitfall": "Expecting half brightness from analogWrite on a pin without PWM; that pin only goes HIGH or LOW."
+              },
+              {
+                "term": "Average voltage",
+                "definition": "The average voltage the pin gives over one round: about 5 V × value / 255.",
+                "example": "For analogWrite(9, 255) it is 5 V, for a value of 0 it is 0 V, for 128 about 2.5 V.",
+                "pitfall": "Thinking the LED needs no resistor because the average voltage is lower; PWM does not limit the current, so the resistor is still a must."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h4d1-q1",
+                "kind": "mcq",
+                "prompt": "Why does the LED on D9 look half bright when you write analogWrite(9, 128)?",
+                "options": [
+                  "The pin really gives a steady voltage of 2.5 V",
+                  "The pin switches on and off about 490 times a second, the duty cycle is about 50% and the eye sees the average",
+                  "The board halves the current going to the LED",
+                  "The value 128 puts the pin into a special half-power mode"
+                ],
+                "answer": 1,
+                "explanation": "analogWrite does not produce a steady in-between voltage on the pin; it switches the pin on and off very quickly. 128 / 255 is about 50% duty cycle, and because the eye cannot separate the flicker, it sees the average brightness. There is no such thing as a steady 2.5 V or halving the current.",
+                "skills": [
+                  "pwm-output"
+                ]
+              },
+              {
+                "id": "m3h4d1-q2",
+                "kind": "numeric",
+                "prompt": "analogWrite(10, 153) was written to pin D10. About how many volts is the pin's average voltage? (Average = 5 V × value / 255)",
+                "answer": 3,
+                "tolerance": 0.05,
+                "unit": "V",
+                "explanation": "153 / 255 = 0.6, that is 60% duty cycle. The average voltage is 5 V × 0.6 = 3 V. The pin still only goes between 0 V and 5 V; 3 V is just the average.",
+                "skills": [
+                  "pwm-output"
+                ]
+              },
+              {
+                "id": "m3h4d1-q3",
+                "kind": "predict-output",
+                "prompt": "A red LED is connected to pin D9 with a resistor. What does the LED do when this sketch runs?\n\n```\nvoid setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  analogWrite(9, 0);\n  delay(500);\n  analogWrite(9, 255);\n  delay(500);\n}\n```",
+                "options": [
+                  "It stays half bright all the time",
+                  "It stays fully bright all the time",
+                  "Off for half a second, fully bright for half a second: it blinks",
+                  "It never lights up"
+                ],
+                "answer": 2,
+                "explanation": "analogWrite(9, 0) makes the pin LOW all the time and analogWrite(9, 255) makes it HIGH all the time; at these two ends no PWM wave is produced. The LED is off for half a second and fully bright for half a second. For half brightness you would need an in-between value such as 128.",
+                "skills": [
+                  "pwm-output",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h4d1-q4",
+                "kind": "find-bug",
+                "prompt": "A potentiometer is on A0 and an LED on D9. When you turn the pot, the LED brightness does not rise smoothly as expected. Which line is wrong?\n\n```\nvoid setup() {\n  pinMode(9, OUTPUT);\n}\n\nvoid loop() {\n  int okunan = analogRead(A0);\n  analogWrite(9, okunan);\n  delay(10);\n}\n```",
+                "options": [
+                  "analogRead(A0): it should say 0 instead of A0",
+                  "analogWrite(9, okunan): the value of okunan is in the range 0-1023, but analogWrite expects 0-255; it should be converted with map first",
+                  "pinMode(9, OUTPUT): the pin should be INPUT",
+                  "delay(10): this line should not be there at all"
+                ],
+                "answer": 1,
+                "explanation": "analogRead gives 0-1023 but analogWrite only expects 0-255. The correct line is analogWrite(9, map(okunan, 0, 1023, 0, 255)). A0 is the correct spelling, the pin must be OUTPUT for an LED, and a short delay does no harm.",
+                "skills": [
+                  "pwm-output",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h4d1-q5",
+                "kind": "numeric",
+                "prompt": "In the breathing LED sketch, p changes one by one from 0 to 255, then from 255 to 0, and there is a delay(2) after each step. That makes 256 + 256 = 512 steps. About how many ms does one full breath (rise + fall) take?",
+                "answer": 1024,
+                "tolerance": 15,
+                "unit": "ms",
+                "explanation": "512 steps × 2 ms = 1024 ms. analogWrite itself takes very little time, so the result is about 1.03 seconds. Counting the steps as 255 + 255 by mistake, or thinking delay is in seconds, spoils the result.",
+                "skills": [
+                  "prog-timing",
+                  "prog-loops-arrays"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "RGB LED ve renk karıştırma",
@@ -3865,7 +5778,124 @@ export const modul3: ModuleContent = {
                 "elec-ohm"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The RGB LED and mixing colours",
+            "problem": "If you look closely at a screen, you see that every dot is made of three tiny lights: red, green and blue. How do they make yellow, purple and even white from just these three colours? Today you try it with the RGB LED in the lab.",
+            "contentMd": "### Circuit\nA common cathode RGB LED holds three LEDs, red, green and blue, inside one case and has four legs. The cathodes (negative legs) of the three LEDs join at one common leg; in the lab this leg is called **COM**. In the part's properties panel, **Common pin: Common cathode** must be selected (this is the default).\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| RGB LED (common cathode) | **COM** → GND |\n| 330 Ω resistor (for red) | leg 1 to **D9**, leg 2 to the RGB LED's **R** leg |\n| 330 Ω resistor (for green) | leg 1 to **D10**, leg 2 to the RGB LED's **G** leg |\n| 330 Ω resistor (for blue) | leg 1 to **D11**, leg 2 to the RGB LED's **B** leg |\n\nEach colour leg must have its own resistor. All three pins can do PWM (D9, D10, D11), so you can set the brightness of each colour separately from 0 to 255.\n\n### How do colours mix?\nWhen you mix light, the colours **add up**:\n\n| Mix | Result |\n|---|---|\n| Red + green | Yellow |\n| Green + blue | Cyan |\n| Red + blue | Purple (magenta) |\n| Red + green + blue | White |\n| All off | Black (LED off) |\n\nBecause each channel's value is 0-255, you can describe 256 × 256 × 256, about 16.7 million colours. The lab models this too: the blue LED has a higher threshold voltage, so with the same resistor the blue channel glows dimmer than red and \"white\" looks slightly tinted; this is normal.\n\n### Program 1: Colour palette\n```cpp\n// sketch: rgb_renkler\n// sıra: kırmızı, yeşil, mavi, sarı, camgöbeği, mor, beyaz, turuncu\nint kirmizi[] = {255,   0,   0, 255,   0, 255, 255, 255};\nint yesil[]   = {  0, 255,   0, 255, 255,   0, 255,  80};\nint mavi[]    = {  0,   0, 255,   0, 255, 255, 255,   0};\n\nvoid setup() {\n  pinMode(9, OUTPUT);\n  pinMode(10, OUTPUT);\n  pinMode(11, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for (int i = 0; i < 8; i++) {\n    analogWrite(9, kirmizi[i]);\n    analogWrite(10, yesil[i]);\n    analogWrite(11, mavi[i]);\n    Serial.print(\"R=\");\n    Serial.print(kirmizi[i]);\n    Serial.print(\" G=\");\n    Serial.print(yesil[i]);\n    Serial.print(\" B=\");\n    Serial.println(mavi[i]);\n    delay(1000);\n  }\n}\n```\n\n### Program 2: Rainbow fade\nIn each stage one colour fades down while the next one rises.\n```cpp\n// sketch: rgb_gokkusagi\nvoid setup() {\n  pinMode(9, OUTPUT);\n  pinMode(10, OUTPUT);\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  for (int i = 0; i <= 255; i++) {      // kırmızıdan yeşile\n    analogWrite(9, 255 - i);\n    analogWrite(10, i);\n    analogWrite(11, 0);\n    delay(10);\n  }\n  for (int i = 0; i <= 255; i++) {      // yeşilden maviye\n    analogWrite(9, 0);\n    analogWrite(10, 255 - i);\n    analogWrite(11, i);\n    delay(10);\n  }\n  for (int i = 0; i <= 255; i++) {      // maviden kırmızıya\n    analogWrite(9, i);\n    analogWrite(10, 0);\n    analogWrite(11, 255 - i);\n    delay(10);\n  }\n}\n```\n\n### Program 3: Pick the colour from the Serial monitor\nType three numbers into the send box of the **Serial monitor** at the bottom, for example `255 128 0` (orange), and press Enter.\n```cpp\n// sketch: rgb_serial\nvoid setup() {\n  pinMode(9, OUTPUT);\n  pinMode(10, OUTPUT);\n  pinMode(11, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    int r = Serial.parseInt();\n    int g = Serial.parseInt();\n    int b = Serial.parseInt();\n    r = constrain(r, 0, 255);   // 255'ten büyükse 255, 0'dan küçükse 0\n    g = constrain(g, 0, 255);\n    b = constrain(b, 0, 255);\n    delay(10);\n    while (Serial.available() > 0) {   // satır sonu karakterlerini at\n      Serial.read();\n    }\n    analogWrite(9, r);\n    analogWrite(10, g);\n    analogWrite(11, b);\n    Serial.print(\"R=\");\n    Serial.print(r);\n    Serial.print(\" G=\");\n    Serial.print(g);\n    Serial.print(\" B=\");\n    Serial.println(b);\n  }\n}\n```\n\n### How does it work?\n1. Each colour leg comes from its own PWM pin. `analogWrite(9, 255)` turns red fully on, `analogWrite(10, 0)` turns green off.\n2. In Program 1 the three arrays are read with the same index: `kirmizi[3]`, `yesil[3]`, `mavi[3]` (red, green, blue) together give yellow.\n3. In Program 2 each stage is 256 steps. The total brightness stays roughly the same, because while one goes down the other goes up.\n4. In Program 3, `parseInt` reads one number from the serial buffer. `constrain` keeps the value at 255 even if the user types 300. We store the `parseInt` result in a variable first, because an expression written straight inside `constrain` may run more than once and read extra numbers from serial. If we did not throw away the end-of-line characters, the next `parseInt` would wait for nothing and return 0.\n\n### Try it\n- Add your own favourite colour to Program 1. Which three numbers did you write? (Update the size of the arrays and the `for` limit.)\n- In Program 2, change `delay(10)` to 3. How did the colour fade change?\n- In Program 3, type `128 0 128`. Which colour do you get? Compare it with `64 0 64`.\n\n### Common mistakes\n- Connecting the COM leg to 5V: this connection is for a common **anode** LED. On a common cathode LED, COM goes to GND.\n- If you set **Common pin** to \"Common anode\" in the properties panel, the logic flips: you must connect COM to 5V and write `analogWrite(pin, 255 - değer)` (where `değer` is the value).\n- Using a single resistor for all three colours: the colours affect each other's brightness. Give each leg its own resistor.\n- Mixing up the R, G and B legs: if the colours come out different from what you expect, check that the wires go to the right legs (R, G, B).",
+            "question": "When you see \"white\" on a screen, what is really lit? Colours add up in light, so why do paints get darker the more you mix them?",
+            "explainerMd": "### What you will learn in this lesson\n- How a common cathode RGB LED is built and how to connect it\n- How the colours of light **add up** (mixing red, green and blue)\n- How to describe a colour with three numbers (R, G, B)\n- Why the logic flips on a common anode LED\n\n### What you should know first\n- Lesson 2: the series resistor for an LED and Ohm's law\n- Lesson 4: arrays and the `for` loop\n- Lesson 9: reading a number from the Serial Monitor (`parseInt`)\n- Lesson 14: limiting a value with `constrain`\n- Lesson 16: `analogWrite` and PWM pins\n\n### Three LEDs in one case\nAn **RGB LED** is three tiny LEDs, red (R), green (G) and blue (B), placed inside the same case. It has four legs. In the **common cathode** type, the cathodes of the three LEDs join at one **COM** leg. COM is connected to GND. The R, G and B legs each go to a separate PWM pin.\n\n```\nD9  --[330 Ω]-- R \\\nD10 --[330 Ω]-- G  >-- LED --- COM --- GND\nD11 --[330 Ω]-- B /\n```\n\nEach colour leg must have its own resistor. A single resistor would share the current of the three channels, and the colours would spoil each other's brightness.\n\n### Colours add up in light\nWhen three lights meet at the same spot, the colours add up:\n\n| Red | Green | Blue | Colour you see |\n|---|---|---|---|\n| full | full | off | yellow |\n| off | full | full | cyan |\n| full | off | full | purple |\n| full | full | full | white |\n| off | off | off | black (LED off) |\n\nEach channel's value is chosen from 0 to 255. Together, the three channels give 256 × 256 × 256, about 16.7 million different colours. If the three values are equal, you get shades of grey: (60, 60, 60) is dark grey, (200, 200, 200) is light grey. For orange, red is full and green is low: (255, 80, 0).\n\n### Colour arrays and the Serial Monitor\nTo show many colours one after another, you use three arrays: `kirmizi[]`, `yesil[]`, `mavi[]` (red, green, blue). The three numbers at the same index describe one colour. You can type three numbers such as \"255 128 0\" into the Serial Monitor and read them with `parseInt`. If the user types 300, `constrain(değer, 0, 255)` keeps it at 255.\n\n### Common anode and real brightness differences\nOn a **common anode** LED, COM is connected to 5 V, and a channel only lights while its pin is LOW. The logic flips: to make a channel as bright as `değer` (the value), you write `analogWrite(pin, 255 - değer)`. Which type you have is printed on the part, or shown in the properties panel in the lab.\n\nIn the lab model the forward voltages differ: red 1.9 V, green 2.2 V, blue 3.0 V. With 330 Ω the currents come out at about 8.6 mA, 7.8 mA and 5.6 mA. Blue is dimmer; that is why (255, 255, 255) may look slightly tinted rather than pure white. This is not a mistake.\n\n### Summary\nAn RGB LED puts three LEDs in one case. With a common cathode, COM goes to GND and each channel is driven from its own PWM pin through its own resistor. Colours add up in light, and three values (R, G, B) describe millions of colours. On a common anode LED, COM goes to 5 V and the values are written the other way round: 255 - value.",
+            "concepts": [
+              {
+                "term": "RGB LED",
+                "definition": "A four-legged part that puts three LEDs, red, green and blue, in one case.",
+                "example": "By driving the three channels separately from D9, D10 and D11 you get any colour you want.",
+                "pitfall": "Mixing up the channels' R, G, B legs; the colours come out different from what you expect, so check the wire ends."
+              },
+              {
+                "term": "Common cathode (COM)",
+                "definition": "The type where the cathodes of the three LEDs join at one leg; the COM leg is connected to GND.",
+                "example": "With COM on GND, analogWrite(9, 255) lights the red channel at full brightness.",
+                "pitfall": "Connecting the COM leg of a common cathode LED to 5V; COM only goes to 5V on a common anode LED."
+              },
+              {
+                "term": "Additive colour mixing",
+                "definition": "In light, colours add up: red + green gives yellow, red + green + blue gives white.",
+                "example": "(255, 255, 0) is yellow, (0, 255, 255) is cyan, (255, 0, 255) is purple.",
+                "pitfall": "Comparing light mixing with paint mixing; paints get darker as you mix them, light gets lighter."
+              },
+              {
+                "term": "Common anode",
+                "definition": "The type where the anodes of the three LEDs join at one leg; COM goes to 5V and a channel lights while its pin is LOW.",
+                "example": "To light a channel at brightness 200, you write analogWrite(pin, 255 - 200).",
+                "pitfall": "Forgetting to write the values the other way round on a common anode LED; you ask for red and see cyan."
+              },
+              {
+                "term": "constrain()",
+                "definition": "Keeps a value between a given lower and upper limit.",
+                "example": "constrain(300, 0, 255) gives 255.",
+                "pitfall": "Writing Serial.parseInt() straight inside constrain; the expression may run several times and read extra numbers from serial. Store it in a variable first."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h4d2-q1",
+                "kind": "mcq",
+                "prompt": "You are using a common cathode RGB LED. Where should the COM leg be connected?",
+                "options": [
+                  "To 5V",
+                  "To GND",
+                  "To D9",
+                  "To A0"
+                ],
+                "answer": 1,
+                "explanation": "With a common cathode, the cathodes of the three LEDs join at COM, and the cathode is the GND side. So COM goes to GND and the channels light up with the HIGH coming from the PWM pins. Connecting it to 5V is for a common anode LED.",
+                "skills": [
+                  "rgb-color",
+                  "circuit-wiring"
+                ]
+              },
+              {
+                "id": "m3h4d2-q2",
+                "kind": "predict-output",
+                "prompt": "A common cathode RGB LED has its R leg on D9, its G leg on D10 and its B leg on D11 (each through 330 Ω). Which colour does the LED show when this sketch runs?\n\n```\nvoid setup() {\n  analogWrite(9, 0);\n  analogWrite(10, 255);\n  analogWrite(11, 255);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "Yellow",
+                  "Purple",
+                  "White",
+                  "Cyan"
+                ],
+                "answer": 3,
+                "explanation": "Red is off, green and blue are fully on. In light, colours add up: green + blue gives cyan. Yellow is red + green, purple is red + blue, and white is all three fully on.",
+                "skills": [
+                  "rgb-color",
+                  "pwm-output"
+                ]
+              },
+              {
+                "id": "m3h4d2-q3",
+                "kind": "numeric",
+                "prompt": "You want to light the red channel of a common anode RGB LED at a brightness of 200/255. With a common anode the logic flips. Which value should you give analogWrite?",
+                "answer": 55,
+                "explanation": "With a common anode a channel lights while its pin is LOW, so the value is written the other way round: 255 - 200 = 55. If you write 200, the channel only lights at about 22% brightness.",
+                "skills": [
+                  "rgb-color",
+                  "pwm-output"
+                ]
+              },
+              {
+                "id": "m3h4d2-q4",
+                "kind": "find-bug",
+                "prompt": "In this sketch, which shows three colours (red, green, blue) one after another, the LED's colour sometimes comes out unexpected. What causes the bug?\n\n```\nint kirmizi[] = {255, 0, 0};\nint yesil[]   = {0, 255, 0};\nint mavi[]    = {0, 0, 255};\n\nvoid setup() {\n}\n\nvoid loop() {\n  for (int i = 0; i <= 3; i++) {\n    analogWrite(9, kirmizi[i]);\n    analogWrite(10, yesil[i]);\n    analogWrite(11, mavi[i]);\n    delay(1000);\n  }\n}\n```",
+                "options": [
+                  "setup() is empty: analogWrite does not work because pinMode is missing",
+                  "The for condition i <= 3: the arrays have 3 elements, and when i = 3 the program reads outside the array",
+                  "The analogWrite(10, ...) line: it should say D12 for green",
+                  "delay(1000): too long for an RGB LED"
+                ],
+                "answer": 1,
+                "explanation": "The valid indexes of a 3-element array are 0, 1, 2. With i <= 3, the last round reads a memory value outside the array, such as kirmizi[3]; a random colour comes out. The correct condition is i < 3. analogWrite makes the pin an output by itself, D10 is the right green pin, and the delay time is not a problem.",
+                "skills": [
+                  "prog-loops-arrays",
+                  "prog-debug",
+                  "rgb-color"
+                ]
+              },
+              {
+                "id": "m3h4d2-q5",
+                "kind": "numeric",
+                "prompt": "The blue channel's forward voltage is 3.0 V. With 5 V and 330 Ω, how many mA flow through the channel when the pin is fully HIGH? (Simple formula: I = (5 - Vf) / R; ignore the internal resistance of the pin and the LED.)",
+                "answer": 6.06,
+                "tolerance": 0.1,
+                "unit": "mA",
+                "explanation": "I = (5 - 3.0) / 330 = 2 / 330, about 0.00606 A, that is 6.06 mA. The lab model also adds the internal resistance of the pin and the LED and gets about 5.6 mA. On the red channel Vf is smaller (1.9 V) and the current is bigger, about 9.4 mA.",
+                "skills": [
+                  "elec-led-resistor",
+                  "elec-ohm"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Buzzer: tone ve nota frekansları",
@@ -3984,7 +6014,125 @@ export const modul3: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The buzzer: tone and note frequencies",
+            "problem": "Every musical instrument does the same thing: it makes the air vibrate at a certain speed. How many times the vibration happens per second decides which note we hear. If you switch an Arduino pin on and off 440 times a second, which note have you played?",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Passive buzzer | **+** leg → **D8**; **-** leg → GND |\n\nThere are two kinds of buzzer. An **active** buzzer has its own oscillator inside: give it 5 V and it makes one fixed sound. A **passive** buzzer is just like a loudspeaker; the pitch of the sound is set by the vibration you produce. In this lesson we use a passive buzzer. When you add the part, make sure **Type: Passive (with tone)** is selected in the properties panel (this is the default). To hear the sound, switch on the sound button at the top.\n\n### Frequency and notes\nFrequency is the number of vibrations per second; its unit is the hertz (Hz). The higher the frequency, the higher the pitch.\n\n| Note | Frequency (approx.) |\n|---|---|\n| Do (C4) | 262 Hz |\n| Re (D4) | 294 Hz |\n| Mi (E4) | 330 Hz |\n| Fa (F4) | 349 Hz |\n| Sol (G4) | 392 Hz |\n| La (A4) | 440 Hz |\n| Si (B4) | 494 Hz |\n| Do (C5) | 523 Hz |\n\nThe last \"Do\" in the table (C5) is one **octave** above the first \"Do\" (C4), and its frequency is about twice as high (262 → 523). The same holds for La: 440 → 880. The values in this table are rounded; `tone` asks for a whole-number frequency anyway.\n\n### The tone() command\n- `tone(pin, frekans)`: produces a square wave at that frequency (`frekans`) on the pin. It lasts until you call `noTone(pin)`.\n- `tone(pin, frekans, süre)`: plays for `süre` (duration) milliseconds and then stops by itself.\n\nA square wave means the pin is HIGH and LOW for equal times (50% duty cycle). Because `tone` uses a timer in the background, it does **not block** the program while it plays: the line straight after the command runs at once. If you want to wait for the note to finish, you must write a `delay`.\n\n### Program 1: The note La\n```cpp\n// sketch: buzzer_a4\nvoid setup() {\n  tone(8, 440);      // D8'de sürekli 440 Hz (La)\n}\n\nvoid loop() {\n}\n```\n\n### Program 2: The C major scale\n```cpp\n// sketch: buzzer_gam\nint notalar[] = {262, 294, 330, 349, 392, 440, 494, 523};\n\nvoid setup() {\n}\n\nvoid loop() {\n  for (int i = 0; i < 8; i++) {\n    tone(8, notalar[i], 400);   // 400 ms çal\n    delay(500);                 // 100 ms sessizlik dahil 500 ms bekle\n  }\n  delay(1000);\n}\n```\n\n### Program 3: Octave\n```cpp\n// sketch: buzzer_oktav\nvoid setup() {\n}\n\nvoid loop() {\n  tone(8, 440, 400);    // La\n  delay(500);\n  tone(8, 880, 400);    // bir oktav yukarısı\n  delay(500);\n  delay(1000);\n}\n```\n\n### Program 4: tone and PWM together\nThe `tone` command uses the Uno's timer number 2 (Timer2). According to the official Arduino documentation, this **interferes with the `analogWrite` output on D3 and D11.** The interference only happens while `tone` is playing. Brightness control does not work on these pins, but you can use fully on (255) or fully off (0). D9 and D10 are not affected.\n```cpp\n// sketch: buzzer_ve_pwm\nvoid setup() {\n  tone(8, 440);            // buzzer çalıyor\n  analogWrite(9, 64);      // D9 PWM çalışmaya devam eder (yaklaşık %25)\n  analogWrite(11, 255);    // D11 yalnızca tam açık/kapalı olur\n}\n\nvoid loop() {\n}\n```\nOur RGB LED has red on D9, green on D10 and blue on D11. We will use this in the project lesson: while a note plays, we will only switch the blue channel on and off.\n\n### How does it work?\n1. `tone(8, 440)` makes the pin go HIGH-LOW 440 times a second. The buzzer's membrane vibrates at this speed and produces the 440 Hz La sound.\n2. In Program 2 the `notalar` (notes) array holds the frequencies from the table; the `for` loop plays them in order.\n3. `tone(8, notalar[i], 400)` plays for 400 ms. With `delay(500)` we leave a 100 ms gap; without the gap, repeated notes would run into each other.\n4. `tone` makes the pin an output by itself; you do not have to write `pinMode` (writing it does no harm either).\n\n### Try it\n- In Program 2, play the scale backwards (let `i` go down from 7 to 0).\n- Write `for (int f = 200; f <= 1000; f += 10) { tone(8, f); delay(10); }`. Did you hear something like a siren?\n- Try a very low frequency such as 20 Hz, or a very high one such as 10000 Hz. Why does the buzzer no longer sound like a \"note\"? (Hint: buzzers have a range in which they play comfortably.)\n\n### Common mistakes\n- Trying `tone` with an active buzzer: an active buzzer makes the same sound at every frequency. If you cannot hear the notes, check the buzzer's type in the properties panel.\n- Not putting a `delay` after a note: `tone` does not wait, and the next `tone` cuts the previous one off at once. Only the last note is heard.\n- Expecting brightness control with `analogWrite` on D3 or D11 while `tone` is playing: PWM on these pins is disturbed (see above).\n- Connecting the buzzer to the wrong pin: if your code says `tone(8, ...)`, the buzzer's **+** leg must be wired to D8.",
+            "question": "Why do we hear the same La note differently when a guitar and a flute play it? Why does the buzzer always sound like \"beep beep\" and not like an instrument?",
+            "explainerMd": "### What you will learn in this lesson\n- That sound is a vibration and that **frequency** (Hz) sets the pitch\n- The difference between an active and a passive buzzer\n- How to play notes with `tone()` and `noTone()`\n- The octave rule: when the frequency doubles, the note rises by one octave\n- The clash between `tone` and PWM on D3 and D11\n\n### What you should know first\n- Lesson 3: waiting with `delay`\n- Lesson 4: arrays and the `for` loop\n- Lesson 16: `analogWrite` and PWM pins\n\n### Sound is a vibration\nSound is the air vibrating very fast. The number of vibrations in one second is called the **frequency**; its unit is the **hertz** (Hz). The higher the frequency, the higher the pitch. The time of one vibration, the **period**, is 1 / frequency. For 440 Hz, one round takes 1000 / 440, about 2.27 ms.\n\n| Note | Frequency (approx.) |\n|---|---|\n| Do (C4) | 262 Hz |\n| Mi (E4) | 330 Hz |\n| Sol (G4) | 392 Hz |\n| La (A4) | 440 Hz |\n| Do (C5) | 523 Hz |\n\nThe same note one **octave** higher has about twice the frequency: the La above 440 Hz is 880 Hz.\n\n### Active and passive buzzers\nAn **active buzzer** has its own oscillator inside; give it 5 V and it always beeps at the same pitch (about 2000 Hz in the lab). You cannot change the pitch. A **passive buzzer** is just a membrane; the pitch of the sound is set by the vibration you send. To play notes you need a passive buzzer. In the lab, the **Type** field in the properties panel decides this.\n\n### tone() and noTone()\n- `tone(pin, frekans)` produces a square wave at that frequency on the pin, and it lasts until you call `noTone(pin)`.\n- `tone(pin, frekans, süre)` plays for only `süre` (duration) milliseconds and then stops by itself.\n\nIn a square wave the pin is HIGH for the same time as it is LOW. Because `tone` uses a timer in the background, it does **not block**: the command starts the sound and the program moves straight on to the next line. If you want to wait for the note to finish, you write a `delay` yourself. If you call `tone` several times in a row without waiting, each one replaces the previous one and only the last is heard.\n\n```\ntone(8, 262, 400);\ndelay(500);          // 400 ms sound + 100 ms silence\ntone(8, 330, 400);\ndelay(500);\n```\n\n### Timer clash\nOn the Uno, `tone` uses the timer called Timer2. This timer also produces the PWM on D3 and D11. So while `tone` is playing, brightness control with `analogWrite` on D3 and D11 breaks; only fully on (255) or fully off (0) is safe. D9 and D10 are not affected. Connect LEDs that need brightness control to D9 or D10.\n\n### Summary\nSound is vibration, and the frequency sets the pitch: when the frequency goes up the sound gets higher, and when it doubles it rises by one octave. To play notes you need a passive buzzer and `tone`. `tone` does not wait, so you put a `delay` between notes. While `tone` is playing, you cannot control brightness with PWM on D3 and D11; use D9 and D10 for dimmable LEDs.",
+            "concepts": [
+              {
+                "term": "Frequency (Hz)",
+                "definition": "The number of vibrations per second. The higher the frequency, the higher the pitch.",
+                "example": "440 Hz means 440 full vibrations per second, and it is the note La.",
+                "pitfall": "Thinking a high frequency means a loud sound; frequency sets how high the pitch is, while intensity sets how loud it is."
+              },
+              {
+                "term": "Octave",
+                "definition": "A higher version of the same note, made by doubling the frequency.",
+                "example": "La: 440 Hz, one octave higher: 880 Hz.",
+                "pitfall": "Thinking an octave means adding a fixed number to the frequency; an octave is not adding, it is multiplying by two."
+              },
+              {
+                "term": "Active and passive buzzer",
+                "definition": "An active buzzer always makes the same sound with its own oscillator; a passive buzzer takes its sound from the frequency you send with tone.",
+                "example": "To play Do-Re-Mi you use a passive buzzer.",
+                "pitfall": "Trying to play notes with an active buzzer; you hear the same pitch at every frequency."
+              },
+              {
+                "term": "tone() / noTone()",
+                "definition": "tone produces a square wave at the given frequency on a pin; if no duration is given, you silence it with noTone.",
+                "example": "tone(8, 440, 300) plays La on D8 for 300 ms.",
+                "pitfall": "Thinking tone waits until the note is finished; it does not wait, so you need a delay between notes."
+              },
+              {
+                "term": "Timer2 clash",
+                "definition": "tone and the PWM on D3/D11 use the same timer (Timer2); while tone is playing, analogWrite control on these two pins breaks.",
+                "example": "That is why, in the music box, the blue channel only gets 0 or 255 while tone is playing.",
+                "pitfall": "Trying to set the brightness of an LED on D11 with analogWrite while tone is playing; you should use D9 or D10."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h4d3-q1",
+                "kind": "numeric",
+                "prompt": "The note Mi is about 330 Hz. How many Hz is the same note one octave higher?",
+                "answer": 660,
+                "tolerance": 1,
+                "unit": "Hz",
+                "explanation": "Going up one octave means multiplying the frequency by two: 330 × 2 = 660 Hz. The octave rule is multiplication; adding the same fixed number to every note would give the wrong result.",
+                "skills": [
+                  "sound-tone"
+                ]
+              },
+              {
+                "id": "m3h4d3-q2",
+                "kind": "numeric",
+                "prompt": "A passive buzzer is playing at 440 Hz. About how many milliseconds does one full vibration (HIGH + LOW) take? (Period = 1000 ms / frequency)",
+                "answer": 2.27,
+                "tolerance": 0.05,
+                "unit": "ms",
+                "explanation": "The period is the inverse of the frequency: 1000 ms / 440 is about 2.27 ms. As the frequency gets bigger the period gets smaller; for 880 Hz it would be about 1.14 ms.",
+                "skills": [
+                  "sound-tone",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h4d3-q3",
+                "kind": "predict-output",
+                "prompt": "A passive buzzer is connected to D8. What do you hear when this sketch runs?\n\n```\nvoid setup() {\n  tone(8, 262, 300);\n  tone(8, 330, 300);\n  tone(8, 392, 300);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "Do, Mi, Sol play one after another",
+                  "The three notes play at the same time, like a chord",
+                  "Only Sol (392 Hz) is heard, for a short time",
+                  "No sound comes out at all"
+                ],
+                "answer": 2,
+                "explanation": "tone does not wait; the three commands run straight after each other and each new tone replaces the previous one. On the same pin the last call wins, so only 392 Hz (Sol) is heard. To hear the notes one after another you need a delay after each tone. One pin makes one frequency, so a chord is not possible.",
+                "skills": [
+                  "sound-tone",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h4d3-q4",
+                "kind": "find-bug",
+                "prompt": "A passive buzzer is playing on D8 and an LED is connected to D11 with a resistor. In this code, written to light the LED dimly, the LED's brightness cannot be controlled. Where is the bug?\n\n```\nvoid setup() {\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  tone(8, 440, 2000);\n  analogWrite(11, 64);\n  delay(2000);\n}\n```",
+                "options": [
+                  "tone(8, 440, 2000): tone does not take a duration parameter",
+                  "analogWrite(11, 64): PWM on D11 breaks while tone is playing; the LED should be moved to D9 or D10",
+                  "pinMode(11, OUTPUT): the pin should be INPUT for tone",
+                  "delay(2000): you cannot use delay while tone is playing"
+                ],
+                "answer": 1,
+                "explanation": "tone and the PWM on D11 use the same Timer2; while tone is playing, brightness control on D11 does not work. The fix is to move the LED to D9 or D10, whose PWM is not affected. tone does take a duration as its third parameter, pinMode does no harm, and the delay is needed here to wait for the note to finish.",
+                "skills": [
+                  "sound-tone",
+                  "pwm-output",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h4d3-q5",
+                "kind": "mcq",
+                "prompt": "You wrote a program that plays the C major scale, but all eight notes sound at the same pitch, like a single beep. What is the most likely reason?",
+                "options": [
+                  "The notes array starts at 0",
+                  "noTone was used instead of tone",
+                  "The delay time is too long",
+                  "The buzzer is set to the active type; an active buzzer makes the same sound at every frequency"
+                ],
+                "answer": 3,
+                "explanation": "An active buzzer has its own oscillator and its frequency cannot be changed; the frequency you send with tone does not affect the pitch. The fix is to choose a passive buzzer in the properties panel (or in the real circuit). An array starting at 0 is normal, and delay changes the length, not the pitch.",
+                "skills": [
+                  "sound-tone",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Fonksiyonlar, kapsam, parametreler",
@@ -4105,7 +6253,127 @@ export const modul3: ModuleContent = {
                 "prog-functions"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Functions, scope and parameters",
+            "problem": "What happens if you write the same three lines (play a note, wait, stop) dozens of times in a melody? Your program gets long, and if you make a mistake somewhere you have to fix every copy one by one. Programmers write this job once and give it a name. Today you will write your own commands.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Passive buzzer | **+** leg → **D8**; **-** leg → GND |\n\nThe last sketch (scope) needs no circuit; the **Serial monitor** is enough.\n\n### What is a function?\n`setup()` and `loop()` are really functions. You can write your own function too:\n\n```cpp\nvoid bip() {\n  // buraya komutlar yazılır\n}\n```\n- `void`: the function does **not return** a value.\n- `bip`: the name of the function (a \"beep\"). Make it descriptive.\n- `()`: the **parameters** go inside the brackets (leave them empty if there are none).\n- `{ }`: the body of the function.\n\nDefining a function does not run it. To make it run, you must **call** it by its name: `bip();`\n\n### Program 1: Your first function\n```cpp\n// sketch: fonk_bip\nvoid bip() {\n  tone(8, 880, 100);\n  delay(150);\n}\n\nvoid setup() {\n}\n\nvoid loop() {\n  bip();\n  bip();\n  bip();\n  delay(1000);\n}\n```\n\n### Parameters and return values\nA parameter is information you give a function from outside. When you write `notaCal(440, 400)` (play note), `440` is the frequency and `400` is the duration. A function can also give back a result: instead of `void`, you write the return type (such as `int`), and you hand back the result with `return`.\n\n### Program 2: A function that plays a melody\nWe play the \"Twinkle, Twinkle, Little Star\" melody. Three functions work together:\n```cpp\n// sketch: fonk_melodi\nconst int BUZZER = 8;           // const: değeri değişmeyen sabit\nconst int NOTA_SAYISI = 14;\n\nint melodi[]  = {262, 262, 392, 392, 440, 440, 392,\n                 349, 349, 330, 330, 294, 294, 262};\nint uzunluk[] = {1, 1, 1, 1, 1, 1, 2,\n                 1, 1, 1, 1, 1, 1, 2};      // kaç vuruş\n\nint vurusSuresi(int bpm) {          // dakikadaki vuruştan ms hesapla\n  return 60000 / bpm;\n}\n\nvoid notaCal(int frekans, int sure) {\n  tone(BUZZER, frekans, sure * 9 / 10);   // sürenin %90'ı ses, %10'u ara\n  delay(sure);\n}\n\nvoid melodiCal(int bpm) {\n  int vurus = vurusSuresi(bpm);\n  for (int i = 0; i < NOTA_SAYISI; i++) {\n    notaCal(melodi[i], uzunluk[i] * vurus);\n  }\n}\n\nvoid setup() {\n}\n\nvoid loop() {\n  melodiCal(150);     // dakikada 150 vuruş: bir vuruş 400 ms\n  delay(2000);\n}\n```\n\n### Scope: where does a variable live?\nThe part of the program where a variable can be seen is called its **scope**.\n- A **local** variable is defined inside a function; only that function sees it, and it is created afresh on every call.\n- A **global** variable is defined outside the functions; every function sees it, and its value is kept between calls.\n\nParameters go into a function as a **copy**: changing the parameter inside the function does not change the variable outside.\n\n### Program 3: See scope in action\n```cpp\n// sketch: fonk_kapsam\nint toplam = 0;      // global: her yerden görünür\nint sayi = 5;\n\nvoid yerelDene() {\n  int yerel = 0;     // her çağrıda yeniden oluşur\n  yerel = yerel + 1;\n  Serial.print(\"yerel: \");\n  Serial.println(yerel);\n}\n\nvoid globalDene() {\n  toplam = toplam + 1;   // değer korunur\n  Serial.print(\"toplam: \");\n  Serial.println(toplam);\n}\n\nvoid ikiyeKatla(int x) {\n  x = x * 2;             // yalnız kopya değişir\n  Serial.print(\"fonksiyonda x: \");\n  Serial.println(x);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  ikiyeKatla(sayi);\n  Serial.print(\"disarida sayi: \");\n  Serial.println(sayi);\n}\n\nvoid loop() {\n  yerelDene();\n  globalDene();\n  delay(500);\n}\n```\n\n### How does it work?\n1. In Program 1, `bip()` is called three times; the code is written once and runs three times. To change the sound, you only need to change one line.\n2. In Program 2, `melodiCal` (play melody) calls `notaCal` for every note. `notaCal` takes a frequency and a duration parameter; `vurusSuresi` (beat length) gives back a number with `return`: `60000 / 150 = 400` ms.\n3. The sum `uzunluk[i] * vurus` (length × beat) makes a two-beat note last 800 ms.\n4. In Program 3, `yerel` (local) prints 1 every time, while `toplam` (total) goes up 1, 2, 3. Inside `ikiyeKatla(sayi)` (double it), `x` becomes 10, but outside, `sayi` is still 5.\n\n### Try it\n- Write `melodiCal(100)` and `melodiCal(200)`. How does the tempo change?\n- Write your own melody by changing the `melodi` and `uzunluk` arrays. Update the value of `NOTA_SAYISI` (number of notes) too.\n- Write a function called `void sessizlik(int sure)` (silence) that only does `delay(sure)`, and add it to the end of the melody.\n\n### Common mistakes\n- Defining a function and never calling it: defining does not run it, you must write `notaCal(440, 300);`.\n- Defining a function inside another function: functions are written side by side, outside each other's `{ }` blocks.\n- Giving the wrong number of parameters: `notaCal(440)` gives a compiler error, because it expects two parameters.\n- Using a local variable in another function: the compiler says \"was not declared in this scope\". Make the variable global or pass it as a parameter.\n- Forgetting to write `return`: in a function that returns `int`, you must give back the result with `return`.",
+            "question": "Why does splitting a big program into functions make bugs easier to find? Why is it not a good idea to make everything a global variable?",
+            "explainerMd": "### What you will learn in this lesson\n- Why you should write your own **functions**\n- The parts of a function: return type, name, parameters and body\n- The difference between defining a function and **calling** it\n- The difference between local and global variables (**scope**)\n- That a parameter goes into a function as a copy\n\n### What you should know first\n- Lesson 1: `setup()` and `loop()`\n- Lessons 3 and 4: `delay`, the `for` loop and arrays\n- Lesson 18: playing notes with `tone`\n\n### Writing the same code again and again\nIf you write the three lines \"play a note, wait\" twenty times in a melody, the program gets long. If you make a mistake, you fix twenty places one by one. A **function** lets you give a group of commands a name and run it as many times as you like. In fact, `setup()` and `loop()` are functions too.\n\n### The parts of a function\n```\nint vurusSuresi(int bpm) {\n  return 60000 / bpm;\n}\n```\n\n| Part | Meaning |\n|---|---|\n| `int` | **Return type**: the function gives back a whole number. If it gives back nothing, you write `void`. |\n| `vurusSuresi` | The function's name (beat length); it should say what the function does. |\n| `(int bpm)` | **Parameter**: information given to the function from outside. |\n| `{ ... }` | Body: the commands that will run. |\n| `return` | Gives the result back to the caller. |\n\nWriting a function does not run it. To make it run, you must **call** it by its name: `vurusSuresi(120);` Here `bpm` becomes 120 and the result is 60000 / 120 = 500 ms. A function can also call other functions: `melodiCal` calls `notaCal` for every note.\n\n### Scope: where does a variable live?\n**Scope** is which parts of the code can see a variable.\n\n| Type | Where it is defined | What it is like |\n|---|---|---|\n| Local | Inside the function | Only that function sees it; it is created afresh on every call |\n| Global | Outside all functions | Everyone sees it; its value is kept between calls |\n\nIf you use a local variable in another function, the compiler gives the error \"was not declared in this scope\".\n\n### A parameter is a copy\nWhen you give a variable to a function, the function works with its **copy**:\n\n```\nvoid ikiyeKatla(int x) {\n  x = x * 2;     // only the copy changes\n}\n// if sayi = 5, sayi is still 5 after ikiyeKatla(sayi)\n```\n\nIf you want to change the value outside, you use a global variable or take the result back with `return`: `sayi = ikiyeKatla(sayi);`. If you write `const` in front of numbers that never change (such as the buzzer pin), you cannot change them by mistake.\n\n### Summary\nA function gives a group of commands a name so you can use it again and again. Defining it does not run it; you must call it by its name. Parameters carry information in from outside, and `return` gives the result back. A local variable lives only in its own function; a global variable is seen everywhere. Because a parameter is a copy, a change inside the function does not affect the outside.",
+            "concepts": [
+              {
+                "term": "Function",
+                "definition": "A name given to a group of commands; when you call it by its name, the commands inside it run.",
+                "example": "You write void bip() { tone(8, 880, 100); delay(150); } and call it in loop with bip();.",
+                "pitfall": "Writing a function and never calling it; defining it does not run it."
+              },
+              {
+                "term": "Parameter",
+                "definition": "Information given to a function from outside; it is written inside the brackets together with its type.",
+                "example": "In the call notaCal(440, 400), 440 is the frequency and 400 is the duration.",
+                "pitfall": "Giving the wrong number of parameters: notaCal(440) gives a compile error because it expects two parameters."
+              },
+              {
+                "term": "Return value (return)",
+                "definition": "The result a function gives back to its caller; if the return type is not void, it is given with return.",
+                "example": "int vurusSuresi(int bpm) { return 60000 / bpm; } gives 500 for 120.",
+                "pitfall": "Forgetting to write return in a function that returns int; the result is not the value you expect."
+              },
+              {
+                "term": "Local and global variables",
+                "definition": "A local variable is only visible in the function where it is defined and is created afresh on every call; a global variable is visible everywhere and keeps its value.",
+                "example": "A value that must keep growing between calls, such as a counter, is defined as global.",
+                "pitfall": "Using a local variable in another function: the compiler says \"was not declared in this scope\"."
+              },
+              {
+                "term": "Parameter passed as a copy",
+                "definition": "The variable given to a function is copied; changing it inside the function does not change the variable outside.",
+                "example": "Inside ikiyeKatla(sayi), x becomes 10, but outside, sayi is still 5.",
+                "pitfall": "Thinking the function changes the variable outside; you must take the result back with return."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h4d4-q1",
+                "kind": "predict-output",
+                "prompt": "What is printed on the Serial Monitor when this sketch runs?\n\n```\nint sayac = 0;\n\nvoid artir() {\n  int adim = 2;\n  sayac = sayac + adim;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  artir();\n  artir();\n  artir();\n  Serial.println(sayac);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "2",
+                  "3",
+                  "6",
+                  "0"
+                ],
+                "answer": 2,
+                "explanation": "sayac (counter) is global, so its value is kept between calls and goes up by 2 on every call: 2, 4, 6. adim (step) is a local variable and is created afresh as 2 on every call. The result is 6. For it to print 2, sayac would also have to be local, but then it would not keep its value.",
+                "skills": [
+                  "prog-scope",
+                  "prog-functions"
+                ]
+              },
+              {
+                "id": "m3h4d4-q2",
+                "kind": "numeric",
+                "prompt": "The function vurusSuresi(int bpm) returns 60000 / bpm. The tempo is 120 beats per minute and a note is 3 beats long. How many milliseconds does this note last?",
+                "answer": 1500,
+                "unit": "ms",
+                "explanation": "vurusSuresi(120) = 60000 / 120 = 500 ms is one beat. A three-beat note lasts 3 × 500 = 1500 ms. Stopping at 500 gives only one beat.",
+                "skills": [
+                  "prog-functions",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h4d4-q3",
+                "kind": "find-bug",
+                "prompt": "The call ikiKat(21) is expected to print 42, but the right result does not come. Which option describes the bug?\n\n```\nint ikiKat(int x) {\n  int sonuc = x * 2;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(ikiKat(21));\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "It should say x + 2 instead of x * 2",
+                  "The Serial.begin(9600) line should not be inside setup()",
+                  "The ikiKat function does not give back the result with return",
+                  "loop() cannot be left empty"
+                ],
+                "answer": 2,
+                "explanation": "The function is defined to return an int, but sonuc (result) is never given back with return; the caller cannot get the expected 42. The fix is to write return x * 2; or return sonuc;. The multiplication is right, Serial.begin belongs in setup, and loop may be empty.",
+                "skills": [
+                  "prog-functions",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h4d4-q4",
+                "kind": "mcq",
+                "prompt": "What is the most important benefit of putting the same three commands into a function instead of copying them into twenty places in a program?",
+                "options": [
+                  "The program definitely runs faster",
+                  "The code is written once, so a change or a bug fix is made in one place",
+                  "The variables inside the function automatically become global",
+                  "You no longer need to write setup() and loop()"
+                ],
+                "answer": 1,
+                "explanation": "The real benefit of a function is less repetition and better order: it is written once, called from anywhere, and a bug is fixed in one place. A speed gain is not what you should expect, the variables inside a function are local, and every sketch still needs setup() and loop().",
+                "skills": [
+                  "prog-functions"
+                ]
+              },
+              {
+                "id": "m3h4d4-q5",
+                "kind": "predict-output",
+                "prompt": "What is printed on the Serial Monitor when this sketch runs?\n\n```\nvoid arttir(int x) {\n  x = x + 10;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  int n = 4;\n  arttir(n);\n  Serial.println(n);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "14",
+                  "10",
+                  "4 and 14",
+                  "4"
+                ],
+                "answer": 3,
+                "explanation": "arttir(n) gives the function a copy of n; x changes but n does not. So 4 is printed. For it to print 14, the function would have to give back the result with return, and you would write n = arttir(n);.",
+                "skills": [
+                  "prog-scope",
+                  "prog-functions"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Işıklı müzik kutusu",
@@ -4229,7 +6497,130 @@ export const modul3: ModuleContent = {
                 "prog-planning"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: The light-up music box",
+            "problem": "With a music box, you turn a handle and a melody plays. Your music box will go one step further: when you press a button it will play \"Twinkle, Twinkle, Little Star\", every note will light up in its own colour, and you will set its speed with a potentiometer. While it waits, a blue light will slowly breathe.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Passive buzzer | **+** leg → **D8**; **-** leg → GND |\n| RGB LED (common cathode) | **COM** → GND |\n| 330 Ω resistor (red) | **D9** → resistor leg 1; leg 2 → RGB LED **R** leg |\n| 330 Ω resistor (green) | **D10** → resistor leg 1; leg 2 → RGB LED **G** leg |\n| 330 Ω resistor (blue) | **D11** → resistor leg 1; leg 2 → RGB LED **B** leg |\n| Button | **A** leg → **D2**, **B** leg → GND (`INPUT_PULLUP`) |\n| Potentiometer | **SIG** → **A0**; **VCC** → 5V, **GND** → GND |\n\nTo press the button while the circuit runs, hold down on the button part; change the tempo with the potentiometer's **Position** property.\n\n### Design\n- **Waiting:** The blue LED slowly brightens and fades (the breathing from lesson 16).\n- **Playing:** When you press the button, the tempo (80-200 beats per minute) is read from the potentiometer and the melody plays. Every note lights up in its own colour.\n- **End:** The melody ends, the LED goes off and the waiting breath starts again.\n\nNote colours:\n\n| Note | Frequency | Colour (R, G, B) |\n|---|---|---|\n| Do | 262 | red (255, 0, 0) |\n| Re | 294 | orange (255, 80, 0) |\n| Mi | 330 | yellow (255, 200, 0) |\n| Fa | 349 | green (0, 255, 0) |\n| Sol | 392 | cyan (0, 255, 255) |\n| La | 440 | blue (0, 0, 255) |\n\nRemember the rule you learnt in lesson 18: while `tone` is playing, brightness cannot be controlled on D11 (blue). That is why the blue values in the table are only 0 or 255. Red (D9) and green (D10) can be fine-tuned; that is where the shades of orange and yellow come from.\n\n### Program\n```cpp\n// sketch: muzik_kutusu\nconst int BUZZER = 8;\nconst int KIRMIZI = 9;\nconst int YESIL = 10;\nconst int MAVI = 11;\nconst int BUTON = 2;\nconst int NOTA_SAYISI = 14;\n\nint melodi[]  = {262, 262, 392, 392, 440, 440, 392,\n                 349, 349, 330, 330, 294, 294, 262};\nint uzunluk[] = {1, 1, 1, 1, 1, 1, 2,\n                 1, 1, 1, 1, 1, 1, 2};\n\nint parlak = 0;     // bekleme nefesinin şu anki parlaklığı\nint yon = 5;        // +5: parlıyor, -5: sönüyor\n\nvoid renkAyarla(int r, int g, int b) {\n  analogWrite(KIRMIZI, r);\n  analogWrite(YESIL, g);\n  analogWrite(MAVI, b);       // tone çalarken yalnız 0 ya da 255 olmalı\n}\n\nvoid notaRengi(int frekans) {\n  switch (frekans) {\n    case 262: renkAyarla(255, 0, 0); break;     // do: kırmızı\n    case 294: renkAyarla(255, 80, 0); break;    // re: turuncu\n    case 330: renkAyarla(255, 200, 0); break;   // mi: sarı\n    case 349: renkAyarla(0, 255, 0); break;     // fa: yeşil\n    case 392: renkAyarla(0, 255, 255); break;   // sol: camgöbeği\n    case 440: renkAyarla(0, 0, 255); break;     // la: mavi\n    default:  renkAyarla(255, 255, 255);        // bilinmeyen nota: beyaz\n  }\n}\n\nvoid notaCal(int frekans, int sure) {\n  notaRengi(frekans);\n  tone(BUZZER, frekans, sure * 9 / 10);\n  delay(sure);\n  renkAyarla(0, 0, 0);\n}\n\nint tempoOku() {\n  return map(analogRead(A0), 0, 1023, 80, 200);   // dakikadaki vuruş\n}\n\nvoid melodiCal(int bpm) {\n  int vurus = 60000 / bpm;                         // bir vuruşun süresi (ms)\n  for (int i = 0; i < NOTA_SAYISI; i++) {\n    notaCal(melodi[i], uzunluk[i] * vurus);\n  }\n}\n\nvoid bekleNefesi() {\n  parlak = parlak + yon;\n  if (parlak >= 255) {\n    parlak = 255;\n    yon = -5;\n  }\n  if (parlak <= 0) {\n    parlak = 0;\n    yon = 5;\n  }\n  analogWrite(MAVI, parlak);\n  delay(10);\n}\n\nvoid setup() {\n  pinMode(BUZZER, OUTPUT);\n  pinMode(KIRMIZI, OUTPUT);\n  pinMode(YESIL, OUTPUT);\n  pinMode(MAVI, OUTPUT);\n  pinMode(BUTON, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (digitalRead(BUTON) == LOW) {     // basılı = LOW\n    int bpm = tempoOku();\n    Serial.print(\"tempo: \");\n    Serial.println(bpm);\n    melodiCal(bpm);\n  } else {\n    bekleNefesi();\n  }\n}\n```\n\n### How does it work?\n1. `loop()` only makes decisions: if the button is pressed it plays the melody, otherwise it moves the waiting breath on by one step. Because the work is split into functions, `loop()` is short and easy to read.\n2. `tempoOku()` (read tempo) converts the potentiometer into the range 80-200 with `map`. With the pot in the middle you get about 140 beats per minute; with `60000 / 140`, one beat is about 428 ms.\n3. `notaCal` first colours the LED with `notaRengi` (note colour), then plays the note with `tone`. `delay(sure)` waits for the note to finish, then the LED is switched off.\n4. The `switch` inside `notaRengi` chooses the colour from the frequency. If you add new notes to the arrays, you must also add a new `case` here.\n5. `bekleNefesi` (waiting breath) changes the brightness by 5 units on every call; it goes back and forth between 0 and 255. Because each step takes 10 ms, `loop()` goes round quickly and button presses are noticed without delay. During the melody the button is not read, because `delay` makes the program wait.\n6. When the melody ends, if the button is still pressed the melody starts again; if you let go of the button, it goes back to the waiting breath.\n\n### Try it\n- To use the blue channel in the melody too, add the notes Si (494) and high Do (523). You could use purple (255, 0, 255) for Si and white (255, 255, 255) for high Do; do not forget to add `case 494:` and `case 523:` to the `switch`.\n- Add a second button (D3) that plays a different melody when pressed. You will need to write a `melodiCal` that takes the melody as a parameter. Hint: two separate arrays and an array selector.\n- Write a `bitisEfekti()` (ending effect) function for a rainbow finish that passes through all the colours after the melody ends.\n\n### Common mistakes\n- Writing `analogWrite(MAVI, 128)` for blue and expecting half brightness while `tone` is playing: PWM does not work on D11 at that time. Use 0 or 255.\n- Not putting `break;` at the end of a `case`: the `switch` falls through into the next colour as well and the colours get mixed up.\n- Connecting the potentiometer's middle leg somewhere other than A0: the tempo always stays the same.\n- Connecting the buzzer to D3 or D11: in this project it must be on D8. D11 is for the blue LED.\n- Not leaving a gap between notes: when the same notes come one after another, they sound like one long note. In the code, `sure * 9 / 10` leaves this gap.",
+            "question": "Why does the program not react if you press the buttons while the melody is playing? Could there be a way to play the melody and watch the button at the same time? (We will solve this in later lessons.)",
+            "explainerMd": "### What you will learn in this lesson\n- How to split a big job first into **stages** and then into functions\n- How to combine sound, colour and input (button, potentiometer) in one program\n- How to turn a tempo into a beat length and the total length of a melody\n- Why a program that uses `delay` cannot watch two things at the same time\n\n### What you should know first\n- Lessons 6 and 7: the button (`INPUT_PULLUP`), `if`/`else` and `switch`\n- Lessons 11 and 14: `analogRead` and `map`\n- Lesson 16: PWM and the breathing LED\n- Lesson 17: the RGB LED\n- Lesson 18: `tone` and the D3/D11 clash\n- Lesson 19: functions, parameters, `return`, scope\n\n### Plan first, then code\nWhen a project is big, you do not start writing code straight away. First you write down the states:\n\n| State | When | What happens |\n|---|---|---|\n| Waiting | Button released | The blue LED slowly brightens and fades |\n| Playing | Button pressed (LOW) | The tempo is read, the melody plays, every note lights up in its own colour |\n| End | The melody ends | The LED goes off, the waiting breath carries on |\n\nCircuit: buzzer on D8, RGB LED on D9 (R), D10 (G), D11 (B), button on D2 (`INPUT_PULLUP`), potentiometer on A0.\n\n### Splitting the work into functions\nEvery small job becomes a function. `loop()` only makes decisions:\n\n```\nloop()\n ├─ is the button pressed?\n │    yes → tempoOku() → melodiCal(bpm)\n │                          └─ for every note, notaCal(f, duration)\n │                                ├─ notaRengi(f) → renkAyarla(r, g, b)\n │                                └─ tone + delay\n │    no  → bekleNefesi()\n```\n\nThanks to this structure, when something goes wrong you only look at the small function involved. The `melodi[]` and `uzunluk[]` arrays (melody, and how many beats) are defined as global, because many functions use them.\n\n### Working out tempo and length\n`tempoOku()` turns the potentiometer reading into beats per minute with `map(analogRead(A0), 0, 1023, 80, 200)`. One beat lasts `60000 / bpm` milliseconds:\n\n| Pot position | bpm | Beat | Melody (16 beats) |\n|---|---|---|---|\n| All the way to the GND side | 80 | 750 ms | 12 000 ms |\n| Middle (reading about 512) | 140 | 428 ms | 6 848 ms |\n| All the way to the 5 V side | 200 | 300 ms | 4 800 ms |\n\nThe melody has 14 notes, but because two notes last 2 beats, the total is 12 × 1 + 2 × 2 = 16 beats.\n\n### Limits and rules\n- The blue channel is on D11. While `tone` is playing, you only write 0 or 255. That is why the blue values in the note colours are either fully on or fully off.\n- In a `switch`, every `case` ends with `break;`; otherwise the code falls through into the next `case` and the colour gets mixed up.\n- While `delay` is running, the program does not run any other command. During the melody you cannot watch the button or the pot. The solution will come in later weeks.\n\n### Summary\nYou first split the project into states (waiting, playing, end), then turn each state into a small function. `loop()` only makes decisions. The tempo is chosen with the potentiometer between 80 and 200 beats per minute, and the beat length is 60000 / bpm. While `tone` is playing, only fully on/off is used on D11. Because of `delay`, the inputs are not watched during the melody.",
+            "concepts": [
+              {
+                "term": "Splitting into states",
+                "definition": "Dividing the project into separate states such as waiting, playing and end, and writing down beforehand what will happen in each state.",
+                "example": "In the music box, if the button is pressed we are in the playing state, otherwise in the waiting state.",
+                "pitfall": "Starting to write code without a plan; because it is not clear what happens in which state, the bugs get tangled."
+              },
+              {
+                "term": "loop() makes decisions",
+                "definition": "When you split the work into functions, loop() only decides which function to call.",
+                "example": "if (button pressed) melodiCal(bpm); else bekleNefesi();",
+                "pitfall": "Piling every command into loop(); the program gets long, hard to read, and bugs are harder to find."
+              },
+              {
+                "term": "Beat length",
+                "definition": "The length of one beat in milliseconds, worked out from the beats per minute (bpm): 60000 / bpm.",
+                "example": "At 140 bpm one beat lasts about 428 ms.",
+                "pitfall": "Thinking the beat gets longer when the tempo goes up; the faster the tempo, the shorter the beat."
+              },
+              {
+                "term": "switch and break",
+                "definition": "switch runs one of several branches of code depending on a value; every branch needs a break at the end.",
+                "example": "The colour is chosen from the note frequency, as in case 262: red; case 294: orange;.",
+                "pitfall": "Not writing break; the code falls through into the next case and the colours get mixed up."
+              },
+              {
+                "term": "The cost of delay",
+                "definition": "While delay is running, the program does not run any other line; during this time the button or pot cannot be watched.",
+                "example": "Pressing the button while the melody plays does not reach the program; it is read when the melody ends.",
+                "pitfall": "Expecting a program stuck inside a delay to react to the button at the same time."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h4d5-q1",
+                "kind": "numeric",
+                "prompt": "The music box is playing at 120 beats per minute. The melody is 16 beats long (two notes of 2 beats, twelve notes of 1 beat). How many milliseconds does one round of the melody take?",
+                "answer": 8000,
+                "unit": "ms",
+                "explanation": "One beat is 60000 / 120 = 500 ms. 16 beats × 500 ms = 8000 ms. If you mix up the number of notes, 14, with the beats, you get a wrong result such as 7000 ms.",
+                "skills": [
+                  "prog-timing",
+                  "prog-planning"
+                ]
+              },
+              {
+                "id": "m3h4d5-q2",
+                "kind": "mcq",
+                "prompt": "In the music box, why does the blue channel in the note colours only take the value 0 or 255?",
+                "options": [
+                  "The blue LED does not support brightness control",
+                  "analogWrite resets itself to zero after 255",
+                  "The RGB LED's blue cannot be controlled because of the value of the resistor it is connected to",
+                  "The blue channel is on D11, and PWM on D11 breaks while tone is playing"
+                ],
+                "answer": 3,
+                "explanation": "tone and the PWM on D3 and D11 use the same timer (Timer2); while tone is playing, an in-between brightness cannot be set on D11, and fully on or off is safe. Red (D9) and green (D10) are not affected. Neither the blue LED itself nor the resistor setting is what stops it.",
+                "skills": [
+                  "sound-tone",
+                  "pwm-output",
+                  "rgb-color"
+                ]
+              },
+              {
+                "id": "m3h4d5-q3",
+                "kind": "find-bug",
+                "prompt": "The note Do (262 Hz) should light red and Re (294 Hz) orange. But while Do is playing, the LED looks orange. Where is the bug?\n\n```\nvoid notaRengi(int frekans) {\n  switch (frekans) {\n    case 262: renkAyarla(255, 0, 0);\n    case 294: renkAyarla(255, 80, 0); break;\n    default:  renkAyarla(255, 255, 255);\n  }\n}\n```",
+                "options": [
+                  "The default branch should not be written at the end",
+                  "There is no break; at the end of the case 262 line, so the code falls through into the next case",
+                  "In the renkAyarla(255, 80, 0) line it should say 0 instead of 80",
+                  "for should be used instead of switch"
+                ],
+                "answer": 1,
+                "explanation": "case 262 sets red, but because there is no break the flow falls through into case 294 and the colour is changed to orange. Adding break; at the end of the 262 line fixes it. default is in the right place, 80 is needed for orange, and switch is the right tool for this job.",
+                "skills": [
+                  "prog-debug",
+                  "rgb-color"
+                ]
+              },
+              {
+                "id": "m3h4d5-q4",
+                "kind": "predict-output",
+                "prompt": "This is part of the brightness logic of the waiting breath. What is printed on the Serial Monitor when it runs?\n\n```\nint parlak = 250;\nint yon = 5;\n\nvoid adim() {\n  parlak = parlak + yon;\n  if (parlak >= 255) {\n    parlak = 255;\n    yon = -5;\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  adim();\n  adim();\n  adim();\n  Serial.println(parlak);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "255",
+                  "260",
+                  "250",
+                  "245"
+                ],
+                "answer": 3,
+                "explanation": "In the first step 250 + 5 = 255, the condition is met and the direction is set to -5. In the second step 255 - 5 = 250, and in the third step 250 - 5 = 245. The brightness does not stay at 255; because the direction changed, it goes back down. It cannot be 260 because it is set equal to the upper limit of 255.",
+                "skills": [
+                  "prog-functions",
+                  "prog-scope",
+                  "pwm-output"
+                ]
+              },
+              {
+                "id": "m3h4d5-q5",
+                "kind": "mcq",
+                "prompt": "In the music box, if you let go of the button and press it again while the melody is playing, the program does not react at once. Why?",
+                "options": [
+                  "The button is not set up as INPUT_PULLUP",
+                  "The tone command switches the button off",
+                  "Because delay is running during the melody, the program cannot reach the line that reads the button",
+                  "loop() only runs once"
+                ],
+                "answer": 2,
+                "explanation": "The delay inside notaCal makes the program wait for the length of the note; the line that reads the button only runs when the melody ends. The button is set up correctly, tone does not affect the button, and loop() repeats all the time. Later you will get past this limit with non-blocking timing.",
+                "skills": [
+                  "prog-timing",
+                  "prog-planning"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -4237,6 +6628,7 @@ export const modul3: ModuleContent = {
       "title": "Motorlar",
       "project": "Otomatik fan ve servo tarayıcı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Servoyu `Servo` kütüphanesiyle istediği açıya götürebilir; açının darbe genişliğiyle söylendiğini açıklayabilir.\n2. Arduino pininin neden motoru doğrudan süremediğini söyleyebilir; NPN transistör ya da mantık seviyeli MOSFET ile motoru anahtarlayabilir ve baz akımını hesaplayabilir.\n3. Flyback diyotun ne işe yaradığını bilir ve doğru yönde bağlar.\n4. L293D ile motorun yönünü (IN1, IN2) ve hızını (EN, PWM) denetleyebilir.\n5. Röle modülünün COM, NO, NC uçlarını ve aktif-LOW mantığını açıklayabilir; histerezisle eşik kararı yazabilir; şebeke gerilimiyle röle denememesi gerektiğini bilir.\n6. Sıcaklığa göre fanı ve servoyu yöneten bir sistemi planlayıp kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Servo: açı kontrolü | ~20 dk | Anlatımı oku, üç sketch'i dene, tarama hızını değiştir, mini testi çöz. |\n| 2 | Transistör ve MOSFET ile anahtarlama, DC motor | ~25 dk | Devreyi kur, baz akımını hesapla, diyotu silip uyarıyı gör, mini testi çöz. |\n| 3 | H-köprüsü L293D: yön ve hız | ~25 dk | Devreyi kur, yön tablosunu sına, iki butonlu sürüşü dene. |\n| 4 | Röle: yüksek akım anahtarlama ve güvenlik | ~20 dk | Güvenlik bölümünü oku, Tetik'i LOW yap, butonlu ve eşikli sketch'leri dene. |\n| 5 | Proje: Sıcaklığa bağlı otomatik fan ve servo tarayıcı | ~35 dk | Planı yaz, devreyi kur, sıcaklığı değiştirerek sına, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBaşlamadan önce şunları kontrol et:\n- `analogRead`, `map` ve `analogWrite` (PWM) kullanabiliyor mu? (Ders 11, 14, 16)\n- `if/else`, `for` ve fonksiyon yazabiliyor mu? (Ders 4, 7, 19)\n- Butonu `INPUT_PULLUP` ile okuyabiliyor mu? (Ders 6)\n- NTC ile sıcaklık hesabını görmüş mü? (Ders 13; proje dersinde gerekli)\n- Ohm yasasıyla akım hesaplayabiliyor mu? (Ders 2)\n\n### Kavram haritası\n- **Hareket:** servo (açı, darbe genişliği) → DC motor (hız) → yön (H-köprüsü)\n- **Güç aktarımı:** pin → baz direnci → NPN / MOSFET → motor → flyback diyot\n- **Yön ve hız:** L293D → IN1, IN2 (yön) → EN (PWM hız) → VCC1 mantık, VCC2 motor\n- **Ayrık devre:** röle → COM, NO, NC → aktif-LOW → histerezis → güvenlik\n- **Proje:** NTC ölçümü → histerezisli karar → map ile fan hızı → servo taraması\n\n### Sık yapılan hatalar\n- **`attach` unutmak.** Servo hiç hareket etmez.\n- **Servoda D9 ve D10'dan PWM beklemek.** Servo kütüphanesi bu iki pinin `analogWrite`'ını kapatır.\n- **Motoru doğrudan pine bağlamak.** Pinin akım sınırı aşılır; transistör ya da sürücü kullan.\n- **Baz direncini ya da flyback diyotu atlamak.** Laboratuvar uyarı verir; gerçekte parça bozulur.\n- **Diyotu ters bağlamak.** Çizgili uç (katot) motorun artı tarafına bakmalıdır.\n- **L293D'de VCC1, VCC2, GND ya da EN'i unutmak.** Çıkışlar boşta kalır, motor dönmez.\n- **IN1 ve IN2'yi aynı yapmak.** Motor durur.\n- **Röle mantığını ters sanmak.** Aktif-LOW modül LOW ile çeker.\n- **Tek eşik kullanmak.** Röle ve fan eşik civarında titrer; histerezis ekle.\n- **Şebeke gerilimiyle röle denemek.** Ölümcüldür; yalnız eğitimli uzman yapabilir.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bak, \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku ve soruyu tekrar çöz.\n3. Servo için açıyı 45 dereceye götürüp darbe genişliğini hesapla (≈ 1008 µs).\n4. NPN devresi için baz akımını 1 kΩ ve 2,2 kΩ değerleriyle hesapla ve karşılaştır.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Motoru neden doğrudan pine bağlamıyoruz, ve flyback diyot ne yapar?\"\n6. Proje programını bakmadan yeniden yaz; eşikleri değiştirip etkisini yaz.\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Otomatik fan ve servo tarayıcı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | Fan doğrudan pinde ya da diyot/baz direnci eksik; laboratuvar uyarı veriyor | Transistör, baz direnci, flyback diyot ve servo doğru bağlı, uyarı yok | Bağlantılar düzenli; her parçanın neden orada olduğunu açıklıyor |\n| Karar | Tek eşik; fan eşikte titriyor | 30 °C aç, 28 °C kapat histerezisi çalışıyor | Eşikleri kendi seçip sıcaklık özelliğiyle sınıyor ve nedenini açıklıyor |\n| Hız | Fan yalnız aç/kapa | Hız sıcaklıkla `map` ile artıyor | Alt sınırı (90) neden koyduğunu anlatıyor, aralığı kendi deniyor |\n| Servo | Servo hiç ya da yanlış açıda hareket ediyor | Fan açıkken 30-150 tarıyor, soğukken 90'da park | Tarama aralığı ve hızını ayarlıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi ve kodu adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor; geliştirme (UYARI gibi) ekliyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta öğrenci kodun fiziksel dünyada hareket oluşturduğunu görür. Önemli kavram ayrımı: bilgi (pin) ile güç (motor kaynağı) ayrı yollardan gider.\n- **Nasıl destek olunur?** Takıldığında cevap vermek yerine sor: \"Akım nereden girip nereden çıkıyor?\", \"Laboratuvar hangi uyarıyı veriyor?\", \"Hangi pini sürüyorsun, güç nereden geliyor?\"\n- **Güvenlik.** Platformdaki her şey sanaldır. Gerçek parçaya geçilirse motoru Arduino'nun 5V ucundan beslemek kartı sıfırlayabilir; ayrı kaynak kullanılır ve GND'ler birleştirilir. Röle dersinde şebeke gerilimiyle (220 V) hiçbir deney yapılmaz; bu iş yalnız eğitimli uzmana aittir.\n- **Süre.** Dersleri günlere yaymak kalıcılığı artırır.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can move a servo to any angle with the `Servo` library; can explain that the angle is given by the pulse width.\n2. Can say why an Arduino pin cannot drive a motor directly; can switch a motor with an NPN transistor or a logic-level MOSFET and work out the base current.\n3. Knows what a flyback diode does and connects it the right way round.\n4. Can control a motor's direction (IN1, IN2) and speed (EN, PWM) with the L293D.\n5. Can explain a relay module's COM, NO and NC terminals and its active-LOW logic; can write a threshold decision with hysteresis; knows never to try a relay with mains voltage.\n6. Can plan and build a system that manages a fan and a servo according to the temperature.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Servo: angle control | ~20 min | Read the explainer, try the three sketches, change the sweep speed, do the mini quiz. |\n| 2 | Switching with a transistor and a MOSFET, DC motor | ~25 min | Build the circuit, work out the base current, delete the diode and see the warning, do the mini quiz. |\n| 3 | H-bridge L293D: direction and speed | ~25 min | Build the circuit, test the direction table, try driving with two buttons. |\n| 4 | Relay: high-current switching and safety | ~20 min | Read the safety section, set Trigger to LOW, try the button and threshold sketches. |\n| 5 | Project: temperature-controlled automatic fan and servo scanner | ~35 min | Write the plan, build the circuit, test it by changing the temperature, assess it with the rubric. |\n\n### Prerequisite check\nBefore you start, check the following:\n- Can they use `analogRead`, `map` and `analogWrite` (PWM)? (Lessons 11, 14, 16)\n- Can they write `if/else`, `for` and a function? (Lessons 4, 7, 19)\n- Can they read a button with `INPUT_PULLUP`? (Lesson 6)\n- Have they seen the temperature calculation with an NTC? (Lesson 13; needed in the project lesson)\n- Can they work out current with Ohm's law? (Lesson 2)\n\n### Concept map\n- **Movement:** servo (angle, pulse width) → DC motor (speed) → direction (H-bridge)\n- **Passing on power:** pin → base resistor → NPN / MOSFET → motor → flyback diode\n- **Direction and speed:** L293D → IN1, IN2 (direction) → EN (PWM speed) → VCC1 logic, VCC2 motor\n- **Separate circuit:** relay → COM, NO, NC → active-LOW → hysteresis → safety\n- **Project:** NTC measurement → decision with hysteresis → fan speed with map → servo sweep\n\n### Common mistakes\n- **Forgetting `attach`.** The servo does not move at all.\n- **Expecting PWM from D9 and D10 with a servo.** The Servo library switches off `analogWrite` on these two pins.\n- **Connecting a motor directly to a pin.** The pin's current limit is exceeded; use a transistor or a driver.\n- **Skipping the base resistor or the flyback diode.** The lab gives a warning; in real life the part fails.\n- **Connecting the diode the wrong way round.** The striped end (the cathode) must face the motor's plus side.\n- **Forgetting VCC1, VCC2, GND or EN on the L293D.** The outputs float and the motor does not turn.\n- **Making IN1 and IN2 the same.** The motor stops.\n- **Getting the relay logic backwards.** An active-LOW module is energised by LOW.\n- **Using a single threshold.** The relay and the fan chatter around the threshold; add hysteresis.\n- **Trying a relay with mains voltage.** It can kill; only a trained specialist may do it.\n\n### End-of-week review\n1. Look at each lesson's concept cards and read the \"common mistake\" lines out loud.\n2. Re-read the explanations of the questions you got wrong in the mini quizzes, then do the question again.\n3. For the servo, move the angle to 45 degrees and work out the pulse width (≈ 1008 µs).\n4. For the NPN circuit, work out the base current with 1 kΩ and with 2.2 kΩ and compare them.\n5. Answer this question in your own words: \"Why do we not connect a motor directly to a pin, and what does a flyback diode do?\"\n6. Write the project program again without looking; change the thresholds and write down the effect.\n\nThe mini quizzes of the five lessons are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. The target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Automatic fan and servo scanner)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The fan is directly on a pin, or the diode/base resistor is missing; the lab gives a warning | The transistor, base resistor, flyback diode and servo are connected correctly, no warnings | The wiring is tidy; explains why each part is there |\n| Decision | A single threshold; the fan chatters at the threshold | The hysteresis of on at 30 °C, off at 28 °C works | Chooses their own thresholds, tests them with the temperature property and explains why |\n| Speed | The fan is only on/off | The speed rises with temperature using `map` | Explains why the lower limit (90) is there and tries out the range themselves |\n| Servo | The servo does not move or moves to the wrong angle | Sweeps 30-150 while the fan is on, parks at 90 when it is cool | Adjusts the sweep range and speed |\n| Explanation | Cannot explain what they did | Explains the circuit and the code step by step | Explains a mistake they made and how they found it; adds an improvement (such as UYARI) |\n\n### Note for parents and teachers\n- **Aim.** This week the learner sees code creating movement in the physical world. An important distinction: information (the pin) and power (the motor supply) travel along separate paths.\n- **How to help.** When the learner gets stuck, instead of giving the answer, ask: \"Where does the current go in and where does it come out?\", \"Which warning is the lab giving?\", \"Which pin are you driving, and where does the power come from?\"\n- **Safety.** Everything on the platform is virtual. If you move on to real parts, powering a motor from the Arduino's 5V pin can reset the board; you use a separate supply and join the GNDs. In the relay lesson, no experiment is ever done with mains voltage (220 V); this job belongs only to a trained specialist.\n- **Time.** Spreading the lessons over several days helps the learning stick.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Servo: açı kontrolü",
@@ -4353,7 +6745,123 @@ export const modul3: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Servo: angle control",
+            "problem": "Robot arms, camera holders and radar scanners all share one part: the servo. You tell a servo \"go to exactly 37 degrees\", and it goes there and stays. So why can't an ordinary motor do this, and how does the servo learn which angle to go to from its signal wire?",
+            "contentMd": "Inside a servo there is a small motor, some gears and a sensor that measures position. The servo looks at the **pulse width** that arrives on one of its three wires. The pulse repeats every 20 ms:\n\n- Short pulse (about 544 µs): 0 degrees\n- Medium pulse (about 1472 µs): 90 degrees\n- Long pulse (about 2400 µs): 180 degrees\n\nThe `Servo` library makes these pulses for you. You only tell it the angle.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Servo | **GND** pin → Uno GND |\n| | **VCC** pin → Uno 5V |\n| | **SIG** (signal) pin → **D9** |\n| Potentiometer (for the second sketch) | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |\n\nIn the lab, the servo is powered from the Uno's 5V pin; you do not need a separate supply for the servo. If the servo gets less than 4 V, or if VCC/GND is not connected, it does not move and its angle does not change. In a real circuit, small servos under load can strain the board's 5 V line; the lab does not model this effect.\n\nWhile it runs, you can watch the angle of the servo arm on the canvas. Virtual measurement does not show anything for the servo; measurement is for two-terminal parts such as resistors, LEDs and motors.\n\n### Program\nThe first sketch moves the servo to three positions. Type the code into the editor (or **Copy** the block below), then press ▶.\n\n```cpp\n// sketch: servo_uc_nokta\n#include <Servo.h>\n\nServo servom;               // bir servo nesnesi oluştur\n\nvoid setup() {\n  servom.attach(9);         // servo sinyal teli D9'a bağlı\n}\n\nvoid loop() {\n  servom.write(0);          // 0 dereceye git\n  delay(1000);\n  servom.write(90);         // 90 dereceye git\n  delay(1000);\n  servom.write(180);        // 180 dereceye git\n  delay(1000);\n}\n```\n\nThe second sketch sets the angle with a potentiometer. `map` turns the 0-1023 range into 0-180 degrees. You can change the potentiometer's **Position** property in the right panel (even while it runs).\n\n```cpp\n// sketch: servo_pot\n#include <Servo.h>\n\nServo servom;\n\nvoid setup() {\n  servom.attach(9);\n}\n\nvoid loop() {\n  int okuma = analogRead(A0);              // 0-1023\n  int aci = map(okuma, 0, 1023, 0, 180);   // 0-180 derece\n  servom.write(aci);\n  delay(15);                               // servonun gitmesi için kısa bekleme\n}\n```\n\nThe third sketch sweeps the servo from 0 to 180 and then back. This is the basis of the \"scanner\" movement we will use in the project.\n\n```cpp\n// sketch: servo_tarama\n#include <Servo.h>\n\nServo servom;\n\nvoid setup() {\n  servom.attach(9);\n}\n\nvoid loop() {\n  for (int aci = 0; aci <= 180; aci++) {   // ileri tara\n    servom.write(aci);\n    delay(15);\n  }\n  for (int aci = 180; aci >= 0; aci--) {   // geri tara\n    servom.write(aci);\n    delay(15);\n  }\n}\n```\n\n### How does it work?\n1. `#include <Servo.h>` adds the servo library to the program. `Servo servom;` defines a servo object.\n2. `attach(9)` connects the servo to D9 and starts making the 20 ms pulses.\n3. With `write(aci)` you give the angle between 0 and 180. The library turns this into a pulse between 544 and 2400 µs; 90 degrees is about 1472 µs.\n4. The servo does not teleport; turning takes time. That is why we wait `delay(15)` after each step. For a slow sweep, make the wait longer; for a fast sweep, make it shorter.\n5. The Servo library switches off the `analogWrite` (PWM) feature on D9 and D10. In a program that uses a servo, do not expect PWM output from these two pins.\n\n### Try it\n- In `servo_tarama`, change `delay(15)` to 5 and then to 40. How does the sweep speed change?\n- Make the sweep go only between 30 and 150 degrees.\n- In the `servo_pot` sketch, move the potentiometer to the middle. Does the servo go to 90 degrees? If not, check the potentiometer's SIG, VCC and GND wires.\n\n### Common mistakes\n- Trying to power the servo from D9: the pin only gives the signal. Power comes from the 5V and GND pins. In the lab, if the VCC or GND wire is missing, the servo does not move at all.\n- Mixing up the SIG and VCC wires: if the signal goes to the 5V line, the servo cannot get commands.\n- Forgetting to write `attach`: the servo does not move at all.\n- Forcing the servo past its mechanical limit: in a real servo the gears whine and can be damaged. So do not go outside 0-180 with `write`, and narrow the sweep range if you need to.",
+            "question": "Why does a servo always turn between 0 and 180 degrees instead of spinning continuously like a DC motor? In which projects is a \"continuously spinning\" motor the better choice, and in which is a servo that \"goes to the angle you want\" better?",
+            "explainerMd": "### What you will learn in this lesson\n- How a servo differs from an ordinary DC motor: it goes to the angle you want and stays there\n- How a servo understands the angle from the **pulse width**\n- How to use `attach` and `write` with the `Servo` library\n- How to turn a potentiometer value into 0-180 degrees with `map`\n\n### What you should know first\n`delay` and milliseconds from lesson 3, the `for` loop from lesson 4, `analogRead` and the potentiometer from lesson 11, `map` from lesson 14.\n\n### Why does a servo \"go to an angle\"?\nAn ordinary DC motor turns as long as you give it power; it does not know how far it has turned. A **servo**, however, holds a motor, a set of gears and a sensor that measures the angle of its shaft. Its small built-in controller compares the requested angle with the measured angle and drives the motor until the difference is zero. That is why, when a servo gets the command \"37 degrees\", it goes there and stays.\n\n### The angle is given by the pulse width\nA servo has three wires: VCC (5 V), GND and SIG (signal). The **width** of the pulse arriving on the SIG wire sets the angle. The pulse repeats every 20 ms; what matters is how long the pulse lasts.\n\n```\nAngle   Pulse width\n0 °     ~544 µs\n90 °    ~1472 µs\n180 °   ~2400 µs\n```\n\nThe angles in between are linear: about (2400 − 544) / 180 ≈ 10.3 µs is added per degree. For example, 45 degrees needs 544 + 45 × 10.31 ≈ 1008 µs. The `Servo` library makes these pulses for you; you only write the angle.\n\n### Three commands are enough\n```\n#include <Servo.h>\nServo servom;          // servo object\nservom.attach(9);      // signal wire on D9\nservom.write(90);      // go to 90 degrees\n```\nIf you do not write `attach`, no pulses are made and the servo does not move. `write` only takes angles from 0 to 180. The servo does not teleport; turning takes time, so in a sweep we put a short `delay` after each step. The longer the wait, the slower the sweep: 181 steps × 15 ms ≈ 2.7 seconds.\n\n### Setting the angle with a potentiometer\n`analogRead` gives 0-1023, but the servo wants 0-180. `map(okuma, 0, 1023, 0, 180)` converts the range. Because `map` uses integer maths, the result is rounded down. The Servo library switches off the `analogWrite` (PWM) feature on D9 and D10; do not expect PWM from these two pins.\n\n### Summary\nA servo learns the requested angle from the width of a pulse that repeats every 20 ms: 544 µs is 0 degrees, 2400 µs is 180 degrees. You name the pin with `attach` and give the angle with `write`. To drive it with a potentiometer, you use `map`. The servo's power comes from 5V and GND, and its command comes from the SIG wire.",
+            "concepts": [
+              {
+                "term": "Servo",
+                "definition": "A motor with a motor, gears and an angle sensor inside; it goes to the requested angle and stays there.",
+                "example": "In a radar scanner, a servo turns the sensor between 30 and 150 degrees.",
+                "pitfall": "Thinking a servo is a continuously spinning DC motor: a servo goes to an angle between 0 and 180 degrees."
+              },
+              {
+                "term": "Pulse width",
+                "definition": "How long the pulse on the SIG wire lasts; the servo reads the angle from this (0 degrees ≈ 544 µs, 180 degrees ≈ 2400 µs).",
+                "example": "For 90 degrees, the pulse lasts about 1472 µs and repeats every 20 ms.",
+                "pitfall": "Thinking the pulse rate is the angle: it is the width of the pulse, not how often it comes, that sets the angle."
+              },
+              {
+                "term": "attach()",
+                "definition": "Connects the servo object to a pin and starts making pulses.",
+                "example": "servom.attach(9); says that the servo's signal wire is on D9.",
+                "pitfall": "Forgetting to write attach: no pulses are made and the servo does not move at all."
+              },
+              {
+                "term": "write()",
+                "definition": "Gives the servo the angle to go to, between 0 and 180 degrees.",
+                "example": "servom.write(135); moves the servo to 135 degrees.",
+                "pitfall": "Giving an angle outside 0-180: the servo strains against its mechanical limit."
+              },
+              {
+                "term": "map()",
+                "definition": "Converts a number from one range to another; the result is an integer.",
+                "example": "map(512, 0, 1023, 0, 180) gives about 90.",
+                "pitfall": "Thinking map gives a result with a fraction: the result is rounded down to an integer."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h5d21-q1",
+                "kind": "mcq",
+                "prompt": "Which wire carries the angle the servo should go to?",
+                "options": [
+                  "The VCC wire: the higher the voltage, the bigger the angle",
+                  "The GND wire: ground sets the angle",
+                  "The SIG wire: the width of the pulse sets the angle",
+                  "All three wires equally"
+                ],
+                "answer": 2,
+                "explanation": "The angle is given by the width of the pulse arriving on the SIG wire. VCC and GND only carry power; changing the voltage does not change the angle.",
+                "skills": [
+                  "servo-angle"
+                ]
+              },
+              {
+                "id": "m3h5d21-q2",
+                "kind": "numeric",
+                "prompt": "A servo wants a 544 µs pulse at 0 degrees and a 2400 µs pulse at 180 degrees, and the values in between are linear. How many microseconds is the pulse for servom.write(45)?",
+                "answer": 1008,
+                "tolerance": 1,
+                "unit": "µs",
+                "explanation": "About (2400 − 544) / 180 ≈ 10.31 µs is added per degree. 544 + 45 × 10.31 ≈ 1008 µs.",
+                "skills": [
+                  "servo-angle"
+                ]
+              },
+              {
+                "id": "m3h5d21-q3",
+                "kind": "predict-output",
+                "prompt": "The potentiometer reads 768. What does the servo do when this code runs?\n\n```\nint okuma = 768;\nint aci = map(okuma, 0, 1023, 0, 180);\nservom.write(aci);\n```",
+                "options": [
+                  "It goes to about 90 degrees",
+                  "It goes to about 135 degrees",
+                  "It goes to 180 degrees",
+                  "It goes to 768 degrees"
+                ],
+                "answer": 1,
+                "explanation": "768 × 180 / 1023 ≈ 135.1 and map rounds to an integer: 135 degrees. 90 degrees only happens when the reading is around 512; the servo cannot go beyond 180 degrees.",
+                "skills": [
+                  "servo-angle",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h5d21-q4",
+                "kind": "find-bug",
+                "prompt": "The servo is wired correctly as SIG-D9, VCC-5V, GND-GND, but it does not move at all. Why?\n\n```\n#include <Servo.h>\nServo servom;\n\nvoid setup() {\n}\n\nvoid loop() {\n  servom.write(90);\n  delay(1000);\n}\n```",
+                "options": [
+                  "There is no servom.attach(9) in setup()",
+                  "The Servo servom; line is not needed",
+                  "delay(1000) is too long",
+                  "write(90) is not a valid angle"
+                ],
+                "answer": 0,
+                "explanation": "Without attach, no pulses are made and the servo gets no commands. 90 is a valid angle and the delay causes no problem.",
+                "skills": [
+                  "servo-angle",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h5d21-q5",
+                "kind": "numeric",
+                "prompt": "This sweep loop moves the servo from 0 to 180. How many milliseconds does a one-way sweep take?\n\n```\nfor (int aci = 0; aci <= 180; aci++) {\n  servom.write(aci);\n  delay(15);\n}\n```",
+                "answer": 2715,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "From 0 to 180 (180 included) there are 181 steps, and each step waits 15 ms: 181 × 15 = 2715 ms. Saying 180 × 15 = 2700 forgets one step.",
+                "skills": [
+                  "servo-angle",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Transistör ve MOSFET ile anahtarlama, DC motor",
@@ -4474,7 +6982,127 @@ export const modul3: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Switching with a transistor and a MOSFET, DC motor",
+            "problem": "An Arduino pin can easily light a small LED. What happens if you connect a fan motor to the same pin? The motor cannot get enough current, and you might even damage the pin. So how does a tiny pin control a motor that is much more powerful than itself?",
+            "contentMd": "An Arduino pin works comfortably with up to about 20 mA; the absolute limit of an output pin is 40 mA. A small DC motor, however, can draw hundreds of mA while it runs. The solution: the pin does not drive the motor directly, it switches a **transistor** on and off. A transistor is an electronic switch that controls a large current with a small current.\n\n- **NPN transistor** (for example 2N2222 / PN2222): if you give its base a small current, the path between collector and emitter conducts. The NPN in the lab starts to conduct when the base-emitter voltage goes above about 0.7 V, and its current gain is about 100. It is suitable for small motors.\n- **Logic-level MOSFET** (for example IRLZ44N): it conducts when you give its gate a voltage above about 2 V. It works with voltage, draws almost no current and drives more powerful loads. Careful: not every MOSFET switches fully on with 5 V; choose a \"logic level\" one. The MOSFET in the lab is logic level.\n\nA motor is a **coil**. When you cut the current, the coil makes a short high-voltage spike for a moment; this spike can damage the transistor. To prevent this, a **flyback diode** (for example 1N4007) is connected across the motor in the reverse direction. The striped end of the diode (the cathode) faces the motor's plus side. The lab checks this: if the motor is driven by a transistor or MOSFET but there is no flyback diode (or it is the wrong way round), you get a warning. In the same way, if you do not put a series resistor on the NPN's base, you get a \"base current too high\" warning; a base current above about 30 mA counts as a problem.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| NPN transistor | **E** (emitter) → GND; **C** (collector) → the motor's **M2** terminal |\n| 1 kΩ resistor | end **1** to **D6**, end **2** to the transistor's **B** (base) |\n| DC motor | **M1** terminal → Uno 5V; **M2** terminal → the transistor's C |\n| Diode | **A** (anode) → the transistor's C; **K** (cathode, striped end) → 5V (the motor's plus side) |\n| Potentiometer | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |\n\nIf you want to try the MOSFET, add a MOSFET instead of the NPN: **G** (gate) → D6 (with a 100 Ω resistor in between), **S** (source) → GND, **D** (drain) → the motor's M2 terminal. Put a 10 kΩ resistor between the gate and GND; in real circuits it is there so the gate is not left floating while the Arduino starts up. The flyback diode is connected the same way (A → D, K → 5V).\n\nIn the lab you power the motor from the Uno's 5V pin; you do not need a separate supply or a common GND connection, because all GND pins are the same node in the lab. In a real circuit, however, powering a strong motor from the Arduino's 5 V pin can reset the board; there you use a separate supply and join the GNDs. Do not forget this detail, but it is not modelled in the lab.\n\n**Virtual measurement:** press ▶ and select the motor. With the NPN at full throttle you see about 4.2 V and 0.4 A across the motor terminals (about 0.8 V less than 5 V: the transistor and the line also drop some voltage while conducting). The motor turns at a speed of about one sixth of the voltage across its terminals (full speed at 6 V): that is why the speed at full throttle is about 0.70 with the NPN and about 0.83 with the MOSFET. The MOSFET loses less because its resistance is very small while it conducts.\n\n### Program\nThe first sketch sets the motor speed with a potentiometer. D6 is a PWM pin; `analogWrite` changes the average voltage going to the motor. Set the speed by changing the potentiometer's **Position** property in the right panel (even while it runs).\n\n```cpp\n// sketch: fan_pot\nconst int MOTOR = 6;        // transistörün bazına giden PWM pini\n\nvoid setup() {\n  pinMode(MOTOR, OUTPUT);\n}\n\nvoid loop() {\n  int okuma = analogRead(A0);       // 0-1023\n  int hiz = okuma / 4;              // 0-255\n  analogWrite(MOTOR, hiz);\n  delay(10);\n}\n```\n\nThe second sketch speeds the motor up slowly, holds it at full speed for a while, then slows it down slowly. A soft start instead of a sudden one protects both the supply and the gears of a real motor.\n\n```cpp\n// sketch: fan_rampa\nconst int MOTOR = 6;\n\nvoid setup() {\n  pinMode(MOTOR, OUTPUT);\n}\n\nvoid loop() {\n  for (int hiz = 0; hiz <= 255; hiz += 5) {   // hızlan\n    analogWrite(MOTOR, hiz);\n    delay(40);\n  }\n  delay(1000);                                // tam hızda bekle\n  for (int hiz = 255; hiz >= 0; hiz -= 5) {   // yavaşla\n    analogWrite(MOTOR, hiz);\n    delay(40);\n  }\n  delay(1000);\n}\n```\n\n### How does it work?\n1. `const int MOTOR = 6;` gives the pin number a name; `const` says this value will not change.\n2. When D6 is high, base current flows, the transistor conducts and the motor current reaches GND through collector-emitter. When D6 is low, the motor stops.\n3. `analogWrite(MOTOR, 128)` switches the pin on and off quickly; the duty cycle is about 50% and the motor runs at close to half power.\n4. The flyback diode opens a path for the reverse voltage that appears when the motor current is cut. This way the spike dies away without harming the transistor.\n5. Small motors may not turn at very low PWM values. With real motors you find the smallest value at which it starts to turn by trying. We will use this in the project.\n\n### Try it\n- With `fan_pot`, slowly increase the potentiometer position. How do the motor voltage and speed change in the virtual measurement?\n- Make `delay(40)` bigger in `fan_rampa`. How does the start change?\n- Write a program that runs the motor at full speed for 1 second every 3 seconds and then switches it off.\n- Delete the flyback diode from the circuit and press ▶. Which warning appears? Then connect the diode the wrong way round; what does the warning message say?\n\n### Common mistakes\n- Connecting the motor directly to the pin: a real pin cannot cope and may be damaged. In the lab, too, a warning appears when the current limit of the pin is exceeded.\n- Skipping the flyback diode or connecting it the wrong way round: in a real circuit the transistor fails over time. The lab gives a \"flyback-missing\" warning. When it is connected correctly, the diode normally carries no current.\n- Leaving out the base resistor: the base current is unlimited; in a real circuit the pin and the transistor are damaged, and in the lab a \"base current\" warning appears.\n- Using a MOSFET that is not logic level: it does not switch on enough at 5 V, it heats up and the motor stays weak.\n- Not connecting the emitter (or the MOSFET's source) to GND: the current path is not complete and the motor does not turn.",
+            "question": "When a small pin controls a large load, where does the power come from? If we think of the transistor as a \"gate\" or a \"tap\", why does the power needed to turn the tap not have to be the same as the power of the water flowing through it?",
+            "explainerMd": "### What you will learn in this lesson\n- Why an Arduino pin cannot drive a motor directly\n- That a **transistor** is a switch that controls a large current with a small current\n- How to work out the base resistor value and the base current\n- What a **flyback diode** does and how it is connected\n- How to set the motor speed with `analogWrite`\n\n### What you should know first\nOhm's law from lesson 2, the potentiometer and `analogRead` from lesson 11, PWM and `analogWrite` from lesson 16.\n\n### Why is a pin not enough?\nAn Arduino pin works comfortably with about 20 mA; going above 40 mA damages the pin. A small DC motor, however, draws hundreds of mA while it runs. The solution: the pin does not control the motor, it controls a **switch** that drives the motor. The power reaches the motor from the 5V line; the pin only says \"on\" or \"off\".\n\n### NPN transistor: a switch that works with current\nA transistor has three legs: **B** (base, the control), **C** (collector, where the load current goes in) and **E** (emitter, the GND side). When the base-emitter voltage goes above about 0.7 V, a small base current flows and the transistor lets a much larger current through between collector and emitter. The gain in the lab is about 100: 1 mA of base current allows at most 100 mA.\n\nThe base resistor limits the current. With D6 = 5 V and 1 kΩ, the base current is about (5 − 0.7) / 1000 = 4.3 mA; this is enough for a load current of up to 100 × 4.3 = 430 mA. If you forget the base resistor, the current is unlimited and a warning appears.\n\n### MOSFET: a switch that works with voltage\nA **logic-level MOSFET** conducts when its gate (G) gets a voltage above about 2 V, and it draws almost no current. Not every MOSFET switches fully on with 5 V; you choose a \"logic level\" one.\n\n### Flyback diode\nA motor is a coil. When the current is cut suddenly, the coil makes a high voltage spike in the reverse direction and can damage the transistor. A diode connected in parallel with the motor, in the reverse direction, gives this current a path. The striped end of the diode (the cathode) faces the motor's plus side, that is 5V.\n\n```\n5V ──┬── motor ──┬── C (transistor)\n     │           │\n     └── K ◄ A ──┘      diode: A to the collector, K to 5V\n```\n\n### Speed with PWM\nIf D6 switches on and off quickly, the motor sees the average voltage. `analogWrite(6, 128)` gives a duty cycle of about 50%. The motor in the lab turns at full speed at 6 V; the speed is about voltage / 6.\n\n### Summary\nThe pin controls the transistor with a small current; the motor's power comes along a separate path. An NPN needs a base resistor, and the coil needs a flyback diode. A MOSFET works with voltage and must be logic level. `analogWrite` sets the motor's speed with the PWM duty cycle.",
+            "concepts": [
+              {
+                "term": "NPN transistor",
+                "definition": "A switch that lets a large collector current through with a small base current once the base-emitter voltage goes above about 0.7 V.",
+                "example": "D6 drives the base through 1 kΩ and switches the motor on and off; the gain is about 100.",
+                "pitfall": "Leaving out the base resistor: the base current is unlimited and a warning appears."
+              },
+              {
+                "term": "Base resistor",
+                "definition": "A series resistor that limits the current through the base.",
+                "example": "With 5 V, 0.7 V and 1 kΩ, the base current is (5 − 0.7) / 1000 = 4.3 mA.",
+                "pitfall": "Connecting the pin straight to the base: the base current can go above 30 mA."
+              },
+              {
+                "term": "Logic-level MOSFET",
+                "definition": "A switch that starts to conduct when the gate voltage goes above about 2 V and draws almost no current.",
+                "example": "The G leg goes to D6, the S leg to GND and the D leg to the motor.",
+                "pitfall": "Thinking every MOSFET switches fully on with 5 V: one that is not logic level heats up and the motor stays weak."
+              },
+              {
+                "term": "Flyback diode",
+                "definition": "A diode connected across the motor in the reverse direction that gives a path to the reverse voltage spike when the motor current is cut.",
+                "example": "The diode's A leg goes to the transistor's C leg, and the striped K leg goes to 5V.",
+                "pitfall": "Skipping the diode or connecting it the wrong way round: the lab gives a flyback warning, and in real life the transistor fails."
+              },
+              {
+                "term": "Motor speed with analogWrite",
+                "definition": "The PWM duty cycle changes the average voltage reaching the motor, and so its speed.",
+                "example": "analogWrite(6, 128) gives a duty cycle of about 50%.",
+                "pitfall": "Giving values outside 0-255: if you write okuma * 4 instead of okuma / 4, the motor runs at full speed for most positions."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h5d22-q1",
+                "kind": "mcq",
+                "prompt": "Why is the motor connected behind a transistor rather than directly to an Arduino pin?",
+                "options": [
+                  "Because the pin gives less than 5 V",
+                  "The pin can only give a few tens of mA; the motor's power comes along a separate path and the pin only controls the switch",
+                  "Because the transistor makes the motor turn faster",
+                  "Because the motor's direction is changed with the transistor"
+                ],
+                "answer": 1,
+                "explanation": "A pin works comfortably with about 20 mA and must not go above 40 mA; a motor draws hundreds of mA. The transistor lets a large current through with a small base current. It is used for current capacity, not for speed or direction.",
+                "skills": [
+                  "transistor-switching"
+                ]
+              },
+              {
+                "id": "m3h5d22-q2",
+                "kind": "numeric",
+                "prompt": "D6 gives 5 V; the base resistor is 1 kΩ and the base-emitter threshold is 0.7 V. What is the base current in mA? (Ignore the pin's internal resistance.)",
+                "answer": 4.3,
+                "tolerance": 0.1,
+                "unit": "mA",
+                "explanation": "The voltage across the resistor is 5 − 0.7 = 4.3 V. I = V / R = 4.3 / 1000 = 0.0043 A = 4.3 mA. Because the gain is 100, this current is enough for a load current of up to about 430 mA.",
+                "skills": [
+                  "transistor-switching",
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h5d22-q3",
+                "kind": "predict-output",
+                "prompt": "The potentiometer reads 600. About what is the PWM duty cycle on D6?\n\n```\nint okuma = 600;\nint hiz = okuma / 4;\nanalogWrite(6, hiz);\n```",
+                "options": [
+                  "25%",
+                  "50%",
+                  "59%",
+                  "100%"
+                ],
+                "answer": 2,
+                "explanation": "600 / 4 = 150. The duty cycle is 150 / 255 ≈ 0.59, that is 59%. 50% happens when the reading is around 512; for 100% the speed must be 255.",
+                "skills": [
+                  "motor-pwm-speed"
+                ]
+              },
+              {
+                "id": "m3h5d22-q4",
+                "kind": "find-bug",
+                "prompt": "The motor speed should be set with the pot, but the motor is already at full speed before the pot reaches the middle. Which line is wrong?\n\n```\nconst int MOTOR = 6;\nvoid setup() { pinMode(MOTOR, OUTPUT); }\n\nvoid loop() {\n  int okuma = analogRead(A0);\n  int hiz = okuma * 4;\n  analogWrite(MOTOR, hiz);\n  delay(10);\n}\n```",
+                "options": [
+                  "pinMode(MOTOR, OUTPUT);",
+                  "int hiz = okuma * 4;",
+                  "analogWrite(MOTOR, hiz);",
+                  "delay(10);"
+                ],
+                "answer": 1,
+                "explanation": "analogRead gives 0-1023, analogWrite wants 0-255. To convert, you must divide by 4. When you multiply by 4, the value goes above 255 once the reading passes 64, and the output stays HIGH all the time. The other lines are correct.",
+                "skills": [
+                  "motor-pwm-speed",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h5d22-q5",
+                "kind": "mcq",
+                "prompt": "The motor is connected to 5V and to the transistor's collector. Where does the striped end (the cathode) of the flyback diode go?",
+                "options": [
+                  "To the transistor's emitter",
+                  "To GND",
+                  "To pin D6",
+                  "To the motor's plus side (5V)"
+                ],
+                "answer": 3,
+                "explanation": "In normal operation the diode must face the reverse direction and carry no current: the K leg goes to the plus side (5V) and the A leg to the collector. If it is connected the wrong way round, it gives no path for the spike and the lab gives a warning.",
+                "skills": [
+                  "transistor-switching",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "H-köprüsü L293D: yön ve hız",
@@ -4591,7 +7219,123 @@ export const modul3: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "H-bridge L293D: direction and speed",
+            "problem": "We ran a motor with a transistor, but it always turned the same way. A radio-controlled car, however, goes both forwards and backwards. Do you have to swap the motor's wires by hand to make it turn the other way?",
+            "contentMd": "To make a DC motor turn the other way, you only need to swap its plus and minus terminals. To do this with code, you use a circuit with four switches; because its shape looks like the letter \"H\", it is called an **H-bridge**. The **L293D** chip has two H-bridges inside, and it also contains diodes against the kickback of the motor current. That is why you do not need a separate flyback diode.\n\nThe L293D pins we use in this lesson in the lab (the real chip's pin number in brackets):\n\n| Lab pin | Job | Connection |\n|---|---|---|\n| **EN12** (pin 1) | Channel on/off, PWM speed | **D6** |\n| **IN1** (pin 2) | Direction input 1 | **D7** |\n| **IN2** (pin 7) | Direction input 2 | **D5** |\n| **OUT1** (pin 3) | Motor terminal 1 | Motor **M1** |\n| **OUT2** (pin 6) | Motor terminal 2 | Motor **M2** |\n| **GND** (pins 4, 5, 12, 13) | Ground | Uno GND |\n| **VCC2** (pin 8) | Motor power (4.5-36 V on the real chip) | Uno 5V |\n| **VCC1** (pin 16) | The chip's logic power (5 V) | Uno 5V |\n\nIn the lab, the L293D's four GND pins are a single **GND** pin. The L293D gives at most 600 mA per channel; it is not suitable for bigger motors.\n\n**Careful:** the L293D drops about 1.4 V at its output. When an output is \"high\", the voltage is VCC2 - 1.4 V; when it is \"low\", it is about 0.2 V. If the motor is powered from 5 V, it sees about 3.3 V across its terminals; that is why the same motor turns more slowly with the L293D than in the transistor circuit. In the lab you see this with virtual measurement. When the EN pin is low, or the chip's VCC1/VCC2 supply is missing, the outputs float (high impedance) and the motor stops.\n\nDirection table:\n\n| D7 (IN1) | D5 (IN2) | D6 (EN) | Motor |\n|---|---|---|---|\n| HIGH | LOW | PWM | Forwards, speed depends on PWM |\n| LOW | HIGH | PWM | Backwards, speed depends on PWM |\n| LOW | LOW | any | Stops |\n| HIGH | HIGH | any | Stops (like a brake) |\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| L293D | As in the table above: EN12 → D6, IN1 → D7, IN2 → D5, VCC1 and VCC2 → 5V, GND → GND |\n| DC motor | **M1** → L293D **OUT1**, **M2** → L293D **OUT2** |\n| Button 1 | end **A** to **D2**, end **B** to GND (forwards) |\n| Button 2 | end **A** to **D3**, end **B** to GND (backwards) |\n| Potentiometer | **SIG** → **A0** (speed), **VCC** → 5V, **GND** → GND |\n\nIn the lab the motor supply comes from the Uno's 5V pin (VCC2 → 5V); there is no separate motor supply. In a real circuit, if the motor voltage is above 5 V, VCC2 is powered from a separate supply, and that supply's GND is joined to the Arduino GND.\n\n### Program\nThe first sketch runs the motor automatically: forwards, stop, backwards, stop. Before changing direction, we stop the motor and wait a little.\n\n```cpp\n// sketch: motor_yon\nconst int EN = 6;     // hız (PWM)\nconst int IN1 = 7;\nconst int IN2 = 5;\n\nvoid ileri(int hiz) {\n  digitalWrite(IN1, HIGH);\n  digitalWrite(IN2, LOW);\n  analogWrite(EN, hiz);\n}\n\nvoid geri(int hiz) {\n  digitalWrite(IN1, LOW);\n  digitalWrite(IN2, HIGH);\n  analogWrite(EN, hiz);\n}\n\nvoid dur() {\n  analogWrite(EN, 0);\n  digitalWrite(IN1, LOW);\n  digitalWrite(IN2, LOW);\n}\n\nvoid setup() {\n  pinMode(EN, OUTPUT);\n  pinMode(IN1, OUTPUT);\n  pinMode(IN2, OUTPUT);\n  dur();\n}\n\nvoid loop() {\n  ileri(200);\n  delay(2000);\n  dur();\n  delay(1000);\n  geri(200);\n  delay(2000);\n  dur();\n  delay(1000);\n}\n```\n\nThe second sketch controls the motor with two buttons; the potentiometer sets the speed. If both buttons are pressed together, the motor stops. To press a button, hold down the button part on the canvas or turn on the **Pressed** option in the properties panel.\n\n```cpp\n// sketch: motor_buton\nconst int EN = 6;\nconst int IN1 = 7;\nconst int IN2 = 5;\n\nvoid surus(bool yonIleri, int hiz) {\n  digitalWrite(IN1, yonIleri ? HIGH : LOW);\n  digitalWrite(IN2, yonIleri ? LOW : HIGH);\n  analogWrite(EN, hiz);\n}\n\nvoid dur() {\n  analogWrite(EN, 0);\n  digitalWrite(IN1, LOW);\n  digitalWrite(IN2, LOW);\n}\n\nvoid setup() {\n  pinMode(EN, OUTPUT);\n  pinMode(IN1, OUTPUT);\n  pinMode(IN2, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  pinMode(3, INPUT_PULLUP);\n  dur();\n}\n\nvoid loop() {\n  int hiz = analogRead(A0) / 4;\n  bool ileriBas = (digitalRead(2) == LOW);   // basılı = LOW\n  bool geriBas = (digitalRead(3) == LOW);\n\n  if (ileriBas && !geriBas) {\n    surus(true, hiz);\n  } else if (geriBas && !ileriBas) {\n    surus(false, hiz);\n  } else {\n    dur();                                    // hiçbiri ya da ikisi birden\n  }\n}\n```\n\n### How does it work?\n1. The direction is set by `IN1` and `IN2` being different. To reverse it, you only need to swap the two.\n2. The speed is set with the PWM given to the `EN` pin; `analogWrite(EN, 200)` means a duty cycle of about 78%.\n3. The `ileri` (forwards), `geri` (backwards) and `dur` (stop) functions make the code readable. Each job has a clear name.\n4. The expression `yonIleri ? HIGH : LOW` means \"HIGH if yonIleri is true, otherwise LOW\".\n5. Reversing the direction suddenly while the motor is turning strains a real motor and its supply. First `dur()`, then the new direction.\n\n### Try it\n- Set the speed in `motor_yon` to 120. Does the motor still turn? Look at the motor's voltage and speed in the virtual measurement.\n- Write a program that runs the motor for 3 seconds in each direction and waits 2 seconds in between.\n- In the `motor_buton` sketch, press both buttons together and check that the motor really stops.\n- Take the EN12 wire off D6, connect it to GND and press ▶. Why does the motor not turn at all?\n\n### Common mistakes\n- Forgetting to give VCC1 5 V: the chip does not work at all. The lab gives an \"L293D not powered\" warning.\n- Not connecting VCC2 (motor power): the outputs float and the motor does not turn.\n- Not connecting GND: the chip does not work.\n- Not driving the EN pin or keeping it LOW: the output floats and the motor stops.\n- Connecting the motor supply to VCC1: on a real chip, if the motor voltage is above 5 V, the logic side is damaged. The motor supply goes to VCC2, and the 5 V logic power goes to VCC1.\n- Connecting a powerful motor to the L293D: the real chip overheats. Big motors need a stronger driver.",
+            "question": "If you connected the wheels of a robot car to the two channels of the L293D, what would you make the two motors do to turn the car right? How would you write these directions as code?",
+            "explainerMd": "### What you will learn in this lesson\n- Why a DC motor's direction changes when its plus and minus terminals are swapped\n- What an **H-bridge** and the **L293D** chip do\n- How to control direction and speed with the IN1, IN2 and EN pins\n- How to connect the power pins (VCC1, VCC2, GND) correctly\n\n### What you should know first\n`INPUT_PULLUP` and `if/else` from lessons 6 and 7, `analogWrite` from lesson 16, functions from lesson 19, driving a motor with a transistor from lesson 22.\n\n### Changing direction\nIn the transistor circuit the motor always turns the same way. To make a DC motor turn the other way, you only need to swap its plus and minus terminals. Instead of doing this by hand, you use a circuit made of four switches whose shape looks like the letter \"H\": an **H-bridge**. The switches close in diagonal pairs; which diagonal closes decides which way the current flows through the motor.\n\n### L293D\nThe L293D contains two H-bridges and kickback diodes; that is why you do not need a separate flyback diode. It gives at most 600 mA per channel.\n\n```\nPin    Job\nEN12   Switches the channel on/off, speed with PWM\nIN1    Direction input 1\nIN2    Direction input 2\nOUT1   Motor terminal 1\nOUT2   Motor terminal 2\nVCC1   The chip's logic power (5 V)\nVCC2   Motor power\nGND    Ground\n```\n\n### Direction table\n```\nIN1   IN2   Motor\nHIGH  LOW   Forwards\nLOW   HIGH  Backwards\nLOW   LOW   Stops\nHIGH  HIGH  Stops (like a brake)\n```\nThe direction is set by IN1 and IN2 being **different**; the speed is set with PWM on the EN pin. For example, `analogWrite(EN, 200)` gives a duty cycle of 200 / 255 ≈ 78%. When EN is low, or the chip's supply is missing, the outputs float and the motor stops.\n\n### Lost voltage\nThe L293D loses about 1.4 V at its output. If VCC2 = 5 V, a high output is about 3.6 V and a low output is about 0.2 V; the motor sees about 3.3 V. The same motor turns more slowly than in the transistor circuit.\n\n### Changing direction safely\nReversing a turning motor suddenly strains the motor and its supply. First `dur()`, a short wait, then the new direction. The `ileri()`, `geri()` and `dur()` functions make the code readable.\n\n### Summary\nThe L293D is an H-bridge chip that sets the motor's direction with IN1 and IN2 and its speed with EN. VCC1 is for logic power, VCC2 is for motor power; GND is a must. The chip drops about 1.4 V, so the motor turns a little more slowly. Stop the motor before changing direction.",
+            "concepts": [
+              {
+                "term": "H-bridge",
+                "definition": "A circuit that changes the direction of the voltage across the motor terminals with four switches; its shape looks like the letter H.",
+                "example": "The L293D has two H-bridges inside, so it controls two motors separately.",
+                "pitfall": "Closing all four switches at once: in a real bridge this can cause a short circuit; the L293D prevents it with its input logic."
+              },
+              {
+                "term": "IN1 and IN2",
+                "definition": "The two inputs that set the motor's direction; if they are different the motor turns, if they are the same it stops.",
+                "example": "When IN1 = HIGH and IN2 = LOW, the motor turns forwards.",
+                "pitfall": "Setting both HIGH or both LOW and expecting the motor to turn."
+              },
+              {
+                "term": "EN12",
+                "definition": "The pin that switches the L293D's first channel on and off; if it gets PWM, it sets the speed.",
+                "example": "analogWrite(6, 200) gives a duty cycle of about 78%, so about 78% speed.",
+                "pitfall": "Not connecting EN or leaving it LOW: the outputs float and the motor stops."
+              },
+              {
+                "term": "VCC1 and VCC2",
+                "definition": "VCC1 is the chip's logic power (5 V); VCC2 carries the motor's power.",
+                "example": "In the lab, both are connected to 5V.",
+                "pitfall": "Connecting the motor supply to VCC1: if the motor voltage is above 5 V, the logic side is damaged."
+              },
+              {
+                "term": "Output voltage loss",
+                "definition": "The L293D loses about 1.4 V on a high output; if VCC2 = 5 V, you see about 3.6 V.",
+                "example": "About 3.3 V is left across the motor terminals, and it turns more slowly than in the transistor circuit.",
+                "pitfall": "Expecting the motor to get 5 V."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h5d23-q1",
+                "kind": "numeric",
+                "prompt": "The L293D's VCC2 is 5 V. Think of it as losing 1.4 V on a high output and 0.2 V on a low output (high output 5 − 1.4 = 3.6 V, low output 0.2 V). About how many volts are left between the motor's two terminals? (Ignore small resistance losses.)",
+                "answer": 3.3,
+                "tolerance": 0.15,
+                "unit": "V",
+                "explanation": "The high end is 3.6 V and the low end is 0.2 V; the difference is 3.4 V. Because there is a small extra loss in the output resistances, the lab reads about 3.3 V. Thinking it is 5 V forgets the chip's loss.",
+                "skills": [
+                  "h-bridge"
+                ]
+              },
+              {
+                "id": "m3h5d23-q2",
+                "kind": "numeric",
+                "prompt": "analogWrite(EN, 200) was written to the EN12 pin. What percentage is the PWM duty cycle? (Round to a whole number.)",
+                "answer": 78,
+                "tolerance": 1,
+                "unit": "%",
+                "explanation": "analogWrite works in the range 0-255: 200 / 255 ≈ 0.784, so about 78%. The motor's speed changes with the average voltage at this ratio.",
+                "skills": [
+                  "motor-pwm-speed"
+                ]
+              },
+              {
+                "id": "m3h5d23-q3",
+                "kind": "predict-output",
+                "prompt": "EN12 is connected to D6, IN1 to D7 and IN2 to D5. What does the motor do when this code runs?\n\n```\ndigitalWrite(7, LOW);\ndigitalWrite(5, HIGH);\nanalogWrite(6, 200);\n```",
+                "options": [
+                  "It turns forwards",
+                  "It stops",
+                  "It turns backwards, at about 78% power",
+                  "It turns backwards, at full speed"
+                ],
+                "answer": 2,
+                "explanation": "IN1 = LOW and IN2 = HIGH is the backwards direction. Because EN gets a duty cycle of 200 / 255 ≈ 78%, it is not full speed. For forwards, IN1 must be HIGH and IN2 LOW.",
+                "skills": [
+                  "h-bridge",
+                  "motor-pwm-speed"
+                ]
+              },
+              {
+                "id": "m3h5d23-q4",
+                "kind": "find-bug",
+                "prompt": "The ileri() (forwards) function is called, but the motor does not turn at all. Which line is wrong?\n\n```\nvoid ileri(int hiz) {\n  digitalWrite(IN1, HIGH);\n  digitalWrite(IN2, HIGH);\n  analogWrite(EN, hiz);\n}\n```",
+                "options": [
+                  "void ileri(int hiz) {",
+                  "digitalWrite(IN1, HIGH);",
+                  "digitalWrite(IN2, HIGH);",
+                  "analogWrite(EN, hiz);"
+                ],
+                "answer": 2,
+                "explanation": "When IN1 and IN2 are both HIGH, the motor stops. For forwards, IN2 must be LOW. IN1 being HIGH is correct; the EN line is not a problem either.",
+                "skills": [
+                  "h-bridge",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h5d23-q5",
+                "kind": "mcq",
+                "prompt": "In a real circuit, the motor will run on 9 V. Which L293D pin does the plus of the 9 V supply go to?",
+                "options": [
+                  "VCC1",
+                  "EN12",
+                  "IN1",
+                  "VCC2"
+                ],
+                "answer": 3,
+                "explanation": "Motor power comes from VCC2. VCC1 is the chip's 5 V logic power; if it gets 9 V, the logic side can be damaged. EN12 and IN1 are signal inputs. The supply's GND must be joined to the Arduino GND.",
+                "skills": [
+                  "h-bridge",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Röle: yüksek akım anahtarlama ve güvenlik",
@@ -4709,7 +7453,124 @@ export const modul3: ModuleContent = {
                 "elec-ohm"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Relay: high-current switching and safety",
+            "problem": "The transistor drove small motors, but sometimes you need to switch a bigger load, or a circuit that is completely separate from the Arduino, on and off. A small box that makes a \"click\" does this: the relay. Let's find out together what is inside it and why it needs so much care.\n\n## Safety warning\nIn the virtual lab you only build **low-voltage** circuits: the Uno's 5 V is enough, and the lab does not offer mains voltage. In real life, **mains voltage (220 V)** can kill; switching a device that is plugged into a socket with a relay is a job for a specialist who has been trained for it and has the right equipment. A relay module having \"250 V\" printed on it does not mean you can use it safely on your own. The logic you learn here (COM, NO, NC, active-LOW) is the same at low voltage too.",
+            "contentMd": "A relay is a switch that works with an **electromagnet**. When you send current through the coil, the magnet pulls a metal arm and the contacts close. The circuit you switch with the Arduino (the contact side) is electrically separate from the coil circuit. The contact side is a circuit that carries no voltage of its own and simply behaves like a switch; this is called a **dry contact**.\n\nA relay module comes with the transistor that drives the coil, a diode and usually an LED already fitted. The module has three input pins: VCC (5 V), GND and IN (signal). On the contact side there are three terminals:\n\n- **COM**: the common terminal\n- **NO** (normally open): open when the relay is not energised, connected to COM when it is energised\n- **NC** (normally closed): connected to COM when the relay is not energised, opens when it is energised\n\nMost modules on the market (especially the ones with an optocoupler) are **energised by LOW**: when you give the IN pin `LOW` the relay pulls in, and when you give it `HIGH` it releases. Some modules are the other way round; on a real module you check what is printed on it or find out with a quick test. On the relay part in the lab, this is the **Trigger** property: \"Energized by HIGH\" (default) or \"Energized by LOW (active-LOW)\". In this lesson we assume a module that is energised by LOW; so after adding the relay, set Trigger to **Energized by LOW**. The relay module needs more than 4 V on its VCC to work; if VCC or GND is not connected, the relay never pulls in.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Relay module | **VCC** → 5V, **GND** → GND, **IN** → **D7**; in the properties, Trigger: Energized by LOW |\n| Contact side | Relay **COM** terminal → Uno 5V |\n| Small load: 330 Ω resistor + LED | Relay **NO** terminal → end **1** of the resistor; end **2** of the resistor → LED **A**; LED **K** → GND |\n| Button | end **A** to **D2**, end **B** to GND |\n| Potentiometer (second sketch) | **SIG** → **A0**, **VCC** → 5V, **GND** → GND |\n\nIn the lab, the voltage on the contact side also comes from the Uno's 5V pin. Although the contact side and the coil side are electrically separate, we use the same 5V line for convenience. In a real circuit, the load current must stay well below the contact current rating printed on the relay; here we only work with small loads of at most a few hundred mA (the LED draws about 9 mA).\n\n**Virtual measurement:** press ▶ and select the resistor or the LED while the relay pulls in and releases. You see about 9 mA flowing through the LED while the relay is energised, and the current dropping to zero when it releases.\n\n### Program\nThe first sketch toggles the relay each time you press the button. Because the relay module is energised by LOW, its \"off\" state is `HIGH`. By writing `HIGH` before making the pin an output, we stop the relay clicking for a moment at start-up.\n\n```cpp\n// sketch: role_buton\nconst int ROLE = 7;\nconst int BUTON = 2;\nbool acik = false;\n\nvoid setup() {\n  digitalWrite(ROLE, HIGH);        // önce kapalı durumu yaz\n  pinMode(ROLE, OUTPUT);\n  pinMode(BUTON, INPUT_PULLUP);\n}\n\nvoid loop() {\n  if (digitalRead(BUTON) == LOW) {     // basıldı\n    acik = !acik;                      // durumu ters çevir\n    if (acik) {\n      digitalWrite(ROLE, LOW);         // röle çeker\n    } else {\n      digitalWrite(ROLE, HIGH);        // röle bırakır\n    }\n    delay(50);\n    while (digitalRead(BUTON) == LOW) {\n      // buton bırakılana kadar bekle\n    }\n    delay(50);\n  }\n}\n```\n\nThe second sketch switches the relay on and off according to a sensor value. The potentiometer on A0 imitates a temperature sensor. The switch-on threshold (600) and the switch-off threshold (500) are different. This difference is called **hysteresis**.\n\n```cpp\n// sketch: role_esik\nconst int ROLE = 7;\nconst int ACMA = 600;     // bunun üstünde röle çeker\nconst int KAPAMA = 500;   // bunun altında röle bırakır\n\nbool acik = false;\n\nvoid setup() {\n  digitalWrite(ROLE, HIGH);\n  pinMode(ROLE, OUTPUT);\n}\n\nvoid loop() {\n  int deger = analogRead(A0);\n  if (!acik && deger > ACMA) {\n    acik = true;\n    digitalWrite(ROLE, LOW);\n  } else if (acik && deger < KAPAMA) {\n    acik = false;\n    digitalWrite(ROLE, HIGH);\n  }\n  delay(50);\n}\n```\n\n### How does it work?\n1. The relay coil is powered through a transistor or the module's own driver. Like a motor, the coil makes a voltage spike when the current is cut. That is why the coil needs a flyback diode; on the module this diode is already fitted.\n2. `role_buton` counts a press once: even if you hold the button down, the state changes only once.\n3. `role_esik` uses two separate thresholds. While the value is between 500 and 600, the relay stays in the state it is in.\n4. If you used a single threshold, the relay would click all the time while the value jittered around the threshold, and the contacts would wear out. Hysteresis prevents this.\n5. A relay is a mechanical part and its life is limited. Do not use it for fast switching such as PWM, switching it on and off dozens of times a second. Where you need speed control, use a transistor or a MOSFET.\n\n### Try it\n- In `role_esik`, set the thresholds to 520 and 480. What changes when the hysteresis range gets narrower? Watch the relay while you slowly change the potentiometer's Position property.\n- Extend the `role_buton` program so that it prints \"ACIK\" (on) to the serial monitor while the relay is on and \"KAPALI\" (off) while it is off.\n- Connect the load to the NC terminal instead of NO. In which state does the load work? Try it and take notes.\n- Set the Trigger property to \"Energized by HIGH\" and press ▶ with `role_buton`. What happens? Why?\n\n### Common mistakes\n- Trying out a relay with mains voltage (220 V): never. This job belongs only to a trained specialist; in the lab, 5 V is enough.\n- Not knowing the relay module's LOW/HIGH logic: the relay can stay energised at start-up. Writing `HIGH` before `pinMode` makes this less likely. In the lab, a wrong Trigger property causes the same confusion.\n- Connecting a bare relay (without a module) directly to a pin: the coil current is too much for the pin, and without a diode the spike damages the pin.\n- Mixing up the COM, NO and NC terminals: the load works with the opposite logic.\n- Not connecting the relay module's VCC or GND: the relay does not pull in, and a \"relay module not powered\" warning appears.\n- In a real circuit, letting the contact current go above the contact rating: the contacts weld together or burn.",
+            "question": "The contact side of the relay is electrically separate from the Arduino. Think about which kind of safety this separation gives you and which it does not. What knowledge and equipment does a person need before working with mains voltage?",
+            "explainerMd": "### What you will learn in this lesson\n- How the electromagnetic switch called a **relay** works\n- What the COM, NO and NC terminals mean\n- How to drive an **active-LOW** module correctly\n- How to stop a relay chattering with **hysteresis**\n- Why you work with low voltage and never touch mains voltage\n\n### What you should know first\n`INPUT_PULLUP`, `digitalRead` and `if/else` from lessons 6 and 7, counting a button press once from lesson 8, `analogRead` from lesson 11, protecting a coil with a flyback diode from lesson 22.\n\n### Safety comes first\nOn this portal you only work with the Uno's 5 V. In real life, **mains voltage (220 V)** can kill; controlling a device that is plugged into a socket with a relay is a job for a trained specialist. A module having \"250 V\" printed on it does not mean you can use it safely.\n\n### What is a relay?\nA relay is a switch that works with an electromagnet. When current flows through the coil, the magnet pulls an arm and the contacts change position. The coil side and the contact side are electrically separate; the contact side simply behaves like a switch (a **dry contact**).\n\n```\nCOM  common terminal\nNO   normally open:   open when not energised,          connected to COM when energised\nNC   normally closed: connected to COM when not energised, opens when energised\n```\n\nThe module already has the transistor and diode that drive the coil; you only connect VCC, GND and IN.\n\n### Active-LOW\nMost modules pull in when the IN pin gets **LOW** and release when it gets HIGH. So the \"off\" state is HIGH. To stop the relay clicking for a moment at start-up, you write `digitalWrite(ROLE, HIGH)` before `pinMode`.\n\n### Hysteresis\nIf a value such as temperature wobbles around a single threshold, the relay clicks all the time and its mechanical contacts wear out. The solution is two thresholds.\n\n```\nif value > 600  energise\nif value < 500  release\nbetween 500-600: stay as it is\n```\n\nThis 100-unit range is called **hysteresis**. Because a relay is mechanical, it is not suitable for fast PWM; for speed control, use a transistor or a MOSFET.\n\n### Summary\nA relay is an electromagnetic switch that switches a separate circuit on and off with a low-current signal. The load goes between COM and NO or NC. Most modules are energised by LOW. Hysteresis prevents chattering around the threshold. Mains voltage belongs only to a specialist.",
+            "concepts": [
+              {
+                "term": "Relay",
+                "definition": "A switch that works with an electromagnet, whose contact side is electrically separate from the control side.",
+                "example": "The Arduino drives a relay, and the relay switches on an LED or a load in a separate circuit.",
+                "pitfall": "Connecting a bare relay directly to a pin: the coil current is too much for the pin, and the spike damages the pin."
+              },
+              {
+                "term": "COM, NO and NC",
+                "definition": "COM is the common terminal; NO connects to COM when energised, NC is connected to COM when not energised.",
+                "example": "If the load is between NO and COM, it works only when the relay is energised.",
+                "pitfall": "Mixing up NO and NC: the load works with the opposite logic."
+              },
+              {
+                "term": "Active-LOW",
+                "definition": "A relay module that pulls in when its IN pin gets LOW and releases when it gets HIGH.",
+                "example": "digitalWrite(7, LOW) energises the relay, HIGH releases it.",
+                "pitfall": "Not knowing the logic: the relay can stay energised at start-up; writing HIGH before pinMode prevents this."
+              },
+              {
+                "term": "Hysteresis",
+                "definition": "Using two separate thresholds for switching on and switching off; in the zone between them, the state is kept.",
+                "example": "Energise above 600, release below 500.",
+                "pitfall": "Using a single threshold: when the value jitters around it, the relay clicks all the time and the contacts wear out."
+              },
+              {
+                "term": "Mains voltage",
+                "definition": "The 220 V in the socket; it can kill, and controlling it with a relay is a job only for a trained specialist.",
+                "example": "On this portal you only build 5 V virtual circuits.",
+                "pitfall": "Thinking the 250 V printed on a module means it is safe, and trying it with a socket."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h5d24-q1",
+                "kind": "numeric",
+                "prompt": "While the relay is energised, COM is connected to 5V and the NO terminal goes to a red LED (Vf = 1.9 V) through a 330 Ω resistor. About how many mA flow through the LED? (Ignore the relay and wire resistances.)",
+                "answer": 9.3,
+                "tolerance": 0.3,
+                "unit": "mA",
+                "explanation": "The voltage across the resistor is 5 − 1.9 = 3.1 V. I = 3.1 / 330 ≈ 0.0094 A ≈ 9.4 mA. When the relay releases, the circuit opens and the current becomes zero.",
+                "skills": [
+                  "relay-logic",
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h5d24-q2",
+                "kind": "predict-output",
+                "prompt": "The relay module is energised by LOW and starts released. analogRead returns 650, 550 and 480 in turn. What is the relay's state after each reading?\n\n```\nif (!acik && deger > 600) {\n  acik = true;\n  digitalWrite(7, LOW);\n} else if (acik && deger < 500) {\n  acik = false;\n  digitalWrite(7, HIGH);\n}\n```",
+                "options": [
+                  "Energised, released, released",
+                  "Energised, energised, released",
+                  "Energised, energised, energised",
+                  "Released, energised, released"
+                ],
+                "answer": 1,
+                "explanation": "Because 650 > 600, the relay pulls in. 550 is between the two thresholds, so the state is kept and the relay stays energised. When 480 < 500, it releases. This is the job of hysteresis.",
+                "skills": [
+                  "hysteresis",
+                  "relay-logic"
+                ]
+              },
+              {
+                "id": "m3h5d24-q3",
+                "kind": "find-bug",
+                "prompt": "When the threshold is passed, the relay pulls in, but it releases straight away, pulls in again and clicks all the time. Which line is wrong?\n\n```\nif (!acik && deger > ACMA) {\n  acik = true;\n  digitalWrite(ROLE, LOW);\n} else if (acik && deger > KAPAMA) {\n  acik = false;\n  digitalWrite(ROLE, HIGH);\n}\n```\n(ACMA = 600, KAPAMA = 500)",
+                "options": [
+                  "if (!acik && deger > ACMA) {",
+                  "digitalWrite(ROLE, LOW);",
+                  "} else if (acik && deger > KAPAMA) {",
+                  "digitalWrite(ROLE, HIGH);"
+                ],
+                "answer": 2,
+                "explanation": "The switch-off condition should have been deger < KAPAMA. With >, the relay is released straight after it pulls in (deger is still above 500), and the cycle repeats. Energising with LOW and releasing with HIGH are correct.",
+                "skills": [
+                  "hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h5d24-q4",
+                "kind": "mcq",
+                "prompt": "The load is connected between COM and the NO terminal. What happens when the relay is energised?",
+                "options": [
+                  "NO connects to COM and the load works",
+                  "NO disconnects from COM and the load stops",
+                  "The load always works",
+                  "The load is connected to GND"
+                ],
+                "answer": 0,
+                "explanation": "NO is normally open: when the relay is not energised it is separate from COM, and when it is energised it connects to COM. If the load were on the NC terminal, it would be the other way round.",
+                "skills": [
+                  "relay-logic"
+                ]
+              },
+              {
+                "id": "m3h5d24-q5",
+                "kind": "numeric",
+                "prompt": "The switch-on threshold is 600 and the switch-off threshold is 500. On the 5 V / 1024 scale, about how many volts is the hysteresis range?",
+                "answer": 0.49,
+                "tolerance": 0.02,
+                "unit": "V",
+                "explanation": "The range is 600 − 500 = 100 units. One unit is 5 / 1024 ≈ 4.88 mV, so 100 × 4.88 mV ≈ 0.49 V.",
+                "skills": [
+                  "hysteresis",
+                  "elec-ohm"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Sıcaklığa bağlı otomatik fan ve servo tarayıcı",
@@ -4827,7 +7688,124 @@ export const modul3: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: temperature-controlled automatic fan and servo scanner",
+            "problem": "The fan in a computer case speeds up when the processor gets hot and slows down when it cools. You can also build a system that switches a fan on by itself when the room warms up, and also scans the room with a servo. What you learned this week comes together in one project.",
+            "contentMd": "The system's job:\n- Read the temperature from the NTC thermistor (A2).\n- When the temperature rises to **30 °C** or above, switch the fan on. The speed should rise as the temperature rises (slow at 30 °C, full speed at 50 °C and above).\n- Do not switch the fan off until the temperature drops below **28 °C** (hysteresis).\n- While the fan runs, the servo should sweep between 30 and 150 degrees; when it is cool, the servo should park at 90 degrees.\n- Print the temperature to the serial monitor.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| NTC thermistor | end **1** to **A2**, end **2** to GND |\n| 10 kΩ resistor | end **1** to 5V, end **2** to **A2** |\n| NPN transistor | **E** → GND; **C** → the fan motor's **M2** terminal |\n| 1 kΩ resistor | end **1** to **D6**, end **2** to the transistor's **B** |\n| DC motor (fan) | **M1** → 5V; **M2** → transistor **C** |\n| Diode | **A** → transistor **C**; **K** (striped end) → 5V (fan plus) |\n| Servo | **SIG** → **D9**; **VCC** → 5V; **GND** → GND |\n\nThis circuit is the same as in lesson 13: the NTC at the bottom, the fixed resistor at the top. As it warms up, the NTC's resistance falls, and so does the voltage on A2. We covered the temperature calculation there: first we find the NTC resistance from the ADC value, then the temperature with the Beta equation.\n\nIn the lab, the fan and the servo are powered from the Uno's 5V pin; you do not need a separate supply or a common GND connection. In a real circuit, the board can reset when the fan and the servo are powered from the same weak supply; there you use a separate 5 V supply and join the GNDs.\n\n**Warming the room:** select the NTC part and change the **Temperature** property in the right panel. This property also changes while it runs. The default is 25 °C: the fan should be off and the servo parked at 90 degrees. When you set the temperature to 45 °C, the fan should turn and the servo should start sweeping. Then lower it to 29 °C: because of hysteresis, the fan should still stay on. At 27 °C it should switch off.\n\n**Virtual measurement:** while it runs, select the NTC, the 10 kΩ resistor and the fan motor. The voltage across the NTC falls with temperature; the motor speed also rises with the temperature you choose.\n\n### Program\n```cpp\n// sketch: fan_servo_proje\n#include <Servo.h>\n\nconst int NTC_PIN = A2;\nconst int FAN_PIN = 6;          // PWM, transistör üzerinden fan\nconst int SERVO_PIN = 9;\n\nconst float SABIT_R = 10000.0;  // 10 kΩ sabit direnç\nconst float NTC_R25 = 10000.0;  // 25 °C'de 10 kΩ\nconst float BETA = 3950.0;\n\nconst float ACMA_C = 30.0;      // fan bu sıcaklıkta başlar\nconst float KAPAMA_C = 28.0;    // fan bu sıcaklığın altında durur\n\nServo tarayici;\nbool fanAcik = false;\nint aci = 90;\nint yon = 2;                    // her adımda 2 derece\nint sayac = 0;\n\nfloat sicaklikOku() {\n  int adc = analogRead(NTC_PIN);\n  adc = constrain(adc, 1, 1022);                      // sıfıra bölmeyi önle\n  float rntc = SABIT_R * adc / (1023.0 - adc);        // NTC altta (13. ders)\n  float kelvin = 1.0 / (1.0 / 298.15 + log(rntc / NTC_R25) / BETA);\n  return kelvin - 273.15;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(FAN_PIN, OUTPUT);\n  tarayici.attach(SERVO_PIN);\n  tarayici.write(90);\n}\n\nvoid loop() {\n  float sicak = sicaklikOku();\n\n  // histerezisli açma/kapama\n  if (!fanAcik && sicak >= ACMA_C) {\n    fanAcik = true;\n  } else if (fanAcik && sicak < KAPAMA_C) {\n    fanAcik = false;\n  }\n\n  if (fanAcik) {\n    // 30-50 °C arasını fan hızına çevir, çok düşük hızlarda motor dönmez\n    int hiz = map((int)(sicak * 10), 300, 500, 90, 255);\n    hiz = constrain(hiz, 90, 255);\n    analogWrite(FAN_PIN, hiz);\n\n    // servo bir adım ilerler\n    aci = aci + yon;\n    if (aci >= 150 || aci <= 30) {\n      yon = -yon;                 // uca gelince yön değiştir\n    }\n    tarayici.write(aci);\n  } else {\n    analogWrite(FAN_PIN, 0);\n    aci = 90;\n    yon = 2;\n    tarayici.write(90);           // park\n  }\n\n  sayac++;\n  if (sayac >= 25) {              // yaklaşık yarım saniyede bir yazdır\n    sayac = 0;\n    Serial.print(\"Sicaklik: \");\n    Serial.print(sicak, 1);\n    Serial.print(\" C  Fan: \");\n    Serial.println(fanAcik ? \"ACIK\" : \"KAPALI\");\n  }\n  delay(20);\n}\n```\n\n### How does it work?\n1. The `sicaklikOku()` (read temperature) function reads A2 and works out the NTC resistance and the temperature. `constrain(adc, 1, 1022)` prevents a division error when the ADC is zero or 1023.\n2. The fan decision has two thresholds: it switches on at 30 °C and off below 28 °C. At 29 °C it stays in the state it is in.\n3. The speed is converted with `map` from the 30-50 °C range to the 90-255 PWM range. We do not go below 90, because real small motors do not start turning at low PWM.\n4. The servo sweeps by moving only 2 degrees each time `loop` runs. This way the temperature is read again at every step, and the fan decision stays up to date even during the sweep.\n5. When the fan switches off, the servo parks at 90 degrees; the `delay(20)` we use gives the servo time to move. The serial printing is thinned out by `sayac` (counter): it prints once every 25 rounds (about every half second).\n\n### Try it\n- Set the thresholds to 26 and 24 °C. Trigger the system by moving the Temperature property around 25 °C.\n- Narrow the servo sweep range to 60-120 degrees.\n- Add a condition that only prints \"UYARI\" (warning) to serial when the temperature goes above 60 °C. (The Temperature property goes up to 120 °C.)\n\n### Common mistakes\n- Using a formula that does not match the positions of the NTC and the fixed resistor: the temperature comes out backwards or makes no sense.\n- Connecting the fan directly to D6: you need a transistor and a diode. The lab reports a missing diode with a \"flyback\" warning and a missing base resistor with a \"base current\" warning.\n- Swapping the places of the NTC and the fixed resistor: the A2 line behaves the other way round, and the formula in the code has to change to match.\n- Forgetting to connect the servo to 5V or GND: the servo does not move at all.\n- Leaving out hysteresis: while the temperature is around the threshold, the fan keeps switching on and off.\n- Expecting `analogWrite` from D9 and D10 while using a servo: the Servo library switches off PWM on these two pins. That is why the fan is on D6.",
+            "question": "If you made the fan just \"on/off\" instead of making its speed proportional to the temperature, how would the system behave? If this were a real product, what would you use the servo for: showing a direction, opening a lid, turning a sensor?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine a sensor, a decision rule and two outputs in one program\n- How to set the fan speed from the temperature with `map`\n- How to write an on/off decision with hysteresis\n- How to manage a fan and a servo in the same loop without one blocking the other\n\n### What you should know first\nThe serial monitor from lesson 9, working out temperature with an NTC from lesson 13, `map` and `constrain` from lesson 14, the servo from lesson 21, a fan with a transistor from lesson 22, hysteresis from lesson 24.\n\n### The system has three parts\nThis project is made of input, decision and output.\n\n```\nInput:     NTC thermistor (A2)  ->  temperature\nDecision:  >= 30 °C on, < 28 °C off (hysteresis)\nOutput:    fan speed (D6, PWM) + servo sweep (D9)\n```\n\nWhen you write a project, first separate these three parts, then test them one by one: first print the temperature to serial, then add the fan, and the servo last.\n\n### Reading the temperature\nBecause the NTC is at the bottom and the 10 kΩ fixed resistor is at the top, you use `rntc = R * adc / (1023 - adc)`. As it warms up, the NTC's resistance falls: 10 kΩ at 25 °C, about 4.3 kΩ at 45 °C. So the voltage on A2 drops from 2.5 V to about 1.5 V. `constrain(adc, 1, 1022)` prevents division by zero.\n\n### Linking speed to temperature\n```\nint hiz = map((int)(sicak * 10), 300, 500, 90, 255);\nhiz = constrain(hiz, 90, 255);\n```\nBecause `map` works with integers, we multiply the temperature by 10; the 30.0-50.0 °C range becomes 300-500. The output starts at 90, because a small motor does not turn at very low PWM. For 40 °C, the speed is 172.\n\n### Decision: hysteresis\nThe fan switches on at 30 °C and above, but only switches off below 28 °C. At 29 °C the fan keeps its old state. For this, a `fanAcik` (fan on) variable is kept.\n\n### Sharing without waiting\nIf the servo sweep were done in one go with `for`, the temperature would not be read until the sweep finished. Instead, each time `loop` runs, it moves the servo by only 2 degrees. With the same idea, the serial output is printed once every 25 rounds. Because the Servo library switches off PWM on D9 and D10, the fan is on D6.\n\n### Summary\nThe project combines measuring with an NTC, a decision with hysteresis, and fan and servo outputs. The speed is converted to the 90-255 range with `map`, and the servo moves step by step, so the temperature stays up to date every round. Test the parts one by one first, then combine them.",
+            "concepts": [
+              {
+                "term": "Input, decision, output",
+                "definition": "The three parts of an automation: the sensor that measures, the program that applies the rule, and the device that acts.",
+                "example": "The NTC measures the temperature, the program checks the threshold, and the fan and servo run.",
+                "pitfall": "Writing everything at once and testing it: test the parts one by one first."
+              },
+              {
+                "term": "Speed with map",
+                "definition": "Converts the temperature range into the PWM range.",
+                "example": "map(400, 300, 500, 90, 255) gives 172 for 40 °C.",
+                "pitfall": "Giving map a temperature with a fraction: multiply by 10 first and turn it into an integer."
+              },
+              {
+                "term": "Minimum PWM",
+                "definition": "The lowest PWM value at which a small motor starts to turn; 90 was used in the project.",
+                "example": "constrain(hiz, 90, 255) stops the speed going below 90.",
+                "pitfall": "Starting the PWM at zero: the motor may not turn at the first values and just hum."
+              },
+              {
+                "term": "Step-by-step sweep",
+                "definition": "Moving the servo a few degrees on each loop round; the temperature reading is not held up.",
+                "example": "aci = aci + yon; then tarayici.write(aci);",
+                "pitfall": "Doing the sweep in one go with for: the temperature is not read until the sweep finishes."
+              },
+              {
+                "term": "Servo and PWM pins",
+                "definition": "On the Uno, the Servo library switches off analogWrite output on D9 and D10.",
+                "example": "The fan is on D6 and the servo is on D9.",
+                "pitfall": "Connecting the fan to D9 or D10: the speed control does not work."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h5d25-q1",
+                "kind": "mcq",
+                "prompt": "The fan switches on at 30 °C but does not switch off until the temperature drops below 28 °C. Why are these two separate thresholds used?",
+                "options": [
+                  "So that the fan turns faster",
+                  "So that the fan does not keep switching on and off while the temperature wobbles around the threshold",
+                  "Because the NTC's resistance works backwards",
+                  "So that less text appears in the serial monitor"
+                ],
+                "answer": 1,
+                "explanation": "With a single threshold, if the temperature jitters between 29.9 and 30.1, the fan keeps switching on and off. In the zone between the two thresholds (28-30 °C), the state is kept. It has nothing to do with speed, resistance or serial output.",
+                "skills": [
+                  "hysteresis"
+                ]
+              },
+              {
+                "id": "m3h5d25-q2",
+                "kind": "predict-output",
+                "prompt": "The fan starts off (fanAcik = false). The temperature becomes 31, 29 and 27.5 °C in turn. What is the fan's state after each measurement?\n\n```\nif (!fanAcik && sicak >= 30.0) {\n  fanAcik = true;\n} else if (fanAcik && sicak < 28.0) {\n  fanAcik = false;\n}\n```",
+                "options": [
+                  "Off, on, off",
+                  "On, on, off",
+                  "On, off, off",
+                  "On, on, on"
+                ],
+                "answer": 1,
+                "explanation": "Because 31 ≥ 30, it switches on. 29 °C is between 28 and 30; it stays on. When 27.5 < 28, it switches off.",
+                "skills": [
+                  "hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h5d25-q3",
+                "kind": "numeric",
+                "prompt": "The fan speed is worked out with map((int)(sicak * 10), 300, 500, 90, 255). If the temperature is 40 °C, what is the PWM value? (map uses integer maths.)",
+                "answer": 172,
+                "tolerance": 0,
+                "explanation": "sicak * 10 = 400. map: (400 − 300) × (255 − 90) / (500 − 300) + 90 = 100 × 165 / 200 + 90 = 82 + 90 = 172 (82.5 is rounded down).",
+                "skills": [
+                  "motor-pwm-speed",
+                  "sensor-actuator-project"
+                ]
+              },
+              {
+                "id": "m3h5d25-q4",
+                "kind": "numeric",
+                "prompt": "The NTC is at the bottom and the 10 kΩ fixed resistor at the top; A2 is read across the NTC. At 45 °C the NTC's resistance is about 4.35 kΩ. About how many volts are on A2?",
+                "answer": 1.5,
+                "tolerance": 0.05,
+                "unit": "V",
+                "explanation": "Voltage divider: V = 5 × 4.35 / (4.35 + 10) ≈ 1.52 V. As it warms up, the NTC's resistance falls, and the A2 voltage falls too; at 25 °C it was 2.5 V.",
+                "skills": [
+                  "sensor-actuator-project",
+                  "elec-ohm"
+                ]
+              },
+              {
+                "id": "m3h5d25-q5",
+                "kind": "find-bug",
+                "prompt": "In this project that uses a servo, the fan speed cannot be set; the fan behaves as if it is either always on or always off. Which line is wrong?\n\n```\nconst int SERVO_PIN = 9;\n// ...\ntarayici.attach(SERVO_PIN);\n// ...\nanalogWrite(FAN_PIN, hiz);\n```\n(Somewhere else: const int FAN_PIN = 10;)",
+                "options": [
+                  "tarayici.attach(SERVO_PIN);",
+                  "const int SERVO_PIN = 9;",
+                  "analogWrite(FAN_PIN, hiz);",
+                  "const int FAN_PIN = 10;"
+                ],
+                "answer": 3,
+                "explanation": "On the Uno, the Servo library switches off PWM on D9 and D10, so analogWrite on D10 does not control the speed. The fan must be moved to another PWM pin such as D6. The other lines are correct.",
+                "skills": [
+                  "sensor-actuator-project",
+                  "servo-angle",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -4835,6 +7813,7 @@ export const modul3: ModuleContent = {
       "title": "Zamanlama",
       "project": "Çoklu görev paneli",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. `delay()` kullanan bir programın neden butona ya da başka işe bakamadığını (bloklama) açıklayabilir.\n2. `millis()` ile `simdi - son >= aralik` kalıbını kullanarak bekletmeden zamanlama yapabilir ve `unsigned long` taşmasını bilir.\n3. Bir işi durumlar ve geçişler olarak çizip `enum` ile `switch` kullanan bir durum makinesi yazabilir.\n4. D2 ve D3 pinlerinde `attachInterrupt` kurabilir; ISR'yi kısa tutmanın ve `volatile` kullanmanın nedenini söyleyebilir.\n5. Birden çok görevi (LED, buzzer, iki buton) `delay` olmadan tek bir panelde birleştirebilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | delay'in tuzağı | ~20 dk | Anlatımı oku, `delay`'li programda butona kısa bas, kaçan basışları gör, mini testi çöz. |\n| 2 | millis() ile bloklamayan kod | ~25 dk | Aynı işi `millis` ile yaz, iki LED'i bağımsız hızlarda yak, taşma örneğini hesapla. |\n| 3 | Durum makineleri (FSM) | ~25 dk | Trafik ışığı durumlarını kâğıda çiz, sonra `switch` ile kodla, buton modunu dene. |\n| 4 | Kesmeler ve timer'lar | ~30 dk | D2'de kesme kur, `CHANGE` ile `FALLING` farkını gör, timer süresini hesapla. |\n| 5 | Proje: Çoklu görev paneli | ~35 dk | Görev tablosunu yaz, devreyi kur, paneli çalıştır, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBaşlamadan önce şunları kontrol et:\n- Butonu `INPUT_PULLUP` ile okuyabiliyor mu? Basılı = LOW kuralını biliyor mu? (Ders 6)\n- `if`, `else` ve `switch` yazabiliyor mu? (Ders 7)\n- Buton basışının kenarını (yeni basış) algılamayı biliyor mu? (Ders 8)\n- `tone()` ve `noTone()` ile buzzer çaldırabiliyor mu? (Ders 18)\n- Fonksiyon tanımlayıp çağırabiliyor mu? (Ders 19)\n\n### Kavram haritası\n- **Sorun:** `delay` bloklar → bakış anları arası olaylar kaçar\n- **Çözüm 1:** `millis()` → `simdi - son >= aralik` → her işe kendi `son` değişkeni → `unsigned long` ve taşma\n- **Çözüm 2:** durum makinesi → `enum` + `switch` + `break` → zamanla ya da olayla geçiş\n- **Çözüm 3:** kesme → `attachInterrupt` (D2, D3) → ISR kısa → `volatile` → bayrak; timer kesmesi\n- **Proje:** görev tablosu → modlar → kesme + `millis` + FSM bir arada → zaman aşımı güvenliği\n\n### Sık yapılan hatalar\n- **`loop()` içinde yine `delay` bırakmak.** Bütün kazanç kaybolur; diğer görevler de beklemeye girer.\n- **Süreyi toplamayla kontrol etmek.** `simdi >= son + aralik` taşmada bozulur; `simdi - son >= aralik` yaz.\n- **Süre değişkeninde `int` kullanmak.** `int` yaklaşık 32,8 saniyede taşar; `unsigned long` kullan.\n- **Bütün işlere tek ortak `son` değişkeni vermek.** İşler birbirinin zamanını bozar.\n- **`case` sonunda `break;` unutmak.** Program alttaki durumun kodunu da çalıştırır.\n- **Durum değişince `durumBasi = simdi;` yazmamak.** Yeni durum hemen biter.\n- **Basılı tutulan butonu her turda saymak.** Kenar algılama (`basili && !oncekiBasili`) kullan.\n- **ISR içinde `delay`, `Serial.print` ya da uzun iş yapmak.** ISR'yi kısa tut, işi `loop()` yapsın.\n- **`volatile` yazmamak.** Paylaşılan değişken `loop()`'ta güncel görünmeyebilir.\n- **Kesmeyi D2/D3 dışında bir pinde denemek.** Uno'da dış kesme yalnızca bu iki pindedir.\n- **Mod değişince sayaçları sıfırlamamak.** Yeni modun ilk yanıp sönmesi yanlış zamanda gelir.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Yanlış yaptığın mini test sorularının açıklamalarını oku, sonra soruyu yeniden çöz.\n3. Blink'i `delay` olmadan, `millis` ile sıfırdan bakmadan yaz; sonra aralığı değiştir.\n4. Kendi seçtiğin bir cihaz (örneğin mikrodalga fırın) için durum şemasını kâğıda çiz: durumlar, olaylar, geçişler.\n5. Timer için bölücü 256 iken `OCR1A = 12499` değerinin kesme aralığını hesapla.\n6. Kendi cümlelerinle şu soruyu cevapla: \"Kesme ile `millis` arasında hangi durumda hangisini seçerim?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Çoklu görev paneli)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | LED, buzzer ya da butonlardan biri bağlı değil veya yanlış pinde | LED'ler dirençli, buzzer D8'de, butonlar D2 ve D3'te doğru bağlı | Bağlantılar düzenli, renkler ve türler (pasif buzzer) bilinçli seçilmiş |\n| Plan | Görev tablosu yok | Görev, tetikleyici ve değişken tablosu var | Tablo kodla birebir uyuyor ve kesme/yoklama seçimi gerekçelendirilmiş |\n| Zamanlama | Kodda `delay` var ya da görevler birbirini bekletiyor | Hiç `delay` yok; LED ve buzzer süreleri tabloyla uyuşuyor | Süreler değiştirilip etkisi açıklanıyor; taşma güvenliği (çıkarma) bilinçli |\n| Kesme ve durum | Mod değişimi çalışmıyor ya da ISR içinde uzun iş var | Kesme + bayrak ve mod durum makinesi doğru çalışıyor | Sıçrama koruması, `volatile` ve sayaç sıfırlama gerekçeleriyle açıklanıyor; yeni mod eklenmiş |\n| Anlatım | Ne yaptığını anlatamıyor | Görevleri ve modları adım adım anlatıyor | Hata yapıp nasıl bulduğunu (örneğin kaçan basış) anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta tek bir işlemcinin birden çok işi nasıl yürüttüğünü anlamaktır. En zor kavram \"beklemeden zamanı sormak\"tır; öğrenci ilk anda `delay`'e dönmek isteyebilir. Ders 26'daki kaçan basış deneyimi bu geçişin gerekçesidir.\n- **Nasıl destek olunur?** Cevabı vermek yerine sor: \"Bu satır çalışırken başka hangi iş bekliyor?\", \"Son değişim ne zaman yazıldı?\", \"Bu fonksiyon kesmeden mi çağrılıyor, `loop()`'tan mı?\" Durum şemasını önce kâğıda çizdirmek çoğu karışıklığı önler.\n- **Süre.** Kesme ve timer dersi (29) yoğundur; Timer1 kodunun satır satır anlaşılması beklenmez, mantığı (sayaç, eşleşme, kesme) yeterlidir.\n- **Güvenlik.** Platformdaki her şey sanaldır. Ders 30'daki zaman aşımı örneği, motor ve röle gibi çıkışlarda güvenli duruma geçmenin neden önemli olduğunu gösterir. Gerçek donanımda motor doğrudan Uno pininden sürülmez; şebeke gerilimiyle hiçbir devre kurulmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week, the learner:\n1. Can explain why a program that uses `delay()` cannot check a button or do any other job (blocking).\n2. Can do timing without waiting using `millis()` and the pattern `simdi - son >= aralik`, and knows about `unsigned long` overflow.\n3. Can draw a job as states and transitions and write a state machine that uses `enum` and `switch`.\n4. Can set up `attachInterrupt` on pins D2 and D3, and can say why the ISR is kept short and why `volatile` is used.\n5. Can combine several tasks (LED, buzzer, two buttons) on one panel without `delay`.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | The delay trap | ~20 min | Read the explainer, press the button briefly in the `delay` program, see the missed presses, do the mini test. |\n| 2 | Non-blocking code with millis() | ~25 min | Write the same job with `millis`, blink two LEDs at independent speeds, work out the overflow example. |\n| 3 | State machines (FSM) | ~25 min | Draw the traffic light states on paper, then code them with `switch`, try the button mode. |\n| 4 | Interrupts and timers | ~30 min | Set up an interrupt on D2, see the difference between `CHANGE` and `FALLING`, work out the timer interval. |\n| 5 | Project: Multitasking panel | ~35 min | Write the task table, build the circuit, run the panel, assess it with the project rubric. |\n\n### Prerequisite check\nBefore you start, check the following:\n- Can they read a button with `INPUT_PULLUP`? Do they know the pressed = LOW rule? (Lesson 6)\n- Can they write `if`, `else` and `switch`? (Lesson 7)\n- Do they know how to detect the edge of a button press (a new press)? (Lesson 8)\n- Can they make a buzzer sound with `tone()` and `noTone()`? (Lesson 18)\n- Can they define and call a function? (Lesson 19)\n\n### Concept map\n- **Problem:** `delay` blocks → events between look moments are missed\n- **Solution 1:** `millis()` → `simdi - son >= aralik` → each job has its own `son` variable → `unsigned long` and overflow\n- **Solution 2:** state machine → `enum` + `switch` + `break` → transition by time or by event\n- **Solution 3:** interrupt → `attachInterrupt` (D2, D3) → short ISR → `volatile` → flag; timer interrupt\n- **Project:** task table → modes → interrupt + `millis` + FSM together → timeout safety\n\n### Common mistakes\n- **Leaving a `delay` in `loop()`.** All the benefit is lost; the other tasks start waiting too.\n- **Checking the time by adding.** `simdi >= son + aralik` breaks at overflow; write `simdi - son >= aralik`.\n- **Using `int` for a time variable.** An `int` overflows in about 32.8 seconds; use `unsigned long`.\n- **Giving all jobs one shared `son` variable.** The jobs spoil each other's timing.\n- **Forgetting `break;` at the end of a `case`.** The program also runs the code of the state below.\n- **Not writing `durumBasi = simdi;` when the state changes.** The new state ends at once.\n- **Counting a button that is held down in every round.** Use edge detection (`basili && !oncekiBasili`).\n- **Doing `delay`, `Serial.print` or a long job inside the ISR.** Keep the ISR short and let `loop()` do the work.\n- **Not writing `volatile`.** The shared variable may not look up to date in `loop()`.\n- **Trying an interrupt on a pin other than D2/D3.** On the Uno, external interrupts are only on these two pins.\n- **Not resetting the counters when the mode changes.** The first blink of the new mode comes at the wrong time.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read the explanations for the mini test questions you got wrong, then answer them again.\n3. Write Blink from scratch without looking, using `millis` instead of `delay`; then change the interval.\n4. Draw the state diagram for a device of your choice (for example a microwave oven) on paper: states, events, transitions.\n5. Work out the interrupt interval for the timer with prescaler 256 and `OCR1A = 12499`.\n6. Answer this question in your own words: \"When would I choose an interrupt and when `millis`?\"\n\nThe mini tests of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct in every lesson. Go back to the explainer of any lesson where you fall short.\n\n### Project rubric (Multitasking panel)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | One of the LEDs, the buzzer or the buttons is not connected or is on the wrong pin | LEDs have resistors, the buzzer is on D8, the buttons are correctly connected to D2 and D3 | The wiring is tidy; colours and types (passive buzzer) are chosen on purpose |\n| Plan | No task table | There is a table of tasks, triggers and variables | The table matches the code one to one and the interrupt/polling choice is justified |\n| Timing | There is a `delay` in the code or the tasks make each other wait | No `delay` at all; the LED and buzzer timings match the table | Timings are changed and the effect is explained; overflow safety (subtraction) is used on purpose |\n| Interrupt and state | The mode change does not work or there is a long job in the ISR | The interrupt + flag and the mode state machine work correctly | The bounce guard, `volatile` and counter resets are explained with reasons; a new mode has been added |\n| Explanation | Cannot explain what they did | Explains the tasks and modes step by step | Explains a mistake they made and how they found it (for example a missed press) |\n\n### Note for parents and teachers\n- **Aim.** This week is about understanding how a single processor runs several jobs. The hardest idea is \"asking the time without waiting\"; at first the learner may want to go back to `delay`. The missed-press experience in lesson 26 is the reason for making this switch.\n- **How to help?** Instead of giving the answer, ask: \"While this line runs, which other job is waiting?\", \"When was the last change written?\", \"Is this function called from the interrupt or from `loop()`?\" Having them draw the state diagram on paper first prevents most confusion.\n- **Time.** The interrupts and timers lesson (29) is dense; learners are not expected to understand the Timer1 code line by line; the idea (counter, match, interrupt) is enough.\n- **Safety.** Everything on the platform is virtual. The timeout example in lesson 30 shows why moving to a safe state matters for outputs such as motors and relays. On real hardware a motor is not driven straight from an Uno pin, and no circuit is ever built with mains voltage.\n- **Progress.** Mini test results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent was given).",
       "lessons": [
         {
           "title": "delay'in tuzağı",
@@ -4956,7 +7935,128 @@ export const modul3: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The delay trap",
+            "problem": "Blinking an LED with `delay()` was very easy. But what happens if you press a button briefly while the LED is blinking? Does the board notice the press, or is it \"asleep\" at that moment? In this lesson you will find out with an experiment.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| LED (red) + 330 Ω resistor | Resistor end 1 to **D13**, resistor end 2 to LED **A**; LED **K** → GND |\n| Button | **A** end to **D2**, **B** end to GND (`INPUT_PULLUP`, pressed = LOW) |\n\nThen write the code into `sketch.ino` and press ▶. Select the resistor and set it to 330 Ω in the properties panel.\n\n### Program\nThe program below turns the LED on for 1 second and off for 1 second. At the end of each round it checks the button; if it is pressed, it increases the counter and prints it.\n\n```cpp\n// sketch: delay_kacirir\nint sayac = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(1000);\n  digitalWrite(13, LOW);\n  delay(1000);\n\n  if (digitalRead(2) == LOW) {   // butona yalnızca burada bakılıyor\n    sayac++;\n    Serial.print(\"Basis sayisi: \");\n    Serial.println(sayac);\n  }\n}\n```\n\nNow, while the LED is on, click the button on the circuit canvas for a short moment (0.1 seconds); to hold the button down, keep the mouse button pressed. Most likely nothing appears in the Serial monitor. But if you hold the button down for longer than 2 seconds, it is counted. In the lab you can see this even without doing it yourself: the activity goals check this behaviour.\n\n### How does it work?\n1. While `delay(1000)` runs, the processor does not move on to any other line; it only counts. This is called **blocking** code.\n2. The button is checked with `digitalRead` only at the end of the round, once every 2 seconds.\n3. Every short press made between these two \"looks\" is missed. The board never saw the button.\n4. A press is only caught if it happens exactly at a look moment (or if the button is held down).\n\nYou can also see for yourself how many times the loop runs:\n\n```cpp\n// sketch: delay_tur_sayaci\nint tur = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  tur++;\n  Serial.println(tur);\n  digitalWrite(13, !digitalRead(13));   // LED'in durumunu tersine çevir\n  delay(1000);\n}\n```\n\n`loop()` runs only **once** per second. So the board's \"eye\" opens once per second. The processor can do millions of operations per second, but `delay` makes it waste almost all of its time.\n\n### Try it\n- In the first program, press the button briefly while the LED is on. Does the counter go up? Then hold the button down for 2 seconds and try again.\n- Change the `delay(1000)` values to `delay(100)`. Are short presses now caught more often? Does the LED still blink once a second?\n- Try to blink one LED every 1000 ms and a second LED every 300 ms using only `delay`. Explain why it is hard.\n\n### Common mistakes\n- Thinking \"the button is broken\": the button part is fine; the program does not see the press.\n- Looking for the fix in a shorter `delay`: presses are caught a little more often, but the problem does not go away, and the LED's timing breaks too.\n- Printing lots of text to the serial port and slowing it down with `delay`: this blocks the board as well.",
+            "question": "A robot has to drive its motor and also check an obstacle button. What happens if it uses `delay`? How do you think we can do the waiting without `delay`?",
+            "explainerMd": "### What you will learn in this lesson\n- That the processor does nothing else while `delay()` runs (**blocking**)\n- That short presses are missed if a button is only checked at certain moments\n- That the length of a round decides how often \"the board's eye\" opens\n- Why making the `delay` shorter is not a real fix\n\n### What you should know first\n`delay` and Blink from lesson 3; reading a button with `INPUT_PULLUP` from lesson 6 (pressed = LOW); the `if` condition from lesson 7; printing with `Serial.println` from lesson 9.\n\n### What happens while the board \"sleeps\"?\nWhen you write `delay(1000)`, the board only counts for one second. During that time it does not move to another line, does not read the button and does not check the serial port. This behaviour is called **blocking**. The board has not frozen; it is just carrying out the \"wait\" command.\n\n### Look moments\nThink about this loop:\n\n```\non → delay(1000) → off → delay(1000) → check button\n```\n\nThe button is checked only **once** per round. There are 2000 ms between two looks. A press is seen only if it happens at a look moment. If a press lasts 100 ms, its chance of being caught is about 100 / 2000 = 5%. So nine presses out of ten are missed. The button is not broken; the program does not see it.\n\n### Text timeline\nBelow, a round is 2000 ms. `|` is a look moment, `#` shows the time the button is pressed:\n\n```\ntime (ms):   0 ........ 1000 ........ 2000 ........ 4000\nLED:         on          off          on/off\nlook:                                |             |\npress A:       ##                                    (missed)\npress B:                         ##########          (pressed at the look at 2000: caught)\n```\n\nPress A started and ended between two looks; it left no trace. Press B was counted because it covered a look moment.\n\n### Is a shorter delay the fix?\nIf you write `delay(100)`, the round becomes 200 ms and the looks come more often. But two problems remain. First, there are still presses that are missed between look moments. Second, the LED's timing breaks: it no longer blinks once a second, it blinks 10 times faster. You break one thing to fix another.\n\n### Why are two jobs hard?\nLet one LED change every 1000 ms and a second one every 300 ms. With `delay`, the two waits get in each other's way; driving both correctly at the same time needs complicated calculations. Real projects (a robot's motor, a display, a button) have many jobs like this. That is why, in the next lessons, you will learn to **ask the time** instead of waiting.\n\n### Summary\n`delay()` is a blocking command: while it waits, the board does not look after anything else. If an input is only checked at the end of the round, the longer the round, the more short events are missed. Making the time shorter reduces the problem but does not solve it. The fix is code that asks \"is the time up?\" instead of waiting, and then carries on straight away.",
+            "concepts": [
+              {
+                "term": "Blocking",
+                "definition": "When the program runs no other line while it waits for a command to finish.",
+                "example": "While delay(2000) runs, the board checks neither the button nor the serial port for 2 seconds.",
+                "pitfall": "Thinking blocking means \"the board freezes\"; the board is working, it is just carrying out the wait command."
+              },
+              {
+                "term": "Round time",
+                "definition": "The total time it takes for all the commands inside loop() to run once. In code with delay, almost all of it is waiting time.",
+                "example": "A loop() with two delay(500) calls takes about 1000 ms per round.",
+                "pitfall": "Counting only one delay and forgetting the other delays in the round."
+              },
+              {
+                "term": "Look moment",
+                "definition": "The moment an input (for example the button) is read. Events between look moments never reach the program.",
+                "example": "In a 2000 ms program that checks the button at the end of the round, the look moments come 2 seconds apart.",
+                "pitfall": "Saying \"I pressed the button but it was not counted, the button is broken\"; the problem is usually in the structure of the program."
+              },
+              {
+                "term": "Missed press",
+                "definition": "A button press that starts and ends between look moments, so the program never sees it.",
+                "example": "A 100 ms press has about a 5% chance of being caught in a 2000 ms round.",
+                "pitfall": "Treating a missed press as \"bad luck\"; it is a flaw in the structure and it happens again and again."
+              },
+              {
+                "term": "The shorter-delay fix",
+                "definition": "Trying to look more often by making the delay values smaller; it reduces the problem but does not end it.",
+                "example": "Writing delay(100) instead of delay(1000) shortens the round, but it also makes the LED 10 times faster.",
+                "pitfall": "Breaking the timing this way, still not getting rid of all missed presses, and thinking \"I fixed it\"."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h6d26-q1",
+                "kind": "mcq",
+                "prompt": "What does the Arduino do while delay(1500) runs?",
+                "options": [
+                  "It keeps running other lines; only the LED waits",
+                  "It keeps reading the input pins but freezes the outputs",
+                  "It runs no other line until the wait is over",
+                  "It only skips the next delay inside loop()"
+                ],
+                "answer": 2,
+                "explanation": "delay() is a blocking command: until the time is up, the processor does not move to the next line and does not check the button either. The other options say that delay only makes part of the program wait, or that the inputs are still read; none of them is true.",
+                "skills": [
+                  "prog-blocking"
+                ]
+              },
+              {
+                "id": "m3h6d26-q2",
+                "kind": "numeric",
+                "prompt": "A program checks the button only at the end of each round inside loop(). The round is made of two delays of 1000 ms + 1000 ms. The button is pressed for 100 ms and the press starts at a random moment. About what percentage is the chance of this press being caught? (Assume the look is instant.)",
+                "answer": 5,
+                "tolerance": 0,
+                "unit": "%",
+                "explanation": "Look moments come 2000 ms apart. A 100 ms press is caught only if it covers a look moment; that is 100 / 2000 = 0.05, which means 5%. Writing 50% or 10% comes from thinking the round is 1000 ms or 200 ms.",
+                "skills": [
+                  "prog-blocking",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d26-q3",
+                "kind": "predict-output",
+                "prompt": "While this program runs (the button is not pressed), these events happen: the button is held down between 100 and 200 ms, then held down again between 550 and 700 ms. What appears in the Serial monitor at the end of 2 seconds?\n\n```\nint sayac = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(300);\n  digitalWrite(13, LOW);\n  delay(300);\n  if (digitalRead(2) == LOW) {\n    sayac++;\n    Serial.print(\"Basis sayisi: \");\n    Serial.println(sayac);\n  }\n}\n```",
+                "options": [
+                  "Nothing",
+                  "Basis sayisi: 1 and Basis sayisi: 2",
+                  "Basis sayisi: 1",
+                  "Basis sayisi: 2"
+                ],
+                "answer": 2,
+                "explanation": "The button is read only at 600 ms (300 + 300). The press at 100-200 ms has ended before the look, so it is missed. The press at 550-700 ms covers 600 ms, so it is counted. The next look is at 1200 ms and the button has been released. The result is a single line.",
+                "skills": [
+                  "prog-blocking",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d26-q4",
+                "kind": "find-bug",
+                "prompt": "This program is meant to turn the LED on as soon as the button is pressed. But most presses do nothing. Which line causes the real problem?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {\n    digitalWrite(13, HIGH);\n  }\n  delay(3000);\n}\n```",
+                "options": [
+                  "pinMode(2, INPUT_PULLUP);",
+                  "if (digitalRead(2) == LOW) {",
+                  "digitalWrite(13, HIGH);",
+                  "delay(3000);"
+                ],
+                "answer": 3,
+                "explanation": "The button is read only once every 3 seconds; delay(3000) blocks the board and presses are missed. The pull-up and the LOW comparison follow the pressed = LOW rule, and the digitalWrite line is correct too.",
+                "skills": [
+                  "prog-blocking",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h6d26-q5",
+                "kind": "mcq",
+                "prompt": "To reduce missed presses, a friend changed the delay(1000) values to delay(100). What is the main drawback of this approach?",
+                "options": [
+                  "The LED's blinking speed changes too, and some presses are still missed",
+                  "The compiler gives an error",
+                  "The button is never checked",
+                  "The board heats up and slows down"
+                ],
+                "answer": 0,
+                "explanation": "Making the time shorter means more frequent looks, but presses can still be missed between look moments; on top of that, the LED's timing breaks by becoming 10 times faster. It does not cause a compile error or heating.",
+                "skills": [
+                  "prog-blocking",
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "millis() ile bloklamayan kod",
@@ -5074,7 +8174,124 @@ export const modul3: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Non-blocking code with millis()",
+            "problem": "Think of a kitchen timer: when you boil an egg, you do not stand over it; you set the timer and do other things. In Arduino, `millis()` is just like that clock: it tells you how many milliseconds have passed since the board started running. Every now and then we look at the clock and ask, \"Is the time up?\"",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| LED 1 + 330 Ω resistor | **D13** → resistor → LED **A**; **K** → GND |\n| LED 2 + 330 Ω resistor | **D12** → resistor → LED **A**; **K** → GND |\n| Button | **A** end to **D2**, **B** end to GND (`INPUT_PULLUP`) |\n\n### Program\nThe idea: read the current time and look at how long it has been since the last change. If it has been long enough, change the LED and update the \"last change\" time. Do nothing else; let `loop()` go round again straight away.\n\n```cpp\n// sketch: millis_blink_buton\nconst unsigned long ARALIK = 500;   // ms\nunsigned long sonDegisim = 0;\nbool ledYanik = false;\nbool oncekiBasili = false;\nint sayac = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - sonDegisim >= ARALIK) {   // 500 ms geçti mi?\n    sonDegisim = simdi;\n    ledYanik = !ledYanik;\n    digitalWrite(13, ledYanik);\n  }\n\n  bool basili = (digitalRead(2) == LOW);\n  if (basili && !oncekiBasili) {        // yeni basış (kenar)\n    sayac++;\n    Serial.print(\"Basis sayisi: \");\n    Serial.println(sayac);\n  }\n  oncekiBasili = basili;\n}\n```\n\nThis does the same job as the `delay` program from the previous lesson: the LED blinks and the button is checked. The difference: `loop()` runs thousands of times a second and checks the button without ever missing it. The short press you missed in the previous lesson is now counted.\n\nWith the same method you can run two separate jobs by giving each one its own clock:\n\n```cpp\n// sketch: millis_iki_led\nunsigned long son1 = 0;\nunsigned long son2 = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(12, OUTPUT);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  if (simdi - son1 >= 1000) {          // LED 1: her 1000 ms\n    son1 = simdi;\n    digitalWrite(13, !digitalRead(13));\n  }\n  if (simdi - son2 >= 300) {           // LED 2: her 300 ms\n    son2 = simdi;\n    digitalWrite(12, !digitalRead(12));\n  }\n}\n```\n\n### How does it work?\n1. `millis()` starts from 0 when the program starts running and goes up by 1 every millisecond.\n2. For each job you keep a \"last time I did it\" variable (`sonDegisim`, the last change).\n3. The expression `simdi - sonDegisim >= aralik` means \"has a whole interval passed?\" (`simdi` is now, `aralik` is the interval).\n4. Because `loop()` never waits, each round is very short. So every job can be checked in turn, all the time.\n\n### Overflow warning\nThe value of `millis()` is of type `unsigned long` (from 0 to 4 294 967 295). It reaches this limit in about 49.7 days and **wraps back to 0**. This matters if a system will stay switched on for weeks. Always make time variables `unsigned long` and work out the time by **subtracting**:\n\n```cpp\n// sketch: millis_tasma\nvoid setup() {\n  Serial.begin(9600);\n\n  unsigned long onceki = 4294967000UL;   // taşmaya 296 ms var\n\n  unsigned long simdi = 4294967100UL;    // 100 ms geçti\n  Serial.print(\"Dogru (cikarma): \");\n  Serial.println(simdi - onceki);        // 100\n  Serial.print(\"Yanlis (toplama): \");\n  Serial.println(simdi >= onceki + 500 ? \"sure doldu\" : \"dolmadi\");\n\n  simdi = 10;                            // sayaç sıfırlandı, toplam 306 ms geçti\n  Serial.print(\"Tasmadan sonra fark: \");\n  Serial.println(simdi - onceki);        // 306\n}\n\nvoid loop() {\n}\n```\n\nThe subtraction method gives the right result even at overflow. Writing `simdi >= onceki + 500` is wrong: `onceki + 500` overflows and wraps round to a small number, and the program says \"time is up\" before it really is. The rule: write **`simdi - onceki >= aralik`**.\n\n### Try it\n- In the `millis_blink_buton` program, click the button in short taps while the LED blinks. Is every press counted? Compare it with the program from the previous lesson.\n- Add a third LED to the `millis_iki_led` program (D11, every 700 ms). Does it work without breaking anything else?\n- Print `Serial.println(millis())` when you press the button. Work out the difference between two presses.\n\n### Common mistakes\n- Using `int` instead of `unsigned long`: an `int` overflows after about 32 seconds (32 767 ms).\n- Checking the time by adding (`simdi >= onceki + aralik`): it goes wrong at overflow.\n- Putting a `delay` back into `loop()`: all the benefit is lost.\n- Giving every job the same \"last time\" variable: the jobs spoil each other's timing. Give each job its own variable.",
+            "question": "What is the biggest difference between `delay` programs and `millis` programs? Why is the code a little longer when you use `millis`?",
+            "explainerMd": "### What you will learn in this lesson\n- Reading the time that has passed since the board started running with `millis()`\n- Asking \"is the time up?\" with the pattern `simdi - son >= aralik`\n- Running several jobs without blocking by giving each its own time variable\n- `millis()` overflow and why the subtraction method is safe\n\n### What you should know first\nBlocking with `delay` and missed presses from lesson 26; `digitalWrite` from lesson 3; detecting the edge of a press (remembering the previous state) from lesson 8.\n\n### The board's clock\n**`millis()`** gives the milliseconds that have passed since the board was switched on. It is 0 when the program starts and goes up by 1 every millisecond. Think of a kitchen timer: you do not stand over the boiling egg, you glance at the clock now and then. With `millis()`, the program glances at the clock now and then while it is busy with other jobs.\n\n### The pattern: look, compare, update\n```\nunsigned long simdi = millis();\nif (simdi - son >= aralik) {\n  son = simdi;      // saati yenile\n  // işi yap\n}\n```\n\n`son` (last) holds the moment you last did the job. `simdi - son` is the time that has passed since then. If that time has reached `aralik` (the interval), do the job and update `son`. There is no waiting anywhere in this code; if the condition is not met, `loop()` goes straight back to the start.\n\n### Why does it not block?\nWith this pattern, `loop()` runs thousands of times a second. In every round, both the button and the clock are checked. The 2000 ms gap between looks from the previous lesson is now a few hundred microseconds; short presses are not missed.\n\n### Each job has its own clock\nIf two LEDs are to blink at different speeds, give each one its own variable:\n\n```\nunsigned long son1 = 0;   // LED 1 için, aralık 1000 ms\nunsigned long son2 = 0;   // LED 2 için, aralık 300 ms\n```\n\nIf you use one shared `son`, when the first job updates the variable, the second job works out its own time wrongly. A small to-do table makes the job clear:\n\n| Job | Interval | Variable |\n|---|---|---|\n| Toggle LED 1 | 1000 ms | `son1` |\n| Toggle LED 2 | 300 ms | `son2` |\n| Check the button | every round | (no clock needed) |\n\n### Overflow: when the counter goes back to zero\nThe value of `millis()` is of type **`unsigned long`** (largest value 4 294 967 295). It reaches this number in about 49.7 days and wraps back to 0. If you use `int`, the largest value on the Uno is 32 767, so it overflows in about 32.8 seconds. Variables that hold times must always be `unsigned long`.\n\nThe safe pattern is **subtraction**: `simdi - son >= aralik`. With unsigned numbers, subtraction gives the right difference even when the counter wraps back to zero. For example, if `son = 4 294 967 000` and the counter wraps round to `simdi = 10`, the difference comes out as 306 ms. `simdi >= son + aralik` is wrong: `son + aralik` overflows and wraps round to a small number, and the program says \"time is up\" before it really is.\n\n### Summary\n`millis()` is the board's clock. The pattern `simdi - son >= aralik` asks \"is the time up?\" without waiting; `loop()` runs fast and each job works independently with its own `son` variable. Time variables must be `unsigned long` and the difference must be worked out by subtraction; that way the 49.7-day overflow causes no trouble.",
+            "concepts": [
+              {
+                "term": "millis()",
+                "definition": "A function that gives the time since the board started running, in milliseconds. It goes up by 1 every millisecond.",
+                "example": "3 seconds after the board is switched on, millis() gives about 3000.",
+                "pitfall": "Expecting millis() to show the time of day; it only gives the time since start-up."
+              },
+              {
+                "term": "The is-the-time-up pattern",
+                "definition": "The expression `simdi - son >= aralik`: if enough time has passed since the last job, do the job and update `son`.",
+                "example": "if (simdi - son >= 500) { son = simdi; digitalWrite(13, !digitalRead(13)); }",
+                "pitfall": "Forgetting the line `son = simdi` inside the if: once the condition is true it stays true, and the job is done every round."
+              },
+              {
+                "term": "A separate clock for each job",
+                "definition": "Giving each of several jobs its own last-time variable.",
+                "example": "`son1` is used for LED 1 and `son2` for LED 2; when one is updated, the other's timing is not spoiled.",
+                "pitfall": "Giving all jobs one shared `son` variable: the jobs reset each other's timing."
+              },
+              {
+                "term": "unsigned long",
+                "definition": "A 32-bit whole-number type that holds no negative values (0 to 4 294 967 295). The value of millis() is of this type.",
+                "example": "unsigned long simdi = millis();",
+                "pitfall": "Putting the value of millis() into an int: an int overflows in about 32.8 seconds."
+              },
+              {
+                "term": "Overflow (rollover)",
+                "definition": "A counter going back to 0 when it reaches its largest value. For millis() this happens after about 49.7 days.",
+                "example": "If `simdi = 10` and `son = 4 294 967 000`, subtraction gives 306 ms; no mistake is made.",
+                "pitfall": "Checking the time by adding (`simdi >= son + aralik`): it gives the wrong result at the moment of overflow."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h6d27-q1",
+                "kind": "mcq",
+                "prompt": "What does the millis() function return?",
+                "options": [
+                  "The current hour and minute of the clock",
+                  "How many times loop() has run",
+                  "The length of the last delay()",
+                  "The milliseconds since the board started running"
+                ],
+                "answer": 3,
+                "explanation": "millis() is the number of milliseconds since start-up; it does not know the real time of day. It has nothing to do with the last delay or the number of rounds.",
+                "skills": [
+                  "prog-millis"
+                ]
+              },
+              {
+                "id": "m3h6d27-q2",
+                "kind": "numeric",
+                "prompt": "The value of millis() is of type unsigned long (at most 4 294 967 295) and goes up by 1 every millisecond. After how many days does the counter go back to zero? (A day is 86 400 000 ms. Round to one decimal place.)",
+                "answer": 49.7,
+                "tolerance": 0.1,
+                "unit": "days",
+                "explanation": "2^32 = 4 294 967 296 ms. Dividing this by 86 400 000 gives about 49.71 days. The overflow happens at around 49.7 days.",
+                "skills": [
+                  "prog-millis",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d27-q3",
+                "kind": "numeric",
+                "prompt": "A friend keeps the time in an int: int simdi = millis(); On the Uno an int is 16 bits and holds at most 32 767. About how many seconds after the program starts does this variable overflow? (Round to one decimal place.)",
+                "answer": 32.8,
+                "tolerance": 0.1,
+                "unit": "s",
+                "explanation": "32 767 ms = 32.767 s, so about 32.8 seconds. That is why time variables must be unsigned long, not int.",
+                "skills": [
+                  "prog-millis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h6d27-q4",
+                "kind": "predict-output",
+                "prompt": "What does the Serial monitor show when this code runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long onceki = 4294967000UL;\n  unsigned long simdi = 100;\n  Serial.println(simdi - onceki);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "396",
+                  "-4294966900",
+                  "100",
+                  "It gives a compile error"
+                ],
+                "answer": 0,
+                "explanation": "The counter wrapped round from 4 294 967 000 to 100. The remaining 296 ms (up to the limit) + 100 ms = 396. Unsigned subtraction gives this difference correctly; no negative number appears, because an unsigned long cannot hold negative values.",
+                "skills": [
+                  "prog-millis",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d27-q5",
+                "kind": "find-bug",
+                "prompt": "This program toggles the LED every half second. But when the board has been on for about 49 days, the behaviour goes wrong for a while. Which line causes the bug?\n\n```\nunsigned long onceki = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n  if (simdi >= onceki + 500) {\n    onceki = simdi;\n    digitalWrite(13, !digitalRead(13));\n  }\n}\n```",
+                "options": [
+                  "unsigned long onceki = 0;",
+                  "unsigned long simdi = millis();",
+                  "if (simdi >= onceki + 500) {",
+                  "digitalWrite(13, !digitalRead(13));"
+                ],
+                "answer": 2,
+                "explanation": "Checking by addition breaks at the moment of overflow: onceki + 500 goes past the limit and wraps round to a small number, and the condition becomes true before the time is up. The right way is to write simdi - onceki >= 500. The variable types are correct, and the line that toggles the LED is fine too.",
+                "skills": [
+                  "prog-millis",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Durum makineleri (FSM)",
@@ -5196,7 +8413,128 @@ export const modul3: ModuleContent = {
                 "prog-millis"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "State machines (FSM)",
+            "problem": "A lift is only ever in one of a few set states, such as \"door open\", \"going up\" or \"waiting\". It moves from one state to another only when certain events happen. If you organise your programs in the same way, you get a readable structure instead of a tangled pile of `if`s. This is called a **state machine** (FSM, finite state machine).",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| LED 1 (red) + 330 Ω | **D13** |\n| LED 2 (yellow) + 330 Ω | **D12** |\n| LED 3 (green) + 330 Ω | **D11** |\n| Button | **A** end to **D2**, **B** end to GND (`INPUT_PULLUP`) |\n\nEach LED's **A** end goes to its resistor and its **K** end goes to GND.\n\n### Program 1: An LED that changes mode with a button\nThere are three modes: **KAPALI** (off), **YAVAS** (slow, changes every 1000 ms) and **HIZLI** (fast, changes every 250 ms). Each press of the button moves on to the next mode. An `enum` gives names to numbers: KAPALI = 0, YAVAS = 1, HIZLI = 2.\n\n```cpp\n// sketch: fsm_mod\nenum Mod { KAPALI, YAVAS, HIZLI };\nMod mod = KAPALI;\n\nunsigned long sonDegisim = 0;\nbool ledYanik = false;\nbool oncekiBasili = false;\n\nvoid yanipSon(unsigned long aralik) {\n  unsigned long simdi = millis();\n  if (simdi - sonDegisim >= aralik) {\n    sonDegisim = simdi;\n    ledYanik = !ledYanik;\n    digitalWrite(13, ledYanik);\n  }\n}\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n}\n\nvoid loop() {\n  bool basili = (digitalRead(2) == LOW);\n  if (basili && !oncekiBasili) {              // yeni basış: sonraki moda geç\n    mod = (Mod)((mod + 1) % 3);\n    sonDegisim = millis();\n    ledYanik = false;\n    digitalWrite(13, LOW);\n  }\n  oncekiBasili = basili;\n\n  switch (mod) {\n    case KAPALI:\n      digitalWrite(13, LOW);\n      break;\n    case YAVAS:\n      yanipSon(1000);\n      break;\n    case HIZLI:\n      yanipSon(250);\n      break;\n  }\n}\n```\n\n### Program 2: A timed traffic light\nHere the states change with **time**, not with a button. Each state has a duration: KIRMIZI (red) 3 s, YESIL (green) 3 s, SARI (yellow) 1 s, then KIRMIZI again.\n\n```cpp\n// sketch: fsm_trafik\nenum Durum { KIRMIZI, YESIL, SARI };\nDurum durum = KIRMIZI;\nunsigned long durumBasi = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);   // kırmızı\n  pinMode(12, OUTPUT);   // sarı\n  pinMode(11, OUTPUT);   // yeşil\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  switch (durum) {\n    case KIRMIZI:\n      digitalWrite(13, HIGH); digitalWrite(12, LOW); digitalWrite(11, LOW);\n      if (simdi - durumBasi >= 3000) { durum = YESIL; durumBasi = simdi; }\n      break;\n    case YESIL:\n      digitalWrite(13, LOW); digitalWrite(12, LOW); digitalWrite(11, HIGH);\n      if (simdi - durumBasi >= 3000) { durum = SARI; durumBasi = simdi; }\n      break;\n    case SARI:\n      digitalWrite(13, LOW); digitalWrite(12, HIGH); digitalWrite(11, LOW);\n      if (simdi - durumBasi >= 1000) { durum = KIRMIZI; durumBasi = simdi; }\n      break;\n  }\n}\n```\n\n### How does it work?\n1. A variable (`mod`, `durum`) holds **which state** the program is in right now.\n2. Every time `loop()` runs, `switch` runs only the code for that state.\n3. The change of state is written inside that state: an event (the button) or a time running out.\n4. When the state changes, do not forget to restart the time counter (`durumBasi`, the start of the state).\n5. There is no `delay` anywhere; so the program can watch the button and the time at the same time.\n\nWhen you draw an FSM, first sketch the states as circles and the transitions as arrows (in a notebook or on the board). Then write the code by looking at the drawing.\n\n### Try it\n- Add a fourth mode to the `fsm_mod` program: KAPALI → YAVAS → HIZLI → SABIT (steady: the LED stays on). Do not forget to update the `% 3` expression too.\n- Add a \"pedestrian button\" to the `fsm_trafik` program: when D2 is pressed, the YESIL state should switch to SARI straight away.\n- Make red and yellow light up together before red (like a real traffic light). Do you need a new state for this?\n\n### Common mistakes\n- Not putting `break;` at the end of a `case`: the program also runs the code of the next state.\n- Not writing `durumBasi = simdi;` when the state changes: the new state ends straight away.\n- Changing state in every round in which the button is \"pressed\": use edge detection (`basili && !oncekiBasili`) so a press is counted once.\n- Mixing `enum` names with plain numbers: always refer to the states by name.",
+            "question": "Pick a household appliance (a washing machine, a microwave oven). What states can it be in, and which events cause the changes between states? Can you draw this as a diagram?",
+            "explainerMd": "### What you will learn in this lesson\n- Thinking of a program as **states** and **transitions**\n- Naming states with `enum` and running the code for that state with `switch`\n- Tying a transition to an event (a button) or to a time running out (`millis`)\n- Restarting the time counter when the state changes\n\n### What you should know first\n`if` and `switch` from lesson 7; detecting the edge of a press from lesson 8; `millis()` and the `simdi - son >= aralik` pattern from lesson 27.\n\n### Why a state machine?\nA lift cannot be \"door open\" and \"going up\" at the same time; at any moment it is in one particular state. If you organise a program like this, your code stays readable. A **state machine** (FSM) keeps the **state** the program is in right now in a variable and defines the **transitions** between states. Order takes the place of tangled piles of `if`s.\n\n### Draw first, then write\nA traffic light has three states. First draw the diagram on paper:\n\n```\n[KIRMIZI] ---after 3 s---> [YESIL] ---after 3 s---> [SARI]\n    ^                                                  |\n    +--------------------after 1 s---------------------+\n```\n\nEach box is a state and each arrow is a transition. The text on the arrow is the **event** that triggers the transition: a button press or a time running out. The code is a one-to-one translation of the drawing.\n\n### enum and switch\n**`enum`** gives names to numbers: when you write `enum Durum { KIRMIZI, YESIL, SARI };`, KIRMIZI = 0, YESIL = 1, SARI = 2. Writing `durum = YESIL;` in the code is much easier to read than writing `durum = 1;`.\n\n`switch (durum)` runs only the `case` block of the current state in each round. Each block does three jobs:\n1. It sets the outputs for that state (which LED is on).\n2. It checks the transition condition (is the time up, was the button pressed).\n3. If the condition is met, it writes the new state and resets the time counter.\n\n```\ncase KIRMIZI:\n  digitalWrite(13, HIGH);\n  if (simdi - durumBasi >= 3000) { durum = YESIL; durumBasi = simdi; }\n  break;\n```\n\nThe **`break;`** at the end of the block is a must. If you forget it, the program also runs the code of the state below (this is called \"fall-through\").\n\n### Changing by time and by event\nA transition can happen in two ways. In a timed transition you ask `simdi - durumBasi >= duration`; if you do not write `durumBasi = simdi;` when the state changes, the new state ends at once, because the difference is still based on the old value. In an event transition you look for the button's **edge** (a new press); otherwise a button held down jumps to the next state every round. For a mode cycle, the expression `(mod + 1) % 3` produces the sequence 0, 1, 2, 0, 1...\n\n### Summary\nA state machine keeps the state the program is in in an `enum` variable and uses `switch` to run the code for that state. Transitions are tied to time (`millis`) or to an event (a button edge); when the state changes, the time counter is reset, and every `case` ends with `break;`. Draw the diagram first, then code it.",
+            "concepts": [
+              {
+                "term": "State",
+                "definition": "The condition the program is in at that moment. It is kept in a variable, and only one is valid at any time.",
+                "example": "In the traffic light program, KIRMIZI, YESIL and SARI are the three states.",
+                "pitfall": "Treating several state variables as independent and allowing the program to be in two states at once."
+              },
+              {
+                "term": "Transition",
+                "definition": "The condition that triggers the move from one state to another: an event or a time running out.",
+                "example": "In the KIRMIZI state, when 3000 ms are up, the program moves to YESIL.",
+                "pitfall": "Not resetting the new state's time counter (`durumBasi = simdi`) during the transition; the new state ends at once."
+              },
+              {
+                "term": "enum",
+                "definition": "A type that gives meaningful names to numbers. It gives the first name 0 and goes on adding one for each following name.",
+                "example": "Writing enum Mod { KAPALI, YAVAS, HIZLI }; makes KAPALI = 0, YAVAS = 1, HIZLI = 2.",
+                "pitfall": "Writing a bare number instead of a name and hiding the meaning of the code (`durum = 2;`)."
+              },
+              {
+                "term": "switch / case / break",
+                "definition": "A structure that runs only the matching case block depending on a variable's value. Each block ends with break;.",
+                "example": "switch (durum) { case YESIL: ...; break; }",
+                "pitfall": "Forgetting break;: the program also runs the code of the next case (fall-through)."
+              },
+              {
+                "term": "Edge detection",
+                "definition": "Looking at the button having just become pressed, not at it \"being pressed\". It is done by keeping the previous state in a variable.",
+                "example": "The code if (basili && !oncekiBasili) { ... } counts a press only once.",
+                "pitfall": "Changing state with only the `basili` condition: a button held down jumps to the next mode every round."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h6d28-q1",
+                "kind": "mcq",
+                "prompt": "In a state machine program, what is the job of the state variable?",
+                "options": [
+                  "It holds which state the program is in right now",
+                  "It holds which pin the board is connected to",
+                  "It holds the time that has passed in milliseconds",
+                  "It holds how many times the button has been pressed"
+                ],
+                "answer": 0,
+                "explanation": "The state variable (for example durum or mod) holds the current state; switch looks at this value to decide which block runs. The time that has passed is kept in a separate variable (durumBasi), and the number of presses in another counter.",
+                "skills": [
+                  "prog-fsm"
+                ]
+              },
+              {
+                "id": "m3h6d28-q2",
+                "kind": "predict-output",
+                "prompt": "What does the Serial monitor show when this code runs?\n\n```\nenum Mod { KAPALI, YAVAS, HIZLI };\n\nvoid setup() {\n  Serial.begin(9600);\n  int mod = KAPALI;\n  for (int i = 0; i < 4; i++) {\n    mod = (mod + 1) % 3;\n  }\n  Serial.println(mod);\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "0",
+                  "1",
+                  "2",
+                  "3"
+                ],
+                "answer": 1,
+                "explanation": "The mode starts at 0; at each step it becomes 1, 2, 0, 1. After 4 presses it stays at 1 (YAVAS). The % 3 operation never lets the result be 3; when it reaches 3 it goes back to 0.",
+                "skills": [
+                  "prog-fsm",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h6d28-q3",
+                "kind": "numeric",
+                "prompt": "A traffic light program uses these durations in its cycle: KIRMIZI 5000 ms, YESIL 4000 ms, SARI 1500 ms, then KIRMIZI again. How many milliseconds pass from the start of one red to the start of the next red?",
+                "answer": 10500,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "Add up the durations of the three states: 5000 + 4000 + 1500 = 10 500 ms. When the cycle is complete, it goes back to red.",
+                "skills": [
+                  "prog-fsm",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d28-q4",
+                "kind": "find-bug",
+                "prompt": "In this two-state program, the red LED does not stay on as expected during the red phase; D13 and D11 flicker together. Where is the bug?\n\n```\nswitch (durum) {\n  case KIRMIZI:\n    digitalWrite(13, HIGH);\n    digitalWrite(11, LOW);\n    if (simdi - durumBasi >= 3000) { durum = YESIL; durumBasi = simdi; }\n  case YESIL:\n    digitalWrite(13, LOW);\n    digitalWrite(11, HIGH);\n    if (simdi - durumBasi >= 3000) { durum = KIRMIZI; durumBasi = simdi; }\n    break;\n}\n```",
+                "options": [
+                  "durumBasi = simdi; should not be written",
+                  "The line digitalWrite(11, LOW); is not needed",
+                  "There is no break; at the end of the KIRMIZI block",
+                  "The word case YESIL: is misspelt"
+                ],
+                "answer": 2,
+                "explanation": "Because the KIRMIZI block does not end with break;, the program falls through into the YESIL block and, in the same round, turns red off and green on. So the two LEDs flicker together. Adding break; at the end of the KIRMIZI block fixes the problem. The other options are lines that work correctly.",
+                "skills": [
+                  "prog-fsm",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h6d28-q5",
+                "kind": "mcq",
+                "prompt": "In a state machine, what happens if the line durumBasi = simdi; is not written when moving to a new state?",
+                "options": [
+                  "The compiler gives an error",
+                  "The LEDs go off and never come back on",
+                  "The program goes back to the old state and never moves on",
+                  "The new state's time is worked out with the old counter, and the state can end at once"
+                ],
+                "answer": 3,
+                "explanation": "simdi - durumBasi is still worked out from the start of the old state; since the difference is already large, the new state can end one round later. There is no compile error and the program does not go back; only the durations work wrongly.",
+                "skills": [
+                  "prog-fsm",
+                  "prog-millis"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Kesmeler ve timer'lar",
@@ -5316,7 +8654,126 @@ export const modul3: ModuleContent = {
                 "prog-interrupts"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Interrupts and timers",
+            "problem": "What do you do when the phone rings? Whatever you are doing, you stop and answer it, you talk, and then you carry on from where you left off. An Arduino can do this too: when an event happens on a pin, it **immediately** pauses the code that is running, runs a small \"interrupt\" function, and then goes back to the main program. Even inside a `delay`!",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| Button | **A** end to **D2**, **B** end to GND (`INPUT_PULLUP`) |\n| LED + 330 Ω resistor | **D13** → resistor → LED **A**; **K** → GND |\n\nOn the Arduino Uno, only two pins can take external interrupts: **D2 (INT0)** and **D3 (INT1)**. That is why our buttons are on these pins.\n\n### Program 1: An interrupt that counts presses even during a delay\n```cpp\n// sketch: kesme_sayac\nvolatile unsigned int basisSayisi = 0;\nvolatile unsigned long sonKesme = 0;\n\nvoid basildi() {                              // ISR: kesme servis rutini\n  unsigned long simdi = millis();\n  if (simdi - sonKesme > 50) {                // 50 ms'den sık gelen sıçramaları yok say\n    basisSayisi++;\n    sonKesme = simdi;\n  }\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), basildi, FALLING);\n}\n\nvoid loop() {\n  delay(1000);                                // ana program \"uyuyor\"\n\n  noInterrupts();                             // okurken kesme araya girmesin\n  unsigned int kopya = basisSayisi;\n  interrupts();\n\n  Serial.print(\"Basis: \");\n  Serial.println(kopya);\n}\n```\nIn this program, `loop()` is almost always inside `delay(1000)`; but when the button is pressed, `basildi()` (pressed) still runs and the counter goes up. The missed-press problem from lesson 26 is gone.\n\n### Program 2: A short ISR, let loop do the work\nThe best method is to only raise a flag inside the ISR and leave the real work to `loop()`:\n\n```cpp\n// sketch: kesme_bayrak\nvolatile bool basisVar = false;\n\nvoid basildi() {\n  basisVar = true;                            // yalnızca bayrağı kaldır\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), basildi, FALLING);\n}\n\nvoid loop() {\n  if (basisVar) {\n    basisVar = false;\n    Serial.println(\"Kesme geldi\");            // yazdırma işi burada, ISR'de değil\n  }\n}\n```\n\n### Program 3: Exactly 1 Hz with a timer interrupt\nTimer1 inside the board can produce interrupts at regular intervals without using `delay` or `millis`. The code below is advanced; for now it is enough to understand the idea.\n\n```cpp\n// sketch: timer1_led\nISR(TIMER1_COMPA_vect) {                      // Timer1 eşleşme kesmesi\n  digitalWrite(13, !digitalRead(13));\n}\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  noInterrupts();\n  TCCR1A = 0;\n  TCCR1B = 0;\n  TCNT1 = 0;\n  OCR1A = 31249;                              // 16 MHz / 256 = 62 500 tik/sn; 31 250 tik = 0,5 sn\n  TCCR1B |= (1 << WGM12);                     // CTC modu: eşleşince sayaç sıfırlanır\n  TCCR1B |= (1 << CS12);                      // bölücü 256\n  TIMSK1 |= (1 << OCIE1A);                    // eşleşme kesmesini aç\n  interrupts();\n}\n\nvoid loop() {\n  // ana program burada başka işler yapabilir\n}\n```\nThe LED changes every 0.5 seconds, so it blinks at 1 Hz. Timer1 is a unit that `analogWrite` on pins 9 and 10 and the `Servo` library also use; if you use it together with them, they clash.\n\n### How does it work?\n1. `attachInterrupt(digitalPinToInterrupt(2), basildi, FALLING)` means: run the `basildi` function when an event happens on pin D2. The modes are: `FALLING` (HIGH→LOW, a button press), `RISING` (LOW→HIGH), `CHANGE` (both) and `LOW`.\n2. `digitalPinToInterrupt(2)` turns the pin number into the interrupt number; do not write the number yourself.\n3. Variables shared between the ISR and the main program must be `volatile`. This tells the compiler: \"this value can change outside the normal flow of the program, check memory every time\". If you leave it out, the compiler may keep the value aside and use an out-of-date copy.\n4. An `unsigned int` is 2 bytes, and because the processor is 8-bit, it is read in two steps. If an interrupt arrives during the read, you get a half-finished value. That is why you take a copy between `noInterrupts()` and `interrupts()`.\n\n### ISR rules\n- **Keep it short.** A few lines; increase a counter, raise a flag.\n- **Do not use `delay()`.** `delay` does not work inside an ISR, and the program may get stuck.\n- **Do not use `Serial.print`.** It is slow, and the program may get stuck if the output buffer fills up. Do the printing in `loop()`.\n- **`millis()` does not move on inside an ISR.** You can read it, but its value stays the same for the whole ISR.\n- Make the shared variable `volatile`; if it is more than one byte, turn interrupts off while reading it.\n- Button bounce can trigger the interrupt several times; add a 50 ms guard like the one in program 1.\n\n### Try it\n- In the `kesme_sayac` program, change `FALLING` to `CHANGE`. How much does one press add to the counter? Why?\n- Why is it not a good idea to put `Serial.println` inside the ISR in the `kesme_bayrak` program? Explain in your own words.\n- In the timer program, change the `OCR1A` value to 15624. How does the LED's speed change? Work it out and check.\n\n### Common mistakes\n- Not writing `volatile`: the counter may seem not to go up in the main program.\n- Putting `delay` or `Serial.print` inside the ISR.\n- Using a pin other than D2 or D3 for the interrupt (on the Uno, `attachInterrupt` only works on these two pins).\n- Trying to give the ISR a parameter: an ISR takes no parameters and returns no value.",
+            "question": "Is using an interrupt always better than `millis`? In which situation is an interrupt the right choice (when a fast event must not be missed), and in which is `millis` enough?",
+            "explainerMd": "### What you will learn in this lesson\n- The idea of an **interrupt**: pausing the main program and running a small function when an event happens\n- Setting up an interrupt on D2 and D3 with `attachInterrupt`, and the `FALLING`, `RISING` and `CHANGE` modes\n- Why a `volatile` variable and a short interrupt function (ISR) are needed\n- That a timer can produce regular interrupts without `millis` or `delay`, and how to work out its interval\n\n### What you should know first\nPresses missed during `delay` from lesson 26; `millis()` from lesson 27; button bounce from lesson 8; defining functions from lesson 19.\n\n### When the phone rings\nWhatever you are doing, when the phone rings you stop, answer it, talk, and then carry on from where you left off. An **interrupt** is the same idea. When an event happens on a chosen pin, the processor pauses what it is doing, runs a small function called an **ISR** (interrupt service routine), and goes back to the main program. It works even inside a `delay`; so there is almost no risk of missing a short event.\n\n### Which pins on the Uno?\nOn the Uno, external interrupts are only on two pins:\n\n| Pin | Interrupt |\n|---|---|\n| D2 | INT0 |\n| D3 | INT1 |\n\nSetting it up: `attachInterrupt(digitalPinToInterrupt(2), basildi, FALLING);` The mode sets the type of event: `FALLING` is a drop from HIGH to LOW (a button press with INPUT_PULLUP), `RISING` is a rise from LOW to HIGH (a release), and `CHANGE` is both. With `CHANGE`, one press and release produce two interrupts.\n\n### ISR rules\n- **Keep it short.** Increase a counter or raise a flag; let `loop()` do the real work.\n- **Do not use `delay()` or `Serial.print`.** Time does not flow inside an ISR, and the program gets stuck if the output buffer fills up.\n- **Take no parameters, return no value.** An ISR is a `void` function with no arguments.\n- **Against button bounce**, add a guard of a few tens of milliseconds.\n\n### volatile and atomic reading\nA variable shared between the ISR and `loop()` is marked **`volatile`**. It tells the compiler: \"this value can change outside the normal flow of the program, check memory every time\". If you leave it out, `loop()` may use an old copy and the counter seems never to go up. The Uno has an 8-bit processor; a 2-byte or 4-byte variable is read in two to four steps. If an interrupt arrives right in the middle, you read half a value. That is why you take a copy after `noInterrupts();` and turn them back on with `interrupts();`.\n\n### Timer: regular interrupts\n**Timer1** inside the board counts by dividing the 16 MHz clock. If the prescaler is 256, that gives 16 000 000 / 256 = 62 500 ticks per second. When the counter has counted N+1 ticks for the compare value `OCR1A`, an interrupt arrives:\n\n```\ninterrupt interval = (OCR1A + 1) / 62 500 seconds   (prescaler 256)\n```\n\nFor `OCR1A = 31249`, 31 250 / 62 500 = 0.5 s. Timer1 uses the same unit as `analogWrite` on pins 9-10 and `Servo`; if they are used together, they clash.\n\n### Summary\nAn interrupt is the mechanism that pauses the main program and runs a short ISR when an event happens. On the Uno it is set up on pins D2 and D3 with `attachInterrupt`. The ISR must be short; a shared variable must be `volatile`, and if it is several bytes long, interrupts must be turned off while it is read. For a timer interrupt, the interval is worked out with `(OCR1A + 1) / tick rate`.",
+            "concepts": [
+              {
+                "term": "Interrupt",
+                "definition": "When an event happens, the processor leaves what it is doing, runs the matching function, and then goes back to where it left off.",
+                "example": "When the button on D2 drops to LOW, the function basildi() runs, whatever loop() is doing.",
+                "pitfall": "Thinking an interrupt solves every problem; long jobs cannot be done inside an ISR."
+              },
+              {
+                "term": "ISR",
+                "definition": "Interrupt service routine: a short function that runs when an interrupt arrives, takes no parameters and returns no value.",
+                "example": "The function void basildi() { sayac++; } is an ISR.",
+                "pitfall": "Putting delay or Serial.print inside an ISR; the program may get stuck."
+              },
+              {
+                "term": "volatile",
+                "definition": "A keyword that tells the compiler a variable can change outside the normal flow of the program (in an ISR).",
+                "example": "volatile unsigned int sayac = 0;",
+                "pitfall": "Not writing volatile: loop() may read the value from an old copy and the counter seems not to go up."
+              },
+              {
+                "term": "Interrupt modes",
+                "definition": "The setting that decides which event triggers attachInterrupt: FALLING, RISING, CHANGE, LOW.",
+                "example": "FALLING is used to catch a press on an INPUT_PULLUP button.",
+                "pitfall": "Choosing CHANGE and thinking one press is one interrupt; a press and a release produce two interrupts."
+              },
+              {
+                "term": "Timer interrupt",
+                "definition": "A regular interrupt produced when one of the counters in the board's timer units reaches a set value.",
+                "example": "With prescaler 256 and OCR1A = 31249, the interrupt comes every 0.5 seconds.",
+                "pitfall": "Using Timer1 together with Servo or with analogWrite on pins 9-10: the same unit clashes."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h6d29-q1",
+                "kind": "mcq",
+                "prompt": "On the Arduino Uno, which pins can take an external interrupt with attachInterrupt?",
+                "options": [
+                  "D0 and D1",
+                  "All digital pins",
+                  "D8 and D9",
+                  "D2 and D3"
+                ],
+                "answer": 3,
+                "explanation": "On the Uno, external interrupts are only on the INT0 (D2) and INT1 (D3) pins. D0 and D1 are for serial communication; D8-D9 and the other pins do not have this interrupt.",
+                "skills": [
+                  "prog-interrupts"
+                ]
+              },
+              {
+                "id": "m3h6d29-q2",
+                "kind": "numeric",
+                "prompt": "Timer1 is running with prescaler 256 (16 MHz / 256 = 62 500 ticks/s) and OCR1A = 6249 has been written. Every how many milliseconds does the interrupt come?",
+                "answer": 100,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "The number of ticks counted is OCR1A + 1 = 6250. 6250 / 62 500 = 0.1 s = 100 ms. If you forget the +1 and work out 6249 / 62 500, you get 99.98 ms; the right formula uses (OCR1A + 1).",
+                "skills": [
+                  "prog-interrupts",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d29-q3",
+                "kind": "find-bug",
+                "prompt": "The button is connected between D4 and GND. When the button is pressed, the counter never goes up. What causes the bug in the program?\n\n```\nvolatile unsigned int basis = 0;\n\nvoid say() {\n  basis++;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(4, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(4), say, FALLING);\n}\n\nvoid loop() {\n  Serial.println(basis);\n  delay(500);\n}\n```",
+                "options": [
+                  "On the Uno, D4 is not an external interrupt pin; the interrupt must be set up on D2 or D3",
+                  "The say() function should be volatile",
+                  "HIGH should be written instead of FALLING",
+                  "The basis variable should not be unsigned"
+                ],
+                "answer": 0,
+                "explanation": "On the Uno, external interrupts exist only on pins D2 (INT0) and D3 (INT1); digitalPinToInterrupt(4) does not give a valid interrupt number, so attachInterrupt sets nothing up. The button must be moved to D2. say() is an ISR; volatile is written for variables; FALLING is the right mode; being unsigned is not a problem.",
+                "skills": [
+                  "prog-interrupts",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h6d29-q4",
+                "kind": "predict-output",
+                "prompt": "An ideal button (no bounce) is pressed and released only once; this finishes within the first 2 seconds. What is the first value printed?\n\n```\nvolatile int sayac = 0;\n\nvoid kes() {\n  sayac++;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), kes, CHANGE);\n}\n\nvoid loop() {\n  delay(2000);\n  Serial.println(sayac);\n}\n```",
+                "options": [
+                  "0",
+                  "1",
+                  "2",
+                  "Nothing is printed, the program gets stuck"
+                ],
+                "answer": 2,
+                "explanation": "CHANGE produces an interrupt for both the press (HIGH→LOW) and the release (LOW→HIGH); two interrupts make the counter 2. If FALLING had been chosen, the result would be 1. The interrupt works even inside delay, so it is not 0 and the program does not get stuck.",
+                "skills": [
+                  "prog-interrupts"
+                ]
+              },
+              {
+                "id": "m3h6d29-q5",
+                "kind": "mcq",
+                "prompt": "Why is it not a good idea to use Serial.println inside an interrupt function?",
+                "options": [
+                  "Serial only works inside setup()",
+                  "Printing is slow and the program may get stuck if the buffer fills up; an ISR must be short",
+                  "No variables can be used inside an ISR",
+                  "The Serial monitor turns interrupts off"
+                ],
+                "answer": 1,
+                "explanation": "An ISR must be short. Serial.println is slow, and it may have to wait if the output buffer fills up; inside an interrupt, the interrupts that would let that wait finish are turned off. Raising a flag and leaving the printing to loop() is right. Variables can be used in an ISR (they need to be volatile).",
+                "skills": [
+                  "prog-interrupts"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Çoklu görev paneli",
@@ -5434,7 +8891,124 @@ export const modul3: ModuleContent = {
                 "prog-multitask"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Multitasking panel",
+            "problem": "On a car's dashboard, a warning light blinks, the driver presses a button and, if needed, a warning sound plays, all at the same time. How does a single processor do all of these at once? In this project you will build it with what you have learnt: `millis`, a state machine and an interrupt on one panel.",
+            "contentMd": "### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| LED 1 (pulse, green) + 330 Ω | **D13** → resistor → LED **A**; **K** → GND |\n| LED 2 (alarm, red) + 330 Ω | **D12** → resistor → LED **A**; **K** → GND |\n| Buzzer (passive; in the properties panel, Type = Passive) | **+** end to **D8**, **-** end to GND |\n| Button 1 (MOD, mode) | **A** end to **D2**, **B** end to GND (`INPUT_PULLUP`) |\n| Button 2 (SUSTUR, mute) | **A** end to **D3**, **B** end to GND (`INPUT_PULLUP`) |\n\n### Tasks\nThe panel does three jobs, and they all run at the same time:\n1. **Pulse LED (D13):** its speed changes with the mode.\n2. **Mode change (D2, interrupt):** each press goes BEKLE (waiting) → CALISIR (running) → ALARM → BEKLE.\n3. **Timed buzzer (D8):** silent in BEKLE; in CALISIR, a single 0.1 second beep every 2 seconds; in ALARM, a 2 kHz warning that sounds for 0.2 s and is silent for 0.2 s.\n\n| Mode | D13 LED | D12 LED | Buzzer |\n|---|---|---|---|\n| BEKLE | changes every 1000 ms (0.5 Hz) | off | silent |\n| CALISIR | changes every 250 ms (2 Hz) | off | a 100 ms 1 kHz beep every 2 s |\n| ALARM | changes every 100 ms (5 Hz) | on | sounds for 200 ms, silent for 200 ms (2 kHz) |\n\nThere are two ways out of ALARM mode: if you press the SUSTUR button (D3), or if 5 seconds pass, it goes back to BEKLE.\n\n### Program\n```cpp\n// sketch: coklu_gorev_paneli\nconst int LED_NABIZ = 13;\nconst int LED_ALARM = 12;\nconst int BUZZER = 8;\nconst int BTN_SUSTUR = 3;\n\nenum Mod { BEKLE, CALISIR, ALARM };\nMod mod = BEKLE;\n\nvolatile bool modIstegi = false;           // ISR ile loop arasında paylaşılır\nvolatile unsigned long sonKesme = 0;\n\nunsigned long ledZaman = 0;\nunsigned long buzzerZaman = 0;\nunsigned long modBasi = 0;\nbool ledYanik = false;\nbool buzzerAcik = false;\n\nvoid modTusu() {                           // ISR: kısa tut\n  unsigned long simdi = millis();\n  if (simdi - sonKesme > 50) {             // sıçrama koruması\n    modIstegi = true;\n    sonKesme = simdi;\n  }\n}\n\nvoid modGec(int yeni) {\n  mod = (Mod)yeni;\n  modBasi = millis();\n  ledZaman = modBasi;\n  buzzerZaman = modBasi;\n  ledYanik = false;\n  buzzerAcik = false;\n  digitalWrite(LED_NABIZ, LOW);\n  noTone(BUZZER);\n}\n\nvoid buzzerYonet(unsigned long simdi, unsigned long acikSure,\n                 unsigned long kapaliSure, int frekans) {\n  if (buzzerAcik) {\n    if (simdi - buzzerZaman >= acikSure) {\n      noTone(BUZZER);\n      buzzerAcik = false;\n      buzzerZaman = simdi;\n    }\n  } else if (simdi - buzzerZaman >= kapaliSure) {\n    tone(BUZZER, frekans);\n    buzzerAcik = true;\n    buzzerZaman = simdi;\n  }\n}\n\nvoid setup() {\n  pinMode(LED_NABIZ, OUTPUT);\n  pinMode(LED_ALARM, OUTPUT);\n  pinMode(BUZZER, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  pinMode(BTN_SUSTUR, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), modTusu, FALLING);\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Mod değişimi (kesmeden gelen istek)\n  if (modIstegi) {\n    modIstegi = false;\n    modGec((mod + 1) % 3);\n  }\n\n  // 2) ALARM'dan çıkış: SUSTUR butonu ya da 5 sn dolması\n  if (mod == ALARM) {\n    if (digitalRead(BTN_SUSTUR) == LOW || simdi - modBasi >= 5000) {\n      modGec(BEKLE);\n    }\n  }\n\n  // 3) Nabız LED'i\n  unsigned long aralik = 1000;\n  if (mod == CALISIR) aralik = 250;\n  if (mod == ALARM) aralik = 100;\n  if (simdi - ledZaman >= aralik) {\n    ledZaman = simdi;\n    ledYanik = !ledYanik;\n    digitalWrite(LED_NABIZ, ledYanik);\n  }\n\n  // 4) Alarm LED'i\n  digitalWrite(LED_ALARM, mod == ALARM ? HIGH : LOW);\n\n  // 5) Zamanlı buzzer\n  switch (mod) {\n    case BEKLE:\n      break;                               // sessiz\n    case CALISIR:\n      buzzerYonet(simdi, 100, 1900, 1000);\n      break;\n    case ALARM:\n      buzzerYonet(simdi, 200, 200, 2000);\n      break;\n  }\n}\n```\n\n### How does it work?\n1. **There is no `delay` at all.** Each task has its own time variable (`ledZaman`, `buzzerZaman`, `modBasi`).\n2. **The mode is a state machine.** The `mod` variable holds which state we are in; transitions are made inside `modGec()` (change mode), which resets the time counters.\n3. **The MOD button is read with an interrupt.** The ISR only raises a flag; the real work is done in `loop()`. Even while the buzzer sounds or the LED waits, no press is missed.\n4. **The buzzer is a small state machine too:** it has two states, \"on\" and \"off\", and their durations are given separately.\n5. The SUSTUR button is read inside `loop()` with `digitalRead`. Because each round runs very fast, this is good enough as well; compare the two methods.\n\n### Extra: What happens when control is lost?\nIn remote-controlled systems like Hyvex, losing the remote or the wireless link is a real risk. If the last command was \"run the motor\" and the link is cut, the motor may keep turning for ever. The fix: commands must arrive regularly; if no command arrives for a certain time, the output must **switch itself off**. In software this is called \"timeout\" or \"watchdog\" logic. The sketch below keeps output D7 (the motor/relay pin) on as long as `1` commands keep coming from the serial port; if no command arrives for 700 ms, it switches it off. Because it is written with `millis`, it does not use `delay`. (The Arduino's processor also has a hardware watchdog timer; in this lesson we only cover the software method.)\n\n```cpp\n// sketch: komut_zaman_asimi\nconst unsigned long ZAMAN_ASIMI = 700;   // ms\nunsigned long sonKomut = 0;\nbool cikisAcik = false;\n\nvoid setup() {\n  pinMode(7, OUTPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (Serial.available() > 0) {\n    char c = Serial.read();\n    if (c == '1') {                      // \"çalış\" komutu: çıkışı aç, sayacı yenile\n      cikisAcik = true;\n      sonKomut = millis();\n      digitalWrite(7, HIGH);\n    } else if (c == '0') {               // \"dur\" komutu\n      cikisAcik = false;\n      digitalWrite(7, LOW);\n    }\n  }\n\n  if (cikisAcik && millis() - sonKomut >= ZAMAN_ASIMI) {\n    cikisAcik = false;                   // komut kesildi: güvenli duruma geç\n    digitalWrite(7, LOW);\n    Serial.println(\"Komut yok: cikis kapandi\");\n  }\n}\n```\nA real motor cannot be powered straight from an Uno pin; it needs a transistor or a driver (lessons 22 and 23). In the lab you can watch the D7 output with an LED.\n\n### Try it\n- In CALISIR mode, make the beep 50 ms long. Can you still hear the beep?\n- End ALARM only with the SUSTUR button instead of the timeout. What happens then for a user who forgets to come back?\n- Add a fourth mode to the panel (for example SESSIZ, silent: the LED is on, the buzzer is quiet).\n\n### Common mistakes\n- Using `Serial.print` or `delay` inside the ISR.\n- Removing `volatile` from the `modIstegi` and `sonKesme` variables.\n- Not resetting the time counters when the mode changes: the first beep or blink of the new mode comes at the wrong time.\n- Forgetting to switch off with `noTone()` while `tone()` is playing: the buzzer does not stop.\n- Checking the `millis` difference by adding (the overflow trap).",
+            "question": "Which task on this panel is most sensitive to timing: the LED, the buzzer or the button? How does adding a new task (for example reading a sensor) affect the existing tasks? What do you need to watch out for so the job you add does not slow `loop()` down?",
+            "explainerMd": "### What you will learn in this lesson\n- Splitting a big job into **tasks** and giving each task its own time variable\n- Combining `millis`, a state machine and an interrupt in one project\n- Deciding which job to do with an interrupt and which with polling inside `loop()`\n- Timeout logic that puts an output into a safe state when the link is lost\n\n### What you should know first\nLessons 26-29: blocking with `delay`, the `millis` pattern, the state machine (`enum` + `switch`) and interrupts (`attachInterrupt`, `volatile`). `tone` and `noTone` from lesson 18; `INPUT_PULLUP` from lesson 6.\n\n### All at the same time?\nA single processor does not really do jobs at the same time; it does them one after another, very quickly. If each `loop()` round takes a few microseconds and every task gets a quick look in every round, they all seem to run at the same time. The trick is that **no task ever waits**: a task either does its job or says \"not time yet\" and leaves.\n\n### Task table first\nBefore you write the code, put the job into a table:\n\n| Task | Trigger | Method | Its own variable |\n|---|---|---|---|\n| Pulse LED | 1000/250/100 ms depending on the mode | `millis` | `ledZaman` |\n| Mode change | MOD button (D2) | Interrupt + flag | `modIstegi` |\n| Buzzer | On/off time depending on the mode | `millis` + a small FSM | `buzzerZaman` |\n| Leaving the alarm | SUSTUR (D3) or 5 s | Polling + `millis` | `modBasi` |\n\nThis way, before you write each line, you can see who affects whom. Adding a new task is just adding a new row to the table.\n\n### Which job is an interrupt, which is polling?\nAn interrupt is for short events that must not be missed: when the MOD button is pressed and released once, it must not get lost even if `loop()` is busy with something else. The ISR only writes `modIstegi = true;` (and uses a 50 ms guard against bounce); the job of changing the mode is done in `loop()`. The SUSTUR button, on the other hand, can be polled with `digitalRead` every round, because the round is very short. You do not need to use interrupts everywhere.\n\n### Reset when the mode changes\nThe mode is a state machine. On a transition, the `modGec()` function resets the time counters and switches the LED and the buzzer off. If you forget this, the first blink of the new mode comes at the wrong time. A small two-state (on/off) state machine is written for the buzzer too; the on and off times are given as parameters.\n\n### What happens when control is lost?\nIn a remote-controlled system the link can be lost. If the last command was \"run the motor\", the motor may turn for ever. The fix is a **timeout**: each command renews the counter (`sonKomut = millis()`), and if no command arrives for a certain time, the output switches itself off. The rule: the safe state is \"off\".\n\n### Summary\nMultitasking comes from a `loop()` that checks the jobs in turn without making them wait. You write a task table and give each task its own time variable; fast events are handled with an interrupt + flag, and the rest with `millis` and a state machine. Counters are reset on mode transitions. In systems such as remote controls, a timeout that switches the output off when commands stop keeps things safe.",
+            "concepts": [
+              {
+                "term": "Task",
+                "definition": "A small job the program runs independently: blinking an LED, the buzzer, reading a button. Each task has its own time variable.",
+                "example": "The pulse LED is managed with `ledZaman` and the buzzer with `buzzerZaman`.",
+                "pitfall": "Giving two tasks one shared time variable: when one is updated, the other loses its timing."
+              },
+              {
+                "term": "Non-waiting loop",
+                "definition": "A loop() with no delay at all that takes a quick look at every task in each round and goes straight back to the start.",
+                "example": "Each round takes a few microseconds; the button, the LED and the buzzer are checked in every round.",
+                "pitfall": "Adding a small delay to one task: all the other tasks wait just as long."
+              },
+              {
+                "term": "ISR + flag",
+                "definition": "Only a volatile flag is raised in the interrupt function; the real work is done in loop().",
+                "example": "Inside `modTusu()`, `modIstegi = true;` is set; when loop() sees the flag, it calls `modGec()`.",
+                "pitfall": "Changing the mode, driving LEDs or using Serial.print inside the ISR."
+              },
+              {
+                "term": "Timeout",
+                "definition": "Logic that puts the output into a safe state by itself if no command or event arrives for a certain time.",
+                "example": "If no command arrives for 700 ms, output D7 goes LOW and the motor stops.",
+                "pitfall": "Leaving the output on when the link is lost while the last command was \"run\"; the motor turns out of control."
+              },
+              {
+                "term": "Task table",
+                "definition": "A planning table that lists the tasks, triggers, methods and variables before the code is written.",
+                "example": "Mode change: trigger the D2 button, method interrupt + flag, variable `modIstegi`.",
+                "pitfall": "Starting to write code without planning: you only notice later that the tasks spoil each other's variables."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h6d30-q1",
+                "kind": "mcq",
+                "prompt": "In the multitasking panel, why does the MOD button's interrupt (ISR) only write modIstegi = true; instead of changing the mode itself?",
+                "options": [
+                  "Interrupts cannot write variables",
+                  "The mode variable can only be written in setup()",
+                  "The ISR must stay short; the real work is done in loop()",
+                  "Reading a button is only possible in loop()"
+                ],
+                "answer": 2,
+                "explanation": "An ISR must be short; changing the mode includes jobs such as resetting the LED and buzzer counters, and it could clash with the main program. Interrupts can write variables (they need to be volatile), and a button can be read with an interrupt too.",
+                "skills": [
+                  "prog-multitask",
+                  "prog-interrupts"
+                ]
+              },
+              {
+                "id": "m3h6d30-q2",
+                "kind": "find-bug",
+                "prompt": "Pressing the SUSTUR button (D3, INPUT_PULLUP) should end ALARM. But as soon as ALARM starts, it goes straight back to BEKLE. Which line is wrong?\n\n```\nif (mod == ALARM) {\n  if (digitalRead(3) == HIGH || simdi - modBasi >= 5000) {\n    modGec(BEKLE);\n  }\n}\n```",
+                "options": [
+                  "if (mod == ALARM) {",
+                  "if (digitalRead(3) == HIGH || simdi - modBasi >= 5000) {",
+                  "modGec(BEKLE);",
+                  "The code is correct; the problem is in the circuit"
+                ],
+                "answer": 1,
+                "explanation": "With INPUT_PULLUP, a button that is not pressed reads HIGH, and a pressed button reads LOW. Because the condition is == HIGH, it becomes true at once without the button being pressed. It should be == LOW. The other lines are correct.",
+                "skills": [
+                  "prog-multitask",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h6d30-q3",
+                "kind": "numeric",
+                "prompt": "In ALARM mode the buzzer sounds for 200 ms and is silent for 200 ms; when the mode starts, buzzerZaman is reset to modBasi and the buzzer is silent for 200 ms first. ALARM lasts 5 seconds (it goes back to BEKLE at 5000 ms). How many times does the buzzer start sounding in this time?",
+                "answer": 12,
+                "tolerance": 0,
+                "unit": "beeps",
+                "explanation": "The beeps start at 200, 600, 1000, ... ms (every 400 ms). The condition 200 + 400k < 5000 is met for k = 0...11: 12 beeps. At 5000 ms, the check for leaving the alarm is done before the buzzer check, so the 13th beep does not start.",
+                "skills": [
+                  "prog-multitask",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d30-q4",
+                "kind": "numeric",
+                "prompt": "An output is protected with a 700 ms timeout: each '1' command renews the counter, and if no command arrives for 700 ms, the output switches off. The last '1' command arrived at t = 600 ms, and no more came after it. At which millisecond does the output switch off?",
+                "answer": 1300,
+                "tolerance": 10,
+                "unit": "ms",
+                "explanation": "The timeout is counted from the last command: 600 + 700 = 1300 ms. Looking at the time of the first command (700 ms) or adding 700 to the total time would be wrong; the counter is renewed with every command.",
+                "skills": [
+                  "prog-multitask",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m3h6d30-q5",
+                "kind": "mcq",
+                "prompt": "In a remote-controlled system, why do we want the output to switch off automatically when the link is lost?",
+                "options": [
+                  "So the code is shorter",
+                  "So the buzzer keeps sounding",
+                  "The board switches itself off anyway when the link is lost",
+                  "To stop the output staying on for ever if the last command was \"run\""
+                ],
+                "answer": 3,
+                "explanation": "If the link is lost, the last command may still be treated as valid and the motor may turn out of control. The timeout moves to the safe state (off). The board does nothing by itself when the link is lost; you write the logic.",
+                "skills": [
+                  "prog-multitask"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -5442,6 +9016,7 @@ export const modul3: ModuleContent = {
       "title": "Ekranlar ve veri",
       "project": "Termostat",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. 7-segment ekranda bir rakamın bir bayt olduğunu söyleyebilir; 74HC595 ve `shiftOut` ile üç pinle sekiz çıkışı sürebilir.\n2. 16x2 LCD'yi `LiquidCrystal` ile bağlayıp `setCursor` ve `print` ile istediği yere yazdırabilir; eski yazının silinmediğini bilir.\n3. I2C hattının SDA (A4) ve SCL (A5) ile çalıştığını, adresin ne olduğunu açıklayabilir; adres taramasıyla cihaz bulabilir.\n4. Flash, SRAM ve EEPROM'un farkını söyleyebilir; ayarı EEPROM'a `update` ile ve seyrek yazabilir; yazma ömrünü hesaplayabilir.\n5. NTC, LCD, röle ve EEPROM'u birleştiren, histerezisli ve durum makineli bir termostat kurup anlatabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Aşağıdaki plan günde bir ders içindir. Bitirme projesi için gerekirse iki gün ayır.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | 7-segment ekran ve 74HC595 | ~25 dk | Anlatımı oku, devreyi kur, 0-9 sayacını çalıştır, bir rakamın baytını elle bul, mini testi çöz. |\n| 2 | LCD 16x2 ekran | ~20 dk | Kontrastı ayarla, iki satıra yazı yaz, eski yazının üstüne yazma sorununu dene. |\n| 3 | I2C: Wire ve adres tarama | ~25 dk | Adres taramasını çalıştır, adresi değiştirip farkı gör, I2C LCD'ye yazdır. |\n| 4 | EEPROM, String ve SRAM | ~25 dk | Açılış sayacını çalıştır, `write` ve `update` farkını gör, yazma ömrü hesabını yap. |\n| 5 | Bitirme projesi: Termostat | ~35 dk | Planı çiz, devreyi kur, programı çalıştır, histerezisi ve EEPROM'u dene, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta önceki haftaların konuları birleşir. Başlamadan önce şunları kontrol et:\n- NTC ile sıcaklık hesabı ve gerilim bölücü (Hafta 3). A2'den okunan ADC değerinden direnç bulabiliyor mu?\n- Röle ile bir yükü açıp kapatma (Hafta 5). Röle düşük gerilimle, yetişkin gözetiminde kullanılıyor mu?\n- `millis()` ile bekleme yapmayan kod ve durum makinesi (Hafta 6). `delay` kullanmadan iki işi birlikte yürütebiliyor mu?\n- Butonu `INPUT_PULLUP` ile okuma ve basış anını yakalama (Hafta 2).\n- Onaltılık sayı ve ikilik sayı (bit) fikri yeni gelir; ders 31'de yavaşça işlenir, takılırsa baytı 8 lambalı bir sıra olarak düşün.\n\n### Kavram haritası\n- **Ekran çıkışı:** 7-segment (bayt deseni) → 74HC595 (SER, SRCLK, RCLK) → `shiftOut` → mandal\n- **Karakter ekranı:** LCD 16x2 → RS, E, D4-D7 → `begin`, `setCursor`, `print` → kontrast (V0)\n- **Haberleşme:** I2C → SDA (A4) ve SCL (A5) → cihaz adresi → `Wire` ve adres taraması → `LiquidCrystal_I2C`\n- **Bellek:** Flash, SRAM, EEPROM → `read`, `update`, `put/get` → yazma ömrü → `String` ve SRAM\n- **Proje:** NTC ölçümü → histerezis → durum makinesi (KAPALI, ISITIYOR, AYAR) → röle → EEPROM'da hedef\n\n### Sık yapılan hatalar\n- **Mandalı unutmak.** `shiftOut` çağrıldı ama RCLK HIGH yapılmadı; 7-segment ekran değişmez.\n- **Ortak anot ile ortak katodu karıştırmak.** Desen ters görünür; ortak anotta COM 5V'a bağlanır.\n- **LCD pin sırasını karıştırmak.** `LiquidCrystal lcd(RS, E, D4, D5, D6, D7)` sırası kablolarla uyuşmalıdır; kontrastı (V0) ayarlamayı da unutma.\n- **Eski yazıyı silmemek.** Kısalan sayıda eski rakamlar kalır (`250` yerine `7` yazınca `750`).\n- **I2C adresini tahmin etmek.** Önce taramayı çalıştır; kodla cihaz adresi aynı olmalı.\n- **SDA ve SCL'yi A4-A5 dışına bağlamak.** Uno'nun I2C'si yalnız bu pinlerdedir.\n- **EEPROM'a her turda yazmak.** Hücre ömrü yaklaşık 100.000 yazmadır. `update` kullan, seyrek yaz.\n- **Boş EEPROM'u 0 sanmak.** Hiç yazılmamış hücrede 255 vardır; geçerli aralık kontrolü yap.\n- **Tek eşikle ısıtıcıyı sürmek.** Röle sürekli açılıp kapanır; histerezis kullan.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarını bir kez daha oku ve \"sık yapılan yanlış\" satırlarını yüksek sesle söyle.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. 7-segment için 5 ve 9 rakamlarının baytını elle yaz; sonra programda dene.\n4. Bir EEPROM hücresine her dakika, her saat ve her 10 saniyede yazarsan ömrünün kaç günde biteceğini hesapla.\n5. Termostat durum tablosunu hedef 25 için kendi eşik sayılarınla (24,5 ve 25,5) yeniden doldur.\n6. Kendi cümlelerinle şu soruyu cevapla: \"Histerezis olmasa röleye ne olurdu?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Termostat)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Devre | NTC ters bağlı ya da röle / LCD bağlantısı eksik | NTC, butonlar, röle (LED yükü) ve I2C LCD doğru bağlı | Bağlantılar düzenli; sensör değeri seri monitörle doğrulanmış |\n| Ölçüm | Sıcaklık mantıksız ya da hiç okunmuyor | Sıcaklık ekranda ve seri monitörde makul görünüyor | Ortalama alıyor, makul aralık dışı okumaları yakalıyor |\n| Kontrol | Tek eşik; röle titriyor | Histerezis çalışıyor; röle yalnız ISITIYOR durumunda açık | Histerezis değerini deneyerek seçmiş ve etkisini açıklıyor |\n| Bellek | Hedef güç kesilince kayboluyor ya da her turda yazılıyor | Hedef ayar bitince bir kez, `update` ile yazılıyor; geçersiz değerde varsayılan kullanılıyor | Yazma sayısını ölçmüş, ömür hesabını yapmış |\n| Program yapısı | `delay` ile bloklanıyor | `millis()` ve `switch` ile durum makinesi kurulu | Sensör arızası gibi bir güvenlik önlemi eklenmiş |\n| Anlatım | Ne yaptığını anlatamıyor | Devreyi, durumları ve EEPROM kullanımını adım adım anlatıyor | Hata yapıp nasıl bulduğunu ve geliştirme fikrini anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta, önceki haftalarda öğrenilenlerin gerçek bir ürün gibi birleştiği haftadır. Hesaplamalar ve pin numaraları bu hafta sıkça karışır; öğrencinin devre şemasını ve durum tablosunu kâğıda çizmesi çok yardımcı olur.\n- **Nasıl destek olunur?** Cevabı söylemek yerine şu soruları sor: \"Hangi pin hangi kabloya bağlı?\", \"Mandalı kullandın mı?\", \"Seri monitör ne yazıyor?\", \"Bu değer EEPROM'a ne zaman yazılıyor?\"\n- **Zor kavramlar.** Bit ve onaltılık gösterim (ders 31, 33) ve I2C adresi soyuttur. İkilik sayıyı sekiz lambalı bir sıra, adresi de apartman daire numarası gibi anlatmak yardımcı olur.\n- **Süre.** Bitirme projesi 35 dakikanın üstüne çıkabilir. Gerekirse devreyi bir gün, programı ertesi gün çalıştırın.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Gerçek kartla çalışırken röleyi yalnız düşük gerilimle (LED, küçük yük) kullanın; şebeke gerilimiyle (220 V) hiçbir devre kurulmaz. Gerçek bir ısıtıcı bağlanmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week, the learner:\n1. Can say that a digit on a 7-segment display is a byte; can drive eight outputs with three pins using the 74HC595 and `shiftOut`.\n2. Can connect a 16x2 LCD with `LiquidCrystal` and print anywhere on it with `setCursor` and `print`; knows that old text is not deleted.\n3. Can explain that the I2C bus works with SDA (A4) and SCL (A5), and what an address is; can find a device with an address scan.\n4. Can say how Flash, SRAM and EEPROM differ; can write a setting to the EEPROM with `update` and rarely; can work out the write lifetime.\n5. Can build and explain a thermostat with hysteresis and a state machine that combines an NTC, an LCD, a relay and the EEPROM.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan below is for one lesson a day. Set aside two days for the final project if needed.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | The 7-segment display and the 74HC595 | ~25 min | Read the explainer, build the circuit, run the 0-9 counter, work out the byte for a digit by hand, do the mini quiz. |\n| 2 | The 16x2 LCD display | ~20 min | Set the contrast, write text on two rows, try the problem of writing over old text. |\n| 3 | I2C: Wire and the address scan | ~25 min | Run the address scan, change the address and see the difference, print on the I2C LCD. |\n| 4 | EEPROM, String and SRAM | ~25 min | Run the power-on counter, see the difference between `write` and `update`, work out the write lifetime. |\n| 5 | Final project: Thermostat | ~35 min | Draw the plan, build the circuit, run the program, try the hysteresis and the EEPROM, assess it with the rubric. |\n\n### Prerequisite check\nThis week brings together the topics of the earlier weeks. Before starting, check the following:\n- Working out the temperature with an NTC, and the voltage divider (Week 3). Can the learner find the resistance from the ADC value read on A2?\n- Switching a load on and off with a relay (Week 5). Is the relay used with a low voltage, under adult supervision?\n- Non-blocking code with `millis()` and the state machine (Week 6). Can the learner run two jobs together without using `delay`?\n- Reading a button with `INPUT_PULLUP` and catching the moment it is pressed (Week 2).\n- The ideas of hexadecimal numbers and binary numbers (bits) are new; they are covered slowly in lesson 31. If the learner gets stuck, think of a byte as a row of 8 lamps.\n\n### Concept map\n- **Display output:** 7-segment (byte pattern) → 74HC595 (SER, SRCLK, RCLK) → `shiftOut` → latch\n- **Character display:** LCD 16x2 → RS, E, D4-D7 → `begin`, `setCursor`, `print` → contrast (V0)\n- **Communication:** I2C → SDA (A4) and SCL (A5) → device address → `Wire` and the address scan → `LiquidCrystal_I2C`\n- **Memory:** Flash, SRAM, EEPROM → `read`, `update`, `put/get` → write lifetime → `String` and SRAM\n- **Project:** NTC measurement → hysteresis → state machine (`KAPALI`, `ISITIYOR`, `AYAR`: off, heating, setting) → relay → target in the EEPROM\n\n### Common mistakes\n- **Forgetting the latch.** `shiftOut` was called but RCLK was not set HIGH; the 7-segment display does not change.\n- **Mixing up common anode and common cathode.** The pattern looks inverted; on a common anode display COM is connected to 5V.\n- **Mixing up the LCD pin order.** The order in `LiquidCrystal lcd(RS, E, D4, D5, D6, D7)` must match the wires; do not forget to set the contrast (V0) either.\n- **Not clearing old text.** When a number gets shorter, old digits stay (writing `7` over `250` gives `750`).\n- **Guessing the I2C address.** Run the scan first; the address in the code and the device's address must be the same.\n- **Connecting SDA and SCL to pins other than A4-A5.** The Uno's I2C is only on these pins.\n- **Writing to the EEPROM on every pass.** A cell's lifetime is about 100,000 writes. Use `update` and write rarely.\n- **Thinking an empty EEPROM is 0.** A cell that has never been written holds 255; check for a valid range.\n- **Driving the heater with a single threshold.** The relay keeps switching on and off; use hysteresis.\n\n### End-of-week review\n1. Read each lesson's concept cards once more and say the \"common mistake\" lines out loud.\n2. Read the explanations of the questions you got wrong in the mini quizzes again, then do those questions again.\n3. Write the bytes for the digits 5 and 9 on the 7-segment display by hand; then try them in the program.\n4. Work out after how many days a cell's lifetime would run out if you wrote to an EEPROM cell every minute, every hour and every 10 seconds.\n5. Fill in the thermostat state table again for a target of 25 with your own threshold numbers (24.5 and 25.5).\n6. Answer this question in your own words: \"What would happen to the relay without hysteresis?\"\n\nThe mini quizzes of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Thermostat)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Circuit | The NTC is connected the wrong way round, or the relay / LCD connection is missing | The NTC, buttons, relay (LED load) and I2C LCD are connected correctly | The connections are tidy; the sensor value has been checked with the serial monitor |\n| Measurement | The temperature makes no sense or is not read at all | The temperature looks sensible on the display and in the serial monitor | It takes an average and catches readings outside a sensible range |\n| Control | A single threshold; the relay chatters | Hysteresis works; the relay is on only in the `ISITIYOR` state | Has chosen the hysteresis value by experimenting and explains its effect |\n| Memory | The target is lost when the power is cut, or is written on every pass | The target is written once, with `update`, when the setting is finished; the default is used for an invalid value | Has measured the number of writes and worked out the lifetime |\n| Program structure | It is blocked by `delay` | A state machine is built with `millis()` and `switch` | A safety measure, such as one for sensor failure, has been added |\n| Explanation | Cannot explain what they did | Explains the circuit, the states and the use of the EEPROM step by step | Explains a mistake they made and how they found it, and an idea for improvement |\n\n### Note for parents and teachers\n- **Aim.** This is the week where everything learnt in the earlier weeks comes together like a real product. Calculations and pin numbers often get mixed up this week; it helps a lot if the learner draws the circuit diagram and the state table on paper.\n- **How can you help?** Instead of giving the answer, ask these questions: \"Which pin is connected to which wire?\", \"Did you use the latch?\", \"What does the serial monitor say?\", \"When is this value written to the EEPROM?\"\n- **Hard concepts.** Bits and hexadecimal notation (lessons 31, 33) and the I2C address are abstract. It helps to explain a binary number as a row of eight lamps and an address as a flat number in a block of flats.\n- **Time.** The final project can take longer than 35 minutes. If needed, build the circuit on one day and run the program the next day.\n- **Safety.** Everything on this platform is virtual. When working with a real board, use the relay only with low voltage (an LED, a small load); no circuit is ever built with mains voltage (220 V). A real heater is not connected.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "7-segment ekran ve 74HC595",
@@ -5556,7 +9131,121 @@ export const modul3: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The 7-segment display and the 74HC595",
+            "problem": "How are the digits on a calculator drawn? In fact, some of seven small LED bars are lit and the rest are off. But using seven pins for seven bars is very costly. Is it possible for a board to control eight outputs at once with only three pins?",
+            "contentMd": "### Circuit\nA 7-segment display is made of seven bars named \"a\" to \"g\", plus a dot (dp) LED. In this lesson we use a **common cathode** display (the negative legs of all the LEDs are joined); in the lab, the part's **Common pin** property is \"Common cathode\" by default. Instead of connecting the seven bars to pins one by one, we will use a **74HC595 shift register**. The Uno sends it the bits one after another, and the chip changes all eight outputs at once.\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. Parts you need: a 74HC595 (`sr595`), a 7-segment display (`sevenseg`) and 7 resistors.\n\n| Part | Connection |\n|---|---|\n| 74HC595 VCC and SRCLR | 5V |\n| 74HC595 GND and OE | GND |\n| 74HC595 SER (data) | **D4** |\n| 74HC595 SRCLK (clock) | **D6** |\n| 74HC595 RCLK (latch) | **D5** |\n| 74HC595 QA, QB, QC, QD, QE, QF, QG | Each through a 330 Ω resistor to the display's a, b, c, d, e, f, g pins in order |\n| 74HC595 QH (optional) | Through a 330 Ω resistor to the display's dp pin (used in the Try it section) |\n| 7-segment COM | GND |\n\nSet the resistor value by selecting the resistor and using the properties in the right panel (the default 330 Ω is fine). Each bar needs its own resistor. On the real chip these pins are numbered 16 for VCC, 8 for GND, 14 for SER, 11 for SRCLK, 12 for RCLK, 13 for OE and 10 for SRCLR; but in the lab you choose the pins by name.\n\nThe lab also models two important pins of the 74HC595: if **OE** (output enable) is connected to 5V or left unconnected, the outputs are off; if **SRCLR** (shift register clear) is connected to GND or left unconnected, the register is cleared all the time. If you leave either of them unconnected, you see a \"floating input\" warning.\n\n### Program\nEach digit is a **byte** (8 bits). Bit 0 controls the \"a\" bar, bit 1 the \"b\" bar, ... bit 6 the \"g\" bar, and bit 7 the dot LED (bit 0 goes to QA, bit 7 to QH). For example, for the digit 1 only b and c light up: `0b00000110`, that is 0x06.\n\n```cpp\n// sketch: yedi_segment_sayac\nconst int VERI = 4;    // DS\nconst int MANDAL = 5;  // ST_CP\nconst int SAAT = 6;    // SH_CP\n\n// 0'dan 9'a rakam desenleri (bit 0 = a ... bit 6 = g)\nconst byte RAKAM[10] = {\n  0x3F, 0x06, 0x5B, 0x4F, 0x66,\n  0x6D, 0x7D, 0x07, 0x7F, 0x6F\n};\n\nvoid yaz(byte desen) {\n  digitalWrite(MANDAL, LOW);                 // mandalı aç: çıkışlar sabit kalsın\n  shiftOut(VERI, SAAT, MSBFIRST, desen);     // 8 biti sırayla kaydır\n  digitalWrite(MANDAL, HIGH);                // mandalı kapat: çıkışlar bir anda güncellenir\n}\n\nvoid setup() {\n  pinMode(VERI, OUTPUT);\n  pinMode(MANDAL, OUTPUT);\n  pinMode(SAAT, OUTPUT);\n}\n\nvoid loop() {\n  for (int i = 0; i < 10; i++) {\n    yaz(RAKAM[i]);\n    delay(1000);\n  }\n}\n```\n\n### How does it work?\n1. `shiftOut` sends a byte bit by bit. For each bit it first sets the **data** pin HIGH or LOW, then gives the **clock** pin a pulse. The 74HC595 looks at the data pin on the rising edge of the clock and shifts the bit into its internal register.\n2. `MSBFIRST` means \"most significant bit first\". If the byte is 0x06 (0b00000110), the bits go in the order 0, 0, 0, 0, 0, 1, 1, 0.\n3. After eight clock pulses the byte is inside the chip, but the outputs have not changed yet. When the **latch** (ST_CP) pin goes from LOW to HIGH, the chip copies the byte inside it to the outputs. This way the display changes in one go instead of sliding.\n4. The chip can be chained: if you connect two 74HC595s one after the other, you control 16 outputs with three pins by calling `shiftOut` twice.\n5. The sums: driving the display directly would need 8 pins. With the 74HC595, 3 pins are enough; each time you add a chip to the chain, the pin count still stays at 3.\n\nYou can connect the same chip to 8 LEDs (each with a resistor) instead of a display. The program below moves a single LED from left to right. The expression `1 << i` sets only bit number i to 1.\n\n```cpp\n// sketch: led_seridi\nconst int VERI = 4;\nconst int MANDAL = 5;\nconst int SAAT = 6;\n\nvoid setup() {\n  pinMode(VERI, OUTPUT);\n  pinMode(MANDAL, OUTPUT);\n  pinMode(SAAT, OUTPUT);\n}\n\nvoid loop() {\n  for (int i = 0; i < 8; i++) {\n    digitalWrite(MANDAL, LOW);\n    shiftOut(VERI, SAAT, MSBFIRST, 1 << i);   // yalnızca i. LED yanar\n    digitalWrite(MANDAL, HIGH);\n    delay(200);\n  }\n}\n```\n\n### Try it\n- Run the program with ▶ and watch the display count from 0 to 9. While it runs, select a resistor: **Virtual meter** shows the current through that bar (about 8 mA). Change the resistor to 1 kΩ and see how the bar becomes dimmer.\n- Spoil one of the patterns in the `RAKAM` (digit) array by hand and watch what changes on the display (for example, write 0x7F instead of 0x3F).\n- To light the dot LED, add 0x80 to the byte: `yaz(RAKAM[i] | 0x80)`. For this, QH must be connected to dp. Does the dot light up next to each digit?\n- Select the display and set its **Common pin** property to \"Common anode\". Connect COM to 5V instead of GND and send the inverted pattern (`~RAKAM[i]`).\n- Write a program that counts backwards: from 9 to 0.\n\n### Common mistakes\n- Never using the latch pin: the bits shift into the chip, but the outputs never change and the display stays blank.\n- Using a common anode display as if it were common cathode: the digits look inverted (the lit bars are off, the off bars are lit). On a common anode display you connect COM to 5V and the pattern byte is inverted: `~RAKAM[i]`.\n- Connecting without resistors: the lab gives the warning \"the LED has no series resistor\" and the bar burns out (the internal resistance of a 74HC595 output is only about 50 Ω). On real bars, too much current damages the bar and the chip.\n- Connecting the 74HC595's OE and SRCLR pins wrongly or leaving them unconnected: the chip gives no output or keeps clearing the register.\n- Forgetting the power (VCC and GND) wires: the lab gives a \"not powered\" warning and there is no output.",
+            "question": "Controlling eight LEDs with three pins is great, but it also has a cost. What do you think that cost could be? (Hint: how many bytes do you have to send to change the state of one LED?)",
+            "explainerMd": "### What you will learn in this lesson\n- That a 7-segment display is made of seven bars (a-g) and a dot (dp), and how a digit is described with a **byte**\n- Working out which bar each bit in a byte lights\n- How the 74HC595 shift register controls eight outputs with three pins\n- Updating the display with `shiftOut` and the latch (RCLK)\n\n### What you should know first\n`pinMode` and `digitalWrite` from lesson 3; the `for` loop and arrays from lesson 4; why an LED needs a series resistor from lesson 2.\n\n### One digit, one byte\nA 7-segment display is seven small LED bars arranged side by side. The bars are named with the letters a, b, c, d, e, f, g; the eighth LED is known as the dot (dp). Showing a digit means choosing which bars light up. Because the eight LEDs have two states (on or off), the choice is exactly one **byte**: eight **bits**.\n\n```\nbit:     7   6   5   4   3   2   1   0\nbar:    dp   g   f   e   d   c   b   a\n```\n\nExample: for the digit 1 only b and c light up. Bit 1 and bit 2 are 1: `0b00000110`. In hexadecimal notation this number is `0x06`. Hexadecimal notation shows a byte with two characters: `0x3F` = 3 × 16 + 15 = 63, and this number is the digit 0 (bars a-f are lit, g is off).\n\n### The pin problem and its solution\nDriving the display directly needs 8 pins. If there are other parts too, the Uno soon runs out of pins. The **74HC595** solves this: the Uno sends it the bits **one after another** over a single wire (SER), the chip lines them up in its internal register and drives eight outputs (QA-QH) at once. Three Uno pins are needed:\n\n| Chip pin | Job | Pin used in the lesson |\n|---|---|---|\n| SER | Data: the bits arrive on this wire | D4 |\n| SRCLK | Clock: each pulse shifts one bit in | D6 |\n| RCLK | Latch: copies the shifted byte to the outputs | D5 |\n\n### shiftOut and the latch\nThe command `shiftOut(VERI, SAAT, MSBFIRST, bayt)` sends eight bits one after another. `MSBFIRST` says the most significant bit (bit 7) goes first. After eight pulses, the first bit sent has travelled the farthest (QH), and the last bit sent, bit 0, has reached QA; that is why bit 0 lights the \"a\" bar.\n\nWhile the bits are shifting in, the outputs do not change. The outputs are only updated together when the **latch** pin goes from LOW to HIGH. This way the display changes in one go instead of \"sliding\":\n\n```\ndigitalWrite(MANDAL, LOW);\nshiftOut(VERI, SAAT, MSBFIRST, desen);\ndigitalWrite(MANDAL, HIGH);\n```\n\n### Chaining\nIf you connect the first chip's serial output to the input of a second 74HC595, the two chips work one after the other. You still use only three Uno pins; `shiftOut` is called twice and you get 16 outputs. The cost is time: for every change of an output, all the bytes are sent again.\n\n### Summary\nA digit is an eight-bit byte whose bits match the bars. With the 74HC595 you send this byte one bit after another over three pins; `shiftOut` shifts the bits, and the outputs are updated when the latch goes HIGH. If you forget the latch, the display never changes. Every bar must have its own series resistor.",
+            "concepts": [
+              {
+                "term": "Segment and byte pattern",
+                "definition": "On a 7-segment display each bar matches one bit: bit 0 = a, bit 1 = b, ... bit 6 = g, bit 7 = dp. A digit is a byte that shows which bits are 1.",
+                "example": "For the digit 1 only b and c light up: 0b00000110, that is 0x06.",
+                "pitfall": "Mixing up the bit order: if you think bit 0 is g, the digits look reversed or broken."
+              },
+              {
+                "term": "74HC595",
+                "definition": "Shift register: a chip that takes bits arriving one after another and drives eight outputs (QA-QH) at once. Three Uno pins are enough.",
+                "example": "Driving the eight LEDs of a 7-segment display with three pins (SER, SRCLK, RCLK).",
+                "pitfall": "Leaving the OE or SRCLR pin unconnected or connecting it wrongly: the chip gives no output or keeps clearing the register."
+              },
+              {
+                "term": "shiftOut()",
+                "definition": "Sends a byte bit by bit: for each bit it sets the data pin and gives the clock pin a pulse.",
+                "example": "shiftOut(VERI, SAAT, MSBFIRST, 0x06); sends the byte with the most significant bit first.",
+                "pitfall": "Calling only shiftOut and not using the latch: the bits shift into the chip but the outputs do not change."
+              },
+              {
+                "term": "Latch (RCLK)",
+                "definition": "The pin that copies the byte inside the 74HC595 to the output pins. On the change from LOW to HIGH, the outputs are updated together.",
+                "example": "First latch LOW, then shiftOut, then latch HIGH: the display shows the new digit in one go.",
+                "pitfall": "Never setting the latch HIGH: the display stays blank or shows the old pattern."
+              },
+              {
+                "term": "Common cathode and common anode",
+                "definition": "A display whose bars have their negative legs joined is called common cathode; one with the positive legs joined is called common anode. On a common anode display COM goes to 5V and a bar whose bit is 0 lights up.",
+                "example": "On a common anode display the digit pattern is inverted: ~RAKAM[i].",
+                "pitfall": "Sending a common cathode pattern to a common anode display: the lit bars look off and the off bars look lit."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h7d31-q1",
+                "kind": "numeric",
+                "prompt": "On a common cathode display you want to light only bars a, d and g (three horizontal lines). If bit 0 = a, bit 3 = d and bit 6 = g, what is the decimal value of the byte you send?",
+                "answer": 73,
+                "tolerance": 0,
+                "explanation": "Bit 0 is worth 1, bit 3 is worth 8, bit 6 is worth 64. The total is 1 + 8 + 64 = 73 (0b01001001, 0x49 in hexadecimal). The other bits are 0, so the other bars stay off.",
+                "skills": [
+                  "bits-bytes"
+                ]
+              },
+              {
+                "id": "m3h7d31-q2",
+                "kind": "mcq",
+                "prompt": "What is the job of the RCLK (latch) pin on a 74HC595?",
+                "options": [
+                  "Carrying the data bits from the Uno to the chip",
+                  "Producing the clock pulse that shifts each bit in",
+                  "Copying the shifted-in byte to the output pins all together",
+                  "Giving the chip its 5 V power"
+                ],
+                "answer": 2,
+                "explanation": "The data pin carries the bits over the SER wire; the SRCLK clock pin shifts each bit. RCLK goes from LOW to HIGH after the eight bits are in and copies the byte to the QA-QH outputs. Power comes from the VCC pin.",
+                "skills": [
+                  "shift-register"
+                ]
+              },
+              {
+                "id": "m3h7d31-q3",
+                "kind": "predict-output",
+                "prompt": "The VERI (data), SAAT (clock) and MANDAL (latch) pins are correctly connected to the 74HC595 (QA is the first LED, QH the eighth). Which LEDs light up when these commands run?\n\n```\ndigitalWrite(MANDAL, LOW);\nshiftOut(VERI, SAAT, MSBFIRST, 0b00000101);\ndigitalWrite(MANDAL, HIGH);\n```",
+                "options": [
+                  "QF and QH",
+                  "QA and QC",
+                  "QB and QD",
+                  "Only QC"
+                ],
+                "answer": 1,
+                "explanation": "In 0b00000101, bit 0 and bit 2 are 1. With MSBFIRST, bit 0 goes last and lands on QA, and bit 2 lands on QC. QF and QH are the outputs that would light if LSBFIRST were used (the bit order would be reversed).",
+                "skills": [
+                  "shift-register",
+                  "bits-bytes"
+                ]
+              },
+              {
+                "id": "m3h7d31-q4",
+                "kind": "numeric",
+                "prompt": "Three 74HC595s are chained one after the other. How many outputs do you get in total?",
+                "answer": 24,
+                "tolerance": 0,
+                "unit": "outputs",
+                "explanation": "Each chip gives 8 outputs: 3 × 8 = 24. The Uno still uses only three pins (data, clock, latch). The pin count does not grow with the number of chips, but you have to send 3 bytes for every update.",
+                "skills": [
+                  "shift-register"
+                ]
+              },
+              {
+                "id": "m3h7d31-q5",
+                "kind": "find-bug",
+                "prompt": "The circuit is built correctly, but the display never changes. What is the problem?\n\n```\nvoid yaz(byte desen) {\n  digitalWrite(MANDAL, LOW);\n  shiftOut(VERI, SAAT, MSBFIRST, desen);\n}\n```",
+                "options": [
+                  "LSBFIRST should be written instead of MSBFIRST",
+                  "The digitalWrite(MANDAL, LOW) line is not needed",
+                  "There is no line at the end that sets the latch HIGH; the byte is not copied to the outputs",
+                  "The desen parameter should not be a byte"
+                ],
+                "answer": 2,
+                "explanation": "The bits shift into the chip, but the outputs are only updated when the latch goes from LOW to HIGH. There should be digitalWrite(MANDAL, HIGH) at the end of the function. If MSBFIRST were wrong, the display would change but the pattern would look reversed. byte is exactly the right type for this job.",
+                "skills": [
+                  "shift-register",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "LCD 16x2 ekran",
@@ -5682,7 +9371,132 @@ export const modul3: ModuleContent = {
                 "circuit-wiring"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The 16x2 LCD display",
+            "problem": "Until now you have read what the board says in the Serial Monitor. But you would not carry a computer to a thermostat. How would it be if the device wrote \"Temperature: 23.5 C\" on its own small screen? And you can do this with only a few lines of code.",
+            "contentMd": "### Circuit\nA 16x2 LCD is made of two rows, each holding 16 characters. Most modules are chips with an HD44780 controller. To talk to the Uno in **4-bit** mode, 6 signal pins are enough: RS, E and D4-D7.\n\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. Parts you need: an `lcd1602` display, a potentiometer (for contrast) and a 220 Ω resistor (for the backlight).\n\n| Part | Connection |\n|---|---|\n| LCD VSS, RW and K | GND |\n| LCD VDD | 5V |\n| LCD A (backlight +) | 5V through a 220 Ω resistor |\n| LCD V0 (contrast) | The potentiometer's SIG pin (the potentiometer's VCC pin to 5V, its GND pin to GND) |\n| LCD RS | **D12** |\n| LCD E | **D11** |\n| LCD D4 | **D5** |\n| LCD D5 | **D4** |\n| LCD D6 | **D3** |\n| LCD D7 | **D2** |\n\nThe LCD's D0-D3 pins stay unconnected. The lab models the display like this: for text to appear, VDD must be at least 4 V, and VSS and RW must be connected to ground. **If the V0 voltage goes above about 1.6 V, the display stays blank**; if V0 is not connected at all, the text is visible. The potentiometer's default position is 0.5 (V0 = 2.5 V), so at first the display looks blank. While it runs, select the potentiometer and lower its **Position** value below 0.3, or select the V0 pin and look at its voltage with the **Virtual meter**. The backlight lights up when current (more than 1 mA) flows through the A and K pins; the text can be visible even when the light is off.\n\n### Program\n```cpp\n// sketch: lcd_merhaba\n#include <LiquidCrystal.h>\n\n// Sıra: RS, E, D4, D5, D6, D7\nLiquidCrystal lcd(12, 11, 5, 4, 3, 2);\n\nvoid setup() {\n  lcd.begin(16, 2);          // 16 sütun, 2 satır\n  lcd.print(\"Merhaba!\");     // 1. satır, 1. sütundan başlar\n  lcd.setCursor(0, 1);       // sütun 0, satır 1 (alt satır)\n  lcd.print(\"Saniye:\");\n}\n\nvoid loop() {\n  lcd.setCursor(8, 1);               // sayıyı sabit yere yaz\n  lcd.print(millis() / 1000);\n}\n```\n\n### How does it work?\n1. `#include <LiquidCrystal.h>` adds the library to the program. The library handles the hard details of talking to the display for you.\n2. `LiquidCrystal lcd(12, 11, 5, 4, 3, 2);` creates an **object**. The numbers in the brackets are the connection pins: first RS, then E, then D4 to D7.\n3. `lcd.begin(16, 2)` tells the display its size and starts it. You call this once inside `setup`.\n4. `lcd.print(...)` writes text where the cursor is. You can give it a number too; it works the same way as `Serial.print`.\n5. `lcd.setCursor(sütun, satır)` moves the cursor (column, row). Counting starts from 0: the top left corner is `(0, 0)`, the bottom right corner is `(15, 1)`.\n6. In `loop` we always write the number in the same place; this way the display updates without flickering.\n\n**Clearing old text.** If the display shows \"100\" and you write \"99\" in its place, you see \"990\"; the LCD does not delete the old character, it writes over it. There are two solutions:\n- Calling `lcd.clear()` before every write (the display may flicker).\n- Padding the new text with spaces: `lcd.print(\"99 \");`\n\n**Custom character.** The display draws every character from 5x8 dots. You can define your own symbol, such as a degree sign:\n\n```cpp\n// sketch: lcd_derece\n#include <LiquidCrystal.h>\n\nLiquidCrystal lcd(12, 11, 5, 4, 3, 2);\n\nbyte derece[8] = {\n  0b00110,\n  0b01001,\n  0b01001,\n  0b00110,\n  0b00000,\n  0b00000,\n  0b00000,\n  0b00000\n};\n\nvoid setup() {\n  lcd.begin(16, 2);\n  lcd.createChar(0, derece);       // 0 numaralı özel karakter yuvasına kaydet\n  lcd.clear();                     // imleci ekran belleğine (DDRAM) döndür; yoksa yazı karakter belleğine gider\n  lcd.print(\"Sicaklik: 23.5\");\n  lcd.write(byte(0));              // özel karakteri ekrana yaz\n  lcd.print(\"C\");\n}\n\nvoid loop() {\n}\n```\n\nEach line is one row of the character; a bit that is `1` is a lit dot. The slot number is between 0 and 7, so you can define at most 8 custom characters.\n\n**Careful:** after calling `createChar`, always call `lcd.clear()` or `lcd.setCursor(...)`. On the HD44780, `createChar` moves the cursor to the character memory (CGRAM); a `print` that comes after it writes the text into that memory instead of the display memory, and the display stays blank. A real display behaves the same way, and the lab models it too.\n\n### Try it\n- Print your name on the top row and your age on the bottom row.\n- On the `lcd.print(millis() / 1000)` line, watch the number as it goes from 9 to 10. Is there a problem, since you always start the text from the same place?\n- Call the `lcd.scrollDisplayLeft()` command inside `loop` with `delay(300)`. What does the text do?\n\n### Common mistakes\n- Mixing up the pin order or the wires: the order inside `LiquidCrystal lcd(12, 11, 5, 4, 3, 2)` is RS, E, D4, D5, D6, D7. If the code and the wires do not match, the display shows nothing or meaningless characters.\n- Setting the contrast wrongly: if the V0 voltage is high (in the lab, above about 1.6 V), the display is blank. Lower the potentiometer position first.\n- Not connecting VDD, VSS or RW: the display does not turn on or the text does not show. Always connect RW to GND.\n- Not calling `clear()` or `setCursor()` after `createChar`: the text does not appear on the display.\n- Forgetting the `lcd.begin(16, 2)` line: the display is not started.\n- Turkish letters (`ı`, `ş`, `ğ`) are not in the display's character table; use `i, s, g` in your text.\n- Writing text longer than 16 characters: the extra part does not appear on the display.",
+            "question": "We used 6 pins for this display. What would you do in a project where you only have a few free pins? Could there be a way to connect the display with fewer pins?",
+            "explainerMd": "### What you will learn in this lesson\n- The layout of a 16x2 LCD (2 rows, 16 characters per row) and which 6 signal pins it uses in four-bit mode\n- Creating an object and starting the display with the `LiquidCrystal` library\n- Writing anywhere you like on the display with `print`, `setCursor` and `clear`\n- Getting to know the contrast pin (V0) and custom characters\n\n### What you should know first\nPrinting with `Serial.print` from lesson 9; setting a voltage with a potentiometer from lesson 11; the pin shortage caused by connections with many pins from lesson 31.\n\n### How to think about a character display\nA 16x2 LCD is a grid of 2 rows with 16 boxes in each row. One character is written into each box. The boxes are drawn from 5x8 dots. Text goes where the **cursor** is, just like text in the serial monitor. Counting starts from 0:\n\n```\ncolumn: 0  1  2 ... 15\nrow 0   [ ][ ][ ]...[ ]\nrow 1   [ ][ ][ ]...[ ]\n```\n\nThe top left corner is `(0, 0)` and the bottom right corner is `(15, 1)`. `lcd.setCursor(sütun, satır)` moves the cursor; you write the column first, then the row.\n\n### Connection: 6 signals, 2 power groups\nMost displays work with the HD44780 controller. In four-bit mode the signal pins are **RS** (command or data), **E** (enable) and **D4-D7** (data). The RW pin is connected to GND, because we do not read from the display. VDD goes to 5V and VSS to GND. The backlight is powered through the A and K pins with a resistor.\n\nThe **V0** pin sets the contrast. It is usually adjusted between 0 and 5 V with a potentiometer. If the voltage is too high, the display looks blank. In this lab model the display is blank if V0 goes above about 1.6 V.\n\n### The library and the object\n```\n#include <LiquidCrystal.h>\nLiquidCrystal lcd(12, 11, 5, 4, 3, 2);   // RS, E, D4, D5, D6, D7\n\nvoid setup() {\n  lcd.begin(16, 2);\n  lcd.print(\"Merhaba\");\n}\n```\nThe **order** of the numbers in the brackets is RS, E, D4, D5, D6, D7. If the wires and the code do not match, the display looks blank or garbled. `lcd.begin(16, 2)` starts the display and tells it its size; if you forget it, the display does not work.\n\n### Text is not deleted, it is written over\nThe LCD does not delete an old character by itself. If the display shows `250` and you write `7` in the same place, you see `750`. Two solutions: deleting everything with `lcd.clear()` (the display may flicker) or padding the new text with spaces, for example `lcd.print(\"7  \")`.\n\n### Custom character\nEvery character is made of dots in 5 columns and 8 rows. Each row is a 5-bit number, and a bit that is `1` is a lit dot. With `lcd.createChar(yuva, dizi)` (slot, array) you define at most 8 custom characters, numbered 0-7. After defining them you must call `lcd.clear()` or `lcd.setCursor()`; otherwise the text goes into the character memory instead of the display memory, and the display stays blank. The display's character table does not have Turkish letters such as `ı`, `ş`, `ğ`.\n\n### Summary\nWriting to the LCD takes three steps: add the library and create the object with the right pin order, start it with `begin(16, 2)`, and write with `setCursor` and `print`. Because old text is not deleted, clear the area you will write over when updating, or fill it with spaces. If the display is blank, check the contrast setting (V0) first.",
+            "concepts": [
+              {
+                "term": "The LiquidCrystal object",
+                "definition": "The library object that lets you talk to the LCD. When you create it, you give the connection pins in the order RS, E, D4, D5, D6, D7.",
+                "example": "LiquidCrystal lcd(12, 11, 5, 4, 3, 2); means RS = D12, E = D11, D4 = D5 ... D7 = D2.",
+                "pitfall": "Writing the pin order so that it does not match the wires: the display stays blank or shows meaningless characters."
+              },
+              {
+                "term": "lcd.begin()",
+                "definition": "Starts the display and tells it the number of columns and rows. It is called once inside setup().",
+                "example": "lcd.begin(16, 2); means a display with 16 columns and 2 rows.",
+                "pitfall": "Forgetting to call begin: the display is not started and no text appears."
+              },
+              {
+                "term": "setCursor(column, row)",
+                "definition": "Moves the cursor; the next text starts from there. Counting starts from 0, and the column comes first.",
+                "example": "lcd.setCursor(0, 1); goes to the start of the bottom row.",
+                "pitfall": "Counting rows from 1 or mixing up the order of column and row."
+              },
+              {
+                "term": "Contrast (V0)",
+                "definition": "The pin that decides how visible the text is. It is usually adjusted with a potentiometer.",
+                "example": "In the lab model, if V0 goes above about 1.6 V, the display looks blank.",
+                "pitfall": "Never adjusting the contrast: the text may not be visible even when the backlight is on."
+              },
+              {
+                "term": "Old text staying behind",
+                "definition": "The LCD does not automatically delete a character written in a box; new text is written over the old one.",
+                "example": "If the display shows 250 and 7 is written in the same place, you see 750; adding spaces with lcd.print(\"7  \") solves this.",
+                "pitfall": "Writing a number that has become shorter without clearing: the old digits stay on the display."
+              },
+              {
+                "term": "Custom character",
+                "definition": "With createChar you save your own 5x8-dot symbol in a slot from 0 to 7; you can have at most 8 symbols.",
+                "example": "Defining a degree sign and writing it to the display with lcd.write(byte(0)).",
+                "pitfall": "Not calling clear() or setCursor() after createChar: the text does not appear on the display."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h7d32-q1",
+                "kind": "mcq",
+                "prompt": "The program says LiquidCrystal lcd(9, 8, 7, 6, 5, 4);. Which Uno pin should the LCD's E pin be connected to?",
+                "options": [
+                  "D9",
+                  "D7",
+                  "D8",
+                  "D4"
+                ],
+                "answer": 2,
+                "explanation": "The parameter order is RS, E, D4, D5, D6, D7. The second number is E, that is 8: the E pin connects to D8. D9 goes to RS, and D4 goes to the D7 pin.",
+                "skills": [
+                  "lcd-display",
+                  "circuit-wiring"
+                ]
+              },
+              {
+                "id": "m3h7d32-q2",
+                "kind": "numeric",
+                "prompt": "After the command lcd.setCursor(5, 1);, lcd.print(\"Merhaba\"); runs. Which column is the last letter of the text (a) in? (Columns start from 0.)",
+                "answer": 11,
+                "tolerance": 0,
+                "explanation": "The text starts at column 5. Merhaba (hello) has 7 letters; they go into columns 5, 6, 7, 8, 9, 10, 11. The last letter is in column 11. So 5 + 7 − 1 = 11. The answer 12 comes from counting one column too many in 5 + 7.",
+                "skills": [
+                  "lcd-display"
+                ]
+              },
+              {
+                "id": "m3h7d32-q3",
+                "kind": "predict-output",
+                "prompt": "The display has been started and is empty. When these commands run, what appears at the start of row 1?\n\n```\nlcd.setCursor(0, 0);\nlcd.print(\"250\");\nlcd.setCursor(0, 0);\nlcd.print(\"7\");\n```",
+                "options": [
+                  "7",
+                  "750",
+                  "250",
+                  "257"
+                ],
+                "answer": 1,
+                "explanation": "The LCD does not delete the old character. After 250 is written, the cursor goes back to the start and 7 is written only into the first box: the boxes become 7, 5, 0 and you see 750. To see only 7, you need lcd.clear() or lcd.print(\"7  \").",
+                "skills": [
+                  "lcd-display"
+                ]
+              },
+              {
+                "id": "m3h7d32-q4",
+                "kind": "find-bug",
+                "prompt": "The pins are connected correctly and the contrast is set, but nothing appears on the display. What is the problem?\n\n```\n#include <LiquidCrystal.h>\nLiquidCrystal lcd(12, 11, 5, 4, 3, 2);\n\nvoid setup() {\n  lcd.print(\"Merhaba\");\n}\n\nvoid loop() {\n}\n```",
+                "options": [
+                  "The lcd.print command should be inside loop()",
+                  "The #include line is wrong",
+                  "The pin order should not be RS, E, D4, D5, D6, D7",
+                  "The lcd.begin(16, 2) call is missing"
+                ],
+                "answer": 3,
+                "explanation": "Creating the object does not start the display. lcd.begin(16, 2) must be called inside setup(). print() works inside setup() too; the include and the pin order are also correct.",
+                "skills": [
+                  "lcd-display",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h7d32-q5",
+                "kind": "mcq",
+                "prompt": "The LCD's backlight is on but no text appears on the display; the wires and the code are correct. Which setting should you check first?",
+                "options": [
+                  "Contrast (the voltage on the V0 pin)",
+                  "The colour of the backlight resistor",
+                  "The number of rows",
+                  "The baud rate"
+                ],
+                "answer": 0,
+                "explanation": "The backlight is independent of the text; whether the text shows depends on the contrast. If the V0 voltage is not right (in the lab, above about 1.6 V), the display looks blank. The baud rate is a serial communication setting and does not affect the LCD.",
+                "skills": [
+                  "lcd-display",
+                  "circuit-wiring"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "I2C: Wire ve adres tarama",
@@ -5804,7 +9618,128 @@ export const modul3: ModuleContent = {
                 "i2c-bus"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "I2C: Wire and the address scan",
+            "problem": "In the previous lesson you used 6 pins for the LCD. Yet many sensors and displays can talk with only **two wires**, and dozens of devices can be connected to the same two wires. So when there are this many devices on a single line, how does the board know which one it is talking to?",
+            "contentMd": "### Circuit\nThe I2C (\"eye-squared-see\") bus is made of two wires: **SDA** (data) and **SCL** (clock). On the Arduino Uno these are the **A4 (SDA)** and **A5 (SCL)** pins. Every device has a **7-bit address** on the bus. The board writes the address at the start of the message; only the device at that address answers.\n\nIn this lesson we use the **I2C LCD** part (`lcdI2c`) in the lab: there is an adapter (\"backpack\") with a PCF8574 chip on the back of the 16x2 display, and the display connects with only 4 pins.\n\nPick the part from the **Add part** menu in the lab and connect the pins by drawing wires.\n\n| Part | Connection |\n|---|---|\n| I2C LCD GND | GND |\n| I2C LCD VCC | 5V |\n| I2C LCD SDA | **A4** |\n| I2C LCD SCL | **A5** |\n\nThe lab models the I2C LCD like this: SDA must be connected directly to A4 and SCL directly to A5; VCC and GND must be in place too (if they are missing, a \"not powered\" warning appears). When you select the part, an **I2C address** property appears in the right panel (0x27 or 0x3F). If the address you write in the code is not the same as this one, the display does not answer.\n\nIn a real circuit, the SDA pins of several I2C devices are connected to each other, and so are the SCL pins; the pull-up resistors are already on most modules. In the lab you do not build this detail.\n\n### Program\nFirst let's find the device's address. This program asks every address from 1 to 126, \"is anyone there?\":\n\n```cpp\n// sketch: i2c_tarama\n#include <Wire.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();                       // kart I2C hattında \"yönetici\" olur\n  Serial.println(\"I2C taraniyor...\");\n\n  int bulunan = 0;\n  for (byte adres = 1; adres < 127; adres++) {\n    Wire.beginTransmission(adres);    // bu adrese konuşmayı başlat\n    byte hata = Wire.endTransmission();   // 0 = cihaz cevap verdi\n    if (hata == 0) {\n      Serial.print(\"Cihaz bulundu: 0x\");\n      if (adres < 16) Serial.print(\"0\");\n      Serial.println(adres, HEX);\n      bulunan++;\n    }\n  }\n  Serial.print(\"Toplam: \");\n  Serial.println(bulunan);\n}\n\nvoid loop() {\n}\n```\n\nIn the serial monitor you will see `0x27` or `0x3F` for most LCD modules. These two addresses are the default addresses of the PCF8574 and PCF8574A chips. In the lab, change the LCD part's **I2C address** property and run the scan again to see the difference.\n\nAfter finding the address, you use the I2C LCD with the `LiquidCrystal_I2C` library. This time the display is connected with only 2 wires:\n\n```cpp\n// sketch: i2c_lcd\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);   // adres, sütun, satır\n\nvoid setup() {\n  lcd.init();             // ekranı başlat\n  lcd.backlight();        // arka ışığı aç\n  lcd.setCursor(0, 0);\n  lcd.print(\"I2C ile merhaba\");\n  lcd.setCursor(0, 1);\n  lcd.print(\"Adres: 0x27\");\n}\n\nvoid loop() {\n}\n```\n\n### How does it work?\n1. `Wire.begin()` gets the board ready for the I2C bus. You call it once inside `setup`.\n2. With `Wire.beginTransmission(adres)` you prepare a message to a device. `Wire.endTransmission()` sends the message and returns an **error code**. `0` means the device said \"got it\"; any other number shows that the device did not answer.\n3. The scan program uses this error code: it asks 126 addresses one after another and prints those that return `0`.\n4. `Serial.println(adres, HEX)` prints the number in hexadecimal. `0x27` is hexadecimal notation: 2×16 + 7 = 39.\n5. The `LiquidCrystal_I2C lcd(0x27, 16, 2)` object talks to the LCD at address 0x27. Commands such as `print` and `setCursor` are the same as for the LCD in the previous lesson; the only difference is how the display is started (`lcd.init()` and `lcd.backlight()`). There is a wait of about 1 second inside `lcd.init()`; that is why it takes about 1.5 seconds for the text to appear after you press ▶. Wait a little.\n6. If two devices on the same bus have the same address, they get mixed up. On real modules the address can be changed with small jumpers on the board; in the lab you do this from the properties panel.\n\n### Try it\n- While the scan program runs, delete the LCD's SDA wire or remove the LCD from the canvas. What happens to the number of devices found?\n- Set the LCD's **I2C address** property to 0x3F. What does the scan program show? In the display program, change the address to `LiquidCrystal_I2C lcd(0x3F, 16, 2);` and try the display again.\n- With the address property at 0x3F, leave 0x27 in the code. What happens on the display?\n- Swap the SDA and SCL wires (A4 and A5). What do the display and the scan do?\n\n### Common mistakes\n- Connecting SDA and SCL the wrong way round: the display or the scan finds nothing.\n- Writing the wrong address: no text appears on the display. Do an address scan first.\n- If the text appears late, the program has not frozen: `lcd.init()` waits about 1 second, so wait a few seconds after ▶.\n- Connecting SDA or SCL to a pin other than A4 and A5: the Uno's hardware I2C is only on these two pins.\n- Forgetting to connect VCC or GND: the lab gives a \"not powered\" warning and the display does not answer.\n- Forgetting to call `lcd.init()` and `lcd.backlight()`.\n- In the real world, connecting an I2C device that works at 3.3 V to a 5 V bus can damage the device; the working voltage is written on the device.",
+            "question": "The scan program said \"there is a device at address 0x27\", but it did not say whether this device is an LCD or a sensor. What do you need to work out what a device is from its address?",
+            "explainerMd": "### What you will learn in this lesson\n- That the I2C bus is made of two wires (SDA and SCL), and which pins they are on the Uno\n- What a device address is and why it is needed\n- Converting hexadecimal (0x) notation to decimal\n- Scanning addresses with `Wire` and using a display with `LiquidCrystal_I2C`\n\n### What you should know first\nThe LCD's parallel connection and its need for 6 pins from lesson 32; bytes and hexadecimal notation from lesson 31; the `for` loop from lesson 4.\n\n### Why are two wires enough?\nIn lesson 32 you used 6 signal pins for one display. **I2C** (\"eye-squared-see\") does the same job with two wires:\n- **SDA:** the data wire\n- **SCL:** the clock wire, which sets the rhythm of the bits\n\nOn the Uno, SDA is on pin **A4** and SCL on pin **A5**. You cannot connect them to other pins; the hardware I2C is only on these two pins. Several devices can be connected to the same two wires. This is called a **bus**.\n\n### Address: who is talking?\nEveryone on the bus hears the same wires. The board writes an **address** at the start of the message; only the device with that address answers, and the others stay quiet. The address is a 7-bit number and is usually written in hexadecimal. In hexadecimal each digit is worth 16 times the one to its right:\n\n```\n0x27 = 2 × 16 + 7  = 39\n0x3F = 3 × 16 + 15 = 63   (F = 15)\n```\n\nThe address of I2C LCD modules is usually 0x27 or 0x3F. If two devices have the same address they get mixed up; the solution is to change the address jumpers (or, in the lab, the address property).\n\n### Address scan\nTo find a device whose address you do not know, you try all the addresses one after another:\n\n```\nWire.beginTransmission(adres);\nbyte hata = Wire.endTransmission();\n```\n\n`endTransmission()` returns an **error code**. `0` means \"the device at the address answered\". Any other number means there is a problem; in a scan its general meaning is \"there is no device there\". The scan program tries every address from 1 to 126 and prints those that return `0`. `Serial.println(adres, HEX)` prints the number in hexadecimal; if you do not write HEX, you see the decimal form, such as 63.\n\n### Using it with a library\n`Wire.begin()` connects the board to the bus. For the I2C LCD, the `LiquidCrystal_I2C` library is used as well:\n\n```\nLiquidCrystal_I2C lcd(0x27, 16, 2);   // adres, sütun, satır\nlcd.init();\nlcd.backlight();\n```\n\nThe `print` and `setCursor` commands are the same as in lesson 32. What is different is that the object takes an **address** instead of pins, and that the display is started with `init()`. If you write the address wrongly, the display does not answer.\n\n### Summary\nWith I2C a device is connected with only the SDA (A4) and SCL (A5) wires, and every device has an address on the bus. If you do not know the address, you find it with the scan program: if the result of `endTransmission()` is 0, the device is there. The address you write in the code must be the same as the device's; also take care not to connect 3.3 V devices to a 5 V bus.",
+            "concepts": [
+              {
+                "term": "The I2C bus (SDA and SCL)",
+                "definition": "Communication over two wires: SDA carries data, SCL carries the clock. Several devices can be connected to the same two wires. On the Uno, SDA = A4, SCL = A5.",
+                "example": "The I2C LCD has only 4 pins: SDA, SCL, VCC and GND.",
+                "pitfall": "Connecting SDA and SCL the wrong way round or to pins other than A4-A5: no device is found."
+              },
+              {
+                "term": "I2C address",
+                "definition": "The 7-bit identity number of every device on the bus. The board sends the message to this address; only that device answers.",
+                "example": "Most LCD modules are at address 0x27 or 0x3F.",
+                "pitfall": "Writing an address in the code that is different from the device's real address: the display does not answer."
+              },
+              {
+                "term": "Hexadecimal number (0x)",
+                "definition": "Base-16 notation; it starts with the 0x prefix. The letters A-F stand for the values 10-15.",
+                "example": "0x3F = 3 × 16 + 15 = 63.",
+                "pitfall": "Thinking 0x27 is decimal 27: 0x27 is actually 39."
+              },
+              {
+                "term": "Wire.endTransmission()",
+                "definition": "Sends the prepared message and returns an error code. 0 = the device at the address answered.",
+                "example": "if (Wire.endTransmission() == 0) Serial.println(\"Cihaz var\");",
+                "pitfall": "Never checking the result: the program seems fine even when no device is connected."
+              },
+              {
+                "term": "Address scan",
+                "definition": "A small program that tries every address one after another and lists the ones that answer. It is used to find a device whose address you do not know.",
+                "example": "If the scan finds 0x3F, you write LiquidCrystal_I2C lcd(0x3F, 16, 2); in the code.",
+                "pitfall": "Not noticing an address clash: if two devices are at the same address, they get mixed up."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h7d33-q1",
+                "kind": "numeric",
+                "prompt": "An address scan found an I2C LCD at address 0x3F. What is this address in decimal?",
+                "answer": 63,
+                "tolerance": 0,
+                "explanation": "In hexadecimal, 3F is 3 × 16 + 15 = 63 (the digit F is 15). Serial.println(adres, HEX) prints 3F; println(adres) without HEX prints 63.",
+                "skills": [
+                  "bits-bytes",
+                  "i2c-bus"
+                ]
+              },
+              {
+                "id": "m3h7d33-q2",
+                "kind": "mcq",
+                "prompt": "Which pins is the I2C bus on, on an Arduino Uno?",
+                "options": [
+                  "SDA = A4, SCL = A5",
+                  "SDA = A5, SCL = A4",
+                  "SDA = D2, SCL = D3",
+                  "SDA = D4, SCL = D5"
+                ],
+                "answer": 0,
+                "explanation": "The Uno's hardware I2C pins are A4 (SDA) for data and A5 (SCL) for the clock. They cannot be changed. D2-D3 and D4-D5 are digital pins; they are not set aside for I2C.",
+                "skills": [
+                  "i2c-bus",
+                  "circuit-wiring"
+                ]
+              },
+              {
+                "id": "m3h7d33-q3",
+                "kind": "predict-output",
+                "prompt": "There is only one device on the bus, and its address is 0x3F. What appears in the serial monitor when this program runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  for (byte adres = 1; adres < 127; adres++) {\n    Wire.beginTransmission(adres);\n    if (Wire.endTransmission() == 0) {\n      Serial.println(adres);\n    }\n  }\n}\n```",
+                "options": [
+                  "3F",
+                  "0x3F",
+                  "63",
+                  "Nothing is printed"
+                ],
+                "answer": 2,
+                "explanation": "There is a device at address 0x3F, so one line is printed. Serial.println(adres) prints the number in decimal: 63. To print 3F you need println(adres, HEX); the 0x prefix does not appear unless you print it yourself.",
+                "skills": [
+                  "i2c-bus",
+                  "bits-bytes"
+                ]
+              },
+              {
+                "id": "m3h7d33-q4",
+                "kind": "find-bug",
+                "prompt": "The address scan found the device at address 0x3F. SDA, SCL, VCC and GND are connected correctly, but the display shows no text. Which line is wrong?\n\n```\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lcd.print(\"Merhaba\");\n}\n```",
+                "options": [
+                  "lcd.init();",
+                  "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+                  "lcd.backlight();",
+                  "lcd.print(\"Merhaba\");"
+                ],
+                "answer": 1,
+                "explanation": "The code says 0x27, but the device is at address 0x3F. The board talks to the wrong address, and nobody is at that address. It should be LiquidCrystal_I2C lcd(0x3F, 16, 2);. init, backlight and print are used correctly.",
+                "skills": [
+                  "i2c-bus",
+                  "lcd-display",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h7d33-q5",
+                "kind": "mcq",
+                "prompt": "Two devices are connected to the same I2C bus, and both have the address 0x27. What happens?",
+                "options": [
+                  "The board writes to them in turn; there is no problem",
+                  "The bus gives out a new address automatically",
+                  "Only the one connected first works",
+                  "Both devices hear the same message and get mixed up; one of the addresses must be changed"
+                ],
+                "answer": 3,
+                "explanation": "The board calls devices only by their address. If two devices are at the same address, both try to answer and the bus gets mixed up. The solution is to change the address jumpers on the module (the address property in the lab). The bus does not hand out addresses by itself.",
+                "skills": [
+                  "i2c-bus"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "EEPROM, String ve SRAM",
@@ -5920,7 +9855,122 @@ export const modul3: ModuleContent = {
                 "bits-bytes"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "EEPROM, String and SRAM",
+            "problem": "When a device's power is cut and switched back on, the values of all its variables are reset. How will the thermostat remember its \"target temperature 24 degrees\" setting? And the Uno's memory is very small: not even one phone photo fits in it. How do we use this small memory wisely?",
+            "contentMd": "### Three memories\nThe Arduino Uno (ATmega328P) has three separate memories:\n\n| Memory | Size | What does it hold? | When the power is cut? |\n|---|---|---|---|\n| Flash | 32 KB | The program itself | Stays |\n| SRAM | 2 KB | Variables while running | Erased |\n| EEPROM | 1 KB | Permanent settings | Stays |\n\nVariables such as `int`, `float` and `String` are all in SRAM. You write data you want to keep permanently to the **EEPROM**.\n\n### Circuit\nYou will not build a circuit in this lesson: the Uno in the lab is enough, with no extra parts. You will read the results in the **Serial monitor** (9600 baud).\n\n**Lab note:** on the first ▶ the Uno's EEPROM is empty (255 in every cell). Stopping with ■ and pressing ▶ again is like **cutting the power and switching it back on** on a real board: the lab keeps the EEPROM contents and the new run starts with them. What you write to the EEPROM during a run is still there on the next run. To empty the cells again (255), press ↺ Reset. (Just stopping and starting with ■/▶ does not touch the EEPROM; even if you change the code the contents stay, just as uploading a new program to a real board does not erase the EEPROM.)\n\n### Program: power-on counter\nA program that adds one to the number in the EEPROM every time it starts. A cell of the EEPROM that has never been written holds `255`; we treat this as \"empty\".\n\n```cpp\n// sketch: eeprom_sayac\n#include <EEPROM.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  byte sayi = EEPROM.read(0);        // 0. adresteki baytı oku\n  if (sayi == 255) sayi = 0;         // hiç yazılmamış: sıfırdan başla\n  sayi = sayi + 1;\n  EEPROM.update(0, sayi);            // yeni değeri 0. adrese yaz\n  Serial.print(\"Acilis sayisi: \");\n  Serial.println(sayi);\n}\n\nvoid loop() {\n}\n```\n\nEach time the power is cut and switched back on, the number goes up 1, 2, 3. It is the same in the lab: on the first ▶ you see \"Acilis sayisi: 1\" (power-on count: 1); when you stop with ■ and press ▶ again (cutting and restoring the power) it becomes 2, then 3. If you press ↺ Reset, the EEPROM is emptied and the counter starts from 1 again.\n\n### Wear: write or update?\nEEPROM cells cannot be written forever. The manufacturer guarantees about **100,000 writes** for each cell. After that the cell may fail. Reading, on the other hand, does not wear the cell.\n\nThe sums: if you write the target temperature to the same cell every second, the cell reaches its guaranteed limit after 100,000 seconds = about 27.8 hours. Even writing every minute lasts only about 69 days. That is why you should write to the EEPROM **only when the value changes**, and as rarely as possible.\n\n- `EEPROM.write(adres, değer)` writes every time it is called, even if the value is the same.\n- `EEPROM.update(adres, değer)` reads the cell first; if the value is already the same, it **does not write at all**.\n\n```cpp\n// sketch: eeprom_yipranma\n#include <EEPROM.h>\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    EEPROM.write(10, 7);     // her seferinde yazar\n  }\n  for (int i = 0; i < 5; i++) {\n    EEPROM.update(11, 7);    // yalnızca ilkinde yazar\n  }\n  Serial.print(\"10. adres: \");\n  Serial.println(EEPROM.read(10));\n  Serial.print(\"11. adres: \");\n  Serial.println(EEPROM.read(11));\n}\n\nvoid loop() {\n}\n```\n\nThe result is 7 at both addresses, but the first loop uses up 5 writes and the second only 1 (because the starting value was 255). Also, one write takes about 3-4 ms; so `update` both protects the cell and saves time.\n\n### Several values: put and get\n`EEPROM.read` and `EEPROM.write` are for a single byte. An `int` takes two bytes and a `float` four bytes. To write these with a single command there are `EEPROM.put` and `EEPROM.get`. These commands also do not write a byte again if its value is the same.\n\n```cpp\n// sketch: eeprom_put_get\n#include <EEPROM.h>\n\nstruct Ayar {            // birden çok değeri bir arada tutan kutu\n  int hedef;\n  float fark;\n};\n\nvoid setup() {\n  Serial.begin(9600);\n  Ayar a = {24, 0.5};\n  EEPROM.put(20, a);     // 20. adresten itibaren yaz\n\n  Ayar b;\n  EEPROM.get(20, b);     // aynı yerden geri oku\n  Serial.print(\"hedef=\");\n  Serial.print(b.hedef);\n  Serial.print(\" fark=\");\n  Serial.println(b.fark, 1);\n}\n\nvoid loop() {\n}\n```\n\n`Ayar` (setting) takes 2 + 4 = 6 bytes; so addresses 20-25 are filled. If you are going to write new data, you must start from 26, or you will write over it.\n\n### String and SRAM\nSRAM is only 2048 bytes. Every piece of text, every array and every variable takes space from here. `String` objects are handy (you join them with `+`), but as they grow they move around in SRAM and can break the memory into pieces. In programs that must run for a long time, use fixed-size `char` arrays where you can and keep your use of `String` low.\n\nHere is a tip as well: the text in `Serial.println(\"Merhaba\")` takes up space in SRAM. `Serial.println(F(\"Merhaba\"))`, however, leaves the text in Flash and saves SRAM.\n\nThe program below measures the free SRAM and shows how much space a `String` takes.\n\n```cpp\n// sketch: sram_string\nextern int __heap_start, *__brkval;\n\nint bosRam() {\n  int v;\n  return (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(F(\"SRAM olcumu\"));\n  Serial.print(F(\"Once: \"));\n  Serial.println(bosRam());\n\n  String s = \"\";\n  for (int i = 0; i < 10; i++) {\n    s += \"0123456789\";          // her turda 10 karakter ekle (toplam 100)\n  }\n  Serial.print(F(\"Sonra: \"));\n  Serial.println(bosRam());\n  Serial.print(F(\"String uzunlugu: \"));\n  Serial.println(s.length());\n}\n\nvoid loop() {\n}\n```\n\n`bosRam()` (free RAM) works out the gap between the stack and the heap. The `Sonra` (after) value is about 100 smaller than the `Once` (before) value, because the `String` stores 100 characters in SRAM. The exact number can vary by a few bytes depending on the board and the compiler.\n\n### Using libraries\nThis week you have seen three libraries: `LiquidCrystal`, `Wire`, `EEPROM`. They all follow the same pattern:\n1. Add the library with `#include <Ad.h>` (the library's name).\n2. Create an **object** if needed: `LiquidCrystal lcd(...)`. (For `EEPROM` and `Wire` the object is ready.)\n3. Call its commands in the form `nesne.komut()` (object.command): `lcd.print()`, `Wire.begin()`, `EEPROM.read()`.\n\nIn the lab these libraries (`LiquidCrystal`, `LiquidCrystal_I2C`, `Wire`, `EEPROM`, `Servo`) are ready; you only need to write `#include` at the start of the program, with no extra installation. In the real Arduino IDE you install a new library from the **Sketch > Include Library > Manage Libraries** menu; the library's ready-made examples under **File > Examples** are the best source for showing how to use it.\n\n### Try it\n- Run the `eeprom_sayac` program, stop it with ■ and press ▶ again; do this three times. Why did the number go up 1, 2, 3? Then press ↺ Reset and run it again: why is the number 1 again? How many times does the program write to the EEPROM each time it starts?\n- In `eeprom_yipranma`, make the `update` loop run 1000 times. Why is the result still 7?\n- In the `sram_string` program, make the `String` 200 characters long. How much does the `Sonra` value go down?\n- Add a potentiometer and a button in the lab. Save the value set with the pot to the EEPROM when the button is pressed. What would happen if you saved it on every loop?\n\n### Common mistakes\n- Writing to the EEPROM on every `loop` pass: the cell wears out quickly. Write only when the value changes; use `update`.\n- Letting addresses clash: if you write two different pieces of data to the same address, one spoils the other. Write down which data is at which address.\n- Trying to read an `int` with `EEPROM.read`: `read` returns only 1 byte. Use `get` for 2-byte values.\n- Thinking a cell that has never been written is 0: an empty cell holds 255. Check whether the value you read is valid.\n- Joining many long `String`s: the SRAM can fill up and the board can start behaving unexpectedly over time.",
+            "question": "When exactly should you write the thermostat's target temperature to the EEPROM? Every time the button is pressed, or a while after the user has finished adjusting it? Why?",
+            "explainerMd": "### What you will learn in this lesson\n- The Uno's three memories (Flash, SRAM, EEPROM) and what each one holds\n- Storing a setting permanently with `EEPROM.read`, `update` and `put/get`\n- Why you should not write to the EEPROM needlessly, and how to work out its lifetime\n- How using `String` affects SRAM\n\n### What you should know first\nPrinting with the Serial Monitor from lesson 9; comparing with `if` from lesson 7; the idea of a byte from lesson 31.\n\n### Three separate memories\nThe Uno's brain has three separate stores:\n\n| Memory | Size | What does it hold? | When the power is cut |\n|---|---|---|---|\n| Flash | 32 KB | The program itself | Stays |\n| SRAM | 2 KB | Variables while running | Erased |\n| EEPROM | 1 KB | Permanent settings | Stays |\n\nVariables such as `int sayac`, `float sicaklik` and `String` are in SRAM. They are all lost when the power is cut. Data that must be remembered, such as the thermostat's target temperature, is written to the EEPROM.\n\n### Reading and writing the EEPROM\nThe EEPROM is 1024 bytes; each byte is at an **address** (0-1023). A cell that has never been written holds **255**.\n\n```\nbyte a = EEPROM.read(0);     // 0. adresi oku\nEEPROM.update(0, 24);        // yalnız değer farklıysa yaz\n```\n\n`read` and `update` are for a single byte. A `byte` holds at most 255; if you write `EEPROM.write(0, 300)`, the number is saved as 300 − 256 = 44. For data bigger than one byte there are `EEPROM.put(adres, değer)` and `EEPROM.get(adres, değer)`: an `int` takes 2 bytes and a `float` 4 bytes. A **struct** with several values takes as many addresses as its total size; you must write the next data after it.\n\n### Wear and how to work it out\nAn EEPROM cell has a lifetime of about **100,000** writes; reading does not shorten it. Worked example: if you write to the same cell once every 10 seconds, 100,000 × 10 = 1,000,000 seconds, so the lifetime runs out in about 11.6 days. That is why:\n- Do not write on every `loop` pass.\n- Use `update` instead of `write`; if the value is already the same, it does not write at all.\n- Write once after the user has finished adjusting the setting.\n\n### SRAM and String\nSRAM is only 2048 bytes. Every variable and every `String` takes space from here. `String` is handy, but if it keeps growing and shrinking in a program that runs for a long time, it can break SRAM into pieces. A fixed-size `char` array is safer. Writing text with `F(\"...\")` leaves fixed text in Flash: `Serial.println(F(\"Merhaba\"));`.\n\n### The library pattern\nThis week you used three libraries. They all follow the same pattern: add it with `#include`, create an object if needed, and call it with `nesne.komut()` (object.command). The best way to learn how to use a new library is to look at its ready-made examples.\n\n### Summary\nFlash holds the program, SRAM the running variables, and EEPROM the permanent settings. You write to the EEPROM only when needed and with `update`, because every cell has a lifetime of about 100,000 writes. An empty cell reads as 255; do not mistake it for a valid value. SRAM is small, so use `String` carefully.",
+            "concepts": [
+              {
+                "term": "Flash, SRAM, EEPROM",
+                "definition": "The Uno's three memories: Flash (32 KB) holds the program, SRAM (2 KB) the running variables, and EEPROM (1 KB) the permanent settings. SRAM is erased when the power is cut; Flash and EEPROM stay.",
+                "example": "While running, the target temperature is in an int variable (SRAM); it is stored in the EEPROM so that it is not lost when the power is cut.",
+                "pitfall": "Thinking a variable will still be there after the power is cut."
+              },
+              {
+                "term": "EEPROM.read and EEPROM.update",
+                "definition": "read reads 1 byte from the given address. update writes 1 byte to that address, but does not write if the value is already the same.",
+                "example": "After EEPROM.update(0, 24);, EEPROM.read(0) gives 24.",
+                "pitfall": "Expecting 0 in a cell that has never been written: an empty cell holds 255."
+              },
+              {
+                "term": "Write lifetime",
+                "definition": "An EEPROM cell can take about 100,000 writes. Reading does not shorten its lifetime.",
+                "example": "If you write to the same cell every second, its lifetime runs out in about 27.8 hours (100,000 seconds).",
+                "pitfall": "Writing to the EEPROM on every loop pass: the cell soon fails."
+              },
+              {
+                "term": "EEPROM.put and EEPROM.get",
+                "definition": "They write and read data of several bytes, such as an int, a float or a struct, with a single command. The data takes as many addresses as its own size.",
+                "example": "An int holds 2 bytes and a float 4 bytes; with EEPROM.put(20, deger) an int is written to addresses 20-21.",
+                "pitfall": "Writing data to the same address so that one overwrites the other; write down the address range of each piece of data."
+              },
+              {
+                "term": "String and SRAM",
+                "definition": "String objects take space in SRAM and can break the memory into pieces as they grow. Fixed text written with F(\"...\") stays in Flash.",
+                "example": "Serial.println(F(\"Merhaba\")); does not copy the text into SRAM.",
+                "pitfall": "Joining Strings all the time in a program that runs for a long time: SRAM fills up and the board can behave unexpectedly."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h7d34-q1",
+                "kind": "numeric",
+                "prompt": "An EEPROM cell can take about 100,000 writes. You write to the same cell once every 30 seconds. After about how many days does the cell's lifetime run out? (Round to one decimal place.)",
+                "answer": 34.7,
+                "tolerance": 0.1,
+                "unit": "days",
+                "explanation": "100,000 writes × 30 seconds = 3,000,000 seconds. A day is 86,400 seconds: 3,000,000 / 86,400 ≈ 34.7 days. Taking 30 seconds as a minute and working out 100,000 minutes would be wrong (about 69 days).",
+                "skills": [
+                  "mem-eeprom"
+                ]
+              },
+              {
+                "id": "m3h7d34-q2",
+                "kind": "predict-output",
+                "prompt": "The EEPROM has never been written; all the cells are empty. What does this program print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  EEPROM.update(0, 12);\n  Serial.println(EEPROM.read(0));\n  Serial.println(EEPROM.read(1));\n}\n```",
+                "options": [
+                  "12 and 0",
+                  "12 and 255",
+                  "12 and 12",
+                  "0 and 0"
+                ],
+                "answer": 1,
+                "explanation": "12 was written to address 0, so the first line is 12. Address 1 was never written, and an empty cell holds 255. Thinking an empty cell is 0 is a common mistake.",
+                "skills": [
+                  "mem-eeprom"
+                ]
+              },
+              {
+                "id": "m3h7d34-q3",
+                "kind": "find-bug",
+                "prompt": "The target is written as 300, but it comes back as 44 when read. Why?\n\n```\nint hedef = 300;\nEEPROM.write(0, hedef);\nint okunan = EEPROM.read(0);\nSerial.println(okunan);\n```",
+                "options": [
+                  "write and read handle only 1 byte; 300 does not fit in one byte (300 − 256 = 44)",
+                  "An int variable cannot be written to the EEPROM",
+                  "Serial.println cannot print an int",
+                  "The address cannot be 0; it must start from 1"
+                ],
+                "answer": 0,
+                "explanation": "write writes one byte (at most 255). Because 300 does not fit, 300 − 256 = 44 is saved. For two-byte values, EEPROM.put(0, hedef) and EEPROM.get(0, okunan) should be used. Addresses start from 0, and println can print an int.",
+                "skills": [
+                  "mem-eeprom",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h7d34-q4",
+                "kind": "mcq",
+                "prompt": "In an aquarium heater controller, the target temperature should stay even when the power is cut. How should the target be stored?",
+                "options": [
+                  "In an int variable; variables are permanent anyway",
+                  "As a String in SRAM",
+                  "By writing it to Flash every second",
+                  "In the EEPROM, writing only when the value changes"
+                ],
+                "answer": 3,
+                "explanation": "Variables and Strings are in SRAM and are erased when the power is cut. The program is uploaded to Flash; it is not used for writing settings while running. The EEPROM is used for permanent settings, and to protect its lifetime it is written only when the value changes (update).",
+                "skills": [
+                  "mem-eeprom",
+                  "mem-sram"
+                ]
+              },
+              {
+                "id": "m3h7d34-q5",
+                "kind": "numeric",
+                "prompt": "The structure below is written with EEPROM.put(20, k). What is the first address where the next data can be written without a clash?\n\n```\nstruct Kayit {\n  byte mod;\n  int hedef;\n  float fark;\n};\nKayit k;\n```",
+                "answer": 27,
+                "tolerance": 0,
+                "explanation": "A byte holds 1, an int 2 and a float 4 bytes: 7 bytes in total. Starting at address 20, addresses 20-26 are filled; the first free address is 27. Writing at 28 leaves one address empty, and writing at 26 spoils the last byte of the float.",
+                "skills": [
+                  "mem-eeprom",
+                  "bits-bytes"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Bitirme projesi: Termostat",
@@ -6038,7 +10088,124 @@ export const modul3: ModuleContent = {
                 "prog-fsm"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Final project: Thermostat",
+            "problem": "The boiler at home, the aquarium heater, the egg incubator: they all have the same small brain inside. It measures the temperature, compares it with the value you want, and switches the heater on or off. And it does not forget the temperature you want even when it is unplugged. In this module's final project, you will build this brain yourself.",
+            "contentMd": "### What are we going to do?\nThis project brings together what you have learnt:\n- **Week 3:** working out the temperature with an NTC thermistor (A2).\n- **Week 5:** switching on and off with a relay, and hysteresis (D7).\n- **Week 6:** non-blocking code with `millis()` and a state machine.\n- **Week 7:** the I2C LCD display and a permanent setting in the EEPROM.\n\nThe user sets the target temperature with two buttons. When the measured temperature falls below the target, the relay switches the heater on; when it reaches the target, it switches it off. The target temperature is stored in the EEPROM.\n\n### Circuit\nPick the parts from the **Add part** menu in the lab and connect the pins by drawing wires. Parts you need: an NTC (`ntc`), two resistors (10 kΩ and 330 Ω), two buttons, a relay (`relay`), an LED and an I2C LCD (`lcdI2c`).\n\n| Part | Connection |\n|---|---|\n| NTC thermistor | Pin 1 to **A2**, pin 2 to GND |\n| 10 kΩ resistor (fixed) | Pin 1 to 5V, pin 2 to **A2** |\n| \"Up\" button | Pin A to **D2**, pin B to GND |\n| \"Down\" button | Pin A to **D3**, pin B to GND |\n| Relay IN | **D7** (relay VCC → 5V, relay GND → GND) |\n| LED in place of the \"heater\" | Relay COM → 5V; relay NO → 330 Ω resistor → LED A; LED K → GND |\n| I2C LCD 16x2 | SDA → **A4**, SCL → **A5**, VCC → 5V, GND → GND (address 0x27) |\n\nWe use an LED instead of a heater: if the LED is lit, it means \"heater on\". Because the buttons are `INPUT_PULLUP`, a pressed button reads `LOW`. The NTC's resistance is 10 kΩ (at 25 °C) and its β value is 3950; you change the temperature by selecting the NTC and using the right panel (this works while it runs too). In the relay's properties, **Trigger** must be \"Energized by HIGH\" (the default); if you choose \"Energized by LOW\", you have to swap the `HIGH` and `LOW` in the program. If the LCD's address is not 0x27, find it with the scan program you learnt in the previous lesson. Because of the wait inside `lcd.init()`, the LCD shows text about 1.5 seconds after ▶.\n\nThe NTC and the fixed resistor make a **voltage divider**: as the temperature rises, the NTC's resistance falls and the voltage on A2 drops. We find the NTC's resistance with the formula `R = 10000 × ADC / (1023 − ADC)`. We work out the temperature with the Steinhart-Hart (beta) formula with β = 3950. If a real thermistor has a different β value, you change the constant; the lab's NTC uses 3950.\n\n### State machine\nThe thermostat has three states:\n\n| State | Relay | Leaving this state |\n|---|---|---|\n| `KAPALI` (off) | Off | If the temperature is equal to or lower than `hedef − 0,5`, `ISITIYOR`; if a button is pressed, `AYAR` |\n| `ISITIYOR` (heating) | On | If the temperature is equal to or higher than `hedef + 0,5`, `KAPALI`; if a button is pressed, `AYAR` |\n| `AYAR` (setting) | Off | 2 seconds after the last button press, the target is written to the EEPROM, `KAPALI` |\n\nThere are two separate thresholds, 0.5 degrees below and above the target (**hysteresis**). This way the relay does not keep switching on and off while the temperature wobbles around the target.\n\nIn the `AYAR` state, every press changes the target by 1 degree and restarts the 2-second timer. Writing to the EEPROM is done **once**, after the setting is finished; this way 5 presses in a row do not use up 5 writes.\n\n### Program\n```cpp\n// sketch: termostat\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n#include <EEPROM.h>\n\nconst int ARTIR = 2;\nconst int AZALT = 3;\nconst int ROLE = 7;\nconst int NTC_PIN = A2;\n\nconst int ADRES = 0;                // hedef sıcaklığın EEPROM adresi\nconst int HEDEF_MIN = 10;\nconst int HEDEF_MAX = 35;\nconst int HEDEF_VARSAYILAN = 22;\nconst float HISTEREZIS = 0.5;       // hedefin altı ve üstü için pay\nconst unsigned long AYAR_SURESI = 2000;   // ms\nconst unsigned long OLCUM_ARALIGI = 500;  // ms\n\nenum Durum { KAPALI, ISITIYOR, AYAR };\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nDurum durum = KAPALI;\nint hedef;\nfloat sicaklik;\nunsigned long sonOlcum = 0;\nunsigned long ayarBasla = 0;\nunsigned long sonBasis = 0;\nbool oncekiArtir = false;\nbool oncekiAzalt = false;\n\nfloat sicaklikOku() {\n  long toplam = 0;\n  for (int i = 0; i < 8; i++) {\n    toplam += analogRead(NTC_PIN);\n  }\n  float adc = toplam / 8.0;\n  if (adc < 1.0) adc = 1.0;           // sıfıra bölmeyi önle\n  if (adc > 1022.0) adc = 1022.0;\n  float direnc = 10000.0 * adc / (1023.0 - adc);\n  float kelvin = 1.0 / (log(direnc / 10000.0) / 3950.0 + 1.0 / 298.15);\n  return kelvin - 273.15;\n}\n\nconst char* durumAdi() {\n  if (durum == ISITIYOR) return \"ISIT  \";\n  if (durum == AYAR) return \"AYAR  \";\n  return \"KAPALI\";\n}\n\nvoid ekranYaz() {\n  lcd.setCursor(0, 0);\n  lcd.print(\"Su an: \");\n  lcd.print(sicaklik, 1);\n  lcd.print(\" C    \");\n  lcd.setCursor(0, 1);\n  lcd.print(\"Hedef:\");\n  lcd.print(hedef);\n  lcd.print(\"C \");\n  lcd.print(durumAdi());\n}\n\nvoid setup() {\n  pinMode(ARTIR, INPUT_PULLUP);\n  pinMode(AZALT, INPUT_PULLUP);\n  pinMode(ROLE, OUTPUT);\n  digitalWrite(ROLE, LOW);\n  Serial.begin(9600);\n\n  hedef = EEPROM.read(ADRES);\n  if (hedef < HEDEF_MIN || hedef > HEDEF_MAX) {\n    hedef = HEDEF_VARSAYILAN;         // boş (255) ya da bozuk değer\n  }\n\n  lcd.init();\n  lcd.backlight();\n  sicaklik = sicaklikOku();\n  ekranYaz();\n}\n\nvoid loop() {\n  unsigned long simdi = millis();\n\n  // 1) Butonlar: basıldığı an (yüksekten alçağa geçiş) bir kez işle\n  bool artirBasili = (digitalRead(ARTIR) == LOW);\n  bool azaltBasili = (digitalRead(AZALT) == LOW);\n  bool artirYeni = artirBasili && !oncekiArtir;\n  bool azaltYeni = azaltBasili && !oncekiAzalt;\n  oncekiArtir = artirBasili;\n  oncekiAzalt = azaltBasili;\n\n  if ((artirYeni || azaltYeni) && simdi - sonBasis > 50) {   // 50 ms: sıçrama önleme\n    sonBasis = simdi;\n    if (artirYeni && hedef < HEDEF_MAX) hedef++;\n    if (azaltYeni && hedef > HEDEF_MIN) hedef--;\n    durum = AYAR;                      // ayar moduna gir, 2 saniyelik süreyi başlat\n    ayarBasla = simdi;\n    ekranYaz();\n  }\n\n  // 2) Sıcaklık: yarım saniyede bir ölç\n  bool olcumZamani = false;\n  if (simdi - sonOlcum >= OLCUM_ARALIGI) {\n    sonOlcum = simdi;\n    sicaklik = sicaklikOku();\n    olcumZamani = true;\n  }\n\n  // 3) Durum makinesi\n  switch (durum) {\n    case KAPALI:\n      if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n      break;\n    case ISITIYOR:\n      if (sicaklik >= hedef + HISTEREZIS) durum = KAPALI;\n      break;\n    case AYAR:\n      if (simdi - ayarBasla >= AYAR_SURESI) {\n        EEPROM.update(ADRES, hedef);   // ayar bitti: yalnızca değiştiyse yazar\n        durum = KAPALI;\n      }\n      break;\n  }\n  digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW);\n\n  // 4) Ekran ve seri çıktı: her ölçümden sonra\n  if (olcumZamani) {\n    ekranYaz();\n    Serial.print(\"sicaklik=\");\n    Serial.print(sicaklik, 1);\n    Serial.print(\" hedef=\");\n    Serial.print(hedef);\n    Serial.print(\" role=\");\n    Serial.println(durum == ISITIYOR ? 1 : 0);\n  }\n}\n```\n\n### How does it work?\n1. In `setup`, the target is first read from the EEPROM. A cell that has never been written holds 255; because this value is outside the 10-35 range, the default of 22 degrees is used.\n2. `loop` does four jobs, and none of them has a `delay`: buttons, measurement, state machine, display. The measurement and the display are done every half second with `millis()`. Debouncing is also done with `millis()`: if 50 ms have not passed since the last press, a new press is not counted.\n3. The buttons are handled only **at the moment they are pressed**: if a button was not pressed on the previous pass and is pressed now, the target changes. This way holding the button down does not keep raising the target.\n4. When a button is pressed, the program moves to the `AYAR` state. In this state the relay is off; the heater does not run while the user is changing the target. If no button is pressed for 2 seconds, the target is written to the EEPROM.\n5. With `switch`, the three states are written in one place. The relay output follows directly from the state: `digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW)`.\n6. Because `EEPROM.update` is used, if the target has stayed the same (for example, if you raised it and lowered it back), nothing is written to the EEPROM.\n\n### Try it\n- Set `HISTEREZIS` to 0.2 and to 2. How often does the relay switch on and off?\n- Raise the target above the temperature, then raise the NTC's **Temperature** property step by step. At what temperature does the relay switch off?\n- Change the target once (for example 22 → 24), wait 2 seconds, stop with ■ and press ▶ again (cutting and restoring the power). Did it start with the target at 24? Why? Then press ↺ Reset and run it again: why is the target 22 again? (The EEPROM is kept when the power is cut; ↺ Reset empties the EEPROM, so `255` is read and the default 22 is used.) Also try pressing ■ straight after changing the setting (before the 2 seconds are up): has the new target been saved?\n- Add a new feature: add a buzzer in the lab (+ pin to D8, - pin to GND). Make it sound if the temperature is more than 5 degrees below the target. Which state will you add it to?\n\n### Common mistakes\n- Putting the NTC and the fixed resistor the wrong way round (connecting the NTC to 5V and the fixed resistor to GND): the reading falls as the temperature rises, or it works backwards. Work out the resistor divider again with the voltage formula.\n- Using a single threshold without hysteresis: when the temperature wobbles around the threshold, the relay switches on and off very fast and wears out.\n- Writing to the EEPROM on every button press: presses in a row use up needless writes. Do the write after the setting is finished.\n- Not limiting the target value: negative or very high targets can leave the heater on all the time.\n- Taking an empty EEPROM that reads as 255 for a valid target.",
+            "question": "Think about what the thermostat does if the temperature sensor comes loose or is connected wrongly: does the heater stay on forever? If you wanted to add a safety measure to this project, what would you add?",
+            "explainerMd": "### What you will learn in this lesson\n- That a thermostat splits into three parts: measurement, decision and output\n- Why, with **hysteresis**, the relay does not keep switching on and off\n- Building a state machine with three states (`KAPALI`, `ISITIYOR`, `AYAR`)\n- Waiting for the setting with `millis()` and writing it to the EEPROM once\n\n### What you should know first\nWorking out the temperature with an NTC from lesson 13; safe switching with a relay from lesson 24; timing with `millis()` and the state machine from lessons 27 and 28; the I2C display and the EEPROM from lessons 33 and 34.\n\n### The three parts of the system\nThe thermostat repeats this cycle: **measure, decide, act**. The measurement comes from the divider made of the NTC and the fixed resistor. From the ADC value on A2, the NTC's resistance is found with `R = 10000 × ADC / (1023 − ADC)`, and the β = 3950 formula turns it into a temperature. As the temperature rises, the NTC's resistance falls and the ADC value gets smaller. For example, ADC = 400 means about 35.3 °C. The decision is in the state machine. The action is the relay on D7.\n\n### Hysteresis: two thresholds\nIf you use a single threshold (\"with the target at 22 °C, switch on below 22 and off above it\"), the relay switches on and off many times a second when the temperature wobbles around 22. This both ends the relay's life and wears out the heater. The solution is two thresholds:\n\n```\nswitch-on threshold  = target − 0.5   (21.5 for 22)\nswitch-off threshold = target + 0.5   (22.5 for 22)\n```\n\nWhen the temperature falls below 21.5, the heater switches on and stays on until it reaches 22.5. In the 1-degree zone in between, the relay **keeps its previous state**. This gap is called hysteresis.\n\n### State machine\n| State | Relay | Leaving condition |\n|---|---|---|\n| `KAPALI` (off) | Off | if temperature ≤ target − 0.5, `ISITIYOR`; if a button is pressed, `AYAR` |\n| `ISITIYOR` (heating) | On | if temperature ≥ target + 0.5, `KAPALI`; if a button is pressed, `AYAR` |\n| `AYAR` (setting) | Off | 2 seconds after the last press the target is written, `KAPALI` |\n\nThe relay output is worked out from the state: HIGH if `ISITIYOR`, otherwise LOW. This makes it hard to leave the relay in the wrong state.\n\n### Saving the setting\nIf you write to the EEPROM on every button press, adjusting the setting uses up its lifetime. Instead, each press only restarts the 2-second timer; when the time is up, the target is written once with `EEPROM.update`. Six presses also turn into a single write, and if the target has not changed at all, nothing is written. If the value read at start-up is not between 10 and 35 (for example 255 from an empty EEPROM), the default of 22 is used.\n\n### Thinking about safety\nIf the sensor comes loose, the A2 pin is pulled to 5 V and the ADC gets close to its highest value; the program takes this as very cold and the heater stays on all the time. On a real heater this is dangerous. That is why a check of \"is the reading in a sensible range?\" and adult supervision are a must. In this lesson you use an LED instead of a heater.\n\n### Summary\nThe thermostat is made of an NTC measurement, a state machine with hysteresis and a relay output. The two thresholds stop the relay from chattering, `millis()` means the program never waits, and the EEPROM keeps the target when the power is cut. You write the setting only once, when the time is up, and you think about sensor failure separately.",
+            "concepts": [
+              {
+                "term": "Hysteresis",
+                "definition": "Using two separate thresholds for switching on and switching off. Between the thresholds, the system keeps its previous state.",
+                "example": "With the target at 22 °C, the heater switches on at 21.5 °C and off at 22.5 °C.",
+                "pitfall": "Using a single threshold: when the temperature wobbles around the threshold, the relay switches on and off very fast."
+              },
+              {
+                "term": "State machine (thermostat)",
+                "definition": "A design in which the system is in exactly one state at any moment. The thermostat's three states are KAPALI (off), ISITIYOR (heating) and AYAR (setting); each state has a set relay output and leaving condition.",
+                "example": "The relay output is worked out from the state: digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW);",
+                "pitfall": "Writing the states as scattered ifs: the question of which state should keep the relay on gets out of control."
+              },
+              {
+                "term": "Temperature from the NTC divider",
+                "definition": "The NTC and a fixed resistor make a voltage divider; from the ADC value, R = 10000 × ADC / (1023 − ADC) gives the NTC's resistance, and the β formula gives the temperature. As it warms up, the NTC's resistance falls.",
+                "example": "With ADC = 512, R ≈ 10 kΩ, so about 25 °C.",
+                "pitfall": "Swapping the places of the NTC and the fixed resistor: the reading works backwards."
+              },
+              {
+                "term": "Saving the setting with a delay",
+                "definition": "Waiting until the user has finished adjusting (here, 2 seconds after the last press) and writing to the EEPROM once.",
+                "example": "Five presses in a row are saved with a single EEPROM.update call.",
+                "pitfall": "Writing to the EEPROM on every button press: needless writes use up its lifetime."
+              },
+              {
+                "term": "Default and limit values",
+                "definition": "At start-up, the value read from the EEPROM is checked to see whether it is in the valid range (10-35); if not, the default (22) is used. The buttons also keep the target in this range.",
+                "example": "An empty EEPROM gives 255; because 255 is bigger than 35, the target becomes 22.",
+                "pitfall": "Taking an empty EEPROM that reads as 255 for a valid target: the heater stays on all the time."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m3h7d35-q1",
+                "kind": "numeric",
+                "prompt": "In the thermostat, ADC = 600 was read from pin A2. The fixed resistor is 10 kΩ and the formula R = 10000 × ADC / (1023 − ADC) is used. About how many ohms is the NTC's resistance? (Round to the nearest whole number.)",
+                "answer": 14184,
+                "tolerance": 5,
+                "unit": "Ω",
+                "explanation": "R = 10000 × 600 / (1023 − 600) = 6,000,000 / 423 ≈ 14,184 Ω. Because the resistance is bigger than 10 kΩ, the NTC is colder than 25 °C (an NTC's resistance falls as it warms up).",
+                "skills": [
+                  "sensor-ntc"
+                ]
+              },
+              {
+                "id": "m3h7d35-q2",
+                "kind": "predict-output",
+                "prompt": "The target is 22, HISTEREZIS is 0.5; the state starts as KAPALI. The temperature readings come in this order: 22.0 - 21.4 - 21.8 - 22.4 - 22.6 - 22.2. What is the relay's state (1 = on) after each reading?\n\n```\ncase KAPALI:\n  if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n  break;\ncase ISITIYOR:\n  if (sicaklik >= hedef + HISTEREZIS) durum = KAPALI;\n  break;\n```",
+                "options": [
+                  "1 1 1 0 0 0",
+                  "0 1 0 0 1 0",
+                  "0 1 1 1 0 1",
+                  "0 1 1 1 0 0"
+                ],
+                "answer": 3,
+                "explanation": "22.0 > 21.5: it stays KAPALI (0). 21.4 ≤ 21.5: ISITIYOR (1). 21.8 and 22.4 are below the switch-off threshold of 22.5: the relay stays on (1, 1). 22.6 ≥ 22.5: KAPALI (0). 22.2 is above the switch-on threshold of 21.5: it stays off (0). Result: 0 1 1 1 0 0.",
+                "skills": [
+                  "ctl-hysteresis",
+                  "prog-fsm"
+                ]
+              },
+              {
+                "id": "m3h7d35-q3",
+                "kind": "find-bug",
+                "prompt": "The heater switches on and off far too often. Which line is wrong?\n\n```\ncase KAPALI:\n  if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n  break;\ncase ISITIYOR:\n  if (sicaklik >= hedef - HISTEREZIS) durum = KAPALI;\n  break;\n```",
+                "options": [
+                  "if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;",
+                  "if (sicaklik >= hedef - HISTEREZIS) durum = KAPALI;",
+                  "case KAPALI:",
+                  "break;"
+                ],
+                "answer": 1,
+                "explanation": "The switch-off threshold in the ISITIYOR state should be hedef + HISTEREZIS. If minus is written, the switch-on and switch-off thresholds fall on the same number (target − 0.5); when the temperature drops below 21.5 the heater switches on, and as soon as the temperature rises a little it switches off straight away. The point of hysteresis is lost.",
+                "skills": [
+                  "ctl-hysteresis",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m3h7d35-q4",
+                "kind": "mcq",
+                "prompt": "While the thermostat is running, the NTC's wire breaks, so the NTC drops out of the circuit (A2 is pulled to 5 V through the fixed resistor). How does the program work out the temperature, and what happens?",
+                "options": [
+                  "It thinks the temperature is very low and the heater stays on all the time",
+                  "It thinks the temperature is very high and the heater switches off",
+                  "It thinks the temperature is 0 °C and the program stops",
+                  "Nothing changes"
+                ],
+                "answer": 0,
+                "explanation": "When A2 is at 5 V, the ADC reaches its highest value (around 1022). The formula finds a very large resistance and the temperature comes out at about -77 °C: the program thinks it is 'very cold' and the relay stays on all the time. On a real heater this is dangerous; that is why a sensible-range check and a safety limit should be added.",
+                "skills": [
+                  "sensor-ntc",
+                  "ctl-hysteresis"
+                ]
+              },
+              {
+                "id": "m3h7d35-q5",
+                "kind": "numeric",
+                "prompt": "The target 22 is already saved in the EEPROM. The user presses the up button 3 times and the down button 3 times, with 1 second between presses, then waits 2 seconds. The program uses EEPROM.update after the setting is finished. How many writes are made to the EEPROM in total?",
+                "answer": 0,
+                "tolerance": 0,
+                "unit": "writes",
+                "explanation": "Every press restarts the 2-second timer, so AYAR only finishes 2 seconds after the last press and a single update is called. Because the target goes 22 → 25 → 22, the value is the same as the one in the EEPROM; in this case update does not write at all. So 0 writes are made.",
+                "skills": [
+                  "mem-eeprom",
+                  "prog-fsm"
+                ]
+              }
+            ]
+          }
         }
       ]
     }

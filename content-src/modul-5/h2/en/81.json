@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Bumper switch",
+      "definition": "A small switch at the robot's front corner that closes when it touches an obstacle. For the program it is no different from a button.",
+      "example": "The left bumper is connected between D2 and GND, the right bumper between D3 and GND.",
+      "pitfall": "Thinking the bumper is a special sensor and making the reading complicated; digitalRead is enough."
+    },
+    {
+      "term": "Pressed = LOW",
+      "definition": "On a bumper using INPUT_PULLUP, a free pin reads HIGH and a pressed pin reads LOW.",
+      "example": "The expression bool sol = (digitalRead(2) == LOW); is true if the left bumper is pressed.",
+      "pitfall": "Asking for the pressed state with == HIGH: the robot behaves as if it has bumped into something without ever touching the bumper."
+    },
+    {
+      "term": "Turning away from the obstacle",
+      "definition": "If the left bumper was pressed, the obstacle is on the left and the robot turns right; if the right bumper was pressed, it turns left.",
+      "example": "For the left bumper, surus(HIZ, -HIZ): left wheel forward, right wheel backward, the robot turns right.",
+      "pitfall": "Choosing the wrong turning direction: the robot turns onto the obstacle and bumps into it again."
+    },
+    {
+      "term": "Backing off",
+      "definition": "The robot going backward briefly before turning; it opens a gap between it and the obstacle.",
+      "example": "Going backward for 400 ms covers about 5.5 cm in the simulation.",
+      "pitfall": "Skipping the back-off and turning while stuck to the obstacle; the robot rubs against it."
+    },
+    {
+      "term": "Sensing by touch",
+      "definition": "A bumper is a sensor that only reports an obstacle after touching it.",
+      "example": "When the bumper is pressed, the robot's centre is about 10 cm from the wall, and it slides 1-2 cm after the stop command.",
+      "pitfall": "Thinking the bumper will catch every obstacle; soft, low or side-on obstacles may not press it."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h2d1-q1",
+      "kind": "mcq",
+      "prompt": "The bumper switch is connected between D2 and GND and the pin is INPUT_PULLUP. What does digitalRead(2) return while the bumper is free?",
+      "options": [
+        "LOW",
+        "A number between 0 and 1023",
+        "HIGH",
+        "A random value"
+      ],
+      "answer": 2,
+      "explanation": "INPUT_PULLUP pulls the pin up to HIGH with an internal resistor. When the switch closes, the pin is connected to GND and reads LOW. So a free bumper gives HIGH. The analogue range (0-1023) is for analogRead; digitalRead only gives HIGH or LOW.",
+      "skills": [
+        "rob-bumper"
+      ]
+    },
+    {
+      "id": "m5h2d1-q2",
+      "kind": "predict-output",
+      "prompt": "The left bumper (D2) is free, the right bumper (D3) is touching GND (pressed). What does this code print?\n\n```\npinMode(2, INPUT_PULLUP);\npinMode(3, INPUT_PULLUP);\nbool sol = (digitalRead(2) == LOW);\nbool sag = (digitalRead(3) == LOW);\nSerial.println(sol && sag ? \"CARPMA ON\" : sol ? \"CARPMA SOL\" : \"CARPMA SAG\");\n```",
+      "options": [
+        "CARPMA ON",
+        "CARPMA SOL",
+        "It prints nothing",
+        "CARPMA SAG"
+      ],
+      "answer": 3,
+      "explanation": "Because the right bumper is pressed, digitalRead(3) reads LOW and sag becomes true. The left is free, so it reads HIGH and sol becomes false. The first condition (both together) is not met, nor is the second (left only); what is left is CARPMA SAG. CARPMA SOL looks right to someone who reads the bumpers the wrong way round.",
+      "skills": [
+        "rob-bumper",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d1-q3",
+      "kind": "find-bug",
+      "prompt": "The robot keeps backing off and turning even though it has not bumped into anything. The bumpers are connected correctly. There is one bug in the code. What is it?\n\n```\npinMode(TAMPON_SOL, INPUT_PULLUP);\npinMode(TAMPON_SAG, INPUT_PULLUP);\n\nbool sol = (digitalRead(TAMPON_SOL) == HIGH);\nbool sag = (digitalRead(TAMPON_SAG) == HIGH);\n\nif (!sol && !sag) {\n  surus(HIZ, HIZ);\n  return;\n}\n```",
+      "options": [
+        "The pinMode lines should say OUTPUT",
+        "The pressed state is asked with == HIGH; with INPUT_PULLUP a pressed bumper reads LOW",
+        "The return in the if condition should be deleted",
+        "The HIZ constant is too large"
+      ],
+      "answer": 1,
+      "explanation": "With INPUT_PULLUP, a free bumper reads HIGH. Because the code counts HIGH as \"pressed\", sol and sag are true while the bumpers are free, the if condition is never met and the robot keeps going into the bump reaction. The fix: == LOW. Making the pin OUTPUT breaks the reading; return and HIZ have nothing to do with the bug.",
+      "skills": [
+        "rob-bumper",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d1-q4",
+      "kind": "numeric",
+      "prompt": "When the bumper is pressed, the robot's centre is 10 cm from the wall. The robot's radius is 7.5 cm. If the robot slides 2 cm after the stop command, how many cm of gap are left between its body and the wall?",
+      "answer": 0.5,
+      "tolerance": 0.05,
+      "unit": "cm",
+      "explanation": "The edge of the body is 7.5 cm from the centre: 10 − 7.5 = 2.5 cm of gap. The slide uses up 2 cm: 2.5 − 2 = 0.5 cm. The margin is very narrow; if the slide had been a little bigger, the robot would have touched the wall. That is why lesson 82 uses a sensor that warns before a bump.",
+      "skills": [
+        "rob-bumper",
+        "rob-threshold"
+      ]
+    },
+    {
+      "id": "m5h2d1-q5",
+      "kind": "mcq",
+      "prompt": "Which of these is a weakness of the bumper sensor?",
+      "options": [
+        "It only notices an obstacle after touching it",
+        "It uses a lot of battery power",
+        "It cannot tell left from right",
+        "It only works in the dark"
+      ],
+      "answer": 0,
+      "explanation": "A bumper is a contact sensor; when the news arrives, the robot is already leaning against the obstacle. Two separate bumpers tell left from right, the power use is tiny and it has nothing to do with light.",
+      "skills": [
+        "rob-bumper"
+      ]
+    }
+  ]
+}

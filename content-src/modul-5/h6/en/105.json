@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "State machine (DENGE, KONTROLSUZ, DUSTU)",
+      "definition": "A structure in which the program is in exactly one state at any moment. In DENGE (balance) the control runs; in the other states the motors are off.",
+      "example": "When the angle goes past the threshold, the program switches to the DUSTU (fell) state, the LED lights up and the motors are cut.",
+      "pitfall": "Forgetting that it never leaves the DUSTU state: after picking the robot up you have to restart it."
+    },
+    {
+      "term": "Fall threshold",
+      "definition": "If the absolute value of the angle goes past this limit, the robot counts as fallen and the motors are cut.",
+      "example": "In the simulation a 40° threshold was chosen; the robot counts as fallen at 45°.",
+      "pitfall": "Checking only one direction (aci > threshold): when the robot falls backwards, it is not detected."
+    },
+    {
+      "term": "Largest tilt",
+      "definition": "The largest deviation the robot reaches after the push. It shows how hard the control's response is.",
+      "example": "In a +200 °/s push, the real largest tilt was measured as 4.96°.",
+      "pitfall": "Expecting the robot's report to match the real value exactly: the robot sees the filtered angle, so there are small differences."
+    },
+    {
+      "term": "Settling time",
+      "definition": "The time it takes after the push for the tilt to drop below the threshold (here 1°) and stay there.",
+      "example": "If the tilt last went past 1° 177 ms after the push, the settling time is 177 ms.",
+      "pitfall": "Counting the first moment it drops below the threshold as settling: the robot may go past the threshold again."
+    },
+    {
+      "term": "Gain tuning",
+      "definition": "KP, KD, KX and KV are specific to the robot. On a real robot you start with small values and tune KP first, then KD, and the outer loop last.",
+      "example": "The simulation's KP = 0.15 is either not enough on a real robot or makes it jitter.",
+      "pitfall": "Copying the simulation gains onto a real robot."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d5-q1",
+      "kind": "mcq",
+      "prompt": "If you do not measure and subtract the gyroscope bias at start-up, what does the balancing robot do?",
+      "options": [
+        "It falls at once, because the error goes to infinity",
+        "It stays balanced but carries a permanent tilt error",
+        "It makes no difference",
+        "Only the outer loop stops working"
+      ],
+      "answer": 1,
+      "explanation": "The complementary filter limits the build-up of the bias, so the robot does not fall; but the estimate shifts by the bias times the time constant, and the robot stands permanently slightly tilted. In the simulation a 1 °/s bias led to a tilt of about -1.05° and went past the settling threshold.",
+      "skills": [
+        "imu-gyro",
+        "ctrl-state-safety"
+      ]
+    },
+    {
+      "id": "m5h6d5-q2",
+      "kind": "predict-output",
+      "prompt": "A state machine (DENGE, KONTROLSUZ, DUSTU) is defined. With the angle at 45°, what does this code print?\n\n```\nDurum durum = DENGE;\nfloat aci = 45.0;\nif (durum != DUSTU && fabs(aci) > 40.0) {\n  durum = DUSTU;\n  Serial.println(\"DUSTU\");\n}\nif (durum == DENGE) Serial.println(\"KONTROL\");\nelse Serial.println(\"MOTOR KAPALI\");\n```",
+      "options": [
+        "Only KONTROL",
+        "DUSTU, then KONTROL",
+        "DUSTU, then MOTOR KAPALI",
+        "Only MOTOR KAPALI"
+      ],
+      "answer": 2,
+      "explanation": "The angle goes past the 40° threshold and the state is not DUSTU; the first block runs, the state becomes DUSTU and \"DUSTU\" is printed. The next if goes into the else branch because the state is no longer DENGE: \"MOTOR KAPALI\" (motor off). Because the state update comes before the control decision, the motors switch off in the same round.",
+      "skills": [
+        "ctrl-state-safety"
+      ]
+    },
+    {
+      "id": "m5h6d5-q3",
+      "kind": "find-bug",
+      "prompt": "When the robot falls forwards the motors are cut, but when it falls backwards they are not. Which line is wrong?\n\n```\nif (durum != DUSTU && aci > DUSME_ACISI) {\n  durum = DUSTU;\n}\n```",
+      "options": [
+        "The durum != DUSTU condition should be removed",
+        "aci > DUSME_ACISI only catches a forward fall; fabs(aci) should be used",
+        "DUSME_ACISI should be zero",
+        "durum = DENGE should be written instead of durum = DUSTU"
+      ],
+      "answer": 1,
+      "explanation": "The angle of a robot falling backwards is negative, and a negative number is never greater than a positive threshold. fabs(aci) catches both directions. The durum != DUSTU condition prevents printing for no reason; it is correct.",
+      "skills": [
+        "ctrl-state-safety",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d5-q4",
+      "kind": "numeric",
+      "prompt": "In the project, the report is printed if the angle stays below 1° for longer than 1000 ms (ms - sonDisariMs > 1000). If the tilt last went past 1° at 3185 ms, at roughly which ms is the RAPOR line printed? (The loop runs every 5 ms.)",
+      "answer": 4188,
+      "tolerance": 5,
+      "unit": "ms",
+      "explanation": "The condition is met when ms - 3185 > 1000, that is, when ms goes past 4185; because of the 5 ms rounds, this is about 4186-4190 ms. The settling time reported, however, is not the moment of the report but the time until the tilt last went past 1°: if the push was at 3010 ms, 3185 - 3010 = 175 ms.",
+      "skills": [
+        "ctrl-state-safety"
+      ]
+    },
+    {
+      "id": "m5h6d5-q5",
+      "kind": "mcq",
+      "prompt": "If you write the KP, KD, KX and KV values that work in the simulation onto a real robot unchanged, what happens?",
+      "options": [
+        "Most likely the robot either does not stay upright or jitters; the gains are tuned again starting small",
+        "The same result comes out, because the code is the same",
+        "Only KX and KV change; KP and KD stay the same",
+        "The robot only reacts a little more slowly"
+      ],
+      "answer": 0,
+      "explanation": "The motor power, wheel diameter, mass, height and battery are different; the gains are specific to the robot. The structure of the program (measuring, filter, fixed loop, cascade) stays the same, and the numbers change. The safe way: KP alone first, then KD, and the outer loop last, holding the robot in the air on the first try.",
+      "skills": [
+        "robot-tuning",
+        "ctrl-cascade"
+      ]
+    }
+  ]
+}

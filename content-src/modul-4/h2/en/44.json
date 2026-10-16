@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "ToF (time of flight)",
+      "definition": "The sensor sends out a pulse of light and works out the distance from the time the reflection takes to come back.",
+      "example": "The VL53L0X measures with an infrared laser and gives the result in millimetres.",
+      "pitfall": "Thinking it works with sound like the ultrasonic sensor; ToF uses light."
+    },
+    {
+      "term": "The VL53L0X and address 0x29",
+      "definition": "A ToF distance sensor that talks over I2C; its default address is 0x29.",
+      "example": "Seeing 0x29 in the address scan output shows that the sensor is connected to the bus.",
+      "pitfall": "Mixing up the sensor's address with the LCD's 0x27."
+    },
+    {
+      "term": "init() and timeoutOccurred()",
+      "definition": "init() tells you whether the sensor was found, and timeoutOccurred() tells you whether the reading finished in time.",
+      "example": "if (!sensor.init()) { Serial.println(\"VL53L0X bulunamadi\"); }",
+      "pitfall": "Taking the number returned by a failed reading for a real distance."
+    },
+    {
+      "term": "Wire.begin()",
+      "definition": "The call that starts the I2C bus; it is done in setup() before talking to the sensor.",
+      "example": "Wire.begin(); sensor.init();",
+      "pitfall": "Forgetting Wire.begin(): no communication with the sensor is possible and init() fails."
+    },
+    {
+      "term": "Millimetres and the threshold margin",
+      "definition": "The VL53L0X gives mm (10 mm = 1 cm); the gap between the close and far thresholds is the hysteresis margin.",
+      "example": "The margin between the 300 mm and 340 mm thresholds is 40 mm, that is, 4 cm.",
+      "pitfall": "Mixing up mm and cm: taking 300 mm for 300 cm."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d4-q1",
+      "kind": "mcq",
+      "prompt": "If the same I2C bus has an I2C LCD (0x27), an MPU6050 (0x68) and a BMP280 (0x76), at which address does the VL53L0X appear in the address scan?",
+      "options": [
+        "0x76",
+        "0x68",
+        "0x27",
+        "0x29"
+      ],
+      "answer": 3,
+      "explanation": "The VL53L0X's default address is 0x29. 0x27 belongs to the LCD, 0x68 to the MPU6050 and the RTC, and 0x76 to the BMP280. Because the addresses are different, they can all be on the same bus.",
+      "skills": [
+        "sensor-tof",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m4h2d4-q2",
+      "kind": "numeric",
+      "prompt": "In the tof_esik sketch, YAKIN_MM = 300 and UZAK_MM = 340. How many centimetres is the hysteresis margin between the two thresholds?",
+      "answer": 4,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "The gap is 340 − 300 = 40 mm. Since 10 mm = 1 cm, the margin is 40 / 10 = 4 cm. This margin stops the state from flickering even if the distance wobbles around the threshold.",
+      "skills": [
+        "prog-hysteresis",
+        "sensor-tof"
+      ]
+    },
+    {
+      "id": "m4h2d4-q3",
+      "kind": "numeric",
+      "prompt": "With the tof_esik logic (YAKIN_MM = 300, UZAK_MM = 340, starting as \"far\"), the sensor reads 350, 295, 305, 296, 310, 345, 330, 290 mm in turn. How many times in total is a \"Yakin\" (close) or \"Uzak\" (far) message printed?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "messages",
+      "explanation": "350: no change. 295 < 300: \"Yakin\" (1). 305, 296 and 310 are in between, so the state is kept (310 is still below 340). 345 > 340: \"Uzak\" (2). 330: no change. 290 < 300: \"Yakin\" (3). 3 messages in total. With a single threshold, the state would change 5 times.",
+      "skills": [
+        "prog-hysteresis",
+        "sensor-tof"
+      ]
+    },
+    {
+      "id": "m4h2d4-q4",
+      "kind": "find-bug",
+      "prompt": "Even though the VL53L0X is wired correctly, init() always returns false and the serial monitor shows \"VL53L0X bulunamadi\". What is missing from the code?\n\n```\n#include <VL53L0X.h>\n\nVL53L0X sensor;\n\nvoid setup() {\n  Serial.begin(9600);\n  sensor.setTimeout(500);\n  if (!sensor.init()) {\n    Serial.println(\"VL53L0X bulunamadi\");\n    while (true) {}\n  }\n  sensor.startContinuous();\n}\n```",
+      "options": [
+        "The sensor.setTimeout(500) call is unnecessary",
+        "startContinuous() should be called before init()",
+        "The Wire.begin() call is missing",
+        "Serial.begin(9600) switches off I2C"
+      ],
+      "answer": 2,
+      "explanation": "The library does not start the I2C bus itself; in the usage examples, Wire.begin() is called first in setup(). Without this call the sensor cannot be reached. The setTimeout(500) and startContinuous() calls are in the right place.",
+      "skills": [
+        "sensor-tof",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d4-q5",
+      "kind": "mcq",
+      "prompt": "After calling sensor.readRangeContinuousMillimeters(), sensor.timeoutOccurred() returned true. What should you do with the number you have?",
+      "options": [
+        "Accept it as the real distance and compare it with the threshold",
+        "Treat the reading as invalid and skip the decision for that pass",
+        "Multiply the value by two and use it",
+        "Divide by 10 to convert the sensor to centimetres"
+      ],
+      "answer": 1,
+      "explanation": "If timeoutOccurred() is true, the reading did not finish in time; the number returned is not a real distance. The right thing is to skip this pass or report an error. Accepting the number as mm leads to wrong threshold decisions.",
+      "skills": [
+        "sensor-tof",
+        "prog-debug"
+      ]
+    }
+  ]
+}

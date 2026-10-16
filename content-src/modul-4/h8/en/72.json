@@ -1,0 +1,106 @@
+{
+  "concepts": [
+    {
+      "term": "Bounce",
+      "definition": "Mechanical contacts chattering for a short time as they close, making the pin go back and forth between HIGH and LOW several times.",
+      "example": "You press a real button once, and the counter goes up by 3 instead of 1.",
+      "pitfall": "Thinking debouncing is unnecessary because the lab button does not bounce."
+    },
+    {
+      "term": "Steady time",
+      "definition": "In debouncing, the time a pin value must stay unchanged before it is accepted (for example 20 ms).",
+      "example": "If the pin is still LOW 20 ms after the last change, the press is accepted.",
+      "pitfall": "Choosing the time too short lets bounce leak through; choosing it too long misses fast presses."
+    },
+    {
+      "term": "Response delay",
+      "definition": "The time between an event happening and the program responding to it.",
+      "example": "If there is a delay(500) inside loop, the button response can be up to 500 ms late.",
+      "pitfall": "Making another job wait with delay and expecting the button to be listened to during the same time."
+    },
+    {
+      "term": "Non-blocking code with millis()",
+      "definition": "The slow job keeping its own time with millis(), while the other inputs are read on every pass inside loop().",
+      "example": "\"tik\" is printed every 500 ms, but the button is checked on every pass.",
+      "pitfall": "Printing a message on every pass while the button is held and filling the Serial monitor; edge detection is needed."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d2-q1",
+      "kind": "mcq",
+      "prompt": "Why does a counter that does not prevent bounce make several counts on a single press of a real button?",
+      "options": [
+        "During the press the pin goes back and forth between HIGH and LOW for a short time, and every change to LOW is counted",
+        "The Arduino is designed to read the button twice",
+        "INPUT_PULLUP connects both ends of the button to 5 V",
+        "Because the counter is an int, it doubles the number"
+      ],
+      "answer": 0,
+      "explanation": "Because the contacts hit each other and chatter, the pin changes several times on a single press, and code that detects edges counts every falling edge. The Arduino does not read the button twice; INPUT_PULLUP pulls the pin up to 5 V, not the button's pin; an int does not multiply the number of counts.",
+      "skills": [
+        "sens-debounce"
+      ]
+    },
+    {
+      "id": "m4h8d2-q2",
+      "kind": "numeric",
+      "prompt": "In the debounce code, SAKIN_SURE = 20 ms. For a press to be counted, for at least how many ms must the pin stay unchanged?",
+      "answer": 20,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "The code resets the time on every change and only accepts the value when it has stayed calm for 20 ms. That is why a press released before 20 ms are up is not counted; this is the cost of the waiting time.",
+      "skills": [
+        "sens-debounce",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h8d2-q3",
+      "kind": "predict-output",
+      "prompt": "The button is on D2 (INPUT_PULLUP). Right after the program starts, the button is pressed for only 100 ms and released. What does this code print to the Serial monitor?\n\n```cpp\nvoid setup() {\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\nvoid loop() {\n  if (digitalRead(2) == LOW) Serial.println(\"BASILDI\");\n  delay(500);\n}\n```",
+      "options": [
+        "It prints BASILDI all the time",
+        "It prints nothing",
+        "It prints BASILDI once",
+        "It prints BASILDI twice"
+      ],
+      "answer": 1,
+      "explanation": "After reading the pin, the program sleeps for 500 ms. Because the press starts and ends within the 500 ms between two readings, it is never seen. Unless a reading happens to fall exactly at the moment of the press, a short press is missed; if it were read on every pass with millis(), it would be caught.",
+      "skills": [
+        "sens-nonblocking",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h8d2-q4",
+      "kind": "find-bug",
+      "prompt": "In this debounce code, bounce is still counted. Which line is missing?\n\n```cpp\nbool ham = digitalRead(2) == LOW;\nif (ham != sonHam) {\n  sonHam = ham;\n}\nif (millis() - sonDegisim >= 20 && ham != kararli) {\n  kararli = ham;\n  if (kararli) sayac++;\n}\n```",
+      "options": [
+        "It should be sayac-- instead of sayac++",
+        "analogRead should be used instead of digitalRead",
+        "The value 20 should be 0",
+        "In the if (ham != sonHam) block, sonDegisim = millis(); is missing"
+      ],
+      "answer": 3,
+      "explanation": "Because the time of the last change is never updated, millis() - sonDegisim always stays above 20; in practice there is no wait, and every bounce is accepted at once. In the correct code, the timer is reset every time the pin changes (sonDegisim = millis()). The other options do not fix the bug; making 20 into 0 removes the wait completely.",
+      "skills": [
+        "sens-debounce",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d2-q5",
+      "kind": "numeric",
+      "prompt": "A program has a delay(50) inside loop(), and the pin is read only once per pass. For at least how many ms must you hold the button down to be sure it is caught?",
+      "answer": 50,
+      "tolerance": 5,
+      "unit": "ms",
+      "explanation": "The time between two readings is about 50 ms. A press shorter than this can fit between two readings and be missed; a press of 50 ms or longer falls on at least one reading. Reducing the delay to 5 or using millis() makes this gap smaller.",
+      "skills": [
+        "sens-nonblocking",
+        "prog-timing"
+      ]
+    }
+  ]
+}

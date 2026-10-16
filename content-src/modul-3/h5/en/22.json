@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "NPN transistor",
+      "definition": "A switch that lets a large collector current through with a small base current once the base-emitter voltage goes above about 0.7 V.",
+      "example": "D6 drives the base through 1 kΩ and switches the motor on and off; the gain is about 100.",
+      "pitfall": "Leaving out the base resistor: the base current is unlimited and a warning appears."
+    },
+    {
+      "term": "Base resistor",
+      "definition": "A series resistor that limits the current through the base.",
+      "example": "With 5 V, 0.7 V and 1 kΩ, the base current is (5 − 0.7) / 1000 = 4.3 mA.",
+      "pitfall": "Connecting the pin straight to the base: the base current can go above 30 mA."
+    },
+    {
+      "term": "Logic-level MOSFET",
+      "definition": "A switch that starts to conduct when the gate voltage goes above about 2 V and draws almost no current.",
+      "example": "The G leg goes to D6, the S leg to GND and the D leg to the motor.",
+      "pitfall": "Thinking every MOSFET switches fully on with 5 V: one that is not logic level heats up and the motor stays weak."
+    },
+    {
+      "term": "Flyback diode",
+      "definition": "A diode connected across the motor in the reverse direction that gives a path to the reverse voltage spike when the motor current is cut.",
+      "example": "The diode's A leg goes to the transistor's C leg, and the striped K leg goes to 5V.",
+      "pitfall": "Skipping the diode or connecting it the wrong way round: the lab gives a flyback warning, and in real life the transistor fails."
+    },
+    {
+      "term": "Motor speed with analogWrite",
+      "definition": "The PWM duty cycle changes the average voltage reaching the motor, and so its speed.",
+      "example": "analogWrite(6, 128) gives a duty cycle of about 50%.",
+      "pitfall": "Giving values outside 0-255: if you write okuma * 4 instead of okuma / 4, the motor runs at full speed for most positions."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d22-q1",
+      "kind": "mcq",
+      "prompt": "Why is the motor connected behind a transistor rather than directly to an Arduino pin?",
+      "options": [
+        "Because the pin gives less than 5 V",
+        "The pin can only give a few tens of mA; the motor's power comes along a separate path and the pin only controls the switch",
+        "Because the transistor makes the motor turn faster",
+        "Because the motor's direction is changed with the transistor"
+      ],
+      "answer": 1,
+      "explanation": "A pin works comfortably with about 20 mA and must not go above 40 mA; a motor draws hundreds of mA. The transistor lets a large current through with a small base current. It is used for current capacity, not for speed or direction.",
+      "skills": [
+        "transistor-switching"
+      ]
+    },
+    {
+      "id": "m3h5d22-q2",
+      "kind": "numeric",
+      "prompt": "D6 gives 5 V; the base resistor is 1 kΩ and the base-emitter threshold is 0.7 V. What is the base current in mA? (Ignore the pin's internal resistance.)",
+      "answer": 4.3,
+      "tolerance": 0.1,
+      "unit": "mA",
+      "explanation": "The voltage across the resistor is 5 − 0.7 = 4.3 V. I = V / R = 4.3 / 1000 = 0.0043 A = 4.3 mA. Because the gain is 100, this current is enough for a load current of up to about 430 mA.",
+      "skills": [
+        "transistor-switching",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h5d22-q3",
+      "kind": "predict-output",
+      "prompt": "The potentiometer reads 600. About what is the PWM duty cycle on D6?\n\n```\nint okuma = 600;\nint hiz = okuma / 4;\nanalogWrite(6, hiz);\n```",
+      "options": [
+        "25%",
+        "50%",
+        "59%",
+        "100%"
+      ],
+      "answer": 2,
+      "explanation": "600 / 4 = 150. The duty cycle is 150 / 255 ≈ 0.59, that is 59%. 50% happens when the reading is around 512; for 100% the speed must be 255.",
+      "skills": [
+        "motor-pwm-speed"
+      ]
+    },
+    {
+      "id": "m3h5d22-q4",
+      "kind": "find-bug",
+      "prompt": "The motor speed should be set with the pot, but the motor is already at full speed before the pot reaches the middle. Which line is wrong?\n\n```\nconst int MOTOR = 6;\nvoid setup() { pinMode(MOTOR, OUTPUT); }\n\nvoid loop() {\n  int okuma = analogRead(A0);\n  int hiz = okuma * 4;\n  analogWrite(MOTOR, hiz);\n  delay(10);\n}\n```",
+      "options": [
+        "pinMode(MOTOR, OUTPUT);",
+        "int hiz = okuma * 4;",
+        "analogWrite(MOTOR, hiz);",
+        "delay(10);"
+      ],
+      "answer": 1,
+      "explanation": "analogRead gives 0-1023, analogWrite wants 0-255. To convert, you must divide by 4. When you multiply by 4, the value goes above 255 once the reading passes 64, and the output stays HIGH all the time. The other lines are correct.",
+      "skills": [
+        "motor-pwm-speed",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d22-q5",
+      "kind": "mcq",
+      "prompt": "The motor is connected to 5V and to the transistor's collector. Where does the striped end (the cathode) of the flyback diode go?",
+      "options": [
+        "To the transistor's emitter",
+        "To GND",
+        "To pin D6",
+        "To the motor's plus side (5V)"
+      ],
+      "answer": 3,
+      "explanation": "In normal operation the diode must face the reverse direction and carry no current: the K leg goes to the plus side (5V) and the A leg to the collector. If it is connected the wrong way round, it gives no path for the spike and the lab gives a warning.",
+      "skills": [
+        "transistor-switching",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

@@ -4,6 +4,7 @@ import { Children, isValidElement, useState, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import rehypeHighlight from 'rehype-highlight'
 import remarkGfm from 'remark-gfm'
+import { useLocale } from '@/i18n/client'
 
 /** Derleme denetleyicisinin sketch işaret satırını (// sketch: ad) öğrenciye göstermeden kaldırır. */
 export function stripSketchMarkers(md: string): string {
@@ -22,6 +23,7 @@ const LANG: Record<string, string> = { cpp: 'Arduino C++', c: 'C', python: 'Pyth
 
 function CodeBlock({ children }: { children?: ReactNode }) {
   const [copied, setCopied] = useState(false)
+  const en = useLocale() === 'en'
   const code = Children.toArray(children)[0]
   const cls = isValidElement<{ className?: string }>(code) ? code.props.className ?? '' : ''
   const lang = /language-(\w+)/.exec(cls)?.[1]
@@ -36,7 +38,7 @@ function CodeBlock({ children }: { children?: ReactNode }) {
     <div className="codeblock">
       <div className="codeblock-bar">
         <span>{lang ? LANG[lang] ?? lang : 'Kod'}</span>
-        <button type="button" className="copy-btn" onClick={copy}>{copied ? 'Kopyalandı' : 'Kopyala'}</button>
+        <button type="button" className="copy-btn" onClick={copy}>{copied ? (en ? 'Copied' : 'Kopyalandı') : (en ? 'Copy' : 'Kopyala')}</button>
       </div>
       <pre>{children}</pre>
     </div>

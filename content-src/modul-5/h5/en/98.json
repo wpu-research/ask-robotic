@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Steady-state error",
+      "definition": "An error that does not close even after a long time; it happens in P control when there is a constant outside influence.",
+      "example": "On the robot with a weak motor, with Ki = 0 the wall offset stayed at 2.25 cm.",
+      "pitfall": "Expecting to wipe out the steady-state error completely by increasing Kp; the error gets smaller but does not close, and if Kp gets too large, overshoot begins."
+    },
+    {
+      "term": "Integral (I)",
+      "definition": "The sum of the error over time: integral += e * dt. Ki x integral is added to the output.",
+      "example": "With Ki = 2 the offset dropped from 2.25 cm to 0.09 cm.",
+      "pitfall": "Forgetting to multiply by dt; the integral then depends on the control period."
+    },
+    {
+      "term": "Ki",
+      "definition": "The gain that turns the accumulated error into output; the bigger it is, the faster the steady-state error closes.",
+      "example": "With Ki = 0.5 the offset at 12 s is 0.97 cm; with Ki = 6 it is 0.08 cm.",
+      "pitfall": "Making Ki very large in one go; at Ki = 12 the target was overshot by 0.8 cm."
+    },
+    {
+      "term": "Output saturation",
+      "definition": "The control output hitting its limit (0 or 255 for PWM); even if the error continues, the output cannot increase.",
+      "example": "Because the motor gives at most about 39.6 cm/s, the output hits 255 at a 50 cm/s target.",
+      "pitfall": "Blaming the controller when the error does not close; sometimes the limit is the motor's power."
+    },
+    {
+      "term": "Windup",
+      "definition": "The integral swelling up because the error continues while the output is saturated; when the target changes, it keeps the output in the wrong place for a long time.",
+      "example": "After 4 s of saturation the integral rose to 40.2, and settling at the new speed took 1.84 s.",
+      "pitfall": "Leaving the control on while holding the robot in the air; the integral quietly builds up and the robot shoots off when you let go."
+    },
+    {
+      "term": "Anti-windup",
+      "definition": "Methods that prevent windup: limiting the integral, or stopping the integral when the output saturates.",
+      "example": "With ANTI_WINDUP = true the integral stayed at 1.8 and the recovery took 0.34 s.",
+      "pitfall": "Choosing ILIM too small; if Ki x ILIM is smaller than the constant steering needed, the error does not close."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h5d98-q1",
+      "kind": "numeric",
+      "prompt": "Balancing a weak motor needs a constant steering of 18 PWM. If only P control (Kp = 9 PWM/cm) is used, how many cm is the steady-state error?",
+      "answer": 2,
+      "tolerance": 0.01,
+      "unit": "cm",
+      "explanation": "In P control u = Kp x e, so 18 = 9 x e and e = 2 cm. If the error were zero, the steering would be zero too, and the weak motor would keep pulling the robot.",
+      "skills": [
+        "ctl-integral"
+      ]
+    },
+    {
+      "id": "m5h5d98-q2",
+      "kind": "numeric",
+      "prompt": "The error stays at a constant 3 cm for 4 seconds and is accumulated with integral += e * dt. If Ki = 2, how many PWM does the integral add to the output? (Assume the ILIM limit is not reached.)",
+      "answer": 24,
+      "tolerance": 0.01,
+      "unit": "PWM",
+      "explanation": "Integral = 3 x 4 = 12 cm x s. Its contribution to the output is Ki x integral = 2 x 12 = 24 PWM. If you forget to multiply by dt, the value depends on the period and comes out wrong.",
+      "skills": [
+        "ctl-integral"
+      ]
+    },
+    {
+      "id": "m5h5d98-q3",
+      "kind": "predict-output",
+      "prompt": "What does this code print to the serial monitor when it runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  float integral = 0;\n  for (int i = 0; i < 10; i++) {\n    integral += 2.0 * 0.5;\n  }\n  integral = constrain(integral, -3, 3);\n  Serial.println(integral, 1);\n}\nvoid loop() {}\n```",
+      "options": [
+        "10.0",
+        "1.0",
+        "3.0",
+        "0.0"
+      ],
+      "answer": 2,
+      "explanation": "Each round adds 2.0 x 0.5 = 1.0 to the integral; after 10 rounds it is 10.0. constrain squeezes this between -3 and 3, so the printed value is 3.0. Limiting is one of the anti-windup methods.",
+      "skills": [
+        "ctl-integral",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h5d98-q4",
+      "kind": "mcq",
+      "prompt": "In speed control the target is 50 cm/s and the motor's limit is about 39.6 cm/s. After 4 seconds the target is dropped to 15 cm/s and there is no anti-windup. What happens?",
+      "options": [
+        "The robot settles at the new speed at once",
+        "Because the swollen integral first has to drain, the output stays high and the robot slows down late",
+        "The integral resets itself",
+        "The motor turns in the opposite direction"
+      ],
+      "answer": 1,
+      "explanation": "During saturation the error does not close, so the integral keeps growing (40.2 in the measurement). When the target drops, the output stays high until this build-up drains, and settling takes 1.84 s. The integral does not reset itself; that is why anti-windup is needed.",
+      "skills": [
+        "ctl-integral"
+      ]
+    },
+    {
+      "id": "m5h5d98-q5",
+      "kind": "find-bug",
+      "prompt": "In this speed controller the integral behaves differently when you change the control period. Where is the single bug?\n\n```\nfloat dt = DT / 1000.0;\nfloat e = hedef - hiz;\nintegral += e;\nfloat u = KP * e + KI * integral;\n```",
+      "options": [
+        "It should be integral += e * dt; a sum without dt depends on the control period",
+        "It should be e = hiz - hedef",
+        "The KP * e term should be removed",
+        "The dt variable should not be defined"
+      ],
+      "answer": 0,
+      "explanation": "The integral is the sum of the error over time; if the error is not multiplied by dt, doubling the period halves the number of additions per second and the integral builds up at half speed. The sign of the error, the KP term and the definition of dt are correct.",
+      "skills": [
+        "ctl-integral",
+        "prog-debug"
+      ]
+    }
+  ]
+}

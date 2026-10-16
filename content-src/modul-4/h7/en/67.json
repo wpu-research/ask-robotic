@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "SPI lines (SCK, MOSI, MISO, CS)",
+      "definition": "SPI works with four lines: the clock (SCK), data from the Arduino (MOSI), data from the device (MISO) and CS, which selects the device.",
+      "example": "On the Uno, SCK is D13, MISO D12, MOSI D11; in this lesson we connect the SD card's CS line to D10.",
+      "pitfall": "Connecting LEDs to the SPI pins D11-D13 and using an SD card at the same time."
+    },
+    {
+      "term": "SD.begin(CS)",
+      "definition": "Starts SPI and tries to talk to the card; returns true if it succeeds, false if not.",
+      "example": "if (!SD.begin(10)) { Serial.println(\"kart yok\"); } gives a warning if no card is found.",
+      "pitfall": "Writing a CS pin different from the module's real connection; begin returns false."
+    },
+    {
+      "term": "FILE_WRITE",
+      "definition": "Opens the file for writing; if the file does not exist, it creates it; if it does, it adds the text to the end.",
+      "example": "If you run the program twice, the second run's lines are added below the first run's.",
+      "pitfall": "Thinking FILE_WRITE writes the file from the start and deletes the old data."
+    },
+    {
+      "term": "8.3 file name",
+      "definition": "A name of at most 8 characters, a dot and an extension of at most 3 characters; Turkish characters and spaces are not used.",
+      "example": "VERI.CSV and LOG0001.TXT are valid names.",
+      "pitfall": "Using a long name such as sicaklik_kaydi.csv; the file does not open, and if (dosya) catches this."
+    },
+    {
+      "term": "close() and flush()",
+      "definition": "Two commands that physically write the data waiting in the buffer to the card; close also closes the file.",
+      "example": "In the open-write-close method, close() is called after every write, so the data is safe even if the power is cut.",
+      "pitfall": "Removing the card or cutting the power without calling close() or flush(); the last lines are lost."
+    },
+    {
+      "term": "3.3 V logic",
+      "definition": "SD cards work on 3.3 V; ready-made modules have a voltage regulator and a level shifter.",
+      "example": "If the module's documentation says it can be used with a 5 V Arduino, the level shifter is built in.",
+      "pitfall": "Connecting a bare SD card slot directly to the Arduino's 5 V pins."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d67-q1",
+      "kind": "mcq",
+      "prompt": "On the Arduino Uno, which pins are the SCK, MISO and MOSI lines for SPI on?",
+      "options": [
+        "SCK D11, MISO D12, MOSI D13",
+        "SCK D13, MISO D12, MOSI D11",
+        "SCK D10, MISO D11, MOSI D12",
+        "SCK A5, MISO A4, MOSI A3"
+      ],
+      "answer": 1,
+      "explanation": "On the Uno, SCK is D13, MISO D12 and MOSI D11; these pins are fixed. D10 was chosen for CS in this lesson; it is not an SPI line. A4 and A5 are the I2C lines (SDA, SCL).",
+      "skills": [
+        "sd-storage",
+        "serial-protocols"
+      ]
+    },
+    {
+      "id": "m4h7d67-q2",
+      "kind": "numeric",
+      "prompt": "Every time a program runs, it opens the file TEST.TXT with FILE_WRITE, writes two lines (println) and closes it. At the start the file does not exist. If the program is run three times, how many lines are in the file?",
+      "answer": 6,
+      "unit": "lines",
+      "explanation": "FILE_WRITE adds to the end of the file and does not delete the old contents. Each run adds 2 lines; 3 × 2 = 6 lines. If you assumed the file is written from the start, you would get 2; this is wrong.",
+      "skills": [
+        "sd-storage"
+      ]
+    },
+    {
+      "id": "m4h7d67-q3",
+      "kind": "find-bug",
+      "prompt": "After the logger has run for an hour, the power cable is suddenly pulled out and the last lines are missing from the file. There is one bug in the code. Which is it?\n\n```\nFile dosya = SD.open(\"VERI.CSV\", FILE_WRITE);\nif (dosya) {\n  dosya.println(\"23.5\");\n}\n```",
+      "options": [
+        "The file name does not follow the 8.3 rule",
+        "FILE_READ should be used instead of FILE_WRITE",
+        "There is no close() or flush(); the data stays in the buffer and is not written to the card",
+        "print should be used instead of println"
+      ],
+      "answer": 2,
+      "explanation": "VERI.CSV follows the 8.3 rule (4 letters, a dot, 3 letters). The data first waits in the buffer in RAM; without close() or flush() it may not be written to the card. The only difference between print and println is the end of line; that is not the cause of the loss.",
+      "skills": [
+        "sd-storage",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d67-q4",
+      "kind": "mcq",
+      "prompt": "You want to connect the VCC and data pins of a bare SD card slot directly to the Uno's 5 V. What should you do?",
+      "options": [
+        "No problem, SD cards work on 5 V",
+        "Connect only GND",
+        "Connect the CS pin to 5 V",
+        "Do not do this; the card works with 3.3 V logic. Use a ready-made module with a voltage regulator and a level shifter"
+      ],
+      "answer": 3,
+      "explanation": "SD cards work with 3.3 V logic. Ready-made modules have a voltage regulator and a level shifter; a bare slot is never connected directly to the Arduino's 5 V. Check in its documentation that the module is suitable for 5 V.",
+      "skills": [
+        "sd-storage",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m4h7d67-q5",
+      "kind": "mcq",
+      "prompt": "Why is the \"open-write-close\" method counted as the safest against power cuts, compared with the \"keep open and flush\" method?",
+      "options": [
+        "Because the file is closed after every write, so no data is left waiting in the buffer",
+        "Because the file uses no RAM at all",
+        "Because the card gets faster",
+        "Because the 8.3 rule is relaxed"
+      ],
+      "answer": 0,
+      "explanation": "In the open-write-close method, close() is called after every line; no unwritten data is left in the buffer. In the keep open and flush method the data is also sent with flush; the difference is that the file stays open. It has nothing to do with speed or the file name rule.",
+      "skills": [
+        "sd-storage"
+      ]
+    }
+  ]
+}

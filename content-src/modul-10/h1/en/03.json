@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Icon",
+      "definition": "A ready-made 5x5 drawing chosen with the show icon block (such as a heart, a face, an arrow or a note).",
+      "example": "The happy face icon draws two eyes and a smile.",
+      "pitfall": "Thinking the icon will disappear by itself; it stays on the screen until something else is shown."
+    },
+    {
+      "term": "Pattern",
+      "definition": "The on/off state of the 25 LEDs at that moment; it is drawn with the boxes in the show LEDs block.",
+      "example": "In the robot head pattern, 15 LEDs are on.",
+      "pitfall": "Marking the boxes in the wrong order; rows go from top to bottom, columns go from left to right."
+    },
+    {
+      "term": "1 and 0 notation",
+      "definition": "A way of writing each row of a pattern like a 5-digit number: 1 on, 0 off.",
+      "example": "In the row 10101, columns 0, 2 and 4 are on.",
+      "pitfall": "Starting the count at 1; the first column is column 0."
+    },
+    {
+      "term": "Animation",
+      "definition": "Showing drawings that are slightly different from each other one after the other, with pauses between them.",
+      "example": "Open eyes pattern, 500 ms pause, closed eyes pattern: the robot blinks.",
+      "pitfall": "Forgetting the pause: only the last drawing is seen."
+    },
+    {
+      "term": "A drawing wipes",
+      "definition": "A new icon or pattern takes the place of the previous drawing on the screen; they do not pile up.",
+      "example": "When the sad face is shown after the happy face, the happy face leaves the screen.",
+      "pitfall": "Expecting the two drawings to be seen together."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d3-q1",
+      "kind": "mcq",
+      "prompt": "You want to show a shape on the screen that you drew yourself and that is not in the ready-made list. Which block is right?",
+      "options": [
+        "show LEDs",
+        "show icon",
+        "show text",
+        "show number"
+      ],
+      "answer": 0,
+      "explanation": "In the show LEDs block you draw your own pattern by marking the 25 boxes however you like. show icon only gives the drawings in the ready-made list; show text and show number show letters and digits.",
+      "skills": [
+        "mk-images"
+      ]
+    },
+    {
+      "id": "m10h1d3-q2",
+      "kind": "predict-output",
+      "prompt": "What is visible on the screen when the program has finished?\n\n```\ncard.onStart(() => {\n  screen.showIcon(\"heart\");\n  wait(500);\n  screen.showIcon(\"smallHeart\");\n  wait(500);\n});\n```",
+      "options": [
+        "The big heart",
+        "Both hearts together",
+        "An empty screen",
+        "The small heart"
+      ],
+      "answer": 3,
+      "explanation": "The big heart is visible for 500 ms, then the small heart takes its place. The pause after the small heart does not wipe the drawing; it only makes the program wait. An icon stays on the screen until a new one comes, so the last one visible is the small heart.",
+      "skills": [
+        "mk-images",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d3-q3",
+      "kind": "numeric",
+      "prompt": "A robot head is drawn with this pattern (1 is on). How many LEDs light up in total?\n\n```\n0 0 1 0 0\n0 1 1 1 0\n1 0 1 0 1\n1 1 1 1 1\n1 0 1 0 1\n```",
+      "answer": 15,
+      "unit": "LED",
+      "explanation": "The 1s in the rows: 1 + 3 + 3 + 5 + 3 = 15. The boxes that are off (0) are not counted. The answer is 15, not 25; 25 is the total number of LEDs on the screen, not the number that are on.",
+      "skills": [
+        "mk-images",
+        "mk-coords"
+      ]
+    },
+    {
+      "id": "m10h1d3-q4",
+      "kind": "find-bug",
+      "prompt": "Mert wants to see the happy face first and the sad face one second later. But he only sees the sad face.\n\n```\n1  screen.showIcon(\"happy\");\n2  screen.showIcon(\"sad\");\n3  wait(1000);\n```\n\nWhat is the bug?",
+      "options": [
+        "Line 1: the happy icon is not in the list",
+        "There is no wait between lines 1 and 2; the happy face is wiped straight away",
+        "Line 2: it should say happy instead of sad",
+        "Line 3: the wait time is too long"
+      ],
+      "answer": 1,
+      "explanation": "The show icon block does not wait, and every new drawing wipes the previous one. For the happy face to be visible, you need to put a pause in between. The happy and sad icons are in the list; the wait at the end keeps the sad face on for longer and is not a bug.",
+      "skills": [
+        "mk-images",
+        "mk-timing",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d3-q5",
+      "kind": "mcq",
+      "prompt": "In a show LEDs block, the third row is 1 0 1 0 1. In which columns do the LEDs light up in this row?",
+      "options": [
+        "Columns 1, 3 and 5, so x = 1, 3, 5",
+        "x = 0, 1 and 4",
+        "x = 0, 2 and 4",
+        "Only x = 2"
+      ],
+      "answer": 2,
+      "explanation": "You read the row from left to right and look at the column numbers where there is a 1. Counting starts at 0, so the 1s are at x = 0, 2 and 4. Writing x = 1, 3, 5 is the mistake of counting from 1, and 5 does not exist on the screen anyway.",
+      "skills": [
+        "mk-images",
+        "mk-coords"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,122 @@
+{
+  "concepts": [
+    {
+      "term": "Logging linked to the RTC's seconds",
+      "definition": "A row is produced when the RTC's unixtime value divides exactly by the interval; that way the times always come out in the same steps, independent of millis() drift.",
+      "example": "When unixtime % 10 == 0, the rows 08:30:10, 08:30:20, 08:30:30 are produced.",
+      "pitfall": "Waiting for the logging interval with delay(); the button and the screen freeze during that time."
+    },
+    {
+      "term": "unixtime()",
+      "definition": "The number of seconds since 1970; it expresses the time as a single number.",
+      "example": "The condition u % 10 == 0 catches every moment whose seconds divide by 10.",
+      "pitfall": "Using the seconds value (0-59) on its own; if the interval does not divide 60 (such as 7), uneven steps come out at the change of minute."
+    },
+    {
+      "term": "Repeat-stopping flag (sonKayit)",
+      "definition": "A variable that keeps the second in which the last row was written; it blocks a second row in the same second.",
+      "example": "The condition u != sonKayit makes a row print on only one of the five 200 ms passes.",
+      "pitfall": "Forgetting the flag: a row with the same timestamp comes out on every 200 ms pass."
+    },
+    {
+      "term": "On/off with edge detection",
+      "definition": "Flips a state variable at the moment the button is pressed (the change from \"not pressed\" to \"pressed\").",
+      "example": "kayitAcik = !kayitAcik; logging switches off when it is on, and on when it is off.",
+      "pitfall": "Flipping the state on every pass for as long as the button is held: logging switches on and off out of control."
+    },
+    {
+      "term": "Error-proof logging",
+      "definition": "Even if the reading fails, the timestamp is written and the sensor fields stay empty; the device keeps running.",
+      "example": "If the DHT's DATA wire comes out, the row is written as 2026-01-01 00:00:20,,",
+      "pitfall": "Stopping the program when a reading fails (while(true) {}), or not writing the row at all."
+    },
+    {
+      "term": "The kaydet() split",
+      "definition": "Building the row and writing the row somewhere are in separate functions; when the place written to changes, the row format does not.",
+      "example": "When moving from the Serial version to the SD version, only SD writing is added inside kaydet().",
+      "pitfall": "Copying the formatting separately for each place it is written; different rows come out in the two places."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d70-q1",
+      "kind": "numeric",
+      "prompt": "The logger writes a row every 10 seconds and runs without stopping. How many data rows are written in 1 hour?",
+      "answer": 360,
+      "unit": "rows",
+      "explanation": "One hour is 3600 seconds. 3600 ÷ 10 = 360 rows. This calculation is used to estimate how long the card will take to fill up and to choose the logging interval.",
+      "skills": [
+        "data-logging",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m4h7d70-q2",
+      "kind": "mcq",
+      "prompt": "If KAYIT_ARALIGI is set to 20, at which seconds of the minute are rows produced in this logging logic linked to the RTC's seconds (unixtime % 20 == 0)?",
+      "options": [
+        "10, 30, 50",
+        "5, 25, 45",
+        "0, 20, 40",
+        "0 and 30"
+      ],
+      "answer": 2,
+      "explanation": "60 seconds divide exactly by 20; that is why the same three seconds come up every minute: 0, 20 and 40 (such as 08:30:20, 08:30:40, 08:31:00). 0 and 30 would be an interval of 30 seconds; 10, 30, 50 are not seconds that divide by 20.",
+      "skills": [
+        "data-logging",
+        "rtc-time"
+      ]
+    },
+    {
+      "id": "m4h7d70-q3",
+      "kind": "find-bug",
+      "prompt": "The logging interval is 20 seconds. But the RTC is read every 200 ms, and the row with the same timestamp appears 5 times on the Serial monitor. Which condition is missing?\n\n```\nif (kayitAcik && u % KAYIT_ARALIGI == 0) {\n  kaydet(satirOlustur(t, sicak, nem));\n}\n```",
+      "options": [
+        "The kayitAcik check is unnecessary",
+        "Serial.println should be called instead of satirOlustur",
+        "The u != sonKayit check is missing; all five passes within the same second meet the condition",
+        "KAYIT_ARALIGI should be a float"
+      ],
+      "answer": 2,
+      "explanation": "When the RTC's seconds divide by 20, that second lasts 1000 ms, and the 200 ms passes find the condition true 5 times in that time. A flag such as u != sonKayit makes the row print once in the same second. The other changes do not stop the repeats.",
+      "skills": [
+        "data-logging",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d70-q4",
+      "kind": "mcq",
+      "prompt": "Why is waiting for the logging interval with delay(10000) a bad idea in this project?",
+      "options": [
+        "For 10 seconds the button is not read and the screen is not updated; the device does not respond",
+        "delay() only works up to 1000 ms",
+        "The RTC resets during this time",
+        "The CSV row gets corrupted"
+      ],
+      "answer": 0,
+      "explanation": "delay() stops the program: even if the button is pressed, it is not noticed, and the time on the LCD freezes. The fix is a non-blocking check with the RTC's seconds or millis() (lesson 27). delay() is not limited to 1000 ms; the RTC and the CSV row are not affected either.",
+      "skills": [
+        "prog-timing",
+        "data-logging"
+      ]
+    },
+    {
+      "id": "m4h7d70-q5",
+      "kind": "mcq",
+      "prompt": "While the logger is running, the DHT22's DATA wire comes out and the reading returns NaN. With the design in the lesson, what appears in the log file?",
+      "options": [
+        "The timestamp is written, and the temperature and humidity columns are left empty",
+        "The device stops and no rows are written",
+        "0 is written in the temperature column",
+        "The previous measurement is repeated as it was"
+      ],
+      "answer": 0,
+      "explanation": "satirOlustur does not write a field that comes in as NaN and leaves it empty: a row such as 2026-03-14 08:30:20,, comes out. That way the log shows why the measurement is missing, and the columns do not shift. Writing zero would be confused with a real 0 °C measurement.",
+      "skills": [
+        "data-logging",
+        "prog-debug"
+      ]
+    }
+  ]
+}

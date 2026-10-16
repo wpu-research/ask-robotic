@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Outlier",
+      "definition": "A single wrong reading that is very different from the readings next to it.",
+      "example": "In the sequence 100, 100, 350, 100, the 350 is an outlier.",
+      "pitfall": "Accepting every reading as correct and making a decision from it straight away."
+    },
+    {
+      "term": "Average",
+      "definition": "The sum of all the values divided by how many there are; it takes the outlier into itself.",
+      "example": "The average of 100, 100, 100, 350, 100 is 150.",
+      "pitfall": "Thinking the average has cleaned up the outlier: a wrong reading spoils the result."
+    },
+    {
+      "term": "Median",
+      "definition": "The middle value once the values are sorted; outliers at the ends are not chosen.",
+      "example": "In the sorted list 100, 100, 100, 100, 350, the middle one is 100.",
+      "pitfall": "Forgetting that the median is fooled too if the wrong values are more than half the window."
+    },
+    {
+      "term": "Sliding window",
+      "definition": "An array that holds the last N readings; a new reading is written in place of the oldest one.",
+      "example": "pencere[sira] = x; sira = (sira + 1) % N; goes back to the start when it reaches the end of the array.",
+      "pitfall": "Forgetting % N, or not filling the window with the first reading."
+    },
+    {
+      "term": "Filter delay",
+      "definition": "The median filter does not react to a real change straight away; the old value stays until the new value is the majority of the window.",
+      "example": "If N = 5 and a measurement is taken every 55 ms, the reaction comes after about 3 × 55 = 165 ms.",
+      "pitfall": "Making the window needlessly large: the noise goes down but the system gets slow."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d38-q1",
+      "kind": "numeric",
+      "prompt": "Five readings: 80, 82, 81, 400, 80 cm. What is the average of these readings in centimetres?",
+      "answer": 144.6,
+      "tolerance": 0.1,
+      "unit": "cm",
+      "explanation": "The sum is 80 + 82 + 81 + 400 + 80 = 723; 723 / 5 = 144.6. A single outlier (400) pulled the average up by about 64 cm.",
+      "skills": [
+        "sens-filter"
+      ]
+    },
+    {
+      "id": "m4h1d38-q2",
+      "kind": "numeric",
+      "prompt": "What is the median of the same five readings (80, 82, 81, 400, 80) in centimetres?",
+      "answer": 81,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "Sorted, they become 80, 80, 81, 82, 400; the middle (3rd) value is 81. The outlier 400 goes to the end of the sorted list and does not affect the median. Compare this with the average (144.6).",
+      "skills": [
+        "sens-filter"
+      ]
+    },
+    {
+      "id": "m4h1d38-q3",
+      "kind": "mcq",
+      "prompt": "A 7-element median filter still gives the right result with at most how many outliers in the window?",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "6"
+      ],
+      "answer": 2,
+      "explanation": "In a window of N elements, the median forgives at most (N − 1) / 2 outliers: (7 − 1) / 2 = 3. If there are four wrong values, the wrong values are the majority and the middle value comes out wrong too.",
+      "skills": [
+        "sens-filter"
+      ]
+    },
+    {
+      "id": "m4h1d38-q4",
+      "kind": "predict-output",
+      "prompt": "The window starts as {50, 50, 50}. If three new readings arrive (200, 200, 50), what does the median print?\n\n```\nfloat p[3] = {50, 50, 50};\nint s = 0;\nfloat yeni[] = {200, 200, 50};\nfor (int i = 0; i < 3; i++) {\n  p[s] = yeni[i];\n  s = (s + 1) % 3;\n}\nfloat a = p[0], b = p[1], c = p[2];\nSerial.println(max(min(a, b), min(max(a, b), c)), 0);\n```",
+      "options": [
+        "50",
+        "100",
+        "150",
+        "200"
+      ],
+      "answer": 3,
+      "explanation": "At the end of the loop, p = {200, 200, 50}. The median of the three values is 200, because in a 3-element window two wrong values are the majority and the median is fooled too (a 3-element window forgives at most 1 wrong value). The average would be 150; the code works out the median.",
+      "skills": [
+        "sens-filter",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m4h1d38-q5",
+      "kind": "find-bug",
+      "prompt": "A program with a sliding window starts crashing and reading nonsense values after a while. Which line is wrong?\n\n```\nconst int N = 5;\nfloat pencere[N];\nint sira = 0;\n\nvoid ekle(float x) {\n  pencere[sira] = x;\n  sira = sira + 1;\n}\n```",
+      "options": [
+        "const int N = 5;",
+        "float pencere[N];",
+        "pencere[sira] = x;",
+        "sira = sira + 1;"
+      ],
+      "answer": 3,
+      "explanation": "sira never goes back to the start; after N rounds, pencere[5], pencere[6]... are written outside the array. It should be sira = (sira + 1) % N;. The line pencere[sira] = x; is correct on its own; the overflow comes from the value of sira there.",
+      "skills": [
+        "sens-filter",
+        "prog-loops-arrays",
+        "prog-debug"
+      ]
+    }
+  ]
+}

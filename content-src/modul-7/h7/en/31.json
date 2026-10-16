@@ -1,0 +1,104 @@
+{
+  "concepts": [
+    {
+      "term": "Coding agent",
+      "definition": "An agent that reads and edits files and runs commands, whose decisions are made by a language model.",
+      "example": "It makes a plan, changes the file, runs the test, looks at the result and fixes it.",
+      "pitfall": "Thinking the tool is flawless; the tools are real, but the model that makes the decisions can be wrong."
+    },
+    {
+      "term": "Plan first",
+      "definition": "Reading and approving the model's plan before having code written.",
+      "example": "You ask \"Which steps will you use for this job?\" and fix a wrong assumption before any code is written.",
+      "pitfall": "Saying \"do it\" without reading the plan: a wrong assumption spreads over hundreds of lines."
+    },
+    {
+      "term": "Small steps and commits",
+      "definition": "Breaking a big change into pieces and saving every working piece separately.",
+      "example": "If you split a 240-line job into 6 steps, each step is about 40 lines.",
+      "pitfall": "Asking for one giant change: when a bug appears, you cannot find where it is, and going back gets harder."
+    },
+    {
+      "term": "Made-up function",
+      "definition": "The model writing the name of a function or library that does not really exist.",
+      "example": "`statistics.average(...)` is written; the module has `mean`, not `average`.",
+      "pitfall": "Thinking the code is right without running it."
+    },
+    {
+      "term": "Weak test",
+      "definition": "A test that lets wrong code pass too, and does not test edge cases.",
+      "example": "A function that always returns the first number passes only the test `buyuk(7, 3) == 7`.",
+      "pitfall": "Reading \"The tests passed\" as \"the code is right\"."
+    },
+    {
+      "term": "Least privilege",
+      "definition": "Giving a tool only the permission its job needs; asking for approval on risky commands.",
+      "example": "Instead of running the delete-file command automatically, approval is asked for every time.",
+      "pitfall": "Turning on all permissions from the start for convenience."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d31-q1",
+      "kind": "mcq",
+      "prompt": "When you ask a coding tool for a change, why is reading the plan first better than having the code written straight away?",
+      "options": [
+        "The plan makes the code run faster",
+        "A wrong assumption can be caught and fixed before the code is written",
+        "Once the plan is read, the model cannot make mistakes",
+        "Reading the plan makes tests unnecessary"
+      ],
+      "answer": 1,
+      "explanation": "The plan makes the model's assumptions visible before the code is written; a wrong assumption is fixed cheaply at that stage. After the code is written, a wrong assumption may have spread over many files. The plan has no effect such as making the code run faster or making the model error-free.",
+      "skills": [
+        "ai-code-workflow"
+      ]
+    },
+    {
+      "id": "m7h7d31-q2",
+      "kind": "predict-output",
+      "prompt": "An AI wrote this function and test. What appears on the screen when you run it?\n\n```\ndef buyuk(a, b):\n    return a\nassert buyuk(7, 3) == 7\nprint(\"test geçti\")\n```",
+      "options": [
+        "`test geçti` is printed (but the function is still wrong)",
+        "An AssertionError happens",
+        "A SyntaxError happens",
+        "Nothing is printed"
+      ],
+      "answer": 0,
+      "explanation": "`buyuk(7, 3)` returns the first number, that is 7; the assert passes and `test geçti` (\"test passed\") is printed. But the function is wrong: `buyuk(3, 7)` also returns 3. A passing test does not show that the code is right, only that the written test passed; you need to add edge cases.",
+      "skills": [
+        "ai-code-workflow",
+        "ai-code-review"
+      ]
+    },
+    {
+      "id": "m7h7d31-q3",
+      "kind": "find-bug",
+      "prompt": "There is exactly one problem in the code the AI suggested. Which one?\n\n```\nimport statistics\nsonuc = statistics.average([2, 4, 9])\nprint(sonuc)\n```",
+      "options": [
+        "The import line: there is no statistics module",
+        "The print line: print is not used in Python",
+        "The statistics.average line: the module has no function called average (it has mean)",
+        "The list line: a list cannot have three elements"
+      ],
+      "answer": 2,
+      "explanation": "The statistics module has mean for the average; there is no function called average, and running it gives an AttributeError. The import line is correct, and so is the print line. This is a typical example of a function the model made up, and running the code catches it.",
+      "skills": [
+        "ai-code-review",
+        "ai-code-workflow"
+      ]
+    },
+    {
+      "id": "m7h7d31-q4",
+      "kind": "numeric",
+      "prompt": "A tool suggested a single 240-line change. You split it into 6 small steps of equal size. How many lines is each step?",
+      "answer": 40,
+      "unit": "lines",
+      "tolerance": 0,
+      "explanation": "240 / 6 = 40 lines. Small steps make the area to search smaller when something breaks; with commits, each step is saved separately.",
+      "skills": [
+        "ai-code-workflow"
+      ]
+    }
+  ]
+}

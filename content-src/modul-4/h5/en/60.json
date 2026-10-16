@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Offset (reset)",
+      "definition": "When the button is pressed, taking the current angle as \"level\" and subtracting it from the angles that follow.",
+      "example": "egim = aci - ofset; with ofset = 12, if aci is 12 then egim is 0.",
+      "pitfall": "Updating the offset on every pass: the tilt always looks like 0."
+    },
+    {
+      "term": "Compensation in the opposite direction",
+      "definition": "Keeping the platform level by turning by the tilt amount the other way. servo = 90 - egim.",
+      "example": "If egim = 20, the servo goes to 70 degrees.",
+      "pitfall": "Getting the sign the wrong way round: the platform doubles the tilt."
+    },
+    {
+      "term": "Limiting with constrain",
+      "definition": "Restricts the servo angle to a safe range (10...170).",
+      "example": "If egim = 85, you get 90 - 85 = 5, but constrain makes it 10.",
+      "pitfall": "Not limiting it: the servo pushes against its mechanical end, strains and heats up."
+    },
+    {
+      "term": "Non-blocking loop",
+      "definition": "Running each job at its own speed with a millis() difference instead of delay().",
+      "example": "The filter is updated every 10 ms, the LCD every 250 ms.",
+      "pitfall": "Using delay: button presses are missed and the filter's dt goes wrong."
+    },
+    {
+      "term": "Open loop",
+      "definition": "Control that does not measure the result of the output. In the mini gimbal there is no sensor measuring the platform's real angle.",
+      "example": "The MPU only measures the base; nobody knows whether the servo kept the platform level.",
+      "pitfall": "Thinking open loop is perfect: servo load or drift leaves the error unseen."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d60-q1",
+      "kind": "numeric",
+      "prompt": "When the button was pressed, ofset = 10. Right now the filtered angle is aci = 25. The mini gimbal works with the rules egim = aci - ofset and servo = 90 - egim. To how many degrees does the servo go? (The limits are not exceeded.)",
+      "answer": 75,
+      "tolerance": 0,
+      "unit": "degrees",
+      "explanation": "egim = 25 - 10 = 15 and servo = 90 - 15 = 75. Because the tilt is positive, the servo goes below 90, that is, the opposite way.",
+      "skills": [
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h5d60-q2",
+      "kind": "predict-output",
+      "prompt": "When egim = 85 degrees, what does this code print?\n\n```\nfloat egim = 85;\nint servoAci = 90 - (int)round(egim);\nbool sinirda = (servoAci <= 10 || servoAci >= 170);\nservoAci = constrain(servoAci, 10, 170);\nSerial.print(servoAci);\nSerial.print(\" \");\nSerial.println(sinirda ? 1 : 0);\n```",
+      "options": [
+        "5 0",
+        "5 1",
+        "10 0",
+        "10 1"
+      ],
+      "answer": 3,
+      "explanation": "90 - 85 = 5; because 5 <= 10, sinirda (at limit) becomes true. constrain raises 5 to 10. The output is \"10 1\": the servo goes to 10 degrees and the LED lights as a limit warning.",
+      "skills": [
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h5d60-q3",
+      "kind": "numeric",
+      "prompt": "The Servo library maps 0 degrees to 544 µs and 180 degrees to 2400 µs (linearly). About how many µs wide is the pulse produced by servo.write(70)?",
+      "answer": 1266,
+      "tolerance": 2,
+      "unit": "µs",
+      "explanation": "544 + 70 / 180 x (2400 - 544) = 544 + 721.8 = 1265.8, about 1266 µs (Arduino's integer map gives 1265). 90 degrees is 1472 µs.",
+      "skills": [
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h5d60-q4",
+      "kind": "mcq",
+      "prompt": "In the mini gimbal the MPU6050 only measures the tilt of the base; there is no sensor measuring the platform's real angle. What is this kind of control called?",
+      "options": [
+        "Closed loop",
+        "Open loop",
+        "Interrupt-based control",
+        "Non-blocking control"
+      ],
+      "answer": 1,
+      "explanation": "If the result of the output is not measured and the error corrected, the control is open loop. A system that also measures the platform's angle and keeps correcting the difference is closed loop. Non-blocking is a way of timing with millis; it is not a type of control.",
+      "skills": [
+        "control-loop"
+      ]
+    },
+    {
+      "id": "m4h5d60-q5",
+      "kind": "find-bug",
+      "prompt": "The mini gimbal often misses button presses and the servo reacts very sluggishly. Which line is wrong?\n\n```\nvoid loop() {\n  bool basili = (digitalRead(SIFIRLA) == LOW);\n  if (basili && !oncekiBasili) ofset = aci;\n  oncekiBasili = basili;\n\n  mpuOku();\n  servo.write(servoAcisiHesapla());\n  delay(500);\n}\n```",
+      "options": [
+        "delay(500);",
+        "if (basili && !oncekiBasili) ofset = aci;",
+        "mpuOku();",
+        "servo.write(servoAcisiHesapla());"
+      ],
+      "answer": 0,
+      "explanation": "delay(500) makes the whole loop wait half a second: the button is missed, and the measurement and servo are updated only twice a second. Instead, a measurement is made every 10 ms with millis(). The edge-detection line is correct.",
+      "skills": [
+        "nonblocking-timing",
+        "prog-debug"
+      ]
+    }
+  ]
+}

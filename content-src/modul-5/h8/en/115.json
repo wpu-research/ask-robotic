@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Results table",
+      "definition": "A table that records, for each criterion, what was asked for, how it was measured, what was measured and the result.",
+      "example": "Path C: \"20 ± 3 cm\", \"distance known to the simulator\", \"18.3-22.0 cm\", \"PASSED\".",
+      "pitfall": "Taking a failed test out of the table: a failed test is one of the most valuable rows in the report."
+    },
+    {
+      "term": "Scope limit",
+      "definition": "Writing down, together with the result, what the measurement covers and what it does not.",
+      "example": "For the arm, \"PASSED (limited scope)\": the commanded position was measured, gear backlash was not.",
+      "pitfall": "Presenting a simulator measurement as if it were the result of a real robot."
+    },
+    {
+      "term": "Symptom and root cause",
+      "definition": "The symptom is what you see; the root cause is the first layer that produces the symptom.",
+      "example": "\"The robot got stuck at the end of the wall\" is the symptom; \"YAN_MS is not enough\" is the root cause.",
+      "pitfall": "Treating the symptom (for example making ENGEL_CM bigger): the bug comes back on another course."
+    },
+    {
+      "term": "Layer check",
+      "definition": "Measuring the bug one layer at a time, such as decision, turn and movement, and ruling out the sound ones.",
+      "example": "The decision and the turn came out sound; the sideways margin was only 8 mm.",
+      "pitfall": "Going by guesswork and changing several things at once."
+    },
+    {
+      "term": "Debounce interval (collision counter)",
+      "definition": "The waiting time allowed so that the vibrations of the same bumper count as a single collision.",
+      "example": "A second press within 500 ms is not counted.",
+      "pitfall": "Forgetting the interval: a single collision is counted as several collisions."
+    },
+    {
+      "term": "Daily report",
+      "definition": "A short daily record containing the goal, the work done, the measurements, problem-root cause-fix and the reason for the decision.",
+      "example": "\"I increased the time and did not change the obstacle threshold: the threshold affects detection, not going sideways.\"",
+      "pitfall": "Putting the report off with \"I'll write it tomorrow\": the reason is forgotten within a few days."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d5-q1",
+      "kind": "mcq",
+      "prompt": "In a bug report, which of these is a ROOT CAUSE statement?",
+      "options": [
+        "The robot got stuck at the end of the wall",
+        "The sideways time does not take the robot to a place where it passes the end of the wall by its radius (no margin)",
+        "The robot crashed",
+        "The simulator is working wrongly"
+      ],
+      "answer": 1,
+      "explanation": "\"Got stuck\" and \"crashed\" are symptoms; they are what you measure and see. The root cause is the first layer that produces the symptom, and it is backed up by measurement: the sideways margin. \"The simulator is wrong\" is an excuse thrown out without measuring.",
+      "skills": [
+        "rep-root-cause"
+      ]
+    },
+    {
+      "id": "m5h8d5-q2",
+      "kind": "numeric",
+      "prompt": "The score sketch builds up the line error as `|konum| × 20 mm`. If the position values in four measurements are 0, 0.5, -1 and 0.5, what is the average error in mm?",
+      "answer": 10,
+      "tolerance": 0.05,
+      "unit": "mm",
+      "explanation": "The absolute values are 0, 0.5, 1, 0.5; their average is 2 / 4 = 0.5 sensor spacings. 0.5 × 20 mm = 10 mm. The signed average would be 0.0 (0 + 0.5 - 1 + 0.5 = 0).",
+      "skills": [
+        "rob-error-stats",
+        "rep-honest-results"
+      ]
+    },
+    {
+      "id": "m5h8d5-q3",
+      "kind": "predict-output",
+      "prompt": "The collision counter counts presses closer together than 500 ms as one. The bumper press moments (ms) are 1000, 1200, 1900 and 2500. What does this code print?\n```\nunsigned long basis[] = {1000, 1200, 1900, 2500};\nunsigned long son = 0;\nint carpma = 0;\nfor (int i = 0; i < 4; i++) {\n  if (basis[i] - son > 500) { carpma++; son = basis[i]; }\n}\nSerial.println(carpma);\n```",
+      "options": [
+        "1",
+        "2",
+        "3",
+        "4"
+      ],
+      "answer": 2,
+      "explanation": "1000: 1000 ms have passed since the previous 0, it is counted (1), son = 1000. 1200: 200 ms have passed, it is not counted. 1900: 900 ms have passed, it is counted (2), son = 1900. 2500: 600 ms have passed, it is counted (3). Total 3. The press at 1200 ms was removed because it counted as a vibration.",
+      "skills": [
+        "prog-timing",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d5-q4",
+      "kind": "find-bug",
+      "prompt": "The line-following robot's scoreboard always gives the average error close to zero. There is a single bug in the code; which is it?\n```\nif (sayi > 0) {\n  sonCizgi = simdi;\n  hataToplamMm += konum * SENSOR_ARALIK_MM;\n  olcumSayisi++;\n}\n```",
+      "options": [
+        "There should be no `olcumSayisi++`",
+        "`fabs(konum)` should be added instead of `konum`; the signed values cancel each other out",
+        "It should not be multiplied by SENSOR_ARALIK_MM",
+        "`sonCizgi = simdi` should be deleted"
+      ],
+      "answer": 1,
+      "explanation": "Deviations to the left and right of the line cancel each other out because of their signs; the average gets close to zero while the robot is going wrong. The size of the error should be taken with `fabs`. `olcumSayisi` is the divisor of the average; `sonCizgi` is needed to detect the end of the line.",
+      "skills": [
+        "rob-error-stats",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d5-q5",
+      "kind": "mcq",
+      "prompt": "In the simulator, the robot arm measured an error of 0.09 mm at the commanded position (gear backlash and bending are not modelled). What should be written in the results table?",
+      "options": [
+        "PASSED: the arm works with an accuracy of 0.09 mm",
+        "FAILED: because the real arm was not measured",
+        "The row is taken out of the table",
+        "PASSED (limited scope): commanded position, simulator; mechanical error not measured"
+      ],
+      "answer": 3,
+      "explanation": "The result is correct, but its scope is limited. Writing what was measured and what was not means avoiding presenting the number as the result of a real robot. Taking the row out, or claiming a precision that does not match reality, is not honest.",
+      "skills": [
+        "rep-honest-results"
+      ]
+    }
+  ]
+}

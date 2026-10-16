@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Ultrasonic sound",
+      "definition": "Sound with a frequency too high for the human ear to hear; the HC-SR04 uses 40 kHz.",
+      "example": "The sensor sends a short burst of 40 kHz sound and listens for its echo.",
+      "pitfall": "Thinking the sensor \"knows\" the distance directly; it only measures a time."
+    },
+    {
+      "term": "TRIG and ECHO",
+      "definition": "TRIG is the \"measure\" command from the board to the sensor; ECHO is the pin that stays HIGH from the sensor to the board until the echo arrives.",
+      "example": "When TRIG gets a short HIGH, the sound goes out; ECHO is held HIGH until the echo returns.",
+      "pitfall": "Mixing up the two pins' roles: thinking TRIG is an input and ECHO an output."
+    },
+    {
+      "term": "There-and-back time",
+      "definition": "The time ECHO stays HIGH; the total time for the sound to reach the object and come back.",
+      "example": "If ECHO stayed HIGH for 5830 µs, the sound was on its way for 5830 µs.",
+      "pitfall": "Treating the time as one way and forgetting to divide by two: the distance comes out doubled."
+    },
+    {
+      "term": "Distance formula",
+      "definition": "distance (cm) = time (µs) × 0.0343 / 2; roughly time / 58 gives the same result.",
+      "example": "2915 µs × 0.0343 / 2 is about 50 cm.",
+      "pitfall": "Putting 343 m/s into the cm/µs formula without converting the units."
+    },
+    {
+      "term": "Speed of sound and temperature",
+      "definition": "The speed of sound rises with temperature: c ≈ 331.3 + 0.606 × T (m/s, T: °C).",
+      "example": "At 0 °C, c = 331.3 m/s; a program that assumes a fixed 343 m/s reads 100 cm as about 103.5 cm.",
+      "pitfall": "Never thinking about temperature: in a cold garage the measurement can drift a few centimetres."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d36-q1",
+      "kind": "numeric",
+      "prompt": "The ECHO pin stayed HIGH for 3500 µs. Taking the speed of sound as 0.0343 cm/µs, how many centimetres away is the object? (Round to the nearest whole number.)",
+      "answer": 60,
+      "tolerance": 0.5,
+      "unit": "cm",
+      "explanation": "Distance = 3500 × 0.0343 / 2 = 60.0 cm. The value 3500 × 0.0343 = 120.05 is the there-and-back path; if you leave it undivided you get 120 cm, which is wrong.",
+      "skills": [
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d36-q2",
+      "kind": "numeric",
+      "prompt": "The object is 150 cm from the sensor. About how many microseconds does ECHO stay HIGH? (You can use 0.0343 cm/µs or 58 µs/cm.)",
+      "answer": 8746,
+      "tolerance": 50,
+      "unit": "µs",
+      "explanation": "The sound travels 150 cm there and 150 cm back, 300 cm in total. Time = 300 / 0.0343, about 8746 µs. If you only use 150 cm you get half of that, about 4373 µs; that is forgetting the return trip.",
+      "skills": [
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d36-q3",
+      "kind": "mcq",
+      "prompt": "In the formula that turns the time into centimetres, why do we divide the result by two?",
+      "options": [
+        "The sensor measures two separate objects at the same time",
+        "The measured time covers the sound's way there and back, while the distance is only the way there",
+        "Sound travels at half speed in air",
+        "The ECHO pin shows the time twice as long"
+      ],
+      "answer": 1,
+      "explanation": "The sound goes to the object and comes back; ECHO stays HIGH for the total time of both trips. The distance to the object is only the way there, so we divide by two. The speed of sound does not halve, and the sensor does not double the time on its own.",
+      "skills": [
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d36-q4",
+      "kind": "predict-output",
+      "prompt": "At 0 °C the object is really 100 cm away, but the program assumes the sensor works with 343 m/s. What does this code print to the Serial Monitor?\n\n```\nfloat c = 331.3 + 0.606 * 0;       // 0 °C\nfloat okunan = 100.0 * 343.0 / c;\nSerial.println(okunan, 1);\n```",
+      "options": [
+        "96.5",
+        "100.0",
+        "103.5",
+        "106.2"
+      ],
+      "answer": 2,
+      "explanation": "At 0 °C sound travels at 331.3 m/s, slower than 343 m/s. In reality the sound returns later, but the program calculates with 343 m/s, so it finds the distance too large: 100 × 343 / 331.3, about 103.5. 96.5 would come out in hot air (40 °C).",
+      "skills": [
+        "sens-sound-speed"
+      ]
+    },
+    {
+      "id": "m4h1d36-q5",
+      "kind": "find-bug",
+      "prompt": "A student wants to work out the distance from a time of 5830 µs, but the result is a meaningless number instead of centimetres. Which line is wrong?\n\n```\nunsigned long sure = 5830;            // µs\nfloat cm = sure * 343.0 / 2.0;\nSerial.println(cm);\n```",
+      "options": [
+        "unsigned long sure = 5830;",
+        "float cm = sure * 343.0 / 2.0;",
+        "Serial.println(cm);"
+      ],
+      "answer": 1,
+      "explanation": "The 343 m/s value was used without converting it to cm/µs. The right factor is 0.0343 cm/µs: sure * 0.0343 / 2.0 gives about 100 cm. Skipping the conversion makes the result about 10 000 times too large. The other two lines are correct.",
+      "skills": [
+        "sens-ultrasonic",
+        "prog-debug"
+      ]
+    }
+  ]
+}

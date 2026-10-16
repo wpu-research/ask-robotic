@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm'
 import {
   bigint, boolean, check, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex, uuid,
 } from 'drizzle-orm/pg-core'
-import type { Concept, LessonStep, QuizQuestion } from '../content/types'
+import type { Concept, LessonStep, LessonTextEn, QuizQuestion } from '../content/types'
 
 export const userRole = pgEnum('user_role', ['student', 'parent', 'teacher', 'admin'])
 export const track = pgEnum('track', ['cocuk', 'maker', 'ai'])
@@ -53,6 +53,7 @@ export const weeks = pgTable('weeks', {
   project: text('project'),
   // Haftalık çalışma rehberi (Markdown); yoksa null
   guideMd: text('guide_md'),
+  guideMdEn: text('guide_md_en'),
 }, (t) => [uniqueIndex('weeks_module_position').on(t.moduleId, t.position)])
 
 // Hyvex formatı: problem → kavram+vaka → demo → soru (15-20 dk)
@@ -73,6 +74,7 @@ export const lessons = pgTable('lessons', {
   steps: jsonb('steps').$type<LessonStep[]>(),
   // steps'in İngilizcesi (arayüz dili 'en' iken); yoksa Türkçe adımlar gösterilir
   stepsEn: jsonb('steps_en').$type<LessonStep[]>(),
+  contentEn: jsonb('content_en').$type<LessonTextEn>(),
 }, (t) => [uniqueIndex('lessons_week_position').on(t.weekId, t.position)])
 
 export const enrollments = pgTable('enrollments', {

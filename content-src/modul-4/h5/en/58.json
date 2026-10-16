@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Register",
+      "definition": "A numbered cell inside the chip. Over I2C you say which register to read from or write to.",
+      "example": "0x6B is power management; 0x3B is the register where the measurements start.",
+      "pitfall": "Writing the wrong register number: random or meaningless data comes back."
+    },
+    {
+      "term": "Sleep mode",
+      "definition": "The MPU6050 is asleep at start-up; it starts measuring when 0 is written to register 0x6B.",
+      "example": "Wire.write(0x6B); Wire.write(0); wakes the chip up.",
+      "pitfall": "Forgetting to wake it up: the sensor gives no meaningful data."
+    },
+    {
+      "term": "Raw value and g",
+      "definition": "The chip gives a 16-bit signed raw number; in the ±2 g range, g = raw / 16384.0.",
+      "example": "Raw 8192 is 0.5 g.",
+      "pitfall": "Writing ax / 16384: integer division gives 0; you must write 16384.0."
+    },
+    {
+      "term": "int16_t",
+      "definition": "A signed 16-bit whole-number type. When two bytes are joined, it reads negative values correctly.",
+      "example": "(int16_t)((yuksek << 8) | dusuk)",
+      "pitfall": "Using an unsigned type: a negative tilt turns into a number like 65000."
+    },
+    {
+      "term": "Tilt with atan2",
+      "definition": "Gives the angle from two sides in radians; multiplying by 180/PI gives degrees. Pitch = atan2(ax, az).",
+      "example": "For ax = 0.5 and az = 0.866, the angle is 30 degrees.",
+      "pitfall": "Forgetting to convert radians into degrees, or trusting the angle while the chip is accelerating."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h5d58-q1",
+      "kind": "numeric",
+      "prompt": "You set the MPU6050's Accel Z property to 0.25 g. In the default ±2 g range, what raw az value is read?",
+      "answer": 4096,
+      "tolerance": 1,
+      "explanation": "Raw = g x 16384 = 0.25 x 16384 = 4096. The reverse is also true: raw 4096 / 16384.0 = 0.25 g.",
+      "skills": [
+        "accel-angle",
+        "i2c-registers"
+      ]
+    },
+    {
+      "id": "m4h5d58-q2",
+      "kind": "mcq",
+      "prompt": "When you add an MPU6050 (default address) and a DS3231 RTC module to the circuit, neither of them works. What is the most likely reason?",
+      "options": [
+        "Both use the same I2C address (0x68)",
+        "The RTC does not need the SDA pin",
+        "I2C supports at most one device at a time",
+        "The MPU6050 only works with 3.3 V"
+      ],
+      "answer": 0,
+      "explanation": "The MPU6050 and the DS3231 are at address 0x68 by default; two devices on the same line cannot use the same address. If the MPU6050's AD0 pin is connected to 5 V, the address becomes 0x69. I2C supports many devices, as long as their addresses are different.",
+      "skills": [
+        "i2c-registers"
+      ]
+    },
+    {
+      "id": "m4h5d58-q3",
+      "kind": "find-bug",
+      "prompt": "With the chip lying flat, the raw ax value is 8192 (0.5 g), but the screen shows 0.00. Which line is wrong?\n\n```\nint16_t ax = oku16();\nfloat g = ax / 16384;\nSerial.println(g, 2);\n```",
+      "options": [
+        "int16_t ax = oku16();",
+        "float g = ax / 16384;",
+        "Serial.println(g, 2);",
+        "No bug, 0.00 is correct"
+      ],
+      "answer": 1,
+      "explanation": "ax and 16384 are whole numbers; in integer division 8192 / 16384 becomes 0, and when it is assigned to a float, 0.00 is printed. You should write 16384.0. int16_t is the right type.",
+      "skills": [
+        "i2c-registers",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h5d58-q4",
+      "kind": "predict-output",
+      "prompt": "The chip is speeding up horizontally without tilting: ax = 0.3 g and az = 1.0 g are read. What does this code print?\n\n```\nfloat pitch = atan2(0.3, 1.0) * 180.0 / PI;\nSerial.println(pitch, 1);\n```",
+      "options": [
+        "0.0",
+        "30.0",
+        "73.3",
+        "16.7"
+      ],
+      "answer": 3,
+      "explanation": "atan2(0.3, 1) is about 0.2915 radians; x 180/PI = 16.7 degrees. An angle came out even though the chip did not tilt, because the accelerometer cannot tell gravity apart from the chip's own acceleration.",
+      "skills": [
+        "accel-angle"
+      ]
+    },
+    {
+      "id": "m4h5d58-q5",
+      "kind": "numeric",
+      "prompt": "Accel X = 0.26 g and Accel Z = 0.97 g are read. How many degrees is pitch = atan2(ax, az) x 180 / PI?",
+      "answer": 15,
+      "tolerance": 0.5,
+      "unit": "degrees",
+      "explanation": "ax / az = 0.268, and arctan(0.268) is about 15.0 degrees (tan 15 = 0.268). The result is in degrees, not radians, because we multiplied by 180/PI.",
+      "skills": [
+        "accel-angle"
+      ]
+    }
+  ]
+}

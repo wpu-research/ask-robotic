@@ -1,0 +1,122 @@
+{
+  "concepts": [
+    {
+      "term": "RTC (real time clock)",
+      "definition": "A separate chip that counts seconds with its own crystal and keeps the date; the Arduino asks it over I2C.",
+      "example": "Your data logger writes a real time such as \"2026-03-14 08:30:10\" next to each measurement.",
+      "pitfall": "Trying to keep the time with millis(); millis() resets when the power is cut, the RTC keeps going."
+    },
+    {
+      "term": "DateTime and rtc.now()",
+      "definition": "rtc.now() gives the current time as a DateTime object; you get its parts with year(), month(), day(), hour(), minute(), second().",
+      "example": "t.hour() returns 7; to show 07 on the screen, you add the leading zero yourself.",
+      "pitfall": "Thinking month() comes back with two digits; for month 3 it returns 3, not \"03\"."
+    },
+    {
+      "term": "rtc.adjust() and lostPower()",
+      "definition": "adjust() sets the time; lostPower() tells you whether the clock has stopped.",
+      "example": "if (rtc.lostPower()) { rtc.adjust(DateTime(F(__DATE__), F(__TIME__))); } sets the time only when needed.",
+      "pitfall": "Putting the adjust(__DATE__, __TIME__) line in setup() without a condition; every time the board switches on, the time goes back to the moment of compiling."
+    },
+    {
+      "term": "I2C address 0x68",
+      "definition": "The RTC module's name on the I2C line; there cannot be two devices with the same address on the line.",
+      "example": "The RTC (0x68) and an I2C LCD (0x27) can share the same SDA and SCL wires.",
+      "pitfall": "Connecting the MPU6050 and the RTC on the same line; both use 0x68 and they clash."
+    },
+    {
+      "term": "Backup battery",
+      "definition": "A small battery in a real RTC module that keeps the clock running when the main power is cut.",
+      "example": "With the battery fitted, if you unplug it and plug it back in an hour later, the time has moved on correctly.",
+      "pitfall": "Thinking the time stays right when the battery is flat; when the power is cut, the time is forgotten and has to be set again."
+    },
+    {
+      "term": "Stopping repeats with a flag",
+      "definition": "The alarm condition stays true for a whole minute; a \"has it gone off today?\" variable makes the alarm go off once.",
+      "example": "The sonTetikGunu variable keeps the day of the month on which the alarm last went off.",
+      "pitfall": "Without a flag, restarting the alarm over and over during 07:30."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h7d66-q1",
+      "kind": "mcq",
+      "prompt": "Why is an RTC used instead of millis() so that a device can answer the question \"what time was it yesterday?\" even days later?",
+      "options": [
+        "millis() starts from zero when the board switches on and is forgotten when the power is cut; the RTC keeps the real date and time",
+        "millis() counts too slowly",
+        "The RTC always measures more precisely",
+        "millis() only counts seconds"
+      ],
+      "answer": 0,
+      "explanation": "millis() counts the time since the board switched on and resets at every restart. The RTC is a separate chip; it keeps the real date and time. Precision is not the real difference: millis() counts milliseconds, and there is no speed problem.",
+      "skills": [
+        "rtc-time"
+      ]
+    },
+    {
+      "id": "m4h7d66-q2",
+      "kind": "predict-output",
+      "prompt": "An RTC is fitted. What appears on the Serial monitor when this code runs?\n\n```\nrtc.adjust(DateTime(2026, 12, 31, 23, 59, 58));\ndelay(3000);\nDateTime t = rtc.now();\nSerial.print(t.year());  Serial.print('-');\nSerial.print(t.month()); Serial.print('-');\nSerial.println(t.day());\n```",
+      "options": [
+        "2026-12-31",
+        "2027-01-01",
+        "2027-1-1",
+        "2026-12-34"
+      ],
+      "answer": 2,
+      "explanation": "3 seconds after 23:59:58 the time is 00:00:01, and the year moves to 2027 and the date to 1 January. The RTC knows the calendar itself, so a value such as 2026-12-34 never comes out. month() and day() return numbers and do not add a leading zero; the output is 2027-1-1. To print 2027-01-01 you need two-digit formatting.",
+      "skills": [
+        "rtc-time",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d66-q3",
+      "kind": "find-bug",
+      "prompt": "Every time this program restarts, the time goes back to the moment the program was compiled. Which line is wrong?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  rtc.begin();\n  rtc.adjust(DateTime(F(__DATE__), F(__TIME__)));\n}\n```",
+      "options": [
+        "The Serial.begin(9600); line",
+        "The rtc.begin(); line",
+        "The rtc.adjust(...) line, because it runs without a condition; it should only be called if rtc.lostPower() is true",
+        "The void setup() line"
+      ],
+      "answer": 2,
+      "explanation": "Because the adjust line has no condition, every time the board switches on it pulls the time back to the moment of compiling; the RTC's job of keeping the time when the power is cut is wasted. The fix: if (rtc.lostPower()) { ... }. Serial.begin and rtc.begin do not change the time value.",
+      "skills": [
+        "rtc-time",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h7d66-q4",
+      "kind": "numeric",
+      "prompt": "The alarm program sets the clock to 07:29:55. The alarm goes off at 07:30 and ALARM_SURESI lasts 5000 ms. About how many seconds after the program starts does the LED go off?",
+      "answer": 10,
+      "tolerance": 1,
+      "unit": "seconds",
+      "explanation": "There are 5 seconds to go until the alarm time (from 07:29:55 to 07:30:00). After it goes off, it stays lit for 5000 ms, that is 5 seconds. In total about 5 + 5 = 10 seconds. The real start of the alarm can be late by up to the quarter-second check interval; that is why there is a small margin.",
+      "skills": [
+        "rtc-time",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h7d66-q5",
+      "kind": "mcq",
+      "prompt": "The same circuit has an RTC (DS3231) and an MPU6050, both at their default addresses. What happens?",
+      "options": [
+        "No problem; I2C tells each device apart automatically",
+        "Only the RTC works, the MPU6050 breaks",
+        "The speed drops to 400 kHz",
+        "They clash because both use 0x68"
+      ],
+      "answer": 3,
+      "explanation": "On I2C, devices are chosen by address. If both use 0x68, there is no telling which one will answer. The fix: as in this course, do not use the two in the same circuit, or change the MPU6050's address (0x69 with the AD0 pin).",
+      "skills": [
+        "rtc-time",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Radio group",
+      "definition": "A number from 0 to 255 that sets which channel the cards talk on. Cards in the same group hear each other.",
+      "example": "If both cards are in group 1, the number sent by Card 1 reaches Card 2.",
+      "pitfall": "Putting the two cards in different groups: the message never arrives, and no error message appears either."
+    },
+    {
+      "term": "radio send number",
+      "definition": "A block that sends a number to the other card in the group.",
+      "example": "If you put a block that sends 1 inside button A and one that sends 2 inside button B, you send two different commands.",
+      "pitfall": "Thinking the sending card will receive its own message; the sending card does not receive its own message."
+    },
+    {
+      "term": "on radio received",
+      "definition": "A hat block that runs by itself when a message from the group arrives.",
+      "example": "You can put an if block inside the hat block and show an icon depending on the number that arrives.",
+      "pitfall": "Leaving the hat block empty: even if the sender works, the receiving card does nothing."
+    },
+    {
+      "term": "received [number]",
+      "definition": "A block that, inside the receive hat block, gives the number in the message that has just arrived.",
+      "example": "The comparison received number = 1 asks whether command number 1 has arrived.",
+      "pitfall": "Using this block outside the receive hat block; there is no meaningful message there."
+    },
+    {
+      "term": "Command number",
+      "definition": "Giving a number a meaning agreed in advance, such as 1 = heart, 2 = happy face.",
+      "example": "Card 1 sends the number 2, and Card 2 shows a happy face when it sees the number.",
+      "pitfall": "Choosing the wrong comparison sign; for equality, use =."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d21-q1",
+      "kind": "mcq",
+      "prompt": "Card 1's group is 3, and Card 2's group is 4. Card 1 sends a number by radio. What happens?",
+      "options": [
+        "Card 2 receives the message",
+        "The radio shows an error message",
+        "Card 2 does not receive the message, and no error message appears",
+        "Card 1 shows the message on its own screen"
+      ],
+      "answer": 2,
+      "explanation": "A message only goes to cards in the same group. Because the groups are different, Card 2 does not receive the message. The card cannot know this, so no error message appears either; that is why the answer \"it gives an error\" is wrong.",
+      "skills": [
+        "mk-radio-group",
+        "mk-message-flow"
+      ]
+    },
+    {
+      "id": "m10h5d21-q2",
+      "kind": "predict-output",
+      "prompt": "Both cards run the same program, and both are in group 1. Button A is pressed on Card 1.\n\n```\non start: set radio group to 1\n\non button A pressed:\n    radio send number 1\n    show icon heart\n\non radio received:\n    if received number = 1 then\n        show icon happy face\n```\n\nWhat appears on the two screens?",
+      "options": [
+        "Card 1: heart, Card 2: heart",
+        "Card 1: heart, Card 2: happy face",
+        "Card 1: happy face, Card 2: happy face",
+        "Card 1: heart, Card 2: empty"
+      ],
+      "answer": 1,
+      "explanation": "Card 1 shows the heart itself inside A and sends the message. Because the sender does not receive its own message, Card 1's receive hat block does not run; the heart stays. Card 2 receives the message, and because the number is 1, it shows a happy face. No heart appears on Card 2, because the block that shows the heart is inside the button, and the button was only pressed on Card 1.",
+      "skills": [
+        "mk-message-flow",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h5d21-q3",
+      "kind": "find-bug",
+      "prompt": "When button A on Card 1 is pressed, Card 2 does nothing. Both cards are in group 1. Find the mistake.\n\n```\non start: set radio group to 1\n\non button A pressed:\n    radio send number 1\n\non radio received:\n    (empty)\n```",
+      "options": [
+        "The radio group cannot be 1",
+        "The send block should not be inside the button",
+        "The number should be 0 instead of 1",
+        "The receive hat block is empty; there is no block that handles the message"
+      ],
+      "answer": 3,
+      "explanation": "The message reaches Card 2, but because the receive hat block is empty, Card 2 does not react to it. The group numbers are the same (1), so there is no group mistake; the send block is in the right place too.",
+      "skills": [
+        "mk-message-flow",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d21-q4",
+      "kind": "numeric",
+      "prompt": "The radio group is a number between 0 and 255 (0 and 255 included). How many different groups are there?",
+      "answer": 256,
+      "tolerance": 0,
+      "unit": "groups",
+      "explanation": "There are 256 numbers from 0 to 255; because counting starts at 0, the last number (255) and the number of groups (256) are different.",
+      "skills": [
+        "mk-radio-group"
+      ]
+    },
+    {
+      "id": "m10h5d21-q5",
+      "kind": "mcq",
+      "prompt": "Where is the received [number] block best used?",
+      "options": [
+        "Inside the on radio received hat block",
+        "Inside on start, when the program opens",
+        "Only inside button hat blocks",
+        "Before the send block, anywhere"
+      ],
+      "answer": 0,
+      "explanation": "The message that arrives is found inside the receive hat block; the block reads it from there. In a button hat block or in on start there may be no message received yet, so there it does not give the number you expect.",
+      "skills": [
+        "mk-message-flow",
+        "mk-conditions"
+      ]
+    }
+  ]
+}

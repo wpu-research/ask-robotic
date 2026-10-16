@@ -1,0 +1,98 @@
+{
+  "concepts": [
+    {
+      "term": "Red team",
+      "definition": "A team that finds weak points by trying to break a system.",
+      "example": "In the workshop, you are the one who writes a document that gets past levels 0 and 1.",
+      "pitfall": "Testing on a real system without permission; this is unethical and can be illegal."
+    },
+    {
+      "term": "Blue team",
+      "definition": "A team that protects the system and builds the defence.",
+      "example": "In the workshop, you are the one who builds the set that stops the six attacks.",
+      "pitfall": "Assuming the defence will never be broken through."
+    },
+    {
+      "term": "Finding and impact",
+      "definition": "A finding is the weakness found; the impact is what would be lost if the weakness were misused.",
+      "example": "Finding: the blacklist was got round. Impact: the secret code would leak.",
+      "pitfall": "Just saying \"I found a weakness\" without writing the impact."
+    },
+    {
+      "term": "Remaining risk",
+      "definition": "The uncertainty that is left even after the defences are in place.",
+      "example": "The simulation stops six attacks, but in real models there is no guarantee.",
+      "pitfall": "Writing \"completely safe\" in the report."
+    },
+    {
+      "term": "Responsible disclosure",
+      "definition": "Telling the owner about a weakness you found, without misusing it.",
+      "example": "If you find a bug in a school app, you write to the administrator.",
+      "pitfall": "Announcing the weakness to everyone, or looking at other people's data."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h7d35-q1",
+      "kind": "mcq",
+      "prompt": "What do the red team and the blue team do?",
+      "options": [
+        "Both attack",
+        "Red attacks, blue defends",
+        "Red defends, blue writes software",
+        "Neither writes a report"
+      ],
+      "answer": 1,
+      "explanation": "The red team tries to break the system and the blue team protects it; the shared goal is to make the system safer. Although the roles look opposed, they are not enemies. A weakness the red team finds turns into a to-do list for the blue team.",
+      "skills": [
+        "ai-red-team"
+      ]
+    },
+    {
+      "id": "m7h7d35-q2",
+      "kind": "mcq",
+      "prompt": "You notice by accident that a door has been left open in a school's marks system. Which is the right thing to do?",
+      "options": [
+        "Look at the marks and test how much you can access",
+        "Show your friends and announce it to everyone",
+        "Tell the owner of the system without harming anyone",
+        "Act as if nothing happened and forget it"
+      ],
+      "answer": 2,
+      "explanation": "Responsible disclosure: telling the owner about the weakness without misusing it. Testing without permission, looking at other people's marks or announcing the weakness to everyone can do harm and can be illegal. Finding a weakness and misusing it are different things.",
+      "skills": [
+        "ai-red-team"
+      ]
+    },
+    {
+      "id": "m7h7d35-q3",
+      "kind": "numeric",
+      "prompt": "Your blue team budget is 4. You chose the \"least privilege\" measure (cost 3). With the remaining budget, how many extra measures costing 1 can you choose at most?",
+      "answer": 1,
+      "unit": "measures",
+      "tolerance": 0,
+      "explanation": "4 - 3 = 1 unit remains; that is enough for a single extra measure costing 1. For example, if the instruction hierarchy is added, the total is 4 and all six attacks in the workshop are closed.",
+      "skills": [
+        "ai-red-team",
+        "ai-defense"
+      ]
+    },
+    {
+      "id": "m7h7d35-q4",
+      "kind": "predict-output",
+      "prompt": "A simple defence table: which measure stops which attack. If the chosen measures are yasak (banned list) and onay (approval), which attacks stay open?\n\n```\nsaldirilar = {\"dogrudan\": {\"yasak\", \"hiyerarsi\"},\n              \"rol\": {\"hiyerarsi\"},\n              \"arac\": {\"onay\", \"asgari\"}}\nsecilen = {\"yasak\", \"onay\"}\nacik = [ad for ad, durduranlar in saldirilar.items()\n        if not (durduranlar & secilen)]\nprint(acik)\n```",
+      "options": [
+        "['dogrudan']",
+        "['rol']",
+        "['arac']",
+        "[]"
+      ],
+      "answer": 1,
+      "explanation": "If the intersection is empty, the attack is open. For dogrudan (direct), the intersection of {yasak, hiyerarsi} and {yasak, onay} is {yasak}: closed. For rol (role-play), the intersection of {hiyerarsi} and the chosen set is empty: open. For arac (tool), the intersection of {onay, asgari} and the chosen set is {onay}: closed. The output is ['rol']. This is a small model of the logic used to report the remaining risk.",
+      "skills": [
+        "ai-red-team",
+        "ai-defense"
+      ]
+    }
+  ]
+}

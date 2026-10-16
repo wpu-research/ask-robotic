@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Voltage divider",
+      "definition": "Taking part of a voltage from the middle point of two resistors in series: Vout = Vin × R2 / (R1 + R2).",
+      "example": "If R1 = 10 kΩ and R2 = 10 kΩ, a 5 V input gives a 2.5 V output.",
+      "pitfall": "Mixing up R1 and R2: R2 in the formula is the resistor on the GND side."
+    },
+    {
+      "term": "LDR",
+      "definition": "Light-dependent resistor. Its resistance goes down as the light increases.",
+      "example": "An LDR that is hundreds of kΩ in the dark can drop to a few hundred Ω in bright light.",
+      "pitfall": "Connecting the LDR directly between 5V and A1 without a fixed resistor: the pin is left floating and the measurement becomes meaningless."
+    },
+    {
+      "term": "Calculating the LDR's resistance",
+      "definition": "With the LDR on top, the resistance from the raw value: R_ldr = 10000 × (1024 − ham) / ham.",
+      "example": "If ham = 256, then R_ldr = 10000 × 768 / 256 = 30 000 Ω.",
+      "pitfall": "Writing 10000 instead of 10000.0: the int multiplication overflows and the result becomes meaningless."
+    },
+    {
+      "term": "Hysteresis",
+      "definition": "Using two separate thresholds for on and off; in the zone between them the state is kept.",
+      "example": "When ham drops below 250 the LED turns on; when it rises above 350 it turns off.",
+      "pitfall": "Using a single threshold: when the light is near the threshold, the LED keeps blinking on and off."
+    },
+    {
+      "term": "Light direction",
+      "definition": "If the LDR is on top and the fixed resistor at the bottom, the raw value rises as the light increases. If they swap places, the direction is reversed.",
+      "example": "LDR on the 5V side, 10 kΩ on the GND side: in the light, ham is large.",
+      "pitfall": "Swapping them and not updating the program's logic: the lamp turns off in the dark and on in the light."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d12-q1",
+      "kind": "numeric",
+      "prompt": "In a voltage divider, Vin = 5 V, the top resistor R1 = 10 kΩ and the bottom resistor R2 = 30 kΩ. How many volts are at the middle point?",
+      "answer": 3.75,
+      "tolerance": 0.01,
+      "unit": "V",
+      "explanation": "Vout = 5 × 30 / (10 + 30) = 3.75 V. Because the bottom resistor is large, the output is above the middle (2.5 V).",
+      "skills": [
+        "volt-divider",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h3d12-q2",
+      "kind": "numeric",
+      "prompt": "The LDR is on top, the 10 kΩ resistor at the bottom, and the raw value read on A1 is 256. How many ohms is the LDR's resistance? (R_ldr = 10000 × (1024 − ham) / ham)",
+      "answer": 30000,
+      "tolerance": 10,
+      "unit": "Ω",
+      "explanation": "10000 × (1024 − 256) / 256 = 10000 × 768 / 256 = 30 000 Ω. Because the raw value is below the middle (512), the LDR is bigger than the fixed resistor, so the surroundings are fairly dark.",
+      "skills": [
+        "sensor-ldr",
+        "volt-divider"
+      ]
+    },
+    {
+      "id": "m3h3d12-q3",
+      "kind": "mcq",
+      "prompt": "The LDR is between 5V and A1, and the 10 kΩ resistor between A1 and GND. What happens to the raw value on A1 when the surroundings get lighter?",
+      "options": [
+        "It decreases",
+        "It does not change",
+        "It is always 512",
+        "It increases"
+      ],
+      "answer": 3,
+      "explanation": "When the light increases, the LDR's resistance drops. When the top resistor gets smaller, the bottom resistor's share grows, and the voltage and the raw value on A1 go up. If they swap places, the direction is reversed.",
+      "skills": [
+        "sensor-ldr",
+        "volt-divider"
+      ]
+    },
+    {
+      "id": "m3h3d12-q4",
+      "kind": "predict-output",
+      "prompt": "The LED starts off. The A1 readings arrive in this order: 200, 300, 400, 300, and after each reading this code runs once. What is the LED like after the last reading?\n\n```\nif (ham < 250) {\n  digitalWrite(13, HIGH);\n} else if (ham > 350) {\n  digitalWrite(13, LOW);\n}\n```",
+      "options": [
+        "On, because the last value is 300, which is less than 350",
+        "Off, because the 400 reading turned the LED off, and since 300 is in between, the state is kept",
+        "On, because the first reading was 200",
+        "Off, because 300 < 350"
+      ],
+      "answer": 1,
+      "explanation": "200 turns the LED on. 300 is in between, so the state is kept (on). 400 > 350, so the LED turns off. The last 300 is again in between, so the LED stays off. The same value of 300 gave two different results: this is hysteresis.",
+      "skills": [
+        "sensor-ldr",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d12-q5",
+      "kind": "find-bug",
+      "prompt": "The LDR's resistance is being calculated, but the result makes no sense. (On the Arduino Uno, int is 16-bit, at most 32767.) Where is the bug?\n\n```\nint ham = analogRead(A1);\nif (ham > 0) {\n  float rLdr = 10000 * (1024 - ham) / ham;\n  Serial.println(rLdr, 0);\n}\n```",
+      "options": [
+        "A0 should be written instead of analogRead(A1)",
+        "10000 * (1024 - ham) is calculated as a whole number and overflows because it does not fit in an int",
+        "The if (ham > 0) condition is unnecessary",
+        "Serial.println cannot print decimals"
+      ],
+      "answer": 1,
+      "explanation": "10000 and (1024 - ham) are whole numbers; for most raw values the product goes above 32767 and overflows. The fix is to write 10000.0. if (ham > 0) is correct because it prevents dividing by zero, and println(rLdr, 0) works without problems.",
+      "skills": [
+        "sensor-ldr",
+        "prog-debug"
+      ]
+    }
+  ]
+}

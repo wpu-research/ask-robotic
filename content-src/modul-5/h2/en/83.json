@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Scanning",
+      "definition": "Turning the sensor to several directions with a servo and measuring the distance in each direction.",
+      "example": "Taking measurements in turn at the angles 30, 60, 90, 120 and 150°.",
+      "pitfall": "Thinking scanning is instant; 5 directions take about 1.7 seconds and the robot stands still during that time."
+    },
+    {
+      "term": "Servo angle and beam direction",
+      "definition": "Because the sensor is fixed to the servo, the servo angle sets the direction of the beam: 90° ahead, a large angle left.",
+      "example": "write(150) turns the sensor about 60° to the robot's left.",
+      "pitfall": "Mixing up left and right; the robot turns away from the open direction."
+    },
+    {
+      "term": "Find the largest",
+      "definition": "The pattern of going through the values one by one and remembering the largest so far and its position.",
+      "example": "if (cm > enIyiCm) { enIyiCm = cm; enIyiAci = ACILAR[i]; }",
+      "pitfall": "Giving a very large starting value (e.g. 1000): no measurement can beat it."
+    },
+    {
+      "term": "Servo waiting time",
+      "definition": "The time you wait after telling the servo write so that it reaches its target; 300 ms in the lesson.",
+      "example": "For five angles, the waiting alone comes to 5 × 300 = 1500 ms.",
+      "pitfall": "Measuring without waiting: the servo is on its way and the measurement is a mix of two directions."
+    },
+    {
+      "term": "From angle to turn",
+      "definition": "fark = aci - 90; if positive, left; if negative, right; time = |fark| × 5 ms.",
+      "example": "If 150° is chosen, the difference is 60° and the turning time is 300 ms.",
+      "pitfall": "Using the sign of fark the wrong way round: the robot turns away from the open direction."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h2d3-q1",
+      "kind": "mcq",
+      "prompt": "The sensor is fixed to the servo. When the servo is at write(150), where does the beam look?",
+      "options": [
+        "60° to the robot's right",
+        "Straight ahead",
+        "60° to the robot's left",
+        "Behind the robot"
+      ],
+      "answer": 2,
+      "explanation": "90° is straight ahead and a large angle corresponds to the left. 150° is 60° more than 90°, so the beam looks 60° to the left. 30° is 60° to the right.",
+      "skills": [
+        "rob-scan"
+      ]
+    },
+    {
+      "id": "m5h2d3-q2",
+      "kind": "predict-output",
+      "prompt": "At the servo angles, the measurements came out as 40, 80, 60, 80, 20 cm. What does this code print?\n\n```\nconst int ACILAR[5] = {30, 60, 90, 120, 150};\nint olcum[5] = {40, 80, 60, 80, 20};\nint enIyiAci = 90;\nint enIyiCm = -1;\nfor (int i = 0; i < 5; i++) {\n  if (olcum[i] > enIyiCm) {\n    enIyiCm = olcum[i];\n    enIyiAci = ACILAR[i];\n  }\n}\nSerial.println(enIyiAci);\n```",
+      "options": [
+        "60",
+        "120",
+        "80",
+        "90"
+      ],
+      "answer": 0,
+      "explanation": "The largest measurement is 80 cm and it appears twice (60° and 120°). Because the comparison is >, an equal value does not overwrite the first; 60° stays. Serial.println prints the angle, not the cm value, so the output is 60, not 80.",
+      "skills": [
+        "rob-scan",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m5h2d3-q3",
+      "kind": "find-bug",
+      "prompt": "During the scan the measurements get mixed up and the robot chooses the wrong direction. There is one bug in the code. What is it?\n\n```\nfor (int i = 0; i < ACI_ADET; i++) {\n  tarayici.write(ACILAR[i]);\n  int cm = medyan3();\n  if (cm > enIyiCm) {\n    enIyiCm = cm;\n    enIyiAci = ACILAR[i];\n  }\n}\n```",
+      "options": [
+        "It should be < instead of if (cm > enIyiCm)",
+        "The for loop should start from 1, not 0",
+        "mesafeOlc() should be called instead of medyan3()",
+        "There is no wait after write for the servo to reach its target"
+      ],
+      "answer": 3,
+      "explanation": "When the servo receives write, it does not reach its target instantly; without a wait, the measurement is taken while the servo is still turning and gives a mix of two directions. In the lesson there is a delay(300) here. The > comparison looks for the farthest, so it is correct; the loop must start from 0; medyan3 is better than a single measurement.",
+      "skills": [
+        "rob-scan",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h2d3-q4",
+      "kind": "numeric",
+      "prompt": "The robot chose 120°. fark = 120 - 90, and the turning time is calculated as |fark| × 5 ms. How many ms does the robot turn for?",
+      "answer": 150,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "fark = 30°, time = 30 × 5 = 150 ms. Because the difference is positive, the robot turns left. The 5 ms per degree comes from 450 ms being about 90°.",
+      "skills": [
+        "rob-scan",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h2d3-q5",
+      "kind": "numeric",
+      "prompt": "The scan is done between 30° and 150° in 15° steps (including both ends). At each angle the servo is given a 300 ms wait. How many ms does this waiting alone add up to?",
+      "answer": 2700,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "From 30 to 150 in steps of 15 there are 9 angles (30, 45, ..., 150). 9 × 300 = 2700 ms. The measuring times are added on top of this. More angles give a finer scan, but the robot stays blind and still for longer.",
+      "skills": [
+        "rob-scan",
+        "prog-timing",
+        "prog-loops-arrays"
+      ]
+    }
+  ]
+}

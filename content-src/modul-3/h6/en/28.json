@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "State",
+      "definition": "The condition the program is in at that moment. It is kept in a variable, and only one is valid at any time.",
+      "example": "In the traffic light program, KIRMIZI, YESIL and SARI are the three states.",
+      "pitfall": "Treating several state variables as independent and allowing the program to be in two states at once."
+    },
+    {
+      "term": "Transition",
+      "definition": "The condition that triggers the move from one state to another: an event or a time running out.",
+      "example": "In the KIRMIZI state, when 3000 ms are up, the program moves to YESIL.",
+      "pitfall": "Not resetting the new state's time counter (`durumBasi = simdi`) during the transition; the new state ends at once."
+    },
+    {
+      "term": "enum",
+      "definition": "A type that gives meaningful names to numbers. It gives the first name 0 and goes on adding one for each following name.",
+      "example": "Writing enum Mod { KAPALI, YAVAS, HIZLI }; makes KAPALI = 0, YAVAS = 1, HIZLI = 2.",
+      "pitfall": "Writing a bare number instead of a name and hiding the meaning of the code (`durum = 2;`)."
+    },
+    {
+      "term": "switch / case / break",
+      "definition": "A structure that runs only the matching case block depending on a variable's value. Each block ends with break;.",
+      "example": "switch (durum) { case YESIL: ...; break; }",
+      "pitfall": "Forgetting break;: the program also runs the code of the next case (fall-through)."
+    },
+    {
+      "term": "Edge detection",
+      "definition": "Looking at the button having just become pressed, not at it \"being pressed\". It is done by keeping the previous state in a variable.",
+      "example": "The code if (basili && !oncekiBasili) { ... } counts a press only once.",
+      "pitfall": "Changing state with only the `basili` condition: a button held down jumps to the next mode every round."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d28-q1",
+      "kind": "mcq",
+      "prompt": "In a state machine program, what is the job of the state variable?",
+      "options": [
+        "It holds which state the program is in right now",
+        "It holds which pin the board is connected to",
+        "It holds the time that has passed in milliseconds",
+        "It holds how many times the button has been pressed"
+      ],
+      "answer": 0,
+      "explanation": "The state variable (for example durum or mod) holds the current state; switch looks at this value to decide which block runs. The time that has passed is kept in a separate variable (durumBasi), and the number of presses in another counter.",
+      "skills": [
+        "prog-fsm"
+      ]
+    },
+    {
+      "id": "m3h6d28-q2",
+      "kind": "predict-output",
+      "prompt": "What does the Serial monitor show when this code runs?\n\n```\nenum Mod { KAPALI, YAVAS, HIZLI };\n\nvoid setup() {\n  Serial.begin(9600);\n  int mod = KAPALI;\n  for (int i = 0; i < 4; i++) {\n    mod = (mod + 1) % 3;\n  }\n  Serial.println(mod);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": 1,
+      "explanation": "The mode starts at 0; at each step it becomes 1, 2, 0, 1. After 4 presses it stays at 1 (YAVAS). The % 3 operation never lets the result be 3; when it reaches 3 it goes back to 0.",
+      "skills": [
+        "prog-fsm",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d28-q3",
+      "kind": "numeric",
+      "prompt": "A traffic light program uses these durations in its cycle: KIRMIZI 5000 ms, YESIL 4000 ms, SARI 1500 ms, then KIRMIZI again. How many milliseconds pass from the start of one red to the start of the next red?",
+      "answer": 10500,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "Add up the durations of the three states: 5000 + 4000 + 1500 = 10 500 ms. When the cycle is complete, it goes back to red.",
+      "skills": [
+        "prog-fsm",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d28-q4",
+      "kind": "find-bug",
+      "prompt": "In this two-state program, the red LED does not stay on as expected during the red phase; D13 and D11 flicker together. Where is the bug?\n\n```\nswitch (durum) {\n  case KIRMIZI:\n    digitalWrite(13, HIGH);\n    digitalWrite(11, LOW);\n    if (simdi - durumBasi >= 3000) { durum = YESIL; durumBasi = simdi; }\n  case YESIL:\n    digitalWrite(13, LOW);\n    digitalWrite(11, HIGH);\n    if (simdi - durumBasi >= 3000) { durum = KIRMIZI; durumBasi = simdi; }\n    break;\n}\n```",
+      "options": [
+        "durumBasi = simdi; should not be written",
+        "The line digitalWrite(11, LOW); is not needed",
+        "There is no break; at the end of the KIRMIZI block",
+        "The word case YESIL: is misspelt"
+      ],
+      "answer": 2,
+      "explanation": "Because the KIRMIZI block does not end with break;, the program falls through into the YESIL block and, in the same round, turns red off and green on. So the two LEDs flicker together. Adding break; at the end of the KIRMIZI block fixes the problem. The other options are lines that work correctly.",
+      "skills": [
+        "prog-fsm",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d28-q5",
+      "kind": "mcq",
+      "prompt": "In a state machine, what happens if the line durumBasi = simdi; is not written when moving to a new state?",
+      "options": [
+        "The compiler gives an error",
+        "The LEDs go off and never come back on",
+        "The program goes back to the old state and never moves on",
+        "The new state's time is worked out with the old counter, and the state can end at once"
+      ],
+      "answer": 3,
+      "explanation": "simdi - durumBasi is still worked out from the start of the old state; since the difference is already large, the new state can end one round later. There is no compile error and the program does not go back; only the durations work wrongly.",
+      "skills": [
+        "prog-fsm",
+        "prog-millis"
+      ]
+    }
+  ]
+}

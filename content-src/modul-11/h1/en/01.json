@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Stage",
+      "definition": "The screen where the game is played. In the Game Workshop it is 160 pixels wide and 120 pixels high.",
+      "example": "You set up the floor of the stage by making the background colour sky blue.",
+      "pitfall": "Thinking the stage updates by itself after you change the blocks; to see the new version you need to start the game again from the beginning."
+    },
+    {
+      "term": "Sprite",
+      "definition": "A player or object on the stage; it has its own picture, position and kind.",
+      "example": "The cat is a sprite, and so is the apple; the two can move independently of each other.",
+      "pitfall": "Thinking the position shows the sprite's top left corner; the position shows the sprite's centre."
+    },
+    {
+      "term": "Coordinates (x and y)",
+      "definition": "Two numbers that show a point on the stage: x is the distance from the left, y the distance from the top.",
+      "example": "The top left corner is x 0 y 0, the middle of the screen is the point x 80 y 60.",
+      "pitfall": "Thinking the sprite goes up as y gets bigger; y grows downwards."
+    },
+    {
+      "term": "Kind",
+      "definition": "The sprite's role in the game: such as Player, Enemy, Food.",
+      "example": "If you make the apple with the Food kind, you can later write the rule \"when the Player hits the Food\".",
+      "pitfall": "Thinking the kind is the same thing as the picture; you can also make the Apple picture with the Enemy kind."
+    },
+    {
+      "term": "Variable",
+      "definition": "A name label you give to a sprite or a value; later you reach it by that name.",
+      "example": "When you put a new sprite into the kedi variable, the kedi block points to that sprite.",
+      "pitfall": "Using the same variable name for two sprites; the variable points to the new sprite and you can never reach the first one again."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h1d1-q1",
+      "kind": "mcq",
+      "prompt": "If you make a sprite's y value bigger on the stage, what does the sprite do?",
+      "options": [
+        "It goes up",
+        "It goes right",
+        "It goes down",
+        "It gets bigger"
+      ],
+      "answer": 2,
+      "explanation": "y is the distance from the top and it grows downwards. When the x value gets bigger, the sprite goes right. To go up, you make y smaller. Neither x nor y changes the sprite's size.",
+      "skills": [
+        "game-coords"
+      ]
+    },
+    {
+      "id": "m11h1d1-q2",
+      "kind": "predict-output",
+      "prompt": "When these blocks run, what do you see on the stage?\n\n```\nwhen game starts\n  kedi = new Cat sprite, kind Player\n  move kedi to x 40 y 80\n  elma = new Apple sprite, kind Food\n  move elma to x 120 y 80\n```",
+      "options": [
+        "The apple is to the left of the cat",
+        "The apple is to the right of the cat, at the same height",
+        "The apple is right above the cat",
+        "The apple is below the cat, in line with it"
+      ],
+      "answer": 1,
+      "explanation": "The apple's x value (120) is bigger than the cat's (40), so the apple is on the right. Both sprites have a y value of 80, so they are at the same height. For the apple to be above the cat, the x values would need to be the same and the y values different.",
+      "skills": [
+        "game-coords",
+        "game-sprite"
+      ]
+    },
+    {
+      "id": "m11h1d1-q3",
+      "kind": "find-bug",
+      "prompt": "The cat should go to the point x 40 y 80, but it stays in the middle of the stage (x 80 y 60). Which is the bug?\n\n```\n1  when game starts\n2    kedi = new Cat sprite, kind Player\n3    elma = new Apple sprite, kind Food\n4    move this sprite to x 40 y 80\n5    move elma to x 120 y 80\n```",
+      "options": [
+        "Line 2: the kedi variable was never made",
+        "Line 3: the apple must be made before the cat",
+        "Line 5: the apple's x value cannot be 120",
+        "Line 4: this sprite is the sprite made last, which is the apple; the kedi variable should be used for the cat"
+      ],
+      "answer": 3,
+      "explanation": "New sprites appear in the middle of the stage. The \"this sprite\" in line 4 points to the apple, the sprite made last; the cat is never placed. Line 5 already places the apple a second time. The fix is to use the kedi variable instead of \"this sprite\" in line 4.",
+      "skills": [
+        "game-debug",
+        "game-sprite"
+      ]
+    },
+    {
+      "id": "m11h1d1-q4",
+      "kind": "numeric",
+      "prompt": "The cat is at the point x 40 y 80, the apple at the point x 120 y 80. How many pixels apart are they horizontally?",
+      "answer": 80,
+      "tolerance": 0,
+      "unit": "pixels",
+      "explanation": "The two sprites are at the same height, so the distance is only the difference of the x values: 120 − 40 = 80 pixels. The stage is 160 pixels wide, so this is half of the stage.",
+      "skills": [
+        "game-coords"
+      ]
+    },
+    {
+      "id": "m11h1d1-q5",
+      "kind": "mcq",
+      "prompt": "What is the main benefit of giving a sprite a kind (Player, Food, Enemy)?",
+      "options": [
+        "In later lessons you can write rules by kind",
+        "The sprite moves faster in the game",
+        "The sprite's colour changes by itself to match its kind",
+        "The sprite looks bigger on the stage"
+      ],
+      "answer": 0,
+      "explanation": "The kind tells you the sprite's role; it has nothing to do with speed, colour or size. In events such as collisions, the computer works out from the kind which sprite is the player and which one is the food.",
+      "skills": [
+        "game-sprite"
+      ]
+    }
+  ]
+}

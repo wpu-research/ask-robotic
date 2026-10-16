@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Acceptance criterion",
+      "definition": "A condition, written with a number and a unit, that the measured value must meet for a job to count as \"done\".",
+      "example": "For the follower robot: \"the target stays at 20 cm ± 3 cm, that is, between 17-23 cm\".",
+      "pitfall": "Loosening the criterion after the result is announced, because the robot could not meet it."
+    },
+    {
+      "term": "Measurable requirement",
+      "definition": "A requirement that has a number, a unit and a measurement method.",
+      "example": "\"Tip position error less than 5 mm at all three points; measured with a ruler.\"",
+      "pitfall": "Writing \"it should go smoothly\" or \"it should be precise\": without a number it is not a requirement, it is a wish."
+    },
+    {
+      "term": "Limit value",
+      "definition": "How the criterion behaves exactly at the threshold: strict (<) or included (<=).",
+      "example": "\"Less than 5 mm\" is strict; if you measure 5.0 you fail, and the code writes `hata < 5.0`.",
+      "pitfall": "Writing `<=` instead of `<` and counting the exact threshold as a pass."
+    },
+    {
+      "term": "Subsystem",
+      "definition": "A part that does a single job, can be tested on its own and has its own pass condition.",
+      "example": "In path A, the drive, distance and line modules; each is tried separately with a serial command.",
+      "pitfall": "Saying \"I'll look at it once it is combined\" and skipping the subsystem test: you cannot tell where the bug comes from."
+    },
+    {
+      "term": "Design document",
+      "definition": "A single page filled in before writing code: goal, requirements, subsystems, state machine, test plan, risks.",
+      "example": "Each row in the requirements table has a number next to it and a \"how is it measured\" column.",
+      "pitfall": "Leaving a box empty: it becomes the cause of an argument later."
+    },
+    {
+      "term": "Common GND",
+      "definition": "Connecting the negative terminal of the external power supply to the Arduino GND.",
+      "example": "The servos are powered with an external 5 V, and the supply's GND is joined to the Arduino GND.",
+      "pitfall": "Powering a servo or motor from the Arduino's 5 V pin: the board resets or gets damaged."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d1-q1",
+      "kind": "mcq",
+      "prompt": "Which of the following is a measurable requirement?",
+      "options": [
+        "The robot should go smoothly",
+        "The robot should be fast",
+        "It should follow the target at a distance of 20 cm ± 3 cm; the distance should be measured with a ruler",
+        "The robot should work precisely"
+      ],
+      "answer": 2,
+      "explanation": "A measurable requirement has a number, a unit and a measurement method: 20 ± 3 cm and a ruler. The others are wishes without numbers; \"smoothly\", \"fast\" and \"precisely\" can neither be proved nor disproved.",
+      "skills": [
+        "bit-requirements",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h8d1-q2",
+      "kind": "numeric",
+      "prompt": "The follower robot's criterion is 20 cm ± 3 cm (limits included). What is the largest value that the difference between the smallest and the largest distance during the follow can take, in cm?",
+      "answer": 6,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "The allowed range is between 17 cm and 23 cm. The largest difference is 23 - 17 = 6 cm; a robot that goes beyond this does not meet the criterion.",
+      "skills": [
+        "bit-acceptance"
+      ]
+    },
+    {
+      "id": "m5h8d1-q3",
+      "kind": "predict-output",
+      "prompt": "The arm criterion is \"tip position error less than 5 mm\". What appears in the serial monitor when the code below runs?\n```\nfloat hata = 5.0;\nSerial.println(hata < 5.0 ? \"GECTI\" : \"KALDI\");\n```",
+      "options": [
+        "GECTI",
+        "It gives a compile error",
+        "It prints nothing",
+        "KALDI"
+      ],
+      "answer": 3,
+      "explanation": "5.0 < 5.0 is false, so it prints \"KALDI\" (failed). \"Less than 5 mm\" is a strict statement; exactly 5.0 does not pass. If `<=` had been written, it would print GECTI (passed), and this would quietly loosen the criterion.",
+      "skills": [
+        "bit-acceptance",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d1-q4",
+      "kind": "find-bug",
+      "prompt": "The path A criterion is \"finish without colliding\". There is a single bug in the code; which is it?\n```\nint carpma = 0;\nint bitti = 0;            // robot olduğu yerde duruyor\nbool gecti = (carpma == 0 || bitti == 1);\n```",
+      "options": [
+        "It should be `carpma != 0` instead of `carpma == 0`",
+        "It should be `&&` instead of `||`; otherwise a robot that never moves also passes",
+        "`bitti` should be a bool",
+        "The variables cannot be `int`"
+      ],
+      "answer": 1,
+      "explanation": "The criterion is the combination of two conditions: no collision AND the course finished. With `||`, meeting one of them is enough; a robot standing still passes because it has not collided. `carpma != 0` would reverse the meaning.",
+      "skills": [
+        "bit-acceptance",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d1-q5",
+      "kind": "mcq",
+      "prompt": "In path A, the bumpers (D2, D3) and the encoder cannot be used at the same time. Why?",
+      "options": [
+        "Both need an analogue input",
+        "The bumpers use PWM",
+        "Both need pins D2 and D3",
+        "The encoder works only with external power"
+      ],
+      "answer": 2,
+      "explanation": "The bumpers and the encoder are connected to D2 and D3, which are the interrupt pins; two parts cannot be connected to the same pin. You need to choose one part or change the design. The analogue inputs (A0-A4) are reserved for the line sensors.",
+      "skills": [
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

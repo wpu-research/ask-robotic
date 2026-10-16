@@ -12,6 +12,7 @@ export const modul11: ModuleContent = {
       "title": "İlk oyunum",
       "project": "Gezgin kedi",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Sahne, sprite, tür ve değişkenin ne olduğunu söyleyebilir; x ve y koordinatlarıyla bir sprite'ı sahnede istediği yere koyabilir.\n2. Bir sprite'ı ok tuşlarıyla yürütebilir, hızı seçebilir ve sprite'ı ekranda tutabilir.\n3. Düğme olaylarıyla (A, B, yön tuşları) sprite'ın resmini, yönünü ve konuşmasını değiştirebilir.\n4. Bir sprite'a hız verip kenarlardan sektirebilir; derece ile yön verebilir.\n5. Küçük bir oyunu hedef listesine bölerek kurabilir, ses ve patlama gibi geri bildirimler ekleyebilir.\n\n### Haftanın planı\nHafta beş derstir. Aşağıdaki plan günde bir ders içindir. Her etkinlik Oyun Atölyesi'nde, sanal sahnede yapılır; kamera, kit ya da kâğıt gerekmez.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Sahneni kur: renk, kedi ve elma | ~20 dk | Anlatımı oku, kediyi ve elmayı sahneye koy, x ve y değerlerini değiştirip sonucu gör, mini testi çöz. |\n| 2 | Kediyi ok tuşlarıyla yürüt | ~20 dk | Tuşla hareket bloğunu kur, hızı dene, ekranda kalsın ayarını ekle. |\n| 3 | A düğmesine basınca değiş ve konuş | ~20 dk | Düğme olaylarını yaz; resim, yön ve konuşma bloklarını dene. |\n| 4 | Sekip duran top | ~20 dk | Hız ver, sekmeyi aç, çimen döşe, dereceyle yön ver. |\n| 5 | Proje: Gezgin kedi | ~30 dk | Yedi hedefi tek tek yap, A ve B yeteneklerini ekle, kendi dokunuşunu kat. |\n\n### Ön koşul kontrolü\nBu hafta özel bir bilgi gerekmez. Başlamadan önce şunları kontrol et:\n- Tarayıcıda Oyun Atölyesi açılıyor mu ve sahnenin altındaki başlat, durdur, baştan başlat düğmeleri çalışıyor mu?\n- Öğrenci fareyle blok sürükleyip birbirine takabiliyor mu?\n- Sayıları karşılaştırabiliyor mu? (Hangisi büyük, hangisi küçük? Eksi sayı nedir?)\n- Çarpma ve toplama (hız x süre) yapabiliyor mu? Ders 2 ve 4 bunu kullanır.\n\n### Kavram haritası\n- **Sahne:** sahne (160 x 120) → sprite → konum (x, y) → tür → değişken\n- **Girdi:** denetleyici → tuşla hareket → hareket biçimi → ekranda kalsın → olay (basılınca, bırakılınca)\n- **Hareket:** hız (x hızı, y hızı) → eksi ve artı → sekme → yön (derece) → döşenmiş arka plan\n- **Sprite eylemleri:** resim değiştirme → yön (sağa/sola baksın) → konuşma balonu\n- **Proje:** hedef listesi → çalıştır, dene, düzelt → geri bildirim (patlama, sarsıntı, ses)\n\n### Sık yapılan hatalar\n- **Blokları `oyun başlayınca` bloğuna bağlamamak.** Bağlı olmayan blok hiç çalışmaz.\n- **Değişiklikten sonra baştan başlatmamak.** Sahne eski hâliyle çalışır; ↺ düğmesine bas.\n- **y'nin yukarı doğru arttığını sanmak.** y aşağı doğru artar; yukarı çıkmak için y'yi küçült.\n- **`bu sprite` kullanmak.** En son oluşturulan sprite etkilenir; her sprite için ayrı değişken adı ver.\n- **İki sprite için aynı değişken adı vermek.** İlk sprite'a bir daha ulaşılamaz.\n- **Ekranda kalsın ayarını unutmak.** Sprite ekrandan çıkıp görünmez olur.\n- **Hareket biçimini yanlış seçmek.** Sağa-sola seçiliyken yukarı tuşu işe yaramaz; bu hata değildir.\n- **Derecede yukarı için 90 yazmak.** Yukarı 0, sağ 90, aşağı 180, sol 270'tir.\n- **Sekme ayarını açmamak.** Top kenardan çıkar, bir daha görünmez.\n- **Peş peşe nota koyup sıralı çalacağını sanmak.** Ses blokları birbirini beklemez; hepsi aynı anda çalar.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Sahneyi baştan, bakmadan kur: mavi fon, kedi sol alta, elma sağ üste. x ve y değerlerini önce kâğıda yaz, sonra dene.\n4. Kediyi önce hız 40, sonra hız 120 ile yürüt. 2 saniyede kaç piksel gittiğini hesapla ve gözle karşılaştır.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Tuşla hareket ile düğme olayı arasındaki fark nedir?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Gezgin kedi)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Sahne ve hareket | Kedi yürümüyor ya da ekrandan çıkıyor | Kedi yürüyor, ekranda kalıyor, yıldız sekiyor, zemin döşeli | Hızlar oyuna uygun seçilmiş ve nedeni anlatılabiliyor |\n| Olaylar | A ve B olaylarından biri çalışmıyor | A'da konuşma ve melodi, B'de patlama ve ses çalışıyor | Olaylara kendi fikirlerinden en az iki yetenek eklenmiş |\n| Hedefler | Yeşil olan hedef sayısı yarıdan az | Yedi hedefin hepsi yeşil | Hedefler bozulmadan ek yetenekler konmuş |\n| Düzen | Bloklar dağınık, değişken adları karışık | Her sprite'ın kendi değişkeni var, bloklar düzenli | Bloklar gruplanmış, ne yaptığı anlatılabiliyor |\n| Anlatım | Ne yaptığını anlatamıyor | Oyunun nasıl çalıştığını adım adım anlatıyor | Bir hatayı nasıl bulup düzelttiğini anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta çocuğun \"bilgisayara söz geçirebildiğini\" görmesi hedeflenir. İlk oyun küçük ama çalışan bir oyundur. Bloklarla programlama, yazım hatası korkusu olmadan mantığı öğretir.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şu soruları sor: \"Bu blok hangi olayın altında?\", \"Önce hangi blok çalışıyor?\", \"Sahneyi baştan başlattın mı?\"\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Etkinlik biter bitmez çocuğun oyunu size göstermesini isteyin; anlatmak en iyi tekrardır.\n- **Merak ve yaratıcılık.** \"Dene\" bölümlerindeki serbest denemeler zorunlu değildir ama en çok öğrenmenin yaşandığı yerlerdir. Sprite'ın resmini ve zeminini değiştirmek çocuğa oyunun kendisine ait olduğunu hissettirir.\n- **Güvenlik.** Bu platformdaki her şey sanaldır; kişisel bilgi girilmez. Oyunları paylaşırken isim ve fotoğraf kullanmayın.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week the learner:\n1. Can say what a stage, a sprite, a kind and a variable are; can put a sprite wherever they want on the stage with x and y coordinates.\n2. Can walk a sprite with the arrow keys, choose its speed and keep the sprite on the screen.\n3. Can change a sprite's picture, direction and speech with button events (A, B, direction keys).\n4. Can give a sprite a speed and bounce it off the edges; can give a direction in degrees.\n5. Can build a small game by splitting it into a goal list, and add feedback such as sound and explosions.\n\n### Plan for the week\nThe week has five lessons. The plan below is for one lesson a day. Every activity happens in the Game Workshop, on the virtual stage; no camera, kit or paper is needed.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | Set up your stage: colour, cat and apple | ~20 min | Read the explainer, put the cat and the apple on the stage, change the x and y values and see the result, do the mini quiz. |\n| 2 | Walk the cat with the arrow keys | ~20 min | Build the key movement block, try the speed, add the stay on screen setting. |\n| 3 | Change and talk when you press the A button | ~20 min | Write the button events; try the picture, direction and talking blocks. |\n| 4 | The ball that keeps bouncing | ~20 min | Give a speed, turn on bounce, tile with grass, give a direction in degrees. |\n| 5 | Project: The wandering cat | ~30 min | Do the seven goals one at a time, add the A and B abilities, add your own touch. |\n\n### Prerequisite check\nNo special knowledge is needed this week. Before you start, check the following:\n- Does the Game Workshop open in the browser, and do the start, stop and restart buttons under the stage work?\n- Can the learner drag blocks with the mouse and snap them together?\n- Can they compare numbers? (Which is bigger, which is smaller? What is a minus number?)\n- Can they multiply and add (speed x time)? Lessons 2 and 4 use this.\n\n### Concept map\n- **Stage:** stage (160 x 120) → sprite → position (x, y) → kind → variable\n- **Input:** controller → key movement → way of moving → stay on screen → event (pressed, released)\n- **Movement:** speed (x speed, y speed) → minus and plus → bounce → direction (degrees) → tiled background\n- **Sprite actions:** changing the picture → direction (faces right/left) → speech bubble\n- **Project:** goal list → run, try, fix → feedback (explosion, shake, sound)\n\n### Common mistakes\n- **Not connecting blocks to the `when game starts` block.** A block that is not connected never runs.\n- **Not restarting after a change.** The stage runs the old version; press the ↺ button.\n- **Thinking y grows upwards.** y grows downwards; to go up, make y smaller.\n- **Using `this sprite`.** The sprite made last is affected; give each sprite its own variable name.\n- **Giving two sprites the same variable name.** The first sprite can never be reached again.\n- **Forgetting the stay on screen setting.** The sprite leaves the screen and cannot be seen.\n- **Choosing the wrong way of moving.** With left-right chosen, the up key does nothing; this is not a bug.\n- **Writing 90 for up in degrees.** Up is 0, right 90, down 180, left 270.\n- **Not turning on the bounce setting.** The ball goes out through the edge and is never seen again.\n- **Putting notes one after another and expecting them to play in order.** Sound blocks do not wait for each other; they all play at the same time.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the questions you got wrong in the mini quizzes, then do the question again.\n3. Set up the stage again from scratch, without looking: blue background, cat at the bottom left, apple at the top right. Write the x and y values on paper first, then try them.\n4. Walk the cat first with speed 40, then with speed 120. Work out how many pixels it goes in 2 seconds and compare with what you see.\n5. Answer this question in your own words: \"What is the difference between key movement and a button event?\"\n\nThe five lessons' mini quizzes are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project assessment rubric (The wandering cat)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Stage and movement | The cat does not walk or it leaves the screen | The cat walks and stays on the screen, the star bounces, the floor is tiled | The speeds are chosen to suit the game and the learner can explain why |\n| Events | One of the A and B events does not work | Talking and the melody work on A, the explosion and sound on B | At least two abilities of their own have been added to the events |\n| Goals | Fewer than half of the goals are green | All seven goals are green | Extra abilities have been added without breaking the goals |\n| Organisation | The blocks are messy and the variable names are mixed up | Each sprite has its own variable and the blocks are tidy | The blocks are grouped and the learner can explain what they do |\n| Explanation | Cannot explain what they did | Explains step by step how the game works | Explains how they found and fixed a bug |\n\n### Note for parents and teachers\n- **Aim.** This week the aim is for the child to see that they \"can make the computer do what they say\". The first game is small, but it is a working game. Programming with blocks teaches logic without the fear of typing mistakes.\n- **How to help.** When they get stuck, instead of giving the answer, ask these questions: \"Which event is this block under?\", \"Which block runs first?\", \"Did you restart the stage?\"\n- **Time.** Spacing the lessons out, instead of doing them one after another on the same day, helps learning stick. As soon as the activity is finished, ask the child to show you the game; explaining is the best review.\n- **Curiosity and creativity.** The free experiments in the \"Try it\" sections are not compulsory, but they are where most of the learning happens. Changing the sprite's picture and floor makes the child feel that the game is their own.\n- **Safety.** Everything on this platform is virtual; no personal information is entered. When sharing games, do not use names or photos.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Sahneni kur: renk, kedi ve elma",
@@ -131,7 +132,126 @@ export const modul11: ModuleContent = {
                 "game-sprite"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Set up your stage: colour, cat and apple",
+            "problem": "Every game starts with an empty stage. Like a theatre crew that builds the set before the curtain opens, you place the players on the stage before the game starts. The screen is 160 pixels wide and 120 pixels high. Which numbers must you tell the computer to put a cat on the left side and an apple on the right side?",
+            "contentMd": "This activity happens entirely in the Game Workshop, on the virtual stage. You do not need a camera, a kit or paper.\n\n### Get to know the workshop\n- **On the left is the stage.** The game is played here. Under the stage, the ▶ button starts the game, ■ stops it and ↺ starts it again from the beginning.\n- Under the stage is the **Goals** list. Each goal turns green when it is done. When they are all green, the activity is complete.\n- **On the right are the tabs:** Blocks, JavaScript, Pictures and Map. In this lesson you will only use the **Blocks** tab.\n- The block box sits to the left of the work area as coloured categories. In this lesson these categories are open: Sprite, Game, Stage / Map, Variables and Math.\n\n### Three new ideas\n- **Sprite:** A player or object on the stage. The cat is a sprite, and so is the apple.\n- **Position:** Every sprite has an x number and a y number. x is counted from left to right, y from top to bottom. The top left corner is the point x 0, y 0. The middle of the screen is the point x 80, y 60.\n- **Kind:** Every sprite has a kind (such as Player, Enemy, Food). Later we will ask, \"What should happen when the Player hits the Food?\" The kind is what lets us say this.\n\n### Build the blocks\n1. The `when game starts` block is already in the work area. This block runs the blocks under it in order as soon as the game starts. You will attach all your blocks under it.\n2. From the **Stage / Map** category, drag the `background color [color]` block and attach it under the `when game starts` block. Click the colour square and choose light blue (sky).\n3. Open the **Variables** category and press the **Create variable...** button. Type `kedi` (cat) as its name. Then attach the `set [kedi] to [ ]` block that appears under the background block.\n4. From the **Sprite** category, take the `new [picture] sprite, kind [kind]` block and plug it into the empty slot of the variable block. Choose **Cat** from the picture list and **Player** as the kind.\n5. Place the cat. From the **Sprite** category, add the `move [this sprite] to x [80] y [60]` block underneath. Drag the `kedi` block from the **Variables** category into it, in place of `this sprite`. Type 40 for x and 80 for y.\n6. Repeat the same job for the apple: make a new variable called `elma` (apple). Connect the `new [picture] sprite, kind [kind]` block to it (picture **Apple**, kind **Food**). Then set the apple's position to x 120, y 80.\n7. Press the ▶ button. On the stage you should see a light blue background, the cat on the left and the apple on the right.\n\nExpected result: The stage is blue, the cat is on the left, the apple is on the right. All four goals are green.\n\n### How does it work?\n- Blocks run from top to bottom, in order. When the game starts, first the colour changes, then the cat appears and goes to its place, then the apple.\n- A **variable** is a name label you give to something. Saying `set [kedi] to [...]` means \"I will call the new sprite kedi.\" After that, wherever you put the `kedi` block, it points to that sprite.\n- The position shows the **centre** of the sprite. The cat is 16 pixels wide, so when you give x 40, the middle of the cat is at 40.\n- `this sprite` means the sprite you made last. So that two sprites do not get mixed up, we give each sprite a variable name.\n\n### Try it\n1. Change the cat's y value to 20. Does the cat move up? Start again from the beginning with the ↺ button instead of ▶.\n2. Choose another background colour and restart the game.\n3. Add a third sprite: a variable called `portakal` (orange), picture **Orange**, kind **Food**. Put it between the cat and the apple.\n\n### Common mistakes\n- If the blocks are not attached under the `when game starts` block, they do not run at all. Make sure the blocks are stuck to each other.\n- After you change the blocks, the stage stays as it was. Press the ↺ button to see the new version.\n- Do not use the same variable name for two sprites. If you put a sprite into the same variable a second time, the variable points to the new sprite and you can never reach the first one again.\n- If the picture list says \"(no picture)\", go to the Pictures tab, press the **Gallery** button and click the picture you want. The picture is added to your project.",
+            "question": "Why are the x values of the cat and the apple different, but their y values the same? If you wanted to put an apple right above the cat, which numbers would you change?",
+            "explainerMd": "### What you will learn in this lesson\n- What a game's stage and a sprite are\n- How to show a point on the screen with two numbers (x and y)\n- Why giving a sprite a **kind** is useful\n- That a variable is a name label given to a sprite\n- That blocks run from top to bottom, in order\n\n### What you should know first\nNothing. This lesson starts from zero. You only need to be able to drag blocks with the mouse.\n\n### Stage and sprite\nEvery game is played on a **stage**. The stage is the game's screen: in the Game Workshop it is 160 pixels wide and 120 pixels high. A **pixel** is the smallest coloured square on the screen. Every player or object on the stage is called a **sprite**. The cat is a sprite, and so are the apple and the enemy.\n\nThink of the stage as a theatre stage. First the set is built (the background colour), then the actors take their places (the sprites).\n\n### Position: x and y\nTwo numbers tell you where a sprite is. They are called **coordinates**.\n\n| Number | What it shows | When it gets bigger |\n|---|---|---|\n| x | distance from the left | the sprite moves right |\n| y | distance from the top | the sprite moves down |\n\nThe top left corner is the point x 0, y 0. The middle of the screen is the point x 80, y 60. The bottom right corner is about x 160, y 120. Watch out: y grows downwards, not upwards. It is the opposite of the graphs in your maths lessons.\n\nA sketch:\n\n```\nx: 0 ----------- 80 ----------- 160\ny=0    top left                 top right\ny=60               middle\ny=120  bottom left              bottom right\n```\n\nThe position shows the **centre** of the sprite. If you put the cat at x 40 y 80, the middle of the cat is there.\n\n### Kind and variable\nEvery sprite has a **kind**: such as Player, Enemy, Food. The kind sets the sprite's role in the game. Later, so that you can say \"give a point when the Player hits the Food\", the computer needs to know which one is the player and which one is the food.\n\nThe block that makes a sprite puts it on the stage, but it does not give it a name. To reach it later, we use a **variable**. A variable is a name label stuck on something. After you put a sprite into the `kedi` (cat) variable, everywhere you write `kedi` you mean that sprite.\n\nA small example (the blocks written as text):\n\n```\nwhen game starts\n  background color: sky\n  kedi = new Cat sprite, kind Player\n  move kedi to x 40 y 80\n  elma = new Apple sprite, kind Food\n  move elma to x 120 y 80\n```\n\n### Order matters\nThe blocks under the `when game starts` block run from top to bottom, one by one. First the sprite is made, then it is put in its place. If you mix up the order, you give a command to something that does not exist. A block that is not connected to this event block does not run at all.\n\nThe `this sprite` block points to the sprite made last. So that there is no mix-up when you have two sprites, use a separate variable for each sprite.\n\n### Summary\nThe stage is 160 x 120 pixels. A sprite is a player on the stage; its place is given by the numbers x (from the left) and y (from the top); y grows downwards. Its kind tells you the sprite's role. A variable is the name you give a sprite. Blocks run in order, and they must all be connected to the `when game starts` block.",
+            "concepts": [
+              {
+                "term": "Stage",
+                "definition": "The screen where the game is played. In the Game Workshop it is 160 pixels wide and 120 pixels high.",
+                "example": "You set up the floor of the stage by making the background colour sky blue.",
+                "pitfall": "Thinking the stage updates by itself after you change the blocks; to see the new version you need to start the game again from the beginning."
+              },
+              {
+                "term": "Sprite",
+                "definition": "A player or object on the stage; it has its own picture, position and kind.",
+                "example": "The cat is a sprite, and so is the apple; the two can move independently of each other.",
+                "pitfall": "Thinking the position shows the sprite's top left corner; the position shows the sprite's centre."
+              },
+              {
+                "term": "Coordinates (x and y)",
+                "definition": "Two numbers that show a point on the stage: x is the distance from the left, y the distance from the top.",
+                "example": "The top left corner is x 0 y 0, the middle of the screen is the point x 80 y 60.",
+                "pitfall": "Thinking the sprite goes up as y gets bigger; y grows downwards."
+              },
+              {
+                "term": "Kind",
+                "definition": "The sprite's role in the game: such as Player, Enemy, Food.",
+                "example": "If you make the apple with the Food kind, you can later write the rule \"when the Player hits the Food\".",
+                "pitfall": "Thinking the kind is the same thing as the picture; you can also make the Apple picture with the Enemy kind."
+              },
+              {
+                "term": "Variable",
+                "definition": "A name label you give to a sprite or a value; later you reach it by that name.",
+                "example": "When you put a new sprite into the kedi variable, the kedi block points to that sprite.",
+                "pitfall": "Using the same variable name for two sprites; the variable points to the new sprite and you can never reach the first one again."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h1d1-q1",
+                "kind": "mcq",
+                "prompt": "If you make a sprite's y value bigger on the stage, what does the sprite do?",
+                "options": [
+                  "It goes up",
+                  "It goes right",
+                  "It goes down",
+                  "It gets bigger"
+                ],
+                "answer": 2,
+                "explanation": "y is the distance from the top and it grows downwards. When the x value gets bigger, the sprite goes right. To go up, you make y smaller. Neither x nor y changes the sprite's size.",
+                "skills": [
+                  "game-coords"
+                ]
+              },
+              {
+                "id": "m11h1d1-q2",
+                "kind": "predict-output",
+                "prompt": "When these blocks run, what do you see on the stage?\n\n```\nwhen game starts\n  kedi = new Cat sprite, kind Player\n  move kedi to x 40 y 80\n  elma = new Apple sprite, kind Food\n  move elma to x 120 y 80\n```",
+                "options": [
+                  "The apple is to the left of the cat",
+                  "The apple is to the right of the cat, at the same height",
+                  "The apple is right above the cat",
+                  "The apple is below the cat, in line with it"
+                ],
+                "answer": 1,
+                "explanation": "The apple's x value (120) is bigger than the cat's (40), so the apple is on the right. Both sprites have a y value of 80, so they are at the same height. For the apple to be above the cat, the x values would need to be the same and the y values different.",
+                "skills": [
+                  "game-coords",
+                  "game-sprite"
+                ]
+              },
+              {
+                "id": "m11h1d1-q3",
+                "kind": "find-bug",
+                "prompt": "The cat should go to the point x 40 y 80, but it stays in the middle of the stage (x 80 y 60). Which is the bug?\n\n```\n1  when game starts\n2    kedi = new Cat sprite, kind Player\n3    elma = new Apple sprite, kind Food\n4    move this sprite to x 40 y 80\n5    move elma to x 120 y 80\n```",
+                "options": [
+                  "Line 2: the kedi variable was never made",
+                  "Line 3: the apple must be made before the cat",
+                  "Line 5: the apple's x value cannot be 120",
+                  "Line 4: this sprite is the sprite made last, which is the apple; the kedi variable should be used for the cat"
+                ],
+                "answer": 3,
+                "explanation": "New sprites appear in the middle of the stage. The \"this sprite\" in line 4 points to the apple, the sprite made last; the cat is never placed. Line 5 already places the apple a second time. The fix is to use the kedi variable instead of \"this sprite\" in line 4.",
+                "skills": [
+                  "game-debug",
+                  "game-sprite"
+                ]
+              },
+              {
+                "id": "m11h1d1-q4",
+                "kind": "numeric",
+                "prompt": "The cat is at the point x 40 y 80, the apple at the point x 120 y 80. How many pixels apart are they horizontally?",
+                "answer": 80,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "The two sprites are at the same height, so the distance is only the difference of the x values: 120 − 40 = 80 pixels. The stage is 160 pixels wide, so this is half of the stage.",
+                "skills": [
+                  "game-coords"
+                ]
+              },
+              {
+                "id": "m11h1d1-q5",
+                "kind": "mcq",
+                "prompt": "What is the main benefit of giving a sprite a kind (Player, Food, Enemy)?",
+                "options": [
+                  "In later lessons you can write rules by kind",
+                  "The sprite moves faster in the game",
+                  "The sprite's colour changes by itself to match its kind",
+                  "The sprite looks bigger on the stage"
+                ],
+                "answer": 0,
+                "explanation": "The kind tells you the sprite's role; it has nothing to do with speed, colour or size. In events such as collisions, the computer works out from the kind which sprite is the player and which one is the food.",
+                "skills": [
+                  "game-sprite"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Kediyi ok tuşlarıyla yürüt",
@@ -252,7 +372,127 @@ export const modul11: ModuleContent = {
                 "game-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Walk the cat with the arrow keys",
+            "problem": "A cat that just stands there is not a game. When the player presses a key, something has to happen. So how does the computer know which key you pressed? And what should happen when the cat reaches the edge of the screen: should it go out and disappear, or should it stop?",
+            "contentMd": "In this lesson, when the game starts, the cat is already standing in the middle of the screen. You will give it the ability to move.\n\n### Controller\nIn the Game Workshop we call the keys the player uses the **controller**. There are four direction keys (or W, A, S, D) and two buttons (A: Space or Z, B: X or Enter). Under the stage there is an on-screen version of the same keys too. You can use them on a touch screen.\n\n### Build the blocks\n1. Open the activity and press the ▶ button. Press the arrow keys. The cat does not move.\n2. Open the **Controller** category and take the `[kedi] moves [in 4 directions] with player keys, speed [60]` block. Attach it under the last block inside the `when game starts` block. Put the `kedi` block from the **Variables** category in place of `this sprite`.\n3. Press the ↺ button and walk with the arrow keys. The cat moves now.\n4. Make the cat a bit faster: set the speed to 100 and try again. The speed shows how many pixels it goes in a second.\n5. Hold the left key down for a long time. The cat goes off the screen and disappears.\n6. From the **Sprite** category, take the `[kedi] [stay on screen]: [yes]` block and attach it under the movement block. This is a setting block. From the first drop-down list choose the **stay on screen** setting, and from the second list choose the value **yes**.\n7. Press the ↺ button. Now the cat stops at the edge of the screen.\n\nExpected result: The cat walks in four directions and cannot leave the screen.\n\n### How does it work?\n- The key movement block runs once but works forever. The game looks at the keys 60 times every second and slides the cat to match. You do not write a separate loop for this.\n- There are three ways of moving: **in 4 directions**, **left-right** and **up-down**. For a platform game, left-right is enough. For a fruit basket too.\n- Without the **stay on screen** setting, the sprite can leave the world. A sprite that has left cannot be seen, but it still exists.\n\n### Try it\n1. Change the way of moving to **left-right**. Do the up and down keys still do anything?\n2. Make the speed very high, for example 200. Can you still control the cat? How do you think speed should be chosen in games?\n3. Swap the cat for another picture: find the robot or the astronaut in the Pictures tab. Change the picture in the drop-down list of the `new [picture] sprite, kind [kind]` block.\n\n### Common mistakes\n- If `this sprite` is still left inside the movement block, the sprite made last moves. There is only one sprite in this lesson, so nothing goes wrong. But once you add a second sprite, always use the variable name.\n- Do not forget to put the block inside the `when game starts` block. A block left outside does not run.\n- A change to the blocks does not show up in the running game by itself. Press ↺ first.",
+            "question": "If the cat did not stay on the screen, what problems would that cause in a game? In which games is the player allowed to leave the screen?",
+            "explainerMd": "### What you will learn in this lesson\n- That the keys the player uses are called the **controller**\n- How to move a sprite with the arrow keys\n- The idea of **speed** (how many pixels a second) and how to work it out\n- The three ways of moving and when to choose each one\n- How to stop a sprite from leaving the screen\n\n### What you should know first\nLesson 1: stage, sprite, position (x and y), variable and the `when game starts` block.\n\n### Controller: the game's remote\nThe player talks to the game through keys. All the keys in the Game Workshop together are called the **controller**. There are four direction keys (or W, A, S, D) and two buttons:\n\n| Key | On the keyboard | On a touch screen |\n|---|---|---|\n| Direction keys | arrows or W A S D | the direction keys under the stage |\n| A button | Space or Z | the A on the screen |\n| B button | X or Enter | the B on the screen |\n\n### Say it once, it works forever\nYou run the `kedi moves with player keys` block once, and its effect lasts forever. The game looks at the keys 60 times a second. If it sees a direction key held down, it slides the cat that way. You do not build a loop for this yourself; the game repeats it for you.\n\n### Speed and way of moving\n**Speed** tells you how many pixels the sprite goes in one second. If you write speed 60 in the block, the cat walks 60 pixels a second while the key is held down. Since distance = speed x time, it goes 120 pixels in 2 seconds. The stage is 160 pixels wide, so a cat with speed 60 crosses the screen in about 2.7 seconds.\n\nThere are three ways of moving:\n\n| Way | Which keys work | Good for |\n|---|---|---|\n| in 4 directions | up, down, left, right | maze, top-down game |\n| left-right | only left and right | platform game, fruit basket |\n| up-down | only up and down | vertical scrolling game |\n\nIf left-right is chosen and you press the up key, nothing happens. This is not a bug; it is the rule of the way of moving you chose.\n\n### The stay on screen setting\nIf you say nothing, the cat passes the edge of the screen and goes out. When it goes out, it is not deleted; it just cannot be seen; it is still in the game. The **stay on screen: yes** setting stops the cat at the edge of the stage. You put this setting inside `when game starts` too, under the movement block.\n\n### Summary\nThe controller is the player's keys. The key movement block is run once and stays in force for the whole game. Speed is the number of pixels travelled in a second; distance is speed times time. The way of moving decides which keys work. The stay on screen setting keeps the sprite inside the stage.",
+            "concepts": [
+              {
+                "term": "Controller",
+                "definition": "The keys the player uses to run the game: four direction keys and the A and B buttons.",
+                "example": "On a keyboard the arrows and Space act as the controller; on a phone the on-screen keys under the stage do.",
+                "pitfall": "Thinking you cannot play with keys on a touch screen; there is an on-screen version of the same keys under the stage."
+              },
+              {
+                "term": "Speed",
+                "definition": "The number that tells you how many pixels a sprite goes in one second.",
+                "example": "If the speed is 60, the cat walks 120 pixels in 2 seconds while the key is held down.",
+                "pitfall": "Choosing a speed that is too big; at values like 200 the cat goes too fast to control."
+              },
+              {
+                "term": "Way of moving",
+                "definition": "The choice in the key movement block that decides which keys work: in 4 directions, left-right or up-down.",
+                "example": "If you set the fruit basket to left-right, the up and down keys do not move the basket.",
+                "pitfall": "Thinking it is a bug that the up key does not work while left-right is chosen; it is the rule of the way you chose."
+              },
+              {
+                "term": "Stay on screen",
+                "definition": "The setting that stops a sprite at the edge of the stage.",
+                "example": "With this setting on, holding the left key down for a long time stops the cat at the left edge.",
+                "pitfall": "Forgetting to add the setting; the sprite leaves the screen and cannot be seen, but it stays in the game."
+              },
+              {
+                "term": "Frame",
+                "definition": "One step of the game, repeated 60 times a second; in every frame the keys are checked and the sprites are moved.",
+                "example": "While the right key is held down, the cat slides right by one sixtieth of its speed in every frame.",
+                "pitfall": "Trying to build a loop to keep running the movement block; the key movement block runs once and stays in force for the whole game."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h1d2-q1",
+                "kind": "mcq",
+                "prompt": "You are making a fruit basket at the bottom of the screen that only slides right and left. Which way of moving should you choose?",
+                "options": [
+                  "In 4 directions",
+                  "Left-right",
+                  "Up-down",
+                  "None; the basket cannot move with keys"
+                ],
+                "answer": 1,
+                "explanation": "The left-right way only responds to the left and right keys; the basket does not go up by mistake. If you choose in 4 directions, the up and down keys move the basket too. Up-down does the exact opposite.",
+                "skills": [
+                  "game-input"
+                ]
+              },
+              {
+                "id": "m11h1d2-q2",
+                "kind": "numeric",
+                "prompt": "The cat is standing at x 80. Its movement speed is 60 and the stay on screen setting is off. If you hold the right key down for exactly 2.5 seconds, how many pixels does the cat travel?",
+                "answer": 150,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "Distance = speed x time = 60 x 2.5 = 150 pixels. Stay on screen is off, so the cat goes all the way to x 230, outside the stage. If the setting were on, it would stop at the right edge.",
+                "skills": [
+                  "game-motion"
+                ]
+              },
+              {
+                "id": "m11h1d2-q3",
+                "kind": "predict-output",
+                "prompt": "The player holds the up key down for 1 second. What does the cat do?\n\n```\nwhen game starts\n  kedi = new Cat sprite, kind Player\n  move kedi to x 80 y 60\n  kedi moves left-right with player keys, speed 60\n```",
+                "options": [
+                  "It stays where it is",
+                  "It goes up 60 pixels",
+                  "It goes to the right",
+                  "The game gives an error and stops"
+                ],
+                "answer": 0,
+                "explanation": "The left-right way only listens to the left and right keys. The up key does nothing with this way; it does not give an error either. For it to go up, in 4 directions or up-down should have been chosen.",
+                "skills": [
+                  "game-input",
+                  "game-motion"
+                ]
+              },
+              {
+                "id": "m11h1d2-q4",
+                "kind": "find-bug",
+                "prompt": "When you press the arrow keys, the cat does not move at all. What is the bug?\n\n```\nwhen game starts\n  kedi = new Cat sprite, kind Player\n  move kedi to x 80 y 60\n\nkedi moves in 4 directions with player keys, speed 60\n```",
+                "options": [
+                  "Speed 60 is too high",
+                  "The cat's position is wrong",
+                  "The movement block is not attached inside the when game starts block, so it never runs",
+                  "Left-right should be chosen instead of in 4 directions"
+                ],
+                "answer": 2,
+                "explanation": "Blocks only run if they are connected to an event block. The movement block is on the loose line at the bottom, outside the when game starts block. The speed value and the position are not the problem; in 4 directions already listens to all the keys.",
+                "skills": [
+                  "game-debug",
+                  "game-blocks"
+                ]
+              },
+              {
+                "id": "m11h1d2-q5",
+                "kind": "mcq",
+                "prompt": "Without the stay on screen setting, the cat went out through the left edge. What happens to the cat?",
+                "options": [
+                  "It is deleted from the game",
+                  "It comes back in through the right edge",
+                  "The game stops",
+                  "It cannot be seen, but it stays in the game"
+                ],
+                "answer": 3,
+                "explanation": "When a sprite leaves the screen it is not deleted; it just cannot be seen and it is still in the game. It does not come back by itself through another edge, and it does not stop the game. To keep it on the stage, you turn on the stay on screen setting.",
+                "skills": [
+                  "game-motion",
+                  "game-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "A düğmesine basınca değiş ve konuş",
@@ -375,7 +615,129 @@ export const modul11: ModuleContent = {
                 "game-blocks"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Change and talk when you press the A button",
+            "problem": "In games some things happen all the time, and some things happen only for a moment: jumping, shooting, talking. These happen at the moment a button is pressed. Let's learn to tell the computer, \"do this the moment I press A.\" Our cat will both change shape and talk.",
+            "contentMd": "The cat walks with the arrow keys and stays on the screen. In this lesson you will give it three new abilities.\n\n### The idea of an event\nSome blocks are blocks that run **when** something happens. `when game starts` was one of them. Now we are learning a new event: when a button is pressed. Event blocks run the blocks you connect under them only when that event happens. Event blocks are not attached under another block; they stand on their own in the work area.\n\n### Build the blocks\n1. From the **Controller** category, drop the `when [A] button is [pressed]` block into the work area. Choose **A** from the drop-down list on the left. This block stands next to the `when game starts` block, as a separate block.\n2. From the **Sprite** category, take the `set [kedi] picture to [picture]` block and attach it inside the A event. Choose **Robot** as the picture. Do not forget to put the `kedi` variable in place of the cat.\n3. Inside the same event, add the `[kedi] says [Hello!] for [2] seconds` block. You can change the text and write \"Hello, I am a robot!\".\n4. Press the ▶ button and press the A key (Space or Z). The cat turns into a robot and a speech bubble appears.\n5. Now let's set the direction it faces. Add a `when [left ←] button is [pressed]` event and put the `[kedi] faces [left]` block inside it.\n6. Add one more event, `when [right →] button is [pressed]`. Put the `[kedi] faces [right]` block inside it.\n7. Press the ↺ button. When you press the left key the cat faces left, and when you press the right key it faces right.\n\nExpected result: When you press A, the cat turns into a robot and talks. When it walks left, the cat's face turns to the left.\n\n### How does it work?\n- Each event block runs separately. You can write more than one button event; they all wait at the same time.\n- A button event runs **once**: the moment you press the button. If you hold it down, it does not run again and again.\n- The `[kedi] faces [left]` block flips the picture sideways. You do not have to draw another picture.\n- The speech bubble disappears by itself after a few seconds.\n\n### Try it\n1. Add a `when [A] button is [released]` event. Turn the cat back into a cat: choose **Cat** as the picture.\n2. Write a separate event for the B button: the cat becomes a ninja (picture **Ninja**) and says \"Hiyaa!\".\n3. Make the talking time 5 seconds and watch what happens.\n\n### Common mistakes\n- If you do not attach anything inside the event block, nothing happens.\n- If you use `this sprite` in button events, the sprite made last is affected. There is only one sprite in this lesson, but use the `kedi` variable anyway.\n- Do not put the direction block inside the walking block. The key movement already takes care of walking. Separate events decide the direction.",
+            "question": "Which of the player's actions do you think should be continuous (for as long as the key is held down), and which should be one-off (the moment it is pressed)? Which would you choose for jumping?",
+            "explainerMd": "### What you will learn in this lesson\n- What an **event** is and how event blocks differ from other blocks\n- Events that run when a button is pressed and when a button is released\n- How to change a sprite's picture and the direction it faces\n- How the speech bubble works\n- How to tell continuous things from one-off things\n\n### What you should know first\nLesson 1: sprite and variable. Lesson 2: controller, key movement and the game repeating 60 times a second.\n\n### Event: \"when this happens, do that\"\nSo far the blocks have run in order. Some jobs, though, are only done **when** something happens. We call these **events**. `when game starts` is an event. Our new event: \"when the A button is pressed\".\n\nAn event block sits at the very top, like a hat. The blocks you connect under it only run when the event happens. Event blocks are not attached under another block; they stand side by side in the work area, separately. They all wait at the same time.\n\n### Pressed and released\nThere are two events for every button:\n\n| Event | When it runs |\n|---|---|\n| pressed | the moment you press the button, once |\n| released | the moment you lift your finger, once |\n\nHolding the button down does not run the event again and again. For continuous jobs like walking, there is the key movement block. For instant jobs like jumping, talking or shooting, you use an event.\n\nA timeline as a sketch:\n\n```\ntime:         ---->\nA button:     __/‾‾‾‾‾‾‾‾‾‾\\__\n                ^           ^\n          pressed       released\n          (once)        (once)\n```\n\n### Picture, direction and talking\nThere are three easy ways to change a sprite:\n\n| Block | What it does |\n|---|---|\n| `set kedi picture to Robot` | changes how the sprite looks; its kind and position stay the same |\n| `kedi faces left` | flips the picture sideways; you do not need to draw a new picture |\n| `kedi says \"Hello!\" for 2 seconds` | shows a speech bubble above it |\n\nThe speech bubble disappears by itself when the time is up. The game draws 60 frames a second, so a 2 second bubble is visible for 120 frames. When the picture changes, the sprite's kind does not change: the cat with the Robot picture is still a Player.\n\n### Always use a variable\nInside events too, use your own variable instead of `this sprite`. Otherwise the sprite made last is affected. With one sprite nothing goes wrong, but the moment you add a second sprite, the bugs begin.\n\n### Summary\nAn event is a block that runs when something happens; the blocks connected under it only run then. Button events come in two types, pressed and released, and each one runs once. You can change a sprite's picture, the direction it faces and its speech inside an event. Continuous jobs are done with key movement, instant jobs with events.",
+            "concepts": [
+              {
+                "term": "Event",
+                "definition": "A block that runs when something happens; the blocks connected under it only run then.",
+                "example": "The talking block you connect under the when A button is pressed event only runs the moment you press A.",
+                "pitfall": "Not attaching anything under the event block; that button then does nothing."
+              },
+              {
+                "term": "Pressed and released",
+                "definition": "The two events of a button: the moment your finger touches the button and the moment it is lifted. Each one runs once.",
+                "example": "When A is pressed the cat becomes a robot, and when A is released it becomes a cat again.",
+                "pitfall": "Thinking the event will run again and again while you hold the button down; it runs only once, the moment it is pressed."
+              },
+              {
+                "term": "Continuous and instant jobs",
+                "definition": "A job that lasts as long as a key is held down, like walking, is continuous; a job that is over in a moment, like talking or changing shape, is instant.",
+                "example": "For walking you use the key movement block; for changing shape you use a button event.",
+                "pitfall": "Trying to do walking with an event; an event only runs once, the moment the button is pressed, so the cat moves for a moment and stops."
+              },
+              {
+                "term": "Speech bubble",
+                "definition": "A text box shown above a sprite for the time you give.",
+                "example": "The kedi says \"Hello!\" for 2 seconds block shows the bubble for 120 frames.",
+                "pitfall": "Thinking the bubble stays forever; it disappears by itself when the time is up."
+              },
+              {
+                "term": "Changing picture and direction",
+                "definition": "Changing how a sprite looks (the set picture block) or flipping it sideways (faces right/left).",
+                "example": "For a cat walking left, the faces left block turns the cat round without drawing a new picture.",
+                "pitfall": "Thinking the sprite's kind changes when the picture changes; the cat with the Robot picture is still a Player."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h1d3-q1",
+                "kind": "mcq",
+                "prompt": "You wrote a when A button is pressed event and held A down for 3 seconds. How many times do the blocks under the event run?",
+                "options": [
+                  "3 times",
+                  "Continuously, for as long as it is held down",
+                  "Once",
+                  "They never run"
+                ],
+                "answer": 2,
+                "explanation": "The pressed event runs only once, the moment you touch the button. Holding it down does not repeat it. If you want a continuous effect, you use blocks that run continuously, like key movement.",
+                "skills": [
+                  "game-blocks",
+                  "game-input"
+                ]
+              },
+              {
+                "id": "m11h1d3-q2",
+                "kind": "predict-output",
+                "prompt": "The player presses A first, then B, and finally A again, releasing it each time. Which picture does the cat end up with?\n\n```\nwhen A button is pressed\n  set kedi picture to Robot\n\nwhen B button is pressed\n  set kedi picture to Ninja\n```",
+                "options": [
+                  "Robot",
+                  "Ninja",
+                  "Cat (the first picture)",
+                  "It gives an error; two events cannot run together"
+                ],
+                "answer": 0,
+                "explanation": "Each press runs its own event and changes the sprite's picture again. The order is Robot, Ninja, Robot, so the last picture is Robot. The two events wait separately and do not spoil each other.",
+                "skills": [
+                  "game-blocks",
+                  "game-sprite"
+                ]
+              },
+              {
+                "id": "m11h1d3-q3",
+                "kind": "find-bug",
+                "prompt": "While the cat walks left, its face still points right. Which line is the bug in?\n\n```\n1  when left ← button is pressed\n2    kedi faces right\n3  when right → button is pressed\n4    kedi faces right\n```",
+                "options": [
+                  "Line 1: it should be the up button instead of the left button",
+                  "Line 2: when left is pressed it should use the kedi faces left block",
+                  "Line 3: it should be the when right button is released event",
+                  "Line 4: it should be faces left instead of faces right"
+                ],
+                "answer": 1,
+                "explanation": "The left key's event makes the cat face right, so the cat's face is the wrong way round. To fix it, line 2 should be 'faces left'. Lines 3 and 4 are right: the right key makes the cat face right.",
+                "skills": [
+                  "game-debug",
+                  "game-blocks"
+                ]
+              },
+              {
+                "id": "m11h1d3-q4",
+                "kind": "numeric",
+                "prompt": "The kedi says \"Hello!\" for 2 seconds block ran. The game draws 60 frames a second, so for how many frames is the speech bubble visible?",
+                "answer": 120,
+                "tolerance": 0,
+                "unit": "frames",
+                "explanation": "Time x frames per second = 2 x 60 = 120 frames. The bubble disappears by itself when the time is up.",
+                "skills": [
+                  "game-sprite",
+                  "game-motion"
+                ]
+              },
+              {
+                "id": "m11h1d3-q5",
+                "kind": "mcq",
+                "prompt": "You want the cat to keep walking for as long as the right direction key is held down. Which is the right way?",
+                "options": [
+                  "Use the when right button is pressed event; holding it down repeats the event",
+                  "Use the when right button is released event",
+                  "Keep changing the cat's picture",
+                  "Use the key movement block"
+                ],
+                "answer": 3,
+                "explanation": "For continuous jobs there is the key movement block; an event only runs once, the moment the button is pressed, so holding it down does not repeat it. The released event does not make it walk either; it only runs at the moment of release.",
+                "skills": [
+                  "game-input",
+                  "game-blocks"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Sekip duran top",
@@ -497,7 +859,128 @@ export const modul11: ModuleContent = {
                 "game-blocks"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The ball that keeps bouncing",
+            "problem": "When a ball hits the wall of a room, it comes back. So how do we teach a sprite on the stage, \"go this many pixels a second, and come back when you hit the wall\"? In this lesson you will make a ball that moves on its own. You will not need to press any keys.",
+            "contentMd": "There is a ball standing in the middle of the stage. The background is a plain colour. You will make the ball move and tile the background with grass.\n\n### What does speed mean?\nSpeed is made of two numbers: the x speed goes sideways, the y speed goes up and down. Its unit is pixels per second. If the x speed is 50, the sprite goes 50 pixels to the right every second. If the x speed is a minus number, it goes left. If the y speed is positive it goes down; if it is minus, it goes up.\n\n### Build the blocks\n1. From the **Motion** category, take the `set [top] speed x [30] y [0]` block and attach it under the last block inside the `when game starts` block. Put the `top` (ball) variable in place of the `this sprite` inside it. Type 50 for x and 35 for y.\n2. Press the ▶ button. The ball goes off the screen and away.\n3. From the **Sprite** category, take the `[top] [bounce off walls/edges]: [yes]` block and attach it underneath. Choose the right options from the setting and value lists.\n4. Press the ↺ button. The ball bounces back when it hits the edge.\n5. Make the background nicer: from the **Stage / Map** category, take the `tile background with picture [picture]` block and attach it inside the `when game starts` block. Choose **Grass** as the picture.\n6. The stage is now covered with grass. The ball bounces around on it.\n\nExpected result: The ball keeps bouncing, and after 10 seconds it is still inside the screen. The background is tiled with grass.\n\n### How does it work?\n- The `set speed` block runs only once. But the speed value stays stored on the sprite, and the sprite keeps going at the same speed until another block changes it.\n- With the bounce setting on, when the sprite hits an edge or a wall, its speed turns the other way. Minus becomes plus, plus becomes minus.\n- Tiling puts a small picture (16 x 16 pixels) next to itself again and again across the whole screen.\n\n### Going in a direction\nInstead of the `set speed x y` block, you can also use the `[top] moves in direction [90] degrees at speed [40]` block. The direction is in degrees: 0 means up, 90 right, 180 down, 270 left. Change the numbers to send the ball in diagonal directions.\n\n### Try it\n1. Send the ball in the 45 degree direction at speed 60. Which corner is it heading towards?\n2. Add the `[top] stops` block and put it straight after the speed block. What does the ball do? Why?\n3. Try another tile picture: **Sand**, **Floor** or **Water**.\n\n### Common mistakes\n- If the `bounce off walls/edges` setting is off, the ball goes out through the edges and is never seen again.\n- At a very high speed, a small sprite crosses the screen in a few frames. Do not go above 400.\n- If you dropped the tiling block in the wrong place (outside the event block), it does not work.",
+            "question": "When the speed is minus, the sprite goes the opposite way. What other ways can you think of to make a sprite come back when it hits a wall in a game?",
+            "explainerMd": "### What you will learn in this lesson\n- How to give a sprite that moves on its own a **speed** (x speed and y speed)\n- Which way minus and plus speed values go\n- What the **bounce** setting does\n- How to give a direction in degrees (0 up, 90 right)\n- How to tile the background with a picture\n\n### What you should know first\nLesson 1: x and y coordinates, and that y grows downwards. Lesson 2: that speed is \"pixels per second\" and distance = speed x time. Lesson 3: that a block can run only once and its effect lasts.\n\n### Speed is two numbers\nIn lesson 2 we linked speed to the keys. Now we give the sprite its own speed. Speed has two parts: the **x speed** tells you the sideways movement, the **y speed** the up-and-down movement. Both are in pixels per second.\n\n| Speed | Direction | Why |\n|---|---|---|\n| x speed plus | right | x grows to the right |\n| x speed minus | left | x gets smaller |\n| y speed plus | down | y grows downwards |\n| y speed minus | up | y gets smaller |\n\nA minus speed means going the opposite way. You run the speed block once; the value stays stored on the sprite, and the sprite keeps going at the same speed until another block changes it. The `stops` block sets the speed to zero.\n\nA calculation: if a ball with an x speed of 40 starts at x 20, after 3 seconds it is at the point x 20 + 40 x 3 = 140.\n\n### Bounce\nThe **bounce** setting decides what happens when a sprite reaches the edge of the stage. With `bounce off walls/edges: yes` on, when the sprite hits an edge, the speed in that direction turns the other way: plus becomes minus, minus becomes plus. So the ball stays inside and keeps going back and forth. With the setting off, the sprite goes out through the edge.\n\nWatch out: the stay on screen setting from lesson 2 stops the sprite at the edge; bounce sends it back. The two do different jobs.\n\n### Direction in degrees\nInstead of giving x and y, you can also give a direction and a speed: `top moves in direction 90 degrees at speed 40`. The degrees are read like a compass:\n\n```\n        0 (up)\n270 (left)   90 (right)\n       180 (down)\n```\n\n45 degrees is exactly halfway between up and right; so it is the top right diagonal. Watch out: to go up you write 0; 90 takes it to the right.\n\n### Tiled background\nThe `tile background with picture Grass` block lays a small (16 x 16 pixel) picture side by side across the whole stage. Instead of a single colour, you get a floor such as grass, sand or water. This block must be under `when game starts` too.\n\n### Summary\nSpeed is two numbers, the x speed and the y speed; its unit is pixels per second. A minus number takes it the opposite way. Once speed is given, the sprite keeps going until it stops or its speed changes. The bounce setting reverses the speed of a sprite that hits an edge. If you want to give a direction, 0 is up, 90 right, 180 down, 270 left.",
+            "concepts": [
+              {
+                "term": "x speed and y speed",
+                "definition": "Two numbers that tell you how many pixels a sprite goes sideways and up-and-down every second.",
+                "example": "A ball with an x speed of 50 and a y speed of 35 goes right and down, so towards the bottom right.",
+                "pitfall": "Thinking a minus y speed goes down; y grows downwards, so a minus y speed takes the sprite up."
+              },
+              {
+                "term": "Bounce",
+                "definition": "The setting that makes the speed in a direction turn the other way when the sprite hits an edge or a wall.",
+                "example": "When a bouncing ball hits the right edge, its x speed turns from 50 to -50 and it goes left.",
+                "pitfall": "Forgetting to turn the bounce setting on; the ball goes out through the edge and is never seen again."
+              },
+              {
+                "term": "Direction (degrees)",
+                "definition": "The number used to send a sprite at an angle: 0 up, 90 right, 180 down, 270 left.",
+                "example": "45 degrees is halfway between up and right; the ball goes towards the top right diagonal.",
+                "pitfall": "Writing 90 for up; 90 is right, up is 0."
+              },
+              {
+                "term": "Speed stays stored",
+                "definition": "The speed block runs once but the value stays on the sprite; the sprite goes at the same speed until another block changes it.",
+                "example": "Even if you give a speed when the game starts and write nothing else, the ball keeps going.",
+                "pitfall": "Thinking you need to run the speed block again and again to keep it moving."
+              },
+              {
+                "term": "Tiled background",
+                "definition": "A floor made by laying a small picture side by side across the whole stage.",
+                "example": "When the 16 x 16 pixel grass picture is tiled, the stage is covered with grass.",
+                "pitfall": "Leaving the tiling block outside the when game starts block; it does not run and the floor stays a plain colour."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h1d4-q1",
+                "kind": "mcq",
+                "prompt": "A ball was given a y speed of -30 (x speed 0). Which way does the ball go?",
+                "options": [
+                  "Down",
+                  "Up",
+                  "Right",
+                  "Left"
+                ],
+                "answer": 1,
+                "explanation": "y grows downwards, so a minus y speed takes it up. To go right or left, you look at the x speed; here the x speed is zero.",
+                "skills": [
+                  "game-motion",
+                  "game-coords"
+                ]
+              },
+              {
+                "id": "m11h1d4-q2",
+                "kind": "numeric",
+                "prompt": "The ball is at x 20. Its x speed is 40 and its y speed 0. The ball does not reach the edge. What is the ball's x value after 3 seconds?",
+                "answer": 140,
+                "tolerance": 0,
+                "explanation": "Distance = speed x time = 40 x 3 = 120 pixels. The ball's new place is 20 + 120 = 140. If you forget to add the starting value you get 120, but the question asks for the ball's x value, not the distance.",
+                "skills": [
+                  "game-motion",
+                  "game-coords"
+                ]
+              },
+              {
+                "id": "m11h1d4-q3",
+                "kind": "predict-output",
+                "prompt": "What happens when the ball reaches the right edge?\n\n```\nwhen game starts\n  top = new Ball sprite, kind Object\n  move top to x 80 y 60\n  set top speed x 50 y 0\n  top bounce off walls/edges: yes\n```",
+                "options": [
+                  "It stops at the edge",
+                  "It leaves the screen and cannot be seen",
+                  "It comes back and goes to the left",
+                  "It starts going up"
+                ],
+                "answer": 2,
+                "explanation": "With bounce on, the speed in that direction of a sprite that hits an edge turns the other way: the value 50 becomes -50 and the ball goes left. Stopping is the job of the stay on screen setting; leaving the screen would happen with bounce off. The y speed is zero, so it does not go up.",
+                "skills": [
+                  "game-motion",
+                  "game-blocks"
+                ]
+              },
+              {
+                "id": "m11h1d4-q4",
+                "kind": "find-bug",
+                "prompt": "The ball should go up but it goes right. Which line is the bug in?\n\n```\n1  when game starts\n2    top = new Ball sprite, kind Object\n3    move top to x 80 y 100\n4    top moves in direction 90 degrees at speed 40\n```",
+                "options": [
+                  "Line 1: when game starts is the wrong event",
+                  "Line 2: the kind should be Player, not Object",
+                  "Line 3: the y value cannot be 100",
+                  "Line 4: 90 degrees means right; for up you should write 0 degrees"
+                ],
+                "answer": 3,
+                "explanation": "Degrees work like a compass: 0 up, 90 right, 180 down, 270 left. Line 4 says 90, so the ball goes right. There is nothing wrong with the kind, the event or the position values; y 100 is a valid value inside the stage.",
+                "skills": [
+                  "game-debug",
+                  "game-motion"
+                ]
+              },
+              {
+                "id": "m11h1d4-q5",
+                "kind": "mcq",
+                "prompt": "You gave the ball a speed when the game starts and wrote no other blocks. What does the ball do?",
+                "options": [
+                  "It keeps going at the same speed, because the speed stays stored",
+                  "It goes only one step and stops",
+                  "Its speed is reset to zero every frame, so it does not move",
+                  "It only moves while it is in the middle of the stage"
+                ],
+                "answer": 0,
+                "explanation": "The speed block runs once but the value stays stored on the sprite. The ball keeps going at the same speed unless another block comes along to change its speed or stop it.",
+                "skills": [
+                  "game-motion",
+                  "game-blocks"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Gezgin kedi",
@@ -621,7 +1104,130 @@ export const modul11: ModuleContent = {
                 "game-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: The wandering cat",
+            "problem": "You are about to finish your first week. You have learnt to set up a stage, make sprites, walk with keys, make something happen when a button is pressed and make an object that keeps bouncing. Now let's turn all of it into one small game. The wandering cat will use its magic abilities while it roams the grass.",
+            "contentMd": "Half of the project is ready: a grass background, a cat that walks with the arrow keys and stays on the screen, and a star that keeps bouncing around the screen. You will add the missing abilities.\n\n### What will you do?\n- A button: the cat talks and plays a melody.\n- B button: there is an explosion on the screen and a short sound.\n- Then add your own ideas.\n\n### Run it and look first\n1. Press the ▶ button to run the game. Walk the cat and watch the star bounce.\n2. In the **Blocks** tab, read the `when game starts` block. Which block does what? Find three places: the tiled background, the key movement and the bounce setting.\n\n### A button: talk and play a melody\n1. From the **Controller** category, put the `when [A] button is [pressed]` event into the work area.\n2. From the **Sprite** category, attach the `[kedi] says [Hello!] for [2] seconds` block inside it.\n3. From the **Sound** category, add the `play melody [start]` block.\n\n### B button: explosion\n1. Put in the `when [B] button is [pressed]` event.\n2. From the **Game** category, attach the `[color] explosion at x [80] y [60]` block inside it. Choose yellow as the colour.\n3. From the **Sound** category, add the `beep [300] Hz for [120] ms` block.\n\n### Run it and try it\n1. Press the ↺ button. Press the A and B keys.\n2. There are seven items in the Goals panel. Are they all green?\n\nExpected result: The cat walks and the star keeps bouncing. When you press A the cat talks and a melody plays; when you press B there is a yellow explosion on the screen.\n\n### How does it work?\nThe project uses all of this week's blocks together:\n- The `when game starts` event sets up the stage (lesson 1).\n- Key movement and the **stay on screen** setting make the cat walk (lesson 2).\n- Button events give the cat abilities (lesson 3).\n- Speed and the **bounce** setting move the star (lesson 4).\n\n### Add your own touch\nDo at least two of the following. Do not break the goals, but you can add as much as you like.\n1. When B is pressed, the cat turns into another picture (e.g. **Astronaut**). Use the `set [kedi] picture to [picture]` block.\n2. When A is pressed, write a message on the screen: `show [Hello!] on screen for [2] seconds`.\n3. Shake the screen when there is an explosion: `shake screen for [300] ms`.\n4. Write your own little melody with `play note [A4] for [250] ms`: add three notes one after another.\n5. Make the star faster or slower.\n\n### Common mistakes\n- If you do not attach anything inside an event block, that button does nothing.\n- If you write two separate events for the same button, both of them run. So that things do not get mixed up, write a single event for each button.\n- If the x and y in the explosion block are outside the screen, you cannot see the explosion. Use an x between 0 and 160 and a y between 0 and 120.",
+            "question": "Which new ability was the most fun in the game? How would a friend playing this game work out what the A and B buttons do? If you added an instructions message to the game, what would you write?",
+            "explainerMd": "### What you will learn in this lesson\n- How to plan a small game by first splitting it into a **goal list**\n- How to develop a game with the run, try, fix loop\n- **Feedback** effects such as screen shake, explosions and messages\n- How the sound blocks (beep, note, melody) work\n- How to bring several jobs together inside one event\n\n### What you should know first\nLesson 1: stage, sprite, variable, `when game starts`. Lesson 2: key movement, stay on screen. Lesson 3: button events, talking. Lesson 4: speed, bounce, tiling.\n\n### Split the game into goals\nA big job gets easier when you split it into small jobs. This project has seven goals; each one comes from one of this week's lessons:\n\n| Goal | From which lesson |\n|---|---|\n| Grass floor | Lesson 4 (tiling) |\n| The cat walks | Lesson 2 (key movement) |\n| The cat stays on the screen | Lesson 2 (stay on screen) |\n| The star keeps bouncing | Lesson 4 (speed and bounce) |\n| A: the cat talks | Lesson 3 (talking) |\n| A: a sound plays | this lesson |\n| B: explosion | this lesson |\n\nDo each goal one at a time, and after each one run the game and try it. Then if something breaks, you know the culprit is the block you added last. This is called the **run, try, fix** loop.\n\n### Feedback: let the game respond\nWhen the player does something, the game responding makes the game feel alive. We call this response feedback. You have these tools:\n\n| Block | Its effect |\n|---|---|\n| `... explosion at x ... y ...` | throws out coloured sparkles |\n| `shake screen for ... ms` | the stage shakes for a short time |\n| `show ... on screen for ... seconds` | shows a message in the middle |\n\nThe explosion's x value should be between 0 and 160 and its y value between 0 and 120, so that it is easy to see inside the stage. For the middle of the screen, x 80, y 60 is a good choice.\n\n### Sound blocks\nThere are three kinds of sound block: `beep` (a frequency and a time, Hz and ms), `play note` (a music note such as C4 or A4) and a ready-made `play melody`. The higher the frequency, the higher the sound. An important detail: each sound block starts its sound the moment it runs; the blocks do not wait for each other to finish. If you put three note blocks one after another, the three notes do not play one after another; they play at the same time. To line notes up in order, you need timing blocks; you will learn them in the coming lessons (week 2). For now, use a single note, a single beep or a ready-made melody.\n\n### Putting several jobs in one event\nYou can connect as many blocks as you like under an event. The A button can hold both the talking and the melody. But if you write two separate events for the same button, both of them run; so that things do not get mixed up, write a single event for each button and put the jobs in order inside it.\n\n### Summary\nSplit a big game into a goal list, and run it and try it after each goal. Explosions, shakes and messages let the game respond to the player; explosion coordinates must be inside the stage. Sound blocks start their sound the moment they run and do not wait for each other. Write a single event for each button and put all the jobs inside it.",
+            "concepts": [
+              {
+                "term": "Goal list",
+                "definition": "A list that splits a project into small jobs you can test one at a time.",
+                "example": "The wandering cat project splits into seven goals: floor, walking, staying on the screen, star, talking, sound and explosion.",
+                "pitfall": "Building all the blocks in one go and only trying at the end; when something breaks, you cannot find which block is the culprit."
+              },
+              {
+                "term": "Run, try, fix",
+                "definition": "The habit of running the game again from the beginning after every small change and checking the result.",
+                "example": "Straight after adding the explosion block, you press B and see the explosion.",
+                "pitfall": "Not restarting the game after changing the blocks; the stage runs the old version."
+              },
+              {
+                "term": "Feedback",
+                "definition": "The response the game shows when the player does something: an explosion, a sound, a shake or a message.",
+                "example": "When you press B, an explosion plus a short beep show the player that the key worked.",
+                "pitfall": "Choosing an explosion position outside the stage; if it is outside x 0-160, y 0-120, you cannot see the explosion."
+              },
+              {
+                "term": "Sound blocks",
+                "definition": "There are three kinds of sound block: beep (Hz and ms), note (for example A4) and a ready-made melody.",
+                "example": "A 300 Hz beep for 120 ms gives a short click; the start melody plays a three-note intro.",
+                "pitfall": "Thinking note blocks lined up one after another will play in order; each sound block starts at once, so the three notes are heard at the same time."
+              },
+              {
+                "term": "One event, many jobs",
+                "definition": "You can put as many blocks as you like in the event under a button; separate events for the same button also run.",
+                "example": "The talking and melody blocks can go together inside the A event.",
+                "pitfall": "Writing two separate events for the same button; both run and it gets confusing what causes what."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h1d5-q1",
+                "kind": "predict-output",
+                "prompt": "What do you hear when the A button is pressed?\n\n```\nwhen A button is pressed\n  play note C4 for 250 ms\n  play note E4 for 250 ms\n  play note G4 for 250 ms\n```",
+                "options": [
+                  "The three notes play one after another, 750 ms in total",
+                  "The three notes play at the same time, for about 250 ms",
+                  "Only the last note (G4) plays",
+                  "No sound comes out; you need a melody block for sound"
+                ],
+                "answer": 1,
+                "explanation": "Sound blocks start their sound the moment they run and do not wait for each other to finish. The three blocks run in the same frame, so the three notes are heard at the same time. Note blocks make a sound on their own too; a melody block is not needed.",
+                "skills": [
+                  "game-effects",
+                  "game-blocks"
+                ]
+              },
+              {
+                "id": "m11h1d5-q2",
+                "kind": "find-bug",
+                "prompt": "The explosion should happen when the B button is pressed, but it happens when A is pressed. Which is the bug?\n\n```\n1  when A button is pressed\n2    kedi says \"Hello!\" for 2 seconds\n3    yellow explosion at x 80 y 60\n4  when B button is pressed\n5    shake screen for 300 ms\n```",
+                "options": [
+                  "Line 2: the talking block should be deleted",
+                  "Line 3: it should be a red explosion instead of yellow",
+                  "Line 3: the explosion block is inside the A event; it should be moved into the B event",
+                  "Line 5: the shake block should come before the explosion"
+                ],
+                "answer": 2,
+                "explanation": "The blocks under an event only run in that event. The explosion block is connected to the A event, so it explodes when A is pressed. Once it is moved, it runs with B. There is nothing wrong with the talking, colour or shake blocks.",
+                "skills": [
+                  "game-debug",
+                  "game-blocks",
+                  "game-effects"
+                ]
+              },
+              {
+                "id": "m11h1d5-q3",
+                "kind": "numeric",
+                "prompt": "When the B button is pressed, the shake screen for 300 ms block runs. The game draws 60 frames a second, so about how many frames does the shake last?",
+                "answer": 18,
+                "tolerance": 1,
+                "unit": "frames",
+                "explanation": "300 ms = 0.3 seconds. Time x frames per second = 0.3 x 60 = 18 frames. To turn milliseconds into seconds, you divide by 1000.",
+                "skills": [
+                  "game-effects",
+                  "game-motion"
+                ]
+              },
+              {
+                "id": "m11h1d5-q4",
+                "kind": "mcq",
+                "prompt": "What happens if you write two separate event blocks for the same button (for example B)?",
+                "options": [
+                  "Both of them run",
+                  "Only the one you wrote first runs",
+                  "Only the one you wrote last runs",
+                  "Neither of them runs"
+                ],
+                "answer": 0,
+                "explanation": "Each event block waits on its own; when you press B, both are triggered. So that things do not get mixed up, it is tidier to write a single event for each button and put the jobs in order inside it.",
+                "skills": [
+                  "game-blocks",
+                  "game-input"
+                ]
+              },
+              {
+                "id": "m11h1d5-q5",
+                "kind": "mcq",
+                "prompt": "What is the safest way to develop a project with seven goals?",
+                "options": [
+                  "Build all the blocks and run it once at the end",
+                  "Do the sounds and effects first and leave the movement until last",
+                  "When there is a bug, delete all the blocks and start again",
+                  "Finish one goal, run it to try it, then move on to the next goal"
+                ],
+                "answer": 3,
+                "explanation": "Trying after every step shows you that, when something breaks, the culprit is the block you added last. Building everything at once makes the bug hard to find; deleting and starting again wastes the parts that work.",
+                "skills": [
+                  "game-design",
+                  "game-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -629,6 +1235,7 @@ export const modul11: ModuleContent = {
       "title": "Çarpışma ve skor",
       "project": "Meyve avı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Çarpışma olayını kurabilir; `bu sprite` ile `diğer sprite` farkını ve sprite türünün rolünü açıklayabilir.\n2. Skoru `yap` ve `değiştir` blokları ile yönetebilir; `eğer ... ise` ile skora bağlı karar verdirebilir.\n3. `her ... ms'de bir` olayı ve rastgele sayıyla gökten düşen nesneler üretebilir; ekran dışına çıkanları silmeyi bilir.\n4. Can sayısını yönetebilir; `can bitince` ve `süre bitince` olaylarında oyunu kendisi bitirebilir.\n5. Amaç, risk ve sondan oluşan eksiksiz bir oyun (Meyve avı) tamamlayabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Elmayı ye, hayaleti patlat | ~20 dk | Anlatımı oku, çarpışma olaylarını kur, `bu sprite` ve `diğer sprite` farkını dene, mini testi çöz. |\n| 2 | Üç meyveyi topla, oyunu kazan | ~22 dk | Skor bloklarını kur, `eğer skor = 3` ile kazanmayı ekle, `=` ve `≥` farkını dene. |\n| 3 | Gökten meyve yağsın | ~25 dk | `her 800 ms'de bir` olayını kur, rastgele konum ve hız ver, silinsin ayarını aç ve kapatıp farkı gör. |\n| 4 | Bombadan kaç, canını koru | ~22 dk | Bomba çarpışmasını, canı, sallanmayı ve `can bitince` olayını yaz. |\n| 5 | Proje: Meyve avı | ~35 dk | Eksikleri tamamla (ceza, geri sayım, kazanma, kaybetme), oyunu oyna, dengele ve ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nHafta 1'den şunlar gerekir. Başlamadan kontrol et:\n- Bloğu çalışma alanına sürükleyip başka bloğa takabiliyor mu?\n- `oyun başlayınca` içinde yeni sprite oluşturup konum verebiliyor mu?\n- Ok tuşlarıyla sprite'ı yürütebiliyor mu ve hız bloğunun x ve y'sini ayırt ediyor mu?\n- Değişken oluşturup sprite'ı onda tutabiliyor mu?\n- ▶ ve ↺ düğmelerinin ne yaptığını biliyor mu?\n\n### Kavram haritası\n- **Etkileşim:** sprite kutusu → çarpışma → çarpışma olayı → `bu sprite` / `diğer sprite` → sprite türü\n- **Durum:** skor (`yap`, `değiştir`) → koşul → `eğer ... ise` → `=` ve `≥`\n- **Üretim:** `her ... ms'de bir` → yeni sprite → rastgele sayı → hız (piksel/sn) → silinsin ayarı\n- **Risk:** can → tehlike olayı → geri bildirim (ses, sallanma) → `can bitince`\n- **Bütün oyun:** amaç + risk + son → olaylara bölme → geri sayım → `süre bitince` → denge\n\n### Sık yapılan hatalar\n- **`bu sprite` ile `diğer sprite`'ı karıştırmak.** Yanlış sprite silinir; çoğu zaman kedi kaybolur.\n- **Sprite türünü yanlış seçmek.** Olay hiç çalışmaz; hayalet ve bomba Düşman, meyve Yiyecek olmalı.\n- **`skoru yap` ile `skoru değiştir`'i karıştırmak.** İlki skoru sabitler, ikincisi ekler.\n- **Hedefi `=` ile kontrol etmek.** Skor hedefi atlarsa oyun hiç kazanılmaz; `≥` daha güvenlidir.\n- **Hız bloğunda 0'ı yanlış eksene yazmak.** Meyve düşmez, yana kayar.\n- **Ekrandan çıkanları silmemek.** Sprite sayısı birikir, 500'ü geçince oyun hata verir.\n- **`can bitince` ya da `süre bitince` içinde oyunu bitirmeyi unutmak.** Oyun sıfır canla ya da sıfır süreyle devam eder.\n- **Geri sayım bloğunu bir olayın dışında bırakmak.** Süre hiç başlamaz.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Meyve avını bakmadan yeniden kur: önce çarpışmalar, sonra skor, düşen nesneler, can, en son geri sayım.\n4. Sayıları değiştir ve tahmin et: süreyi 30 saniyeye indirirsen oyun nasıl değişir? Hedefi 12 yaparsan?\n5. Kendi cümlelerinle şu soruyu cevapla: \"Bir oyunun amacı, riski ve sonu ne işe yarar?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Meyve avı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Çarpışmalar | Meyve ya da bomba çarpışması çalışmıyor | Meyve skoru artırıyor, bomba can götürüyor ve ikisi de siliniyor | Geri bildirim eklenmiş (ses, sallanma, mesaj) |\n| Kurallar | Kazanma ya da kaybetme yok | Skor 8 olunca kazanma, can ya da süre bitince kaybetme var | Hedef ve süre oynanarak dengelenmiş |\n| Zaman | Geri sayım başlamıyor | 45 saniyelik sayım var ve süre bitince oyun kaybediliyor | Kalan süre mesajda kullanılıyor |\n| Karar | `=` ile kontrol, bilmeden yazılmış | Kazanma `≥` ile yazılmış | Neden `≥` seçtiğini anlatıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Oyunun amacını, riskini ve sonunu söylüyor | Arkadaşından aldığı geri bildirimle bir şeyi değiştiriyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta oyun yapmanın \"bir şeyin başka bir şeye değince ne olacağını tasarlamak\" olduğunu görmek; ezber değil. Hata yapmak güvenlidir, ↺ ile baştan başlanır.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine sor: \"Hangi iki şey değince bu olmalıydı?\", \"Türleri doğru seçtin mi?\", \"Skoru bu bloktan sonra mı kontrol ediyorsun?\", \"Oyunu kim bitiriyor?\"\n- **Oyun testi.** Çocuk oyununu bir arkadaşına ya da aileden birine oynatsın ve nerede zorlandığını izlesin. Oyun tasarımının yarısı oynayanı izlemektir.\n- **Süre.** Dersleri aralıklı yapmak kalıcılığı artırır. Her ders arasında kısa bir tekrar yeterlidir.\n- **Ekran süresi ve güvenlik.** Bu platformdaki her şey sanaldır ve kişisel veri istemez. Oyun yapmak oyun oynamaktan farklıdır; ara vermeyi unutmayın.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week the learner:\n1. Can set up a collision event; can explain the difference between `this sprite` and `other sprite` and the role of a sprite's kind.\n2. Can manage the score with the `set` and `change` blocks; can make a decision based on the score with `if ... do`.\n3. Can produce objects falling from the sky with the `every ... ms` event and a random number; knows how to delete the ones that leave the screen.\n4. Can manage the number of lives; can end the game themselves in the `when lives run out` and `when time runs out` events.\n5. Can complete a full game (Fruit hunt) made of a goal, a risk and an ending.\n\n### Plan for the week\nThe week has five lessons; each lesson is about 20-35 minutes. The plan is for one lesson a day.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | Eat the apple, pop the ghost | ~20 min | Read the explainer, set up the collision events, try the difference between `this sprite` and `other sprite`, do the mini quiz. |\n| 2 | Collect three fruits, win the game | ~22 min | Build the score blocks, add winning with `if score = 3`, try the difference between `=` and `≥`. |\n| 3 | Let it rain fruit | ~25 min | Set up the `every 800 ms` event, give a random position and speed, turn the delete setting on and off and see the difference. |\n| 4 | Dodge the bombs, keep your lives | ~22 min | Write the bomb collision, the lives, the shaking and the `when lives run out` event. |\n| 5 | Project: Fruit hunt | ~35 min | Fill in what is missing (penalty, countdown, winning, losing), play the game, balance it and assess it with the rubric. |\n\n### Prerequisite check\nThe following are needed from week 1. Check before you start:\n- Can they drag a block into the work area and attach it to another block?\n- Can they make a new sprite inside `when game starts` and give it a position?\n- Can they walk a sprite with the arrow keys, and can they tell apart the x and y of the speed block?\n- Can they make a variable and hold a sprite in it?\n- Do they know what the ▶ and ↺ buttons do?\n\n### Concept map\n- **Interaction:** sprite box → collision → collision event → `this sprite` / `other sprite` → sprite kind\n- **State:** score (`set`, `change`) → condition → `if ... do` → `=` and `≥`\n- **Producing:** `every ... ms` → new sprite → random number → speed (pixels/s) → delete setting\n- **Risk:** lives → danger event → feedback (sound, shaking) → `when lives run out`\n- **The whole game:** goal + risk + ending → splitting into events → countdown → `when time runs out` → balance\n\n### Common mistakes\n- **Mixing up `this sprite` and `other sprite`.** The wrong sprite is deleted; most of the time the cat disappears.\n- **Choosing the wrong sprite kind.** The event never runs; the ghost and the bomb must be Enemy, the fruit Food.\n- **Mixing up `set score to` and `change score by`.** The first fixes the score, the second adds.\n- **Checking the target with `=`.** If the score jumps over the target, the game is never won; `≥` is safer.\n- **Writing the 0 on the wrong axis in the speed block.** The fruit does not fall; it slides sideways.\n- **Not deleting the ones that leave the screen.** The number of sprites piles up, and when it passes 500 the game gives an error.\n- **Forgetting to end the game inside `when lives run out` or `when time runs out`.** The game carries on with zero lives or zero time.\n- **Leaving the countdown block outside an event.** The time never starts.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the questions you got wrong in the mini quizzes, then do the question again.\n3. Build the fruit hunt again without looking: first the collisions, then the score, the falling objects, the lives and last of all the countdown.\n4. Change the numbers and predict: if you cut the time to 30 seconds, how does the game change? And if you make the target 12?\n5. Answer this question in your own words: \"What are a game's goal, risk and ending for?\"\n\nThe five lessons' mini quizzes are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project assessment rubric (Fruit hunt)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Collisions | The fruit or bomb collision does not work | The fruit raises the score, the bomb takes a life and both are deleted | Feedback has been added (sound, shaking, message) |\n| Rules | There is no winning or losing | There is winning when the score is 8, and losing when the lives or time run out | The target and time have been balanced by playing with them |\n| Time | The countdown does not start | There is a 45 second countdown and the game is lost when the time runs out | The time left is used in a message |\n| Decision | Checked with `=`, written without understanding | Winning is written with `≥` | Explains why they chose `≥` |\n| Explanation | Cannot explain what they did | States the game's goal, risk and ending | Changes something based on feedback from a friend |\n\n### Note for parents and teachers\n- **Aim.** This week the aim is to see that making a game means \"designing what happens when one thing touches another\", not memorising. Making mistakes is safe; you start again with ↺.\n- **How to help.** When they get stuck, instead of giving the answer, ask: \"Which two things should have touched for this to happen?\", \"Did you choose the right kinds?\", \"Are you checking the score after this block?\", \"Who ends the game?\"\n- **Game testing.** Let the child have a friend or someone in the family play their game, and watch where they struggle. Half of game design is watching the player.\n- **Time.** Spacing the lessons out helps learning stick. A short review between lessons is enough.\n- **Screen time and safety.** Everything on this platform is virtual and no personal data is asked for. Making games is different from playing games; do not forget to take breaks.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "Elmayı ye, hayaleti patlat",
@@ -749,7 +1356,127 @@ export const modul11: ModuleContent = {
                 "game-kinds"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Eat the apple, pop the ghost",
+            "problem": "What makes a game a game is that something happens when objects touch each other. When the cat touches the apple, the apple disappears. When the cat touches the ghost, something explodes. How does the computer notice that two pictures are on top of each other? And how does it answer the question \"which one touched which?\"",
+            "contentMd": "On the stage there is the cat (Player), an apple (Food) at the top right and a ghost (Enemy) at the bottom right. Walk the cat with the arrow keys. For now nothing happens.\n\n### The collision event\nThe Game Workshop checks in every frame whether two sprites are on top of each other. This check is called a **collision**. You only say what should happen when which kinds collide.\n\nThere are two sprites in a collision event:\n- `this sprite`: the one of the kind at the start of the event, so the first sprite. (In this lesson, the cat.)\n- `other sprite`: the second sprite, the one that was hit. (The apple or the ghost.)\n\n### Build the blocks\n1. From the **Sprite** category, drop the `when a [Player] sprite hits a [Food] sprite` event block into the work area.\n2. From the same category, take the `delete sprite [this sprite]` block and attach it inside the event. Drag the `other sprite` block (in the same category) into it, in place of `this sprite`. This way the apple is deleted, not the cat.\n3. Press the ▶ button and take the cat to the apple. The apple disappears.\n4. Bring a second event block: `when a [Player] sprite hits a [Enemy] sprite`.\n5. Put the `make [other sprite] explode` block inside it.\n6. Press the ↺ button and this time visit the ghost. The ghost explodes into sparkles.\n7. If you like, also add the `play melody [point]` block from the **Sound** category to the apple event.\n\nExpected result: When you touch the apple, the apple disappears. When you touch the ghost, the ghost explodes and disappears.\n\n### How does it work?\n- The kinds in the event block give the sprite's **kind**, not its **name**. If there are many sprites of the same kind, it works for all of them.\n- The collision event runs **once**, the moment the two sprites come on top of each other. Even if the cat stays on top of the apple, it does not run again and again in every frame.\n- The `make ... explode` block is the version of the `delete sprite` block with an effect. It removes the sprite and throws out sparkles.\n\n### Try it\n1. Delete the cat: delete `this sprite` and see what happens. Then fix it.\n2. Make the cat explode instead of the ghost. Which block must you change?\n3. Add a second apple to the stage (with **Create variable...** make `elma2`, then `new [Apple] sprite, kind [Food]` and a position). Does the same event work for both apples?\n\n### Common mistakes\n- If you put `this sprite` instead of `other sprite`, the wrong sprite is deleted. Most of the time the cat is deleted and the game looks as if it has ended.\n- If the sprite's kind is wrong, the event never runs. The apple's kind must be **Food** and the ghost's kind **Enemy**.\n- Do not put the event block inside the `when game starts` block. An event block always stands on its own in the work area.",
+            "question": "A collision does not only mean \"touching\": what can two things touching each other lead to in a game? If you designed a game, which two sprites would you want to collide, and what would you want to come of it?",
+            "explainerMd": "### What you will learn in this lesson\n- How the computer works out that two pictures are touching\n- The **collision event** block and the difference between `this sprite` and `other sprite` inside it\n- Why the sprite's **kind** matters\n- How to link several responses to one collision (deleting, exploding, playing a sound)\n\n### What you should know first\nFrom lesson 1, making a sprite and its position; from lesson 2, walking the player with the arrow keys; from lesson 4, giving a speed. From lesson 3, the logic of event blocks (blocks that run when something happens).\n\n### Every sprite has an invisible box\nThe Game Workshop draws an invisible **rectangle** around every sprite, wrapping the filled part of the picture. If the insides of two rectangles overlap, the two sprites count as having **collided**. The empty, see-through corners of the picture do not count. This check is done 60 times a second; you only hear the result.\n\n```\nCat box:    x = 70..86\nApple box:  x = 80..90   -> 80 to 86 is shared, there is a collision\nApple box:  x = 100..110 -> nothing shared, no collision\n```\n\n### The collision event and the two sprites\nThe block reads like this: \"when a Player hits a Food, do these things.\" Inside it there are two special sprites:\n\n| Block | What it means | In this lesson |\n|---|---|---|\n| `this sprite` | the one of the event's first kind | the cat |\n| `other sprite` | the one of the event's second kind | the apple or the ghost |\n\nIf you want to delete the apple, you delete `other sprite`. If you delete `this sprite`, the cat disappears.\n\n### A kind is not a name\n\"Player\" or \"Food\" in the event block is a sprite's **kind**. Even if you had ten apples of the same kind, one event block works for all of them. If you choose the wrong kind, the event never runs, because there is no sprite of that kind on the stage.\n\n### Several responses to the same collision\nYou can put as many blocks as you like inside the event, one under another: first a sound, then the deleting, for example. The blocks run in order from top to bottom. The `make ... explode` block is the version of deleting with sparkles.\n\n### One touch, one response\nThe event runs **once**, the moment the two sprites start touching. Even if the cat is still standing on the apple, it does not run again in every frame. If they separate and touch again, it runs again.\n\n### Summary\nEvery sprite has an invisible box; when the boxes overlap, there is a collision. The collision event links two kinds, and inside it there are `this sprite` and `other sprite`. To delete or explode something, you need to choose the right sprite. The event runs once, at the moment of touching.",
+            "concepts": [
+              {
+                "term": "Collision",
+                "definition": "What happens when the invisible boxes of two sprites overlap. The game checks this in every frame.",
+                "example": "When the cat's box goes into the apple's box, the game says \"they collided\" and runs the event block.",
+                "pitfall": "Thinking the empty corners of the pictures count for collisions too; only the box wrapping the filled part of the picture counts."
+              },
+              {
+                "term": "Collision event",
+                "definition": "The \"when a [kind] hits a [kind]\" block; it runs the blocks inside it once, the moment the two kinds touch.",
+                "example": "When a Player hits a Food, delete the apple.",
+                "pitfall": "Putting the event block inside the when game starts block; an event block stands on its own in the work area."
+              },
+              {
+                "term": "this sprite and other sprite",
+                "definition": "The two sprites in a collision event: \"this sprite\" is the one of the first kind, \"other sprite\" the one of the second kind.",
+                "example": "When a Player hits a Food, \"delete sprite other sprite\" deletes the apple, and \"delete sprite this sprite\" deletes the cat.",
+                "pitfall": "Putting \"this sprite\" when you want to delete the apple; the cat disappears and the game looks as if it has ended."
+              },
+              {
+                "term": "Sprite kind",
+                "definition": "The label that says which group a sprite belongs to (Player, Food, Enemy). Events use the kind, not the name.",
+                "example": "If all ten apples on the stage are of the Food kind, one event block works for all of them.",
+                "pitfall": "Forgetting to make the ghost's kind Enemy; the event written for Enemy never runs."
+              },
+              {
+                "term": "Explode",
+                "definition": "The block that deletes a sprite and throws out sparkles; the version of the \"delete\" block with an effect.",
+                "example": "When a Player hits an Enemy, make other sprite explode.",
+                "pitfall": "Using this block with \"this sprite\"; the one that explodes is your own player."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h2d6-q1",
+                "kind": "mcq",
+                "prompt": "How does the game know that two sprites have collided?",
+                "options": [
+                  "If the two pictures have the same name",
+                  "When the sprites' invisible boxes overlap",
+                  "If the two sprites go at the same speed",
+                  "When the player presses a key"
+                ],
+                "answer": 1,
+                "explanation": "Every sprite has an invisible box wrapping the filled part of its picture; when the boxes overlap, there is a collision. The name, the speed or the keys do not decide the collision.",
+                "skills": [
+                  "game-collision"
+                ]
+              },
+              {
+                "id": "m11h2d6-q2",
+                "kind": "predict-output",
+                "prompt": "The cat's kind is Player and the apple's kind is Food. What happens when the cat touches the apple?\n\n```\nwhen a Player hits a Food:\n  delete this sprite\n```",
+                "options": [
+                  "The apple disappears",
+                  "The cat disappears",
+                  "Both disappear",
+                  "Nothing happens"
+                ],
+                "answer": 1,
+                "explanation": "\"this sprite\" is the event's first kind; the first kind is Player, so the one deleted is the cat. To delete the apple you would need \"other sprite\".",
+                "skills": [
+                  "game-collision",
+                  "game-kinds"
+                ]
+              },
+              {
+                "id": "m11h2d6-q3",
+                "kind": "find-bug",
+                "prompt": "The ghost's kind is Enemy. The cat touches the ghost but the ghost does not explode. Where is the bug?\n\n```\nwhen a Player hits a Food:\n  make other sprite explode\n```",
+                "options": [
+                  "It should be \"this sprite\" instead of \"other sprite\"",
+                  "The explode block is not used like this",
+                  "The event's second kind is Food; the ghost is an Enemy, so the event does not run",
+                  "The cat's kind should not be Player"
+                ],
+                "answer": 2,
+                "explanation": "The event only runs when the two kinds it names touch. The second kind should have been Enemy. \"other sprite\" is the right choice; making it \"this sprite\" would explode the cat.",
+                "skills": [
+                  "game-kinds",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d6-q4",
+                "kind": "numeric",
+                "prompt": "There is one event: when a Player hits a Food, delete the apple. On the stage there are 3 apples (Food) and 2 ghosts (Enemy). The cat touches each of them in turn and stays on each one for 5 seconds. How many times does the event run?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "times",
+                "explanation": "The event only runs for a collision with the Food kind, and it is triggered once, at the moment of touching; staying on top does not trigger it again. There are three apples and no event for the ghosts: 3 times.",
+                "skills": [
+                  "game-collision",
+                  "game-kinds"
+                ]
+              },
+              {
+                "id": "m11h2d6-q5",
+                "kind": "mcq",
+                "prompt": "There are 6 apples on the stage and they are all of the Food kind. How many collision event blocks must you write to delete every apple with the cat?",
+                "options": [
+                  "6, one for each apple",
+                  "1 is enough",
+                  "2",
+                  "As many as there are apple pictures"
+                ],
+                "answer": 1,
+                "explanation": "Events use the sprite's kind, not its name. However many sprites of the same kind there are, one event works for all of them.",
+                "skills": [
+                  "game-kinds"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Üç meyveyi topla, oyunu kazan",
@@ -870,7 +1597,127 @@ export const modul11: ModuleContent = {
                 "game-conditions"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Collect three fruits, win the game",
+            "problem": "In games we collect points. But where does the computer keep the points? And which question does it need to ask so that it can say \"You collected three fruits, you win!\"? In this lesson you will make a game that counts numbers.",
+            "contentMd": "On the stage there are the cat and three fruits (apple, orange, cherry). They are all of the **Food** kind. The score starts at zero, but nothing makes it go up.\n\n### Score\nThe game has a ready-made number called the **score**. It is shown in the top corner. Three blocks do the job:\n- `set score to [0]`: sets the score to the number you choose.\n- `change score by [1]`: adds to the score. If you give a minus number, it takes away.\n- `score`: gives the score as a number; you can use it in a condition.\n\n### Build the blocks\n1. From the **Sprite** category, put in the `when a [Player] sprite hits a [Food] sprite` event.\n2. Attach the `change score by [1]` block from the **Game** category inside it.\n3. Underneath, add `delete sprite [other sprite]` (`other sprite` instead of `this sprite`).\n4. From the **Sound** category, add the `play melody [point]` block.\n5. Press the ▶ button and collect the three fruits. The score becomes 3.\n6. Now let's add winning. From the **Logic** category, take the `if ... do` block and attach it at the very bottom of the event.\n7. Drop the **=** comparison block from the **Logic** category into the condition slot. Put the `score` block from the **Game** category into the left slot, and the number 3 from the **Math** category into the right slot.\n8. Inside the `if` block, attach these in order: `show [You got them all!] on screen for [2] seconds`, `play melody [victory]`, `end game: [you win]`.\n9. Press the ↺ button and finish the game. The words YOU WIN! appear on the screen.\n\nExpected result: Each fruit adds 1 to the score and a melody plays. After the third fruit a message appears, the victory melody plays and the game is won.\n\n### How does it work?\n- The event runs from the start at every collision. At the first fruit the score becomes 1, the `if` question asks \"is the score 3?\" and the answer is no. At the third one the answer is yes and the blocks inside it run.\n- The `if ... do` block asks a **question**. If the answer is yes, the blocks inside it run; if it is no, they are skipped.\n- The **=** block compares two numbers. You can also choose other signs from the drop-down list: such as greater than or less than.\n- When the game ends, the Game Workshop shows an end screen. The A button starts the game again.\n\n### Try it\n1. Change the comparison from **=** to **≥**. Does it still work after the third fruit? And why is **≥** sometimes safer?\n2. Make each fruit give 10 points, and make the score needed to win 30. Which two numbers must you change?\n3. Add the `[kedi] says [OK!] for [1] seconds` block so that the cat says it when it gobbles up a fruit.\n\n### Common mistakes\n- `set score to [1]` and `change score by [1]` are not the same thing. The first fixes the score at 1, the second adds 1. If the score never goes up, check this.\n- If you write text instead of 3 on the right side of the condition, the comparison does not work. Use the number block in the Math category.\n- Do not forget to reset the score: make sure `set score to [0]` is inside `when game starts`.",
+            "question": "Why are points important in games? How does the score going up make the player feel? If you said \"collect as many as you can in 30 seconds\" instead of \"collect them all\", how would the game change?",
+            "explainerMd": "### What you will learn in this lesson\n- Where the number called the **score** lives, and its three blocks\n- The difference between `set` and `change`\n- How a **condition** and the `if ... do` block make a decision\n- When the `=` and `≥` comparisons behave differently\n\n### What you should know first\nFrom lesson 6, the collision event, `other sprite` and deleting. From lesson 3, event blocks. From lesson 1, attaching one block inside another.\n\n### The score is a number box\nInside the game there is a ready-made box called the **score**; a number sits inside it. You touch it with three blocks:\n\n| Block | What it does | Result when the score is 2 |\n|---|---|---|\n| `set score to [5]` | Puts 5 in the box and wipes the old one | 5 |\n| `change score by [1]` | Adds 1 to the number in the box | 3 |\n| `change score by [-1]` | Takes away 1 | 1 |\n| `score` | Reads the number; used in a condition | 2 |\n\nIf you write `set score to [0]` at the start of the game, every game starts clean.\n\n### A condition is a question\nA **condition** is a question whose answer is \"yes\" or \"no\": such as \"is the score 3?\". The `if ... do` block asks the question. If the answer is yes, the blocks inside it run; if it is no, they are skipped.\n\n```\non collision (Player, Food):\n  change score by 1\n  delete other sprite\n  if score = 3:\n    show \"You got them all!\" on screen\n    end game: you win\n```\n\nAt the first fruit the score is 1; the question comes out \"no\" and the inside is skipped. At the third fruit the score becomes 3, the answer comes out \"yes\" and the game is won.\n\n### Comparison signs\n| Sign | What it means | When score = 4 |\n|---|---|---|\n| `=` | exactly equal | score = 3 no |\n| `≥` | greater than or equal | score ≥ 3 yes |\n| `<` | less than | score < 3 no |\n\nIf the score goes up by 1 each time, `=` is enough. But if a fruit gives 2 points, the score can jump over 3 (2, 4...). So when you check the target number, `≥` is safer.\n\n### Sound is feedback\nThe `point` melody tells the player \"you did it right\". Sound lets you feel what happened even when you are not looking at the screen.\n\n### Summary\nThe score is a number box inside the game. `set` puts in a value, `change` adds. The `if` block asks a condition and, if the answer is yes, runs the blocks inside it. To find out whether the target has been reached, `≥` is often safer than `=`.",
+            "concepts": [
+              {
+                "term": "Score",
+                "definition": "The ready-made number inside the game that is shown on the screen; it counts how well the player is doing.",
+                "example": "Each fruit eaten adds 1 to the score; after three fruits the score is 3.",
+                "pitfall": "Forgetting to reset the score at the start of the game; the game's first score may start differently from what you expect."
+              },
+              {
+                "term": "set score and change score",
+                "definition": "\"set\" puts a fixed value in the score; \"change\" adds to or takes away from the current score.",
+                "example": "When the score is 2, \"set score to 5\" makes it 5, and \"change score by 1\" makes it 3.",
+                "pitfall": "Using \"set score to 1\" in the collision event; the score gets stuck at 1."
+              },
+              {
+                "term": "Condition",
+                "definition": "A question whose answer is yes or no; such as \"is the score 3?\".",
+                "example": "The condition \"score = 3\" is yes when the score is 3, and no when it is 2.",
+                "pitfall": "Writing text instead of a number next to the comparison; the number block in the Math category should be used."
+              },
+              {
+                "term": "if",
+                "definition": "The block that asks the condition; if the answer is yes it runs the blocks inside it, if it is no it skips them.",
+                "example": "If score ≥ 3, end game: you win.",
+                "pitfall": "Putting the block outside the collision event; when the score changes, nobody asks the question."
+              },
+              {
+                "term": "Comparison signs",
+                "definition": "= asks about being exactly equal, ≥ about being greater than or equal, < about being less than.",
+                "example": "If each fruit gives 2 points, the score goes 2, 4, 6; \"score ≥ 5\" says yes at 6, \"score = 5\" never says yes.",
+                "pitfall": "Checking the target with = and forgetting that the score can jump over that number."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h2d7-q1",
+                "kind": "predict-output",
+                "prompt": "The cat eats two fruits (the score starts at 0). What is the score?\n\n```\nwhen a Player hits a Food:\n  set score to 2\n  change score by 1\n```",
+                "options": [
+                  "6",
+                  "4",
+                  "2",
+                  "3"
+                ],
+                "answer": 3,
+                "explanation": "At each collision the score is first set to 2 (set wipes the old value), then 1 is added: 3. At the second fruit it is set to 2 again and 1 is added: the score stays 3. It does not add up; so 6 or 4 is wrong.",
+                "skills": [
+                  "game-score",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d7-q2",
+                "kind": "numeric",
+                "prompt": "Each fruit gives 5 points and the score starts at 0. You win when the score is 35. What is the smallest number of fruits you must collect?",
+                "answer": 7,
+                "tolerance": 0,
+                "unit": "fruits",
+                "explanation": "35 / 5 = 7. With six fruits the score is 30, with the seventh 35.",
+                "skills": [
+                  "game-score"
+                ]
+              },
+              {
+                "id": "m11h2d7-q3",
+                "kind": "find-bug",
+                "prompt": "You collect the fruits but the score never goes up; it always stays 1. Which is the bug?\n\n```\nwhen a Player hits a Food:\n  set score to 1\n  delete other sprite\n```",
+                "options": [
+                  "Deleting the fruit spoils the score",
+                  "\"set score to 1\" fixes the score at 1; it should be \"change score by 1\"",
+                  "The event's kinds are written the wrong way round",
+                  "The score cannot be shown on the screen"
+                ],
+                "answer": 1,
+                "explanation": "\"set\" makes the score equal to 1 at every collision, so it never goes up. To make it go up you need \"change\" (add). Deleting does not touch the score.",
+                "skills": [
+                  "game-score",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d7-q4",
+                "kind": "mcq",
+                "prompt": "Each fruit gives 2 points, the score starts at 0 and the winning condition is \"score = 5\". What happens?",
+                "options": [
+                  "The game is won when the score is 5",
+                  "The game is won when the score is 6",
+                  "The score goes 2, 4, 6 and is never exactly 5; the game cannot be won",
+                  "The game gives an error"
+                ],
+                "answer": 2,
+                "explanation": "A score that moves in even numbers jumps over 5, so \"=\" never says yes. If \"score ≥ 5\" were used, it would be won at 6.",
+                "skills": [
+                  "game-conditions",
+                  "game-score"
+                ]
+              },
+              {
+                "id": "m11h2d7-q5",
+                "kind": "mcq",
+                "prompt": "What does the \"if [condition]\" block do?",
+                "options": [
+                  "If the condition is yes, it runs the blocks inside it; if it is no, it skips them",
+                  "It always runs the blocks inside it",
+                  "If the condition is no, it runs the blocks inside it",
+                  "It stops the game"
+                ],
+                "answer": 0,
+                "explanation": "\"if\" asks a question. If the answer is yes, the blocks inside it run; if it is no, they are skipped and the game carries on.",
+                "skills": [
+                  "game-conditions"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Gökten meyve yağsın",
@@ -989,7 +1836,125 @@ export const modul11: ModuleContent = {
                 "game-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Let it rain fruit",
+            "problem": "So far we have placed objects one by one when the game starts. In real games, though, new things keep appearing: falling fruit, approaching enemies. We cannot make a hundred sprites by hand. Is there a way to tell the computer \"make a new one every second\"? And they should not pile up on the screen forever.",
+            "contentMd": "The basket (the cat) goes left and right, and the score goes up when it catches a fruit. But no fruit falls from the sky.\n\n### A repeating event\nThe `every [1000] ms` block runs once every set amount of time. 1000 milliseconds is one second. If you write \"make a new fruit\" inside it, a fruit appears every second.\n\n### Build the blocks\n1. From the **Game** category, drop the `every [1000] ms` event block into the work area. Change the number to 800.\n2. In the **Variables** category, use **Create variable...** to make a variable called `meyve` (fruit). Take the `set [meyve] to [ ]` block and attach it inside the event. Connect the `new [Apple] sprite, kind [Food]` block from the **Sprite** category as its value.\n3. Put the fruit in the sky: add the `move [meyve] to x [80] y [60]` block. Type -8 for y (just above the screen). For x, put the `random integer from [10] to [150]` block from the **Math** category.\n4. Make the fruit fall: add the `set [meyve] speed x [30] y [0]` block from the **Motion** category. Type 0 for x. For y, put a random number: between 35 and 70.\n5. Delete the ones that leave the screen: add the `[meyve] [delete when it leaves the world]: [yes]` block from the **Sprite** category.\n6. Press the ▶ button. Fruits fall from random places. Catch them with the basket and watch the score go up.\n\nExpected result: Every 0.8 seconds a fruit falls from a different place. The fruit you catch raises the score. The fruits you miss are deleted when they leave the screen.\n\n### How does it work?\n- The `every [800] ms` event repeats for as long as the game stays open.\n- In each round, the `new [Apple] sprite, kind [Food]` block makes a brand new fruit. The `meyve` variable points to the newest fruit each time. The old fruits keep falling at their own speeds.\n- A **random number** picks a number between 10 and 150 every time it runs. So the fruit falls from a different place each time.\n- The fruit starts outside the screen (y -8). The delete when it leaves the world setting makes sure that once a sprite has come onto the screen, it is deleted if it leaves again. If you turn this setting off, thousands of fruits pile up off the screen and the game slows down.\n\n### Try it\n1. Make the falling speed range wider: between 20 and 120. Did the game get harder?\n2. Change the frequency to 400 ms. How did the game change?\n3. Change the fruit's picture: add the `set [meyve] picture to [picture]` block inside the event and choose **Orange**.\n\n### Common mistakes\n- If you leave the y value at 60, the fruit appears in the middle of the screen.\n- If you type 0 for y instead of x in the speed block, the fruit slides sideways and never falls.\n- If you do not delete the fruits that leave the screen, the game stops after a while. The Game Workshop allows 500 sprites at most.\n- In the random number block, write the smaller number in the first slot and the bigger number in the second slot.",
+            "question": "Why does the game use randomness instead of always dropping fruit in the same order? What would the game be like without randomness? Give examples of things that are random in real life.",
+            "explainerMd": "### What you will learn in this lesson\n- How to do a job that repeats at set intervals with the `every ... ms` block\n- How to make **new sprites** while the game runs and hold them with a variable\n- The **random number** block and why it makes the game interesting\n- Why sprites that leave the screen need to be deleted\n\n### What you should know first\nFrom lesson 1, making a new sprite and giving it a position; from lesson 4, giving a speed (x and y); from lessons 6 and 7, collisions and the score. You used the idea of a variable with **Create variable...** in lesson 1.\n\n### An interval event\n`when game starts` runs once. `every [800] ms`, on the other hand, **repeats** for as long as the game stays open. The time is in milliseconds: 1000 ms = 1 second, 800 ms = 0.8 seconds. So that is 60000 / 800 = 75 rounds a minute.\n\n### Making new sprites\nIn each round, the `new [Apple] sprite, kind [Food]` block makes a **brand new** fruit. You put it into a variable (`meyve`, fruit) so that you can set its position and speed. The variable points to the newest fruit in each round; the old fruits keep falling at their own speeds.\n\n```\nevery 800 ms:\n  meyve = new Apple sprite (kind: Food)\n  meyve position: x = random(10, 150), y = -8\n  meyve speed: x = 0, y = random(35, 70)\n  meyve delete when it leaves the world: yes\n```\n\n### Random number\n`random integer from [10] to [150]` picks a number between these two numbers (including both ends) every time it runs. The fruit falls from a different place each time; the game is different each time. The screen is 160 pixels wide and 120 pixels high, so the 10-150 range is a little way in from the edges.\n\n### Falling speed\nSpeed is how many pixels are covered in a second. If y is positive, it goes down (the top of the screen is y = 0). At a speed of 60 pixels/s, the height of the screen (120 pixels) is crossed in about 2 seconds.\n\n| y speed | Time to cross 120 pixels |\n|---|---|\n| 30 | 4 s |\n| 60 | 2 s |\n| 120 | 1 s |\n\n### Tidying up is a must\nA fruit that has left the screen keeps existing even though it cannot be seen. The `delete when it leaves the world: yes` setting deletes them. If you turn the setting off, the number of sprites grows; the Game Workshop allows 500 sprites at most and gives an error when that is passed.\n\n### Summary\nThe `every ... ms` block does a job again and again. In each round you make a new sprite and set its position and speed with a random number. Speed is measured in pixels per second. If you do not delete the ones that leave the screen, the sprites pile up and the game stops.",
+            "concepts": [
+              {
+                "term": "every ... ms",
+                "definition": "An event that repeats once every set amount of time for as long as the game stays open. The time is in milliseconds (1000 ms = 1 second).",
+                "example": "\"every 800 ms\" runs 75 times a minute.",
+                "pitfall": "Thinking the time is in seconds and writing 2; 2 milliseconds is very short, so the event runs at its fastest (50 ms) and the sprites pile up straight away."
+              },
+              {
+                "term": "Making new sprites",
+                "definition": "The \"new [picture] sprite, kind [kind]\" block makes a brand new sprite while the game runs; you hold it in a variable.",
+                "example": "The meyve variable points to the newest fruit in each round; the old fruits keep falling.",
+                "pitfall": "Forgetting to set the new sprite's position and speed; they pile up, not moving, in the middle of the screen."
+              },
+              {
+                "term": "Random number",
+                "definition": "A block that picks a different number between two numbers (including both ends) each time it runs.",
+                "example": "If you give a random 10-150 for x, the fruit falls from a different place each time.",
+                "pitfall": "Letting the range spill off the screen; the screen is 160 pixels wide, so an x bigger than 160 makes a fruit outside the screen."
+              },
+              {
+                "term": "Speed and direction",
+                "definition": "Speed is measured in pixels per second. If y is positive the sprite goes down; if it is negative it goes up.",
+                "example": "A fruit with a y speed of 60 crosses the screen's 120 pixel height in about 2 seconds.",
+                "pitfall": "Writing the 0 on the wrong axis; if you give 0 to y instead of x, the fruit slides sideways and does not fall."
+              },
+              {
+                "term": "Delete when it leaves the world",
+                "definition": "The setting that deletes a sprite by itself when it leaves the screen.",
+                "example": "A missed fruit is deleted when it leaves through the bottom of the screen, and memory is freed.",
+                "pitfall": "Not turning the setting on; the sprites pile up, and when there are more than 500 the game gives an error and stops."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h2d8-q1",
+                "kind": "numeric",
+                "prompt": "An event makes a fruit \"every 800 ms\". How many fruits are made in one minute (60 seconds)?",
+                "answer": 75,
+                "tolerance": 0,
+                "unit": "fruits",
+                "explanation": "60 seconds = 60000 ms. 60000 / 800 = 75 fruits.",
+                "skills": [
+                  "game-spawn",
+                  "game-timing"
+                ]
+              },
+              {
+                "id": "m11h2d8-q2",
+                "kind": "numeric",
+                "prompt": "A fruit's y speed is 40 (40 pixels a second). The screen is 120 pixels high. In how many seconds does the fruit get from the top edge of the screen (y = 0) to the bottom edge?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "s",
+                "explanation": "Time = distance / speed = 120 / 40 = 3 seconds. If the speed goes up, the time gets shorter and the game gets harder.",
+                "skills": [
+                  "game-timing"
+                ]
+              },
+              {
+                "id": "m11h2d8-q3",
+                "kind": "find-bug",
+                "prompt": "The fruits do not fall from the sky; they slide sideways. Which is the bug?\n\n```\nevery 800 ms:\n  meyve = new Apple sprite (kind: Food)\n  meyve position: x = random(10, 150), y = -8\n  meyve speed: x = 40, y = 0\n  meyve delete when it leaves the world: yes\n```",
+                "options": [
+                  "y = -8 is not allowed in the position",
+                  "The delete setting has been turned on wrongly",
+                  "The speed block has x = 40, y = 0; to fall it should be x = 0, y = a positive number",
+                  "The random number range is too wide"
+                ],
+                "answer": 2,
+                "explanation": "The y speed is 0, so the fruit does not go down; the x speed is 40, so it slides sideways. To fall, y is given a positive speed. y = -8 means just above the screen and is correct.",
+                "skills": [
+                  "game-timing",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d8-q4",
+                "kind": "mcq",
+                "prompt": "What happens if you never turn on the \"delete when it leaves the world\" setting?",
+                "options": [
+                  "Nothing happens; a sprite that leaves the screen disappears by itself",
+                  "The fruits that leave the screen pile up; when the number of sprites passes 500, the game gives an error and stops",
+                  "The fruits come back",
+                  "The score is reset"
+                ],
+                "answer": 1,
+                "explanation": "A sprite that cannot be seen still exists. If a new one is added every 800 ms, the number keeps growing. The Game Workshop allows 500 sprites at most.",
+                "skills": [
+                  "game-spawn",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d8-q5",
+                "kind": "predict-output",
+                "prompt": "After this event runs for a few seconds, what can you see on the screen?\n\n```\nevery 1000 ms:\n  meyve = new Apple sprite (kind: Food)\n  meyve position: x = 80, y = 60\n```",
+                "options": [
+                  "Fruits fall from random places",
+                  "There is always just one apple on the screen",
+                  "They stay still at the same point and pile on top of each other; one more apple is added every second",
+                  "No apples appear"
+                ],
+                "answer": 2,
+                "explanation": "The position is the same each time (80, 60) and no speed is given. The old apples are not deleted, so each new one sits on top; it looks like a single apple, but the number of sprites grows.",
+                "skills": [
+                  "game-spawn",
+                  "game-random",
+                  "game-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Bombadan kaç, canını koru",
@@ -1112,7 +2077,129 @@ export const modul11: ModuleContent = {
                 "game-lives"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Dodge the bombs, keep your lives",
+            "problem": "Every game has a risk. If you make a mistake you lose something, and most of the time that loss is measured in lives. How does a game say \"you are out of lives\"? And when you see that message, who decides that the game should end?",
+            "contentMd": "Bombs have been added to the fruit-catching game. The bombs fall from the sky like the fruits, and their kind is **Enemy**. The basket (the cat) can touch both fruits and bombs. When it touches a fruit the score goes up, but when it touches a bomb nothing happens. The game starts with 3 lives.\n\n### Lives\nThe game has a ready-made number called **lives**. It is shown as hearts in the corner of the screen.\n- `set lives to [3]`: sets the lives.\n- `change lives by [-1]`: adds to the lives. A minus number lowers them.\n- `lives`: gives the lives as a number.\n- When the lives reach **0**, the game ends by itself. But if you use the `when lives run out` block, the decision is yours: you must end the game yourself there.\n\n### Build the blocks\n1. First run the game and watch the bombs and fruits fall. Touching a bomb has no effect.\n2. From the **Sprite** category, put in the `when a [Player] sprite hits a [Enemy] sprite` event.\n3. Attach the `change lives by [-1]` block from the **Game** category inside it.\n4. Underneath, add the `shake screen for [250] ms` block.\n5. From the **Sound** category, add the `play melody [boom]` block.\n6. At the very bottom, put the `delete sprite [other sprite]` block (swallow the bomb).\n7. Press the ▶ button. Each time you touch a bomb a heart goes, the screen shakes and the bomb disappears. After the third bomb it says \"NO LIVES LEFT\".\n8. Now let's write our own ending. Bring the `when lives run out` event block from the **Game** category. Attach the `show [You are out of lives!] on screen for [2] seconds`, `play melody [lose]` and `end game: [you lose]` blocks inside it, in order.\n9. Press the ↺ button and catch three bombs. Your own message appears and the game is lost.\n\nExpected result: When you touch a bomb, a life goes and the screen shakes. After the third bomb your message appears and the game is lost.\n\n### How does it work?\n- Two collision events can run side by side. One waits for fruit, the other for bombs. Each event only runs when its own kinds touch.\n- The `when lives run out` event runs once, the moment the lives drop to zero. If you write this block, the game does not end automatically. If you forget to end the game, the game carries on with zero lives.\n- Saying `change lives by [-1]` means \"add -1 to the lives\". The lives never go below 0.\n\n### Try it\n1. Make the bomb's penalty take away 2 lives.\n2. Make the starting lives 5: change the `set lives to [3]` block inside `when game starts`.\n3. Make the screen shake time 100 and then 800 ms. Which one feels better?\n\n### Common mistakes\n- If you forget to delete the bomb, the bomb takes a life as it passes over the basket, but then it keeps falling on the stage. What you see is confusing.\n- If there is no block that ends the game inside the `when lives run out` block, the game keeps running with zero lives.\n- If you choose the wrong kind in the collision event (e.g. Food instead of Enemy), the event runs for the fruit, not for the bomb.",
+            "question": "Can you think of another penalty instead of \"lives\" in a game? (For example, losing time or losing points.) Which one seems fairer to you? What makes you give up on a game that is too easy or too hard?",
+            "explainerMd": "### What you will learn in this lesson\n- The **lives** number and its three blocks\n- How several collision events run side by side in the same game\n- How the `when lives run out` event changes who ends the game\n- How to make danger felt with feedback (shaking, sound)\n\n### What you should know first\nFrom lesson 6, the collision event and deleting `other sprite`; from lesson 7, the `set` and `change` blocks like the score blocks, and the `if` block; from lesson 8, falling objects and sprite kinds.\n\n### Lives, the score's sibling\n**Lives** is a number that counts how many mistakes the player has left. It works like the score and appears on the screen as hearts:\n\n| Block | What it does | When lives are 3 |\n|---|---|---|\n| `set lives to [5]` | Sets the lives | 5 |\n| `change lives by [-1]` | Adds -1 to the lives | 2 |\n| `lives` | Reads the number | 3 |\n\nThe lives do not go below 0. When the lives reach 0, the \"out of lives\" state begins.\n\n### Two kinds, two events\nThe falling things are of different kinds, so you write two separate events:\n\n| Event | Response |\n|---|---|\n| when a Player hits a **Food** | score +1, melody, delete the fruit |\n| when a Player hits an **Enemy** | lives -1, shake the screen, boom sound, delete the bomb |\n\nEach event only runs when its own two kinds touch. One does not spoil the other.\n\n### Shaking and sound\n`shake screen for [250] ms` tells the player \"you lost a life\". As the time gets longer, the feeling changes: 100 ms is a light shake, 800 ms is a long shake. The right time depends on the mood of the game.\n\n### When the lives run out, who ends the game?\nIf you never write a `when lives run out` block, the game ends by itself the moment the lives reach 0 and it says \"NO LIVES LEFT\". If you write this block, the decision passes to you: you show your own message, and **you** must also put in the `end game: [you lose]` block. If you do not, the game carries on with zero lives.\n\n```\nwhen lives run out:\n  show \"You are out of lives!\" on screen\n  play melody lose\n  end game: you lose\n```\n\n### A calculation\nYou have 5 lives at the start and each bomb takes 2 lives. The first bomb leaves 3, the second leaves 1; the third brings the lives down to 0 (not -1). So the game ends at the third bomb.\n\n### Summary\nLives is a number that counts your margin for mistakes. Separate collision events are written for fruit and bombs. When you touch a bomb, the lives go down, the screen shakes and the bomb is deleted. If you write the `when lives run out` block, ending the game is your job.",
+            "concepts": [
+              {
+                "term": "Lives",
+                "definition": "The number, shown as hearts on the screen, that counts how many mistakes the player has left. It does not go below 0.",
+                "example": "You start with 3 lives; each bomb takes one life.",
+                "pitfall": "Not setting the starting lives; the game's number of lives may be different from what you expect."
+              },
+              {
+                "term": "change lives",
+                "definition": "Adds to or takes away from the lives. A minus number lowers the lives.",
+                "example": "\"change lives by -1\" brings 3 lives down to 2.",
+                "pitfall": "Writing 1 instead of -1; touching a bomb then gives you a life."
+              },
+              {
+                "term": "Danger event",
+                "definition": "A separate collision event that runs when the player hits the Enemy kind; it holds the penalty and the feedback.",
+                "example": "Lives -1, shake the screen, boom sound, delete the bomb.",
+                "pitfall": "Choosing the wrong kind (such as Food instead of Enemy); the event does not run for the bombs."
+              },
+              {
+                "term": "when lives run out",
+                "definition": "The event that runs once, the moment the lives drop to 0.",
+                "example": "Inside it: write a message, play the lose melody, end game: you lose.",
+                "pitfall": "Not putting the end game block inside it; the game carries on with zero lives."
+              },
+              {
+                "term": "Feedback",
+                "definition": "A sound, shake or message that lets the player feel something has happened.",
+                "example": "When you touch a bomb, the screen shakes for 250 ms and a boom sound plays.",
+                "pitfall": "Making the shake too long; 800 ms blurs the game in an annoying way."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h2d9-q1",
+                "kind": "numeric",
+                "prompt": "The game starts with 5 lives and each bomb takes 2 lives. At which bomb does the game end?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "bombs",
+                "explanation": "5 → 3 → 1 → 0. The third bomb brings the lives down to 0, not -1 (the lives do not go below 0), and the game ends.",
+                "skills": [
+                  "game-lives"
+                ]
+              },
+              {
+                "id": "m11h2d9-q2",
+                "kind": "predict-output",
+                "prompt": "The cat touches 3 bombs (the lives start at 3). What happens?\n\n```\nwhen a Player hits an Enemy:\n  change lives by -1\n  delete other sprite\nwhen lives run out:\n  show \"Over\" on screen\n```",
+                "options": [
+                  "The game ends by itself with \"NO LIVES LEFT\"",
+                  "The cat is deleted",
+                  "The message appears, but there is no block that ends the game; the game carries on with zero lives",
+                  "The lives go below zero"
+                ],
+                "answer": 2,
+                "explanation": "When the lives reach 0, \"when lives run out\" runs and the message is written. Once you write this block, ending the game is up to you; there is no \"end game\", so the game goes on. The lives do not go below zero and the cat is not deleted.",
+                "skills": [
+                  "game-lives",
+                  "game-flow",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d9-q3",
+                "kind": "find-bug",
+                "prompt": "The bombs are of the Enemy kind, but when the cat touches them the lives do not go down. Which is the bug?\n\n```\nwhen a Player hits a Food:\n  change lives by -1\n  shake screen for 250 ms\n```",
+                "options": [
+                  "It should be \"set lives to 1\" instead of \"change lives by -1\"",
+                  "The shake time is too short",
+                  "The \"lives -1\" block is in the wrong place",
+                  "The event's second kind is Food; the bomb is an Enemy, so the event does not run"
+                ],
+                "answer": 3,
+                "explanation": "The event only runs when the kinds it names touch. The bombs are of the Enemy kind, so the event should be for hitting an Enemy. The blocks themselves are correct.",
+                "skills": [
+                  "game-kinds",
+                  "game-lives",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d9-q4",
+                "kind": "mcq",
+                "prompt": "If you never write a \"when lives run out\" block, what happens when the lives reach 0?",
+                "options": [
+                  "The game ends by itself and says \"NO LIVES LEFT\"",
+                  "The game goes on and nothing happens",
+                  "The lives go back to 3 automatically",
+                  "The score is reset"
+                ],
+                "answer": 0,
+                "explanation": "If there is no \"when lives run out\" block, the game does its default behaviour: it ends the game. When you write the block, this decision passes to you.",
+                "skills": [
+                  "game-lives",
+                  "game-flow"
+                ]
+              },
+              {
+                "id": "m11h2d9-q5",
+                "kind": "mcq",
+                "prompt": "What does the -1 in the \"change lives by [-1]\" block mean?",
+                "options": [
+                  "The lives become -1",
+                  "-1 is added to the lives; so the lives go down by 1",
+                  "You gain 1 life",
+                  "The game ends at once"
+                ],
+                "answer": 1,
+                "explanation": "\"change\" adds to the current number. Adding -1 is taking away 1; 3 lives become 2. Making the lives exactly -1 would be the job of the \"set\" block, and anyway the lives do not go below 0.",
+                "skills": [
+                  "game-lives"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Meyve avı",
@@ -1236,7 +2323,130 @@ export const modul11: ModuleContent = {
                 "game-collision"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Fruit hunt",
+            "problem": "You will bring together all of this week's pieces and make a complete game: collisions, score, lives, randomly falling objects and a race against time as well. A good game has a goal, a risk and an ending. In the fruit hunt, the goal is to collect 8 fruits, the risk is the bombs, and the ending is winning or losing.",
+            "contentMd": "Half of the project is ready: the basket cat walks left and right, fruits and bombs fall, and the score goes up when you catch a fruit. What is missing: the bomb penalty, the countdown, and the rules for winning and losing.\n\n### The rules of the game\n- At the start you have 5 lives and 45 seconds.\n- If you catch a fruit, the score goes up by 1. When the score is 8, you win.\n- If you touch a bomb, you lose 1 life and the screen shakes.\n- If you run out of lives or the time runs out, you lose.\n\n### Look first\n1. Press the ▶ button to run the game. What works, and what is missing?\n2. Read the blocks: how many event blocks are there? When does each one run?\n\n### Bomb penalty\n1. Put in the `when a [Player] sprite hits a [Enemy] sprite` event.\n2. Inside it, attach the `change lives by [-1]`, `shake screen for [250] ms`, `play melody [boom]` and `delete sprite [other sprite]` blocks, in order.\n\n### Countdown\n1. Inside the `when game starts` block, add the `start countdown from [30] seconds` block from the **Game** category. Change the number to 45.\n2. Bring the `when time runs out` event block. Attach the `show [Time is up!] on screen for [2] seconds`, `play melody [lose]` and `end game: [you lose]` blocks inside it.\n\n### Winning\n1. At the very bottom of the fruit event (`when a [Player] sprite hits a [Food] sprite`), add an `if ... do` block.\n2. As the condition, use the comparison block in the **Logic** category: the `score` block **≥** 8.\n3. Inside it, put the `show [You win!] on screen for [2] seconds`, `play melody [victory]` and `end game: [you win]` blocks.\n\n### Losing\nBring the `when lives run out` event block. Inside it, put the `show [You are out of lives!] on screen for [2] seconds`, `play melody [lose]` and `end game: [you lose]` blocks.\n\n### Run it and try it\n1. Press the ↺ button and play the game from start to finish. Win once, and lose once on purpose.\n2. Are all seven items in the Goals panel green?\n\nExpected result: The score, the hearts and the time left are shown at the top. If you collect 8 fruits, you win. If you run out of lives or the time runs out, you lose.\n\n### How does it work?\n- The parts of the game are split into **events** that are independent of each other: setting up the stage, dropping fruit, dropping bombs, the collisions, when lives run out, when time runs out. Each event only deals with its own job.\n- The game should end with a single ending. The moment a winning or losing block runs, the game ends and the other events stop.\n- The `time left (s)` block gives how much time is left in the countdown. To add it to the winning message, you can use it with the `create text with` block.\n\n### Add your own touch\nTry at least two of the following:\n1. Make the winning score 12 and raise the time to 60 seconds. Is the game balanced?\n2. Make the fruit fall faster. Which speed is fun, and which is impossible?\n3. When the cat catches a fruit, show the message `show [Yummy!] on screen for [1] seconds`.\n4. Change the background colour or choose another player picture.\n\n### Common mistakes\n- If you write the winning condition with **=** and the score jumps over 8, you cannot win. Using **≥** is safer.\n- If you do not put the countdown block inside any event, it does not run. Put it inside `when game starts`.\n- Do not forget to end the game in the `when lives run out` and `when time runs out` blocks. Once you write these blocks, whether the game ends is up to you.\n- Write two separate collision events for fruit and bombs. If you choose the wrong kind, the event does not run for the sprite you expect.",
+            "question": "What are the game's goal, risk and ending? Where did your friend find it hardest while playing? If you had to change one thing to make the game more fun, what would you change?",
+            "explainerMd": "### What you will learn in this lesson\n- How to design a complete game as a **goal, a risk and an ending**\n- How to split the game into independent events\n- How to use the **countdown** and the `when time runs out` event\n- How to write the winning and losing rules without them clashing\n\n### What you should know first\nCollisions from lesson 6, the score and `if score ≥ ...` from lesson 7, every ... ms and randomly falling objects from lesson 8, lives and `when lives run out` from lesson 9. This lesson brings these pieces together more than it adds a new idea.\n\n### The three parts of a good game\n| Part | In the fruit hunt |\n|---|---|\n| Goal | Collecting 8 fruits |\n| Risk | Bombs (5 lives) and time (45 seconds) |\n| Ending | Winning or losing |\n\nIf one of the three is missing, the game is boring. Without a goal, you do not know what to do. Without a risk, there is no excitement. Without an ending, the game never finishes.\n\n### Splitting into events\nA big job is split into small events that each do one job:\n\n| Event | Its job |\n|---|---|\n| `when game starts` | Set up the stage, make the score 0 and the lives 5, start the countdown from 45 seconds |\n| `every ... ms` (two of them) | Drop fruit; drop bombs |\n| when a Player hits a Food | Raise the score, do the winning check |\n| when a Player hits an Enemy | Lower the lives, shake, delete |\n| `when lives run out` | You lose |\n| `when time runs out` | You lose |\n\nIf something breaks, you only look at the event involved.\n\n### Countdown\nThe `start countdown from [45] seconds` block starts the time, and the time left is shown on the screen. When the time reaches 0, the `when time runs out` event runs. If you do not write this event, the game says \"TIME IS UP\" by itself; if you write it, ending the game is up to you. To run the block you must put it inside an event; `when game starts` is the best choice.\n\n### The one-ending rule\nThink about whether the winning and losing blocks could run at the same time: you get the 8th fruit and the time runs out in the same frame. The game applies the first `end game` block; the later ones are ignored. So set up the rules clearly, in a way that they will not clash.\n\n### Work out the balance\nTo collect 8 fruits in 45 seconds, you need to catch a fruit every 45 / 8 = 5.6 seconds on average. If a fruit falls every 0.8 seconds, there are enough chances; but the bombs reduce the chances. Change the numbers and try: time, lives, target score, speed.\n\n### Summary\nA good game has a goal, a risk and an ending. Splitting the game into events that each do one job makes hunting for bugs easier. The countdown and `when time runs out` add time pressure. The game ends with the first `end game` block; set up the rules with that in mind and balance them by playing with the numbers.",
+            "concepts": [
+              {
+                "term": "Goal, risk, ending",
+                "definition": "The three parts of a good game: what is to be done, what is at stake and how it will end.",
+                "example": "In the fruit hunt, the goal is 8 fruits, the risk is bombs and time, and the ending is winning or losing.",
+                "pitfall": "Forgetting the risk; if it is impossible to lose, the game has no excitement."
+              },
+              {
+                "term": "Splitting into events",
+                "definition": "Dividing the game into small events that each do one job: setup, dropping, collisions, endings.",
+                "example": "The bomb penalty is only in the Enemy collision; the winning check is only in the fruit collision.",
+                "pitfall": "Piling everything into one event; when there is a bug, it is hard to find where it is."
+              },
+              {
+                "term": "Countdown and when time runs out",
+                "definition": "\"start countdown from [n] seconds\" starts the time; when the time reaches 0, the \"when time runs out\" event runs.",
+                "example": "When the game starts, start the countdown from 45 seconds.",
+                "pitfall": "Leaving the countdown block outside an event; it never runs."
+              },
+              {
+                "term": "Winning condition",
+                "definition": "Inside the fruit collision you write \"if score ≥ target, end game: you win\".",
+                "example": "If score ≥ 8, write \"You win!\", play the victory melody and end the game.",
+                "pitfall": "Using =; if the score jumps over the target, the game cannot be won."
+              },
+              {
+                "term": "Balance",
+                "definition": "The game being neither too easy nor impossible; the time, lives, target and speed numbers fitting together.",
+                "example": "For 8 fruits in 45 seconds, you need to catch a fruit every 5.6 seconds on average.",
+                "pitfall": "Setting the numbers without ever trying them; the game either ends at once or never ends."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h2d10-q1",
+                "kind": "numeric",
+                "prompt": "In the game you need to collect 8 fruits. You catch a fruit every 4 seconds on average. How many seconds do 8 fruits take? (The time is 45 seconds.)",
+                "answer": 32,
+                "tolerance": 0,
+                "unit": "s",
+                "explanation": "8 × 4 = 32 seconds. That is less than 45 seconds, so at this rate you win before the time runs out (with 13 seconds to spare).",
+                "skills": [
+                  "game-design",
+                  "game-timing"
+                ]
+              },
+              {
+                "id": "m11h2d10-q2",
+                "kind": "predict-output",
+                "prompt": "The player catches the 8th fruit at the 30th second. What happens?\n\n```\nwhen game starts:\n  start countdown from 45 seconds\nwhen time runs out:\n  end game: you lose\nwhen a Player hits a Food:\n  change score by 1\n  if score ≥ 8:\n    end game: you win\n```",
+                "options": [
+                  "The game is won and ends at once",
+                  "The game lasts until the 45th second, then it is lost",
+                  "The game is lost",
+                  "The game gives an error"
+                ],
+                "answer": 0,
+                "explanation": "When the score reaches 8, \"if\" answers yes and \"end game: you win\" runs. Once the game has ended, the when time runs out event no longer runs.",
+                "skills": [
+                  "game-flow",
+                  "game-conditions",
+                  "game-score"
+                ]
+              },
+              {
+                "id": "m11h2d10-q3",
+                "kind": "find-bug",
+                "prompt": "The time never appears on the screen and the game is never lost when the time runs out. Which is the bug?\n\n```\nwhen game starts:\n  set score to 0\n  set lives to 5\nwhen time runs out:\n  start countdown from 45 seconds\n  end game: you lose\n```",
+                "options": [
+                  "The lives cannot be 5",
+                  "The block that starts the countdown is inside \"when time runs out\"; it should be put inside \"when game starts\"",
+                  "The score has not been reset",
+                  "\"end game\" is in the wrong place"
+                ],
+                "answer": 1,
+                "explanation": "\"when time runs out\" only runs if the countdown has started. The countdown never starts, so the time does not appear either. The start block goes in the event that runs at the start of the game.",
+                "skills": [
+                  "game-flow",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h2d10-q4",
+                "kind": "mcq",
+                "prompt": "In the fruit hunt, what is the \"risk\"?",
+                "options": [
+                  "Collecting 8 fruits",
+                  "The bombs and the countdown",
+                  "The victory melody",
+                  "The basket going left and right"
+                ],
+                "answer": 1,
+                "explanation": "The goal is collecting 8 fruits. The risk is the things the player can lose: lives with the bombs, time with the countdown. The melody is feedback.",
+                "skills": [
+                  "game-design"
+                ]
+              },
+              {
+                "id": "m11h2d10-q5",
+                "kind": "mcq",
+                "prompt": "Inside which event is it best to put the winning check (\"if score ≥ 8\")?",
+                "options": [
+                  "In the bomb collision event",
+                  "In the fruit collision event, because that is where the score changes",
+                  "In the when lives run out event",
+                  "In no event, on its own in the work area"
+                ],
+                "answer": 1,
+                "explanation": "The score changes when a fruit is caught, and the check should be made at exactly that moment. The score does not change in the bomb collision; a block standing on its own is not run by any event.",
+                "skills": [
+                  "game-conditions",
+                  "game-flow",
+                  "game-collision"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1244,6 +2454,7 @@ export const modul11: ModuleContent = {
       "title": "Harita ve dünya",
       "project": "Hazine adası",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Haritayı 16 x 16 pikselik karoların ızgarası olarak anlatabilir; sütun ve satırı 0'dan sayarak bir karoyu gösterebilir.\n2. Karonun \"duvar\" kutusunun sprite'ı durdurduğunu bilir ve bir odayı ya da labirenti duvarlarla kurabilir.\n3. `bir [Oyuncu] sprite'ı [Karo] karosuna dokununca` olayını kurar; olayın ilk değmede bir kez çalıştığını bilir.\n4. Olay karosunun sütun ve satırıyla dokunulan karoyu boşaltır; sayaçla kazanma koşulunu doğru sırayla kurar.\n5. Kamerayla büyük bir dünyada gezer; karoları sprite'a çevirir; anahtar, elmas, lav ve sandıklı Hazine adası oyununu kurar.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 22-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | İlk odan: duvarlı bir harita | ~22 dk | Anlatımı oku, odayı taş duvarla çevir, kediyi yürüt, mini testi çöz. |\n| 2 | Labirentten çık | ~22 dk | Kapı karosuna dokununca kazanma olayını kur, labirenti değiştirip kendin dene. |\n| 3 | Mağarada elmas avı | ~25 dk | Olay karosuyla elması boşalt, sayaçla kazan, lavı kur. |\n| 4 | Büyük bir dünya, kayan kamera | ~25 dk | Kamerayı bağla, elma karolarını sprite'a çevir, kameranın sınırlarını deney. |\n| 5 | Proje: Hazine adası | ~35 dk | Kural tablosunu yaz, dört olayı kur, haritayı kendi fikrinle değiştir. |\n\n### Ön koşul kontrolü\nHafta 1 ve Hafta 2 (Modül 11) tamamlanmış olmalı. Başlamadan önce şunları kontrol et:\n- `oyun başlayınca` bloğu, sprite oluşturma ve `oyuncu tuşlarıyla hareket etsin` bloğunu kullanabiliyor mu?\n- Sprite'lar arası çarpışma olayını, skor ve can bloklarını hatırlıyor mu?\n- Çarpma, bölme ve çıkarma ile küçük hesaplar (7 x 16, 480 - 160) yapabiliyor mu?\n\n### Kavram haritası\n- **Harita:** karo (16 x 16) → ızgara (sütun, satır; 0'dan) → karo takımı → duvar kutusu\n- **Olay:** karoya dokununca → ilk değmede bir kez → olay karosunun sütunu ve satırı → karoyu boşalt\n- **Kural:** sayaç (karo sayısı) → kazanma koşulu → lav (can ve başa dönüş) → oyunu bitir\n- **Dünya:** harita (büyük) ve ekran (160 x 120) → kamera takibi → karoyu sprite'a çevirme\n- **Proje:** kural tablosu → anahtar-kapı → skorlu mesaj → kendi harita tasarımı\n\n### Sık yapılan hatalar\n- **Sütun ve satırı 1'den saymak.** İlk sütun ve ilk satır 0'dır.\n- **Sütun ile satırı karıştırmak.** `sütun 10 satır 5` ile `sütun 5 satır 10` farklıdır; ikincisi 10 satırlı haritanın dışındadır.\n- **Duvar kutusunu işaretlememek.** Karo duvar gibi görünür ama sprite içinden geçer.\n- **`haritayı yükle` bloğunu `oyun başlayınca` dışında bırakmak.** Harita hiç gelmez.\n- **Karoyu boşaltan bloğa sabit sayı yazmak.** Hep aynı karo silinir; olay karosunu kullan.\n- **Kazanma kontrolünü karo silinmeden önce yapmak.** Sayaç bir fazla görünür.\n- **`oyunu bitir` bloğunu unutmak.** Mesaj çıkar ama oyun sürer.\n- **Karoları sprite'a çevirmeyi ya da kamerayı unutmak.** Elma toplanmaz; kedi ekrandan çıkar.\n- **Olayın beklemekle tekrar çalışacağını sanmak.** Karo olayı ilk değmede yalnız bir kez çalışır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Boş bir haritada 12 x 8 bir oda çiz; çıkışı olan bir labirente çevir; kapı karosuna dokununca kazanılsın.\n4. Kendi haritanın genişliğini ve yüksekliğini piksel olarak hesapla; ekrana sığıp sığmadığını söyle.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Kamera olmasa büyük bir harita ne olurdu?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Hazine adası)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Plan | Kural tablosu yok | Dört karo için ne olacağı tabloda yazılı | Tablo, bloklarla birebir uyuyor ve açıklanmış |\n| Anahtar ve kapı | Anahtar kayboluyor ama kapı açılmıyor | Anahtar alınınca kapı (sütun 10, satır 5) açılıyor | Kapı yerine başka bir engel ya da ikinci bir anahtar-kapı eklenmiş |\n| Elmas, lav, sandık | Bir ya da daha fazla kural çalışmıyor | Elmas skor veriyor, lav can götürüp başa gönderiyor, sandık oyunu kazandırıyor | Mesajda skor yazıyor; lav ve elmas değerleri düşünerek ayarlanmış |\n| Harita | Haritayı değiştirmemiş ya da yol kapanmış | Haritayı değiştirmiş ve sandığa yol açık | Yeni karo türü ve yeni kuralla genişletmiş |\n| Anlatım | Ne yaptığını anlatamıyor | Dört olayı adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta çocuk bir oyunun kurallarını haritanın karolarına bağlamayı öğrenir. \"Hangi karoya dokununca ne olsun?\" sorusu, bir oyun tasarımcısının temel sorusudur.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şunları sor: \"Hangi karoya dokununca olay çalışmalı?\", \"Bu karo duvar mı değil mi?\", \"Sütun mu önce, satır mı?\", \"Kazanma kontrolü karo silindikten önce mi sonra mı?\"\n- **Hata yapmak güvenlidir.** Her şey sanaldır; ↺ düğmesi oyunu başa alır.\n- **Süre.** Dersleri aralıklı çalışmak kalıcılığı artırır. Proje dersinde çocuğa kendi haritasını çizmesi için ek zaman tanı.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week the learner:\n1. Can describe a map as a grid of 16 x 16 pixel tiles; can point to a tile by counting the column and row from 0.\n2. Knows that a tile's \"wall\" box stops a sprite, and can build a room or a maze with walls.\n3. Sets up the `when a [Player] sprite touches tile [...]` event; knows that the event runs once, at the first touch.\n4. Clears the touched tile with the event tile's column and row; sets up a winning condition with a counter in the right order.\n5. Explores a big world with the camera; turns tiles into sprites; builds the Treasure island game with a key, diamonds, lava and a chest.\n\n### Plan for the week\nThe week has five lessons; each lesson is about 22-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | Your first room: a map with walls | ~22 min | Read the explainer, surround the room with stone wall, walk the cat, do the mini quiz. |\n| 2 | Get out of the maze | ~22 min | Set up the winning event for touching the door tile, change the maze and try it yourself. |\n| 3 | Diamond hunt in the cave | ~25 min | Clear the diamond with the event tile, win with a counter, set up the lava. |\n| 4 | A big world, a scrolling camera | ~25 min | Connect the camera, turn the apple tiles into sprites, experiment with the camera's limits. |\n| 5 | Project: Treasure island | ~35 min | Write the rule table, set up the four events, change the map with your own idea. |\n\n### Prerequisite check\nWeek 1 and week 2 (module 11) should be finished. Before you start, check the following:\n- Can they use the `when game starts` block, making a sprite and the `moves with player keys` block?\n- Do they remember the collision event between sprites, and the score and lives blocks?\n- Can they do small calculations with multiplication, division and subtraction (7 x 16, 480 - 160)?\n\n### Concept map\n- **Map:** tile (16 x 16) → grid (column, row; from 0) → tile set → wall box\n- **Event:** when touching a tile → once, at the first touch → event tile column and row → clear tile\n- **Rule:** counter (number of tiles) → winning condition → lava (lives and back to the start) → end game\n- **World:** map (big) and screen (160 x 120) → camera following → turning tiles into sprites\n- **Project:** rule table → key and door → message with the score → your own map design\n\n### Common mistakes\n- **Counting columns and rows from 1.** The first column and the first row are 0.\n- **Mixing up the column and the row.** `column 10 row 5` and `column 5 row 10` are different; the second is outside a map with 10 rows.\n- **Not ticking the wall box.** The tile looks like a wall but the sprite goes straight through it.\n- **Leaving the `load map` block outside `when game starts`.** The map never comes in.\n- **Writing fixed numbers in the block that clears the tile.** The same tile is always deleted; use the event tile.\n- **Doing the winning check before the tile is deleted.** The counter shows one too many.\n- **Forgetting the `end game` block.** The message appears but the game goes on.\n- **Forgetting to turn tiles into sprites, or forgetting the camera.** The apple is not collected; the cat leaves the screen.\n- **Thinking the event will run again if you wait.** A tile event runs only once, at the first touch.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the questions you got wrong in the mini quizzes, then do the question again.\n3. Draw a 12 x 8 room on an empty map; turn it into a maze with an exit; make the game won when the door tile is touched.\n4. Work out the width and height of your own map in pixels; say whether it fits on the screen.\n5. Answer this question in your own words: \"Without a camera, what would happen to a big map?\"\n\nThe five lessons' mini quizzes are enough as an end-of-week test; 5 questions in each lesson, 25 questions in total. Target: at least 4 right in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project assessment rubric (Treasure island)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Plan | There is no rule table | What will happen for the four tiles is written in the table | The table matches the blocks exactly and is explained |\n| Key and door | The key disappears but the door does not open | When the key is taken, the door (column 10, row 5) opens | Another obstacle instead of the door, or a second key and door, has been added |\n| Diamond, lava, chest | One or more rules do not work | The diamond gives points, the lava takes a life and sends you back to the start, the chest wins the game | The message shows the score; the lava and diamond values have been set with thought |\n| Map | Has not changed the map, or the path is closed | Has changed the map and the path to the chest is open | Has extended it with a new kind of tile and a new rule |\n| Explanation | Cannot explain what they did | Explains the four events step by step | Explains a mistake they made and how they found it |\n\n### Note for parents and teachers\n- **Aim.** This week the child learns to link a game's rules to the tiles of the map. \"What should happen when you touch which tile?\" is a game designer's basic question.\n- **How to help.** When they get stuck, instead of giving the answer, ask these: \"Which tile should the event run on when it is touched?\", \"Is this tile a wall or not?\", \"Does the column come first, or the row?\", \"Is the winning check before or after the tile is deleted?\"\n- **Making mistakes is safe.** Everything is virtual; the ↺ button takes the game back to the start.\n- **Time.** Spacing the lessons out helps learning stick. In the project lesson, give the child extra time to draw their own map.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; recorded only if consent has been given).",
       "lessons": [
         {
           "title": "İlk odan: duvarlı bir harita",
@@ -1356,7 +2567,119 @@ export const modul11: ModuleContent = {
                 "oyun-harita-izgara"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Your first room: a map with walls",
+            "problem": "So far our games have taken place on an empty screen. Real games, though, have rooms, mazes and corridors. Why can't a sprite go through a wall? And instead of placing a room with blocks one by one, how can we make it by drawing?",
+            "contentMd": "In this lesson you will draw your first map. A map is small square pictures (tiles) laid out in a grid. Tiles can be walls, or just decoration.\n\n### Map and tile\n- **Tile:** A 16 x 16 pixel square picture.\n- **Map:** A grid made of tiles. In this lesson the map called `oda` (room) has 10 columns and 7 rows. That makes 160 x 112 pixels.\n- **Wall:** A sprite cannot go into a tile marked as a wall. There is a \"wall\" box for this in the tile set.\n- Columns and rows are counted **from 0**. The top left tile is column 0, row 0.\n\n### Look first\n1. Open the activity and press the ▶ button. The cat is standing in the middle of the room.\n2. Go to the **Map** tab. You will see an empty map called `oda` and, under it, a **Tile set**. There are three tiles in the set: stone wall, grass and water.\n3. The **wall** box under the stone wall and water tiles is ticked. Grass is not ticked. So you can walk over grass, but you cannot get through stone wall or water.\n4. The red dashed frame on the map shows the first screen of the game.\n\n### Draw the map\n1. Click the **stone wall** tile in the tile set. The chosen tile is highlighted.\n2. Choose **Paint** from the tools.\n3. Paint the top row of the map by clicking and dragging from left to right. Then paint the bottom row, the left column and the right column. It should be a room completely surrounded by walls.\n4. If you like, choose the **Grass** tile and paint the inside of the room green with the **Fill** tool. Grass is only decoration.\n5. If you painted something by mistake, use the **Erase** tool.\n\n### Walk the cat\n1. Go to the **Blocks** tab. In the work area, inside the `when game starts` block, there are `load map: [oda]`, the making of a cat and the placing of the cat.\n2. From the **Controller** category, add the `[kedi] moves [in 4 directions] with player keys, speed [60]` block at the very bottom (`kedi` instead of `this sprite`).\n3. Press the ▶ button and walk the cat in four directions. It should stop when it hits a wall.\n\nExpected result: The cat walks inside the room but cannot go through the walls. All four goals are green.\n\n### How does it work?\n- The `load map: [oda]` block puts the map you drew in the Map tab into the game. Without this block, the map does not appear.\n- The `put sprite [kedi] on tile column [5] row [3]` block places the cat in the exact middle of the tile. Giving a position on the map is easier than counting pixels.\n- Wall tiles stop the sprite. You do not need to write a separate block for this. It is enough to make the tile a wall.\n- If a single gap is left in a wall, the cat gets out through it. The edge must be fully closed.\n\n### Try it\n1. Draw a few stone wall tiles in the middle of the room and watch the cat go around them.\n2. Paint the **Water** tile in one corner of the map. Can the cat go into the water?\n3. Tick the **wall** box of the grass tile. Can the cat go onto the grass?\n4. Make the map bigger by changing the **Columns** and **Rows** boxes. Paint the new tiles.\n\n### Common mistakes\n- If you painted the tile but its **wall** box is not ticked, the cat goes straight through it.\n- The `load map: [oda]` block must be inside the `when game starts` block. If it is left outside, the map does not come in.\n- To remove a tile you added to the map, use the **Erase** tool. If you remove a tile from the tile set, all its copies on the map are deleted too.\n- If the map's name changes somewhere, the same name must be chosen in the block as well. In this lesson, do not change the name `oda`.",
+            "question": "Why do we make most walls in a game by drawing a map rather than with blocks one by one? If you turned a real room (your own room or your classroom) into a grid, how big would it be?",
+            "explainerMd": "### What you will learn in this lesson\n- That a map is a grid made of small square pictures (tiles)\n- That columns and rows are counted starting from 0\n- What it means for a tile to be a \"wall\"\n- The difference between drawing the map, loading it into the game and putting a sprite on a tile\n\n### What you should know first\nThe lessons in module 11, week 1 and week 2: stage, sprite, moving with the arrow keys and lining blocks up under `when game starts`. No new idea is needed.\n\n### A map is a grid\nSo far you have moved sprites around an empty stage. Real games have rooms, corridors and mazes. Instead of drawing these piece by piece, we lay small square pictures called **tiles** side by side. A tile is 16 x 16 pixels. The grid the tiles are laid out in is called a **map**.\n\nThe room in this lesson has 10 columns and 7 rows:\n\n```\nwidth = 10 tiles x 16 pixels = 160 pixels\nheight = 7 tiles x 16 pixels = 112 pixels\n```\n\nThe screen is 160 pixels wide, so the room fits the screen exactly.\n\n### Column and row numbers start from zero\nTwo numbers are enough to describe a tile: the **column** (from left to right) and the **row** (from top to bottom). The top left corner is column 0, row 0. So the last column of a map with 10 columns is 9.\n\n```\n        column 0   1   2   3 ...\nrow 0       [ ] [ ] [ ] [ ]\nrow 1       [ ] [ ] [ ] [ ]\nrow 2       [ ] [ ] [ ] [ ]\n```\n\nThe centre of a tile is at column x 16 + 8 and row x 16 + 8 pixels. The centre of the tile at column 5, row 3 is the point (88, 56).\n\n### Tile set and wall\nTo paint the map you use a **tile set**. Every tile in the set has a **wall** box. If the box is ticked, a sprite cannot go into that tile; if it is not ticked, it walks over it.\n\n| Tile | Wall box | What does the sprite do? |\n|---|---|---|\n| Stone wall | ticked | Stops |\n| Water | ticked | Stops |\n| Grass | not ticked | Walks over it |\n\nPainting the tile with the right picture is not enough; you also need to set the box correctly. You do not write a separate block for the wall to work.\n\n### Drawing a map is different from loading it\nThe map you draw in the Map tab does not go into the game by itself. The `load map` block must run inside the `when game starts` block. Placing the sprite with the `put sprite on tile column row` block is also easier than counting pixels. If a single gap is left in the outer wall, the sprite gets out through it; the room must be fully closed.\n\n### Summary\nA map is a grid of 16 x 16 pixel tiles, and columns and rows are counted from 0. Tiles with a ticked wall box stop the sprite. You draw the map in the Map tab, but for it to appear in the game you need to run the `load map` block.",
+            "concepts": [
+              {
+                "term": "Tile",
+                "definition": "A small 16 x 16 pixel square picture that makes up the map.",
+                "example": "Stone wall, grass and water are three separate tiles; the map builds the room by laying them side by side.",
+                "pitfall": "Mixing up a tile and a sprite: a tile is one cell of the map; it does not move by itself."
+              },
+              {
+                "term": "Map and grid",
+                "definition": "The grid in which tiles are laid out in columns and rows; its size is given as a number of tiles.",
+                "example": "A room with 10 columns and 7 rows makes 160 x 112 pixels.",
+                "pitfall": "Drawing the map in the Map tab and forgetting to load it into the game: if the `load map` block does not run, the map does not appear."
+              },
+              {
+                "term": "Column and row (counting from 0)",
+                "definition": "A tile's address: the column from left to right, the row from top to bottom. The top left tile is column 0, row 0.",
+                "example": "The centre of the tile at column 5, row 3 is at (5 x 16 + 8, 3 x 16 + 8) = (88, 56) pixels.",
+                "pitfall": "Counting from 1: the last column of a map with 10 columns is 9, not 10."
+              },
+              {
+                "term": "Wall box",
+                "definition": "The box next to each tile in the tile set; if it is ticked, a sprite cannot go into that tile.",
+                "example": "Stone wall and water are ticked, grass is not; the cat walks on grass but cannot get through stone.",
+                "pitfall": "Painting a tile like a wall but not ticking the box: the cat goes straight through it."
+              },
+              {
+                "term": "Tile set",
+                "definition": "The list of tiles you can use on the map, and the settings of each one.",
+                "example": "In this lesson the set has stone wall, grass and water.",
+                "pitfall": "Removing a tile from the tile set: all its copies on the map are deleted too."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h3d11-q1",
+                "kind": "numeric",
+                "prompt": "The room map has 10 columns and 7 rows, and each tile is 16 pixels. How many pixels high is the map?",
+                "answer": 112,
+                "unit": "pixels",
+                "explanation": "The height is the number of rows times the tile size: 7 x 16 = 112 pixels. The value 160 is the width (10 x 16); mixing up rows and columns is the most common mistake.",
+                "skills": [
+                  "oyun-harita-izgara"
+                ]
+              },
+              {
+                "id": "m11h3d11-q2",
+                "kind": "mcq",
+                "prompt": "You painted the stone wall tile but the cat goes through the wall. What is the most likely reason?",
+                "options": [
+                  "The cat's speed is too high",
+                  "The map is bigger than 10 columns",
+                  "In the tile set, the stone wall tile's wall box is not ticked",
+                  "The `moves with player keys` block is missing from the blocks"
+                ],
+                "answer": 2,
+                "explanation": "What stops the sprite is not the tile's picture but the wall box. If the box is not ticked, the tile is only decoration. The speed and the map size do not affect whether the wall works; if the movement block were missing, the cat would not walk at all.",
+                "skills": [
+                  "oyun-karo-duvar"
+                ]
+              },
+              {
+                "id": "m11h3d11-q3",
+                "kind": "numeric",
+                "prompt": "You placed the cat with the `put sprite on tile column 5 row 3` block. At what x position in pixels is the cat's centre? (A tile is 16 pixels; the centre is the middle of the tile.)",
+                "answer": 88,
+                "unit": "pixels",
+                "explanation": "The column 5 tile starts at 5 x 16 = 80 pixels. The centre is half a tile (8 pixels) to the right: 80 + 8 = 88. If you multiply the column by 16 and forget to add the middle, you get 80.",
+                "skills": [
+                  "oyun-harita-izgara"
+                ]
+              },
+              {
+                "id": "m11h3d11-q4",
+                "kind": "find-bug",
+                "prompt": "You drew the map in the Map tab, but when you run the game the screen is empty and only the cat can be seen. The blocks are:\n\n```\n1  load map: [oda]\n2  when game starts\n3      make sprite [kedi]\n4      put sprite [kedi] on tile column [5] row [3]\n5      [kedi] moves with player keys\n```\n\nLine 1 stands on its own in the work area, not inside the `when game starts` block. What is the bug?",
+                "options": [
+                  "The `load map` block is left outside the `when game starts` block, so it never runs",
+                  "The cat's column and row are wrong",
+                  "The movement block is linked to the wrong sprite",
+                  "The map name is not written in capital letters"
+                ],
+                "answer": 0,
+                "explanation": "Blocks that should run at the start must be inside `when game starts`. A block left outside never runs, so the map is not loaded either. The cat's position and movement are correct; whether the map name is in capital or small letters is not the problem here.",
+                "skills": [
+                  "oyun-hata-ayiklama"
+                ]
+              },
+              {
+                "id": "m11h3d11-q5",
+                "kind": "predict-output",
+                "prompt": "The room is closed. There is a stone wall (wall box ticked) on the tile at column 4, row 3. The cat is put on the tile at column 2, row 3, and the player holds the right arrow key down.\n\n```\nload map: [oda]\nput [kedi] on tile column [2] row [3]\n[kedi] moves in 4 directions with player keys, speed [60]\n```\n\nWhat happens after a few seconds?",
+                "options": [
+                  "The cat goes through the wall to the right edge",
+                  "The cat jumps over the wall",
+                  "The wall disappears",
+                  "The cat stops just to the left of the stone wall and cannot go on"
+                ],
+                "answer": 3,
+                "explanation": "A tile with a ticked wall box stops the sprite; the cat stays put when it touches the wall. No separate block is needed for this. The wall disappearing by itself or the cat jumping is not set up by any block in this lesson.",
+                "skills": [
+                  "oyun-karo-duvar",
+                  "oyun-harita-izgara"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Labirentten çık",
@@ -1476,7 +2799,126 @@ export const modul11: ModuleContent = {
                 "oyun-karo-duvar"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Get out of the maze",
+            "problem": "Mazes are a very old game idea. You find a path between the walls and reach the exit. What does the computer look at to say \"you reached the exit!\"? How does it know that a sprite has touched a tile?",
+            "contentMd": "The maze map is ready. The cat (a mini cat) is on the start tile and walks with the arrow keys. The walls are brick. The exit door is in the bottom right corner of the maze. But when you go into the door, nothing happens.\n\n### The touching a tile event\nJust as sprites can hit each other, they can also touch tiles. The `when a [Player] sprite touches tile [Door]` block runs the blocks inside it **once**, the moment a Player touches a door tile.\n\n### Look first\n1. Press the ▶ button and try walking through the maze once. You cannot go through the brick walls.\n2. Go to the **Map** tab and study the path through the maze. Where is the exit?\n3. There are two tiles in the tile set: brick wall (wall box ticked) and door (not ticked). It matters that the door is not ticked: the sprite must be able to go into the door, because the event runs \"when it touches\".\n\n### Build the blocks\n1. Go back to the **Blocks** tab. From the **Stage / Map** category, drop the `when a [Player] sprite touches tile [Door]` event block into the work area. Choose the door from the picture list.\n2. Inside it, attach the `show [You found the exit!] on screen for [2] seconds` block from the **Game** category.\n3. From the **Sound** category, add the `play melody [victory]` block.\n4. At the very bottom, add the `end game: [you win]` block from the **Game** category.\n5. Press the ▶ button. Find the path through the maze and reach the door. The message appears and the game is won.\n\nExpected result: When the cat touches the door tile, the message is written, the victory melody plays and the game is won.\n\n### How does it work?\n- The event runs the moment the cat **first touches** the door. Staying on top of the door does not run it again and again.\n- The **wall** box in the tile set decides the walls. You can also use the same brick picture as a tile that is not a wall.\n- The maze uses a small cat (8 x 8 pixels). The corridors are 16 pixels wide, so it fits easily. A 16 x 16 sprite would be very squashed.\n- The background has been covered with a floor picture using `tile background with picture [Floor]`. This floor shows in the places left empty on the map.\n\n### Try it\n1. Add a score: put `set score to [0]` inside `when game starts`, and `change score by [100]` in the door event.\n2. Add a time counter: make the message with the `create text with` block: `[Exit: ]` and `time passed (s)`. Write how many seconds it took to get out.\n3. In the Map tab, draw a new wall inside the maze and make the path longer. Can the exit still be reached?\n\n### Common mistakes\n- If you forget to choose the **door** tile in the event, it waits for the wrong tile.\n- If the door tile's **wall** box is ticked, the cat cannot go into the door. Untick it.\n- If the maze's path is completely blocked, the exit can never be reached. Play the maze you edited yourself.\n- If you forget to end the game, the message appears but the game carries on.",
+            "question": "What makes a maze hard or easy? The number of paths, the dead ends, the time? If you designed your own maze, where would the exit be?",
+            "explainerMd": "### What you will learn in this lesson\n- That a sprite touching a tile is caught as an event\n- That the tile event runs once, at the moment of first touching\n- The three steps needed to win a game: message, sound, end the game\n- Why a maze has to be solvable\n\n### What you should know first\nLesson 11: map, tile, wall box, column and row. From week 2, it is enough to know how to write a message on the screen and play a melody.\n\n### Tiles make events too\nIn week 2 you ran an event when two sprites hit each other. The same idea works for tiles. The `when a [Player] sprite touches tile [Door]` block runs the blocks inside it when the player touches that tile. You make two choices in the event: which kind of sprite (Player) and which tile (Door).\n\n### The event runs once\nThe tile event is triggered **at the moment of first touching**. Even if the cat keeps standing on the door, the event does not run again and again. When it comes out and goes in again, it runs again.\n\n```\nplayer went into the door       -> the event runs (once)\nplayer waits there              -> the event does not run\nplayer came out and went in again -> the event runs again\n```\n\nSo if you put `change score by [100]` inside the event, waiting at the door does not raise the points.\n\n### The three steps of winning\nA player who finds the exit gets a reward and the game ends. The door event in the lesson has three blocks:\n\n1. `show [You found the exit!] on screen`: tells the player.\n2. `play melody [victory]`: a celebration sound.\n3. `end game: [you win]`: ends the game.\n\nIf the last one is missing, the message appears but the game carries on.\n\n### Maze design\nThe walls in the maze come from the tile set. The door tile's wall box must not be ticked, because the cat needs to go into the tile. A small cat (8 x 8 pixels) walks easily in 16 pixel corridors.\n\nIf you edit the maze, **a path to the exit must remain**. If the path is closed off with walls, the event never runs and the game cannot be won. So play the maze you changed yourself.\n\n### Summary\nThe event that runs when a tile is touched is triggered once, when the sprite first touches the tile. To let the player win the game, you write a message, play a melody and use the `end game` block. Keeping the path to the exit open is the first rule of maze design.",
+            "concepts": [
+              {
+                "term": "When touching a tile event",
+                "definition": "An event block that runs the blocks inside it when a sprite of a certain kind touches a certain tile.",
+                "example": "The `when a [Player] sprite touches tile [Door]` block runs when the cat touches the door.",
+                "pitfall": "Forgetting to choose a tile in the event, or choosing the wrong tile: it waits for the wrong tile."
+              },
+              {
+                "term": "Triggering once",
+                "definition": "The event runs once, at the moment the sprite first touches the tile; standing on it does not run it again.",
+                "example": "Even if you wait at the door for 3 seconds, `change score by 100` runs only once.",
+                "pitfall": "Thinking the points will go up if you wait."
+              },
+              {
+                "term": "End game",
+                "definition": "The block that finishes the game as won or lost.",
+                "example": "`end game: you win` goes at the end of the door event.",
+                "pitfall": "Forgetting this block: the message appears and the melody plays, but the game carries on."
+              },
+              {
+                "term": "Passable door tile",
+                "definition": "The exit tile's wall box is not ticked; that way the cat can go into the tile.",
+                "example": "In the tile set, the brick wall is ticked and the door is not.",
+                "pitfall": "Making the door tile a wall: the cat cannot go into the door."
+              },
+              {
+                "term": "Solvable maze",
+                "definition": "A maze with at least one open path from the start to the exit.",
+                "example": "After drawing a new wall, you try the maze by walking it yourself from start to finish.",
+                "pitfall": "Closing the path completely: the exit can never be reached and the game cannot be won."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h3d12-q1",
+                "kind": "mcq",
+                "prompt": "When does the `when a [Player] sprite touches tile [Door]` event run?",
+                "options": [
+                  "As soon as the game starts",
+                  "All the time, for as long as the player stands on the door",
+                  "Only when the game ends",
+                  "Once, at the moment the player first touches the door tile"
+                ],
+                "answer": 3,
+                "explanation": "The tile event runs once, at the moment the sprite goes into the tile. Standing on it does not trigger it again; coming out and going in again does. What runs at the start is the `when game starts` block.",
+                "skills": [
+                  "oyun-karo-olay"
+                ]
+              },
+              {
+                "id": "m11h3d12-q2",
+                "kind": "predict-output",
+                "prompt": "With the score at 0, the player goes into the door tile and waits there for 3 seconds, then you close the game.\n\n```\nwhen a [Player] sprite touches tile [Door]\n    change score by [100]\n```\n\nWhat is the score?",
+                "options": [
+                  "100",
+                  "0",
+                  "300",
+                  "18000"
+                ],
+                "answer": 0,
+                "explanation": "The event runs once, at the moment of first touching: 0 + 100 = 100. Waiting does not repeat the event, so it is not 300 or 18000. For it to be 0, the event would have to never run.",
+                "skills": [
+                  "oyun-karo-olay",
+                  "oyun-kazanma-kosulu"
+                ]
+              },
+              {
+                "id": "m11h3d12-q3",
+                "kind": "find-bug",
+                "prompt": "When the cat goes into the door, the message appears and the victory melody plays, but the game does not end and the cat keeps walking.\n\n```\n1  when a [Player] sprite touches tile [Door]\n2      show [You found the exit!] on screen for [2] seconds\n3      play melody [victory]\n```\n\nWhich is the bug?",
+                "options": [
+                  "The wrong sprite kind is chosen in line 1",
+                  "The message time should not be 2 seconds",
+                  "The `end game: you win` block is missing at the end of the event",
+                  "The melody name should not be `victory`"
+                ],
+                "answer": 2,
+                "explanation": "The message and melody work, so the event is being triggered; that means the kind and the tile are right. The only block that ends the game is `end game`, and it is missing. The time and the melody name do not affect whether the game ends.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-kazanma-kosulu"
+                ]
+              },
+              {
+                "id": "m11h3d12-q4",
+                "kind": "numeric",
+                "prompt": "The maze map has 12 columns and 9 rows. How many wall tiles are there in the outermost ring (the edge)? (Count the corners once.)",
+                "answer": 38,
+                "unit": "tiles",
+                "explanation": "There are 12 + 12 = 24 tiles in the top and bottom rows. In the left and right columns, without the corners, 7 + 7 = 14 tiles are left. The total is 24 + 14 = 38. If you add up the four sides as 12 + 12 + 9 + 9 = 42, you have counted the corners twice.",
+                "skills": [
+                  "oyun-harita-izgara"
+                ]
+              },
+              {
+                "id": "m11h3d12-q5",
+                "kind": "mcq",
+                "prompt": "While editing the maze, you drew new walls. How do you make sure the game can still be won?",
+                "options": [
+                  "I count the number of walls",
+                  "I try the maze by walking it myself from the start to the exit",
+                  "I delete the door event",
+                  "I make the cat faster"
+                ],
+                "answer": 1,
+                "explanation": "The most reliable way to show whether there is an open path to the exit is to actually walk the maze. The number of walls does not tell you the path is open; deleting the event or raising the speed does not open a closed path.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-karo-duvar"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Mağarada elmas avı",
@@ -1602,7 +3044,132 @@ export const modul11: ModuleContent = {
                 "oyun-olay-karosu"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Diamond hunt in the cave",
+            "problem": "On a map, some tiles are not just walls or floor. They can be gold, a key, a diamond or lava. Touching them makes something happen. So when you touch a diamond, how do you make that diamond **disappear** from the map? How does the computer know which diamond you touched?",
+            "contentMd": "A cave map is ready: there are four diamonds and three red lava tiles. The cat walks with the arrow keys, but nothing happens when it touches the diamonds or the lava. At the start the score is 0 and the lives are 3.\n\n### The event tile\nInside an event that runs when a tile is touched, you can find out where the touched tile is:\n- `event tile [column]`\n- `event tile [row]`\n\nIf you give these two numbers to the `clear tile at column [0] row [0]` block, exactly that tile disappears. The other diamonds stay where they are.\n\n### Collect the diamonds\n1. From the **Stage / Map** category, drop the `when a [Player] sprite touches tile [Diamond]` event into the work area. Choose **Diamond** as the tile.\n2. Attach the `clear tile at column [0] row [0]` block inside it. Put the `event tile [column]` block in the column slot, and the `event tile [row]` block in the row slot.\n3. Add the `change score by [1]` block from the **Game** category and the `play melody [point]` block from the **Sound** category.\n4. Press the ▶ button. Touch the diamonds: they disappear and the score goes up.\n\n### Win when they are all collected\n1. At the very bottom of the event, attach the `if ... do` block from the **Logic** category.\n2. For the condition, take the **=** comparison block. Put the `number of [Diamond] tiles on map` block in the left slot, and the number 0 in the right slot.\n3. Inside the `if`, attach the `show [You have all the diamonds!] on screen for [2] seconds`, `play melody [victory]` and `end game: [you win]` blocks.\n\n### Lava danger\n1. Bring a second event: `when a [Player] sprite touches tile [Lava]`.\n2. Inside it, attach the `change lives by [-1]`, `shake screen for [250] ms` and `play melody [boom]` blocks.\n3. Finally, add the `put sprite [this sprite] on tile column [1] row [1]` block. This way, when the cat touches lava, it is sent back to the start tile.\n4. Press the ↺ button. Touch the lava and see the cat go back. Then collect all the diamonds.\n\nExpected result: When you touch a diamond, the diamond disappears and the score goes up. At the fourth diamond the game is won. When you touch lava, a life goes and the cat goes back to the start.\n\n### How does it work?\n- The same event runs each time a diamond is touched, but the event tile's column and row tell you where that diamond is each time.\n- The `number of [Diamond] tiles on map` block gives how many diamonds are left on the map. When it is zero, they have all been collected. Because you do the check **after** the tile has been deleted, the number comes out right.\n- In the lava event, `this sprite` is the sprite that triggered the event, so the cat. That is why you do not need to write the cat's name.\n- Columns and rows are counted from 0. Column 1, row 1 is the first tile just inside the outer wall.\n\n### Try it\n1. Write the score in the winning message too: with the `create text with` block, `[Diamonds: ]` and `score`.\n2. Make the lava say `change lives by [-2]`. Did the game get harder?\n3. In the Map tab, paint a new diamond (choose **Diamond** from the tile set). Does winning still work correctly? Why?\n\n### Common mistakes\n- If you write fixed numbers in the block that clears the tile, the same tile is always deleted. Use the event tile's column and row.\n- Do not tick the **wall** box of the diamond and lava tiles. The cat cannot go into a tile that is a wall, and collecting looks odd.\n- If you do the winning check before the tile is deleted, the number comes out one too many and the game is never won.\n- If you forget the block that teleports the cat from the lava to the start tile, the cat stays on the lava and loses a life once.",
+            "question": "What does it add to the game for the tiles on the map to have different jobs (wall, danger, reward)? If you designed a cave, which jobs would you give to which tiles?",
+            "explainerMd": "### What you will learn in this lesson\n- How to find out the column and row of the touched tile with the \"event tile\" blocks\n- How to clear exactly that tile from the map\n- How to count how many of a certain tile are left on the map and win with it\n- How to lower the lives on a dangerous tile and send the player back to the start\n\n### What you should know first\nLesson 11 (column, row, counting from 0) and lesson 12 (the touching a tile event and ending the game). Remember the score and lives blocks from week 2 too.\n\n### Which tile did I touch?\nThere are four diamonds on the map. The same `touches tile [Diamond]` event looks after all of them. Inside the event, two blocks tell you which diamond the cat touched: `event tile [column]` and `event tile [row]`. If you give these to the `clear tile at column row` block, **the diamond you touched** disappears and the others stay where they are.\n\nIf you write fixed numbers, for example column 3 row 2, the same tile is always deleted.\n\n### Winning by counting\nWhen the diamonds run out, the game should be won. The `number of [Diamond] tiles on map` block tells you how many diamonds are left on the map. The rule: win when the number is 0.\n\n```\nclear the diamond tile\nchange score by 1\nif number of diamonds on map = 0\n    end game: you win\n```\n\n**Order matters.** If you do the check before clearing the tile, at the last diamond the number still shows 1 and the game is never won. Clear first, then count.\n\n| Left | Checking before deleting, as the last diamond is taken | After deleting |\n|---|---|---|\n| 1 | number 1, not won | number 0, won |\n\n### Lava: a dangerous tile\nYou write a second event for the lava tile: `change lives by [-1]`, shake the screen, play a boom sound and `put sprite [this sprite] on tile column [1] row [1]`. Column 1, row 1 is the first tile just inside the outer wall, and it becomes the starting point. `this sprite` is the sprite that triggered the event; so it is the cat.\n\nIf you forget the teleport, the cat stays on the lava. The event runs once, so a life is lost only once; but the player is still standing in the danger.\n\n### Summary\nThe event tile's column and row tell you which tile was touched; with them, exactly that tile is cleared. You must do the winning check after the tile has been cleared. Dangerous tiles like lava lower the lives and send the player back to the start.",
+            "concepts": [
+              {
+                "term": "Event tile (column, row)",
+                "definition": "Two values inside a tile event that give the column and row of the touched tile.",
+                "example": "When the cat touches the diamond at (8, 1), the event tile column is 8 and the row is 1.",
+                "pitfall": "Writing fixed numbers in the block that clears the tile: the same tile is always deleted."
+              },
+              {
+                "term": "Clear tile",
+                "definition": "The block that removes the tile at the given column and row from the map.",
+                "example": "When you touch a diamond, that diamond's tile is cleared and the other diamonds stay where they are.",
+                "pitfall": "Swapping the column and the row: another tile (or one outside the map) is pointed to."
+              },
+              {
+                "term": "Tile counter",
+                "definition": "The `number of [Diamond] tiles on map` block gives how many of that tile are left on the map.",
+                "example": "When three of the four diamonds have been collected, the counter shows 1.",
+                "pitfall": "Reading the counter before the tile is cleared: at the last diamond the number shows 1 and winning is never triggered."
+              },
+              {
+                "term": "Winning condition",
+                "definition": "An `if` block that makes the game won when a number or state is true.",
+                "example": "If the number of diamonds = 0, end game: you win.",
+                "pitfall": "Setting the condition up with the wrong number instead of `= 0`, or leaving the `if` block outside the event."
+              },
+              {
+                "term": "Dangerous tile (lava)",
+                "definition": "A tile that lowers the lives when touched; most of the time it also sends the player back to the start.",
+                "example": "On lava, `change lives by -1` runs and `this sprite` is put on the tile at column 1 row 1.",
+                "pitfall": "Forgetting the teleport block: the cat stays on the lava, a life goes and the player is still in danger."
+              },
+              {
+                "term": "This sprite",
+                "definition": "The sprite that triggered the event; in a tile event, it is the sprite that touched the tile.",
+                "example": "In the lava event, `this sprite` points to the cat that touched the lava.",
+                "pitfall": "Writing another sprite's name: the wrong sprite is moved."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h3d13-q1",
+                "kind": "mcq",
+                "prompt": "A friend of yours has written `clear tile at column [3] row [2]` in the diamond event. Whichever diamond the cat touches, what happens?",
+                "options": [
+                  "The touched diamond is deleted",
+                  "Nothing is deleted",
+                  "The tile at column 3, row 2 is deleted every time; the touched diamond may not be deleted",
+                  "All the diamonds are deleted at once"
+                ],
+                "answer": 2,
+                "explanation": "Fixed numbers point to the same tile at every touch. To delete the touched tile, the `event tile column` and `event tile row` values must be used. Deleting all the diamonds would need a separate loop or a turn-into block.",
+                "skills": [
+                  "oyun-olay-karosu"
+                ]
+              },
+              {
+                "id": "m11h3d13-q2",
+                "kind": "find-bug",
+                "prompt": "All four diamonds are collected and the score becomes 4, but the game is never won.\n\n```\n1  when a [Player] sprite touches tile [Diamond]\n2      if number of [Diamond] tiles on map = [0]\n3          end game: [you win]\n4      clear tile at column [event tile column] row [event tile row]\n5      change score by [1]\n```\n\nWhich line is wrong?",
+                "options": [
+                  "Lines 2-3: the check is done before the tile is cleared (line 4)",
+                  "Line 1: the wrong tile is chosen",
+                  "Line 5: the score should not go up by 1",
+                  "Line 4: the event tile should not be used in the clear block"
+                ],
+                "answer": 0,
+                "explanation": "When the last diamond is touched, the counter is still 1, because the clearing comes after the check. So `= 0` is never true. The fix is to do the clearing first. The score works (it becomes 4), so lines 1 and 5 are correct; line 4 is used correctly too.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-kazanma-kosulu"
+                ]
+              },
+              {
+                "id": "m11h3d13-q3",
+                "kind": "numeric",
+                "prompt": "At the start the score is 0 and the lives are 3. The diamond event raises the score by 1; the lava event lowers the lives by 1 and sends the cat back to the start. The cat touched these tiles in order: diamond, lava, diamond, lava, diamond (all different tiles). How many lives are left at the end?",
+                "answer": 1,
+                "unit": "lives",
+                "explanation": "The lava ran twice: 3 - 1 - 1 = 1. The diamonds do not change the lives (the score becomes 3). If there had been three lavas, the lives would be 0.",
+                "skills": [
+                  "oyun-karo-olay",
+                  "oyun-kazanma-kosulu"
+                ]
+              },
+              {
+                "id": "m11h3d13-q4",
+                "kind": "predict-output",
+                "prompt": "The lives are 5. In the lava event there is no block that sends the cat back to the start:\n\n```\nwhen a [Player] sprite touches tile [Lava]\n    change lives by [-2]\n```\n\nThe cat goes into the lava tile and stays on it for 4 seconds. How many lives are there?",
+                "options": [
+                  "5",
+                  "-3",
+                  "1",
+                  "3"
+                ],
+                "answer": 3,
+                "explanation": "The tile event runs once, at the first touch; 5 - 2 = 3. Even if the cat waits on the lava, the event does not repeat. It is not true that the lives drop every second (-3) or do not drop at all (5).",
+                "skills": [
+                  "oyun-karo-olay"
+                ]
+              },
+              {
+                "id": "m11h3d13-q5",
+                "kind": "mcq",
+                "prompt": "You want to point to the 3rd tile from the left and the 2nd from the top on the map. What should the column and row numbers be?",
+                "options": [
+                  "Column 2, row 1",
+                  "Column 3, row 2",
+                  "Column 2, row 3",
+                  "Column 1, row 2"
+                ],
+                "answer": 0,
+                "explanation": "Counting starts from 0: the 3rd tile from the left is column 2, and the 2nd tile from the top is row 1. Column 3, row 2 is actually the 4th from the left and the 3rd from the top; swapping the column and the row also points to another tile.",
+                "skills": [
+                  "oyun-harita-izgara",
+                  "oyun-olay-karosu"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Büyük bir dünya, kayan kamera",
@@ -1722,7 +3289,126 @@ export const modul11: ModuleContent = {
                 "oyun-karo-sprite"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "A big world, a scrolling camera",
+            "problem": "Some game worlds are much bigger than the screen. The screen is 160 pixels wide, but the world might be 480 pixels. So what do we see on the screen? The camera. The camera shows one part of the world and scrolls as the player walks.",
+            "contentMd": "The `ova` (plain) map is 30 tiles wide, so 480 pixels. That is three times the screen! The cat walks with the arrow keys but the camera is still, so when the cat goes right it leaves the screen and disappears. There are also 7 apple marks on the map: these are tiles with an apple picture. You will turn them into apples that can be collected.\n\n### Camera\n- The `camera follows sprite [kedi]` block ties the camera to the cat. As the cat walks, the view scrolls. If the world is smaller than the screen, the camera does not scroll.\n- The `camera stays still` block stops the following.\n- The `map [width] (tiles)` block tells you how big the map is.\n\n### Turning tiles into sprites\nThe apple tiles on the map are just pictures. To be collected, they need to be real sprites. The `turn all [Apple] tiles into [Food] sprites` block clears all the apple tiles on the map and puts a **Food** sprite in the place of each one.\n\n### Build the blocks\n1. Go to the **Map** tab and study the plain. The red dashed frame shows the first screen of the game: a very small part of the map. The trees are walls.\n2. Go back to the **Blocks** tab. Look at the blocks inside `when game starts`: the map has been loaded, the cat has been put at column 1, row 4, and it walks with the keys. The collecting event is ready too: when the cat touches a Food, the score goes up by 1 and the food is deleted.\n3. From the **Stage / Map** category, attach the `camera follows sprite [this sprite]` block at the very bottom of the inside of `when game starts`. Put the `kedi` variable in place of `this sprite`.\n4. In the same place, add the `turn all [Apple] tiles into [Food] sprites` block. Choose **Apple** as the tile and **Food** as the kind.\n5. Press the ▶ button. Walk the cat to the right. The view scrolls and you collect apples on the way.\n\nExpected result: The camera follows the cat. The 7 apples on the map turn into sprites that can be collected. When you collect an apple, the score goes up.\n\n### How does it work?\n- The camera tries to keep the sprite it follows in the middle of the screen. When it gets close to the edge of the world it stops, and it does not show empty space.\n- The map is the world; the screen is a window onto this world. With the camera, you choose where this window is.\n- After the turn-into block, no apple tiles are left on the map. The apples have become sprites. Sprites can move and take part in collision events. Tiles cannot.\n- For each sprite that is made this way, the `when a [Food] sprite is created` event runs. You can use it to give the apples movement, sound or other features.\n\n### Try it\n1. Give the apples a speed: write the `when a [Food] sprite is created` event and put `set [this sprite] speed x [0] y [20]` inside it. Do the apples slide down?\n2. Leave the camera still instead of following the cat: use `camera stays still`. What changed?\n3. In the Map tab, add new apple tiles or trees to the plain. Does it work?\n\n### Common mistakes\n- If you forget to add the camera, the cat leaves the screen.\n- If you do not turn the apple tiles into sprites, nothing happens even when the cat touches them. That is because the event waits for a Food **sprite**.\n- If you make the wrong choice of kind in the turn-into block, the apples cannot be collected. The kind must be **Food**.\n- If you put the camera block after the turn-into block and leave it as `this sprite`, the camera follows the apple made last. Always give the camera the `kedi` variable.",
+            "question": "Why don't games with big worlds show the whole world on the screen? What would a game without a camera be like? In which games does the camera never scroll, with a fixed screen?",
+            "explainerMd": "### What you will learn in this lesson\n- The difference between the world and the screen\n- How the camera follows a sprite and where it stops\n- Why tiles need to be turned into real sprites\n- How to put the camera and the turn-into block in the right place\n\n### What you should know first\nLesson 11 (map, tile, 16 pixels) and lesson 13 (deleting tiles from the map, score). Remember the collision event between sprites from week 2 too.\n\n### The world is big, the screen is small\nThe screen is fixed: 160 x 120 pixels. The map, though, can be bigger than this. The plain in this lesson is 30 tiles wide:\n\n```\n30 tiles x 16 pixels = 480 pixels\n480 / 160 = 3 times the width of the screen\n```\n\nThe screen is a window onto this world. The **camera** decides where in the world the window is.\n\n### The camera follows the cat\nThe `camera follows sprite [kedi]` block tries to keep the cat in the middle of the screen. The camera can scroll from the left edge of the world to the right edge; it does not go past the limit. The camera's x value is at least 0 and at most the world width minus 160.\n\n```\ncat x = 200 pixels  -> camera x = 200 - 80 = 120\ncat x = 30 pixels   -> the camera stops at the left edge, x = 0\ncat x = 470 pixels  -> the camera stops at the right edge, x = 480 - 160 = 320\n```\n\nThat is why no empty space shows at the edge of the world. To let go of the camera you use `camera stays still`; the camera stays where it is.\n\n### A tile is a picture, a sprite is a player\nThe apple tile on the map is only a picture; it cannot take part in the collision event needed for collecting. The `turn all [Apple] tiles into [Food] sprites` block clears all the apple tiles on the map and puts a **Food** sprite in the place of each one. Sprites can move, take part in collision events and be deleted.\n\n### Order and name\n- In the turn-into block, **Food** must be chosen as the kind; the collecting code waits for this kind.\n- Always give the camera the `kedi` variable. Outside an event, `this sprite` can be the sprite made last, and the camera may follow the wrong sprite.\n\n### Summary\nThe world is the map, and the screen is a 160 x 120 window onto the world. The camera keeps the sprite it follows in the middle, but it stops at the edge of the world. When the tiles on the map are turned into sprites, they can be collected or made to move.",
+            "concepts": [
+              {
+                "term": "World and screen",
+                "definition": "The world is the whole map; the screen is a 160 x 120 pixel window onto the world.",
+                "example": "The 30-tile plain is 480 pixels wide, three times the screen.",
+                "pitfall": "Thinking the screen is the world: the screen only shows one part of the world."
+              },
+              {
+                "term": "Camera following",
+                "definition": "The `camera follows sprite [kedi]` block scrolls the view so that it keeps the sprite in the middle of the screen.",
+                "example": "If the cat is at 200 pixels, the camera x is 200 - 80 = 120.",
+                "pitfall": "Not adding the camera block: the cat goes off the screen and disappears."
+              },
+              {
+                "term": "Camera limit",
+                "definition": "The camera stops at the edge of the world; it does not show the empty space outside the world.",
+                "example": "In a 480 pixel world, the camera x is at most 480 - 160 = 320.",
+                "pitfall": "Expecting the cat to still be in the middle of the screen at the edge: at the edge, the cat slides away from the middle."
+              },
+              {
+                "term": "Turning tiles into sprites",
+                "definition": "Clears one type of tile on the map and puts a sprite in the place of each one.",
+                "example": "Seven apple tiles turn into seven Food sprites.",
+                "pitfall": "Forgetting to turn them: the apple stays only a picture and the collision event does not run."
+              },
+              {
+                "term": "Sprite kind",
+                "definition": "A label of the sprite (player, food and so on); events work by kind.",
+                "example": "The collecting code waits for the `Food` kind.",
+                "pitfall": "Choosing the wrong kind when turning them: the apples cannot be collected."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h3d14-q1",
+                "kind": "numeric",
+                "prompt": "The plain map is 30 tiles wide (480 pixels). The camera follows the cat and the cat's centre is at x = 200 pixels. The screen is 160 pixels wide. What is the camera's x value?",
+                "answer": 120,
+                "unit": "pixels",
+                "explanation": "The camera keeps the sprite in the middle: 200 - 160 / 2 = 120. This value is between 0 and 480 - 160 = 320, so it does not hit the limit. Working out just 200 - 160 = 40 is forgetting to use half the screen.",
+                "skills": [
+                  "oyun-kamera",
+                  "oyun-harita-izgara"
+                ]
+              },
+              {
+                "id": "m11h3d14-q2",
+                "kind": "mcq",
+                "prompt": "The cat has walked to the far right end of the plain (x = 470 pixels) and the camera is following the cat. What do you see?",
+                "options": [
+                  "The camera stops at the right edge of the world; the cat slides a little to the right of the middle of the screen",
+                  "The camera shows the outside of the world",
+                  "The cat disappears",
+                  "The camera goes back to the left"
+                ],
+                "answer": 0,
+                "explanation": "The camera does not go past the limit of the world: x is at most 480 - 160 = 320. In this case the cat slides from the middle towards the right of the screen. No empty space is shown, the cat does not disappear and the camera does not go back to the left.",
+                "skills": [
+                  "oyun-kamera"
+                ]
+              },
+              {
+                "id": "m11h3d14-q3",
+                "kind": "find-bug",
+                "prompt": "The camera follows the cat, but when the cat touches an apple, the score does not go up and the apple is not deleted. The collecting code is correct: when `Player` and `Food` collide, the score goes up by 1.\n\n```\n1  when game starts\n2      load map: [ova]\n3      make the cat and put it on tile column [1] row [4]\n4      the cat moves with player keys\n5      camera follows sprite [kedi]\n```\n\nWhat is the bug?",
+                "options": [
+                  "There is no block that turns the apple tiles into Food sprites",
+                  "The camera in line 5 is wrong",
+                  "The cat should not be put on column 1",
+                  "The map name is wrong"
+                ],
+                "answer": 0,
+                "explanation": "The collision event waits for a Food sprite; the apple tiles, though, are only pictures. The turn-into block is missing, so the event is never triggered. The camera and the cat work, and the map has been loaded.",
+                "skills": [
+                  "oyun-karo-sprite",
+                  "oyun-hata-ayiklama"
+                ]
+              },
+              {
+                "id": "m11h3d14-q4",
+                "kind": "predict-output",
+                "prompt": "The plain is 30 tiles wide. There is no camera block in the blocks:\n\n```\nload map: [ova]\nput the cat on tile column [1] row [4]\nthe cat moves with player keys\n```\n\nThe player walks the cat to the column 12 tile (x = 200 pixels). What can be seen on the screen?",
+                "options": [
+                  "The camera follows the cat by itself",
+                  "The cat stops at column 9",
+                  "The camera does not move (x = 0); after 160 pixels the cat leaves through the right of the screen and cannot be seen",
+                  "The map shrinks"
+                ],
+                "answer": 2,
+                "explanation": "Without the follow block the camera stays still, and the screen shows the first 160 pixels of the world. At 200 pixels the cat is outside the screen. The camera does not follow by itself, and the map does not shrink.",
+                "skills": [
+                  "oyun-kamera",
+                  "oyun-hata-ayiklama"
+                ]
+              },
+              {
+                "id": "m11h3d14-q5",
+                "kind": "mcq",
+                "prompt": "Why do we turn the apple tiles into `Food` sprites?",
+                "options": [
+                  "Because the tiles are not coloured",
+                  "The camera only shows sprites",
+                  "To make the map smaller",
+                  "Sprites can take part in collision events, move and be deleted; a tile is only a picture on the map"
+                ],
+                "answer": 3,
+                "explanation": "An apple that is a sprite takes part in the collecting event, can be made to move and can be deleted. The colour, or what the camera shows, is not the reason for turning them; the map does not shrink either when they are turned, only the apple tiles are cleared.",
+                "skills": [
+                  "oyun-karo-sprite"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Hazine adası",
@@ -1839,7 +3525,123 @@ export const modul11: ModuleContent = {
                 "oyun-kazanma-kosulu"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Treasure island",
+            "problem": "We are bringing together all of this week's pieces to make a long adventure. The hero starts on an island. First they will find the key that opens the door, avoid the lava, collect the diamonds and finally reach the treasure chest. Everything is made with the map's tiles.",
+            "contentMd": "The island map is ready: 20 x 10 tiles. The hero is on the start tile, walks with the arrow keys and the camera follows them. The score is 0 and the lives are 3. But no tile does anything. You will write the rules.\n\n### The tiles on the map\n- **Stone wall:** There is a wall in the middle that splits the island in two.\n- **Door:** The way through in the wall. At the start it is closed like a wall. Its place: column 10, row 5 (columns and rows are counted from 0).\n- **Key:** Somewhere in the left half. It opens the door.\n- **Lava:** There are three lava tiles in the left half.\n- **Diamond:** There are three diamonds, two in the right half and one in the left half.\n- **Water:** There is a strip of water in the right half. Water behaves like a wall; you cannot get through.\n- **Chest:** The treasure chest, somewhere in the right half.\n\n### Rules\n1. When you touch the key, the key disappears and the door opens.\n2. When you touch a diamond, the diamond disappears and the score goes up by 1.\n3. When you touch lava, 1 life goes and the hero goes back to the start.\n4. When you touch the chest, it says \"You found the treasure! Score: ...\" and the game is won.\n\n### Look first\n1. Press the ▶ button and explore the island. The hero cannot go through walls or water. You cannot go everywhere on the map, because the door is closed.\n2. Go to the **Map** tab and study where the tiles are. Where are the key, the door and the chest?\n\n### Key and door\n1. From the **Stage / Map** category, put in the `when a [Player] sprite touches tile [Key]` event.\n2. Attach the `clear tile at column [event tile column] row [event tile row]` block inside it. This way the key disappears.\n3. Underneath, add a second `clear tile at column [10] row [5]` block. This opens the door. Type the numbers yourself.\n4. Add the `show [The door is open!] on screen for [2] seconds` and `play melody [power up]` blocks.\n\n### Diamonds\n1. Put in the `when a [Player] sprite touches tile [Diamond]` event.\n2. Inside it, put the block that clears the event tile, `change score by [1]` and `play melody [point]`.\n\n### Lava\n1. Put in the `when a [Player] sprite touches tile [Lava]` event.\n2. Inside it, attach the `change lives by [-1]`, `shake screen for [250] ms`, `play melody [boom]` and `put sprite [this sprite] on tile column [1] row [1]` blocks.\n\n### Chest and winning\n1. Put in the `when a [Player] sprite touches tile [Chest]` event.\n2. Inside it, add the `show [create text with ...] on screen for [3] seconds` block. In the create text block, put first the text `[You found the treasure! Score: ]`, then the `score` block.\n3. Add the `play melody [victory]` and `end game: [you win]` blocks.\n\n### Run it and try it\n1. Press the ↺ button. First touch one of the lava tiles. Then get the key, go through the door, collect the diamonds and reach the chest.\n2. Are all six items in the Goals panel green?\n\nExpected result: When you get the key, the door opens. Diamonds raise the score. Lava takes a life and sends you back to the start. When you touch the chest, the game is won with a message showing the score.\n\n### How does it work?\n- Every rule in this game is a **tile event**. The map's tiles carry the rules of the game. To add a new rule, you just draw a new tile and write an event.\n- The key and door system is an example of one event changing another place: touching the key removes the door somewhere else.\n- At the start, the door is a tile with its **wall box ticked**. When the tile is deleted, the wall disappears too and the way opens.\n- The camera does not show the outside of the island. The map is 320 x 160 pixels, so the screen only sees part of it.\n\n### Add your own touch\n1. Edit the map: in the Map tab, paint a new lava, diamond or wall. Is the path to the chest still open?\n2. Make the lava take more lives, or make the starting lives 5.\n3. When you collect a diamond, show the message `show [Shiny!] on screen for [1] seconds`.\n4. Close the door off with a thicker wall and put the key further away. Did the game get harder?\n\n### Common mistakes\n- If you write the wrong column and row for the door, another tile is deleted. Count the column and row in the Map tab; the first tile is 0.\n- If you forget to delete the event tile in the key event, the key stays where it is and the goal does not turn green.\n- If you forget to fill the slots of the `create text with` block in the score message, the message comes out incomplete.\n- If you write another sprite's name instead of `[this sprite]` in the lava event, the wrong sprite is moved.",
+            "question": "What turns a map into a game? The jobs of the tiles, or the events you write with blocks? What other kinds of tile could you add to treasure island to make the game more interesting?",
+            "explainerMd": "### What you will learn in this lesson\n- How to split a game's rules into tile events\n- How one event, like key and door, changes another place\n- How to plan with a rule table first and then build the blocks\n- How to make the game harder or easier by changing the map\n\n### What you should know first\nLessons 11-14: map and walls (11), the touching a tile event (12), clearing the event tile, winning by counting and lava (13), the camera (14). This lesson brings them all together.\n\n### Rule table first\nThere are four rules on treasure island. Before you build the blocks, write in a table what will happen on which tile:\n\n| Tile | What happens when you touch it? |\n|---|---|\n| Key | The key disappears, the door tile (column 10, row 5) disappears |\n| Diamond | The diamond disappears, the score goes up by 1 |\n| Lava | The lives go down by 1, the hero goes back to the start |\n| Chest | A message with the score is written, the game is won |\n\nEach row is an event: four `touches tile` blocks in total.\n\n### One event changes another place\nIn the key event, two tiles are cleared. The first is the key you touched; you do this with the event tile's column and row. The second is the door; its place is fixed, so you type the numbers yourself: column 10, row 5. The door tile has its wall box ticked, so it stops the hero. When the tile is deleted, the wall goes too and the way through opens.\n\nDo not mix up the column and the row. The island has 20 columns and 10 rows. Column 10 row 5 and column 5 row 10 are different places. The second one is outside the map, and no tile is deleted.\n\n### Big island, scrolling camera\nThe map is 20 x 10 tiles: 320 x 160 pixels. The screen is 160 x 120, so the camera follows the hero. The camera x can be at most 320 - 160 = 160, and the camera y at most 160 - 120 = 40.\n\n### Show that you have won\nThe message in the chest event is made with the `create text with` block: first the text `You found the treasure! Score: `, then the `score` block. If there are three diamonds and each one is worth 1 point, the message says 3. If you make the diamond's value 2, the message says 6; the message reads the score itself.\n\n### Summary\nThe game's rules are tile events. First you make a table, then you turn each row into an event block. In the key and door system, one event deletes another tile. The camera lets you see the work from the rule table.",
+            "concepts": [
+              {
+                "term": "Rule table",
+                "definition": "The plan in which you write what will happen when each tile is touched.",
+                "example": "Key: the key and the door are deleted. Diamond: score +1. Lava: lives -1 and back to the start. Chest: win the game.",
+                "pitfall": "Starting on the blocks without a plan: you forget a rule or make two rules clash."
+              },
+              {
+                "term": "Key and door system",
+                "definition": "Touching one tile opens a new way by deleting a tile somewhere else.",
+                "example": "When you touch the key, the tile at column 10 row 5 (the door) is cleared.",
+                "pitfall": "Writing the wrong column and row for the door: the door does not open, or another tile is deleted."
+              },
+              {
+                "term": "Door tile",
+                "definition": "A tile with its wall box ticked; when it is deleted, the wall goes too and the way through opens.",
+                "example": "The only way through the wall in the middle of the island is the door.",
+                "pitfall": "Never deleting the door: you cannot get to the half where the chest is."
+              },
+              {
+                "term": "Adding the score to a message",
+                "definition": "The `create text with` block joins text and the score block into one message.",
+                "example": "`You found the treasure! Score: ` + score; if the score is 3, it writes `You found the treasure! Score: 3`.",
+                "pitfall": "Not filling the slots of the create text block: the message comes out incomplete."
+              },
+              {
+                "term": "Tile rules",
+                "definition": "The game's rules live in the events of the tiles on the map; for a new rule, a new tile and event are added.",
+                "example": "Drawing a new lava tile on the map adds more danger; no new event is needed, the existing lava event is enough.",
+                "pitfall": "Drawing a new kind of tile and not writing an event for it: the tile does nothing."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h3d15-q1",
+                "kind": "numeric",
+                "prompt": "The treasure island map is 20 x 10 tiles (a tile is 16 pixels). The screen is 160 x 120 pixels. What is the largest value the camera's x can be?",
+                "answer": 160,
+                "unit": "pixels",
+                "explanation": "The world width is 20 x 16 = 320 pixels. The camera scrolls at most the world minus the screen: 320 - 160 = 160. If you write 320, you have let the camera go outside the world.",
+                "skills": [
+                  "oyun-kamera",
+                  "oyun-harita-izgara"
+                ]
+              },
+              {
+                "id": "m11h3d15-q2",
+                "kind": "find-bug",
+                "prompt": "The hero gets the key and the key disappears, but the door does not open. The door is on the tile at column 10, row 5.\n\n```\n1  when a [Player] sprite touches tile [Key]\n2      clear tile at column [event tile column] row [event tile row]\n3      clear tile at column [5] row [10]\n4      show [The door is open!] on screen for [2] seconds\n```\n\nWhich line is wrong?",
+                "options": [
+                  "Line 1",
+                  "Line 2",
+                  "Line 3: the column and row have been swapped",
+                  "Line 4"
+                ],
+                "answer": 2,
+                "explanation": "The door is at column 10, row 5, but line 3 says column 5, row 10. The island has 10 rows (0-9), so row 10 is outside the map and no tile is deleted. The key being deleted shows that line 2 works correctly.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-olay-karosu"
+                ]
+              },
+              {
+                "id": "m11h3d15-q3",
+                "kind": "mcq",
+                "prompt": "Which best explains why the door opens when the key is taken?",
+                "options": [
+                  "Because the hero walks faster",
+                  "The door opens by itself because its wall box is not ticked",
+                  "The camera hides the door",
+                  "The key event deletes the door tile from the map; when a tile with a ticked wall box is deleted, the wall goes too"
+                ],
+                "answer": 3,
+                "explanation": "The door is drawn as a wall, and the way only opens when the tile is deleted. If the door could be passed from the start, the lock would be pointless. The speed and the camera have nothing to do with the door opening.",
+                "skills": [
+                  "oyun-olay-karosu",
+                  "oyun-karo-olay"
+                ]
+              },
+              {
+                "id": "m11h3d15-q4",
+                "kind": "numeric",
+                "prompt": "You changed the diamond event to `change score by [2]`. The hero collected all three diamonds, never touched lava and reached the chest. The chest message joins `You found the treasure! Score: ` and the score block. What score does the message show?",
+                "answer": 6,
+                "unit": "points",
+                "explanation": "Three diamonds x 2 points = 6. The message reads the score itself, so when you change the event, the message updates by itself. Forgetting the diamond's value and writing 3 is using the old rule.",
+                "skills": [
+                  "oyun-kural-planlama",
+                  "oyun-kazanma-kosulu"
+                ]
+              },
+              {
+                "id": "m11h3d15-q5",
+                "kind": "predict-output",
+                "prompt": "There are three lava tiles on the island. The lava event does `change lives by -1` and sends the hero to the start tile (column 1, row 1). At the start the lives are 3. The hero touches three different lava tiles in turn. No other blocks have been written. What happens?",
+                "options": [
+                  "The lives become 0 and the game is lost",
+                  "The lives stay at 3",
+                  "The lives become -3 and the game goes on",
+                  "The game is won"
+                ],
+                "answer": 0,
+                "explanation": "On each lava the lives go down by 1: 3 - 3 = 0. When the lives reach 0, if no `when lives run out` event has been written, the game is lost by itself. The lives are not expected to go below zero with the game carrying on; to win, you need to reach the chest.",
+                "skills": [
+                  "oyun-karo-olay",
+                  "oyun-kazanma-kosulu"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1847,6 +3649,7 @@ export const modul11: ModuleContent = {
       "title": "Düşman ve zekâ",
       "project": "Hayalet avcısı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Zamanlayıcı olayıyla (`her ... ms'de bir`) ve `hızı ters çevir` bloğuyla bir düşmana devriye düzeni verebilir; hız, süre ve yol ilişkisini hesaplayabilir.\n2. `takip etsin` ve `arası mesafe` bloklarıyla \"yakınsa kovala, uzaksa dur\" kuralını kurabilir; `dursun` ile `takibi bıraksın` farkını açıklayabilir.\n3. Yönü derece olarak (0 yukarı, 90 sağ, 180 aşağı, 270 sol) okuyabilir ve rastgele sayıyla düşmana tahmin edilmesi zor bir hareket verebilir.\n4. A düğmesine basınca mermi sprite'ı yaratabilir; Mermi ve Düşman türleriyle çarpışma kuralı yazabilir; kullanılmayan mermileri silebilir.\n5. Devriye, takip, ateş, skor ve can kurallarını birleştirerek \"Hayalet avcısı\" oyununu tamamlayabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders 20-35 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Devriye: düşman gidip gelir | ~20 dk | Anlatımı oku, yarasayı zamanlayıcıyla gidip gelir yap, süreyi değiştirip yolu hesapla, mini testi çöz. |\n| 2 | Takip: hayalet seni kovalıyor | ~20 dk | Takip ve mesafe bloklarını dene, uyanma mesafesini 40 ve 100 yap, farkı konuş. |\n| 3 | Rastgele hareket: şaşkın yarasa | ~20 dk | Rastgele yön kur, zamanlayıcıyı 300 ve 2000 ms yap, hangisinin daha tehlikeli olduğunu söyle. |\n| 4 | Ateş etme: lazerle vur | ~25 dk | Lazeri yarat, hızını ve türünü ayarla, vurma kuralını kur, mermiyi sil. |\n| 5 | Proje: Hayalet avcısı | ~35 dk | Planı tabloya yaz, beş parçayı tek tek kur, oyna ve ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta 1-3. haftalardaki şu becerilere dayanır; başlamadan önce kontrol et:\n- Bir sprite yaratıp ona tür verebiliyor mu? (Düşman, Oyuncu, Mermi)\n- Bir sprite'a hız verip ekranda kalmasını ya da sekmesini ayarlayabiliyor mu?\n- Bir `eğer ... değilse` bloğu kurabiliyor mu?\n- Çarpışma olayı, skor ve can bloklarını biliyor mu?\n- Değişken oluşturup sprite'ı değişkenle seçebiliyor mu?\n\n### Kavram haritası\n- **Zaman:** `her karede` (saniyede 60) · `her N ms'de bir` (milisaniye) · yol = hız x süre\n- **Hareket:** hız (x, y) · yön (derece) · ters çevirme · takip · dursun\n- **Zekâ:** devriye (kendi düzeni) · algılama eşiği (mesafe < N) · rastgelelik (tohumlu formül)\n- **Mermi:** düğmeye basılınca yeni sprite · tür (Mermi) · bu sprite / diğer sprite · silme\n- **Oyun:** plan tablosu · paylaşılan tür · skor ve kazanma · can ve kaybetme\n\n### Sık yapılan hatalar\n- **Hızı ters çevirmek yerine hızı yeniden yazmak.** Zamanlayıcıda \"x hızı 40\" yarasayı döndürmez.\n- **Ters çevirmede yanlış eksen.** y (dikey) seçiliyse yatay hız hiç değişmez.\n- **Milisaniyeyi saniye sanmak.** 1500 ms bir buçuk saniyedir; yol hesabından önce saniyeye çevir.\n- **Takip bloğunun iki kutusuna aynı sprite'ı koymak.** Sprite kendini takip eder ve kıpırdamaz.\n- **`dursun` yerine `takibi bıraksın`.** Hayalet son hızıyla kaymaya devam eder.\n- **Mesafe denetimini `oyun başlayınca` içine koymak.** Kural yalnız bir kez sınanır.\n- **Yön için 1-100 gibi küçük bir aralık.** Yön için 0-359 gerekir.\n- **Lazeri Nesne türünde yaratmak.** Çarpışma kuralı Mermi türünü bekler ve çalışmaz.\n- **Mermiyi hiç silmemek.** Vuran lazeri `sil`, kaçanı `dünyadan çıkınca silinsin` ile temizle.\n- **Kazanma denetimini skorun değişmediği yere koymak.** Oyun hiç bitmeyebilir.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Devriye yarasasını bakmadan sıfırdan kur; zamanlayıcıyı 1000 ve 2000 ms yapıp yarasanın bir yönde kaç piksel gittiğini hesapla, sonra çalıştırıp kontrol et.\n4. Hayaletin uyanma mesafesini 40, 70 ve 100 yap; hangisinde oyun adil geliyor, nedenini bir cümleyle yaz.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Çarpışma kuralı neden sprite'ın adına değil türüne bakar?\"\n6. Yeni bir düşman türü düşün (örneğin örümcek) ve onun için bir plan tablosu çiz.\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Hayalet avcısı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Düşmanlar | Yarasa ya da hayaletlerden biri çalışmıyor | Yarasa sekiyor, hayaletler üstten gelip avcıyı takip ediyor | Hayaletlerin hızı ve üretim aralığı oyunu dengeli kılacak biçimde ayarlanmış |\n| Ateş | A'ya basınca lazer çıkmıyor ya da yanlış yöne gidiyor | Lazer avcının burnundan yukarı gidiyor ve ekrandan çıkınca siliniyor | İki lazer ya da B düğmesi gibi bir ekleme yapılmış |\n| Çarpışma ve skor | Vuruş skor vermiyor ya da lazer silinmiyor | Vuruş 1 puan veriyor, lazer ve hayalet kalkıyor | Kazanma ve kaybetme mesajları var |\n| Can | Düşman değince can değişmiyor | Can azalıyor, ekran sallanıyor, düşman siliniyor | `can bitince` ile oyun bitiyor |\n| Anlatım | Ne yaptığını anlatamıyor | Beş parçayı ve olaylarını anlatıyor | Bir hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta çocuk \"kural koyma\" fikrini öğrenir: düşmanı bir zamanlayıcı, bir mesafe ya da bir rastgele sayı yönetir. Kod yazmak yerine blok sürüklendiği için sonuç hemen ekranda görülür.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şunları sor: \"Hangi olay bu bloğu çalıştırıyor?\", \"Hızın işareti ne?\", \"Sprite'ın türü ne?\", \"Bu blok olayın içinde mi?\"\n- **Hata yapmak güvenlidir.** Her şey sanaldır; ↺ düğmesi oyunu başa sardığında hiçbir şey bozulmaz. Blok değişikliği çalışan oyuna yansımaz, önce ↺ gerekir.\n- **Sayılar.** Hız ve yol hesapları dört işlemle yapılır; mesafe sorusu Pisagor'u hazır bilmeyi gerektirmez, sayıları verilen örneklerdeki gibi 3-4-5 oranına yakın seçilmiştir.\n- **Düşman tasarımı.** Oyunun adil olması önemli bir tasarım sorusudur; çocukla \"bu düşmandan kaçmak mümkün mü?\" sorusunu konuşmak hem matematik hem tasarım düşüncesi kazandırır.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Give an enemy a patrol pattern with the timer event (`every ... ms`) and the `reverse speed` block, and calculate the link between speed, time and distance.\n2. Build the rule \"chase if near, stop if far\" with the `follows sprite` and `distance from` blocks, and explain the difference between `stops` and `stops following`.\n3. Read direction in degrees (0 up, 90 right, 180 down, 270 left) and give an enemy movement that is hard to predict with a random number.\n4. Create a bullet sprite when the A button is pressed, write a collision rule with the Bullet and Enemy kinds, and delete bullets that are no longer used.\n5. Finish the \"Ghost hunter\" game by combining the patrol, follow, shooting, score and lives rules.\n\n### Plan for the week\nThe week has five lessons; each lesson takes 20-35 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Patrol: the enemy goes back and forth | ~20 min | Read the explainer, make the bat go back and forth with a timer, change the time and calculate the distance, do the mini quiz. |\n| 2 | Follow: the ghost chases you | ~20 min | Try the follow and distance blocks, set the wake-up distance to 40 and 100, talk about the difference. |\n| 3 | Random movement: the confused bat | ~20 min | Build a random direction, set the timer to 300 and 2000 ms, say which one is more dangerous. |\n| 4 | Shooting: hit it with a laser | ~25 min | Create the laser, set its speed and kind, build the hit rule, delete the bullet. |\n| 5 | Project: Ghost hunter | ~35 min | Write the plan in a table, build the five parts one by one, play, and assess with the rubric. |\n\n### Prerequisite check\nThis week builds on these skills from weeks 1-3; check them before you start:\n- Can they create a sprite and give it a kind? (Enemy, Player, Bullet)\n- Can they give a sprite a speed and make it stay on screen or bounce?\n- Can they build an `if ... else` block?\n- Do they know the collision event and the score and lives blocks?\n- Can they create a variable and choose a sprite with a variable?\n\n### Concept map\n- **Time:** `every frame` (60 a second) · `every N ms` (milliseconds) · distance = speed x time\n- **Movement:** speed (x, y) · direction (degrees) · reversing · following · stops\n- **Brains:** patrol (its own pattern) · detection threshold (distance < N) · randomness (a formula with a seed)\n- **Bullet:** new sprite when a button is pressed · kind (Bullet) · this sprite / other sprite · deleting\n- **Game:** plan table · shared kind · score and winning · lives and losing\n\n### Common mistakes\n- **Writing the speed again instead of reversing it.** \"x speed 40\" in the timer does not turn the bat round.\n- **The wrong axis when reversing.** If y (up-down) is selected, the sideways speed never changes.\n- **Thinking milliseconds are seconds.** 1500 ms is one and a half seconds; change to seconds before working out the distance.\n- **Putting the same sprite in both slots of the follow block.** The sprite follows itself and does not move.\n- **`stops following` instead of `stops`.** The ghost keeps sliding at its last speed.\n- **Putting the distance check inside `when game starts`.** The rule is only tested once.\n- **A small range such as 1-100 for direction.** Direction needs 0-359.\n- **Creating the laser with the Object kind.** The collision rule expects the Bullet kind and does not run.\n- **Never deleting bullets.** Clear away the laser that hits with `delete`, and the one that misses with `delete when it leaves the world`.\n- **Putting the win check where the score does not change.** The game may never end.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the mini quiz questions you got wrong, then answer the question again.\n3. Build the patrol bat from scratch without looking; set the timer to 1000 and 2000 ms and work out how many pixels the bat goes in one direction, then run it and check.\n4. Set the ghost's wake-up distance to 40, 70 and 100; write in one sentence which one makes the game feel fair, and why.\n5. Answer this question in your own words: \"Why does the collision rule look at a sprite's kind and not its name?\"\n6. Think of a new kind of enemy (for example, a spider) and draw a plan table for it.\n\nAs an end-of-week test, the five lessons' mini quizzes are enough: 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Ghost hunter)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Enemies | The bat or one of the ghosts does not work | The bat bounces; the ghosts come from the top and follow the hunter | The ghosts' speed and making interval are set so that the game is balanced |\n| Shooting | No laser comes out when A is pressed, or it goes the wrong way | The laser goes up from the hunter's nose and is deleted when it leaves the screen | An extra has been added, such as two lasers or the B button |\n| Collision and score | A hit gives no score, or the laser is not deleted | A hit gives 1 point; the laser and the ghost are removed | There are winning and losing messages |\n| Lives | Lives do not change when an enemy touches | Lives go down, the screen shakes, the enemy is deleted | The game ends with `when lives run out` |\n| Explanation | Cannot explain what they did | Explains the five parts and their events | Explains a bug they made and how they found it |\n\n### Note for parents and teachers\n- **Aim.** This week the child learns the idea of \"setting rules\": an enemy is controlled by a timer, a distance or a random number. Because blocks are dragged instead of code being typed, the result appears on the screen straight away.\n- **How to help.** When they get stuck, instead of giving the answer, ask: \"Which event runs this block?\", \"What is the sign of the speed?\", \"What is the sprite's kind?\", \"Is this block inside the event?\"\n- **Making mistakes is safe.** Everything is virtual; nothing breaks when the ↺ button rewinds the game. Block changes do not reach the running game; you need ↺ first.\n- **Numbers.** The speed and distance calculations use the four operations; the distance question does not need Pythagoras to be known already, as the numbers are chosen close to the 3-4-5 ratio, as in the examples given.\n- **Enemy design.** Whether a game is fair is an important design question; talking with the child about \"is it possible to escape from this enemy?\" builds both maths and design thinking.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; they are only saved if consent has been given).",
       "lessons": [
         {
           "title": "Devriye: düşman gidip gelir",
@@ -1965,7 +3768,125 @@ export const modul11: ModuleContent = {
                 "game-velocity"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Patrol: the enemy goes back and forth",
+            "problem": "In a game, a guard bat flies back and forth along the same corridor. Nobody tells it \"turn now\", but it turns at exactly the right time. This week we will give enemies a little \"brain\". The first step is the simplest: a patrol that goes back and forth to its own rhythm.",
+            "contentMd": "On the stage there is a navy background and a bat. The bat flies to the right and, after a few seconds, leaves the screen and disappears. The starter project is ready for you. In the Goals panel on the right, the boxes turn ✓ as you finish each job.\n\n### The enemy \"kind\"\nThe bat is a sprite of the `Enemy` kind. A kind is a label: later, when we write rules like \"lose a life when you hit an enemy\", we will talk about kinds. For now we are only looking at how the bat moves.\n\n### Build the blocks\n1. Open the activity and press the ▶ button. The bat goes right and leaves the screen. Stop it with ■.\n2. From the **Game** category, take the `every [1000] ms` block and drop it in the workspace. Change the number to 1500. (1000 ms = 1 second, so 1500 ms is one and a half seconds.)\n3. From the **Motion** category, take the `reverse [this sprite] [x (sideways)] speed` block and snap it inside the `every 1500 ms` block. Replace `this sprite` with the `yarasa` (bat) block from the **Variables** category. Leave **x (sideways)** selected in the list.\n4. Press the ↺ button and watch. The bat goes right for one and a half seconds, then turns left, then goes right again.\n\nExpected result: after 6 seconds the bat is back where it started (x about 40). All three goals turn ✓.\n\n### How does it work?\n- The bat's speed in the x direction is 40. In one and a half seconds it travels 40 x 1.5 = 60 pixels.\n- The `reverse` block changes the sign of the speed: a speed of 40 becomes -40, and a speed of -40 becomes 40.\n- The `every ... ms` block runs once in that time, and this repeats for ever. The jobs inside the block are done every time.\n- Because the times going and coming back are equal, the bat returns to its starting point every 3 seconds.\n- This patrol is different from the \"bounce\" setting: it needs no wall or edge. The enemy's own timer decides.\n\n### Try it\n1. Set the timer to 1000 ms. How many pixels does the bat travel? Work it out, then check with ▶.\n2. Change the starting speed block to `set speed x 40 y 20`. The bat flies diagonally. To make it come back on patrol, add a `reverse [yarasa] [y (up-down)] speed` block to the timer as well.\n3. Make the bat look the way it is going: in the timer, build `if [yarasa x speed] > [0] do [yarasa] faces [right] else [yarasa] faces [left]`. Reverse the speed first, then choose the facing; this order matters.\n\n### Common mistakes\n- If you put `set speed x 40 y 0` inside the timer, the bat never turns, because the speed becomes 40 again every time. To reverse it you need the `reverse` block.\n- If **y (up-down)** is selected in the `reverse` block, the sideways speed never changes.\n- Block changes do not reach the running game. Press the ↺ button first.\n- You cannot set the timer below 50 ms.",
+            "question": "What would happen to the bat if the times going and coming back were different (for example, 1 s going and 2 s coming back)? In a real game, how does a player use the patrol pattern once they notice it?",
+            "explainerMd": "### What you will learn in this lesson\n- How to make an enemy go back and forth on its own\n- When, and how many times, the timer event (`every ... ms`) runs\n- The link between speed, time and distance (distance = speed x time)\n- How the `reverse speed` block changes the sign of the speed\n\n### What you should know first\nFrom earlier weeks: making a sprite and giving it a kind (weeks 1 and 2), giving a sprite a speed (lesson 4), choosing a sprite with a variable. You do not need anything else.\n\n### What is a patrol?\nA guard walks along the same corridor every night: forward, back, forward, back. In games this is called a **patrol**. An enemy on patrol does not see the player; it only follows its own pattern. The player learns this pattern and tries to get past at just the right moment. It is a simple idea, but it makes the game \"come alive\" for the first time.\n\n### Speed and distance\nIn the engine, speed is measured in pixels per second. If the bat's sideways speed is 40, it moves 40 pixels to the right every second. The link between them:\n\n```\ndistance = speed x time\n40 pixels/s x 1.5 s = 60 pixels\n```\n\nThe sign of the speed gives the direction: a positive x speed goes right, a negative x speed goes left. For up-down speed, a minus value means up, because y is zero at the top edge of the screen.\n\n### The timer event\nThe `every 1500 ms` block is an **event**. While the game is running, it runs the blocks inside it once every 1500 milliseconds (1.5 seconds) and keeps repeating this without stopping. A millisecond is one thousandth of a second: 1000 ms = 1 second. The timer can be 50 ms at the least; if you write a smaller number, the engine makes it 50.\n\n### Reversing the speed\nFor a patrol you do not need to write two separate movements. The `reverse speed` block changes the sign of the speed: a speed of 40 becomes -40, and -40 becomes 40 again. Watch which direction is selected in the block: if x (sideways) is selected, the sideways speed is reversed; if y (up-down) is selected, the up-down speed is reversed. If you write \"set speed x 40\" in the timer, the speed becomes 40 again every time and the bat never turns; giving a new value and reversing the one you have are different things.\n\nAt the start the bat goes right, after 1.5 seconds it turns left, and after 3 seconds it goes right again. Because the times going and coming back are equal, the bat returns to its starting point every 3 seconds.\n\n### Summary\nA patrol is an enemy going back and forth regularly. Speed is pixels per second, and distance is speed times time. The `every ... ms` event runs at a set interval; the `reverse` block you put inside it changes the sign of the speed and turns the bat round. Remember to choose the right direction (x or y).",
+            "concepts": [
+              {
+                "term": "Patrol",
+                "definition": "An enemy going back and forth all the time in its own pattern, without seeing the player.",
+                "example": "A guard bat that flies right for 1.5 seconds and left for 1.5 seconds along a corridor.",
+                "pitfall": "Thinking a patrol is a single movement block; turning round needs a timer and a reverse."
+              },
+              {
+                "term": "Timer event",
+                "definition": "The \"every N ms\" block runs the blocks inside it once every N milliseconds and keeps repeating.",
+                "example": "The every 1500 ms block turns the bat round every one and a half seconds.",
+                "pitfall": "Thinking 1000 ms is 1000 seconds; 1000 ms is only 1 second."
+              },
+              {
+                "term": "Speed and distance",
+                "definition": "Speed is the number of pixels travelled each second; distance = speed x time.",
+                "example": "If the speed is 40 and the time is 1.5 seconds, the bat travels 60 pixels.",
+                "pitfall": "Leaving the time in milliseconds when you calculate: multiplying by 1500 ms gives a very different answer from multiplying by 1.5 seconds."
+              },
+              {
+                "term": "Reverse speed",
+                "definition": "Changes the sign of the speed on the chosen axis: 40 becomes -40, and -40 becomes 40.",
+                "example": "When a bat with an x speed of 40 is reversed, it goes left at 40 pixels/s.",
+                "pitfall": "Leaving y (up-down) selected in the block; the sideways speed never changes and the bat does not turn."
+              },
+              {
+                "term": "Enemy kind",
+                "definition": "A label given to a sprite; rules are written for the sprite's kind.",
+                "example": "Because the bat is of the Enemy kind, a collision rule written later will apply to the bat too.",
+                "pitfall": "Choosing the wrong kind: the rule cannot find the kind it expects and never runs."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h4d16-q1",
+                "kind": "numeric",
+                "prompt": "The bat's sideways speed is 50 pixels/s. A timer reverses the speed every 2000 ms. How many pixels does the bat travel in one direction before it turns?",
+                "answer": 100,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "2000 ms = 2 seconds. Distance = speed x time = 50 x 2 = 100 pixels. Multiplying by the time in milliseconds (2000) would give 100000; change it to seconds before you calculate.",
+                "skills": [
+                  "game-velocity",
+                  "game-timer"
+                ]
+              },
+              {
+                "id": "m11h4d16-q2",
+                "kind": "mcq",
+                "prompt": "You put a \"set yarasa speed x 40, y 0\" block inside the bat's timer. The bat does not turn; it keeps going right. Why?",
+                "options": [
+                  "The timer must be at least 50 ms",
+                  "The bat cannot turn because it is of the Enemy kind",
+                  "Speed blocks do not work inside a timer",
+                  "Every time it runs, the speed is set to 40 again; there is no block that changes the sign of the speed"
+                ],
+                "answer": 3,
+                "explanation": "The speed block sets the speed to the given value; it does not reverse it. 40 is written as 40 again and again. To turn, you need the \"reverse\" block, which changes the sign of the speed. The 50 ms timer limit is not the problem here, and the kind does not stop it turning either.",
+                "skills": [
+                  "game-velocity",
+                  "game-timer"
+                ]
+              },
+              {
+                "id": "m11h4d16-q3",
+                "kind": "predict-output",
+                "prompt": "The bat starts at x = 50. The program is:\n\n```\nwhen game starts:\n  set yarasa speed x 30, y 0\n\nevery 1000 ms:\n  reverse yarasa x speed\n```\n\nAfter 3.5 seconds, where is the bat and which way is it going?",
+                "options": [
+                  "At about x = 65, going left",
+                  "Standing still where it started (x = 50)",
+                  "At about x = 80, going right",
+                  "At about x = 155, off the screen"
+                ],
+                "answer": 0,
+                "explanation": "0-1 s right: x = 80. 1-2 s left: x = 50. 2-3 s right: x = 80. At 3 seconds the third reverse makes the speed -30; in 0.5 seconds it goes 15 pixels left, so x = 65. So it is at about 65 and going left.",
+                "skills": [
+                  "game-velocity",
+                  "game-timer"
+                ]
+              },
+              {
+                "id": "m11h4d16-q4",
+                "kind": "find-bug",
+                "prompt": "The bat goes right but never comes back. Which is the bug?\n\n```\nwhen game starts:\n  set yarasa speed x 40, y 0\n\nevery 1500 ms:\n  reverse yarasa y (up-down) speed\n```",
+                "options": [
+                  "The starting speed should not be 40",
+                  "The timer should not be 1500 ms",
+                  "y (up-down) is selected in the reverse block; the sideways speed does not change",
+                  "The bat's kind label is missing"
+                ],
+                "answer": 2,
+                "explanation": "The bat moves sideways, but the reverse is applied to the up-down speed. The up-down speed is already 0, so reversing it changes nothing; the sideways speed never changes. The fix: set the axis in the block to x (sideways). The other lines have no bug.",
+                "skills": [
+                  "game-debug",
+                  "game-velocity"
+                ]
+              },
+              {
+                "id": "m11h4d16-q5",
+                "kind": "numeric",
+                "prompt": "The bat's timer is 800 ms. The times going and coming back are equal. Every how many milliseconds does the bat come back to its starting point?",
+                "answer": 1600,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "Every 800 ms the speed is reversed: it goes 800 ms one way and 800 ms the other way. A full round trip takes 800 + 800 = 1600 ms, and the bat is back at its starting point.",
+                "skills": [
+                  "game-timer",
+                  "game-velocity"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Takip: hayalet seni kovalıyor",
@@ -2084,7 +4005,125 @@ export const modul11: ModuleContent = {
                 "game-distance"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Follow: the ghost chases you",
+            "problem": "The scariest enemy is the one that sees you and comes after you. But if a ghost chases you across the whole map, the game becomes very hard. In good games the ghost only wakes up if you get close enough. In this lesson you will make a ghost that both chases and asks itself \"is it near or far?\".",
+            "contentMd": "On the stage there is a cat and, in the corner, a ghost. You can walk the cat with the arrow keys; the ghost does nothing yet. The starter project is ready for you, and the `every frame` event is waiting, empty.\n\n### Two new ideas\n- **Follow:** the `[hayalet] follows sprite [kedi] at speed [25]` block keeps the ghost walking towards the cat. You choose the speed (pixels per second).\n- **Distance:** the `distance from [hayalet] to [kedi]` block tells you how far apart the centres of two sprites are, in pixels.\n\n### Build the blocks\n1. First, simple following: from the **Sprite** category, take the `[this sprite] follows sprite [this sprite] at speed [30]` block. Put the `hayalet` (ghost) variable in the first slot and the `kedi` (cat) variable in the second; set the speed to 25. Snap the block inside the `every frame` event.\n2. Press ↺ and run away with the cat. Wherever you go, the ghost is after you. Unless the cat is very fast, you get caught.\n3. Now keep the ghost alert, but limited: the **Logic** category has two `if` blocks; take the one with an \"else\" branch and snap it inside the `every frame` block. Drag the follow block into the `do` branch.\n4. For the condition, take a comparison block (`[ ] = [ ]`) from the **Logic** category and change its sign to `<`. On the left, put `distance from [hayalet] to [kedi]` from the **Sprite** category; on the right, type 70.\n5. In the `else` branch, put the `[hayalet] stops` block from the **Motion** category. (`stops` sets the speed to zero and also ends the following.)\n6. Press ↺. Do not bring the cat closer than 70 pixels to the ghost: the ghost stays where it is. Come a little closer: the ghost wakes up and chases. When you move away, it stops again.\n\nExpected result: when the cat is near, the ghost moves towards it; when it is far away, the ghost does not move at all. Three goals ✓.\n\n### How does it work?\n- The `every frame` block runs 60 times a second, so the ghost checks \"is the cat near?\" 60 times a second.\n- The follow speed is fixed (25 here). If the cat walks at speed 60, the ghost can never catch it; you set the speeds to make the game harder or easier.\n- When the ghost is closer than 1 pixel to the cat, it stops; it does not climb on top of it.\n- There is also a `[hayalet] stops following` block for ending the follow, but this block does not set the speed to zero: the ghost carries on at its last speed. That is why we used `stops`.\n\n### Try it\n1. Set the wake-up distance to 40, then to 100. Which one feels fairer?\n2. Slow the ghost down (15) and speed the cat up (100). Make the cat and the ghost touch: what happens? (We will write the collision rule later; for now you are just watching.)\n3. Add a second ghost: make a new sprite with the `new [Ghost] sprite, kind [Enemy]` block, give it a different variable name, and build the same rule for it too.\n\n### Common mistakes\n- Putting the same variable in both slots of the follow block: the sprite tries to follow itself and nothing happens.\n- Putting the follow block only inside `when game starts` and not writing the distance rule inside `every frame`: the ghost chases for ever, or never wakes up.\n- Using `stops following` instead of `stops`: the ghost keeps sliding at its last speed.",
+            "question": "In real life, a dog barks when you come near and ignores you when you are far away. In which other game enemies have you seen this \"detection distance\" idea? Should the player be able to see the ghost's detection distance, or not?",
+            "explainerMd": "### What you will learn in this lesson\n- How to send one sprite after another sprite\n- What the distance between two sprites means and how it is measured\n- How to build the rule \"chase if near, stop if far\" with `if ... else`\n- The difference between `stops` and `stops following`\n\n### What you should know first\nLesson 16: speed and distance (distance = speed x time). From earlier weeks: the `if` block, choosing a sprite with a variable, the `every frame` event and walking a sprite with the arrow keys.\n\n### How does following work?\nThe `hayalet follows kedi at speed 25` block makes the ghost look towards the cat every frame and move that way at 25 pixels/second. If the cat moves, the ghost corrects its direction by itself. The follow speed is fixed: if the cat is running at speed 60, the ghost at speed 25 can never catch it. When the ghost comes closer than 1 pixel to the cat, it stops; it does not climb on top of it.\n\nAn important detail: if you put the same sprite in both slots (the ghost follows the ghost), the block does nothing.\n\n### Distance\nThe `distance from hayalet to kedi` block gives the distance between the **centres** of two sprites, in pixels. It combines the sideways difference and the up-down difference with Pythagoras' theorem:\n\n```\ndx = 80 - 20 = 60\ndy = 110 - 30 = 80\ndistance = square root(60 x 60 + 80 x 80) = 100\n```\n\nThe distance is always zero or positive; it does not matter which sprite you write first.\n\n### The detection threshold\nIf the ghost chases across the whole map, the game becomes hard. Instead we choose a **threshold**: if the distance is smaller than the threshold, the ghost \"wakes up\". The rule:\n\n```\nevery frame:\n  if distance < 70 do\n    hayalet follows kedi at speed 25\n  else\n    hayalet stops\n```\n\nThe `every frame` event runs 60 times a second, so the ghost checks \"is the cat near?\" 60 times a second. If you put this check inside `when game starts`, it is only checked once; even if the cat comes close later, the rule is not tested again.\n\n### stops and stops following\n`stops` sets the speed to zero and ends the following. `stops following` only ends the following; the speed stays as it is. The ghost keeps sliding in its current direction at its current speed. That is why we put `stops` in the \"else\" branch.\n\n### Summary\nThe follow block walks one sprite towards another at a fixed speed. The distance block measures between the centres in pixels. By combining a distance threshold with `if ... else`, you make the ghost an enemy that only wakes up when you are near. To really stop following, use `stops`.",
+            "concepts": [
+              {
+                "term": "Following",
+                "definition": "A sprite moving towards a target sprite at a fixed speed, every frame.",
+                "example": "The ghost follows the cat at speed 25 and turns whichever way the cat goes.",
+                "pitfall": "Putting the same sprite in both slots: the sprite tries to follow itself and does not move at all."
+              },
+              {
+                "term": "Distance",
+                "definition": "How far apart the centres of two sprites are, in pixels.",
+                "example": "If the centres are 60 pixels apart sideways and 80 pixels apart up-down, the distance is 100.",
+                "pitfall": "Thinking only the sideways difference is the distance; the up-down difference counts too."
+              },
+              {
+                "term": "Detection threshold",
+                "definition": "The largest distance at which the enemy notices the player; in the rule it is written as the number in a comparison.",
+                "example": "If the distance is less than 70, the ghost chases; otherwise it stops.",
+                "pitfall": "Choosing a threshold that is too big: the ghost sees you from everywhere and the game becomes unfairly hard."
+              },
+              {
+                "term": "stops and stops following",
+                "definition": "stops sets the speed to zero and ends the following; stops following only ends the following and leaves the speed as it is.",
+                "example": "If stops following is used, the ghost keeps sliding at its last speed.",
+                "pitfall": "Using stops following where it should stop: the ghost slides as if it were on ice."
+              },
+              {
+                "term": "Every frame",
+                "definition": "An event that runs 60 times a second while the game is on; used for rules that must be checked all the time.",
+                "example": "A ghost that measures the distance every frame notices at once when the cat comes near.",
+                "pitfall": "Putting the distance check inside when game starts: it is checked once and never tested again."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h4d17-q1",
+                "kind": "numeric",
+                "prompt": "The ghost's centre is at (20, 30) and the cat's centre is at (80, 110). What does the distance block give?",
+                "answer": 100,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "The sideways difference is 80 - 20 = 60, the up-down difference is 110 - 30 = 80. Distance = square root(60 x 60 + 80 x 80) = square root(10000) = 100. Adding the differences to get 140 is wrong; the distance is the diagonal line.",
+                "skills": [
+                  "game-distance"
+                ]
+              },
+              {
+                "id": "m11h4d17-q2",
+                "kind": "numeric",
+                "prompt": "The cat is standing still. The ghost wakes up 70 pixels from the cat and follows at speed 25. How many seconds pass until the distance drops to 20 pixels?",
+                "answer": 2,
+                "tolerance": 0.05,
+                "unit": "s",
+                "explanation": "The gap to close is 70 - 20 = 50 pixels. Time = distance / speed = 50 / 25 = 2 seconds. Because following moves in a straight line at a fixed speed, the calculation is direct.",
+                "skills": [
+                  "game-follow",
+                  "game-distance"
+                ]
+              },
+              {
+                "id": "m11h4d17-q3",
+                "kind": "predict-output",
+                "prompt": "The program is:\n\n```\nevery frame:\n  if distance(hayalet, kedi) < 70 do\n    hayalet follows kedi at speed 25\n  else\n    hayalet stops following\n```\n\nThe cat comes near the ghost, and the ghost wakes up and chases. Then the cat moves away fast and the distance goes past 70. What does the ghost do?",
+                "options": [
+                  "It stops at once",
+                  "It goes back to where it started",
+                  "It disappears from the screen",
+                  "It keeps sliding in the same direction at its last speed"
+                ],
+                "answer": 3,
+                "explanation": "\"Stops following\" only breaks the follow link; the speed stays as it is. The ghost keeps going in its current direction at speed 25. To make it stop, \"stops\" should have been put in the else branch.",
+                "skills": [
+                  "game-follow",
+                  "game-condition",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h4d17-q4",
+                "kind": "find-bug",
+                "prompt": "The ghost does not move at all. Which is the bug?\n\n```\nevery frame:\n  hayalet follows sprite hayalet at speed 25\n```",
+                "options": [
+                  "The follow speed should not be 25",
+                  "The every frame event cannot be used for following",
+                  "The ghost is also chosen as the target; the ghost is following itself",
+                  "The ghost should not be of the Enemy kind"
+                ],
+                "answer": 2,
+                "explanation": "The same sprite has been put in both slots of the follow block. A sprite cannot follow itself, so the block does nothing. The cat should have been put in the second slot. The speed and the event choice are correct.",
+                "skills": [
+                  "game-debug",
+                  "game-follow"
+                ]
+              },
+              {
+                "id": "m11h4d17-q5",
+                "kind": "mcq",
+                "prompt": "Why do we write the distance check inside \"every frame\" instead of \"when game starts\"?",
+                "options": [
+                  "The distance changes as the cat moves; the rule must be tested again 60 times a second",
+                  "The when game starts event does not support the distance block",
+                  "Every frame takes up less space",
+                  "The follow block only works inside every frame"
+                ],
+                "answer": 0,
+                "explanation": "The when game starts block runs only once; if the cat comes near later, nobody checks again. The every frame event runs 60 times a second, so the ghost notices at once when the cat comes near. When game starts can use the distance block too; the problem is the timing.",
+                "skills": [
+                  "game-condition",
+                  "game-distance"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Rastgele hareket: şaşkın yarasa",
@@ -2202,7 +4241,124 @@ export const modul11: ModuleContent = {
                 "game-random"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Random movement: the confused bat",
+            "problem": "An enemy that takes the same path every time soon gets boring; the player learns its pattern. Some enemies, though, fly off in a different direction at every moment, as if they were confused. How does a computer do \"random\"? In this lesson you will make a bat choose its own direction roughly every half second.",
+            "contentMd": "On the stage there is a bat standing in the middle of the screen. It does not move at all. The `every [700] ms` event is ready too, empty. The bat starts with the \"stay on screen\" setting, so it cannot leave the screen.\n\n### Direction and random numbers\nDirection is in degrees: 0 means up, 90 right, 180 down and 270 left. The `random integer from [1] to [100]` block in the **Math** category picks a number from the range each time. If the range is 0 to 359, it covers every direction.\n\n### Build the blocks\n1. From the **Motion** category, take the `[this sprite] moves in direction [90] degrees at speed [40]` block and snap it inside the `every 700 ms` block. Replace `this sprite` with the `yarasa` (bat) variable.\n2. In place of the 90 in the direction slot, snap in the `random integer from [1] to [100]` block from the **Math** category. Make the first number 0 and the second number 359.\n3. Press ↺. The bat flies in a different direction about every half second. When it reaches the edge of the screen it stops, because it has the \"stay on screen\" setting.\n4. Stop and restart the program a few times. Each time the bat draws a different path.\n\nExpected result: the bat moves, does not leave the screen, and its path changes on every run. (The activity checks this by trying it with two different randomness \"seeds\".)\n\n### How does it work?\n- The `at speed` block gives a direction and a speed together. In fact, it works out the x and y speeds for you.\n- The timer makes it choose a new direction every 700 ms. In between, the bat goes in a fixed direction.\n- On a computer, random numbers are made with a formula. In this game the formula moves on from a starting number (the \"seed\") on each run; that is why the activity check can be done reliably.\n- A shorter timer makes a jumpier bat that is hard to avoid. A longer timer is easier to predict.\n\n### Try it\n1. Set the timer to 300, then to 2000 ms. Which one feels more dangerous?\n2. Make the speed random as well: put a random number between 20 and 60 in the speed slot of the `at speed` block.\n3. Does the bat get stuck at the edge? Instead of \"stay on screen\", try the \"bounce off walls/edges: yes\" setting.\n\n### Common mistakes\n- If you leave the random number range at 1-100, the bat always goes right and a little up. For direction you need 0-359.\n- Putting the random direction inside `when game starts`: the direction is chosen once and the bat always goes the same way.\n- Leaving the `at speed` block outside the timer: the block never runs.",
+            "question": "Is a \"completely random\" enemy always good? If the player cannot find a pattern to learn, how fair is the game? How would you describe an enemy that is a bit random and a bit regular?",
+            "explainerMd": "### What you will learn in this lesson\n- How direction is given in degrees (0 up, 90 right, 180 down, 270 left)\n- The `moves in direction ... degrees at speed` block\n- How to choose the right range for the random number block\n- How a computer makes a \"random\" number\n\n### What you should know first\nLesson 16: the `every ... ms` event and speed. From earlier weeks: making a sprite, the `stay on screen` setting and the speed block.\n\n### Direction, in degrees\nInstead of telling a sprite \"your x speed is this, your y speed is that\", you can say \"go this way at this speed\". Direction is in degrees and is read like a compass:\n\n```\n  0 degrees   = up\n 90 degrees   = right\n180 degrees   = down\n270 degrees   = left\n```\n\nThe numbers in between are diagonals: 45 is up-right, 225 is down-left. The `moves in direction ... degrees at speed` block turns these two pieces of information into x and y speeds for you. For example, if the direction is 270 and the speed is 30, the x speed becomes -30 and the y speed 0. The sprite travels 90 pixels to the left in 3 seconds.\n\n### Random numbers\nEach time it runs, the `random integer from [1] to [100]` block picks a whole number from the given range. Both end numbers can be picked: if you say 5 to 8, you get 5, 6, 7 or 8 (4 possibilities). For direction you need the range 0 to 359, which covers the whole circle. If you write 1 to 100, all the directions are on the right-hand side and the bat never goes left.\n\n### Why random?\nIf an enemy always takes the same path, the player learns it by heart. Random movement makes the enemy unpredictable. The timer length sets its character: 300 ms makes the bat jumpy and hard to avoid, while 2000 ms makes it one that goes the same way for a long time and is easy to predict.\n\n### The seed: computers do not roll dice\nA computer does not really roll dice. It makes random numbers with a formula. The formula starts from a starting number, called the **seed**. If you start with the same seed, you always get the same list of numbers. In this game the seed changes on every run, so the bat draws a different path each time. The activity's own check tries two different seeds and makes sure the paths are different.\n\n### Summary\nDirection is between 0 and 359 degrees: 0 up, 90 right, 180 down, 270 left. `moves in direction ... degrees at speed` gives the direction and the speed together. The random number range must be chosen to cover every direction (0-359). Randomness is a formula with a seed; the timer length decides how restless the enemy will be.",
+            "concepts": [
+              {
+                "term": "Direction (degrees)",
+                "definition": "The angle of movement, read like a compass: 0 up, 90 right, 180 down, 270 left.",
+                "example": "Given 270 degrees and speed 30, the sprite goes 30 pixels to the left every second.",
+                "pitfall": "Thinking 0 degrees is right; in this game 0 is up and right is 90."
+              },
+              {
+                "term": "Random number",
+                "definition": "A block that picks a whole number from the given range each time it runs; both end numbers can be picked.",
+                "example": "A random integer from 5 to 8 can give 5, 6, 7 or 8.",
+                "pitfall": "Not matching the range to the job: if you write 1-100 for direction, it never goes left."
+              },
+              {
+                "term": "Seed",
+                "definition": "The starting number of the random number formula; the same seed gives the same list of numbers.",
+                "example": "Because the game takes a different seed on every run, the bat's path is always different.",
+                "pitfall": "Thinking the computer really rolls dice; the numbers come from a formula."
+              },
+              {
+                "term": "Timer length",
+                "definition": "Decides how often the random direction is renewed.",
+                "example": "300 ms makes the bat jumpy; 2000 ms makes it more predictable.",
+                "pitfall": "Putting the random direction inside when game starts: the direction is chosen only once and the bat always goes the same way."
+              },
+              {
+                "term": "moves in direction ... at speed",
+                "definition": "Gives the direction and the speed together; the engine turns them into x and y speeds.",
+                "example": "180 degrees, speed 40: the x speed becomes 0, the y speed 40, and the sprite moves down.",
+                "pitfall": "Leaving the block outside the timer: it never runs."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h4d18-q1",
+                "kind": "predict-output",
+                "prompt": "The program is:\n\n```\nwhen game starts:\n  move yarasa to x 100, y 60\n  yarasa moves in direction 180 degrees at speed 40\n```\n\nHow does the bat move?",
+                "options": [
+                  "It goes sideways to the right",
+                  "It moves down",
+                  "It moves up",
+                  "It goes sideways to the left"
+                ],
+                "answer": 1,
+                "explanation": "In degrees, 0 means up, 90 right, 180 down and 270 left. 180 degrees is down: the x speed becomes 0, the y speed 40, and the bat moves down 40 pixels every second.",
+                "skills": [
+                  "game-heading",
+                  "game-velocity"
+                ]
+              },
+              {
+                "id": "m11h4d18-q2",
+                "kind": "numeric",
+                "prompt": "The bat is at x = 100. It starts moving in direction 270 degrees at speed 30, and nothing stops it for 3 seconds. What is its x value after 3 seconds?",
+                "answer": 10,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "270 degrees is left; the x speed is -30. In 3 seconds it goes 30 x 3 = 90 pixels to the left: 100 - 90 = 10. If it had gone right, you would get 190.",
+                "skills": [
+                  "game-heading",
+                  "game-velocity"
+                ]
+              },
+              {
+                "id": "m11h4d18-q3",
+                "kind": "find-bug",
+                "prompt": "The bat picks a random direction, but it always flies towards the right of the screen and never goes left. Which is the bug?\n\n```\nevery 700 ms:\n  yarasa moves in direction [random integer from 1 to 100] degrees at speed 40\n```",
+                "options": [
+                  "The timer should not be 700 ms",
+                  "The speed should be 400 instead of 40",
+                  "The bat's stay on screen setting should not be on",
+                  "The range chosen for direction (1-100) only covers the right-hand side; it should be 0-359"
+                ],
+                "answer": 3,
+                "explanation": "Directions from 1 to 100 degrees are all in an area from up to right; left (270) and down-left directions cannot be picked. For the whole circle of directions you should write 0 to 359. The timer and the speed do not affect this direction.",
+                "skills": [
+                  "game-random",
+                  "game-heading",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h4d18-q4",
+                "kind": "mcq",
+                "prompt": "Which is true about two game runs started with the same seed?",
+                "options": [
+                  "The bat picks the same random directions both times",
+                  "The bat always picks different directions each time",
+                  "The random number block gives an error the first time it runs",
+                  "The seed is only used for sound"
+                ],
+                "answer": 0,
+                "explanation": "Random numbers come from a formula, and the formula starts from the seed. The same seed makes the same list of numbers. In normal play the seed changes every time, so the paths look different.",
+                "skills": [
+                  "game-random"
+                ]
+              },
+              {
+                "id": "m11h4d18-q5",
+                "kind": "numeric",
+                "prompt": "How many different values can the \"random integer from 5 to 8\" block give (both end numbers included)?",
+                "answer": 4,
+                "tolerance": 0,
+                "unit": "values",
+                "explanation": "The ends are included: 5, 6, 7 and 8. So there are not 8 - 5 = 3 but 8 - 5 + 1 = 4 different values. The range 0 to 359 likewise gives 360 different directions.",
+                "skills": [
+                  "game-random"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Ateş etme: lazerle vur",
@@ -2321,7 +4477,125 @@ export const modul11: ModuleContent = {
                 "game-velocity"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Shooting: hit it with a laser",
+            "problem": "In space games, when you press a key the ship fires a laser and the enemy explodes. How does a \"laser\" object suddenly appear on the screen? Who moves it? In this lesson, every time you press the A button you will create a new bullet sprite and send it at the enemy.",
+            "contentMd": "On the stage there is a night sky, a spaceship at the bottom and an alien waiting at the top. The ship moves left and right with the arrow keys and stays on the screen. The score starts at 0. The starter project is ready for you; the shooting is up to you.\n\n### A bullet is a sprite too\nThe laser is a small moving sprite. We give it the **Bullet** kind. That way we can write a rule like \"when a Bullet sprite hits an Enemy sprite\".\n\n### Build the blocks: fire the laser\n1. In the **Variables** category, press the **Create variable...** button and name it `lazer` (laser).\n2. From the **Controller** category, take the `when [A] button is [pressed]` block and drop it in the workspace.\n3. From the **Variables** category, take the `set [lazer] to [ ]` block and snap it inside this event. In the value slot, snap the `new [picture] sprite, kind [kind]` block from the **Sprite** category. Choose **Laser** from the picture list and **Bullet** from the kind list.\n4. From the **Sprite** category, take the `move [this sprite] to x [80] y [60]` block and snap it underneath. Replace `this sprite` with `lazer`.\n5. In the x slot, snap a `[gemi] x position` block (take the `[this sprite] [x position]` block from the **Sprite** category and choose `gemi` (ship) as the sprite). In the y slot, snap a subtraction block (`[ ] - [ ]`) from the **Math** category: put `gemi y position` on the left and 12 on the right. This way the laser comes out of the ship's nose.\n6. Snap the `set [lazer] speed x [0] y [-140]` block from the **Motion** category underneath. A minus y means up.\n7. Add the `[lazer] [delete when it leaves the world]: [yes]` block from the **Sprite** category. This way lasers that leave the top of the screen are deleted and the stage does not fill up.\n8. Press ↺ and press the space (A) key. Lasers come out of the ship going upwards.\n\n### Build the blocks: hit\n9. From the **Sprite** category, take the `when a [Bullet] sprite hits a [Enemy] sprite` event.\n10. Inside it, in this order: `change score by [10]` from the **Game** category; `play melody [boom]` from the **Sound** category; `make [other sprite] explode` and `delete sprite [this sprite]` from the **Sprite** category.\n11. Press ↺. Bring the ship under the alien and press the space key: the alien explodes and the score becomes 10.\n\nExpected result: when you press A, a laser comes out going upwards; when it hits the alien, the alien explodes, the laser is deleted and the score goes up.\n\n### How does it work?\n- Each press of the A button runs the event once. So each press creates a brand-new bullet sprite. Holding the button down does not fire again and again.\n- In a collision event, `other sprite` and `this sprite` are the sprites of the second and the first kind. We wrote \"when a Bullet hits an Enemy\": `this sprite` is the laser and `other sprite` is the alien.\n- The collision event runs once, at the moment the two sprites overlap. If you do not delete the laser, it carries on its way even after the alien explodes.\n- A speed of -140 means 140 pixels upwards every second. It gets from the ship's nose to where the alien is in about half a second.\n\n### Try it\n1. Set the laser's speed to -60: a slower laser that is easier to watch. Set it to -300: does the very fast laser ever miss the alien?\n2. Link firing to the B button: the **Controller** category has `when [B] button is [pressed]`.\n3. Make the ship fire two lasers: in the same event, create a second laser sprite, and move their x positions 6 pixels to the left and 6 pixels to the right of the ship.\n4. Give the alien a speed: add `set uzayli speed x 30 y 0` and the `bounce off walls/edges: yes` setting. Hitting a moving target is more fun.\n\n### Common mistakes\n- Leaving the bullet's kind as `Object`: the collision event expects the \"Bullet\" kind, so it never runs.\n- Leaving the laser's speed at 0: the laser comes out of the ship but stays where it is.\n- Never deleting the laser: lasers pile up on the screen. Use `delete when it leaves the world` for the ones that fly off the top and `delete` for the ones that hit.\n- Putting the collision event, the block with the rounded top, inside another event: events only work on their own in the workspace.",
+            "question": "If the player pressed A 20 times a second, how many lasers would be on the screen? How do real games limit the rate of fire?",
+            "explainerMd": "### What you will learn in this lesson\n- How a new sprite (a bullet) is created while the game is running\n- Why the sprite kind (Bullet, Enemy) matters in a collision rule\n- Who the `this sprite` and `other sprite` blocks are\n- Why you must delete bullets you no longer use\n\n### What you should know first\nLessons 16-18: speed and direction. From earlier weeks: making a sprite and giving it a kind, creating a variable, the `button is pressed` event, the collision event and the score.\n\n### A bullet is a sprite too\nThe laser is nothing special: it is an ordinary small sprite that moves fast. The difference is that it is created **later**, when the player presses a key. It is not on the screen when the game starts. When the `when A button is pressed` event runs, a `new sprite` block runs and adds a new laser to the stage.\n\nYou say where to put the laser. To make it come out of the ship's nose, you make its x the same as the ship's and move its y 12 pixels up:\n\n```\nlazer x = gemi x\nlazer y = gemi y - 12\nlazer speed = x 0, y -140\n```\n\nA minus y is up. A speed of -140 means the laser goes 140 pixels up every second. If the speed stays at 0, the laser hangs where it is.\n\n### Every press, a new bullet\nThe event runs once, at the moment the button is pressed. Every press means a brand-new laser sprite. Holding the button down does not fire again and again, because holding it does not count as a new press. If you press 4 times a second, you get 4 new lasers a second. If a laser stays on the screen for 1.5 seconds, you see at most 4 x 1.5 = 6 lasers at the same time.\n\n### Kind and collision\nWe write the collision rule as `when a Bullet sprite hits a Enemy sprite`. The rule looks at the sprite's **kind**, not its name. If you create the laser with the `Object` kind, the rule never recognises it and nothing happens. Inside the event there are two special blocks: `this sprite` is the kind written first in the rule (here the laser), and `other sprite` is the kind written second (here the alien).\n\n### Tidying up\nThe collision event runs only once, at the moment the two sprites overlap. If you do not delete the laser, it carries on its way even after the alien explodes. You clear away the laser that hit with `delete sprite this sprite`, and the target with `make other sprite explode`. For lasers that fly off the top of the screen without hitting anything, you also need the `delete when it leaves the world: yes` setting; otherwise the stage slowly fills up with bullets.\n\n### Summary\nA laser is an ordinary sprite created when a button is pressed. Its position is set to the ship's nose and its speed to a negative y. The collision rule looks at the kind; `this sprite` is the first kind and `other sprite` the second. Delete the bullet that hits, and clear away the bullet that misses with `delete when it leaves the world`.",
+            "concepts": [
+              {
+                "term": "Creating a new sprite",
+                "definition": "Adding a brand-new sprite to the stage from inside an event while the game is running.",
+                "example": "Every time you press the A button, a new laser sprite is created.",
+                "pitfall": "Creating the sprite once inside when game starts and using the same one for every press: there is only ever one bullet."
+              },
+              {
+                "term": "Bullet kind",
+                "definition": "The label the collision rule recognises; if the laser is created with the Bullet kind, the rule finds it.",
+                "example": "The rule \"when a Bullet hits an Enemy, raise the score\" finds the laser of the Bullet kind.",
+                "pitfall": "Leaving the kind as Object: the collision event never runs."
+              },
+              {
+                "term": "this sprite and other sprite",
+                "definition": "In a collision event, the sprite of the kind written first is this sprite and the second is other sprite.",
+                "example": "In the event when a Bullet hits an Enemy, this sprite is the laser and other sprite is the alien.",
+                "pitfall": "Mixing the two up and trying to blow up the laser and delete the alien."
+              },
+              {
+                "term": "Delete when it leaves the world",
+                "definition": "A setting that deletes a sprite by itself when it goes off the screen.",
+                "example": "A laser that leaves the top of the screen is deleted and the stage does not fill up.",
+                "pitfall": "Not turning this setting on: missed bullets pile up and the stage fills up."
+              },
+              {
+                "term": "When button is pressed",
+                "definition": "An event that runs once at the moment the button is pressed; holding it down does not start a new run.",
+                "example": "If you press A twice, two lasers come out.",
+                "pitfall": "Expecting rapid fire from holding the button down."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h4d19-q1",
+                "kind": "numeric",
+                "prompt": "The laser appears at y = 88 and goes up at 140 pixels a second. In how many seconds does the laser's centre reach y = 18?",
+                "answer": 0.5,
+                "tolerance": 0.01,
+                "unit": "s",
+                "explanation": "The distance to travel is 88 - 18 = 70 pixels. Time = distance / speed = 70 / 140 = 0.5 seconds. Note: in the real game the sprites have a size, so the collision happens a little before the centres meet.",
+                "skills": [
+                  "game-velocity",
+                  "game-spawn"
+                ]
+              },
+              {
+                "id": "m11h4d19-q2",
+                "kind": "predict-output",
+                "prompt": "The laser is created with the \"delete when it leaves the world\" setting. The collision event is:\n\n```\nwhen a Bullet sprite hits a Enemy sprite:\n  change score by 10\n  make other sprite explode\n```\n\nWhat happens after the laser hits the alien?",
+                "options": [
+                  "The laser is deleted at once too",
+                  "The laser stops and stays where the alien was",
+                  "The laser carries on its way and is deleted when it leaves the top of the screen",
+                  "The laser comes back"
+                ],
+                "answer": 2,
+                "explanation": "There is no block in the event that deletes the laser; only the alien explodes. The laser keeps going up and is deleted thanks to the setting when it leaves the screen. This bug leads to unneeded bullets piling up on the screen.",
+                "skills": [
+                  "game-collision",
+                  "game-debug"
+                ]
+              },
+              {
+                "id": "m11h4d19-q3",
+                "kind": "find-bug",
+                "prompt": "The lasers come out and touch the alien, but the score never goes up. Which is the bug?\n\n```\nwhen A button is pressed:\n  lazer = new [Laser] sprite, kind [Object]\n  set lazer speed x 0, y -140\n\nwhen a Bullet sprite hits a Enemy sprite:\n  change score by 10\n```",
+                "options": [
+                  "The laser is created with the Object kind; the collision rule expects the Bullet kind",
+                  "The speed should not be -140",
+                  "The score should change by 1, not 10",
+                  "The A button event cannot be used together with a collision"
+                ],
+                "answer": 0,
+                "explanation": "The collision rule looks at the sprite's kind. Because the laser is of the Object kind, the Bullet rule never sees it and the score does not change. Creating the laser with the Bullet kind fixes the problem. The speed and score numbers are not wrong.",
+                "skills": [
+                  "game-debug",
+                  "game-collision",
+                  "game-spawn"
+                ]
+              },
+              {
+                "id": "m11h4d19-q4",
+                "kind": "mcq",
+                "prompt": "Inside the \"when a Bullet sprite hits a Enemy sprite\" event, who is \"this sprite\"?",
+                "options": [
+                  "The sprite of the Enemy kind",
+                  "The sprite of the Bullet kind",
+                  "The player",
+                  "Someone at random"
+                ],
+                "answer": 1,
+                "explanation": "This sprite is the kind written first in the rule: Bullet. Other sprite is the second kind: Enemy. You use this sprite to delete the laser and other sprite to blow up the alien.",
+                "skills": [
+                  "game-collision"
+                ]
+              },
+              {
+                "id": "m11h4d19-q5",
+                "kind": "numeric",
+                "prompt": "The player presses A 5 times a second. Each laser stays on the screen for exactly 2 seconds (then it is deleted). At most, how many lasers are on the screen at the same time?",
+                "answer": 10,
+                "tolerance": 0,
+                "unit": "lasers",
+                "explanation": "5 new lasers are created every second and each one lives for 2 seconds: 5 x 2 = 10 lasers are on the screen at the same time. Holding the button down does not raise this number, because it does not count as a new press.",
+                "skills": [
+                  "game-spawn",
+                  "game-velocity"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Hayalet avcısı",
@@ -2437,7 +4711,122 @@ export const modul11: ModuleContent = {
                 "game-planning"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Ghost hunter",
+            "problem": "This week, all together: a patrol bat that keeps bouncing, ghosts that chase you, and shooting too. When you put them all in the same game, you will feel like a night guard. It is time to break your own game's logic into pieces and build them one by one.",
+            "contentMd": "### What are we going to make?\nIn a night scene, a hunter (an astronaut) is at the bottom of the screen. It can only walk left and right, and it stays on the screen. The score is set to 0 and lives to 3. You will add these:\n\n| Part | Which lesson you learnt it in | What will it do? |\n|---|---|---|\n| Patrol bat | 16 | A bat going back and forth at the top |\n| Chasing ghosts | 17 | Ghosts that come from the top and follow the hunter |\n| Laser | 19 | Fire with A, upwards |\n| Hit rule | 19 | Each hit is 1 point, win at 5 points |\n| Lives rule | 9 | If an enemy touches the hunter, a life is lost |\n\n### Build the blocks\n1. **Bat:** at the very bottom of the `when game starts` block, set up the bat: `set yarasa to [new [Bat] sprite, kind [Enemy]]`, `move yarasa to x 20 y 30`, `set yarasa speed x 40 y 0` and `yarasa [bounce off walls/edges]: [yes]`. The bat goes back and forth on the screen. (You can also choose the timer method from lesson 16.)\n2. **Ghosts:** build an `every [900] ms` event. Inside it: `set hayalet to [new [Ghost] sprite, kind [Enemy]]`; `move hayalet to x [random integer from 10 to 150] y [-8]`; `[hayalet] follows sprite [avci] at speed [15]`. Ghosts come from random places at the top and drift towards the hunter (`avci`).\n3. **Laser:** fire a laser with the `when [A] button is [pressed]` event, as in lesson 19. The laser should appear at `avci x position` and `avci y position - 12`, with `speed x 0 y -140` and `delete when it leaves the world: yes`.\n4. **Hit:** in the `when a [Bullet] sprite hits a [Enemy] sprite` event, put `change score by [1]`, `play melody [boom]`, `make [other sprite] explode` and `delete sprite [this sprite]`. Then, with an `if [score] ≥ [5] do` block, add `show [Hunter wins!] on screen for [2] seconds` and `end game: [you win]`. (The `score` block is in the **Game** category.)\n5. **Lives:** in the `when a [Player] sprite hits a [Enemy] sprite` event, put `change lives by [-1]`, `shake screen for [250] ms` and `delete sprite [other sprite]`.\n6. Press ↺ and play. Ghosts drift down from the top while you move left and right and shoot. When you hit 5 ghosts, \"Hunter wins!\" appears.\n\nExpected result: all six goals ✓. The bat bounces, the ghosts follow the hunter, A fires a laser, collisions change the score and lives, and the game is won at 5 points.\n\n### How does it work?\n- The bat and the ghosts are both of the **Enemy** kind. That is why the hit and lives rules apply to both of them. One rule, two different enemies.\n- The ghosts enter the stage from above, and their follow speed (15) is much lower than the hunter's speed (80). This gives the player time to escape.\n- The three events (hit, lives, timer) run independently of each other. Breaking one does not break the others.\n- It takes the ghosts more than seven seconds to get from the top of the screen to the hunter; that is enough time to shoot.\n\n### Try it\n1. Set the ghost's speed to 30 and make one every 600 ms. How many times harder did the game get?\n2. Raise the target: increase the winning score from 5 to 10 and make ghosts every 700 ms. Is the game still balanced, or has it become too hard?\n3. In the `when lives run out` event, add `show [Ghosts win!] on screen` and `end game: [you lose]`.\n\n### Common mistakes\n- Writing `this sprite` instead of `avci` in the ghost's follow block: the ghost follows itself and does not move at all.\n- In the hit rule, blowing up `other sprite` but forgetting to delete `this sprite`: the laser keeps going through the target.\n- Putting the `if score ≥ 5` block outside the collision event: the game may never end.\n- Making the ghosts too fast: the player has no chance.",
+            "question": "Which part of this game keeps you busiest: the bat, the ghost or the laser? If a friend played it, which enemy would they find harder? Why?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine several small rules in one game\n- How to plan a game by breaking it into pieces\n- How a single rule is applied to enemies of the same kind\n- How to think about winning and losing conditions together\n\n### What you should know first\nLesson 16 (patrol), lesson 17 (following and distance), lesson 19 (shooting and collision), lesson 9 (the lives rule). The random number from lesson 18 is also used to choose where the ghosts appear.\n\n### Plan first\nA big game is not written in one go. First we write what we need in a table:\n\n```\nPart       What it does                     Which event\nBat        goes back and forth at the top   when game starts\nGhost      comes from the top, chases       every 900 ms\nLaser      goes up with A                   when A is pressed\nHit        gives points, checks for a win   Bullet hits Enemy\nLives      a life is lost if an enemy hits  Player hits Enemy\n```\n\nEach row is a separate event, and they run independently of each other. If you break one, the others keep working; this is very useful when you are looking for a bug.\n\n### One rule, two enemies\nThe bat and the ghost are both of the **Enemy** kind. That is why the `Bullet hits Enemy` rule applies to both of them at once. When you add a new enemy, you do not write a new rule; you just choose Enemy as its kind. This is the real power of using kinds.\n\n### Making ghosts\nThe `every 900 ms` event creates a new ghost sprite, puts it at a random x at the top of the screen (y = -8) and makes it follow the hunter. With a 900 ms interval, about one ghost appears every second. The ghost's speed is 15 and the hunter's speed is 80: the player has time to escape and to shoot. If a ghost is 112 pixels away from the hunter directly below it, it takes 112 / 15, about 7.5 seconds, for the centres to meet; because the sprites have a size, they touch earlier, at about 6.4 seconds.\n\n### Winning and losing\nEach hit raises the score by 1. At the end of the hit rule, an `if score >= 5 do` block shows the winning message and ends the game. You put this check **inside** the hit event, because that is the only place where the score changes. For losing there is the lives rule: when the hunter touches an enemy, lives go down by 1; if it touches 3 times, the lives run out.\n\n### Summary\nA big game is the sum of small rules. Make a table first, and build each part in its own event. Enemies that share a kind use the same rule. A timer makes enemies, collision events change the score and lives, and the win check goes where the score changes.",
+            "concepts": [
+              {
+                "term": "Game plan",
+                "definition": "A table showing the parts of the game, what they do and which event they run with.",
+                "example": "The bat, ghost, laser, hit and lives rules make a five-row table.",
+                "pitfall": "Writing everything at once without a plan: when a bug appears, you cannot find which part it is in."
+              },
+              {
+                "term": "Independent events",
+                "definition": "Each event runs on its own; if one breaks, the others do not.",
+                "example": "Even if the lives rule has a bug, the laser and the ghost making keep working.",
+                "pitfall": "Thinking one event is inside another; blocks with a rounded top stand on their own in the workspace."
+              },
+              {
+                "term": "Shared kind",
+                "definition": "Giving several sprites the same kind makes the same collision rule apply to all of them.",
+                "example": "Because the bat and the ghost are both Enemy, the laser can hit both.",
+                "pitfall": "Giving a new enemy the wrong kind: the laser never hits it."
+              },
+              {
+                "term": "Winning condition",
+                "definition": "The rule that decides the game is won; in this game it is a score of 5 or more.",
+                "example": "At the end of the event that raises the score, if the score is greater than or equal to 5, the game is won.",
+                "pitfall": "Putting the check in an event where the score does not change: the game may never end."
+              },
+              {
+                "term": "Balance",
+                "definition": "Setting numbers such as enemy speed, making interval and winning score so that the game is neither too easy nor too hard.",
+                "example": "With a ghost speed of 15 you can win; if it were 100 (faster than the hunter), the hunter could not escape.",
+                "pitfall": "Making one number very big and turning the game into one nobody can play."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h4d20-q1",
+                "kind": "numeric",
+                "prompt": "Ghosts are made every 900 ms. How many ghosts have been made 4.6 seconds after the game starts? (Each time the event runs, it creates one ghost.)",
+                "answer": 5,
+                "tolerance": 0,
+                "unit": "ghosts",
+                "explanation": "4.6 seconds = 4600 ms. 4600 / 900 is about 5.1; the unfinished interval does not count, so exactly 5 intervals have passed. When we run the game, 5 ghosts do appear in the first 4.6 seconds.",
+                "skills": [
+                  "game-timer",
+                  "game-planning"
+                ]
+              },
+              {
+                "id": "m11h4d20-q2",
+                "kind": "mcq",
+                "prompt": "The bat and the ghost can both be hit by the same \"Bullet hits Enemy\" rule. Why is this?",
+                "options": [
+                  "They both have the same picture",
+                  "The ghost is a copy of the bat",
+                  "The rule applies to all sprites",
+                  "They are both of the Enemy kind"
+                ],
+                "answer": 3,
+                "explanation": "The collision rule looks at the kind. Because the bat and the ghost were both created with the Enemy kind, the same rule applies to both. Even though their pictures are different, the result does not change; the rule is not for \"all sprites\" but only for Enemy.",
+                "skills": [
+                  "game-collision",
+                  "game-planning"
+                ]
+              },
+              {
+                "id": "m11h4d20-q3",
+                "kind": "numeric",
+                "prompt": "The hunter has 3 lives. Five ghosts are hit and 2 ghosts crash into the hunter. Each crash takes away 1 life. How many lives are left?",
+                "answer": 1,
+                "tolerance": 0,
+                "unit": "lives",
+                "explanation": "The ghosts that are hit do not affect lives; they only raise the score. The 2 ghosts that crash into the hunter bring lives down to 3 - 2 = 1. The score becomes 5 and the game is won.",
+                "skills": [
+                  "game-collision",
+                  "game-planning"
+                ]
+              },
+              {
+                "id": "m11h4d20-q4",
+                "kind": "find-bug",
+                "prompt": "The score reaches 5, but \"Hunter wins!\" never appears. Which is the bug?\n\n```\nwhen a Bullet sprite hits a Enemy sprite:\n  change score by 1\n  make other sprite explode\n  delete sprite this sprite\n\nif score >= 5 do:\n  show \"Hunter wins!\" on screen\n  end game: you win\n```",
+                "options": [
+                  "The if block is not inside any event; it stands on its own",
+                  "The score should change by 5, not 1",
+                  "This sprite should not be deleted",
+                  "The message text is too long"
+                ],
+                "answer": 0,
+                "explanation": "An \"if\" block without an event on top does not run: it cannot know which event to run in. The check should be put inside the collision event, where the score changes. The score and delete blocks are correct.",
+                "skills": [
+                  "game-debug",
+                  "game-condition"
+                ]
+              },
+              {
+                "id": "m11h4d20-q5",
+                "kind": "numeric",
+                "prompt": "A ghost appears exactly above the hunter, 100 pixels away, and the hunter stays still. The ghost comes straight towards the hunter at speed 20. About how many seconds does it take for the centres to meet?",
+                "answer": 5,
+                "tolerance": 0.1,
+                "unit": "s",
+                "explanation": "Time = distance / speed = 100 / 20 = 5 seconds. In the real game the sprites have a size, so they touch a little before the centres meet. If the speed were 40, the time would halve to 2.5 seconds.",
+                "skills": [
+                  "game-velocity",
+                  "game-follow",
+                  "game-planning"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -2445,6 +4834,7 @@ export const modul11: ModuleContent = {
       "title": "Platform ve fizik",
       "project": "Platform atlayıcı",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Hız ile ivmenin farkını söyleyebilir; yerçekimini aşağı yönlü ivme olarak kurabilir.\n2. Zıplamayı eksi y hızı olarak kurar, havada zıplamayı `alttan bir duvara dokunuyor mu?` koşuluyla engeller.\n3. Altın, diken ve kapı gibi geçilebilir karolar için `karosuna dokununca` olayı yazar; `olay karosunun` bloklarını kullanır.\n4. Çarpışmayı düşüş hızı ve konum ölçütleriyle \"ezme\" ve \"yan çarpma\" olarak ayırır.\n5. Haftanın parçalarını kurallar tablosuyla planlayıp tek bir platform seviyesinde birleştirir.\n\n### Haftanın planı\nHafta beş derstir. Aşağıdaki plan günde bir ders içindir; son gün proje olduğu için daha uzundur.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Yerçekimi: kahraman yere insin | ~20 dk | Anlatımı oku, ivme bloğunu kur, hareket biçimini sağa-sola seç, mini testi çöz. |\n| 2 | Zıplama: A ile zıpla | ~20 dk | Zıplama hızını dene, `eğer` koşulunu ekle, havada zıplamayı engelle. |\n| 3 | Platformlar, altınlar ve dikenler | ~25 dk | Altın ve diken olaylarını kur, karo boşaltmayı dene. |\n| 4 | Düşmanın üstüne zıpla | ~25 dk | İki ölçütü kur, ezme ve yan çarpmayı sına. |\n| 5 | Proje: Platform atlayıcı | ~35 dk | Kurallar tablosunu doldur, altın-diken-kapı olaylarını yaz, oyunu oyna ve ayarla. |\n\n### Ön koşul kontrolü\nBu hafta şu bilgiler gerekir; eksik varsa ilgili dersi tekrar et:\n- Sprite oluşturmak ve `hızı x y` bloğunu kullanmak (Modül 11, ders 1-4).\n- Çarpışma olayını ve `diğer sprite` kavramını bilmek (ders 6).\n- `eğer` bloğu ve skor/can bloklarını kullanmak (ders 7 ve 9).\n- Karo haritası, duvar ve `karosuna dokununca` olayı (ders 11-13) ve kamera (ders 14).\n- Öğrenci toplama ve çarpma işlemlerinde rahat olmalı; bu hafta hız x süre hesapları var.\n\n### Kavram haritası\n- **Fizik:** hız → ivme → yerçekimi (y yönünde pozitif ivme) → zıplama (eksi y hızı) → tepe ve düşüş\n- **Koordinat:** x sağa, y aşağı artar → yukarı = eksi hız, küçük y\n- **Karo olayları:** geçilebilir karo → `karosuna dokununca` → kenar tetikleme → `olay karosunun sütunu / satırı` → karoyu boşalt\n- **Çarpışma:** çarpışma olayı → `bu sprite` / `diğer sprite` → düşüş hızı ve konum ölçütü → `ve` → `eğer ... değilse`\n- **Proje:** kurallar tablosu → altın, diken, kapı, ezme → kamera → sınama ve zorluk ayarı\n\n### Sık yapılan hatalar\n- **Hareket biçimini dört yöne seçmek.** Motor y hızını tuşlara göre yeniden yazar; yerçekimi neredeyse etkisiz kalır.\n- **Hız ile ivmeyi karıştırmak.** Hızla düşersen kahraman hep aynı hızla gider, ivmeyle düşersen hızlanır.\n- **Zıplama hızına artı sayı yazmak.** y aşağı doğru artar; zıplamak için eksi gerekir.\n- **Zıplamayı yerde mi koşuluna bağlamamak.** Kahraman havada da zıplar.\n- **Yatay hızı sıfırlamak.** Zıplarken `x hızı` kutusuna kahramanın kendi x hızı konmalı.\n- **Altın karosunu boşaltmamak ya da sabit sütun/satır yazmak.** Altın yerinde kalır ya da yanlış karo boşalır.\n- **Olay türünü yanlış seçmek.** Oyuncu yerine Düşman seçersen olay çalışmaz.\n- **Ezme ölçütünde ters karşılaştırma.** Düşman üstte olduğunda ezme sayılır.\n- **`bu sprite` ile `diğer sprite`ı karıştırmak.** Düşman yerine kahraman yok olur.\n- **Dikenden sonra hızı sıfırlamamak.** Kahraman yukarı hızla başlangıçtan havaya fırlayabilir.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarını bir kez daha oku ve \"sık yapılan yanlış\" satırlarını yüksek sesle söyle.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Yerçekimi ve zıplamayı sıfırdan, bakmadan kur. Zıplama hızını -150, -250 ve -350 yap ve kahramanın yüksekliğini karşılaştır.\n4. Hız -260 ve ivme 520 iken tepe noktasının kaç saniyede geldiğini hesapla, sonra oyunda dene.\n5. Kendi cümlelerinle şu soruyu cevapla: \"Oyun, kahramanın düşmanı ezdiğini mi yoksa yandan çarptığını mı nasıl anlıyor?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Platform atlayıcı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Hareket | Kahraman düşmüyor ya da zıplamıyor | Yerçekimi, yürüme ve zıplama çalışıyor; havada zıplama engelli | Zıplama gücünü kendisi ayarlamış ve nedenini açıklıyor |\n| Karo olayları | Altın ya da diken olayı çalışmıyor | Altın kayboluyor ve skor artıyor; dikende can azalıp kahraman başa dönüyor | Başa dönerken hızı sıfırlıyor ve nedenini söylüyor |\n| Kapı ve kazanma | Kapıya dokununca bir şey olmuyor | Mesaj yazılıyor ve oyun kazanılıyor | Kazanma koşulunu değiştirmiş (örneğin skor şartı) ve açığı düşünmüş |\n| Düşman | Ezme ve yan çarpma ayrılmıyor | Üstten ezince düşman yok oluyor, yandan çarpınca can azalıyor | İki ölçütü açıklıyor ve eşiği değiştirip etkisini gösteriyor |\n| Tasarım ve anlatım | Oyun oynanamayacak kadar zor ya da kolay | Seviye oynanabilir; kuralları anlatabiliyor | Arkadaşına oynatıp zorluğu ayarlamış |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta çocuk fizik formüllerini ezberlemez; yerçekimi ve zıplamanın bir sayıyla ayarlanabildiğini deneyerek görür. Hız ve ivmeyi tartışırken oyundaki hissi konuşmak yeterlidir.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şunu sor: \"Hangi blok bunu yapıyor?\", \"Sayıyı değiştirirsen ne olur?\", \"Kahraman düşüyor mu, yoksa yerde mi?\" Birlikte tahmin edip sonra denemek iyi çalışır.\n- **Süre.** Dersler 20-35 dakikadır. Zıplama gücünü ayarlamak gibi deneme zamanı gerektiren işlerde acele ettirme.\n- **Güvenlik.** Her şey tarayıcıda çalışır, harici bir donanım yoktur. Oyunda dikenden korunmak yalnız bir oyun kuralıdır.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Say the difference between speed and acceleration, and set up gravity as a downward acceleration.\n2. Build a jump as a minus y speed and stop jumps in mid-air with the `touching a wall below?` condition.\n3. Write a `touches tile` event for passable tiles such as gold, spikes and doors, and use the `event tile` blocks.\n4. Separate a collision into a \"stomp\" and a \"side hit\" using falling speed and position tests.\n5. Plan the week's pieces with a rules table and combine them in a single platform level.\n\n### Plan for the week\nThe week has five lessons. The plan below is for one lesson a day; the last day is longer because it is the project.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Gravity: let the hero land | ~20 min | Read the explainer, build the acceleration block, choose left-right as the way of moving, do the mini quiz. |\n| 2 | Jumping: jump with A | ~20 min | Try the jump speed, add the `if` condition, stop jumps in mid-air. |\n| 3 | Platforms, gold and spikes | ~25 min | Build the gold and spike events, try clearing tiles. |\n| 4 | Jump on the enemy | ~25 min | Build the two tests, test the stomp and the side hit. |\n| 5 | Project: Platform jumper | ~35 min | Fill in the rules table, write the gold, spike and door events, play the game and adjust it. |\n\n### Prerequisite check\nThis week needs the following knowledge; if anything is missing, repeat the lesson concerned:\n- Creating a sprite and using the `set speed x y` block (Module 11, lessons 1-4).\n- Knowing the collision event and the idea of `other sprite` (lesson 6).\n- Using the `if` block and the score/lives blocks (lessons 7 and 9).\n- The tile map, walls and the `touches tile` event (lessons 11-13), and the camera (lesson 14).\n- The learner should be comfortable with addition and multiplication; this week has speed x time calculations.\n\n### Concept map\n- **Physics:** speed → acceleration → gravity (positive acceleration in the y direction) → jump (minus y speed) → highest point and fall\n- **Coordinates:** x grows to the right, y grows downwards → up = minus speed, small y\n- **Tile events:** passable tile → `touches tile` → edge triggering → `event tile column / row` → clear the tile\n- **Collision:** collision event → `this sprite` / `other sprite` → falling speed and position tests → `and` → `if ... else`\n- **Project:** rules table → gold, spikes, door, stomp → camera → testing and adjusting the difficulty\n\n### Common mistakes\n- **Choosing in 4 directions as the way of moving.** The engine writes the y speed again from the keys; gravity has almost no effect.\n- **Mixing up speed and acceleration.** If you fall with a speed, the hero always goes at the same speed; if you fall with an acceleration, it speeds up.\n- **Typing a plus number for the jump speed.** y grows downwards; to jump you need a minus.\n- **Not linking the jump to the on-the-ground condition.** The hero jumps in the air too.\n- **Setting the sideways speed to zero.** When jumping, the hero's own x speed should go in the `x speed` slot.\n- **Not clearing the gold tile, or typing a fixed column/row.** The gold stays where it is, or the wrong tile is cleared.\n- **Choosing the wrong event kind.** If you choose Enemy instead of Player, the event does not run.\n- **A comparison the wrong way round in the stomp test.** It counts as a stomp when the enemy is on top.\n- **Mixing up `this sprite` and `other sprite`.** The hero disappears instead of the enemy.\n- **Not resetting the speed after the spikes.** The hero can shoot up into the air from the start with its upward speed.\n\n### End-of-week review\n1. Read each lesson's concept cards once more and say the \"common mistake\" lines out loud.\n2. Read again the explanations of the mini quiz questions you got wrong, then answer the question again.\n3. Build gravity and jumping from scratch without looking. Set the jump speed to -150, -250 and -350 and compare how high the hero goes.\n4. Work out how many seconds it takes to reach the highest point when the speed is -260 and the acceleration 520, then try it in the game.\n5. Answer this question in your own words: \"How does the game know whether the hero stomped the enemy or hit it from the side?\"\n\nAs an end-of-week test, the five lessons' mini quizzes are enough; 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (Platform jumper)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Movement | The hero does not fall or does not jump | Gravity, walking and jumping work; jumping in mid-air is blocked | Has set the jump strength themselves and explains why |\n| Tile events | The gold or spike event does not work | The gold disappears and the score goes up; on the spikes a life is lost and the hero goes back to the start | Resets the speed when going back to the start and says why |\n| Door and winning | Nothing happens when the door is touched | A message appears and the game is won | Has changed the winning condition (for example, a score requirement) and thought about the loophole |\n| Enemy | The stomp and the side hit are not told apart | A stomp from above gets rid of the enemy; a side hit takes a life | Explains the two tests and shows the effect of changing the threshold |\n| Design and explanation | The game is too hard or too easy to play | The level is playable; can explain the rules | Has had a friend play it and adjusted the difficulty |\n\n### Note for parents and teachers\n- **Aim.** This week the child does not learn physics formulas by heart; they see by experimenting that gravity and jumping can be set with a number. When talking about speed and acceleration, it is enough to discuss how it feels in the game.\n- **How to help.** When they get stuck, instead of giving the answer, ask: \"Which block does this?\", \"What happens if you change the number?\", \"Is the hero falling, or on the ground?\" Guessing together and then trying it works well.\n- **Time.** Lessons take 20-35 minutes. Do not rush tasks that need time to experiment, such as adjusting the jump strength.\n- **Safety.** Everything runs in the browser; there is no external hardware. Avoiding the spikes is just a game rule.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; they are only saved if consent has been given).",
       "lessons": [
         {
           "title": "Yerçekimi: kahraman yere insin",
@@ -2569,7 +4959,131 @@ export const modul11: ModuleContent = {
                 "oyun-yercekimi"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Gravity: let the hero land",
+            "problem": "When you let go of an apple, it falls slowly at first and then faster and faster. Nobody tells it \"go\"; it just speeds up a little more at every moment. That is exactly why platform games feel the way they do: you give the hero gravity and it falls by itself. In this lesson you will set up gravity in the Game Workshop.",
+            "contentMd": "On the stage there is a light blue sky and, at the bottom, two rows of ground tiles (grassy dirt and dirt). The hero is hanging in the air in the top half of the screen, and starts with the \"stay on screen\" setting. The starter project is ready for you; the map and the hero are created, but nothing moves.\n\n### Speed and acceleration\n- **Speed** is how many pixels the sprite moves each second.\n- **Acceleration** is how much the speed grows each second. A downward acceleration behaves like gravity: the hero falls a little faster every second.\n\n### Build the blocks\n1. Open the activity and press the ▶ button. The hero is hanging in the air.\n2. From the **Motion** category, take the `set [this sprite] acceleration x [0] y [300]` block and snap it at the very bottom of the `when game starts` block. Replace `this sprite` with the `kahraman` (hero) variable. Type 520 in the y slot.\n3. Press ↺. The hero falls and stands on top of the ground.\n4. From the **Controller** category, take the `[kahraman] moves [left-right] with player keys, speed [70]` block and snap it under the acceleration block. Make sure **left-right** is selected in the list.\n5. Press ↺. Walk with the right and left keys. The hero stays on the ground and stops when it reaches the edge of the map.\n\nExpected result: the hero comes down from the air, stands on the ground and can walk left and right. All three goals ✓.\n\n### How does it work?\n- Acceleration is added to the speed every frame. The hero starts at speed 0; half a second later it is falling at about 260 pixels a second.\n- The hero stops when it lands on the ground: the ground tiles are \"walls\", and walls stop sprites. When the hero touches a wall, its y speed is set to zero.\n- While the hero is on the ground, gravity is still working; only the wall is holding it up. This will help us ask the question \"am I on the ground?\" in the next lesson.\n- The value 520 is a carefully chosen number: if it is too small, the hero falls slowly as if it were on the Moon; if it is too big, it falls like a stone.\n\n### Try it\n1. Set the acceleration to 200 (light, like the Moon) and to 1000 (heavy). Which one is better for a platform game?\n2. Give the acceleration a minus number (-300). What happens to the hero? In which game would you use this?\n3. At the start, put the hero at the very top of the screen (`move to x 80 y 10`) and watch it fall. How many seconds does it take to land?\n\n### Common mistakes\n- Choosing **in 4 directions** as the way of moving: every frame the game sets the y speed from the up and down keys, and gravity has no effect. In platform games, choose **left-right**.\n- Writing `set speed x 0 y 100` instead of acceleration: the hero falls, but always at the same speed; there is no feeling of \"falling faster and faster\".\n- Leaving the acceleration block outside `when game starts`: the block does not run, and the hero stays hanging.\n- Placing the hero inside the ground at the start: the hero gets stuck inside the wall. Put it somewhere in the sky.",
+            "question": "In the game, gravity is a fixed 520, but in real life gravity on the Moon is much weaker than on Earth. If you made a game set on the Moon, how would you choose the acceleration, and how would the hero's jump be different?",
+            "explainerMd": "### What you will learn in this lesson\n- The difference between speed and acceleration\n- That gravity in a game is an \"acceleration\"\n- That the y axis grows downwards\n- Why you choose the \"left-right\" way of moving in a platform game\n\n### What you should know first\nIn lesson 2 you learnt to walk the cat with the keys, and in lesson 4 the `set speed x y` block. In lesson 11 you saw the tile map and wall tiles. In this lesson you will put these together.\n\n### Speed and acceleration are not the same thing\n**Speed** is how many pixels a sprite moves each second. If the speed is 100, the sprite moves 100 pixels every second, always at the same speed.\n\n**Acceleration** is how much the speed changes. If the acceleration is y = 400, the sprite's downward speed grows by 400 pixels/s every second. Like a bicycle going faster and faster down a hill.\n\n```\nTime     Speed (acceleration 400)\n0.25 s   100 pixels/s\n0.50 s   200 pixels/s\n0.75 s   300 pixels/s\n```\n\nSpeed = acceleration x time. As it speeds up, the sprite moves further every frame; that is why the fall looks \"real\".\n\n### The y axis grows downwards\nOn the game screen, the top-left corner is the point (0, 0). x grows to the right and **y grows downwards**. That is why a downward acceleration is a **positive** y value. If you want to move the sprite up, you use a minus number. You will need this rule in the jumping lesson too.\n\n### Setting up gravity\nGravity means giving the sprite a constant downward acceleration. One block is enough:\n\n```\nwhen game starts:\n  set kahraman acceleration x 0 y 520\n```\n\nThe hero falls and stops when it hits a ground tile (a wall). The engine sets the speed of a sprite that hits a wall to zero in that direction. While the hero is standing on the ground, the acceleration is still there; the wall holds it up.\n\n### Choose the right way of moving\nIf you choose **in 4 directions** in the `moves with player keys` block, the engine writes the y speed again from the keys every frame. If you are not pressing a key, the y speed becomes 0 and gravity has almost no effect; the hero drifts down very slowly. If you choose **left-right**, only the sideways speed depends on the keys, and the up-down speed is left to gravity.\n\n### Summary\nSpeed tells you how fast a sprite is going; acceleration tells you how quickly that speed changes. Gravity is a positive acceleration in the y direction, because y grows downwards. In a platform game you choose left-right as the way of moving so that gravity can work. Because the ground tiles are walls, the hero stops when it lands.",
+            "concepts": [
+              {
+                "term": "Speed",
+                "definition": "How many pixels the sprite moves each second (pixels/s).",
+                "example": "A sprite with speed x 100 moves 100 pixels to the right every second.",
+                "pitfall": "Mixing up speed and acceleration; speed stays the same, acceleration changes the speed."
+              },
+              {
+                "term": "Acceleration",
+                "definition": "How much the speed grows each second (pixels/s²).",
+                "example": "If the acceleration is y = 400, the downward speed grows by 400 every second; after 0.5 seconds it is 200.",
+                "pitfall": "Writing a fixed number for speed instead of acceleration: the sprite always goes at the same speed and there is no feeling of speeding up."
+              },
+              {
+                "term": "Gravity",
+                "definition": "A positive y acceleration given to a sprite all the time, pulling it down.",
+                "example": "The set kahraman acceleration x 0 y 520 block makes the hero fall faster and faster.",
+                "pitfall": "Forgetting to put the acceleration inside when game starts: the block does not run and the hero stays hanging."
+              },
+              {
+                "term": "y axis",
+                "definition": "On the screen, y grows from top to bottom; the top-left corner is (0, 0).",
+                "example": "A sprite that goes from y = 24 to y = 88 has moved down.",
+                "pitfall": "Writing a minus number for the downward direction; down is positive, up is minus."
+              },
+              {
+                "term": "Left-right movement",
+                "definition": "The keys only control the sideways speed and leave the up-down speed to gravity.",
+                "example": "In a platform game you choose `moves [left-right] with player keys`.",
+                "pitfall": "Choosing 4 directions: the y speed is written from the keys every frame and gravity has almost no effect."
+              },
+              {
+                "term": "Ground wall",
+                "definition": "A wall tile stops a sprite and sets its speed in that direction to zero.",
+                "example": "When the falling hero touches a ground tile, it stops and its y speed becomes 0.",
+                "pitfall": "Putting the hero inside the ground at the start: it gets stuck inside the wall."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h5d21-q1",
+                "kind": "mcq",
+                "prompt": "You gave a sprite acceleration x 0 y 300. What does this block do?",
+                "options": [
+                  "It moves the sprite 300 pixels down at once",
+                  "It raises the downward speed by 300 pixels/s every second",
+                  "It fixes the sprite's speed at 300 all the time",
+                  "It makes the sprite 300 pixels tall"
+                ],
+                "answer": 1,
+                "explanation": "Acceleration changes the speed: the downward speed grows by 300 pixels/s every second. It does not move the position directly (so the first option is wrong), it does not fix the speed at 300 (the third option is the speed block's job), and it has nothing to do with how it looks.",
+                "skills": [
+                  "oyun-hiz-ivme",
+                  "oyun-yercekimi"
+                ]
+              },
+              {
+                "id": "m11h5d21-q2",
+                "kind": "numeric",
+                "prompt": "A sprite starts still (speed 0) and its downward acceleration is 400 pixels/s². What is its downward speed after 0.75 seconds, in pixels/s?",
+                "answer": 300,
+                "tolerance": 1,
+                "unit": "pixels/s",
+                "explanation": "Speed = acceleration x time = 400 x 0.75 = 300 pixels/s. Multiplying the speeding up by the time is enough; the question asks for the speed, not the change in position.",
+                "skills": [
+                  "oyun-hiz-ivme"
+                ]
+              },
+              {
+                "id": "m11h5d21-q3",
+                "kind": "predict-output",
+                "prompt": "The hero starts in the air and no key is pressed. When this program runs, what does the hero do?\n\n```\nwhen game starts:\n  set kahraman acceleration x 0 y 300\n  kahraman moves [in 4 directions] with player keys, speed 70\n```",
+                "options": [
+                  "It falls faster and faster and lands on the ground",
+                  "It almost hangs in the air, drifting only a few pixels a second",
+                  "It flies upwards",
+                  "There is a compile error"
+                ],
+                "answer": 1,
+                "explanation": "When 4 directions is chosen, the engine writes the y speed again from the keys every frame; if no key is pressed, it becomes 0. The acceleration only adds a small amount each frame, so the hero does not fall faster and faster; it drifts only a few pixels a second. If left-right had been chosen, gravity would be free to work.",
+                "skills": [
+                  "oyun-yercekimi",
+                  "oyun-hiz-ivme"
+                ]
+              },
+              {
+                "id": "m11h5d21-q4",
+                "kind": "find-bug",
+                "prompt": "The hero does not fall; it stays in the air. Which line is wrong?\n\n```\n1  when game starts:\n2    kahraman = new [Hero] sprite, kind [Player]\n3    move kahraman to x 80 y 24\n4    set kahraman acceleration x 520 y 0\n5    kahraman moves [left-right] with player keys, speed 70\n```",
+                "options": [
+                  "Line 2: the kind is wrong when the sprite is created",
+                  "Line 3: because the position is in the air",
+                  "Line 4: the x and y values of the acceleration are swapped",
+                  "Line 5: choosing left-right movement"
+                ],
+                "answer": 2,
+                "explanation": "On line 4 the x and y values have been written the wrong way round: the acceleration is 520 sideways and 0 up-down. For gravity, 520 must be typed in the acceleration's y slot. Lines 2, 3 and 5 are correct: the sprite is created, placed in the air, and left-right movement is chosen.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-yercekimi",
+                  "oyun-y-ekseni"
+                ]
+              },
+              {
+                "id": "m11h5d21-q5",
+                "kind": "numeric",
+                "prompt": "The top edge of the ground tile is at y = 96 pixels. The hero is 16 pixels tall and its position is measured from its centre. When the hero lands on the ground and stops, what is its centre y value?",
+                "answer": 88,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "The sprite's centre is half its height (8) above its bottom edge. Because the bottom edge sits on top of the ground (96), the centre is 96 - 8 = 88. y grows downwards, so to go up we subtract.",
+                "skills": [
+                  "oyun-y-ekseni",
+                  "oyun-yercekimi"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Zıplama: A ile zıpla",
@@ -2699,7 +5213,136 @@ export const modul11: ModuleContent = {
                 "oyun-hiz-ivme"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Jumping: jump with A",
+            "problem": "You know how Mario jumps. But what happens if you press again while he is in the air? In many platform games nothing happens, because the hero cannot start a new jump in mid-air. There is a simple question that controls this: \"Am I standing on something right now?\" In this lesson you will make the game ask that question.",
+            "contentMd": "The scene you built in the last lesson is ready: ground, hero, gravity and walking left and right. At the start the hero is standing on top of a ground tile. It cannot jump yet.\n\n### What is a jump, really?\nJumping means giving the hero's y speed a sudden **upward** value. Because the y axis grows downwards, an upward speed is a **minus** number. Gravity slowly takes this speed away, the hero stops at the highest point and falls back down.\n\n### Build the blocks\n1. From the **Controller** category, take the `when [A] button is [pressed]` block and drop it in the workspace.\n2. From the **Motion** category, take the `set [kahraman] speed x [30] y [0]` block and snap it inside the event. Type -250 in the y speed slot. In the x speed slot, snap the `[kahraman] [x speed]` block from the **Sprite** category. This way you keep the sideways speed while jumping.\n3. Press ↺. Press the space (A) key. The hero jumps.\n4. While it is in the air, press A quickly again and again. The hero shoots up again on every press and climbs all the way to the top of the screen. This is a kind of \"flying\" we do not want.\n5. Fix it: take the `if ... do ...` block from the **Logic** category, put the speed block inside it, and put the if block inside the event. For the condition, snap in the `is [kahraman] touching [a wall below]?` block from the **Sprite** category.\n6. Also add the `play melody [jump]` block from the **Sound** category under the speed block in the `do` branch.\n7. Press ↺ and press A while in the air. Now the hero does not jump a second time in the air.\n\nExpected result: when you press A, the hero rises about 60 pixels and falls back down; in the air A does nothing; a sound plays when it jumps.\n\n### How does it work?\n- The question `touching a wall below?` says \"true\" if there is a wall tile right under the hero. If the hero is on the ground or on top of a platform it is true; if it is in the air it is false.\n- Because the starting speed is -250 and the acceleration is 520, the rise works out at about 250 x 250 / (2 x 520) = 60 pixels. The jump takes about a second.\n- If you want a stronger jump, set the y speed to -300: the rise goes up to about 86 pixels.\n- Without the `if` block, every press of A gives a new speed; the hero speeds up in the air too.\n\n### Try it\n1. Set the jump speed to -150, then to -350. Which value is good for a platform game? Why?\n2. Copy the same block into a `when [up ↑] button is [pressed]` event as well. Now you jump with two keys.\n3. Give the hero a speech bubble when it jumps: add the `[kahraman] says [Hop!] for [1] seconds` block.\n\n### Common mistakes\n- Typing a positive number for the y speed: the hero goes down instead of up and tries to sink into the ground.\n- Forgetting the `if` block: the hero flies.\n- Putting the jump block inside `when game starts`: the jump happens only once, at the start of the game. You need an event linked to a key.\n- Setting the sideways speed to zero while jumping: the hero goes straight up and down on the spot, like a lift. For the sideways speed, use the hero's own `x speed`.",
+            "question": "Some games have a double jump; how do you think you would make one with blocks? What would you need to store the \"number of jumps\"?",
+            "explainerMd": "### What you will learn in this lesson\n- That a jump is a minus value given to the y speed\n- How gravity slows a jump down and turns it round\n- How to ask \"am I on the ground?\" with an `if` block\n- How to set the jump strength with the speed value\n\n### What you should know first\nThe acceleration and gravity from lesson 21 are the base of this lesson; remember that the y axis grows downwards. In lesson 3 you saw the button event (`when A button is pressed`), and in lesson 7 the `if` block.\n\n### Jumping = a sudden upward speed\nTo jump, you give the hero an upward speed all at once. Because y grows downwards, an upward speed is a **minus** number.\n\n```\nwhen A button is pressed:\n  set kahraman speed x (kahraman x speed) y -250\n```\n\nYou gave the speed once; gravity does the rest. Every second, 520 is added to the speed, so the minus speed gets smaller, reaches zero (the highest point) and becomes positive (falling). The hero comes down by itself.\n\n### Height and time\nThe rise is about speed x speed / (2 x acceleration). The time is speed / acceleration.\n\n```\nSpeed -250, acceleration 520:\n  rise = 250 x 250 / (2 x 520) = about 60 pixels\n  time to the top = 250 / 520 = about 0.5 seconds\n```\n\nIf you double the speed, the rise becomes four times bigger, because the speed appears twice in the multiplication. That is why you should adjust the jump strength in small steps.\n\n### Stop jumping in mid-air\nIf you do not add a guard, every press of A gives a new speed and the hero jumps in the air too; it is almost like flying. The fix is to ask a condition:\n\n```\nwhen A button is pressed:\n  if is kahraman touching a wall below? do:\n    jump\n```\n\n`touching a wall below?` is only true if there is a wall right under the hero: the ground or a platform. In the air it is false, and the block does not run.\n\n### Keep the sideways speed\nIf you type 0 in the `x speed` slot when jumping, the hero goes straight up and straight down. If you put the hero's own `x speed` in the slot, it keeps going in the direction it was walking while it jumps.\n\n### Summary\nA jump is giving the hero's y speed a minus value. Gravity takes this speed away and brings the hero back down. To stop jumps in mid-air, you link the jump to the condition `touching a wall below?`. The jump height grows with the square of the speed, so choose the value by trying it in small steps.",
+            "concepts": [
+              {
+                "term": "Jump speed",
+                "definition": "An upward (minus) y speed given to the hero all at once.",
+                "example": "set kahraman speed x (x speed) y -250 launches the hero upwards.",
+                "pitfall": "Typing a positive number: the hero goes down instead of up."
+              },
+              {
+                "term": "Highest point",
+                "definition": "The moment the hero is at its highest, when gravity has brought the upward speed down to zero.",
+                "example": "If the speed is -260 and the acceleration 520, it reaches the top in 0.5 seconds.",
+                "pitfall": "Thinking the jump ends at the top; gravity brings the hero back down."
+              },
+              {
+                "term": "On the ground?",
+                "definition": "The `touching a wall below?` block tells you whether there is a wall under the hero.",
+                "example": "It is true on the ground and false in the air.",
+                "pitfall": "Forgetting this condition: the hero jumps in the air too, in other words it flies."
+              },
+              {
+                "term": "Conditional jump",
+                "definition": "Putting the jump block inside `if on the ground`.",
+                "example": "When the A button is pressed, the speed block runs if it is touching a wall below.",
+                "pitfall": "Putting the jump inside when game starts: it only happens once, at the start."
+              },
+              {
+                "term": "Keeping the sideways speed",
+                "definition": "Putting the hero's own x speed in the x speed slot when jumping.",
+                "example": "The `kahraman x speed` block keeps the walking direction during the jump.",
+                "pitfall": "Typing 0 for the x speed: the hero goes straight up and straight down."
+              },
+              {
+                "term": "Jump strength",
+                "definition": "How big the jump speed is; the height grows with the square of the speed.",
+                "example": "Going from -250 to -300 raises the rise from 60 pixels to about 86 pixels.",
+                "pitfall": "Raising the speed too much: the hero can leave the screen, and the platforms lose their point."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h5d22-q1",
+                "kind": "mcq",
+                "prompt": "Why is a minus number typed for the y speed to jump?",
+                "options": [
+                  "Because on the screen y grows downwards, so up is minus",
+                  "Because minus numbers are faster",
+                  "Because the A button needs a minus value",
+                  "Because gravity works with a minus number"
+                ],
+                "answer": 0,
+                "explanation": "Because y grows downwards on the screen, the upward direction is minus. A positive number pushes the hero down. The \"sound\" or \"key\" reasons among the options have nothing to do with the sign of the speed.",
+                "skills": [
+                  "oyun-ziplama",
+                  "oyun-y-ekseni"
+                ]
+              },
+              {
+                "id": "m11h5d22-q2",
+                "kind": "numeric",
+                "prompt": "The hero jumps with a y speed of -260, and the gravity acceleration is 520 pixels/s². In how many seconds does its upward speed drop to zero and reach the highest point?",
+                "answer": 0.5,
+                "tolerance": 0.05,
+                "unit": "s",
+                "explanation": "Time = speed / acceleration = 260 / 520 = 0.5 seconds. The speed goes down by 520 every second; it takes half a second for 260 to drop to zero. Because the engine works in steps of 1/60 of a second, a difference of 0.05 seconds is accepted.",
+                "skills": [
+                  "oyun-ziplama",
+                  "oyun-hiz-ivme"
+                ]
+              },
+              {
+                "id": "m11h5d22-q3",
+                "kind": "predict-output",
+                "prompt": "While in the air, the player presses A again and again. How does this program move the hero?\n\n```\nwhen A button is pressed:\n  set kahraman speed x (kahraman x speed) y -250\n```",
+                "options": [
+                  "Presses in the air do nothing",
+                  "It shoots up again on every press and jumps in the air too",
+                  "The hero sinks into the ground",
+                  "It only jumps on the first press"
+                ],
+                "answer": 1,
+                "explanation": "There is no condition in the block asking whether it is on the ground. On every press the upward speed is set to -250 again, so the hero shoots up in the air too and rises as much as you like. The fix is to put this block inside `if is kahraman touching a wall below? do`.",
+                "skills": [
+                  "oyun-ziplama",
+                  "oyun-mantik-kosul"
+                ]
+              },
+              {
+                "id": "m11h5d22-q4",
+                "kind": "find-bug",
+                "prompt": "When you press A, the hero is pushed towards the ground instead of jumping. Which line is wrong?\n\n```\n1  when A button is pressed:\n2    if is kahraman touching a wall below? do:\n3      set kahraman speed x (kahraman x speed) y 250\n4      play melody [jump]\n```",
+                "options": [
+                  "Line 1: the A button event is wrong",
+                  "Line 2: the on-the-ground condition",
+                  "Line 4: playing the sound",
+                  "Line 3: the sign of the y speed is wrong"
+                ],
+                "answer": 3,
+                "explanation": "On line 3 the y speed is written as positive; positive y means down. To jump up it should be -250. The condition on line 2 is correct, and the sound on line 4 does not affect the jump.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-ziplama",
+                  "oyun-y-ekseni"
+                ]
+              },
+              {
+                "id": "m11h5d22-q5",
+                "kind": "mcq",
+                "prompt": "To make the hero keep going in the direction it was walking while it jumps, what should go in the x speed slot of the speed block?",
+                "options": [
+                  "0",
+                  "The hero's own x speed",
+                  "70",
+                  "The gravity acceleration"
+                ],
+                "answer": 1,
+                "explanation": "When the hero's own `x speed` block is used, the sideways speed is kept as it was at the moment of the jump. If 0 is typed, the hero goes straight up and down; if 70 is typed, the hero shoots off to the right even when it was standing still.",
+                "skills": [
+                  "oyun-ziplama",
+                  "oyun-hiz-ivme"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Platformlar, altınlar ve dikenler",
@@ -2826,7 +5469,133 @@ export const modul11: ModuleContent = {
                 "oyun-hiz-ivme"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Platforms, gold and spikes",
+            "problem": "The fun of platform games is jumping and reaching the next place. Along the way you collect gold, while spikes try to trap you. In this lesson you will make the special tiles on the map talk to the hero: \"I touched gold\", \"I touched spikes\".",
+            "contentMd": "A ready-made map is loaded: it is 20 tiles wide, with spikes on the ground, two platforms in the air and a piece of gold on top of each platform. The hero walks, jumps, and the camera follows it. The score is 0 and lives are 3. Gold is not collected yet, and the spikes do no harm.\n\n### Get to know the map\nYou can look at the map in the **Map** tab. Column and row numbers start from 0 at the top left. Gold (object) and spike (trap) tiles are **not walls**: the hero passes through them. But the game notices that the hero has touched that tile and triggers an event.\n\n### Build the blocks: gold\n1. Press ▶. The hero passes through the gold, but nothing happens.\n2. From the **Stage / Map** category, take the `when a [Player] sprite touches tile [Gold]` event. Choose **Player** as the kind and **Gold** as the picture.\n3. Inside it, put the `clear tile at column [0] row [0]` block from the **Stage / Map** category. In the column slot, snap the `event tile [column]` block, and in the row slot, the `event tile [row]` block. These blocks know where the gold you touched is.\n4. Underneath, add `change score by [1]` from the **Game** category and `play melody [point]` from the **Sound** category.\n5. Press ↺. Touch the gold: the gold disappears and the score goes up by 1.\n\n### Build the blocks: spikes\n6. Take a new `when a [Player] sprite touches tile [Spikes]` event. Choose **Spikes** as the picture.\n7. Inside it, in this order: `change lives by [-1]`; `shake screen for [250] ms`; `put sprite [this sprite] on tile column [2] row [5]` from the **Stage / Map** category (`this sprite` will be the hero); `set [this sprite] speed x [0] y [0]` from the **Motion** category.\n8. Press ↺. When you touch the spikes, you lose a life, the screen shakes and the hero goes back to the starting tile.\n\nExpected result: gold disappears when collected and the score goes up; when you touch the spikes, you lose a life and the hero goes back to the start. All five goals ✓.\n\n### How does it work?\n- The `touches tile` event is edge-triggered: it runs once, at the moment the hero enters the tile. It does not keep running for as long as you stand on the same tile.\n- `event tile column / row` only makes sense inside this event.\n- Clearing (deleting) the gold is important: otherwise the gold stays on the map and, as far as you can see, it has not been collected.\n- When we put the hero back at the start, we also set its speed to zero: otherwise, even after going back, it could hit the ground at its falling speed and bounce.\n\n### Try it\n1. Reach the gold on top of the platform by jumping. If you cannot get high enough, set the jump speed to -300.\n2. Instead of taking a life when you touch the spikes, lose the game at once: try the `end game: [you lose]` block.\n3. Give 5 points for each piece of gold. Set the score target to 10 and add a win when you collect 2 pieces of gold.\n\n### Common mistakes\n- Not clearing the tile when you touch the gold: the gold does not disappear.\n- Typing 0 instead of the `event tile` blocks: the tile in the top-left corner is always the one cleared.\n- Typing pixel coordinates instead of column/row when putting the hero back at the start: that block wants tile numbers, not pixels.\n- Choosing the wrong kind in the spikes event: if you choose **Enemy** instead of **Player**, the event does not run when the hero touches the spikes.",
+            "question": "Why did we not make the spike and gold tiles walls? If they were walls, what would happen before the hero touched them? Which tiles need to be walls, and which need to be passable?",
+            "explainerMd": "### What you will learn in this lesson\n- That tiles such as gold and spikes are not walls, but can trigger events\n- That the `touches tile` event is edge-triggered\n- How to find where the touched tile is with `event tile column / row`\n- How to turn a column and row number into a pixel position\n\n### What you should know first\nIn lessons 11-13 you learnt about the map and the `touches tile` event. In lesson 9 you used the `change lives` and `shake screen` blocks. The gravity and jumping from lessons 21-22 give this scene its movement.\n\n### Every tile is something\nThe map is made of tiles, and each tile is 16 x 16 pixels. There are two kinds of tile:\n- **Wall tile:** a sprite cannot pass through it (ground, platform).\n- **Passable tile:** a sprite passes through it (gold, spikes, door). But the engine triggers an event saying \"this sprite touched that tile\".\n\nIf you made the gold and spikes walls, the hero could never get into them; it would just stand on top of them. To collect or get hurt, it must be able to go inside them.\n\n### Edge triggering\nThe `when a Player sprite touches tile [Gold]` block runs **once**, at the moment the hero enters the tile. It does not run again for as long as you stay on the same tile. If you leave the tile and enter it again, it runs again.\n\nThat is why you must **clear** the tile when you collect the gold. If you do not clear it, the gold stays visible and gives points every time the hero leaves and comes back in.\n\n### Which tile?\nThere can be lots of gold on the map. The same event runs for all of it, so you need to know which one to clear. The answer is the event blocks:\n\n```\nclear tile at column (event tile column) row (event tile row)\n```\n\nIf you type a fixed number, the same tile is always cleared.\n\n### From tile number to pixels\nColumns and rows start from 0. When you put a sprite on a tile, the sprite's **centre** goes to the middle of the tile:\n\n```\ncentre x = column x 16 + 8\ncentre y = row x 16 + 8\nColumn 2, row 5  ->  x = 40, y = 88\n```\n\n### Reset after the spikes\nIn the spikes event, when you put the hero on the starting tile, set its speed to zero too. If you were going up when you jumped into the spikes and you do not reset the speed, the hero shoots up into the air from the starting tile.\n\n### Summary\nTiles such as gold, spikes and doors are not walls; the hero passes through them and the engine triggers a touch event. The event runs once when the tile is entered. The `event tile` blocks tell you which tile triggered it. You find the centre pixel of a tile by multiplying the tile number by 16 and adding 8.",
+            "concepts": [
+              {
+                "term": "Passable tile",
+                "definition": "A tile that is not a wall, which a sprite can pass through (gold, spikes, door).",
+                "example": "The hero passes through the gold; the engine still triggers a touch event.",
+                "pitfall": "Making the gold or spikes a wall: the hero cannot get inside it or collect it."
+              },
+              {
+                "term": "touches tile",
+                "definition": "An event that runs at the moment a sprite enters a particular tile.",
+                "example": "In the Player + Gold tile event, the score is raised.",
+                "pitfall": "Choosing the wrong kind: if you choose Enemy instead of Player, the event does not run when the hero touches it."
+              },
+              {
+                "term": "Edge triggering",
+                "definition": "The event runs once when the tile is entered; standing on the tile does not trigger it again.",
+                "example": "If you stand on the spikes for three seconds, the event runs once; if you leave and come back, it runs again.",
+                "pitfall": "Thinking the event will run every frame."
+              },
+              {
+                "term": "event tile column / row",
+                "definition": "Blocks that give the position of the tile that triggered the event.",
+                "example": "You delete the gold with `clear tile at column (event tile column) row (event tile row)`.",
+                "pitfall": "Typing a fixed number: the same tile is always cleared."
+              },
+              {
+                "term": "Clearing a tile",
+                "definition": "Deleting a tile from the map; this is how the gold gets collected.",
+                "example": "When `clear tile` runs in the gold event, the gold disappears.",
+                "pitfall": "Forgetting to clear it: the gold stays and gives points every time you leave and come back."
+              },
+              {
+                "term": "Tile centre",
+                "definition": "The centre of a sprite put on a tile: x = column x 16 + 8, y = row x 16 + 8.",
+                "example": "The centre of the tile at column 2, row 5 is (40, 88).",
+                "pitfall": "Typing pixels instead of a tile number, or the other way round."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h5d23-q1",
+                "kind": "mcq",
+                "prompt": "Why is the gold tile not made a wall?",
+                "options": [
+                  "If the gold were a wall it could not be drawn",
+                  "If it were a wall, the hero could not get inside it and the event would not be triggered",
+                  "Wall tiles do not give points",
+                  "Gold can only stand on top of a platform"
+                ],
+                "answer": 1,
+                "explanation": "If it were a wall, the hero could not get inside the gold; it would just stop in front of it. When it enters a passable tile, the engine triggers the touch event, and the collecting or the hurting happens. Being a wall gives stopping, not a collision.",
+                "skills": [
+                  "oyun-karo-olay"
+                ]
+              },
+              {
+                "id": "m11h5d23-q2",
+                "kind": "predict-output",
+                "prompt": "The gold event is as below. The gold tile is still on the map. The hero goes into the tile and out again, then goes in and out once more. What is the score?\n\n```\nwhen a [Player] sprite touches tile [Gold]:\n  change score by 1\n```",
+                "options": [
+                  "1",
+                  "2",
+                  "0",
+                  "A very high number, because it goes up every frame"
+                ],
+                "answer": 1,
+                "explanation": "The event runs once each time the tile is entered. Because the tile is not cleared, two entries give two points (1 + 1 = 2). It is not triggered again while standing on the tile, but the second entry is a new trigger. That is why you need to clear the tile in the gold event.",
+                "skills": [
+                  "oyun-olay-kenar",
+                  "oyun-karo-olay"
+                ]
+              },
+              {
+                "id": "m11h5d23-q3",
+                "kind": "find-bug",
+                "prompt": "The hero touches the gold and the score goes up, but the gold stays on the screen. Which line is wrong?\n\n```\n1  when a [Player] sprite touches tile [Gold]:\n2    clear tile at column 0 row 0\n3    change score by 1\n```",
+                "options": [
+                  "Line 1: the event kind",
+                  "Line 2: the fixed column and row",
+                  "Line 3: the score change",
+                  "There is no bug; the gold disappears anyway"
+                ],
+                "answer": 1,
+                "explanation": "On line 2 the column and row are typed as a fixed 0; every time, the tile in the top-left corner is cleared and the gold you touched stays where it is. The `event tile column` and `event tile row` blocks should be there. The score line is correct.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-karo-olay"
+                ]
+              },
+              {
+                "id": "m11h5d23-q4",
+                "kind": "numeric",
+                "prompt": "You put the hero on the tile at `column 6 row 4`. A tile is 16 pixels; the sprite sits in the middle of the tile. What is the hero's centre x position, in pixels?",
+                "answer": 104,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "Centre x = column x 16 + 8 = 6 x 16 + 8 = 104. Column numbers start from 0; the tile's left edge is at 96 and its middle point at 104.",
+                "skills": [
+                  "oyun-harita-olcu"
+                ]
+              },
+              {
+                "id": "m11h5d23-q5",
+                "kind": "mcq",
+                "prompt": "The hero touches the spikes while jumping upwards and is put on the starting tile, but its speed is not reset. What happens?",
+                "options": [
+                  "Nothing happens",
+                  "The hero keeps its upward speed and shoots up into the air from the starting tile",
+                  "The hero sinks into the ground",
+                  "Two lives are lost"
+                ],
+                "answer": 1,
+                "explanation": "Even though the position changes, the speed stays the same; the hero carries on with its upward speed and shoots up into the air from the starting tile. Any downward speed left over is reset anyway when it hits the ground, so the real problem is the upward speed. That is why we also set the speed to 0, 0 when we put it back at the start.",
+                "skills": [
+                  "oyun-karo-olay",
+                  "oyun-hiz-ivme"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Düşmanın üstüne zıpla",
@@ -2956,7 +5725,136 @@ export const modul11: ModuleContent = {
                 "oyun-mantik-kosul"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Jump on the enemy",
+            "problem": "In platform games you can touch an enemy in two ways: by jumping on top of it (then the enemy is beaten) or by walking into its side (then you get hurt). How does the game tell these two apart? The answer: it looks at the direction. Am I falling? Am I above the enemy?",
+            "contentMd": "The ground, the hero and a slime enemy going back and forth at the right end of the map are ready. The map is wider than the screen; the camera follows the hero, and you need to walk towards the slime. The enemy changes direction when it reaches an edge or a wall. The score is 0 and lives are 3. When the hero touches the slime, nothing happens yet.\n\n### Two tests\nWe can tell whether it hit from above by looking at two things:\n1. Is the hero moving downwards? (The y speed is positive, for example greater than 10.)\n2. Is the hero's y position a little smaller than the enemy's y position? (The hero is a little **above** the enemy.) y is small at the top and big at the bottom.\n\nIf both are true, it is a stomp; if not, it is a side hit.\n\n### Build the blocks\n1. From the **Sprite** category, take the `when a [Player] sprite hits a [Enemy] sprite` event.\n2. Inside it, put the two-branch `if ... do ... else ...` block from the **Logic** category.\n3. For the condition, take an `[ ] and [ ]` block from the **Logic** category. On its left side, a `[ ] > [ ]` comparison block: on its left `[this sprite] [y speed]`, on its right 10. On its right side, a `[ ] < [ ]` comparison block: on its left `[this sprite] [y position]`, on its right a subtraction block (`[ ] - [ ]`): on its left `[other sprite] [y position]`, on its right 4.\n4. The `do` branch (stomp): `make [other sprite] explode`; `change score by [5]`; `set [this sprite] speed x [this sprite x speed] y [-150]` (so the hero bounces up a little); `play melody [boom]`.\n5. The `else` branch (side hit): `change lives by [-1]`; `shake screen for [250] ms`; `put sprite [this sprite] on tile column [2] row [5]`; `set [this sprite] speed x [0] y [0]`.\n6. Press ↺. Jump on top of the enemy: the slime explodes, the score goes up by 5 and the hero bounces. Walk into it from the side: you lose a life.\n\nExpected result: when you jump on it from above, the slime is beaten and you do not lose a life; when you hit it from the side, the hero goes back to the start and loses a life. Four goals ✓.\n\n### How does it work?\n- In the collision event, `this sprite` is the sprite of the first kind (the hero) and `other sprite` the sprite of the second kind (the slime).\n- While the hero is falling, its y speed is positive. While walking on the ground its y speed is 0, so the \"speed > 10\" condition rules out a side hit.\n- If the hero's y is smaller than the enemy's, the hero is above the enemy.\n- The enemy's movement comes ready-made: gravity, a sideways speed and reversing when it reaches a wall. These are in the `when a [Enemy] sprite is created` and `every frame` events; these events work for every enemy.\n- To check your work, the activity puts a separate slime on the stage and drops the hero on top of it; then it tries a side hit too.\n\n### Try it\n1. Make the stomp worth 10 points. Raise the bouncing hero's speed to -250: this way the hero gets a high jump when it stomps an enemy.\n2. Create one more enemy on the map (`new [Slime] sprite, kind [Enemy]`) and check that it can be stomped.\n3. In the stomp condition, use \"y speed > 100\" instead of \"y speed > 10\". What changes? Which one makes the game fairer?\n\n### Common mistakes\n- Using only the \"y speed > 10\" condition: even if the hero touches the enemy while falling past its side, the enemy dies. The second test (position) prevents this.\n- Writing the sprites the wrong way round in the subtraction: if you write `balcik y < kahraman y - 4` instead of `kahraman y < balcik y - 4`, it counts as a stomp when the enemy is on top.\n- Putting the lives loss in the `do` branch: you lose a life when you stomp too.\n- Forgetting to delete `other sprite`: the stomped slime stays on the screen and you keep stomping it.",
+            "question": "Does the rule \"speed > 10 and I am above\" feel fair to the player? If you sometimes touch from the side and still count as stomping, or lose a life when you did stomp, how does the game make you feel? How could you make the collision rule more generous or stricter?",
+            "explainerMd": "### What you will learn in this lesson\n- That the same collision can have two different results, and how to separate them with a condition\n- How to use the difference between `this sprite` and `other sprite` in a collision event\n- How to combine two conditions with `and`\n- How to build the stomp test (falling speed + position)\n\n### What you should know first\nIn lesson 6 you saw the collision event and `other sprite`. In lessons 21-22 you learnt that the y speed is positive downwards. The patrol logic from lesson 16 (an enemy that turns round at a wall) moves the enemy in this scene. Remember the `if ... else` block from lesson 9.\n\n### One collision, two results\nIn a platform game there are two ways to touch an enemy: by falling on it from above (the enemy is beaten) or by walking into its side (the hero gets hurt). The engine's collision event does not tell them apart; it just says \"the two overlapped\". You tell them apart with a condition.\n\n### Two tests\nWe recognise a hit from above by looking at two things:\n\n```\nTest 1: is the hero falling?     y speed > 10\nTest 2: is the hero above?       kahraman y < enemy y - 4\n```\n\nA hero walking on the ground has a y speed of 0, so test 1 rules out a side hit. Test 2 rules out a hero that touches the enemy while falling past its side. Because y grows downwards, the y value of the sprite on top is **smaller**.\n\n### Both together: and\nIf both tests are true, it is a stomp. The `and` in the logic block is only true if both sides are true:\n\n```\nif (y speed > 10) and (kahraman y < enemy y - 4) do:\n  stomp\nelse:\n  side hit\n```\n\nExample: the hero is falling at speed 120, y = 70; the enemy's y = 88. Test 1: 120 > 10 is true. Test 2: 70 < 84 is true. Result: a stomp.\n\nAnother example: the speed is 120 but the hero's y = 86. Test 2: 86 < 84 is false. Result: a side hit.\n\n### Who is who?\nIn the `when a [Player] sprite hits a [Enemy] sprite` event, `this sprite` is the sprite of the first kind (the hero) and `other sprite` the sprite of the second kind (the enemy). To blow up the enemy you write `make other sprite explode`. If you blow up `this sprite`, the hero disappears.\n\n### Reward and penalty in separate branches\nThe score and the bounce go in the `do` branch; the lives loss and going back to the start go in the `else` branch. If you put the lives loss outside the condition, you lose a life when you stomp too.\n\n### Summary\nThe collision event tells you that two sprites touched; you work out how they touched with a condition. For a hit from above, the hero must be falling (y speed > 10) and a little above the enemy. You combine the two tests with `and`, and separate the stomp from the side hit with `if ... else`. `this sprite` points to the hero and `other sprite` to the enemy.",
+            "concepts": [
+              {
+                "term": "this sprite / other sprite",
+                "definition": "In a collision event, the sprite of the first kind (the hero) and the sprite of the second kind (the enemy).",
+                "example": "`make other sprite explode` gets rid of the enemy.",
+                "pitfall": "Mixing up this and other: if you blow up `this sprite`, the hero disappears."
+              },
+              {
+                "term": "Falling test",
+                "definition": "Is the hero moving downwards: y speed > 10.",
+                "example": "While walking on the ground the y speed is 0; this condition rules out a side hit.",
+                "pitfall": "Not checking for falling: the enemy dies even when you just walk past it."
+              },
+              {
+                "term": "Position test",
+                "definition": "Is the hero a little above the enemy: kahraman y < enemy y - 4.",
+                "example": "Hero y = 70, enemy y = 88: because 70 < 84, the hero is above.",
+                "pitfall": "Writing the comparison the wrong way round: it counts as a stomp even when the enemy is on top."
+              },
+              {
+                "term": "and (logic)",
+                "definition": "A combination where both conditions must be true.",
+                "example": "`(speed > 10) and (y position < enemy y - 4)` recognises a stomp.",
+                "pitfall": "Using `or` instead of `and`: one of the tests becomes enough, and stomping gets too easy."
+              },
+              {
+                "term": "if ... else",
+                "definition": "A two-branch choice: if the condition is true the `do` branch runs; if it is false the `else` branch runs.",
+                "example": "The stomp is in the `do` branch and the side hit in the `else` branch.",
+                "pitfall": "Putting the lives loss outside the branches: you lose a life when you stomp too."
+              },
+              {
+                "term": "Bouncing hero",
+                "definition": "A small upward speed (-150) given to the hero after a stomp.",
+                "example": "When it stomps an enemy, the hero bounces up a little and the game feels smooth.",
+                "pitfall": "Forgetting the bounce: after the stomp, the hero seems to sit down where the enemy was."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h5d24-q1",
+                "kind": "mcq",
+                "prompt": "While walking on the ground, the hero hits the slime from the side. Why does the \"y speed > 10\" condition come out false (so it does not count as a stomp)?",
+                "options": [
+                  "Because the hero's y speed is 0 on the ground",
+                  "Because the slime's speed is big",
+                  "Because a side collision never triggers an event",
+                  "Because the y speed is only positive when going right"
+                ],
+                "answer": 0,
+                "explanation": "The up-down speed of a hero walking on the ground is 0; the ground stops it. Because 0 is not > 10, the `do` branch does not run and the `else` branch runs. A positive speed means falling; there is no falling on the ground.",
+                "skills": [
+                  "oyun-carpisma-yon",
+                  "oyun-mantik-kosul"
+                ]
+              },
+              {
+                "id": "m11h5d24-q2",
+                "kind": "predict-output",
+                "prompt": "The hero is falling at 200 pixels/s and its y position is 86. The slime's y position is 88. What happens when the collision event runs?\n\n```\nif (this y speed > 10) and (this y position < other y position - 4) do:\n  make other sprite explode, change score by 5\nelse:\n  change lives by -1, put the hero back at the start\n```",
+                "options": [
+                  "The slime explodes and the score goes up by 5",
+                  "The hero loses a life and goes back to the start",
+                  "Nothing happens",
+                  "The slime explodes and a life is lost too"
+                ],
+                "answer": 1,
+                "explanation": "The first test is true (200 > 10). The second test: 88 - 4 = 84, and 86 < 84 is false. With `and`, both sides must be true; because one is false, the `else` branch runs: the hero loses a life and goes back to the start. The hero is not far enough above the enemy.",
+                "skills": [
+                  "oyun-carpisma-yon",
+                  "oyun-mantik-kosul",
+                  "oyun-y-ekseni"
+                ]
+              },
+              {
+                "id": "m11h5d24-q3",
+                "kind": "find-bug",
+                "prompt": "When you jump on top of the enemy, the hero itself disappears instead of the slime. Which line is wrong?\n\n```\n1  when a [Player] sprite hits a [Enemy] sprite:\n2    if (this y speed > 10) and (this y position < other y position - 4) do:\n3      make this sprite explode\n4      change score by 5\n5    else:\n6      change lives by -1\n```",
+                "options": [
+                  "Line 2: the condition",
+                  "Line 4: change score by 5",
+                  "Line 6: losing a life",
+                  "Line 3: this sprite explodes"
+                ],
+                "answer": 3,
+                "explanation": "On line 3, `this sprite` is the hero; that is the one that gets blown up. `other sprite` should be used for the enemy. The condition on line 2 is correct: the falling speed is this sprite's, and the position comparison is the right way round.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-carpisma-yon"
+                ]
+              },
+              {
+                "id": "m11h5d24-q4",
+                "kind": "numeric",
+                "prompt": "The slime's y position is 88. To count as a stomp, the hero's y position must be SMALLER than `slime y - 4`. What is the largest whole number the hero's y can be?",
+                "answer": 83,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "The condition is y < 88 - 4 = 84. Among whole numbers, 84 does not meet the condition (84 < 84 is false); the largest whole number that does is 83. A small y means higher up, so the hero with the smaller value is higher.",
+                "skills": [
+                  "oyun-y-ekseni",
+                  "oyun-mantik-kosul"
+                ]
+              },
+              {
+                "id": "m11h5d24-q5",
+                "kind": "mcq",
+                "prompt": "Why are both a \"falling speed\" test and a \"position\" test put in the stomp rule?",
+                "options": [
+                  "One is not enough; together they describe \"hitting by falling from above\"",
+                  "The engine does not accept a single condition",
+                  "The position test works out the speed",
+                  "The speed test gets rid of the enemy"
+                ],
+                "answer": 0,
+                "explanation": "If only the speed test is used, the enemy dies even when the hero touches it while falling past its side. If only the position test is used, a hero standing on top of the enemy without falling also counts as stomping. Together they describe the \"falling from above\" case.",
+                "skills": [
+                  "oyun-carpisma-yon",
+                  "oyun-mantik-kosul"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Platform atlayıcı",
@@ -3079,7 +5977,129 @@ export const modul11: ModuleContent = {
                 "oyun-ziplama"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Platform jumper",
+            "problem": "You are putting together all the pieces from this week to make your first real platform game: a hero that walks and jumps; spikes on the ground, gold in the air, a slime enemy and, at the end, a door. Half the game is ready; the other half is writing the rules.",
+            "contentMd": "### What are we going to make?\nWhat comes ready-made: a map 24 tiles wide, gravity, walking, jumping with A, the camera, a slime on patrol and the rule for stomping the slime. What you will write:\n\n| Rule | From which lesson | What will happen? |\n|---|---|---|\n| Gold | 23 | When touched, the gold disappears and the score goes up by 1 |\n| Spikes | 23 | When touched, lives go down by 1 and the hero goes back to the start |\n| Door | 13 and 23 | When touched, \"Level complete!\" appears and the game is won |\n\n### Build the blocks\n1. Press ▶ and explore the map. The camera follows the hero; walk right and jump onto the platforms. You pass through the gold, the spikes and the door, but nothing happens.\n2. **Gold:** build a `when a [Player] sprite touches tile [Gold]` event. Inside it, put `clear tile at column [event tile column] row [event tile row]`, `change score by [1]` and `play melody [point]`.\n3. **Spikes:** build a `when a [Player] sprite touches tile [Spikes]` event. Inside it, put `change lives by [-1]`, `shake screen for [250] ms`, `put sprite [this sprite] on tile column [2] row [5]` and `set [this sprite] speed x [0] y [0]`.\n4. **Door:** build a `when a [Player] sprite touches tile [Door]` event. Inside it, put `show [Level complete!] on screen for [2] seconds`, `play melody [victory]` and `end game: [you win]`.\n5. Press ↺ and play. Take the first gold, avoid the spikes, jump on the slime and reach the door.\n\nExpected result: all five goals ✓. The gold disappears and the score goes up; when you touch the spikes, you lose a life and the hero goes back to the start; when you touch the door, \"Level complete!\" appears and the game is won.\n\n### How does it work?\n- The three events run separately. The gold and spike events are made of the same kind of blocks; only the picture (tile) is different.\n- The door tile is not a wall either; the hero can pass through it. The moment it touches it, the game runs the `touches tile` event.\n- The ready-made slime rule (stomp/side hit) works as in lesson 24.\n- The map is 24 x 8 tiles, which is 384 x 128 pixels. Because the screen is 160 x 120, the camera follows the hero.\n\n### Try it\n1. Make the gold worth 5 points and require the score to be at least 10 before touching the door: in the door event, `if [score] ≥ [10] do win, else show [Collect the gold first!]`.\n2. Put a new spike somewhere on the map: in the **Map** tab, choose the spikes and paint them on the ground. Does the game recognise the new spikes too?\n3. Change the hero's picture to the robot, or add another enemy.\n\n### Common mistakes\n- Putting the hero back at the start after the spikes without resetting its speed: the falling speed stays, and the hero jumps strangely when it hits the ground.\n- Choosing `end game: [you lose]` in the door event: the game shows the losing screen instead of winning.\n- Typing fixed numbers instead of the `event tile` blocks in the gold event: the same tile is always cleared.\n- Drawing the gold tile on the map with a picture other than **Gold**: the event is never triggered.",
+            "question": "Where does a friend struggle when they play this game? How does having fewer spikes, or putting the gold higher up, change the game? How does a good level move from easy to hard?",
+            "explainerMd": "### What you will learn in this lesson\n- How to plan a game as a list of rules\n- How to combine the week's pieces (gravity, jumping, tile events, stomping) in one level\n- How to work out the map size and why a camera is needed\n- How to play the game and adjust the difficulty\n\n### What you should know first\nThis project uses all of lessons 21-24: gravity (21), jumping (22), gold and spikes (23), stomping the enemy (24). For the door, remember the `show on screen` and `end game` blocks from lesson 13. For the camera, look at lesson 14.\n\n### A rules table first\nBreak a big job into pieces. Each rule answers these three questions: **Touching what? What happens? Which block?**\n\n```\nRule    Trigger                     Result\nGold    Player + Gold tile          tile cleared, score +1\nSpikes  Player + Spikes tile        lives -1, back to start, speed 0\nDoor    Player + Door tile          message, win the game\nStomp   Player + Enemy collision    enemy gone, score +5\n```\n\nThe rules table is a checklist: while you play, try each row one by one.\n\n### Map size\nEach tile is 16 pixels, and the screen is 160 x 120 pixels.\n\n```\nMap 24 x 8 tiles  ->  384 x 128 pixels\nScreen 160 pixels wide  ->  384 - 160 = 224 pixels outside\n```\n\nThe camera follows the hero for the 224 pixels that do not fit on the screen. Without the camera you would never see the door on the right.\n\n### The pieces work together\nThe gold, spike and door events are separate, but they run in the same scene. The score comes from both the gold and the stomping. When you add a new rule, try again to make sure the earlier rules have not broken.\n\n### Put yourself in the player's shoes\nWhen the game is finished, play it: are the first spikes too close? Is it too hard to reach the gold? A good level goes from easy to hard. The first obstacle is easy, and the later ones slowly get harder. If you change the winning condition (for example, score ≥ 10 for the door), check whether the points let players meet this condition some other way. Because the score comes from both gold and stomping, players can get through in whichever way they like.\n\n### Summary\nYou plan a game with a rules table: trigger, result and block. In this project, gravity, jumping, tile events and stomping enemies come together in one level. Because the map is 384 pixels wide, a camera is needed. When it is finished, you play the game and check the difficulty and that the rules do not break each other.",
+            "concepts": [
+              {
+                "term": "Rules table",
+                "definition": "A plan that writes down the trigger, the result and the blocks, row by row.",
+                "example": "Gold: player + gold tile, tile cleared, score +1.",
+                "pitfall": "Starting without a plan: you forget a rule or write events that clash."
+              },
+              {
+                "term": "Map size",
+                "definition": "The map size is the number of tiles x 16 pixels.",
+                "example": "24 x 8 tiles = 384 x 128 pixels.",
+                "pitfall": "Mixing up tiles and pixels: 24 tiles is not 24 pixels."
+              },
+              {
+                "term": "Camera",
+                "definition": "If the map is bigger than the screen, it follows the hero and scrolls the part shown on the screen.",
+                "example": "The map is 384 pixels and the screen 160 pixels; 224 pixels are seen with the camera.",
+                "pitfall": "Not setting up the camera: the right-hand side of the map is never seen."
+              },
+              {
+                "term": "Winning condition",
+                "definition": "The rule that decides how the game is won (reaching the door, enough score).",
+                "example": "In the door event, `end game: you win` runs.",
+                "pitfall": "Choosing lose instead of win: the losing screen appears when you reach the door."
+              },
+              {
+                "term": "Level balance",
+                "definition": "The difficulty growing from easy to hard.",
+                "example": "The first spikes are far away; the later ones are close together.",
+                "pitfall": "Making the first obstacle hard: the player gets fed up right at the start."
+              },
+              {
+                "term": "Testing",
+                "definition": "Playing the game and trying each rule one by one.",
+                "example": "You touch every piece of gold, every spike, the slime and the door, and check the result.",
+                "pitfall": "Trying only once: you do not notice that other rules have broken."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h5d25-q1",
+                "kind": "numeric",
+                "prompt": "The platform jumper map is 24 tiles wide, a tile is 16 pixels, and the screen is 160 pixels wide. How many pixels wider than the screen is the map (the amount scrolled with the camera)?",
+                "answer": 224,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "The map width is 24 x 16 = 384 pixels. Because the screen is 160 pixels, 384 - 160 = 224 pixels are left outside; the camera shows this part by following the hero.",
+                "skills": [
+                  "oyun-harita-olcu"
+                ]
+              },
+              {
+                "id": "m11h5d25-q2",
+                "kind": "mcq",
+                "prompt": "You added the condition \"the score must be at least 10\" to the door event. Gold gives 5 points, and a stomped slime also gives 5 points; there are 2 pieces of gold on the map. What loophole does this rule have?",
+                "options": [
+                  "It has no loophole",
+                  "The player can reach 10 points with one piece of gold and one slime and win without taking the second piece of gold",
+                  "The door never opens",
+                  "When gold is worth 10 points, the score becomes negative"
+                ],
+                "answer": 1,
+                "explanation": "Because the score comes from both gold and stomping, the player can reach 5 + 5 = 10 points with one piece of gold and one slime and win without collecting the second piece of gold. This loophole spoils the aim of making players collect the gold. The fix is to change the test or adjust the points.",
+                "skills": [
+                  "oyun-seviye-tasarimi",
+                  "oyun-mantik-kosul"
+                ]
+              },
+              {
+                "id": "m11h5d25-q3",
+                "kind": "find-bug",
+                "prompt": "A player who reaches the door with a score below 10 should only be shown a warning, and the game should go on. But right now the player loses the game instead of seeing a warning. Which line is wrong?\n\n```\n1  when a [Player] sprite touches tile [Door]:\n2    if score >= 10 do:\n3      end game: [you win]\n4    else:\n5      end game: [you lose]\n```",
+                "options": [
+                  "Line 2: the score >= 10 condition",
+                  "Line 3: winning",
+                  "Line 5: ending the game in the else branch",
+                  "Line 1: the event kind"
+                ],
+                "answer": 2,
+                "explanation": "`end game: you lose` on line 5 ends the game. For a warning, `show [Collect the gold first!] on screen for 2 seconds` should be there. Lines 2 and 3 build the winning rule correctly.",
+                "skills": [
+                  "oyun-hata-ayiklama",
+                  "oyun-seviye-tasarimi"
+                ]
+              },
+              {
+                "id": "m11h5d25-q4",
+                "kind": "numeric",
+                "prompt": "Gold gives 1 point, a stomped slime gives 5 points, and touching spikes does not change the score (it only takes a life). The player collected 2 pieces of gold, stomped 2 slimes and touched the spikes once. What is the score?",
+                "answer": 12,
+                "tolerance": 0,
+                "unit": "points",
+                "explanation": "From the gold, 2 x 1 = 2; from the slimes, 2 x 5 = 10. The spikes only affect lives, not the score. Total: 2 + 10 = 12.",
+                "skills": [
+                  "oyun-seviye-tasarimi"
+                ]
+              },
+              {
+                "id": "m11h5d25-q5",
+                "kind": "mcq",
+                "prompt": "Your friend tried the game and lost all three lives on the first spikes. Which change is best for making the level more balanced?",
+                "options": [
+                  "Setting lives to 99",
+                  "Making the first spikes narrower and leaving safe ground before them",
+                  "Turning jumping off",
+                  "Removing the door"
+                ],
+                "answer": 1,
+                "explanation": "A good level goes from easy to hard. Making the first spikes narrower and leaving safe ground before them gives the player a chance to learn. Raising lives a lot hides the problem, turning jumping off breaks the game, and removing the door makes the game impossible to finish.",
+                "skills": [
+                  "oyun-seviye-tasarimi",
+                  "oyun-ziplama"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -3087,6 +6107,7 @@ export const modul11: ModuleContent = {
       "title": "Proje: tam oyunlar",
       "project": "Final oyunum",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Bir oyunun iskeletini (oyuncu, hedef, tehlike, kazanma, kaybetme) beş soruluk tasarım kartıyla anlatabilir.\n2. Skor ve canı oyun başlarken ayarlayıp kazanma kuralını `≥` ile doğru yazabilir.\n3. Değişkenlerle zamanla artan zorluk ve bayrakla (anahtar gibi) hafıza kurabilir.\n4. `eğer … ise … değilse` ile iki yoldan birini seçebilir ve karo koordinatını piksele çevirebilir.\n5. Dört adımlı dedektif yöntemiyle bozuk bir oyunun hatalarını bulup düzeltebilir; oyuna ses ve sarsıntı gibi cila ekleyebilir.\n6. Kendi fikrinden, dört turda sekiz hedefin hepsini karşılayan tam bir oyun yapabilir.\n\n### Haftanın planı\nHafta beş derstir. Plan günde bir ders içindir; final dersi daha uzun olduğu için ayrı bir gün ayırmak iyi olur.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Oyun iskeleti: oyuncu, hedef, skor, bitiş | ~25 dk | Tasarım kartını doldur, kedi ve elmalar oyununu kur, ≥ ile = farkını dene. |\n| 2 | Tam oyun 1: Uzay savunması | ~30 dk | Vurma, can, süre ve zorluk kurallarını sırayla kur; artış miktarını değiştirip dengele. |\n| 3 | Tam oyun 2: Labirent kaçışı | ~30 dk | Anahtar bayrağını ve iki kollu kapı kuralını yaz; hayaletin hızını ayarla. |\n| 4 | Cila ve hata ayıklama: bozuk oyunu onar | ~25 dk | Dedektif yöntemiyle üç hatayı düzelt, sonra ses ve sarsıntı ekle. |\n| 5 | Final: Kendi oyunun | ~40 dk | Kartı doldur, dört turda oyunu yap, hedefleri ✓ yap ve oyunu arkadaşına oynat. |\n\n### Ön koşul kontrolü\nBu hafta önceki haftaların bloklarını kullanır. Başlamadan önce şunlar rahat olmalı:\n- Sprite oluşturma, ok tuşlarıyla hareket ve çarpışma olayı (1. ve 2. hafta)\n- Skor, can ve `skoru değiştir` bloğu\n- Değişken oluşturmak ve `kadar değiştir` ile `yap` farkı\n- Harita sekmesi, karo ve takip eden düşman (3. ve 4. hafta; labirent dersi için)\n- Basit çarpma, bölme ve toplama (hız ve süre hesapları için)\n\n### Kavram haritası\n- **Tasarım:** tasarım kartı → oyuncu, hedef, tehlike → kazanma ve kaybetme kuralı\n- **Kurallar:** olay + koşul → çarpışma olayı (bir kez) → her karede olayı (saniyede 60 kez)\n- **Hafıza:** değişken → bayrak (0 ya da 1) → olaylar arası köprü\n- **Karar:** `eğer … ise` → `değilse` kolu → `≥` ile `=` farkı\n- **Zorluk ve zaman:** `her N ms'de bir` → geri sayım → `süre bitince` → denge\n- **Kalite:** dedektif yöntemi → hata ayıklama → cila → hedefler paneli\n\n### Sık yapılan hatalar\n- **Kazanma kontrolünü olayın dışına koymak.** Skor değişir ama kural hiç sorulmaz.\n- **`skor = 3` yazmak.** Skor atlıyorsa (2, 4, 6) hiç tetiklenmez; `≥` kullan.\n- **`yap` yerine `kadar değiştir` ya da tersi.** Artış beklerken değer sabit kalır.\n- **Bayrağı 1 yapmamak ya da başlangıçta 0 yapmamak.** Kapı hep kilitli kalır.\n- **Karo bloğuna piksel yazmak.** Numaralar 0'dan başlar ve bir karo 16 pikseldir.\n- **Karelik kuralda sprite'ı silmemek.** `her karede` olayı saniyede 60 kez çalışır ve üç can 50 ms'de gider.\n- **Yanlış sprite türü seçmek.** Olay Yiyecek bekliyorsa Nesne türündeki sprite olayı tetiklemez.\n- **Etkinlikteki ↺ Başa dön düğmesine basmak.** Bloklar silinir; oyunu denemek için sahnedeki ↺ kullanılır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarını yeniden oku ve \"sık yapılan yanlış\" satırlarını yüksek sesle söyle.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Uzay savunmasında artış miktarını 5 yerine 10 yap. 28. saniyedeki `hiz` değerini ve en yavaş uzaylının hızını hesapla, sonra oyunda dene.\n4. Labirent kaçışına ikinci bir anahtar ve ikinci bir kapı ekle. Hangi bayrakları kullanacağını önce kâğıda yaz.\n5. Arkadaşından kendi oyununu oynamasını iste; hiçbir şey söylemeden izle. İlk 10 saniyede nerede takıldı?\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Final oyunum)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Tasarım | Kart yok, oyunun amacı belirsiz | Beş sorunun hepsi cevaplanmış ve oyunla uyuşuyor | Kart oyunla birebir uyuyor, oyuncuya amaç ilk 10 saniyede anlaşılıyor |\n| Kurallar | Skor ya da can çalışmıyor | Toplayınca skor artıyor, tehlikeye değince can azalıyor | Zaman, bayrak ya da seviye gibi ek bir kural eklenmiş |\n| Bitiş | Oyun kazanılamıyor ya da hiç bitmiyor | Kazanma ve kaybetme çalışıyor | Her iki bitişte de anlamlı bir mesaj gösteriliyor |\n| Cila ve denge | Ses ve efekt yok, oyun çok kolay ya da imkânsız | Ses ve en az bir efekt var, oyun oynanabilir | Sayılar denenip ayarlanmış ve değişiklikler açıklanmış |\n| Anlatım | Ne yaptığını anlatamıyor | Oyunu ve kurallarını adım adım anlatıyor | Bir hata yapıp nasıl bulduğunu dedektif adımlarıyla anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta ezber değil, bir fikri baştan sona çalışan bir ürüne dönüştürme deneyimidir. Final oyunu öğrencinin kendi tasarımıdır; \"daha iyisi\" yerine \"ne eklemek istersin?\" diye sorun.\n- **Nasıl destek olunur?** Takıldığında cevabı vermeyin. \"Belirti ne?\", \"Hangi olay çalışıyor?\", \"Hangi bloğu şüphelendin?\" sorularıyla dedektif yöntemini birlikte uygulayın.\n- **Süre.** Final dersi 40 dakikadır; öğrenci yorulursa tur arasında ara verilebilir. Oyun, ↺ ile sınırsız denenebilir.\n- **Güvenlik.** Her şey tarayıcıda çalışır; gerçek donanım yoktur. Oyun dosyası **Kaydet** ile bilgisayara indirilirse kişisel bilgi içermez, ancak adı verirken gerçek ad ve soyad kullanmamaya özen gösterin.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Describe a game's skeleton (player, goal, danger, winning, losing) with the five-question design card.\n2. Set the score and lives when the game starts, and write the winning rule correctly with `≥`.\n3. Build difficulty that grows over time with variables, and memory (such as a key) with a flag.\n4. Choose one of two paths with `if … do … else`, and turn tile coordinates into pixels.\n5. Find and fix the bugs in a broken game with the four-step detective method, and add polish such as sounds and shakes to a game.\n6. Make a complete game from their own idea, in four rounds, that meets all eight goals.\n\n### Plan for the week\nThe week has five lessons. The plan is for one lesson a day; because the final lesson is longer, it is a good idea to set aside a separate day for it.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Game skeleton: player, goal, score, ending | ~25 min | Fill in the design card, build the cat and apples game, try the difference between ≥ and =. |\n| 2 | Full game 1: Space defence | ~30 min | Build the hitting, lives, time and difficulty rules in order; change the increase and balance it. |\n| 3 | Full game 2: Maze escape | ~30 min | Write the key flag and the two-branch door rule; adjust the ghost's speed. |\n| 4 | Polish and debugging: fix the broken game | ~25 min | Fix three bugs with the detective method, then add sounds and shakes. |\n| 5 | Final: Your own game | ~40 min | Fill in the card, make the game in four rounds, get the goals to ✓ and have a friend play the game. |\n\n### Prerequisite check\nThis week uses the blocks from earlier weeks. Before you start, these should feel comfortable:\n- Creating sprites, moving with the arrow keys and the collision event (weeks 1 and 2)\n- The score, lives and the `change score` block\n- Creating a variable, and the difference between `change by` and `set`\n- The Map tab, tiles and enemies that follow (weeks 3 and 4; for the maze lesson)\n- Simple multiplication, division and addition (for speed and time calculations)\n\n### Concept map\n- **Design:** design card → player, goal, danger → winning and losing rules\n- **Rules:** event + condition → collision event (once) → every frame event (60 times a second)\n- **Memory:** variable → flag (0 or 1) → a bridge between events\n- **Decisions:** `if … do` → the `else` branch → the difference between `≥` and `=`\n- **Difficulty and time:** `every N ms` → countdown → `when time runs out` → balance\n- **Quality:** detective method → debugging → polish → Goals panel\n\n### Common mistakes\n- **Putting the win check outside the event.** The score changes but the rule is never asked.\n- **Writing `score = 3`.** If the score skips (2, 4, 6), it never triggers; use `≥`.\n- **`change by` instead of `set`, or the other way round.** You expect an increase, but the value stays fixed.\n- **Not setting the flag to 1, or not setting it to 0 at the start.** The door stays locked for ever.\n- **Typing pixels into a tile block.** The numbers start from 0, and a tile is 16 pixels.\n- **Not deleting the sprite in an every-frame rule.** The `every frame` event runs 60 times a second, and three lives go in 50 ms.\n- **Choosing the wrong sprite kind.** If the event expects Food, a sprite of the Object kind does not trigger the event.\n- **Pressing the ↺ Start over button in the activity.** The blocks are deleted; to test the game, use the ↺ on the stage.\n\n### End-of-week review\n1. Read each lesson's concept cards again and say the \"common mistake\" lines out loud.\n2. Read again the explanations of the mini quiz questions you got wrong, then answer the question again.\n3. In space defence, change the increase from 5 to 10. Work out the `hiz` value at 28 seconds and the speed of the slowest alien, then try it in the game.\n4. Add a second key and a second door to maze escape. Write on paper first which flags you will use.\n5. Ask a friend to play your own game; watch without saying anything. Where did they get stuck in the first 10 seconds?\n\nAs an end-of-week test, the five lessons' mini quizzes are enough: 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project rubric (My final game)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Design | No card; the aim of the game is unclear | All five questions are answered and match the game | The card matches the game exactly; the player understands the aim in the first 10 seconds |\n| Rules | The score or lives do not work | The score goes up when you collect something; lives go down when you touch the danger | An extra rule such as time, a flag or levels has been added |\n| Ending | The game cannot be won, or never ends | Winning and losing both work | A meaningful message is shown for both endings |\n| Polish and balance | No sounds or effects; the game is too easy or impossible | There are sounds and at least one effect; the game is playable | The numbers have been tried and adjusted, and the changes are explained |\n| Explanation | Cannot explain what they did | Explains the game and its rules step by step | Explains a bug they made and how they found it, using the detective steps |\n\n### Note for parents and teachers\n- **Aim.** This week is not about learning things by heart; it is the experience of turning an idea into a product that works from start to finish. The final game is the learner's own design; instead of \"make it better\", ask \"what would you like to add?\"\n- **How to help.** When they get stuck, do not give the answer. Use the detective method together with questions such as \"What is the symptom?\", \"Which event is running?\", \"Which block did you suspect?\"\n- **Time.** The final lesson is 40 minutes; if the learner gets tired, you can take a break between rounds. The game can be tried as many times as you like with ↺.\n- **Safety.** Everything runs in the browser; there is no real hardware. If the game file is downloaded to the computer with **Save**, it contains no personal information, but take care not to use a real first name and surname when naming it.\n- **Progress.** Mini quiz results appear skill by skill on the \"My progress\" page (a draft/pilot feature; they are only saved if consent has been given).",
       "lessons": [
         {
           "title": "Oyun iskeleti: oyuncu, hedef, skor, bitiş",
@@ -3209,7 +6230,129 @@ export const modul11: ModuleContent = {
                 "oyun-hata"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Game skeleton: player, goal, score, ending",
+            "problem": "Chess, football and a computer game look very different, but they all share a skeleton: who are you, what can you do, what are you trying to achieve, and when do you win or lose? A game that answers these questions from the start gets finished much faster than one left half-done. This week we are making complete games; first, learn the skeleton.",
+            "contentMd": "### The five-question design card\nBefore you start a game, answer these five questions for yourself (explaining them to a friend works too):\n1. **Who is the player?** (a cat, a robot, a ship…) How does it move?\n2. **What is the goal?** (collecting, shooting, escaping, reaching a place)\n3. **What is the danger?** (enemies, spikes, time…)\n4. **How do you win?** (for example, when the score reaches 3)\n5. **How do you lose?** (for example, when lives reach 0)\n\nIn this lesson you will put the answers into practice with a ready-made game: the player is a cat, the goal is apples, you win at a score of 3, and you lose at 0 lives.\n\n### What is ready\nOn the stage there is a light blue background, a cat at the bottom left and three apples. The cat does not walk yet, the score and lives are not set, and touching the apples does nothing.\n\n### Build the blocks\n1. From the **Controller** category, snap the `[kedi] moves [in 4 directions] with player keys, speed [60]` block at the very bottom of the `when game starts` block. The cat now walks with the arrow keys.\n2. From the **Game** category, add the `set score to [0]` and `set lives to [3]` blocks in the same place. The counters should be set when the game starts.\n3. From the **Sprite** category, build the `when a [Player] sprite hits a [Food] sprite` event.\n4. Inside the event: `change score by [1]`, `play melody [point]`, `delete sprite [other sprite]`.\n5. At the bottom, put an `if [score] ≥ [3] do` block from the **Logic** category. (The `score` block is in the **Game** category.) Snap the `show [You win!] on screen for [2] seconds` and `end game: [you win]` blocks inside it.\n6. Press ↺. Collect the apples. On the third one, \"You win!\" appears and the game ends.\n\nExpected result: all five goals ✓. The cat walks, the score and lives are set at the start, the apples disappear when eaten, and the game is won after three apples.\n\n### How does it work?\n- Winning and losing are each a **rule**. We wrote the winning rule (`if score ≥ 3`). If we do not write a losing rule, the game is lost by itself when lives reach 0.\n- The score and lives variables are the game's own counters; on the screen they appear as the score at the top left and hearts at the top right.\n- The collision event does three jobs together: it gives a point, plays a sound and gets rid of the apple. You can put as many blocks as you like inside an event.\n- Once the skeleton is complete, it is easy to add pieces such as enemies, a map or time on top of it.\n\n### Try it\n1. Add more apples: add new apples with `new [Apple] sprite, kind [Food]`. Raise the winning score to match.\n2. Use **Cherry** or **Mushroom** instead of the apple. Does changing the picture of the new apples affect the collision rule?\n3. Add a danger to the screen (`new [Ghost] sprite, kind [Enemy]`) and take away a life in the `when a [Player] sprite hits a [Enemy] sprite` event.\n\n### Common mistakes\n- Putting the win check outside the collision event: the score changes but the rule is never asked, and the game does not end.\n- Writing `score = 3` instead of `if score ≥ 3` and raising the score by more than 1: if the score skips 3 and becomes 4, the win is never triggered. `≥` is safer.\n- Not deleting the apple: an eaten apple is still visible on the stage, and it looks as if it has not been eaten.\n- Not writing the starting score and lives: the game still works, but someone reading the program cannot see the starting values. Writing the starting values clearly is a good habit.",
+            "question": "Which was the hardest answer on the five-question card? If you had a game idea, which question would make things hardest for you if you started without answering it?",
+            "explainerMd": "### What you will learn in this lesson\n- The skeleton every game shares: the player, the goal, the danger, the winning rule and the losing rule\n- What the score and lives counters are for in a game\n- Why it is safer to write the winning rule with `≥`\n- How to put an idea onto a five-question design card\n\n### What you should know first\n- Creating a sprite and using the `when game starts` block (lessons 1 and 2)\n- Walking the player with the keys (lesson 2)\n- The collision event and the `change score` block (lessons in weeks 2-3)\n\n### The hidden skeleton of every game\nChess, football and a computer game are nothing like each other. But in all of them the same five questions have been answered: **Who are you?** (the player), **What are you trying to do?** (the goal), **What stops you?** (the danger), **When do you win?** and **When do you lose?**\n\nIf you answer these questions before you put any blocks into a game, the chance of it being left half-done is much smaller. When the questions are written on a card, we call it a **design card**.\n\n| Question | Space game | Cat and apples |\n|---|---|---|\n| Player | Ship | Cat |\n| Goal | Shooting aliens | Collecting apples |\n| Danger | Aliens, time | None (a ghost later) |\n| Winning | Still alive when the time runs out | When the score reaches 3 |\n| Losing | When lives reach 0 | When lives reach 0 |\n\n### Counters and rules\nThe **score** and **lives** are the game's own counters. You write their values when the game starts: for example, score 0 and lives 3. A **rule** is an event and a condition put together: \"when an apple is eaten, raise the score\" is an event, and \"if the score is 3, win\" is a condition.\n\nYou write the winning rule yourself. If you do not write a losing rule, the game is lost by itself when lives reach 0. So every game has an ending, but you define the winning ending.\n\n### Where should the check go?\nA condition is only asked at the moment it runs. If the `if score ≥ 3` block were at the start of the game, the score would be 0 at that moment, so the answer would always be \"no\". It must be asked where the score changes, that is, inside the collision event.\n\nAnother trap is the difference between `=` and `≥`. If each apple gives 2 points, the score goes 2, 4, 6. If the rule is `score = 5`, the score is never equal to 5. If the rule is `score ≥ 5`, you win at 6. If the number can skip, use `≥`.\n\n### A small calculation\nSay each apple is worth 4 points and the winning rule is `score ≥ 10`. The score goes 4, 8, 12; because 12 ≥ 10, you win on the third apple. So the number of apples needed is the target score divided by the points per apple, **rounded up**: 10 ÷ 4 = 2.5 → 3.\n\n### Summary\nEvery game's skeleton is made of five questions: player, goal, danger, winning, losing. The score and lives are set at the start, and rules are events and conditions put together. The win check must be inside the event where the score changes, and written with `≥` if the number can skip. Even if no losing rule is written, the game ends when lives reach 0.",
+            "concepts": [
+              {
+                "term": "Design card",
+                "definition": "A short note answering five questions before you start a game: player, goal, danger, winning, losing.",
+                "example": "The card for the cat and apples game: the player is the cat, the goal is apples, winning is a score of 3, losing is 0 lives.",
+                "pitfall": "Skipping the card and putting blocks in straight away; because it is not clear how the game will end, it is left half-done."
+              },
+              {
+                "term": "Score and lives",
+                "definition": "The game's own counters; the score counts success, lives count the chances left, and their values are set when the game starts.",
+                "example": "When the game starts you set the score to 0 and lives to 3; when an apple is eaten, the score goes up by 1.",
+                "pitfall": "Not writing the starting values; the game still works, but someone reading the program cannot see what the start is."
+              },
+              {
+                "term": "Winning rule",
+                "definition": "An event and a condition put together that say under what condition the game is won.",
+                "example": "When an apple is eaten, the rule `if score ≥ 3 do end game: you win` is asked.",
+                "pitfall": "Putting the check outside the collision event; even when the score changes, the rule is never asked and the game does not end."
+              },
+              {
+                "term": "Losing rule",
+                "definition": "The game ending by itself as a loss when lives reach 0; if you like, you can customise it with the `when lives run out` event.",
+                "example": "Hitting an enemy takes away 1 life; after 3 collisions the game is lost.",
+                "pitfall": "Thinking losing is impossible; if the danger never takes away lives, the game is no challenge."
+              },
+              {
+                "term": "The difference between ≥ and =",
+                "definition": "`score ≥ 3` is true when the score is 3 or bigger; `score = 3` is only true when it is exactly 3.",
+                "example": "When each apple gives 2 points, the score goes 2, 4, 6; `score ≥ 5` triggers at 6.",
+                "pitfall": "Using `=` when the score can skip; if the number skips the target, the win is never triggered."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h6d26-q1",
+                "kind": "mcq",
+                "prompt": "Which one cannot be a good winning rule? (A rule must look at something the game can measure.)",
+                "options": [
+                  "When the score reaches 10",
+                  "If you still have lives when the time runs out",
+                  "When the game is beautiful",
+                  "When you reach the door with the key"
+                ],
+                "answer": 2,
+                "explanation": "The game can measure the score, lives, time, position and sprite kinds; it cannot measure \"being beautiful\". The other three options depend on a number or an event.",
+                "skills": [
+                  "oyun-iskelet",
+                  "oyun-tasarim"
+                ]
+              },
+              {
+                "id": "m11h6d26-q2",
+                "kind": "mcq",
+                "prompt": "You did not write any blocks for the losing rule. What happens when the cat hits an enemy and its lives drop from 3 to 0?",
+                "options": [
+                  "The game ends by itself as a loss",
+                  "Nothing happens, and the game goes on for ever",
+                  "The game is won",
+                  "The score is reset but the game goes on"
+                ],
+                "answer": 0,
+                "explanation": "When lives reach 0, if no `when lives run out` event has been written, the game is lost by itself. Writing a separate rule for losing is not required; the winning rule, however, you write yourself.",
+                "skills": [
+                  "oyun-iskelet"
+                ]
+              },
+              {
+                "id": "m11h6d26-q3",
+                "kind": "numeric",
+                "prompt": "Each apple gives 5 points and the winning rule is `score ≥ 12`. What is the smallest number of apples you must collect to win the game?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "apples",
+                "explanation": "The score goes 5, 10, 15. Because 10 < 12, the second apple is not enough; on the third, 15 ≥ 12. Calculation: 12 ÷ 5 = 2.4, rounded up, gives 3. Writing 2 apples would be rounding down.",
+                "skills": [
+                  "oyun-iskelet",
+                  "oyun-kosul"
+                ]
+              },
+              {
+                "id": "m11h6d26-q4",
+                "kind": "predict-output",
+                "prompt": "Each apple gives 2 points, the score starts at 0, and there are 4 apples in total. The rule is written as below. What happens if the cat collects all four apples?\n\n```\nwhen Player hits Food:\n  change score by 2\n  delete sprite other sprite\n  if score = 5 do:\n    end game: you win\n```",
+                "options": [
+                  "You win on the fifth point",
+                  "The score goes 2, 4, 6, 8; because it is never equal to 5, the win is never triggered",
+                  "The game is won when the score reaches 8",
+                  "There is a compile error"
+                ],
+                "answer": 1,
+                "explanation": "The score only passes through even numbers and never lands on 5; the `=` condition is never true. The right way is to write `score ≥ 5`: you win at 6. For the game to give a compile error, a block would have to be missing; here the blocks are valid.",
+                "skills": [
+                  "oyun-kosul",
+                  "oyun-hata"
+                ]
+              },
+              {
+                "id": "m11h6d26-q5",
+                "kind": "find-bug",
+                "prompt": "You collect all three apples, but the game is never won. What is the bug in the program?\n\n```\nwhen game starts:\n  set score to 0\n  set lives to 3\n  if score ≥ 3 do: end game: you win\n\nwhen Player hits Food:\n  change score by 1\n  delete sprite other sprite\n```",
+                "options": [
+                  "The win check is asked only once, at the start of the game, when the score is 0",
+                  "The score should start at 1 instead of 0",
+                  "`≤` should be written instead of `≥`",
+                  "Deleting the apple locks the game"
+                ],
+                "answer": 0,
+                "explanation": "A condition is only asked at the moment it runs. At the start the score is 0, so the answer is \"no\" and it is never asked again. The check must be moved inside the event where the score changes. `≥` is correct; writing `≤` would make you win even at the start. Deleting the apple is not a bug.",
+                "skills": [
+                  "oyun-kosul",
+                  "oyun-olay",
+                  "oyun-hata"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Tam oyun 1: Uzay savunması",
@@ -3332,7 +6475,129 @@ export const modul11: ModuleContent = {
                 "oyun-iskelet"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Full game 1: Space defence",
+            "problem": "In space games, waves of enemies get faster over time, the player's time is limited, and in the end you either win or lose. None of this needs a new block: they are all pieces you have learnt before. In this lesson you will put them together to make a timed game that keeps getting harder.",
+            "contentMd": "### What is ready\nIn the night sky there is a ship at the bottom. It goes left and right with the arrow keys and fires a laser with A. Every 800 ms an alien comes down from a random place at the top. The score is 0 and lives are 3. There is also a variable called `hiz` (speed), which starts at 0. The collision rules for the laser and the aliens, lives, time and difficulty are not there yet.\n\n### Four jobs\n| Job | Which lesson you learnt it in |\n|---|---|\n| Score when the laser hits an alien | 19 |\n| Lives when an alien touches the ship | 9 |\n| A 30-second time limit | New: `countdown` |\n| Aliens that get faster over time | New: changing a variable |\n\n### Build the blocks: hitting and lives\n1. Build the `when a [Bullet] sprite hits a [Enemy] sprite` event. Inside it, put `change score by [10]`, `play melody [boom]`, `make [other sprite] explode`, `delete sprite [this sprite]`.\n2. Build the `when a [Player] sprite hits a [Enemy] sprite` event. Inside it, put `change lives by [-1]`, `shake screen for [250] ms`, `delete sprite [other sprite]`.\n3. Press ↺. Shoot the aliens with the laser; when an alien touches the ship, you lose a life.\n\n### Build the blocks: time\n4. From the **Game** category, add the `start countdown from [30] seconds` block at the very bottom inside `when game starts`. The time left appears in the middle at the top of the stage; in the last 5 seconds it turns yellow.\n5. From the **Game** category, build the `when time runs out` event. Inside it, put `show [Earth is saved!] on screen for [2] seconds` and `end game: [you win]`.\n\n### Build the blocks: difficulty\n6. From the **Game** category, take the `every [4000] ms` event. Inside it, snap the `change [hiz] by [5]` block from the **Variables** category.\n7. Find the ready-made `every [800] ms` event. In the y slot of the `set [ufo] speed x [0] y [random]` block inside it, put an addition block (`[ ] + [ ]`): put the old random number block on its left and the `hiz` variable on its right. Every 4 seconds, the aliens come down a little faster.\n8. Press ↺ and play the full game. If you survive for 30 seconds you win; if your lives run out you lose.\n\nExpected result: all five goals ✓. The laser hits, lives go down when an alien touches the ship, the counter counts down from 30, the game is won when the time runs out, and the aliens get faster over time.\n\n### How does it work?\n- The `when time runs out` event runs when the countdown reaches 0. If you do not write this event, the game ends by itself when the time is up (you lose). We chose the rule \"win when the time is up\".\n- `hiz` is a **variable**: it remembers a number. Every 4 seconds it goes up by 5. At 28 seconds it is 35. Because the alien's speed is worked out by adding `hiz` to a random number between 20 and 45, it is 20-45 at the start and about 55-80 at the end.\n- Three events use the same `hiz` variable: one sets it to zero at the start, one raises it over time, and one works out the alien's speed. Shared numbers like this are like the game's \"adjustment knobs\".\n- The three rules (hitting, lives, time) are independent; if you switch one off, the others keep working.\n\n### Try it\n1. Change the increase from 5 to 2, then to 10. Which one is more balanced?\n2. Set the time to 60 seconds; does the game get boring when the difficulty increase is not enough?\n3. Add a new `every [4000] ms` event that makes a second alien every 4 seconds. Does the game get more crowded?\n4. Add a winning rule for when the score reaches 100 as well.\n\n### Common mistakes\n- Deleting the ready-made block that sets `hiz` to 0 at the start: the variable's first value is unknown, and the alien speed calculation can come out wrong. Leave that block where it is.\n- Writing only `hiz` in the alien's speed block instead of an addition: the aliens do not move at all at the start.\n- Putting the `when time runs out` block inside another event: events only stand on their own.\n- Increasing the difficulty too fast: the game becomes impossible to play by the 10th second. Game design is partly trial and error.",
+            "question": "What was the most fun moment in this game: the first minute, or the last 5 seconds? Why does difficulty that grows over time make a game more gripping?",
+            "explainerMd": "### What you will learn in this lesson\n- How to combine three independent rules (hitting, lives, time) in one game\n- How to use a **variable** like an adjustment knob for the game\n- How a timed event (`every 4000 ms`) makes the game harder over time\n- How to work out the difficulty increase and balance it\n\n### What you should know first\n- The game skeleton, score, lives and winning rule (lesson 26)\n- The collision event: `when a [Bullet] hits a [Enemy]` and deleting sprites\n- Moving with the arrow keys and the `every … ms` event (lessons in weeks 1-4)\n\n### A game is the sum of small rules\nSpace defence looks big, but there is no new idea in it. Four small rules sit side by side:\n\n| Rule | Event | Result |\n|---|---|---|\n| Hitting | Bullet hits Enemy | Score +10, the alien explodes |\n| Lives | Player hits Enemy | Lives -1, the screen shakes |\n| Time | When time runs out | The game is won |\n| Difficulty | Every 4000 ms | `hiz` goes up by 5 |\n\nEach rule lives in its own event. If you delete one, the others keep working. That is why you build a big game rule by rule, not all at once, and test each rule with ↺.\n\n### A variable: a box that remembers a number\nA **variable** lets the game keep a number in mind. The variable called `hiz` starts at 0. One event makes it bigger, and another event reads it. Because three separate places use the same box, changing what is in the box changes all of them at once.\n\nWatch out: `change [hiz] by [5]` adds 5. `set [hiz] to [5]`, on the other hand, fixes the value at 5; it does not go up.\n\n### How is the difficulty worked out?\nThe alien's speed is worked out as \"a random number between 20 and 45 + `hiz`\". `hiz` goes up by 5 every 4 seconds:\n\n| Second | `hiz` | Slowest alien | Fastest alien |\n|---|---|---|---|\n| 0-3 | 0 | 20 | 45 |\n| 4-7 | 5 | 25 | 50 |\n| 8-11 | 10 | 30 | 55 |\n| 28-29 | 35 | 55 | 80 |\n\nBecause the time is 30 s, `hiz` goes up at most 7 times: 7 × 5 = 35. Making this table lets you answer the question \"is it too easy or too hard?\" with numbers instead of a guess.\n\n### What happens when the time runs out?\nThe `start countdown from [30] seconds` block starts the counter. When the counter reaches 0, the `when time runs out` event runs. If you do not write this event, the game ends as a loss. We chose the rule \"survive for 30 seconds and win\". An event block is not put inside another event; it stands on its own in the workspace.\n\n### Summary\nA full game is the sum of small, independent rules. A variable remembers a number, and several events can read and write the same variable. `change` adds, `set` fixes the value. A variable that grows over time makes the game harder step by step, and you can work out the increase with a table.",
+            "concepts": [
+              {
+                "term": "Variable",
+                "definition": "A box with a name that remembers a number (or a sprite); it is the game's memory.",
+                "example": "The `hiz` variable starts at 0, goes up by 5 every 4 seconds and is used to work out the alien's speed.",
+                "pitfall": "Deleting the block that sets it to zero at the start; the variable's first value is unknown and the calculation can come out wrong."
+              },
+              {
+                "term": "change and set",
+                "definition": "`change by` adds to the current value; `set` fixes the value directly at that number.",
+                "example": "When `hiz` is 10, `change by [5]` makes it 15, but `set to [5]` makes it 5.",
+                "pitfall": "Using `set` for an increase; the value always stays the same and the difficulty never goes up."
+              },
+              {
+                "term": "Timed event",
+                "definition": "The `every N ms` event runs again and again at a set interval.",
+                "example": "`every 800 ms` makes an alien, and `every 4000 ms` raises the difficulty.",
+                "pitfall": "Thinking milliseconds are seconds; 800 ms is less than a second, not 800 seconds."
+              },
+              {
+                "term": "Countdown and when time runs out",
+                "definition": "The countdown counter counts from a set number of seconds down to 0; at 0 the `when time runs out` event runs.",
+                "example": "When the 30-second counter runs out, \"Earth is saved!\" appears and the game is won.",
+                "pitfall": "Not writing the `when time runs out` event; the game ends as a loss when the time is up."
+              },
+              {
+                "term": "Difficulty balance",
+                "definition": "The game being neither too easy nor impossible; you adjust the numbers (speed, time, increase) by trying them.",
+                "example": "If the increase is 10 instead of 5, `hiz` is 70 at 28 seconds and the game is impossible to play.",
+                "pitfall": "Increasing the difficulty too fast; the game becomes impossible to play in the first few seconds."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h6d27-q1",
+                "kind": "mcq",
+                "prompt": "In space defence, you never wrote the `when time runs out` event. What happens when the 30 seconds are up?",
+                "options": [
+                  "The game is won",
+                  "The game ends as a loss",
+                  "Nothing happens, and the game goes on",
+                  "The counter starts again from 30"
+                ],
+                "answer": 1,
+                "explanation": "If there is no when time runs out event, the game ends automatically and is lost. If you want the rule \"win when the time is up\", you must write the event and put `end game: you win` inside it.",
+                "skills": [
+                  "oyun-zorluk",
+                  "oyun-olay"
+                ]
+              },
+              {
+                "id": "m11h6d27-q2",
+                "kind": "numeric",
+                "prompt": "The `hiz` variable starts at 0 and goes up by 5 `every 4000 ms`. The alien's speed is `[random from 20 to 45] + hiz`. When `hiz` is 35, what is the LOWEST speed an alien that appears can have?",
+                "answer": 55,
+                "tolerance": 0,
+                "unit": "speed",
+                "explanation": "The lowest random number is 20; 20 + 35 = 55. The highest would be 45 + 35 = 80. To reach 35 you need 7 increases: after 7 × 4 s = 28 seconds.",
+                "skills": [
+                  "oyun-zorluk",
+                  "oyun-degisken"
+                ]
+              },
+              {
+                "id": "m11h6d27-q3",
+                "kind": "predict-output",
+                "prompt": "The game has these three rules. What is the speed of an alien that appears at the 9th second of the game?\n\n```\nhiz = 0\nevery 4000 ms:  change hiz by 5\nevery 800 ms:   alien speed = 30 + hiz\n```",
+                "options": [
+                  "30",
+                  "35",
+                  "40",
+                  "45"
+                ],
+                "answer": 2,
+                "explanation": "At 4 and 8 seconds `hiz` goes up by 5, so at 9 seconds `hiz` = 10. The alien's speed is 30 + 10 = 40. The third increase comes at 12 seconds; at 9 seconds it has not come yet, so it is not 45.",
+                "skills": [
+                  "oyun-zorluk",
+                  "oyun-degisken"
+                ]
+              },
+              {
+                "id": "m11h6d27-q4",
+                "kind": "find-bug",
+                "prompt": "The aliens' speed never goes up during the game. Which line is wrong?\n\n```\nwhen game starts:\n  set hiz to 0\n\nevery 4000 ms:\n  set hiz to 5\n\nevery 800 ms:\n  alien speed = random(20, 45) + hiz\n```",
+                "options": [
+                  "The `set hiz to 0` line",
+                  "The `set hiz to 5` line: it fixes the value instead of adding to it",
+                  "The `every 800 ms` line",
+                  "The `random(20, 45)` line"
+                ],
+                "answer": 1,
+                "explanation": "`set` makes the value equal to 5 directly; `hiz` is 5 every time and does not go up. The right block is `change hiz by 5`. Setting it to 0 at the start is correct, and the random range and the making every 800 ms are not wrong either.",
+                "skills": [
+                  "oyun-degisken",
+                  "oyun-hata"
+                ]
+              },
+              {
+                "id": "m11h6d27-q5",
+                "kind": "mcq",
+                "prompt": "In space defence, you deleted the Bullet-Enemy collision event. What else happens in the game?",
+                "options": [
+                  "The game does not open at all",
+                  "The time counter stops too",
+                  "No aliens are made",
+                  "The lives and time rules keep working, but the laser no longer hits the aliens"
+                ],
+                "answer": 3,
+                "explanation": "Each rule lives in its own event. When the hit event is deleted, only the score and the explosion go; making aliens, the lives event and the time rules keep working because they are in their own blocks.",
+                "skills": [
+                  "oyun-olay",
+                  "oyun-iskelet"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Tam oyun 2: Labirent kaçışı",
@@ -3449,7 +6714,123 @@ export const modul11: ModuleContent = {
                 "oyun-harita"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Full game 2: Maze escape",
+            "problem": "In an old treasure room, the door is locked. The key is at the other end of the maze, and a ghost that can pass through walls is chasing you. If you take the key and reach the door, you win. But how will the game know whether you took the key? In this lesson you will add a \"memory\" to the game.",
+            "contentMd": "### What is ready\nA maze of 20 x 9 tiles is loaded. The cat starts at the top left, walks with the arrow keys, and the camera follows it. There is a key at the top right and a door at the bottom right. From the middle of the maze, a ghost follows the cat; the ghost passes through walls. The score is 0 and lives are 3. A variable called `anahtarVar` (has key) is ready, set to 0.\n\n### Memory: a state variable\nThe `anahtarVar` variable holds the answer to the game's question \"has the key been taken?\": 0 is no, 1 is yes. Variables like this are called **flags**.\n\n### Build the blocks: the key\n1. Build a `when a [Player] sprite touches tile [Key]` event.\n2. Inside it, add `clear tile at column [event tile column] row [event tile row]`, `set [anahtarVar] to [1]`, `change score by [10]` and `play melody [point]`.\n3. Press ↺. Go to the key tile: the key disappears.\n\n### Build the blocks: the door\n4. Build a `when a [Player] sprite touches tile [Door]` event.\n5. Inside it, put a two-branch `if ... do ... else ...` block. The condition: `[anahtarVar] = [1]`.\n6. The `do` branch: `show [You escaped!] on screen for [2] seconds`, `play melody [victory]`, `end game: [you win]`.\n7. The `else` branch: `show [Locked!] on screen for [1] seconds`.\n8. Press ↺. First go to the door without the key: \"Locked!\" appears. Then take the key and go back to the door: the game is won.\n\n### Build the blocks: the ghost\n9. Build a `when a [Player] sprite hits a [Enemy] sprite` event. Inside it, write `change lives by [-1]`, `shake screen for [250] ms`, `put sprite [this sprite] on tile column [1] row [1]` and `put sprite [other sprite] on tile column [10] row [5]`. If the ghost catches the cat, they both go back to the start.\n10. Press ↺ and play the full game.\n\nExpected result: all five goals ✓. The key is collected, the door does not open without the key and opens with it, the ghost chases the cat, and if it catches it a life is lost.\n\n### How does it work?\n- The flag variable (anahtarVar) is the bridge between two events: the key event writes it and the door event reads it.\n- The `if` at the door separates two paths: if you have the key, you win; if not, you get a warning. Without the `else` branch, going to the door without the key would tell you nothing.\n- Because the ghost is made with the \"go through walls\" setting, the maze does not stop it; its speed is 14 and the cat's is 60, so the cat can escape the chase.\n- The walls around the edges of the map are an obstacle for the cat, but not for the ghost.\n- When the ghost catches the cat, we put both of them back in their starting places. This way the player is not caught again straight away and gets a breather.\n\n### Try it\n1. Slow the ghost down (10) and speed it up (30). Which one is balanced?\n2. Add a second key and a second door: paint the tiles in the **Map** tab. Use two flag variables.\n3. When the key is taken, show the message \"You got the key!\".\n4. The game is lost if the ghost catches the cat 3 times; decide this yourself by writing `end game: [you lose]` in the `when lives run out` event.\n\n### Common mistakes\n- Not setting the `anahtarVar` variable to 1 when the key is taken: the door always says \"Locked!\".\n- Writing the `if anahtarVar = 1` check at the door with the wrong variable: if variable names look alike, the flag is not read.\n- Deleting the ready-made `set [anahtarVar] to [0]` block: the flag's first value is unknown. Always set the flag clearly to 0 at the start.\n- Typing pixels instead of column/row when putting the cat back at the start: the block wants a tile number.",
+            "question": "In which other game rules are flag variables useful? For example, which flags would you need for questions such as \"is there a double jump left?\", \"has the boss been beaten?\", \"has the secret room been found?\"",
+            "explainerMd": "### What you will learn in this lesson\n- The **flag** variable, which gives a game \"memory\"\n- How to choose one of two paths with `if … do … else`\n- The difference between tile (column-row) coordinates and pixel coordinates\n- How a chaser that passes through walls makes a game exciting\n\n### What you should know first\n- Variables, and the difference between `change` and `set` (lesson 27)\n- The map, tiles and the touches tile event (week 3 lessons)\n- Enemies that follow, and the camera following (week 4 lessons)\n\n### How does the game remember the key?\nThe cat touches the key, and a little later it comes to the door. When the door event runs, how will it know the key was taken a moment ago? The two events cannot see each other; they need to leave a note in a shared place.\n\nThis note is a **flag** variable: `anahtarVar`. It only takes two values: 0 (no) and 1 (yes). The key event sets the flag to 1, and the door event reads the flag.\n\n```\nwhen game starts:        anahtarVar = 0\nwhen touching key tile:  anahtarVar = 1\nwhen touching door tile: if anahtarVar = 1 do win, else \"Locked!\"\n```\n\n### A two-way decision\nThe `if … do` block only runs the \"yes\" path. When you add an `else` branch, you also say what happens for \"no\". At the door this is a must: if there is no key, the player should learn something; otherwise the door just stands there like a wall that does not explain why it will not open.\n\n### Tile or pixel?\nThe map is made of 16-pixel tiles. The maze in this game is 20 columns by 9 rows, that is 320 × 144 pixels. The screen is only 160 × 120 pixels; that is why the camera follows the cat.\n\n`put on tile column [1] row [1]` wants a tile number, and the numbers start from 0. The pixel position of the middle of a tile is:\n\n```\nx = column × 16 + 8\ny = row × 16 + 8\n```\n\nFor column 1, row 1, x = 24 and y = 24. If you type a pixel number into the tile block instead, the sprite goes far off the map.\n\n### The chaser and speed\nThe ghost has the `ghost` setting (go through walls); it passes through walls. On the other hand, its speed is 14 and the cat's speed is 60 pixels/s. The ghost always gets closer to the cat, but the cat can easily get away by running. What makes things hard for the player is not the ghost's speed, but the maze walls and the chance of the cat being cornered.\n\nIf the ghost catches the cat, they both go back to their starting tiles. This way the player is not caught again straight away.\n\n### Summary\nA flag variable (0 or 1) carries information between two events. `if … do … else` gives an answer for both possibilities. Tile numbers start from 0, and multiplying by 16 and adding 8 turns them into the middle pixel. The chaser's speed decides whether the game is fair or hard.",
+            "concepts": [
+              {
+                "term": "Flag variable",
+                "definition": "A variable that only holds two states (0 no, 1 yes); it carries the result of one event to another event.",
+                "example": "`anahtarVar` becomes 1 when the key is taken; the door event reads it and opens the door.",
+                "pitfall": "Not setting the flag to 0 at the start; its first value is unknown and the door sometimes opens unexpectedly."
+              },
+              {
+                "term": "if … do … else",
+                "definition": "A two-way decision block that runs one branch if the condition is true and the other branch if it is false.",
+                "example": "At the door, if `anahtarVar = 1`, \"You escaped!\" appears and the game is won; otherwise \"Locked!\" appears.",
+                "pitfall": "Leaving the `else` branch empty; a player who comes to the door without the key sees nothing."
+              },
+              {
+                "term": "Tile coordinates",
+                "definition": "Shows a place on the map with a column and a row number; the numbers start from 0 and a tile is 16 pixels.",
+                "example": "The middle of the tile at column 18, row 7 is at x = 18 × 16 + 8 = 296, y = 7 × 16 + 8 = 120 pixels.",
+                "pitfall": "Typing pixels into the tile block; the sprite is put far off the map."
+              },
+              {
+                "term": "A sprite that goes through walls (ghost)",
+                "definition": "A sprite setting for which walls are no obstacle, so it can move while ignoring the map.",
+                "example": "The ghost in the maze follows the cat by the shortest route.",
+                "pitfall": "Making the ghost too fast; the cat cannot escape and the game stops being fair."
+              },
+              {
+                "term": "A bridge between events",
+                "definition": "Two separate events that cannot see each other communicating through a shared variable.",
+                "example": "The key event writes to the `anahtarVar` variable, and the door event reads from the same variable.",
+                "pitfall": "Using two variables with slightly different names in the two events; one is written, the other is read, and the flag never works."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h6d28-q1",
+                "kind": "mcq",
+                "prompt": "For which of these is a flag variable (0 or 1) a good choice?",
+                "options": [
+                  "Whether the boss enemy has been beaten",
+                  "The cat's x position",
+                  "The time left",
+                  "The score"
+                ],
+                "answer": 0,
+                "explanation": "A flag only holds \"yes/no\". The answer to the question \"has the boss been beaten?\" has two values. The x position, time and score are numbers that take lots of values; for those you use a normal variable or a ready-made game block.",
+                "skills": [
+                  "oyun-degisken"
+                ]
+              },
+              {
+                "id": "m11h6d28-q2",
+                "kind": "numeric",
+                "prompt": "The door tile is in column 18 and row 7 (the numbers start from 0, a tile is 16 pixels). What is the x position of the middle of the door tile, in pixels?",
+                "answer": 296,
+                "tolerance": 0,
+                "unit": "pixels",
+                "explanation": "x = column × 16 + 8 = 18 × 16 + 8 = 288 + 8 = 296. Writing only 18 × 16 = 288 gives the left edge of the tile; for the middle, add half a tile (8).",
+                "skills": [
+                  "oyun-harita"
+                ]
+              },
+              {
+                "id": "m11h6d28-q3",
+                "kind": "predict-output",
+                "prompt": "The player touches the door first, then the key, then the door again. Which messages appear on the screen, in order?\n\n```\nwhen game starts:  anahtarVar = 0\nwhen touching key:  anahtarVar = 1\nwhen touching door:\n  if anahtarVar = 1 do: show \"You escaped!\", win the game\n  else: show \"Locked!\"\n```",
+                "options": [
+                  "You escaped!, You escaped!",
+                  "Locked!, You escaped!",
+                  "Locked!, Locked!",
+                  "You escaped!, Locked!"
+                ],
+                "answer": 1,
+                "explanation": "On the first touch of the door, anahtarVar is 0: \"Locked!\" appears. After the key it becomes 1; on the second touch \"You escaped!\" appears and the game is won. If the order were the other way round, the two messages would swap places.",
+                "skills": [
+                  "oyun-kosul",
+                  "oyun-degisken"
+                ]
+              },
+              {
+                "id": "m11h6d28-q4",
+                "kind": "find-bug",
+                "prompt": "You take the key and go to the door, but the door always says \"Locked!\". Which line is wrong?\n\n```\nwhen game starts:       anahtarVar = 0\nwhen touching key:      anahtarVar = 0   <- A\n                        change score by 10\nwhen touching door:     if anahtarVar = 1 do win  <- B\n                        else show \"Locked!\"       <- C\n```",
+                "options": [
+                  "Line A: the flag is left at 0 when the key is taken; it should be set to 1",
+                  "Line B: the condition should be 0",
+                  "Line C: the `else` branch is not needed",
+                  "The `anahtarVar = 0` line at the start"
+                ],
+                "answer": 0,
+                "explanation": "The key event must set the flag to 1; here it writes 0 again, so the door always says \"no key\". Line B is correct: the condition looks for 1. Line C is useful feedback. Setting it to 0 at the start is correct too.",
+                "skills": [
+                  "oyun-degisken",
+                  "oyun-hata"
+                ]
+              },
+              {
+                "id": "m11h6d28-q5",
+                "kind": "numeric",
+                "prompt": "The ghost passes through walls and follows the cat at 14 pixels a second. The cat has stopped; there are 84 pixels between them. In how many seconds does the ghost reach the cat?",
+                "answer": 6,
+                "tolerance": 0,
+                "unit": "s",
+                "explanation": "Time = distance ÷ speed = 84 ÷ 14 = 6 seconds. If the cat moved at speed 60, it could escape; in this game the cat is more than 4 times faster than the ghost (60 ÷ 14 ≈ 4.3).",
+                "skills": [
+                  "oyun-zorluk",
+                  "oyun-harita"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Cila ve hata ayıklama: bozuk oyunu onar",
@@ -3567,7 +6948,124 @@ export const modul11: ModuleContent = {
                 "oyun-olay"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Polish and debugging: fix the broken game",
+            "problem": "One day every programmer goes through this: the game runs, but something somewhere is wrong. But where? Debugging is detective work: catch the symptom, look at the clues, find the culprit. In this lesson you will find and fix three bugs in a broken game, and then you will polish the game.",
+            "contentMd": "### The broken game\nA fruit-catching game: the basket (the cat) is at the bottom and fruit falls from the top. But when you play the game, three things are wrong:\n1. **Bug 1:** when you catch a fruit, the score goes down instead of up.\n2. **Bug 2:** the fruit you caught stays on the screen and keeps falling.\n3. **Bug 3:** when a fruit reaches the bottom of the screen, the game ends at once; all three lives go in a flash.\n\n### The detective method\n1. **See the symptom:** what is wrong? (the score goes down)\n2. **Find the event:** in which event does it happen? (when the fruit hits the basket)\n3. **Find the block:** which block inside that event does this? (`change score by [-1]`)\n4. **Fix and test:** change the block, press ↺, and check that the symptom has gone.\nIf the program has an error, a warning appears in the Goals panel and the **Show block** button marks the block with the problem. In the JavaScript tab you can also read the written form of your program (you cannot edit it).\n\n### Fix the bugs\n1. **Bug 1:** in the catching event, find the `change score by [-1]` block and change the number to 1.\n2. **Bug 2:** add the `delete sprite [other sprite]` block at the very bottom of the same event. The caught fruit disappears.\n3. **Bug 3:** look at the `for each [Food] sprite` loop in the `every frame` event. Inside it there is `if [this sprite y position] > [116] do change lives by [-1]`, but it does not delete the fruit. The fruit stays at the bottom and takes a life every frame (60 times a second). Add `delete sprite [this sprite]` inside the `if`.\n4. Press ↺ and play. The score goes up, a caught fruit disappears, and a missed fruit takes only one life.\n\n### Polish\n5. Add `play melody [point]` from the **Sound** category to the catching event.\n6. Add `shake screen for [200] ms` to the missing rule (`if ... > 116`).\n7. Play the game once more. Now both catching and missing can be felt.\n\nExpected result: all five goals ✓. When you catch a fruit, the score goes up and a sound plays; a caught fruit disappears; a missed fruit takes only one life and the screen shakes.\n\n### How does it work?\n- The cause of bug 3 is that the missing rule is in the `every frame` event. This event runs 60 times a second; if you do not delete the fruit inside it, a life is lost again every frame for the same fruit.\n- The collision event, on the other hand, runs only once; not deleting the fruit does not give the score again, but the fruit stays on the stage.\n- Sounds and shakes do not touch the game's rules; they just tell the player \"something happened\". This is called **polish**. Good polish is small but effective.\n- These bugs are really common: a sign mistake, forgetting to delete, not limiting a rule that repeats.\n\n### Try it\n1. When a fruit is missed, add `play melody [lose]`.\n2. Add a rule for winning the game when the score reaches 10 (an `if` inside the collision event).\n3. Show a particle effect when you catch a fruit: use the `[yellow] explosion at x [80] y [60]` block from the **Game** category. For x and y, use `[other sprite] [x position]` and `[other sprite] [y position]`.\n\n### Common mistakes\n- Solving bug 3 by deleting the \"lose a life\" block: the game has no bug, but there is no longer any penalty for missing.\n- Trying to write the event again from scratch while fixing bug 1: most of the time, changing a single number or sign is enough.\n- Making the change and not pressing ↺: the running game uses the old program.\n- Making three changes at once and not being able to tell which one worked: fix one thing, test it, then move on to the next.",
+            "question": "What do you look at first when you are trying to find a bug? If a friend's game had a bug like this, how would you describe it to them so that they could find it too?",
+            "explainerMd": "### What you will learn in this lesson\n- The four-step **detective method** for debugging\n- How to find which event a bug comes from\n- Why the `every frame` event runs 60 times a second, and what danger this creates\n- What **polish** is, and how it adds feeling to a game\n\n### What you should know first\n- The collision event, score, lives and deleting sprites (lessons 26 and 27)\n- The `for each [Food] sprite` loop, which finds sprites by kind (week 4 lessons)\n- The sound and screen shake blocks\n\n### Bugs do not vanish; they are found\nEvery programmer makes mistakes; the difference is in how you look for them. The method has four steps:\n\n| Step | Question | Example |\n|---|---|---|\n| 1 | What is the symptom? | The score goes down when you catch a fruit |\n| 2 | In which event does it happen? | When Player hits Food |\n| 3 | Which block in that event is responsible? | `change score by [-1]` |\n| 4 | Fix it, press ↺, test it | Change -1 to 1 |\n\nChange only one thing at a time. If you change three things at once, you cannot know which one worked.\n\n### Collision once, frame event every frame\nThe two kinds of event work very differently:\n\n- The **collision event** runs **once**, at the moment two sprites touch. Even if the sprites stay on top of each other, the event does not repeat.\n- The **every frame** event runs on every frame of the game. The game draws 60 frames a second, so the event runs 60 times a second.\n\nThis difference is the source of the third bug. A missed fruit at the bottom of the screen has `y > 116`. If the rule does not delete the fruit, the fruit stays there and takes a life every frame. Three lives go in 3 ÷ 60 = 0.05 seconds, that is 50 milliseconds. The game is over before the player can see what happened.\n\nThe fix is to make the rule happen only once: when a life is taken, the fruit is deleted too. A deleted fruit can no longer trigger the `y > 116` condition again.\n\n### Working out the falling time\nA fruit appears at y = -8 and counts as missed when `y > 116`. The distance to travel is 116 - (-8) = 124 pixels. A fruit with a speed of 62 pixels a second is missed in 124 ÷ 62 = 2 seconds. This calculation shows how much time a fruit gives the player: about 3.5 seconds if the speed is 35, and about 1.8 seconds if the speed is 70.\n\n### Polish\nThe job is not finished just because the game's rules work. **Polish** means small extras that do not change the rules but make the game feel alive: a sound when you catch something, a screen shake when you miss, an explosion effect. Polish tells the player \"something happened\". Add polish only after you have fixed the bugs; polishing a broken game is pointless.\n\n### Summary\nDebugging means, in order, seeing the symptom, finding the event and the block, and fixing and testing. The collision event runs once and the `every frame` event 60 times a second; that is why forgetting to delete a sprite in an every-frame event leads to lives being lost very fast. Polish does not change the rules, but it makes the game clearer and more fun.",
+            "concepts": [
+              {
+                "term": "Detective method",
+                "definition": "Following the steps see the symptom, find the event, find the block, fix and test, in order, to find a bug.",
+                "example": "If the score goes down, look at the catching event, find the `change score by [-1]` block there and change -1 to 1.",
+                "pitfall": "Making three changes at once; you cannot tell which one worked."
+              },
+              {
+                "term": "Bug symptom",
+                "definition": "The wrong behaviour you see in the game; it is not the bug itself but a clue.",
+                "example": "\"The fruit was caught but stays on the screen\" is a symptom; the cause is that there is no delete block.",
+                "pitfall": "Thinking the symptom is the bug itself and writing the whole event again from scratch."
+              },
+              {
+                "term": "Collision event and every frame",
+                "definition": "The collision event runs once, at the moment they touch; the every frame event runs 60 times a second.",
+                "example": "A missed fruit takes a life every frame; the score in the collision goes up once.",
+                "pitfall": "Not deleting the sprite inside an every-frame rule; the lives run out in a fraction of a second."
+              },
+              {
+                "term": "Polish",
+                "definition": "Small extras such as sounds, shakes and effects that make the game feel more alive without changing the rules.",
+                "example": "The `point` melody when you catch something, a 200 ms screen shake when you miss.",
+                "pitfall": "Adding polish before the bugs are fixed; making a broken game shine does not solve the problem."
+              },
+              {
+                "term": "Show block",
+                "definition": "A button in the warning in the Goals panel that marks the block with the problem in the workspace.",
+                "example": "When the program has an error, you press the button and find the block at once.",
+                "pitfall": "Not pressing ↺ after fixing it; the running game uses the old program."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h6d29-q1",
+                "kind": "mcq",
+                "prompt": "You have seen a bug in the game. According to the detective method, what is the first step?",
+                "options": [
+                  "Deleting the whole program and writing it again",
+                  "Changing the number in a random block",
+                  "Adding polish and waiting for the bug to disappear",
+                  "Seeing the symptom clearly: what is behaving wrongly?"
+                ],
+                "answer": 3,
+                "explanation": "First you see what is wrong; then you find the event and the block that cause that behaviour. Deleting the whole program or changing things at random does not solve the bug, and often adds new ones.",
+                "skills": [
+                  "oyun-hata"
+                ]
+              },
+              {
+                "id": "m11h6d29-q2",
+                "kind": "numeric",
+                "prompt": "A fruit stays at the bottom of the screen and the `every frame` event takes 1 life every frame. The game draws 60 frames a second. In how many milliseconds do 3 lives run out?",
+                "answer": 50,
+                "tolerance": 1,
+                "unit": "ms",
+                "explanation": "3 lives go in 3 frames. One frame lasts 1000 ÷ 60 ≈ 16.7 ms; 3 × 16.7 = 50 ms. That is why the player loses without seeing anything. Deleting the fruit breaks this loop.",
+                "skills": [
+                  "oyun-hata",
+                  "oyun-olay"
+                ]
+              },
+              {
+                "id": "m11h6d29-q3",
+                "kind": "predict-output",
+                "prompt": "The delete block has been forgotten in the catching event. The cat touches a fruit and the fruit stays on top of the cat for a few more frames. How much does the score go up?\n\n```\nwhen Player hits Food:\n  change score by 1\n  play sound: point\n```",
+                "options": [
+                  "60 points (1 every frame)",
+                  "1 point, because the collision event runs once at the moment they touch",
+                  "0 points",
+                  "3 points"
+                ],
+                "answer": 1,
+                "explanation": "The collision event runs once, at the moment the two sprites start touching; staying on top of each other does not repeat the event. Forgetting to delete does not give the score again, but the fruit stays on the screen and in the end the missing rule counts it anyway.",
+                "skills": [
+                  "oyun-olay",
+                  "oyun-hata"
+                ]
+              },
+              {
+                "id": "m11h6d29-q4",
+                "kind": "numeric",
+                "prompt": "A fruit appears at y = -8 and counts as missed when `y > 116`. A fruit falls at 62 pixels a second. How many seconds pass until it is missed?",
+                "answer": 2,
+                "tolerance": 0,
+                "unit": "s",
+                "explanation": "Distance = 116 - (-8) = 124 pixels. Time = 124 ÷ 62 = 2 seconds. Forgetting the minus sign and taking 116 ÷ 62 gives 1.87; the starting point is above the screen.",
+                "skills": [
+                  "oyun-zorluk",
+                  "oyun-hata"
+                ]
+              },
+              {
+                "id": "m11h6d29-q5",
+                "kind": "find-bug",
+                "prompt": "When a fruit is missed, the game ends at once; the player sees all three lives go in a flash. Find the bug.\n\n```\nevery frame:\n  for each Food sprite:\n    if this sprite's y position > 116 do:\n      change lives by -1\n      shake screen for 200 ms\n```",
+                "options": [
+                  "The missed fruit is not deleted; the condition becomes true again every frame",
+                  "The `change lives by -1` block is not needed",
+                  "It should be `y < 116` instead of `y > 116`",
+                  "The `shake screen` block affects lives"
+                ],
+                "answer": 0,
+                "explanation": "Because the fruit is not deleted, `y > 116` is true every frame and 1 life goes every frame. The fix is to add `delete sprite this sprite` inside the `if`. The block that takes a life is correct; writing `<` would count fruit in the wrong place; the shake does not change lives.",
+                "skills": [
+                  "oyun-hata",
+                  "oyun-olay"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Final: Kendi oyunun",
@@ -3683,7 +7181,122 @@ export const modul11: ModuleContent = {
                 "oyun-tasarim"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Final: Your own game",
+            "problem": "In five weeks you have moved sprites, handled collisions, drawn maps, and given enemies brains and the hero gravity. Now all of this is yours: an empty stage, an idea and the blocks in your hands. In this lesson you will make your own game. The idea is entirely up to you; I will only check whether the game is \"complete\".",
+            "contentMd": "### Starting point\nOn the stage there is a navy background and nothing else. All the blocks are available: Sprite, Motion, Controller, Game, Stage / Map, Sound, Logic, Loops, Variables, Math, Text and Functions. You can also draw your own pictures and map with the Pictures and Map tabs.\n\n### Decide first: the five-question design card\nFill in the card from lesson 26: Who is the player? What is the goal? What is the danger? How do you win? How do you lose? You can pick one of the ideas below or come up with your own:\n- **Fruit hunter:** a cat collects fruit and escapes from a ghost.\n- **Space defence:** a ship shoots enemies (lesson 27).\n- **Treasure maze:** collect the diamonds and get out through the door (lesson 28).\n- **Platform adventure:** collect gold and jump over spikes (lesson 25).\n- **Your own idea:** fishing, protecting a balloon in the air, a race…\n\n### The goal list: signs of a complete game\nThe Goals panel checks your game. The design belongs to you; the list only tests what a complete game must have:\n\n| Goal | What does it mean? |\n|---|---|\n| Player | A sprite of the **Player** kind that moves with the arrow keys |\n| Something to collect | A sprite of the **Food**, **Bonus**, **Goal** or **Object** kind |\n| Danger | A sprite of the **Enemy** or **Obstacle** kind |\n| Score | The score goes up when you collect something |\n| Lives | Lives go down when you touch the danger |\n| Ending | Your program has an `end game` block |\n| Sound | At least one melody or beep plays |\n| Polish | A screen shake, an explosion or a message on the screen |\n\nImportant: the goals look at sprite kinds and collision events. Choose the kinds correctly: **Food** for things to collect, **Enemy** for dangers, and so on.\n\n### Do it in four rounds (about 35 minutes)\n**Round 1 (10 min): the skeleton.** Create the player sprite with the `when game starts` block, add the `moves … with player keys` block, turn on the `stay on screen` setting, and set the score to 0 and lives to 3. Press ↺: does your player walk?\n\n**Round 2 (10 min): something to collect and a danger.** With an `every [1000] ms` event, make sprites to collect appear in random places (for a random position, use `random integer from [ ] to [ ]`). Create an enemy; make it bounce, follow, or move randomly. Write the `when a [Player] sprite hits a [Food] sprite` and `… hits a [Enemy] sprite` events: raise the score, take away a life, delete.\n\n**Round 3 (5 min): the ending.** In the collision event, write `end game: [you win]` with `if [score] ≥ [5] do`. For losing, the game ends by itself when lives drop to 0; if you like, add a special message in the `when lives run out` event.\n\n**Round 4 (10 min): polish.** Add sounds (a point melody when you collect, a lose melody when you crash), and use `shake screen` and `show … on screen`. Play your game yourself from start to finish; if it is too easy or too hard, adjust the numbers (speed, time, score target).\n\nExpected result: all eight goals ✓ and the game can be played from start to finish. When all the goals are ✓, your game counts as \"complete\"; the best part is carrying on making it even better.\n\n### How does it work?\n- The goal check tries out your game the way a robot would play it: it presses keys and makes the player collide with the thing to collect and with the danger. If you have no collision events, the score and lives do not change, and the goals do not turn ✓.\n- The **Ending** goal checks whether your program contains an `end game` block. To see that the ending really works, try winning your game yourself.\n- The same game can be solved in many ways. Your solution may be very different from mine; that is a good thing.\n\n### Example solution: Fruit hunter\nIf you get stuck on an idea, look at this example design: a cat (in 4 directions, stay on screen), a ghost bouncing around from a corner (Enemy), and every second a cherry (Food) in a random place that lives for 5 seconds. A cherry gives 1 point and the ghost takes 1 life; when the score reaches 5, \"Hunter wins!\" appears and the game is won; there are sounds and screen shakes. You can make this design on your own, then change it.\n\n### Try it\n1. Add a **time limit** to your game: `start countdown from [30] seconds`, and decide what happens in the `when time runs out` event.\n2. Add **levels** to your game: when the score reaches 5, make the enemy faster (with a variable, as in lesson 27).\n3. Draw a maze or platforms in the **Map** tab and move your game onto the map.\n4. Draw your own pictures in the **Pictures** tab.\n5. On the free Game Workshop page (outside the lessons), you can download your game as a file with the **💾 Save** button and load it back with **📂 Open**.\n\n### Common mistakes\n- Choosing the wrong kind in a collision event: if the event expects \"Food\" but you made the sprite with the **Object** kind, the event never runs and the score does not change.\n- Trying to put one event block inside another event block: event blocks only stand on their own, in the workspace.\n- Trying to do lots of things at once and not finishing any part: first the skeleton, then the danger, then the ending, and polish last.\n- Pressing the **↺ Start over** button by accident: the activity goes back to the starter project and the blocks you made are gone. The ↺ on the stage only restarts the game.",
+            "question": "What is the strongest thing about your game? If someone played it, what would they understand in the first 10 seconds? What would be the first thing you would add in the next version?",
+            "explainerMd": "### What you will learn in this lesson\n- How to turn your own game idea into something concrete with the five-question design card\n- How to make a game in four rounds (skeleton, danger, ending, polish)\n- That the Goals panel looks at sprite kinds and events\n- How to adjust and balance your game with numbers\n\n### What you should know first\n- The game skeleton and the winning rule (lesson 26)\n- Timed events, variables and time (lesson 27)\n- Flags, `if … else` and the map (lesson 28)\n- Debugging and polish (lesson 29)\n\n### From an empty stage to a complete game\nThere is no ready-made game in this lesson. The stage is empty, and you make the decisions. But the path is clear: first the card, then four rounds.\n\n| Round | Time | Job | When is it done? |\n|---|---|---|---|\n| 1 | 10 min | Player, key movement, score and lives | The player walks |\n| 2 | 10 min | Something to collect, a danger, collision events | The score goes up, lives go down |\n| 3 | 5 min | Winning rule | The game ends |\n| 4 | 10 min | Sound, shakes, messages, adjusting | The game can be felt |\n\nThat makes 35 minutes in total. The order matters: adding polish to a game with no ending is a waste of time.\n\n### The kind must be right\nThe Goals panel plays your game like a robot. It walks the player with the arrow keys, makes it collide with a sprite of the \"Food\", \"Bonus\", \"Goal\" or \"Object\" kind, and tries out the danger (\"Enemy\" or \"Obstacle\"). The panel does not check whether it likes your design; it looks at the **kinds** and the **events**.\n\nThat is why a sprite's kind must match the kind the collision event expects. If you make the sprite with the **Object** kind and the event expects **Food**, the event never runs. Even if the picture is the same, the event looks at the kind, not the picture.\n\n### Adjusting with numbers\nWhen you finish your game, play it yourself. If it is too easy, raise the speed or the target; if it is too hard, lower them. Work out the numbers:\n\n- If you have 3 lives and each collision takes 1 life, you can collide at most 2 times; on the third, lives reach 0 and the game is lost.\n- If a cherry appears every second and each cherry lives for 5 seconds, there are at most 5 cherries on the screen.\n- If the target score is 5 and each cherry is worth 1 point, you must collect at least 5 cherries.\n\n### Saving and the ↺ buttons\nThe **↺ Start over** button on the activity screen takes the activity back to the starter project; the blocks you made are gone. The ↺ on the stage only restarts the game. Do not mix the two up.\n\n### Summary\nTo make your own game, fill in the design card first, then go through the skeleton, danger, ending and polish in that order. The Goals panel looks at kinds and events, so choose sprite kinds correctly. After finishing the game, adjust the numbers (speed, time, target score) by trying them. The two ↺ buttons do different jobs; with one of them you can lose your work.",
+            "concepts": [
+              {
+                "term": "Four rounds",
+                "definition": "A plan for making a game in order: skeleton, something to collect and a danger, ending, and polish.",
+                "example": "You split the 35-minute lesson into 10 + 10 + 5 + 10 minutes and test with ↺ at the end of each round.",
+                "pitfall": "Trying to do everything at once and not finishing any part."
+              },
+              {
+                "term": "Sprite kind",
+                "definition": "A sprite's role in the game: Player, Food, Enemy, Bonus, Goal, Obstacle or Object.",
+                "example": "The cherry is made with the Food kind and the ghost with the Enemy kind; the collision event expects these kinds.",
+                "pitfall": "Making the thing to collect with the Object kind and expecting Food in the event; the event never runs."
+              },
+              {
+                "term": "Goals panel",
+                "definition": "A list that tests your game by looking at kinds and events, and checks for the signs of a complete game.",
+                "example": "The Ending goal checks whether your program has an `end game` block.",
+                "pitfall": "Thinking a goal turning ✓ means the game is good; the panel only tests that it is complete."
+              },
+              {
+                "term": "Game balance",
+                "definition": "Adjusting numbers such as speed, time, lives and target score so that the game is neither too easy nor impossible.",
+                "example": "Target score 5, 3 lives: the player can collide at most 2 times and still win.",
+                "pitfall": "Leaving the numbers without ever trying them; the game turns out too easy or impossible to play."
+              },
+              {
+                "term": "↺ Start over and ↺ restart",
+                "definition": "↺ Start over in the activity brings back the starter project; the ↺ on the stage only plays the game again from the start.",
+                "example": "To test the game you press the ↺ button on the stage, and your blocks are not touched.",
+                "pitfall": "Pressing the activity's ↺ button by accident; the blocks you made are gone."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m11h6d30-q1",
+                "kind": "mcq",
+                "prompt": "The Goals panel does not tick the \"Score\" goal. You make the player collide with the cherry, but the score does not go up. What is the most likely reason?",
+                "options": [
+                  "The cherry sprite is of the Object kind, but the collision event expects Food",
+                  "The cherry picture is small",
+                  "The stage background is navy",
+                  "The player's speed is too high"
+                ],
+                "answer": 0,
+                "explanation": "The collision event looks at the sprite's kind. If the kind does not match what the event expects, the event never runs and the score does not change. The picture size, background colour and speed do not decide whether the event is triggered in this way.",
+                "skills": [
+                  "oyun-olay",
+                  "oyun-tasarim"
+                ]
+              },
+              {
+                "id": "m11h6d30-q2",
+                "kind": "numeric",
+                "prompt": "Your game starts with 3 lives and every collision with an enemy takes 1 life. At most, how many times can you hit an enemy without losing the game?",
+                "answer": 2,
+                "tolerance": 0,
+                "unit": "collisions",
+                "explanation": "Three collisions bring lives from 3 down to 0, and the game is lost. So you can have at most 2 collisions without losing. Writing 3 means forgetting that the game ends when lives reach 0.",
+                "skills": [
+                  "oyun-iskelet"
+                ]
+              },
+              {
+                "id": "m11h6d30-q3",
+                "kind": "predict-output",
+                "prompt": "The cat starts at the point 80,100. Lives are 3. What happens if the cat hits the ghost?\n\n```\nwhen Player hits Enemy:\n  change lives by -1\n  shake screen for 250 ms\n  move this sprite to 80,100\n```",
+                "options": [
+                  "Lives become 2, the screen shakes and the cat goes back to its starting point",
+                  "The game is lost at once",
+                  "The ghost is deleted and lives stay at 3",
+                  "The ghost, not the cat, goes to 80,100"
+                ],
+                "answer": 0,
+                "explanation": "In the collision event, `this sprite` is the first kind, the Player, that is, the cat. Lives drop from 3 to 2, the screen shakes and the cat goes back to the middle. The ghost is not deleted and stays where it is. Because lives are not 0, the game does not end.",
+                "skills": [
+                  "oyun-olay",
+                  "oyun-iskelet"
+                ]
+              },
+              {
+                "id": "m11h6d30-q4",
+                "kind": "mcq",
+                "prompt": "You have been writing blocks in the activity for a while. Which button deletes the blocks you wrote if you press it by accident?",
+                "options": [
+                  "The ↺ button on the stage",
+                  "The ↺ Start over button in the activity",
+                  "Opening the Goals panel",
+                  "Switching to the Pictures tab"
+                ],
+                "answer": 1,
+                "explanation": "↺ Start over takes the activity back to the starter project and deletes your blocks. The ↺ on the stage only restarts the game. Opening the goals panel and switching tabs do not touch the project.",
+                "skills": [
+                  "oyun-tasarim"
+                ]
+              },
+              {
+                "id": "m11h6d30-q5",
+                "kind": "numeric",
+                "prompt": "In the final lesson, the four rounds take 10, 10, 5 and 10 minutes, in that order. In how many minutes in total is your game finished?",
+                "answer": 35,
+                "tolerance": 0,
+                "unit": "min",
+                "explanation": "10 + 10 + 5 + 10 = 35 minutes. The ending round (5 min) is the shortest, because only one winning rule is written; the polish round is longer so that you have time to adjust things.",
+                "skills": [
+                  "oyun-tasarim"
+                ]
+              }
+            ]
+          }
         }
       ]
     }

@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Measure-calculate-move",
+      "definition": "Measuring before every move, doing the calculation with a tool, and using the result in the action.",
+      "example": "`mesafe()` -> `hesapla($1*0.5)` -> `ileri($2)`.",
+      "pitfall": "Doing the calculation in your head and not checking it with a tool."
+    },
+    {
+      "term": "Step number",
+      "definition": "In the script, each call gets a sequence number; $n refers to it.",
+      "example": "In the project, $4 is the second measurement and $5 is the second calculation.",
+      "pitfall": "Mixing up $1 and $4: a calculation based on the wrong measurement leads to a crash."
+    },
+    {
+      "term": "Percentage of what remains",
+      "definition": "Setting the amount of movement from the distance remaining at that moment rather than the total.",
+      "example": "With 50 cm remaining, 60 per cent of it is 30 cm.",
+      "pitfall": "Applying the percentage to the first distance."
+    },
+    {
+      "term": "Deterministic script",
+      "definition": "A script that gives the same result every time in the same world with the same inputs.",
+      "example": "The project script moves the robot forward 80 cm on every run.",
+      "pitfall": "Thinking an agent that uses a model is repeatable in the same way."
+    },
+    {
+      "term": "Agent evaluation",
+      "definition": "Finding the success and error rates by measuring an agent over many tries, not one.",
+      "example": "In how many of 10 runs did it reach the goal, and in how many did it crash?",
+      "pitfall": "Looking at one successful try and treating the agent as reliable."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h6d30-q1",
+      "kind": "numeric",
+      "prompt": "The wall is 100 cm away. The agent measures, moves forward half the remaining distance, measures again and this time moves forward 40 per cent of what remains. In the end, how many cm from the wall does the robot stop?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "The first move is 100 × 0.5 = 50 cm; 50 remain. The second move is 50 × 0.4 = 20 cm; 50 - 20 = 30 cm remain. If the percentage were applied to the first distance (100), it would move 40 cm and 10 would remain: wrong.",
+      "skills": [
+        "agent-plan"
+      ]
+    },
+    {
+      "id": "m7h6d30-q2",
+      "kind": "find-bug",
+      "prompt": "In the script of the mini agent project, the robot hits the wall (wall at 100 cm):\n```\nmesafe()\nhesapla($1*0.5)\nileri($2)\nmesafe()\nhesapla($1*0.6)\nileri($5)\ndur()\n```\nOn which line is the bug, and what is it?",
+      "options": [
+        "Line 3: `ileri($2)` is wrong",
+        "Line 7: `dur()` is unnecessary",
+        "Line 5: the second calculation is based on the first measurement $1 instead of the second measurement $4",
+        "Line 4: `mesafe()` should not be called a second time"
+      ],
+      "answer": 2,
+      "explanation": "$1 is the first measurement (100). `hesapla($1*0.6)` gives 60; the robot has already moved 50 cm, so `ileri(60)` makes the total 110 and it hits the wall. The fix is `hesapla($4*0.6)` = 30. The third line and the second measurement are correct.",
+      "skills": [
+        "agent-plan",
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d30-q3",
+      "kind": "predict-output",
+      "prompt": "The project script is (wall at 100 cm):\n```\nmesafe()\nhesapla($1*0.5)\nileri($2)\nmesafe()\nhesapla($4*0.6)\nileri($5)\ndur()\nbitir(tamam)\n```\nWhat is the final state?",
+      "options": [
+        "The robot hits the wall",
+        "The robot stops at 50 cm",
+        "The robot has moved 80 cm, stops 20 cm from the wall, and the agent finishes with `tamam`",
+        "The robot has moved 60 cm and is 40 cm from the wall"
+      ],
+      "answer": 2,
+      "explanation": "100 -> 50 (first move), 50 remaining -> 30 (second move), 80 cm in total; 20 cm remain. `dur()` stops the robot and `bitir(tamam)` closes the agent. There is no crash, because 50 + 30 = 80 < 100.",
+      "skills": [
+        "agent-plan",
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d30-q4",
+      "kind": "mcq",
+      "prompt": "Why does the script in the workshop always give the same result when it is run many times in the same world, and why is this not guaranteed for an agent that uses a model?",
+      "options": [
+        "The script is deterministic because its decisions and tools are fixed; a model may choose different steps each time, so agents are measured with repeated tries",
+        "Models are slower than scripts",
+        "The scripted agent makes random mistakes",
+        "An agent that uses a model always gives the same result"
+      ],
+      "answer": 0,
+      "explanation": "The script and the workshop world are fixed. A language model samples, so it can choose a different step even on the same task; that is why an agent's success is measured not by one try but by the rate over many tries (an eval).",
+      "skills": [
+        "agent-eval"
+      ]
+    },
+    {
+      "id": "m7h6d30-q5",
+      "kind": "mcq",
+      "prompt": "An agent crashes the robot into the wall in 3 of 10 tries. Which is the most sensible engineering response?",
+      "options": [
+        "Look at the 7 successful tries and say \"it works\"",
+        "Study the causes of the errors and add a rule-based braking/approval layer before movement, then measure again",
+        "Increase the step limit",
+        "Remove the failed tries from the results"
+      ],
+      "answer": 1,
+      "explanation": "A crash is an irreversible error; 3/10 is not acceptable. First the types of error are studied; a rule-based layer (a distance threshold, approval) is added for irreversible steps, and the evaluation is repeated. The step limit does not prevent crashes, and deleting failed tries is not honest measurement.",
+      "skills": [
+        "agent-eval",
+        "agent-safety"
+      ]
+    }
+  ]
+}

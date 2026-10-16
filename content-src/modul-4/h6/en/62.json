@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Key matrix",
+      "definition": "A way of reading many keys with few pins by arranging the keys in a grid of rows and columns.",
+      "example": "4 rows and 4 columns read 16 keys with 8 pins; a 3-row, 4-column phone keypad needs 7 pins.",
+      "pitfall": "Thinking the number of pins is the number of keys; in a matrix the number of pins is rows plus columns."
+    },
+    {
+      "term": "Scanning",
+      "definition": "Making the columns LOW in turn and looking for a LOW on the rows; the row and column that cross give the pressed key.",
+      "example": "If row 2 reads LOW while column 3 is LOW, the key pressed is 6.",
+      "pitfall": "Writing the row and column pins in the sketch the opposite way to the wiring: the keys give the wrong letter."
+    },
+    {
+      "term": "getKey()",
+      "definition": "In the Keypad library, returns the newly pressed key as a char; if there is no press, it returns '\\0'.",
+      "example": "if (tus) { Serial.println(tus); } prints only on a new press.",
+      "pitfall": "Using the returned value without checking it; when there is no press, '\\0' comes back."
+    },
+    {
+      "term": "The terminator '\\0'",
+      "definition": "A special character that shows where a piece of text ends in C; room is kept for it in the array.",
+      "example": "For a 4-digit PIN, char girilen[5] is declared.",
+      "pitfall": "Declaring the array with 4 elements: the '\\0' overflows the array and corrupts the memory next to it."
+    },
+    {
+      "term": "strcmp",
+      "definition": "Compares the contents of two texts; returns 0 if they are equal.",
+      "example": "If strcmp(girilen, \"1234\") == 0, the PIN is correct.",
+      "pitfall": "Comparing with ==: it compares addresses, so it comes out false even when the contents are the same."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h6d2-q1",
+      "kind": "numeric",
+      "prompt": "You are going to read a 12-key phone keypad made of 3 rows and 4 columns using the matrix method. How many Arduino pins are needed?",
+      "answer": 7,
+      "unit": "pins",
+      "explanation": "In a matrix the number of pins is rows plus columns: 3 + 4 = 7. If each key had its own pin, 12 pins would be needed. 12 is the number of keys, not the number of pins.",
+      "skills": [
+        "keypad-matrix"
+      ]
+    },
+    {
+      "id": "m4h6d2-q2",
+      "kind": "mcq",
+      "prompt": "During scanning, one column has been made LOW. If a key in that column is pressed, what does the row pin (with INPUT_PULLUP) read?",
+      "options": [
+        "HIGH, because the pull-up always holds it HIGH",
+        "LOW, because the pressed key connects the row to the LOW column",
+        "It cannot be read",
+        "The column has to be HIGH first"
+      ],
+      "answer": 1,
+      "explanation": "When the key is pressed, the row and the column are joined; because the column is LOW, the row also reads LOW. If it is not pressed, the pull-up holds the row HIGH. The difference gives away which key was pressed.",
+      "skills": [
+        "keypad-matrix"
+      ]
+    },
+    {
+      "id": "m4h6d2-q3",
+      "kind": "predict-output",
+      "prompt": "The keys 4, 2, *, 7, 9 are pressed in turn. '*' deletes the last digit. What is printed on the screen at the end?\n\n```\nchar girilen[5] = \"\";\nint hane = 0;\nchar tuslar[] = {'4', '2', '*', '7', '9'};\nfor (int i = 0; i < 5; i++) {\n  char t = tuslar[i];\n  if (t == '*') {\n    if (hane > 0) { hane--; girilen[hane] = '\\0'; }\n  } else {\n    girilen[hane] = t;\n    hane++;\n    girilen[hane] = '\\0';\n  }\n}\nSerial.println(girilen);\n```",
+      "options": [
+        "4279",
+        "479",
+        "47",
+        "429"
+      ],
+      "answer": 1,
+      "explanation": "4 and 2 are entered (42); '*' deletes the last digit, 2 (4); 7 and 9 are added (479). 4279 would be forgetting to delete; 47 is missing the last digit, and 429 would have deleted the wrong digit.",
+      "skills": [
+        "c-strings",
+        "keypad-matrix"
+      ]
+    },
+    {
+      "id": "m4h6d2-q4",
+      "kind": "find-bug",
+      "prompt": "This code does not print \"dogru\" (correct) even when the right PIN is entered. Why?\n\n```\nchar girilen[5] = \"1234\";\nif (girilen == \"1234\") {\n  Serial.println(\"dogru\");\n}\n```",
+      "options": [
+        "The char array must have at least 6 elements",
+        "Println is spelt wrongly",
+        "== compares addresses; for the contents you need strcmp(girilen, \"1234\") == 0",
+        "There must be a '\\0' at the start of the array"
+      ],
+      "answer": 2,
+      "explanation": "In C, when two texts are compared with ==, their addresses in memory are compared, not their contents; the addresses are different, so the condition comes out false. An array size of 5 is enough (4 digits and '\\0').",
+      "skills": [
+        "c-strings",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h6d2-q5",
+      "kind": "mcq",
+      "prompt": "If you hold a key down for 2 seconds, how many times does getKey() return that key?",
+      "options": [
+        "On every loop pass, so thousands of times",
+        "Only once, at the moment of the press",
+        "It never returns it",
+        "Once a second"
+      ],
+      "answer": 1,
+      "explanation": "getKey() gives the key once on a new press, then keeps returning '\\0'. That way a key held down is not added to the PIN again and again.",
+      "skills": [
+        "keypad-matrix"
+      ]
+    }
+  ]
+}

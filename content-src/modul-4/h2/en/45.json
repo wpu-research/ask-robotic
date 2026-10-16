@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "State machine",
+      "definition": "A design that describes a system with a few named states and the rules for moving between them.",
+      "example": "The alarm: the DEVRE_DISI, HAZIR, ALARM and SUSTURULDU states.",
+      "pitfall": "Mixing states up with flags: it becomes unclear which state you are in."
+    },
+    {
+      "term": "Exit delay",
+      "definition": "The time after arming the alarm when the sensors are not listened to, so the user can leave the house.",
+      "example": "In the project, the sensors are ignored for 5 seconds after the arm button; if the door is still open, arming is cancelled.",
+      "pitfall": "Skipping the delay: the alarm goes off as soon as it is armed."
+    },
+    {
+      "term": "Latch",
+      "definition": "Keeping the state after a breach, even when the condition that triggered it has ended.",
+      "example": "Even if the PIR goes back to LOW and the door closes, ALARM continues until the code is entered or the time runs out.",
+      "pitfall": "Tying ALARM directly to the sensor level: when the burglar leaves, the alarm goes quiet by itself."
+    },
+    {
+      "term": "Code window",
+      "definition": "The condition that the code must be entered within a certain time (counted from the first press).",
+      "example": "3 presses within 3 seconds. If 3 seconds pass after the first press, the counter starts again.",
+      "pitfall": "Counting the window from the last press; accidental presses add up."
+    },
+    {
+      "term": "Non-blocking timing",
+      "definition": "Measuring the time that has passed with millis() instead of delay(); this way loop() runs on every pass.",
+      "example": "The alarm time is measured with simdi - alarmBasla >= ALARM_SURESI.",
+      "pitfall": "Using delay(): the button and the sensors are missed during that time."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d5-q1",
+      "kind": "mcq",
+      "prompt": "hirsiz_alarmi is in the ALARM state. The burglar moves away from the PIR and closes the door again (PIR LOW, reed LOW). What does the alarm do?",
+      "options": [
+        "It goes back to HAZIR straight away",
+        "It moves to DEVRE_DISI straight away",
+        "It keeps sounding until the code is entered or the time runs out",
+        "It lowers the siren's frequency"
+      ],
+      "answer": 2,
+      "explanation": "ALARM works like a latch: once it has started, it continues even if the sensors return to normal, until the code is entered or ALARM_SURESI (10 s) runs out. This stops the alarm from switching off quietly just because the burglar escapes and closes the door.",
+      "skills": [
+        "prog-state-machine",
+        "design-failsafe"
+      ]
+    },
+    {
+      "id": "m4h2d5-q2",
+      "kind": "numeric",
+      "prompt": "The door is closed (Magnet nearby ticked) and the program is running. 1 s after pressing the arm button you tick the Motion box, and you untick it 3 s after the button press (the lab PIR holds OUT HIGH for 3 s after the motion ends; the warm-up has finished). How many seconds after the button press does the system move to the ALARM state?",
+      "answer": 5,
+      "tolerance": 0.2,
+      "unit": "s",
+      "explanation": "The exit delay lasts 5 s and the PIR is ignored during this time. The Motion box is unticked 3 s after the button; OUT stays HIGH until 6 s. At second 5 the system becomes HAZIR, ihlalVar() sees the PIR HIGH straight away and ALARM starts: 5 seconds.",
+      "skills": [
+        "prog-state-machine",
+        "sensor-pir",
+        "prog-millis"
+      ]
+    },
+    {
+      "id": "m4h2d5-q3",
+      "kind": "predict-output",
+      "prompt": "The code window is 3000 ms and the code is 3 presses. Presses come at t = 0, 1500, 3200, 3500 and 4000 ms, and tamam() is called for each of them. What is the output?\n\n```\nconst unsigned long PENCERE = 3000;\nint basis = 0;\nunsigned long ilk = 0;\n\nbool tamam(unsigned long t) {\n  if (basis == 0 || t - ilk > PENCERE) {\n    basis = 1;\n    ilk = t;\n  } else {\n    basis++;\n  }\n  return basis >= 3;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long zamanlar[] = {0, 1500, 3200, 3500, 4000};\n  for (int i = 0; i < 5; i++) {\n    Serial.print(tamam(zamanlar[i]) ? \"E \" : \"H \");\n  }\n  Serial.println();\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "H H E H H",
+        "E E E E E",
+        "H H H H E",
+        "H H H E E"
+      ],
+      "answer": 2,
+      "explanation": "t = 0: basis 1. t = 1500: basis 2. t = 3200: 3200 − 0 > 3000, outside the window, so the counter starts from 1 (ilk = 3200). t = 3500: basis 2. t = 4000: 4000 − 3200 = 800 < 3000, basis 3 and E. The output is \"H H H H E\". Expecting E on the third press means forgetting that the window is counted from the first press.",
+      "skills": [
+        "prog-state-machine",
+        "prog-millis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d5-q4",
+      "kind": "find-bug",
+      "prompt": "The alarm goes off as soon as it becomes HAZIR, even when the door is closed and nobody is moving. Which line is wrong?\n\n```\nbool ihlalVar() {\n  bool hareket = (digitalRead(PIR) == HIGH);\n  bool kapiAcik = (digitalRead(REED) == LOW);\n  return hareket || kapiAcik;\n}\n```",
+      "options": [
+        "bool hareket = (digitalRead(PIR) == HIGH);",
+        "bool kapiAcik = (digitalRead(REED) == LOW);",
+        "return hareket || kapiAcik;",
+        "bool ihlalVar() {"
+      ],
+      "answer": 1,
+      "explanation": "The reed is connected with INPUT_PULLUP: when the door is closed (magnet nearby), the contact is closed and it reads LOW. `== LOW` counts the door as \"open\" while it is closed. The correct version is `kapiAcik = (digitalRead(REED) == HIGH)`. The PIR line and `||` are correct: either of the two breaches is enough.",
+      "skills": [
+        "sensor-contact",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d5-q5",
+      "kind": "mcq",
+      "prompt": "When ALARM_SURESI runs out, why does the system move to SUSTURULDU rather than straight to DEVRE_DISI?",
+      "options": [
+        "To protect the buzzer",
+        "To remind you of the event with the LED",
+        "To reset the code counter",
+        "To avoid using delay()"
+      ],
+      "answer": 1,
+      "explanation": "In SUSTURULDU the sound stops, but the slowly blinking LED reminds the home owner that an event happened. If it went straight to DEVRE_DISI, the trace of the event would be lost and the home owner could not know what happened during the night. Because the sensors are not checked, new motion does not set the alarm off again.",
+      "skills": [
+        "prog-state-machine",
+        "design-failsafe"
+      ]
+    }
+  ]
+}

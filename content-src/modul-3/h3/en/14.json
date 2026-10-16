@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "map()",
+      "definition": "Moves a number from one range to another in proportion; it does integer maths.",
+      "example": "map(500, 200, 800, 0, 100) gives 50.",
+      "pitfall": "Expecting a decimal result: map(5, 0, 10, 0, 3) gives 1, not 1.5."
+    },
+    {
+      "term": "constrain()",
+      "definition": "Keeps a number between a lower and an upper limit.",
+      "example": "constrain(-16, 0, 100) gives 0, and constrain(116, 0, 100) gives 100.",
+      "pitfall": "Passing the map result to analogWrite without clipping it: a negative value or one greater than 255 produces unexpected brightness."
+    },
+    {
+      "term": "Calibration",
+      "definition": "Measuring the sensor's real smallest and largest values when the program starts.",
+      "example": "The LDR is watched for the first 3 seconds, enAz and enCok are saved, then map works with this range.",
+      "pitfall": "Not moving the sensor to its extremes during calibration: the range stays narrow."
+    },
+    {
+      "term": "Noise",
+      "definition": "analogRead wobbling by one or two units even under the same conditions.",
+      "example": "Even if the pot does not move at all, the reading can go back and forth between 511, 512 and 513.",
+      "pitfall": "Trusting a single measurement and deciding by a threshold: the value flickers around the threshold."
+    },
+    {
+      "term": "Averaging",
+      "definition": "Reducing noise by dividing the sum of several measurements by how many there are.",
+      "example": "16 measurements are added up and toplam / 16 is taken.",
+      "pitfall": "Forgetting to reset the sum: the average grows every round."
+    },
+    {
+      "term": "Exponential smoothing",
+      "definition": "Each round, keeping most of the old value and taking a small share from the new measurement.",
+      "example": "duzgun = duzgun * 0.9 + ham * 0.1; (duzgun must be a float)",
+      "pitfall": "Declaring duzgun as an int: small increases are rounded to whole numbers and lost."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d14-q1",
+      "kind": "numeric",
+      "prompt": "What does map(100, 200, 800, 0, 100) return? (map does integer maths; the result of (x − 200) × 100 / 600 is cut off towards zero.)",
+      "explanation": "(100 − 200) × 100 / 600 = −10000 / 600 = −16.67; in integer maths this becomes −16. Because the input is below the range (200-800), the result came out negative; map does not limit the result.",
+      "answer": -16,
+      "tolerance": 0,
+      "skills": [
+        "map-constrain"
+      ]
+    },
+    {
+      "id": "m3h3d14-q2",
+      "kind": "predict-output",
+      "prompt": "What appears in the Serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  int p = map(900, 200, 800, 0, 100);\n  p = constrain(p, 0, 100);\n  Serial.println(p);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "116",
+        "117",
+        "100",
+        "0"
+      ],
+      "explanation": "map: (900 − 200) × 100 / 600 = 116 (116.67 is cut off). Then constrain pulls 116 down to the upper limit, 100. Printing 116 would mean forgetting constrain; 117 means thinking it rounds, but map cuts off.",
+      "answer": 2,
+      "skills": [
+        "map-constrain",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d14-q3",
+      "kind": "find-bug",
+      "prompt": "The calibration loop cannot find the sensor's range: enAz always stays 0 and enCok always 1023. Which line has the bug?\n\n```\nint enAz = 0;\nint enCok = 1023;\nfor (int i = 0; i < 300; i++) {\n  int ham = analogRead(A1);\n  if (ham < enAz) enAz = ham;\n  if (ham > enCok) enCok = ham;\n  delay(10);\n}\n```",
+      "options": [
+        "The starting values: enAz = 0 and enCok = 1023 should be the other way round",
+        "for (int i = 0; i < 300; i++)",
+        "int ham = analogRead(A1);",
+        "delay(10);"
+      ],
+      "explanation": "If enAz starts at 0, no measurement is ever smaller than 0; if enCok starts at 1023, none is ever larger than 1023. The right way is to start with enAz = 1023 and enCok = 0. The loop, reading and waiting lines are correct.",
+      "answer": 0,
+      "skills": [
+        "calibration-smoothing",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d14-q4",
+      "kind": "numeric",
+      "prompt": "Before the line duzgun = duzgun * 0.9 + ham * 0.1; runs, duzgun = 100 and ham = 200. What is duzgun after the line?",
+      "explanation": "100 × 0.9 + 200 × 0.1 = 90 + 20 = 110. Even though the raw value jumped by 100 units, the smoothed value only moved by 10 units; this is the effect of smoothing.",
+      "answer": 110,
+      "tolerance": 0.01,
+      "skills": [
+        "calibration-smoothing"
+      ]
+    },
+    {
+      "id": "m3h3d14-q5",
+      "kind": "mcq",
+      "prompt": "What does taking the average of 16 measurements give you, and what is the cost?",
+      "options": [
+        "Reading gets faster, noise increases",
+        "Noise decreases, reading takes a little longer",
+        "Noise decreases, reading speed does not change",
+        "The sensor range widens, noise stays the same"
+      ],
+      "explanation": "Averaging smooths out noise, but 16 measurements mean 16 waits and readings; in this lesson that takes 16 × 3 ms ≈ 48 ms. So it is more stable but a little slower.",
+      "answer": 1,
+      "skills": [
+        "calibration-smoothing",
+        "prog-timing"
+      ]
+    }
+  ]
+}

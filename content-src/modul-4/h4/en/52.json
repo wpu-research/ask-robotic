@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Baseline level",
+      "definition": "The steady value read on the sound module's analog output when the room is quiet.",
+      "example": "On the virtual module, analogRead gives about 256 when quiet; you measure it by taking an average at start-up.",
+      "pitfall": "Assuming the baseline is 512, or measuring it while the Sound level is not 0: all deviations are worked out wrongly."
+    },
+    {
+      "term": "Deviation and abs()",
+      "definition": "How far the reading is from the baseline; abs() turns this distance into a positive number, whatever its direction.",
+      "example": "abs(614 - 256) gives 358; abs(100 - 256) gives 156.",
+      "pitfall": "Not using abs(): a real microphone also swings below the baseline, so some sounds are missed."
+    },
+    {
+      "term": "Peak (peak value)",
+      "definition": "The largest deviation seen during an event.",
+      "example": "A clap can have a peak of about 348; a whisper stays around 20-30.",
+      "pitfall": "Looking only at the peak: a very loud door slam also looks like a clap, so the duration must be checked too."
+    },
+    {
+      "term": "Event duration and classification",
+      "definition": "Sorting a sound into short interference, a clap or a long sound by the time between the start of the event and the last loud sample.",
+      "example": "5 ms is short interference, 40 ms is a clap, 800 ms is a long sound.",
+      "pitfall": "Thinking the duration limits are fixed without looking at the real hardware; the limits are tuned to the module and the room."
+    },
+    {
+      "term": "Quiet margin",
+      "definition": "Waiting for the deviation to stay below the threshold for a short time before ending the event.",
+      "example": "SESSIZ_PAY = 20 ms: if the signal stays calm for 20 ms, the event ends.",
+      "pitfall": "Ending the event on a single sample: when the swinging signal passes through the baseline, one clap looks like two events."
+    },
+    {
+      "term": "State variable (sesVar)",
+      "definition": "A variable that lets the program remember whether it is in the middle of an event.",
+      "example": "While sesVar is true, the function does not start a new event; it continues the current one.",
+      "pitfall": "Keeping the state in a local variable: it is reset every time the function is called and the event never ends."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d2-q1",
+      "kind": "numeric",
+      "prompt": "On the virtual sound module, AO = 5 V × (0.25 + 0.7 × Sound level) and analogRead = AO / 5 × 1023. When quiet, the baseline was measured as 256. At a Sound level of 0.5, about what does abs(analogRead - baz) come to?",
+      "answer": 358,
+      "tolerance": 2,
+      "explanation": "For a level of 0.5, AO = 5 × (0.25 + 0.35) = 3.0 V, so analogRead is about 614. The deviation is 614 - 256 = 358. If TEPE_ESIK is 150, this sound counts as an event; at a level of 0.1 the deviation would be about 71 and it would not count.",
+      "skills": [
+        "sens-noise",
+        "sens-event-detect"
+      ]
+    },
+    {
+      "id": "m4h4d2-q2",
+      "kind": "predict-output",
+      "prompt": "Three sound events last 5 ms, 40 ms and 800 ms. The letter 'K' is printed for short interference, 'A' for a clap and 'U' for a long sound. What does this code print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long sureler[] = {5, 40, 800};\n  for (int i = 0; i < 3; i++) {\n    char tur;\n    if (sureler[i] < 10) tur = 'K';\n    else if (sureler[i] > 500) tur = 'U';\n    else tur = 'A';\n    Serial.print(tur);\n  }\n}\n```",
+      "options": [
+        "AAU",
+        "KAU",
+        "KAA",
+        "UAK"
+      ],
+      "answer": 1,
+      "explanation": "5 ms is shorter than 10 ms, so 'K'; 40 ms is in between, so 'A'; 800 ms is longer than 500 ms, so 'U'. The output is KAU. The first option counts 5 ms as a clap, the third counts 800 ms as a clap, and the fourth reads the order backwards.",
+      "skills": [
+        "sens-event-detect"
+      ]
+    },
+    {
+      "id": "m4h4d2-q3",
+      "kind": "find-bug",
+      "prompt": "Every clap is printed in the serial monitor as 'KISA sure=0'. When the event ends, sure = sonYuksek - baslangic is worked out. There is one mistake in the event-catching code. Where is it?\n\n```\nif (fark >= TEPE_ESIK) {\n  if (!sesVar) {\n    sesVar = true;\n    baslangic = simdi;\n    sonYuksek = simdi;\n  }\n  if (fark > tepe) tepe = fark;\n}\n```",
+      "options": [
+        "TEPE_ESIK has been chosen too small",
+        "abs() is missing, so the deviation comes out negative",
+        "sonYuksek is only set when the event starts; because it is not updated on every loud sample, the duration is always 0",
+        "SURE_MAX has been chosen too large"
+      ],
+      "answer": 2,
+      "explanation": "The duration is the difference between the last loud sample and the start. If sonYuksek is only set when the event starts, sonYuksek and baslangic always stay the same and the difference is 0; since that is shorter than 10 ms, everything is printed as KISA (short). The fix is to move the sonYuksek = simdi line outside the sesVar check, to a place where it runs on every loud sample.",
+      "skills": [
+        "sens-event-detect",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d2-q4",
+      "kind": "mcq",
+      "prompt": "In the two-clap switch, ARALIK is 3000 ms. The second clap comes 5 seconds after the first. What happens?",
+      "options": [
+        "The LED does not change; the second clap counts as a new 'first clap'",
+        "The LED changes its state",
+        "The LED does not change and the second clap is completely forgotten",
+        "The program gives an error"
+      ],
+      "answer": 0,
+      "explanation": "The time between the starts is 5000 ms, longer than ARALIK (3000), so the LED does not change. But the second clap is still a clap: it is saved as ilkAlkis and can form a pair with a clap that follows within 3 seconds.",
+      "skills": [
+        "sens-event-detect",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h4d2-q5",
+      "kind": "mcq",
+      "prompt": "If the quiet margin (SESSIZ_PAY) is removed from the clap-recognition code and the event is ended on the first sample where the deviation drops below the threshold, what can happen with a real microphone?",
+      "options": [
+        "No clap is detected at all",
+        "The LED stays lit all the time",
+        "The baseline drifts",
+        "As the swinging signal passes through the baseline, one clap can be split into several short events"
+      ],
+      "answer": 3,
+      "explanation": "A real microphone signal swings on both sides of the baseline; as it passes through the baseline, the deviation briefly gets close to zero. If the event is ended at once, one clap looks like several short events and the duration/height check breaks. The quiet margin ignores these short gaps. The other options have nothing to do with the code.",
+      "skills": [
+        "sens-event-detect",
+        "sens-noise"
+      ]
+    }
+  ]
+}

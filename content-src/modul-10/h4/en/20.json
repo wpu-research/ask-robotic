@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Recording list",
+      "definition": "A list that collects the frequencies of the notes played, in the order they were played.",
+      "example": "After pressing A, B, A, P0, kayit = [262, 294, 262, 392].",
+      "pitfall": "Not setting up the list as an empty list in on start; the add block gives the error \"This block needs a list.\""
+    },
+    {
+      "term": "Add to list",
+      "definition": "Adds a value to the end of the list; the list gets one item longer.",
+      "example": "The add [note C] to list kayit block puts 262 in the list.",
+      "pitfall": "Playing the note but forgetting to record it; the playback does not know about that note."
+    },
+    {
+      "term": "Playback",
+      "definition": "A loop that plays every note in the recording list in turn, from start to end.",
+      "example": "When you touch the logo, the for each item in list kayit loop runs.",
+      "pitfall": "Expecting the recording to reset; the recording stays unless you give it an empty list."
+    },
+    {
+      "term": "Key pattern",
+      "definition": "The light, play, record, clear sequence that is the same for every key.",
+      "example": "A key is copied and only the note and the column (x) are changed.",
+      "pitfall": "Giving the same column to two keys; you cannot tell from the screen which key you pressed."
+    },
+    {
+      "term": "Pin touch (P0, P1)",
+      "definition": "The touch areas at the bottom of the card; like a button, they are triggered by their own hat block.",
+      "example": "The on pin P0 touched hat block plays the note G.",
+      "pitfall": "Leaving the hat block empty; an empty hat block does nothing when it is touched."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h4d20-q1",
+      "kind": "numeric",
+      "prompt": "There are 8 notes in the recording list. At tempo 120, the playback plays each note for [1/8] beat. How many milliseconds does the whole recording last?",
+      "answer": 2000,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "At tempo 120 a 1/8 beat is 250 ms. 8 × 250 = 2000 ms. Because each note block waits until it finishes, the times add up.",
+      "skills": [
+        "prog-timing",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m10h4d20-q2",
+      "kind": "numeric",
+      "prompt": "The tempo is 80. How many milliseconds does it take to play back a four-note recording, with each note lasting [1/8] beat?",
+      "answer": 1500,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "At tempo 80 one unit is 60000 / 80 = 750 ms, and a 1/8 beat is half of it: 375 ms. 4 × 375 = 1500 ms. Because the tempo is lower, the recording lasts longer than at tempo 120 (1000 ms).",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d20-q3",
+      "kind": "predict-output",
+      "prompt": "At the start, kayit is an empty list. These keys are pressed in turn: A (C), P0 (G), A (C). Then the logo is touched. In the playback, which frequencies are heard from the speaker, in order?",
+      "options": [
+        "262, 392, 262",
+        "262, 262, 392",
+        "392, 262, 262",
+        "262, 392"
+      ],
+      "answer": 0,
+      "explanation": "The list collects the notes in the order they were pressed: [262, 392, 262]. The playback plays it from start to end. Repeats are not deleted; C was recorded twice.",
+      "skills": [
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m10h4d20-q4",
+      "kind": "find-bug",
+      "prompt": "While the piano is running, pressing a key shows the error \"This block needs a list.\" and the program stops:\n\n```\non start:\n   (empty)\n\non button [A] pressed:\n   plot (0, 2)\n   play note [C] for [1/8] beat\n   add [262] to list kayit\n   clear screen\n```\n\nWhat is the problem?",
+      "options": [
+        "The plot block cannot be used with y = 2",
+        "The kayit variable was not given an empty list in on start",
+        "The clear screen block is in the wrong place",
+        "The note C cannot be played for a 1/8 beat"
+      ],
+      "answer": 1,
+      "explanation": "The add block needs a list. Because the kayit variable was not given an empty list in on start, the variable is not a list. The other options have nothing to do with the error.",
+      "skills": [
+        "prog-debug",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m10h4d20-q5",
+      "kind": "mcq",
+      "prompt": "On the virtual piano, what problem appears if you give two keys the same column (x = 1)?",
+      "options": [
+        "The program does not run at all",
+        "You cannot tell from the screen which key you pressed",
+        "The frequency of the notes changes",
+        "The recording list is deleted"
+      ],
+      "answer": 1,
+      "explanation": "Showing each key with its own column on the screen is how you tell the keys apart. The same column shows the two keys in the same way. The program runs, and the notes and the recording are not affected.",
+      "skills": [
+        "prog-planning",
+        "prog-debug"
+      ]
+    }
+  ]
+}

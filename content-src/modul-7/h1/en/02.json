@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Token",
+      "definition": "The piece a model uses when it processes text; it can be a word, part of a word, a letter or punctuation.",
+      "example": "In the tool, `robotlar` (robots) is split into three tokens: `▁robot`, `l`, `ar`.",
+      "pitfall": "Treating the token count as equal to the word count; a token is often smaller than a word."
+    },
+    {
+      "term": "Token ID (number)",
+      "definition": "The whole number that matches each token; the model processes text as this sequence of numbers.",
+      "example": "To the model, the sequence [▁robot] [l] [ar] is a list of three whole numbers.",
+      "pitfall": "Thinking the model reads letters and words directly."
+    },
+    {
+      "term": "Number of merges",
+      "definition": "In the tool, the number of learned merge steps the tokeniser applies; as it rises, the token count falls.",
+      "example": "`robot ileri` (robot forward) takes 12 tokens with 0 merges and 2 tokens with many merges.",
+      "pitfall": "Thinking the token count at zero merges is just the number of letters; the start-of-word mark counts as a token too."
+    },
+    {
+      "term": "Start-of-word mark (▁)",
+      "definition": "A mark showing that a piece is at the start of a word; in the tool it also appears as \"·\".",
+      "example": "\"▁robot\" is a separate word, while \"robot\" is a piece coming from inside another word.",
+      "pitfall": "Thinking the mark is a space character and leaving it out of the token count."
+    },
+    {
+      "term": "Corpus",
+      "definition": "A collection of text used to train a tokeniser or a model.",
+      "example": "The tool has two small corpora, one Turkish and one English.",
+      "pitfall": "Thinking the tool's tokeniser, trained on a small corpus, is a real model's."
+    },
+    {
+      "term": "Language-dependent token cost",
+      "definition": "The same text in a language seen less in training is split into more, smaller tokens.",
+      "example": "With 120 merges, \"the robot turns left\" takes 4 tokens with the English corpus and 13 with the Turkish corpus.",
+      "pitfall": "Thinking more tokens means \"richer\" meaning; it only means the tokeniser fits that language poorly."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d2-q1",
+      "kind": "mcq",
+      "prompt": "Which of these is true about tokens?",
+      "options": [
+        "Every token is a whole word",
+        "A token can also be part of a word, a letter or punctuation",
+        "A token is made only of numbers",
+        "A token is the full stop at the end of a sentence"
+      ],
+      "answer": 1,
+      "explanation": "A token can be a whole word, but it can also be part of a word, a single letter or punctuation. That is why the first option is wrong; inside the model tokens are turned into numbers, but a token itself is not just a number.",
+      "skills": [
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d2-q2",
+      "kind": "numeric",
+      "prompt": "In the tool, with the number of merges at 0, you typed \"robot ileri\". Each letter is a separate token, and the mark at the start of each word is a separate token too. How many tokens appear in total?",
+      "answer": 12,
+      "unit": "tokens",
+      "explanation": "\"robot\" is 5 letters plus 1 start-of-word mark, so 6 tokens; \"ileri\" is also 5 letters plus 1 mark, 6 tokens. Total 6 + 6 = 12. People who count only the letters get 10 and forget the mark.",
+      "skills": [
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d2-q3",
+      "kind": "predict-output",
+      "prompt": "The tokeniser split the word \"robotlar\" into three tokens. What does this code print when it runs?\n\n```\nconst parcalar = [\"▁robot\", \"l\", \"ar\"]\nconsole.log(parcalar.length)\nconsole.log(parcalar.join(\"\").replace(\"▁\", \"\"))\n```",
+      "options": [
+        "1, then ▁robotlar",
+        "3, then robotlar",
+        "3, then ▁robot l ar",
+        "8, then robotlar"
+      ],
+      "answer": 1,
+      "explanation": "The array has three elements, so the first line prints 3. join joins the pieces with no spaces between them, and replace deletes the start-of-word mark; the result is robotlar. Splitting into pieces does not lose information: when you join the pieces, the text comes back.",
+      "skills": [
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d2-q4",
+      "kind": "find-bug",
+      "prompt": "A student wants to find how many tokens a sentence will take up in the model. There is one bug in the code; which is it?\n\n```\nconst cumle = \"robotlar duvarı görünce durur\"\nconst tokenSayisi = cumle.split(\" \").length\nconsole.log(\"Model \" + tokenSayisi + \" token görür\")\n```",
+      "options": [
+        "The cumle variable should not be const",
+        "split(\" \") counts words; it assumes the token count is the same as the word count",
+        "The + sign cannot be used in the console.log call",
+        "The sentence has no full stop"
+      ],
+      "answer": 1,
+      "explanation": "split(\" \") counts the words and finds 4. But \"robotlar\" on its own can be more than one token; the token count can only be found by running the tokeniser. Using const and joining text with + are not problems in this code.",
+      "skills": [
+        "ai-tokens",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d2-q5",
+      "kind": "mcq",
+      "prompt": "The same English sentence takes far more tokens with a tokeniser trained on the Turkish corpus (13 tokens) than with one trained on the English corpus (4 tokens). What is the most likely reason?",
+      "options": [
+        "English sentences are longer",
+        "A tokeniser splits a language it saw less in training into smaller pieces",
+        "The Turkish corpus contains a bigger vocabulary",
+        "The tool produces random numbers"
+      ],
+      "answer": 1,
+      "explanation": "A tokeniser makes the pieces it sees often into single tokens; a language it saw less in training does not have these pieces, so the text breaks into small pieces close to single letters. The calculation is not random; it gives the same result every time.",
+      "skills": [
+        "ai-tokens",
+        "ai-bpe"
+      ]
+    }
+  ]
+}

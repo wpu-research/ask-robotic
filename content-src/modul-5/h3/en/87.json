@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Calibration",
+      "definition": "Measuring the sensor's values in the real conditions before the robot starts work, and making decisions based on that measurement.",
+      "example": "When the light increases by the window, the robot wiggles once at the start, measures the new min and max, and recalculates the threshold accordingly.",
+      "pitfall": "Calibrating once and trusting the old threshold even when the light changes noticeably."
+    },
+    {
+      "term": "Min and max",
+      "definition": "The smallest value (floor) and largest value (line) a sensor sees during calibration.",
+      "example": "In normal light the simulation measures min 163 and max 860.",
+      "pitfall": "Never showing the sensors the line or the floor during calibration; min and max end up close together."
+    },
+    {
+      "term": "Threshold = (min + max) / 2",
+      "definition": "Exactly halfway between floor and line; if the reading is above it, it counts as line, otherwise floor.",
+      "example": "If the floor reads 593 and the line 941, the threshold becomes (593 + 941) / 2 = 767.",
+      "pitfall": "Forgetting about equality in the comparison; if the reading equals the threshold, `okuma > esik` is false and the line may not be seen."
+    },
+    {
+      "term": "Starting values (1023 and 0)",
+      "definition": "When finding the smallest, you start by giving enAz the largest possible number (1023); when finding the largest, you give enCok the smallest possible number (0).",
+      "example": "If the first reading is 300, enAz = 300 and enCok = 300; the following readings widen them.",
+      "pitfall": "Writing the starting values the wrong way round (enAz = 0): no reading can be smaller than 0, so min is never updated."
+    },
+    {
+      "term": "Calibration by wiggling",
+      "definition": "The robot, starting with the line in the middle, turning on the spot left and right so that each sensor passes over both the line and the floor.",
+      "example": "It turns left for 400 ms, right for 800 ms and left for 400 ms, then the robot stops and min, max and threshold are printed.",
+      "pitfall": "Leaving the wiggle PWM value below the dead zone (for example 40): the robot does not turn and the threshold is spoilt."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d2-q1",
+      "kind": "numeric",
+      "prompt": "The smallest value a sensor sees during calibration is 140 and the largest is 900. What is the threshold found with the (min + max) / 2 rule?",
+      "answer": 520,
+      "tolerance": 0,
+      "explanation": "(140 + 900) / 2 = 1040 / 2 = 520. The threshold is halfway between floor and line; this way it separates the two surfaces with an equal margin.",
+      "skills": [
+        "rob-calibration"
+      ]
+    },
+    {
+      "id": "m5h3d2-q2",
+      "kind": "mcq",
+      "prompt": "When the ambient light increases, the floor reads about 593 and the line about 941. All five sensors are over the floor. What do the fixed threshold (512) and the calibrated threshold ((593 + 941) / 2) see?",
+      "options": [
+        "Both see 00000",
+        "The fixed threshold sees 00000, the calibrated threshold sees 11111",
+        "The fixed threshold sees 11111 (the floor is counted as \"line\" too); the calibrated threshold (767) gives the right result with 00000",
+        "Both see 11111"
+      ],
+      "answer": 2,
+      "explanation": "The floor, 593, is greater than 512; the fixed threshold thinks every sensor is on the line and gives 11111. The calibrated threshold is 767; because 593 is below it, the floor correctly shows as 0. This is the real job of calibration: fitting the threshold to the current conditions.",
+      "skills": [
+        "rob-calibration",
+        "rob-line-pattern"
+      ]
+    },
+    {
+      "id": "m5h3d2-q3",
+      "kind": "find-bug",
+      "prompt": "This code, which finds the min and max, gives a wrong result. Where is the bug?\n\n```\nint enAz = 0;\nint enCok = 1023;\n\nvoid kalibreAdimi(int v) {\n  if (v < enAz) enAz = v;\n  if (v > enCok) enCok = v;\n}\n```",
+      "options": [
+        "The two comparisons should point the other way",
+        "The starting values are the wrong way round: no reading can be smaller than 0 or larger than 1023, so enAz and enCok are never updated",
+        "kalibreAdimi should take a float parameter instead of int",
+        "The threshold calculation is missing; that is why min and max cannot be found"
+      ],
+      "answer": 1,
+      "explanation": "With enAz = 0, `v < 0` is never true; with enCok = 1023, `v > 1023` is never true either. The comparisons are correct. The right way is to start with enAz = 1023 and enCok = 0; this way the first reading beats both at once.",
+      "skills": [
+        "rob-calibration",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d2-q4",
+      "kind": "predict-output",
+      "prompt": "What does this code print on the Serial monitor?\n\n```\nint okumalar[] = {420, 310, 760, 690, 240};\n\nvoid setup() {\n  Serial.begin(9600);\n  int enAz = 1023, enCok = 0;\n  for (int i = 0; i < 5; i++) {\n    if (okumalar[i] < enAz) enAz = okumalar[i];\n    if (okumalar[i] > enCok) enCok = okumalar[i];\n  }\n  int esik = (enAz + enCok) / 2;\n  Serial.print(esik);\n  Serial.print(' ');\n  Serial.println(500 > esik);\n}\nvoid loop() {}\n```",
+      "options": [
+        "500 1",
+        "760 1",
+        "250 0",
+        "500 0"
+      ],
+      "answer": 3,
+      "explanation": "The smallest reading is 240 and the largest 760; the threshold is (240 + 760) / 2 = 500. The comparison `500 > 500` is false, so 0 is printed. When the reading is exactly equal to the threshold, `>` does not say line; so you need to think about equality in edge cases.",
+      "skills": [
+        "rob-calibration",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d2-q5",
+      "kind": "mcq",
+      "prompt": "In the wiggle calibration, SALLA_PWM was written as 40 instead of 120. Thinking about the dead zone (the wheel does not turn below about PWM 51), say what will happen.",
+      "options": [
+        "The robot does not turn at all; A2, on the line, always reads 860, min = max = 860 and the threshold becomes 860. Even the line shows as 0 because `860 > 860` is false",
+        "The robot turns slowly; calibration takes a little longer but the result comes out right",
+        "The robot turns quickly and the threshold becomes 0",
+        "The program does not compile"
+      ],
+      "answer": 0,
+      "explanation": "PWM 40 is below the dead zone; the wheels do not move. Because the sensors always stay in the same place, A2 sees only the line and the others only the floor; min and max come out equal. On A2 the threshold becomes 860, and even with the line right underneath, the pattern gives 00000.",
+      "skills": [
+        "rob-calibration",
+        "prog-debug"
+      ]
+    }
+  ]
+}

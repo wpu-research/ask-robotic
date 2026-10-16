@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Relay",
+      "definition": "A switch that works with an electromagnet, whose contact side is electrically separate from the control side.",
+      "example": "The Arduino drives a relay, and the relay switches on an LED or a load in a separate circuit.",
+      "pitfall": "Connecting a bare relay directly to a pin: the coil current is too much for the pin, and the spike damages the pin."
+    },
+    {
+      "term": "COM, NO and NC",
+      "definition": "COM is the common terminal; NO connects to COM when energised, NC is connected to COM when not energised.",
+      "example": "If the load is between NO and COM, it works only when the relay is energised.",
+      "pitfall": "Mixing up NO and NC: the load works with the opposite logic."
+    },
+    {
+      "term": "Active-LOW",
+      "definition": "A relay module that pulls in when its IN pin gets LOW and releases when it gets HIGH.",
+      "example": "digitalWrite(7, LOW) energises the relay, HIGH releases it.",
+      "pitfall": "Not knowing the logic: the relay can stay energised at start-up; writing HIGH before pinMode prevents this."
+    },
+    {
+      "term": "Hysteresis",
+      "definition": "Using two separate thresholds for switching on and switching off; in the zone between them, the state is kept.",
+      "example": "Energise above 600, release below 500.",
+      "pitfall": "Using a single threshold: when the value jitters around it, the relay clicks all the time and the contacts wear out."
+    },
+    {
+      "term": "Mains voltage",
+      "definition": "The 220 V in the socket; it can kill, and controlling it with a relay is a job only for a trained specialist.",
+      "example": "On this portal you only build 5 V virtual circuits.",
+      "pitfall": "Thinking the 250 V printed on a module means it is safe, and trying it with a socket."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d24-q1",
+      "kind": "numeric",
+      "prompt": "While the relay is energised, COM is connected to 5V and the NO terminal goes to a red LED (Vf = 1.9 V) through a 330 Ω resistor. About how many mA flow through the LED? (Ignore the relay and wire resistances.)",
+      "answer": 9.3,
+      "tolerance": 0.3,
+      "unit": "mA",
+      "explanation": "The voltage across the resistor is 5 − 1.9 = 3.1 V. I = 3.1 / 330 ≈ 0.0094 A ≈ 9.4 mA. When the relay releases, the circuit opens and the current becomes zero.",
+      "skills": [
+        "relay-logic",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h5d24-q2",
+      "kind": "predict-output",
+      "prompt": "The relay module is energised by LOW and starts released. analogRead returns 650, 550 and 480 in turn. What is the relay's state after each reading?\n\n```\nif (!acik && deger > 600) {\n  acik = true;\n  digitalWrite(7, LOW);\n} else if (acik && deger < 500) {\n  acik = false;\n  digitalWrite(7, HIGH);\n}\n```",
+      "options": [
+        "Energised, released, released",
+        "Energised, energised, released",
+        "Energised, energised, energised",
+        "Released, energised, released"
+      ],
+      "answer": 1,
+      "explanation": "Because 650 > 600, the relay pulls in. 550 is between the two thresholds, so the state is kept and the relay stays energised. When 480 < 500, it releases. This is the job of hysteresis.",
+      "skills": [
+        "hysteresis",
+        "relay-logic"
+      ]
+    },
+    {
+      "id": "m3h5d24-q3",
+      "kind": "find-bug",
+      "prompt": "When the threshold is passed, the relay pulls in, but it releases straight away, pulls in again and clicks all the time. Which line is wrong?\n\n```\nif (!acik && deger > ACMA) {\n  acik = true;\n  digitalWrite(ROLE, LOW);\n} else if (acik && deger > KAPAMA) {\n  acik = false;\n  digitalWrite(ROLE, HIGH);\n}\n```\n(ACMA = 600, KAPAMA = 500)",
+      "options": [
+        "if (!acik && deger > ACMA) {",
+        "digitalWrite(ROLE, LOW);",
+        "} else if (acik && deger > KAPAMA) {",
+        "digitalWrite(ROLE, HIGH);"
+      ],
+      "answer": 2,
+      "explanation": "The switch-off condition should have been deger < KAPAMA. With >, the relay is released straight after it pulls in (deger is still above 500), and the cycle repeats. Energising with LOW and releasing with HIGH are correct.",
+      "skills": [
+        "hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d24-q4",
+      "kind": "mcq",
+      "prompt": "The load is connected between COM and the NO terminal. What happens when the relay is energised?",
+      "options": [
+        "NO connects to COM and the load works",
+        "NO disconnects from COM and the load stops",
+        "The load always works",
+        "The load is connected to GND"
+      ],
+      "answer": 0,
+      "explanation": "NO is normally open: when the relay is not energised it is separate from COM, and when it is energised it connects to COM. If the load were on the NC terminal, it would be the other way round.",
+      "skills": [
+        "relay-logic"
+      ]
+    },
+    {
+      "id": "m3h5d24-q5",
+      "kind": "numeric",
+      "prompt": "The switch-on threshold is 600 and the switch-off threshold is 500. On the 5 V / 1024 scale, about how many volts is the hysteresis range?",
+      "answer": 0.49,
+      "tolerance": 0.02,
+      "unit": "V",
+      "explanation": "The range is 600 − 500 = 100 units. One unit is 5 / 1024 ≈ 4.88 mV, so 100 × 4.88 mV ≈ 0.49 V.",
+      "skills": [
+        "hysteresis",
+        "elec-ohm"
+      ]
+    }
+  ]
+}

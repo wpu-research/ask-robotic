@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Gap and losing the line",
+      "definition": "The case where no sensor sees the line (00000); either it is a narrow gap in the line, or the robot has missed the line.",
+      "example": "If the line disappears while in the middle, a gap is likely; if it disappears while on an edge sensor, a bend has been overshot.",
+      "pitfall": "Always turning the same way when the line is lost; in a gap the robot spins round on itself."
+    },
+    {
+      "term": "Telling them apart by the last direction",
+      "definition": "When 00000 appears, looking at where the line was last seen to tell a gap (sonYon = 0) from an overshot bend (sonYon ≠ 0).",
+      "example": "If sonYon = −1, the robot was turning left; it overshot the line, and searches by turning left on the spot.",
+      "pitfall": "Resetting sonYon on every pass; the memory is wiped and the two cannot be told apart."
+    },
+    {
+      "term": "Time limit and DUR",
+      "definition": "Putting an upper limit on the time for crossing a gap and searching for the line, and stopping the robot when it runs out.",
+      "example": "It goes straight for BOSLUK_MS = 900 ms and turns for ARAMA_MS = 2500 ms; if the line is not found, DUR is printed and the motors switch off.",
+      "pitfall": "Leaving the search unlimited; if the line really is not there, the robot turns forever."
+    },
+    {
+      "term": "Junction decision",
+      "definition": "When the pattern 11111 is seen, carrying out a decision given in advance: −1 left, 0 straight, +1 right.",
+      "example": "At a T junction, if the decision is −1 the robot goes to the left end of the bar; at a + junction, if the decision is 0 it goes straight across.",
+      "pitfall": "Turning as soon as you see the junction; because the sensor array is in front of the axle, the turn starts from the wrong place."
+    },
+    {
+      "term": "KAVSAK_ILERI",
+      "definition": "The state that, once a junction is detected, goes forward briefly before turning to bring the wheel axle level with the junction.",
+      "example": "After going forward for 350 ms, the axle reaches the junction; then it turns on the spot.",
+      "pitfall": "Setting this time to zero: instead of going to the end of the T, the robot turns back onto the stem it came from."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d4-q1",
+      "kind": "mcq",
+      "prompt": "While the robot is following the line with the middle sensor (sonYon = 0), the pattern suddenly becomes 00000. Which reaction is correct?",
+      "options": [
+        "Start turning left on the spot at once",
+        "Move to the BOSLUK state: go straight; if the line appears, go back to IZLE; if the time runs out, move to ARAMA",
+        "Set the threshold to 0 and carry on",
+        "Move to the DUR state at once"
+      ],
+      "answer": 1,
+      "explanation": "If the line disappeared while in the middle, the robot was going straight; most probably it is a gap. If we go straight, we cross a narrow gap. Turning at once spins the robot in the gap; stopping at once is unnecessary. If the time runs out, the line really is lost and ARAMA steps in.",
+      "skills": [
+        "rob-gap-recovery",
+        "rob-line-memory"
+      ]
+    },
+    {
+      "id": "m5h3d4-q2",
+      "kind": "predict-output",
+      "prompt": "Readings: 0 = no line, 1 = on the left, 2 = in the middle, 3 = on the right. When there is no line, 'B' (gap) is printed if sonYon == 0, otherwise 'A' (search); if there is a line, 'I' (follow). What does this code print?\n\n```\nint sonYon = 0;\nint okuma[] = {2, 1, 0, 0, 3};\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    int o = okuma[i];\n    if (o == 0) {\n      Serial.print(sonYon == 0 ? 'B' : 'A');\n    } else {\n      sonYon = (o == 1) ? -1 : (o == 3) ? 1 : 0;\n      Serial.print('I');\n    }\n  }\n  Serial.println();\n}\nvoid loop() {}\n```",
+      "options": [
+        "IIBBI",
+        "IIAAA",
+        "IIAAI",
+        "IBBAI"
+      ],
+      "answer": 2,
+      "explanation": "At readings 2 and 1 the line is seen (I, I) and sonYon ends up as −1. At the next two 0s, sonYon ≠ 0, so A, A is printed. The last reading, 3, sees the line, and I is printed. The output is IIAAI. The first option assumes sonYon stayed at 0.",
+      "skills": [
+        "rob-gap-recovery",
+        "rob-line-memory",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d4-q3",
+      "kind": "numeric",
+      "prompt": "In the BOSLUK state, the robot goes straight at 0.2 m/s and BOSLUK_MS = 900. What is the greatest distance in cm it can cover in this state before the time runs out?",
+      "answer": 18,
+      "tolerance": 0.1,
+      "unit": "cm",
+      "explanation": "Distance = speed × time = 0.2 m/s × 0.9 s = 0.18 m = 18 cm. If the speed increases, it travels further in the same time; so BOSLUK_MS must be rethought along with the speed. Do not forget to multiply the metres by 100 to convert to centimetres.",
+      "skills": [
+        "rob-gap-recovery",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h3d4-q4",
+      "kind": "find-bug",
+      "prompt": "In the left-turn state at a junction, the robot moves to IZLE as soon as it starts turning and is left facing the wrong way. Where is the bug?\n\n```\ncase KAVSAK_DON:\n  yerindeDon(KAVSAK_KARARI);\n  if (orta) merkezGitti = true;\n  if (merkezGitti && orta) {\n    sonYon = 0;\n    gec(IZLE);\n  }\n  break;\n```",
+      "options": [
+        "`if (orta) merkezGitti = true;` should be the other way round: merkezGitti should be marked when the old line is left (!orta); as written, the turn ends on the very first pass",
+        "The yerindeDon call should come after break",
+        "The sonYon = 0 line should be deleted",
+        "gec(DUR) should be written instead of gec(IZLE)"
+      ],
+      "answer": 0,
+      "explanation": "When the turn starts, the middle sensor is still on the old line. If merkezGitti is marked while `orta` is true, and `merkezGitti && orta` is checked straight afterwards, the condition is met on the first pass. The right way is to wait first for the middle sensor to leave the old line (!orta), then finish when it finds the new line.",
+      "skills": [
+        "rob-junction",
+        "rob-line-fsm",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d4-q5",
+      "kind": "mcq",
+      "prompt": "When the robot sees a T junction (11111), why does it not start turning at once, but first go forward briefly in the KAVSAK_ILERI state?",
+      "options": [
+        "The motor driver does not allow sudden changes of direction",
+        "Five sensors seeing the line at the same time is a reading error",
+        "Turning before ARAMA_MS has run out is not allowed",
+        "The sensor array is about 7 cm in front of the wheel axle; a robot that turns at once turns from the wrong place, before it reaches the middle of the junction"
+      ],
+      "answer": 3,
+      "explanation": "The sensor array sees the junction, but the robot's turning centre (the axle) is 7 cm behind. With a short move forward, the axle comes level with the junction and the turn starts from the right place. The driver does allow sudden changes of direction; 11111 is not always an error, it is the pattern of a junction.",
+      "skills": [
+        "rob-junction",
+        "rob-line-fsm"
+      ]
+    }
+  ]
+}

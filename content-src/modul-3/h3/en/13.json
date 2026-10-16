@@ -1,0 +1,118 @@
+{
+  "concepts": [
+    {
+      "term": "NTC thermistor",
+      "definition": "A non-linear resistor whose resistance goes down as the temperature rises.",
+      "example": "A 10 kΩ NTC is 10 kΩ at 25 °C and about 3.59 kΩ at 50 °C.",
+      "pitfall": "Thinking the resistance changes linearly with temperature: there is no straight line between the raw value and the temperature."
+    },
+    {
+      "term": "Calculating the NTC's resistance",
+      "definition": "With the NTC at the bottom, the resistance from the raw value: R = 10000.0 × ham / (1024 − ham).",
+      "example": "If ham = 512, then R = 10 000 Ω (25 °C).",
+      "pitfall": "Not updating the 10000 value in the code when the fixed resistor is not 10 kΩ: the temperature is always wrong."
+    },
+    {
+      "term": "Beta formula",
+      "definition": "An approximate model that gives the temperature from the resistance: 1/T = 1/T0 + log(R/R0) / B (Kelvin).",
+      "example": "When R = R0, log(1) = 0 and T = T0 = 298.15 K = 25 °C.",
+      "pitfall": "Thinking the beta formula is perfect at every temperature: it is most accurate around 25 °C."
+    },
+    {
+      "term": "Kelvin and Celsius",
+      "definition": "Kelvin = Celsius + 273.15. The beta formula gives Kelvin.",
+      "example": "312.15 K = 39 °C.",
+      "pitfall": "Forgetting to subtract 273.15: you see numbers like 298 instead of 25."
+    },
+    {
+      "term": "log()",
+      "definition": "The natural logarithm (ln) function on the Arduino.",
+      "example": "log(1.0) gives 0.",
+      "pitfall": "Using log10(): the formula needs the natural logarithm, so the result is wrong."
+    },
+    {
+      "term": "Checking for sensor errors",
+      "definition": "If ham is 0 or 1023, treating the measurement as invalid and not calculating.",
+      "example": "if (ham <= 0 || ham >= 1023) { Serial.println(\"sensor hatasi\"); }",
+      "pitfall": "Dividing without checking: with a disconnected sensor you get division by zero and a meaningless temperature."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d13-q1",
+      "kind": "numeric",
+      "prompt": "The NTC is the bottom resistor and the fixed 10 kΩ resistor is on top. ham = 614 is read on A2. About how many ohms is the NTC's resistance? (R = 10000 × ham / (1024 − ham))",
+      "unit": "Ω",
+      "explanation": "R = 10000 × 614 / (1024 − 614) = 6 140 000 / 410 ≈ 14 976 Ω. Because it is bigger than 10 kΩ, the surroundings are colder than 25 °C (about 16 °C).",
+      "answer": 14976,
+      "tolerance": 5,
+      "skills": [
+        "sensor-ntc",
+        "volt-divider"
+      ]
+    },
+    {
+      "id": "m3h3d13-q2",
+      "kind": "numeric",
+      "prompt": "The beta formula gave 312.15 K in Kelvin. How many °C is this?",
+      "unit": "°C",
+      "explanation": "°C = K − 273.15 = 312.15 − 273.15 = 39 °C.",
+      "answer": 39,
+      "tolerance": 0.05,
+      "skills": [
+        "sensor-ntc"
+      ]
+    },
+    {
+      "id": "m3h3d13-q3",
+      "kind": "mcq",
+      "prompt": "The NTC is the bottom resistor and the fixed 10 kΩ resistor is on top. What happens to the voltage on A2 when the surroundings warm up?",
+      "options": [
+        "It increases, because the NTC gets bigger",
+        "It decreases, because the NTC's resistance drops",
+        "It does not change",
+        "It first increases, then decreases"
+      ],
+      "explanation": "The NTC's resistance goes down with temperature. When the bottom resistor gets smaller, Vout = 5 × R_ntc / (10 kΩ + R_ntc) drops. So as the temperature rises, the raw value goes down.",
+      "answer": 1,
+      "skills": [
+        "sensor-ntc",
+        "volt-divider"
+      ]
+    },
+    {
+      "id": "m3h3d13-q4",
+      "kind": "predict-output",
+      "prompt": "What appears in the Serial monitor? (For ham = 512, R = 10000 Ω.)\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  float r = 10000.0;\n  float tK = 1.0 / (1.0 / 298.15 + log(r / 10000.0) / 3950.0);\n  Serial.println(tK - 273.15, 1);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "298.2",
+        "0.0",
+        "25.0",
+        "sensor hatasi"
+      ],
+      "explanation": "r / 10000 = 1 and log(1) = 0, so the bracket becomes 1 / 298.15 and tK = 298.15 K. Subtracting 273.15, 25.0 °C is printed. If 298.2 were printed, we would have forgotten to convert to Celsius.",
+      "answer": 2,
+      "skills": [
+        "sensor-ntc",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d13-q5",
+      "kind": "find-bug",
+      "prompt": "The temperature is being calculated, but the results are always wrong. Which line has the only bug?\n\n```\nint ham = analogRead(A2);\nfloat r = 10000.0 * ham / (1024.0 - ham);\nfloat tK = 1.0 / (1.0 / 298.15 + log10(r / 10000.0) / 3950.0);\nfloat tC = tK - 273.15;\n```",
+      "options": [
+        "int ham = analogRead(A2);",
+        "float r = 10000.0 * ham / (1024.0 - ham);",
+        "float tK = ... log10(r / 10000.0) ...",
+        "float tC = tK - 273.15;"
+      ],
+      "explanation": "The beta formula needs the natural logarithm; on the Arduino this is log(). log10() gives the base-10 logarithm, and the temperature is always off. The other lines are correct: 10000.0 is a decimal, and 273.15 is subtracted from Kelvin.",
+      "answer": 2,
+      "skills": [
+        "sensor-ntc",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "concepts": [
+    {
+      "term": "Input - state - output layout",
+      "definition": "A program layout that, on every pass, first reads the inputs, then updates the state, and finally writes the outputs.",
+      "example": "First the button, PIR, LDR and DHT are read; then the DOLU/BOS decision is made; then the lamp and relay are written.",
+      "pitfall": "Writing an output where the input is read, with a half-finished state; the lamp and fan behave inconsistently."
+    },
+    {
+      "term": "State machine",
+      "definition": "A structure in which the program is in only one state at any moment and moves between states on events.",
+      "example": "The ISINMA, BOS, DOLU and KAPALI states; PIR motion moves it from BOS to DOLU.",
+      "pitfall": "Building scattered logic with flags (bool) without stating the state; it gets confusing which output is on and why."
+    },
+    {
+      "term": "Two-band decision",
+      "definition": "Using more than one hysteresis in the same program: each sensor has its own switch-on and switch-off thresholds.",
+      "example": "Light: below 300 is dark, above 400 is light. Fan: switches on at 28 °C, off at 26 °C.",
+      "pitfall": "Using a single threshold (28 °C) for the fan as well; when the temperature wobbles around the threshold, the relay clatters."
+    },
+    {
+      "term": "Safe default",
+      "definition": "Leaving a costly or dangerous output off if the sensor is invalid or the situation is uncertain.",
+      "example": "If the DHT22 gives isnan, fan = false and the LCD shows DHT HATA.",
+      "pitfall": "Taking an invalid temperature reading as the last good value and leaving the fan on."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d5-q1",
+      "kind": "predict-output",
+      "prompt": "The fan thresholds are 28 and 26 °C. The temperature is read as 25, 28, 27, 26, 29 in turn. What does this code print?\n\n```cpp\nfloat t[] = {25, 28, 27, 26, 29};\nbool fan = false;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 5; i++) {\n    if (t[i] >= 28.0) fan = true;\n    else if (t[i] <= 26.0) fan = false;\n    Serial.print(fan ? 1 : 0);\n  }\n}\nvoid loop() {}\n```",
+      "options": [
+        "01100",
+        "01101",
+        "01111",
+        "01001"
+      ],
+      "answer": 1,
+      "explanation": "25: off (0). 28: switches on (1). 27: inside the band, stays on (1). 26: switches off (0). 29: switches on again (1). The output is 01101. Staying on at 27 °C is hysteresis; with a single threshold it would be off at 27.",
+      "skills": [
+        "sens-hysteresis",
+        "proj-statemachine"
+      ]
+    },
+    {
+      "id": "m4h8d5-q2",
+      "kind": "numeric",
+      "prompt": "The LDR is between 5 V and A1, and a 10 kΩ resistor is between A1 and GND. With Light = 0.5, the LDR is about 14.1 kΩ. About what does analogRead(A1) read? (Voltage divider: V = 5 x 10 / (10 + 14.1))",
+      "answer": 424,
+      "tolerance": 3,
+      "explanation": "V = 5 x 10 / 24.1 ≈ 2.07 V. ADC = 2.07 / 5 x 1023 ≈ 424. This value is above 400, so above the light threshold; if it were between 300 and 400, the previous decision would be kept.",
+      "skills": [
+        "proj-integration",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m4h8d5-q3",
+      "kind": "mcq",
+      "prompt": "The room is DOLU and the temperature is 30 °C, but the DHT22 connection has come off and the reading returns isnan. Which is the right behaviour?",
+      "options": [
+        "The fan stays on, based on the last good reading",
+        "The fan switches off and the LCD shows DHT HATA",
+        "The temperature is taken as 0 °C and the fan switches off, with no error shown",
+        "The program stops and no outputs are updated"
+      ],
+      "answer": 1,
+      "explanation": "If the sensor is invalid, the costly output (the fan) stays off in the unknown situation and the user is told about the error. Using the old value cuts the link with reality, quietly taking 0 °C hides the error, and stopping the program also breaks the lamp and the screen.",
+      "skills": [
+        "sens-failsafe",
+        "proj-integration"
+      ]
+    },
+    {
+      "id": "m4h8d5-q4",
+      "kind": "find-bug",
+      "prompt": "The lamp flashes quickly between dark and light. Where is the bug?\n\n```cpp\nint isik = analogRead(A1);\nif (!karanlik && isik < 300) karanlik = true;\nif (karanlik && isik > 300) karanlik = false;\n```",
+      "options": [
+        "digitalRead should be used instead of analogRead",
+        "karanlik should not be a bool",
+        "The isik variable should be global",
+        "Both thresholds are 300: there is no hysteresis band, so with wobbles around 300 the decision keeps changing"
+      ],
+      "answer": 3,
+      "explanation": "The same threshold is used for both dark and light, with no \"keep the previous decision\" region in between. The right way is separate thresholds, such as < 300 for dark and > 400 for light. The other options do not fix the bug.",
+      "skills": [
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d5-q5",
+      "kind": "numeric",
+      "prompt": "BOS_SURESI = 8000 ms. The last motion in the room was detected 12000 ms after the program started, and there was no more motion. At which millisecond does the room move to the BOS state?",
+      "answer": 20000,
+      "tolerance": 100,
+      "unit": "ms",
+      "explanation": "The state becomes BOS BOS_SURESI after the last motion: 12000 + 8000 = 20000 ms. Every new motion updates the sonHareket value, so the waiting time starts again each time.",
+      "skills": [
+        "proj-statemachine",
+        "prog-timing"
+      ]
+    }
+  ]
+}

@@ -23,6 +23,7 @@ export default async function ModulSayfasi({ params }: { params: Promise<{ slug:
   // Haftalık rehber metinleri yalnız bu sayfada yüklenir (panel verisi şişmesin)
   const tree = await getModuleTree(db, slug)
   const guides: Record<number, string> = {}
-  for (const w of tree?.weeks ?? []) if (w.guideMd) guides[w.position] = w.guideMd
+  const enUi = (await getLocale()) === 'en'
+  for (const w of tree?.weeks ?? []) { const g = enUi && w.guideMdEn ? w.guideMdEn : w.guideMd; if (g) guides[w.position] = g }
   return <ModuleView m={m} guides={guides} />
 }

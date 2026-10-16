@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "List",
+      "definition": "A variable that holds several values in order.",
+      "example": "ezgi = [262, 330, 392, 523] stores the frequencies of four notes.",
+      "pitfall": "Putting a single number instead of a list; the list block stops with \"This block needs a list.\""
+    },
+    {
+      "term": "List number (index)",
+      "definition": "The position of an item in the list; counting starts at 0.",
+      "example": "In the list [262, 330, 392, 523], item number 2 is 392.",
+      "pitfall": "Thinking the first item is 1; the first item is always 0."
+    },
+    {
+      "term": "List length",
+      "definition": "How many items the list holds.",
+      "example": "A list of four notes has a length of 4 and a last number of 3.",
+      "pitfall": "Mixing up the length and the last number; the last number is one less than the length."
+    },
+    {
+      "term": "For each item",
+      "definition": "A loop that takes each value in the list in turn and runs the blocks inside it for that value.",
+      "example": "In a list with four items, the note block inside runs four times.",
+      "pitfall": "Using it on an empty list; if the list is empty, the loop never goes round and no sound comes out."
+    },
+    {
+      "term": "on start",
+      "definition": "A hat block that runs once when the program starts; lists and variables are set up here.",
+      "example": "You build the melody list in on start, and the buttons find the list ready.",
+      "pitfall": "Building the list in a button hat block; the list starts again on every press and the old values are lost."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h4d18-q1",
+      "kind": "mcq",
+      "prompt": "In the list ezgi = [262, 330, 392, 523], which is item number 2?",
+      "options": [
+        "330",
+        "392",
+        "262",
+        "523"
+      ],
+      "answer": 1,
+      "explanation": "The numbering starts at 0: 0 -> 262, 1 -> 330, 2 -> 392, 3 -> 523. If you said 330, you started counting from 1.",
+      "skills": [
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m10h4d18-q2",
+      "kind": "numeric",
+      "prompt": "The Fanfare melody is 5.5 units long and the tempo is 60 (one unit is 1000 ms). How many milliseconds does the melody last?",
+      "answer": 5500,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "At tempo 60 one unit is 60000 / 60 = 1000 ms. 5.5 × 1000 = 5500 ms. At tempo 120 the same melody finishes in half the time, 2750 ms.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d18-q3",
+      "kind": "predict-output",
+      "prompt": "The tempo is 120. When B is pressed, the program below runs:\n\n```\non start:\n   ezgi = [262, 330, 392]\n\non button [B] pressed:\n   for each item in list ezgi:\n      play tone [item] Hz for [1/8] beat\n```\n\nHow many notes, and how many ms in total, are heard from the speaker?",
+      "options": [
+        "3 notes, 750 ms",
+        "3 notes, 1500 ms",
+        "1 note, 250 ms",
+        "4 notes, 1000 ms"
+      ],
+      "answer": 0,
+      "explanation": "The list has 3 items, so the loop goes round 3 times. At tempo 120 a 1/8 beat is 250 ms: 3 × 250 = 750 ms. If you said 4 notes, you thought the loop goes round one extra time.",
+      "skills": [
+        "prog-loops-arrays",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m10h4d18-q4",
+      "kind": "find-bug",
+      "prompt": "A student wanted the card to play the melody when B is pressed, but the card gave the error \"This block needs a list.\":\n\n```\non start:\n   ezgi = 0\n\non button [B] pressed:\n   for each item in list ezgi:\n      play tone [item] Hz for [1/8] beat\n```\n\nWhat causes the error?",
+      "options": [
+        "A 1/8 beat cannot be chosen",
+        "The ezgi variable was given the number 0 instead of a list",
+        "Button B cannot be used",
+        "The name of the item variable is wrong"
+      ],
+      "answer": 1,
+      "explanation": "Because the ezgi variable is 0, it is not a list but an ordinary number. In on start it should be given a make list block with items in it. The other options have nothing to do with the error message.",
+      "skills": [
+        "prog-debug",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m10h4d18-q5",
+      "kind": "numeric",
+      "prompt": "A list has 6 items. What is the number of the last item?",
+      "answer": 5,
+      "tolerance": 0,
+      "explanation": "Because numbering starts at 0, the numbers of the 6 items are 0, 1, 2, 3, 4, 5. The last number is one less than the length: 6 - 1 = 5.",
+      "skills": [
+        "prog-loops-arrays"
+      ]
+    }
+  ]
+}

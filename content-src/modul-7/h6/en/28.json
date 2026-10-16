@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Step limit",
+      "definition": "The most steps an agent can take; a safety net against an endless loop. In the workshop it is 30.",
+      "example": "Once the total number of steps reaches 30, the next tool call gives a \"step limit exceeded\" error.",
+      "pitfall": "Using the limit in place of a plan; the limit cuts off the problem but does not show that the plan is right."
+    },
+    {
+      "term": "Stopping condition",
+      "definition": "The reason the agent leaves the loop: a result (`bitir`), an error or a limit.",
+      "example": "The call `bitir(tamam)` closes the loop.",
+      "pitfall": "Only thinking about success and not designing for the error and limit cases."
+    },
+    {
+      "term": "Error observation",
+      "definition": "The error text a failed tool call returns to the agent; the program does not crash.",
+      "example": "`hesapla(1/0)` gives a \"division by zero\" observation.",
+      "pitfall": "Ignoring the error and carrying on with the script."
+    },
+    {
+      "term": "`tekrar N:`",
+      "definition": "A workshop structure that runs a line N times (`tekrar` means \"repeat\").",
+      "example": "`tekrar 3: ileri(20)` moves the robot forward 60 cm.",
+      "pitfall": "Not working out the total movement: `tekrar 6: ileri(20)` hits the wall."
+    },
+    {
+      "term": "Irreversible action",
+      "definition": "An action that cannot be undone once it is done; it must be prevented in advance.",
+      "example": "The robot hitting the wall.",
+      "pitfall": "Thinking \"if something goes wrong, we will try again\"; there is no retry after a crash."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h6d28-q1",
+      "kind": "numeric",
+      "prompt": "In the virtual corridor the wall is 100 cm away. After this script, how many cm does `mesafe()` (\"distance\") return?\n```\ntekrar 4: ileri(20)\nmesafe()\n```",
+      "answer": 20,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "Each `ileri(20)` reduces the remaining distance by 20: 80, 60, 40, 20. The robot moved 80 cm in total, so `mesafe()` returns 20. The wall is at 100 cm, so there is no crash yet.",
+      "skills": [
+        "agent-limits",
+        "agent-plan"
+      ]
+    },
+    {
+      "id": "m7h6d28-q2",
+      "kind": "predict-output",
+      "prompt": "In the robot corridor (wall at 100 cm) this script runs:\n```\ntekrar 5: ileri(20)\ndur()\nbitir(tamam)\n```\nWhat happens?",
+      "options": [
+        "The robot moves 100 cm, and `dur()` and `bitir()` run",
+        "The fifth `ileri(20)` hits the wall; the agent stops there, and `dur()` and `bitir()` never run",
+        "The step limit kicks in",
+        "The robot stays at 80 cm and `bitir` runs"
+      ],
+      "answer": 1,
+      "explanation": "The first four calls give 80, 60, 40, 20 cm remaining. The fifth makes the total movement 100 and reaches the wall: CRASHED. On a crash error the agent stops; the following lines do not run. The number of steps is 5, so the limit (30) is not reached.",
+      "skills": [
+        "agent-limits",
+        "agent-safety"
+      ]
+    },
+    {
+      "id": "m7h6d28-q3",
+      "kind": "mcq",
+      "prompt": "What is the main reason for putting a step limit on agents?",
+      "options": [
+        "To make the agent smarter",
+        "To stop a faulty or fruitless loop from running for ever (or for a very long time) and using up resources",
+        "To hide tool errors",
+        "To guarantee that the result is always right"
+      ],
+      "answer": 1,
+      "explanation": "The limit is a safety net: even if the loop cannot reach the goal, it is cut off at a certain step. It does not guarantee the right result and does not hide errors; the plan still needs to be right.",
+      "skills": [
+        "agent-limits"
+      ]
+    },
+    {
+      "id": "m7h6d28-q4",
+      "kind": "find-bug",
+      "prompt": "You want to move the robot forward safely in the corridor (wall at 100 cm):\n```\ntekrar 3: ileri(40)\ndur()\nbitir(tamam)\n```\nThe robot hits the wall. Where is the bug?",
+      "options": [
+        "Line 1: the total is 3 × 40 = 120 cm and the wall is at 100 cm; it crashes on the third step",
+        "Line 2: `dur()` is unnecessary",
+        "Line 3: `bitir(tamam)` is written wrongly",
+        "There is no bug; the step limit causes the crash"
+      ],
+      "answer": 0,
+      "explanation": "40 + 40 = 80 is safe (20 remaining), and the third `ileri(40)` makes 120 cm and reaches the wall. The problem is that the total goes past the wall; `dur()` and `bitir()` are correct, and since there are 3 steps, the limit plays no part.",
+      "skills": [
+        "agent-limits",
+        "agent-plan",
+        "agent-safety"
+      ]
+    },
+    {
+      "id": "m7h6d28-q5",
+      "kind": "mcq",
+      "prompt": "When a tool returns an error observation, which behaviour is safest for the agent?",
+      "options": [
+        "Ignore the error and carry on with the plan unchanged",
+        "Repeat the same call for ever",
+        "Read the error; try a different way, or stop and tell a human",
+        "Make up the result and give it with `bitir()`"
+      ],
+      "answer": 2,
+      "explanation": "An error is information. A safe agent changes its plan depending on the cause of the error, or stops and reports it. Ignoring it causes a chain of errors, endless repetition burns resources, and making up the result is misleading.",
+      "skills": [
+        "agent-limits",
+        "agent-safety"
+      ]
+    }
+  ]
+}

@@ -275,7 +275,7 @@ export const SKILLS: readonly Skill[] = [
   { id: 'rob-smooth-motion', label: 'Yumuşak hareket', area: 'Robotik', description: 'Doğrusal ara değerle servoyu zamana yayar, millis() ile bloklamadan yürütür, adım tablosu kurar.' },
   { id: 'rob-eval', label: 'Robotu ölçmek', area: 'Robotik', description: 'Kapsama, çarpma ve süre gibi ölçütlerle robotu değerlendirir; karşılaştırma koşusu yapar.' },
   { id: 'bit-requirements', label: 'Ölçülebilir gereksinim', area: 'Proje', description: 'Dileği sayı, birim ve ölçüm yöntemi içeren gereksinime çevirir.' },
-  { id: 'bit-acceptance', label: 'Kabul ölçütü', area: 'Proje', description: 'Ölçütü sınır değerleri (< ve <=) ve mantıksal birleşimle (&&,' },
+  { id: 'bit-acceptance', label: 'Kabul ölçütü', area: 'Proje', description: 'Ölçütü sınır değerleri (< ve <=) ve mantıksal birleşimle (&&, ||) doğru yazar; her ölçütü bir testle doğrular.' },
   { id: 'bit-subsystems', label: 'Alt sistemler', area: 'Proje', description: 'İşi tek başına sınanabilen alt sistemlere böler ve geçme koşulunu sayıyla yazar.' },
   { id: 'bit-test-matrix', label: 'Test matrisi', area: 'Proje', description: 'Beklenen sonucu ölçümden önce yazarak birden çok senaryoyla sınar.' },
   { id: 'rob-median', label: 'Ortanca filtre', area: 'Robotik', description: 'Üç ölçümün ortancasıyla aykırı okumayı eler.' },

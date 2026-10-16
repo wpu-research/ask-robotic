@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Behaviour",
+      "definition": "A small function that does a single job for the robot: it says whether it is active and what it suggests for the wheels.",
+      "example": "The `KAC` (escape) behaviour becomes active when the front distance drops below 25 cm and suggests turning left on the spot.",
+      "pitfall": "Driving the motor directly inside the behaviour: two behaviours write to the motor at the same time and the result becomes unpredictable."
+    },
+    {
+      "term": "Suggestion",
+      "definition": "A behaviour's answer to the arbiter: active or not, left speed, right speed.",
+      "example": "Oneri o = {true, -140, 140}; that is, I am active, left wheel backwards, right wheel forwards.",
+      "pitfall": "Writing aktif = true for all behaviours: the arbiter always picks the first one, and the others never run again."
+    },
+    {
+      "term": "Arbiter",
+      "definition": "Code that goes through the suggestions in priority order, picks the first active one and drives the motors only with it.",
+      "example": "for (i = 0; i < 3; i++) { if (oneri[i].aktif) { secilen = i; break; } }",
+      "pitfall": "Mixing up the order: if you put the default behaviour first, the others are never chosen."
+    },
+    {
+      "term": "Priority",
+      "definition": "The order between behaviours. The behaviour that comes first in the order overrides the one behind it.",
+      "example": "`KAC` comes before `CIZGI` (line); that is why it does not hit the wall even while the line is visible.",
+      "pitfall": "Setting priorities without thinking: on a fire robot, if 'escape from obstacles' is at the top, the robot may never get close to the smoke."
+    },
+    {
+      "term": "Hysteresis (two thresholds)",
+      "definition": "Using different thresholds for starting and ending a behaviour.",
+      "example": "`KAC` starts at 25 cm and ends when it goes past 60 cm.",
+      "pitfall": "Using a single threshold: around the threshold the robot keeps switching back and forth between `KAC` and `DOLAS` (wander)."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h7d107-q1",
+      "kind": "mcq",
+      "prompt": "The arbiter picks the first active behaviour in priority order (`KAC`, `CIZGI`, `DOLAS`). The robot is on the line and 20 cm from the wall, so both `KAC` and `CIZGI` are active. Which one drives the motors?",
+      "options": [
+        "`CIZGI`, because it sees the line",
+        "The average of the two",
+        "`KAC`, because it comes first in the order and is the first active one",
+        "`DOLAS`, because it is always active"
+      ],
+      "answer": 2,
+      "explanation": "The arbiter loop sees `KAC` (number 0), and because it is active it stops with break; it never looks at `CIZGI`. No average is taken and the suggestions are not mixed. `DOLAS` is always active but comes last; it is only chosen when the others are not active.",
+      "skills": [
+        "rob-behavior-arbiter"
+      ]
+    },
+    {
+      "id": "m5h7d107-q2",
+      "kind": "predict-output",
+      "prompt": "`KAC` is not active; `CIZGI` and `DOLAS` are active. What does this arbiter print?\n\n```\nbool aktif[3] = {false, true, true};   // KAC, CIZGI, DOLAS\nint secilen = 2;\n\nvoid setup() {\n  Serial.begin(9600);\n  for (int i = 0; i < 3; i++) {\n    if (aktif[i]) { secilen = i; break; }\n  }\n  Serial.println(secilen);\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "3"
+      ],
+      "answer": 1,
+      "explanation": "At i = 0, aktif[0] is false, so it carries on. At i = 1, aktif[1] is true: secilen becomes 1 and break ends the loop. It does not print 2; that is only the starting value, and the loop overwrites it. 3 is not the number of any behaviour.",
+      "skills": [
+        "rob-behavior-arbiter"
+      ]
+    },
+    {
+      "id": "m5h7d107-q3",
+      "kind": "numeric",
+      "prompt": "`KAC` starts below 25 cm and ends when it goes above 60 cm. The measurements, in order: 30, 24, 40, 58, 61, 50 cm. In how many measurements is `KAC` active?",
+      "answer": 3,
+      "tolerance": 0,
+      "unit": "measurements",
+      "explanation": "30 cm: it has not started yet. 24 cm: it starts (1). 40 cm: below 60, it carries on (2). 58 cm: still below 60, it carries on (3). 61 cm: it ends. 50 cm: it is not below 25, so it does not start again. Total 3. With a single threshold it would have been active only at 24 cm.",
+      "skills": [
+        "rob-hysteresis",
+        "rob-behavior-arbiter"
+      ]
+    },
+    {
+      "id": "m5h7d107-q4",
+      "kind": "find-bug",
+      "prompt": "The arbiter works properly, but the `KAC` behaviour causes two behaviours to write to the motor at the same time. Where is the bug?\n\n```\nOneri kac() {\n  Oneri o = {false, 0, 0};\n  if (onCm < 25) {\n    o.aktif = true;\n    surus(-140, 140);\n  }\n  return o;\n}\n```",
+      "options": [
+        "The threshold should be 60, not 25",
+        "The Oneri struct cannot contain a bool",
+        "The behaviour drives the motor itself; even if the arbiter picks another behaviour, this line writes to the motors",
+        "The return o; line is unnecessary"
+      ],
+      "answer": 2,
+      "explanation": "Behaviours should only return a suggestion; the arbiter drives the motor. Here, as soon as kac() is called (before the arbiter has chosen), it writes to the motors. The threshold value is deliberately 25. A bool field is allowed in structs. return o; is required so the arbiter gets the suggestion.",
+      "skills": [
+        "rob-behavior-arbiter",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h7d107-q5",
+      "kind": "numeric",
+      "prompt": "The HC-SR04 echo time was measured as 1160 µs. The code uses distance = time / 58.0. What is the front distance in cm?",
+      "answer": 20,
+      "tolerance": 0.1,
+      "unit": "cm",
+      "explanation": "1160 / 58 = 20 cm. Because the sound goes there and back, the time covers both ways; 58 µs/cm is a factor that takes this into account. Because the `KAC` threshold is 25 cm, `KAC` takes over at this measurement.",
+      "skills": [
+        "rob-behavior-arbiter"
+      ]
+    }
+  ]
+}

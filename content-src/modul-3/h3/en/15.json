@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "Reverse map",
+      "definition": "Making the output go down as the input goes up, by writing map's output range from large to small.",
+      "example": "map(isik, 150, 700, 200, 0): 200 in the dark, 0 in the light.",
+      "pitfall": "Forgetting to reverse the range: the lamp goes off in the dark and turns on in the light."
+    },
+    {
+      "term": "const",
+      "definition": "Defines a number whose value never changes; used to put the settings numbers at the top.",
+      "example": "const int KARANLIK = 150;",
+      "pitfall": "Writing the same number in many places in the code: later it becomes hard to find and change them all."
+    },
+    {
+      "term": "Developing in stages",
+      "definition": "Getting a small version working first and then adding features.",
+      "example": "First a lamp with only the LDR, then the potentiometer and the NTC.",
+      "pitfall": "Writing everything in one go: when a bug appears, finding its cause becomes hard."
+    },
+    {
+      "term": "Safety priority",
+      "definition": "Checking the safety condition after the normal calculation and letting it override the result.",
+      "example": "If the temperature goes above 40 °C, the brightness is set to 0 no matter what value was calculated.",
+      "pitfall": "Writing the safety check at the very start and then calculating the brightness again: the safety is overridden."
+    },
+    {
+      "term": "Invalid measurement marker",
+      "definition": "Giving the temperature an impossible value such as -99 when no measurement could be made.",
+      "example": "If you see sicaklik=-99.0 in the Serial monitor, check the NTC connection.",
+      "pitfall": "Thinking -99 is a real temperature, or making decisions with this value."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d15-q1",
+      "kind": "numeric",
+      "prompt": "KARANLIK = 150, AYDINLIK = 700, enYuksek = 200. When isik = 425, what does map(isik, KARANLIK, AYDINLIK, enYuksek, 0) return?",
+      "explanation": "(425 − 150) × (0 − 200) / (700 − 150) + 200 = 275 × (−200) / 550 + 200 = −100 + 200 = 100. 425 is exactly in the middle of the range, so the output is also halfway between 200 and 0.",
+      "answer": 100,
+      "tolerance": 0,
+      "skills": [
+        "map-constrain",
+        "analog-adc"
+      ]
+    },
+    {
+      "id": "m3h3d15-q2",
+      "kind": "find-bug",
+      "prompt": "The night light is on in the light and stays off in the dark. The wiring is correct (LDR on top, 10 kΩ at the bottom). Which line has the bug?\n\n```\nint isik = analogRead(A1);\nint parlaklik = map(isik, KARANLIK, AYDINLIK, 0, 255);\nparlaklik = constrain(parlaklik, 0, 255);\nanalogWrite(11, parlaklik);\n```",
+      "options": [
+        "int isik = analogRead(A1);",
+        "map(isik, KARANLIK, AYDINLIK, 0, 255)",
+        "constrain(parlaklik, 0, 255)",
+        "analogWrite(11, parlaklik);"
+      ],
+      "explanation": "As the light increases, isik gets bigger; because the output range is written from 0 to 255, the brightness also increases. Since we want it bright in the dark, the range must be reversed: map(isik, KARANLIK, AYDINLIK, 255, 0).",
+      "answer": 1,
+      "skills": [
+        "map-constrain",
+        "sensor-ldr",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d15-q3",
+      "kind": "predict-output",
+      "prompt": "SICAK_SINIR = 40.0, sicaklik = 42.5 and the calculated parlaklik = 120. When this code runs, what do the lamp (D11) and the warning LED (D13) do?\n\n```\nif (sicaklik > SICAK_SINIR) {\n  parlaklik = 0;\n  digitalWrite(13, HIGH);\n} else {\n  digitalWrite(13, LOW);\n}\nanalogWrite(11, parlaklik);\n```",
+      "options": [
+        "The lamp goes off, and the warning goes off too",
+        "The lamp is on at brightness 120, the warning goes off",
+        "The lamp is on at brightness 120, and the warning is on too",
+        "The lamp goes off, the warning turns on"
+      ],
+      "explanation": "Because 42.5 > 40, the if branch runs: parlaklik becomes 0 and D13 turns on. analogWrite(11, 0) turns the lamp off. The safety condition has overridden the 120 calculated earlier.",
+      "answer": 3,
+      "skills": [
+        "prog-debug",
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m3h3d15-q4",
+      "kind": "numeric",
+      "prompt": "In the loop there is a delay(3) inside the 8-measurement average and a delay(200) at the end of the round. Based only on the total of the delays, how many milliseconds does one round take?",
+      "unit": "ms",
+      "explanation": "8 × 3 = 24 ms of measurement waiting, plus 200 ms of waiting at the end of the round: 224 ms. In reality the calculation time adds a little, but the delays dominate. About 4.5 rounds per second lets the lamp respond to the light quickly enough.",
+      "answer": 224,
+      "tolerance": 0,
+      "skills": [
+        "prog-timing",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m3h3d15-q5",
+      "kind": "mcq",
+      "prompt": "In the night light project, the potentiometer has been turned all the way to the left (enYuksek = 0) and the room is dark. What does the lamp do?",
+      "options": [
+        "It is fully bright",
+        "It is at half brightness",
+        "It does not turn on at all",
+        "It blinks on and off"
+      ],
+      "explanation": "The map output range goes from 0 to 0, and constrain also keeps it between 0 and 0; the brightness is 0. The potentiometer sets the lamp's upper limit; if it is 0, the lamp is not broken, the maximum allowed brightness is simply zero.",
+      "answer": 2,
+      "skills": [
+        "analog-adc",
+        "map-constrain"
+      ]
+    }
+  ]
+}

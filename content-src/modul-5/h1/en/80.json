@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Watchdog (command timeout)",
+      "definition": "A safety mechanism that stops the robot automatically if no valid command arrives for a certain time. In the project, CMD_TIMEOUT = 700 ms.",
+      "example": "700 ms after a single W20, the robot stops and the LED goes off.",
+      "pitfall": "Treating it as the only safety measure; leaving the robot unattended at the edge of the table is still dangerous."
+    },
+    {
+      "term": "Safe state",
+      "definition": "The default state the system is in at start-up and when something goes wrong; for a robot, standing still.",
+      "example": "dur() is called in setup(); the robot does not move as soon as it is switched on.",
+      "pitfall": "Forgetting the safe state: the robot spins out of control as soon as it is switched on."
+    },
+    {
+      "term": "Two-state machine",
+      "definition": "A simple state machine that defines the DURUYOR (stopped) and SURUYOR (driving) states and the transitions between them (command, X, timeout).",
+      "example": "When a valid W20 arrives it becomes SURUYOR; when no command arrives for 700 ms it becomes DURUYOR.",
+      "pitfall": "Changing the state and updating the LED and motors in different places; dur() should do all of it in one place."
+    },
+    {
+      "term": "The price of the watchdog time",
+      "definition": "The distance the robot travels after the commands stop: speed × CMD_TIMEOUT.",
+      "example": "For 20 cm/s and 0.7 s it is 14 cm; for 39 cm/s about 27 cm.",
+      "pitfall": "Choosing the time without calculating; a time that is too long is dangerous, one that is too short keeps stopping the robot."
+    },
+    {
+      "term": "Valid and invalid commands",
+      "definition": "Only recognised commands renew the time; an unrecognised command (such as Q) does not.",
+      "example": "If only Q is sent for 2 seconds, the robot stops 700 ms after the first W20.",
+      "pitfall": "Letting an invalid command renew the time too; noise could keep the robot driving forever."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d80-q1",
+      "kind": "numeric",
+      "prompt": "The watchdog time is 700 ms. While the robot is going at 30 cm/s, the commands stop completely. About how many cm does the robot travel before it stops? (Ignore the motor lag and braking.)",
+      "answer": 21,
+      "tolerance": 0.5,
+      "unit": "cm",
+      "explanation": "distance = speed × time = 30 cm/s × 0.7 s = 21 cm. Multiplying by the time in milliseconds (700) would give 21000; you need to convert it to seconds. On a real robot the stopping distance changes with the surface and the load; do not consider it safe without measuring.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d80-q2",
+      "kind": "find-bug",
+      "prompt": "The robot does not stop even while invalid commands (Q) are arriving; the watchdog never steps in. What is the bug?\n\n```\nswitch (komut) {\n  case 'W': tekerlekler(v, v); break;\n  case 'X': dur(); break;\n  default:\n    Serial.println(\"?\");\n    break;\n}\nsonKomut = millis();\n```",
+      "options": [
+        "The 'W' line is wrong",
+        "The default section has break instead of return; an invalid command renews sonKomut too",
+        "Serial.println is too slow",
+        "delay should be used instead of millis()"
+      ],
+      "answer": 1,
+      "explanation": "If return is used inside default, the function ends before it reaches the sonKomut assignment. break, however, takes the flow out of the switch to the line sonKomut = millis(); noise renews the watchdog forever.",
+      "skills": [
+        "prog-debug",
+        "prog-structure"
+      ]
+    },
+    {
+      "id": "m5h1d80-q3",
+      "kind": "mcq",
+      "prompt": "The remote repeats the command every 200 ms and CMD_TIMEOUT = 50 ms was chosen. What does the robot do?",
+      "options": [
+        "It moves smoothly",
+        "It does not move at all",
+        "After each command it stops within 50 ms and starts again with the next command; it keeps stopping and starting",
+        "It goes faster"
+      ],
+      "answer": 2,
+      "explanation": "Because there are 200 ms between commands, the 50 ms run out before the next command arrives and the watchdog stops the robot. The time must be longer than the command repeat interval (in the project 700 ms > 200 ms). Saying it does not move at all is wrong; each command starts a short movement.",
+      "skills": [
+        "prog-timing",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h1d80-q4",
+      "kind": "numeric",
+      "prompt": "For a turn right on the spot, each wheel turns in opposite directions at 16 cm/s, L = 0.12 m. About how many seconds does the robot need to turn 180°?",
+      "answer": 1.18,
+      "tolerance": 0.03,
+      "unit": "s",
+      "explanation": "ω = 2·v / L = 2 · 0.16 / 0.12, about 2.67 rad/s. Because 180° = π rad, time = π / 2.67, about 1.18 s. Leaving the speed in cm/s and forgetting to convert it to metres throws the result off by a factor of a hundred.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d80-q5",
+      "kind": "mcq",
+      "prompt": "What is the result of raising the watchdog time from 700 ms to 5 seconds?",
+      "options": [
+        "When the connection drops, the robot travels out of control for 5 seconds; the stopping distance grows",
+        "The robot becomes safer, because it waits longer",
+        "The robot never stops",
+        "There is no need to repeat commands and no risk arises"
+      ],
+      "answer": 0,
+      "explanation": "The stopping distance is speed × time; when the time is seven times larger, so is the distance (100 cm instead of 14 cm at 20 cm/s). A long time only increases the tolerance to delay; it reduces safety.",
+      "skills": [
+        "prog-planning"
+      ]
+    }
+  ]
+}

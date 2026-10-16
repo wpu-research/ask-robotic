@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "Event tile (column, row)",
+      "definition": "Two values inside a tile event that give the column and row of the touched tile.",
+      "example": "When the cat touches the diamond at (8, 1), the event tile column is 8 and the row is 1.",
+      "pitfall": "Writing fixed numbers in the block that clears the tile: the same tile is always deleted."
+    },
+    {
+      "term": "Clear tile",
+      "definition": "The block that removes the tile at the given column and row from the map.",
+      "example": "When you touch a diamond, that diamond's tile is cleared and the other diamonds stay where they are.",
+      "pitfall": "Swapping the column and the row: another tile (or one outside the map) is pointed to."
+    },
+    {
+      "term": "Tile counter",
+      "definition": "The `number of [Diamond] tiles on map` block gives how many of that tile are left on the map.",
+      "example": "When three of the four diamonds have been collected, the counter shows 1.",
+      "pitfall": "Reading the counter before the tile is cleared: at the last diamond the number shows 1 and winning is never triggered."
+    },
+    {
+      "term": "Winning condition",
+      "definition": "An `if` block that makes the game won when a number or state is true.",
+      "example": "If the number of diamonds = 0, end game: you win.",
+      "pitfall": "Setting the condition up with the wrong number instead of `= 0`, or leaving the `if` block outside the event."
+    },
+    {
+      "term": "Dangerous tile (lava)",
+      "definition": "A tile that lowers the lives when touched; most of the time it also sends the player back to the start.",
+      "example": "On lava, `change lives by -1` runs and `this sprite` is put on the tile at column 1 row 1.",
+      "pitfall": "Forgetting the teleport block: the cat stays on the lava, a life goes and the player is still in danger."
+    },
+    {
+      "term": "This sprite",
+      "definition": "The sprite that triggered the event; in a tile event, it is the sprite that touched the tile.",
+      "example": "In the lava event, `this sprite` points to the cat that touched the lava.",
+      "pitfall": "Writing another sprite's name: the wrong sprite is moved."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m11h3d13-q1",
+      "kind": "mcq",
+      "prompt": "A friend of yours has written `clear tile at column [3] row [2]` in the diamond event. Whichever diamond the cat touches, what happens?",
+      "options": [
+        "The touched diamond is deleted",
+        "Nothing is deleted",
+        "The tile at column 3, row 2 is deleted every time; the touched diamond may not be deleted",
+        "All the diamonds are deleted at once"
+      ],
+      "answer": 2,
+      "explanation": "Fixed numbers point to the same tile at every touch. To delete the touched tile, the `event tile column` and `event tile row` values must be used. Deleting all the diamonds would need a separate loop or a turn-into block.",
+      "skills": [
+        "oyun-olay-karosu"
+      ]
+    },
+    {
+      "id": "m11h3d13-q2",
+      "kind": "find-bug",
+      "prompt": "All four diamonds are collected and the score becomes 4, but the game is never won.\n\n```\n1  when a [Player] sprite touches tile [Diamond]\n2      if number of [Diamond] tiles on map = [0]\n3          end game: [you win]\n4      clear tile at column [event tile column] row [event tile row]\n5      change score by [1]\n```\n\nWhich line is wrong?",
+      "options": [
+        "Lines 2-3: the check is done before the tile is cleared (line 4)",
+        "Line 1: the wrong tile is chosen",
+        "Line 5: the score should not go up by 1",
+        "Line 4: the event tile should not be used in the clear block"
+      ],
+      "answer": 0,
+      "explanation": "When the last diamond is touched, the counter is still 1, because the clearing comes after the check. So `= 0` is never true. The fix is to do the clearing first. The score works (it becomes 4), so lines 1 and 5 are correct; line 4 is used correctly too.",
+      "skills": [
+        "oyun-hata-ayiklama",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d13-q3",
+      "kind": "numeric",
+      "prompt": "At the start the score is 0 and the lives are 3. The diamond event raises the score by 1; the lava event lowers the lives by 1 and sends the cat back to the start. The cat touched these tiles in order: diamond, lava, diamond, lava, diamond (all different tiles). How many lives are left at the end?",
+      "answer": 1,
+      "unit": "lives",
+      "explanation": "The lava ran twice: 3 - 1 - 1 = 1. The diamonds do not change the lives (the score becomes 3). If there had been three lavas, the lives would be 0.",
+      "skills": [
+        "oyun-karo-olay",
+        "oyun-kazanma-kosulu"
+      ]
+    },
+    {
+      "id": "m11h3d13-q4",
+      "kind": "predict-output",
+      "prompt": "The lives are 5. In the lava event there is no block that sends the cat back to the start:\n\n```\nwhen a [Player] sprite touches tile [Lava]\n    change lives by [-2]\n```\n\nThe cat goes into the lava tile and stays on it for 4 seconds. How many lives are there?",
+      "options": [
+        "5",
+        "-3",
+        "1",
+        "3"
+      ],
+      "answer": 3,
+      "explanation": "The tile event runs once, at the first touch; 5 - 2 = 3. Even if the cat waits on the lava, the event does not repeat. It is not true that the lives drop every second (-3) or do not drop at all (5).",
+      "skills": [
+        "oyun-karo-olay"
+      ]
+    },
+    {
+      "id": "m11h3d13-q5",
+      "kind": "mcq",
+      "prompt": "You want to point to the 3rd tile from the left and the 2nd from the top on the map. What should the column and row numbers be?",
+      "options": [
+        "Column 2, row 1",
+        "Column 3, row 2",
+        "Column 2, row 3",
+        "Column 1, row 2"
+      ],
+      "answer": 0,
+      "explanation": "Counting starts from 0: the 3rd tile from the left is column 2, and the 2nd tile from the top is row 1. Column 3, row 2 is actually the 4th from the left and the 3rd from the top; swapping the column and the row also points to another tile.",
+      "skills": [
+        "oyun-harita-izgara",
+        "oyun-olay-karosu"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "RFID and UID",
+      "definition": "RFID means reading a battery-free card with radio waves; the UID is the card's unique identification number (usually 4 bytes).",
+      "example": "If the card's UID is AA BB CC DD, it is compared with the four bytes in the authorised list.",
+      "pitfall": "Thinking the UID is a password; it can be read and copied with some cards."
+    },
+    {
+      "term": "SPI",
+      "definition": "A fast, four-wire way of communicating with SCK, MOSI, MISO and SS.",
+      "example": "For the RC522 on the Uno, SCK is D13, MOSI D11, MISO D12; SS can be chosen as D10.",
+      "pitfall": "Giving the SPI pins to another device: D11-D13 are fixed by the hardware."
+    },
+    {
+      "term": "3.3 V logic",
+      "definition": "The RC522 module runs on 3.3 V; if it is given 5 V, it can be damaged.",
+      "example": "In a real circuit, the module's 3.3V pin is connected to the Uno's 3.3 V output.",
+      "pitfall": "Connecting the 3.3V pin to the 5 V output."
+    },
+    {
+      "term": "Pin budget",
+      "definition": "Adding up the pin needs of all the parts in a project and comparing the total with the number of pins on the board.",
+      "example": "Keypad 8 + RC522 5 + servo 1 + buzzer 1 + LEDs 2 = 17 pins; the Uno has 16.",
+      "pitfall": "Connecting the parts one by one and only noticing at the end that you have run out of pins."
+    },
+    {
+      "term": "Serial imitation",
+      "definition": "Testing the logic by sending a line in the same format from the Serial monitor in place of the missing hardware.",
+      "example": "Typing KART:AABBCCDD behaves as if the reader had read that UID.",
+      "pitfall": "Thinking the serial imitation is a real RC522; it is only for testing."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h6d3-q1",
+      "kind": "numeric",
+      "prompt": "Imagine a project without a keypad: there is an RC522 (three fixed SPI pins, SS and RST), 1 servo, 1 buzzer and 2 LEDs. How many pins are needed in total?",
+      "answer": 9,
+      "unit": "pins",
+      "explanation": "3 + 2 = 5 for the RC522, servo 1, buzzer 1, LEDs 2: 5 + 1 + 1 + 2 = 9 pins. Taking away the keypad's 8 pins gives 17 - 8 = 9, and there is room left on the Uno.",
+      "skills": [
+        "pin-budget",
+        "rfid-spi"
+      ]
+    },
+    {
+      "id": "m4h6d3-q2",
+      "kind": "mcq",
+      "prompt": "Which Uno pin would you connect a real RC522 module's power pin to?",
+      "options": [
+        "5V",
+        "VIN",
+        "3.3 V",
+        "A0"
+      ],
+      "answer": 2,
+      "explanation": "The RC522 is a 3.3 V module. Connecting it to the 5V pin can damage the module. VIN is the board's input and its voltage depends on the supply; A0 is an input pin and does not give power.",
+      "skills": [
+        "rfid-spi"
+      ]
+    },
+    {
+      "id": "m4h6d3-q3",
+      "kind": "predict-output",
+      "prompt": "hexDeger('C') returns 12 and hexDeger('5') returns 5. What does this code print?\n\n```\nint yuksek = hexDeger('C');\nint alcak = hexDeger('5');\nSerial.println(yuksek * 16 + alcak);\n```",
+      "options": [
+        "125",
+        "197",
+        "205",
+        "17"
+      ],
+      "answer": 1,
+      "explanation": "12 * 16 = 192, 192 + 5 = 197 (0xC5). 125 would be writing the digits side by side; 17 is the sum 12 + 5.",
+      "skills": [
+        "c-strings",
+        "rfid-spi"
+      ]
+    },
+    {
+      "id": "m4h6d3-q4",
+      "kind": "find-bug",
+      "prompt": "This function always returns 0 for the letter 'A', so UIDs like AA are read as 00. Which line is the bug on?\n\n```\nint hexDeger(char c) {\n  if (c >= '0' && c <= '9') return c - '0';        // line 1\n  if (c >= 'A' && c <= 'F') return c - 'A';        // line 2\n  return -1;                                       // line 3\n}\n```",
+      "options": [
+        "Line 2: the result for 'A' should be 10, the + 10 is missing",
+        "Line 1: '0' should not be subtracted",
+        "Line 3: it should be 0 instead of -1",
+        "No bug; 'A' really is 0"
+      ],
+      "answer": 0,
+      "explanation": "'A' - 'A' is zero; hexadecimal A has the value 10. The right version is c - 'A' + 10. Because of the bug, 'A' and '0' give the same value and different UIDs get mixed up.",
+      "skills": [
+        "c-strings",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h6d3-q5",
+      "kind": "mcq",
+      "prompt": "A door lock looks only at the card's UID. Why is this a weak design?",
+      "options": [
+        "The UID is 4 bytes, so it is very short and can never be read",
+        "The UID can be read and copied; when the card is taken or copied, the lock opens",
+        "The RC522 can never read the UID",
+        "The UID changes on every read"
+      ],
+      "answer": 1,
+      "explanation": "A UID is not a hidden secret: anyone who gets close to the reader sees it, and some cards copy a UID. That is why a second factor (a PIN) is added. The UID can be read, and it stays the same on every read.",
+      "skills": [
+        "access-security",
+        "rfid-spi"
+      ]
+    }
+  ]
+}

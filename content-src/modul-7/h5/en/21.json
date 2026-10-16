@@ -1,0 +1,106 @@
+{
+  "concepts": [
+    {
+      "term": "Vector",
+      "definition": "An ordered list of numbers that represents a text; each position belongs to one term.",
+      "example": "With the term order (robot, sensor, motor), the text \"robot sensor\" becomes (1, 1, 0).",
+      "pitfall": "Thinking the vector is the meaning of the text; a count vector only tells you which word appears how many times."
+    },
+    {
+      "term": "Word count",
+      "definition": "The simplest vector method: it counts how many times each term appears in the text.",
+      "example": "The text \"robot sensor robot sensor\" becomes (2, 2, 0).",
+      "pitfall": "Thinking a frequent word is important; linking words such as \"and\" appear a lot but tell nothing apart."
+    },
+    {
+      "term": "TF-IDF",
+      "definition": "A weighting that multiplies a term's count by how rare the term is.",
+      "example": "\"sensor\", which appears in three of eight documents, gets an idf of about 1.81; \"servo\", which appears in one, gets about 2.50.",
+      "pitfall": "Thinking the rare word is always more correct; a spelling mistake is rare too, and gets a high weight."
+    },
+    {
+      "term": "Cosine similarity",
+      "definition": "The cosine of the angle between two vectors: 1 in the same direction, 0 if there are no shared terms at all.",
+      "example": "For A = (1, 1, 0) and B = (1, 0, 1), (A·B) / (|A||B|) = 1 / 2 = 0.5.",
+      "pitfall": "Thinking it also takes length into account; it only looks at direction, so the similarity of (1, 2) and (3, 6) is 1."
+    },
+    {
+      "term": "Embedding",
+      "definition": "A vector that encodes the meaning of a text as a learned list of numbers; texts that are close in meaning get close vectors.",
+      "example": "A real embedding model can place \"distance\" and \"range\" on vectors close to each other.",
+      "pitfall": "Thinking the count vector in the workshop is an embedding; it only counts words and learns no meaning."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d21-q1",
+      "kind": "numeric",
+      "prompt": "Let the term order be (robot, sensor, motor). Count vectors are made for Text 1 \"robot sensor\" and Text 2 \"robot motor\". What is the cosine similarity of the two texts?",
+      "answer": 0.5,
+      "tolerance": 0.01,
+      "explanation": "The vectors are (1, 1, 0) and (1, 0, 1). The dot product is 1×1 + 1×0 + 0×1 = 1. Each length is √2, so their product is 2. Similarity is 1 / 2 = 0.5. If you said 1, you only saw the shared term and forgot the denominator.",
+      "skills": [
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d21-q2",
+      "kind": "predict-output",
+      "prompt": "What does this code print when it runs?\n\n```\na = [2, 0, 1]\nb = [0, 3, 0]\nprint(sum(x * y for x, y in zip(a, b)))\n```",
+      "options": [
+        "0",
+        "3",
+        "6",
+        "It raises an error"
+      ],
+      "answer": 0,
+      "explanation": "The products are 2×0, 0×3 and 1×0, so they are all 0; the sum is 0. The two vectors have no non-zero value in the same position, which means they share no terms. So the cosine similarity is 0 too. The values 6 and 3 come from taking one element instead of a product; the code does not raise an error.",
+      "skills": [
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d21-q3",
+      "kind": "find-bug",
+      "prompt": "This function wants to compute cosine similarity, but it unfairly pushes long documents to the top.\n\n```\nimport math\n\ndef kosinus(a, b):\n    nokta = sum(x * y for x, y in zip(a, b))\n    return nokta\n```\n\nWhat is the bug?",
+      "options": [
+        "It does not divide by the vector lengths (norms)",
+        "zip is used wrongly",
+        "max should be used instead of sum",
+        "The function does not return a value"
+      ],
+      "answer": 0,
+      "explanation": "Cosine is the dot product divided by the product of the two vectors' lengths. Without the division, a long document (with many words) produces big numbers and always gets ahead. zip is used correctly, sum is correct and there is a return.",
+      "skills": [
+        "ai-vektor-kosinus"
+      ]
+    },
+    {
+      "id": "m7h5d21-q4",
+      "kind": "numeric",
+      "prompt": "The formula in the workshop is idf = ln((n + 1) / (df + 1)) + 1. There are n = 8 documents in total and a term appears in df = 3 documents. What is idf? (Round to two decimal places.)",
+      "answer": 1.81,
+      "tolerance": 0.01,
+      "explanation": "ln(9 / 4) = ln(2.25) is about 0.81; add 1 and you get 1.81. If the term appeared in more documents, idf would drop; even a term that appears in every document never goes below 1.",
+      "skills": [
+        "ai-tfidf"
+      ]
+    },
+    {
+      "id": "m7h5d21-q5",
+      "kind": "mcq",
+      "prompt": "Why does TF-IDF give a low weight to terms such as \"and\" that appear in every document?",
+      "options": [
+        "Because it does not like short words",
+        "Because that term does not tell documents apart; rare terms carry more information",
+        "Because linking words are meaningless to a computer",
+        "Because count vectors only keep nouns"
+      ],
+      "answer": 1,
+      "explanation": "A term that appears in every document does not say which document is relevant. A rare term points to only a few documents, so it gets more weight. The word being short, or its type, does not decide the weight; the number of documents it appears in does.",
+      "skills": [
+        "ai-tfidf"
+      ]
+    }
+  ]
+}

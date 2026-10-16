@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Eval (evaluation)",
+      "definition": "A test set that measures how well a system meets the expected behaviour; each case is made of an input and an expected output.",
+      "example": "You write five comments and the correct label of each, and look at how many the system gets right.",
+      "pitfall": "Trying it three times and saying \"it works nicely\"; three tries are not a measurement."
+    },
+    {
+      "term": "Test case",
+      "definition": "A pair made of a single input and the output expected for that input.",
+      "example": "(`Çok yavaş ve sıkıcı` = very slow and boring, negative) is a case.",
+      "pitfall": "Writing only the input without the expected output; then it is not clear what counts as correct."
+    },
+    {
+      "term": "Accuracy",
+      "definition": "The ratio of the number of cases found correctly to the total number of cases.",
+      "example": "If 6 out of 8 cases are correct, the accuracy is 6/8 = 75%.",
+      "pitfall": "Working out the ratio the wrong way round (wrong / total) or forgetting to turn it into a percentage."
+    },
+    {
+      "term": "Rule-based classifier",
+      "definition": "A small program that decides with hand-written rules (such as word lists), not a trained model.",
+      "example": "This week's sentiment classifier looks at lists of positive and negative words.",
+      "pitfall": "Thinking it is a real language model; the method is the same, but the system itself is not a model."
+    },
+    {
+      "term": "Sarcasm and unknown words",
+      "definition": "Two weak points that rules often cannot catch.",
+      "example": "The sentence `Harika, yine bozuldu` (Great, it broke again) is sarcastic; the system sees only the word `harika` (great).",
+      "pitfall": "Writing only easy cases and never probing the weak points."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d16-q1",
+      "kind": "numeric",
+      "prompt": "You tried a classifier with 8 test cases, and it found the expected label in 6 cases. What is the accuracy as a percentage?",
+      "answer": 75,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Accuracy = number correct / total cases = 6 / 8 = 0.75, or 75%. If you divide the number wrong (2) by the total, you get 25%; that is not the accuracy but the error rate.",
+      "skills": [
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d16-q2",
+      "kind": "mcq",
+      "prompt": "Which of these counts as a real eval?",
+      "options": [
+        "Trying the prompt three times and looking at the results",
+        "Running many cases whose expected outputs were written in advance and working out the accuracy",
+        "Showing the best-looking example to friends",
+        "Deciding that the system's answer \"looks nice\""
+      ],
+      "answer": 1,
+      "explanation": "An eval gives the system cases whose expected output is known in advance and turns the result into a number. The other options rely on gut feeling or a hand-picked example; they cannot be repeated or compared.",
+      "skills": [
+        "eval-basics",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d16-q3",
+      "kind": "predict-output",
+      "prompt": "The sentiment classifier works with this rule: the positive word list contains `harika` (great); `bozuk` (broken) is in the negative list, and `bozuldu` (it broke) is in no list. The system scans the words one by one, giving +1 for a positive word and -1 for a negative one; if the total is > 0 it says \"olumlu\" (positive), if < 0 \"olumsuz\" (negative), and if 0 \"belirsiz\" (unclear).\n\n```\netiketle(\"Harika, yine bozuldu\")\n```\n\nWhich label does the system return?",
+      "options": [
+        "olumsuz",
+        "belirsiz",
+        "olumlu",
+        "hata"
+      ],
+      "answer": 2,
+      "explanation": "\"harika\" (great) gives +1 point; \"yine\" (again) and \"bozuldu\" (it broke) are not in the lists, so they add no points. The total is 1 > 0, so the system says \"olumlu\" (positive). For a person the sentence is sarcastic and negative; this difference is a mistake the eval should catch.",
+      "skills": [
+        "eval-basics",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d16-q4",
+      "kind": "find-bug",
+      "prompt": "The code below wants to work out the accuracy as a percentage (8 cases, 6 correct). Which line is wrong?\n\n```\n1: vakalar = 8\n2: dogru = 6\n3: yanlis = vakalar - dogru\n4: dogruluk = 100 * yanlis / vakalar\n```",
+      "options": [
+        "Line 1: vakalar should be 8",
+        "Line 2: dogru should be 6",
+        "Line 3: the number wrong cannot be vakalar - dogru",
+        "Line 4: dogru should be used for the accuracy, not yanlis"
+      ],
+      "answer": 3,
+      "explanation": "Line 4 divides the number wrong by the total and gives the error rate (25%); for the accuracy you should write 100 * dogru / vakalar (75%). The other lines are correct: 1 and 2 set the given values, and 3 works out the number wrong (2).",
+      "skills": [
+        "eval-basics",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d16-q5",
+      "kind": "mcq",
+      "prompt": "What happens if you write only easy cases in the test set?",
+      "options": [
+        "The accuracy comes out high, but the system's weak points are not visible",
+        "The accuracy definitely comes out low",
+        "The system improves by itself",
+        "The eval becomes more reliable"
+      ],
+      "answer": 0,
+      "explanation": "Most systems get easy cases right; the accuracy looks high, but the result is misleading because hard situations such as sarcasm, ambiguity and limits are not tested. The value of an eval is in showing where the system goes wrong.",
+      "skills": [
+        "eval-cases",
+        "eval-basics"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Dead zone",
+      "definition": "The low PWM range in which the motor does not turn at all; on this robot, 20% of the PWM (51).",
+      "example": "With `map(abs(hiz), 1, 255, 51, 255)`, when the command is 128 the output is 153.",
+      "pitfall": "Giving a low PWM and thinking the motor is \"not working\"."
+    },
+    {
+      "term": "Distance from echo time",
+      "definition": "The HC-SR04 gives a time, not a distance; about 58 µs = 1 cm.",
+      "example": "If `pulseIn` gives 1160 µs, the distance is 1160 / 58 = 20 cm.",
+      "pitfall": "Taking the 0 result of a missing echo as 0 cm; in the code it is treated as \"very far\" (400)."
+    },
+    {
+      "term": "Servo pulse width",
+      "definition": "The linear relation that converts an angle to microseconds: us = 544 + angle × 1856 / 180.",
+      "example": "1008 µs for 45°; 1472 µs for 90°.",
+      "pitfall": "Writing microseconds or radians instead of degrees inside `write()`."
+    },
+    {
+      "term": "Round-trip test",
+      "definition": "Feeding the angles found with inverse kinematics back into forward kinematics and checking whether you get back to the target.",
+      "example": "For `g 12 4`, shoulder 69.20° and elbow 101.54° are found; forward kinematics gives `12.00, 4.00`.",
+      "pitfall": "Fitting the servo the wrong way round and blaming the formula: also compare the angle layout with the physical arm."
+    },
+    {
+      "term": "Median filter",
+      "definition": "A filter that uses the middle value of the last three measurements; it removes a single bad reading.",
+      "example": "For measurements of 20, 90, 21 cm, the result is 21 cm.",
+      "pitfall": "Giving an unfiltered measurement to the PID's derivative term: it amplifies the noise."
+    },
+    {
+      "term": "Windup limit",
+      "definition": "Keeping the PID integral within upper and lower limits, and not growing it when the output saturates.",
+      "example": "`constrain(integral + hata * dt, -40, 40)`",
+      "pitfall": "Not limiting the integral: if the robot cannot reach the target for a long time, the integral swells up and it overshoots the target."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d2-q1",
+      "kind": "numeric",
+      "prompt": "In the servo driver, `dereceyiUsYap(45)` is called (0° = 544 µs, 180° = 2400 µs, linear). How many µs is the pulse width?",
+      "answer": 1008,
+      "tolerance": 1,
+      "unit": "µs",
+      "explanation": "544 + 45 × (2400 - 544) / 180 = 544 + 464 = 1008 µs. Sanity check: 544 µs for 0°, 1472 µs for 90°; 45° is exactly halfway between them: (544 + 1472) / 2 = 1008.",
+      "skills": [
+        "rob-servo-pulse"
+      ]
+    },
+    {
+      "id": "m5h8d2-q2",
+      "kind": "predict-output",
+      "prompt": "The median filter sorts three values. What does this code print?\n```\nfloat a = 20, b = 90, c = 21;\nif (a > b) { float t = a; a = b; b = t; }\nif (b > c) { float t = b; b = c; c = t; }\nif (a > b) { float t = a; a = b; b = t; }\nSerial.println(b);\n```",
+      "options": [
+        "20.00",
+        "90.00",
+        "21.00",
+        "131.00"
+      ],
+      "answer": 2,
+      "explanation": "The first comparison does not swap (20 > 90 is false). The second swaps b and c because 90 > 21: b = 21, c = 90. The third (20 > 21) is false. It prints the middle value, b = 21; `println` prints a float with two decimals. 90 was an outlier measurement and was removed.",
+      "skills": [
+        "rob-median",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d2-q3",
+      "kind": "numeric",
+      "prompt": "A two-axis arm whose parts are each 10 cm is taking its tip to the point (10; 10) cm. What shoulder angle (degrees) does inverse kinematics give?",
+      "answer": 90,
+      "tolerance": 0.5,
+      "unit": "°",
+      "explanation": "c = (100 + 100 - 100 - 100) / 200 = 0, so elbow = acos(0) = 90°. Shoulder = atan2(10, 10) + atan2(10 sin 90°, 10 + 10 cos 90°) = 45° + 45° = 90°. Round trip: x = 10 cos 90° + 10 cos 0° = 10, y = 10 sin 90° + 0 = 10.",
+      "skills": [
+        "rob-ik-check"
+      ]
+    },
+    {
+      "id": "m5h8d2-q4",
+      "kind": "find-bug",
+      "prompt": "The line position should be +2 for A0 (far left) and -2 for A4 (far right). There is a single bug in the code; which is it?\n```\nfloat cizgiKonum(int &sayi) {\n  float toplam = 0;\n  sayi = 0;\n  for (int i = 0; i < 5; i++) {\n    if (analogRead(CIZGI[i]) > 512) {\n      toplam += i - 2;\n      sayi++;\n    }\n  }\n  return sayi ? toplam / sayi : 0;\n}\n```",
+      "options": [
+        "The loop should be `i <= 5` instead of `i < 5`",
+        "It should be `toplam += 2 - i;` instead of `toplam += i - 2;`; because the sign is reversed, the robot runs away from the line",
+        "The threshold should be 1023 instead of 512",
+        "`sayi` should not be a reference"
+      ],
+      "answer": 1,
+      "explanation": "The position should be +2 for A0: 2 - 0 = +2. The code gives i - 2 = -2; the sign of the position comes out reversed and the line-following robot moves away from the line. `i <= 5` goes past the end of the array (there is no A5). The threshold 512 is in the middle of the measured range of 164-860.",
+      "skills": [
+        "bit-subsystems",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d2-q5",
+      "kind": "mcq",
+      "prompt": "When the target suddenly disappeared, the path C subsystem rushed about 38 cm forwards. What is the real reason?",
+      "options": [
+        "The subsystem has no \"no target\" decision; a 400 cm measurement is read as \"very far away, go\"",
+        "The PID coefficients were tuned wrongly",
+        "The HC-SR04 is broken",
+        "The motors have a dead zone"
+      ],
+      "answer": 0,
+      "explanation": "The PID did its own job correctly: large error, large speed. What is missing is the decision layer (a state machine). The solution is in lesson 113: if there is no target, stop at once. Changing KP or the sensor would hide the symptom, not the cause.",
+      "skills": [
+        "bit-subsystems",
+        "rob-failsafe"
+      ]
+    }
+  ]
+}

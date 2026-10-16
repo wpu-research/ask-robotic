@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "EEPROM map",
+      "definition": "A written layout that gives every piece of information a fixed address and size; it stops you writing one on top of another.",
+      "example": "Address 9 is the number of cards; from 10 onwards come the 4-byte UIDs.",
+      "pitfall": "Writing the addresses as scattered numbers in the code; when one changes, you break the others."
+    },
+    {
+      "term": "Setup marker",
+      "definition": "A special byte (0xA5), written last, that tells the first start-up apart.",
+      "example": "If 0xA5 is not at address 0, the factory settings are written.",
+      "pitfall": "Not adding a marker: the 255 values in an empty EEPROM are mistaken for a PIN."
+    },
+    {
+      "term": "EEPROM.update",
+      "definition": "A write command that does nothing if the value already in the cell is the same as the one to be written.",
+      "example": "Saving the same card again does not wear the cells.",
+      "pitfall": "Using EEPROM.write: it writes the same value again every time and wears the cell out for nothing."
+    },
+    {
+      "term": "Writing the counter last",
+      "definition": "The record's bytes are written first, then the counter; a half record does not appear in the list.",
+      "example": "If the power goes while the card bytes are being written, the counter has not gone up.",
+      "pitfall": "Raising the counter before the record: a half-written card can look authorised."
+    },
+    {
+      "term": "Master PIN",
+      "definition": "A separate management PIN needed for adding and deleting cards and changing the user PIN.",
+      "example": "The command EKLE:9999:AABBCCDD adds the card if 9999 is correct.",
+      "pitfall": "Making the master PIN the same as the user PIN, or allowing unlimited attempts."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h6d4-q1",
+      "kind": "numeric",
+      "prompt": "The card UIDs start at address 10 and each card is 4 bytes. At which EEPROM address is the first byte of card 3 (the third in the list)?",
+      "answer": 18,
+      "tolerance": 0,
+      "explanation": "The third card's position is 2 (counting from 0): 10 + 2 × 4 = 18. The answer 22 belongs to the fourth card, and 14 to the second card.",
+      "skills": [
+        "eeprom-store"
+      ]
+    },
+    {
+      "id": "m4h6d4-q2",
+      "kind": "mcq",
+      "prompt": "Why is the setup marker (0xA5) written at the very end of the factory settings?",
+      "options": [
+        "The byte written last wears out less",
+        "If setup is interrupted half-way, the marker is missing and setup is done again from the start at the next start-up",
+        "Because 0xA5 is bigger than the other bytes",
+        "The EEPROM cannot be read until the marker is written"
+      ],
+      "answer": 1,
+      "explanation": "The marker proves that setup has finished. If the power goes in the middle, the marker was never written; the program repeats the setup as if it were running for the first time. It has nothing to do with wear or the size of the value.",
+      "skills": [
+        "eeprom-store"
+      ]
+    },
+    {
+      "id": "m4h6d4-q3",
+      "kind": "predict-output",
+      "prompt": "The cards are saved as 10, 20, 30, 40. While card 20 (position 1) is being deleted, the last card is moved into the empty place. What is printed when the code runs?\n\n```\nbyte kart[4] = {10, 20, 30, 40};\nbyte n = 4;\nint sira = 1;\nkart[sira] = kart[n - 1];\nn--;\nfor (int i = 0; i < n; i++) {\n  Serial.print(kart[i]);\n  Serial.print(' ');\n}\n```",
+      "options": [
+        "10 30 40",
+        "10 40 30",
+        "10 20 30",
+        "10 30 40 40"
+      ],
+      "answer": 1,
+      "explanation": "40, the last card, is written in place of kart[1]: 10, 40, 30, 40. n drops to 3 and only the first three positions are printed: 10 40 30. The order is not kept, but the list stays without gaps.",
+      "skills": [
+        "eeprom-store",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m4h6d4-q4",
+      "kind": "find-bug",
+      "prompt": "With this function, a corrupt card can appear in the list if the power is cut while adding a card. Why?\n\n```\nvoid kartEkle(const byte uid[4]) {\n  byte n = kartSayisi();\n  EEPROM.update(ADR_KART_SAYISI, n + 1);   // line 1\n  kartYaz(n, uid);                          // line 2\n}\n```",
+      "options": [
+        "Line 1: the counter goes up before the card bytes; if the power goes at line 2, a half card has entered the list",
+        "Line 2: kartYaz should not be called",
+        "It should be n - 1 instead of n + 1",
+        "EEPROM.update should never be used"
+      ],
+      "answer": 0,
+      "explanation": "The counter must be written last. Here the counter has gone up but the card's bytes have not been written yet; if the power goes in between, a corrupt or old UID counts as authorised. Using update is correct.",
+      "skills": [
+        "eeprom-store",
+        "access-security",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h6d4-q5",
+      "kind": "numeric",
+      "prompt": "An EEPROM cell is guaranteed for about 100,000 writes. If a program writes this cell 50 times a day, in how many days does it reach the limit?",
+      "answer": 2000,
+      "tolerance": 0,
+      "unit": "days",
+      "explanation": "100,000 / 50 = 2000 days (about 5.5 years). That is why values that change often are written to RAM, not EEPROM, and unnecessary writes are avoided with EEPROM.update.",
+      "skills": [
+        "eeprom-store"
+      ]
+    }
+  ]
+}

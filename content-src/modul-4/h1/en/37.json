@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Trigger pulse",
+      "definition": "A short HIGH pulse (10 µs) given on the TRIG pin; it tells the sensor to start measuring.",
+      "example": "The sequence LOW (2 µs), HIGH (10 µs), LOW triggers the sensor.",
+      "pitfall": "Making the pulse too short or putting it on the wrong pin: the sensor does not measure and you always read 0."
+    },
+    {
+      "term": "delayMicroseconds()",
+      "definition": "Makes the program wait for the given number of microseconds; delay(), on the other hand, works in milliseconds.",
+      "example": "delayMicroseconds(10); waits exactly 10 µs.",
+      "pitfall": "Writing delay(10) and thinking it is 10 µs: it is 10 milliseconds, a thousand times longer."
+    },
+    {
+      "term": "pulseIn()",
+      "definition": "Measures how long a pin stays HIGH (or LOW) and returns it in microseconds.",
+      "example": "pulseIn(ECHO, HIGH, 30000) gives how long ECHO stays HIGH.",
+      "pitfall": "Thinking the returned number is centimetres: it is a time and must be converted with the formula."
+    },
+    {
+      "term": "Timeout",
+      "definition": "The third parameter, which sets the longest time pulseIn will wait; if the pulse does not finish in this time, it returns 0.",
+      "example": "30000 µs matches about 514 cm; it covers the 400 cm limit.",
+      "pitfall": "Not writing a timeout: the default is 1 second, and with no echo the program looks frozen."
+    },
+    {
+      "term": "Invalid measurement (0)",
+      "definition": "If pulseIn returned 0, no echo came back; this does not mean 0 cm.",
+      "example": "If sure == 0, mesafeOku() returns -1 and the LED does not light.",
+      "pitfall": "Putting 0 into the formula: the distance comes out as 0 cm and the LED or buzzer behaves wrongly."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h1d37-q1",
+      "kind": "mcq",
+      "prompt": "In the call pulseIn(ECHO, HIGH, 30000), 30 ms have passed and ECHO has not gone HIGH and finished. What does the function return?",
+      "options": [
+        "30000",
+        "-1",
+        "0",
+        "The program waits for ever"
+      ],
+      "answer": 2,
+      "explanation": "When the timeout runs out, pulseIn returns 0; this means \"no measurement\". It is not 30000, and it is not -1 either. The program does not wait for ever; stopping that is the whole point of the timeout.",
+      "skills": [
+        "sens-pulsein"
+      ]
+    },
+    {
+      "id": "m4h1d37-q2",
+      "kind": "numeric",
+      "prompt": "A timeout of 30000 µs was chosen for pulseIn. At a speed of 0.0343 cm/µs, about how many centimetres is the farthest distance the sound can travel to and back from?",
+      "answer": 514.5,
+      "tolerance": 5,
+      "unit": "cm",
+      "explanation": "If the there-and-back time is 30000 µs, the one-way distance = 30000 × 0.0343 / 2 = 514.5 cm. This is above the sensor's 400 cm limit, so no valid measurement gets caught by the timeout.",
+      "skills": [
+        "sens-pulsein",
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d37-q3",
+      "kind": "find-bug",
+      "prompt": "This code lights the LED if the object is closer than 30 cm. When there is nothing in front of the sensor (no echo), the LED lights. Why?\n\n```\nunsigned long sure = pulseIn(ECHO, HIGH, 30000);\nfloat cm = sure * 0.0343 / 2.0;\ndigitalWrite(LED, cm < 30);\n```",
+      "options": [
+        "The timeout of 30000 is too small",
+        "When sure is 0, cm is also 0 and 0 < 30 counts as true; the no-echo case is not checked",
+        "The LED pin must not have been made an output",
+        "0.343 should be written instead of 0.0343"
+      ],
+      "answer": 1,
+      "explanation": "If no echo comes back, pulseIn returns 0. The formula produces 0 cm and the condition cm < 30 is true. The fix: handle the sure == 0 case separately. The timeout value is big enough; the problem is not in the constant or the LED pin.",
+      "skills": [
+        "sens-pulsein",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h1d37-q4",
+      "kind": "predict-output",
+      "prompt": "What is printed to the Serial Monitor when this code runs?\n\n```\nunsigned long sure = 4372;   // µs\nSerial.println(sure * 0.0343 / 2.0, 1);\n```",
+      "options": [
+        "150.0",
+        "37.5",
+        "74.9",
+        "75.0"
+      ],
+      "answer": 3,
+      "explanation": "4372 × 0.0343 = 149.96; divided by two that is 74.98. println rounds to one decimal place: 75.0. 150.0 is forgetting to divide by two. 74.9 would be cutting off instead of rounding; Arduino rounds.",
+      "skills": [
+        "sens-pulsein",
+        "sens-ultrasonic"
+      ]
+    },
+    {
+      "id": "m4h1d37-q5",
+      "kind": "numeric",
+      "prompt": "A program takes a measurement every 100 ms. Because there is no object in front of it, pulseIn waits until the timeout (30 ms). For what percentage of this 100 ms round is the program busy waiting for the measurement?",
+      "answer": 30,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "pulseIn is blocking: for 30 ms the program cannot do any other work. 30 / 100 = 30%. That is why measurements are taken less often with millis(), and when there is a lot to do, the timing is chosen with care.",
+      "skills": [
+        "prog-nonblocking",
+        "sens-pulsein"
+      ]
+    }
+  ]
+}

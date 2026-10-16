@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "Sensor direction",
+      "definition": "Whether the raw value goes up as the physical quantity goes up; it changes from sensor to sensor.",
+      "example": "On the soil moisture module the raw value drops from 921 to 307 as it gets wetter; on the water level stick it rises from 51 to 819.",
+      "pitfall": "Assuming \"wet = big number\"; you need to learn the direction of each sensor by measuring it dry and wet."
+    },
+    {
+      "term": "Calibration ends",
+      "definition": "The two raw values the sensor gives when dry and when wet; they are the limits of the percentage calculation.",
+      "example": "With KURU = 800 and ISLAK = 350, a raw value of 575 is 50 %.",
+      "pitfall": "Using numbers taken from someone else's sensor; every sensor's ends are different."
+    },
+    {
+      "term": "map() and constrain()",
+      "definition": "map converts the raw value to another range in proportion; constrain keeps the result between the given lower and upper limits.",
+      "example": "constrain(map(ham, 800, 350, 0, 100), 0, 100) gives the percentage between 0 and 100.",
+      "pitfall": "Forgetting constrain; readings outside the calibration range give values such as -26 % or 130 %."
+    },
+    {
+      "term": "Averaging",
+      "definition": "Reducing noise by adding up several measurements and dividing by how many there are.",
+      "example": "Eight analogRead values are added up and divided by 8.",
+      "pitfall": "Deciding from a single measurement; a momentary jump leads to a false warning."
+    },
+    {
+      "term": "Threshold flicker",
+      "definition": "The state changing quickly when the reading wobbles around the threshold; it is prevented with two thresholds (hysteresis).",
+      "example": "With a rain threshold of 600, if the reading goes back and forth between 595 and 605, the state keeps flipping between VAR and YOK.",
+      "pitfall": "Thinking a single threshold is enough."
+    },
+    {
+      "term": "Resistive and capacitive soil sensors",
+      "definition": "The resistive kind measures with bare prongs that touch the soil; on the capacitive kind the prongs are covered with an insulator.",
+      "example": "For a sensor that will stay in the soil for a long time, the capacitive kind is preferred.",
+      "pitfall": "Leaving a resistive sensor in the soil and switched on all the time; the prongs rust and the reading drifts."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h3d48-q1",
+      "kind": "mcq",
+      "prompt": "You connected a soil moisture module. As you pull the slider from dry to wet, the raw value goes down from 921 to 307. What do you conclude from this?",
+      "options": [
+        "The sensor is broken, because the value should go up when wet",
+        "Whatever the raw value is, the percentage stays the same",
+        "On this module the value drops as it gets wetter; the percentage calculation must follow this direction",
+        "The sensor can only give 0 and 1023"
+      ],
+      "answer": 2,
+      "explanation": "The sensor direction changes from module to module; this module is the kind that drops as it gets wetter, and it is not broken. For the right percentage, the KURU and ISLAK ends are given according to this direction. Calculating without knowing the direction gives the opposite result.",
+      "skills": [
+        "sens-analog-calib"
+      ]
+    },
+    {
+      "id": "m4h3d48-q2",
+      "kind": "numeric",
+      "prompt": "With KURU = 800 and ISLAK = 350, a raw value of 500 was read. What does the code below print to the serial monitor?\n\n```\nint yuzde = map(500, 800, 350, 0, 100);\nSerial.println(yuzde);\n```",
+      "answer": 66,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "The map formula: (500 − 800) × (100 − 0) / (350 − 800) = (−300 × 100) / (−450) = 66.67. Because map does integer division, the fraction is thrown away and the result is 66 (not 67).",
+      "skills": [
+        "sens-analog-calib"
+      ]
+    },
+    {
+      "id": "m4h3d48-q3",
+      "kind": "predict-output",
+      "prompt": "The rain sensor is on A0 and the water level sensor is on A1. The readings are A0 = 700 and A1 = 450. What does this code print?\n\n```\nint yagmur = analogRead(A0);\nint seviye = analogRead(A1);\nSerial.print(yagmur < 600 ? \"VAR\" : \"YOK\");\nSerial.print(\" \");\nif (seviye < 300) Serial.println(\"BOS\");\nelse if (seviye < 600) Serial.println(\"ORTA\");\nelse Serial.println(\"DOLU\");\n```",
+      "options": [
+        "VAR ORTA",
+        "YOK ORTA",
+        "YOK DOLU",
+        "VAR BOS"
+      ],
+      "answer": 1,
+      "explanation": "Because 700 is not less than 600, \"YOK\" (no) is printed for rain (on this sensor the value drops in rain). Since 450 is between 300 and 600, the level is \"ORTA\" (half). Result: YOK ORTA.",
+      "skills": [
+        "sens-analog-calib",
+        "sens-threshold-hyst"
+      ]
+    },
+    {
+      "id": "m4h3d48-q4",
+      "kind": "find-bug",
+      "prompt": "When the soil is wet and the raw value is 350, you expect 100 % on the screen, but this code prints 0 %. The KURU raw value is 800 and the ISLAK raw value is 350. Which line has the bug?\n\n```\n1 const int KURU = 800;\n2 const int ISLAK = 350;\n3 int yuzde = map(analogRead(A2), ISLAK, KURU, 0, 100);\n4 Serial.println(yuzde);\n```",
+      "options": [
+        "Line 1: the KURU value is wrong",
+        "Line 2: the ISLAK value should be zero",
+        "Line 3: the order of the ends inside map is reversed; KURU should come first, then ISLAK",
+        "Line 4: print should be written instead of println"
+      ],
+      "answer": 2,
+      "explanation": "map(x, a, b, 0, 100) links the value a to 0 and the value b to 100. When ISLAK is written first, the value 350 becomes 0 %. Since 0 % should be dry and 100 % wet, the right version is map(analogRead(A2), KURU, ISLAK, 0, 100).",
+      "skills": [
+        "sens-analog-calib",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h3d48-q5",
+      "kind": "mcq",
+      "prompt": "The rain threshold is 600. When the reading flickers between 595 and 605, the output flips quickly between VAR and YOK. Which is the best fix?",
+      "options": [
+        "Use two thresholds: for example VAR below 550, YOK above 650, and keep the state in between",
+        "Set the threshold to 601",
+        "Remove the delay",
+        "Connect the sensor the other way round"
+      ],
+      "answer": 0,
+      "explanation": "The problem is that the state keeps changing around a single threshold. With two thresholds (hysteresis), the old state is kept in the zone between them and the flicker stops. Moving the threshold by 1 unit just causes the same problem at another value.",
+      "skills": [
+        "sens-threshold-hyst"
+      ]
+    }
+  ]
+}

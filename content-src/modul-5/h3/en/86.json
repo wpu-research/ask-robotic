@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Reflective IR sensor",
+      "definition": "A sensor that carries, side by side, an LED that sends infrared light to the floor and a phototransistor that measures the light coming back; the reading changes with how much light the surface reflects.",
+      "example": "In this lesson the line reads about 4.2 V (analogRead ≈ 860) and the floor about 0.8 V (≈ 164).",
+      "pitfall": "Thinking every module reads in the same direction; on some modules the line reads low, so you look at the raw values first."
+    },
+    {
+      "term": "Threshold",
+      "definition": "The limit number that turns a reading into \"line\" (1) or \"no line\" (0) information: if the reading is greater than the threshold, 1.",
+      "example": "If the floor reads 164 and the line 860, 512, halfway between them, is a sensible starting threshold.",
+      "pitfall": "Choosing the threshold by guessing without measuring and tying everything to one number; when the light or floor changes, the decision breaks."
+    },
+    {
+      "term": "Bit pattern",
+      "definition": "The 0/1 results of the five sensors written side by side from left to right.",
+      "example": "00100 says the line is exactly in the middle; 01000 says the line is seen one sensor to the left.",
+      "pitfall": "Mixing up the sensor order; if you think A0 is on the right, the robot turns the wrong way in all the following lessons."
+    },
+    {
+      "term": "Line position",
+      "definition": "If a single sensor is on the line, a number from −2 to +2 found by subtracting 2 from the sensor number; negative shows the line is on the left.",
+      "example": "If the pattern is 10000, the first sensor is number 0 and the position is 0 − 2 = −2.",
+      "pitfall": "Forgetting to subtract 2 when finding the position; a number from 0 to 4 does not give 0 in the middle."
+    },
+    {
+      "term": "Blind zone",
+      "definition": "A narrow strip where, because the sensor spacing is larger than the line width, no sensor sees the line while the line's centre is between two sensors.",
+      "example": "With a 2.4 cm spacing and a 2 cm line, the blind zone is 0.4 cm; in this position the pattern comes out as 00000.",
+      "pitfall": "Thinking the line has definitely ended when you see 00000; the line may be passing between the sensors."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d1-q1",
+      "kind": "mcq",
+      "prompt": "You connected a new module and printed the raw values: about 164 on the line and about 860 on the floor. The decision in the code is `analogRead(pin) > 512`. What happens, and what should you do?",
+      "options": [
+        "The module is broken and needs replacing",
+        "The pattern comes out reversed (line 0, floor 1); you make the comparison `<` or invert the pattern, fitting the code to the module",
+        "Nothing changes, because the threshold is still halfway between them",
+        "digitalRead must be used instead of analogRead"
+      ],
+      "answer": 1,
+      "explanation": "Even though the threshold is in the middle, the direction has been reversed: the line now reads low, so with `>` the line is 0 and the floor 1. The module is not broken; modules can differ in direction. You look at the raw values first and write the comparison to match.",
+      "skills": [
+        "rob-line-sensor",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d1-q2",
+      "kind": "numeric",
+      "prompt": "Five line sensors are lined up side by side, with 2.4 cm between neighbouring sensors. How many cm are there between the far-left sensor and the far-right sensor?",
+      "answer": 9.6,
+      "tolerance": 0.01,
+      "unit": "cm",
+      "explanation": "Between five sensors there are four gaps, not five: 4 × 2.4 = 9.6 cm. The number of gaps is one less than the number of sensors.",
+      "skills": [
+        "rob-line-geometry"
+      ]
+    },
+    {
+      "id": "m5h3d1-q3",
+      "kind": "predict-output",
+      "prompt": "The array stands for five values read from the sensors. What does this code print on the Serial monitor?\n\n```\nint v[5] = {160, 870, 170, 165, 162};\nconst int ESIK = 512;\n\nvoid setup() {\n  Serial.begin(9600);\n  int ilk = -1;\n  for (int i = 0; i < 5; i++) {\n    bool cizgide = v[i] > ESIK;\n    Serial.print(cizgide ? '1' : '0');\n    if (cizgide && ilk < 0) ilk = i;\n  }\n  Serial.print(\" konum=\");\n  Serial.println(ilk - 2);\n}\nvoid loop() {}\n```",
+      "options": [
+        "01000 konum=-1",
+        "01000 konum=1",
+        "10000 konum=-2",
+        "00100 konum=0"
+      ],
+      "answer": 0,
+      "explanation": "Only v[1] = 870 is greater than the threshold, so the pattern is 01000. The first sensor to see the line is number 1; the position is 1 − 2 = −1, so the line is on the left. Getting the sign the wrong way round (konum=1) is the most common mistake.",
+      "skills": [
+        "rob-line-pattern",
+        "prog-loops-arrays"
+      ]
+    },
+    {
+      "id": "m5h3d1-q4",
+      "kind": "find-bug",
+      "prompt": "This code was written to read five sensors and print them on one line, but there is a bug somewhere. What is the bug?\n\n```\nconst int SENSOR_SAYISI = 5;\nconst int SENSOR_PIN[SENSOR_SAYISI] = {A0, A1, A2, A3, A4};\n\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  for (int i = 0; i <= SENSOR_SAYISI; i++) {\n    Serial.print(analogRead(SENSOR_PIN[i]));\n    Serial.print(' ');\n  }\n  Serial.println();\n  delay(200);\n}\n```",
+      "options": [
+        "For analogRead you must first write pinMode(INPUT) for each pin",
+        "The SENSOR_PIN array cannot be defined as const",
+        "Because the for condition is `i <= 5`, on the sixth pass SENSOR_PIN[5] runs past the end of the array; the last valid index is 4",
+        "delay(200) is too short; the sensor cannot be read in that time"
+      ],
+      "answer": 2,
+      "explanation": "The array has five elements, from 0 to 4. The condition `i <= SENSOR_SAYISI` also runs for i = 5 and reads a meaningless pin beyond the end of the array. The correct version is `i < SENSOR_SAYISI`. analogRead does not need pinMode, and 200 ms is more than enough for a reading.",
+      "skills": [
+        "prog-loops-arrays",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d1-q5",
+      "kind": "numeric",
+      "prompt": "The line is 2 cm wide, and a sensor sees the line if it is at most 1 cm from the line's centre. If neighbouring sensors are 2.4 cm apart, how many mm wide is the blind zone where the line's centre is not seen by any sensor?",
+      "answer": 4,
+      "tolerance": 0.1,
+      "unit": "mm",
+      "explanation": "The strip each sensor sees is 2 cm wide. Between the strips of two neighbouring sensors there is 2.4 − 2.0 = 0.4 cm left; that is 4 mm. While the line's centre is in this gap, the pattern comes out as 00000.",
+      "skills": [
+        "rob-line-geometry",
+        "rob-line-pattern"
+      ]
+    }
+  ]
+}

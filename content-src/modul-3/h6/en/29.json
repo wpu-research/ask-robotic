@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Interrupt",
+      "definition": "When an event happens, the processor leaves what it is doing, runs the matching function, and then goes back to where it left off.",
+      "example": "When the button on D2 drops to LOW, the function basildi() runs, whatever loop() is doing.",
+      "pitfall": "Thinking an interrupt solves every problem; long jobs cannot be done inside an ISR."
+    },
+    {
+      "term": "ISR",
+      "definition": "Interrupt service routine: a short function that runs when an interrupt arrives, takes no parameters and returns no value.",
+      "example": "The function void basildi() { sayac++; } is an ISR.",
+      "pitfall": "Putting delay or Serial.print inside an ISR; the program may get stuck."
+    },
+    {
+      "term": "volatile",
+      "definition": "A keyword that tells the compiler a variable can change outside the normal flow of the program (in an ISR).",
+      "example": "volatile unsigned int sayac = 0;",
+      "pitfall": "Not writing volatile: loop() may read the value from an old copy and the counter seems not to go up."
+    },
+    {
+      "term": "Interrupt modes",
+      "definition": "The setting that decides which event triggers attachInterrupt: FALLING, RISING, CHANGE, LOW.",
+      "example": "FALLING is used to catch a press on an INPUT_PULLUP button.",
+      "pitfall": "Choosing CHANGE and thinking one press is one interrupt; a press and a release produce two interrupts."
+    },
+    {
+      "term": "Timer interrupt",
+      "definition": "A regular interrupt produced when one of the counters in the board's timer units reaches a set value.",
+      "example": "With prescaler 256 and OCR1A = 31249, the interrupt comes every 0.5 seconds.",
+      "pitfall": "Using Timer1 together with Servo or with analogWrite on pins 9-10: the same unit clashes."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d29-q1",
+      "kind": "mcq",
+      "prompt": "On the Arduino Uno, which pins can take an external interrupt with attachInterrupt?",
+      "options": [
+        "D0 and D1",
+        "All digital pins",
+        "D8 and D9",
+        "D2 and D3"
+      ],
+      "answer": 3,
+      "explanation": "On the Uno, external interrupts are only on the INT0 (D2) and INT1 (D3) pins. D0 and D1 are for serial communication; D8-D9 and the other pins do not have this interrupt.",
+      "skills": [
+        "prog-interrupts"
+      ]
+    },
+    {
+      "id": "m3h6d29-q2",
+      "kind": "numeric",
+      "prompt": "Timer1 is running with prescaler 256 (16 MHz / 256 = 62 500 ticks/s) and OCR1A = 6249 has been written. Every how many milliseconds does the interrupt come?",
+      "answer": 100,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "The number of ticks counted is OCR1A + 1 = 6250. 6250 / 62 500 = 0.1 s = 100 ms. If you forget the +1 and work out 6249 / 62 500, you get 99.98 ms; the right formula uses (OCR1A + 1).",
+      "skills": [
+        "prog-interrupts",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d29-q3",
+      "kind": "find-bug",
+      "prompt": "The button is connected between D4 and GND. When the button is pressed, the counter never goes up. What causes the bug in the program?\n\n```\nvolatile unsigned int basis = 0;\n\nvoid say() {\n  basis++;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(4, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(4), say, FALLING);\n}\n\nvoid loop() {\n  Serial.println(basis);\n  delay(500);\n}\n```",
+      "options": [
+        "On the Uno, D4 is not an external interrupt pin; the interrupt must be set up on D2 or D3",
+        "The say() function should be volatile",
+        "HIGH should be written instead of FALLING",
+        "The basis variable should not be unsigned"
+      ],
+      "answer": 0,
+      "explanation": "On the Uno, external interrupts exist only on pins D2 (INT0) and D3 (INT1); digitalPinToInterrupt(4) does not give a valid interrupt number, so attachInterrupt sets nothing up. The button must be moved to D2. say() is an ISR; volatile is written for variables; FALLING is the right mode; being unsigned is not a problem.",
+      "skills": [
+        "prog-interrupts",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d29-q4",
+      "kind": "predict-output",
+      "prompt": "An ideal button (no bounce) is pressed and released only once; this finishes within the first 2 seconds. What is the first value printed?\n\n```\nvolatile int sayac = 0;\n\nvoid kes() {\n  sayac++;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  pinMode(2, INPUT_PULLUP);\n  attachInterrupt(digitalPinToInterrupt(2), kes, CHANGE);\n}\n\nvoid loop() {\n  delay(2000);\n  Serial.println(sayac);\n}\n```",
+      "options": [
+        "0",
+        "1",
+        "2",
+        "Nothing is printed, the program gets stuck"
+      ],
+      "answer": 2,
+      "explanation": "CHANGE produces an interrupt for both the press (HIGH→LOW) and the release (LOW→HIGH); two interrupts make the counter 2. If FALLING had been chosen, the result would be 1. The interrupt works even inside delay, so it is not 0 and the program does not get stuck.",
+      "skills": [
+        "prog-interrupts"
+      ]
+    },
+    {
+      "id": "m3h6d29-q5",
+      "kind": "mcq",
+      "prompt": "Why is it not a good idea to use Serial.println inside an interrupt function?",
+      "options": [
+        "Serial only works inside setup()",
+        "Printing is slow and the program may get stuck if the buffer fills up; an ISR must be short",
+        "No variables can be used inside an ISR",
+        "The Serial monitor turns interrupts off"
+      ],
+      "answer": 1,
+      "explanation": "An ISR must be short. Serial.println is slow, and it may have to wait if the output buffer fills up; inside an interrupt, the interrupts that would let that wait finish are turned off. Raising a flag and leaving the printing to loop() is right. Variables can be used in an ISR (they need to be volatile).",
+      "skills": [
+        "prog-interrupts"
+      ]
+    }
+  ]
+}

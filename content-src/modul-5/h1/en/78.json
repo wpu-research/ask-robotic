@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Dead zone",
+      "definition": "The low PWM range in which the motor does not turn because it cannot overcome friction. On the robot in the simulation it is about 51 and below.",
+      "example": "At PWM 40 the motor hums but the wheel does not move.",
+      "pitfall": "Thinking 128 is half speed; the speed is proportional not to the PWM but to the difference PWM − dead zone."
+    },
+    {
+      "term": "Maximum speed (V_MAX)",
+      "definition": "The highest speed the wheel reaches at PWM 255; 0.396 m/s on the robot in the lessons.",
+      "example": "From the measured slope: 0.194 cm/s × (255 − 51), about 39.6 cm/s.",
+      "pitfall": "Using V_MAX with the value from another robot or from a flat battery."
+    },
+    {
+      "term": "Calibration by measuring",
+      "definition": "Drawing a straight line through two points that can be measured well to find the slope, the end of the dead zone and the maximum speed.",
+      "example": "If you measure 9.4 cm/s at PWM 100 and 28.8 cm/s at PWM 200, the speed crosses zero at about PWM 51.",
+      "pitfall": "Thinking the first PWM you notice by eye (57) is the end of the dead zone; the real end is where the speed line crosses zero."
+    },
+    {
+      "term": "hizdanPwm()",
+      "definition": "The function that turns the requested speed into PWM: PWM = OLU_PWM + (255 − OLU_PWM) · v / V_MAX. For very small requests it returns 0.",
+      "example": "When you ask for 20 cm/s, the function gives 154; the robot really goes at about 20 cm/s.",
+      "pitfall": "Forgetting the dead zone and writing PWM = 255 · v / V_MAX; at slow speeds the PWM stays inside the dead zone."
+    },
+    {
+      "term": "Repeating the calibration",
+      "definition": "Measuring OLU_PWM and V_MAX again when the battery, floor, wheels or motor change.",
+      "example": "When you move from carpet to a wooden floor, the dead zone changes; you measure the numbers again.",
+      "pitfall": "Calibrating with a flat battery and driving with a full one; the speeds do not match."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d78-q1",
+      "kind": "numeric",
+      "prompt": "Calibration: OLU_PWM = 51, V_MAX = 0.396 m/s. What does hizdanPwm(0.25) return (for 0.25 m/s, with rounding)?\n\nFormula: 51 + (int)(204 * v / V_MAX + 0.5)",
+      "answer": 180,
+      "tolerance": 1,
+      "explanation": "204 · 0.25 / 0.396 is about 128.8; with +0.5 it is 129.3, and cut to an int it becomes 129. 51 + 129 = 180. Forgetting to add the dead zone (51) gives 129; that value is a speed far below 0.25 m/s.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d78-q2",
+      "kind": "numeric",
+      "prompt": "On a robot, 10 cm/s was measured at PWM 100 and 30 cm/s at PWM 200. If the speed rises linearly, what is the end of the dead zone (the PWM where the speed is zero)?",
+      "answer": 50,
+      "tolerance": 0,
+      "explanation": "Slope = (30 − 10) / (200 − 100) = 0.2 cm/s per PWM unit. Zero point = 100 − 10 / 0.2 = 50. You need to look for where the line crosses the PWM axis; taking measurement points such as 10 or 100 as the answer is wrong.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d78-q3",
+      "kind": "predict-output",
+      "prompt": "What does this code print?\n\n```\nint hizdanPwm(float v) {\n  if (v < 0.005) return 0;\n  if (v > 0.396) v = 0.396;\n  return 51 + (int)(204 * v / 0.396 + 0.5);\n}\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(hizdanPwm(0.003));\n  Serial.println(hizdanPwm(0.5));\n}\nvoid loop() {}\n```",
+      "options": [
+        "0 and 303",
+        "0 and 255",
+        "51 and 255",
+        "3 and 255"
+      ],
+      "answer": 1,
+      "explanation": "0.003 m/s is below 0.005, so the function returns 0 (so the robot does not wander around just above the dead zone, too slowly to measure). 0.5 m/s is limited to the maximum speed (0.396) and becomes 51 + 204 = 255. 303 would come out without the limit and would overflow analogWrite.",
+      "skills": [
+        "prog-structure",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d78-q4",
+      "kind": "find-bug",
+      "prompt": "The robot drives well at 20 cm/s and above, but when 5 cm/s is requested it does not move at all. The dead zone ends at 51, V_MAX = 0.396. Where is the bug?\n\n```\nint hizdanPwm(float v) {\n  return (int)(255 * v / V_MAX);\n}\n```",
+      "options": [
+        "The return line: the dead zone is not added, so for 5 cm/s the PWM is 32 and stays inside the dead zone",
+        "V_MAX is too large",
+        "int should be used instead of float",
+        "256 should be written instead of 255"
+      ],
+      "answer": 0,
+      "explanation": "255 · 0.05 / 0.396 is about 32, which is below 51, so the motor does not turn. The correct mapping starts above the dead zone, in the form 51 + 204 · v / V_MAX. The other options are not the cause of the bug.",
+      "skills": [
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d78-q5",
+      "kind": "mcq",
+      "prompt": "The robot was calibrated with a full battery. A week later the battery is half empty. How does the robot behave when it asks for 20 cm/s?",
+      "options": [
+        "It still goes at exactly 20 cm/s; calibration is permanent",
+        "It goes faster",
+        "It does not move at all",
+        "It goes slower, because the maximum speed drops as the battery runs down"
+      ],
+      "answer": 3,
+      "explanation": "As the battery runs down, the voltage going to the motors drops and the speed is lower at the same PWM; a mapping made with a fixed V_MAX no longer fits. That is why calibration is done with a full battery and repeated from time to time.",
+      "skills": [
+        "prog-planning"
+      ]
+    }
+  ]
+}

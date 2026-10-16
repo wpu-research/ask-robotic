@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "State table",
+      "definition": "A planning table that shows the outputs in each state and the condition for the next state.",
+      "example": "In the BLOKE state the servo is at 0°, the red LED flashes, and when 30 s are up it goes to KILITLI.",
+      "pitfall": "Starting to code without drawing the table; some moves between states are left out."
+    },
+    {
+      "term": "Non-blocking timing",
+      "definition": "Working out the end moment with millis() and comparing it on every pass; the program keeps running without waiting.",
+      "example": "acikBitis = millis() + 5000; on every pass it checks whether the time is up.",
+      "pitfall": "Keeping the door open with delay(5000): keys and serial commands are missed."
+    },
+    {
+      "term": "Overflow-proof comparison",
+      "definition": "The expression (long)(simdi - bitis) >= 0 correctly finds when the time is up, even if millis() goes back to zero.",
+      "example": "doldu(millis(), blokBitis) answers the question \"is the block over?\".",
+      "pitfall": "Writing simdi >= bitis: it gives the wrong result when the counter overflows."
+    },
+    {
+      "term": "Shared error counter",
+      "definition": "The PIN and card inputs sharing the same wrong-attempt counter.",
+      "example": "Two wrong PINs and one unauthorised card use up the third attempt.",
+      "pitfall": "Keeping a separate counter for each way: an attacker makes 3 attempts separately through each way."
+    },
+    {
+      "term": "Separate servo power",
+      "definition": "In a real circuit, powering the servo from a 5 V supply separate from the Arduino; the GNDs are made common.",
+      "example": "The external 5 V supply's GND is connected to the Uno's GND.",
+      "pitfall": "Powering the servo from the Uno's 5 V pin: the board can restart or the screen can go wrong."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h6d5-q1",
+      "kind": "numeric",
+      "prompt": "12.3 seconds (12300 ms) have passed since the block started. The screen shows the time left with the calculation (30000 - 12300 + 999) / 1000, using integer division. How many seconds does the screen show?",
+      "answer": 18,
+      "unit": "s",
+      "explanation": "30000 - 12300 = 17700 ms; adding 999 makes 18699, and integer division gives 18. Thanks to the extra 999, 17.7 s is rounded up; otherwise it would show 17, and the countdown would show 0 in the last second.",
+      "skills": [
+        "prog-millis",
+        "state-machine"
+      ]
+    },
+    {
+      "id": "m4h6d5-q2",
+      "kind": "predict-output",
+      "prompt": "There are three attempts. A correct entry resets the counter. What do these calls print, in order?\n\n```\nint yanlis = 0;\nvoid reddet() { yanlis++; Serial.println(yanlis); }\nvoid kabul()  { yanlis = 0; }\n\nreddet();\nkabul();\nreddet();\nreddet();\n```",
+      "options": [
+        "1, 1, 2",
+        "1, 2, 3",
+        "1, 2, 2",
+        "1, 0, 1"
+      ],
+      "answer": 0,
+      "explanation": "The first reddet (deny) prints 1. kabul (accept) resets the counter, the next reddet prints 1 again, and the one after it prints 2. The kabul call prints nothing, so 0 does not appear; 1, 2, 3 would be forgetting the reset.",
+      "skills": [
+        "access-security",
+        "state-machine"
+      ]
+    },
+    {
+      "id": "m4h6d5-q3",
+      "kind": "find-bug",
+      "prompt": "The block should lock the door for 30 s, but during this time the card and keys do not react and the screen freezes too. Where is the problem?\n\n```\nvoid bloke() {\n  durum = BLOKE;            // line 1\n  delay(30000);             // line 2\n  durum = KILITLI;          // line 3\n}\n```",
+      "options": [
+        "Line 1: the durum variable is not declared",
+        "Line 2: delay stops the program for 30 s; the end moment should be worked out and checked inside loop",
+        "Line 3: it should be ACIK instead of KILITLI",
+        "Line 2: the time should be written in seconds, not milliseconds"
+      ],
+      "answer": 1,
+      "explanation": "While delay runs, loop() never comes round; keys, serial commands, LEDs and the screen are not updated. The right way is to write blokBitis = millis() + 30000 and check the time on every pass inside durumGuncelle. The unit of delay is already milliseconds.",
+      "skills": [
+        "prog-millis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h6d5-q4",
+      "kind": "mcq",
+      "prompt": "In a real door project, why do you power the servo from a separate 5 V supply rather than the Arduino's 5 V pin?",
+      "options": [
+        "The servo needs 12 V",
+        "The servo draws a brief high current when it starts; the board can restart or the screen can go wrong. The GNDs are made common",
+        "A separate supply makes the servo turn faster",
+        "The Arduino's 5V pin can only power LEDs"
+      ],
+      "answer": 1,
+      "explanation": "Even a small servo draws more current than the board's 5 V line can give when it starts, and the voltage drops. If the separate supply's GND is not joined to the Arduino's, the signal loses its reference. A servo does not need 12 V; it works on 4-6 V.",
+      "skills": [
+        "circuit-wiring",
+        "servo-control"
+      ]
+    },
+    {
+      "id": "m4h6d5-q5",
+      "kind": "numeric",
+      "prompt": "The Servo library produces a 544 µs pulse for 0° and a 2400 µs pulse for 180°, and the values in between are linear. How many microseconds long is the pulse sent with write(90)?",
+      "answer": 1472,
+      "tolerance": 1,
+      "unit": "µs",
+      "explanation": "90° is exactly the middle of the range: 544 + (2400 - 544) / 2 = 544 + 928 = 1472 µs. 1500 is a round guess, but the library's value is 1472.",
+      "skills": [
+        "servo-control"
+      ]
+    }
+  ]
+}

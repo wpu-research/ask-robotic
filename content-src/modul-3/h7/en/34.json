@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Flash, SRAM, EEPROM",
+      "definition": "The Uno's three memories: Flash (32 KB) holds the program, SRAM (2 KB) the running variables, and EEPROM (1 KB) the permanent settings. SRAM is erased when the power is cut; Flash and EEPROM stay.",
+      "example": "While running, the target temperature is in an int variable (SRAM); it is stored in the EEPROM so that it is not lost when the power is cut.",
+      "pitfall": "Thinking a variable will still be there after the power is cut."
+    },
+    {
+      "term": "EEPROM.read and EEPROM.update",
+      "definition": "read reads 1 byte from the given address. update writes 1 byte to that address, but does not write if the value is already the same.",
+      "example": "After EEPROM.update(0, 24);, EEPROM.read(0) gives 24.",
+      "pitfall": "Expecting 0 in a cell that has never been written: an empty cell holds 255."
+    },
+    {
+      "term": "Write lifetime",
+      "definition": "An EEPROM cell can take about 100,000 writes. Reading does not shorten its lifetime.",
+      "example": "If you write to the same cell every second, its lifetime runs out in about 27.8 hours (100,000 seconds).",
+      "pitfall": "Writing to the EEPROM on every loop pass: the cell soon fails."
+    },
+    {
+      "term": "EEPROM.put and EEPROM.get",
+      "definition": "They write and read data of several bytes, such as an int, a float or a struct, with a single command. The data takes as many addresses as its own size.",
+      "example": "An int holds 2 bytes and a float 4 bytes; with EEPROM.put(20, deger) an int is written to addresses 20-21.",
+      "pitfall": "Writing data to the same address so that one overwrites the other; write down the address range of each piece of data."
+    },
+    {
+      "term": "String and SRAM",
+      "definition": "String objects take space in SRAM and can break the memory into pieces as they grow. Fixed text written with F(\"...\") stays in Flash.",
+      "example": "Serial.println(F(\"Merhaba\")); does not copy the text into SRAM.",
+      "pitfall": "Joining Strings all the time in a program that runs for a long time: SRAM fills up and the board can behave unexpectedly."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h7d34-q1",
+      "kind": "numeric",
+      "prompt": "An EEPROM cell can take about 100,000 writes. You write to the same cell once every 30 seconds. After about how many days does the cell's lifetime run out? (Round to one decimal place.)",
+      "answer": 34.7,
+      "tolerance": 0.1,
+      "unit": "days",
+      "explanation": "100,000 writes × 30 seconds = 3,000,000 seconds. A day is 86,400 seconds: 3,000,000 / 86,400 ≈ 34.7 days. Taking 30 seconds as a minute and working out 100,000 minutes would be wrong (about 69 days).",
+      "skills": [
+        "mem-eeprom"
+      ]
+    },
+    {
+      "id": "m3h7d34-q2",
+      "kind": "predict-output",
+      "prompt": "The EEPROM has never been written; all the cells are empty. What does this program print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  EEPROM.update(0, 12);\n  Serial.println(EEPROM.read(0));\n  Serial.println(EEPROM.read(1));\n}\n```",
+      "options": [
+        "12 and 0",
+        "12 and 255",
+        "12 and 12",
+        "0 and 0"
+      ],
+      "answer": 1,
+      "explanation": "12 was written to address 0, so the first line is 12. Address 1 was never written, and an empty cell holds 255. Thinking an empty cell is 0 is a common mistake.",
+      "skills": [
+        "mem-eeprom"
+      ]
+    },
+    {
+      "id": "m3h7d34-q3",
+      "kind": "find-bug",
+      "prompt": "The target is written as 300, but it comes back as 44 when read. Why?\n\n```\nint hedef = 300;\nEEPROM.write(0, hedef);\nint okunan = EEPROM.read(0);\nSerial.println(okunan);\n```",
+      "options": [
+        "write and read handle only 1 byte; 300 does not fit in one byte (300 − 256 = 44)",
+        "An int variable cannot be written to the EEPROM",
+        "Serial.println cannot print an int",
+        "The address cannot be 0; it must start from 1"
+      ],
+      "answer": 0,
+      "explanation": "write writes one byte (at most 255). Because 300 does not fit, 300 − 256 = 44 is saved. For two-byte values, EEPROM.put(0, hedef) and EEPROM.get(0, okunan) should be used. Addresses start from 0, and println can print an int.",
+      "skills": [
+        "mem-eeprom",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h7d34-q4",
+      "kind": "mcq",
+      "prompt": "In an aquarium heater controller, the target temperature should stay even when the power is cut. How should the target be stored?",
+      "options": [
+        "In an int variable; variables are permanent anyway",
+        "As a String in SRAM",
+        "By writing it to Flash every second",
+        "In the EEPROM, writing only when the value changes"
+      ],
+      "answer": 3,
+      "explanation": "Variables and Strings are in SRAM and are erased when the power is cut. The program is uploaded to Flash; it is not used for writing settings while running. The EEPROM is used for permanent settings, and to protect its lifetime it is written only when the value changes (update).",
+      "skills": [
+        "mem-eeprom",
+        "mem-sram"
+      ]
+    },
+    {
+      "id": "m3h7d34-q5",
+      "kind": "numeric",
+      "prompt": "The structure below is written with EEPROM.put(20, k). What is the first address where the next data can be written without a clash?\n\n```\nstruct Kayit {\n  byte mod;\n  int hedef;\n  float fark;\n};\nKayit k;\n```",
+      "answer": 27,
+      "tolerance": 0,
+      "explanation": "A byte holds 1, an int 2 and a float 4 bytes: 7 bytes in total. Starting at address 20, addresses 20-26 are filled; the first free address is 27. Writing at 28 leaves one address empty, and writing at 26 spoils the last byte of the float.",
+      "skills": [
+        "mem-eeprom",
+        "bits-bytes"
+      ]
+    }
+  ]
+}

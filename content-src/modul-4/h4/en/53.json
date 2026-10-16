@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "Warm-up time",
+      "definition": "The time you wait for the heater inside the MQ-2 to bring the sensing element up to its working temperature.",
+      "example": "In the lesson we wait 5 seconds; for a real module you use the time given in the datasheet.",
+      "pitfall": "Not waiting for the warm-up: the baseline comes out wrong, and the alarm goes off wrongly or never goes off."
+    },
+    {
+      "term": "Baseline value",
+      "definition": "The average reading measured in clean air after the warm-up.",
+      "example": "On the virtual module the baseline is about 102 when Gas level is 0.",
+      "pitfall": "Measuring the baseline in air that contains gas: the thresholds move up and a real rise is missed."
+    },
+    {
+      "term": "Relative threshold (ratio)",
+      "definition": "Writing the threshold as a multiple of the baseline instead of a fixed number.",
+      "example": "If ALARM_ORAN = 1.5 and the baseline is 120, the alarm starts at 180 and above.",
+      "pitfall": "Using a fixed number like okuma > 400: it becomes meaningless with another module or in different air."
+    },
+    {
+      "term": "Smoothing",
+      "definition": "Mixing each new reading with the old average to soften sudden spikes.",
+      "example": "The line ort = 0.8 * ort + 0.2 * okuma stops a single spike from raising the alarm.",
+      "pitfall": "Tying the alarm to a single raw reading: one spike produces a false alarm."
+    },
+    {
+      "term": "The integer division trap",
+      "definition": "Dividing two int numbers throws the fraction away: 160 / 100 gives 1.",
+      "example": "If you write float oran = ort / 100.0; the ratio comes out as 1.6.",
+      "pitfall": "Putting the ratio into a float variable and thinking it is correct; if the division was done with int, the fraction is already lost."
+    },
+    {
+      "term": "A relative reading instead of a ppm number",
+      "definition": "ppm needs the gas type, the curve and a calibration; without them you can only say how many times the baseline it is.",
+      "example": "\"1.6 times clean air\" is a correct statement; \"500 ppm\" is made up in this circuit.",
+      "pitfall": "Converting the reading to ppm and believing it, or using the circuit on its own to protect real lives."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d3-q1",
+      "kind": "numeric",
+      "prompt": "On another MQ-2 module, the baseline in clean air was measured as 120. If the alarm ratio is 1.5, what is the smallest reading at which the alarm starts?",
+      "answer": 180,
+      "tolerance": 0,
+      "explanation": "The threshold is a multiple of the baseline: 120 × 1.5 = 180. If you ran the same code on the virtual module with a baseline of 102, the threshold would be 153. That is why it matters that you do not write the threshold as a fixed number.",
+      "skills": [
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d3-q2",
+      "kind": "predict-output",
+      "prompt": "The baseline is 100, smoothing is ort = 0.8 * ort + 0.2 * okuma. The reading suddenly jumps to 300 and stays there. What does this code print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  float ort = 100;\n  for (int i = 1; i <= 3; i++) {\n    ort = 0.8 * ort + 0.2 * 300;\n    Serial.println(ort, 0);\n  }\n}\n```\n(The second println parameter is 0: no digits after the decimal point.)",
+      "options": [
+        "300, 300, 300",
+        "140, 172, 198",
+        "120, 136, 149",
+        "140, 140, 140"
+      ],
+      "answer": 1,
+      "explanation": "The first step is 0.8 × 100 + 60 = 140, the second 0.8 × 140 + 60 = 172, the third 0.8 × 172 + 60 = 197.6 and println prints 198. The average only passes 150 (1.5 times the baseline) at the second step. That is why smoothing raises the alarm on a lasting rise, not on a single spike.",
+      "skills": [
+        "sens-smoothing",
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d3-q3",
+      "kind": "mcq",
+      "prompt": "You have just connected a real MQ-2 module and you measure the baseline straight away. Why is this not a good idea?",
+      "options": [
+        "Until the heater has warmed up, the readings are unsteady; this baseline comes out wrong",
+        "The MQ-2 never gives an analog output",
+        "The baseline is only measured in the factory",
+        "analogRead does not work before the warm-up"
+      ],
+      "answer": 0,
+      "explanation": "Until the MQ-2's heater brings the sensing element up to its working temperature, the readings settle slowly. A baseline measured during that time is very different from later readings, and the ratio calculation breaks. The other options are wrong: the module has an AO output, analogRead always works and the baseline is measured where the sensor is.",
+      "skills": [
+        "sens-baseline",
+        "safety-sensors"
+      ]
+    },
+    {
+      "id": "m4h4d3-q4",
+      "kind": "find-bug",
+      "prompt": "When the real ratio is 1.6 (ort = 160, baz = 100), the alarm never starts. Where is the mistake?\n\n```\nint baz = 100;\nint ort = 160;\nfloat oran = ort / baz;\nif (oran >= 1.5) alarm = true;\n```",
+      "options": [
+        "The line int ort = 160;",
+        "The line if (oran >= 1.5)",
+        "The line int baz = 100;",
+        "The line float oran = ort / baz; : when two ints are divided the result is 1"
+      ],
+      "answer": 3,
+      "explanation": "Because ort and baz are both int, 160 / 100 is integer division and the result is 1; putting it into a float variable does not bring the fraction back. The fix is to write ort / (float)baz or ort / 100.0. The other lines are correct.",
+      "skills": [
+        "prog-debug",
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d3-q5",
+      "kind": "mcq",
+      "prompt": "The MQ-2 reading is 500. A friend asks: \"How many ppm of gas does that mean?\" Which answer is the most correct?",
+      "options": [
+        "500 ppm",
+        "5 ppm, because 500 / 100",
+        "In this circuit you cannot say ppm; you can only say how many times it has risen compared with the clean-air baseline",
+        "Zero ppm, because there is no gas"
+      ],
+      "answer": 2,
+      "explanation": "ppm needs the curve from the datasheet, the type of gas and the sensor's calibration. The MQ-2 cannot tell gases apart and no calibration has been done. So only the ratio (reading / baseline) is given. The other options make up a conversion.",
+      "skills": [
+        "sens-baseline",
+        "safety-sensors"
+      ]
+    }
+  ]
+}

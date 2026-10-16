@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "RAG",
+      "definition": "Retrieval-augmented generation: first the relevant chunks are found, then the model writes an answer based on that context.",
+      "example": "The \"due date\" chunk is found in the club guide and put into the prompt.",
+      "pitfall": "Thinking RAG is the model itself; the model is only the last step, and everything before it is a search pipeline."
+    },
+    {
+      "term": "Chunk",
+      "definition": "A small part of a long document that is vectorized separately for retrieval.",
+      "example": "The 130-word guide is split into chunks of 20 words each.",
+      "pitfall": "Thinking a chunk is always a sentence; in the workshop it is cut at a fixed number of words and can end in the middle of a sentence."
+    },
+    {
+      "term": "Chunk size",
+      "definition": "The number of words in a chunk; smaller means more focus, larger means a watered-down context.",
+      "example": "With a size of 20, the due-date sentence stays in one chunk.",
+      "pitfall": "Making the size too small: the answer is split across two chunks and does not appear complete in either."
+    },
+    {
+      "term": "Overlap",
+      "definition": "The number of words consecutive chunks share; it protects an answer on the boundary.",
+      "example": "With size 20 and overlap 5, each chunk moves forward 15 words.",
+      "pitfall": "Choosing an overlap equal to or larger than the size: the window does not move forward, the number of chunks explodes or the loop never ends."
+    },
+    {
+      "term": "Step",
+      "definition": "Size minus overlap; the number of words between the starts of consecutive chunks.",
+      "example": "100 words, size 20, overlap 5: step 15, 7 chunks in total.",
+      "pitfall": "Working out the number of chunks as 100 / 20 = 5; overlap increases the count."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h5d23-q1",
+      "kind": "numeric",
+      "prompt": "A 100-word document is split into 20-word chunks, and consecutive chunks overlap by 5 words. The last chunk counts even if it is short. How many chunks are made?",
+      "answer": 7,
+      "unit": "chunks",
+      "explanation": "The step is 20 − 5 = 15. The starts are 0, 15, 30, 45, 60, 75, 90; the chunk that starts at 90 ends the document at 100. 7 chunks in total. Without overlap there would be 5 chunks; rounding 100 / 15 ≈ 6.7 down to 6 also skips the short last chunk.",
+      "skills": [
+        "ai-chunking"
+      ]
+    },
+    {
+      "id": "m7h5d23-q2",
+      "kind": "mcq",
+      "prompt": "What is the main purpose of leaving an overlap between chunks?",
+      "options": [
+        "To reduce the number of chunks",
+        "To make sure that, if the answer falls on the boundary of two chunks, it is complete in at least one chunk",
+        "To speed up the similarity calculation",
+        "To make the model's context window bigger"
+      ],
+      "answer": 1,
+      "explanation": "Overlap lets a sentence on the boundary appear in two chunks at once. It increases the number of chunks rather than reducing it; it does not speed up the calculation and does not change the model's window.",
+      "skills": [
+        "ai-chunking"
+      ]
+    },
+    {
+      "id": "m7h5d23-q3",
+      "kind": "predict-output",
+      "prompt": "What does this code print when it runs?\n\n```\nk = list(\"abcdefgh\")\nboy, ortus = 4, 1\nfor bas in range(0, len(k), boy - ortus):\n    print(\"\".join(k[bas:bas + boy]))\n```",
+      "options": [
+        "abcd, defg, gh",
+        "abcd, efgh",
+        "abcd, bcde, cdef",
+        "abcd, defg, ghh"
+      ],
+      "answer": 0,
+      "explanation": "The step is 4 − 1 = 3; the starts are 0, 3, 6. From 0 you get abcd, from 3 defg (\"d\" is shared), from 6 only gh (the document ends). abcd, efgh would be the case without overlap; bcde is the case where the step is 1. A slice does not go past the end of the document, so \"ghh\" does not appear.",
+      "skills": [
+        "ai-chunking"
+      ]
+    },
+    {
+      "id": "m7h5d23-q4",
+      "kind": "find-bug",
+      "prompt": "For size 20 and overlap 5, this chunking function makes chunks that overlap by 15 words, and the number of chunks balloons.\n\n```\ndef parcala(kelimeler, boy, ortusme):\n    parcalar = []\n    bas = 0\n    while bas < len(kelimeler):\n        parcalar.append(kelimeler[bas:bas + boy])\n        bas = bas + ortusme\n    return parcalar\n```\n\nWhat is the bug?",
+      "options": [
+        "The slice boundary is wrong",
+        "The step forward is ortusme; it should be boy - ortusme",
+        "for should be used instead of while",
+        "The parcalar list is not reset"
+      ],
+      "answer": 1,
+      "explanation": "The window moves forward ortusme (5) words on each pass; as a result consecutive chunks overlap by 15 words. The right step is boy − ortusme = 15. If the overlap were 0, bas would never move and the loop would never end. The slice and the while are correct, and the list is reset once at the start.",
+      "skills": [
+        "ai-chunking",
+        "ai-rag-pipeline"
+      ]
+    },
+    {
+      "id": "m7h5d23-q5",
+      "kind": "mcq",
+      "prompt": "For a question whose answer is one sentence, what would you expect if the chunk size is set to 300 words?",
+      "options": [
+        "The answer definitely cannot be found",
+        "The answer is in the chunk, but unrelated text also gets into the context and the similarity is watered down",
+        "The overlap increases automatically",
+        "The model cannot use the context at all"
+      ],
+      "answer": 1,
+      "explanation": "A large chunk can contain the answer but carries many words unrelated to the question; the similarity drops and the prompt becomes needlessly long. Losing the answer completely is the risk of small chunks. The overlap does not change by itself.",
+      "skills": [
+        "ai-chunking",
+        "ai-rag-pipeline"
+      ]
+    }
+  ]
+}

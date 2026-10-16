@@ -1,0 +1,122 @@
+{
+  "concepts": [
+    {
+      "term": "Input - decision - output",
+      "definition": "Splitting the alarm panel into three separate layers: reading the sensors, finding the level and driving the outputs.",
+      "example": "The analogRead values go into seviyeBul, and the overall level goes to ciktilariSur.",
+      "pitfall": "Mixing reading, deciding and output in the same block of code: changing one place breaks another."
+    },
+    {
+      "term": "Overall state (enKotu)",
+      "definition": "Making the highest of the three sensors' levels the panel's state.",
+      "example": "If gas is NORMAL, flame is UYARI and heat is TEHLIKE, the overall state is TEHLIKE.",
+      "pitfall": "Leaving a sensor out: even if that sensor is in danger, the panel shows NORMAL."
+    },
+    {
+      "term": "Working out the outputs from the level",
+      "definition": "Driving the LEDs, buzzer, relay and screen in a single function, looking only at the level.",
+      "example": "ciktilariSur() sets the LEDs, buzzer and relay from the overall level on every pass.",
+      "pitfall": "Driving the outputs from different places: the level and the outputs get out of step, and the buzzer is silent while the screen says TEHLIKE."
+    },
+    {
+      "term": "Non-blocking beep pattern",
+      "definition": "Making an on-off sound without delay, using the remainder of millis() (simdi % 1000 < 150).",
+      "example": "The buzzer sounds in the first 150 ms of every second and is silent for the other 850 ms.",
+      "pitfall": "Using delay for the beep: meanwhile the sensors are not read and the screen is not updated."
+    },
+    {
+      "term": "Relay rule (fan for gas)",
+      "definition": "The fan runs only until the gas level is NORMAL; a flame on its own does not switch the fan on.",
+      "example": "If flame is TEHLIKE and gas is NORMAL, the red LED lights up but the relay stays off.",
+      "pitfall": "Tying the relay to the overall state without thinking about this rule: you may not want the fan running in a fire; this is a design decision and should be questioned."
+    },
+    {
+      "term": "Limit: for learning only",
+      "definition": "This panel does not replace a certified gas or fire detector.",
+      "example": "The panel only drives a 5 V LED with the relay; mains voltage is not used.",
+      "pitfall": "Using the circuit on its own to protect real lives and property."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d5-q1",
+      "kind": "mcq",
+      "prompt": "On the panel, gas is NORMAL and heat is NORMAL, but the flame sensor is at the TEHLIKE level. What state are the outputs in?",
+      "options": [
+        "Green LED lit, buzzer silent, relay on",
+        "Yellow LED lit, one beep a second, relay on",
+        "Red LED lit, buzzer continuous, relay off",
+        "Red LED lit, buzzer silent, relay on"
+      ],
+      "answer": 2,
+      "explanation": "The overall state is the worst level: TEHLIKE. So the red LED lights up and the buzzer sounds continuously. The relay depends only on the gas level; because the gas is NORMAL, the fan does not run. The other options apply the overall state or the relay rule wrongly.",
+      "skills": [
+        "alarm-design",
+        "sens-levels"
+      ]
+    },
+    {
+      "id": "m4h4d5-q2",
+      "kind": "numeric",
+      "prompt": "For gas, the TEHLIKE off threshold is baseline × 2 (integer maths). On the virtual MQ-2 the baseline in clean air was measured as 102. Below which value must the reading fall for the gas to drop from TEHLIKE to UYARI?",
+      "answer": 204,
+      "tolerance": 0,
+      "explanation": "tehlikeKapat = gazBaz × 2 = 102 × 2 = 204. While at the TEHLIKE level, when the reading drops below 204 it moves to UYARI. The TEHLIKE on threshold is 102 × 5 / 2 = 255; the 204-255 region between the two thresholds is the hysteresis band.",
+      "skills": [
+        "sens-levels",
+        "sens-baseline"
+      ]
+    },
+    {
+      "id": "m4h4d5-q3",
+      "kind": "predict-output",
+      "prompt": "At the UYARI level, the buzzer pattern is set by (simdi % 1000) < 150. The buzzer state (1 = sounding) is printed while millis() is 2100, 2200, 2999 and 3050 in turn. What does this code print?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  unsigned long t[] = {2100, 2200, 2999, 3050};\n  for (int i = 0; i < 4; i++) {\n    bool bip = (t[i] % 1000) < 150;\n    Serial.print(bip ? 1 : 0);\n  }\n}\n```",
+      "options": [
+        "0110",
+        "1111",
+        "0000",
+        "1001"
+      ],
+      "answer": 3,
+      "explanation": "2100 % 1000 = 100 < 150, so 1. 2200 % 1000 = 200 ≥ 150, so 0. 2999 % 1000 = 999, so 0. 3050 % 1000 = 50 < 150, so 1. The output is 1001: the first 150 ms of every second is a beep, the rest is silent.",
+      "skills": [
+        "alarm-design",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h4d5-q4",
+      "kind": "find-bug",
+      "prompt": "The NTC shows 70 °C and the heat level is found to be TEHLIKE, but the panel shows NORMAL and stays silent. Where is the mistake?\n\n```\ngaz = yeniGaz;\nalev = yeniAlev;\nisi = yeniIsi;\n\nSeviye yeniGenel = enKotu(gaz, alev);\nif (yeniGenel != genel) {\n  genel = yeniGenel;\n}\n```",
+      "options": [
+        "The line gaz = yeniGaz; is not needed",
+        "The genel variable should not be global",
+        "enKotu cannot compare enums",
+        "enKotu(gaz, alev) does not take the isi level into account"
+      ],
+      "answer": 3,
+      "explanation": "The overall state must be the worst of the three sensors: enKotu(gaz, enKotu(alev, isi)). Because the heat is not taken into account, the sensor at the TEHLIKE level does not show up in the overall state and the outputs stay silent. enum values can be compared like numbers, and the other lines are correct.",
+      "skills": [
+        "alarm-design",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d5-q5",
+      "kind": "mcq",
+      "prompt": "The panel was switched on by mistake while Gas level was 0.3; the baseline was measured as about 379. Then the gas rose to 0.6 (reading about 655). If the baseline had been 102 in clean air, this reading would count as TEHLIKE (threshold 255). Which level does this panel show now?",
+      "options": [
+        "NORMAL",
+        "UYARI",
+        "TEHLIKE",
+        "It gives an error"
+      ],
+      "answer": 1,
+      "explanation": "If the baseline is 379, the UYARI on threshold is 379 × 3 / 2 = 568 and the TEHLIKE on threshold is 379 × 5 / 2 = 947. 655 only goes above the UYARI threshold. Because the baseline was measured in air containing gas, the thresholds move up and a real danger is underestimated. That is why the baseline is measured in clean air, after the warm-up; this panel is also for learning and is not used for real safety.",
+      "skills": [
+        "sens-baseline",
+        "safety-sensors"
+      ]
+    }
+  ]
+}

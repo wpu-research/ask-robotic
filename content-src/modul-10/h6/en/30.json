@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Flow plan",
+      "definition": "A list, written before coding, of which hat block runs when and what it does.",
+      "example": "Every 2 seconds measure and send; A: show; when a message arrives: react.",
+      "pitfall": "Starting without a plan: blocks end up in the wrong hat block."
+    },
+    {
+      "term": "Radio group",
+      "definition": "The cards need to be in the group with the same number; only cards in the same group hear each other.",
+      "example": "Both cards set the radio group to 7.",
+      "pitfall": "Staying in different groups: the messages never arrive."
+    },
+    {
+      "term": "Sender and receiver",
+      "definition": "The sender sends its own reading; the receiver uses the value that arrives.",
+      "example": "On the receiving card, the received value is put into the uzak variable.",
+      "pitfall": "Reading its own P1 on the receiving card: you see yourself, not the other pot."
+    },
+    {
+      "term": "Message name",
+      "definition": "The name in the name = value pair of a radio message.",
+      "example": "The sender sends \"nem\", and the receiver checks received name = \"nem\".",
+      "pitfall": "The difference between capital and small letters: \"Nem\" and \"nem\" do not count as equal."
+    },
+    {
+      "term": "The largest value sets the scale",
+      "definition": "The bar graph's largest value must fit the measuring range.",
+      "example": "Because the moisture is a percentage, the largest value is 100.",
+      "pitfall": "Leaving the largest value at 1023: when the moisture is 50, only 1 LED lights."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d30-q1",
+      "kind": "mcq",
+      "prompt": "Two cards are in the same group and run the same program. When Card 1 sends a message, who receives it?",
+      "options": [
+        "Only Card 2 receives it",
+        "Card 1 and Card 2 receive it",
+        "Nobody receives it",
+        "All the cards in the group and the sender receive it"
+      ],
+      "answer": 0,
+      "explanation": "A card does not receive its own message; the message only goes to the other card. That is why each card sees the state of the other pot.",
+      "skills": [
+        "mk-radio"
+      ]
+    },
+    {
+      "id": "m10h6d30-q2",
+      "kind": "find-bug",
+      "prompt": "The receiving card does not show a sad face even though the other pot is dry, because its own P1 input value is high. Which is the mistake?\n\n```\non radio received:\n  if received name = \"nem\" then:\n    set uzak to (map [analog read P1] 0-1023 -> 0-100)\n    if uzak < 30 then:\n      show icon [sad face]\n```",
+      "options": [
+        "The threshold should be 300, not 30",
+        "The uzak value is read not from the received value but from the receiving card's own P1 pin",
+        "There is no sad face icon",
+        "received value should be written instead of received name"
+      ],
+      "answer": 1,
+      "explanation": "When a message arrives, the received [value] block is used; that is the other pot's moisture. Reading P1 gives the receiving card's own moisture. The threshold and the icon are correct.",
+      "skills": [
+        "mk-radio",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h6d30-q3",
+      "kind": "numeric",
+      "prompt": "Card 2's P1 input slider is at 150. Card 2 maps 0-1023 to 0-100 and sends the moisture by radio. Which moisture value does Card 1 receive?",
+      "answer": 15,
+      "unit": "%",
+      "explanation": "150 x 100 / 1023 = 14.66, which rounds to 15. Rounding down and writing 14, or writing 150, would be wrong.",
+      "skills": [
+        "mk-sensors",
+        "mk-radio"
+      ]
+    },
+    {
+      "id": "m10h6d30-q4",
+      "kind": "predict-output",
+      "prompt": "The receiving card runs this program. The messages arrive in this order: nem = 50, nem = 28, sicak = 12, nem = 30. How many times is the sad face shown?\n\n```\non radio received:\n  if received name = \"nem\" then:\n    set uzak to (received value)\n    if uzak < 30 then:\n      sad face and the Sad melody\n    else:\n      bar graph [uzak] up to [100]\n```",
+      "options": [
+        "0 times",
+        "1 time",
+        "2 times",
+        "3 times"
+      ],
+      "answer": 1,
+      "explanation": "Only nem = 28 both matches the name and is below 30. For nem = 30, 30 < 30 is false, so it goes to the else branch (bar graph); sicak = 12 is not handled at all, because its name does not match.",
+      "skills": [
+        "mk-radio",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d30-q5",
+      "kind": "numeric",
+      "prompt": "The moisture is 50 as a percentage, but the bar graph's largest value has been left at 1023 by mistake. How many LEDs light up?",
+      "answer": 1,
+      "unit": "LEDs",
+      "explanation": "50 / 1023 x 25 = 1.22, which rounds to 1 LED lighting up. If the largest value were 100, 13 LEDs would light. The scale must fit the measured range.",
+      "skills": [
+        "mk-display",
+        "mk-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Hysteresis",
+      "definition": "Using two separate thresholds for switching on and switching off. Between the thresholds, the system keeps its previous state.",
+      "example": "With the target at 22 °C, the heater switches on at 21.5 °C and off at 22.5 °C.",
+      "pitfall": "Using a single threshold: when the temperature wobbles around the threshold, the relay switches on and off very fast."
+    },
+    {
+      "term": "State machine (thermostat)",
+      "definition": "A design in which the system is in exactly one state at any moment. The thermostat's three states are KAPALI (off), ISITIYOR (heating) and AYAR (setting); each state has a set relay output and leaving condition.",
+      "example": "The relay output is worked out from the state: digitalWrite(ROLE, durum == ISITIYOR ? HIGH : LOW);",
+      "pitfall": "Writing the states as scattered ifs: the question of which state should keep the relay on gets out of control."
+    },
+    {
+      "term": "Temperature from the NTC divider",
+      "definition": "The NTC and a fixed resistor make a voltage divider; from the ADC value, R = 10000 × ADC / (1023 − ADC) gives the NTC's resistance, and the β formula gives the temperature. As it warms up, the NTC's resistance falls.",
+      "example": "With ADC = 512, R ≈ 10 kΩ, so about 25 °C.",
+      "pitfall": "Swapping the places of the NTC and the fixed resistor: the reading works backwards."
+    },
+    {
+      "term": "Saving the setting with a delay",
+      "definition": "Waiting until the user has finished adjusting (here, 2 seconds after the last press) and writing to the EEPROM once.",
+      "example": "Five presses in a row are saved with a single EEPROM.update call.",
+      "pitfall": "Writing to the EEPROM on every button press: needless writes use up its lifetime."
+    },
+    {
+      "term": "Default and limit values",
+      "definition": "At start-up, the value read from the EEPROM is checked to see whether it is in the valid range (10-35); if not, the default (22) is used. The buttons also keep the target in this range.",
+      "example": "An empty EEPROM gives 255; because 255 is bigger than 35, the target becomes 22.",
+      "pitfall": "Taking an empty EEPROM that reads as 255 for a valid target: the heater stays on all the time."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h7d35-q1",
+      "kind": "numeric",
+      "prompt": "In the thermostat, ADC = 600 was read from pin A2. The fixed resistor is 10 kΩ and the formula R = 10000 × ADC / (1023 − ADC) is used. About how many ohms is the NTC's resistance? (Round to the nearest whole number.)",
+      "answer": 14184,
+      "tolerance": 5,
+      "unit": "Ω",
+      "explanation": "R = 10000 × 600 / (1023 − 600) = 6,000,000 / 423 ≈ 14,184 Ω. Because the resistance is bigger than 10 kΩ, the NTC is colder than 25 °C (an NTC's resistance falls as it warms up).",
+      "skills": [
+        "sensor-ntc"
+      ]
+    },
+    {
+      "id": "m3h7d35-q2",
+      "kind": "predict-output",
+      "prompt": "The target is 22, HISTEREZIS is 0.5; the state starts as KAPALI. The temperature readings come in this order: 22.0 - 21.4 - 21.8 - 22.4 - 22.6 - 22.2. What is the relay's state (1 = on) after each reading?\n\n```\ncase KAPALI:\n  if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n  break;\ncase ISITIYOR:\n  if (sicaklik >= hedef + HISTEREZIS) durum = KAPALI;\n  break;\n```",
+      "options": [
+        "1 1 1 0 0 0",
+        "0 1 0 0 1 0",
+        "0 1 1 1 0 1",
+        "0 1 1 1 0 0"
+      ],
+      "answer": 3,
+      "explanation": "22.0 > 21.5: it stays KAPALI (0). 21.4 ≤ 21.5: ISITIYOR (1). 21.8 and 22.4 are below the switch-off threshold of 22.5: the relay stays on (1, 1). 22.6 ≥ 22.5: KAPALI (0). 22.2 is above the switch-on threshold of 21.5: it stays off (0). Result: 0 1 1 1 0 0.",
+      "skills": [
+        "ctl-hysteresis",
+        "prog-fsm"
+      ]
+    },
+    {
+      "id": "m3h7d35-q3",
+      "kind": "find-bug",
+      "prompt": "The heater switches on and off far too often. Which line is wrong?\n\n```\ncase KAPALI:\n  if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;\n  break;\ncase ISITIYOR:\n  if (sicaklik >= hedef - HISTEREZIS) durum = KAPALI;\n  break;\n```",
+      "options": [
+        "if (sicaklik <= hedef - HISTEREZIS) durum = ISITIYOR;",
+        "if (sicaklik >= hedef - HISTEREZIS) durum = KAPALI;",
+        "case KAPALI:",
+        "break;"
+      ],
+      "answer": 1,
+      "explanation": "The switch-off threshold in the ISITIYOR state should be hedef + HISTEREZIS. If minus is written, the switch-on and switch-off thresholds fall on the same number (target − 0.5); when the temperature drops below 21.5 the heater switches on, and as soon as the temperature rises a little it switches off straight away. The point of hysteresis is lost.",
+      "skills": [
+        "ctl-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h7d35-q4",
+      "kind": "mcq",
+      "prompt": "While the thermostat is running, the NTC's wire breaks, so the NTC drops out of the circuit (A2 is pulled to 5 V through the fixed resistor). How does the program work out the temperature, and what happens?",
+      "options": [
+        "It thinks the temperature is very low and the heater stays on all the time",
+        "It thinks the temperature is very high and the heater switches off",
+        "It thinks the temperature is 0 °C and the program stops",
+        "Nothing changes"
+      ],
+      "answer": 0,
+      "explanation": "When A2 is at 5 V, the ADC reaches its highest value (around 1022). The formula finds a very large resistance and the temperature comes out at about -77 °C: the program thinks it is 'very cold' and the relay stays on all the time. On a real heater this is dangerous; that is why a sensible-range check and a safety limit should be added.",
+      "skills": [
+        "sensor-ntc",
+        "ctl-hysteresis"
+      ]
+    },
+    {
+      "id": "m3h7d35-q5",
+      "kind": "numeric",
+      "prompt": "The target 22 is already saved in the EEPROM. The user presses the up button 3 times and the down button 3 times, with 1 second between presses, then waits 2 seconds. The program uses EEPROM.update after the setting is finished. How many writes are made to the EEPROM in total?",
+      "answer": 0,
+      "tolerance": 0,
+      "unit": "writes",
+      "explanation": "Every press restarts the 2-second timer, so AYAR only finishes 2 seconds after the last press and a single update is called. Because the target goes 22 → 25 → 22, the value is the same as the one in the EEPROM; in this case update does not write at all. So 0 writes are made.",
+      "skills": [
+        "mem-eeprom",
+        "prog-fsm"
+      ]
+    }
+  ]
+}

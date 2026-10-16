@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Measure-error-PID-drive skeleton",
+      "definition": "The same order in both the line task and the wall task: read the measurement, work out the error, find the PID output, give it to the motors.",
+      "example": "On the line the error is the array position, at the wall it is mesafe - HEDEF; the rest of the code is the same.",
+      "pitfall": "Using the same Kp for the line and the wall; the error units are different."
+    },
+    {
+      "term": "Fair comparison",
+      "definition": "Comparing two methods on the same track, with the same TABAN and the same measurement method, over more than one run.",
+      "example": "Running PID and bang-bang at full speed on the hard and the easy track.",
+      "pitfall": "Deciding from a single run; noise and the starting point can change the result."
+    },
+    {
+      "term": "Bang-bang tuning sensitivity",
+      "definition": "Bang-bang's dependence on its fixed turn value; with a small value it cannot take the bend.",
+      "example": "Of the four turn values, only 200 finished the track.",
+      "pitfall": "Thinking bang-bang needs no tuning; the turn value has to be tuned too."
+    },
+    {
+      "term": "Steering jitter",
+      "definition": "The average change, at each measurement step, in the speed difference between the left and right wheels; if it is large, the steering keeps wiggling.",
+      "example": "On the hard track PID gave a jitter of 0.91 and bang-bang 0.46.",
+      "pitfall": "Automatically treating staying close to the line as smooth driving; PID was closer to the line but wiggled the steering more."
+    },
+    {
+      "term": "I and D on the line array",
+      "definition": "Because the array measures in steps of 0.5 and the line can disappear between sensors, it feeds fake jumps into I and D; here Ki = 0 and Kd is small.",
+      "example": "When Ki = 1 was switched on, the lap on the hard track got longer, from 8.62 s to 9.40 s.",
+      "pitfall": "Increasing Kd by intuition; on the line array the derivative behaves like noise."
+    },
+    {
+      "term": "Target band",
+      "definition": "The accepted range of deviation in wall following; here ±2 cm around the target.",
+      "example": "After the 4th second the robot stayed inside the band 100% of the time.",
+      "pitfall": "Counting the deviation in the first seconds as a failure of the controller when the starting distance is outside the band."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h5d100-q1",
+      "kind": "numeric",
+      "prompt": "In the PID wall follower, KP = 16, KI = 1, KD = 4, TABAN = 170, UMAX = 100. In one round e = 3 cm, integral = 2 and turevSuz = 5 cm/s. What value is given to the left wheel (TABAN - u)?",
+      "answer": 100,
+      "tolerance": 0,
+      "explanation": "u = 16 x 3 + 1 x 2 + 4 x 5 = 48 + 2 + 20 = 70. Because it stays within the UMAX = 100 limit, u is used as it is and the left wheel gets 170 - 70 = 100.",
+      "skills": [
+        "ctl-pid-project"
+      ]
+    },
+    {
+      "id": "m5h5d100-q2",
+      "kind": "numeric",
+      "prompt": "On a track, the PID lap took 9.0 s and the bang-bang lap took 10.0 s. By what percentage was the PID lap shorter than the bang-bang time?",
+      "answer": 10,
+      "tolerance": 0.1,
+      "unit": "%",
+      "explanation": "The difference is 10.0 - 9.0 = 1.0 s, and its ratio to the bang-bang time is 1.0 / 10.0 = 10%. If you divided the difference by the PID time (9.0), you would get 11.1%; a comparison must say which method it is relative to.",
+      "skills": [
+        "ctl-pid-project"
+      ]
+    },
+    {
+      "id": "m5h5d100-q3",
+      "kind": "predict-output",
+      "prompt": "In the bang-bang line follower, yon = +1 means turn left and -1 means turn right. What does this code print when it runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  bool gor[5] = {false, false, false, true, true};\n  int yon;\n  if (gor[0] || gor[1]) yon = 1;\n  else if (gor[3] || gor[4]) yon = -1;\n  else yon = 0;\n  int sol = constrain(255 - yon * 200, -255, 255);\n  int sag = constrain(255 + yon * 200, -255, 255);\n  Serial.print(\"sol=\");\n  Serial.print(sol);\n  Serial.print(\" sag=\");\n  Serial.println(sag);\n}\nvoid loop() {}\n```",
+      "options": [
+        "sol=255 sag=55",
+        "sol=55 sag=255",
+        "sol=455 sag=55",
+        "sol=255 sag=455"
+      ],
+      "answer": 0,
+      "explanation": "Because A3 and A4 see the line, the line is on the right and yon = -1. Left = 255 + 200 = 455, and constrain squeezes this to 255; right = 255 - 200 = 55. Because the right wheel slows down, the robot turns right.",
+      "skills": [
+        "ctl-pid-project",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h5d100-q4",
+      "kind": "mcq",
+      "prompt": "When Ki = 1 was switched on in the line follower, the lap on the hard track got longer and the steering jitter increased. What is the real reason?",
+      "options": [
+        "Ki always makes the lap longer",
+        "The array's measurement in steps of 0.5 and the jumps when the line is lost create fake build-up in the integral",
+        "Ki only works in wall following",
+        "Never limiting the integral causes a compile error"
+      ],
+      "answer": 1,
+      "explanation": "While the line passes between two sensors, the error jumps and the integral accumulates this fake error. Ki was useful in wall following, so it is not always harmful; the ILIM limit does not cause a compile error either.",
+      "skills": [
+        "ctl-pid-project",
+        "ctl-integral"
+      ]
+    },
+    {
+      "id": "m5h5d100-q5",
+      "kind": "find-bug",
+      "prompt": "The wall follower (wall on the left; u > 0 turn left) moves even further away the further it gets from the wall. Where is the single bug?\n\n```\nfloat e = HEDEF - mesafe;\nfloat u = constrain(pid(e, DT / 1000.0), -UMAX, UMAX);\nsurucu(SOL_EN, SOL_IN1, SOL_IN2, TABAN - u);\nsurucu(SAG_EN, SAG_IN1, SAG_IN2, TABAN + u);\n```",
+      "options": [
+        "The UMAX limit should be removed",
+        "The left wheel should get TABAN + u",
+        "The sign of e = HEDEF - mesafe is reversed; when moving away from the wall e becomes negative and the robot turns right",
+        "The servo should look at 0 degrees instead of 180"
+      ],
+      "answer": 2,
+      "explanation": "Our rule was e = mesafe - HEDEF: when far from the wall (e > 0), the robot should turn left, towards the wall. With the sign reversed, e becomes negative and the robot turns right, away from the wall. The wheel formula and UMAX are correct.",
+      "skills": [
+        "ctl-pid-project",
+        "prog-debug"
+      ]
+    }
+  ]
+}

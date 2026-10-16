@@ -1,0 +1,113 @@
+{
+  "concepts": [
+    {
+      "term": "BPE (byte pair encoding)",
+      "definition": "A method that learns a list of pieces by merging, again and again, the two pieces that sit next to each other most often in the corpus.",
+      "example": "In the small Turkish corpus the first merges are pairs such as e+r, r+o, o+t.",
+      "pitfall": "Thinking BPE knows meaning; it only counts how often pieces sit next to each other."
+    },
+    {
+      "term": "Merge",
+      "definition": "A step in which two pieces are turned into a single new piece and written in the list.",
+      "example": "When o + t are merged, \"ot\" becomes a new piece.",
+      "pitfall": "Thinking a merge adds a whole word to the vocabulary; it works step by step, pair by pair."
+    },
+    {
+      "term": "Merge order",
+      "definition": "The order in which the merges were learned; they are applied to new text in the same order.",
+      "example": "b + ot is only possible after o + t has been done.",
+      "pitfall": "Shuffling the list or applying it in reverse order; you get different and often broken pieces."
+    },
+    {
+      "term": "Pair frequency",
+      "definition": "How many times a pair sits next to each other in the corpus (taking word frequency into account).",
+      "example": "If a word appears 3 times in the corpus and contains \"ur\" once, that word adds 3 to the pair's count.",
+      "pitfall": "Looking at how many different forms a word has and forgetting how many times it appears."
+    },
+    {
+      "term": "Unseen word",
+      "definition": "A word that never appears in the corpus; because the merges are no use for it, it is split into small pieces.",
+      "example": "`kalemlik` (pencil case) does not appear in the robot corpus, so it is represented letter by letter or with very small pieces.",
+      "pitfall": "Thinking the model will give an error on a word it does not know; the tokeniser can split any text."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d3-q1",
+      "kind": "numeric",
+      "prompt": "In a small corpus, the word \"dur\" appears 3 times and the word \"durur\" appears 2 times. The words have been split into letters. How many times in total is the pair where \"u\" and \"r\" sit next to each other counted in the corpus?",
+      "answer": 7,
+      "unit": "times",
+      "explanation": "\"dur\" contains the (u, r) pair once: 3 appearances x 1 = 3. \"durur\" contains it twice (d-u-r-u-r): 2 appearances x 2 = 4. Total 3 + 4 = 7. Both how many times the word appears and how many pairs it contains go into the count.",
+      "skills": [
+        "ai-bpe"
+      ]
+    },
+    {
+      "id": "m7h1d3-q2",
+      "kind": "predict-output",
+      "prompt": "This code applies the merge \"u + r -> ur\". What does it print when it runs?\n\n```\nfunction birlestir(parcalar) {\n  const sonuc = []\n  for (let i = 0; i < parcalar.length; i++) {\n    if (parcalar[i] === \"u\" && parcalar[i + 1] === \"r\") {\n      sonuc.push(\"ur\")\n      i++\n    } else {\n      sonuc.push(parcalar[i])\n    }\n  }\n  return sonuc\n}\nconsole.log(birlestir([\"d\",\"u\",\"r\",\"u\",\"r\"]).join(\" \"))\n```",
+      "options": [
+        "d u r u r",
+        "d ur ur",
+        "d ur r ur r",
+        "dur ur"
+      ],
+      "answer": 1,
+      "explanation": "The code goes from left to right: d stays as it is, at the first u r pair it writes ur and skips r with i++; the same happens at the second pair. The result is d ur ur. Without the skip, r would also be written separately (the third option).",
+      "skills": [
+        "ai-bpe"
+      ]
+    },
+    {
+      "id": "m7h1d3-q3",
+      "kind": "find-bug",
+      "prompt": "This code wants to apply the merge \"u + r\", but for [\"d\",\"u\",\"r\",\"u\",\"r\"] it produces \"d ur r ur r\". Which is the one bug?\n\n```\nfunction hatali(parcalar) {\n  const sonuc = []\n  for (let i = 0; i < parcalar.length; i++) {\n    if (parcalar[i] === \"u\" && parcalar[i + 1] === \"r\") {\n      sonuc.push(\"ur\")\n    } else {\n      sonuc.push(parcalar[i])\n    }\n  }\n  return sonuc\n}\n```",
+      "options": [
+        "The second piece of the merged pair is not skipped (i++ is missing)",
+        "The sonuc array starts empty",
+        "The condition should use || instead of &&",
+        "pop should be used instead of push"
+      ],
+      "answer": 0,
+      "explanation": "When the pair is merged, r has already gone into ur, but on the next round the loop reads r again and adds it separately. The fix is to write i++ in the merge branch. Starting empty is correct; with || even a single u would be merged.",
+      "skills": [
+        "ai-bpe",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d3-q4",
+      "kind": "mcq",
+      "prompt": "What happens when the tokeniser meets the word \"kalemlik\", which never appears in the corpus?",
+      "options": [
+        "It gives an error and stops",
+        "It skips the word",
+        "It splits the parts where the merges are no use into small pieces, into letters if needed",
+        "It replaces the word with the closest robot word"
+      ],
+      "answer": 2,
+      "explanation": "Learned merges only fit pairs that are common in the corpus. An unseen word has few of these pairs and breaks into small pieces; this way every text can still be represented. The word is not skipped or replaced with another word.",
+      "skills": [
+        "ai-bpe",
+        "ai-tokens"
+      ]
+    },
+    {
+      "id": "m7h1d3-q5",
+      "kind": "mcq",
+      "prompt": "In the long run, how does BPE's rule of merging the common pair affect the pieces?",
+      "options": [
+        "All words are split into pieces of equal length",
+        "Common words get close to a single token; rare words are split into more pieces",
+        "Only the longest words are merged",
+        "The pieces are chosen at random on every run"
+      ],
+      "answer": 1,
+      "explanation": "Because common pairs are merged first, common words become a single token within a few steps; the pairs of rare words are not seen often enough, so they stay in pieces. The algorithm is not random: the same corpus gives the same list every time.",
+      "skills": [
+        "ai-bpe"
+      ]
+    }
+  ]
+}

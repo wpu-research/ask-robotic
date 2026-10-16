@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Command parser",
+      "definition": "The part of the program that collects the characters coming from the serial port and splits them into a command (letter) and a value (number).",
+      "example": "The line W200 is decoded as 'forward, speed 200'.",
+      "pitfall": "Trying to process the command before the line ending arrives; the buffer is only half full."
+    },
+    {
+      "term": "Buffer (char array)",
+      "definition": "A fixed-length array in which the incoming characters are collected until the line ends.",
+      "example": "char tampon[12]; holds at most 11 characters; the last one is for '\\0'.",
+      "pitfall": "Not limiting the buffer: a long line overflows memory."
+    },
+    {
+      "term": "atoi, toupper and constrain",
+      "definition": "atoi turns text into a whole number (\"200\" → 200), toupper turns a lower-case letter into upper case, and constrain squeezes a value into a range.",
+      "example": "atoi(\"999\") gives 999; constrain(999, 0, 255) makes it 255.",
+      "pitfall": "Not limiting the speed: a silly value such as W9999 overflows analogWrite."
+    },
+    {
+      "term": "Line ending (\\n and \\r)",
+      "definition": "The character that signals that the command has finished. 'Newline' must be selected in the Serial monitor.",
+      "example": "If both \\n and \\r count as a line ending, the command is processed whichever setting is chosen.",
+      "pitfall": "Choosing 'No line ending': the command is never completed and the robot does not react at all."
+    },
+    {
+      "term": "The last command keeps going",
+      "definition": "This parser carries out a command until a new command arrives; it does not stop on its own.",
+      "example": "If the connection drops after a single W150, the robot keeps going.",
+      "pitfall": "Not taking this seriously: when the remote control drops out, the robot moves on out of control."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d79-q1",
+      "kind": "predict-output",
+      "prompt": "The buffer holds \"d75\". What does this code print?\n\n```\nchar tampon[12] = \"d75\";\nint uzunluk = 3;\nchar komut = toupper(tampon[0]);\nint hiz = 150;\nif (uzunluk > 1) hiz = constrain(atoi(tampon + 1), 0, 255);\nSerial.print(komut);\nSerial.print(' ');\nSerial.println(hiz);\n```",
+      "options": [
+        "d 75",
+        "D 150",
+        "D 75",
+        "D 0"
+      ],
+      "answer": 2,
+      "explanation": "toupper turns the letter 'd' into 'D'. Because uzunluk is greater than 1, atoi(tampon + 1), that is \"75\", is read and the speed becomes 75. 150 is only used when no speed is written.",
+      "skills": [
+        "prog-structure",
+        "digital-out"
+      ]
+    },
+    {
+      "id": "m5h1d79-q2",
+      "kind": "numeric",
+      "prompt": "The command S-40 arrives at the parser. When hiz = constrain(atoi(tampon + 1), 0, 255) runs, what does hiz become?",
+      "answer": 0,
+      "tolerance": 0,
+      "explanation": "atoi(\"-40\") gives −40; because the lower limit of constrain is 0, the result is 0. The direction is chosen by the letter (S), not by the sign. The speed is never negative; thinking −40 would be a backward speed is wrong.",
+      "skills": [
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d79-q3",
+      "kind": "numeric",
+      "prompt": "At PWM 150 each wheel turns in opposite directions at about 0.192 m/s (turning on the spot). L = 0.12 m. About how many seconds should the robot take to turn 180° (π rad)?",
+      "answer": 0.98,
+      "tolerance": 0.03,
+      "unit": "s",
+      "explanation": "When turning on the spot, ω = 2·v / L = 2 · 0.192 / 0.12 = 3.2 rad/s. Time = π / 3.2, about 0.98 s. Using 2v instead of v (the wheels turn in opposite directions) doubles the turning speed.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d79-q4",
+      "kind": "find-bug",
+      "prompt": "When the W command is given, the robot goes backward instead of forward. Where is the bug?\n\n```\nswitch (komut) {\n  case 'W': surus(hiz, hiz);\n  case 'S': surus(-hiz, -hiz); break;\n  case 'X': surus(0, 0); break;\n}\n```",
+      "options": [
+        "The 'W' line: surus(hiz, hiz) is calculated wrongly",
+        "The 'W' line is missing a break; control falls through to the 'S' line and runs the motors backward",
+        "The 'S' line has an extra break",
+        "if should be used instead of switch"
+      ],
+      "answer": 1,
+      "explanation": "Because there is no break, the switch falls from the 'W' case into the 'S' case (fall-through); the second surus call overwrites the first and the robot goes backward. surus(hiz, hiz) is correct.",
+      "skills": [
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d79-q5",
+      "kind": "mcq",
+      "prompt": "This week's serial command program is running. The operator sends a single W150 and the connection drops. What does the robot do?",
+      "options": [
+        "It stops at once",
+        "It stops by itself after a few seconds",
+        "It keeps moving with the last command until a new command arrives",
+        "It turns back"
+      ],
+      "answer": 2,
+      "explanation": "The pins stay the same until a command arrives; there is no timeout in the program. So the robot keeps going with the last command. This is a safety gap that will be closed with the watchdog in lesson 80.",
+      "skills": [
+        "prog-structure"
+      ]
+    }
+  ]
+}

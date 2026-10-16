@@ -1,0 +1,102 @@
+{
+  "concepts": [
+    {
+      "term": "Analog value",
+      "definition": "The raw number between 0 and 1023 read from a pin.",
+      "example": "If the P1 input slider is 512, the analog read block gives 512.",
+      "pitfall": "Thinking this number is directly a percentage: 512 is not 512 percent."
+    },
+    {
+      "term": "map",
+      "definition": "A block that moves a value from one range to another in proportion and rounds it to the nearest whole number.",
+      "example": "If you map the 512 that was read from the 0-1023 range to 0-100, you get 50.",
+      "pitfall": "Writing the ranges the wrong way round: the value 512 gives a meaningless result such as 5238."
+    },
+    {
+      "term": "Threshold",
+      "definition": "The limit number chosen for giving a warning.",
+      "example": "When nem < 30, the pot is counted as thirsty.",
+      "pitfall": "Using the wrong sign: if you write nem > 30, it warns you when it is wet."
+    },
+    {
+      "term": "bar graph",
+      "definition": "A block that shows a value, compared to the largest value, by how many of the 25 LEDs light up.",
+      "example": "bar graph [50] up to [100] lights 13 LEDs.",
+      "pitfall": "Entering the wrong largest value: the scale breaks and the bar looks wrongly filled."
+    },
+    {
+      "term": "Calibration",
+      "definition": "Comparing the numbers a real sensor reads with known situations and adjusting.",
+      "example": "The two numbers read in dry and wet soil set the mapping range.",
+      "pitfall": "Thinking every sensor uses the whole 0-1023 range: real sensors can have a different range."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d29-q1",
+      "kind": "numeric",
+      "prompt": "The P1 input slider is 256. The value read is mapped from the 0-1023 range to the 0-100 range. What is the result?",
+      "answer": 25,
+      "unit": "%",
+      "explanation": "256 / 1023 is about 0.25, and multiplying by 100 gives 25.02; the map block rounds it: 25. Leaving the result as 256 would mean forgetting the mapping.",
+      "skills": [
+        "mk-sensors"
+      ]
+    },
+    {
+      "id": "m10h6d29-q2",
+      "kind": "predict-output",
+      "prompt": "The P1 input value is 512. What does the block below show on the screen?\n\n```\nshow number:\n  map [analog read P1]\n  from [0]-[100]\n  to [0]-[1023]\n```",
+      "options": [
+        "50",
+        "512",
+        "5238",
+        "0"
+      ],
+      "answer": 2,
+      "explanation": "The ranges are written the wrong way round: the input is taken as 0-100 and the output as 0-1023. 512 x 1023 / 100 = 5237.76, which rounds to 5238. The correct way is from the 0-1023 range to the 0-100 range (the result is 50).",
+      "skills": [
+        "mk-sensors",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h6d29-q3",
+      "kind": "numeric",
+      "prompt": "The warning condition is nem < 30, and nem is the P1 value mapped from 0-1023 to 0-100. What is the largest whole-number P1 value at which the warning still starts?",
+      "answer": 301,
+      "explanation": "The value 301 gives 29.42, which rounds to 29: there is a warning. The value 302 gives 29.52, which rounds to 30: 30 < 30 is false, no warning. Because of rounding, the limit is 301, not 306.9.",
+      "skills": [
+        "mk-sensors",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d29-q4",
+      "kind": "numeric",
+      "prompt": "How many LEDs does bar graph [70] up to [200] light? (The share of 25 LEDs, rounded to the nearest whole number.)",
+      "answer": 9,
+      "unit": "LEDs",
+      "explanation": "70 / 200 = 0.35, and 0.35 x 25 = 8.75; the nearest whole number is 9. 8 (rounding down) or 35 (the percentage) would be wrong.",
+      "skills": [
+        "mk-display"
+      ]
+    },
+    {
+      "id": "m10h6d29-q5",
+      "kind": "mcq",
+      "prompt": "Why is a real soil moisture sensor calibrated first before mapping?",
+      "options": [
+        "Sensors do not work at all without calibration",
+        "The smallest and largest numbers a real sensor reads change from sensor to sensor; without measuring the range, the mapping gives a wrong percentage",
+        "Calibration makes the sensor faster",
+        "The percentage value can only be written with calibration"
+      ],
+      "answer": 1,
+      "explanation": "Each sensor can give different numbers when dry and when wet. If these two numbers are measured, the mapping gives the right percentage. The sensor still produces a number without calibration; the problem is what that number means.",
+      "skills": [
+        "mk-sensors"
+      ]
+    }
+  ]
+}

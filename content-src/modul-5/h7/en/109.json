@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Sudden movement",
+      "definition": "Giving the servo the target angle in a single command and expecting it to cover the distance as fast as possible.",
+      "example": "omuz.write(90) then omuz.write(30): a 60° jump in a single frame.",
+      "pitfall": "Thinking this is harmless: the arm jolts, the object falls, the gears wear out."
+    },
+    {
+      "term": "Linear interpolation",
+      "definition": "Producing in-between angles between the start and the target, in proportion to the elapsed time: angle = start + (target − start) · ratio.",
+      "example": "Going from 30° to 90° in 2 s, the angle after 0.5 s is 45°.",
+      "pitfall": "Not limiting oran (ratio) to 1: the servo goes past the target."
+    },
+    {
+      "term": "Servo frame",
+      "definition": "The 20 ms period in which the servo gets a new pulse.",
+      "example": "A 900 ms step is 45 frames.",
+      "pitfall": "Trying to update more often than the frame: the servo sees nothing more from the extra pulses."
+    },
+    {
+      "term": "Non-blocking movement",
+      "definition": "Running the movement with millis() instead of delay(), so that loop() always stays free.",
+      "example": "While the movement lasts, a sensor can also be read in the same loop.",
+      "pitfall": "Doing the smooth movement with a for loop containing delay(): the code cannot do anything else while the movement lasts."
+    },
+    {
+      "term": "Step table",
+      "definition": "Data that describes a job row by row: each row has a target, a gripper state and a duration.",
+      "example": "Pick-and-place is a 9-row table; for a new job, rows are added to the table.",
+      "pitfall": "Not taking the start as the current angle at every step: the servo jumps to an old place at every step."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h7d109-q1",
+      "kind": "numeric",
+      "prompt": "A servo gets a new pulse every 20 ms. How many frames are there in a step that lasts 900 ms?",
+      "answer": 45,
+      "tolerance": 0,
+      "unit": "frames",
+      "explanation": "900 / 20 = 45. If the gripper moves 60° in this step, it moves about 1.3° per frame. If you multiply 900 by 20, you get 18000; you need to divide the time by the period.",
+      "skills": [
+        "rob-smooth-motion",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h7d109-q2",
+      "kind": "numeric",
+      "prompt": "The shoulder is to go from 30° to 90° in 2000 ms (linear interpolation). How many degrees should the angle be 500 ms after the movement starts?",
+      "answer": 45,
+      "tolerance": 0.1,
+      "unit": "degrees",
+      "explanation": "oran = 500 / 2000 = 0.25; angle = 30 + (90 − 30) · 0.25 = 45. It should not be halfway (60°): a quarter of the time has passed, so a quarter of the way has been covered.",
+      "skills": [
+        "rob-smooth-motion"
+      ]
+    },
+    {
+      "id": "m5h7d109-q3",
+      "kind": "find-bug",
+      "prompt": "The program should move smoothly, but the servo jumps to the target in one move. Where is the bug?\n\n```\nunsigned long gecen = simdi - adimBasi;\nfloat oran = gecen / DIZI[adim].sure;   // sure: unsigned long\nif (oran > 1) oran = 1;\nsimdiki = baslangic + (hedef - baslangic) * oran;\n```",
+      "options": [
+        "oran is not limited to 1",
+        "gecen and sure are both integers: the division gives 0, then 1, so no in-between values are produced",
+        "baslangic should not be subtracted from hedef",
+        "long should be used instead of float"
+      ],
+      "answer": 1,
+      "explanation": "unsigned long / unsigned long is integer division: until the time is up the result is 0, and when it is up it is 1, so the angle jumps to the target in a single step. The limiting line is already there. The (target − start) difference is used correctly. oran must stay a float; writing (float)gecen / sure fixes it.",
+      "skills": [
+        "rob-smooth-motion",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h7d109-q4",
+      "kind": "mcq",
+      "prompt": "In the pick-and-place sequence, when should the gripper close?",
+      "options": [
+        "While the arm is moving towards the target, to save time",
+        "While the arm has stopped next to the object",
+        "At the first step of the sequence",
+        "After the arm has released the object"
+      ],
+      "answer": 1,
+      "explanation": "The gripper should close only while the arm has stopped; if it closes during the movement, it grabs the object in the wrong place or misses it. Closing it at the start of the sequence means never grabbing the object. Closing it after releasing means there is no object; the KAVRA (grab) step comes before lifting.",
+      "skills": [
+        "rob-smooth-motion",
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h7d109-q5",
+      "kind": "predict-output",
+      "prompt": "On some arms, smoothstep is used to smooth the interpolation. What does it print?\n\n```\nfloat oran = 0.25;\n\nvoid setup() {\n  Serial.begin(9600);\n  float yumusak = oran * oran * (3 - 2 * oran);\n  Serial.println(yumusak, 2);\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "0.25",
+        "0.16",
+        "0.06",
+        "0.50"
+      ],
+      "answer": 1,
+      "explanation": "0.25 · 0.25 = 0.0625; (3 − 0.5) = 2.5; the product is 0.15625, which is 0.16 to two places. With linear interpolation this would be 0.25; smoothstep starts slowly. 0.06 is only oran² (forgetting the bracket). 0.50 is the value of the ratio exactly halfway.",
+      "skills": [
+        "rob-smooth-motion"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Remote and vehicle",
+      "definition": "The remote sends commands and the vehicle carries them out; only radio messages flow between them.",
+      "example": "When you tilt Card 1, Card 2 shows an arrow and the servo turns.",
+      "pitfall": "Mixing up the remote's and the vehicle's tables; the sender sends 1, and the receiver understands 1 as something else."
+    },
+    {
+      "term": "Command table",
+      "definition": "A plan that writes down which movement, screen and servo angle each command number matches.",
+      "example": "1 = left arrow and servo 45°, 2 = right arrow and servo 135°.",
+      "pitfall": "Writing the code without a table; the two sides are written with different agreements."
+    },
+    {
+      "term": "Position event",
+      "definition": "When the card is tilted, the accelerometer detects a new position and the hat block runs. The event happens when the position changes.",
+      "example": "radio send number 1 inside the when card is [tilted left] hat block.",
+      "pitfall": "Thinking that tilting in the same direction again is a new command; no event happens unless the position changes."
+    },
+    {
+      "term": "Servo angle",
+      "definition": "The position of the servo on pin P0, between 0 and 180 degrees. 90 is the middle.",
+      "example": "45° turns 45 degrees to one side, and 135° 45 degrees to the other.",
+      "pitfall": "Giving an angle beyond 180; the angle is pulled into the 0-180 range."
+    },
+    {
+      "term": "Safe last branch",
+      "definition": "The last else branch of the if chain stops the vehicle even on an unknown command.",
+      "example": "If command 9 arrives, the vehicle shows the \"no\" icon and the servo goes to 90°.",
+      "pitfall": "Leaving the last branch empty; on an unknown command the vehicle stays in its previous state."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h5d25-q1",
+      "kind": "numeric",
+      "prompt": "According to the command table, the servo goes to 45° when you tilt left and to 135° when you tilt right. How many degrees does the servo turn from one end to the other?",
+      "answer": 90,
+      "tolerance": 0,
+      "unit": "degrees",
+      "explanation": "135 − 45 = 90 degrees. Because the middle point is 90°, both sides are 45° away from the middle.",
+      "skills": [
+        "mk-servo-tilt"
+      ]
+    },
+    {
+      "id": "m10h5d25-q2",
+      "kind": "predict-output",
+      "prompt": "The vehicle side's program is below. Command 9 arrives from the remote (it was sent by hand). What does the vehicle do?\n\n```\non radio received:\n    set komut to received number\n    if komut = 1 then: left arrow, servo 45\n    else if komut = 2 then: right arrow, servo 135\n    else if komut = 3 then: up arrow, servo 90\n    else if komut = 4 then: down arrow, servo 90\n    else: \"no\" icon, servo 90\n```",
+      "options": [
+        "It shows the down arrow, servo 90",
+        "It gives an error and the program stops",
+        "It shows the \"no\" icon, servo 90",
+        "It does nothing, and the previous arrow stays"
+      ],
+      "answer": 2,
+      "explanation": "9 does not match any condition, so the last else branch runs: the \"no\" icon and servo 90°. Stopping the vehicle on an unknown command is the behaviour we want. No error message appears.",
+      "skills": [
+        "mk-protocol",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h5d25-q3",
+      "kind": "find-bug",
+      "prompt": "When the remote is tilted right, the vehicle shows the left arrow. The vehicle side matches the table. Find the mistake.\n\n```\nwhen card is tilted left:   radio send number 1\nwhen card is tilted right:  radio send number 1\n```",
+      "options": [
+        "The order of the chain on the vehicle side is wrong",
+        "The tilted right hat block sends 1 instead of 2",
+        "The servo angle goes beyond 180",
+        "The radio groups are different"
+      ],
+      "answer": 1,
+      "explanation": "For tilted right, the command in the table is 2. Because 1 is sent here, the vehicle shows the left arrow. The chain on the receiving side is correct, so the mistake is on the sending side, in the wrong number.",
+      "skills": [
+        "mk-protocol",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d25-q4",
+      "kind": "mcq",
+      "prompt": "The remote card is already tilted left. A student tries to tilt the card left again. What happens?",
+      "options": [
+        "No new event happens, and no command is sent",
+        "The command is sent again",
+        "The servo goes to 0°",
+        "The vehicle stops"
+      ],
+      "answer": 0,
+      "explanation": "The event happens when the position changes. Because the position is already \"tilted left\", no new event happens and no new command goes out. You first need to bring the card to another position, such as \"face up\".",
+      "skills": [
+        "mk-servo-tilt",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m10h5d25-q5",
+      "kind": "mcq",
+      "prompt": "When you start the remote control project, which is the best first step?",
+      "options": [
+        "Turning the servo to random angles",
+        "Writing the first block that works and thinking about the numbers later",
+        "Writing only the remote side and designing the vehicle later",
+        "Making a command table that writes down what each command triggers"
+      ],
+      "answer": 3,
+      "explanation": "You write the command table first, because the remote and the vehicle must share the same agreement. Without a table, the sending and receiving sides might use different numbers. Connecting the servo or trying random numbers comes later.",
+      "skills": [
+        "prog-planning",
+        "mk-protocol"
+      ]
+    }
+  ]
+}

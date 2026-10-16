@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Analog signal",
+      "definition": "A continuously changing voltage that can take any value between 0 V and 5 V.",
+      "example": "The middle terminal of a potentiometer moves between 0-5 V as the slider turns.",
+      "pitfall": "Reading an analog pin with digitalRead: you only see 0 or 1 and lose the in-between values."
+    },
+    {
+      "term": "ADC",
+      "definition": "Analog-to-Digital Converter. On the Uno it turns the voltage on a pin into a number from 0 to 1023 with 10 bits.",
+      "example": "If the pin is at 2.5 V, analogRead gives about 512.",
+      "pitfall": "Thinking the number you read is the voltage itself. analogRead gives 0-1023; for volts you calculate ham * 5.0 / 1024.0."
+    },
+    {
+      "term": "analogRead()",
+      "definition": "Returns the voltage on an analog pin (A0-A5) as a whole number from 0 to 1023.",
+      "example": "int ham = analogRead(A0); gives the potentiometer's position as a number.",
+      "pitfall": "Writing an unnecessary pinMode(A0, OUTPUT) for an analog input: the pin becomes an output and the reading becomes meaningless."
+    },
+    {
+      "term": "Potentiometer",
+      "definition": "A three-terminal resistor whose position changes. The two outer terminals go to 5V and GND; the middle terminal (SIG) gives 0-5 V depending on the position.",
+      "example": "With the connections VCC → 5V, GND → GND, SIG → A0, the slider's position is read.",
+      "pitfall": "Connecting the VCC or GND terminal to A0 instead of SIG: the number never changes."
+    },
+    {
+      "term": "Integer division",
+      "definition": "When two whole numbers are divided, the result is also a whole number; everything after the decimal point is thrown away.",
+      "example": "5 / 2 gives 2; 5.0 / 2 gives 2.5.",
+      "pitfall": "Writing ham * 5 / 1024: the result is rounded to 0, 1, 2. Write 5.0 to do a decimal calculation."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h3d11-q1",
+      "kind": "numeric",
+      "prompt": "analogRead(A0) gave the value 820. About how many volts are on pin A0? (ham × 5.0 / 1024)",
+      "answer": 4.0,
+      "tolerance": 0.02,
+      "unit": "V",
+      "explanation": "820 × 5.0 / 1024 = 4.004 V, so about 4.0 V. If you divide by 1023 instead, the result is very close; here the lesson formula uses 1024.",
+      "skills": [
+        "analog-adc"
+      ]
+    },
+    {
+      "id": "m3h3d11-q2",
+      "kind": "numeric",
+      "prompt": "How many millivolts is one step of a 10-bit ADC? (The 0-5 V range is divided into 1024 steps; round to the nearest 0.1.)",
+      "answer": 4.9,
+      "tolerance": 0.1,
+      "unit": "mV",
+      "explanation": "5000 mV / 1024 ≈ 4.88 mV. So when the voltage changes by about 4.9 mV, the number you read goes up or down by one.",
+      "skills": [
+        "analog-adc"
+      ]
+    },
+    {
+      "id": "m3h3d11-q3",
+      "kind": "predict-output",
+      "prompt": "What appears in the Serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  int ham = 700;\n  float v = ham * 5 / 1024;\n  Serial.println(v);\n}\n\nvoid loop() {\n}\n```",
+      "options": [
+        "3.42",
+        "3.00",
+        "0.00",
+        "3500.00"
+      ],
+      "answer": 1,
+      "explanation": "ham * 5 = 3500, and 3500 / 1024 is a division of two whole numbers: the result is 3, not 3.417. When this 3 is assigned to float v, 3.00 is printed. For the correct result, 5.0 should have been written.",
+      "skills": [
+        "analog-adc",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d11-q4",
+      "kind": "find-bug",
+      "prompt": "The LED brightness is set with a potentiometer (the LED is on D11). Past the middle of the slider, the LED behaves unexpectedly. Which line has the bug?\n\n```\nvoid setup() {\n  pinMode(11, OUTPUT);\n}\n\nvoid loop() {\n  int ham = analogRead(A0);\n  analogWrite(11, ham);\n}\n```",
+      "options": [
+        "pinMode(11, OUTPUT);",
+        "int ham = analogRead(A0);",
+        "analogWrite(11, ham);",
+        "void loop() {"
+      ],
+      "answer": 2,
+      "explanation": "ham is between 0-1023, but analogWrite wants 0-255. It should be ham / 4. The other lines are correct: D11 must be an output, and analogRead(A0) reads the raw value.",
+      "skills": [
+        "analog-adc",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h3d11-q5",
+      "kind": "mcq",
+      "prompt": "When the potentiometer's slider is exactly in the middle, about what does analogRead(A0) give?",
+      "options": [
+        "0",
+        "256",
+        "512",
+        "1023"
+      ],
+      "answer": 2,
+      "explanation": "In the middle position SIG is about 2.5 V; this matches 512, the middle of the 0-1023 range. 0 and 1023 are the ends, and 256 is about 1.25 V.",
+      "skills": [
+        "analog-adc",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

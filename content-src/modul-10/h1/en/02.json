@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "x and y",
+      "definition": "The address of an LED: x is the column number from left to right, y is the row number from top to bottom; it is written as (x, y).",
+      "example": "The top right corner is at (4, 0), the bottom left corner is at (0, 4).",
+      "pitfall": "Mixing up x and y: (4, 0) is the top right corner, not the bottom left."
+    },
+    {
+      "term": "Counting from 0",
+      "definition": "Counting starts at 0, not 1; so the numbers of the 5 columns are 0, 1, 2, 3, 4.",
+      "example": "The LED right in the middle is at (2, 2).",
+      "pitfall": "Calling the rightmost column 5; the largest address is 4."
+    },
+    {
+      "term": "plot / unplot",
+      "definition": "Switches the single light at the given address on or off.",
+      "example": "plot x 0 y 0 lights up the top left corner.",
+      "pitfall": "Switching the same address on and off and expecting a result you can see; you need a pause in between."
+    },
+    {
+      "term": "Clear screen",
+      "definition": "Switches off all the LEDs at once with a single block.",
+      "example": "If you put clear screen after the diagonal line, you can draw the corners on an empty screen.",
+      "pitfall": "Forgetting to clear: the lights of the previous drawing stay on and get mixed up with the new drawing."
+    },
+    {
+      "term": "pause (ms)",
+      "definition": "Stops the program for the given number of milliseconds; 1000 ms is one second. LED blocks do not wait by themselves.",
+      "example": "If you add pause 1000 ms, the drawing is visible for one second.",
+      "pitfall": "Drawing and clearing straight away without a pause: the drawing is visible for too short a time to see."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d2-q1",
+      "kind": "mcq",
+      "prompt": "Where on the screen is the address (4, 0)?",
+      "options": [
+        "Top left corner",
+        "Bottom left corner",
+        "Bottom right corner",
+        "Top right corner"
+      ],
+      "answer": 3,
+      "explanation": "x = 4 is the rightmost column and y = 0 is the top row; that is the top right corner. x (horizontal) comes first, then y (vertical). The bottom left corner would be (0, 4) and the bottom right corner (4, 4).",
+      "skills": [
+        "mk-coords"
+      ]
+    },
+    {
+      "id": "m10h1d2-q2",
+      "kind": "numeric",
+      "prompt": "How many LEDs are in the frame made of the outermost lines of the screen (the top and bottom rows, the left and right columns)? Hint: take away the inner 3 x 3 area.",
+      "answer": 16,
+      "unit": "LED",
+      "explanation": "The screen has 5 x 5 = 25 LEDs. The area inside the frame is 3 x 3 = 9 LEDs. The frame is 25 - 9 = 16 LEDs. Adding up the edges as 4 x 5 = 20 is wrong; the corners would be counted twice.",
+      "skills": [
+        "mk-coords"
+      ]
+    },
+    {
+      "id": "m10h1d2-q3",
+      "kind": "predict-output",
+      "prompt": "Which LEDs are still on after the program has finished?\n\n```\ncard.onStart(() => {\n  screen.plot(1, 3);\n  screen.plot(3, 1);\n  wait(500);\n  screen.clear();\n  screen.plot(2, 4);\n});\n```",
+      "options": [
+        "The single LED in the middle of the bottom row",
+        "The single LED in the middle of the top row",
+        "Three LEDs: (1, 3), (3, 1) and (2, 4)",
+        "None; the screen is empty"
+      ],
+      "answer": 0,
+      "explanation": "First (1, 3) and (3, 1) light up, and half a second later clear screen switches them all off. Finally (2, 4) lights up: x = 2 is the middle column and y = 4 is the bottom row. So the middle of the bottom row stays on. The first two LEDs were cleared, so they are no longer on.",
+      "skills": [
+        "mk-coords",
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d2-q4",
+      "kind": "find-bug",
+      "prompt": "Deniz wants to light up the four corners, but the top right corner does not light up. There is no error message either.\n\n```\n1  screen.plot(0, 0);\n2  screen.plot(5, 0);\n3  screen.plot(0, 4);\n4  screen.plot(4, 4);\n```\n\nWhich line is the bug on, and why?",
+      "options": [
+        "Line 1: the top left corner should be 1, 1",
+        "Line 3: y can be at most 3",
+        "Line 2: x can be at most 4; 5 is outside the screen and is quietly ignored",
+        "Line 4: unplot is needed instead of plot"
+      ],
+      "answer": 2,
+      "explanation": "Column numbers go from 0 to 4; x = 5 is outside the screen. The card ignores an address outside the screen without showing an error, so you see no warning. The top right corner should have been (4, 0). The addresses on the other lines are the correct addresses of the corners.",
+      "skills": [
+        "mk-coords",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d2-q5",
+      "kind": "mcq",
+      "prompt": "A learner puts a clear screen block straight after five plot blocks, with no pause in between. What do they see on the screen?",
+      "options": [
+        "The five LEDs stay on for one second",
+        "They cannot see the drawing; LED blocks do not wait, so everything is wiped straight away",
+        "The five LEDs light up one after the other",
+        "The card shows an error"
+      ],
+      "answer": 1,
+      "explanation": "LED blocks do not wait; the drawing and the clearing happen almost at the same time, and the drawing cannot be seen. For the drawing to be visible, you need a pause block in between. The lights only come on one after the other if pause blocks are put between them. The card does not show an error, because the program is valid.",
+      "skills": [
+        "mk-timing",
+        "mk-flow"
+      ]
+    }
+  ]
+}

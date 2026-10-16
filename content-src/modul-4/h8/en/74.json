@@ -1,0 +1,107 @@
+{
+  "concepts": [
+    {
+      "term": "Layered debugging",
+      "definition": "Checking for a fault from the bottom up (physical, address, identity, data) in order and counting the first failing layer as the root cause.",
+      "example": "The address answers, but the identity register is different from what is expected: the root cause is in layer 3.",
+      "pitfall": "Starting to change the software without checking the lower layer."
+    },
+    {
+      "term": "The WHO_AM_I register",
+      "definition": "On many sensors, the register that gives the device's identity; on the MPU6050 its address is 0x75 and the expected value is 0x68.",
+      "example": "If you read 0x75 with Wire and 0x68 does not come back, there is a wrong or faulty device.",
+      "pitfall": "Taking the answer at the address to mean \"this is the right device\"."
+    },
+    {
+      "term": "Sensibility check",
+      "definition": "Checking whether the value read is in the physically expected range.",
+      "example": "On a resting MPU6050 the acceleration size should be about 1 g; 0 g or 1.9 g is suspicious.",
+      "pitfall": "Doing the check without a condition: it gives false alarms while the sensor is moving."
+    },
+    {
+      "term": "XOR checksum",
+      "definition": "A check byte made by taking the XOR of the bytes in a message, which the receiver recalculates and compares.",
+      "example": "In the frame AA 02 01 01 02, 02 ^ 01 ^ 01 = 02, and the last byte matches.",
+      "pitfall": "Thinking the incoming byte is right without calculating the checksum; a corrupted frame gets carried out."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h8d4-q1",
+      "kind": "mcq",
+      "prompt": "For the MPU6050, address 0x68 answers, but the identity register (WHO_AM_I) returns 0x70 (0x68 expected). Which layer is the fault in?",
+      "options": [
+        "Layer 1 (physical lines)",
+        "Layer 2 (address)",
+        "Layer 3 (identity)",
+        "Layer 4 (data sensibility)"
+      ],
+      "answer": 2,
+      "explanation": "The physical lines and the address are fine; the device answering does not give the expected identity, so it is a wrong or different device. The first failing layer is 3. There is no point testing layer 4, because it is not known who the device is.",
+      "skills": [
+        "dbg-layers"
+      ]
+    },
+    {
+      "id": "m4h8d4-q2",
+      "kind": "numeric",
+      "prompt": "Frame: sync 0xAA, N = 3, data bytes 0x01, 0x01, 0x06. Last byte = the XOR of N and the data bytes. What is the value of the last byte (in decimal)?",
+      "answer": 5,
+      "tolerance": 0,
+      "explanation": "3 XOR 1 = 2, 2 XOR 1 = 3, 3 XOR 6 = 5. If the receiver does the same calculation and does not get 5, the frame is corrupted and is ignored.",
+      "skills": [
+        "dbg-checksum"
+      ]
+    },
+    {
+      "id": "m4h8d4-q3",
+      "kind": "predict-output",
+      "prompt": "An MPU6050 thought to be at rest is being held tilted (x = 0.5, y = 0.5, z = 1.0 g). What does this code print?\n\n```cpp\nvoid setup() {\n  Serial.begin(9600);\n  float x = 0.5, y = 0.5, z = 1.0;\n  float g = sqrt(x * x + y * y + z * z);\n  if (g < 0.8 || g > 1.2) Serial.println(\"HATA\");\n  else Serial.println(\"TAMAM\");\n}\nvoid loop() {}\n```",
+      "options": [
+        "TAMAM",
+        "It prints nothing",
+        "It gives a compile error",
+        "HATA"
+      ],
+      "answer": 3,
+      "explanation": "g = square-root(0.25 + 0.25 + 1) ≈ 1.22, which is bigger than 1.2, so it prints HATA (error). The sensor is sound; because the sensibility range relies on the \"at rest\" condition, it gives a false alarm while the sensor is tilted or accelerating.",
+      "skills": [
+        "dbg-layers",
+        "dbg-plausibility"
+      ]
+    },
+    {
+      "id": "m4h8d4-q4",
+      "kind": "find-bug",
+      "prompt": "In this frame parser, valid frames (for example AA 02 01 01 02) always give CHECKSUM HATA. Which is the bug? (`satır` = line)\n\n```cpp\ncase UZUNLUK:\n  n = b;\n  alinan = 0;\n  xorHesap = 0;      // satır A\n  asama = VERI;\n  break;\ncase VERI:\n  xorHesap ^= b;     // satır B\n  alinan++;\n  if (alinan == n) asama = SUM;\n  break;\n```",
+      "options": [
+        "The alinan++ line is unnecessary",
+        "The n = b line is unnecessary",
+        "Line A: the XOR should start with the length byte n (xorHesap = b)",
+        "Line B: += should be used instead of ^="
+      ],
+      "answer": 2,
+      "explanation": "The frame's check byte is the XOR of N and the data bytes. If xorHesap starts from zero, N is not included: 01 ^ 01 = 0 comes out and does not match the incoming 02. The right version is xorHesap = b. Using addition instead of XOR is a different method and does not match the frame definition.",
+      "skills": [
+        "dbg-checksum",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h8d4-q5",
+      "kind": "mcq",
+      "prompt": "A friend says \"the sensor sorts itself out now and then, it does not matter\". Which is the best approach?",
+      "options": [
+        "It sorted itself out, so there is no problem; leave it",
+        "Instability shows that a layer is unhealthy; test the layers again from the bottom up and keep watching until you are sure the problem does not come back",
+        "Rewrite the code from scratch",
+        "Throw the sensor away straight away"
+      ],
+      "answer": 1,
+      "explanation": "As in the Hyvex case, \"it sorts itself out now and then\" is the sign of an unstable layer. Brushing it aside without finding the root cause brings the fault back later. Rewriting the code or throwing the sensor away are over-the-top reactions made without knowing which layer is at fault.",
+      "skills": [
+        "dbg-layers"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Input, decision, output",
+      "definition": "The three parts of an automation: the sensor that measures, the program that applies the rule, and the device that acts.",
+      "example": "The NTC measures the temperature, the program checks the threshold, and the fan and servo run.",
+      "pitfall": "Writing everything at once and testing it: test the parts one by one first."
+    },
+    {
+      "term": "Speed with map",
+      "definition": "Converts the temperature range into the PWM range.",
+      "example": "map(400, 300, 500, 90, 255) gives 172 for 40 °C.",
+      "pitfall": "Giving map a temperature with a fraction: multiply by 10 first and turn it into an integer."
+    },
+    {
+      "term": "Minimum PWM",
+      "definition": "The lowest PWM value at which a small motor starts to turn; 90 was used in the project.",
+      "example": "constrain(hiz, 90, 255) stops the speed going below 90.",
+      "pitfall": "Starting the PWM at zero: the motor may not turn at the first values and just hum."
+    },
+    {
+      "term": "Step-by-step sweep",
+      "definition": "Moving the servo a few degrees on each loop round; the temperature reading is not held up.",
+      "example": "aci = aci + yon; then tarayici.write(aci);",
+      "pitfall": "Doing the sweep in one go with for: the temperature is not read until the sweep finishes."
+    },
+    {
+      "term": "Servo and PWM pins",
+      "definition": "On the Uno, the Servo library switches off analogWrite output on D9 and D10.",
+      "example": "The fan is on D6 and the servo is on D9.",
+      "pitfall": "Connecting the fan to D9 or D10: the speed control does not work."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d25-q1",
+      "kind": "mcq",
+      "prompt": "The fan switches on at 30 °C but does not switch off until the temperature drops below 28 °C. Why are these two separate thresholds used?",
+      "options": [
+        "So that the fan turns faster",
+        "So that the fan does not keep switching on and off while the temperature wobbles around the threshold",
+        "Because the NTC's resistance works backwards",
+        "So that less text appears in the serial monitor"
+      ],
+      "answer": 1,
+      "explanation": "With a single threshold, if the temperature jitters between 29.9 and 30.1, the fan keeps switching on and off. In the zone between the two thresholds (28-30 °C), the state is kept. It has nothing to do with speed, resistance or serial output.",
+      "skills": [
+        "hysteresis"
+      ]
+    },
+    {
+      "id": "m3h5d25-q2",
+      "kind": "predict-output",
+      "prompt": "The fan starts off (fanAcik = false). The temperature becomes 31, 29 and 27.5 °C in turn. What is the fan's state after each measurement?\n\n```\nif (!fanAcik && sicak >= 30.0) {\n  fanAcik = true;\n} else if (fanAcik && sicak < 28.0) {\n  fanAcik = false;\n}\n```",
+      "options": [
+        "Off, on, off",
+        "On, on, off",
+        "On, off, off",
+        "On, on, on"
+      ],
+      "answer": 1,
+      "explanation": "Because 31 ≥ 30, it switches on. 29 °C is between 28 and 30; it stays on. When 27.5 < 28, it switches off.",
+      "skills": [
+        "hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d25-q3",
+      "kind": "numeric",
+      "prompt": "The fan speed is worked out with map((int)(sicak * 10), 300, 500, 90, 255). If the temperature is 40 °C, what is the PWM value? (map uses integer maths.)",
+      "answer": 172,
+      "tolerance": 0,
+      "explanation": "sicak * 10 = 400. map: (400 − 300) × (255 − 90) / (500 − 300) + 90 = 100 × 165 / 200 + 90 = 82 + 90 = 172 (82.5 is rounded down).",
+      "skills": [
+        "motor-pwm-speed",
+        "sensor-actuator-project"
+      ]
+    },
+    {
+      "id": "m3h5d25-q4",
+      "kind": "numeric",
+      "prompt": "The NTC is at the bottom and the 10 kΩ fixed resistor at the top; A2 is read across the NTC. At 45 °C the NTC's resistance is about 4.35 kΩ. About how many volts are on A2?",
+      "answer": 1.5,
+      "tolerance": 0.05,
+      "unit": "V",
+      "explanation": "Voltage divider: V = 5 × 4.35 / (4.35 + 10) ≈ 1.52 V. As it warms up, the NTC's resistance falls, and the A2 voltage falls too; at 25 °C it was 2.5 V.",
+      "skills": [
+        "sensor-actuator-project",
+        "elec-ohm"
+      ]
+    },
+    {
+      "id": "m3h5d25-q5",
+      "kind": "find-bug",
+      "prompt": "In this project that uses a servo, the fan speed cannot be set; the fan behaves as if it is either always on or always off. Which line is wrong?\n\n```\nconst int SERVO_PIN = 9;\n// ...\ntarayici.attach(SERVO_PIN);\n// ...\nanalogWrite(FAN_PIN, hiz);\n```\n(Somewhere else: const int FAN_PIN = 10;)",
+      "options": [
+        "tarayici.attach(SERVO_PIN);",
+        "const int SERVO_PIN = 9;",
+        "analogWrite(FAN_PIN, hiz);",
+        "const int FAN_PIN = 10;"
+      ],
+      "answer": 3,
+      "explanation": "On the Uno, the Servo library switches off PWM on D9 and D10, so analogWrite on D10 does not control the speed. The fan must be moved to another PWM pin such as D6. The other lines are correct.",
+      "skills": [
+        "sensor-actuator-project",
+        "servo-angle",
+        "prog-debug"
+      ]
+    }
+  ]
+}

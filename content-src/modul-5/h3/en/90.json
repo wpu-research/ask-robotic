@@ -1,0 +1,118 @@
+{
+  "concepts": [
+    {
+      "term": "State machine (KALIBRE, IZLE, BOSLUK, ARAMA, BITTI, HATA)",
+      "definition": "A structure in which the program is in only one of six states at any moment and moves between states on conditions.",
+      "example": "When KALIBRE finishes it moves to IZLE; in IZLE, when the line disappears, it moves to BOSLUK or ARAMA.",
+      "pitfall": "Writing the states in a scattered way with flags (bool); it gets muddled which exit runs for which reason."
+    },
+    {
+      "term": "MIN_KONTRAST",
+      "definition": "If max − min in calibration is less than this value, line and floor are treated as impossible to tell apart; the robot is not driven.",
+      "example": "If a sensor stays between 500 and 640, the difference is 140 < 200 and KALIBRASYON HATASI is printed.",
+      "pitfall": "Leaving out this check and driving the robot with uncertain thresholds; the robot moves without knowing where the line is."
+    },
+    {
+      "term": "Start-up protection (BITIS_BEKLE_MS)",
+      "definition": "Only looking for the finish strip decision after a certain time since the start.",
+      "example": "For the first 3 s, all five sensors being on the line at once does not count as the finish.",
+      "pitfall": "Leaving out this protection: an odd reading at the start could stop the robot straight away."
+    },
+    {
+      "term": "kayipMs and enUzunMs",
+      "definition": "The total time, measured by the robot itself, during which no sensor sees the line, and the longest single gap.",
+      "example": "On this track the longest gap happens at the 9 cm gap in the line and lasts about 0.37 s.",
+      "pitfall": "Not updating sonTur on every pass; the difference grows from the start and the loss comes out many times too large."
+    },
+    {
+      "term": "The speed trade-off",
+      "definition": "As the speed increases, the lap gets shorter but reliability falls; a good setting is found with measured values.",
+      "example": "In the simulation, when HIZ rises from 140 to 230, the lap drops from 17.6 s to 8.6 s; at 255 the robot cannot find the line at the sharp bend.",
+      "pitfall": "Thinking the fastest setting is the best; a robot that does not finish the track has no lap time."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h3d5-q1",
+      "kind": "predict-output",
+      "prompt": "Calibration results were obtained for three sensors. What does this code print?\n\n```\nconst int N = 3;\nint enAz[N] = {163, 500, 163};\nint enCok[N] = {860, 640, 860};\nconst int MIN_KONTRAST = 200;\n\nvoid setup() {\n  Serial.begin(9600);\n  bool tamam = true;\n  for (int i = 0; i < N; i++) {\n    Serial.print((enAz[i] + enCok[i]) / 2);\n    Serial.print(' ');\n    if (enCok[i] - enAz[i] < MIN_KONTRAST) tamam = false;\n  }\n  Serial.println(tamam ? \"TAMAM\" : \"HATA\");\n}\nvoid loop() {}\n```",
+      "options": [
+        "511 570 511 TAMAM",
+        "511 511 511 HATA",
+        "511 570 511 HATA",
+        "570 570 570 HATA"
+      ],
+      "answer": 2,
+      "explanation": "The thresholds are (163 + 860) / 2 = 511 (int division), (500 + 640) / 2 = 570, and 511 again. Because the second sensor's contrast is 640 − 500 = 140 < 200, tamam becomes false and HATA is printed. If one sensor is not good enough, the robot is not driven.",
+      "skills": [
+        "rob-calibration",
+        "rob-safe-stop",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d5-q2",
+      "kind": "mcq",
+      "prompt": "In the project, the finish strip is only looked for 3 s after the start (BITIS_BEKLE_MS = 3000). What is the purpose of this?",
+      "options": [
+        "So that an odd reading at the start (all five sensors appearing to be on the line at once) does not stop the robot by mistake",
+        "To give the motors time to warm up",
+        "To make the calibration time longer",
+        "To calculate the length of the track"
+      ],
+      "answer": 0,
+      "explanation": "The finish strip is the 11111 pattern, just like a junction. At the start the robot is on the line, and before it moves the sensors may read a wrong pattern; the protection time prevents this false alarm. It has nothing to do with motors warming up, the calibration time or the length of the track.",
+      "skills": [
+        "rob-line-fsm",
+        "rob-safe-stop"
+      ]
+    },
+    {
+      "id": "m5h3d5-q3",
+      "kind": "numeric",
+      "prompt": "A lap of the track took 16 s, and for 4 s of this time the robot could not see the line with any sensor. What percentage of the lap is the time it could not see the line?",
+      "answer": 25,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Ratio = loss / lap = 4 / 16 = 0.25, that is 25%. The lap time on its own is not enough; even if two robots finish in the same time, the one that loses the line less is more in control.",
+      "skills": [
+        "rob-line-metrics"
+      ]
+    },
+    {
+      "id": "m5h3d5-q4",
+      "kind": "find-bug",
+      "prompt": "The robot lost the line a few times for a short while, but the program reports hundreds of thousands of ms of loss. Where is the bug?\n\n```\nunsigned long sonTur = 0;\nunsigned long kayipMs = 0;\n\nvoid loop() {\n  unsigned long simdi = millis();\n  bool hicbiri = !(sol || sag || orta);   // yukarıda hesaplandı\n  if (hicbiri) {\n    kayipMs += simdi - sonTur;\n  }\n}\n```",
+      "options": [
+        "kayipMs should not be unsigned long; it should be int",
+        "The ! sign in the definition of hicbiri should be removed",
+        "delay() should be used instead of millis()",
+        "sonTur is never updated: on every lost pass, the time since the start is added. sonTur = simdi should be written at the end of the pass"
+      ],
+      "answer": 3,
+      "explanation": "simdi − sonTur should be the time since the last pass; if sonTur stays at 0, the difference is the time since the program started, and this is added on every lost pass. The fix is to store it on every pass with sonTur = simdi. The other options are not the cause of the bug; delay() is not used in this project.",
+      "skills": [
+        "rob-line-metrics",
+        "prog-timing",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h3d5-q5",
+      "kind": "mcq",
+      "prompt": "On the same track, with HIZ at 140, 170 and 230 the robot finished the track (as the speed increased, both the lap time and the lost time went down), but at HIZ 255 it printed CIZGI KAYBOLDU and stopped. Which interpretation is the most accurate?",
+      "options": [
+        "The highest speed is always the best; 255 is just bad luck",
+        "Looking only at the lap time is enough",
+        "As the speed increases the lap gets shorter, but beyond a limit the robot cannot finish the track; the setting means finding, by measuring, the highest safe speed that finishes",
+        "The lost time does not matter; only the speed should be measured"
+      ],
+      "answer": 2,
+      "explanation": "The measurement shows that there is a trade-off between speed and reliability: at 255 there is not even a lap time, because the robot did not finish the track. A good setting is made by looking at the time, the line loss and whether it finished at all.",
+      "skills": [
+        "rob-line-metrics",
+        "rob-gap-recovery"
+      ]
+    }
+  ]
+}

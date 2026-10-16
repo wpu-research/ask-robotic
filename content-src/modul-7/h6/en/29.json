@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Measure first, then move",
+      "definition": "The rule of finding out the situation with a tool before an irreversible action.",
+      "example": "Measuring the distance to the wall with `mesafe()` before calling `ileri(...)`.",
+      "pitfall": "Skipping the measurement and writing the number into the script by hand; if the surroundings change, the script does not notice."
+    },
+    {
+      "term": "Safety margin",
+      "definition": "A gap left on purpose so you do not go past the target.",
+      "example": "`ileri(mesafe - 20)` to stop 20 cm from the wall.",
+      "pitfall": "Choosing a margin that is too small: a small measurement error leads to a crash."
+    },
+    {
+      "term": "Least privilege",
+      "definition": "Giving an agent only the tools needed for its job.",
+      "example": "An agent that only reports the distance needs just `mesafe()`; we do not give it `ileri()`.",
+      "pitfall": "Giving wide permissions \"in case they are needed\"."
+    },
+    {
+      "term": "Human approval",
+      "definition": "A human giving approval before an irreversible or risky step.",
+      "example": "Asking for approval before deleting a file or sending an email.",
+      "pitfall": "Asking for approval on every small step and making approval useless."
+    },
+    {
+      "term": "Change between measuring and moving",
+      "definition": "A measurement is one moment; the surroundings can change after it.",
+      "example": "An obstacle being put in the corridor later.",
+      "pitfall": "Measuring once and then making the whole movement blindly."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h6d29-q1",
+      "kind": "numeric",
+      "prompt": "`mesafe()` returned 100 cm. To leave a 25 cm safety margin to the wall, what is the result of the call `hesapla($1-25)` (the input to `ileri()`)?",
+      "answer": 75,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "100 cm - 25 cm = 75 cm. If the robot moves forward 75 cm, 25 cm remain to the wall. Getting 125 shows you added, that is, applied the margin in the wrong direction.",
+      "skills": [
+        "agent-plan",
+        "agent-safety"
+      ]
+    },
+    {
+      "id": "m7h6d29-q2",
+      "kind": "predict-output",
+      "prompt": "In the robot corridor (wall at 100 cm) this script runs:\n```\nmesafe()\nhesapla($1-20)\nileri($2)\nmesafe()\nbitir($4)\n```\nWhich answer does the agent finish with?",
+      "options": [
+        "100",
+        "80",
+        "20",
+        "The robot hits the wall"
+      ],
+      "answer": 2,
+      "explanation": "Step 1 gives 100, step 2 gives 80, step 3 moves the robot forward 80 cm (20 remaining), step 4 `mesafe()` gives 20 and `bitir($4)` finishes with 20. 80 is only the amount of movement; there is no crash, because 80 < 100.",
+      "skills": [
+        "agent-plan",
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d29-q3",
+      "kind": "mcq",
+      "prompt": "Suppose an agent's only job is \"report the robot's distance to the wall\". By the principle of least privilege, which tool set is suitable?",
+      "options": [
+        "Only `mesafe()`",
+        "`mesafe()` and `ileri()`",
+        "`mesafe()`, `ileri()` and `dur()`",
+        "All tools, just in case"
+      ],
+      "answer": 0,
+      "explanation": "A report only needs reading. If action tools such as `ileri()` are given, a wrong plan could move the robot. To limit the damage of a mistake, permissions are kept narrow to fit the job.",
+      "skills": [
+        "agent-safety"
+      ]
+    },
+    {
+      "id": "m7h6d29-q4",
+      "kind": "find-bug",
+      "prompt": "You want to move the robot forward until 20 cm remain to the wall (wall at 100 cm):\n```\nmesafe()\nhesapla($1+20)\nileri($2)\ndur()\n```\nThe robot crashes. Where is the bug?",
+      "options": [
+        "Line 1: `mesafe()` is the wrong tool",
+        "Line 2: the margin must be subtracted instead of added ($1-20)",
+        "Line 3: `dur` should be used instead of `ileri`",
+        "Line 4: `dur()` is unnecessary"
+      ],
+      "answer": 1,
+      "explanation": "100 + 20 = 120, and `ileri(120)` goes past the wall. The safety margin is subtracted from the distance: 100 - 20 = 80. `mesafe()` is the right tool; `dur()` is needed to stop the robot.",
+      "skills": [
+        "agent-plan",
+        "agent-safety",
+        "agent-loop"
+      ]
+    },
+    {
+      "id": "m7h6d29-q5",
+      "kind": "mcq",
+      "prompt": "Which best explains why measuring once and making the whole movement in one go can be a problem on a real robot?",
+      "options": [
+        "A measurement is never correct",
+        "A measurement only shows that moment; the surroundings can change afterwards, so you need to measure while moving too",
+        "Robots cannot measure distance",
+        "Measuring increases the step limit"
+      ],
+      "answer": 1,
+      "explanation": "A measurement is like a photo: an obstacle can appear after it, or the sensor can be noisy. The world in the workshop is fixed; the real world is not. It is not true that a measurement is always wrong.",
+      "skills": [
+        "agent-safety",
+        "agent-plan"
+      ]
+    }
+  ]
+}

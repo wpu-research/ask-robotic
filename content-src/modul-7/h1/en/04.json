@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "N-gram model",
+      "definition": "A model that looks at the last one (bigram) or two (trigram) words and finds the probability of the next word by counting it in the corpus.",
+      "example": "If `döner` (turns) always came after the context `robot sağa` (robot right) in the corpus, the probability of `döner` is 1.",
+      "pitfall": "Thinking this model is a neural network; it is only a counting table."
+    },
+    {
+      "term": "Probability (from counts)",
+      "definition": "The ratio of how many times a word came after the context to the count of all words that came after the context.",
+      "example": "If `durur` (stops) came 4 times and `sağa` (right) came once after a context, the probability of `durur` is 4/5.",
+      "pitfall": "Taking only the word's own count as both the top and the bottom of the fraction; the bottom is the total of all candidates."
+    },
+    {
+      "term": "Bigram and trigram model",
+      "definition": "A bigram model looks at the last word; a trigram model looks at the last two words.",
+      "example": "`görür ve` (sees and) is a trigram context; `ve` (and) is a bigram context.",
+      "pitfall": "Thinking a longer context is always better; without enough data, the context is not found in the corpus."
+    },
+    {
+      "term": "Backing off",
+      "definition": "When the context is not in the corpus, the model looks at a shorter context, and if that is missing too, at general word frequencies.",
+      "example": "If a three-word context is not found, the tool looks at the last word and says which level it used.",
+      "pitfall": "Thinking the model will give an error in a context it does not know; it backs off and still predicts."
+    },
+    {
+      "term": "Seed",
+      "definition": "The number that starts the random choice; the same seed gives the same choices.",
+      "example": "The sentence generated with seed 1 is the same on every run; seed 2 gives a different sentence.",
+      "pitfall": "Thinking random generation changes uncontrollably every time; with a seed it can be repeated."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h1d4-q1",
+      "kind": "numeric",
+      "prompt": "After a context, the corpus has `gider` (goes) 6 times, `döner` (turns) 2 times and `durur` (stops) 2 times. What is the probability of the word `döner` (turns) as a percentage?",
+      "answer": 20,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "There are 6 + 2 + 2 = 10 appearances in total. The word for \"turns\" came 2 times, so the probability is 2/10 = 20%. The bottom of the fraction is not just the count of \"goes\" or just the count of \"turns\", but the total of all candidates.",
+      "skills": [
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d4-q2",
+      "kind": "predict-output",
+      "prompt": "This code counts the words that come after the word \"robot\". When it runs, what is sayac?\n\n```\nconst metin = \"robot right turns . robot right turns . robot left turns .\"\nconst kelimeler = metin.split(\" \")\nconst sayac = {}\nfor (let i = 0; i < kelimeler.length - 1; i++) {\n  if (kelimeler[i] === \"robot\") {\n    const sonraki = kelimeler[i + 1]\n    sayac[sonraki] = (sayac[sonraki] || 0) + 1\n  }\n}\nconsole.log(sayac)\n```",
+      "options": [
+        "1 for right, 1 for left",
+        "3 for right",
+        "2 for right, 1 for left",
+        "2 for right, 1 for left, 3 for turns"
+      ],
+      "answer": 2,
+      "explanation": "\"robot\" appears three times; \"right\" comes after two of them and \"left\" after one. The loop counts only the word right after \"robot\"; \"turns\" is not right after robot, so it is not counted.",
+      "skills": [
+        "ai-next-token"
+      ]
+    },
+    {
+      "id": "m7h1d4-q3",
+      "kind": "find-bug",
+      "prompt": "The code works out the probability of \"durur\"; the expected value is 0.8, but it prints 1. Which is the one bug?\n\n```\nconst sayim = { durur: 4, sağa: 1 }\nconst toplam = sayim.durur\nconsole.log(sayim.durur / toplam)\n```",
+      "options": [
+        "sayim should not be an object",
+        "toplam is only the count of \"durur\"; the total of all candidates should be used",
+        "console.log cannot be used",
+        "Multiplication is needed instead of division"
+      ],
+      "answer": 1,
+      "explanation": "The bottom of the probability is the total of all words that came after the context: 4 + 1 = 5. In the code toplam is only 4, so 4/4 = 1 comes out. The correct value is 4/5 = 0.8.",
+      "skills": [
+        "ai-next-token",
+        "ai-model-limits"
+      ]
+    },
+    {
+      "id": "m7h1d4-q4",
+      "kind": "mcq",
+      "prompt": "The trigram model could not find the two-word context in the corpus. What does the tool do?",
+      "options": [
+        "It backs off to a shorter context that looks at the last word, and if that is missing too, falls back on general word frequencies",
+        "It gives an error and stops",
+        "It deletes the context and produces random letters",
+        "It asks a real language model"
+      ],
+      "answer": 0,
+      "explanation": "So as not to come out empty, the tool shortens the context and writes on the screen which level it used. No question is sent to a real model on this portal; everything is done with the table counted from the corpus.",
+      "skills": [
+        "ai-next-token",
+        "ai-simulation-literacy"
+      ]
+    },
+    {
+      "id": "m7h1d4-q5",
+      "kind": "mcq",
+      "prompt": "What happens if you generate words twice with the same context, the same setting and the same seed?",
+      "options": [
+        "A different sentence comes out each time",
+        "First the same sentence, then a different one",
+        "The same sentence comes out",
+        "The tool gives an error"
+      ],
+      "answer": 2,
+      "explanation": "The random choice comes from a seeded generator; the same seed produces the same sequence of choices, so the result can be repeated. For a different sentence you need to change the seed.",
+      "skills": [
+        "ai-next-token"
+      ]
+    }
+  ]
+}

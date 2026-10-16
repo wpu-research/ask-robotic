@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "JSON",
+      "definition": "An orderly data format made of key-value pairs, with double quotation marks and items separated by commas.",
+      "example": "{\"duygu\": \"olumlu\", \"konu\": \"robot dersi\"} (sentiment: positive, topic: robot lesson)",
+      "pitfall": "Using single quotation marks or leaving a comma after the last item; both produce invalid JSON."
+    },
+    {
+      "term": "Structured output",
+      "definition": "Asking the model for an answer in an orderly format a program can read, instead of free sentences.",
+      "example": "Getting the sentiment and topic extracted from a comment as JSON.",
+      "pitfall": "Never stating the format; the model may choose a different format each time."
+    },
+    {
+      "term": "Consistent key names",
+      "definition": "Using the same key names in the instructions, in the example and in the validation code.",
+      "example": "Writing \"duygu\" and \"konu\" in all of them.",
+      "pitfall": "Writing \"duygu\" (sentiment) in the instructions and \"his\" (feeling) in the example; the model cannot know which one to choose."
+    },
+    {
+      "term": "Validation",
+      "definition": "Checking that the output that arrives is valid JSON and carries the expected keys.",
+      "example": "Parsing it with JSON.parse, then checking whether \"duygu\" and \"konu\" are there.",
+      "pitfall": "Skipping validation and assuming the output will always arrive in proper form."
+    },
+    {
+      "term": "Retrying",
+      "definition": "Sending the request again, or giving an error, when validation fails.",
+      "example": "If it is invalid in all three attempts, telling the user \"I can't answer right now\".",
+      "pitfall": "Retrying forever; you need to put a limit on the number of attempts."
+    },
+    {
+      "term": "Ban on extra text",
+      "definition": "Telling the prompt \"write nothing except JSON\".",
+      "example": "A constraint written to reduce opening sentences such as \"Here is the result:\".",
+      "pitfall": "Treating the constraint as a guarantee; the model may still add an explanation."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d12-q1",
+      "kind": "mcq",
+      "prompt": "When asked for JSON, the model mostly gives a proper answer. Why do you still need to validate the output?",
+      "options": [
+        "Because JSON can carry only one key",
+        "Because JSON.parse never gives an error",
+        "Because validation makes the model smarter",
+        "Because the model can sometimes produce invalid JSON or a missing key, and it cannot guarantee this will not happen"
+      ],
+      "answer": 3,
+      "explanation": "The model writes using probability; it is usually proper but there is no guarantee. It may add an explanation in front, miss a quotation mark or forget a key. Validation does not change the model; it only catches the error. JSON.parse throws an error on invalid text.",
+      "skills": [
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d12-q2",
+      "kind": "predict-output",
+      "prompt": "The model gave this answer. What happens when this code runs?\n\n```\nconst yanit = 'Here is the result: {\"duygu\": \"olumlu\"}'\nconst veri = JSON.parse(yanit)\nconsole.log(veri.duygu)\n```",
+      "options": [
+        "olumlu is printed",
+        "undefined is printed",
+        "JSON.parse throws an error, nothing is printed",
+        "Here is the result: olumlu is printed"
+      ],
+      "answer": 2,
+      "explanation": "The text is not valid JSON: it starts with \"Here is the result:\", and the JSON must be the whole text. In this case JSON.parse throws a SyntaxError; the console.log line is never reached. That is why the \"give only JSON\" constraint and validation are used together.",
+      "skills": [
+        "ai-output-validate",
+        "ai-structured-output"
+      ]
+    },
+    {
+      "id": "m7h3d12-q3",
+      "kind": "find-bug",
+      "prompt": "The output below, produced by a model, cannot be parsed with JSON.parse. What is the problem?\n\n```\n{\"duygu\": \"olumlu\", \"konu\": \"robot dersi\",}\n```",
+      "options": [
+        "The \"duygu\" key contains Turkish characters",
+        "There is an extra comma after the last item",
+        "The values are written in double quotation marks",
+        "The object has two keys"
+      ],
+      "answer": 1,
+      "explanation": "JSON does not allow a comma after the last item. Keys with Turkish letters and values in double quotation marks are valid; having two keys is not a problem either. The fix: delete the comma at the end.",
+      "skills": [
+        "ai-structured-output",
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d12-q4",
+      "kind": "numeric",
+      "prompt": "An app got 50 replies from the model, and 3 of them could not be parsed with JSON.parse. What percentage of the replies are valid JSON?",
+      "answer": 94,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "There are 50 − 3 = 47 valid replies. 47 / 50 × 100 = 94. An error rate of 6 per cent may look small; but the app still has to deal with it by retrying or giving an error.",
+      "skills": [
+        "ai-output-validate"
+      ]
+    },
+    {
+      "id": "m7h3d12-q5",
+      "kind": "mcq",
+      "prompt": "The reply is valid JSON, but the \"konu\" (topic) key you expected is missing. What should the app do?",
+      "options": [
+        "Notice that \"konu\" is missing and retry or give an error",
+        "Use the data as it is, because JSON.parse succeeded",
+        "Silently delete the reply",
+        "Look at the Prompt checker's score"
+      ],
+      "answer": 0,
+      "explanation": "Validation has two layers: is it valid JSON, and are the expected keys there. If a key is missing, retry or give an error. Silently deleting it hides the error. The checker in the Workshop judges only the prompt; it does not validate the model's reply.",
+      "skills": [
+        "ai-output-validate",
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

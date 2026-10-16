@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Blocking",
+      "definition": "When the program runs no other line while it waits for a command to finish.",
+      "example": "While delay(2000) runs, the board checks neither the button nor the serial port for 2 seconds.",
+      "pitfall": "Thinking blocking means \"the board freezes\"; the board is working, it is just carrying out the wait command."
+    },
+    {
+      "term": "Round time",
+      "definition": "The total time it takes for all the commands inside loop() to run once. In code with delay, almost all of it is waiting time.",
+      "example": "A loop() with two delay(500) calls takes about 1000 ms per round.",
+      "pitfall": "Counting only one delay and forgetting the other delays in the round."
+    },
+    {
+      "term": "Look moment",
+      "definition": "The moment an input (for example the button) is read. Events between look moments never reach the program.",
+      "example": "In a 2000 ms program that checks the button at the end of the round, the look moments come 2 seconds apart.",
+      "pitfall": "Saying \"I pressed the button but it was not counted, the button is broken\"; the problem is usually in the structure of the program."
+    },
+    {
+      "term": "Missed press",
+      "definition": "A button press that starts and ends between look moments, so the program never sees it.",
+      "example": "A 100 ms press has about a 5% chance of being caught in a 2000 ms round.",
+      "pitfall": "Treating a missed press as \"bad luck\"; it is a flaw in the structure and it happens again and again."
+    },
+    {
+      "term": "The shorter-delay fix",
+      "definition": "Trying to look more often by making the delay values smaller; it reduces the problem but does not end it.",
+      "example": "Writing delay(100) instead of delay(1000) shortens the round, but it also makes the LED 10 times faster.",
+      "pitfall": "Breaking the timing this way, still not getting rid of all missed presses, and thinking \"I fixed it\"."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h6d26-q1",
+      "kind": "mcq",
+      "prompt": "What does the Arduino do while delay(1500) runs?",
+      "options": [
+        "It keeps running other lines; only the LED waits",
+        "It keeps reading the input pins but freezes the outputs",
+        "It runs no other line until the wait is over",
+        "It only skips the next delay inside loop()"
+      ],
+      "answer": 2,
+      "explanation": "delay() is a blocking command: until the time is up, the processor does not move to the next line and does not check the button either. The other options say that delay only makes part of the program wait, or that the inputs are still read; none of them is true.",
+      "skills": [
+        "prog-blocking"
+      ]
+    },
+    {
+      "id": "m3h6d26-q2",
+      "kind": "numeric",
+      "prompt": "A program checks the button only at the end of each round inside loop(). The round is made of two delays of 1000 ms + 1000 ms. The button is pressed for 100 ms and the press starts at a random moment. About what percentage is the chance of this press being caught? (Assume the look is instant.)",
+      "answer": 5,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Look moments come 2000 ms apart. A 100 ms press is caught only if it covers a look moment; that is 100 / 2000 = 0.05, which means 5%. Writing 50% or 10% comes from thinking the round is 1000 ms or 200 ms.",
+      "skills": [
+        "prog-blocking",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d26-q3",
+      "kind": "predict-output",
+      "prompt": "While this program runs (the button is not pressed), these events happen: the button is held down between 100 and 200 ms, then held down again between 550 and 700 ms. What appears in the Serial monitor at the end of 2 seconds?\n\n```\nint sayac = 0;\n\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  digitalWrite(13, HIGH);\n  delay(300);\n  digitalWrite(13, LOW);\n  delay(300);\n  if (digitalRead(2) == LOW) {\n    sayac++;\n    Serial.print(\"Basis sayisi: \");\n    Serial.println(sayac);\n  }\n}\n```",
+      "options": [
+        "Nothing",
+        "Basis sayisi: 1 and Basis sayisi: 2",
+        "Basis sayisi: 1",
+        "Basis sayisi: 2"
+      ],
+      "answer": 2,
+      "explanation": "The button is read only at 600 ms (300 + 300). The press at 100-200 ms has ended before the look, so it is missed. The press at 550-700 ms covers 600 ms, so it is counted. The next look is at 1200 ms and the button has been released. The result is a single line.",
+      "skills": [
+        "prog-blocking",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m3h6d26-q4",
+      "kind": "find-bug",
+      "prompt": "This program is meant to turn the LED on as soon as the button is pressed. But most presses do nothing. Which line causes the real problem?\n\n```\nvoid setup() {\n  pinMode(13, OUTPUT);\n  pinMode(2, INPUT_PULLUP);\n}\n\nvoid loop() {\n  if (digitalRead(2) == LOW) {\n    digitalWrite(13, HIGH);\n  }\n  delay(3000);\n}\n```",
+      "options": [
+        "pinMode(2, INPUT_PULLUP);",
+        "if (digitalRead(2) == LOW) {",
+        "digitalWrite(13, HIGH);",
+        "delay(3000);"
+      ],
+      "answer": 3,
+      "explanation": "The button is read only once every 3 seconds; delay(3000) blocks the board and presses are missed. The pull-up and the LOW comparison follow the pressed = LOW rule, and the digitalWrite line is correct too.",
+      "skills": [
+        "prog-blocking",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h6d26-q5",
+      "kind": "mcq",
+      "prompt": "To reduce missed presses, a friend changed the delay(1000) values to delay(100). What is the main drawback of this approach?",
+      "options": [
+        "The LED's blinking speed changes too, and some presses are still missed",
+        "The compiler gives an error",
+        "The button is never checked",
+        "The board heats up and slows down"
+      ],
+      "answer": 0,
+      "explanation": "Making the time shorter means more frequent looks, but presses can still be missed between look moments; on top of that, the LED's timing breaks by becoming 10 times faster. It does not cause a compile error or heating.",
+      "skills": [
+        "prog-blocking",
+        "prog-timing"
+      ]
+    }
+  ]
+}

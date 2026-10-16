@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "H-bridge",
+      "definition": "A circuit that changes the direction of the voltage across the motor terminals with four switches; its shape looks like the letter H.",
+      "example": "The L293D has two H-bridges inside, so it controls two motors separately.",
+      "pitfall": "Closing all four switches at once: in a real bridge this can cause a short circuit; the L293D prevents it with its input logic."
+    },
+    {
+      "term": "IN1 and IN2",
+      "definition": "The two inputs that set the motor's direction; if they are different the motor turns, if they are the same it stops.",
+      "example": "When IN1 = HIGH and IN2 = LOW, the motor turns forwards.",
+      "pitfall": "Setting both HIGH or both LOW and expecting the motor to turn."
+    },
+    {
+      "term": "EN12",
+      "definition": "The pin that switches the L293D's first channel on and off; if it gets PWM, it sets the speed.",
+      "example": "analogWrite(6, 200) gives a duty cycle of about 78%, so about 78% speed.",
+      "pitfall": "Not connecting EN or leaving it LOW: the outputs float and the motor stops."
+    },
+    {
+      "term": "VCC1 and VCC2",
+      "definition": "VCC1 is the chip's logic power (5 V); VCC2 carries the motor's power.",
+      "example": "In the lab, both are connected to 5V.",
+      "pitfall": "Connecting the motor supply to VCC1: if the motor voltage is above 5 V, the logic side is damaged."
+    },
+    {
+      "term": "Output voltage loss",
+      "definition": "The L293D loses about 1.4 V on a high output; if VCC2 = 5 V, you see about 3.6 V.",
+      "example": "About 3.3 V is left across the motor terminals, and it turns more slowly than in the transistor circuit.",
+      "pitfall": "Expecting the motor to get 5 V."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d23-q1",
+      "kind": "numeric",
+      "prompt": "The L293D's VCC2 is 5 V. Think of it as losing 1.4 V on a high output and 0.2 V on a low output (high output 5 − 1.4 = 3.6 V, low output 0.2 V). About how many volts are left between the motor's two terminals? (Ignore small resistance losses.)",
+      "answer": 3.3,
+      "tolerance": 0.15,
+      "unit": "V",
+      "explanation": "The high end is 3.6 V and the low end is 0.2 V; the difference is 3.4 V. Because there is a small extra loss in the output resistances, the lab reads about 3.3 V. Thinking it is 5 V forgets the chip's loss.",
+      "skills": [
+        "h-bridge"
+      ]
+    },
+    {
+      "id": "m3h5d23-q2",
+      "kind": "numeric",
+      "prompt": "analogWrite(EN, 200) was written to the EN12 pin. What percentage is the PWM duty cycle? (Round to a whole number.)",
+      "answer": 78,
+      "tolerance": 1,
+      "unit": "%",
+      "explanation": "analogWrite works in the range 0-255: 200 / 255 ≈ 0.784, so about 78%. The motor's speed changes with the average voltage at this ratio.",
+      "skills": [
+        "motor-pwm-speed"
+      ]
+    },
+    {
+      "id": "m3h5d23-q3",
+      "kind": "predict-output",
+      "prompt": "EN12 is connected to D6, IN1 to D7 and IN2 to D5. What does the motor do when this code runs?\n\n```\ndigitalWrite(7, LOW);\ndigitalWrite(5, HIGH);\nanalogWrite(6, 200);\n```",
+      "options": [
+        "It turns forwards",
+        "It stops",
+        "It turns backwards, at about 78% power",
+        "It turns backwards, at full speed"
+      ],
+      "answer": 2,
+      "explanation": "IN1 = LOW and IN2 = HIGH is the backwards direction. Because EN gets a duty cycle of 200 / 255 ≈ 78%, it is not full speed. For forwards, IN1 must be HIGH and IN2 LOW.",
+      "skills": [
+        "h-bridge",
+        "motor-pwm-speed"
+      ]
+    },
+    {
+      "id": "m3h5d23-q4",
+      "kind": "find-bug",
+      "prompt": "The ileri() (forwards) function is called, but the motor does not turn at all. Which line is wrong?\n\n```\nvoid ileri(int hiz) {\n  digitalWrite(IN1, HIGH);\n  digitalWrite(IN2, HIGH);\n  analogWrite(EN, hiz);\n}\n```",
+      "options": [
+        "void ileri(int hiz) {",
+        "digitalWrite(IN1, HIGH);",
+        "digitalWrite(IN2, HIGH);",
+        "analogWrite(EN, hiz);"
+      ],
+      "answer": 2,
+      "explanation": "When IN1 and IN2 are both HIGH, the motor stops. For forwards, IN2 must be LOW. IN1 being HIGH is correct; the EN line is not a problem either.",
+      "skills": [
+        "h-bridge",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d23-q5",
+      "kind": "mcq",
+      "prompt": "In a real circuit, the motor will run on 9 V. Which L293D pin does the plus of the 9 V supply go to?",
+      "options": [
+        "VCC1",
+        "EN12",
+        "IN1",
+        "VCC2"
+      ],
+      "answer": 3,
+      "explanation": "Motor power comes from VCC2. VCC1 is the chip's 5 V logic power; if it gets 9 V, the logic side can be damaged. EN12 and IN1 are signal inputs. The supply's GND must be joined to the Arduino GND.",
+      "skills": [
+        "h-bridge",
+        "circuit-wiring"
+      ]
+    }
+  ]
+}

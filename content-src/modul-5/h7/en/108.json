@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Forward kinematics",
+      "definition": "Working out the position of the arm's tip from the joint angles.",
+      "example": "For q1 = 90°, q2 = 90°, the tip is at (10, 10) cm.",
+      "pitfall": "Writing the forearm's direction as q1 + q2: in this arm layout the direction is q1 − q2."
+    },
+    {
+      "term": "Inverse kinematics",
+      "definition": "Working out the joint angles from the desired tip position.",
+      "example": "For the target (10, 0), q1 = 60° and q2 = 120° are found.",
+      "pitfall": "Thinking there is only one solution: there can be two, with the elbow above or below; in this servo layout only one is used."
+    },
+    {
+      "term": "Cosine rule",
+      "definition": "The relation that lets you find the angles of a triangle when its three sides are known.",
+      "example": "If the sides are 10, 10, 10, each angle is 60°.",
+      "pitfall": "Giving acos() a value slightly above 1: the result is NaN; check the range first."
+    },
+    {
+      "term": "Reach and unreachable points",
+      "definition": "The region the tip of the arm can reach. Points that are too far away or outside the servo limits are unreachable.",
+      "example": "The furthest reach of an arm with L1 = L2 = 10 cm is 20 cm; the target (25, 5) is unreachable.",
+      "pitfall": "Writing an unreachable target to the servo as well: NaN or out-of-range angles strain the servo."
+    },
+    {
+      "term": "Servo pulse width",
+      "definition": "The length of the signal pulse that sets the servo angle; about 544 µs = 0°, 2400 µs = 180°.",
+      "example": "For 90°: 544 + 90 · 1856 / 180 = 1472 µs.",
+      "pitfall": "Mixing up degrees and radians: cos() and sin() want radians, the servo wants degrees."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h7d108-q1",
+      "kind": "numeric",
+      "prompt": "The tip of an arm with L1 = L2 = 10 cm is to go to the point (10, 0). How many degrees should the elbow angle q2 be?",
+      "answer": 120,
+      "tolerance": 0.5,
+      "unit": "degrees",
+      "explanation": "r = 10, cos(q2) = (100 − 200) / 200 = −0.5, q2 = 120°. Because all three sides of the triangle are 10, the inner angle is 60°; q2 is what makes it up to 180°. If you got 60°, you mixed up the elbow's inner angle with q2.",
+      "skills": [
+        "rob-ik"
+      ]
+    },
+    {
+      "id": "m5h7d108-q2",
+      "kind": "numeric",
+      "prompt": "When a two-part arm with L1 = 10 cm and L2 = 15 cm is fully stretched out, at most how many cm from the shoulder does its tip reach?",
+      "answer": 25,
+      "tolerance": 0,
+      "unit": "cm",
+      "explanation": "When the arm is fully straight, the lengths of the two parts add up: 10 + 15 = 25 cm. At this point cos(q2) = 1. It cannot go further. There is also a lower limit: the arm cannot reach points closer than |L1 − L2| = 5 cm, even when folded.",
+      "skills": [
+        "rob-ik"
+      ]
+    },
+    {
+      "id": "m5h7d108-q3",
+      "kind": "mcq",
+      "prompt": "The target came out outside the arm's reach (cos(q2) = 1.3). What should the program do?",
+      "options": [
+        "Work out acos(1.3) and write the result to the servo",
+        "Reject the target and write nothing to the servos",
+        "Set cos(q2) to 1 and open the arm fully",
+        "Pull the servo to 0°"
+      ],
+      "answer": 1,
+      "explanation": "If |cos| goes past 1, the triangle cannot be formed; acos gives NaN, and a NaN written to the servo is an angle that was never worked out. Rejecting the target and leaving the arm in place is safe. Clipping cos to 1 also seems to work, but the arm does not reach the target; unless this is done on purpose, it is misleading. Pulling to 0° throws the arm into a random position.",
+      "skills": [
+        "rob-ik",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h7d108-q4",
+      "kind": "find-bug",
+      "prompt": "In the back-calculation, forward kinematics gives a point very different from the target, even for correct angles. Where is the bug?\n\n```\nfloat q1 = 63.6;     // derece\nfloat q2 = 80.8;     // derece\nfloat a1 = q1;\nfloat a2 = q1 - q2;\nx = L1 * cos(a1) + L2 * cos(a2);\ny = L1 * sin(a1) + L2 * sin(a2);\n```",
+      "options": [
+        "The degrees are passed to cos() and sin() without being converted to radians",
+        "There should be no L2 factor",
+        "cos should be used for y",
+        "q1 + q2 should be used instead of q2"
+      ],
+      "answer": 0,
+      "explanation": "cos() and sin() want radians; 63.6 'radians' means hundreds of degrees. It should be a1 = q1 * PI / 180. The L2 factor is the length of the arm's front part and is needed. sin is correct for y. In this arm layout the forearm's direction is q1 − q2.",
+      "skills": [
+        "rob-ik",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h7d108-q5",
+      "kind": "predict-output",
+      "prompt": "The servo pulse width is being worked out. What does it print?\n\n```\nint aci = 90;\n\nvoid setup() {\n  Serial.begin(9600);\n  int us = 544 + aci * ((2400 - 544) / 180);\n  Serial.println(us);\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "1472",
+        "1444",
+        "928",
+        "2400"
+      ],
+      "answer": 1,
+      "explanation": "The part in brackets is integer division: 1856 / 180 = 10 (not 10.31; the fraction is thrown away). 544 + 90 · 10 = 1444. The correct value is 1472 µs; the difference is 28 µs, that is, about 3°. If you write 180.0 and force decimal division, you get 1472.",
+      "skills": [
+        "rob-servo-pulse",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Recall",
+      "definition": "The rate that shows how many of the cases that really have a label were found correctly.",
+      "example": "If 3 of 4 negative cases were found correctly, the recall for negative is 3/4.",
+      "pitfall": "Putting all the cases at the bottom of the fraction; the bottom is only the number of cases with that label."
+    },
+    {
+      "term": "Unbalanced data",
+      "definition": "One of the labels appearing far more often in the set.",
+      "example": "If 90 of 100 comments are positive, the set is tilted towards the positive label.",
+      "pitfall": "Trusting a single accuracy number without noticing the imbalance."
+    },
+    {
+      "term": "Per-label result",
+      "definition": "Success worked out separately for each label; it shows the weak point.",
+      "example": "If the positive label comes out at 100% and negative at 50%, the problem is in the negative cases.",
+      "pitfall": "Looking at the overall accuracy and never opening the per-label table."
+    },
+    {
+      "term": "Grouping mistakes",
+      "definition": "Sorting the wrong cases by their shared cause.",
+      "example": "Three mistakes involving sarcasm and two involving unknown words make two groups.",
+      "pitfall": "Trying to patch every mistake separately; if a shared cause is found, one fix solves many mistakes."
+    },
+    {
+      "term": "The cost of a kind of mistake",
+      "definition": "The idea that not every wrong answer has the same price: some mistakes are more serious than others.",
+      "example": "The robot saying \"continue\" at an obstacle is much more dangerous than saying \"stop\" for no reason.",
+      "pitfall": "Counting all mistakes as equal."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d18-q1",
+      "kind": "numeric",
+      "prompt": "In a set of 50 cases, 45 cases are positive and 5 are negative. The system finds 44 of the positive cases correctly, but only 2 of the negative cases. What is the recall for the negative label as a percentage?",
+      "answer": 40,
+      "tolerance": 0,
+      "unit": "%",
+      "explanation": "Recall = cases of that label found correctly / all cases of that label = 2 / 5 = 40%. The overall accuracy is (44 + 2) / 50 = 92%, so it looks good; the weakness only becomes clear when you look per label.",
+      "skills": [
+        "eval-metrics"
+      ]
+    },
+    {
+      "id": "m7h4d18-q2",
+      "kind": "mcq",
+      "prompt": "In a set where 95% of the data is positive, what can be said about a system that always says \"positive\"?",
+      "options": [
+        "The accuracy comes out at 95%, but none of the negative cases are found; the system has not really learned anything",
+        "The system is great; its accuracy is 95%",
+        "The accuracy comes out at 50%",
+        "The system gives an error"
+      ],
+      "answer": 0,
+      "explanation": "Always saying the same label gives a high accuracy when that label is the majority. The recall for negative is 0%; in practice this system is useless. With unbalanced data, a single number misleads.",
+      "skills": [
+        "eval-metrics",
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d18-q3",
+      "kind": "predict-output",
+      "prompt": "The sentiment classifier looks at word lists (`fena` (bad) and `bozuldu` (it broke) are in no list; `değil` (not) flips the previous score; if the score is 0, \"unclear\"). A set of five cases is run:\n\n```\n(\"Berbat bir ders\"       , negative)\n(\"Harika, yine bozuldu\"  , negative)\n(\"Çok yavaş\"             , negative)\n(\"Fena değil\"            , positive)\n(\"Güzel\"                 , positive)\n```\n\nWhich is the report?",
+      "options": [
+        "Accuracy 5/5; all labels 100%",
+        "Accuracy 3/5; positive recall 1/2, negative recall 2/3",
+        "Accuracy 3/5; positive recall 2/2, negative recall 1/3",
+        "Accuracy 2/5; positive recall 1/2, negative recall 1/3"
+      ],
+      "answer": 1,
+      "explanation": "\"An awful lesson\" is negative, correct. \"Great, it broke again\": great +1, the system says positive, wrong. \"Very slow\" is negative, correct. \"Not bad\": bad is not in the list, the score is 0, the system says unclear, wrong. \"Nice\" is positive, correct. The negative label finds 2 of its 3 cases and positive finds 1 of its 2; overall 3/5.",
+      "skills": [
+        "eval-metrics",
+        "eval-basics"
+      ]
+    },
+    {
+      "id": "m7h4d18-q4",
+      "kind": "find-bug",
+      "prompt": "There is one bug in the code that works out recall for a label. Which line?\n\n```\n1: n  = say(vakalar, beklenen == etiket)\n2: ok = say(vakalar, beklenen == etiket and cikti == etiket)\n3: toplam = say(vakalar)\n4: geri_cagirma = ok / toplam\n```",
+      "options": [
+        "Line 1: n should not be calculated",
+        "Line 2: checking cikti is unnecessary for ok",
+        "Line 3: toplam should not be calculated",
+        "Line 4: ok should be divided by n, not by the total number of cases"
+      ],
+      "answer": 3,
+      "explanation": "The bottom of the recall fraction is the number of cases with that label (n). Dividing by the total number of cases makes every label's recall look lower than it is. Lines 1 and 2 count the top and the bottom of the fraction correctly.",
+      "skills": [
+        "eval-metrics",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d18-q5",
+      "kind": "mcq",
+      "prompt": "What is the biggest benefit of grouping the wrong cases by their causes?",
+      "options": [
+        "It raises the accuracy number",
+        "It shortens the test set",
+        "It makes the mistakes invisible",
+        "It lets you solve mistakes caused by the same thing with a single fix"
+      ],
+      "answer": 3,
+      "explanation": "Grouping mistakes helps you find the shared root cause (for example, not recognising sarcasm). A single fix can rescue many cases at once. Grouping does not change the accuracy by itself.",
+      "skills": [
+        "eval-metrics",
+        "eval-method"
+      ]
+    }
+  ]
+}

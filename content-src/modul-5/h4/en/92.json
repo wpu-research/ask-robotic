@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "Window",
+      "definition": "The fixed slice of time in which we count ticks; the speed is worked out from the tick difference in this slice.",
+      "example": "Every 100 ms the counter is read and its difference from the previous value is taken.",
+      "pitfall": "Choosing a window that is too short; at low speed 0 ticks arrive and the robot looks as if it has stopped."
+    },
+    {
+      "term": "Counter difference",
+      "definition": "Subtracting the value stored at the previous measurement from the current counter value.",
+      "example": "s - oncekiSol gives the number of ticks that arrived in the window.",
+      "pitfall": "Resetting the counter at the end of the window; a tick that arrives between reading and resetting is lost."
+    },
+    {
+      "term": "Quantisation",
+      "definition": "A continuous value being measured only in whole-number steps.",
+      "example": "With a 100 ms window, the speed only shows up in steps such as 0, 10.4, 20.7 or 31.1 cm/s.",
+      "pitfall": "Thinking a jump in a single measurement is a real change in speed."
+    },
+    {
+      "term": "Speed resolution",
+      "definition": "The smallest speed difference that can be measured: the tick distance divided by the window length.",
+      "example": "1.037 cm / 0.5 s ≈ 2.1 cm/s.",
+      "pitfall": "Thinking that making the window longer makes the measurement both finer and faster; the delay grows."
+    },
+    {
+      "term": "Real dt",
+      "definition": "When working out speed, using the real time measured with millis() between two measurements instead of a fixed number.",
+      "example": "float dt = (simdi - sonOlcum) / 1000.0;",
+      "pitfall": "Using a fixed 0.1 when loop() slows down, and working out a speed that is higher than it really is."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h4d92-q1",
+      "kind": "numeric",
+      "prompt": "The tick distance is 1.037 cm. In a 100 ms window the counter went up by 4 ticks. What is the speed in cm/s?",
+      "answer": 41.48,
+      "tolerance": 0.1,
+      "unit": "cm/s",
+      "explanation": "Speed = 4 · 1.037 / 0.1 = 41.48 cm/s. If you had divided by the time in milliseconds (100), the result would have come out 1000 times too small; convert the unit to seconds.",
+      "skills": [
+        "rob-speed-window"
+      ]
+    },
+    {
+      "id": "m5h4d92-q2",
+      "kind": "numeric",
+      "prompt": "For the same robot, if the window is 250 ms, what is the smallest speed step that can be measured, in cm/s? (tick distance 1.037 cm)",
+      "answer": 4.148,
+      "tolerance": 0.05,
+      "unit": "cm/s",
+      "explanation": "Step = tick distance / window = 1.037 / 0.25 = 4.148 cm/s. At 100 ms this step was 10.4; as the window gets longer, the step gets smaller.",
+      "skills": [
+        "rob-quantization",
+        "rob-speed-window"
+      ]
+    },
+    {
+      "id": "m5h4d92-q3",
+      "kind": "mcq",
+      "prompt": "What happens if you raise the window in a speed measurement from 100 ms to 500 ms?",
+      "options": [
+        "The measurement becomes both finer and quicker to react to a change in speed",
+        "The measurement becomes finer and calmer, but reacts late to a change in speed",
+        "The measurement becomes coarser, but reacts faster",
+        "Nothing changes"
+      ],
+      "answer": 1,
+      "explanation": "As the window gets longer, the speed step gets smaller and the measurement calms down; but because the result is the average of the last half second, it shows a change with a delay. A fine and fast measurement cannot be had at the same time.",
+      "skills": [
+        "rob-quantization",
+        "rob-speed-window"
+      ]
+    },
+    {
+      "id": "m5h4d92-q4",
+      "kind": "find-bug",
+      "prompt": "There is one safety bug in the speed calculation below. Which is it?\n\n```\nif (simdi - sonOlcum >= 100) {\n  float dt = (simdi - sonOlcum) / 1000.0;\n  sonOlcum = simdi;\n  unsigned int d = oku(tikSol);\n  tikSol = 0;\n  Serial.println(d * TIK_CM / dt);\n}\n```",
+      "options": [
+        "The line tikSol = 0;: a tick that arrives between reading and resetting is lost",
+        "100 should be written instead of 1000.0 in the dt calculation",
+        "The oku() function should not be used",
+        "sonOlcum should not be updated"
+      ],
+      "answer": 0,
+      "explanation": "If a tick arrives between reading and resetting, the reset wipes it out. The safe way is to store the previous value and take the difference. The 1000.0 in dt is correct for converting milliseconds to seconds, and oku() exists precisely for interrupt safety.",
+      "skills": [
+        "rob-interrupt-count",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h4d92-q5",
+      "kind": "predict-output",
+      "prompt": "On an AVR Arduino, unsigned int is 2 bytes. What does this code print?\n\n```\nunsigned int onceki = 65534;\nunsigned int simdi = 3;\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(simdi - onceki);\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "-65531",
+        "65531",
+        "5",
+        "0"
+      ],
+      "answer": 2,
+      "explanation": "Unsigned arithmetic wraps round modulo 65536: 3 - 65534 = -65531, which becomes 5 when 65536 is added. Even if the counter wraps round from 65535 to 0, the difference comes out right. A negative result does not happen with an unsigned type.",
+      "skills": [
+        "rob-interrupt-count",
+        "prog-timing"
+      ]
+    }
+  ]
+}

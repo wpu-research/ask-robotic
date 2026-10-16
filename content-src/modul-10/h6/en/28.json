@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "State machine",
+      "definition": "A way of thinking in which the device is in a single state at any moment and events move it to another state.",
+      "example": "Alarm: off, set, ringing. A sets it, a shake makes it ring, A+B turns it off.",
+      "pitfall": "Thinking an event has an effect in every state: shaking does nothing while it is not set."
+    },
+    {
+      "term": "State variable",
+      "definition": "A variable that remembers the device's state as 0 or 1.",
+      "example": "kurulu = 1 and alarm = 1 is the \"ringing\" state.",
+      "pitfall": "Mixing up the variables: when the card is shaken, alarm becomes 1, not kurulu."
+    },
+    {
+      "term": "forever",
+      "definition": "A loop that runs the blocks inside it again and again without ending.",
+      "example": "If you put \"if alarm = 1, play the melody\" inside it, the sound repeats all the time while the alarm is on.",
+      "pitfall": "Not putting a pause inside: the flashing skull becomes almost invisible."
+    },
+    {
+      "term": "Long press",
+      "definition": "Pressing a button for longer than 1 second. It is hard to do by accident.",
+      "example": "When you hold A+B down for 1.2 seconds, the alarm turns off.",
+      "pitfall": "Pressing briefly: the long press hat block never runs."
+    },
+    {
+      "term": "Full turn-off",
+      "definition": "Stopping the sound and resetting the state variables when turning off the alarm.",
+      "example": "The turn-off hat block sets kurulu and alarm to 0 and stops the sound.",
+      "pitfall": "Only stopping the sound: because alarm is still 1, forever starts the melody again."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h6d28-q1",
+      "kind": "mcq",
+      "prompt": "If the card is shaken while the alarm is not set (kurulu = 0), what happens?",
+      "options": [
+        "The alarm starts ringing",
+        "Nothing happens, because the shake hat block first checks whether kurulu = 1",
+        "The card sets itself automatically",
+        "The card gives an error"
+      ],
+      "answer": 1,
+      "explanation": "The if in the shake hat block waits for kurulu = 1. If kurulu is 0, the alarm variable does not change and the sound does not start. For the alarm to ring, it must first be set with A.",
+      "skills": [
+        "mk-state",
+        "mk-conditions"
+      ]
+    },
+    {
+      "id": "m10h6d28-q2",
+      "kind": "find-bug",
+      "prompt": "When A+B is long-pressed, the sound stops, but after a while the alarm rings again. Which is the mistake?\n\n```\non button [A+B] long pressed:\n  stop sound\n  show icon [happy face]\n\nforever:\n  if alarm = 1 then:\n    show icon [skull]\n    play melody [Alarm]\n    clear screen\n    pause 200 ms\n```",
+      "options": [
+        "The alarm variable is not set to 0; on the next round, forever sees alarm = 1 and plays the melody again",
+        "The happy face is the wrong icon",
+        "The pause is too short",
+        "The forever block should not be used at all"
+      ],
+      "answer": 0,
+      "explanation": "Turning it off without resetting the state variable is only half done. The turn-off hat block must set alarm (and kurulu) to 0. The other options do not make the alarm ring again.",
+      "skills": [
+        "mk-debug",
+        "mk-state"
+      ]
+    },
+    {
+      "id": "m10h6d28-q3",
+      "kind": "predict-output",
+      "prompt": "The program below is running. The events come in this order: shake, A, shake, A+B long, shake. When is the alarm variable 1?\n\n```\non start: kurulu = 0, alarm = 0\nA pressed: kurulu = 1\nwhen shaken: if kurulu = 1 then alarm = 1\nA+B long pressed: kurulu = 0, alarm = 0\n```",
+      "options": [
+        "All the time from the first shake on",
+        "On every shake",
+        "Only from the second shake until the A+B long press",
+        "Never"
+      ],
+      "answer": 2,
+      "explanation": "On the first shake kurulu is 0, so alarm stays 0. A sets it, and the second shake sets alarm to 1. The A+B long press sets both to 0. The third shake has no effect because kurulu is 0.",
+      "skills": [
+        "mk-state",
+        "mk-events"
+      ]
+    },
+    {
+      "id": "m10h6d28-q4",
+      "kind": "numeric",
+      "prompt": "The Alarm melody is 3.25 beats and the tempo is 120 (one beat is 500 ms). Inside forever, there is a 200 ms pause after the melody. Do not count the system's small loop allowance. How many ms does one round take?",
+      "answer": 1825,
+      "unit": "ms",
+      "explanation": "3.25 x 500 = 1625 ms of melody. Adding the 200 ms pause makes 1825 ms. The round measured on the virtual card comes out as 1845 ms; the 20 ms difference is the allowance the system adds at the end of each round.",
+      "skills": [
+        "mk-concurrency"
+      ]
+    },
+    {
+      "id": "m10h6d28-q5",
+      "kind": "mcq",
+      "prompt": "The alarm is kept in two variables: kurulu and alarm. Which state is kurulu = 1 and alarm = 1?",
+      "options": [
+        "Off",
+        "Set but not ringing",
+        "There should be no such state",
+        "Ringing"
+      ],
+      "answer": 3,
+      "explanation": "alarm only becomes 1 while it is set. If both are 1, the device is ringing. In the off state both are 0; in the set state kurulu is 1 and alarm is 0.",
+      "skills": [
+        "mk-state",
+        "mk-variables"
+      ]
+    }
+  ]
+}

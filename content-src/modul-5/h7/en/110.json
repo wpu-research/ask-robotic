@@ -1,0 +1,109 @@
+{
+  "concepts": [
+    {
+      "term": "Position estimate",
+      "definition": "The robot working out its own position from the distance it has travelled since the start and the direction it is facing.",
+      "example": "0.2 m travelled at a heading of 60°: x increases by 0.10 m, y by 0.173 m.",
+      "pitfall": "Trusting the estimate absolutely: after a collision or wheel slip, the estimate goes wrong."
+    },
+    {
+      "term": "Wrapping the angle difference",
+      "definition": "Bringing the difference between two angles into the −180...180 range, so that the robot heads for the target with the shortest turn.",
+      "example": "If the target is 350° and the heading is 10°, the difference is −20°, not 340°.",
+      "pitfall": "Wrapping the heading to 0-360 and then filtering it; do the wrapping only in the difference calculation."
+    },
+    {
+      "term": "Coverage",
+      "definition": "With the arena divided into cells, the ratio of the cells the robot's track passes through to the total number of cells.",
+      "example": "A robot that visits 40 of 64 cells has a coverage of 62.5%.",
+      "pitfall": "Looking at a single number only: if coverage is high but collisions are high too, the robot is not good."
+    },
+    {
+      "term": "Silencing a behaviour",
+      "definition": "A behaviour (ZIYARET, visit) being switched off for a short time, so that another behaviour (DOLAS, wander) gets a chance to change direction.",
+      "example": "When KAC (escape) starts, ZIYARET is silent for 3 seconds.",
+      "pitfall": "Not adding any silencing: the robot turns back to the same wall and switches back and forth between KAC and ZIYARET."
+    },
+    {
+      "term": "Comparison run",
+      "definition": "Measuring the effect of a feature by switching it off and repeating the same test.",
+      "example": "When KAC is switched off, the robot pushes against the wall and stays there, and coverage drops.",
+      "pitfall": "Saying 'it works' without a comparison: without numbers there is no proof."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h7d110-q1",
+      "kind": "numeric",
+      "prompt": "The arena is divided into 8 x 8 = 64 cells. The robot's track passed through 40 different cells. What is the coverage as a percentage?",
+      "answer": 62.5,
+      "tolerance": 0.1,
+      "unit": "%",
+      "explanation": "Coverage = 40 / 64 = 0.625, that is, 62.5%. Counting a cell twice, or taking the total number of cells as 40, spoils the result.",
+      "skills": [
+        "rob-eval"
+      ]
+    },
+    {
+      "id": "m5h7d110-q2",
+      "kind": "numeric",
+      "prompt": "The robot's heading is 60° and in the last step it travelled 0.2 m. By how many cm does y increase in the position estimate? (y = distance · sin(heading))",
+      "answer": 17.3,
+      "tolerance": 0.1,
+      "unit": "cm",
+      "explanation": "0.2 m · sin60° = 0.2 · 0.866 = 0.1732 m = 17.3 cm. If you used cos60°, you would get the value for x (10 cm). Do not forget to convert metres to centimetres either.",
+      "skills": [
+        "rob-localization"
+      ]
+    },
+    {
+      "id": "m5h7d110-q3",
+      "kind": "mcq",
+      "prompt": "The robot is pushed against a wall, but the wheels keep turning. What happens to the position estimate?",
+      "options": [
+        "It stays correct, because the encoder does not lie",
+        "Because ticks are counted even though the robot is not really moving forwards, the estimate drifts away from the real position",
+        "The estimate resets itself",
+        "Only the heading goes wrong; the position stays correct"
+      ],
+      "answer": 1,
+      "explanation": "The encoder counts that the wheel turns; it does not know whether the robot moves forwards. If the robot is at the wall while the wheel turns, the ticks are added as extra distance and (x, y) slides. There is no automatic reset. The heading is less affected because it is backed up by the gyroscope, but the position goes wrong because it is worked out by adding up the distance.",
+      "skills": [
+        "rob-localization"
+      ]
+    },
+    {
+      "id": "m5h7d110-q4",
+      "kind": "find-bug",
+      "prompt": "While escaping from the wall, the robot jitters between KAC and DOLAS at around 25 cm. Where is the bug?\n\n```\nOneri kac() {\n  Oneri o = {false, 0, 0};\n  if (onCm < 25) o.aktif = true;\n  if (o.aktif) { o.sol = 0; o.sag = 190; }\n  return o;\n}\n```",
+      "options": [
+        "The right wheel speed should not be 190",
+        "The onCm variable should not be a float",
+        "There is a single threshold for starting and ending; when the robot turns and goes past 25, KAC ends at once, it drives forwards and starts again",
+        "The Oneri struct should not have left and right fields"
+      ],
+      "answer": 2,
+      "explanation": "KAC is active only below 25 cm; when the robot turns and the distance rises a few mm above 25, the behaviour switches off, DOLAS drives forwards, and the distance drops below 25 again. The solution is a separate end threshold (60 cm) and keeping the state in a variable. The wheel speeds and data types have nothing to do with the jitter.",
+      "skills": [
+        "rob-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h7d110-q5",
+      "kind": "predict-output",
+      "prompt": "The robot's heading is 10° and the target's angle is 350°. What does it print when the difference is wrapped?\n\n```\nfloat aciFarki(float hedef, float simdiki) {\n  float f = hedef - simdiki;\n  while (f > 180) f -= 360;\n  while (f < -180) f += 360;\n  return f;\n}\n\nvoid setup() {\n  Serial.begin(9600);\n  Serial.println(aciFarki(350, 10), 0);\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "340",
+        "20",
+        "-20",
+        "-340"
+      ],
+      "answer": 2,
+      "explanation": "350 − 10 = 340; because 340 > 180, 360 is subtracted once: −20. So the target is 20° to the right, and the robot heads for it with a short turn to the right. 340 is the unwrapped difference, and the robot would turn the long way round. 20 has the wrong sign (direction).",
+      "skills": [
+        "rob-localization"
+      ]
+    }
+  ]
+}

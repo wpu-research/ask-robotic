@@ -12,6 +12,7 @@ export const modul10: ModuleContent = {
       "title": "Kartı tanı",
       "project": "Atan kalp",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Mikro Kart'ın parçalarını (25 LED'lik ekran, A ve B düğmeleri, logo, P0-P2) ve sanal kartın ne olduğunu söyleyebilir.\n2. Blok editöründe başlık bloğuna (başlangıçta, sonsuza kadar) bloklar takıp ▶ ile çalıştırabilir; blokların yukarıdan aşağıya, sırayla çalıştığını açıklayabilir.\n3. LED'lerin (x, y) adresini, 0'dan sayımı ve ekranı temizleme/bekleme mantığını kullanarak tek tek LED yakabilir.\n4. Hazır simgeleri ve kendi çizdiği 5 x 5 deseni gösterebilir; iki çizim arasına bekleme koyarak animasyon yapabilir.\n5. Tekrarla bloğunu ve bekleme sürelerini kullanıp ritimli bir proje (Atan kalp) kurabilir; döngünün toplam süresini hesaplayabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 15-30 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Merhaba, Mikro Kart | ~15 dk | Anlatımı oku, kartın parçalarını tanı, yazı ve sayı göster, mini testi çöz. |\n| 2 | LED'lerin adresi: x ve y | ~20 dk | Çapraz çizgiyi ve dört köşeyi çiz, adresleri kâğıda yazıp kontrol et. |\n| 3 | Simgeler ve kendi desenin | ~20 dk | Yüzleri göster, robot başını çiz, iki çizim arasına bekle koyup animasyon yap. |\n| 4 | Sıra ve tekrar | ~20 dk | Üç yanıp sönmeyi tekrarla ile kur, sayı ve süreleri değiştirip dene. |\n| 5 | Proje: Atan kalp | ~30 dk | Planı tabloya yaz, kalbi kur, ritmi değiştir, proje ölçütüyle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta özel bir ön bilgi gerekmez. Başlamadan önce şunları kontrol et:\n- Tarayıcıda Mikro Kart editörü açılıyor mu ve ▶ düğmesi çalışıyor mu?\n- Öğrenci fareyle (ya da parmakla) blok tutup sürükleyebiliyor mu?\n- Sayıları 0'dan 10'a kadar sayabiliyor ve toplama/çarpma yapabiliyor mu? (Süre hesaplarında gerekir.)\n\n### Kavram haritası\n- **Kart:** LED ekranı (5 x 5 = 25) → düğmeler ve logo → sanal kart\n- **Program:** başlık bloğu (başlangıçta, sonsuza kadar) → bloklar yukarıdan aşağıya → JavaScript ve Python görünümü (salt okunur)\n- **Ekran:** yazı (kayar) ve tek karakter (durur) → LED adresi (x, y) → simge ve desen → ekranı temizle\n- **Zaman:** bekle (ms) → animasyon → tekrarla → tur süresi ve toplam süre\n- **Proje:** plan tablosu → parlaklık (0-255) → ritim\n\n### Sık yapılan hatalar\n- **Bloğu başlık bloğunun dışında bırakmak.** Soluk görünür ve hiç çalışmaz.\n- **Değişiklikten sonra ▶ düğmesine basmamak.** Eski program ekranda kalır.\n- **x ile y'yi karıştırmak ya da 1'den saymak.** (4, 0) sağ üst köşedir; en büyük adres 4'tür, 5 değil. Ekran dışı adres hata vermeden yok sayılır.\n- **bekle koymamak.** Art arda iki çizimde yalnızca sonuncusu görülür; çizip hemen temizlenen şey de görünmez.\n- **Temizlemeyi unutmak.** Yanıp sönmede kare hiç sönmez.\n- **Bloğu tekrarla'nın içine/dışına yanlış takmak.** İçeridekiler her turda, dışarıdakiler bir kez çalışır.\n- **Yazıyı sonsuza kadar içine koymak.** Her turda yeniden kayar ve kalp atışını bozar.\n- **Parlaklığı 0 yapıp programın bozulduğunu sanmak.** Ekran karanlıktır ama program çalışır.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Dört köşeyi yakan programı sıfırdan, bakmadan kur; sonra çerçevenin tamamını (16 LED) yakmayı dene.\n4. Kendi çizdiğin bir deseni kâğıda 1 ve 0'larla yaz, kaç LED yandığını say ve editörde kontrol et.\n5. Atan kalbin tur süresini ve dakikadaki tur sayısını hesapla; sonra bekleme sürelerini değiştirip hızın nasıl değiştiğini anlat.\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Atan kalp)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Yapı | Bloklar başlık bloğunun dışında ya da program çalışmıyor | Yazı başlangıçta, kalp sonsuza kadar içinde | Plan tablosuyla birebir uyuşuyor ve bölümlerin neden ayrıldığı anlatılıyor |\n| Görünüm | Kalp ya da küçük kalp görünmüyor | Büyük ve küçük kalp sırayla görünüyor, parlaklık ayarlı | Parlaklığı bilerek seçmiş ve nedenini açıklıyor |\n| Ritim | Beklemeler yok ya da çok kısa | Tup-tup ve dinlenme ayırt ediliyor | Hızlı ve yavaş iki ritim yapıp tur süresini hesaplıyor |\n| Hata ayıklama | Takıldığında nedenini bulamıyor | Hatayı sorarak/bakarak buluyor | Hatayı kendi başına bulup nasıl bulduğunu anlatıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Blokları sırayla anlatıyor | Bir arkadaşının programındaki hatayı bulup düzeltiyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta ezber değil, çocuğun blokla düşünmeye ve sonucu hemen görmeye alışmasıdır. Kart sanaldır; hata yapmak güvenlidir ve ↺ ile sıfırlanır.\n- **Nasıl destek olunur?** Cevabı söylemek yerine şunları sor: \"Hangi blok önce çalışıyor?\", \"Bu blok başlangıçta bloğuna bağlı mı?\", \"Bekle koydun mu?\", \"Hangi adresi yazdın, ekranın neresi?\"\n- **Süre.** Dersleri art arda yapmak yerine her gün bir ders ve kısa bir tekrar kalıcılığı artırır. Yaş 8 ise okuma ve sayı işlemlerinde birlikte ilerleyin.\n- **Ekran süresi.** Dersler kısadır; uzun oturumlar yerine ara vermek iyi olur.\n- **İlerleme.** Dersin sonundaki mini test sonuçları beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Name the parts of the Micro Card (the 25-LED screen, the A and B buttons, the logo, P0-P2) and say what a virtual card is.\n2. Attach blocks to a header block (on start, forever) in the block editor and run them with ▶; explain that blocks run from top to bottom, in order.\n3. Light up single LEDs using the (x, y) address of the LEDs, counting from 0 and the logic of clearing the screen and pausing.\n4. Show ready-made icons and a 5 x 5 pattern they drew themselves; make an animation by putting a pause between two drawings.\n5. Build a project with a rhythm (Beating heart) using the repeat block and pause times; work out the total time of a loop.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 15-30 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | Hello, Micro Card | ~15 min | Read the explainer, get to know the parts of the card, show text and a number, do the mini quiz. |\n| 2 | The address of the LEDs: x and y | ~20 min | Draw the diagonal line and the four corners, write the addresses on paper and check them. |\n| 3 | Icons and your own pattern | ~20 min | Show the faces, draw the robot head, put a pause between two drawings and make an animation. |\n| 4 | Order and repetition | ~20 min | Build the three blinks with repeat, change the numbers and times and try them out. |\n| 5 | Project: Beating heart | ~30 min | Write the plan in a table, build the heart, change the rhythm, assess it with the project rubric. |\n\n### Prerequisite check\nNo special prior knowledge is needed this week. Before you start, check these:\n- Does the Micro Card editor open in the browser, and does the ▶ button work?\n- Can the learner grab and drag a block with the mouse (or a finger)?\n- Can they count from 0 to 10 and do addition and multiplication? (This is needed for the time sums.)\n\n### Concept map\n- **Card:** LED screen (5 x 5 = 25) → buttons and logo → virtual card\n- **Program:** header block (on start, forever) → blocks from top to bottom → JavaScript and Python view (read-only)\n- **Screen:** text (scrolls) and a single character (stays) → LED address (x, y) → icon and pattern → clear screen\n- **Time:** pause (ms) → animation → repeat → round time and total time\n- **Project:** plan table → brightness (0-255) → rhythm\n\n### Common mistakes\n- **Leaving a block outside the header block.** It looks faded and never runs.\n- **Not pressing the ▶ button after a change.** The old program stays on the screen.\n- **Mixing up x and y, or counting from 1.** (4, 0) is the top right corner; the largest address is 4, not 5. An address outside the screen is ignored without an error.\n- **Not adding a pause.** With two drawings one after the other, only the last one is seen; something that is drawn and cleared straight away is not visible either.\n- **Forgetting to clear.** When blinking, the square never goes off.\n- **Attaching a block inside/outside repeat by mistake.** What is inside runs in every round; what is outside runs once.\n- **Putting the text inside forever.** It scrolls again in every round and spoils the heartbeat.\n- **Setting the brightness to 0 and thinking the program is broken.** The screen is dark, but the program is running.\n\n### End-of-week review\n1. Look at the concept cards of each lesson once more and read the \"common mistake\" lines out loud.\n2. Read the explanations of the questions you got wrong in the mini quizzes again, then do the question again.\n3. Build the program that lights up the four corners from scratch, without looking; then try lighting up the whole frame (16 LEDs).\n4. Write a pattern you drew yourself on paper with 1s and 0s, count how many LEDs are on and check it in the editor.\n5. Work out the round time of the beating heart and the number of rounds per minute; then change the pause times and explain how the speed changes.\n\nThe mini quizzes of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct in each lesson. Go back to the explainer of any lesson that needs more work.\n\n### Project rubric (Beating heart)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Structure | Blocks are outside the header block, or the program does not run | The text is inside on start, the heart inside forever | It matches the plan table exactly, and the learner explains why the parts are separate |\n| Look | The heart or the small heart does not appear | The big and small hearts appear in turn, and the brightness is set | Chose the brightness on purpose and explains why |\n| Rhythm | There are no pauses, or they are too short | The lub-dub and the rest can be told apart | Makes a fast and a slow rhythm and works out the round time |\n| Debugging | Cannot find the cause when stuck | Finds the mistake by asking or looking | Finds the mistake on their own and explains how they found it |\n| Explaining | Cannot explain what they did | Explains the blocks in order | Finds and fixes the mistake in a friend's program |\n\n### Note for parents and teachers\n- **Aim.** This week is not about memorising; it is about the child getting used to thinking in blocks and seeing the result straight away. The card is virtual; making mistakes is safe, and ↺ resets it.\n- **How can you help?** Instead of giving the answer, ask: \"Which block runs first?\", \"Is this block attached to the on start block?\", \"Did you add a pause?\", \"Which address did you type, and where on the screen is it?\"\n- **Time.** Rather than doing the lessons back to back, one lesson a day with a short review helps learning stick. If the child is 8, work through the reading and the number work together.\n- **Screen time.** The lessons are short; taking breaks is better than long sessions.\n- **Progress.** The results of the mini quiz at the end of each lesson are shown by skill (draft/pilot feature; only saved if consent was given).",
       "lessons": [
         {
           "title": "Merhaba, Mikro Kart",
@@ -397,7 +398,126 @@ export const modul10: ModuleContent = {
               "kind": "reflect",
               "prompt": "The board's screen is only 5 columns wide. Apart from scrolling, are there other ways to show long text on a small screen? Why do you think we keep a single letter in the middle instead of scrolling it?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Hello, Micro Card",
+            "problem": "Imagine a computer small enough to fit in the palm of your hand. Its screen is made of only 25 tiny lights, yet it can write words, play songs and answer you. You will program this card with blocks. So how does a word fit on a screen of 25 lights?",
+            "contentMd": "### Meet the virtual card\nIn this module you will work with the **virtual Micro Card**. The card lives entirely inside the computer; there are no wires, batteries or real parts. You use everything you see on the screen with the mouse or your finger.\n\nThe card has these parts:\n\n| Part | What does it do? |\n|---|---|\n| LED screen | 5 columns x 5 rows, 25 tiny lights in total |\n| A and B buttons | On the two sides of the card. They tell the program when you press them |\n| A+B button | For pressing both at the same time |\n| Logo (star) | A surface that tells the program when you touch it |\n| P0, P1, P2 | Three connection points at the bottom of the card (we will use them later) |\n\nTo the right of the card there is a control panel. There you change things like shaking, tilting, light and temperature yourself. We will use those in later lessons too.\n\n### Parts of the editor\n- **Top bar:** the ▶ **Run**, ■ **Stop** and ↺ **Reset** buttons are here. There are also **Start over** (takes the lesson back to how it started), **Export** and **Import**.\n- **Goals box:** the tasks for this lesson. Each time you complete a task, a ✓ appears in the box next to it.\n- **Block box:** the colourful categories on the left. In this lesson you will only use the **Basic** category.\n- **Tabs:** **Blocks**, **JavaScript**, **Python**. In the last two you see the written code of your blocks. You cannot change the text there; you can only read it.\n\n### Program: Hello\nThere is already an **on start** block on the screen. This block runs once when you start the program. Every program lives inside a header block like this one.\n\n1. Click the **Basic** category in the block box.\n2. Grab the **show text [Hello!]** block and drag it inside the **on start** block. When you let go, you will see it snap into place.\n3. Click the text in the block and type your own name. If you like, type Merhaba (Turkish for \"hello\"), as in the examples in this lesson.\n4. Take the **show number [0]** block from the **Basic** category and attach it right under the text block.\n5. Type 7 in the number box.\n6. Press the ▶ **Run** button.\n\n### Expected result\nThe text scrolls across the card's screen from right to left. A 7-letter word like \"Merhaba\" takes about 4 seconds. When the text ends, the screen goes dark, then the number 7 appears in the middle for about half a second. All three tasks in the Goals box should have a ✓.\n\n### How does it work?\n- Blocks run **from top to bottom**, in order.\n- The next block does not start until the scrolling text has finished. The card waits until the text is done.\n- A single letter or a one-digit number does not scroll. It stays in the middle of the screen for a short time. A two-digit number (for example 25) scrolls like text.\n- Look at the **JavaScript** tab: inside the `card.onStart(...)` line it says `screen.showText(\"Merhaba\")` and `screen.showNumber(7)`. This is the code form of your blocks. In the **Python** tab, the same program appears written in another language.\n\n### Try it\n1. Change the text and press ▶ again. How long did the scrolling take? Compare a long text with a short one.\n2. Type 25 in the number block. How is it different from a one-digit number?\n3. Put two **show text** blocks one under the other. Which one appears first?\n\n### Common mistakes\n- **Dropping the block outside on start.** A stack of blocks that is not attached to a header block does not run; it looks faded. Move the block inside on start.\n- **Not pressing ▶ after making a change.** A change you make while the program is running is not applied by itself. A note appears on the screen: \"Press ▶ to use your changes\".\n- **Expecting a result before the program has finished.** The number does not appear until the scrolling text is done. Wait a little.",
+            "question": "The card's screen is only 5 columns wide. Are there other ways, apart from scrolling, to show a long text on a small screen? Why do you think we keep a single letter in the middle instead of scrolling it?",
+            "explainerMd": "### What you will learn in this lesson\n- The parts of the Micro Card (LED screen, buttons, logo, connection points) and what they do\n- How a program is built in the block editor: a header block, blocks attached underneath, ▶ Run\n- That blocks run from top to bottom, in order\n- That text is shown by scrolling, while a single letter or a one-digit number stays in the middle\n\n### What you should know first\nNothing. This is the first lesson of the module. It is enough that you can grab an object with the mouse and drag it.\n\n### A small but complete computer\nThe Micro Card is a computer that fits in the palm of your hand. Its screen is made of 25 tiny lights (**LEDs**); these lights form a grid of 5 columns and 5 rows. There are **A** and **B** buttons on the two sides of the card and a **logo** surface in the middle. You will use the P0, P1 and P2 connection points at the bottom in later weeks. The card in this module is **virtual**: it runs inside the computer and needs no batteries or wires.\n\n### What is a program, what is a block?\nA computer only does what it is told. The written list of these instructions is called a **program**. In this module you build the program not by typing, but by snapping colourful **blocks** together. Each block does one job: \"show text\", \"pause\", \"clear screen\" and so on.\n\nThe **header block** decides where the blocks will run. The **on start** block is the part that runs once when you press the ▶ button. If a block is not attached to it, the card does not see it; it looks faded and does not run. You can think of it as a room without a door: you cannot get in.\n\n### Order is everything\nThe card runs the blocks **from top to bottom**, one by one. It does not move on to the next block until the current one has finished. The two stacks below are made of the same blocks, but their results are different:\n\n```\nStack A: text \"Hi\"  ->  number 7\nStack B: number 7  ->  text \"Hi\"\n```\n\nIn A, Hi scrolls first, then 7 appears. In B, 7 appears first, then Hi scrolls. That is why \"in which order\" matters as much as \"what to do\".\n\n### Text scrolls, a single character stays\nBecause the screen is only 5 columns wide, long text **scrolls** from right to left. While it scrolls, the card waits; the next block does not start until the text is done. A 7-letter word like \"Merhaba\" (Turkish for \"hello\") scrolls past in about 4 seconds. A single letter or a one-digit number fits on the screen and does not scroll; it stays in the middle for a little over half a second. A two-digit number (for example 25) is two characters, so it scrolls like text.\n\n### The hidden side of the code\nThe editor has **JavaScript** and **Python** tabs. They show the written code that matches your blocks. You cannot change the text there; you can only read it. The blocks and the written code are the same program; they just look different. Reading written code gets you ready to move on to programming by typing later.\n\n### Summary\nThe Micro Card is a virtual computer with 25 LEDs, two buttons and a logo. You build the program from blocks, and every stack of blocks must be attached to a header block. Blocks run from top to bottom, in order. Long text scrolls; a single character stays in the middle.",
+            "concepts": [
+              {
+                "term": "LED screen",
+                "definition": "The card's screen of 5 columns and 5 rows, with 25 tiny lights in total.",
+                "example": "The heart icon is drawn by lighting up some of the 25 lights on the screen.",
+                "pitfall": "Thinking the screen has hundreds of dots; there are only 25 lights, so long text does not fit and scrolls."
+              },
+              {
+                "term": "Header block (on start)",
+                "definition": "The block that decides where the program starts running; the blocks attached under it run once when you press ▶.",
+                "example": "When you put the show text block inside the on start block, the text scrolls when you press ▶.",
+                "pitfall": "Leaving a block outside the on start block: a block that is not attached looks faded and never runs."
+              },
+              {
+                "term": "Order",
+                "definition": "Blocks run from top to bottom, and the next one does not start before the current one has finished.",
+                "example": "To show the text first and then the number, you put the text block above the number block.",
+                "pitfall": "Putting the blocks in the wrong order and thinking \"the program is broken\"; most of the time only the order is wrong."
+              },
+              {
+                "term": "Scrolling text",
+                "definition": "Text that does not fit on the screen is shown by scrolling from right to left; a single character does not scroll, it stays in the middle for a short time.",
+                "example": "\"Merhaba\" scrolls in about 4 seconds; the one-digit 7 stays in the middle, but 25 scrolls because it is two characters.",
+                "pitfall": "Not waiting for the scrolling text to finish: the next block does not start until the text is done."
+              },
+              {
+                "term": "Code tabs",
+                "definition": "The JavaScript and Python tabs show the written code that matches your blocks, read-only.",
+                "example": "In the JavaScript tab you see the line screen.showText(\"Merhaba\").",
+                "pitfall": "Trying to change the code in the tabs; changes are made through the blocks."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h1d1-q1",
+                "kind": "mcq",
+                "prompt": "A block is sitting on its own on the screen, not attached to the on start block. What happens when you press ▶?",
+                "options": [
+                  "The block still runs, because it is visible on the screen",
+                  "The card shows an error and deletes the whole program",
+                  "The block does not run; a block that is not attached to a header block looks faded",
+                  "The block moves inside the on start block by itself"
+                ],
+                "answer": 2,
+                "explanation": "Programs live inside a header block. A stack that is not attached to a header block does not run and looks faded. A block being on the screen does not mean it runs; the card does not show an error either, it simply does not see it.",
+                "skills": [
+                  "mk-flow",
+                  "mk-card"
+                ]
+              },
+              {
+                "id": "m10h1d1-q2",
+                "kind": "predict-output",
+                "prompt": "Below is how this program looks in the JavaScript tab. What happens on the screen when you run it with ▶?\n\n```\ncard.onStart(() => {\n  screen.showNumber(7);\n  screen.showText(\"Merhaba\");\n});\n```",
+                "options": [
+                  "First 7 stays in the middle for a short time, then Merhaba scrolls",
+                  "First Merhaba scrolls, then 7 appears",
+                  "7 and Merhaba are on the screen at the same time",
+                  "Nothing happens; the number should have come after the text"
+                ],
+                "answer": 0,
+                "explanation": "Blocks run from top to bottom; the number block comes before the text block, so 7 appears first. The one-digit 7 does not scroll; it stays in the middle for a short time, and then Merhaba scrolls. If the order were reversed, the result would be reversed too.",
+                "skills": [
+                  "mk-flow"
+                ]
+              },
+              {
+                "id": "m10h1d1-q3",
+                "kind": "numeric",
+                "prompt": "The Micro Card screen has 5 columns and 5 rows. How many LEDs are on the screen in total?",
+                "answer": 25,
+                "unit": "LED",
+                "explanation": "The number of columns times the number of rows: 5 x 5 = 25. Do not mix it up with adding (5 + 5 = 10); each column has 5 lights and there are 5 columns.",
+                "skills": [
+                  "mk-card"
+                ]
+              },
+              {
+                "id": "m10h1d1-q4",
+                "kind": "find-bug",
+                "prompt": "Selin wants the text \"Merhaba\" to scroll first and then the number 7 to appear. But 7 appears on the screen first. Look at the program:\n\n```\n1  card.onStart(() => {\n2    screen.showNumber(7);\n3    screen.showText(\"Merhaba\");\n4  });\n```\n\nWhat is the bug?",
+                "options": [
+                  "Line 1: a different header block is needed instead of onStart",
+                  "Line 4: the closing is missing",
+                  "On line 3 Merhaba is too long and should be shortened",
+                  "Lines 2 and 3 are in the wrong order; the text block should be above the number block"
+                ],
+                "answer": 3,
+                "explanation": "The card runs blocks from top to bottom. For the text to appear first, the text block must be on top and the number block below it. There is no bug in the other lines: onStart is the right header block, and the length of the text does not affect the order.",
+                "skills": [
+                  "mk-flow",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h1d1-q5",
+                "kind": "mcq",
+                "prompt": "Which one does NOT scroll on the screen and stays in the middle for a short time?",
+                "options": [
+                  "Text: Merhaba",
+                  "Number: 7",
+                  "Number: 25",
+                  "Text: Ali"
+                ],
+                "answer": 1,
+                "explanation": "A single character (a letter or a one-digit number) fits on the screen and stays in the middle. Merhaba and Ali scroll because they have more than one character. 25 is two characters; a two-digit number scrolls like text too.",
+                "skills": [
+                  "mk-card",
+                  "mk-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "LED'lerin adresi: x ve y",
@@ -797,7 +917,126 @@ export const modul10: ModuleContent = {
               "kind": "reflect",
               "prompt": "Why do we need two numbers to light one light? Do you think it would be easier if we gave each of the 25 lights a single number from 1 to 25?"
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The address of the LEDs: x and y",
+            "problem": "On a treasure map, when it says \"three steps right, two steps down\", you find the treasure. Every place has an address. The 25 lights on the card's screen have addresses too. With these addresses you can switch any light on and off. How would you draw a line or a shape of your own?",
+            "contentMd": "### Address: x and y\nEvery LED has an address made of two numbers:\n\n- **x:** the column number from left to right, from 0 to 4.\n- **y:** the row number from top to bottom, from 0 to 4.\n\nCounting starts at **0**. So the leftmost column is 0 and the rightmost is 4.\n\n| Place | x | y |\n|---|---|---|\n| Top left corner | 0 | 0 |\n| Top right corner | 4 | 0 |\n| Right in the middle | 2 | 2 |\n| Bottom left corner | 0 | 4 |\n| Bottom right corner | 4 | 4 |\n\nWhen you write an address, x comes first, then y: (x, y).\n\n### Program: a diagonal line, then four corners\nIn this lesson you will use the **Basic** and **LED** categories.\n\n1. Drag the **plot x [2] y [2]** block from the **LED** category into **on start**.\n2. Set the x and y boxes to 0 and 0. This lights up the top left corner.\n3. Add four more of the same block. Set their addresses to (1, 1), (2, 2), (3, 3), (4, 4) in order.\n4. Take the **pause [500] ms** block from the **Basic** category, type 1000 instead of the time and attach it under the LED blocks.\n5. Under it, add the **clear screen** block from the **Basic** category.\n6. Then add four more **plot** blocks: (0, 0), (4, 0), (0, 4), (4, 4).\n7. ▶ **Run**.\n\n### Expected result\nFirst a diagonal line from the top left to the bottom right lights up. One second later the screen goes dark and the four corners light up. All three tasks in the Goals box should have a ✓.\n\n### How does it work?\n- The **plot** block switches on the light at the given address. The **unplot** block switches off the light at the same address.\n- LED blocks **do not wait**. If you put five LED blocks one after the other, all five seem to light up at the same time. You decide how long something stays on the screen with the **pause** block.\n- The **pause** time is in milliseconds (ms). 1000 ms is one second.\n- **clear screen** switches them all off at once. It is much quicker than switching them off one by one.\n- If you type an address outside the screen (for example x = 7), the card does not show an error; it ignores that block.\n\n### Try it\n1. Light up the light right in the middle of the screen: (2, 2). Then switch it off with **unplot**.\n2. Try lighting up the outer frame (the 16 lights on the edges). Which addresses do you need to type?\n3. Draw the diagonal line the other way: from the top right to the bottom left. Use the addresses (4, 0), (3, 1), (2, 2), (1, 3), (0, 4).\n\n### Common mistakes\n- **Mixing up x and y.** x is horizontal, y is vertical. (4, 0) is the top right corner, not the bottom left.\n- **Counting from 1.** Counting starts at 0. The rightmost column is 4, not 5.\n- **Lighting everything up and thinking you cannot see anything.** If you do not add a pause block, the first drawing is wiped straight away. Put **pause** blocks in between.",
+            "question": "Why do we need two numbers to light up one light? Do you think it would be easier if we gave each of the 25 lights a single number from 1 to 25?",
+            "explainerMd": "### What you will learn in this lesson\n- That every LED has an (x, y) address, where x gives the column and y gives the row\n- That counting starts at 0, so the largest address is 4\n- How to switch a single LED on and off and how to clear the screen\n- That LED blocks do not wait, and that the **pause** block decides how long something is visible\n\n### What you should know first\nLesson 1: the Micro Card's 5 x 5 LED screen, the on start block and the fact that blocks run in order.\n\n### An address on a grid\nOn a chessboard, when someone says \"e4\", the square's place is clear. The card's screen is a grid too, and every light has an address made of two numbers, written as **(x, y)**:\n\n- **x** is the **column** number from left to right.\n- **y** is the **row** number from top to bottom.\n\nx comes first, then y. The diagram below shows the four corners and the middle of the screen:\n\n```\n        x=0  x=1  x=2  x=3  x=4\ny=0     (0,0)                 (4,0)\ny=1\ny=2               (2,2)\ny=3\ny=4     (0,4)                 (4,4)\n```\n\n### Why do we start at 0?\nComputers usually start counting at **0**. The first item in a row is item \"zero\". If there are five columns, their numbers are 0, 1, 2, 3, 4; so the largest address is **4**, not 5. This is where beginners get stuck most often. Remind yourself: \"There are five, but the last number is four.\"\n\n### Switching on, switching off, clearing\nThe **plot** block switches on the light at the given address, and the **unplot** block switches off the same address. **clear screen** switches off all 25 lights at once. It is much quicker than switching them off one by one.\n\nAn address outside the screen, for example (7, 2), does not produce an error message. The card quietly ignores that block. This calm behaviour is a trap: even if there is a wrong number in your code, you will not see a red warning; the light just does not come on. If a light does not come on, check the addresses first.\n\n### LED blocks do not wait\nIf you put five **plot** blocks one after the other, all five light up almost at the same time. The **pause** block decides how long a drawing stays visible; its time is in **milliseconds** (ms). 1000 ms is one second. If you put **clear screen** straight after a drawing, the drawing is visible for too short a time for your eyes to see.\n\nA little sum: the outer frame is the lights that are left when you take the inner 3 x 3 part away from the 5 x 5 screen. That makes 25 - 9 = 16 LEDs.\n\n### Summary\nEvery LED has an (x, y) address: x is the column and y is the row, and both go from 0 to 4. The plot, unplot and clear screen blocks control the lights. Addresses outside the screen are quietly ignored. LED blocks do not wait; the pause block decides how long something is visible.",
+            "concepts": [
+              {
+                "term": "x and y",
+                "definition": "The address of an LED: x is the column number from left to right, y is the row number from top to bottom; it is written as (x, y).",
+                "example": "The top right corner is at (4, 0), the bottom left corner is at (0, 4).",
+                "pitfall": "Mixing up x and y: (4, 0) is the top right corner, not the bottom left."
+              },
+              {
+                "term": "Counting from 0",
+                "definition": "Counting starts at 0, not 1; so the numbers of the 5 columns are 0, 1, 2, 3, 4.",
+                "example": "The LED right in the middle is at (2, 2).",
+                "pitfall": "Calling the rightmost column 5; the largest address is 4."
+              },
+              {
+                "term": "plot / unplot",
+                "definition": "Switches the single light at the given address on or off.",
+                "example": "plot x 0 y 0 lights up the top left corner.",
+                "pitfall": "Switching the same address on and off and expecting a result you can see; you need a pause in between."
+              },
+              {
+                "term": "Clear screen",
+                "definition": "Switches off all the LEDs at once with a single block.",
+                "example": "If you put clear screen after the diagonal line, you can draw the corners on an empty screen.",
+                "pitfall": "Forgetting to clear: the lights of the previous drawing stay on and get mixed up with the new drawing."
+              },
+              {
+                "term": "pause (ms)",
+                "definition": "Stops the program for the given number of milliseconds; 1000 ms is one second. LED blocks do not wait by themselves.",
+                "example": "If you add pause 1000 ms, the drawing is visible for one second.",
+                "pitfall": "Drawing and clearing straight away without a pause: the drawing is visible for too short a time to see."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h1d2-q1",
+                "kind": "mcq",
+                "prompt": "Where on the screen is the address (4, 0)?",
+                "options": [
+                  "Top left corner",
+                  "Bottom left corner",
+                  "Bottom right corner",
+                  "Top right corner"
+                ],
+                "answer": 3,
+                "explanation": "x = 4 is the rightmost column and y = 0 is the top row; that is the top right corner. x (horizontal) comes first, then y (vertical). The bottom left corner would be (0, 4) and the bottom right corner (4, 4).",
+                "skills": [
+                  "mk-coords"
+                ]
+              },
+              {
+                "id": "m10h1d2-q2",
+                "kind": "numeric",
+                "prompt": "How many LEDs are in the frame made of the outermost lines of the screen (the top and bottom rows, the left and right columns)? Hint: take away the inner 3 x 3 area.",
+                "answer": 16,
+                "unit": "LED",
+                "explanation": "The screen has 5 x 5 = 25 LEDs. The area inside the frame is 3 x 3 = 9 LEDs. The frame is 25 - 9 = 16 LEDs. Adding up the edges as 4 x 5 = 20 is wrong; the corners would be counted twice.",
+                "skills": [
+                  "mk-coords"
+                ]
+              },
+              {
+                "id": "m10h1d2-q3",
+                "kind": "predict-output",
+                "prompt": "Which LEDs are still on after the program has finished?\n\n```\ncard.onStart(() => {\n  screen.plot(1, 3);\n  screen.plot(3, 1);\n  wait(500);\n  screen.clear();\n  screen.plot(2, 4);\n});\n```",
+                "options": [
+                  "The single LED in the middle of the bottom row",
+                  "The single LED in the middle of the top row",
+                  "Three LEDs: (1, 3), (3, 1) and (2, 4)",
+                  "None; the screen is empty"
+                ],
+                "answer": 0,
+                "explanation": "First (1, 3) and (3, 1) light up, and half a second later clear screen switches them all off. Finally (2, 4) lights up: x = 2 is the middle column and y = 4 is the bottom row. So the middle of the bottom row stays on. The first two LEDs were cleared, so they are no longer on.",
+                "skills": [
+                  "mk-coords",
+                  "mk-flow"
+                ]
+              },
+              {
+                "id": "m10h1d2-q4",
+                "kind": "find-bug",
+                "prompt": "Deniz wants to light up the four corners, but the top right corner does not light up. There is no error message either.\n\n```\n1  screen.plot(0, 0);\n2  screen.plot(5, 0);\n3  screen.plot(0, 4);\n4  screen.plot(4, 4);\n```\n\nWhich line is the bug on, and why?",
+                "options": [
+                  "Line 1: the top left corner should be 1, 1",
+                  "Line 3: y can be at most 3",
+                  "Line 2: x can be at most 4; 5 is outside the screen and is quietly ignored",
+                  "Line 4: unplot is needed instead of plot"
+                ],
+                "answer": 2,
+                "explanation": "Column numbers go from 0 to 4; x = 5 is outside the screen. The card ignores an address outside the screen without showing an error, so you see no warning. The top right corner should have been (4, 0). The addresses on the other lines are the correct addresses of the corners.",
+                "skills": [
+                  "mk-coords",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h1d2-q5",
+                "kind": "mcq",
+                "prompt": "A learner puts a clear screen block straight after five plot blocks, with no pause in between. What do they see on the screen?",
+                "options": [
+                  "The five LEDs stay on for one second",
+                  "They cannot see the drawing; LED blocks do not wait, so everything is wiped straight away",
+                  "The five LEDs light up one after the other",
+                  "The card shows an error"
+                ],
+                "answer": 1,
+                "explanation": "LED blocks do not wait; the drawing and the clearing happen almost at the same time, and the drawing cannot be seen. For the drawing to be visible, you need a pause block in between. The lights only come on one after the other if pause blocks are put between them. The card does not show an error, because the program is valid.",
+                "skills": [
+                  "mk-timing",
+                  "mk-flow"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Simgeler ve kendi desenin",
@@ -919,7 +1158,128 @@ export const modul10: ModuleContent = {
                 "mk-coords"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Icons and your own pattern",
+            "problem": "When you are messaging, drawing a smiling face is much quicker than typing words. The card's screen is a small canvas too: it can draw faces, arrows and hearts. Using ready-made drawings is easy. But what should you do to draw something that does not exist yet, such as a robot?",
+            "contentMd": "### Ready-made icons\nThe **show icon [heart]** block in the **Basic** category contains small ready-made drawings. When you click the box, a list opens: heart, small heart, happy face, sad face, surprised face, sleeping face, yes, no, arrows, square, diamond, triangle, house, target, ghost, skull, butterfly, cat, note, sun.\n\nAn icon is drawn on the screen straight away and stays there until you clear it or show something else.\n\n### Your own pattern: show LEDs\nThe **show LEDs** block in the **Basic** category contains 5x5 small boxes. When you click a box, that LED lights up; click it again and it goes off. Whatever you draw, the card shows it on the screen.\n\nIn this lesson you will draw a **robot head**. Mark the boxes like this (1 on, 0 off):\n\n| Row | Pattern |\n|---|---|\n| Row 1 | 0 0 1 0 0 |\n| Row 2 | 0 1 1 1 0 |\n| Row 3 | 1 0 1 0 1 |\n| Row 4 | 1 1 1 1 1 |\n| Row 5 | 1 0 1 0 1 |\n\n### Program: three faces\n1. Put a **show icon** block inside the **on start** block and choose **happy face** from the list.\n2. Attach a **pause [1000] ms** block under it.\n3. Under that, add a second **show icon** block and choose **sad face**.\n4. Add another **pause 1000 ms**.\n5. At the very bottom, attach the **show LEDs** block. Draw the robot head by clicking the boxes.\n6. ▶ **Run**.\n\n### Expected result\nFirst the happy face appears, one second later the sad face, and one second after that the robot head. The robot head stays on the screen. All four goals should have a ✓.\n\n### How does it work?\n- Both draw on the screen straight away, but they work differently: **show icon** picks a ready-made drawing, while **show LEDs** uses the one you drew.\n- The 25 LEDs on the screen are really 25 tiny \"on/off\" switches. A pattern is the state of these 25 switches at that moment.\n- When a block draws something, it completely wipes the previous drawing. Drawings do not pile up on top of each other.\n\n### Try it\n1. Draw your own face in the **show LEDs** block: eyes, mouth, nose. Compare it with a friend's drawing.\n2. Add a second **show LEDs** block under the first one and draw a slightly changed version of the pattern (such as the robot closing its eyes). Put a **pause 500 ms** between them: you have made an animation!\n3. Pick two of the ready-made icons and change the pause time. What does a very short pause (100 ms) look like?\n\n### Common mistakes\n- **Not adding a pause.** If you put two icons one after the other without a pause, you will only see the last one. The first one is visible for such a short time that you do not notice it.\n- **Marking the boxes the wrong way round.** Rows go from top to bottom, columns go from left to right. Look at your drawing from one side and make sure it is right.\n- **Trying to write text with show LEDs.** This block only shows the pattern you drew; for text, use the **show text** block.",
+            "question": "Is it more fun to use the ready-made icons or to draw your own pattern? Think of a feeling or an object you could show with 25 lights: how many lights would you need to draw it?",
+            "explainerMd": "### What you will learn in this lesson\n- How to draw on the screen in one step with the ready-made **icon** block\n- How to draw your own pattern of 25 switches with the **show LEDs** block\n- That a pattern can be read row by row as \"1 on, 0 off\"\n- That a new drawing wipes the previous one, and that you need a pause between two drawings\n\n### What you should know first\nLesson 1: the block editor and the fact that blocks run in order. Lesson 2: LED addresses (x, y), counting from 0 and the time of the **pause** block in milliseconds.\n\n### Lighting them one by one is tiring\nIn lesson 2 you drew a shape one LED at a time with plot blocks. A face could need ten blocks. That is why there are two shortcuts: ready-made icons and your own pattern.\n\n### Ready-made icons\nThe list in the **show icon** block contains ready-made drawings such as a heart, faces, arrows, a square and a note. When you choose one, the drawing appears on the screen straight away. The icon **stays** on the screen until you clear it or show something else; it does not disappear by itself just because a block has finished its job.\n\n### Pattern: 25 switches\nThe 25 LEDs on the screen are really 25 tiny switches; each one is either on or off. A **pattern** is the state of these switches at that moment. The **show LEDs** block has 5 x 5 boxes, and each box is a switch. You can write a pattern on paper like this; 1 means on, 0 means off:\n\n```\nrow 0:  0 0 1 0 0\nrow 1:  0 1 1 1 0\nrow 2:  1 0 1 0 1\nrow 3:  1 1 1 1 1\nrow 4:  1 0 1 0 1\n```\n\nThis is a robot head. You read each row from left to right; the columns that are lit are where the 1s are in that row. For example, in row 2 the 1s are in columns 0, 2 and 4. The total number of lit LEDs is 1 + 3 + 3 + 5 + 3 = 15. You can check your drawing by counting like this.\n\n### The next drawing wipes the previous one\nThe **show icon** and **show LEDs** blocks redraw the whole screen; the previous drawing is completely gone. They do not pile up on top of each other. That is why, if two drawings are placed one after the other with no pause in between, only the last one is seen: the first one stays for such a short time that nobody notices it.\n\nIf you line up two drawings with a **pause** between them, you get a simple **animation**. A cinema film is also lots of drawings, each slightly different from the one before, shown quickly. If you make the pause shorter, the animation speeds up; if you make it longer, it slows down.\n\n### Careful: there is another block for text\n**show LEDs** does not write letters; it only shows the pattern you drew. For text, use the **show text** block.\n\n### Summary\nshow icon puts ready-made drawings on the screen, while show LEDs puts the 25-switch pattern you drew yourself. A pattern can be written row by row with 1s and 0s. A new drawing wipes the previous one, so you make an animation by putting pauses between them.",
+            "concepts": [
+              {
+                "term": "Icon",
+                "definition": "A ready-made 5x5 drawing chosen with the show icon block (such as a heart, a face, an arrow or a note).",
+                "example": "The happy face icon draws two eyes and a smile.",
+                "pitfall": "Thinking the icon will disappear by itself; it stays on the screen until something else is shown."
+              },
+              {
+                "term": "Pattern",
+                "definition": "The on/off state of the 25 LEDs at that moment; it is drawn with the boxes in the show LEDs block.",
+                "example": "In the robot head pattern, 15 LEDs are on.",
+                "pitfall": "Marking the boxes in the wrong order; rows go from top to bottom, columns go from left to right."
+              },
+              {
+                "term": "1 and 0 notation",
+                "definition": "A way of writing each row of a pattern like a 5-digit number: 1 on, 0 off.",
+                "example": "In the row 10101, columns 0, 2 and 4 are on.",
+                "pitfall": "Starting the count at 1; the first column is column 0."
+              },
+              {
+                "term": "Animation",
+                "definition": "Showing drawings that are slightly different from each other one after the other, with pauses between them.",
+                "example": "Open eyes pattern, 500 ms pause, closed eyes pattern: the robot blinks.",
+                "pitfall": "Forgetting the pause: only the last drawing is seen."
+              },
+              {
+                "term": "A drawing wipes",
+                "definition": "A new icon or pattern takes the place of the previous drawing on the screen; they do not pile up.",
+                "example": "When the sad face is shown after the happy face, the happy face leaves the screen.",
+                "pitfall": "Expecting the two drawings to be seen together."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h1d3-q1",
+                "kind": "mcq",
+                "prompt": "You want to show a shape on the screen that you drew yourself and that is not in the ready-made list. Which block is right?",
+                "options": [
+                  "show LEDs",
+                  "show icon",
+                  "show text",
+                  "show number"
+                ],
+                "answer": 0,
+                "explanation": "In the show LEDs block you draw your own pattern by marking the 25 boxes however you like. show icon only gives the drawings in the ready-made list; show text and show number show letters and digits.",
+                "skills": [
+                  "mk-images"
+                ]
+              },
+              {
+                "id": "m10h1d3-q2",
+                "kind": "predict-output",
+                "prompt": "What is visible on the screen when the program has finished?\n\n```\ncard.onStart(() => {\n  screen.showIcon(\"heart\");\n  wait(500);\n  screen.showIcon(\"smallHeart\");\n  wait(500);\n});\n```",
+                "options": [
+                  "The big heart",
+                  "Both hearts together",
+                  "An empty screen",
+                  "The small heart"
+                ],
+                "answer": 3,
+                "explanation": "The big heart is visible for 500 ms, then the small heart takes its place. The pause after the small heart does not wipe the drawing; it only makes the program wait. An icon stays on the screen until a new one comes, so the last one visible is the small heart.",
+                "skills": [
+                  "mk-images",
+                  "mk-flow"
+                ]
+              },
+              {
+                "id": "m10h1d3-q3",
+                "kind": "numeric",
+                "prompt": "A robot head is drawn with this pattern (1 is on). How many LEDs light up in total?\n\n```\n0 0 1 0 0\n0 1 1 1 0\n1 0 1 0 1\n1 1 1 1 1\n1 0 1 0 1\n```",
+                "answer": 15,
+                "unit": "LED",
+                "explanation": "The 1s in the rows: 1 + 3 + 3 + 5 + 3 = 15. The boxes that are off (0) are not counted. The answer is 15, not 25; 25 is the total number of LEDs on the screen, not the number that are on.",
+                "skills": [
+                  "mk-images",
+                  "mk-coords"
+                ]
+              },
+              {
+                "id": "m10h1d3-q4",
+                "kind": "find-bug",
+                "prompt": "Mert wants to see the happy face first and the sad face one second later. But he only sees the sad face.\n\n```\n1  screen.showIcon(\"happy\");\n2  screen.showIcon(\"sad\");\n3  wait(1000);\n```\n\nWhat is the bug?",
+                "options": [
+                  "Line 1: the happy icon is not in the list",
+                  "There is no wait between lines 1 and 2; the happy face is wiped straight away",
+                  "Line 2: it should say happy instead of sad",
+                  "Line 3: the wait time is too long"
+                ],
+                "answer": 1,
+                "explanation": "The show icon block does not wait, and every new drawing wipes the previous one. For the happy face to be visible, you need to put a pause in between. The happy and sad icons are in the list; the wait at the end keeps the sad face on for longer and is not a bug.",
+                "skills": [
+                  "mk-images",
+                  "mk-timing",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h1d3-q5",
+                "kind": "mcq",
+                "prompt": "In a show LEDs block, the third row is 1 0 1 0 1. In which columns do the LEDs light up in this row?",
+                "options": [
+                  "Columns 1, 3 and 5, so x = 1, 3, 5",
+                  "x = 0, 1 and 4",
+                  "x = 0, 2 and 4",
+                  "Only x = 2"
+                ],
+                "answer": 2,
+                "explanation": "You read the row from left to right and look at the column numbers where there is a 1. Counting starts at 0, so the 1s are at x = 0, 2 and 4. Writing x = 1, 3, 5 is the mistake of counting from 1, and 5 does not exist on the screen anyway.",
+                "skills": [
+                  "mk-images",
+                  "mk-coords"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Sıra ve tekrar",
@@ -1040,7 +1400,127 @@ export const modul10: ModuleContent = {
                 "mk-repeat"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Order and repetition",
+            "problem": "If you mix up the order when you write a recipe, the meal goes wrong: first crack the egg, then stir. In computers, order is everything too. Now say you want the same job done three times. Are you going to copy the blocks three times?",
+            "contentMd": "### Order\nThe card runs blocks **from top to bottom**. The same blocks give a different result in a different order.\n\nCompare these two stacks:\n\n| Stack 1 | Stack 2 |\n|---|---|\n| show square | clear screen |\n| pause 300 ms | pause 300 ms |\n| clear screen | show square |\n| pause 300 ms | pause 300 ms |\n\nIn stack 1 the square appears first, then goes off. In stack 2 the screen stays empty first, then the square appears and stays on the screen. The blocks are the same; the order is different.\n\n### Repetition\nTo make a square blink three times, you could put the 4 blocks one under the other three times. But the **repeat [4] times** block in the **Loops** category gives you a much shorter way. The blocks you put inside it run again as many times as the number you type.\n\n### Program: three blinks and yes\n1. Drag the **repeat [4] times** block from the **Loops** category into **on start**.\n2. Change the number to 3.\n3. Attach these inside the repeat block, in this order:\n   - **show icon** from the **Basic** category (choose **square** from the list)\n   - **pause [300] ms**\n   - **clear screen**\n   - **pause [300] ms**\n4. **Under** the repeat block, that is outside it, add a **show icon** block and choose **yes**.\n5. ▶ **Run**.\n\n### Expected result\nThe square blinks three times. Each blink takes about 0.6 seconds. Then the \"yes\" sign stays on the screen. All three tasks in the Goals box should have a ✓.\n\n### How does it work?\n- The blocks inside the repeat block run from start to finish **as many times as the number**. When the third round is over, the card moves on to the next block.\n- If a block is **inside** the repeat block, it repeats; if it is **under** it, it runs once. The \"yes\" icon is outside the repeat block, so it appears only once, at the very end.\n- Look at the **JavaScript** tab: the repeat block has turned into the line `for (let _i = 0; _i < 3; _i++)`. The lines inside the curly brackets are the blocks that repeat.\n\n### Try it\n1. Change the number to 10. The square blinks 10 times. Change the pause time to 100 ms and compare the speed.\n2. Add a second icon inside the repeat block: square, pause, diamond, pause and so on. What happens instead of blinking?\n3. Move the \"yes\" block inside the repeat block and see what changes.\n\n### Common mistakes\n- **Attaching the block in the wrong place.** Pay attention to whether you put it inside the repeat block or under it. Inside and outside do different things.\n- **Forgetting to clear.** Without clearing and pausing, the square never goes off and you cannot see it blink.\n- **Typing a time that is too short.** A very short pause, such as 10 ms, cannot be seen.",
+            "question": "What repeats in everyday life? How would you describe repeated things, such as brushing your teeth or climbing stairs, with a single \"repeat ... times\" sentence?",
+            "explainerMd": "### What you will learn in this lesson\n- That the same blocks give a different result in a different order\n- How to use the **repeat** block to have a job done more than once\n- The difference between a block being **inside** repeat or **under** it\n- How to work out the total time of a program that repeats\n\n### What you should know first\nLesson 1: blocks run from top to bottom. Lesson 2: the time of the **pause** block in milliseconds and **clear screen**. Lesson 3: the **show icon** block.\n\n### Order changes the result\nIn a recipe, if you stir before cracking the egg, the result goes wrong. It is the same on the card. These two stacks are made of the same four blocks:\n\n```\nStack 1: show square -> pause 300 -> clear -> pause 300\nStack 2: clear -> pause 300 -> show square -> pause 300\n```\n\nWhen stack 1 finishes, the screen is empty. When stack 2 finishes, the square is left on the screen. The **final state** of a program is the state left by the last block that ran.\n\n### Repeating instead of copying\nTo make the square blink three times, you could line up the four blocks three times; that makes 12 blocks. But what if it had to blink 100 times? That is what the **repeat** block is for. The blocks you put inside it run from start to finish as many times as the number you type. This kind of structure is called a **loop**.\n\nThis is the JavaScript version of the repeat block:\n\n```\nfor (let _i = 0; _i < 3; _i++) {\n  ...\n}\n```\n\nHere `_i` is a counter. It starts at 0, goes up by 1 in each round and stops when it reaches 3. So it goes round exactly three times: 0, 1, 2.\n\n### Inside or outside?\nIf a block is **inside** the repeat block, it runs in every round. If it is **under** it, it runs once after the loop has completely finished. The difference looks small, but the result is big: if you put the \"yes\" icon inside, the card tries to show it in every round; if you put it outside, it appears only once, at the very end.\n\n### Working out the total time\nThe time of the loop is the time of one round times the number of rounds. If you wait 300 ms with the square on and 300 ms with it off in one round, the round takes 600 ms. The total for three rounds:\n\n```\n3 x (300 + 300) = 1800 ms = 1.8 seconds\n```\n\nBeing able to do this sum helps you when you plan an animation. Remember: for the blink to be visible, you need both **clear** and two **pause** blocks. Without clearing, the square never goes off; without pausing, the change happens too fast for your eyes to see.\n\n### Summary\nThe same blocks give a different result in a different order. The repeat block runs the blocks inside it as many times as the number and saves you the trouble of copying. What is inside runs in every round; what is outside runs once after the loop. The total time is the time of one round times the number of rounds.",
+            "concepts": [
+              {
+                "term": "Order",
+                "definition": "The same blocks give a different result when they are lined up in a different order; the final state of the program depends on the last block that ran.",
+                "example": "Clear first, then show the square: the square stays on the screen; in the opposite order the screen stays empty.",
+                "pitfall": "Lining up the right blocks in the wrong order and thinking the program is broken."
+              },
+              {
+                "term": "Loop (repeat)",
+                "definition": "A block that runs the blocks inside it from start to finish as many times as the number typed in.",
+                "example": "Repeat 3: show square, pause, clear, pause. The square blinks three times.",
+                "pitfall": "Typing the wrong number; if you type 3, it goes round exactly three times, not two or four."
+              },
+              {
+                "term": "Inside and outside",
+                "definition": "The blocks inside repeat run in every round, while the blocks under it run once after the loop has finished.",
+                "example": "If the yes icon is under repeat, it appears only at the very end.",
+                "pitfall": "Attaching the block in the wrong place: a block attached inside repeats where you do not want it to."
+              },
+              {
+                "term": "Round time",
+                "definition": "The total of the pause times inside the loop; the total time is this multiplied by the number of rounds.",
+                "example": "A round of 300 + 300 ms makes 1800 ms in total for 3 rounds.",
+                "pitfall": "Thinking the time of one round is the total."
+              },
+              {
+                "term": "Counter (_i)",
+                "definition": "The variable used by the repeat block in the JavaScript tab; it starts at 0 and goes up towards the number of rounds.",
+                "example": "The line for (let _i = 0; _i < 3; _i++) goes round three times: 0, 1, 2.",
+                "pitfall": "Thinking _i < 3 means \"up to and including three\"; the value 3 is not included."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h1d4-q1",
+                "kind": "predict-output",
+                "prompt": "What is on the screen after this program has finished?\n\n```\ncard.onStart(() => {\n  screen.clear();\n  wait(300);\n  screen.showIcon(\"square\");\n  wait(300);\n});\n```",
+                "options": [
+                  "The screen is empty",
+                  "First the square, then an empty screen",
+                  "The square icon is visible",
+                  "An error happens"
+                ],
+                "answer": 2,
+                "explanation": "The screen is cleared first, then the square is shown. The pause after the square does not wipe the drawing, so the square stays on the screen. If the clear and show square blocks were the other way round, the screen would stay empty.",
+                "skills": [
+                  "mk-flow",
+                  "mk-images"
+                ]
+              },
+              {
+                "id": "m10h1d4-q2",
+                "kind": "numeric",
+                "prompt": "A repeat block runs 3 times. In each round there are the blocks pause 300 ms, clear screen, pause 300 ms. What is the total time of the loop in milliseconds? (The show and clear blocks do not wait.)",
+                "answer": 1800,
+                "unit": "ms",
+                "explanation": "One round takes 300 + 300 = 600 ms. Three rounds: 3 x 600 = 1800 ms (1.8 seconds). Writing only 600 means thinking the time of one round is the total.",
+                "skills": [
+                  "mk-repeat",
+                  "mk-timing"
+                ]
+              },
+              {
+                "id": "m10h1d4-q3",
+                "kind": "find-bug",
+                "prompt": "Ece wants the square to blink three times, but the square never goes off.\n\n```\n1  for (let _i = 0; _i < 3; _i++) {\n2    screen.showIcon(\"square\");\n3    wait(300);\n4    wait(300);\n5  }\n```\n\nWhat is the bug?",
+                "options": [
+                  "Line 4 needs screen.clear() instead of wait; the screen is never cleared",
+                  "Line 1: the loop should go round 4 times",
+                  "Line 2: the square icon cannot blink",
+                  "Line 3: the pause is too short"
+                ],
+                "answer": 0,
+                "explanation": "To blink, one round needs show, pause, clear, pause. Here there is no clearing, so after the first round the square stays on all the time. The number of rounds (3) is the number wanted and square is a valid icon; the pause time does not spoil the result, it only changes the speed.",
+                "skills": [
+                  "mk-repeat",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h1d4-q4",
+                "kind": "mcq",
+                "prompt": "To show the \"yes\" icon, you attach the block UNDER (outside) the repeat block. What does this do?",
+                "options": [
+                  "The icon is shown in every round",
+                  "The icon is never shown",
+                  "The loop goes on forever",
+                  "The icon is shown only once, after the loop has completely finished"
+                ],
+                "answer": 3,
+                "explanation": "The block under repeat runs once when the loop has finished. If it were attached inside, it would try to run in every round. Attaching it underneath does not hide the icon and does not make the loop longer.",
+                "skills": [
+                  "mk-repeat",
+                  "mk-flow"
+                ]
+              },
+              {
+                "id": "m10h1d4-q5",
+                "kind": "mcq",
+                "prompt": "The JavaScript tab has the line for (let _i = 0; _i < 5; _i++). How many times do the blocks inside it run?",
+                "options": [
+                  "4 times",
+                  "5 times",
+                  "6 times",
+                  "Forever"
+                ],
+                "answer": 1,
+                "explanation": "The value of _i becomes 0, 1, 2, 3, 4, and when it becomes 5 the condition is no longer true. That makes five rounds. Because it starts at 0, \"up to 5\" does not mean 5 is included; so it goes round 5 times, not 6.",
+                "skills": [
+                  "mk-repeat"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Atan kalp",
@@ -1158,7 +1638,124 @@ export const modul10: ModuleContent = {
                 "mk-planning"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Beating heart",
+            "problem": "When a doctor listens to your heart, they hear \"lub-dub, lub-dub\": two short beats, then a little rest. With what you have learnt this week, you can make a real heartbeat on the card's screen. And with a short greeting at the very start, too!",
+            "contentMd": "### Project: Beating heart\nYou will bring together everything you learnt this week: showing text, showing icons, pausing, repeating and screen brightness.\n\n**Goals:**\n- When the card starts, a short text scrolls.\n- The screen brightness is turned down a little.\n- Then the heart beats \"lub-dub\" forever: big heart, small heart, big heart, small heart and then a short rest.\n\n### New block: forever\nThe **forever** block in the **Basic** category repeats the blocks inside it from the start without stopping. It keeps going until you press the **Stop** button. It is perfect for jobs that never end, like a beating heart.\n\n### New block: set screen brightness\nThe **set screen brightness to [255]** block in the **LED** category sets the brightness of all the LEDs between 0 and 255. 255 is the brightest. At 0 nothing is visible. Turning the light down a little before showing text is easier on your eyes.\n\n### Step by step\nThe **on start** and **forever** blocks are already in the editor.\n\n1. Put the **set screen brightness to [255]** block from the **LED** category inside the **on start** block. Change the number to 200.\n2. Under it, attach the **show text** block from the **Basic** category. Change the text to \"Sev\" (Turkish for \"love\").\n3. Attach these blocks inside the **forever** block, in this order:\n   - **show icon** (heart), **pause** 150 ms\n   - **show icon** (small heart), **pause** 100 ms\n   - **show icon** (heart), **pause** 150 ms\n   - **show icon** (small heart), **pause** 400 ms\n4. ▶ **Run**.\n\n### Expected result\nFirst a short \"Sev\" text scrolls across the screen (about 2 seconds). Then the heart beats twice quickly, there is a short rest, and it starts again. All five goals should have a ✓.\n\n### How does it work?\n- **on start** runs once; after it has finished, **forever** takes over.\n- The heartbeat: big heart, small heart, big heart, small heart. The pause times in between set the rhythm. About 0.8 seconds in total.\n- **forever** takes a very short breather at the end of every round, so it does not wear the card out.\n- By changing the times, you can make an excited heart or a sleeping heart.\n\n### Try it\n1. Make the heart faster by shortening the pauses. Make it like the heart of someone who is running.\n2. Slow it down by making the pauses longer. Like the heart of someone who is asleep.\n3. Use the first letter of your name as the text. A single letter does not scroll; it stays in the middle. What is the difference?\n4. If you like, set the brightness inside the **on start** block to 20 and see what the heart looks like. Then set it back to 255.\n\n### Common mistakes\n- **Putting the blocks in the wrong place.** The text block must be inside **on start**, the heart blocks inside **forever**. If you put the text in the forever block, it scrolls again in every round.\n- **Not adding pauses.** If there is no pause between the big and the small heart, you cannot see the heart beating.\n- **Setting the brightness to 0.** If the brightness is 0, the screen shows nothing. The program is not broken; raise the number.",
+            "question": "Which times did you choose in your project? How different is a real heartbeat from your beating heart? How would you turn this heart into a gift for a friend that they could reprogram?",
+            "explainerMd": "### What you will learn in this lesson\n- The difference between the **on start** (once) and **forever** (without stopping) blocks\n- How a rhythm is built with pause times\n- That the **set screen brightness** block works between 0 and 255\n- How to plan a big job by first splitting it into parts and putting them in a table\n\n### What you should know first\nLesson 1: showing text and header blocks. Lesson 2: **pause** and milliseconds. Lesson 3: **show icon** (heart and small heart). Lesson 4: the order of blocks and repetition.\n\n### Two separate header blocks\nUntil now you put everything in the **on start** block; that part runs once and ends. A beating heart, though, should not end. The **forever** block repeats what is inside it from the start until you press ■ Stop. The jobs are shared out like this:\n\n| Part | When it runs | What you put in it in this project |\n|---|---|---|\n| on start | Once, at the start | Set the brightness, show the greeting text |\n| forever | Again and again without ending | The heartbeat |\n\nIf you put the text inside forever by mistake, the heart waits for the text to finish again in every round; the beat never looks right.\n\n### A rhythm is the total of the pauses\nA real heart goes \"lub-dub, rest\". On the card you show this as big heart, small heart, big heart, small heart, and you put pauses of different lengths in between:\n\n```\nbig heart      150 ms\nsmall heart    100 ms\nbig heart      150 ms\nsmall heart    400 ms  (long rest)\ntotal          800 ms\n```\n\nOne round takes 800 ms. Since a minute is 60 000 ms, that makes about 60 000 / 800 = 75 rounds a minute. If you shorten the pauses, the heart speeds up; if you make them longer, it slows down. You set the rhythm you want with these numbers.\n\n### Brightness\nThe **set screen brightness** block sets the brightness of all the LEDs. The value is between **0 and 255**: 255 is the brightest, and 0 is when nothing is visible. Do not think the program is broken; if the brightness is 0, the screen is dark even when something is drawn. Turning the screen down is easier on your eyes, especially in a dark room.\n\n### Plan first, then blocks\nAs a project gets bigger, writing a small table first, instead of dragging blocks straight away, makes your job easier:\n\n| Step | Part | Job |\n|---|---|---|\n| 1 | on start | Set the brightness to 200 |\n| 2 | on start | Show the text \"Sev\" |\n| 3 | forever | Heartbeat: four drawings, four pauses |\n\nEach row matches one or a few blocks. When you write the plan like this, you know which block goes where.\n\n### Summary\non start runs once; forever runs all the time. The rhythm of the beating heart is the total of the pause times; in this project a round is 800 ms. Brightness is between 0 and 255, and 0 makes the screen dark. Starting the job by putting the plan in a table cuts down mistakes.",
+            "concepts": [
+              {
+                "term": "on start and forever",
+                "definition": "on start runs once, while forever keeps repeating until you stop it.",
+                "example": "The greeting text goes inside on start, the heartbeat inside forever.",
+                "pitfall": "Putting the text inside forever: it scrolls again in every round and spoils the heartbeat."
+              },
+              {
+                "term": "Rhythm",
+                "definition": "The series of pause times in a movement; their total is the time of one round.",
+                "example": "Pauses of 150, 100, 150 and 400 ms give a heartbeat round of 800 ms.",
+                "pitfall": "Leaving out the pauses in between; you cannot tell the big and the small heart apart."
+              },
+              {
+                "term": "Brightness",
+                "definition": "The set screen brightness block sets the light of the LEDs between 0 (off) and 255 (brightest).",
+                "example": "When you set the brightness to 200, the screen is turned down a little.",
+                "pitfall": "Setting the brightness to 0 and thinking the program is broken; the screen works, but it is dark."
+              },
+              {
+                "term": "Number of rounds and speed",
+                "definition": "The shorter one round is, the more rounds are done in the same time; the number of rounds per minute is 60 000 / round time.",
+                "example": "With an 800 ms round, there are about 75 rounds a minute.",
+                "pitfall": "Thinking the time is in seconds; pause blocks are in milliseconds."
+              },
+              {
+                "term": "Plan table",
+                "definition": "A small table that writes down the project step by step (which part, which job).",
+                "example": "Step 1: set the brightness, step 2: show the text, step 3: beat the heart inside forever.",
+                "pitfall": "Starting without a plan; dragging blocks at random and forgetting where they belong."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h1d5-q1",
+                "kind": "numeric",
+                "prompt": "In the beating heart, the pauses are 150, 100, 150 and 400 ms in order. What is the total pause time of one heartbeat round in milliseconds?",
+                "answer": 800,
+                "unit": "ms",
+                "explanation": "150 + 100 + 150 + 400 = 800 ms. The drawing blocks do not wait, so only the pause blocks decide the round time.",
+                "skills": [
+                  "mk-timing",
+                  "mk-planning"
+                ]
+              },
+              {
+                "id": "m10h1d5-q2",
+                "kind": "numeric",
+                "prompt": "If one round takes 800 ms, about how many times does the heart beat in 1 minute (60 000 ms)? (Count each round as one beat.)",
+                "answer": 75,
+                "tolerance": 2,
+                "unit": "rounds",
+                "explanation": "60 000 / 800 = 75 rounds. On the actual virtual card, the forever block takes a breather of about 20 ms at the end of every round; so in practice there are about 73 rounds, and a small difference is accepted.",
+                "skills": [
+                  "mk-timing",
+                  "mk-repeat"
+                ]
+              },
+              {
+                "id": "m10h1d5-q3",
+                "kind": "predict-output",
+                "prompt": "The greeting text has been put in the forever block by mistake. What happens when this program runs?\n\n```\ncard.forever(() => {\n  screen.showText(\"Sev\");\n  screen.showIcon(\"heart\");\n  wait(500);\n});\n```",
+                "options": [
+                  "The text scrolls once, then the heart is visible all the time",
+                  "Only the text scrolls; the heart does not appear",
+                  "The heart is visible for half a second, then the text scrolls again; this goes on and on",
+                  "The program shows an error and stops"
+                ],
+                "answer": 2,
+                "explanation": "Everything in the forever block runs again in every round. The text scrolls for about 2 seconds, then the heart is visible for 500 ms, and the round starts again. That is why the text needs to go in the on start block. The program does not show an error.",
+                "skills": [
+                  "mk-flow",
+                  "mk-repeat"
+                ]
+              },
+              {
+                "id": "m10h1d5-q4",
+                "kind": "find-bug",
+                "prompt": "Zeynep cannot see anything on the screen while the heartbeat is running.\n\n```\n1  card.onStart(() => {\n2    screen.setBrightness(0);\n3    screen.showText(\"Sev\");\n4  });\n```\n\nWhich line is the problem on?",
+                "options": [
+                  "Line 3: the text is too short",
+                  "Line 1: forever is needed instead of onStart",
+                  "Line 4: there is one closing bracket too many",
+                  "Line 2: brightness 0 makes the screen dark; a value between 0 and 255 that is greater than zero is needed"
+                ],
+                "answer": 3,
+                "explanation": "If the brightness is 0, the LEDs stay dark even when something is drawn. The program is not broken; raising the number is enough (for example 200). The start block is in the right place, and the length of the text does not affect whether it is visible.",
+                "skills": [
+                  "mk-debug",
+                  "mk-flow"
+                ]
+              },
+              {
+                "id": "m10h1d5-q5",
+                "kind": "mcq",
+                "prompt": "You want a faster beat, like the heart of someone who is running. What should you do?",
+                "options": [
+                  "Make the pause times longer",
+                  "Make the pause times shorter",
+                  "Set the brightness to 255",
+                  "Change the heart icon to the small heart"
+                ],
+                "answer": 1,
+                "explanation": "The round time is the total of the pause blocks; if it gets shorter, more rounds are done in the same time and the heart speeds up. Making them longer slows it down. The brightness and the choice of icon affect the picture, not the rhythm.",
+                "skills": [
+                  "mk-timing",
+                  "mk-planning"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1166,6 +1763,7 @@ export const modul10: ModuleContent = {
       "title": "Düğmeler ve olaylar",
       "project": "Zar oyunu skor panosu",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Olayın ne olduğunu açıklayabilir; A, B ve A+B düğme olay bloklarını kullanabilir.\n2. Basılınca, bırakılınca ve uzun basılınca arasındaki farkı gösterebilir; logoyu bir olay kaynağı olarak kullanabilir.\n3. Değişken oluşturup değerini yapabilir, artırıp azaltabilir ve ekranda gösterebilir (sayaç).\n4. Rastgele sayı bloğu ve **eğer ... ise** ile karar veren bir program yazabilir; atama ile karşılaştırma farkını söyleyebilir.\n5. Kural tablosuna bakarak üç düğmeli, değişkenli ve ezgili bir skor panosu kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Plan günde bir ders içindir. Daha yoğun takvim isteyenler 1. ve 2. dersi ya da 3. ve 4. dersi birleştirebilir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | A, B ve A+B düğmeleri | ~20 dk | Anlatımı oku, üç düğmeye üç simge ver, bırakılınca ve bekleme deneylerini yap, mini testi çöz. |\n| 2 | Sayaç ve değişken | ~25 dk | Ziyaretçi sayacını kur; 12 kez basarak iki basamaklı sayıyı gözle; beşer beşer saydır. |\n| 3 | Elektronik zar | ~25 dk | Zarı bir kez at, kutuya koy; 6'da kalp göster; 10 atışta kaç altı geldiğini say. |\n| 4 | Logo, uzun basış ve gizli düğmeler | ~20 dk | Logo ve uzun basış bloklarını kur; 1 saniye süresini kendi gözlemle ölç. |\n| 5 | Proje: Zar oyunu skor panosu | ~35 dk | Kural tablosunu yaz, programı kur, oyunu bir arkadaşınla oyna, ölçütle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Hafta 1'in sonunda şunları yapabilmek gerekir:\n- Sanal kartta ▶ Çalıştır, ■ Durdur ve ↺ Sıfırla düğmelerini kullanmak.\n- **başlangıçta** ve **sonsuza kadar** gibi başlık bloklarının içine blok takmak.\n- **simgeyi göster**, **sayıyı göster**, **bekle** ve **ekranı temizle** bloklarını bilmek.\n- Dört işlemi (toplama, çıkarma, çarpma) rahat yapmak; sayaç ve toplam hesabı bunları içerir.\n\n### Kavram haritası\n- **Olay:** olay bloğu (başlık bloğu) → düğme A, B, A+B → basılınca, bırakılınca, uzun basılınca (1 saniye) → logo (dokununca, bırakılınca)\n- **Veri:** değişken (ada sahip kutu) → değerini yap, değerine ekle → başlangıç değeri → sayaç → toplam (biriktirici)\n- **Karar:** rastgele sayı (uçlar dahil) → karşılaştırma (=, ≠, <, ≤, >, ≥) → eğer ... ise → değilse\n- **Proje:** kural tablosu → zar ve toplam → ezgiyi çal (bitene kadar bekler) → sıfırlama\n\n### Sık yapılan hatalar\n- **Düğme listesini değiştirmemek.** İki blokta da A seçili kalır; B'ye basınca hiçbir şey olmaz.\n- **A'ya, sonra B'ye basıp A+B beklemek.** İkisine aynı anda basmak için sanal kartın alttaki A+B düğmesi kullanılır.\n- **Bloğu başlık bloğunun dışında bırakmak.** Soluk görünür ve çalışmaz.\n- **Değişkeni değiştirip göstermeyi unutmak.** Kutu değişir ama ekranda bir şey olmaz.\n- **Önce göstermek, sonra artırmak.** Sayaç bir geriden gelir.\n- **İki ayrı rastgele blok kullanmak.** Ekranda görünen ile karşılaştırılan sayı farklı çıkar; zarı bir kez at, kutuya koy.\n- **Atama ile karşılaştırmayı karıştırmak.** \"değerini yap\" kutuya değer koyar; \"=\" soru sorar.\n- **`>` ile `≥` karıştırmak.** 5 > 5 yanlıştır; 5 ≥ 5 doğrudur.\n- **Uzun basış için 1 saniyeden az basmak.** Olay hiç gelmez.\n- **Toplamı sıfırlamayı unutmak.** Yeni oyunda eski puan üstüne eklenir.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Sayaç programını sıfırdan, bakmadan kur; sonra A'ya 12 kez bas ve ekranda ne gördüğünü anlat.\n4. Zar programına bir kural ekle: 1 gelirse üzgün yüz, 6 gelirse kalp. İki kolu da **eğer** ile yap.\n5. Kendi cümlelerinle cevapla: \"Değişken olmasaydı kart ziyaretçi sayısını nasıl tutardı?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Zar oyunu skor panosu)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Olaylar | Düğmelerden biri tepki vermiyor | A, B ve A+B doğru çalışıyor | Bir ek olay eklenmiş (uzun basışla sıfırlama gibi) |\n| Değişkenler | Toplam birikmiyor ya da hep son atış görünüyor | zar ve toplam doğru kullanılmış, A+B sıfırlıyor | Üçüncü değişken eklenmiş (en yüksek atış gibi) |\n| Zar ve karar | İki ayrı rastgele blok var ya da 6'da ezgi çalmıyor | Zar bir kez atılıyor, 6'da zafer ezgisi çalıyor | Ek kural var (1 gelince sıfırlama, 30'u aşınca mutlu yüz) |\n| Plan | Kural tablosu yok | Olay, iş ve değişken tablosu var | Tablo programla birebir uyuyor |\n| Anlatım | Ne yaptığını anlatamıyor | Her düğmenin işini adım adım anlatıyor | Bir hatayı nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu haftanın büyük fikri \"kart bekler, olay gelince çalışır\" ve \"kutu hatırlar\". Ezberletmeye gerek yoktur; öğrenci kendi sayacında ve zarında deneyerek görür.\n- **Nasıl destek olunur?** Takıldığında cevabı söylemek yerine şunu sor: \"Hangi düğmeye basınca hangi blok çalışıyor?\", \"Kutunun içinde şu an ne var?\", \"Bu sayıyı ekranda mı gösteriyorsun, yoksa yalnızca kutuyu mu değiştirdin?\"\n- **Olasılık.** Zar rastgeledir; 10 atışta hiç 6 gelmeyebilir. Bu hata değildir. Atış sayısını artırınca oranın altıda bire yaklaştığını konuşmak güzel bir sohbettir.\n- **Ses.** Zafer ezgisi için tarayıcı sayfada bir tıklama bekler. Ses duyulmazsa sağ paneldeki Hoparlör bölümüne bakın.\n- **Süre.** Dersleri aralıklı yapmak kalıcılığı artırır. Proje günü uzayabilir; yarım bırakmak sorun değildir.\n- **Güvenlik.** Bu platformdaki her şey sanaldır; gerçek bir parça, pil ya da kablo gerekmez.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Explain what an event is; use the A, B and A+B button event blocks.\n2. Show the difference between pressed, released and long pressed; use the logo as a source of events.\n3. Make a variable, set its value, make it bigger and smaller and show it on the screen (a counter).\n4. Write a program that makes decisions with the random number block and **if ... then**; say what the difference between assignment and comparison is.\n5. Build a scoreboard with three buttons, variables and a melody by following a rules table.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan is for one lesson a day. If you want a busier timetable, you can combine lessons 1 and 2, or lessons 3 and 4.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | The A, B and A+B buttons | ~20 min | Read the explainer, give three icons to the three buttons, do the released and pause experiments, do the mini quiz. |\n| 2 | Counter and variable | ~25 min | Build the visitor counter; watch the two-digit number by pressing 12 times; make it count in fives. |\n| 3 | Electronic dice | ~25 min | Roll the dice once and put it in the box; show a heart on a 6; count how many sixes come up in 10 rolls. |\n| 4 | The logo, long presses and secret buttons | ~20 min | Build the logo and long press blocks; measure the 1-second time by watching it yourself. |\n| 5 | Project: Dice game scoreboard | ~35 min | Write the rules table, build the program, play the game with a friend, assess it with the rubric. |\n\n### Prerequisite check\nThis week, the learner needs to be able to do these things from the end of week 1:\n- Use the ▶ Run, ■ Stop and ↺ Reset buttons on the virtual card.\n- Attach blocks inside header blocks such as **on start** and **forever**.\n- Know the **show icon**, **show number**, **pause** and **clear screen** blocks.\n- Do the basic operations (addition, subtraction, multiplication) comfortably; the counter and total sums use them.\n\n### Concept map\n- **Event:** event block (header block) → button A, B, A+B → pressed, released, long pressed (1 second) → logo (touched, released)\n- **Data:** variable (a box with a name) → set to, change by → starting value → counter → total (accumulator)\n- **Decision:** random number (both ends included) → comparison (=, ≠, <, ≤, >, ≥) → if ... then → else\n- **Project:** rules table → zar and toplam → play melody (waits until it is over) → resetting\n\n### Common mistakes\n- **Not changing the button list.** A stays selected in both blocks; nothing happens when B is pressed.\n- **Pressing A, then B, and expecting A+B.** To press both at the same time, use the A+B button underneath the virtual card.\n- **Leaving a block outside the header block.** It looks faded and does not run.\n- **Changing the variable and forgetting to show it.** The box changes, but nothing happens on the screen.\n- **Showing first, then adding.** The counter is always one behind.\n- **Using two separate random blocks.** The number shown on the screen and the number compared turn out different; roll the dice once and put it in the box.\n- **Mixing up assignment and comparison.** \"set to\" puts a value in the box; \"=\" asks a question.\n- **Mixing up `>` and `≥`.** 5 > 5 is false; 5 ≥ 5 is true.\n- **Pressing for less than 1 second for a long press.** The event never comes.\n- **Forgetting to reset the total.** In a new game, it adds on top of the old score.\n\n### End-of-week review\n1. Look at the concept cards of each lesson once more and read the \"common mistake\" lines out loud.\n2. Read the explanations of the questions you got wrong in the mini quizzes again, then do the question again.\n3. Build the counter program from scratch, without looking; then press A 12 times and describe what you see on the screen.\n4. Add a rule to the dice program: a sad face on a 1, a heart on a 6. Make both branches with **if**.\n5. Answer in your own words: \"Without variables, how would the card keep track of the number of visitors?\"\n\nThe mini quizzes of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct in each lesson. Go back to the explainer of any lesson that needs more work.\n\n### Project rubric (Dice game scoreboard)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Events | One of the buttons does not react | A, B and A+B work correctly | An extra event has been added (such as resetting with a long press) |\n| Variables | The total does not add up, or the last roll is always shown | zar and toplam are used correctly, A+B resets | A third variable has been added (such as the highest roll) |\n| Dice and decision | There are two separate random blocks, or no melody plays on a 6 | The dice is rolled once, the victory melody plays on a 6 | There is an extra rule (reset when a 1 comes up, a happy face when it goes over 30) |\n| Plan | There is no rules table | There is a table of events, jobs and variables | The table matches the program exactly |\n| Explaining | Cannot explain what they did | Explains each button's job step by step | Explains how they found a mistake |\n\n### Note for parents and teachers\n- **Aim.** The big ideas of this week are \"the card waits and runs when an event comes\" and \"the box remembers\". There is no need to make them memorise anything; the learner sees it by trying things out on their own counter and dice.\n- **How can you help?** When they get stuck, instead of giving the answer, ask: \"Which block runs when you press which button?\", \"What is in the box right now?\", \"Are you showing this number on the screen, or did you only change the box?\"\n- **Probability.** The dice is random; in 10 rolls there may be no 6 at all. This is not a bug. Talking about how the share gets closer to one in six as the number of rolls goes up makes a good conversation.\n- **Sound.** For the victory melody, the browser waits for a click on the page. If you cannot hear any sound, look at the Speaker section in the right panel.\n- **Time.** Spreading the lessons out helps learning stick. Project day may run long; it is fine to leave it half-finished.\n- **Safety.** Everything on this platform is virtual; no real parts, batteries or wires are needed.\n- **Progress.** Mini quiz results are shown by skill on the \"My progress\" page (draft/pilot feature; only saved if consent was given).",
       "lessons": [
         {
           "title": "A, B ve A+B düğmeleri",
@@ -1283,7 +1881,124 @@ export const modul10: ModuleContent = {
                 "mk-events"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The A, B and A+B buttons",
+            "problem": "What happens when you press a doorbell button? The bell rings. The bell does not ring by itself; it waits for someone to press it. In computers, a rule like \"when something happens, do this\" is called an event. With the card's A and B buttons, you will write your first event blocks.",
+            "contentMd": "### What is an event?\nUntil now, programs ran from start to finish on their own. In this lesson, though, the card **waits**. When you press a button, the jobs inside that button's block are done. These blocks that \"run when something happens\" are called event blocks.\n\nThe **on button [A] [pressed]** block in the **Input** category is a header block, like **on start**. It has two lists:\n\n- Button: **A**, **B** or **A+B**.\n- When: **pressed**, **released** or **long pressed**.\n\n### Program: feeling buttons\nThree **on button** blocks are already in the editor: for A, B and A+B. They are all empty. You will fill them in.\n\n1. Drag the **show icon** block from the **Basic** category into the first block (A). Choose **happy face** from the list.\n2. Put **show icon** in the second block (B) and choose **sad face** from the list.\n3. Put **show icon** in the third block (A+B) and choose **heart** from the list.\n4. Make sure the first drop-down list of the third block is **A+B**.\n5. ▶ **Run**.\n6. Click the A button on the virtual card, then B, then the A+B button underneath.\n\n### Expected result\nWhen you press A, the happy face appears; when you press B, the sad face appears. When you press A+B, the heart comes up. All four goals should have a ✓.\n\n### How does it work?\n- While the program is running, the event blocks quietly **wait**. When the button is pressed, the inside of that block runs from top to bottom, and when it is done, it goes back to waiting.\n- When A and B are both pressed at the same time, only the **A+B** event runs; the separate blocks of A and B do not run.\n- **pressed** runs the moment you press the button; **released** runs the moment you lift your finger. **long pressed** runs one second after you start holding the button down.\n- Events are independent of each other. A program can have as many event blocks as you like.\n\n### Try it\n1. Change the A block from **pressed** to **released**. When does the happy face come up?\n2. Add a second block inside the B block: **pause 1000 ms**, and under it **clear screen**. The sad face goes off after one second.\n3. Hold down the A button and let go after one second. Which block ran when? Tell a friend what you saw.\n\n### Common mistakes\n- **Forgetting to change the button list.** If A stays selected in both blocks, both blocks react to A; nothing happens when you press B.\n- **Pressing one after the other instead of A+B.** Pressing A and then B separately does not produce the A+B event. To press both at the same time, use the **A+B** button underneath the virtual card.\n- **Leaving a block outside the header block.** A **show icon** that you put outside the event block never runs. It looks faded.",
+            "question": "Which devices in everyday life work when you press a button? If you compare the buttons on a games console with the card's A, B and A+B buttons, what do you think you would need most?",
+            "explainerMd": "### What you will learn in this lesson\n- What an event is and why we need blocks that \"run when something happens\"\n- The card's three buttons: **A**, **B** and **A+B**\n- Three different moments for a button: pressed, released, long pressed\n- That several event blocks can live side by side in one program\n\n### What you should know first\n- Lessons 1-2: using the editor, dragging and attaching blocks, the ▶ **Run** button\n- Lesson 3: the **show icon** block\n- Lessons 4-5: header blocks such as **on start** and **forever**; the rule \"a block outside a header block does not run\"\n\n### Waiting is a program too\nUntil now, programs started by themselves and flowed from start to finish. Real devices often do not work like this. Inside a lift, everything waits quietly until you press a button. When you press it, something happens, and then it waits again. Computer people call this \"when something happens\" situation an **event**. A button being pressed, a button being released and the logo being touched are all events.\n\n### Event block: a header block\nThe **on button [A] [pressed]** block is a header block, like **on start**. But it does not run straight away. First it sleeps. When the event comes, the blocks inside it run from top to bottom, and when they are done, the block goes back to sleep. If the same event comes again, it runs again.\n\n### Three buttons, three moments\nThere are two buttons on the card. Underneath the virtual card there is also an **A+B** button that presses both at once. For each button you can choose three moments:\n\n| Moment | When it runs |\n|---|---|\n| pressed | The moment you press the button |\n| released | The moment you lift your finger |\n| long pressed | 1 second after you start holding it down |\n\nSo one short press produces two events: first pressed, then released.\n\n### A+B is a special button\nWhen A and B are pressed together, the card counts this as a **separate button**. Then only the A+B block runs, not the block of A or B. If you press A first and then B, A's block may already have run. To press both at the same time, use the **A+B** button underneath the virtual card.\n\n### Every event lives in its own block\nA program can have as many event blocks as you like. Three blocks written for A, for B and for A+B are independent of each other. Careful: if **A** stays selected in the lists of both blocks, both of them react to A, and nothing happens for B. The button list is the block's \"address\".\n\n### Summary\nAn event is a rule: \"when something happens, do this\". An event block is a header block; it sleeps and runs when the event comes. Every button has the moments pressed, released and long pressed. A+B is a separate event and does not run the blocks of A and B. A program can have several event blocks.",
+            "concepts": [
+              {
+                "term": "Event",
+                "definition": "A piece of news the card gets from outside: a button being pressed or released, or the logo being touched.",
+                "example": "When the A button is pressed, the card gets an \"A pressed\" event.",
+                "pitfall": "Thinking the program does everything from start to finish on its own; the inside of an event block does not run until the event comes."
+              },
+              {
+                "term": "Event block",
+                "definition": "A header block that runs the blocks inside it when an event comes; when no event comes, it waits.",
+                "example": "The show icon you put inside the on button A pressed block runs only when you press A.",
+                "pitfall": "Leaving blocks outside the event block: a block that is not attached never runs and looks faded."
+              },
+              {
+                "term": "A+B button",
+                "definition": "A separate button event that happens when A and B are pressed together.",
+                "example": "If you put a heart in the A+B block, the heart appears when you press both at once.",
+                "pitfall": "Pressing A and then B separately and expecting A+B; use the A+B button at the bottom of the virtual card."
+              },
+              {
+                "term": "Pressed, released, long pressed",
+                "definition": "The three moments of a button: the moment you press, the moment you lift your finger, 1 second after you start holding it down.",
+                "example": "If you choose released, the icon appears the moment you lift your finger.",
+                "pitfall": "Forgetting to change the second list and seeing the block always run on pressed."
+              },
+              {
+                "term": "Independent events",
+                "definition": "A program can have as many event blocks as you like, and each one listens to its own button.",
+                "example": "A shows a happy face, B a sad face, A+B a heart; all three live in the same program.",
+                "pitfall": "Leaving A selected in the button list of both blocks: both blocks react to A, and nothing happens when you press B."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h2d6-q1",
+                "kind": "mcq",
+                "prompt": "The program is running, but no button is pressed. What happens to an \"on button A pressed\" block that has blocks inside it?",
+                "options": [
+                  "It keeps running from start to finish again and again",
+                  "It waits; when A is pressed, the inside runs once",
+                  "It runs once when the card starts",
+                  "The card shows an error because nobody is pressing"
+                ],
+                "answer": 1,
+                "explanation": "An event block is a header block and it sleeps. When the event comes, the inside runs once from top to bottom, then it waits again. Repeating all the time is the job of the \"forever\" block; running once at the start is the job of the \"on start\" block.",
+                "skills": [
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h2d6-q2",
+                "kind": "predict-output",
+                "prompt": "A program has these three event blocks:\n\n```\ncard.onButton(\"A\", \"press\", () => { screen.showNumber(1); });\ncard.onButton(\"B\", \"press\", () => { screen.showNumber(2); });\ncard.onButton(\"AB\", \"press\", () => { screen.showNumber(3); });\n```\n\nYou press the A+B button underneath the virtual card. What is shown on the screen?",
+                "options": [
+                  "1",
+                  "2",
+                  "3",
+                  "First 1, then 2 appear"
+                ],
+                "answer": 2,
+                "explanation": "When A and B are pressed together, the card counts it as a separate A+B event and only the A+B block runs. 1 or 2 do not appear, because the blocks of A and B do not run.",
+                "skills": [
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h2d6-q3",
+                "kind": "find-bug",
+                "prompt": "Ceylin wants a happy face when she presses A and a sad face when she presses B. But nothing happens when she presses B, and when she presses A she sees a sad face instead of a happy one. Her code:\n\n```\ncard.onButton(\"A\", \"press\", () => { screen.showIcon(\"happy\"); });\ncard.onButton(\"A\", \"press\", () => { screen.showIcon(\"sad\"); });\n```\n\nWhat is the bug?",
+                "options": [
+                  "The button list of the second block was left as A; it should have been B",
+                  "showNumber should have been written instead of showIcon",
+                  "\"long\" should have been written instead of \"press\"",
+                  "The curly bracket of the second block is missing"
+                ],
+                "answer": 0,
+                "explanation": "The button of both blocks is A. When A is pressed, both run, and because the second one comes later, the sad face stays. No block is listening to B. The button list is the block's address. The other options do not cause these symptoms.",
+                "skills": [
+                  "mk-events",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h2d6-q4",
+                "kind": "numeric",
+                "prompt": "Your program has an \"on button A pressed\" block and an \"on button A released\" block. You press and release A briefly 4 times in a row. How many times in total does the inside of the two blocks run?",
+                "answer": 8,
+                "unit": "times",
+                "explanation": "Each short press produces two events: one when you press and one when you let go. 4 presses x 2 events = 8. Counting only the pressed block and getting 4 leaves some out.",
+                "skills": [
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h2d6-q5",
+                "kind": "mcq",
+                "prompt": "Which one produces the card's A+B event?",
+                "options": [
+                  "Pressing and releasing A, then pressing and releasing B",
+                  "Pressing A and B at the same time (on the virtual card, the A+B button underneath)",
+                  "Only long pressing B",
+                  "Touching the logo"
+                ],
+                "answer": 1,
+                "explanation": "A+B happens when the two buttons are pressed together. Pressing one after the other produces two separate events. A long press is one of B's moment options, and the logo is a different source of events.",
+                "skills": [
+                  "mk-events"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Sayaç ve değişken",
@@ -1402,7 +2117,125 @@ export const modul10: ModuleContent = {
                 "mk-events"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Counter and variable",
+            "problem": "Imagine someone at the door of a bus counting passengers. For each passenger they bend a finger once and keep the number in their head. So where does the card keep a number? Not in its head, but in a box: a variable.",
+            "contentMd": "### Variable: a labelled box\nA **variable** is a box with a name written on it. It stores a number or a text inside. You can put a new value in the box, look at what is inside, and make the number inside bigger or smaller.\n\nA variable called **sayi** (Turkish for \"number\") is already in the editor. To make a new variable in your own projects, you click the **Make a variable...** button in the **Variables** category and type a name.\n\nThe blocks in the **Variables** category:\n\n- **set sayi to [0]:** puts a new number in the box.\n- **change sayi by [1]:** makes the number in the box bigger by the given amount (if you type a minus number, it makes it smaller).\n- **sayi:** gives the number inside the box. It fits into the hole of another block.\n\n### Program: visitor counter\nThe **on start** block and three **on button** blocks (A, B, A+B) are already in the editor.\n\n1. Put the **set sayi to [0]** block from the **Variables** category inside **on start**. Make sure it is zero.\n2. Attach the **change sayi by [1]** block inside the A block.\n3. Under it, add the **show number [0]** block from the **Basic** category.\n4. Remove the 0 inside this block: grab the **sayi** block from the **Variables** category and drop it on top of the 0.\n5. Do the same in the B block, but use **change sayi by [-1]**.\n6. Put **set sayi to [0]** inside the A+B block, and add **show number sayi** under it.\n7. ▶ **Run**. Press A three times, then B once, then A+B.\n\n### Expected result\nEach time you press A, the screen shows 1, 2, 3. When you press B, it goes down to 2. A+B shows 0 on the screen and resets the counter. All four goals should have a ✓.\n\n### How does it work?\n- The **on start** block resets the counter. That way the counter clearly starts from 0 every time it runs.\n- **change sayi by 1** makes the number in the box 1 bigger. First it reads the old value, adds 1 and puts the new value back.\n- **show number [sayi]** first looks in the box, takes the number inside and shows it on the screen. The name of the box is not written on the screen; the number inside it is.\n- When the number reaches 10, there are two digits on the screen and the number scrolls. Minus numbers scroll too, together with the minus sign.\n- In the **JavaScript** tab you will see the line `let sayi = 0;` at the very top. That is where the variable's box is made.\n\n### Try it\n1. Press A 12 times in a row. What does a two-digit number look like on the screen?\n2. What does the counter do if you press B at the start? Can it go below zero?\n3. Change the 1 in the **change sayi by [1]** block to 5. The counter now counts in fives.\n\n### Common mistakes\n- **Forgetting to show the number.** The variable's box changes, but if there is no **show number** block, you see nothing on the screen.\n- **Not resetting in on start.** The card counts a variable that has never been given a value as 0. Still, writing 0 clearly in on start lets anyone reading the program see what it starts with.\n- **Pressing too fast.** Showing the number takes some time. If you press many times very quickly, some of the presses wait in a queue or may be skipped. Press a little more slowly.",
+            "question": "Without variables, how would the card remember the number? Think of something from your own life whose value you keep changing: like your score in a game or the money in your pocket. What name would you give the box you put it in?",
+            "explainerMd": "### What you will learn in this lesson\n- What a **variable** is and why we think of it as a \"labelled box\"\n- How to put a value in a box and make the value in the box bigger or smaller\n- How to show the number inside the box on the screen\n- How a counter program works\n\n### What you should know first\n- Lesson 6: button events (putting jobs inside the A, B and A+B blocks)\n- Lessons 1-5: the **show number** block and the **on start** header block\n\n### What does the card remember?\nWhen an event is over, everything inside the block is forgotten. When you press A a second time, the card does not know about the first press by itself. You need to write it down somewhere. That place is a **variable**.\n\n### Variable: a box with a name\nA variable is a box with its name written on it. There is always just one value in the box. When you put a new value in the box, the old one is wiped. You choose the name: **sayi** (number), **puan** (score), **zar** (dice). The name should tell you what is inside.\n\n### Three things you can do with a box\n| Block | What it does | Example (when the box is 4) |\n|---|---|---|\n| set sayi to [7] | Wipes the old one, puts the new one in | The box becomes 7 |\n| change sayi by [3] | Adds to the current number | The box becomes 7 |\n| sayi | Reads what is inside | Gives 4 |\n\nIf you add a minus number, the number in the box gets smaller: if you add -1 to 4, it becomes 3.\n\n### The name of the box, or what is inside?\nIn the **show number [sayi]** block, what is written on the screen is not the name of the box but the number inside it. If the box is 3, the screen shows 3. Also, changing the variable does not change the screen. If you want to see it on the screen, you need to use the show number block too.\n\n### Starting value\nPutting a value in the box on purpose at the start of the program is a good habit. If you put **set sayi to 0** in the **on start** block, the counter starts from zero every time you press ▶. Anyone reading the program can also see what it starts with.\n\n### How does a counter work?\nWhen A is pressed, three things happen in order: the card looks in the box, adds 1 and puts the new number in the box. Then it shows it on the screen. On the first press 0 + 1 = 1, on the second 1 + 1 = 2. Each press uses the number left from the press before. The variable builds the bridge between events.\n\n### Summary\nA variable is a box that has a name and holds one value. You manage it with the set, change and read blocks. To see it on the screen, you need the show number block. Resetting the box at the start of the program keeps counters working properly. A counter is a program that, at every event, reads the old value in the box and adds to it.",
+            "concepts": [
+              {
+                "term": "Variable",
+                "definition": "A box that has a name and stores a single value inside it; the value stays there even when an event is over.",
+                "example": "The box called sayi remembers the previous number each time you press A.",
+                "pitfall": "Thinking a variable is only a label; the value inside it changes and the old one is wiped."
+              },
+              {
+                "term": "set to",
+                "definition": "Puts a new value in the box; the old value is wiped.",
+                "example": "set sayi to 0 resets the counter.",
+                "pitfall": "Mixing up \"set to\" and \"change by\": set wipes the old one, change adds to it."
+              },
+              {
+                "term": "change by",
+                "definition": "Makes the number in the box bigger by the given amount; if you give a minus number, it makes it smaller.",
+                "example": "When sayi is 4, change by -1 makes sayi 3.",
+                "pitfall": "Looking for a separate block to make it smaller; adding a minus number is enough."
+              },
+              {
+                "term": "Starting value",
+                "definition": "The first value you put in the box on purpose when the program starts.",
+                "example": "set sayi to 0 in the on start block starts the counter from zero every time you run it with ▶.",
+                "pitfall": "Not writing a starting value; the card still counts it as 0, but someone reading the program cannot see what it starts with."
+              },
+              {
+                "term": "Showing a variable",
+                "definition": "If you put the sayi block into the show number block, the screen shows the number inside the box, not its name.",
+                "example": "When sayi is 3, show number [sayi] shows 3 on the screen.",
+                "pitfall": "Changing the box without adding a show block: the variable goes up, but you see nothing on the screen."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h2d7-q1",
+                "kind": "mcq",
+                "prompt": "If the box is 4 and the \"change sayi by [3]\" block runs, what is in the box?",
+                "options": [
+                  "The box holds 3; the 4 is wiped",
+                  "The box holds 7",
+                  "The box stays at 4, and 3 appears on the screen",
+                  "The box holds 12"
+                ],
+                "answer": 1,
+                "explanation": "\"Change by\" adds to the current number: 4 + 3 = 7. Making the box 3 is the job of the \"set to\" block. The change block does not change the screen, and it does not multiply either.",
+                "skills": [
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h2d7-q2",
+                "kind": "predict-output",
+                "prompt": "At the start, sayi = 0. While this program runs, the buttons A, A, B, A are pressed in this order:\n\n```\ncard.onButton(\"A\", \"press\", () => {\n  sayi += 2;\n  screen.showNumber(sayi);\n});\ncard.onButton(\"B\", \"press\", () => {\n  sayi += -1;\n  screen.showNumber(sayi);\n});\n```\n\nWhich number is on the screen after the last press?",
+                "options": [
+                  "3",
+                  "4",
+                  "5",
+                  "6"
+                ],
+                "answer": 2,
+                "explanation": "0 → A: 2 → A: 4 → B: 3 → A: 5. Each press carries on from the last value in the box. The last press is A, so the screen shows 5. Getting 3 means skipping the last A press.",
+                "skills": [
+                  "mk-variables",
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h2d7-q3",
+                "kind": "find-bug",
+                "prompt": "Baran's counter shows 0 on the first press and 1 on the second press; so it is always one behind:\n\n```\ncard.onButton(\"A\", \"press\", () => {\n  screen.showNumber(sayi);\n  sayi += 1;\n});\n```\n\nWhere is the problem?",
+                "options": [
+                  "Showing is done before adding; the two lines are in the wrong order",
+                  "The sayi variable was never made",
+                  "-= 1 should be written instead of += 1",
+                  "showText is needed instead of showNumber"
+                ],
+                "answer": 0,
+                "explanation": "The number written on the screen is the value before adding. You need to add first and then show it. The variable exists, the sign is right, and showNumber is enough to show a number.",
+                "skills": [
+                  "mk-variables",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h2d7-q4",
+                "kind": "numeric",
+                "prompt": "sayi is 0 at the start. The A block does \"change sayi by 5\" and the B block does \"change sayi by -2\". If you press A 3 times and B 4 times, what is sayi?",
+                "answer": 7,
+                "explanation": "A adds 3 x 5 = 15, B adds 4 x (-2) = -8. 15 - 8 = 7. The order of the presses does not change the result, because they are all added up.",
+                "skills": [
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h2d7-q5",
+                "kind": "mcq",
+                "prompt": "Your program has \"change sayi by 1\" when you press A, but there is no \"show number\" block at all. What happens if you press A?",
+                "options": [
+                  "The variable goes up, but you see nothing on the screen",
+                  "The variable does not go up",
+                  "The card shows an error",
+                  "sayi appears on the screen automatically"
+                ],
+                "answer": 0,
+                "explanation": "Changing the variable does not change the screen. The box goes up, but to see it you need the show number block. The card does not show an error in this case.",
+                "skills": [
+                  "mk-variables",
+                  "mk-events"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Elektronik zar",
@@ -1523,7 +2356,127 @@ export const modul10: ModuleContent = {
                 "mk-variables"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Electronic dice",
+            "problem": "When you roll a dice, nobody knows what will come up; that is exactly why games are exciting. Computers can make \"random\" numbers too. So what if we put a dice inside the card, and something surprising happens when a 6 comes up?",
+            "contentMd": "### Random number\nThe **random number from [1] to [6]** block in the **Math** category gives a random whole number between these two numbers (including both ends) every time it runs. Like the faces of a dice: 1, 2, 3, 4, 5 or 6.\n\n### Asking a question: if\nThe **if ... then** block in the **Logic** category makes a decision based on a question. If the question is true, the blocks inside it run; if not, they are skipped. For the question you use the **comparison** block from the same category. It is a block with the options **=**, **≠**, **<**, **≤**, **>**, **≥** in its middle part.\n\nCareful: **set zar to 6** is an **assignment**: it puts 6 in the box. **zar = 6**, on the other hand, is a **question**: is there a 6 in the box? Its answer is true or false. (**zar** is Turkish for \"dice\".)\n\n### Program: roll the dice, show a heart on a 6\nThe A button's block is already in the editor.\n\n1. Click the **Make a variable...** button in the **Variables** category. Type the name **zar**.\n2. Put the **set zar to [0]** block from the **Variables** category inside A.\n3. Take the **random number from [1] to [6]** block from the **Math** category and drop it in place of the \"0\".\n4. Under it, attach the **show number** block from the **Basic** category. Replace the number inside it with the **zar** block.\n5. Take the **if ... then** block from the **Logic** category and attach it at the very bottom.\n6. Attach the comparison block to the \"if\" slot of the if block. Put the **zar** block in the left hole and 6 in the right hole. Make sure the sign in the middle is **=**.\n7. Put a **show icon** block inside the if block and choose **heart**.\n8. ▶ **Run**. Roll the dice by pressing A. Keep going until you get a 6.\n\n### Expected result\nEach time you press A, a digit from 1 to 6 appears on the screen for about half a second. When a 6 comes up, a heart appears on the screen after the digit disappears. All four goals should have a ✓.\n\n### How does it work?\n- We make the random number **once** and put it in the **zar** box. That way the number we show on the screen and the number we compare are the same.\n- Every time a **random number** block runs, it makes a new number. If we used two separate random blocks for showing and comparing, the number we show and the number we compare could turn out different.\n- The if block runs after the number has finished showing. The digit stays for half a second, then the heart appears.\n- In the **JavaScript** tab you will see the lines `zar = randomInt(1, 6);` and `if (zar == 6)`.\n\n### Try it\n1. Make the dice go from 1 to 20. On which number would you like to show the heart?\n2. In the **Logic** category there are two kinds of **if** block: one with only **then**, and another with **then ... else**. Take the second one: show a heart when a 6 comes up, and a sad face when it does not.\n3. Press A 10 times and count how many times a 6 came up. How often do you think a 6 should come up?\n\n### Common mistakes\n- **Mixing up the single equals sign.** **set zar to 6** always makes the dice 6. In the comparison block, **=** must be selected.\n- **Using two random blocks for the same dice.** Take the digit and the comparison from the same box (zar).\n- **Not seeing the heart and thinking it is a bug.** When a 6 does not come up, the heart never appears. Press a few more times.",
+            "question": "What could be the difference between a real dice and a random number on a computer? If you see the same number twice in a row, is that a bug, or part of being random?",
+            "explainerMd": "### What you will learn in this lesson\n- What the random number block gives and why a different number comes up each time\n- How to make the program decide with the **if ... then** block\n- The difference between assignment and comparison\n- Why it is important to store a random result in a variable\n\n### What you should know first\n- Lesson 6: button events\n- Lesson 7: making a variable, setting its value, putting a variable into the hole of a block\n- Lessons 1-5: the **show number** and **show icon** blocks\n\n### Random number: the card's dice\nThe **random number from [1] to [6]** block gives 1, 2, 3, 4, 5 or 6 every time it runs. Both ends are included, so 1 and 6 can both come up. 0 or 7 never come up. Neither you nor the card knows in advance which number will come up. On a fair dice every face has the same chance: the chance of getting a 6 is one in six.\n\n### Rolling the same dice twice\nEvery time the random block runs, it rolls a **new** dice. If you put two separate blocks, one to show the number on the screen first and one to check whether it is a 6, you have rolled two separate dice. While you see 3 on the screen, the card may have seen 6. The fix: roll the dice once and put the result in the box called **zar** (dice). Use the box both when showing and when comparing.\n\n```\nzar = randomInt(1, 6);\nscreen.showNumber(zar);\nif (zar == 6) { ... }\n```\n\n### If ... then: asking a question\nThe **if** block asks a question. If the answer is true, the blocks inside it run; if it is false, the inside of the block is skipped and the program carries on below. Questions are asked with the **comparison** block: **=**, **≠**, **<**, **≤**, **>**, **≥**. The result of a comparison is \"true\" or \"false\".\n\n| Question | When zar is 6 | When zar is 4 |\n|---|---|---|\n| zar = 6 | true | false |\n| zar > 4 | true | false |\n| zar ≥ 4 | true | true |\n| zar ≠ 6 | false | true |\n\n### Assignment and comparison are different\n**set zar to 6** is a command: it puts 6 in the box. **zar = 6** is a question: is there a 6 in the box? The command changes the box; the question does not. If you mix them up, the dice always comes up 6.\n\n### If and else\nYou can add an \"else\" branch to the if block. If the question is true, the top branch runs; if it is false, the bottom branch runs; they never both run. Showing a heart when a 6 comes up and a sad face when it does not is an example of this.\n\n### Summary\nThe random number block makes a new whole number every time it runs, including both ends. If you are going to use a result in several places, store it in a variable. The if block runs or skips its inside depending on a comparison question. The set command changes the box; the = question looks at the box. The else branch runs exactly one of the two options.",
+            "concepts": [
+              {
+                "term": "Random number",
+                "definition": "A block that, every time it runs, gives a whole number between the two numbers you set (including both ends) that cannot be known in advance.",
+                "example": "Random number from 1 to 6 is like rolling a dice: 1, 2, 3, 4, 5 or 6 comes up.",
+                "pitfall": "Thinking it is a bug when the same number comes up twice in a row; with randomness this can happen."
+              },
+              {
+                "term": "if ... then",
+                "definition": "Looks at a question; if the answer is true, it runs the blocks inside it, and if it is false, it skips them.",
+                "example": "if zar = 6 then show heart: the heart appears only when a 6 comes up.",
+                "pitfall": "Thinking it is a bug when you do not see the heart; if the question is false, the block is skipped on purpose."
+              },
+              {
+                "term": "Comparison",
+                "definition": "A block that compares two values with =, ≠, <, ≤, > or ≥ and gives the result true or false.",
+                "example": "The question zar > 4 is true for 5 and 6 and false for the others.",
+                "pitfall": "Mixing up > and ≥: if it is zar > 4, it is not true when a 4 comes up, but with zar ≥ 4 it is."
+              },
+              {
+                "term": "Assignment versus comparison",
+                "definition": "\"set to\" is a command that puts a value in the box; \"=\" is a question that does not change the box.",
+                "example": "set zar to 6 puts 6 in the box; zar = 6 asks \"is there a 6 in the box?\"",
+                "pitfall": "Using an assignment instead of a question: the dice is always 6 and the heart appears every time."
+              },
+              {
+                "term": "Storing the result in a variable",
+                "definition": "Making the random number once, putting it in a box and using the box everywhere.",
+                "example": "zar = randomInt(1, 6); then you write both showNumber(zar) and if (zar == 6).",
+                "pitfall": "Using two separate random blocks for showing and comparing: two different dice are rolled."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h2d8-q1",
+                "kind": "mcq",
+                "prompt": "Which numbers can the \"random number from [1] to [6]\" block give?",
+                "options": [
+                  "Only 2, 3, 4, 5",
+                  "1, 2, 3, 4, 5 and 6 (including both ends)",
+                  "From 0 to 6",
+                  "From 1 to 7"
+                ],
+                "answer": 1,
+                "explanation": "The block picks one of the whole numbers including both ends: 1 and 6 can come up too. 0 and 7 are outside the range.",
+                "skills": [
+                  "mk-random"
+                ]
+              },
+              {
+                "id": "m10h2d8-q2",
+                "kind": "find-bug",
+                "prompt": "Defne's dice sometimes shows 3 and also shows the heart, and sometimes shows 6 and does not bring up the heart:\n\n```\ncard.onButton(\"A\", \"press\", () => {\n  screen.showNumber(randomInt(1, 6));\n  if (randomInt(1, 6) == 6) {\n    screen.showIcon(\"heart\");\n  }\n});\n```\n\nWhat is the problem?",
+                "options": [
+                  "The number shown and the number compared come from two separate random rolls; she should put the result in a variable and use it in both",
+                  "showIcon is spelt wrong",
+                  "+= should be written instead of ==",
+                  "7 should be written instead of 6, because the dice goes up to 7"
+                ],
+                "answer": 0,
+                "explanation": "Every random block rolls a new dice. The number on the screen and the number the if looks at are independent of each other. The fix: write zar = randomInt(1, 6) and use showNumber(zar) and if (zar == 6). == is the right sign for comparing, and the largest value of the dice is 6.",
+                "skills": [
+                  "mk-random",
+                  "mk-variables",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h2d8-q3",
+                "kind": "numeric",
+                "prompt": "Every face of a fair dice has the same chance, so the chance of getting a 6 is one in six. If you roll the dice 60 times, about how many 6s would you expect on average?",
+                "answer": 10,
+                "unit": "times",
+                "explanation": "One sixth of 60 rolls is 60 / 6 = 10. The real number could be 8 or 12; 10 is the average you expect, not a certain result.",
+                "skills": [
+                  "mk-random"
+                ]
+              },
+              {
+                "id": "m10h2d8-q4",
+                "kind": "predict-output",
+                "prompt": "This code runs when A is pressed:\n\n```\ncard.onButton(\"A\", \"press\", () => {\n  zar = 5;\n  screen.showNumber(zar);\n  if (zar > 5) {\n    screen.showIcon(\"heart\");\n  }\n});\n```\n\nWhat happens on the screen?",
+                "options": [
+                  "First 5 appears, then the heart comes",
+                  "Only 5 appears; the heart never appears",
+                  "Only the heart appears",
+                  "Nothing appears"
+                ],
+                "answer": 1,
+                "explanation": "5 > 5 is false, because 5 is not greater than 5; the inside of the if is skipped and the heart does not appear. To see the heart, zar ≥ 5 would be needed. The digit is shown with showNumber.",
+                "skills": [
+                  "mk-conditions",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h2d8-q5",
+                "kind": "mcq",
+                "prompt": "What is the difference between \"set zar to 6\" and \"zar = 6\"?",
+                "options": [
+                  "They are the same thing",
+                  "The first puts 6 in the box (a command); the second asks whether there is a 6 in the box (a question)",
+                  "The first asks a question; the second puts 6 in the box",
+                  "Both show 6 on the screen"
+                ],
+                "answer": 1,
+                "explanation": "An assignment changes the value of the box. A comparison looks without changing it and gives true or false. If you mix them up, the dice is always 6. Neither writes to the screen; for the screen you need show number.",
+                "skills": [
+                  "mk-conditions",
+                  "mk-variables"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Logo, uzun basış ve gizli düğmeler",
@@ -1643,7 +2596,126 @@ export const modul10: ModuleContent = {
                 "mk-events"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The logo, long presses and secret buttons",
+            "problem": "Some toys have a secret button; it only works when you touch the right spot or press for a while. The star-shaped logo on top of the card is a touch-sensitive button too. In this lesson you will add secret doors to your card.",
+            "contentMd": "### The logo: a touch star\nThe star-shaped logo on top of the card is a **touch button**. On the virtual card, if you press on it with the mouse and hold, it is \"touched\"; if you let go, it is \"released\".\n\nThe **Input** category has this block:\n\n- **when logo is [touched]:** runs the moment the logo is touched. If you choose **released** from the list, it runs the moment you lift your finger.\n\n### Long press\nEarlier you looked at the second list of the **on button [A] [pressed]** block. It had three options: **pressed**, **released**, **long pressed**. The **long pressed** option runs when you **hold the button down for 1 second**.\n\n### Program: secret buttons\nThree event blocks are already in the editor: one **when logo is touched**, one **when logo is released** and one **on button A long pressed**.\n\n1. Put **show icon** from the **Basic** category inside the **when logo is touched** block and choose **heart**.\n2. Put the **clear screen** block from the **Basic** category inside the **when logo is released** block.\n3. Put **show icon** inside the **on button A long pressed** block and choose **sleeping face**.\n4. ▶ **Run**.\n5. On the virtual card, press on the logo with the mouse and hold it: the heart will appear. Let go: the screen will go dark.\n6. Hold the A button down for 1 second or longer.\n\n### Expected result\nWhen you touch the logo, the heart appears; when you lift off, the screen goes dark. When you press A for longer than a second, the sleeping face comes up. All four goals should have a ✓.\n\n### How does it work?\n- The logo is a source of events too, just like the A and B buttons: being touched and being released make two separate events.\n- If you press the A button briefly, nothing happens in this program, because we only wrote a **long pressed** block.\n- A long press is triggered **1 second** after the moment you press the button. If you let go before a second has passed, there is no long press.\n- **pressed** and **long pressed** blocks for the same button can be used together. If you press for a long time, both run: first the short one, and one second later the long one.\n\n### Try it\n1. Show a **happy face** when you touch the logo and a **sad face** when you let go. The logo is like a mood button.\n2. Add a **pressed** block for A as well: make it show a face. Do you see two different things when you press for a long time?\n3. Make a **long pressed** block for B too: make it clear the screen. Let it be a secret button that resets the card.\n\n### Common mistakes\n- **Not changing the list in the logo block.** If **touched** stays selected in both, the **clear screen** block does not run when you let go.\n- **Pressing too briefly for a long press.** You need to hold it down for a full second. Hold the virtual button down; do not let go quickly.\n- **Clicking the logo and letting go straight away.** The heart appears for a moment and goes off. If you hold it down, the heart stays on the screen.",
+            "question": "What jobs is a long press used for on phones or toys? Why would we want to give different jobs to a short press and a long press?",
+            "explainerMd": "### What you will learn in this lesson\n- That the logo on top of the card gives events too, like a button\n- The difference between the **touched** and **released** events\n- When the long press event runs\n- How to give the same button both a short-press job and a long-press job\n\n### What you should know first\n- Lesson 6: the button event block and the pressed, released, long pressed list\n- Lesson 3: **show icon**; lesson 2: **clear screen**\n\n### The logo: a touch star\nThe star-shaped logo on top of the card is touch-sensitive. On the virtual card, if you hold the mouse down on it, it counts as \"touched\"; if you let go, it counts as \"released\". The logo has two events:\n\n| Event | When |\n|---|---|\n| touched | The moment your finger touches the logo |\n| released | The moment your finger leaves the logo |\n\nIt is the same idea as with the buttons: you can give two separate jobs to two separate blocks. For example, a heart when touched and clear screen when released.\n\n### Time: 1 second\nThe **long pressed** event runs **1 second (1000 ms)** after the moment you press the button, if the button is still pressed. If you press for 0.9 seconds and let go, the event never comes. Once it has run, it does not run again, even if you keep holding the button.\n\n### How many events in one press?\nIf you write a **pressed**, a **long pressed** and a **released** block for one button, a very long press triggers all three. The order is like this:\n\n```\nt = 0 ms     pressed runs\nt = 1000 ms  long pressed runs\nt = 2500 ms  (finger lifted) released runs\n```\nIn a short press (say 300 ms), only pressed and released run; the long event does not come.\n\n### The secret button idea\nA long press is good for jobs that should not run by accident. That is why the \"reset\" buttons on toys often need a long press. If you want something to be easy to do, give it to a short press; if you want to protect a serious job, give it to a long press.\n\n### Things to watch out for\n- Choose the right list in each block. If **touched** stays in both blocks, both of them run when you touch.\n- One screen action writes over another: the block that runs later is what you see.\n\n### Summary\nThe logo is a source of events like A and B, and it gives the touched and released events. The long pressed event comes once if the button stays pressed for 1 second. A short press produces pressed and released; a long press adds the long event to them. Each event gives a job to its own block; choosing the right list is important.",
+            "concepts": [
+              {
+                "term": "Logo",
+                "definition": "The star-shaped, touch-sensitive area on top of the card; it gives events like a button.",
+                "example": "On the virtual card, holding the mouse down on the logo counts as \"touched\".",
+                "pitfall": "Thinking the logo is only decoration; it is a source of events."
+              },
+              {
+                "term": "touched and released (logo)",
+                "definition": "The two events of the logo: when a finger touches it and when the finger leaves it.",
+                "example": "Show a heart when touched, clear the screen when released: the heart stays as long as you hold it.",
+                "pitfall": "Leaving touched selected in both blocks; the clear block runs on the touch, not on the release."
+              },
+              {
+                "term": "Long press",
+                "definition": "An event that comes once if the button stays pressed for 1 second (1000 ms).",
+                "example": "When you hold A down for 1.2 seconds, the sleeping face appears.",
+                "pitfall": "Pressing for 0.5 seconds and expecting a long press; if you let go before 1 second, the event never comes."
+              },
+              {
+                "term": "Using short and long presses together",
+                "definition": "You can write both a pressed and a long pressed block for the same button; on a long press, both run.",
+                "example": "First the short block runs the moment you press, and 1 second later the long block runs.",
+                "pitfall": "Thinking only the long block runs on a long press; the pressed block has already run."
+              },
+              {
+                "term": "Secret button",
+                "definition": "A job linked to a long press or to the logo, not a short press, so that it is not pressed by accident.",
+                "example": "A reset button that clears the screen when you long press B.",
+                "pitfall": "Linking an important job to a short press; it could run by accident."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h2d9-q1",
+                "kind": "mcq",
+                "prompt": "When does the inside of the \"on button A long pressed\" block run?",
+                "options": [
+                  "Every time you press A",
+                  "When you lift your finger from A",
+                  "1 second after you press A, if the button is still pressed",
+                  "When you press A and let go 1 second later"
+                ],
+                "answer": 2,
+                "explanation": "A long press comes 1 second after you start holding the button, while it is still pressed; it does not wait for you to lift your finger. Lifting it is a separate event: released.",
+                "skills": [
+                  "mk-input-timing"
+                ]
+              },
+              {
+                "id": "m10h2d9-q2",
+                "kind": "numeric",
+                "prompt": "Each block adds 1 to the variable total. The program has all three blocks for A: \"pressed\", \"long pressed\" and \"released\". You press A at t = 0 and let go at t = 3000 ms. What is the total?",
+                "answer": 3,
+                "explanation": "Once on the press, once for the long press when 1 second has passed, once on the release: 3 events. The long press does not repeat while the button stays pressed.",
+                "skills": [
+                  "mk-input-timing",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h2d9-q3",
+                "kind": "predict-output",
+                "prompt": "The program has two logo blocks:\n\n```\ncard.onLogo(\"touch\", () => { screen.showIcon(\"heart\"); });\ncard.onLogo(\"release\", () => { screen.clear(); });\n```\n\nYou touch the logo at t = 0 s and lift your finger at t = 2 s. What does the screen look like at t = 1 s and t = 3 s?",
+                "options": [
+                  "A heart at 1 second, an empty screen at 3 seconds",
+                  "A heart at both",
+                  "An empty screen at 1 second, a heart at 3 seconds",
+                  "An empty screen at both"
+                ],
+                "answer": 0,
+                "explanation": "At the moment of the touch the heart comes up and stays on the screen until the finger is lifted. When the finger is lifted, the clear block runs; at 3 seconds the screen is empty.",
+                "skills": [
+                  "mk-input-timing",
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h2d9-q4",
+                "kind": "find-bug",
+                "prompt": "Elif wants a heart when she touches the logo and a dark screen when she lets go. But as soon as she touches it, the heart appears and goes off straight away:\n\n```\ncard.onLogo(\"touch\", () => { screen.showIcon(\"heart\"); });\ncard.onLogo(\"touch\", () => { screen.clear(); });\n```\n\nWhat is the bug?",
+                "options": [
+                  "The moment list of the second block was left as \"touch\"; it should be \"release\"",
+                  "showNumber is needed instead of showIcon",
+                  "The first block needs to be \"release\"",
+                  "screen.clear() never runs"
+                ],
+                "answer": 0,
+                "explanation": "Both blocks are listening to the moment of the touch; the second one clears the screen straight after the first. The moment list of the clear block should be released. The first block is right, and clear does run.",
+                "skills": [
+                  "mk-input-timing",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h2d9-q5",
+                "kind": "mcq",
+                "prompt": "The program has both a \"pressed\" block (heart) and a \"long pressed\" block (sleeping face) for A. You press A for 0.3 seconds and let go. What happens?",
+                "options": [
+                  "Only the sleeping face appears",
+                  "Only the heart appears; the long press never comes",
+                  "First the heart, then the sleeping face appears",
+                  "Nothing happens"
+                ],
+                "answer": 1,
+                "explanation": "When you press, the heart runs. The button is let go before 1 second has passed, so the long press never happens. The sleeping face only appears if you press for at least 1 second.",
+                "skills": [
+                  "mk-input-timing",
+                  "mk-events"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Zar oyunu skor panosu",
@@ -1761,7 +2833,124 @@ export const modul10: ModuleContent = {
                 "prog-planning"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Dice game scoreboard",
+            "problem": "In board games you roll dice, add up points and find out who wins. Someone always has to keep the score. In this project your card will roll the dice and add up the points, and it will even play victory music when a 6 comes up. That way it will be the game table's only helper!",
+            "contentMd": "### Project: Dice game scoreboard\nYou will bring together everything you learnt this week: button events, variables, random numbers and if.\n\n**Rules:**\n- **A:** rolls the dice, shows the result on the screen and adds it to the **toplam** (total) score. If a 6 comes up, a victory melody plays.\n- **B:** shows the total score.\n- **A+B:** resets the total and shows 0 on the screen.\n\n### New block: play melody\nThe **play melody [Ode to joy]** block in the **Music** category plays a ready-made piece of music. Choose **Fanfare** from the list. The next block waits until the melody is over. The sound comes from the virtual speaker. Your browser waits for one click on the page before it will make sound. If you cannot hear anything, check that the **Speaker** section in the card's right panel says **Sound on**.\n\n### Step by step\nThe **on start**, A, B and A+B blocks are already in the editor. The **zar** (dice) and **toplam** (total) variables are ready too.\n\n1. **A button:**\n   1. Put a **set zar to [0]** block and attach **random number from [1] to [6]** inside it.\n   2. Under it, put the **change toplam by [1]** block. Attach the **zar** variable in place of the number.\n   3. Add a **show number** block and put **zar** inside it.\n   4. Add an **if ... then** block: the condition is **zar = 6**.\n   5. Put the **play melody** block from the **Music** category inside the if, and choose **Fanfare**.\n2. **B button:** put **show number** inside it and attach the **toplam** variable.\n3. **A+B button:** **set toplam to [0]**, then show 0 (or **toplam**) with **show number**.\n4. ▶ **Run**. Press A at least five times and keep going until a 6 comes up. Then press B, and finally A+B.\n\n### Expected result\nEach time you press A, a digit from 1 to 6 appears on the screen for about half a second. When a 6 comes up, the victory melody plays. When you press B, the total so far scrolls across the screen (for example 17). When you press A+B, 0 appears on the screen. All five tasks in the Goals box should have a ✓.\n\n### How does it work?\n- **zar** holds the current roll, and **toplam** holds the total of all the rolls. On every roll, the total grows with **change toplam by zar**.\n- The **if zar = 6 then** block plays the victory music only when a 6 comes up. For any other number it is skipped.\n- The **on start** block resets the total. That way every run starts from zero.\n- While the melody is playing, the A block waits until it has finished. If you press A again before the melody ends, the new press waits in the queue.\n- Read the whole program in the **JavaScript** tab: can you find the line `toplam += zar;`? This is the code version of the word \"change\" in the block.\n\n### Try it\n1. Make a happy face come up when the total goes over 30. Hint: add another **if toplam > 30 then** block to A.\n2. Add a \"reset the score\" as a long press on B. Then there are two separate ways to reset.\n3. Choose another melody for the victory. Which one sounds most like victory music to you?\n\n### Common mistakes\n- **Forgetting to reset the total.** If you do not reset the total with A+B when you start a new game, it adds on top of the old game's score.\n- **Rolling the dice twice.** Use the **zar** box both for showing and for adding up; do not put two separate random blocks. Otherwise the number on the screen and the number added up will be different.\n- **Giving up before a 6 comes up.** A 6 does not come up on every roll. Press a few times to hear the victory melody.\n- **Looking for a bug when you cannot hear any sound.** The speaker may be off. Look at the **Speaker** section in the right panel.",
+            "question": "Which rule would you like to add to your game? For example, should the score go back to zero when a 1 comes up? As you change the rules, how does the game become more fun or harder?",
+            "explainerMd": "### What you will learn in this lesson\n- How to put a project into a rules table before coding it\n- How a variable that keeps a total (an accumulator) works\n- How to bring the button event, variable, random number and if blocks together in one program\n- That a block that plays music makes the program wait for as long as the music lasts\n\n### What you should know first\n- Lesson 6: the A, B and A+B events\n- Lesson 7: variables, the change block, starting values\n- Lesson 8: random numbers, **if ... then**, comparison\n- Lesson 9: events are independent of each other\n\n### Rules table first\nSplit the big job into small parts. On the scoreboard, three buttons do three separate jobs:\n\n| Event | What it does | Variable it uses |\n|---|---|---|\n| On start | Sets the total to 0 | toplam |\n| A pressed | Rolls the dice, adds it to the total, shows the dice, plays a melody on a 6 | zar, toplam |\n| B pressed | Shows the total | toplam |\n| A+B pressed | Resets the total, shows 0 | toplam |\n\nOnce you have written the table, coding is just filling it in in order.\n\n### Two variables, two jobs\n**zar** (dice) holds the current roll and changes with every A. **toplam** (total), on the other hand, collects all the rolls and is only ever added to. An example: if the rolls are 4, 6, 3, the total goes 0 → 4 → 10 → 13. It never gets smaller until you reset it.\n\n### Order matters\nIn the A block the order is: first roll the dice and put it in the box, then add it to the total, then show it, and finally ask whether it is a 6. Add the **zar** box to the total; do not put a new random block. That way the number you see on the screen is the same as the number that goes into the total.\n\n### Waiting while the melody plays\nThe **play melody** block makes the rest of the block wait until the melody is over. The Fanfare melody is 5.5 beats long; at a speed of 120 beats per minute, one beat is 500 ms. So the melody takes 5.5 × 500 = 2750 ms. Because the digit also stays on the screen for a short time, an A press that rolls a 6 keeps the card busy for about 3 seconds. Meanwhile, new presses wait in the queue.\n\n### Resetting\nIf you do not reset the total with A+B when you start a new game, the old game's score stays. The on start block also resets the total every time you press ▶. Both ways put 0 in the same box.\n\n### Summary\nFirst you write the rules table, then you build the blocks. zar holds the last roll, toplam holds all the rolls. The zar box is added to the total; a second random block is not added. The block waits until the melody is over. The reset block makes the total 0 again, so a new game starts.",
+            "concepts": [
+              {
+                "term": "Rules table",
+                "definition": "A small table, made before writing code, that shows what each event will do and which variables it will use.",
+                "example": "A: roll the dice, add it to the total; B: show the total; A+B: reset the total.",
+                "pitfall": "Starting to drag blocks straight away; you lose track of which job goes on which button."
+              },
+              {
+                "term": "Total (accumulator)",
+                "definition": "A variable that is added to at every event and only gets smaller when it is reset.",
+                "example": "If the rolls are 4, 6, 3, the total becomes 4, 10, 13.",
+                "pitfall": "Writing toplam = zar; every roll wipes the old one, and the total is always the last roll."
+              },
+              {
+                "term": "Order and a single dice",
+                "definition": "Roll the dice once first and put it in the box; always use the same box in the add, show and compare steps.",
+                "example": "zar = randomInt(1, 6); toplam += zar; screen.showNumber(zar);",
+                "pitfall": "Adding a new random block to the total; the number on the screen and the number added up turn out different."
+              },
+              {
+                "term": "play melody",
+                "definition": "A block that plays a ready-made melody from the virtual speaker and makes the next block wait until it is over.",
+                "example": "The Fanfare melody is 5.5 beats long; at 120 beats per minute it takes 2750 ms.",
+                "pitfall": "Thinking the block finishes instantly; while the melody is playing, new presses wait in the queue."
+              },
+              {
+                "term": "Resetting",
+                "definition": "Putting the starting value back into a variable: it can be done in on start and with A+B.",
+                "example": "In the A+B block, set toplam to 0, then show the total.",
+                "pitfall": "Not resetting the total before a new game; the old score gets added to."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h2d10-q1",
+                "kind": "numeric",
+                "prompt": "The Fanfare melody is 5.5 beats long and the tempo is 120 beats per minute (one beat is 60000 ÷ 120 = 500 ms). On the virtual card a single digit stays on the screen for 600 ms. On an A press that rolls a 6, how many milliseconds in total is the A block busy until it has shown the digit and finished the melody?",
+                "answer": 3350,
+                "unit": "ms",
+                "explanation": "The melody is 5.5 x 500 = 2750 ms. Showing the digit takes 600 ms and comes before the melody: 600 + 2750 = 3350 ms. Getting only 2750 means forgetting the time of the digit.",
+                "skills": [
+                  "mk-input-timing",
+                  "mk-random"
+                ]
+              },
+              {
+                "id": "m10h2d10-q2",
+                "kind": "predict-output",
+                "prompt": "At the start, toplam = 0. The dice comes up 4, 6 and 3 in that order (A is pressed three times), then B is pressed:\n\n```\ncard.onButton(\"A\", \"press\", () => {\n  zar = randomInt(1, 6);\n  toplam += zar;\n  screen.showNumber(zar);\n  if (zar == 6) { music.playMelody(\"fanfare\"); }\n});\ncard.onButton(\"B\", \"press\", () => { screen.showNumber(toplam); });\n```\n\nWhich number appears on the screen when B is pressed?",
+                "options": [
+                  "3",
+                  "6",
+                  "13",
+                  "19"
+                ],
+                "answer": 2,
+                "explanation": "toplam: 0 + 4 = 4, + 6 = 10, + 3 = 13. B shows the total, not 3, the last roll. On the 6 the victory melody plays, but it does not change the total.",
+                "skills": [
+                  "mk-variables",
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h2d10-q3",
+                "kind": "find-bug",
+                "prompt": "On Mert's scoreboard, when B is pressed the total always shows the last roll; the rolls do not add up:\n\n```\ncard.onButton(\"A\", \"press\", () => {\n  zar = randomInt(1, 6);\n  toplam = zar;\n  screen.showNumber(zar);\n});\ncard.onButton(\"B\", \"press\", () => { screen.showNumber(toplam); });\n```\n\nWhat is the bug?",
+                "options": [
+                  "screen.showNumber is in the wrong place",
+                  "\"A\" should be written instead of onButton(\"B\")",
+                  "toplam = zar wipes the old value on every roll; it should be toplam += zar",
+                  "It should be randomInt(0, 6) instead of randomInt(1, 6)"
+                ],
+                "answer": 2,
+                "explanation": "= puts a new value in the box and wipes the old one, so the total stays equal to the last roll. += adds to the current total. The other lines work correctly.",
+                "skills": [
+                  "mk-variables",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h2d10-q4",
+                "kind": "mcq",
+                "prompt": "You want to add a \"highest roll\" display to the scoreboard. Which design is right?",
+                "options": [
+                  "Keep a separate enyuksek variable; if zar > enyuksek, set enyuksek = zar",
+                  "Never change the zar variable",
+                  "Reset the toplam variable on every roll",
+                  "Make a second random number on every roll"
+                ],
+                "answer": 0,
+                "explanation": "The highest value is kept in a separate box and is only updated if a new roll beats it. To plan this, a new row is added to the rules table. Resetting the total or making a second random number spoils the score.",
+                "skills": [
+                  "prog-planning",
+                  "mk-conditions",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h2d10-q5",
+                "kind": "numeric",
+                "prompt": "New rule: if the dice comes up 1, the total becomes 0. The rolls come up 5, 3, 1, 4, 6 in that order. What is the total after the last roll?",
+                "answer": 10,
+                "explanation": "5 + 3 = 8. Then a 1 comes up and the total becomes 0. Then 4 and 6 are added: 0 + 4 + 6 = 10. Getting 19 means forgetting the reset on the 1.",
+                "skills": [
+                  "mk-conditions",
+                  "mk-variables",
+                  "prog-planning"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -1769,6 +2958,7 @@ export const modul10: ModuleContent = {
       "title": "Sensörler",
       "project": "Çevre istasyonu",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. İvmeölçerin x, y ve z eksenlerinde ne ölçtüğünü söyleyebilir; hareket bloklarının yalnız durum değişince çalıştığını açıklayabilir.\n2. Sıcaklık, ışık ve ses sensörlerinin değerlerini (sıcaklık -5..50, ışık ve ses 0..255) okuyabilir ve bir eşikle karar verebilir.\n3. Çubuk grafiğin kaç LED yaktığını değer ÷ en çok × 25 işlemiyle hesaplayabilir.\n4. Pusula derecesini yönle eşleştirebilir ve kuzeyi gösteren okun açısını 360 eksi pusula olarak kurabilir.\n5. Değişken ve kalan işlemiyle, düğmeyle mod değiştiren üç sensörlü bir Çevre istasyonu yapabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-35 dakikadır. Plan günde bir ders içindir. Daha yoğun bir takvimde iki dersi birleştirmek mümkündür.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | İvmeölçer: salla ve yatır | ~20 dk | Anlatımı oku, sanal kartı salla ve yatır, sihirli topu kur, mini testi çöz. |\n| 2 | Sıcaklık ve ışık | ~25 dk | Kaydırıcılarla sıcaklığı ve ışığı değiştir, eşik ve çubuk grafik hesaplarını yap, mini hava istasyonunu kur. |\n| 3 | Pusula: kuzeyi bul | ~25 dk | Pusula derecelerini yönlerle eşleştir, 360 eksi pusula kuralıyla kuzey okunu çiz. |\n| 4 | Ses seviyesi: alkış sayacı | ~25 dk | Doğru eşiği seç, değişkenle alkışları say, tur süresini hesapla. |\n| 5 | Proje: Çevre istasyonu | ~35 dk | Planı yaz, A ile mod değiştir, çubuk ve sayı göster, projeyi ölçütlerle değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta Hafta 1 ve Hafta 2'nin konuları kullanılır. Başlamadan önce kontrol et:\n- Öğrenci bir olay (düğme) bloğuna program yığını bağlayabiliyor mu? (Hafta 2, Ders 6)\n- Bir değişkeni oluşturup \"değerine ekle\" ile artırabiliyor mu? (Ders 7)\n- Eğer ... ise ... değilse bloğunu kullanabiliyor mu? (Ders 8)\n- Sonsuza kadar bloğunun ne yaptığını biliyor mu? (Ders 5)\n- Çarpma, bölme ve yüzde oranı (0,4 × 25) gibi işlemlerle rahat mı?\n\n### Kavram haritası\n- **Algılama:** sensör → sanal kaydırıcı → okuma anı → eşik\n- **Hareket:** ivmeölçer → x, y, z → duruş (700 eşiği) → hareket olayı (yalnız değişimde)\n- **Yön:** pusula (0 kuzey, 90 doğu, 180 güney, 270 batı) → 360 ≡ 0 → ok açısı = 360 − pusula → sekiz yönlü ok\n- **Gösterim:** çubuk grafik (değer ÷ en çok × 25) → ekranı tek yerden yönetme\n- **Program:** değişken → sayaç → kalan işlemi → mod → önce hazırla, sonra çiz\n\n### Sık yapılan hatalar\n- **Aynı yatışı tekrar denemek.** Sola yatık kartı yeniden sola yatırmak olay üretmez; önce yüzü yukarı yap.\n- **Eşiği 700'ün altında sanmak.** Bir eksen en büyük ve en az 700 olmalı; küçük kaydırma yatış sayılmaz.\n- **Sınır değerini unutmak.** sıcaklık > 30 koşulu 30'da yanlıştır; üzgün yüz 31'de çıkar.\n- **En çok değerini yanlış yazmak.** Işık 255'e çıkar; en çok 5 bırakılırsa ekran hemen dolar.\n- **Okun açısını doğrudan pusula yapmak.** Ok kartla birlikte döner; 360 − pusula gerekir.\n- **Eksi yerine artı bırakmak.** Aritmetik blok varsayılan olarak toplar; işareti − yap.\n- **Eşiği oda sesinin altında seçmek.** Oda sesi yaklaşık 20; eşik 10 olursa sayaç sürekli artar.\n- **Ekrana iki yerden yazmak.** Hem sonsuza kadar hem düğme olayı çizerse görüntü karışır.\n- **Kalan yerine mod + 1 yazmak.** Mod başa dönmez, 3, 4, 5 diye büyür.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Çubuk grafik hesabını elle yap: (sıcaklık 12, en çok 40), (ışık 100, en çok 255), (ses 255, en çok 255). Sonra sanal kartta sına.\n4. Pusula 0, 90, 180, 270 ve 45 iken okun hangi yöne baktığını önce tahmin et, sonra çalıştırarak doğrula.\n5. Kendi cümlelerinle cevapla: \"Hareket blokları neden aynı yatışta ikinci kez çalışmaz?\" ve \"Neden 360 eksi pusula kullandık?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Çevre istasyonu)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Sensörler | Yalnız bir sensör çalışıyor | Sıcaklık, ışık ve ses kendi modunda çubuk olarak görünüyor | Her sensör doğru en çok değeriyle (40 ve 255) ve değer değişince çubuk orantılı değişiyor |\n| Mod değiştirme | A mod değiştirmiyor ya da mod 3'ten sonra büyüyor | A her basışta 0, 1, 2 sırasıyla ilerliyor ve başa dönüyor | Dördüncü bir mod (pusula) ekleyip bölen sayıyı kendisi güncelliyor |\n| Sayı gösterimi | B basılınca sayı görünmüyor | B basılıyken seçili sensörün sayısı kayıyor | Ekran yalnız sonsuza kadar bloğundan çiziliyor ve neden anlatılabiliyor |\n| Program düzeni | Aynı ekrana birden çok yerden yazılıyor | Okuma ve enCok önce hazırlanıp sonra çiziliyor | Değişken adları anlaşılır ve bir uyarı (örneğin sıcaklık yüksekken kalp) eklenmiş |\n| Anlatım | Ne yaptığını anlatamıyor | Programı adım adım anlatıyor | Hata yapıp nasıl bulduğunu ve çubuğun hesabını anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta ölçmek ve karar vermektir: değer okunur, bir eşikle karşılaştırılır, ekranda gösterilir. Sanal sensörlerin değerini öğrencinin kendisinin verdiğini vurgulamak, \"ölçüm\" ile \"ayarlama\" farkını düşündürür.\n- **Nasıl destek olunur?** Cevabı söylemek yerine şu soruları sor: \"Bu sensör şu an kaç okuyor?\", \"Eşik kaç ve bu değer ondan büyük mü?\", \"Ekrana kaç yerden yazıyorsun?\"\n- **Hesaplar.** Çubuk grafik ve pusula hesapları ufak ama gerçek matematiktir; öğrenci elle hesaplayıp sanal kartta doğrulayınca ilişki kalıcı olur.\n- **Ses ve gizlilik.** Ses seviyesi sanal bir kaydırıcıdır; gerçek mikrofon kullanılmaz. Konuşmada gerçek cihazların sesi dinlerken gizlilik kuralları gerektiğini öğrenciyle tartışabilirsiniz.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Ders ilerleyip gerçek kart kullanılacaksa şebeke gerilimiyle (220 V) hiçbir devre kurulmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Goals for the week\nBy the end of this week the learner can:\n1. Say what the accelerometer measures on the x, y and z axes; explain that motion blocks only run when the state changes.\n2. Read the values of the temperature, light and sound sensors (temperature -5..50, light and sound 0..255) and make a decision with a threshold.\n3. Work out how many LEDs a bar graph lights up with the sum value ÷ largest × 25.\n4. Match compass degrees with directions and build the angle of the arrow pointing north as 360 minus compass.\n5. Make an Environment station with three sensors, using a variable and the remainder operation, where a button changes the mode.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-35 minutes. The plan is for one lesson a day. On a busier timetable, you can combine two lessons.\n\n| Day | Lesson | Time | What you do |\n|---|---|---|---|\n| 1 | Accelerometer: shake and tilt | ~20 min | Read the explainer, shake and tilt the virtual card, build the magic ball, do the mini quiz. |\n| 2 | Temperature and light | ~25 min | Change the temperature and light with the sliders, do the threshold and bar graph sums, build the mini weather station. |\n| 3 | Compass: find north | ~25 min | Match compass degrees with directions, draw the north arrow with the 360 minus compass rule. |\n| 4 | Sound level: clap counter | ~25 min | Choose the right threshold, count claps with a variable, work out the round time. |\n| 5 | Project: Environment station | ~35 min | Write the plan, change the mode with A, show the bar and the number, assess the project with the rubric. |\n\n### Prerequisite check\nThis week uses the topics of week 1 and week 2. Before you start, check:\n- Can the learner attach a program stack to an event (button) block? (Week 2, lesson 6)\n- Can they make a variable and make it go up with \"change by\"? (Lesson 7)\n- Can they use the if ... then ... else block? (Lesson 8)\n- Do they know what the forever block does? (Lesson 5)\n- Are they comfortable with sums such as multiplication, division and proportions (0.4 × 25)?\n\n### Concept map\n- **Sensing:** sensor → virtual slider → moment of reading → threshold\n- **Motion:** accelerometer → x, y, z → position (threshold 700) → motion event (only on a change)\n- **Direction:** compass (0 north, 90 east, 180 south, 270 west) → 360 ≡ 0 → arrow angle = 360 − compass → eight-direction arrow\n- **Display:** bar graph (value ÷ largest × 25) → managing the screen from one place\n- **Program:** variable → counter → remainder operation → mode → get it ready first, then draw\n\n### Common mistakes\n- **Trying the same tilt again.** Tilting a card that is already tilted left to the left again does not produce an event; set it face up first.\n- **Thinking the threshold is below 700.** One axis must be the largest and at least 700; a small slide does not count as a tilt.\n- **Forgetting the boundary value.** The condition temperature > 30 is false at 30; the sad face comes up at 31.\n- **Typing the wrong largest value.** Light goes up to 255; if the largest value is left at 5, the screen fills up straight away.\n- **Making the arrow's angle the compass value directly.** The arrow turns with the card; you need 360 − compass.\n- **Leaving plus instead of minus.** The arithmetic block adds by default; change the sign to −.\n- **Choosing a threshold below the room noise.** Room noise is about 20; if the threshold is 10, the counter keeps going up.\n- **Writing to the screen from two places.** If both forever and a button event draw, the picture gets mixed up.\n- **Writing mod + 1 instead of the remainder.** The mode does not go back to the start; it grows as 3, 4, 5.\n\n### End-of-week review\n1. Look at the concept cards of each lesson and read the \"common mistake\" lines out loud.\n2. Read the explanations of the questions you got wrong in the mini quizzes again, then do the question again.\n3. Do the bar graph sum by hand: (temperature 12, largest 40), (light 100, largest 255), (sound 255, largest 255). Then test it on the virtual card.\n4. Guess first which way the arrow points when the compass is 0, 90, 180, 270 and 45, then check by running it.\n5. Answer in your own words: \"Why do motion blocks not run a second time on the same tilt?\" and \"Why did we use 360 minus compass?\"\n\nThe mini quizzes of the five lessons are enough as the end-of-week test; 5 questions in each lesson, 25 questions in total. Goal: at least 4 correct in each lesson. Go back to the explainer of any lesson that needs more work.\n\n### Project rubric (Environment station)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Sensors | Only one sensor works | Temperature, light and sound each appear as a bar in their own mode | Each sensor has the right largest value (40 and 255), and the bar changes in proportion when the value changes |\n| Changing mode | A does not change the mode, or the mode keeps growing after 3 | With every press, A moves on in the order 0, 1, 2 and goes back to the start | Adds a fourth mode (compass) and updates the divisor on their own |\n| Showing the number | The number does not appear when B is pressed | While B is held down, the number of the selected sensor scrolls | The screen is drawn only from the forever block, and they can explain why |\n| Program layout | The same screen is written to from more than one place | okuma and enCok are got ready first, then drawn | The variable names are clear and a warning has been added (for example a heart when the temperature is high) |\n| Explaining | Cannot explain what they did | Explains the program step by step | Explains a mistake they made, how they found it, and the bar sum |\n\n### Note for parents and teachers\n- **Aim.** This week is about measuring and deciding: a value is read, compared with a threshold and shown on the screen. Pointing out that the learner gives the values of the virtual sensors themselves gets them thinking about the difference between \"measuring\" and \"setting\".\n- **How can you help?** Instead of giving the answer, ask these questions: \"What is this sensor reading right now?\", \"What is the threshold, and is this value bigger than it?\", \"From how many places are you writing to the screen?\"\n- **Sums.** The bar graph and compass sums are small but real maths; when the learner works them out by hand and checks them on the virtual card, the connection sticks.\n- **Sound and privacy.** The sound level is a virtual slider; no real microphone is used. You can discuss with the learner that real devices need privacy rules when they listen to sound.\n- **Safety.** Everything on this platform is virtual. If the lessons move on to using a real card, no circuit is ever built with mains voltage (220 V).\n- **Progress.** Mini quiz results are shown by skill on the \"My progress\" page (draft/pilot feature; only saved if consent was given).",
       "lessons": [
         {
           "title": "İvmeölçer: salla ve yatır",
@@ -1895,7 +3085,133 @@ export const modul10: ModuleContent = {
                 "mk-accel"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Accelerometer: shake and tilt",
+            "problem": "When you turn your phone sideways, the screen rotates by itself. Some apps undo things when you shake the phone, and in some games you steer a car by tilting the phone. A part inside the phone called an **accelerometer** senses movement and tilt. The card has an accelerometer too. Let's use it to make a \"magic ball\"!",
+            "contentMd": "### What does the accelerometer sense?\nThe accelerometer measures the card's movement and **which way it is tilted**. The measurements are given on three axes:\n\n- **x:** the card tilting to the left (minus) and to the right (plus)\n- **y:** the card tilting backwards (minus) and forwards (plus)\n- **z:** the card's face looking up (plus) or down (minus)\n\nThe values are in **milli-g**. When the card lies face up, gravity measures about 1024 on the z axis. So (x, y, z) = (0, 0, 1024).\n\nOn the virtual card, in the **Motion (accelerometer)** section to the right of the card, you will find:\n\n- Buttons: **Shake**, **Tilt left**, **Tilt right**, **Tilt forward**, **Tilt back**, **Face up**, **Face down**, **Free fall**.\n- Three sliders: **x (side)**, **y (front-back)**, **z (face)**.\n- Under them, three readings: **strength**, **pitch**, **roll**.\n\n### Motion blocks\nThe **Input** category has these blocks:\n\n- **when card is [shaken]:** a header block. Choose the movement from the list: shaken, tilted left, tilted right, tilted forward, tilted back, face up, face down, falling.\n- **card is [shaking]?:** asks whether the card is in this state right now. It gives true or false.\n- **acceleration ([strength])** and **tilt ([pitch (forward +)]) degrees:** give a number.\n\n### Program: magic ball\nThree **when card is ...** header blocks are already in the editor: shaken, tilted left, tilted right.\n\n1. Put the **if ... then ... else** block from the **Logic** category inside the **shaken** block (there are two kinds of if; take the one with \"else\").\n2. Attach the **coin flip (random true/false)** block from the **Logic** category to the condition slot of the if.\n3. In the \"then\" part put **show icon** and choose **yes** from the list. In the \"else\" part put **show icon** and choose **no**.\n4. Inside the **tilted left** block put **show icon** and choose **left arrow**.\n5. Inside the **tilted right** block put **show icon** and choose **right arrow**.\n6. ▶ **Run**.\n7. On the virtual card, press the **Shake** button. Shake it a few times. Then **Tilt left**, then **Tilt right**.\n\n### Expected result\nWith every shake, \"yes\" or \"no\" appears at random. When you tilt it left, the left arrow comes up; when you tilt it right, the right arrow comes up. All five goals should have a ✓.\n\n### How does it work?\n- A motion block runs **the moment the card's state changes**. If the card is already tilted left, **tilted left** does not run again; first you need to go back to another state, for example **Face up**.\n- **Shaking** is a short event: when the card is shaken, the block runs straight away, and the acceleration readings wobble for about half a second.\n- **coin flip** gives **true** or **false** at random every time it runs. It is like tossing a coin.\n- When an axis goes past 700 milli-g, the card counts as tilted in that direction.\n\n### Try it\n1. Add two blocks for **tilted forward** and **tilted back** as well: make them show the up arrow and the down arrow.\n2. Add a **face down** block and make it clear the screen. When you turn the card over, the screen goes dark.\n3. Move the sliders by hand. When does the **strength** reading get bigger? How does the strength value change while you shake the card?\n\n### Common mistakes\n- **Trying the same tilt again and again.** If you press **Tilt left** again after tilting it left, the event does not run again. Press the **Face up** button first.\n- **Leaving out the \"else\" branch.** If you put an if that only has a **then** part, half the time you see nothing.\n- **Moving the slider only a little.** For the card to count as tilted, one axis must go past 700. A small slide does not count as a tilt; the ready-made buttons are easier to use.",
+            "question": "What else do you know that senses movement in your phone or a games controller? What do you think is the difference between wanting something to happen when you shake the card and pressing a button?",
+            "explainerMd": "### What you will learn in this lesson\n- What the accelerometer measures and why it can sense \"tilt\"\n- Which movement of the card the x, y and z axes match\n- When a motion event runs and when it does not\n- How to make a random decision (a coin flip) with the if block\n\n### What you should know first\n- Lesson 3: the show icon block\n- Lesson 6: what an event is (a header block, a stack that runs at that moment)\n- Lesson 8: the if ... then ... else block and randomness\n\n### The card senses gravity\nWhen you tilt the phone in your hand, the screen rotates. The phone knows which way it is being pulled. The **accelerometer** does this. The accelerometer measures the card's movement and which way gravity \"pulls\" the card. It takes measurements even when the card is lying on the table, because gravity is always there.\n\n### Three axes\nThe measurement is given as three separate numbers. Each number describes one direction.\n\n```\nx : left (-)  <->  right (+)\ny : back (-) <-> forward (+)\nz : face down (-) <-> face up (+)\n```\n\nThe unit is **milli-g**. About 1024 milli-g means the full strength of gravity. When the card lies face up, gravity is in the z direction. That is why the reading comes out as (x, y, z) = (0, 0, 1024). If the card is tilted all the way to the right, gravity moves to the x direction: (1024, 0, 0).\n\n### How does a tilt become a \"position\"?\nThe card looks at the largest axis value. If this value is at least 700 and bigger than the other axes, the card counts as tilted in that direction. For example, the reading (650, 0, 900) is still \"face up\": z is the largest and x has not reached 700. Shaking is separate: the card wobbles for a short time and the readings jump.\n\n### An event only runs on a change\nA block like **when card is [tilted left]** runs **the moment the card's state changes**. If the card is already tilted left, saying \"tilt left\" again changes nothing, so the block does not run again. For it to run, you first need to go back to another position, for example face up. Shaking is different: every shake is a new event.\n\n### Deciding with a coin flip\nThe **coin flip** block gives **true** or **false** at random every time it runs. If you attach it to the condition of an if block, the program picks one of two paths at random:\n\n```\nwhen card is shaken:\n  if coin flip then\n    show icon yes\n  else\n    show icon no\n```\n\nIf you leave out the \"else\" branch, half the time nothing happens: the old picture stays on the screen.\n\n### Summary\nThe accelerometer measures on three axes in milli-g and knows the card's tilt thanks to gravity. If an axis is the largest and has reached 700, the card counts as tilted in that direction. Motion blocks only run when the state changes. Every shake is a new event. When you combine the coin flip block with the if block, you can make a magic ball that gives a random answer.",
+            "concepts": [
+              {
+                "term": "Accelerometer",
+                "definition": "A sensor that measures, on three axes, the card's movement and which way gravity pulls the card.",
+                "example": "When the card lies face up on the table, the measurement is (x, y, z) = (0, 0, 1024).",
+                "pitfall": "Thinking the accelerometer only works while the card is being shaken; it measures gravity even when the card is still."
+              },
+              {
+                "term": "The x, y and z axes",
+                "definition": "x shows the card tilting left or right, y backwards or forwards, z its face looking up or down.",
+                "example": "When the card is tilted all the way to the right, the measurement is (1024, 0, 0).",
+                "pitfall": "Thinking y is the left-right tilt and x the forward-back tilt; x is the side, y is front-back."
+              },
+              {
+                "term": "milli-g",
+                "definition": "A unit of acceleration. About 1024 milli-g is the full strength of gravity.",
+                "example": "When the card is face up, the z axis reads about 1024 milli-g.",
+                "pitfall": "Thinking the value is in degrees; milli-g is an amount of force, not an angle."
+              },
+              {
+                "term": "Position threshold (700)",
+                "definition": "If an axis value is the largest and at least 700, the card counts as tilted in that direction.",
+                "example": "The reading (650, 0, 900) is still face up; z is the largest and x has not reached 700.",
+                "pitfall": "Moving the slider only a little and expecting a tilt; anything under 700 does not count as a tilt."
+              },
+              {
+                "term": "Motion event",
+                "definition": "Blocks such as when card is [tilted left] run once, the moment the state changes.",
+                "example": "When the card is tilted left from face up, the block runs; if it stays tilted left, it does not run again.",
+                "pitfall": "Trying the same tilt again and again; the event does not come again until you go back to another position first."
+              },
+              {
+                "term": "Coin flip",
+                "definition": "A block that gives true or false at random every time it runs.",
+                "example": "if coin flip then the yes icon, else the no icon: this makes the magic ball.",
+                "pitfall": "Leaving out the else branch; when it comes out false, nothing happens and the old picture stays."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h3d1-q1",
+                "kind": "mcq",
+                "prompt": "The card's accelerometer reads (x, y, z) = (650, 0, 900). Which position does the card count as being in?",
+                "options": [
+                  "Tilted right",
+                  "Face up",
+                  "Tilted forward",
+                  "In free fall"
+                ],
+                "answer": 1,
+                "explanation": "The position is found by looking at the largest axis. The largest axis is z (900) and it is over 700, so the card is face up. x is only 650; because it has not reached 700 and is smaller than z, it does not count as tilted right.",
+                "skills": [
+                  "mk-accel"
+                ]
+              },
+              {
+                "id": "m10h3d1-q2",
+                "kind": "mcq",
+                "prompt": "You tilted the card left and the left arrow appeared. You leave the card tilted left and press the \"Tilt left\" button once more. What happens?",
+                "options": [
+                  "The left arrow is drawn again",
+                  "Nothing happens, because the position did not change",
+                  "The card counts as shaken",
+                  "The program shows an error"
+                ],
+                "answer": 1,
+                "explanation": "A motion event only runs when the state changes. When the card is already tilted left, the position stays the same, so there is no new event. To try the event again, you first need to go back to another position, such as face up.",
+                "skills": [
+                  "mk-events",
+                  "mk-accel"
+                ]
+              },
+              {
+                "id": "m10h3d1-q3",
+                "kind": "predict-output",
+                "prompt": "The card starts face up. The program below is running, and sayac starts at 0.\n\n```\nwhen card is tilted right:\n  change sayac by 1\n```\n\nYou do these in order: Tilt right, Tilt right, Face up, Tilt right, Tilt right. What is sayac at the end?",
+                "options": [
+                  "4",
+                  "1",
+                  "2",
+                  "5"
+                ],
+                "answer": 2,
+                "explanation": "The first \"Tilt right\" changes the position and the block runs (sayac 1). The second does not change the position, so the block does not run. There is no block for \"Face up\". The next \"Tilt right\" is a change again (sayac 2); the one after it does not run. The result is 2; for it to be 4, every press would have to produce an event.",
+                "skills": [
+                  "mk-events",
+                  "mk-accel"
+                ]
+              },
+              {
+                "id": "m10h3d1-q4",
+                "kind": "find-bug",
+                "prompt": "When you shake the card, the magic ball sometimes shows \"yes\", but sometimes nothing changes and the old picture stays on the screen. Where is the bug?\n\n```\nwhen card is shaken:\n  if coin flip then\n    show icon yes\n```",
+                "options": [
+                  "The if block has no else branch; when the coin flip comes out false, the screen does not change",
+                  "The coin flip block is in the wrong category",
+                  "tilted left should be used instead of shaken",
+                  "The yes icon does not exist"
+                ],
+                "answer": 0,
+                "explanation": "The coin flip comes out false half the time. When it comes out false, there is no else branch to run, so no command runs and the screen stays as it was. The fix is to add show icon no to the else branch. The other options are not real bugs.",
+                "skills": [
+                  "mk-conditions",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h3d1-q5",
+                "kind": "numeric",
+                "prompt": "The card's accelerometer reads x = 600 and y = 800, z = 0. What is the strength of the movement, that is \"acceleration (strength)\", in milli-g? (strength = square root(x² + y² + z²))",
+                "answer": 1000,
+                "tolerance": 0,
+                "unit": "milli-g",
+                "explanation": "600² = 360000 and 800² = 640000. The total is 1000000, and its square root is 1000. As you saw in lesson 11, the strength combines the three axes; it is not the value of a single axis.",
+                "skills": [
+                  "mk-accel"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Sıcaklık ve ışık",
@@ -2019,7 +3335,130 @@ export const modul10: ModuleContent = {
                 "mk-sensors"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Temperature and light",
+            "problem": "A weather app tells you how many degrees it is outside. Your phone's screen brightness also changes by itself depending on the light in the room. All of this happens thanks to small feelers called **sensors**. The card has a temperature sensor and a light sensor too. With them, you will make a small weather station.",
+            "contentMd": "### Virtual sensors\nOn a real card, the sensors are physical parts. On the virtual card, though, **you** change the values. In the **Compass and sensors** section to the right of the card you will find three sliders:\n\n- **Temperature:** from −5 to 50 degrees (°C).\n- **Light:** from 0 (dark) to 255 (very bright).\n- **Sound:** from 0 to 255 (we will use this in lesson 14).\n\nThe **Input** category has two matching value blocks:\n\n- **temperature (°C):** gives the temperature at that moment.\n- **light level:** gives the light at that moment.\n\n### Bar graph\nThe **bar graph [3] up to [5]** block in the **LED** category shows a number with LEDs. The first number is the value you measured; the second is the largest value it could be. The LEDs fill up from the bottom to the top: if the value is half of the largest value, half the screen lights up. Because the light level is measured out of 255, you use **bar graph [light level] up to [255]**. If the light is 128, about 13 LEDs light up. If the light is 255, all 25 LEDs light up.\n\n### Program: mini weather station\nThe **on button A** and **on button B** blocks are already in the editor.\n\n1. **A button:**\n   1. Put the **show number** block from the **Basic** category.\n   2. Replace the number inside it with the **temperature (°C)** block from the **Input** category.\n   3. Under it, put the **if ... then** block from the **Logic** category.\n   4. For the condition, take a comparison block: **temperature (°C)** in the left hole, the sign **>**, and 30 in the right hole.\n   5. Put **show icon** inside the if and choose **sad face**.\n2. **B button:** put the **bar graph** block from the **LED** category inside it. Attach the **light level** block to the first hole and type 255 in the second hole.\n3. ▶ **Run**.\n4. With the temperature slider at 21, press A. Then raise the temperature to 35 and press A.\n5. Pull the light slider all the way up and press B.\n\n### Expected result\nWhen you press A, the temperature number scrolls (such as 21). When the temperature is above 30, a sad face appears after the number. When you press B, as many LEDs light up as the light level says. When the light is pulled all the way up, the whole screen lights up. All four goals should have a ✓.\n\n### How does it work?\n- A sensor block reads the value **at the moment** it runs. If you change the temperature afterwards, the value that was read earlier does not change.\n- **if temperature > 30 then** asks a question: is the temperature greater than 30? If it is, the block inside runs.\n- The program waits while the number scrolls. When the number is done, the sad face is drawn. That is why you see the number first, then the face.\n- A **threshold** is the boundary value where a decision changes. Here the threshold is 30 degrees: different things happen below and above 30.\n\n### Try it\n1. Lower the threshold to 25. At what temperature does the sad face appear?\n2. Add an **else** branch to the A block: make it show a happy face if the temperature is less than 30.\n3. Put **temperature (°C)** inside the **bar graph** block and set the largest value to 50. Set the temperature to 25. How many LEDs do you think will light up? Make your guess before you try, then try it.\n\n### Common mistakes\n- **Typing the wrong largest value for the bar.** Light goes up to 255. If you leave the largest value at 5, the whole screen lights up straight away.\n- **Building the condition the wrong way round.** If you write **temperature < 30**, you see the sad face when it is cool.\n- **Forgetting the slider when reading a sensor.** On the virtual card you change the values; if you do not change them, they stay fixed (the temperature is 21 and the light is 128 at the start).",
+            "question": "Which is more reliable, a real thermometer or this card's temperature sensor? Do you think virtual sensors take real measurements, or do we tell them the value? Did the answer to this question surprise you?",
+            "explainerMd": "### What you will learn in this lesson\n- What a sensor is and how you change the values on the virtual card\n- That the temperature and light blocks give numbers\n- How to decide between two states with a threshold\n- How to work out how many LEDs a bar graph turns a number into\n\n### What you should know first\n- Lesson 3: show icon\n- Lesson 6: button events\n- Lesson 8: the if block\n- Lesson 11: the sliders of the virtual card, and that a block is a job that runs for a moment and finishes\n\n### What is a sensor?\nA **sensor** is a feeler that turns something around it into a number. A thermometer measures temperature; a light sensor measures brightness. On a real card, the sensors are physical parts. On the virtual card, **you** give the value with a slider; the program still sees it as a sensor reading.\n\n```\ntemperature : -5 ... 50  (degrees)\nlight       :  0 ... 255 (0 dark, 255 very bright)\n```\n\nThe starting values are 21 for temperature and 128 for light.\n\n### A reading is a moment\nThe **temperature (°C)** and **light level** blocks read the value **at the moment** they run. If you change the temperature while the number is scrolling on the screen, the number on the screen does not change, because the reading has already been taken. To see the new value, the block needs to run again.\n\n### Threshold: the decision boundary\nA **threshold** is the boundary value where a decision changes. In the sentence \"If the temperature is greater than 30, show a sad face\", the threshold is 30. A comparison needs care right at the boundary:\n\n```\nwhen temperature = 30   30 > 30   false   (no sad face)\nwhen temperature = 31   31 > 30   true    (sad face)\n```\n\nYou decide which side the boundary value itself goes on by choosing \">\" or \"≥\".\n\n### Bar graph\nThe **bar graph [value] up to [largest]** block spreads a number over 25 LEDs. The LEDs fill up from the bottom. The sum is:\n\n```\nnumber of LEDs lit = nearest whole number( value / largest × 25 )\n```\n\nExample: if the value is 20 and the largest is 50, then 20 ÷ 50 = 0.4 and 0.4 × 25 = 10 LEDs light up. Because the light sensor goes up to 255, you type 255 as the largest value when you show the light. If you leave it at 5, the whole screen lights up as soon as the light goes past 5.\n\n| value | largest | LEDs lit |\n|---|---|---|\n| 0 | 255 | 0 |\n| 51 | 255 | 5 (bottom row) |\n| 255 | 255 | 25 (all) |\n\n### Summary\nA sensor turns its surroundings into a number; on the virtual card, you give the value with a slider. A sensor block takes a reading at the moment it runs; a value that changes afterwards does not change the old reading. A threshold is the boundary where a decision changes, and depending on the comparison sign, the boundary value itself goes on one side or the other. A bar graph multiplies the value ÷ largest ratio by 25 LEDs and rounds it to the nearest whole number.",
+            "concepts": [
+              {
+                "term": "Sensor",
+                "definition": "A feeler that turns something around it (temperature, light, sound) into a number.",
+                "example": "The light sensor gives a number between 0 (dark) and 255 (very bright).",
+                "pitfall": "Thinking the sensor makes guesses; it only gives the value at that moment as a number."
+              },
+              {
+                "term": "Virtual sensor",
+                "definition": "On the virtual card, you set the sensor value with a slider; the program sees it as a real reading.",
+                "example": "When you pull the temperature slider to 35, the program reads 35.",
+                "pitfall": "Forgetting to change the slider; the value stays fixed at the start (temperature 21, light 128)."
+              },
+              {
+                "term": "Moment of reading",
+                "definition": "A sensor block reads the value at the moment it runs; a value that changes afterwards does not change the earlier reading.",
+                "example": "Even if you set the temperature to 35 while 21 is scrolling on the screen, the number on the screen stays 21.",
+                "pitfall": "Thinking the value will update by itself while the number is scrolling on the screen."
+              },
+              {
+                "term": "Threshold",
+                "definition": "The boundary value where a decision changes.",
+                "example": "In the condition temperature > 30, the threshold is 30; at 31 there is a sad face, at 30 there is not.",
+                "pitfall": "Mixing up which side the boundary value goes on; 30 > 30 is false."
+              },
+              {
+                "term": "Bar graph",
+                "definition": "A block that compares a value with the largest value and shows it as the part of the 25 LEDs that fills up from the bottom.",
+                "example": "A value of 20 with a largest value of 50 lights up 20 ÷ 50 × 25 = 10 LEDs.",
+                "pitfall": "Typing the wrong largest value; if you type 5 for light, the whole screen lights up once the light goes past 5."
+              },
+              {
+                "term": "Comparison",
+                "definition": "A block that compares two numbers with a sign such as >, < or = and produces true or false.",
+                "example": "temperature > 30 is false in a cool room and true in a hot room.",
+                "pitfall": "Choosing the sign the wrong way round; if you write <, you see the sad face when it is cool."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h3d2-q1",
+                "kind": "numeric",
+                "prompt": "The temperature is 20 degrees. The block \"bar graph temperature up to 50\" runs in the program. How many LEDs light up?",
+                "answer": 10,
+                "tolerance": 0,
+                "unit": "LED",
+                "explanation": "The ratio is 20 ÷ 50 = 0.4. The bar is spread over 25 LEDs: 0.4 × 25 = 10. The value 20 is less than half (25) of the largest value 50, so less than half the screen lights up.",
+                "skills": [
+                  "mk-bar",
+                  "mk-sensors"
+                ]
+              },
+              {
+                "id": "m10h3d2-q2",
+                "kind": "numeric",
+                "prompt": "The light level is 64. \"bar graph light level up to 255\" runs in the program. How many LEDs light up? (Round the result to the nearest whole number.)",
+                "answer": 6,
+                "tolerance": 0,
+                "unit": "LED",
+                "explanation": "64 ÷ 255 is about 0.251. 0.251 × 25 is about 6.27. Because an LED cannot be half on, the nearest whole number, 6, is taken.",
+                "skills": [
+                  "mk-bar",
+                  "mk-sensors"
+                ]
+              },
+              {
+                "id": "m10h3d2-q3",
+                "kind": "predict-output",
+                "prompt": "The temperature slider is at exactly 30. The A button is pressed.\n\n```\non button A pressed:\n  show number temperature\n  if temperature > 30 then\n    show icon sad face\n```\n\nWhat is seen on the screen?",
+                "options": [
+                  "First 30 scrolls, then the sad face comes up",
+                  "Only 30 scrolls; the sad face does not come up",
+                  "Only the sad face comes up",
+                  "Nothing comes up"
+                ],
+                "answer": 1,
+                "explanation": "The show number block scrolls 30. But 30 > 30 is false, because 30 is not greater than itself. So the inside of the if block does not run and the sad face does not come up. You see the sad face at 31; if you want to see it at 30 too, you use ≥.",
+                "skills": [
+                  "mk-threshold",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h3d2-q4",
+                "kind": "find-bug",
+                "prompt": "The light bar always lights up the whole screen, even when the slider is in the middle. The code is:\n\n```\non button B pressed:\n  bar graph light level up to 5\n```\n\nWhere is the bug?",
+                "options": [
+                  "The wrong light level block was chosen",
+                  "The largest value is 5; because light goes up to 255, the largest value should be 255",
+                  "show number should be used instead of bar graph",
+                  "The A button should be used instead of the B button"
+                ],
+                "answer": 1,
+                "explanation": "The ratio is light ÷ largest, so when the largest value is 5, the ratio goes over 1 as soon as the light goes past 5 and the screen lights up completely. Light goes up to 255, so 255 should be typed as the largest value.",
+                "skills": [
+                  "mk-bar",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h3d2-q5",
+                "kind": "mcq",
+                "prompt": "You pressed A and the number 21 is scrolling on the screen. While the number is scrolling, you pulled the temperature slider to 35. What happens to this number?",
+                "options": [
+                  "The scrolling number turns into 35",
+                  "It scrolls as 21; 35 does not appear",
+                  "The program stops",
+                  "The screen is wiped"
+                ],
+                "answer": 1,
+                "explanation": "The temperature block reads the value at the moment it runs and prepares the number with that reading. Changing the slider afterwards does not change the old reading. To see 35, you need to press A again.",
+                "skills": [
+                  "mk-sensors"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Pusula: kuzeyi bul",
@@ -2135,7 +3574,122 @@ export const modul10: ModuleContent = {
                 "mk-compass"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Compass: find north",
+            "problem": "If you have lost your way on a mountain, a compass needle always points north. Whichever way you turn, the needle still finds north. The card has a compass too. In this lesson you will make your own north finder.",
+            "contentMd": "### Compass degrees\nThe card's compass tells you, in **degrees**, which way the top edge of the card is facing:\n\n| Degrees | Direction |\n|---|---|\n| 0 | North (N) |\n| 90 | East (E) |\n| 180 | South (S) |\n| 270 | West (W) |\n\nThe degrees go up clockwise. They go from 0 to 359; 360 is 0 again.\n\nOn the virtual card, in the **Compass and sensors** section, there is a dial and a **Compass** slider. By grabbing and turning the dial, or by moving the slider, it is as if you were turning the card. The **Point north** button sets the degrees to 0.\n\n### New blocks\n- **Input** category: **compass heading (degrees)** gives the compass number. **button [A] pressed?** gives true if A is being pressed at that moment.\n- **LED** category: **show arrow at [0] degrees** draws an arrow pointing in the given direction. 0 means up, 90 right, 180 down, 270 left.\n\n### How do you find the north arrow?\nAs the card turns, north ends up in a different place relative to the card. When the card turns to the east (90), north falls to the card's **left**. So the arrow should point left. The arrow needs to turn the opposite way by as much as the card has turned:\n\n**arrow angle = 360 − compass**\n\n| Compass | 360 − compass | Arrow |\n|---|---|---|\n| 0 | 360 (= 0) | up |\n| 90 | 270 | left |\n| 180 | 180 | down |\n| 270 | 90 | right |\n\n### Program: north finder\nA **forever** block is already in the editor.\n\n1. Put the **if ... then ... else** block from the **Logic** category inside **forever** (there are two kinds of if; take the one with \"else\").\n2. Attach the **button [A] pressed?** block from the **Input** category to the condition slot.\n3. In the \"then\" part put the **show number** block from the **Basic** category and attach **compass heading (degrees)** inside it.\n4. In the \"else\" part put the **show arrow at [0] degrees** block from the **LED** category.\n5. Remove the 0 inside the block and attach the **[ ] + [ ]** block from the **Math** category. Change the middle sign to **−**. Put 360 in the left hole and the **compass heading (degrees)** block in the right hole.\n6. ▶ **Run**. Set the compass slider to 0, 90 and 180 and watch the arrow. Then set the compass to 135 and hold the A button down.\n\n### Expected result\nWhen the compass is at 0, the arrow points up; at 90 it points left; at 180 it points down. When you hold A down, the compass degrees, such as 135, appear on the screen; when you let go, the arrow comes back. All five goals should have a ✓.\n\n### How does it work?\n- The **forever** block looks at the compass all the time and updates the arrow. That is why the arrow reacts straight away when you turn the compass.\n- **if A pressed? then ... else** chooses one of two states: if A is pressed, the number; if not, the arrow.\n- The block that draws the arrow can only point in eight directions (north, north-east, east...). It rounds the angle you give it to the nearest direction. For example, 100 degrees is rounded to east.\n- In the **JavaScript** tab you can find the line `screen.showArrowAngle(360 - input.compass())`.\n\n### Try it\n1. Turn the compass to 45 degrees and watch the arrow. Which way is it pointing?\n2. Make it write a direction letter over the arrow: if the compass is less than 10, make the screen show \"N\". Which block do you need?\n3. Set the compass to 270 and guess the arrow. Then run it and check.\n\n### Common mistakes\n- **Working out the arrow angle wrongly.** If the arrow's angle is the compass value itself, the arrow turns in the **same** direction as the card, not towards north. Taking it away from 360 makes the arrow turn the opposite way.\n- **Forgetting to change to the minus sign.** The arithmetic block adds by default. You must click the middle sign and choose −.\n- **Writing to the same screen from two places.** If you do the arrow job both in **forever** and in a button block, the two race for the screen and the picture becomes unsteady. That is why we did not write an event block for A, but asked **A pressed?** instead.",
+            "question": "Why does a compass needle always point north? Where might navigation apps use the compass? Do you think the compass still works if you lift the card up off the ground?",
+            "explainerMd": "### What you will learn in this lesson\n- How compass degrees describe directions\n- Why you find the angle of the arrow that points north with \"360 minus compass\"\n- That on a circle of numbers, 360 is the same as 0\n- Why it is important to manage the screen from one place\n\n### What you should know first\n- Lesson 5: the forever block\n- Lesson 12: reading sensors and the virtual sliders\n- Lesson 8: if ... then ... else\n- Subtraction and addition (no decimals needed)\n\n### Degrees and direction\nThe compass tells you, in **degrees**, which way the top edge of the card is facing. The degrees start from north and go up clockwise.\n\n```\n   0 = North\n  90 = East\n 180 = South\n 270 = West\n```\n\nOne full turn is 360 degrees, but 360 is north again, so it is the same as 0. After 359 the number goes back to 0. That is why, if the card turns another 20 degrees to the right from 350 degrees, the compass shows not 370 but 370 − 360 = 10.\n\n### The arrow's angle: why 360 minus compass?\nAs you turn the card, north slides to another place relative to the card. When the card turns to the east (90), north falls to the card's left. Since the arrow is meant to point north, it must turn the **opposite** way by as much as the card has turned:\n\n```\narrow angle = 360 - compass\n```\n\n| compass | 360 - compass | arrow |\n|---|---|---|\n| 0 | 360 (= 0) | up |\n| 90 | 270 | left |\n| 180 | 180 | down |\n| 270 | 90 | right |\n\nIf you make the arrow's angle the compass value directly (or add 360 to it), the arrow turns **together** with the card and does not point north.\n\n### The arrow points in eight directions\nThe card's screen is 5×5, so the arrow block only draws eight directions: up, up-right, right, down-right, down, down-left, left, up-left. It rounds the angle you give it to the nearest direction. 100 degrees is closest to 90 (right), so a right arrow comes up.\n\n### Manage the screen from one place\nThe forever block redraws the arrow in every round. If you also write to the same screen from a button block, the two blocks wipe each other's drawings. That is why we ask about the button not as an **event**, but as the question **\"A pressed?\"**. That way only the forever block writes to the screen.\n\n### Summary\nThe compass gives a number of degrees between 0 and 359: 0 is north, 90 east, 180 south, 270 west. 360 is 0 again. For the arrow that points north, the angle is 360 minus the compass, because the arrow must turn the opposite way to the card. The arrow points in eight directions and rounds the angle to the nearest direction. To avoid screen clashes, keep the drawing in a single loop.",
+            "concepts": [
+              {
+                "term": "Compass degrees",
+                "definition": "The angle of the direction the top edge of the card is facing, measured clockwise from north: 0 north, 90 east, 180 south, 270 west.",
+                "example": "If the compass shows 90, the top of the card is facing east.",
+                "pitfall": "Thinking 180 is north; north is 0, 180 is south."
+              },
+              {
+                "term": "360 and 0 are the same",
+                "definition": "One full turn is 360 degrees; when it reaches 360 degrees, the direction is north again and the number goes back to 0.",
+                "example": "If you turn 20 degrees to the right when the compass is at 350, the compass becomes 10.",
+                "pitfall": "Thinking the compass will carry on after 359 as 360, 361 and so on."
+              },
+              {
+                "term": "Arrow angle = 360 - compass",
+                "definition": "The arrow that points north must turn the opposite way to the card; that is why the angle is 360 minus the compass.",
+                "example": "When the compass is 90, the arrow angle is 270 and the arrow points left.",
+                "pitfall": "Making the arrow's angle the compass value directly; the arrow turns with the card and does not point north."
+              },
+              {
+                "term": "Eight-direction arrow",
+                "definition": "The arrow block rounds the given angle to the nearest of eight directions (45 degrees apart).",
+                "example": "100 degrees is closest to 90, so a right arrow comes up.",
+                "pitfall": "Expecting the arrow to show every degree separately; on a 5×5 screen there are only eight directions."
+              },
+              {
+                "term": "The pressed? question",
+                "definition": "By asking about the button as \"is it pressed right now?\" instead of as an event, you make sure only the forever block writes to the screen.",
+                "example": "if A pressed? then show the compass number, else show the arrow.",
+                "pitfall": "Writing to the same screen from both a button event and the forever block; the two blocks wipe each other's drawings."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h3d3-q1",
+                "kind": "numeric",
+                "prompt": "The compass shows 60 degrees. How many degrees should the angle of the arrow pointing north be? (arrow angle = 360 - compass)",
+                "answer": 300,
+                "tolerance": 0,
+                "unit": "degrees",
+                "explanation": "The card has turned 60 degrees to the right from north. The arrow must turn the opposite way, so it is 360 - 60 = 300 degrees. If you write 60, the arrow turns in the same direction as the card and does not point north.",
+                "skills": [
+                  "mk-compass"
+                ]
+              },
+              {
+                "id": "m10h3d3-q2",
+                "kind": "predict-output",
+                "prompt": "The program below is running. The compass slider is at 100 degrees.\n\n```\nforever:\n  show arrow at (360 - compass heading) degrees\n```\n\nWhich arrow appears on the screen?",
+                "options": [
+                  "Up arrow",
+                  "Right arrow",
+                  "Down arrow",
+                  "Left arrow"
+                ],
+                "answer": 3,
+                "explanation": "360 - 100 = 260. The arrow block rounds the angle to the nearest of eight directions. 260 is 10 degrees from 270 (left) and 35 degrees from 225 (down-left); the nearest is 270, so it is the left arrow. Because the card has turned towards the east, north is on the card's left.",
+                "skills": [
+                  "mk-compass"
+                ]
+              },
+              {
+                "id": "m10h3d3-q3",
+                "kind": "find-bug",
+                "prompt": "The north finder shows a right arrow when the compass is 90, but north should be on the card's left. The code is:\n\n```\nforever:\n  show arrow at (360 + compass heading) degrees\n```\n\nWhere is the bug?",
+                "options": [
+                  "on start should be used instead of forever",
+                  "360 was typed wrongly; it should be 180",
+                  "The arithmetic sign is +; it should be subtraction (-)",
+                  "show number should be used instead of the arrow block"
+                ],
+                "answer": 2,
+                "explanation": "360 + 90 = 450, and 450 degrees counts as the same direction as 90; the arrow turns with the card and a right arrow comes up. 360 - 90 = 270, on the other hand, gives an arrow pointing left. The problem is the sign: subtraction is needed instead of addition; the number 360 is right.",
+                "skills": [
+                  "mk-compass",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h3d3-q4",
+                "kind": "mcq",
+                "prompt": "In the north finder program, why was the question \"A pressed?\" used for the A button instead of a separate event block?",
+                "options": [
+                  "Because event blocks run more slowly",
+                  "So that only the forever block writes to the screen, and the two blocks do not wipe each other's drawings",
+                  "Because the A button cannot be linked to anything else",
+                  "Because the compass can only be read with an if block"
+                ],
+                "answer": 1,
+                "explanation": "forever redraws the arrow in every round. If an A event also writes to the same screen, the two blocks take turns wiping each other's drawings and the picture becomes unsteady. Asking it as a question keeps the screen management in one place. The other options are not real reasons.",
+                "skills": [
+                  "mk-display",
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h3d3-q5",
+                "kind": "numeric",
+                "prompt": "The compass shows 350. You turn the card another 20 degrees clockwise. What does the compass show?",
+                "answer": 10,
+                "tolerance": 0,
+                "unit": "degrees",
+                "explanation": "350 + 20 = 370, but one turn is 360 degrees and 360 is north again. 370 - 360 = 10. After 359 the compass goes back to 0; it never shows more than 360.",
+                "skills": [
+                  "mk-compass"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Ses seviyesi: alkış sayacı",
@@ -2252,7 +3806,123 @@ export const modul10: ModuleContent = {
                 "mk-events"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Sound level: clap counter",
+            "problem": "Some lamps switch on when you clap. Some phones give a warning when they detect a loud sound. All of them have a small \"ear\" that measures how loud the sound around them is. The card has sound level information too. In this lesson you will count claps.",
+            "contentMd": "### Virtual sound level\nOn the virtual card, the sound level is set by the **Sound** slider in the **Compass and sensors** section. The value is between 0 (silent) and 255 (very loud). At the start it is around 20.\n\nThe **sound level** block in the **Input** category gives this value.\n\n### Threshold: when do we count it as \"loud\"?\nA clap is short and very loud. If we ask **if sound level > 150 then**, we only catch loud sounds. The number 150 is called the **threshold**.\n\nTo count a clap once and then let it go, we show the number on the screen after counting. Showing the number takes a short time, so the same clap is not counted twice.\n\n### Program: sound meter and clap counter\nThe **on start** and **forever** blocks are already in the editor. The **alkis** (Turkish for \"clap\") variable is ready too.\n\n1. The **set alkis to [0]** block should already be inside **on start**.\n2. Put the **if ... then ... else** block from the **Logic** category inside **forever** (there are two kinds of if; take the one with \"else\").\n3. Condition: **sound level > 150**. Put **sound level** from the **Input** category in the left hole and 150 in the right hole.\n4. Attach these in the \"then\" part:\n   1. **change alkis by [1]**\n   2. **show number** (with **alkis** inside)\n5. In the \"else\" part put the **bar graph** block from the **LED** category. Put **sound level** in the first hole and 255 in the second hole.\n6. ▶ **Run**.\n7. Pull the **Sound** slider to 130: more than half the screen lights up. Then pull it to 200 and drop it straight back to 20: the number becomes 1. Do this three times.\n\n### Expected result\nWhen it is quiet, the sound bar is visible on the screen. When the sound level goes past 150, the bar goes and, in its place, 1 appears for half a second, then 2, then 3. All four goals should have a ✓.\n\n### How does it work?\n- The **forever** block listens all the time: if the sound is loud, it counts; if not, it draws the bar.\n- The **show number** block takes about half a second. During this time the program has, in effect, waited before the next round. That way one short clap is not counted twice.\n- The bar graph spreads the sound level over 25 LEDs: a value such as 130 lights up about 13 LEDs.\n- **alkis** goes up by 1 with every count. The counter is not reset; when you press ▶ again, it starts from zero.\n\n### Try it\n1. Set the threshold to 100 to make a more sensitive clap detector.\n2. Add an event block for the **B button**: **set alkis to 0**. That way the counter is reset.\n3. Add another **if** that shows a heart on the screen when the counter reaches 5.\n\n### Common mistakes\n- **Leaving the slider up high.** If the sound stays above 150, the counter keeps going up every half second. Bring the sound back down straight away.\n- **Choosing a threshold that is too low.** Because the sound starts at 20, if the threshold is 10, it always counts as \"loud\" and the counter goes up without stopping.\n- **Putting the bar in the wrong branch.** The bar must be in the **else** branch. If it is in the **then** branch, the number is wiped straight away.",
+            "question": "How do we stop a device that works by sound from switching on by accident? Would the clap counter work properly in a noisy crowd? What privacy rules do you think are needed when people are being listened to through a microphone?",
+            "explainerMd": "### What you will learn in this lesson\n- That the sound level is a number between 0 and 255\n- Why it is important to choose the right threshold\n- How to keep a counter in a variable and make it go up in each round\n- That showing something on the screen takes time, and how this affects counting\n\n### What you should know first\n- Lesson 5: the forever block\n- Lesson 7: variables and counters (change by)\n- Lesson 12: thresholds and the bar graph\n\n### Sound is a number too\nThe card turns how loud the sound around it is into a number called the **sound level**. 0 means silence, 255 means a very loud sound. On the virtual card you give it with the Sound slider. At the start the value is about 20; you can think of this as \"room noise\".\n\n### Choosing a threshold\nA clap is a short, loud sound. To catch a clap, you compare the sound level with a **threshold** number. The threshold must be bigger than the room noise but smaller than a clap.\n\n```\nroom noise          ~  20\nclap                ~ 200\na good threshold    :  between 100 and 150\ntoo low a threshold :  10  (even room noise is 20 > 10)\ntoo high a threshold:  250 (a clap can never go past it)\n```\n\nIf the threshold is too low, the counter goes up for nothing. If it is too high, it does not count any claps.\n\n### Counter: a variable and adding to it\nA **variable**, which is a box for a value, keeps its value from round to round. For the clap counter you use a variable called `alkis` (clap). You set it to 0 at the start. At every clap you say **change alkis by 1**. If you had only written \"show number 1\", you would always see 1 on the screen; for the counter to remember, a variable is essential.\n\n```\non start:  alkis = 0\nforever:\n  if sound level > 150 then\n    change alkis by 1\n    show number alkis\n  else\n    bar graph sound level up to 255\n```\n\n### Showing takes time\nShowing a one-digit number takes about 0.6 seconds (600 ms), and there is also a short 20 ms pause at the end of the round. So one round takes about 620 ms. If the sound stays loud, the counter goes up by one every round:\n\n```\nIf the sound stays at 200, within 2000 ms:\nrounds start at 0, 620, 1240, 1860 ms  ->  4 increases\n```\n\nWith a short clap, the sound drops straight away; thanks to this time, the same clap is not counted twice.\n\n### Summary\nThe sound level is a number from 0 to 255, and room noise is about 20. The threshold should be chosen bigger than room noise and smaller than a clap. To keep a count, you need a variable: it is set to 0 at the start and 1 is added at every clap. Showing the number takes about 600 ms; if the sound stays loud, the counter goes up again and again at that interval.",
+            "concepts": [
+              {
+                "term": "Sound level",
+                "definition": "A number from 0 to 255 that shows how loud the sound around the card is.",
+                "example": "In a quiet room the value is about 20; with a clap it is around 200.",
+                "pitfall": "Thinking the sound sensor knows what is being said; it only tells you how loud it is."
+              },
+              {
+                "term": "Choosing a threshold",
+                "definition": "The threshold should be bigger than the room noise but smaller than the sound you want to detect.",
+                "example": "If the room noise is 20 and a clap is 200, a value between 100 and 150 is a good threshold.",
+                "pitfall": "Choosing a threshold that is too low (10); because even the room noise is 20, the counter keeps going up."
+              },
+              {
+                "term": "Variable",
+                "definition": "A box with a name that keeps its value from round to round.",
+                "example": "The alkis variable is 0 at the start and goes up by one with every clap.",
+                "pitfall": "Making the counter with \"show number 1\"; there is no remembering, so it always shows 1."
+              },
+              {
+                "term": "change by",
+                "definition": "Adds the given number to the current value of a variable.",
+                "example": "change alkis by 1 makes alkis 4 when it is 3.",
+                "pitfall": "Mixing it up with \"set to 1\"; that resets the variable to 1 every time."
+              },
+              {
+                "term": "Display time",
+                "definition": "Showing a one-digit number takes about 600 ms; during this time the program waits before the next round.",
+                "example": "If the sound stays loud, each round takes about 620 ms and the counter goes up at that interval.",
+                "pitfall": "Leaving the slider up high; the same clap is counted again and again."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h3d4-q1",
+                "kind": "numeric",
+                "prompt": "The sound level is 170. \"bar graph sound level up to 255\" runs in the program. How many LEDs light up? (Round to the nearest whole number.)",
+                "answer": 17,
+                "tolerance": 0,
+                "unit": "LED",
+                "explanation": "170 ÷ 255 is about 0.667. 0.667 × 25 is about 16.67. The nearest whole number is 17.",
+                "skills": [
+                  "mk-bar",
+                  "mk-sensors"
+                ]
+              },
+              {
+                "id": "m10h3d4-q2",
+                "kind": "numeric",
+                "prompt": "The clap counter is running. The Sound slider was forgotten at 200 and stayed there. One round takes 620 ms: 600 ms to show the number and a 20 ms pause at the end of the round. The first round starts the moment the sound is 200. What is alkis after 2000 ms? (It goes up by 1 at the start of each round.)",
+                "answer": 4,
+                "tolerance": 0,
+                "explanation": "The rounds start at 0, 620, 1240 and 1860 ms; at the start of each round the counter goes up by 1. The next round starts at 2480 ms, which is after 2000 ms. So there are 4 increases. You can test the same result on the virtual card.",
+                "skills": [
+                  "mk-variables",
+                  "mk-threshold"
+                ]
+              },
+              {
+                "id": "m10h3d4-q3",
+                "kind": "find-bug",
+                "prompt": "The clap counter keeps going up while nobody in the room is making any noise (the sound level is about 20). The code is:\n\n```\nforever:\n  if sound level > 10 then\n    change alkis by 1\n    show number alkis\n```\n\nWhere is the bug?",
+                "options": [
+                  "The alkis variable was not made",
+                  "The threshold of 10 is too low; because the room noise is 20, it always counts as loud",
+                  "on start should be used instead of forever",
+                  "The show number block should be outside the if"
+                ],
+                "answer": 1,
+                "explanation": "The room noise is about 20, and 20 > 10 is true. Because the condition is always true, the counter keeps going up. The threshold should be chosen bigger than the room noise (for example 100 or 150). The other options do not explain why the counter goes up.",
+                "skills": [
+                  "mk-threshold",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h3d4-q4",
+                "kind": "mcq",
+                "prompt": "Why is a variable called \"alkis\" used for the clap counter?",
+                "options": [
+                  "Because a variable is required to show text on the screen",
+                  "Because the counter needs to remember its previous value and have 1 added to it at every clap",
+                  "Because the threshold can only be compared with a variable",
+                  "Because the sound level block does not work without a variable"
+                ],
+                "answer": 1,
+                "explanation": "At every clap, you need to remember the previous number and add 1 to it; only a variable does this. If you had written \"show number 1\", you would always see 1. The threshold comparison and the sound block work without a variable too.",
+                "skills": [
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h3d4-q5",
+                "kind": "predict-output",
+                "prompt": "sayac is 0 at the start. There are these two event blocks:\n\n```\non button B pressed:\n  change sayac by 2\n\non button A pressed:\n  set sayac to (sayac × 2)\n```\n\nThese buttons are pressed in order: B, A, B. What is sayac at the end?",
+                "options": [
+                  "4",
+                  "8",
+                  "2",
+                  "6"
+                ],
+                "answer": 3,
+                "explanation": "B: 0 + 2 = 2. A: 2 × 2 = 4. B: 4 + 2 = 6. The order matters: if you had pressed A first and then B, the result would be different. The answer 4 comes from forgetting the last B press, 2 from counting only the first B, and 8 from thinking the last press was A instead of B.",
+                "skills": [
+                  "mk-variables",
+                  "mk-events"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Çevre istasyonu",
@@ -2370,7 +4040,124 @@ export const modul10: ModuleContent = {
                 "mk-modulo"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Environment station",
+            "problem": "If a scientist wanted to describe what a room is like, what would they measure? They would look at the temperature, the light and the sound. Now you are going to bring these three sensors together on a single card. Choose which one to watch with a button, let the screen show it as a bar, and read the number whenever you want!",
+            "contentMd": "### Project: Environment station\n**How will it work?**\n- The **A button** changes the mode: 0 = temperature, 1 = light, 2 = sound. After the third press, it goes back to 0.\n- The screen shows the selected sensor as a **bar graph**.\n- **If you hold down the B button**, the screen shows the number instead of the bar.\n\n### New block: remainder\nThe **remainder of [ ] ÷ [ ]** block in the **Math** category gives the number left over from a division. For example, the remainder of 3 ÷ 3 is 0, and the remainder of 4 ÷ 3 is 1. We want the mode to go back to 0 after 0, 1, 2: **the remainder of (mod + 1) ÷ 3** does exactly this.\n\n| mod | mod + 1 | remainder of ÷ 3 |\n|---|---|---|\n| 0 | 1 | 1 |\n| 1 | 2 | 2 |\n| 2 | 3 | 0 |\n\n### Step by step\nThe **on start**, **on button A** and **forever** blocks are already in the editor. The variables called **mod** (mode), **okuma** (reading) and **enCok** (largest) are ready too.\n\n1. **A button:** put the **set mod to [0]** block inside it. In place of the 0, attach the **remainder of [ ] ÷ [ ]** block from the **Math** category. In the first hole attach a **[ ] + [ ]** block: **mod** and 1. Type 3 in the second hole.\n2. Inside the **forever** block, first get the reading ready according to the selected mode. Put an **if mod = 0 then ... else** block:\n   1. **\"then\":** **set okuma to [temperature (°C)]**, **set enCok to [40]**.\n   2. **\"else\":** put a second **if mod = 1 then ... else** block inside it.\n      - **\"then\":** **set okuma to [light level]**, **set enCok to [255]**.\n      - **\"else\":** **set okuma to [sound level]**, **set enCok to [255]**.\n3. In the same **forever**, under this if block, put a second **if ... then ... else**. Condition: **button [B] pressed?**\n   - **\"then\":** **show number okuma**.\n   - **\"else\":** **bar graph okuma up to enCok**.\n4. ▶ **Run**. Set the temperature to 30: the bar fills up more than two thirds. Press A to switch to light, then to sound. Hold B down and read the number. On the third press of A it should go back to the start.\n\n### Expected result\nAt the start you are in temperature mode. When you set the temperature to 30, the bar lights up about 19 LEDs (the ratio 30 ÷ 40). When you press A, the light bar comes up; press again and the sound bar comes up; on the third press, temperature comes back. When you hold B down, the matching number scrolls across the screen. All five tasks in the Goals box should have a ✓.\n\n### How does it work?\n- **mod** holds which sensor is being watched. **okuma** is the value of the selected sensor, and **enCok** is the largest number that value can have (40 for temperature, 255 for light and sound).\n- In each round, **forever** first gets the reading ready, then draws the screen. This is the only place that writes to the screen; that is why the picture on the screen does not get mixed up.\n- The **A button block** only changes the mode; it does not touch the screen.\n- **bar graph okuma up to enCok** draws the ratio: if okuma is 30 and enCok is 40, then 30 ÷ 40 = 0.75; that is about 19 of the 25 LEDs.\n- All the parts in the same program (events, variables, if, bar graph, remainder) add up everything you learnt this week.\n\n### Try it\n1. Set the largest value of the temperature bar to 50. How many LEDs light up at the same temperature? Why?\n2. Add a fourth mode: **Compass**. Make its largest value 360. With four modes, which number should you change in the A block? (Hint: the number you divide by in the remainder block.)\n3. Instead of the bar graph, add a warning such as **if okuma is high then show a heart**.\n\n### Common mistakes\n- **Writing the number instead of the remainder.** If you write **mod + 1** directly in the A block, the mode never goes back to the start and grows as 3, 4, 5. The remainder block, dividing by 3, keeps the 0, 1, 2 cycle.\n- **Forgetting the enCok value.** If you leave 255 for temperature, the bar hardly fills up at all.\n- **Writing to the screen from two places.** If you write a separate event block for B and try to show the number from there, **forever** wipes the screen straight away. Keep it all in one place, inside **forever**.\n- **Forgetting to change the sensor slider.** If the bar never changes, move the sliders of the virtual sensors.",
+            "question": "What other things would a real weather station measure? Where would you use this card's three sensors: a greenhouse, a classroom or your own room? Think about which measurement is most important to you, and explain why.",
+            "explainerMd": "### What you will learn in this lesson\n- How to choose between several jobs with a single \"mode\" variable\n- How to build the 0, 1, 2 cycle with the remainder operation\n- Why getting the data ready first and then drawing it on the screen is a clean method\n- How to choose the right largest value for different sensors\n\n### What you should know first\n- Lesson 7: variables\n- Lesson 12: the bar graph and thresholds\n- Lesson 13: managing the screen from one place\n- Lesson 14: counters and the sound sensor\n\n### Mode: which job now?\nThe station will show three sensors in turn. A variable called **mod** (mode) holds which sensor is selected:\n\n```\nmod 0 = temperature\nmod 1 = light\nmod 2 = sound\n```\n\nEvery time you press the A button, the mode moves on by one. But after 2 it should not become 3; it should go back to 0.\n\n### The remainder operation\nThe **remainder** is the number left over from a division. 7 ÷ 3 = 2, remainder 1. **The remainder of (mod + 1) ÷ 3** gives exactly this cycle:\n\n| mod | mod + 1 | remainder of ÷ 3 |\n|---|---|---|\n| 0 | 1 | 1 |\n| 1 | 2 | 2 |\n| 2 | 3 | 0 |\n\nThat way, however many times you press, the mode always stays in the range 0, 1, 2. After n presses, the mode is the remainder of n ÷ 3; after 7 presses the mode is 1.\n\n### Get it ready first, then draw\nThe forever block does two jobs. First, it gets two variables ready according to the selected mode:\n\n```\nokuma : the value of the selected sensor\nenCok : the largest value that sensor can have\n         temperature 40, light 255, sound 255\n```\n\nSecond, it draws on the screen: if B is pressed, the number; if not, **bar graph okuma up to enCok**. This is the only place that writes to the screen, so the picture does not get mixed up.\n\n### The largest value sets the proportion\nThe same temperature gives a different bar with a different largest value:\n\n| okuma | enCok | LEDs lit |\n|---|---|---|\n| 30 | 40 | 19 |\n| 30 | 50 | 15 |\n| 21 | 255 | 2 |\n\nThe third row is a common mistake: if you give temperature the scale of light (255), the bar hardly fills up at all.\n\n### A chain of choices\nFor three modes you use two ifs, one inside the other: first you ask whether the mode is 0, and if not, whether it is 1. If it is neither, the mode is 2. Because of this, an unexpected value such as mode 3 always ends up in sound mode, since nothing catches it.\n\n### Summary\nThe mode variable holds which sensor is being watched. The remainder operation (mod + 1) ÷ 3 keeps the mode in the 0, 1, 2 cycle. The program first gets the okuma and enCok variables ready, then draws on the screen from one place. The largest value should be chosen to match each sensor's real range; otherwise the bar is out of proportion.",
+            "concepts": [
+              {
+                "term": "Mode variable",
+                "definition": "A variable that holds which job is selected. In the environment station, 0 means temperature, 1 light and 2 sound.",
+                "example": "When mod is 1, the program reads the light and draws the light bar.",
+                "pitfall": "Making the A button draw the mode on the screen too; the button should only change the mode."
+              },
+              {
+                "term": "The remainder operation",
+                "definition": "The number left over from a division. The remainder of (mod + 1) ÷ 3 keeps the mode in the cycle 0, 1, 2, 0, ...",
+                "example": "When mod is 2, (2 + 1) ÷ 3 = 1 with remainder 0; the mode goes back to the start.",
+                "pitfall": "Writing mod + 1 directly instead of the remainder; the mode grows as 3, 4, 5 and never goes back to the start."
+              },
+              {
+                "term": "okuma and enCok",
+                "definition": "Two variables that hold the value of the selected sensor (okuma, reading) and the largest number that sensor can have (enCok, largest).",
+                "example": "In temperature mode, okuma is the temperature and enCok is 40.",
+                "pitfall": "Leaving enCok the same for every sensor; if you give temperature 255, the bar hardly fills up at all."
+              },
+              {
+                "term": "Get it ready first, then draw",
+                "definition": "The program fills in the variables first, then draws the screen from a single place.",
+                "example": "Inside forever, okuma and enCok are got ready first, then the bar or the number is drawn.",
+                "pitfall": "Writing to the same screen from two places; one wipes the other's drawing straight away."
+              },
+              {
+                "term": "Chain of ifs inside ifs",
+                "definition": "Putting a second if into the else branch of an if block to choose one of three options.",
+                "example": "First it asks whether the mode is 0; if not, it asks whether it is 1; if it is neither, the mode is 2.",
+                "pitfall": "Not noticing that an unexpected mode value (for example 3) quietly ends up in the last branch."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h3d5-q1",
+                "kind": "numeric",
+                "prompt": "The A block is: set mod to (the remainder of (mod + 1) ÷ 3). mod starts at 0. The A button is pressed 7 times in total. What is mod at the end?",
+                "answer": 1,
+                "tolerance": 0,
+                "explanation": "With every press the mode moves on by one and goes back to 0 when it reaches 3: 1, 2, 0, 1, 2, 0, 1. After seven presses, mod is 1. Shortcut: 7 ÷ 3 = 2 remainder 1.",
+                "skills": [
+                  "mk-modulo",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h3d5-q2",
+                "kind": "numeric",
+                "prompt": "In temperature mode the temperature is 10 degrees and enCok is 40. How many LEDs does the bar graph light up? (Round to the nearest whole number.)",
+                "answer": 6,
+                "tolerance": 0,
+                "unit": "LED",
+                "explanation": "The ratio is 10 ÷ 40 = 0.25. 0.25 × 25 = 6.25. The nearest whole number is 6.",
+                "skills": [
+                  "mk-bar",
+                  "mk-sensors"
+                ]
+              },
+              {
+                "id": "m10h3d5-q3",
+                "kind": "find-bug",
+                "prompt": "In the environment station, the mode moves on with every press of A, but after the fourth press the screen always stays on the sound bar; it does not go back to temperature. The A block is:\n\n```\non button A pressed:\n  set mod to (mod + 1)\n```\n\nWhere is the bug?",
+                "options": [
+                  "The B button should be used instead of the A button",
+                  "There is no remainder operation; mod grows as 3, 4, ... and the chain of ifs always ends up in the sound branch",
+                  "The mod variable should not be set to 0 at the start",
+                  "The enCok value should be 40"
+                ],
+                "answer": 1,
+                "explanation": "Because there is no remainder, the mode never goes back to the start. 3 and above are neither 0 nor 1, so the if chain ends up in the last branch, that is sound mode. The remainder of (mod + 1) ÷ 3 keeps the mode in the range 0-2. Setting mod to 0 at the start is right; the problem is not there.",
+                "skills": [
+                  "mk-modulo",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h3d5-q4",
+                "kind": "predict-output",
+                "prompt": "mod = 2 and the sound slider is at 51. B is not pressed.\n\n```\nforever:\n  if mod = 0 then: okuma = temperature, enCok = 40\n  else, if mod = 1 then: okuma = light, enCok = 255\n  else: okuma = sound level, enCok = 255\n  bar graph okuma up to enCok\n```\n\nWhat is seen on the screen?",
+                "options": [
+                  "The 5 LEDs in the bottom row light up",
+                  "The 5 LEDs in the top row light up",
+                  "No LEDs light up",
+                  "The whole screen lights up"
+                ],
+                "answer": 0,
+                "explanation": "Because mod is 2, the last branch runs: okuma = 51, enCok = 255. The ratio is 51 ÷ 255 = 0.2, and 0.2 × 25 = 5 LEDs. Because the bar fills up from the bottom, the 5 LEDs fill the bottom row completely.",
+                "skills": [
+                  "mk-bar",
+                  "mk-sensors",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h3d5-q5",
+                "kind": "mcq",
+                "prompt": "You want to add the Compass to the environment station as a fourth mode (mod 0-3). Which number should you change in the A block?",
+                "options": [
+                  "Change the 1 in (mod + 1) to 4",
+                  "Change the divisor 3 to 4",
+                  "Set the enCok value to 360",
+                  "Set the number being divided to 255"
+                ],
+                "answer": 1,
+                "explanation": "If the mode is to have 4 different values, it needs to go back to 0 after 0, 1, 2, 3; the remainder of (mod + 1) ÷ 4 does this. So the divisor should be 4. The +1 stays the same. It is right that enCok should be 360 for the compass, but that is the job of the reading part, not of the A block.",
+                "skills": [
+                  "mk-modulo"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -2378,6 +4165,7 @@ export const modul10: ModuleContent = {
       "title": "Müzik ve ses",
       "project": "Sanal piyano",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Sesin bir titreşim olduğunu, **frekansın** (Hz) perdeyi belirlediğini ve kartın notalarını (Do 262 Hz, La 440 Hz) söyleyebilir.\n2. Tempoya göre bir notanın süresini `60000 / tempo` ile hesaplayabilir ve **sus** bloğuyla ritim kurabilir.\n3. Hazır ezgileri çalabilir; **liste** ile kendi ezgisini kurup **her öğe için** döngüsüyle çalabilir.\n4. Düğme, logo ve ışık sensörüyle çalınan bir enstrüman yapabilir; sürekli sesi **sesi durdur** ile kapatabilir.\n5. Plan tablosundan yola çıkarak kayıt yapan ve geri oynatan beş tuşlu bir sanal piyano kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 18-32 dakikadır. Aşağıdaki plan günde bir ders içindir. Müzikli derslerde ses açık olmalıdır; ilk ▶ Çalıştır basışından sonra tarayıcı sesi açar.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | İlk nota | ~18 dk | Anlatımı oku, Do, Re, Mi çal, nota simgesini göster, mini testi çöz. |\n| 2 | Süre, sus ve tempo | ~20 dk | Tempoyu 60 ve 240 yap, süreleri hesapla ve Hoparlör bölümüyle karşılaştır. |\n| 3 | Ezgiler ve listeler | ~22 dk | Hazır ezgileri dinle, dört notalık liste kur, her öğe için döngüsünü dene. |\n| 4 | Enstrüman yap | ~22 dk | Üç düğmeyle nota çal, logo ve ışıkla sürekli ses ver, eşle bloğunu dene. |\n| 5 | Proje: Sanal piyano | ~32 dk | Tabloyu doldur, A tuşunu çalıştır, kopyala, kayıt ve geri oynatmayı ekle. |\n\n### Ön koşul kontrolü\nBu hafta Modül 10'un üç haftalık temeli gerekir. Başlamadan önce şunları kontrol et:\n- Blok sürükleyip başlığın içine bırakabiliyor mu? (Hafta 1)\n- **Düğme [A] basılınca** gibi olay başlıklarını ve ▶ Çalıştır düğmesini biliyor mu? (Hafta 2)\n- Sensör (ışık) değerlerinin sayı olduğunu ve kaydırıcıyla değiştirildiğini biliyor mu? (Hafta 3)\n- Değişken oluşturup değer atayabiliyor mu?\n- Ses açık mı? Bilgisayarın sesi ve Hoparlör bölümündeki **Ses açık** düğmesi açılmış olmalı.\n\n### Kavram haritası\n- **Ses:** titreşim → frekans (Hz) → nota (Do 262, La 440) → oktav (iki katı)\n- **Zaman:** tempo (vuruş/dk) → 60000 / tempo → vuruş değerleri (1/16 ... 2) → sus\n- **Veri:** değişken → liste → numara (0'dan) → uzunluk → her öğe için\n- **Enstrüman:** giriş (düğme, logo, ışık) → kural → çıkış (hoparlör) → eşle → sürekli ses\n- **Proje:** plan tablosu → tek tuş kalıbı → kopyala → kayıt listesi → geri oynatma\n\n### Sık yapılan hatalar\n- **Nota bloklarını başlığın dışında bırakmak.** Blok soluk görünür ve hiç çalışmaz.\n- **▶ düğmesine basmadan düğmeye basmak.** Program önce çalıştırılmalı.\n- **Vuruş ile milisaniyeyi karıştırmak.** **bekle [500] ms** tempoyu dinlemez; nota ve sus dinler.\n- **Tempo 60'ta takıldı sanmak.** Tempo 20'de bir 1/4 vuruş 3 saniyedir.\n- **Listeyi başlangıçta kurmamak.** Ekleme bloğu \"Bu blok için bir liste gerekli.\" hatasıyla durur.\n- **Listede numarayı 1'den başlatmak.** İlk öğe 0 numaralıdır; son numara uzunluktan bir azdır.\n- **Sesi durdur koymamak.** Sürekli ses kendiliğinden susmaz.\n- **Eşle bloğunda aralıkları ters yazmak.** Önce sensör aralığı, sonra ses aralığı.\n- **Aynı sütunu iki tuşa vermek.** Projede tuşlar ekrandan ayırt edilemez.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına yeniden bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını oku, sonra soruyu yeniden çöz.\n3. Tempoyu 60, 120 ve 240 yaparak 1/4 vuruşun süresini hesapla (1000, 500, 250 ms) ve Hoparlör bölümüyle karşılaştır.\n4. Zafer ezgisinin tempo 120'de 2750 ms sürdüğünü bil; tempo 60'ta ne kadar süreceğini hesapla.\n5. Kendi cümlelerinle cevapla: \"Liste numaraları neden 0'dan başlar?\" ve \"Sürekli ses neden sesi durdur ister?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Sanal piyano)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Tuşlar | Bir iki tuş çalışmıyor ya da yanlış nota çalıyor | Beş tuşun hepsi kendi notasını çalıyor | Tablodaki notaların dışında ek tuş ya da oktav değişimi eklenmiş |\n| Ekran | Sütunlar karışık ya da yanmıyor | Her tuş kendi sütununu yakıp söndürüyor | Sütun süresi nota süresiyle uyumlu, ekran temiz kalıyor |\n| Kayıt | Liste kurulmamış, program hata veriyor | Notalar kayıt listesine sırayla ekleniyor | Kaydı silen bir tuş ya da kayıt uzunluğunu gösteren bir sayı eklenmiş |\n| Geri oynatma | Logoya dokununca bir şey çalmıyor | Kayıt çalındığı sırayla baştan çalınıyor | Tempo ya da nota arası duraklama ayarlanmış ve etkisi açıklanmış |\n| Anlatım | Ne yaptığını anlatamıyor | Tuş kalıbını ve listeyi adım adım anlatıyor | Hata yapıp nasıl bulduğunu anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta bir şarkıyı ezberletmek değil, öğrencinin sesi bir sayı olarak (frekans) ve zamanı bir hesap olarak (tempo) görmesidir. Müzik sevenler için bu sıradan bir tablo, sevmeyenler için bir bulmacadır; ikisi de yeterlidir.\n- **Nasıl destek olunur?** Öğrenci takıldığında cevabı söylemek yerine şu soruları sor: \"Hangi başlığın içinde?\", \"Hoparlör bölümü kaç Hz diyor?\", \"Liste kaç öğeli, son numarası kaç?\"\n- **Ses.** Ses sanal karttan çıkar ve ilk ▶ Çalıştır'dan sonra açılır. Sesi duymayan öğrenci için önce bilgisayarın sesini, sonra Hoparlör bölümündeki Ses açık düğmesini kontrol edin. Ses olmasa da frekans, ekran ve etkinlik hedefleri yine görünür.\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Tempo hesapları için kâğıt ve kalem uygundur.\n- **Güvenlik.** Bu platformdaki her şey sanaldır. Kulaklık kullanılıyorsa ses seviyesi düşük tutulmalıdır.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week, the learner:\n1. Can say that sound is a vibration, that **frequency** (Hz) sets the pitch, and what the card's notes are (C 262 Hz, A 440 Hz).\n2. Can work out a note's duration from the tempo with `60000 / tempo` and build a rhythm with the **rest** block.\n3. Can play ready-made melodies; can build their own melody with a **list** and play it with the **for each item** loop.\n4. Can make an instrument played with the buttons, the logo and the light sensor; can turn off a continuous sound with **stop sound**.\n5. Can build a five-key virtual piano that records and plays back, starting from a plan table.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 18-32 minutes. The plan below is for one lesson a day. In the music lessons the sound must be on; the browser turns the sound on after the first press of ▶ Run.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | The first note | ~18 min | Read the explainer, play C, D, E, show the note icon, do the mini quiz. |\n| 2 | Duration, rests and tempo | ~20 min | Set the tempo to 60 and 240, work out the durations and compare them with the Speaker section. |\n| 3 | Melodies and lists | ~22 min | Listen to the ready-made melodies, build a four-note list, try the for each item loop. |\n| 4 | Make an instrument | ~22 min | Play notes with three buttons, make a continuous sound with the logo and light, try the map block. |\n| 5 | Project: Virtual piano | ~32 min | Fill in the table, get the A key working, copy it, add recording and playback. |\n\n### Prerequisite check\nThis week needs the three-week foundation of Module 10. Before you start, check these:\n- Can they drag a block and drop it inside a hat block? (Week 1)\n- Do they know event hat blocks such as **on button [A] pressed** and the ▶ Run button? (Week 2)\n- Do they know that sensor (light) values are numbers and are changed with a slider? (Week 3)\n- Can they make a variable and give it a value?\n- Is the sound on? The computer's sound and the **Sound on** button in the Speaker section must both be on.\n\n### Concept map\n- **Sound:** vibration → frequency (Hz) → note (C 262, A 440) → octave (twice as much)\n- **Time:** tempo (bpm) → 60000 / tempo → beat values (1/16 ... 2) → rest\n- **Data:** variable → list → index (from 0) → length → for each item\n- **Instrument:** input (button, logo, light) → rule → output (speaker) → map → continuous sound\n- **Project:** plan table → a single key pattern → copy → recording list → playback\n\n### Common mistakes\n- **Leaving the note blocks outside the hat block.** The block looks faded and never runs.\n- **Pressing a button without pressing ▶.** The program has to be run first.\n- **Mixing up beats and milliseconds.** **pause [500] ms** does not listen to the tempo; notes and rests do.\n- **Thinking it is stuck at tempo 60.** At tempo 20 a 1/4 beat is 3 seconds.\n- **Not building the list in on start.** The add block stops with the error \"This block needs a list.\"\n- **Starting the list numbers at 1.** The first item is number 0; the last number is one less than the length.\n- **Not putting in stop sound.** A continuous sound does not stop by itself.\n- **Writing the ranges in the map block the wrong way round.** First the sensor's range, then the sound's range.\n- **Giving the same column to two keys.** In the project the keys cannot be told apart on the screen.\n\n### End-of-week review\n1. Look at each lesson's concept cards again and read the \"common mistake\" lines out loud.\n2. Read the explanations of the questions you got wrong in the mini quizzes, then answer the question again.\n3. Set the tempo to 60, 120 and 240, work out the duration of a 1/4 beat (1000, 500, 250 ms) and compare it with the Speaker section.\n4. Know that the Fanfare melody lasts 2750 ms at tempo 120; work out how long it would last at tempo 60.\n5. Answer in your own words: \"Why do list numbers start at 0?\" and \"Why does a continuous sound need stop sound?\"\n\nAs an end-of-week test, the mini quizzes of the five lessons are enough; 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project assessment rubric (Virtual piano)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Keys | One or two keys do not work or play the wrong note | All five keys play their own note | An extra key or an octave change beyond the notes in the table has been added |\n| Screen | The columns are mixed up or do not light | Each key lights its own column and turns it off | The column time matches the note time, and the screen stays clean |\n| Recording | The list is not built, and the program gives an error | The notes are added to the recording list in order | A key that deletes the recording, or a number that shows the recording's length, has been added |\n| Playback | Nothing plays when the logo is touched | The recording plays from the start in the order it was played | The tempo or the pause between notes has been adjusted and its effect explained |\n| Explanation | Cannot explain what they did | Explains the key pattern and the list step by step | Explains a mistake they made and how they found it |\n\n### Note for parents and teachers\n- **Aim.** The aim this week is not to memorise a song, but for the learner to see sound as a number (frequency) and time as a calculation (tempo). For those who love music this is an everyday table, and for those who do not it is a puzzle; both are fine.\n- **How to help.** When the learner gets stuck, instead of giving the answer, ask these questions: \"Which hat block is it inside?\", \"How many Hz does the Speaker section say?\", \"How many items does the list have, and what is its last number?\"\n- **Sound.** The sound comes from the virtual card and turns on after the first ▶ Run. For a learner who cannot hear the sound, check the computer's sound first, then the Sound on button in the Speaker section. Even without sound, the frequency, the screen and the activity goals are still visible.\n- **Time.** Spacing the lessons out, rather than doing them one after another on the same day, helps the learning stick. Paper and a pencil are handy for the tempo calculations.\n- **Safety.** Everything on this platform is virtual. If headphones are used, the volume should be kept low.\n- **Progress.** The mini quiz results at the end of each lesson appear by skill on the \"My progress\" page (a draft/pilot feature; saved only if consent has been given).",
       "lessons": [
         {
           "title": "İlk nota",
@@ -2492,7 +4280,121 @@ export const modul10: ModuleContent = {
                 "prog-structure"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "The first note",
+            "problem": "When you pluck a guitar string, the string vibrates and makes a sound. The faster the string vibrates, the higher the sound. The Virtual Micro Card's speaker works the same way: you give it a number of vibrations, and it plays that sound. So how many blocks does it take to make the card play C, D, E?",
+            "contentMd": "### Getting ready\nIn the editor the blocks are on the left and the virtual card is on the right. Among the panels under the card there is also a **Speaker** section. Open it: it shows which sound is playing. To hear sound on the page, press the ▶ **Run** button once; browsers only turn sound on after you have touched the page. The **Sound on** button in the Speaker section turns the sound off and on.\n\n### What is frequency?\nThe number of times a sound vibrates in one second is called its **frequency**. Its unit is **Hz** (hertz). The card plays the notes at these frequencies:\n\n| Note | C | D | E | F | G | A | B | High C |\n|---|---|---|---|---|---|---|---|---|\n| Hz | 262 | 294 | 330 | 349 | 392 | 440 | 494 | 523 |\n\n**High C** has about twice the frequency of **C** (262 × 2 = 524). The same note one step higher is called an \"octave\". **Low C** is 131 Hz, which is half of C.\n\n### New blocks\n- The **play note [C] for [1/4] beat** block in the **Music** category plays a note. It does not move on to the next block until the note has finished. So if you put two note blocks one under the other, the notes play in turn; they do not overlap.\n- The **show icon [heart]** block in the **Basic** category puts a ready-made picture on the screen. You can choose the **note** icon from the list.\n\n### Step by step\nThe **on button [A] [pressed]** block is already in the editor. There are three goals in the Goals panel.\n\n1. Drag the **play note [C] for [1/4] beat** block from the **Music** category. Drop it inside the **on button [A] [pressed]** block.\n2. Take two more of the same block and attach them underneath. In the second one choose **D** from the list, and in the third one **E**.\n3. Take the **show icon [heart]** block from the **Basic** category and put it above the notes. Choose the **note** icon from the list.\n4. Press the ▶ **Run** button. Then click the card's **A** button.\n\n### Expected result\nWhen you press A, the note icon appears on the card's screen. In the Speaker section you see **playing: 262 Hz**, **294 Hz**, **330 Hz** in turn, and (if your sound is on) you hear three notes. Each note lasts half a second, one and a half seconds in total. All three goals should have a ✓.\n\n### How does it work?\n- The blocks run from top to bottom, in order.\n- The note block starts the note and waits until its time is up. That is why D only starts when C has finished.\n- **[1/4] beat**: says how long the note lasts. The card's tempo starts at 120 beats per minute. At this speed, \"1/4 beat\" is exactly 500 milliseconds. You will look at duration in detail in the next lesson.\n- If you click the **JavaScript** and **Python** tabs at the top, you see the code of the same program. For example, the first note is written as `music.playNote(\"Do\", 1)` (the code uses the Turkish note names: `Do` is C). These tabs are only for reading; you run the program with blocks.\n\n### Try it\n1. Make the first note **Low C** and the last one **High C**. How did the sound change? Read the Hz values from the Speaker section.\n2. Find your own three-note ringtone. Which order sounds more cheerful to you?\n3. Put seven notes instead of three and climb a staircase from C to B.\n\n### Common mistakes\n- **Leaving the blocks outside the hat block.** If the note blocks are not inside **on button [A] [pressed]**, they do not run; they look faded in the editor.\n- **Pressing A without pressing ▶.** The program has to be run first.\n- **Changing a block and not running again.** If you change something while it is running, the warning \"Press ▶ to use your changes\" appears.\n- **Not hearing the sound.** Make sure the Speaker section says **Sound on**. Your computer's sound must be on too.",
+            "question": "What difference did you hear between C and High C? Do you think animal sounds (birdsong, a cat's miaow) have high or low frequencies? Why?",
+            "explainerMd": "### What you will learn in this lesson\n- What sound is and how **frequency** (Hz) sets the pitch\n- Which frequencies the card's notes match\n- That the note block waits until it has finished, which is why notes play in turn\n- Why you need to put blocks inside an event hat block (button pressed)\n\n### What you should know first\nThis week starts with music. From the earlier weeks you only need these: dragging and dropping blocks, the **on button [A] pressed** hat block, the ▶ Run button and showing an icon on the screen.\n\n### Sound is a vibration\nWhen you pluck a guitar string, the string moves back and forth and pushes the air. This back-and-forth movement reaches your ear as sound. The **number of vibrations per second** of the string is called its **frequency**; its unit is **Hz** (hertz). If the frequency is large, the sound is **high**; if it is small, the sound is **low** (deep). The card's speaker does the same thing: you give it a number, and it makes a sound with that many vibrations.\n\n### Notes are numbers\nOn the card, every note is tied to a fixed frequency. Some of them:\n\n```\nNote    Low C      C     D     E     G     A     High C\nHz        131     262   294   330   392   440    523\n```\n\nNotice something: **Low C** (131) is half of **C** (262); **High C** (523) is about twice as much. Doubling the frequency raises the sound by one **octave**. It is the same note name, sung higher or lower.\n\n### The note block waits\nThe **play note [C] for [1/4] beat** block does two jobs: it starts the note and **waits** until its time is up. This waiting is very important. If you put two note blocks one under the other, the second starts after the first:\n\n```\nplay C  (500 ms)  -> when it ends\nplay D  (500 ms)  -> when it ends\nplay E  (500 ms)\nTotal: 1500 ms\n```\n\nThe card's tempo starts at 120, and at this speed a 1/4 beat lasts 500 milliseconds. You will look at duration in detail in the next lesson.\n\n### Blocks run inside a hat block\nOn the card, no block runs by itself. Something has to happen first, such as a button being pressed. This \"event\" is written with a **hat** block. If the note blocks are not inside a hat block, they look faded in the editor and do not run. To see the code, you can look at the JavaScript tab: `music.playNote(\"Do\", 1)`. This tab is only for reading.\n\n### Summary\nSound is vibration; the number of vibrations per second is the frequency, measured in Hz. A large frequency gives a high sound, a small frequency a low sound. The card's note blocks play at fixed frequencies and wait until they finish, so notes placed one under the other are heard in turn. Notes must be inside a hat block, or they do not run at all.",
+            "concepts": [
+              {
+                "term": "Frequency",
+                "definition": "The number of times a sound vibrates per second; its unit is hertz (Hz).",
+                "example": "The note A is 440 Hz: the speaker moves back and forth 440 times a second.",
+                "pitfall": "Thinking frequency is how loud a sound is; frequency sets how high the sound is, while the volume sets how loud it is."
+              },
+              {
+                "term": "Hertz (Hz)",
+                "definition": "The unit that shows how many times something repeats per second.",
+                "example": "262 Hz means 262 vibrations per second.",
+                "pitfall": "Thinking Hz is a count per minute; Hz is always per second."
+              },
+              {
+                "term": "Octave",
+                "definition": "The same note with its frequency halved or doubled.",
+                "example": "If C is 262 Hz, Low C is 131 Hz and High C is about 523 Hz.",
+                "pitfall": "Adding a fixed number to the frequency to go up an octave; the frequency is multiplied by two."
+              },
+              {
+                "term": "Note block",
+                "definition": "Plays the chosen note and does not move on to the next block until its time is up.",
+                "example": "When the C, D, E blocks are placed one under the other, they are heard in turn.",
+                "pitfall": "Thinking the notes overlap; the blocks run in order, and each one waits for the previous one to finish."
+              },
+              {
+                "term": "Hat block",
+                "definition": "A block that runs the blocks under it when an event happens, for example on button [A] pressed.",
+                "example": "When the note blocks are put inside the on button [A] pressed block, they play when you press A.",
+                "pitfall": "Leaving the blocks outside the hat block; they look faded and never run."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h4d16-q1",
+                "kind": "mcq",
+                "prompt": "You want a speaker to play a note higher. Which one do you need to increase?",
+                "options": [
+                  "The frequency",
+                  "The volume",
+                  "The number of blocks",
+                  "How long you press the button"
+                ],
+                "answer": 0,
+                "explanation": "How high a sound is depends on its frequency; as the number of vibrations per second goes up, the sound gets higher. The volume only changes how loud the sound is, not its pitch.",
+                "skills": [
+                  "prog-structure"
+                ]
+              },
+              {
+                "id": "m10h4d16-q2",
+                "kind": "numeric",
+                "prompt": "With the tempo at 120 (1/4 beat = 500 ms), three [1/4] beat note blocks placed one under the other are run. How many milliseconds pass until they have all finished?",
+                "answer": 1500,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "Each note block waits until it finishes; the notes do not overlap. 500 + 500 + 500 = 1500 ms. If they played at the same time, the total would be 500 ms, but the blocks run in order.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d16-q3",
+                "kind": "numeric",
+                "prompt": "On the card the note C is 262 Hz. Low C has half the frequency of C. How many Hz is Low C?",
+                "answer": 131,
+                "tolerance": 0,
+                "unit": "Hz",
+                "explanation": "To go down one octave, the frequency is divided by two: 262 / 2 = 131 Hz. In the same way, to go up one octave it is multiplied by two (about 524; on the card 523).",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d16-q4",
+                "kind": "find-bug",
+                "prompt": "A student wanted the card to play C, D, E when A is pressed. They ran it, but no sound came when they pressed A. In the editor the note blocks look faded.\n\n```\non button [A] pressed\n   (empty)\n\nplay note [C] for [1/4] beat\nplay note [D] for [1/4] beat\nplay note [E] for [1/4] beat\n```\n\nWhat is the mistake?",
+                "options": [
+                  "The frequency of the note C is wrong",
+                  "The note blocks have been left outside the on button [A] pressed hat block",
+                  "The note E cannot be played",
+                  "The tempo is too high"
+                ],
+                "answer": 1,
+                "explanation": "A faded block is a block that does not run because it is not attached to a hat block. The blocks need to be moved inside on button [A] pressed. The frequency, the note or the tempo are not the problem here.",
+                "skills": [
+                  "prog-debug",
+                  "prog-structure"
+                ]
+              },
+              {
+                "id": "m10h4d16-q5",
+                "kind": "predict-output",
+                "prompt": "The order is written with blocks as below, and A is pressed:\n\n```\non button [A] pressed\n   play note [G] for [1/4] beat\n   play note [C] for [1/4] beat\n```\n\nIn what order do the frequencies appear in the Speaker section?",
+                "options": [
+                  "392 Hz, then 262 Hz",
+                  "262 Hz, then 392 Hz",
+                  "Both at the same time: 654 Hz",
+                  "Only 262 Hz"
+                ],
+                "answer": 0,
+                "explanation": "The blocks run from top to bottom: first G (392 Hz), and when it finishes, C (262 Hz). The frequencies are not added together; the two do not play at the same time.",
+                "skills": [
+                  "prog-structure"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Süre, sus ve tempo",
@@ -2607,7 +4509,121 @@ export const modul10: ModuleContent = {
                 "prog-timing"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Duration, rests and tempo",
+            "problem": "If you play the same song slowly and then fast, it sounds like a different song. What makes a song a lullaby or a march is not so much the notes as their durations. Inside the card there is a \"metronome\", a tempo setting. When you change it, the duration of every note changes at the same time.",
+            "contentMd": "### Beat and tempo\nIn music, duration is measured in **beats**. On the card, the **tempo** says how many beats are played in one minute. It starts at 120.\n\nThe card works out the duration of a \"1/4 beat\" like this: 60 000 ms ÷ tempo.\n\n| Tempo | 1/4 beat | 1/8 beat | 1/2 beat |\n|---|---|---|---|\n| 60 | 1000 ms | 500 ms | 2000 ms |\n| 120 | 500 ms | 250 ms | 1000 ms |\n| 240 | 250 ms | 125 ms | 500 ms |\n\nAs the tempo gets bigger, the notes get shorter and the music speeds up. The values **1/16, 1/8, 1/4, 1/2, 1, 2** in the note list choose how many \"quarter-beat units\" that note lasts. A 1/4 beat is one unit; a 1/2 beat is two units and 1 beat is four units.\n\n### New blocks\n- The **set tempo to [120] (bpm)** block in the **Music** category sets the tempo.\n- The **rest for [1/4] beat** block leaves a silence in the music. It waits as long as a note, but makes no sound.\n- The **tempo** block gives the current tempo as a number. To show it on the screen, you can put it inside **show number**.\n\n### Step by step\n**on button [A] [pressed]** is ready in the editor. In this activity you will play a slow and a fast \"ta ta ta\".\n\n1. Put these inside **on button [A] [pressed]**, in this order:\n   - **set tempo to [60] (bpm)**\n   - **play note [G] for [1/4] beat**\n   - **rest for [1/4] beat**\n   - **set tempo to [240] (bpm)**\n   - **play note [G] for [1/4] beat**\n   - **rest for [1/4] beat**\n   - **play note [G] for [1/4] beat**\n2. Press ▶ **Run**, then press the card's **A** button.\n\n### Expected result\nThe first G is slow and long: a whole second. Then the two Gs are fast and short: a quarter of a second each, with a quarter of a second of silence between them. In the Speaker section you see **playing: 392 Hz** appear and disappear. All three goals should have a ✓.\n\n### How does it work?\n- The **set tempo to ...** block runs once, but it affects the duration of every note that comes after it. It stays in force until a new tempo block comes.\n- The **rest** block follows the tempo too. When the tempo is 60, a 1/4 beat rest is silent for 1 second.\n- When you play the same note several times in a row, it is harder to tell the notes apart if you do not put rests between them.\n\n### Try it\n1. Set the tempo to different values between 20 and 400. The card automatically pulls values outside this range back to the limit.\n2. Put the **tempo** block into a **show number** block and show on the screen which tempo you are at.\n3. Check that two 1/8 beat notes fill the same time as one 1/4 beat note.\n\n### Common mistakes\n- **Mixing up beat values and milliseconds.** **pause [500] ms** gives a real time and does not listen to the tempo at all. The note and **rest** blocks, however, change with the tempo.\n- **Leaving the tempo very low and thinking \"the program is stuck\".** At tempo 20, a quarter beat is 3 seconds.\n- **Forgetting the rests.** Rhythm is made of gaps as much as of notes.",
+            "question": "What would a lullaby sound like at tempo 240? And a march at tempo 40? How does the tempo change the feeling in a song?",
+            "explainerMd": "### What you will learn in this lesson\n- The ideas of **tempo** and **beat**\n- How to work out a note's duration with the formula `60000 / tempo`\n- Why the **rest** block is part of the music\n- What happens when the tempo changes, and that duration values depend on the tempo\n\n### What you should know first\nLesson 16: you should know that the note block plays the note and waits until it has finished, and the ideas of frequency and Hz. You should also be able to use the button hat block.\n\n### Tempo: the speed of the music\nIf you play the same song slowly and then fast, it sounds like a different song. In music this speed is called the **tempo**. On the card, the tempo says **how many beats are played in one minute**. It starts at 120: 120 beats per minute, so 2 beats per second.\n\n### How many milliseconds is a beat?\nOne minute is 60 000 milliseconds. Whatever the tempo is, that many beats fit into one minute. So the duration of one unit is found like this:\n\n```\nduration of a 1/4 beat (ms) = 60000 / tempo\n```\n\nThe values in the card's note list choose how many times this unit the note lasts:\n\n```\nValue        1/16   1/8   1/4   1/2   1    2\nUnits        0.25   0.5    1     2    4    8\n```\n\nAt tempo 120, one unit is 500 ms. So a 1/8 beat is 250 ms and a 1/2 beat is 1000 ms. If the tempo is 60, the unit is 1000 ms; if the tempo is 240, it is 250 ms. **As the tempo gets bigger, the notes get shorter**, and the music speeds up.\n\n### A rest is like a note\nThe **rest for [1/4] beat** block makes no sound, but it waits for the same time. Rhythm is made of gaps as much as of notes. If you play the same note several times in a row without a rest in between, the notes run into each other.\n\n### The tempo block lasts\nThe **set tempo to [N]** block runs once, but every note and every rest after it is worked out with the new tempo. The value stays until a new tempo block comes. The card keeps the tempo between 20 and 400; if you write a number outside this range, it pulls it to the nearest limit. For example, if you write 500, the tempo becomes 400.\n\n### Blocks that want milliseconds, not beats\nThe **pause [500] ms** block gives the real time in milliseconds and does not listen to the tempo at all. The note and rest blocks, however, change with the tempo. If you do not know this difference, you will be puzzled: \"I raised the tempo, but the pause did not get shorter\".\n\n### Summary\nThe tempo is the number of beats per minute, and one unit lasts 60000 / tempo milliseconds. When the tempo goes up, the notes get shorter. The rest block waits for the same time without making a sound. The tempo block affects everything after it; the pause block does not depend on the tempo and wants milliseconds directly.",
+            "concepts": [
+              {
+                "term": "Tempo",
+                "definition": "The speed of the music; on the card it is given as beats per minute and starts at 120.",
+                "example": "At tempo 60 a 1/4 beat lasts 1000 ms; at tempo 240 it lasts 250 ms.",
+                "pitfall": "Thinking the notes get longer when you raise the tempo; as the tempo goes up, the notes get shorter."
+              },
+              {
+                "term": "Beat duration",
+                "definition": "A 1/4 beat lasts 60000 / tempo milliseconds; the other values are multiples of it.",
+                "example": "At tempo 120 a 1/2 beat lasts 2 × 500 = 1000 ms.",
+                "pitfall": "Thinking the beat value is directly in milliseconds; it is first converted using the tempo."
+              },
+              {
+                "term": "Rest block",
+                "definition": "A block that makes no sound but waits for the chosen time.",
+                "example": "By putting a 1/4 beat rest between three notes, you make the rhythm clear.",
+                "pitfall": "Forgetting the rests; the same notes run into each other and the rhythm is lost."
+              },
+              {
+                "term": "Tempo block",
+                "definition": "Changes the speed of all the notes and rests after it; it works between 20 and 400.",
+                "example": "After the set tempo to [240] block, every 1/4 beat lasts 250 ms.",
+                "pitfall": "Thinking the tempo block only affects the next note; it stays in force until a new tempo block comes."
+              },
+              {
+                "term": "pause (ms)",
+                "definition": "A block that waits for real milliseconds; it ignores the tempo completely.",
+                "example": "pause [500] ms always lasts half a second, whatever the tempo is.",
+                "pitfall": "Using the pause block in a rhythm and expecting its time to change when you change the tempo."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h4d17-q1",
+                "kind": "numeric",
+                "prompt": "The tempo is 60. How many milliseconds does a [1/2] beat note last? (1/4 beat = 60000 / tempo, 1/2 beat = 2 units)",
+                "answer": 2000,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "At tempo 60 one unit is 60000 / 60 = 1000 ms. A 1/2 beat is two units, so it lasts 2 × 1000 = 2000 ms.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d17-q2",
+                "kind": "numeric",
+                "prompt": "With the tempo at 240, how many milliseconds does a [1/8] beat note last? (1/8 beat = half a unit)",
+                "answer": 125,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "At tempo 240 one unit is 60000 / 240 = 250 ms. A 1/8 beat is half a unit, so it is 250 / 2 = 125 ms.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d17-q3",
+                "kind": "predict-output",
+                "prompt": "The tempo starts at 120. When A is pressed, the program below runs. How many milliseconds do the notes take in total?\n\n```\nset tempo to [60]\nplay note [G] for [1/4] beat\nrest for [1/4] beat\nset tempo to [240]\nplay note [G] for [1/4] beat\nrest for [1/4] beat\nplay note [G] for [1/4] beat\n```",
+                "options": [
+                  "1500 ms",
+                  "2750 ms",
+                  "3500 ms",
+                  "1750 ms"
+                ],
+                "answer": 1,
+                "explanation": "The first G and the first rest are 1000 ms each at tempo 60: 2000 ms. Then the tempo becomes 240; the three blocks are 250 ms each: 750 ms. Total 2000 + 750 = 2750 ms. If you think it is all at tempo 240 you get 1500; if you think it is all at tempo 60 you get 5000.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d17-q4",
+                "kind": "find-bug",
+                "prompt": "To speed up the song, a student set the tempo to 240. The notes got shorter, but the pause after each note stayed the same:\n\n```\nset tempo to [240]\nplay note [C] for [1/4] beat\npause [500] ms\nplay note [D] for [1/4] beat\n```\n\nWhat is the problem?",
+                "options": [
+                  "The note C does not support tempo 240",
+                  "The pause ms block does not listen to the tempo; a rest block should be used for the pause",
+                  "The tempo block should be written twice",
+                  "The note D cannot be a 1/4 beat"
+                ],
+                "answer": 1,
+                "explanation": "pause [500] ms waits for real milliseconds and does not change with the tempo. To tie the pause to the tempo, use the rest for [1/4] beat block; then the pause is 250 ms.",
+                "skills": [
+                  "prog-debug",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d17-q5",
+                "kind": "mcq",
+                "prompt": "If you try to set the tempo to 500 in the program, what happens on the card?",
+                "options": [
+                  "The tempo becomes 500",
+                  "The tempo becomes 400; the card pulls the value to the upper limit",
+                  "It gives an error and the program stops",
+                  "The tempo goes back to 120"
+                ],
+                "answer": 1,
+                "explanation": "The card keeps the tempo between 20 and 400. 500 is outside the limit, so it is pulled to 400; at this speed a 1/4 beat lasts 150 ms. The program does not stop.",
+                "skills": [
+                  "prog-timing"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Ezgiler ve listeler",
@@ -2722,7 +4738,121 @@ export const modul10: ModuleContent = {
                 "prog-loops-arrays"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Melodies and lists",
+            "problem": "Writing every note of a song as a separate block takes a very long time. The card has ready-made melodies inside it: one block plays a whole song. But what if you want to write your own melody? Then you can put the notes into a **list** and have them all played in turn. This lesson teaches you both.",
+            "contentMd": "### Ready-made melodies\nThe **play melody [Ode to joy]** block in the **Music** category plays a melody from start to finish and waits until it ends. There are nine melodies in the list: **Ode to joy**, **Twinkle star**, **Fanfare**, **Sad**, **Alarm**, **Going up**, **Going down**, **Jingle**, **Birdsong**. At tempo 120, **Twinkle star** lasts 8 seconds, **Fanfare** 2.75 seconds and **Alarm** 1.6 seconds.\n\n### What is a list?\nA list is a box that holds several values in order. Every item has a number, and **the numbers start at 0**: the first item is 0, the second item is 1, the third item is 2... In this lesson we will put the frequencies of notes into a list.\n\n### New blocks\n- The **note [C]** block in the **Music** category gives the frequency (Hz) of the note as a number. For example, **note [E]** = 330.\n- The **play tone [440] Hz for [1/4] beat** block in the **Music** category plays with a number instead of a note name. You can plug a value such as **note [C]** into it.\n- The **make list** block in the **Lists** category makes a list. You add more items with the gear on top of it.\n- The **for each item [item] in list [list]** block in the **Loops** category takes each item in the list in turn and runs the blocks inside it for that item.\n- The **set [ezgi] to [0]** block and the variable block (called **ezgi**, \"melody\") in the **Variables** category are for storing the list.\n\n### Step by step\nThe **on start**, **on button [A] [pressed]** and **on button [B] [pressed]** blocks are ready in the editor.\n\n1. In the **Variables** category, press the **Make a variable...** button. Name it **ezgi** (it is best not to use special letters such as `ç` or `ş`).\n2. Put the **set ezgi to [0]** block inside **on start**. In place of the zero, plug in the **make list** block from the **Lists** category. Open four slots in the list.\n3. Plug a **note [C]** block from the **Music** category into each of the four slots: **C**, **E**, **G**, **High C**, in that order.\n4. Put the **play melody [Ode to joy]** block inside **on button [A] [pressed]**, and choose **Twinkle star** from the list.\n5. Put the **for each item [item] in list [list]** block inside **on button [B] [pressed]**. Plug the **ezgi** variable in place of the list.\n6. Put the **play tone [440] Hz for [1/4] beat** block inside the loop. Plug the loop variable in place of the frequency (you can take it from the Variables category).\n7. Press ▶ **Run**. First press **B**, then press **A**.\n\n### Expected result\nWhen you press **B**, four notes play: 262, 330, 392 and 523 Hz. When you press **A**, Twinkle star plays for eight seconds. All three goals should have a ✓.\n\n### How does it work?\n- **on start** runs once and makes the list. That is why the list is not built again every time you press B.\n- The loop takes one item from the list at a time, puts it into the loop variable and plays the note inside. Because there are four items, it goes round four times.\n- In the code tab, the loop looks like `for (oge of ezgi)`. In the code tab, Turkish letters in variable names are written with their plain ASCII versions (`o` instead of `ö`); `oge` comes from the Turkish loop variable name `öğe` (\"item\").\n- If you press B while a melody is playing after pressing A, the two melodies try to play together. The card has only one speaker; the new sound takes the place of the old one.\n\n### Try it\n1. Put eight notes in the list instead of four and find your own melody.\n2. Put the **set tempo to [160] (bpm)** block before the loop. Did your melody speed up?\n3. Try another ready-made melody: **Birdsong**. Describe what you hear.\n4. Put the **length of list [ezgi]** block from the **Lists** category inside **show number**. You should see 4 on the screen.\n\n### Common mistakes\n- **Not making the list in on start.** If the list is empty, the loop never goes round and no sound comes out.\n- **Writing the note name straight into the list.** We put frequency blocks such as **note [C]** into the list, because the **play tone Hz** block expects a number.\n- **Starting the numbers at 1.** In lists, the first item's number is 0.",
+            "question": "Why is putting the notes of a song into a list more useful than writing them one by one with blocks? Could you use the same list for both notes and colours?",
+            "explainerMd": "### What you will learn in this lesson\n- How to put several values into a **list** in order\n- That list numbers start at **0**\n- How to work through the items of a list in turn with the **for each item** loop\n- How to work out the duration of ready-made melodies from the tempo\n\n### What you should know first\nLessons 16 and 17: playing notes, frequency and tempo. You should also know how to make a **variable** and give it a value, and the **on start** hat block.\n\n### Ready-made melodies\nThe card has nine ready-made melodies, and the **play melody** block plays a whole song with one block. Its duration depends on the total units of the melody's notes and on the tempo. For example, the Fanfare melody is 5.5 units long. At tempo 120 one unit is 500 ms, so the duration is 5.5 × 500 = 2750 ms. At tempo 60 the same melody lasts 5.5 × 1000 = 5500 ms.\n\n### What is a list?\nPutting in a block for every note takes a long time. A **list** holds many values in order in one box. Every value has a **number** (index), and the numbering starts at **0**:\n\n```\nezgi = [262, 330, 392, 523]\nindex:   0    1    2    3\n```\n\nHere the length of the `ezgi` (melody) list is 4, but the number of the last item is 3. Item number 2 is 392, because we start counting from zero. Keep this difference of one between the \"length\" and the \"last number\" in mind.\n\n### Where do you build the list?\nYou build the list inside the **on start** hat block. That block runs once when the program opens. So when a button is pressed, the list is already ready. If you forget to build the list, the variable is still a number, and the list block stops with the error \"This block needs a list.\"\n\n### For each item\nThe **for each item [item] in list [list]** block takes each value in the list in turn, puts it into the loop variable and runs the blocks inside it for that value. In a list with four items, the blocks inside run exactly four times:\n\n```\nfor each item in list ezgi:\n   play tone [item] Hz for [1/8] beat\n```\n\nBecause this block plays the sound on every round, the four notes take 4 × 250 = 1000 ms in total (tempo 120, 1/8 beat). In code, the same thing appears as `for (oge of ezgi)`. The code tab writes Turkish letters in plain ASCII (`oge` is the Turkish word for \"item\").\n\n### Summary\nReady-made melodies play with a single block, and their duration depends on the tempo. A list is a box that holds several values in order; the numbers start at 0, so the last number is one less than the length. You build the list in on start. The for each item block runs once with each value in the list, and the total time is the number of rounds multiplied by the time of each round.",
+            "concepts": [
+              {
+                "term": "List",
+                "definition": "A variable that holds several values in order.",
+                "example": "ezgi = [262, 330, 392, 523] stores the frequencies of four notes.",
+                "pitfall": "Putting a single number instead of a list; the list block stops with \"This block needs a list.\""
+              },
+              {
+                "term": "List number (index)",
+                "definition": "The position of an item in the list; counting starts at 0.",
+                "example": "In the list [262, 330, 392, 523], item number 2 is 392.",
+                "pitfall": "Thinking the first item is 1; the first item is always 0."
+              },
+              {
+                "term": "List length",
+                "definition": "How many items the list holds.",
+                "example": "A list of four notes has a length of 4 and a last number of 3.",
+                "pitfall": "Mixing up the length and the last number; the last number is one less than the length."
+              },
+              {
+                "term": "For each item",
+                "definition": "A loop that takes each value in the list in turn and runs the blocks inside it for that value.",
+                "example": "In a list with four items, the note block inside runs four times.",
+                "pitfall": "Using it on an empty list; if the list is empty, the loop never goes round and no sound comes out."
+              },
+              {
+                "term": "on start",
+                "definition": "A hat block that runs once when the program starts; lists and variables are set up here.",
+                "example": "You build the melody list in on start, and the buttons find the list ready.",
+                "pitfall": "Building the list in a button hat block; the list starts again on every press and the old values are lost."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h4d18-q1",
+                "kind": "mcq",
+                "prompt": "In the list ezgi = [262, 330, 392, 523], which is item number 2?",
+                "options": [
+                  "330",
+                  "392",
+                  "262",
+                  "523"
+                ],
+                "answer": 1,
+                "explanation": "The numbering starts at 0: 0 -> 262, 1 -> 330, 2 -> 392, 3 -> 523. If you said 330, you started counting from 1.",
+                "skills": [
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m10h4d18-q2",
+                "kind": "numeric",
+                "prompt": "The Fanfare melody is 5.5 units long and the tempo is 60 (one unit is 1000 ms). How many milliseconds does the melody last?",
+                "answer": 5500,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "At tempo 60 one unit is 60000 / 60 = 1000 ms. 5.5 × 1000 = 5500 ms. At tempo 120 the same melody finishes in half the time, 2750 ms.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d18-q3",
+                "kind": "predict-output",
+                "prompt": "The tempo is 120. When B is pressed, the program below runs:\n\n```\non start:\n   ezgi = [262, 330, 392]\n\non button [B] pressed:\n   for each item in list ezgi:\n      play tone [item] Hz for [1/8] beat\n```\n\nHow many notes, and how many ms in total, are heard from the speaker?",
+                "options": [
+                  "3 notes, 750 ms",
+                  "3 notes, 1500 ms",
+                  "1 note, 250 ms",
+                  "4 notes, 1000 ms"
+                ],
+                "answer": 0,
+                "explanation": "The list has 3 items, so the loop goes round 3 times. At tempo 120 a 1/8 beat is 250 ms: 3 × 250 = 750 ms. If you said 4 notes, you thought the loop goes round one extra time.",
+                "skills": [
+                  "prog-loops-arrays",
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d18-q4",
+                "kind": "find-bug",
+                "prompt": "A student wanted the card to play the melody when B is pressed, but the card gave the error \"This block needs a list.\":\n\n```\non start:\n   ezgi = 0\n\non button [B] pressed:\n   for each item in list ezgi:\n      play tone [item] Hz for [1/8] beat\n```\n\nWhat causes the error?",
+                "options": [
+                  "A 1/8 beat cannot be chosen",
+                  "The ezgi variable was given the number 0 instead of a list",
+                  "Button B cannot be used",
+                  "The name of the item variable is wrong"
+                ],
+                "answer": 1,
+                "explanation": "Because the ezgi variable is 0, it is not a list but an ordinary number. In on start it should be given a make list block with items in it. The other options have nothing to do with the error message.",
+                "skills": [
+                  "prog-debug",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m10h4d18-q5",
+                "kind": "numeric",
+                "prompt": "A list has 6 items. What is the number of the last item?",
+                "answer": 5,
+                "tolerance": 0,
+                "explanation": "Because numbering starts at 0, the numbers of the 6 items are 0, 1, 2, 3, 4, 5. The last number is one less than the length: 6 - 1 = 5.",
+                "skills": [
+                  "prog-loops-arrays"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Enstrüman yap",
@@ -2838,7 +4968,122 @@ export const modul10: ModuleContent = {
                 "prog-structure"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Make an instrument",
+            "problem": "A piano's keys make a sound when you press them. But can there be an instrument with no keys at all? A strange instrument called the theremin is played without touching it, just by bringing your hand closer. We will make something similar, a \"light string\", with the virtual card's light sensor.",
+            "contentMd": "### Buttons: a three-key instrument\nThe card has three button combinations: **A**, **B** and **A+B**. **A+B** works when you press both at once. We will use these three buttons for three notes.\n\n### Continuous sound\nThe note blocks so far played for a set time and then went quiet. The **ring tone [440] Hz** block in the **Music** category, however, starts the sound and does not let go until you use the **stop sound** block. These two blocks are used together: one turns the sound on, the other turns it off. The **playing** box in the Speaker section only shows notes with a duration; it may not show the continuous sound.\n\n### New blocks\n- The **every [1000] ms** block in the **Basic** category runs what is inside it again and again at a set interval. We will make the interval 100.\n- The **light level** block in the **Input** category gives a number between 0 (dark) and 255 (very bright). You can change it with the **Light** slider in the **Compass and sensors** section next to the card.\n- The **logo touched?** block in the **Input** category is true if the logo is being touched right now.\n- The **map [light level] from [0]-[255] to [200]-[1000]** block in the **Math** category scales a number from one range to another. When the light is 0 you get 200; when the light is 255 you get 1000. Light levels in between give frequencies in between.\n- The **when logo is [touched]** and **when logo is [released]** hat blocks.\n\n### Step by step\nFive hat blocks are ready in the editor: three buttons, the timer **every [100] ms** and **when logo is [released]**.\n\n1. Put **play note [C] for [1/4] beat** inside **on button [A] [pressed]**, **D** inside **on button [B] [pressed]** and **E** inside **on button [A+B] [pressed]**.\n2. Put the **if ... then** block from the **Logic** category inside **every [100] ms**. Plug **logo touched?** from the **Input** category into the condition.\n3. Put **ring tone [440] Hz** from the **Music** category inside the **if**. Plug the **map** block in place of the frequency. Drop the **light level** block into the first input of the map block, and make the ranges 0-255 and 200-1000.\n4. Put the **stop sound** block inside **when logo is [released]**.\n5. Press ▶ **Run**. Play the notes with the three buttons. Then click the logo and hold it down; move the light slider.\n\n### Expected result\nThe buttons play C, D, E. When you hold the logo down, the sound rings continuously. When you pull the light slider up, the sound gets higher (close to 1000 Hz); when you pull it down, it gets deeper (close to 200 Hz). When you let go of the logo, the sound stops. All four goals should have a ✓.\n\n### How does it work?\n- **every [100] ms** looks at the light every 0.1 seconds and updates the sound. As you change the light, the sound follows.\n- If the logo is not being touched, the blocks inside **if** are skipped, and the sound never starts.\n- **stop sound** runs when you let go of the logo. If you do not put this block in, the continuous sound does not stop by itself.\n- The **map** block rounds the result to the nearest whole number.\n\n### Try it\n1. Make the range 100-2000. Do you want to hear a very high sound?\n2. The **set volume to [128] (0-255)** block sets how loud the sound is. Try 40 first, then 255.\n3. Put the **sound level** block in place of the light and try playing the string with sound. Move the card's **Sound** slider.\n\n### Common mistakes\n- Not putting in **stop sound**.\n- Writing the ranges in the **map** block the wrong way round. The first range must be the sensor's range (0-255), the second the sound's range (200-1000).\n- Forgetting the **if** block and turning the sound on every 100 ms. The sound plays even if you never touch the logo.",
+            "question": "A theremin is played by bringing your hand closer; your card is played with light. Which other sensors could you turn into an instrument? What kind of sound would the sound level, the temperature or the tilt make?",
+            "explainerMd": "### What you will learn in this lesson\n- How to **play** an instrument with the button and logo inputs\n- The difference between sound **with a duration** and **continuous** sound\n- How to turn a sensor value into a frequency with the **map** block\n- Why you need to turn off a continuous sound with **stop sound**\n\n### What you should know first\nLessons 16-18: playing notes, tempo and variables. You also need to know the **if ... then** block and the card's **light level** sensor (0-255).\n\n### Inputs, sound and a sensor\nAn instrument has three parts: an **input** (a finger, a button, light), a **rule** (which sound for which input) and an **output** (the speaker). The card has three button combinations: **A**, **B** and **A+B**. You use the three of them for three notes. Touching the logo is a fourth input.\n\n### Sound with a duration and continuous sound\nThe note blocks so far played for a set time and then went quiet. The **ring tone [N] Hz** block, however, starts the sound and lets go; the sound keeps playing until the **stop sound** block. The two blocks are a pair: one turns it on, the other turns it off. Because a continuous sound counts as having a duration of zero, the \"playing\" box in the Speaker section may not show it; you still hear the sound.\n\n### Map: turn one range into another\nThe light sensor gives a number between 0 and 255, but the frequencies that sound nice are between 200 and 1000. The **map** block scales a value from one range to the other:\n\n```\nmap( light , 0-255 , 200-1000 )\n   light   0  -> 200\n   light 255  -> 1000\n   light 128  -> 602   (near the middle)\n```\n\nThe calculation: `200 + ışık × 800 / 255` (`ışık` is the light level), then it is rounded to the nearest whole number. The first range is the sensor's, the second range is the sound's. If you mix up the order, the result is nonsense.\n\n### Updating all the time with a timer\nBecause the light keeps changing, setting the sound once is not enough. The **every [100] ms** hat block repeats what is inside it ten times a second. Inside it you write: **if the logo is touched**, set the sound from the light at that moment. If the logo is not touched, the **if** block skips its inside and the sound does not start. When the logo is released, a separate hat block that calls **stop sound** turns the sound off. If you forget this block, the continuous sound does not stop by itself.\n\n### Summary\nAn instrument is made of an input, a rule and an output. A note with a duration ends by itself; a continuous sound must be turned off with the stop sound block. The map block scales a sensor range such as 0-255 to a frequency range. The timer hat block keeps the values up to date, and the if block plays the sound only while the logo is being touched.",
+            "concepts": [
+              {
+                "term": "Continuous sound",
+                "definition": "A sound that, once started, plays until the stop sound block.",
+                "example": "While you touch the logo the continuous sound rings; when you let go, stop sound runs.",
+                "pitfall": "Not putting in the stop sound block; the sound does not stop by itself."
+              },
+              {
+                "term": "Map (range conversion)",
+                "definition": "Scales a value from one range to another and rounds it to the nearest whole number.",
+                "example": "When the light is mapped from 0-255 to 200-1000 Hz, a light of 255 gives 1000 Hz.",
+                "pitfall": "Writing the ranges the wrong way round; the sensor's range comes first, then the sound's."
+              },
+              {
+                "term": "Light level",
+                "definition": "How bright the sensor reads; between 0 (dark) and 255 (very bright).",
+                "example": "When you pull the light slider up, the value gets bigger.",
+                "pitfall": "Playing the light level directly as a frequency; values between 0 and 255 sound very low."
+              },
+              {
+                "term": "every [N] ms",
+                "definition": "A timer hat block that runs what is inside it again and again at a set interval.",
+                "example": "An interval of 100 ms reads the light and updates the sound ten times a second.",
+                "pitfall": "Choosing an interval that is too long; the sound follows the light late."
+              },
+              {
+                "term": "Condition (if ... then)",
+                "definition": "Runs the blocks inside it only while the condition is true.",
+                "example": "If the logo is touched, play a sound; if not, do nothing.",
+                "pitfall": "Forgetting the condition and starting the sound on every round; the sound plays even if you do not touch the logo."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h4d19-q1",
+                "kind": "numeric",
+                "prompt": "When the light level is 255, how many Hz does the map( light, 0-255, 200-1000 ) block give?",
+                "answer": 1000,
+                "tolerance": 0,
+                "unit": "Hz",
+                "explanation": "The map block links the top end of one range to the top end of the other: 255 -> 1000. If the light were 0, you would get 200 Hz.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d19-q2",
+                "kind": "numeric",
+                "prompt": "When the light level is 128, how many Hz does the map( light, 0-255, 200-1000 ) block give? (Round the result to the nearest whole number.)",
+                "answer": 602,
+                "tolerance": 0,
+                "unit": "Hz",
+                "explanation": "200 + 128 × 800 / 255 = 200 + 401.57 = 601.57. Rounded to the nearest whole number, it is 602. Because the light is a little more than half of the range, the result is a little above 600.",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d19-q3",
+                "kind": "find-bug",
+                "prompt": "A student wanted a sound when the logo is touched. But when they let go of the logo, the sound does not stop:\n\n```\nevery [100] ms:\n   if logo touched? then:\n      ring tone [map(light, 0-255, 200-1000)] Hz\n\nwhen logo is [released]:\n   (empty)\n```\n\nWhat is missing?",
+                "options": [
+                  "The every [100] ms block",
+                  "The stop sound block inside when logo is released",
+                  "The if block",
+                  "The light level block"
+                ],
+                "answer": 1,
+                "explanation": "A continuous sound does not end by itself; the stop sound block is needed. It must be added inside the released hat block. The other blocks start the sound but do not silence it.",
+                "skills": [
+                  "prog-debug",
+                  "prog-structure"
+                ]
+              },
+              {
+                "id": "m10h4d19-q4",
+                "kind": "predict-output",
+                "prompt": "The logo is held down. The light slider is pulled first to 0, then to 255:\n\n```\nevery [100] ms:\n   if logo touched? then:\n      ring tone [map(light, 0-255, 200-1000)] Hz\n```\n\nA little while after the slider reaches 255, how many Hz is the sound?",
+                "options": [
+                  "200 Hz",
+                  "255 Hz",
+                  "1000 Hz",
+                  "602 Hz"
+                ],
+                "answer": 2,
+                "explanation": "The timer looks at the light ten times a second and updates the sound. When the light is 255, the map block gives 1000. 200 Hz would play when the light is 0; 255 is the light value itself, without mapping.",
+                "skills": [
+                  "prog-structure"
+                ]
+              },
+              {
+                "id": "m10h4d19-q5",
+                "kind": "mcq",
+                "prompt": "The sound plays even if you never touch the logo. Inside the timer there is a ring tone block. Which block is most likely missing?",
+                "options": [
+                  "The if logo touched? then block",
+                  "The tempo block",
+                  "The rest block",
+                  "The on button [A] hat block"
+                ],
+                "answer": 0,
+                "explanation": "Without the condition, the sound is started every 100 ms; it plays even if the logo is not touched. The condition block starts the sound only while the logo is being touched. The tempo and rest blocks have nothing to do with continuous sound.",
+                "skills": [
+                  "prog-debug",
+                  "prog-structure"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Sanal piyano",
@@ -2955,7 +5200,123 @@ export const modul10: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Virtual piano",
+            "problem": "In a band everyone has a key to play, but the magic is being able to record the song you play and listen to it again. In this project you will turn your card into a five-key piano. As you press the keys, a column will light up on the screen, the notes will be recorded, and when you touch the logo, the song you played will play again from the start.",
+            "contentMd": "### Project: Virtual piano\nYou will put together everything you learnt this week: playing notes, tempo, lists, loops and taking input from buttons and sensors.\n\n**Goals:**\n- Five keys play five different notes: C, D, E, G, A.\n- Each key lights up its own column on the screen.\n- The notes that are played are added to a recording list.\n- When you touch the logo, the recording plays from the start.\n\n### The keys\nThe card has five inputs: the **A**, **B** and **A+B** buttons and the **P0** and **P1** pins. The pins are the three touch areas at the bottom of the card (the boxes marked **0**, **1**, **2** on the card). On the virtual card, clicking them with the mouse counts as touching them. Let's match them like this:\n\n| Key | Note | Column to light on the screen (x) |\n|---|---|---|\n| A | C | 0 |\n| B | D | 1 |\n| A+B | E | 2 |\n| P0 | G | 3 |\n| P1 | A | 4 |\n\n### New block\nThe **on pin [P0] [touched]** block in the **Pins** category is a new hat block that runs when a pin is touched. It is no different from the button hat blocks; only the thing that triggers it is a pin.\n\n### Step by step\nSeven hat blocks are ready in the editor: **on start**, three buttons, two pins and **when logo is [touched]**. First build only the **A** key and see that it works. Then copy it for the others.\n\n1. In the **Variables** category, make a variable called **kayit** (\"recording\").\n2. Put **set kayit to [0]** inside **on start**. In place of the zero, plug in an empty **make list** block from the **Lists** category.\n3. Put these inside **on button [A] [pressed]**, in this order:\n   - **plot x [0] y [2]**\n   - **play note [C] for [1/8] beat**\n   - **add [note C] to list [kayit]**. Plug the **kayit** variable in place of the list, and the **note [C]** block in place of the item to add.\n   - **clear screen**\n4. Select these four blocks and copy them (Ctrl+C, Ctrl+V). Move the copies to the **B**, **A+B**, **P0** and **P1** hat blocks. In each copy, change the **x** value and the note as in the table.\n5. Put the **for each item [item] in list [kayit]** block inside **when logo is [touched]**. Put the **play tone [440] Hz for [1/8] beat** block inside it, and plug the loop variable in place of the frequency.\n6. Press ▶ **Run**. Play a short melody by clicking the keys. Then click the logo.\n\n### Expected result\nEach key plays its own note, and its own column in the middle row of the screen lights up for a moment and goes out. When you press the logo, the notes you played are played again in the order you played them. All four goals should have a ✓.\n\n### How does it work?\n- The list stores the frequency of every note played, in order. To add to the end of the list, you use **add ... to list**.\n- When you touch the logo, the loop plays every number in the list from start to end. The speed is set by the duration of the notes and the tempo.\n- The body of every key follows the same pattern: light, play, record, clear. Only the note and the column change.\n- Because the notes are 1/8 beat, each one lasts a quarter of a second at tempo 120. If you click fast, a new key starts before the previous note has finished.\n\n### Try it\n1. Put the **set tempo to [80] (bpm)** block inside **on start**. Did the song you played slow down?\n2. In the playback, add **pause [50] ms** inside the loop. A small gap appears between the notes.\n3. To find out how many notes the list holds, put the **length of list [kayit]** block inside **show number**.\n4. The recording is never deleted by itself. How would you make your own key to delete the recording? (Hint: give the recording variable an empty list again.)\n\n### Common mistakes\n- **Not building the list in on start.** If **kayit** never becomes a list, the add block gives the error \"This block needs a list.\" and the program stops.\n- **Giving the same column to two keys.** You cannot tell from the screen which key you pressed.\n- **Leaving the pin key with an empty hat block.** If the **on pin [P0] [touched]** block is empty, touching it does nothing.",
+            "question": "If a friend used your piano, what would they most like to change? In which other project would you use the recording feature: a password, a game, a diary?",
+            "explainerMd": "### What you will learn in this lesson\n- How to connect several inputs (buttons, pins) to a single **pattern**\n- How to add the notes played to a **recording list**\n- How to play the recording from the start **when the logo is touched**\n- How to break a project into **plan, build, test** steps\n\n### What you should know first\nLessons 16-19: playing notes, tempo, lists and the **for each item** loop, event hat blocks. You should also know how to light an LED on the screen (**plot x y**) and the **clear screen** block.\n\n### Break the project down\nThe virtual piano looks big, but really it is the same small job repeated five times. First put the job into a table:\n\n```\nKey   Note   Column (x)\nA     C      0\nB     D      1\nA+B   E      2\nP0    G      3\nP1    A      4\n```\n\nThe table is the backbone of the code. Each key differs in only two things: the note it plays and the column it lights.\n\n### The key pattern\nThe body of every key has four steps:\n\n```\n1. Plot an LED (x, 2)\n2. Play the note for [1/8] beat\n3. Add the note's frequency to the recording list\n4. Clear the screen\n```\n\nFirst build only the A key and run it. If it works, copy its blocks, move them to the other hat blocks and change only the note and the column. This is the **get the small one working first, then multiply it** method; it makes finding mistakes much easier.\n\n### The recording list\nIn the **on start** hat block, you give the **kayit** (recording) variable an **empty list**. On every key, the **add [note] to list kayit** block puts the note's frequency at the end of the list. If you press the A, B, A, P0 keys in this order, the list becomes:\n\n```\nkayit = [262, 294, 262, 392]     length 4\n```\n\nThe add block runs after the note has been played, because the note block waits for its duration first. If you press the same key quickly, the card queues the presses (up to three); different keys, however, can run at the same time.\n\n### Playback\nYou put a **for each item in list kayit** loop in the **when logo is touched** hat block. Inside the loop there is the **play tone [item] Hz for [1/8] beat** block. At tempo 120 each note is 250 ms; a four-note recording lasts 1000 ms. If the tempo is 80, one note is 375 ms and four notes are 1500 ms. The recording is never deleted; to delete it, you give the kayit variable an empty list again.\n\n### Summary\nReducing a big project to a small table and a single pattern makes the job easier. Every key follows the light, play, record, clear steps. The recording is a list that collects the frequencies of the notes in order; playback plays this list from start to end with the for each item loop. The duration is found by multiplying the number of notes by the tempo unit.",
+            "concepts": [
+              {
+                "term": "Recording list",
+                "definition": "A list that collects the frequencies of the notes played, in the order they were played.",
+                "example": "After pressing A, B, A, P0, kayit = [262, 294, 262, 392].",
+                "pitfall": "Not setting up the list as an empty list in on start; the add block gives the error \"This block needs a list.\""
+              },
+              {
+                "term": "Add to list",
+                "definition": "Adds a value to the end of the list; the list gets one item longer.",
+                "example": "The add [note C] to list kayit block puts 262 in the list.",
+                "pitfall": "Playing the note but forgetting to record it; the playback does not know about that note."
+              },
+              {
+                "term": "Playback",
+                "definition": "A loop that plays every note in the recording list in turn, from start to end.",
+                "example": "When you touch the logo, the for each item in list kayit loop runs.",
+                "pitfall": "Expecting the recording to reset; the recording stays unless you give it an empty list."
+              },
+              {
+                "term": "Key pattern",
+                "definition": "The light, play, record, clear sequence that is the same for every key.",
+                "example": "A key is copied and only the note and the column (x) are changed.",
+                "pitfall": "Giving the same column to two keys; you cannot tell from the screen which key you pressed."
+              },
+              {
+                "term": "Pin touch (P0, P1)",
+                "definition": "The touch areas at the bottom of the card; like a button, they are triggered by their own hat block.",
+                "example": "The on pin P0 touched hat block plays the note G.",
+                "pitfall": "Leaving the hat block empty; an empty hat block does nothing when it is touched."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h4d20-q1",
+                "kind": "numeric",
+                "prompt": "There are 8 notes in the recording list. At tempo 120, the playback plays each note for [1/8] beat. How many milliseconds does the whole recording last?",
+                "answer": 2000,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "At tempo 120 a 1/8 beat is 250 ms. 8 × 250 = 2000 ms. Because each note block waits until it finishes, the times add up.",
+                "skills": [
+                  "prog-timing",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m10h4d20-q2",
+                "kind": "numeric",
+                "prompt": "The tempo is 80. How many milliseconds does it take to play back a four-note recording, with each note lasting [1/8] beat?",
+                "answer": 1500,
+                "tolerance": 0,
+                "unit": "ms",
+                "explanation": "At tempo 80 one unit is 60000 / 80 = 750 ms, and a 1/8 beat is half of it: 375 ms. 4 × 375 = 1500 ms. Because the tempo is lower, the recording lasts longer than at tempo 120 (1000 ms).",
+                "skills": [
+                  "prog-timing"
+                ]
+              },
+              {
+                "id": "m10h4d20-q3",
+                "kind": "predict-output",
+                "prompt": "At the start, kayit is an empty list. These keys are pressed in turn: A (C), P0 (G), A (C). Then the logo is touched. In the playback, which frequencies are heard from the speaker, in order?",
+                "options": [
+                  "262, 392, 262",
+                  "262, 262, 392",
+                  "392, 262, 262",
+                  "262, 392"
+                ],
+                "answer": 0,
+                "explanation": "The list collects the notes in the order they were pressed: [262, 392, 262]. The playback plays it from start to end. Repeats are not deleted; C was recorded twice.",
+                "skills": [
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m10h4d20-q4",
+                "kind": "find-bug",
+                "prompt": "While the piano is running, pressing a key shows the error \"This block needs a list.\" and the program stops:\n\n```\non start:\n   (empty)\n\non button [A] pressed:\n   plot (0, 2)\n   play note [C] for [1/8] beat\n   add [262] to list kayit\n   clear screen\n```\n\nWhat is the problem?",
+                "options": [
+                  "The plot block cannot be used with y = 2",
+                  "The kayit variable was not given an empty list in on start",
+                  "The clear screen block is in the wrong place",
+                  "The note C cannot be played for a 1/8 beat"
+                ],
+                "answer": 1,
+                "explanation": "The add block needs a list. Because the kayit variable was not given an empty list in on start, the variable is not a list. The other options have nothing to do with the error.",
+                "skills": [
+                  "prog-debug",
+                  "prog-loops-arrays"
+                ]
+              },
+              {
+                "id": "m10h4d20-q5",
+                "kind": "mcq",
+                "prompt": "On the virtual piano, what problem appears if you give two keys the same column (x = 1)?",
+                "options": [
+                  "The program does not run at all",
+                  "You cannot tell from the screen which key you pressed",
+                  "The frequency of the notes changes",
+                  "The recording list is deleted"
+                ],
+                "answer": 1,
+                "explanation": "Showing each key with its own column on the screen is how you tell the keys apart. The same column shows the two keys in the same way. The program runs, and the notes and the recording are not affected.",
+                "skills": [
+                  "prog-planning",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -2963,6 +5324,7 @@ export const modul10: ModuleContent = {
       "title": "Radyo ve iletişim",
       "project": "Uzaktan kumanda",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. Radyo grubunun ne olduğunu açıklayabilir ve iki kartı aynı gruba alarak mesaj gönderip alabilir.\n2. Sayı, yazı ve ad = değer mesajlarını ayırt edip doğru alma bloğunu seçebilir.\n3. Değişkenlerle toplama ve çıkarma kullanarak basit bir şifre kurabilir ve anahtarın rolünü anlatabilir.\n4. Bir komut tablosu hazırlayıp iç içe **eğer** zinciriyle gelen sayıyı simgeye ya da eyleme çevirebilir.\n5. Kumanda ve araç rollerinde çalışan iki kartlı bir proje planlayıp kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 20-32 dakikadır. Plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Mesaj gönder, mesaj al | ~20 dk | Anlatımı oku, iki kartı aynı gruba al, A ve B ile sayı gönder, alan kartta simge göster. |\n| 2 | Yazı, ad ve değer | ~20 dk | Yazı ve ad = değer mesajı gönder, alan kartta türü ad kontrolüyle ayır. |\n| 3 | Gizli mesaj | ~22 dk | Anahtar değişkeniyle toplayıp gönder, alan kartta çıkararak çöz. |\n| 4 | İki kartla sohbet | ~22 dk | Sayı tablosunu kur, iç içe eğer zinciriyle üç simgeyi ayır, ezgi ekle. |\n| 5 | Proje: Uzaktan kumanda | ~32 dk | Komut tablosunu yaz, kumanda ve araç tarafını kur, ok ve servoyu dene. |\n\n### Ön koşul kontrolü\n- Düğme başlıklarını (A, B, A+B) kullanabiliyor mu? (Hafta 2)\n- Değişken oluşturup değerini değiştirebiliyor mu? (Ders 7)\n- **eğer ... ise ... değilse** bloğunu kurabiliyor mu? (Ders 8)\n- Kartı yatırma olayını ve ezgi çalmayı tanıyor mu? (Ders 11 ve Ders 18)\n- Editörde iki kart yan yana açabiliyor mu? (İlk derste gösterilir.)\n\n### Kavram haritası\n- **Radyo temeli:** grup (0-255) → gönderen blok → **radyo mesajı alınınca** → **alınan [sayı]**\n- **Mesaj türleri:** sayı → yazı (en çok 32 karakter) → ad = değer (ad en çok 12 karakter)\n- **Veri düzenleme:** şifreleme (anahtar, toplama ve çıkarma) → komut tablosu (protokol) → mesajı değişkene almak\n- **Karar verme:** eğer → iç içe eğer zinciri → son değilse kolu\n- **Proje:** kart yatışı → komut → radyo → ok ve servo\n\n### Sık yapılan hatalar\n- **İki kartı farklı gruba koymak.** Mesaj ulaşmaz ve hata mesajı çıkmaz.\n- **Alma başlığını boş bırakmak.** Gönderen çalışsa bile alan kart hiçbir şey yapmaz.\n- **Gönderenin kendi mesajını alacağını sanmak.** Mesaj yalnız gruptaki öteki karta gider.\n- **Adı iki tarafta farklı yazmak.** \"sicak\" ile \"sıcak\" aynı değildir; ad 12 karakterden uzunsa kesilir.\n- **Şifrede iki tarafta aynı işlemi kullanmak.** Gönderen toplarsa alan çıkarmalıdır.\n- **Anahtarı ya da mesaj değişkenini doldurmamak.** Değişken 0 kalır, sonuç sessizce yanlış çıkar.\n- **İkinci eğer'i değilse kolunun dışına koymak.** Zincirin sırası bozulur.\n- **Tabloyu iki tarafta farklı kurmak.** Sayıların anlamı kaybolur.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarını oku ve \"sık yapılan yanlış\" satırlarını yüksek sesle söyle.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Bakmadan iki kartlı en küçük programı kur: A ile kalp gönder, alan kart kalbi göstersin.\n4. Gizli mesaj programında anahtarı 7'den 20'ye çevir; düz rakam 5 için radyoyla hangi sayı gider? (Cevap: 25.)\n5. Kendi cümlelerinle şu soruyu cevapla: \"Gönderen ve alan taraf neden aynı tabloyu kullanmalı?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Uzaktan kumanda)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Plan | Komut tablosu yok | Tabloda komut, ekran ve servo açısı var | Tablo kodla birebir uyuyor ve bilinmeyen komut için karar yazılmış |\n| Kumanda tarafı | Bazı yönler mesaj göndermiyor | Dört yön ve A düğmesi doğru sayıyı yolluyor | Ek bir olay (örneğin yüzü yukarı) ya da eğim bilgisi de gönderiliyor |\n| Araç tarafı | Gelen sayı okunmuyor ya da zincir bozuk | Her komutta doğru ok gösteriliyor ve servo dönüyor | Bip ya da ek bir tepki var, son kol aracı durduruyor |\n| Hata ayıklama | Hatayı bulamıyor | Hatayı grup, tablo ya da boş başlık olarak bulup düzeltiyor | Hatayı nasıl bulduğunu ve önlemeyi anlatıyor |\n| Anlatım | Ne yaptığını anlatamıyor | Sistemi kumanda, mesaj ve araç diye anlatıyor | Mesaj kaybolursa ne olacağını ve neye ihtiyaç olduğunu tartışıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Bu hafta iki ayrı şeyin yalnız bir mesajla bağlanabileceğini görmek, gelen mesajı yorumlayan program kurmak ve ortak bir \"anlaşma\" (tablo) fikrini kavramaktır.\n- **Nasıl destek olunur?** Cevabı söylemek yerine şunları sor: \"İki kart aynı grupta mı?\", \"Alma başlığının içinde ne var?\", \"Hangi sayıyı gönderdin, tabloda o sayı ne demek?\"\n- **Sessiz hatalar.** Radyoda çoğu hata uyarı üretmez. Öğrenciye hatayı sistematik aratın: önce grup, sonra gönderen blok, sonra alma başlığı.\n- **Şifreleme.** Burada kurulan şifre öğretici bir örnektir, gerçek güvenlik sağlamaz. Gerçek hayatta şifre ya da parola paylaşılmaz.\n- **Güvenlik ve gizlilik.** Portal tamamen sanaldır; gerçek bir radyo, motor ya da kişisel veri kullanılmaz.\n- **İlerleme.** Mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week, the learner:\n1. Can explain what a radio group is, and can send and receive messages by putting two cards in the same group.\n2. Can tell number, text and name = value messages apart and choose the right receiving block.\n3. Can build a simple cipher using addition and subtraction with variables, and can explain the role of the key.\n4. Can prepare a command table and turn the number that arrives into an icon or an action with a chain of **if** blocks inside each other.\n5. Can plan and build a two-card project that works in the roles of remote and vehicle.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 20-32 minutes. The plan is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Send a message, receive a message | ~20 min | Read the explainer, put two cards in the same group, send numbers with A and B, show an icon on the receiving card. |\n| 2 | Text, name and value | ~20 min | Send text and name = value messages, tell the type apart on the receiving card with a name check. |\n| 3 | Secret message | ~22 min | Add with the key variable and send, decrypt by subtracting on the receiving card. |\n| 4 | Chatting with two cards | ~22 min | Set up the number table, tell three icons apart with a chain of if blocks, add a melody. |\n| 5 | Project: Remote control | ~32 min | Write the command table, build the remote and vehicle sides, test the arrow and the servo. |\n\n### Prerequisite check\n- Can they use the button hat blocks (A, B, A+B)? (Week 2)\n- Can they make a variable and change its value? (Lesson 7)\n- Can they build the **if ... then ... else** block? (Lesson 8)\n- Do they know the card's tilt event and how to play a melody? (Lesson 11 and Lesson 18)\n- Can they open two cards side by side in the editor? (This is shown in the first lesson.)\n\n### Concept map\n- **Radio basics:** group (0-255) → sending block → **on radio received** → **received [number]**\n- **Message types:** number → text (at most 32 characters) → name = value (name at most 12 characters)\n- **Organising data:** encryption (key, addition and subtraction) → command table (protocol) → putting the message into a variable\n- **Making decisions:** if → chain of if blocks inside each other → the last else branch\n- **Project:** card tilt → command → radio → arrow and servo\n\n### Common mistakes\n- **Putting the two cards in different groups.** The message does not arrive, and no error message appears.\n- **Leaving the receive hat block empty.** Even if the sender works, the receiving card does nothing.\n- **Thinking the sender will receive its own message.** The message only goes to the other card in the group.\n- **Writing the name differently on the two sides.** \"sicak\" and `sıcak` are not the same; a name longer than 12 characters is cut off.\n- **Using the same operation on both sides of the cipher.** If the sender adds, the receiver must subtract.\n- **Not filling in the key or the message variable.** The variable stays 0, and the result is quietly wrong.\n- **Putting the second if outside the else branch.** The order of the chain breaks.\n- **Setting up the table differently on the two sides.** The meaning of the numbers is lost.\n\n### End-of-week review\n1. Read each lesson's concept cards and say the \"common mistake\" lines out loud.\n2. Read again the explanations of the questions you got wrong in the mini quizzes, then answer the question again.\n3. Without looking, build the smallest two-card program: send a heart with A, and the receiving card shows the heart.\n4. In the secret message program, change the key from 7 to 20; for the plain digit 5, which number goes by radio? (Answer: 25.)\n5. Answer this question in your own words: \"Why must the sending and receiving sides use the same table?\"\n\nAs an end-of-week test, the mini quizzes of the five lessons are enough; 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project assessment rubric (Remote control)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Plan | There is no command table | The table has the command, the screen and the servo angle | The table matches the code exactly, and a decision for unknown commands is written down |\n| Remote side | Some directions do not send a message | The four directions and button A send the right number | An extra event (for example face up) or tilt information is sent too |\n| Vehicle side | The number that arrives is not read, or the chain is broken | For every command the right arrow is shown and the servo turns | There is a beep or another reaction, and the last branch stops the vehicle |\n| Debugging | Cannot find the mistake | Finds and fixes the mistake as a group, table or empty hat block problem | Explains how they found the mistake and how to prevent it |\n| Explanation | Cannot explain what they did | Explains the system as remote, message and vehicle | Discusses what would happen if a message were lost and what would be needed |\n\n### Note for parents and teachers\n- **Aim.** This week is about seeing that two separate things can be connected by just a message, building a program that interprets the message that arrives, and understanding the idea of a shared \"agreement\" (table).\n- **How to help.** Instead of giving the answer, ask these: \"Are the two cards in the same group?\", \"What is inside the receive hat block?\", \"Which number did you send, and what does that number mean in the table?\"\n- **Silent mistakes.** Most radio mistakes do not produce a warning. Have the learner look for the mistake systematically: first the group, then the sending block, then the receive hat block.\n- **Encryption.** The cipher built here is a teaching example and does not give real security. In real life, passwords and codes are not shared.\n- **Safety and privacy.** The portal is completely virtual; no real radio, motor or personal data is used.\n- **Progress.** The mini quiz results appear by skill on the \"My progress\" page (a draft/pilot feature; saved only if consent has been given).",
       "lessons": [
         {
           "title": "Mesaj gönder, mesaj al",
@@ -3084,7 +5446,128 @@ export const modul10: ModuleContent = {
                 "mk-conditions"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Send a message, receive a message",
+            "problem": "Two people talking on walkie-talkies have to be tuned to the same channel. If the channel is different, however loudly you shout, the other person does not hear. Micro Cards have a radio too, and the channel is called a **group**. In this lesson you will set two cards to the same group and send a message from one to the other.",
+            "contentMd": "### Two cards\nThe radio works with two cards. In this activity two cards appear side by side in the editor (if the second one does not appear by itself, press the **Add second card** button in the **Radio** section on the right). Both cards run **the same program**. So the program you write runs on both the sending and the receiving card. In the virtual portal there is no real hardware or distance; the message reaches the other card after a very short moment (about 10 milliseconds).\n\n### New blocks\nThey are all in the **Radio** category:\n- **set radio group to [1]**: says which group the card joins. The group is a number between 0 and 255. Cards in the same group hear each other.\n- **radio send number [1]**: sends a number to the other card in the group.\n- **on radio received**: a hat block that runs when a message arrives.\n- **received [number]**: gives the number in the message that arrived. From the list you can also choose **text**, **name** and **value**; you will see them in the next lesson.\n\n### Step by step\n**on start**, two button hat blocks and **on radio received** are ready in the editor.\n\n1. Put the **set radio group to [1]** block inside **on start**.\n2. Put **radio send number [1]** inside **on button [A] [pressed]**. Put the same block inside **on button [B] [pressed]** and make the number **2**.\n3. Put the **if ... then ... else** block from the **Logic** category inside **on radio received**. (There are two **if** blocks in your palette; take the one with the \"else\" branch.)\n4. Plug a comparison block into the condition of the **if**. On the left side put **received [number]** from the **Radio** category, and on the right side write **1**. The sign should be **=**.\n5. Put **show icon [heart]** in the **then** branch and **show icon [happy face]** in the **else** branch.\n6. Press ▶ **Run**. Press Card 1's **A** button. Then press **B**.\n\n### Expected result\nWhen you press **A** on Card 1, a heart appears on Card 2's screen; when you press **B**, a happy face appears. The sending card does not receive its own message: Card 1's screen does not change. The **Last received:** box in the Radio section shows the number received. All five goals should have a ✓.\n\n### How does it work?\n- Card 1 sends the number with **A**. It reaches Card 2, which is in the same group, 10 ms later. On Card 2, the **on radio received** hat block runs.\n- The **received [number]** block inside the hat block reads the message that has just arrived.\n- Because Card 2 runs the same program too, if you press Card 2's **A**, a heart appears on Card 1. So both sides can send and receive.\n- Even if you do not put the group block in the program, the cards start in group 1. Still, writing the group clearly is a good habit.\n\n### Try it\n1. Change Card 2's group: in the Radio section, choose **5** from the **Card 2 group** list. Send a message from Card 1. What happens? Then set the list back to **From program**.\n2. Send a message by hand from the Radio section: type **number**, message **1**, **Send to card 2**. Do you see the same result?\n3. Add a third message to your program: the **A+B** button sends **3**, and Card 2 shows a sad face.\n\n### Common mistakes\n- **Putting the two cards in different groups.** The message never arrives. No error message appears either, because the card does not know who is listening.\n- **Not writing the receiving code.** Even if the sender works, if **on radio received** is empty, the receiving card does nothing.\n- **Comparing the number wrongly.** To check whether the **received [number]** value is equal to **1**, the sign in the comparison block must be **=**.",
+            "question": "Is choosing a channel on a walkie-talkie the same as choosing a group on the card? How would you make sure only your friend hears your message?",
+            "explainerMd": "### What you will learn in this lesson\n- How the cards talk by radio, and what the **group** number is for\n- That the side that sends a message and the side that receives it are programmed separately\n- When the \"on radio received\" hat block runs\n- How to make a decision based on the number that arrives\n\n### What you should know first\n- Button hat blocks and the **if ... then ... else** block (Lesson 6 and Lesson 8)\n- Showing an icon on the screen (Lesson 3)\n\n### Think like a walkie-talkie\nTwo walkie-talkies only hear each other if they are tuned to the same channel. On the Micro Card's radio, the channel is called a **group**. The group is a number between 0 and 255, so there are 256 different groups. Cards in the same group receive each other's messages; cards in different groups do not hear them. If the program says nothing, the card is in group 1.\n\n### Sender and receiver\nThere are two separate jobs in radio, and you write separate blocks for each:\n\n```\non button A pressed:\n    radio send number 1\n\non radio received:\n    if received number = 1 then show heart\n```\n\nThe send block runs whenever you want; the message goes to the other card in the group. The receive hat block, however, runs by itself when the message **arrives**, without you calling it. This is like the button hat block: there, the event is a key press; here, the event is a message arriving.\n\n### The message does not arrive instantly\nIn the virtual portal there is no distance between the two cards, but just like real radios, the message spends a short time on its way: about 10 milliseconds. Your eye does not notice this. The important rule is this: **the sending card does not receive its own message.** Card 1 sends, Card 2 receives. If the two cards run the same program, Card 2 can send too, and Card 1 receives.\n\n### Deciding with the number that arrives\nYou look at the number inside the message with the **received [number]** block. This block only makes sense inside the receive hat block, because \"the last message that arrived\" is right there at that moment. Then you build a classic condition: if the number is 1, a heart; if not, a happy face. Depending on which number the sender sent, the other card does a different job. In this way, a single number becomes a small **command**.\n\n### Silent mistakes\nWhen the radio goes wrong, usually no warning appears. The card cannot know who is listening; it sends the message and its job is done. So check three things: are the two cards in the same group, is the send block inside the right button, is the hat block on the receiving side filled in?\n\n### Summary\nRadio messages travel between cards in the same group; the group is a number from 0 to 255. The send block sends the message, and the **on radio received** hat block runs when a message arrives. The sender does not receive its own message, and the message arrives about 10 ms later. You decide with the **if** block based on the number that arrives. If a message is not getting through, look at the group numbers first.",
+            "concepts": [
+              {
+                "term": "Radio group",
+                "definition": "A number from 0 to 255 that sets which channel the cards talk on. Cards in the same group hear each other.",
+                "example": "If both cards are in group 1, the number sent by Card 1 reaches Card 2.",
+                "pitfall": "Putting the two cards in different groups: the message never arrives, and no error message appears either."
+              },
+              {
+                "term": "radio send number",
+                "definition": "A block that sends a number to the other card in the group.",
+                "example": "If you put a block that sends 1 inside button A and one that sends 2 inside button B, you send two different commands.",
+                "pitfall": "Thinking the sending card will receive its own message; the sending card does not receive its own message."
+              },
+              {
+                "term": "on radio received",
+                "definition": "A hat block that runs by itself when a message from the group arrives.",
+                "example": "You can put an if block inside the hat block and show an icon depending on the number that arrives.",
+                "pitfall": "Leaving the hat block empty: even if the sender works, the receiving card does nothing."
+              },
+              {
+                "term": "received [number]",
+                "definition": "A block that, inside the receive hat block, gives the number in the message that has just arrived.",
+                "example": "The comparison received number = 1 asks whether command number 1 has arrived.",
+                "pitfall": "Using this block outside the receive hat block; there is no meaningful message there."
+              },
+              {
+                "term": "Command number",
+                "definition": "Giving a number a meaning agreed in advance, such as 1 = heart, 2 = happy face.",
+                "example": "Card 1 sends the number 2, and Card 2 shows a happy face when it sees the number.",
+                "pitfall": "Choosing the wrong comparison sign; for equality, use =."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h5d21-q1",
+                "kind": "mcq",
+                "prompt": "Card 1's group is 3, and Card 2's group is 4. Card 1 sends a number by radio. What happens?",
+                "options": [
+                  "Card 2 receives the message",
+                  "The radio shows an error message",
+                  "Card 2 does not receive the message, and no error message appears",
+                  "Card 1 shows the message on its own screen"
+                ],
+                "answer": 2,
+                "explanation": "A message only goes to cards in the same group. Because the groups are different, Card 2 does not receive the message. The card cannot know this, so no error message appears either; that is why the answer \"it gives an error\" is wrong.",
+                "skills": [
+                  "mk-radio-group",
+                  "mk-message-flow"
+                ]
+              },
+              {
+                "id": "m10h5d21-q2",
+                "kind": "predict-output",
+                "prompt": "Both cards run the same program, and both are in group 1. Button A is pressed on Card 1.\n\n```\non start: set radio group to 1\n\non button A pressed:\n    radio send number 1\n    show icon heart\n\non radio received:\n    if received number = 1 then\n        show icon happy face\n```\n\nWhat appears on the two screens?",
+                "options": [
+                  "Card 1: heart, Card 2: heart",
+                  "Card 1: heart, Card 2: happy face",
+                  "Card 1: happy face, Card 2: happy face",
+                  "Card 1: heart, Card 2: empty"
+                ],
+                "answer": 1,
+                "explanation": "Card 1 shows the heart itself inside A and sends the message. Because the sender does not receive its own message, Card 1's receive hat block does not run; the heart stays. Card 2 receives the message, and because the number is 1, it shows a happy face. No heart appears on Card 2, because the block that shows the heart is inside the button, and the button was only pressed on Card 1.",
+                "skills": [
+                  "mk-message-flow",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h5d21-q3",
+                "kind": "find-bug",
+                "prompt": "When button A on Card 1 is pressed, Card 2 does nothing. Both cards are in group 1. Find the mistake.\n\n```\non start: set radio group to 1\n\non button A pressed:\n    radio send number 1\n\non radio received:\n    (empty)\n```",
+                "options": [
+                  "The radio group cannot be 1",
+                  "The send block should not be inside the button",
+                  "The number should be 0 instead of 1",
+                  "The receive hat block is empty; there is no block that handles the message"
+                ],
+                "answer": 3,
+                "explanation": "The message reaches Card 2, but because the receive hat block is empty, Card 2 does not react to it. The group numbers are the same (1), so there is no group mistake; the send block is in the right place too.",
+                "skills": [
+                  "mk-message-flow",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d21-q4",
+                "kind": "numeric",
+                "prompt": "The radio group is a number between 0 and 255 (0 and 255 included). How many different groups are there?",
+                "answer": 256,
+                "tolerance": 0,
+                "unit": "groups",
+                "explanation": "There are 256 numbers from 0 to 255; because counting starts at 0, the last number (255) and the number of groups (256) are different.",
+                "skills": [
+                  "mk-radio-group"
+                ]
+              },
+              {
+                "id": "m10h5d21-q5",
+                "kind": "mcq",
+                "prompt": "Where is the received [number] block best used?",
+                "options": [
+                  "Inside the on radio received hat block",
+                  "Inside on start, when the program opens",
+                  "Only inside button hat blocks",
+                  "Before the send block, anywhere"
+                ],
+                "answer": 0,
+                "explanation": "The message that arrives is found inside the receive hat block; the block reads it from there. In a button hat block or in on start there may be no message received yet, so there it does not give the number you expect.",
+                "skills": [
+                  "mk-message-flow",
+                  "mk-conditions"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Yazı, ad ve değer",
@@ -3205,7 +5688,127 @@ export const modul10: ModuleContent = {
                 "prog-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Text, name and value",
+            "problem": "You can split a message like \"temperature 28\" into two parts: \"temperature\" is a name, and 28 is a value. A card that knows the name puts the value in the right place. When a number is not enough, the radio can also carry text, or a name and a value as a pair. In this lesson you will use all three message types.",
+            "contentMd": "### Three message types\n| Type | Sending block | Receiving block |\n|---|---|---|\n| number | **radio send number [1]** | **received [number]** |\n| text | **radio send text [hello]** | **received [text]** |\n| name = value | **radio send [name] = [1]** | **received [name]** and **received [value]** |\n\nLimits: a text can be at most 32 characters, and a name at most 12 characters. Anything longer is cut off. In this lesson we will write names without special letters (for example **sicak**, short for \"hot\"). The sending and receiving sides must write the name exactly the same, letter for letter.\n\nThere is also a block called **signal strength**. In the virtual radio there is no distance, so the signal strength is always 200. Still, it is good to know: on real radios, the signal strength usually drops as the cards move further apart.\n\n### Step by step\n**on start**, **on button [A] [pressed]**, **on button [B] [pressed]** and **on radio received** are ready in the editor.\n\n1. Put **set radio group to [1]** inside **on start**.\n2. Put **radio send text [selam]** inside **on button [A] [pressed]**. Make the text **selam** (\"hi\").\n3. Put **radio send [sicak] = [0]** inside **on button [B] [pressed]**. Make the name **sicak**. Plug the **temperature (°C)** block from the **Input** category in place of the value.\n4. Put **if ... then ... else** inside **on radio received**. Condition: **received [name]** **=** **sicak**. In the **then** branch, put **received [value]** inside **show number**. In the **else** branch, put **received [text]** inside **show text**.\n5. Press ▶ **Run**. Set Card 1's temperature to 28 with the **Temperature** slider in the **Compass and sensors** section. On Card 1, press **A**, then **B**.\n\n### Expected result\nWhen you press **A**, the text **selam** scrolls across Card 2's screen (about 3 seconds). When you press **B**, **28** appears on Card 2. All five goals should have a ✓.\n\n### How does it work?\n- In a text message, the **received [name]** value is empty. So the comparison comes out false and the **else** branch runs.\n- In a **name = value** message, **received [name]** is \"sicak\", and **received [value]** is 28.\n- For every message, you first need to work out its type. In this program, checking the name is a simple way to work out the message type.\n- Card 1's temperature slider belongs to Card 1, and Card 2's slider belongs to Card 2. You can see which card you have selected from the **Card 1 / Card 2** buttons in the right panel.\n\n### Try it\n1. Try the **received [text]** block on a name = value message too. You will see that it gives the value as text.\n2. Send a name = value message by hand from the Radio section: type **name = value**, name **sicak**, message **35**. 35 should appear on Card 2.\n3. Add a new message: **on button [A+B] [pressed]** does **radio send [isik] = [light level]** (`isik` means \"light\"). If the name is **isik**, the receiving card shows a bar graph. (The light is 0-255; make the bar graph's upper limit **255**.)\n4. Send a text longer than 32 characters. How much of it appears on the receiving card?\n\n### Common mistakes\n- **Writing the name differently.** If you write **sicak** on the sender and `sıcak` on the receiver, the comparison does not come out equal.\n- **Thinking the value is text.** **received [value]** is a number. It is good for doing calculations.\n- **A name longer than 12 characters is cut off.** If you choose a long name, the comparison on the receiving side does not match.",
+            "question": "Where does sending a \"name = value\" pair instead of a number make your job easier? If you want to send three readings, such as temperature, light and sound, at the same time, how would you organise the messages?",
+            "explainerMd": "### What you will learn in this lesson\n- The three message types that can be sent by radio: number, text and the **name = value** pair\n- How to choose the right receiving block for each type\n- The length limits for text and names\n- How to use a name check to work out the type of a message\n\n### What you should know first\n- Radio group, sending and receiving messages (Lesson 21)\n- Showing numbers and text on the screen (Lesson 1 and Lesson 7)\n- The temperature sensor (Lesson 12)\n\n### Why is one type not enough?\nA number is often enough: \"command number 1\". But if you want to say \"temperature 28\", you also have to say what the number measures. That is why the radio carries three types of message:\n\n| Type | Sender | Receiver |\n|---|---|---|\n| number | radio send number | received [number] |\n| text | radio send text | received [text] |\n| name = value | radio send [name] = [value] | received [name] and received [value] |\n\n### The name = value pair\nThe pair is made of a label and a number: the name \"sicak\" (\"hot\"), the value 28. The receiving side reads the name to work out what the message is about. If you want to send three readings at the same time, you use three different names (sicak, isik, ses for hot, light and sound), and the receiving side looks at the name and puts the value in the right place.\n\n### Limits\nA text can be at most **32 characters**, and a name at most **12 characters**. Anything longer is quietly **cut off** while it is being sent. For example, of a 40-letter text, only the first 32 letters arrive on the receiving card. Be careful when comparing names too: if a name is longer than 12 characters, the cut-off version is sent and does not match the full name on the receiving side. You must write the name exactly the same, letter for letter; \"sicak\" and `sıcak` are different names.\n\n### Working out the message type\nThe receiving side does not ask directly what type the message is; it finds out with a name check. In text and number messages, **received [name]** is empty. So the question \"is received name = sicak?\" only comes out true for a name = value message; for the others, the **else** branch runs. This small pattern is the simplest way to tell several different messages apart in one hat block.\n\nThe value that arrives is a number; you can do calculations with it and compare it with a threshold. Text, on the other hand, is shown scrolling across the screen.\n\n### Signal strength\nThe **signal strength** block gives how strongly the message arrived. Because there is no distance in the virtual radio, its value is always 200. On real radios it drops as the cards move apart.\n\n### Summary\nThe radio carries number, text and name = value messages. A text is at most 32 characters and a name at most 12; anything longer is cut off. The sending and receiving sides must write the name the same. The receiving side tells the message type apart with **received [name]** and uses the number with **received [value]**. In the virtual radio, the signal strength is always 200.",
+            "concepts": [
+              {
+                "term": "Number, text, name = value",
+                "definition": "The three message types the radio can carry.",
+                "example": "A number is used for a command, text for a greeting, and a name = value pair for a reading such as \"sicak = 28\".",
+                "pitfall": "Trying to send everything as a number; the receiving side cannot tell what was measured."
+              },
+              {
+                "term": "Name = value pair",
+                "definition": "A message made of a label (name) and a number (value).",
+                "example": "radio send [sicak] = [28]; the receiving side reads received name and received value.",
+                "pitfall": "Writing the name differently on the two sides; \"sicak\" and `sıcak` do not match."
+              },
+              {
+                "term": "Length limits",
+                "definition": "A text can be at most 32 characters and a name at most 12 characters; anything longer is cut off.",
+                "example": "Of a 40-letter text, only the first 32 letters arrive on the receiving card.",
+                "pitfall": "Choosing a long name; the cut-off name does not match the full name on the receiving side."
+              },
+              {
+                "term": "received [name] check",
+                "definition": "A simple way to tell whether the message that arrived is a name = value message. In number and text messages the name is empty.",
+                "example": "if received name = sicak then show the value, else show the text.",
+                "pitfall": "Reading the same block for every message; you need to choose the block that fits the message type."
+              },
+              {
+                "term": "signal strength",
+                "definition": "A block that gives how strongly the message arrived. In the virtual radio it is always 200.",
+                "example": "On a real radio, the value drops as the cards move further apart.",
+                "pitfall": "Expecting the signal strength to change in the virtual portal; there is no distance."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h5d22-q1",
+                "kind": "mcq",
+                "prompt": "A card wants to send the temperature, the light and the sound level to the other card at the same time. Which is the best method?",
+                "options": [
+                  "Sending the three numbers one after another as plain numbers",
+                  "Writing them all in one text",
+                  "Using a different name for each reading and sending name = value messages",
+                  "Using three different groups"
+                ],
+                "answer": 2,
+                "explanation": "To tell the three readings apart, each one is given its own name (sicak, isik, ses) and name = value messages are used; the receiving side looks at the name and puts the value in the right place. If you send three plain numbers, it gets mixed up which one measures what.",
+                "skills": [
+                  "mk-radio-types"
+                ]
+              },
+              {
+                "id": "m10h5d22-q2",
+                "kind": "numeric",
+                "prompt": "A card sends a 40-character text by radio. How many characters of the text arrive on the receiving card?",
+                "answer": 32,
+                "tolerance": 0,
+                "unit": "characters",
+                "explanation": "A text can be at most 32 characters; anything longer is cut off while being sent, without an error. 40 − 32 = 8 characters are lost.",
+                "skills": [
+                  "mk-radio-types"
+                ]
+              },
+              {
+                "id": "m10h5d22-q3",
+                "kind": "predict-output",
+                "prompt": "The receiving card's program is below. The sending card sends radio send [isik] = [90]. What happens on the receiving card?\n\n```\non radio received:\n    if received name = sicak then\n        show number received value\n    else\n        show text received text\n```",
+                "options": [
+                  "The then branch runs and 90 appears",
+                  "The else branch runs, because the name is isik and not sicak",
+                  "The program gives an error",
+                  "Nothing happens"
+                ],
+                "answer": 1,
+                "explanation": "The name of the message that arrived is isik, but the name being checked is sicak; they are not equal, so the else branch runs. Even if the message is a name = value message, the then branch is skipped if the name does not match. No error appears, and the answer \"nothing happens\" is wrong too: the else branch shows something.",
+                "skills": [
+                  "mk-radio-types",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h5d22-q4",
+                "kind": "find-bug",
+                "prompt": "The sender sends the temperature reading, but the receiving card always shows text on the screen (the then branch never runs). Find the mistake.\n\n```\nsender:    radio send [sıcak] = [temperature]\nreceiver:  if received name = sicak then ...\n```",
+                "options": [
+                  "The name is written differently on the two sides: `sıcak` and `sicak` are not the same",
+                  "The sending block was taken from the wrong category",
+                  "The value must be a number, and temperature is not a number",
+                  "The radio group is above 255"
+                ],
+                "answer": 0,
+                "explanation": "The sender writes `sıcak` (with the letter `ı`), and the receiver writes `sicak` (with the letter `i`). Names must be exactly the same, letter for letter; a difference of one letter breaks the equality. The groups and the value block are not the cause of the problem.",
+                "skills": [
+                  "mk-radio-types",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d22-q5",
+                "kind": "mcq",
+                "prompt": "The sender sends radio send [sicaklik_olcum] = [25]. The receiving side compares \"received name = sicaklik_olcum\". What is the result?",
+                "options": [
+                  "Equal, because the name is the same",
+                  "An error message is shown",
+                  "Equal, but the value becomes 0",
+                  "Not equal, because the name is cut off to 12 characters"
+                ],
+                "answer": 3,
+                "explanation": "sicaklik_olcum is 14 characters, but the name limit is 12. While being sent, it is cut off to \"sicaklik_olc\". Because the cut-off name does not match the full name on the receiving side, the comparison comes out false, and no error message is given.",
+                "skills": [
+                  "mk-radio-types",
+                  "prog-debug"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Gizli mesaj",
@@ -3321,7 +5924,122 @@ export const modul10: ModuleContent = {
                 "mk-cipher"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Secret message",
+            "problem": "It is said that in ancient Rome, Julius Caesar shifted the letters in his secret letters: in place of each letter, he wrote the letter a few places further on in the alphabet. Someone who catches the message sees meaningless letters; but a friend who knows the shift number decodes the message easily. In this lesson you will do the same idea with numbers: before sending, a **key** will be added to the number, and the receiving card will take this key away.",
+            "contentMd": "### Encryption and the key\n- **Plain message**: the real information you want to send (for example the digit 3).\n- **Key**: a secret number that both sides know (for example 7).\n- **Encrypted message**: plain message + key = 3 + 7 = 10. This 10 is what goes by radio.\n- **Decrypting**: the receiving side works out 10 − 7 = 3 and finds the real digit.\n\nThis is a very simple cipher, and in real life it is easily broken. But it is very good for learning the basic idea of encryption: **the information changes on the way, and whoever knows the right key turns it back into what it was.**\n\n### New blocks\n- In the **Math** category, the arithmetic block that adds and subtracts: it has two number boxes and a sign in the middle. Choose **+** or **−** for the sign from the list.\n- In the **Variables** category, the **change [gizli] by [1]** block.\n\n### Step by step\n**on start**, two buttons and **on radio received** are ready in the editor.\n\n1. In the **Variables** category, make two variables: **gizli** (\"secret\") and **anahtar** (\"key\").\n2. Inside **on start**, in this order: **set radio group to [1]**, **set gizli to [0]**, **set anahtar to [7]**.\n3. Put **change gizli by [1]** and **show number [gizli]** inside **on button [A] [pressed]**. (Plug the **gizli** variable in as the number to show.)\n4. Put **radio send number** inside **on button [B] [pressed]**. Plug the addition block in place of the number: **gizli** **+** **anahtar**.\n5. Put **show number** inside **on radio received**. Plug the subtraction block in place of the number: **received [number]** **−** **anahtar**.\n6. Press ▶ **Run**. On Card 1, press **A** three times (1, 2, 3 appear on the screen). Then press **B**.\n\n### Expected result\nCard 1 sends 10 by radio. In the Radio section, Card 2's **Last received:** box shows **10**. But on Card 2's screen, **3** appears: the key has been taken away and the real digit found. All four goals should have a ✓.\n\n### How does it work?\n- The number travelling on the way is 10. Someone who hears the message cannot know the 3; they would need to know the key (7).\n- Because the two cards run the same program, both of their keys are 7. So they share the same key.\n- Because the key is stored in a variable, you change it in only one place; both the encryption and the decryption follow automatically.\n\n### Try it\n1. From the Radio section, send **10** by hand to Card 2 as a **number** message. You see 3 on Card 2.\n2. Now send **5** by hand. What appears on Card 2's screen? (5 − 7 = −2.) This is like someone who does not know the key getting the wrong result.\n3. In **on start**, make the key 12 instead of 7. Did the decrypted digit change? Why did it not change?\n4. Think: if the key were random every time, how would the receiving card know it? Would it be safe to send the key by radio too?\n\n### Common mistakes\n- **Forgetting the key.** If you did not set the key variable in **on start** on the receiving card, the variable stays at zero; the decrypting does not work.\n- **Putting subtraction instead of addition** (or the other way round). If the sender adds, the receiver must subtract.\n- **Putting the number to show in the wrong place.** Inside **show number** there must be the subtraction block, not **received [number]** on its own.",
+            "question": "If someone caught this cipher on the way, could they guess the 7? How many tries would it take them? What would you add to make a harder cipher?",
+            "explainerMd": "### What you will learn in this lesson\n- The ideas of **encryption**, **key**, plain message and encrypted message\n- How to build a simple cipher with addition and subtraction\n- How a key stored in a variable keeps the two sides in step\n- Why this cipher is easily broken\n\n### What you should know first\n- Making a variable and changing its value (Lesson 7)\n- Sending and receiving numbers by radio (Lesson 21)\n\n### The information changes on the way\nEveryone in the same group can receive a radio message. If you do not want others to understand the information, you scramble it before sending it. This is called **encryption**. You have three things:\n\n- **Plain message:** the real information, for example the digit 3.\n- **Key:** a secret number that both sides know, for example 7.\n- **Encrypted message:** the number that travels on the way.\n\n### Encrypting by adding\nThe simplest method is to add the key:\n\n```\nencrypted = plain + key        3 + 7 = 10\nplain     = encrypted - key    10 - 7 = 3\n```\n\nThe sending side sends 10. Someone listening on the way sees 10, but cannot know that the real digit is 3. Because the receiving side knows the key, it takes away 7 and gets back to 3. Addition and subtraction are the opposite of each other; that is why the operation can be undone.\n\n### Why is the key in a variable?\nIf you write the key separately in both the sending and the receiving block, you might change one and forget the other. Instead, you write it once in a variable called **anahtar** (\"key\") (inside **on start**), and both operations use it. You change the value in one place; the two sides stay in step. Because the two cards run the same program, both cards have the same key too.\n\n### Wrong key, wrong result\nEven if someone who does not know the key receives 10 and does the same subtraction, they cannot find the right result. For example, if they have no key (the variable has stayed 0), they see 10 − 0 = 10. If they think the key is 5, they find 10 − 5 = 5. But the result is wrong, and there is no error message either. Forgetting to set the key in **on start** has the same effect.\n\n### Is this cipher strong?\nNo. If the key is a small number, the listener can easily find it by trying 1, 2, 3 ... Real ciphers use very large keys and very complicated operations. The aim here is not security but seeing the basic idea: the information changes on the way, and whoever knows the right key turns it back into what it was. Also, sending the key by radio ruins the idea, because the listener catches the key too.\n\n### Summary\nIn encryption, the plain message is scrambled with the key, and the encrypted message is sent. If you encrypted by adding, the receiving side decrypts by subtracting. If the key is kept in a variable, the two sides stay in step. A wrong or missing key quietly gives a wrong result. This cipher can be broken by trying small numbers.",
+            "concepts": [
+              {
+                "term": "Encryption",
+                "definition": "Scrambling information before sending it so that others do not understand it.",
+                "example": "The digit 3 is turned into 10 with the key 7 and sent.",
+                "pitfall": "Thinking encryption means real security; a simple addition cipher is easily broken."
+              },
+              {
+                "term": "Key",
+                "definition": "A secret number that both sides know; it is used for encrypting and decrypting.",
+                "example": "If the key is 7, the sender does +7 and the receiver does −7.",
+                "pitfall": "Forgetting to set the key on the receiving side: the variable stays 0 and the decrypting comes out wrong."
+              },
+              {
+                "term": "Plain message and encrypted message",
+                "definition": "The plain message is the real information; the encrypted message is the number travelling on the way, changed with the key.",
+                "example": "If the plain message is 3 and the key is 7, the encrypted message is 10.",
+                "pitfall": "Thinking the number shown in the Radio section is the real information; it is encrypted."
+              },
+              {
+                "term": "Opposite operation",
+                "definition": "The opposite of addition is subtraction; an operation that undoes another one.",
+                "example": "The sender adds (3 + 7 = 10), the receiver subtracts (10 − 7 = 3).",
+                "pitfall": "Using the same operation on both sides; if both add, the result comes out as 17."
+              },
+              {
+                "term": "Key in a variable",
+                "definition": "Keeping the key in a variable lets you change the value in one place.",
+                "example": "In on start, set anahtar to 7; both sending and receiving use the key.",
+                "pitfall": "Writing the key by hand in two places; you might change one and forget the other."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h5d23-q1",
+                "kind": "numeric",
+                "prompt": "The plain message is 5 and the key is 12. The sender encrypts by adding. Which number goes by radio?",
+                "answer": 17,
+                "tolerance": 0,
+                "explanation": "Encrypted message = plain message + key = 5 + 12 = 17. The receiving side finds the real digit with 17 − 12 = 5.",
+                "skills": [
+                  "mk-cipher",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h5d23-q2",
+                "kind": "numeric",
+                "prompt": "The sender encrypted the digit 5 with the key 12 and sent 17. The receiving card wrongly thinks the key is 7. Which number does the receiving card show on the screen?",
+                "answer": 10,
+                "tolerance": 0,
+                "explanation": "The receiving side works out 17 − 7 = 10. If the key were the correct 12, it would find 5. A wrong key does not give an error message; it quietly produces a wrong result.",
+                "skills": [
+                  "mk-cipher",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d23-q3",
+                "kind": "predict-output",
+                "prompt": "Both cards run this program (group 1). On Card 1, A is pressed 4 times, then B once. What appears in the \"Last received\" box in the Radio section and on Card 2's screen?\n\n```\non start:\n    set radio group to 1\n    set gizli to 0\n    set anahtar to 7\n\non button A pressed:\n    change gizli by 1\n    show number gizli\n\non button B pressed:\n    radio send number (gizli + anahtar)\n\non radio received:\n    show number (received number − anahtar)\n```",
+                "options": [
+                  "Last received 4, screen 4",
+                  "Last received 11, screen 11",
+                  "Last received 4, screen 11",
+                  "Last received 11, screen 4"
+                ],
+                "answer": 3,
+                "explanation": "When A is pressed four times, gizli = 4. With B, 4 + 7 = 11 is sent; the box shows 11. Card 2's key is also 7, so it shows 11 − 7 = 4. So on the way there is 11, and on the screen there is 4.",
+                "skills": [
+                  "mk-cipher",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h5d23-q4",
+                "kind": "find-bug",
+                "prompt": "The sender sends \"gizli + anahtar\". The receiving card wants to find the real digit, but the result always comes out too big (for example 17 instead of 3). Find the mistake.\n\n```\non radio received:\n    show number (received number + anahtar)\n```",
+                "options": [
+                  "The key was not set in on start",
+                  "The receiving side adds instead of subtracting",
+                  "The radio group is missing",
+                  "A show text block is needed instead of show number"
+                ],
+                "answer": 1,
+                "explanation": "Because the sender adds, the receiver must subtract. If the receiver adds too, 10 + 7 = 17 comes out. Setting the key in on start or the group block does not produce this result.",
+                "skills": [
+                  "mk-cipher",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d23-q5",
+                "kind": "mcq",
+                "prompt": "Why is this addition cipher not a strong cipher?",
+                "options": [
+                  "Radio messages travel very slowly",
+                  "The addition cannot be undone",
+                  "Because the key is a small number, it can be found by trying",
+                  "The receiving card cannot receive the message"
+                ],
+                "answer": 2,
+                "explanation": "The key is a small number; someone listening on the way finds it quickly by trying 1, 2, 3 ... Addition is an operation that can be undone; that is the property the cipher needs in order to work, so it is not the problem. The speed of the radio has nothing to do with security either.",
+                "skills": [
+                  "mk-cipher"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "İki kartla sohbet",
@@ -3437,7 +6155,122 @@ export const modul10: ModuleContent = {
                 "mk-message-flow"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Chatting with two cards",
+            "problem": "When you send messages, you send emoji: a heart, a smiling face, a sad face. An emoji is really a small picture, but the phone sends it as a number, and the other side turns that number back into the picture. You can do the same trick between two Micro Cards. In this lesson the two cards will become a small chat app that sends heart and face icons to each other.",
+            "contentMd": "### The idea\nLet's give each icon a number and send that number by radio:\n\n| Number | Icon | Which key sends it? |\n|---|---|---|\n| 1 | heart | A |\n| 2 | happy face | B |\n| 3 | sad face | A+B |\n\nWhen the receiving card sees the number, it shows the matching icon and plays a short sound. Because both cards run the same program, both directions work.\n\n### A new idea: reading into a variable\nThe **received [number]** block is read when a message arrives. If you are going to compare this number in more than one place, it is tidier to put it into a variable (**mesaj**, \"message\") first. That way you do not need to find the **received** block again and again for every comparison.\n\nTo check three possibilities, you will put **if ... then ... else** blocks inside each other: \"is the number 1? If not, is the number 2? If not (then it is 3)\".\n\n### Step by step\n**on start**, **on button [A] [pressed]**, **on button [B] [pressed]**, **on button [A+B] [pressed]** and **on radio received** are ready in the editor.\n\n1. Put **set radio group to [1]** inside **on start**.\n2. Put **radio send number [1]** inside **on button [A] [pressed]**, **radio send number [2]** inside **on button [B] [pressed]**, and **radio send number [3]** inside **on button [A+B] [pressed]**.\n3. In the **Variables** category, make a variable called **mesaj**.\n4. Inside **on radio received**, in this order:\n   - **set mesaj to [0]**. Plug **received [number]** in place of the zero.\n   - **if ... then ... else**. Condition: **mesaj** **=** **1**. **then**: **show icon [heart]**.\n   - Inside the **else** branch, put a second **if ... then ... else**. Condition: **mesaj** **=** **2**. **then**: **show icon [happy face]**. **else**: **show icon [sad face]**.\n   - **play melody [Birdsong]** from the **Music** category.\n5. Press ▶ **Run**. Press **A** on Card 1, then **B** on Card 2, then **A+B** on Card 1 again.\n\n### Expected result\nCard 1's **A** shows a heart on Card 2. Card 2's **B** shows a happy face on Card 1. Card 1's **A+B** shows a sad face on Card 2. After each message, Birdsong plays (about 1.25 seconds). All seven goals should have a ✓.\n\n### How does it work?\n- The sender cannot receive the message; the message only goes to the other card in the group.\n- The chain of **if** blocks inside each other checks in order. If the first one is true, the others are not checked at all.\n- The **play melody** block waits until it finishes. If another message arrives during that time, it joins a queue; for the same hat block, at most 3 messages wait in the queue.\n\n### Try it\n1. Add a fourth icon: the **on button [A] [long pressed]** hat block sends **4**, and the receiving card shows a **sun**. (You need to add one more branch to the **if** chain.)\n2. Instead of Birdsong, choose a different melody for each icon: the **Jingle** melody for the heart, the **Sad** melody for the sad face.\n3. So that you also see your own message on your screen, make the sending side **show** the icon too. Which hat block should you put it inside?\n\n### Common mistakes\n- **Putting the second if outside the else branch.** Then the happy face does not appear in the \"else\" branch.\n- **Always sending 1 instead of different numbers.** The receiving card cannot tell which key was pressed.\n- **Never reading the message.** If you do not put **received [number]** into the **mesaj** variable, the variable stays zero and the sad face always appears.",
+            "question": "Isn't turning numbers into icons a kind of \"agreement\"? If the other side did not know your table, how would they understand the message? Where does this \"shared table\" idea turn up in real messaging apps?",
+            "explainerMd": "### What you will learn in this lesson\n- How to set up a shared **table** (protocol) that turns numbers into icons\n- How to tell three or more options apart with a chain of **if** blocks inside each other\n- How to copy the message that arrives into a variable and use it in several places\n- How many messages the receive hat block puts in a queue\n\n### What you should know first\n- Sending and receiving numbers by radio (Lesson 21 and Lesson 22)\n- Variables (Lesson 7)\n- Playing a melody (Lesson 18)\n\n### Numbers are an agreement\nThe heart emoji you send on a phone is really a number; the other person's phone turns that number back into a heart. For this to work, both sides must know **the same table**. Our chat table:\n\n| Number | Icon | Key that sends it |\n|---|---|---|\n| 1 | heart | A |\n| 2 | happy face | B |\n| 3 | sad face | A+B |\n\nThis table is called a **protocol** (a communication agreement). If you change the table on one side and not on the other, the messages are misunderstood.\n\n### A chain of if blocks inside each other\nTo tell three options apart, the questions are asked in order:\n\n```\nif mesaj = 1 then\n    show heart\nelse\n    if mesaj = 2 then\n        show happy face\n    else\n        show sad face\n```\n\nIf the first condition is true, the remaining questions are not looked at at all. The second **if** must be inside the **else** branch of the first block; if you put it outside, it becomes a separate question and the order breaks. The last **else** branch means \"everything else\": here, all numbers other than 1 and 2 show a sad face.\n\n### Putting the message into a variable\nIf you are going to compare the same number in several places, you first put it into a variable called **mesaj** (\"message\"). At the start of the program you say \"set mesaj to the received number\", and then you use **mesaj** in the conditions. That way you do not have to find the **received** block again and again. If you forget to fill in the variable, its value stays 0; neither 1 nor 2 matches, and the last branch always runs.\n\n### Messages join a queue\nThe **play melody** block waits until the melody ends. Birdsong lasts 1.25 seconds. If a new message arrives during this time, the receive hat block is busy; the message joins a queue. For the same hat block, at most **3 messages** can wait in the queue, and any more are thrown away. This is why some messages get lost when you send messages quickly.\n\n### Summary\nThe chat app is based on a table of numbers; both sides must use the same table. Three options are told apart with a chain of **if** blocks inside each other, and the second **if** is in the first one's **else** branch. If the message that arrives is put into a variable, it can be used in many places. While a long receiving job is running, at most 3 new messages wait in the queue.",
+            "concepts": [
+              {
+                "term": "Protocol (shared table)",
+                "definition": "A table of rules that both sides agree on: which number means what.",
+                "example": "The table 1 = heart, 2 = happy face, 3 = sad face.",
+                "pitfall": "Changing the table on only one side; the other side misunderstands the message."
+              },
+              {
+                "term": "Chain of if blocks inside each other",
+                "definition": "if blocks that ask about three or more options in order; each one is in the else branch of the one before.",
+                "example": "It asks: is the message 1, if not is it 2, if not (then it is 3).",
+                "pitfall": "Putting the second if outside the else branch; the order breaks."
+              },
+              {
+                "term": "Putting the message into a variable",
+                "definition": "Copying the number that arrives into a variable and using it in many places.",
+                "example": "set mesaj to received number; then the comparisons mesaj = 1, mesaj = 2.",
+                "pitfall": "Not filling in the variable: its value stays 0 and the last branch always runs."
+              },
+              {
+                "term": "Receive queue",
+                "definition": "Messages that arrive while the receive hat block is busy join a queue; at most 3 messages wait.",
+                "example": "While a 1.25-second melody is playing, the first 3 messages that arrive wait in the queue, and any more are lost.",
+                "pitfall": "Thinking every message will be handled when sending messages very quickly."
+              },
+              {
+                "term": "play melody block",
+                "definition": "A block that waits until the melody ends; it keeps the hat block busy during this time.",
+                "example": "Birdsong lasts 1250 ms at 120 beats per minute.",
+                "pitfall": "Thinking the melody plays in the background and does not make the program wait."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h5d24-q1",
+                "kind": "predict-output",
+                "prompt": "The receiving card's program is below. Card 1 sends 1 by radio. What appears on Card 2's screen?\n\n```\non radio received:\n    set mesaj to 0\n    if mesaj = 1 then\n        show icon heart\n    else\n        if mesaj = 2 then\n            show icon happy face\n        else\n            show icon sad face\n```",
+                "options": [
+                  "heart",
+                  "happy face",
+                  "sad face",
+                  "Nothing"
+                ],
+                "answer": 2,
+                "explanation": "A fixed 0 has been put into the mesaj variable instead of the received number. So mesaj is always 0; it is equal to neither 1 nor 2, and the last else branch runs and shows the sad face. The number that arrived was never copied into the variable.",
+                "skills": [
+                  "mk-conditions",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h5d24-q2",
+                "kind": "numeric",
+                "prompt": "The receive hat block is busy playing a melody. Before the melody ends, 5 more messages arrive. For the same hat block, at most how many messages can wait in the queue?",
+                "answer": 3,
+                "tolerance": 0,
+                "unit": "messages",
+                "explanation": "The queue takes at most 3 messages; the first three messages join the queue, and the other two are thrown away.",
+                "skills": [
+                  "mk-message-flow"
+                ]
+              },
+              {
+                "id": "m10h5d24-q3",
+                "kind": "mcq",
+                "prompt": "Following the chat table, Card 1 expects a happy face when it sends 2, but in Card 2's program the branch for number 2 has a sad face. What happens on the receiving card to the message of the user who pressed B?",
+                "options": [
+                  "The radio message never arrives",
+                  "The message arrives, but a different icon from the expected one is shown",
+                  "The card gives an error message",
+                  "Both cards show the same icon, and this is expected"
+                ],
+                "answer": 1,
+                "explanation": "The two sides are not using the same table. The sender thinks 2 is a happy face, and the receiver shows a sad face; the meaning of the message is broken not on the way but by the difference between the two tables. The radio has not been cut off; the message arrived correctly.",
+                "skills": [
+                  "mk-protocol"
+                ]
+              },
+              {
+                "id": "m10h5d24-q4",
+                "kind": "find-bug",
+                "prompt": "Whichever button is pressed, Card 2 always shows a heart. The receiving card's if chain is correct. Find the mistake.\n\n```\non button A pressed:    radio send number 1\non button B pressed:    radio send number 1\non button A+B pressed:  radio send number 1\n```",
+                "options": [
+                  "B and A+B also send 1; they should be 2 and 3 from the table",
+                  "The A+B block is inside the wrong hat block",
+                  "The if chain on the receiving side is too short",
+                  "The radio group should be 255"
+                ],
+                "answer": 0,
+                "explanation": "All three buttons send 1. According to the table, 2 should have been sent for B and 3 for A+B. The receiving side can only tell which key was pressed from the number. There is no mistake in the if chain, the group or the hat blocks.",
+                "skills": [
+                  "mk-protocol",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d24-q5",
+                "kind": "numeric",
+                "prompt": "The Birdsong melody lasts 1.25 seconds. If the receiving card handles 3 messages one after another and plays the melody for each one, how many seconds does it play in total?",
+                "answer": 3.75,
+                "tolerance": 0.01,
+                "unit": "seconds",
+                "explanation": "The melody block waits until it ends, and the messages are handled in turn: 3 × 1.25 = 3.75 seconds.",
+                "skills": [
+                  "mk-message-flow"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Uzaktan kumanda",
@@ -3559,7 +6392,128 @@ export const modul10: ModuleContent = {
                 "mk-protocol"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Remote control",
+            "problem": "As you tilt the remote control of a toy car, the car changes direction. The remote and the car are really two separate devices, and the only link between them is a radio message: \"go left\", \"go right\". In this project Card 1 will be the remote, and Card 2 will be the car. When you tilt the remote, the car will show an arrow in that direction and turn its steering servo.",
+            "contentMd": "### Project: Remote control\nYou will put together all of this week's ideas: radio group, sending numbers, receiving, reading into a variable and a chain of **if** blocks inside each other. On top of that, detecting tilt with the accelerometer and a servo output are added.\n\n**Goals:**\n- When you tilt Card 1 left, right, forward and back, the commands 1, 2, 3 and 4 are sent.\n- When Card 2 receives a command, it shows the matching direction arrow.\n- When you tilt left, the servo turns to 45 degrees; when you tilt right, it turns to 135 degrees.\n- Button A sends the \"stop\" command (0), and Card 2 shows the \"no\" icon.\n\n### Command table\n| Command number | Remote movement | Car screen | Servo (P0) |\n|---|---|---|---|\n| 1 | tilt left | left arrow | 45° |\n| 2 | tilt right | right arrow | 135° |\n| 3 | tilt forward | up arrow | 90° |\n| 4 | tilt back | down arrow | 90° |\n| 0 | button A | \"no\" icon | 90° |\n\n### New blocks\n- The **when card is [tilted left]** hat block in the **Input** category runs when the card is tilted. From the list you can choose **tilted right**, **tilted forward** and **tilted back**.\n- The **show arrow [↑ north]** block in the **LED** category draws an arrow in one of eight directions. We will use **← west** (left), **→ east** (right), **↑ north** (up) and **↓ south** (down).\n- The **servo [P0] to angle [90]** block in the **Pins** category turns the virtual servo connected to pin P0 to an angle between 0 and 180 degrees. You can see the servo turn in the **Pins** section next to the card.\n\n### Step by step\n**on start**, four **when card is [tilted left]** hat blocks, **on button [A] [pressed]** and **on radio received** are ready in the editor.\n\n**The remote side**\n1. Put **set radio group to [1]** inside **on start**.\n2. Put **radio send number [1]** inside **when card is [tilted left]**; **2** inside **when card is [tilted right]**; **3** inside **when card is [tilted forward]**; and **4** inside **when card is [tilted back]**.\n3. Put **radio send number [0]** inside **on button [A] [pressed]**.\n\n**The car side**\n4. In the **Variables** category, make the variable **komut** (\"command\").\n5. Put **set komut to [0]** inside **on radio received**; plug **received [number]** in place of the zero.\n6. Underneath, build an **if ... then ... else** chain:\n   - if **komut = 1**: **show arrow [← west]** and **servo [P0] to angle [45]**.\n   - else if **komut = 2**: **show arrow [→ east]** and **servo [P0] to angle [135]**.\n   - else if **komut = 3**: **show arrow [↑ north]** and **servo [P0] to angle [90]**.\n   - else if **komut = 4**: **show arrow [↓ south]** and **servo [P0] to angle [90]**.\n   - else (that is, 0): **show icon [no]** and **servo [P0] to angle [90]**.\n\n**Testing**\n7. Press ▶ **Run**. Choose the **Card 1** tab in the right panel. In the **Motion (accelerometer)** section, press the **Tilt left**, **Tilt right**, **Tilt forward** and **Tilt back** buttons in turn. Then press Card 1's **A** button.\n8. Switch to the **Card 2** tab, open the **Pins** section and look at the servo's angle.\n\n### Expected result\nEvery time you tilt Card 1, the arrow for that direction appears on Card 2's screen. When you tilt left and right, Card 2's **P0** servo turns to 45° and 135°. When you press **A**, Card 2 shows the \"no\" icon and the servo comes to the middle (90°). All nine goals should have a ✓.\n\n### How does it work?\n- When the card tilts, the accelerometer detects a new position and the **when card is [tilted left]** hat block runs. The event only happens when the position **changes**. If you tilt in the same direction twice in a row, the command is not sent the second time; first straighten it with **Face up**.\n- Because Card 2 runs the same program too, if you tilt Card 2, Card 1 behaves like a car as well. The two cards control each other.\n- The command numbers are the agreement in the table. The sending and receiving sides use the same table; if you change the table, change both together.\n- In the virtual portal there is no real motor or servo; the virtual servo display in the **Pins** section shows the angle.\n\n### Try it\n1. Make \"stop\" go in the **Face up** position too: put **radio send number [0]** inside the **when card is [face up]** hat block.\n2. Make a short beep play when a command is received: add the **play note [C] for [1/8] beat** block inside **on radio received**.\n3. Send the remote's tilt angle too: send the **tilt (side) degrees** block from the **Input** category with **radio send [aci] = [...]** (`aci` means \"angle\"), and set the servo's angle on the receiving card from it.\n\n### Common mistakes\n- **Mixing up the remote's and the car's tables.** If the sender sends 1 but the receiver thinks 1 is the right arrow, you see the wrong direction.\n- **Thinking that tilting in the same direction again is a command.** No new event is produced unless the position changes.\n- **Leaving a hat block empty.** If a **when card is [tilted left]** hat block is empty, that direction sends no message.\n- **Trying to turn the servo beyond 180.** The servo angle is pulled into the 0-180 range.",
+            "question": "Only one thing flows between the remote and the car: numbers. This is a very simple method. Where would this method fall short in a real vehicle? If a message is lost or arrives wrong, what should the vehicle do?",
+            "explainerMd": "### What you will learn in this lesson\n- How to plan a system that connects a remote and a vehicle by radio\n- How to turn the card's tilt (an accelerometer event) into a command\n- How to show an arrow and set the servo angle depending on the command that arrives\n- How to put all of the week's ideas together in one project\n\n### What you should know first\n- Radio group, sending and receiving numbers (Lesson 21)\n- The command table and the chain of **if** blocks inside each other (Lesson 24)\n- The tilt and shake events of the card (Lesson 11)\n- Showing an icon on the screen (Lesson 3); you will see showing an arrow and the servo for the first time in this lesson\n\n### Two parts, one message\nA remote-controlled vehicle has two parts: the **remote** says what to do, and the **vehicle** does it. Only radio messages flow between them. Both Micro Cards run the same program, but one plays the role of the remote and the other the role of the vehicle. The \"send\" half of the program is useful on the remote, and the \"receive\" half on the vehicle.\n\n### The table first\nWriting the commands in a table before writing the code lowers the chance of making mistakes:\n\n| Command | Remote movement | Vehicle screen | Servo |\n|---|---|---|---|\n| 1 | tilt left | left arrow | 45° |\n| 2 | tilt right | right arrow | 135° |\n| 3 | tilt forward | up arrow | 90° |\n| 4 | tilt back | down arrow | 90° |\n| 0 | button A | \"no\" icon | 90° |\n\n90° is the middle of the servo. 45° turns 45 degrees to one side, and 135° turns 45 degrees to the other side; the difference between the two ends is 90 degrees. The servo angle is between 0 and 180; anything outside this range is clipped.\n\n### Tilting is an event\nThe **when card is [tilted left]** hat block runs once when the card is tilted. The event only happens when the position **changes**. If the card is already tilted left and you try to tilt it left again, no new event happens. If you leave the hat block empty, that direction never sends a message.\n\n### The vehicle side\nThe vehicle puts the number that arrives into the **komut** (\"command\") variable and asks in order: is it 1, 2, 3, 4, and if none of these, 0, that is \"stop\". In every branch it both shows an arrow and turns the servo. Because the last **else** branch is \"everything else\", it catches 0; if a number it does not know arrives (for example 9), it also behaves like \"stop\". This is a useful safety feature: on an unknown command, the vehicle stops.\n\n### A link to real life\nHere, if a message is lost or arrives wrong, the vehicle quietly stays in its old state. In real vehicles, safety measures are added, such as the vehicle stopping when the signal from the remote is cut off. Adding a \"stops whatever happens\" rule to your own project is a good habit too.\n\n### Summary\nThe remote and the vehicle agree through the command table. The remote turns the card's tilt into a number and sends it by radio; the vehicle puts the number into a variable, shows an arrow with the **if** chain and turns the servo. The tilt event happens when the position changes. The table must be the same on both sides, and the last branch should stop the vehicle on an unknown command.",
+            "concepts": [
+              {
+                "term": "Remote and vehicle",
+                "definition": "The remote sends commands and the vehicle carries them out; only radio messages flow between them.",
+                "example": "When you tilt Card 1, Card 2 shows an arrow and the servo turns.",
+                "pitfall": "Mixing up the remote's and the vehicle's tables; the sender sends 1, and the receiver understands 1 as something else."
+              },
+              {
+                "term": "Command table",
+                "definition": "A plan that writes down which movement, screen and servo angle each command number matches.",
+                "example": "1 = left arrow and servo 45°, 2 = right arrow and servo 135°.",
+                "pitfall": "Writing the code without a table; the two sides are written with different agreements."
+              },
+              {
+                "term": "Position event",
+                "definition": "When the card is tilted, the accelerometer detects a new position and the hat block runs. The event happens when the position changes.",
+                "example": "radio send number 1 inside the when card is [tilted left] hat block.",
+                "pitfall": "Thinking that tilting in the same direction again is a new command; no event happens unless the position changes."
+              },
+              {
+                "term": "Servo angle",
+                "definition": "The position of the servo on pin P0, between 0 and 180 degrees. 90 is the middle.",
+                "example": "45° turns 45 degrees to one side, and 135° 45 degrees to the other.",
+                "pitfall": "Giving an angle beyond 180; the angle is pulled into the 0-180 range."
+              },
+              {
+                "term": "Safe last branch",
+                "definition": "The last else branch of the if chain stops the vehicle even on an unknown command.",
+                "example": "If command 9 arrives, the vehicle shows the \"no\" icon and the servo goes to 90°.",
+                "pitfall": "Leaving the last branch empty; on an unknown command the vehicle stays in its previous state."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h5d25-q1",
+                "kind": "numeric",
+                "prompt": "According to the command table, the servo goes to 45° when you tilt left and to 135° when you tilt right. How many degrees does the servo turn from one end to the other?",
+                "answer": 90,
+                "tolerance": 0,
+                "unit": "degrees",
+                "explanation": "135 − 45 = 90 degrees. Because the middle point is 90°, both sides are 45° away from the middle.",
+                "skills": [
+                  "mk-servo-tilt"
+                ]
+              },
+              {
+                "id": "m10h5d25-q2",
+                "kind": "predict-output",
+                "prompt": "The vehicle side's program is below. Command 9 arrives from the remote (it was sent by hand). What does the vehicle do?\n\n```\non radio received:\n    set komut to received number\n    if komut = 1 then: left arrow, servo 45\n    else if komut = 2 then: right arrow, servo 135\n    else if komut = 3 then: up arrow, servo 90\n    else if komut = 4 then: down arrow, servo 90\n    else: \"no\" icon, servo 90\n```",
+                "options": [
+                  "It shows the down arrow, servo 90",
+                  "It gives an error and the program stops",
+                  "It shows the \"no\" icon, servo 90",
+                  "It does nothing, and the previous arrow stays"
+                ],
+                "answer": 2,
+                "explanation": "9 does not match any condition, so the last else branch runs: the \"no\" icon and servo 90°. Stopping the vehicle on an unknown command is the behaviour we want. No error message appears.",
+                "skills": [
+                  "mk-protocol",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h5d25-q3",
+                "kind": "find-bug",
+                "prompt": "When the remote is tilted right, the vehicle shows the left arrow. The vehicle side matches the table. Find the mistake.\n\n```\nwhen card is tilted left:   radio send number 1\nwhen card is tilted right:  radio send number 1\n```",
+                "options": [
+                  "The order of the chain on the vehicle side is wrong",
+                  "The tilted right hat block sends 1 instead of 2",
+                  "The servo angle goes beyond 180",
+                  "The radio groups are different"
+                ],
+                "answer": 1,
+                "explanation": "For tilted right, the command in the table is 2. Because 1 is sent here, the vehicle shows the left arrow. The chain on the receiving side is correct, so the mistake is on the sending side, in the wrong number.",
+                "skills": [
+                  "mk-protocol",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d25-q4",
+                "kind": "mcq",
+                "prompt": "The remote card is already tilted left. A student tries to tilt the card left again. What happens?",
+                "options": [
+                  "No new event happens, and no command is sent",
+                  "The command is sent again",
+                  "The servo goes to 0°",
+                  "The vehicle stops"
+                ],
+                "answer": 0,
+                "explanation": "The event happens when the position changes. Because the position is already \"tilted left\", no new event happens and no new command goes out. You first need to bring the card to another position, such as \"face up\".",
+                "skills": [
+                  "mk-servo-tilt",
+                  "prog-debug"
+                ]
+              },
+              {
+                "id": "m10h5d25-q5",
+                "kind": "mcq",
+                "prompt": "When you start the remote control project, which is the best first step?",
+                "options": [
+                  "Turning the servo to random angles",
+                  "Writing the first block that works and thinking about the numbers later",
+                  "Writing only the remote side and designing the vehicle later",
+                  "Making a command table that writes down what each command triggers"
+                ],
+                "answer": 3,
+                "explanation": "You write the command table first, because the remote and the vehicle must share the same agreement. Without a table, the sending and receiving sides might use different numbers. Connecting the servo or trying random numbers comes later.",
+                "skills": [
+                  "prog-planning",
+                  "mk-protocol"
+                ]
+              }
+            ]
+          }
         }
       ]
     },
@@ -3567,6 +6521,7 @@ export const modul10: ModuleContent = {
       "title": "Projeler",
       "project": "Ders sonu final projesi",
       "guideMd": "### Hafta hedefleri\nBu haftanın sonunda öğrenci:\n1. 10 saniyelik ölçüm ve çarpma ile dakikadaki atışı hesaplayabilir; bir bayrak değişkeni ile sayma zamanını yönetebilir.\n2. **kart sallandığında** başlığıyla olay sayabilir; eşitlik ile büyük-eşit koşulunun farkını ve kalan (mod) işlemini açıklayabilir.\n3. Alarm gibi bir cihazı durumlar ve geçişler olarak tarif edip değişkenlerle kurabilir.\n4. Sensör değerini (0-1023) **eşle** ile yüzdeye çevirebilir; eşik, çubuk grafik ve konsol kullanabilir.\n5. İki kartı radyoyla konuşturan bir projeyi önce plan olarak yazıp sonra kurabilir.\n\n### Haftanın planı\nHafta beş derstir; her ders yaklaşık 25-40 dakikadır. Aşağıdaki plan günde bir ders içindir.\n\n| Gün | Ders | Süre | Ne yapılır |\n|---|---|---|---|\n| 1 | Nabız ölçer | ~28 dk | Anlatımı oku, B ile 10 saniyelik ölçümü başlat, 12 kez A'ya bas, 72'yi gör, mini testi çöz. |\n| 2 | Adımsayar | ~25 dk | Kartı sal, A ile adımı oku, 10. adımda kutlamayı gör, \"= ya da >=\" farkını dene. |\n| 3 | Alarm | ~28 dk | Üç durumu kur, kurulu ve alarm değişkenlerini izle, A+B uzun basışla kapat. |\n| 4 | Nem ve sıcaklık istasyonu | ~30 dk | P1 kaydırıcısıyla nemi yüzdeye çevir, çubuk grafiği ve konsolu dene, eşiği değiştir. |\n| 5 | Proje: Akıllı saksı (final) | ~40 dk | Planı çiz, iki kartı kur, radyoyla nemi karşılıklı izlet, kendini değerlendir. |\n\n### Ön koşul kontrolü\nBu hafta önceki haftaların parçalarını birleştirir. Başlamadan önce kontrol et:\n- Değişken oluşturup değer yapabiliyor ve değerine ekleyebiliyor mu? (7. ders)\n- **eğer ... ise** ve karşılaştırma bloklarını kullanabiliyor mu? (8. ders)\n- Düğme başlıklarını ve uzun basışı biliyor mu? (6. ve 9. dersler)\n- **kart sallandığında** başlığını ve **çubuk grafik** bloğunu biliyor mu? (11. ve 12. dersler)\n- **ezgiyi çal** bloğunu ve radyo gönder/al bloklarını biliyor mu? (18., 21. ve 22. dersler)\n- Yüzde ve oran fikrine alışık mı? (50 / 100 gibi)\n\n### Kavram haritası\n- **Sayma ve ölçüm:** bayrak değişkeni → bekle bloğu → sayac x 6\n- **Olay ve koşul:** kart sallandığında → adim = 10 / adim >= 10 → kalan işlemi\n- **Durum:** kapalı → kurulu → çalıyor → kapat; kurulu ve alarm değişkenleri\n- **Sensör:** analog oku (0-1023) → eşle (0-100) → eşik → çubuk grafik ve konsol\n- **Proje:** plan → her 2000 ms'de gönder → mesaj gelince alınan değerle tepki ver\n\n### Sık yapılan hatalar\n- **Bayrağı yanlış yerde açmak.** olcum değerini bekle bloğundan sonra 1 yaparsan bekleme boyunca hiç sayılmaz.\n- **Sayacı sıfırlamamak.** İkinci ölçüm ilkinin üstüne eklenir (126 gibi).\n- **Çarpanı unutmak ya da yanlış seçmek.** süre x çarpan = 60 olmalı.\n- **Sayma bloğunu eğer'in içine koymak.** Değişken artmaz, koşul hiç doğru olmaz.\n- **Eşit yerine büyük-eşit kullanmak.** Kutlama 10. adımdan sonra her adımda tekrarlanır.\n- **Alarmı yarım kapatmak.** Yalnız sesi durdurmak; alarm değişkeni 1 kalır ve ezgi yeniden başlar.\n- **eşle bloğunda aralıkları ters yazmak.** 512 değeri 50 yerine 5238 olur.\n- **Eşik işaretini ters koymak.** nem > 30 yazarsan ıslakken uyarır.\n- **Alan kartta kendi sensörünü okumak.** Gelen mesajdaki alınan değer kullanılmalı.\n- **Mesaj adını farklı yazmak.** \"nem\" ile \"Nem\" eşit sayılmaz.\n- **Çubuk grafikte en çok değeri yanlış bırakmak.** Nem yüzde ise 100 olmalı.\n\n### Hafta sonu tekrarı\n1. Her dersin kavram kartlarına bir kez daha bak ve \"sık yapılan yanlış\" satırlarını yüksek sesle oku.\n2. Mini testlerde yanlış yaptığın soruların açıklamalarını yeniden oku, sonra soruyu yeniden çöz.\n3. Nabız ölçeri bakmadan yeniden kur. Sonra ölçüm süresini 15 saniye yapıp çarpanı değiştir ve aynı sonucu bul.\n4. Alarm için durum tablosunu kâğıda çiz: üç durum, hangi olay hangi durumu değiştirir.\n5. P1 kaydırıcısını 0, 100, 300, 512 ve 1023 yap; her birinin yüzde karşılığını tahmin et, sonra konsolda karşılaştır.\n6. Kendi cümlelerinle şu soruyu cevapla: \"bekle bloğu neden öteki düğmeleri durdurmaz?\"\n\nHafta sonu testi olarak beş dersin mini testleri yeterlidir; her derste 5 soru, toplam 25 soru. Hedef: her dersten en az 4 doğru. Eksik kalan dersin anlatımına dön.\n\n### Proje değerlendirme ölçütü (Akıllı saksı)\n| Ölçüt | Gelişmeli | Yeterli | İleri |\n|---|---|---|---|\n| Plan | Plan yok | Dört başlığın ne zaman çalıştığı yazılmış | Plan kodla birebir uyuyor ve eşiğin neden seçildiği açıklanmış |\n| Ölçüm | Nem ham sayı olarak gösteriliyor | P1 değeri eşle ile 0-100'e çevrilmiş | Eşik bir değişkende tutuluyor, kolayca değiştirilebiliyor |\n| Radyo | Kartlar birbirini görmüyor | İki kart aynı grupta, nem mesajı gidiyor ve alan kart alınan değeri kullanıyor | Mesaj adı ve grup kontrol edilmiş, ek bir mesaj (sıcaklık gibi) eklenmiş |\n| Tepki | Uyarı yok ya da hep çalıyor | Nem 30'un altında üzgün yüz ve ezgi, değilse çubuk grafik | Çubuk grafik doğru ölçekli, ezgi sürerken gelen mesajlar anlatılabiliyor |\n| Anlatım | Ne yaptığını anlatamıyor | Programı üç cümleyle anlatıyor | Hata yapıp nasıl bulduğunu ve ders parçalarını nerede kullandığını anlatıyor |\n\n### Veli ve öğretmen notu\n- **Amaç.** Hafta ezber değil, öğrencinin önceki haftaları birleştirerek küçük bir \"ürün\" kurmasıdır. Her derste bir cihaz (nabız ölçer, adımsayar, alarm, istasyon) çıkar.\n- **Nasıl destek olunur?** Takıldığında cevabı söyleme; şu soruları sor: \"Hangi olay bu başlığı çalıştırıyor?\", \"O anda değişkenlerin değeri ne?\", \"Bu bloğu eğer'in içine mi dışına mı koydun?\", \"Hangi karttan okuyorsun, gelen mesajdan mı kendi pininden mi?\"\n- **Sağlık notu.** Nabız ölçer bir eğitim aracıdır, tıbbi ölçüm değildir. Gerçek bir sağlık kaygısı için bir yetişkine ya da doktora danışılmalıdır.\n- **Süre.** Dersleri aynı gün peş peşe yapmak yerine aralıklı çalışmak kalıcılığı artırır. Final projesini farklı bir günde yapmak iyi olur.\n- **Güvenlik.** Bu platformdaki her şey sanaldır; gerçek bir sensör, pil ya da radyo kullanılmaz.\n- **İlerleme.** Dersin sonundaki mini test sonuçları \"İlerlemem\" sayfasında beceri bazında görünür (taslak/pilot özellik; yalnız onay verildiyse kaydedilir).",
+      "guideMdEn": "### Week goals\nBy the end of this week, the learner:\n1. Can work out beats per minute with a 10-second measurement and a multiplication; can manage the counting time with a flag variable.\n2. Can count events with the **when card is shaken** hat block; can explain the difference between the equal and greater-than-or-equal conditions, and the remainder (mod) operation.\n3. Can describe a device such as an alarm as states and moves between them, and build it with variables.\n4. Can turn a sensor value (0-1023) into a percentage with **map**; can use a threshold, a bar graph and the console.\n5. Can write a project in which two cards talk by radio as a plan first, and then build it.\n\n### Plan for the week\nThe week has five lessons; each lesson takes about 25-40 minutes. The plan below is for one lesson a day.\n\n| Day | Lesson | Time | What to do |\n|---|---|---|---|\n| 1 | Pulse meter | ~28 min | Read the explainer, start the 10-second measurement with B, press A 12 times, see 72, do the mini quiz. |\n| 2 | Step counter | ~25 min | Shake the card, read the steps with A, see the celebration on the 10th step, try the \"= or >=\" difference. |\n| 3 | Alarm | ~28 min | Set up the three states, watch the kurulu and alarm variables, turn it off with an A+B long press. |\n| 4 | Humidity and temperature station | ~30 min | Turn the moisture into a percentage with the P1 slider, try the bar graph and the console, change the threshold. |\n| 5 | Project: Smart plant pot (final) | ~40 min | Draw the plan, set up the two cards, have them watch each other's moisture by radio, assess yourself. |\n\n### Prerequisite check\nThis week puts together parts from the earlier weeks. Before you start, check:\n- Can they make a variable, set a value and change the value by an amount? (Lesson 7)\n- Can they use the **if ... then** and comparison blocks? (Lesson 8)\n- Do they know the button hat blocks and the long press? (Lessons 6 and 9)\n- Do they know the **when card is shaken** hat block and the **bar graph** block? (Lessons 11 and 12)\n- Do they know the **play melody** block and the radio send/receive blocks? (Lessons 18, 21 and 22)\n- Are they used to the idea of percentage and proportion? (such as 50 / 100)\n\n### Concept map\n- **Counting and measuring:** flag variable → pause block → sayac x 6\n- **Event and condition:** when card is shaken → adim = 10 / adim >= 10 → remainder operation\n- **State:** off → set → ringing → turn off; the kurulu and alarm variables\n- **Sensor:** analog read (0-1023) → map (0-100) → threshold → bar graph and console\n- **Project:** plan → send every 2000 ms → when a message arrives, react with the received value\n\n### Common mistakes\n- **Turning the flag on in the wrong place.** If you set olcum to 1 after the pause block, nothing is counted during the wait.\n- **Not resetting the counter.** The second measurement is added on top of the first (such as 126).\n- **Forgetting the multiplier or choosing the wrong one.** time x multiplier must be 60.\n- **Putting the counting block inside the if.** The variable does not go up, and the condition is never true.\n- **Using greater-than-or-equal instead of equal.** The celebration repeats on every step after the 10th.\n- **Only half turning off the alarm.** Only stopping the sound; the alarm variable stays 1 and the melody starts again.\n- **Writing the ranges in the map block the wrong way round.** The value 512 becomes 5238 instead of 50.\n- **Putting the threshold sign the wrong way round.** If you write nem > 30, it warns you when it is wet.\n- **Reading its own sensor on the receiving card.** The received value in the message that arrives should be used.\n- **Writing the message name differently.** \"nem\" and \"Nem\" do not count as equal.\n- **Leaving the wrong largest value in the bar graph.** If the moisture is a percentage, it must be 100.\n\n### End-of-week review\n1. Look at each lesson's concept cards once more and read the \"common mistake\" lines out loud.\n2. Read again the explanations of the questions you got wrong in the mini quizzes, then answer the question again.\n3. Build the pulse meter again without looking. Then make the measurement time 15 seconds, change the multiplier and find the same result.\n4. Draw the state table for the alarm on paper: three states, and which event changes which state.\n5. Set the P1 slider to 0, 100, 300, 512 and 1023; guess the percentage for each one, then compare in the console.\n6. Answer this question in your own words: \"Why does the pause block not stop the other buttons?\"\n\nAs an end-of-week test, the mini quizzes of the five lessons are enough; 5 questions in each lesson, 25 questions in total. Target: at least 4 correct in each lesson. Go back to the explainer of any lesson that falls short.\n\n### Project assessment rubric (Smart plant pot)\n| Criterion | Developing | Secure | Advanced |\n|---|---|---|---|\n| Plan | No plan | When the four hat blocks run is written down | The plan matches the code exactly, and why the threshold was chosen is explained |\n| Measuring | The moisture is shown as a raw number | The P1 value has been turned into 0-100 with map | The threshold is kept in a variable and can be changed easily |\n| Radio | The cards do not see each other | The two cards are in the same group, the moisture message goes out and the receiving card uses the received value | The message name and the group have been checked, and an extra message (such as temperature) has been added |\n| Reaction | There is no warning, or it rings all the time | Below 30 moisture, a sad face and the melody; otherwise a bar graph | The bar graph is correctly scaled, and they can explain what happens to messages that arrive while the melody plays |\n| Explanation | Cannot explain what they did | Explains the program in three sentences | Explains a mistake they made and how they found it, and where they used the parts from the lessons |\n\n### Note for parents and teachers\n- **Aim.** The week is not about memorising, but about the learner building a small \"product\" by putting the earlier weeks together. Each lesson produces a device (pulse meter, step counter, alarm, station).\n- **How to help.** When they get stuck, do not give the answer; ask these questions: \"Which event runs this hat block?\", \"What are the values of the variables at that moment?\", \"Did you put this block inside or outside the if?\", \"Which card are you reading from: the message that arrived or its own pin?\"\n- **Health note.** The pulse meter is a learning tool, not a medical measurement. For a real health concern, ask an adult or a doctor.\n- **Time.** Spacing the lessons out, rather than doing them one after another on the same day, helps the learning stick. It is a good idea to do the final project on a different day.\n- **Safety.** Everything on this platform is virtual; no real sensor, battery or radio is used.\n- **Progress.** The mini quiz results at the end of each lesson appear by skill on the \"My progress\" page (a draft/pilot feature; saved only if consent has been given).",
       "lessons": [
         {
           "title": "Nabız ölçer",
@@ -3682,7 +6637,122 @@ export const modul10: ModuleContent = {
                 "mk-variables"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Pulse meter",
+            "problem": "A doctor holds your wrist, looks at a watch and counts your heartbeats. Why do they not count for a whole minute? Because counting for a short time and doing a multiplication gives the same result much faster. In this lesson you will make your own virtual pulse meter. You will press A on every beat of your heart, and the card will count and tell you the result.",
+            "contentMd": "### The idea\nThe card has no real pulse sensor. The portal is completely virtual, and you enter the measurement yourself: you count your own pulse or a rhythm and press **A** on every beat. The card counts these presses for 10 seconds and multiplies at the end.\n\n**Beats per minute = beats counted in 10 seconds × 6**\n\n| Beats in 10 seconds | Beats per minute |\n|---|---|\n| 10 | 60 |\n| 12 | 72 |\n| 15 | 90 |\n\nThis is a learning tool, not a medical measurement.\n\n### A new idea: other work while waiting\nThe **pause [10000] ms** block waits for 10 seconds inside a hat block. But the card's other hat blocks keep running during this time. So while **B** is waiting for 10 seconds, the **A** button still works. The card runs different hat blocks together.\n\n### Step by step\n**on start**, **on button [A] [pressed]** and **on button [B] [pressed]** are ready in the editor.\n\n1. In the **Variables** category, make two variables: **sayac** (\"counter\": how many beats) and **olcum** (\"measuring\": is a measurement running? 1 = yes, 0 = no).\n2. Put **set sayac to [0]** and **set olcum to [0]** inside **on start**.\n3. Put **if ... then** inside **on button [A] [pressed]**. Condition: **olcum** **=** **1**. Inside it, in this order:\n   - **change sayac by [1]**\n   - **show icon [heart]**\n   - **pause [100] ms**\n   - **clear screen**\n4. Inside **on button [B] [pressed]**, in this order:\n   - **set sayac to [0]**\n   - **set olcum to [1]**\n   - **show icon [small heart]**\n   - **pause [10000] ms**\n   - **set olcum to [0]**\n   - **sayac** **×** **6** (the multiplication block) inside **show number**.\n5. Press ▶ **Run**. Press **B** and the measurement starts. Within 10 seconds, press **A** twelve times (about once a second). Look at the result.\n\n### Expected result\nAfter **B**, a small heart stays on the screen. On every press of **A**, a big heart flashes for a moment. After 10 seconds, **72** scrolls across the screen. All four goals should have a ✓. If you do not hit exactly 12 beats, your result is a multiple of 6 (60, 66, 72, 78...).\n\n### How does it work?\n- **olcum** is a flag. While it is 1, **A** counts; while it is 0, **A** does nothing. This way, presses outside a measurement are not counted by mistake.\n- **sayac** is reset at the start of every measurement.\n- **pause [10000] ms** waits for 10 seconds. During this time **A** works, because **A** is a separate hat block.\n- When the 10 seconds are over, the flag is turned off and the result is shown.\n\n### Try it\n1. Make the measurement time 15 seconds (**pause [15000] ms**) and make the multiplier 4. The result should come out about the same.\n2. Show an icon on the screen depending on the result: below 60 a **sleeping face**, above 100 a **surprised face**, in between a **happy face**. (Put **if ... then ... else** blocks inside each other.)\n3. Play a short beep when the measurement starts and a different beep when it ends.\n\n### Common mistakes\n- **Forgetting to set olcum to 1.** **A** never counts.\n- **Writing 10 instead of 10000.** **pause** works in milliseconds. 10 ms is not noticeable at all.\n- **Not resetting sayac.** In the second measurement, the number is added on top of the previous measurement.\n- **Forgetting the multiplier.** Only the number of beats stays on the screen, not \"beats per minute\".",
+            "question": "When you run fast, your pulse goes up. If you measured before running and after running, what difference would you see? If you measured for 5 seconds instead of 10, how reliable would the result be?",
+            "explainerMd": "### What you will learn in this lesson\n- The logic of counting an event for a set time and scaling the result up with a multiplication\n- How to answer the question \"is it time to count now?\" with a **flag** (a variable that holds 0 or 1)\n- That when the **pause** block makes one hat block wait, the other hat blocks keep running\n- Why you need to reset the counter before every measurement\n\n### What you should know first\n- Lesson 6: the A, B and A+B button hat blocks\n- Lesson 7: making a variable, setting a value, changing a value\n- Lesson 8: the **if ... then** block and comparisons\n\n### Count for a short time, then multiply\nThe heart beats about 60 to 100 times a minute. Counting for a whole minute takes a long time. Instead, we count for 10 seconds and multiply by 6, because 6 times 10 seconds is 60 seconds (one minute).\n\n| Counted in 10 seconds | Multiplier | Beats per minute |\n|---|---|---|\n| 10 | 6 | 60 |\n| 12 | 6 | 72 |\n| 14 | 6 | 84 |\n\nIf you measure for half the time (5 seconds), the multiplier is 12. But in a short measurement, missing one beat changes the result a lot: one beat too many or too few in 5 seconds makes a difference of 12 beats per minute. The longer the measurement, the smaller the effect of a single mistake.\n\n### The flag: is a measurement running?\nThe A button can work at any time. But we only want it to count during a measurement. For this we use a flag variable called **olcum** (\"measuring\"). The flag takes only two values:\n\n| olcum | Meaning | What does button A do? |\n|---|---|---|\n| 0 | no measurement | nothing |\n| 1 | measurement running | adds 1 to sayac |\n\nOne place in the program sets the flag to 1, and another sets it to 0. The condition \"if olcum = 1\" tells these two states apart.\n\n### Other work while waiting\nThe Micro Card runs different hat blocks together. When the B hat block reaches the **pause [10000] ms** block, only the B hat block stops for 10 seconds. The A hat block keeps handling new presses during this time. The timeline looks like this:\n\n```\nt = 0 s     press B: sayac = 0, olcum = 1, pause starts\nt = 1..10   every press of A increases sayac\nt = 10 s    B carries on: olcum = 0, sayac x 6 is shown\n```\n\n### Do not forget to reset\nIf the counter is not set to 0 at the start of the measurement, the beats of the old measurement get mixed into the new result. If you counted 12 beats in the first measurement and 9 in the second and did not reset, the card shows (12 + 9) x 6 = 126. This is an impossible value for a resting heart; the mistake is not in the card but in the program.\n\n### Summary\nBeats per minute are found by counting for a short time and multiplying: number of beats x 6. A flag variable sets when counting is valid. The **pause** block only stops its own hat block; the other hat blocks keep running. You need to reset the counter before every measurement.",
+            "concepts": [
+              {
+                "term": "Short measurement and multiplying",
+                "definition": "Estimating a one-minute value by counting for a short time and multiplying the result.",
+                "example": "If you count 14 beats in 10 seconds, you get 14 x 6 = 84 beats per minute.",
+                "pitfall": "Forgetting the multiplier: the number of beats stays on the screen, not the beats per minute."
+              },
+              {
+                "term": "Flag",
+                "definition": "A variable that holds 0 or 1 and answers the question \"is this action valid right now?\".",
+                "example": "While olcum = 1, A counts; while olcum = 0, A does nothing.",
+                "pitfall": "Forgetting to set the flag to 1: the measurement never starts and A never counts."
+              },
+              {
+                "term": "pause and hat blocks",
+                "definition": "The pause block only stops its own hat block; the other hat blocks keep running.",
+                "example": "While B waits for 10 seconds, button A keeps counting presses.",
+                "pitfall": "Thinking the pause block stops the whole card."
+              },
+              {
+                "term": "Resetting",
+                "definition": "Setting the counter to 0 at the start of a new measurement.",
+                "example": "The first block of the B hat block is set sayac to 0.",
+                "pitfall": "Not resetting: in the second measurement the earlier beats are added too, and the result is inflated."
+              },
+              {
+                "term": "Millisecond",
+                "definition": "The unit of the pause block; 1000 ms = 1 second.",
+                "example": "For 10 seconds you write pause [10000] ms.",
+                "pitfall": "Writing pause [10]: this is only 10 ms, which you cannot notice by eye."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h6d26-q1",
+                "kind": "numeric",
+                "prompt": "On the pulse meter you counted 14 beats in 10 seconds. Which number should the card show?",
+                "answer": 84,
+                "unit": "beats/min",
+                "explanation": "6 times 10 seconds is one minute. 14 x 6 = 84. Showing the number of beats (14) or multiplying by 10 (140) does not give the beats per minute.",
+                "skills": [
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h6d26-q2",
+                "kind": "mcq",
+                "prompt": "If button A is pressed while the B hat block is waiting at the pause [10000] ms block, what happens?",
+                "options": [
+                  "Button A does not work, because the card is waiting",
+                  "The card gives an error",
+                  "The A hat block runs, because hat blocks carry on independently of each other",
+                  "The A presses are handled all together after 10 seconds"
+                ],
+                "answer": 2,
+                "explanation": "pause only stops its own hat block. The A hat block is a separate task and runs straight away on every press. That is why counting can happen while waiting.",
+                "skills": [
+                  "mk-concurrency",
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h6d26-q3",
+                "kind": "find-bug",
+                "prompt": "This program always shows 0, even if A is pressed 12 times in 10 seconds. Which is the mistake?\n\n```\non button B pressed:\n  set sayac to 0\n  pause 10000 ms\n  set olcum to 1\n  show number (sayac x 6)\n\non button A pressed:\n  if olcum = 1 then:\n    change sayac by 1\n```",
+                "options": [
+                  "In the A hat block, sayac should go up by 2 instead of 1",
+                  "The set olcum to 1 block comes after the pause block; because olcum is 0 during the wait, A never counts",
+                  "The multiplier should be 10, not 6",
+                  "sayac was not reset at the start"
+                ],
+                "answer": 1,
+                "explanation": "The flag must be set to 1 before the wait starts. Here it becomes 1 after the wait has finished, so the counting window never opens and sayac stays 0. The multiplier and the reset are correct.",
+                "skills": [
+                  "mk-debug",
+                  "mk-concurrency",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h6d26-q4",
+                "kind": "predict-output",
+                "prompt": "The program below is used. 12 beats were counted in the first measurement, and right after that 9 beats in the second measurement. What does the card show at the end of the second measurement?\n\n```\non start:\n  set sayac to 0\n  set olcum to 0\n\non button B pressed:\n  set olcum to 1\n  pause 10000 ms\n  set olcum to 0\n  show number (sayac x 6)\n\non button A pressed:\n  if olcum = 1 then:\n    change sayac by 1\n```",
+                "options": [
+                  "54",
+                  "72",
+                  "126",
+                  "0"
+                ],
+                "answer": 2,
+                "explanation": "The program does not reset sayac in B. In the second measurement sayac becomes 12 + 9 = 21, and 21 x 6 = 126 is shown. 54 would be the result of the second measurement alone; but there is no reset.",
+                "skills": [
+                  "mk-variables",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h6d26-q5",
+                "kind": "numeric",
+                "prompt": "You increased the measurement time to 15 seconds and made the multiplier 4. You counted 17 beats in 15 seconds. How many beats per minute is that?",
+                "answer": 68,
+                "unit": "beats/min",
+                "explanation": "4 times 15 seconds is 60 seconds. 17 x 4 = 68. The multiplier is chosen from the time: time x multiplier = 60.",
+                "skills": [
+                  "mk-variables"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Adımsayar",
@@ -3796,7 +6866,120 @@ export const modul10: ModuleContent = {
                 "mk-concurrency"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Step counter",
+            "problem": "How does the step counter in a wristband count? A tiny accelerometer inside it feels a small jolt on every step and adds one to the count. The Virtual Micro Card has an accelerometer too. We will make a step counter by counting each shake of the card as \"one step\", and we will add a little celebration on the 10th step.",
+            "contentMd": "### The idea\nShaking the card virtually is a jolt, like walking. The card's **when shaken** hat block runs once on every shake. If we put a block inside it that adds one to the **adim** (\"step\") variable, we have a step counter.\n\n### A new idea: something special when you reach the goal\nWe can say that something should happen when a variable is **exactly** equal to a number: **if [adim] = [10] then**. The equality is only true at that moment. On the 11th step the condition is false, and the sound does not play again.\n\n### Step by step\n**on start**, **when card is [shaken]**, **on button [A] [pressed]** and **on button [B] [pressed]** are ready in the editor.\n\n1. In the **Variables** category, make the **adim** variable.\n2. Put **set adim to [0]** inside **on start**.\n3. Inside **when card is [shaken]**, in this order:\n   - **change adim by [1]**\n   - an **if ... then** block. Condition: **adim** **=** **10**. Inside it, **show icon [happy face]** and **play melody [Fanfare]**.\n4. Put **show number** inside **on button [A] [pressed]**; plug the **adim** variable in as the number.\n5. Put **set adim to [0]** and **clear screen** inside **on button [B] [pressed]**.\n6. Press ▶ **Run**. In the **Motion (accelerometer)** section in the right panel, press the **Shake** button three times. Then press the card's **A** button: you should see 3 on the screen. Shake seven more times. On the 10th shake the celebration starts. Reset with the card's **B** button.\n\n### Expected result\n**A** shows the number of steps: 3 after three shakes, 10 after ten shakes. On the 10th shake, a happy face appears on the card's screen and the **Fanfare** melody plays (about 2.75 seconds). When you press **B**, the counter is reset. All six goals should have a ✓.\n\n### How does it work?\n- With every **Shake**, the **when card is shaken** hat block runs once.\n- On the 10th step, the **if** condition becomes true and the celebration starts. That hat block is busy until the melody ends; new shakes that arrive during this time join a queue (at most 3).\n- **A** and **B** are separate hat blocks; they can run while the melody is playing too.\n- You can also see the values coming from the acceleration sensor: the **strength** value in the **Motion** section goes up while shaking.\n\n### Try it\n1. Make the goal 5 instead of 10. Does the celebration come sooner?\n2. To celebrate every 10 steps, use the **remainder of [adim] ÷ [10]** block in the **Math** category. If the remainder is **0**, celebrate.\n3. If you count your step as 70 cm, the distance you walked is **adim** × 7 ÷ 10 metres. Make the **A** button show this.\n\n### Common mistakes\n- **Forgetting to reset with B.** If you do not press B first for a new walk, the count carries on from where it stopped.\n- **Using the greater-than sign instead of equals.** If it is **adim ≥ 10**, the melody plays again on the 11th and 12th steps too.\n- **Putting the change adim by 1 block inside the if.** Then the variable does not go up.",
+            "question": "How does a real step counter tell shaking apart from walking? Does jumping or swinging your arm count as a step? What information could you use to make the counter smarter?",
+            "explainerMd": "### What you will learn in this lesson\n- How to count events with a hat block that is triggered on every shake\n- The difference between \"exactly equal to this number\" and \"equal to or greater than this number\"\n- How to set up repeating goals such as \"every 10 steps\" with the remainder (mod) operation\n- Whether the counting block should be inside or outside the **if**\n\n### What you should know first\n- Lesson 7: variables and the **change by** block\n- Lesson 8: **if ... then** and comparisons\n- Lesson 11: the accelerometer and the **when card is shaken** hat block\n- Lesson 18: the **play melody** block\n\n### Every shake is an event\nThe accelerometer in a real step counter feels small jolts while you walk. On the virtual card, we count a shake as a step. The **when card is [shaken]** hat block runs once on every shake. If you put **change adim by 1** inside it, adim (\"step\") goes up by one on every shake.\n\n### Equal or greater?\nTo do something when the goal is reached, we write a condition. A small change makes a big difference:\n\n| Condition | adim = 9 | adim = 10 | adim = 11 | adim = 12 |\n|---|---|---|---|---|\n| adim = 10 | false | true | false | false |\n| adim >= 10 | false | true | true | true |\n\n\"adim = 10\" is only true on exactly the 10th step, so the celebration happens once. \"adim >= 10\", however, is true on every step after the 10th, so the celebration repeats on every shake. If the goal is to be done once, choose equality; if it is to be done \"always after passing the goal\", choose greater-than-or-equal.\n\n### Every 10 steps\nIf you want to celebrate at 10, 20, 30... steps, the **remainder of adim ÷ 10** block is useful. The remainder is the number left over from a division:\n\n| adim | remainder of adim ÷ 10 |\n|---|---|\n| 7 | 7 |\n| 10 | 0 |\n| 23 | 3 |\n| 30 | 0 |\n\nIf the remainder is 0, adim is a multiple of 10. So the condition \"if remainder = 0, celebrate\" is true once every 10 steps.\n\n### Where should the counting go?\nYou count first, then you check. If the counting block goes inside the **if**, it only counts while the condition is true. If the condition is \"adim = 10\" and adim starts at 0, the condition is never true, because adim never goes up. The counting block must always be outside the condition, before it.\n\n### The ones that queue\nThe celebration melody lasts about 2.75 seconds. During this time the hat block is busy. New shakes that arrive join a queue, but at most 3 of them are kept, and any more are lost. This is why the counter can count too few with very fast events.\n\n### Summary\nThe **when card is shaken** hat block counts one step on every shake. Exact equality is true once, and greater-than-or-equal is true on every step after it. The remainder operation sets up repeating goals. The counting block must be outside the condition. A busy hat block only queues 3 events.",
+            "concepts": [
+              {
+                "term": "when card is shaken",
+                "definition": "An event hat block that runs once on every shake of the card.",
+                "example": "If you put change adim by 1 inside the hat block, every shake counts as one step.",
+                "pitfall": "Leaving the hat block empty: shaking does not increase any variable."
+              },
+              {
+                "term": "Equal and greater-than-or-equal",
+                "definition": "\"Equal\" is only true at exactly that number; \"greater-than-or-equal\" is true at every number from that one on.",
+                "example": "adim = 10 does the celebration once; adim >= 10 repeats it on every step.",
+                "pitfall": "Using greater-than-or-equal for something that should happen once: the celebration plays on the 11th and 12th steps too."
+              },
+              {
+                "term": "Remainder (mod)",
+                "definition": "The number left over from a division. The remainder of adim ÷ 10 is 0 at multiples of 10.",
+                "example": "The remainder of 30 ÷ 10 is 0, and the remainder of 23 ÷ 10 is 3.",
+                "pitfall": "Mixing up the quotient and the remainder: for 23 ÷ 10 the quotient is 2 and the remainder is 3."
+              },
+              {
+                "term": "Counting order",
+                "definition": "You count first, then you check. The counting block must be outside the condition.",
+                "example": "The change adim by 1 block comes before the if block.",
+                "pitfall": "Putting the counting block inside the if: the condition is never true and the variable does not go up."
+              },
+              {
+                "term": "Event queue",
+                "definition": "New events that arrive at a busy hat block join a queue, but at most 3 of them are kept.",
+                "example": "Of 5 shakes that arrive while Fanfare is playing, only 3 are handled.",
+                "pitfall": "Thinking every shake will definitely be counted: on a busy hat block, the extra ones are lost."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h6d27-q1",
+                "kind": "predict-output",
+                "prompt": "The card is shaken 12 times (adim starts at 0, and after each shake you wait until the melody ends). How many times does the Fanfare melody play?\n\n```\nwhen card is shaken:\n  change adim by 1\n  if adim >= 10 then:\n    play melody [Fanfare]\n```",
+                "options": [
+                  "1 time",
+                  "2 times",
+                  "3 times",
+                  "12 times"
+                ],
+                "answer": 2,
+                "explanation": "The condition is true when adim is 10, 11 and 12: 3 times. If \"adim = 10\" had been written, it would play only once. For it to play 12 times, it would have to be true from the first shake.",
+                "skills": [
+                  "mk-conditions",
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h6d27-q2",
+                "kind": "find-bug",
+                "prompt": "However many times you shake the card, there is no celebration on the 10th step. Which is the mistake?\n\n```\non start:\n  set adim to 0\n\nwhen card is shaken:\n  if adim = 10 then:\n    change adim by 1\n    show icon [happy face]\n    play melody [Fanfare]\n```",
+                "options": [
+                  "The change adim by 1 block is inside the if; because adim is 0, the condition is never true and adim never goes up",
+                  "The melody name is wrong",
+                  "adim should not be set to 0 in on start",
+                  "< should be used instead of = in the condition"
+                ],
+                "answer": 0,
+                "explanation": "The counting block should be put outside the condition, before it. If it stays inside, adim gets stuck at 0, and \"adim = 10\" never becomes true. Setting it to 0 in on start and the melody name are correct.",
+                "skills": [
+                  "mk-debug",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h6d27-q3",
+                "kind": "numeric",
+                "prompt": "Your step is 70 cm. The step counter shows 50 steps. How many metres have you walked?",
+                "answer": 35,
+                "unit": "m",
+                "explanation": "70 cm = 0.7 m. 50 x 0.7 = 35 m. In blocks it can also be written as adim x 7 ÷ 10. The answer 3500 is in centimetres.",
+                "skills": [
+                  "mk-variables"
+                ]
+              },
+              {
+                "id": "m10h6d27-q4",
+                "kind": "mcq",
+                "prompt": "The condition \"remainder of adim ÷ 10 = 0\" is used to celebrate every 10 steps. On which steps does the celebration happen?",
+                "options": [
+                  "Only on the 10th step",
+                  "On all the steps 1, 2, 3 ...",
+                  "On steps 10, 20, 30 ...",
+                  "On steps 5, 15, 25 ..."
+                ],
+                "answer": 2,
+                "explanation": "The remainder is only 0 at multiples of 10: 10, 20, 30 ... To celebrate only on the 10th step, you would write adim = 10.",
+                "skills": [
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h6d27-q5",
+                "kind": "numeric",
+                "prompt": "In a correctly built step counter, the 10th shake starts the Fanfare melody (2.75 seconds). While the melody is playing, the card is shaken 5 more times. When the melody ends and the queued events are handled, what is adim?",
+                "answer": 13,
+                "explanation": "At most 3 events join the queue of a busy hat block; of the 5 shakes, 3 are kept and 2 are lost. adim becomes 10 + 3 = 13. We checked this number by running it on the virtual card.",
+                "skills": [
+                  "mk-events",
+                  "mk-concurrency"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Alarm",
@@ -3917,7 +7100,127 @@ export const modul10: ModuleContent = {
                 "mk-variables"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Alarm",
+            "problem": "What if your bag or your bike had an alarm that started ringing as soon as anyone touched it? An alarm is really a **state** machine: either it is not set, or it is set, or it is ringing. The buttons and sensors make it move between the states. In this lesson you will make an alarm that keeps its states in variables.",
+            "contentMd": "### Three states\n| State | When? | On the screen |\n|---|---|---|\n| Off | at the start | empty |\n| Set | when you press A | the \"yes\" mark |\n| Ringing | when the card is shaken while it is set | a skull and the alarm melody |\n\nTo turn off a ringing alarm, you press **A+B** for longer than a second. A long press does not happen by accident, so it works like a password. When it turns off, a happy face appears on the screen.\n\n### New ideas\n- Two **state variables**: **kurulu** (\"set\", 0/1) and **alarm** (0/1). The variables remember the card's current state.\n- **on button [A+B] [long pressed]**: runs when you press A and B together for longer than 1 second. (In the button hat block, choose **A+B** and **long pressed** from the lists.)\n- Checking a state all the time with an **if** inside **forever**.\n\n### Step by step\n**on start**, **on button [A] [pressed]**, **when card is [shaken]**, **forever** and **on button [A+B] [long pressed]** are ready in the editor.\n\n1. In the **Variables** category, make the **kurulu** and **alarm** variables.\n2. Put **set kurulu to [0]** and **set alarm to [0]** inside **on start**.\n3. Put **set kurulu to [1]** and **show icon [yes]** inside **on button [A] [pressed]**.\n4. Put **if ... then** inside **when card is [shaken]**. Condition: **kurulu** **=** **1**. Inside it, **set alarm to [1]**.\n5. Put **if ... then** inside **forever**. Condition: **alarm** **=** **1**. Inside it, in this order: **show icon [skull]**, **play melody [Alarm]**, **clear screen**, **pause [200] ms**.\n6. Inside **on button [A+B] [long pressed]**, in this order: **set kurulu to [0]**, **set alarm to [0]**, **stop sound**, **show icon [happy face]**.\n7. Press ▶ **Run**. Press the card's **A** button. Press **Shake** in the **Motion** section. While the alarm is ringing, press the button marked **A+B** for longer than a second and do not let go.\n\n### Expected result\nAfter **A**, the \"yes\" mark appears on the screen. When you shake, the skull flashes on and off and a short alarm melody plays again and again (the melody lasts 1.6 seconds, followed by a gap of 0.2 seconds). When you long-press **A+B**, the alarm stops and a happy face appears. All six goals should have a ✓.\n\n### How does it work?\n- If you shake **while it is not set**, nothing happens, because the **if** inside **when card is [shaken]** waits for **kurulu = 1**.\n- **forever** always goes round, but while **alarm = 0** it skips its inside.\n- When the **A+B** long press sets **alarm** to 0, **forever** does not ring the alarm on the next round. The melody that is playing at that moment may carry on until it ends (at most 1.6 seconds), but it does not start again.\n- Because more than one hat block runs at the same time, the **A+B** long press is handled before the melody has ended.\n\n### Try it\n1. Make the alarm ring when the card is turned face down instead of shaken: use the **when card is [face down]** hat block.\n2. While the alarm is ringing, play a different melody if the **light level** is below 50 (in the dark). Change the light with the **Light** slider.\n3. To turn it off, try pressing the B button 3 times in a row instead of A+B. You will need a variable that keeps count.\n\n### Common mistakes\n- **Keeping the press too short.** For a long press you must keep A+B pressed for more than a second.\n- Mixing up the **kurulu** and **alarm** variables. When the card is shaken, **alarm** becomes 1, not **kurulu**.\n- **Only stopping the sound when turning off the alarm.** If you do not reset the **alarm** variable, **forever** rings the alarm again.\n- **Not putting a pause inside forever.** The screen is only empty for a very short moment, and the flashing is almost invisible.",
+            "question": "In a real alarm, ringing by mistake (a false alarm) is a problem. Which would bother you more: an alarm that rings when it should not, or an alarm that does not ring when it really should? How would you make the card more reliable?",
+            "explainerMd": "### What you will learn in this lesson\n- How to think of a device as **states** and the moves between states\n- How to keep the state in variables, and how events change the state\n- How to check a state all the time inside **forever**\n- Why you need to reset both the sound and the state variable when turning off the alarm\n\n### What you should know first\n- Lesson 7: variables\n- Lesson 8: **if ... then**\n- Lesson 9: long press\n- Lesson 11: the **when card is shaken** hat block\n- Lesson 18: the **play melody** block\n\n### A device is in one state at a time\nThink of a door alarm. Either it is off (it does nothing), or it is set (it waits for a burglar), or it is ringing. It cannot be in two states at the same time. This way of thinking is called a **state machine**. For every state we ask: while I am in this state, which event takes me to which state?\n\n| Current state | Event | New state |\n|---|---|---|\n| Off | A was pressed | Set |\n| Set | the card was shaken | Ringing |\n| Ringing | A+B was long-pressed | Off |\n| Off | the card was shaken | Off (nothing happens) |\n\nThe last row is important: an event does not have an effect in every state. Shaking while the alarm is not set does not change anything.\n\n### Keeping the state in two variables\nTwo variables are enough for three states. The kurulu (\"set\") and alarm variables are 0 or 1:\n\n| State | kurulu | alarm |\n|---|---|---|\n| Off | 0 | 0 |\n| Set | 1 | 0 |\n| Ringing | 1 | 1 |\n\nThe shake hat block first checks \"is kurulu = 1?\"; if yes, it sets the alarm variable to 1. The hat block itself does not play the sound; it only changes the state. Playing the sound is a separate task.\n\n### The task that checks all the time\nThe **forever** block is a loop that never ends. If you put \"if alarm = 1, play the melody\" inside it, the sound starts as soon as the alarm state becomes 1 and repeats until alarm becomes 0. The Alarm melody is 3.25 beats. At tempo 120 one beat is 500 ms, so the melody lasts about 1625 ms. If there is a 200 ms pause inside, one round is about 1825 ms, plus the small allowance that the system adds for each loop.\n\n### Turning it off takes two jobs\nThe hat block that turns off the alarm must set alarm to 0. Just stopping the sound is not enough, because on the next round **forever** sees \"alarm = 1\" and rings again. The turn-off hat block resets the kurulu and alarm variables, stops the sound and gives the user a sign.\n\n### Why is a long press a good password?\nIt is hard to press A+B for longer than a second by accident. Real alarms also ask for a difficult action like this so that they are not turned off by mistake.\n\n### Summary\nAn alarm is a state machine: off, set, ringing. Variables keep the state, and events change the state. The check inside **forever** watches the state all the time. When turning it off, you need to reset both the sound and the state variable.",
+            "concepts": [
+              {
+                "term": "State machine",
+                "definition": "A way of thinking in which the device is in a single state at any moment and events move it to another state.",
+                "example": "Alarm: off, set, ringing. A sets it, a shake makes it ring, A+B turns it off.",
+                "pitfall": "Thinking an event has an effect in every state: shaking does nothing while it is not set."
+              },
+              {
+                "term": "State variable",
+                "definition": "A variable that remembers the device's state as 0 or 1.",
+                "example": "kurulu = 1 and alarm = 1 is the \"ringing\" state.",
+                "pitfall": "Mixing up the variables: when the card is shaken, alarm becomes 1, not kurulu."
+              },
+              {
+                "term": "forever",
+                "definition": "A loop that runs the blocks inside it again and again without ending.",
+                "example": "If you put \"if alarm = 1, play the melody\" inside it, the sound repeats all the time while the alarm is on.",
+                "pitfall": "Not putting a pause inside: the flashing skull becomes almost invisible."
+              },
+              {
+                "term": "Long press",
+                "definition": "Pressing a button for longer than 1 second. It is hard to do by accident.",
+                "example": "When you hold A+B down for 1.2 seconds, the alarm turns off.",
+                "pitfall": "Pressing briefly: the long press hat block never runs."
+              },
+              {
+                "term": "Full turn-off",
+                "definition": "Stopping the sound and resetting the state variables when turning off the alarm.",
+                "example": "The turn-off hat block sets kurulu and alarm to 0 and stops the sound.",
+                "pitfall": "Only stopping the sound: because alarm is still 1, forever starts the melody again."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h6d28-q1",
+                "kind": "mcq",
+                "prompt": "If the card is shaken while the alarm is not set (kurulu = 0), what happens?",
+                "options": [
+                  "The alarm starts ringing",
+                  "Nothing happens, because the shake hat block first checks whether kurulu = 1",
+                  "The card sets itself automatically",
+                  "The card gives an error"
+                ],
+                "answer": 1,
+                "explanation": "The if in the shake hat block waits for kurulu = 1. If kurulu is 0, the alarm variable does not change and the sound does not start. For the alarm to ring, it must first be set with A.",
+                "skills": [
+                  "mk-state",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h6d28-q2",
+                "kind": "find-bug",
+                "prompt": "When A+B is long-pressed, the sound stops, but after a while the alarm rings again. Which is the mistake?\n\n```\non button [A+B] long pressed:\n  stop sound\n  show icon [happy face]\n\nforever:\n  if alarm = 1 then:\n    show icon [skull]\n    play melody [Alarm]\n    clear screen\n    pause 200 ms\n```",
+                "options": [
+                  "The alarm variable is not set to 0; on the next round, forever sees alarm = 1 and plays the melody again",
+                  "The happy face is the wrong icon",
+                  "The pause is too short",
+                  "The forever block should not be used at all"
+                ],
+                "answer": 0,
+                "explanation": "Turning it off without resetting the state variable is only half done. The turn-off hat block must set alarm (and kurulu) to 0. The other options do not make the alarm ring again.",
+                "skills": [
+                  "mk-debug",
+                  "mk-state"
+                ]
+              },
+              {
+                "id": "m10h6d28-q3",
+                "kind": "predict-output",
+                "prompt": "The program below is running. The events come in this order: shake, A, shake, A+B long, shake. When is the alarm variable 1?\n\n```\non start: kurulu = 0, alarm = 0\nA pressed: kurulu = 1\nwhen shaken: if kurulu = 1 then alarm = 1\nA+B long pressed: kurulu = 0, alarm = 0\n```",
+                "options": [
+                  "All the time from the first shake on",
+                  "On every shake",
+                  "Only from the second shake until the A+B long press",
+                  "Never"
+                ],
+                "answer": 2,
+                "explanation": "On the first shake kurulu is 0, so alarm stays 0. A sets it, and the second shake sets alarm to 1. The A+B long press sets both to 0. The third shake has no effect because kurulu is 0.",
+                "skills": [
+                  "mk-state",
+                  "mk-events"
+                ]
+              },
+              {
+                "id": "m10h6d28-q4",
+                "kind": "numeric",
+                "prompt": "The Alarm melody is 3.25 beats and the tempo is 120 (one beat is 500 ms). Inside forever, there is a 200 ms pause after the melody. Do not count the system's small loop allowance. How many ms does one round take?",
+                "answer": 1825,
+                "unit": "ms",
+                "explanation": "3.25 x 500 = 1625 ms of melody. Adding the 200 ms pause makes 1825 ms. The round measured on the virtual card comes out as 1845 ms; the 20 ms difference is the allowance the system adds at the end of each round.",
+                "skills": [
+                  "mk-concurrency"
+                ]
+              },
+              {
+                "id": "m10h6d28-q5",
+                "kind": "mcq",
+                "prompt": "The alarm is kept in two variables: kurulu and alarm. Which state is kurulu = 1 and alarm = 1?",
+                "options": [
+                  "Off",
+                  "Set but not ringing",
+                  "There should be no such state",
+                  "Ringing"
+                ],
+                "answer": 3,
+                "explanation": "alarm only becomes 1 while it is set. If both are 1, the device is ringing. In the off state both are 0; in the set state kurulu is 1 and alarm is 0.",
+                "skills": [
+                  "mk-state",
+                  "mk-variables"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Nem ve sıcaklık istasyonu",
@@ -4025,7 +7328,114 @@ export const modul10: ModuleContent = {
                 "mk-sensors"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Humidity and temperature station",
+            "problem": "How do you know when the potted plant at home is thirsty? You push your finger into the soil. But what about when you are not at home? That is exactly what a station is for: it measures the temperature and how moist the soil is, and warns you when the soil dries out. In this lesson you will build your own small weather and plant pot station.",
+            "contentMd": "### Sensors\nThe card has no moisture sensor of its own. We will pretend a virtual **soil moisture sensor** is connected to the **P1** pin. Open the **Pins** section in the right panel; in the **P1** row there is an **Input** slider. This slider sets the number the sensor reads: we will take **0 as very dry and 1023 as very wet**. On a real sensor, the values come out differently depending on the sensor; that is why you first need to calibrate a real sensor when you use one.\n\nFor temperature, the card has its own **temperature (°C)** sensor. You change its value with the **Temperature** slider in the **Compass and sensors** section.\n\n### Turning 0-1023 into a percentage\nThe number read is between 0 and 1023; we want to see a **percentage** (0-100). The **map** block in the **Math** category does this:\n\n**map [analog read P1 (0-1023)] from [0]-[1023] to [0]-[100]**\n\nExamples: 0 → 0%, 512 → 50%, 1023 → 100%.\n\n### New blocks\n- The **analog read [P1] (0-1023)** block in the **Pins** category gives the pin's input value as a number.\n- The **bar graph [3] up to [5]** block in the **LED** category shows a value with LEDs, compared to the largest value. The LEDs fill from the bottom up. If the value is **50** and the largest is **100**, half of the 25 LEDs (13 when rounded) light up.\n- The **print to console [hello]** block in the **Basic** category writes a value to the card's console. The console appears in the **Console** section in the right panel.\n\n### Step by step\n**on start**, three button hat blocks (**A**, **B**, **A+B**) and **every [2000] ms** are ready in the editor.\n\n1. In the **Variables** category, make the **nem** (\"moisture\") variable. Put **set nem to [0]** inside **on start**.\n2. Put **show number** inside **on button [A] [pressed]**; plug in **temperature (°C)** from the **Input** category as the number.\n3. Put **show number** inside **on button [B] [pressed]**; plug in the **map** block above as the number (the **analog read [P1] (0-1023)** value from 0-1023 to 0-100).\n4. Put **bar graph [...] up to [100]** inside **on button [A+B] [pressed]**. Plug in the same **map** block (you can copy it) as the value.\n5. Inside **every [2000] ms**, in this order:\n   - **set nem to [...]**; plug in the **map** block as the value.\n   - **print to console [nem]**\n   - **if ... then**: condition **nem** **<** **30**. Inside it, **show icon [sad face]** and **play melody [Sad]**.\n6. Getting ready: set the **Temperature** slider to 27, and bring the **P1 Input** slider to about 512.\n7. Press ▶ **Run**. Press **A**, **B** and **A+B** in turn. Then pull the **P1** slider down to 100 and wait a few seconds.\n\n### Expected result\n**A** scrolls 27, and **B** scrolls 50. **A+B** shows a half-full bar graph (13 LEDs). In the Console section, a moisture value appears every two seconds. When you pull **P1** down to 100, the moisture becomes about 10%: the sad face and the **Sad** melody (3 seconds) start. All seven goals should have a ✓.\n\n**Note:** When the program first runs, the **P1** slider is at 0. So the moisture is 0%, and right at the end of the first two seconds the sad face appears. This is not a mistake; the soil is taken to be dry. When you pull the slider up, it goes back to normal.\n\n### How does it work?\n- **every [2000] ms** reads the moisture every two seconds, writes it to the console and warns you if the soil is dry.\n- **nem < 30** is the warning threshold. The threshold changes with the real plant; it is chosen separately for each plant.\n- **A**, **B** and **A+B** are for seeing the current value whenever you want. The station keeps running in the background anyway.\n- The **map** block rounds the result to the nearest whole number. That is why the value 512 becomes 50% (50.05).\n\n### Try it\n1. Make the threshold 20 instead of 30. At which **P1** value does the warning start?\n2. Measure the light too: make **on button [A+B] [long pressed]** show the light level. In the dark (light below 50), imagine the plant wants to \"sleep\": **show icon [sleeping face]**.\n3. Write not only the moisture but also the temperature to the console: add a second **print to console** block.\n4. If the heat is high (above 35 °C) and the moisture is low (below 30), play a different warning. To combine the two conditions, use the **and** block in the **Logic** category.\n\n### Common mistakes\n- **Writing the ranges wrongly.** The input range must be **0-1023** and the output range **0-100**. If you write it the other way round when mapping 1023 to 100, the results come out backwards.\n- **The wrong sign in the threshold comparison.** **nem < 30** means dry; if you write **>**, it warns you when it is wet.\n- **Playing a melody on every round.** The Sad melody lasts 3 seconds. Set how often it warns, and the melody, with that in mind.\n- **Mixing up temperature and moisture.** The temperature comes from the card's own sensor, and the moisture from the **P1** pin. Their sliders are in different sections.",
+            "question": "If the threshold for a potted plant were 30, what would it be for a cactus? How would you make the program more flexible so you can change the threshold for each plant? What would you do if a real sensor gave you random numbers?",
+            "explainerMd": "### What you will learn in this lesson\n- How to turn the raw number a sensor gives (0-1023) into a percentage\n- How to write the input and output ranges of the **map** block correctly\n- How to give a warning based on a threshold\n- How to show and record a value with the **bar graph** and the console\n\n### What you should know first\n- Lesson 7: variables\n- Lesson 8: **if ... then**\n- Lesson 12: temperature, light and the **bar graph** block\n- Lesson 18: the **play melody** block\n\n### A raw number is not a percentage\nThe analog value that comes from the pin is between 0 and 1023. We want to see \"what percentage moist\" the soil is. The operation that moves this number into the 0-100 range is called **mapping**. The logic is proportion: wherever you are in the input range, you go to the same place in the output range.\n\n| P1 input | Proportion (input / 1023) | Percentage (rounded) |\n|---|---|---|\n| 0 | 0 | 0 |\n| 256 | 0.25 | 25 |\n| 512 | 0.5 | 50 |\n| 1023 | 1 | 100 |\n\nThe **map** block rounds the result to the nearest whole number. For 512 it finds 50.05 and writes 50.\n\n### Write the ranges in the right order\nThe block wants four numbers: input lowest, input highest, output lowest, output highest. Because the sensor gives 0-1023, the first two must be 0 and 1023, and because you want 0-100, the last two must be 0 and 100. If you mix up the order, the value 512 is moved from the 0-100 range to 0-1023, and a meaningless number such as 5238 comes out.\n\n### Threshold and warning\nWhen the moisture drops below 30, the plant is thirsty. The value 30 is called the **threshold**. The raw value that matches the threshold is about 307; but because of rounding, when 301 is read, 29 percent comes out and the warning starts, and at 302, 30 percent comes out and the warning stops. The threshold changes with each plant: 10 might suit a cactus better, and 40 a seedling.\n\n### Bar graph and console\nThe **bar graph [value] up to [100]** block works out how many of the 25 LEDs light up: value / largest x 25, then it is rounded. If the moisture is 50 and the largest is 100, you get 12.5, and 13 LEDs light up. If you enter the wrong largest value, the graph stops making sense. The **print to console** block, on the other hand, keeps the values as a record; you can see them in the console even if the screen is cleared.\n\n### Each sensor from its own slider\nThe temperature comes from the card's own sensor. The moisture comes from the virtual sensor connected to the P1 pin. You must not mix them up. On a real sensor, the 0-1023 range can come out differently depending on the sensor; that is why a real sensor is calibrated first.\n\n### Summary\nThe raw sensor value is turned into a percentage with **map**. Writing the ranges in the right order is essential. The threshold is a warning limit. The **bar graph** shows the value with LEDs compared to the largest value, and **print to console** keeps a record.",
+            "concepts": [
+              {
+                "term": "Analog value",
+                "definition": "The raw number between 0 and 1023 read from a pin.",
+                "example": "If the P1 input slider is 512, the analog read block gives 512.",
+                "pitfall": "Thinking this number is directly a percentage: 512 is not 512 percent."
+              },
+              {
+                "term": "map",
+                "definition": "A block that moves a value from one range to another in proportion and rounds it to the nearest whole number.",
+                "example": "If you map the 512 that was read from the 0-1023 range to 0-100, you get 50.",
+                "pitfall": "Writing the ranges the wrong way round: the value 512 gives a meaningless result such as 5238."
+              },
+              {
+                "term": "Threshold",
+                "definition": "The limit number chosen for giving a warning.",
+                "example": "When nem < 30, the pot is counted as thirsty.",
+                "pitfall": "Using the wrong sign: if you write nem > 30, it warns you when it is wet."
+              },
+              {
+                "term": "bar graph",
+                "definition": "A block that shows a value, compared to the largest value, by how many of the 25 LEDs light up.",
+                "example": "bar graph [50] up to [100] lights 13 LEDs.",
+                "pitfall": "Entering the wrong largest value: the scale breaks and the bar looks wrongly filled."
+              },
+              {
+                "term": "Calibration",
+                "definition": "Comparing the numbers a real sensor reads with known situations and adjusting.",
+                "example": "The two numbers read in dry and wet soil set the mapping range.",
+                "pitfall": "Thinking every sensor uses the whole 0-1023 range: real sensors can have a different range."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h6d29-q1",
+                "kind": "numeric",
+                "prompt": "The P1 input slider is 256. The value read is mapped from the 0-1023 range to the 0-100 range. What is the result?",
+                "answer": 25,
+                "unit": "%",
+                "explanation": "256 / 1023 is about 0.25, and multiplying by 100 gives 25.02; the map block rounds it: 25. Leaving the result as 256 would mean forgetting the mapping.",
+                "skills": [
+                  "mk-sensors"
+                ]
+              },
+              {
+                "id": "m10h6d29-q2",
+                "kind": "predict-output",
+                "prompt": "The P1 input value is 512. What does the block below show on the screen?\n\n```\nshow number:\n  map [analog read P1]\n  from [0]-[100]\n  to [0]-[1023]\n```",
+                "options": [
+                  "50",
+                  "512",
+                  "5238",
+                  "0"
+                ],
+                "answer": 2,
+                "explanation": "The ranges are written the wrong way round: the input is taken as 0-100 and the output as 0-1023. 512 x 1023 / 100 = 5237.76, which rounds to 5238. The correct way is from the 0-1023 range to the 0-100 range (the result is 50).",
+                "skills": [
+                  "mk-sensors",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h6d29-q3",
+                "kind": "numeric",
+                "prompt": "The warning condition is nem < 30, and nem is the P1 value mapped from 0-1023 to 0-100. What is the largest whole-number P1 value at which the warning still starts?",
+                "answer": 301,
+                "explanation": "The value 301 gives 29.42, which rounds to 29: there is a warning. The value 302 gives 29.52, which rounds to 30: 30 < 30 is false, no warning. Because of rounding, the limit is 301, not 306.9.",
+                "skills": [
+                  "mk-sensors",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h6d29-q4",
+                "kind": "numeric",
+                "prompt": "How many LEDs does bar graph [70] up to [200] light? (The share of 25 LEDs, rounded to the nearest whole number.)",
+                "answer": 9,
+                "unit": "LEDs",
+                "explanation": "70 / 200 = 0.35, and 0.35 x 25 = 8.75; the nearest whole number is 9. 8 (rounding down) or 35 (the percentage) would be wrong.",
+                "skills": [
+                  "mk-display"
+                ]
+              },
+              {
+                "id": "m10h6d29-q5",
+                "kind": "mcq",
+                "prompt": "Why is a real soil moisture sensor calibrated first before mapping?",
+                "options": [
+                  "Sensors do not work at all without calibration",
+                  "The smallest and largest numbers a real sensor reads change from sensor to sensor; without measuring the range, the mapping gives a wrong percentage",
+                  "Calibration makes the sensor faster",
+                  "The percentage value can only be written with calibration"
+                ],
+                "answer": 1,
+                "explanation": "Each sensor can give different numbers when dry and when wet. If these two numbers are measured, the mapping gives the right percentage. The sensor still produces a number without calibration; the problem is what that number means.",
+                "skills": [
+                  "mk-sensors"
+                ]
+              }
+            ]
+          }
         },
         {
           "title": "Proje: Akıllı saksı (final)",
@@ -4141,7 +7551,122 @@ export const modul10: ModuleContent = {
                 "mk-debug"
               ]
             }
-          ]
+          ],
+          "contentEn": {
+            "title": "Project: Smart plant pot (final)",
+            "problem": "Time to put it all together. In this module you learnt how to light LEDs, listen to buttons, read sensors, play music and talk by radio. Now you will use all of them in the same project: two smart plant pots watching each other's state by radio. When one pot's soil dries out, the other pot sees it and sounds an alarm.",
+            "contentMd": "### Project: Smart plant pot\nThe two cards are two virtual plant pots. We pretend each card has a soil moisture sensor connected to its **P1** pin (the **Input** slider in the Pins section: 0 dry, 1023 wet). Both cards run the same program.\n\n**Goals:**\n- Every two seconds, the card measures its own moisture as a percentage and sends it by radio with the name **nem** (\"moisture\").\n- If the moisture is below 30, the card that receives the message shows a sad face and plays the sad melody.\n- If the moisture is 30 or above, the receiving card shows the moisture with a bar graph.\n- The **A** button shows the card's own moisture.\n\n### Which lesson gives which part?\n| Part | Where you learnt it |\n|---|---|\n| **every [2000] ms**, variables, **if** | earlier weeks |\n| Turning 0-1023 into a percentage with **map** | lesson 29 |\n| **bar graph** | lesson 29 |\n| **radio group**, **radio send [name] = [value]**, **received [name]**, **received [value]** | lesson 22 |\n| **play melody [Sad]**, **show icon [sad face]** | lesson 18 and the first week |\n\n### Draw your plan\nFirst draw a flow on paper or in your head:\n\n1. **Start:** radio group 7, the **nem** variable 0.\n2. **Every 2 seconds:** measure the moisture, send **nem = value** by radio.\n3. **A:** measure the moisture and show it on the screen.\n4. **When a message is received:** if its name is **nem**, put the value into the **uzak** (\"remote\") variable. If it is less than 30, a sad face and the melody; if not, a bar graph.\n\n### Step by step\n**on start**, **every [2000] ms**, **on button [A] [pressed]** and **on radio received** are ready in the editor.\n\n1. In the **Variables** category, make the **nem** and **uzak** variables.\n2. Put **set radio group to [7]** and **set nem to [0]** inside **on start**.\n3. Put **set nem to [...]** inside **every [2000] ms**; as the value, the **map** block: **map [analog read P1 (0-1023)] from [0]-[1023] to [0]-[100]**. Underneath, put **radio send [nem] = [...]**; the name is **nem**, and the value is the **nem** variable.\n4. Put **set nem to [...]** (the same map block) and **show number [nem]** inside **on button [A] [pressed]**.\n5. Put **if ... then** inside **on radio received**. Condition: **received [name]** **=** **nem**. Inside it, in this order:\n   - **set uzak to [...]**; as the value, **received [value]**\n   - **if ... then ... else**. Condition: **uzak** **<** **30**. **then**: **show icon [sad face]** and **play melody [Sad]**. **else**: **bar graph [uzak] up to [100]**.\n6. Getting ready: choose the **Card 1** tab in the right panel and set **P1 Input** to about 512 in the **Pins** section. Choose the **Card 2** tab and set **P1 Input** to 100.\n7. Press ▶ **Run**. Wait a few seconds. Press Card 1's **A** button.\n\n### Expected result\nCard 1's moisture is 50%, and Card 2's moisture is 10%. When Card 2 receives the **nem = 50** message from Card 1, it shows a half-full bar graph (13 LEDs). When Card 1 receives the **nem = 10** message from Card 2, it shows a sad face and plays the **Sad** melody (3 seconds). The **A** button shows the number **50** on Card 1. All six goals should have a ✓.\n\n### How does it work?\n- Every two seconds, each card sends its own moisture. When the receiving side sees the name **nem**, it puts the value into the **uzak** variable.\n- A card does not receive its own message. So each card only sees the state of the **other** pot.\n- The Sad melody lasts 3 seconds, longer than the two-second messages. The hat block is busy until the melody ends; for the same hat block, at most 3 messages wait in the queue.\n- Because the cards run the same program, you only need to change the program once. When you press ▶, both cards run the new program.\n\n### Try it\n1. Make the **B** button show the temperature; if the temperature is above 35 °C, a **surprised face** appears on the screen.\n2. You cannot make the radio group different on one card (the program is the same), but you can make it 5 with the **Card 2 group** selector in the Radio section. Do Card 1's messages reach Card 2?\n3. Measure the light too: in the dark (light below 50), do not send the message.\n4. Choose your own threshold and put it into a variable (**esik**, \"threshold\"); you should only need to change it in one place in the program.\n\n### Common mistakes\n- **Writing the message name differently.** If the sender writes **nem** and the receiver **Nem**, they do not come out equal. Write it exactly the same, letter for letter.\n- **Measuring the moisture again on the receiving card.** When a message arrives, use **received [value]**. If you read from its own P1, you see its own state, not the state of the other pot.\n- **Leaving the bar graph's largest value at 1023.** Because the moisture is now a percentage, it must be **100**.\n- **Not setting the variables in on start.** Do not leave **uzak** empty before the first message.\n\n### Assess yourself\n- Which group of blocks did you use most in this project?\n- Which part did you get stuck on? How did you solve it?\n- If you explained the program to a friend, which three sentences would you say?",
+            "question": "What was the best thing you made in this project? What would your next Micro Card project be: a game, a home alarm or a musical instrument? Who would you share it with?",
+            "explainerMd": "### What you will learn in this lesson\n- How to plan a project as a flow before coding it\n- How to set up two cards that watch each other's readings by radio\n- How to use the value that **arrives** in a received message, not your **own** reading\n- How to put the parts you learnt in earlier weeks together in one program\n\n### What you should know first\n- Lesson 7: variables\n- Lesson 8: **if ... then ... else**\n- Lesson 12: **bar graph**\n- Lesson 18: **play melody**\n- Lessons 21 and 22: radio group, **radio send [name] = [value]**, **received [name]**, **received [value]**\n- Lesson 29: **map** and the moisture threshold\n\n### Plan first\nInstead of starting a big project with blocks, write the flow on paper. There are four jobs in this project:\n\n| Hat block | When does it run? | What does it do? |\n|---|---|---|\n| on start | once | sets the radio group and the variables |\n| every 2000 ms | every two seconds | measures the moisture and sends it by radio |\n| button A | when A is pressed | shows its own moisture |\n| on radio received | when a message arrives | shows the state of the other pot |\n\nEvery row of the plan is one hat block. Once you have made the plan, the rest of the job is putting the blocks in place.\n\n### Sender and receiver\nThe two cards run the same program. Each card both sends and receives. A card does not receive its own message; only the other card's message comes to it. That is why you should not take a measurement on the receiving card. When a message arrives, use the **received [value]** block; that is the other pot's moisture. If the receiving card reads its own P1, it shows its own moisture, and the project does not reach its goal.\n\n### The name must match\nThe sender sends with the name \"nem\", and the receiver looks for the name \"nem\". Capital and small letters make a difference; \"Nem\" and \"nem\" count as different. In projects that use more than one name, this check filters out the wrong messages.\n\n### Timing\nMessages arrive every 2 seconds. The Sad melody lasts 3 seconds. The hat block is busy while the melody plays; at most 3 of the messages that arrive wait in the queue. Knowing this helps you understand why some messages do not show up on the screen straight away.\n\nIf Card 1's moisture is 50 and the largest value is 100, the bar graph lights 13 LEDs. If the largest value had been left at 1023, you would get 50 / 1023 x 25 = 1.2, and only 1 LED would light; so the largest value is the number that sets the scale.\n\n### Summary\nA good project is a plan first. Each hat block does one job. On the radio, the receiving side uses the value that arrives, not its own sensor. Message names must match exactly. Long jobs such as a melody make the messages that arrive join a queue. The bar graph's largest value must fit the measuring range.",
+            "concepts": [
+              {
+                "term": "Flow plan",
+                "definition": "A list, written before coding, of which hat block runs when and what it does.",
+                "example": "Every 2 seconds measure and send; A: show; when a message arrives: react.",
+                "pitfall": "Starting without a plan: blocks end up in the wrong hat block."
+              },
+              {
+                "term": "Radio group",
+                "definition": "The cards need to be in the group with the same number; only cards in the same group hear each other.",
+                "example": "Both cards set the radio group to 7.",
+                "pitfall": "Staying in different groups: the messages never arrive."
+              },
+              {
+                "term": "Sender and receiver",
+                "definition": "The sender sends its own reading; the receiver uses the value that arrives.",
+                "example": "On the receiving card, the received value is put into the uzak variable.",
+                "pitfall": "Reading its own P1 on the receiving card: you see yourself, not the other pot."
+              },
+              {
+                "term": "Message name",
+                "definition": "The name in the name = value pair of a radio message.",
+                "example": "The sender sends \"nem\", and the receiver checks received name = \"nem\".",
+                "pitfall": "The difference between capital and small letters: \"Nem\" and \"nem\" do not count as equal."
+              },
+              {
+                "term": "The largest value sets the scale",
+                "definition": "The bar graph's largest value must fit the measuring range.",
+                "example": "Because the moisture is a percentage, the largest value is 100.",
+                "pitfall": "Leaving the largest value at 1023: when the moisture is 50, only 1 LED lights."
+              }
+            ],
+            "quiz": [
+              {
+                "id": "m10h6d30-q1",
+                "kind": "mcq",
+                "prompt": "Two cards are in the same group and run the same program. When Card 1 sends a message, who receives it?",
+                "options": [
+                  "Only Card 2 receives it",
+                  "Card 1 and Card 2 receive it",
+                  "Nobody receives it",
+                  "All the cards in the group and the sender receive it"
+                ],
+                "answer": 0,
+                "explanation": "A card does not receive its own message; the message only goes to the other card. That is why each card sees the state of the other pot.",
+                "skills": [
+                  "mk-radio"
+                ]
+              },
+              {
+                "id": "m10h6d30-q2",
+                "kind": "find-bug",
+                "prompt": "The receiving card does not show a sad face even though the other pot is dry, because its own P1 input value is high. Which is the mistake?\n\n```\non radio received:\n  if received name = \"nem\" then:\n    set uzak to (map [analog read P1] 0-1023 -> 0-100)\n    if uzak < 30 then:\n      show icon [sad face]\n```",
+                "options": [
+                  "The threshold should be 300, not 30",
+                  "The uzak value is read not from the received value but from the receiving card's own P1 pin",
+                  "There is no sad face icon",
+                  "received value should be written instead of received name"
+                ],
+                "answer": 1,
+                "explanation": "When a message arrives, the received [value] block is used; that is the other pot's moisture. Reading P1 gives the receiving card's own moisture. The threshold and the icon are correct.",
+                "skills": [
+                  "mk-radio",
+                  "mk-debug"
+                ]
+              },
+              {
+                "id": "m10h6d30-q3",
+                "kind": "numeric",
+                "prompt": "Card 2's P1 input slider is at 150. Card 2 maps 0-1023 to 0-100 and sends the moisture by radio. Which moisture value does Card 1 receive?",
+                "answer": 15,
+                "unit": "%",
+                "explanation": "150 x 100 / 1023 = 14.66, which rounds to 15. Rounding down and writing 14, or writing 150, would be wrong.",
+                "skills": [
+                  "mk-sensors",
+                  "mk-radio"
+                ]
+              },
+              {
+                "id": "m10h6d30-q4",
+                "kind": "predict-output",
+                "prompt": "The receiving card runs this program. The messages arrive in this order: nem = 50, nem = 28, sicak = 12, nem = 30. How many times is the sad face shown?\n\n```\non radio received:\n  if received name = \"nem\" then:\n    set uzak to (received value)\n    if uzak < 30 then:\n      sad face and the Sad melody\n    else:\n      bar graph [uzak] up to [100]\n```",
+                "options": [
+                  "0 times",
+                  "1 time",
+                  "2 times",
+                  "3 times"
+                ],
+                "answer": 1,
+                "explanation": "Only nem = 28 both matches the name and is below 30. For nem = 30, 30 < 30 is false, so it goes to the else branch (bar graph); sicak = 12 is not handled at all, because its name does not match.",
+                "skills": [
+                  "mk-radio",
+                  "mk-conditions"
+                ]
+              },
+              {
+                "id": "m10h6d30-q5",
+                "kind": "numeric",
+                "prompt": "The moisture is 50 as a percentage, but the bar graph's largest value has been left at 1023 by mistake. How many LEDs light up?",
+                "answer": 1,
+                "unit": "LEDs",
+                "explanation": "50 / 1023 x 25 = 1.22, which rounds to 1 LED lighting up. If the largest value were 100, 13 LEDs would light. The scale must fit the measured range.",
+                "skills": [
+                  "mk-display",
+                  "mk-debug"
+                ]
+              }
+            ]
+          }
         }
       ]
     }

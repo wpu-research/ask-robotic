@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "Eval report",
+      "definition": "A short text that clearly writes down the results, the mistakes and the limits of reliability.",
+      "example": "It gives the accuracy, the per-label results, the wrong cases, an idea for improvement and how far it can be trusted.",
+      "pitfall": "Writing only \"accuracy 80%\" and leaving out the mistakes and the limits."
+    },
+    {
+      "term": "Sample size",
+      "definition": "The number of cases needed to trust a result; the fewer there are, the more the result jumps around.",
+      "example": "In a set of 10 cases, a single case moves the accuracy by 10 points.",
+      "pitfall": "Thinking the result of a small set is certain."
+    },
+    {
+      "term": "Hard case",
+      "definition": "A case where the system is likely to go wrong, and which exposes a weak point.",
+      "example": "In the sentence `Hata yok` (No errors), `hata` (error) is a word in the negative list; the system says negative.",
+      "pitfall": "Avoiding hard cases to try to make the system look good."
+    },
+    {
+      "term": "Regression test",
+      "definition": "Running the eval again after changing the system to see that the earlier success is kept.",
+      "example": "When you add a new word, you check whether the old cases still pass.",
+      "pitfall": "Not running the eval again after a fix; you might break one thing while fixing another."
+    },
+    {
+      "term": "Tuning set and measurement set",
+      "definition": "The cases used to improve the system, and the cases kept aside to measure the final success.",
+      "example": "You fix the rule with the first 10 cases and report the final accuracy with a separate 10 cases.",
+      "pitfall": "Keeping the two the same; the measurement comes out too optimistic."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d20-q1",
+      "kind": "numeric",
+      "prompt": "In a set of 10 cases, the system shows 80% accuracy. If one more case in the set had come out wrong, by how many percentage points would the accuracy have dropped?",
+      "answer": 10,
+      "tolerance": 0,
+      "unit": "points",
+      "explanation": "With 10 cases, each case is worth 10%: 8/10 = 80%, 7/10 = 70%. A single case moves it by 10 points. In a set of 100 cases the same difference would be 1 point; that is why the results of small sets are viewed with caution.",
+      "skills": [
+        "eval-method",
+        "eval-metrics"
+      ]
+    },
+    {
+      "id": "m7h4d20-q2",
+      "kind": "mcq",
+      "prompt": "Which of these report sentences is the most honest?",
+      "options": [
+        "The system works perfectly, accuracy 90%.",
+        "I got 75% accuracy on 12 cases; the set is small, so the result is not certain. The mistakes are concentrated in sarcastic sentences.",
+        "I removed the hard cases, so the accuracy became 100%.",
+        "The system works; there is no need to test it."
+      ],
+      "answer": 1,
+      "explanation": "A good report gives the number, the size of the set and where the mistakes are concentrated, all together. Removing the hard cases improves the measurement falsely; and saying \"perfect\" cannot be backed up by a single number.",
+      "skills": [
+        "eval-method",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d20-q3",
+      "kind": "predict-output",
+      "prompt": "The sentiment classifier looks at word lists; `hata` (error) and `kullanışsız` (useless) are in the negative list, `hızlı` (fast) is in the positive list, and `yok` (none) is in no list. `değil` (not) flips the previous score; if the score is 0, \"unclear\". A set of six cases is run:\n\n```\n(\"Çok iyi\"                 , positive)\n(\"Kolay değil\"             , negative)\n(\"Toplantı saat beşte\"     , unclear)\n(\"Süper ama zor\"           , unclear)\n(\"Hızlı ve kullanışsız\"    , negative)\n(\"Hata yok\"                , positive)\n```\n\nWhich cases are got wrong?",
+      "options": [
+        "None; 6/6 correct",
+        "Only the 6th case, \"no errors\"",
+        "The 5th case, \"fast and useless\", and the 6th case, \"no errors\"; accuracy 4/6",
+        "The 4th case, \"great but hard\", and the 2nd case, \"not easy\"; accuracy 4/6"
+      ],
+      "answer": 2,
+      "explanation": "\"Fast and useless\": +1 and -1 add up to 0, the system says unclear; the expected label is negative. \"No errors\": \"error\" -1, \"none\" is in no list, the system says negative; the expected label is positive. The other four cases are correct (\"Great but hard\": +1 and -1, unclear; \"Not easy\": negative). Accuracy 4/6, about 67%.",
+      "skills": [
+        "eval-basics",
+        "eval-cases",
+        "eval-metrics"
+      ]
+    },
+    {
+      "id": "m7h4d20-q4",
+      "kind": "find-bug",
+      "prompt": "A student measures their system with the steps below. Which line has the mistake that makes the measurement too optimistic?\n\n```\n1: vakalar = yaz(10)\n2: kurali_ayarla(vakalar)      # fix the rule to suit these cases\n3: skor = olc(vakalar)         # measure with the same cases\n4: rapor_yaz(skor)\n```",
+      "options": [
+        "Line 1: writing cases is unnecessary",
+        "Line 3: the measurement is done with the cases used for tuning; a separate set is needed",
+        "Line 2: the rule should not be tuned at all",
+        "Line 4: the report should not be written"
+      ],
+      "answer": 1,
+      "explanation": "Because the rule was fitted to these cases on line 2, the score on line 3 comes out better than it is (data leakage). The solution is to keep separate sets for tuning and for measurement. Tuning the rule and writing a report are not wrong.",
+      "skills": [
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d20-q5",
+      "kind": "mcq",
+      "prompt": "Why do you run the eval again every time you change the system?",
+      "options": [
+        "To see whether a fix has broken other cases",
+        "So that the accuracy always stays the same",
+        "To delete the test set",
+        "It is not needed, because the eval runs by itself"
+      ],
+      "answer": 0,
+      "explanation": "Adding a word can fix one mistake while breaking another case. Running the eval after every change (a regression test) shows this straight away. Keeping the accuracy fixed is not the aim; the aim is to measure the truth.",
+      "skills": [
+        "eval-method",
+        "eval-basics"
+      ]
+    }
+  ]
+}

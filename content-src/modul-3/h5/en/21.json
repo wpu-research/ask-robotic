@@ -1,0 +1,111 @@
+{
+  "concepts": [
+    {
+      "term": "Servo",
+      "definition": "A motor with a motor, gears and an angle sensor inside; it goes to the requested angle and stays there.",
+      "example": "In a radar scanner, a servo turns the sensor between 30 and 150 degrees.",
+      "pitfall": "Thinking a servo is a continuously spinning DC motor: a servo goes to an angle between 0 and 180 degrees."
+    },
+    {
+      "term": "Pulse width",
+      "definition": "How long the pulse on the SIG wire lasts; the servo reads the angle from this (0 degrees ≈ 544 µs, 180 degrees ≈ 2400 µs).",
+      "example": "For 90 degrees, the pulse lasts about 1472 µs and repeats every 20 ms.",
+      "pitfall": "Thinking the pulse rate is the angle: it is the width of the pulse, not how often it comes, that sets the angle."
+    },
+    {
+      "term": "attach()",
+      "definition": "Connects the servo object to a pin and starts making pulses.",
+      "example": "servom.attach(9); says that the servo's signal wire is on D9.",
+      "pitfall": "Forgetting to write attach: no pulses are made and the servo does not move at all."
+    },
+    {
+      "term": "write()",
+      "definition": "Gives the servo the angle to go to, between 0 and 180 degrees.",
+      "example": "servom.write(135); moves the servo to 135 degrees.",
+      "pitfall": "Giving an angle outside 0-180: the servo strains against its mechanical limit."
+    },
+    {
+      "term": "map()",
+      "definition": "Converts a number from one range to another; the result is an integer.",
+      "example": "map(512, 0, 1023, 0, 180) gives about 90.",
+      "pitfall": "Thinking map gives a result with a fraction: the result is rounded down to an integer."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h5d21-q1",
+      "kind": "mcq",
+      "prompt": "Which wire carries the angle the servo should go to?",
+      "options": [
+        "The VCC wire: the higher the voltage, the bigger the angle",
+        "The GND wire: ground sets the angle",
+        "The SIG wire: the width of the pulse sets the angle",
+        "All three wires equally"
+      ],
+      "answer": 2,
+      "explanation": "The angle is given by the width of the pulse arriving on the SIG wire. VCC and GND only carry power; changing the voltage does not change the angle.",
+      "skills": [
+        "servo-angle"
+      ]
+    },
+    {
+      "id": "m3h5d21-q2",
+      "kind": "numeric",
+      "prompt": "A servo wants a 544 µs pulse at 0 degrees and a 2400 µs pulse at 180 degrees, and the values in between are linear. How many microseconds is the pulse for servom.write(45)?",
+      "answer": 1008,
+      "tolerance": 1,
+      "unit": "µs",
+      "explanation": "About (2400 − 544) / 180 ≈ 10.31 µs is added per degree. 544 + 45 × 10.31 ≈ 1008 µs.",
+      "skills": [
+        "servo-angle"
+      ]
+    },
+    {
+      "id": "m3h5d21-q3",
+      "kind": "predict-output",
+      "prompt": "The potentiometer reads 768. What does the servo do when this code runs?\n\n```\nint okuma = 768;\nint aci = map(okuma, 0, 1023, 0, 180);\nservom.write(aci);\n```",
+      "options": [
+        "It goes to about 90 degrees",
+        "It goes to about 135 degrees",
+        "It goes to 180 degrees",
+        "It goes to 768 degrees"
+      ],
+      "answer": 1,
+      "explanation": "768 × 180 / 1023 ≈ 135.1 and map rounds to an integer: 135 degrees. 90 degrees only happens when the reading is around 512; the servo cannot go beyond 180 degrees.",
+      "skills": [
+        "servo-angle",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d21-q4",
+      "kind": "find-bug",
+      "prompt": "The servo is wired correctly as SIG-D9, VCC-5V, GND-GND, but it does not move at all. Why?\n\n```\n#include <Servo.h>\nServo servom;\n\nvoid setup() {\n}\n\nvoid loop() {\n  servom.write(90);\n  delay(1000);\n}\n```",
+      "options": [
+        "There is no servom.attach(9) in setup()",
+        "The Servo servom; line is not needed",
+        "delay(1000) is too long",
+        "write(90) is not a valid angle"
+      ],
+      "answer": 0,
+      "explanation": "Without attach, no pulses are made and the servo gets no commands. 90 is a valid angle and the delay causes no problem.",
+      "skills": [
+        "servo-angle",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h5d21-q5",
+      "kind": "numeric",
+      "prompt": "This sweep loop moves the servo from 0 to 180. How many milliseconds does a one-way sweep take?\n\n```\nfor (int aci = 0; aci <= 180; aci++) {\n  servom.write(aci);\n  delay(15);\n}\n```",
+      "answer": 2715,
+      "tolerance": 0,
+      "unit": "ms",
+      "explanation": "From 0 to 180 (180 included) there are 181 steps, and each step waits 15 ms: 181 × 15 = 2715 ms. Saying 180 × 15 = 2700 forgets one step.",
+      "skills": [
+        "servo-angle",
+        "prog-timing"
+      ]
+    }
+  ]
+}

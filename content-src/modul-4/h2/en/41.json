@@ -1,0 +1,117 @@
+{
+  "concepts": [
+    {
+      "term": "PIR sensor",
+      "definition": "A passive sensor that detects changes in the infrared (heat) radiation in its field of view and sends no light itself.",
+      "example": "The sensor that switches on the light for someone walking down a corridor: the walking person shifts the radiation from one half to the other.",
+      "pitfall": "Thinking it will also see someone standing still; because the radiation does not change, the PIR may not notice them."
+    },
+    {
+      "term": "The OUT pin and INPUT",
+      "definition": "A PIR's OUT pin is HIGH when there is motion and LOW when there is none; because the module drives its own voltage, the pin is set to plain INPUT.",
+      "example": "pinMode(2, INPUT); if digitalRead(2) == HIGH, there is motion.",
+      "pitfall": "Using INPUT_PULLUP, or counting LOW as motion as with a button; the logic ends up the wrong way round."
+    },
+    {
+      "term": "Warm-up time",
+      "definition": "The waiting time after a PIR is switched on, while it gets used to its surroundings and its output cannot be trusted.",
+      "example": "On the PIR in the lab the output jumps randomly between HIGH and LOW for the first 2 seconds; on real modules it is around half a minute to a minute.",
+      "pitfall": "Starting to read without waiting for the warm-up: a false HIGH arrives at start-up and the alarm goes off for no reason."
+    },
+    {
+      "term": "Hold time",
+      "definition": "The time a PIR keeps its OUT pin HIGH after the motion has ended.",
+      "example": "The lab PIR keeps its output HIGH for 3 more seconds once the motion ends.",
+      "pitfall": "Expecting OUT to go LOW the moment you untick the Motion box."
+    },
+    {
+      "term": "Time of the last motion",
+      "definition": "Storing the millis() value each time HIGH is seen and saying \"empty\" once enough quiet time has passed.",
+      "example": "sonHareket = millis(); ... if (millis() - sonHareket >= BOS_SURE) the room is empty.",
+      "pitfall": "Treating the sensor output directly as room-occupied information; someone sitting still may be counted as \"not there\"."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d1-q1",
+      "kind": "mcq",
+      "prompt": "What does a PIR sensor detect?",
+      "options": [
+        "The time it takes for a sound wave it sends to echo back",
+        "Changes in the infrared radiation in its field of view",
+        "The colour and brightness of an object",
+        "The field of a nearby magnet"
+      ],
+      "answer": 1,
+      "explanation": "A PIR is passive: it sends nothing itself, it only listens for changes in the infrared radiation in its field of view. The sensor that sends sound and waits for the echo is the HC-SR04; a PIR does not detect colour or magnets.",
+      "skills": [
+        "sensor-pir"
+      ]
+    },
+    {
+      "id": "m4h2d1-q2",
+      "kind": "mcq",
+      "prompt": "When the alarm board is plugged in, the PIR gives random HIGHs and LOWs in the first few seconds and the siren goes off for no reason. Which is the right fix?",
+      "options": [
+        "Setting the pin to INPUT_PULLUP",
+        "Shortening the siren time",
+        "Ignoring the PIR reading until the warm-up time is over",
+        "Putting delay(1000) in every pass"
+      ],
+      "answer": 2,
+      "explanation": "During the warm-up the PIR's output is not reliable. The program does not read the PIR (or ignores the reading) until the warm-up time is over. INPUT_PULLUP does not help the pin; the module drives the output. Putting delay(1000) in every pass does not solve the problem, it only blocks the program.",
+      "skills": [
+        "sensor-pir",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h2d1-q3",
+      "kind": "numeric",
+      "prompt": "In the pir_oda_dolu sketch, BOS_SURE is set to 5000 ms. On the PIR in the lab you tick the Motion box at t = 20 s and untick it at t = 23 s. OUT stays HIGH for 3 more seconds after the motion ends. At which second does the sketch say \"Oda bos\" (room empty)?",
+      "answer": 31,
+      "tolerance": 0.2,
+      "unit": "s",
+      "explanation": "The box is unticked at t = 23 s; OUT stays HIGH for 3 more seconds, so sonHareket is refreshed until t = 26 s. After that the room needs 5 s of quiet: 26 + 5 = 31 s. The sensor's own hold time is added on top of BOS_SURE in the software.",
+      "skills": [
+        "sensor-pir",
+        "prog-millis",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m4h2d1-q4",
+      "kind": "predict-output",
+      "prompt": "The PIR OUT pin, read once per pass, is LOW, HIGH, HIGH, HIGH, LOW, LOW in turn. What does the serial monitor show when this code runs?\n\n```\nbool onceki = false;\n\nvoid setup() {\n  pinMode(2, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool h = (digitalRead(2) == HIGH);\n  if (h && !onceki) Serial.println(\"A\");\n  if (!h && onceki) Serial.println(\"B\");\n  onceki = h;\n}\n```",
+      "options": [
+        "A, A, A, B (an A for every pass it stays HIGH)",
+        "A and B, once each",
+        "B and A, once each",
+        "Nothing is printed"
+      ],
+      "answer": 1,
+      "explanation": "The code only prints changes (edges). On the change from LOW to HIGH it prints \"A\" once, and on the change from HIGH to LOW it prints \"B\" once. HIGH lasting three passes does not produce three lines; it prints the edge, not the level.",
+      "skills": [
+        "prog-edge-detect",
+        "sensor-pir"
+      ]
+    },
+    {
+      "id": "m4h2d1-q5",
+      "kind": "find-bug",
+      "prompt": "We want the LED to light when there is motion. The PIR module is wired correctly, but when the Motion box is ticked the LED is off, and when it is unticked the LED is on. Which line is wrong?\n\n```\nconst int PIR = 2;\n\nvoid setup() {\n  pinMode(PIR, INPUT);\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  digitalWrite(13, digitalRead(PIR) == LOW);\n}\n```",
+      "options": [
+        "const int PIR = 2;",
+        "pinMode(PIR, INPUT);",
+        "pinMode(13, OUTPUT);",
+        "digitalWrite(13, digitalRead(PIR) == LOW);"
+      ],
+      "answer": 3,
+      "explanation": "A PIR gives HIGH when there is motion; because the code compares with LOW, the LED lights when there is no motion. The correct version is `digitalRead(PIR) == HIGH`. pinMode(PIR, INPUT) is correct: the module drives OUT, so no pull-up is needed.",
+      "skills": [
+        "sensor-pir",
+        "prog-debug"
+      ]
+    }
+  ]
+}

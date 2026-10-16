@@ -1,0 +1,115 @@
+{
+  "concepts": [
+    {
+      "term": "Portfolio",
+      "definition": "A short collection that shows the work you did, with evidence.",
+      "example": "Describing the eval, RAG and agent sections with numbers and screenshots.",
+      "pitfall": "Saying \"I know AI\" without evidence."
+    },
+    {
+      "term": "Evidence",
+      "definition": "A number, screenshot or prompt that supports a claim.",
+      "example": "\"88% accuracy on 25 cases.\"",
+      "pitfall": "Only writing the percentage and not saying how many cases it is based on."
+    },
+    {
+      "term": "The difference between real calculation and simulation",
+      "definition": "Separating the parts of the portal tools that are really calculated (tokenising, retrieval, eval) from the parts that are simulated.",
+      "example": "Writing that RAG synthesis is a template and retrieval is real.",
+      "pitfall": "Describing a simulation as if it were a real model's answer."
+    },
+    {
+      "term": "Saying you used AI",
+      "definition": "Clearly writing in your portfolio where you had help from AI.",
+      "example": "\"I had help with debugging, and I made the fix myself.\"",
+      "pitfall": "Hiding the help and saying you did everything yourself."
+    },
+    {
+      "term": "Writing down what is missing",
+      "definition": "Clearly stating the part you did not try or could not test with a real model.",
+      "example": "\"This section was not tried with a real model.\"",
+      "pitfall": "Filling the missing section by writing something anyway."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h8d5-q1",
+      "kind": "mcq",
+      "prompt": "When you write the RAG section of your portfolio, which statement is honest?",
+      "options": [
+        "My tool shows a real model's answer",
+        "Retrieval is a real calculation; the synthesis step is a template (simulation)",
+        "The portal gives the same result as a real model",
+        "There is no need to write that it is a simulation"
+      ],
+      "answer": 1,
+      "explanation": "Saying that retrieval is a real calculation and the synthesis step is a template is honest. The portal tools are small examples and do not represent the behaviour of a real model.",
+      "skills": [
+        "ai-portfolio",
+        "ai-honesty"
+      ]
+    },
+    {
+      "id": "m7h8d5-q2",
+      "kind": "numeric",
+      "prompt": "In the first eval round you got 20 of 25 cases right; after fixing the prompt you got 22 right. By how many percentage points did the accuracy increase?",
+      "answer": 8,
+      "tolerance": 0,
+      "unit": "points",
+      "explanation": "The first round is 20 / 25 = 80%, the second round 22 / 25 = 88%. The increase is 88 - 80 = 8 points. Because the same 25 cases were used, the comparison is fair.",
+      "skills": [
+        "ai-portfolio",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d5-q3",
+      "kind": "mcq",
+      "prompt": "Which portfolio sentence has the strongest evidence?",
+      "options": [
+        "My prompt works brilliantly.",
+        "On 25 cases in the eval set, accuracy went up from 80% to 88%; I studied the two failing cases.",
+        "The results are good because the model is very clever.",
+        "Everyone liked this prompt."
+      ],
+      "answer": 1,
+      "explanation": "The sentence with the number of cases, the accuracy and a comparison can be measured and checked. Phrases such as \"it works really well\" or \"a brilliant prompt\" have no evidence.",
+      "skills": [
+        "ai-portfolio"
+      ]
+    },
+    {
+      "id": "m7h8d5-q4",
+      "kind": "predict-output",
+      "prompt": "What does this code, which works out the accuracy in the portfolio table, print?\n\n```\ndogru = 22\ntoplam = 25\nprint(round(dogru / toplam * 100))\n```",
+      "options": [
+        "0.88",
+        "22",
+        "88",
+        "88%"
+      ],
+      "answer": 2,
+      "explanation": "22 / 25 = 0.88; multiplied by 100 it is 88; round rounds it to a whole number. The output is 88. There is no percent sign in the code; only the number is printed.",
+      "skills": [
+        "ai-portfolio",
+        "ai-eval-rate"
+      ]
+    },
+    {
+      "id": "m7h8d5-q5",
+      "kind": "mcq",
+      "prompt": "What should you do in your portfolio with a section you could not try without a real model?",
+      "options": [
+        "Fill the results in with guesses",
+        "Not write the section at all and move on without saying anything",
+        "State clearly \"I did not try this with a real model\"",
+        "Present the simulation output as real model output"
+      ],
+      "answer": 2,
+      "explanation": "Writing clearly about the section that stayed incomplete earns trust. Presenting a simulation as if it were a real result, or filling the gap with made-up information, is a problem of honesty.",
+      "skills": [
+        "ai-honesty"
+      ]
+    }
+  ]
+}

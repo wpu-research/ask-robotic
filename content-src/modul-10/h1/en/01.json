@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "LED screen",
+      "definition": "The card's screen of 5 columns and 5 rows, with 25 tiny lights in total.",
+      "example": "The heart icon is drawn by lighting up some of the 25 lights on the screen.",
+      "pitfall": "Thinking the screen has hundreds of dots; there are only 25 lights, so long text does not fit and scrolls."
+    },
+    {
+      "term": "Header block (on start)",
+      "definition": "The block that decides where the program starts running; the blocks attached under it run once when you press ▶.",
+      "example": "When you put the show text block inside the on start block, the text scrolls when you press ▶.",
+      "pitfall": "Leaving a block outside the on start block: a block that is not attached looks faded and never runs."
+    },
+    {
+      "term": "Order",
+      "definition": "Blocks run from top to bottom, and the next one does not start before the current one has finished.",
+      "example": "To show the text first and then the number, you put the text block above the number block.",
+      "pitfall": "Putting the blocks in the wrong order and thinking \"the program is broken\"; most of the time only the order is wrong."
+    },
+    {
+      "term": "Scrolling text",
+      "definition": "Text that does not fit on the screen is shown by scrolling from right to left; a single character does not scroll, it stays in the middle for a short time.",
+      "example": "\"Merhaba\" scrolls in about 4 seconds; the one-digit 7 stays in the middle, but 25 scrolls because it is two characters.",
+      "pitfall": "Not waiting for the scrolling text to finish: the next block does not start until the text is done."
+    },
+    {
+      "term": "Code tabs",
+      "definition": "The JavaScript and Python tabs show the written code that matches your blocks, read-only.",
+      "example": "In the JavaScript tab you see the line screen.showText(\"Merhaba\").",
+      "pitfall": "Trying to change the code in the tabs; changes are made through the blocks."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m10h1d1-q1",
+      "kind": "mcq",
+      "prompt": "A block is sitting on its own on the screen, not attached to the on start block. What happens when you press ▶?",
+      "options": [
+        "The block still runs, because it is visible on the screen",
+        "The card shows an error and deletes the whole program",
+        "The block does not run; a block that is not attached to a header block looks faded",
+        "The block moves inside the on start block by itself"
+      ],
+      "answer": 2,
+      "explanation": "Programs live inside a header block. A stack that is not attached to a header block does not run and looks faded. A block being on the screen does not mean it runs; the card does not show an error either, it simply does not see it.",
+      "skills": [
+        "mk-flow",
+        "mk-card"
+      ]
+    },
+    {
+      "id": "m10h1d1-q2",
+      "kind": "predict-output",
+      "prompt": "Below is how this program looks in the JavaScript tab. What happens on the screen when you run it with ▶?\n\n```\ncard.onStart(() => {\n  screen.showNumber(7);\n  screen.showText(\"Merhaba\");\n});\n```",
+      "options": [
+        "First 7 stays in the middle for a short time, then Merhaba scrolls",
+        "First Merhaba scrolls, then 7 appears",
+        "7 and Merhaba are on the screen at the same time",
+        "Nothing happens; the number should have come after the text"
+      ],
+      "answer": 0,
+      "explanation": "Blocks run from top to bottom; the number block comes before the text block, so 7 appears first. The one-digit 7 does not scroll; it stays in the middle for a short time, and then Merhaba scrolls. If the order were reversed, the result would be reversed too.",
+      "skills": [
+        "mk-flow"
+      ]
+    },
+    {
+      "id": "m10h1d1-q3",
+      "kind": "numeric",
+      "prompt": "The Micro Card screen has 5 columns and 5 rows. How many LEDs are on the screen in total?",
+      "answer": 25,
+      "unit": "LED",
+      "explanation": "The number of columns times the number of rows: 5 x 5 = 25. Do not mix it up with adding (5 + 5 = 10); each column has 5 lights and there are 5 columns.",
+      "skills": [
+        "mk-card"
+      ]
+    },
+    {
+      "id": "m10h1d1-q4",
+      "kind": "find-bug",
+      "prompt": "Selin wants the text \"Merhaba\" to scroll first and then the number 7 to appear. But 7 appears on the screen first. Look at the program:\n\n```\n1  card.onStart(() => {\n2    screen.showNumber(7);\n3    screen.showText(\"Merhaba\");\n4  });\n```\n\nWhat is the bug?",
+      "options": [
+        "Line 1: a different header block is needed instead of onStart",
+        "Line 4: the closing is missing",
+        "On line 3 Merhaba is too long and should be shortened",
+        "Lines 2 and 3 are in the wrong order; the text block should be above the number block"
+      ],
+      "answer": 3,
+      "explanation": "The card runs blocks from top to bottom. For the text to appear first, the text block must be on top and the number block below it. There is no bug in the other lines: onStart is the right header block, and the length of the text does not affect the order.",
+      "skills": [
+        "mk-flow",
+        "mk-debug"
+      ]
+    },
+    {
+      "id": "m10h1d1-q5",
+      "kind": "mcq",
+      "prompt": "Which one does NOT scroll on the screen and stays in the middle for a short time?",
+      "options": [
+        "Text: Merhaba",
+        "Number: 7",
+        "Number: 25",
+        "Text: Ali"
+      ],
+      "answer": 1,
+      "explanation": "A single character (a letter or a one-digit number) fits on the screen and stays in the middle. Merhaba and Ali scroll because they have more than one character. 25 is two characters; a two-digit number scrolls like text too.",
+      "skills": [
+        "mk-card",
+        "mk-timing"
+      ]
+    }
+  ]
+}

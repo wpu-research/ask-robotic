@@ -1,0 +1,114 @@
+{
+  "concepts": [
+    {
+      "term": "Expected output (label)",
+      "definition": "The answer you accept as correct for a case; the system's answer is measured against it.",
+      "example": "For `Kolay ve eğlenceli` (Easy and fun), the expected label is \"positive\".",
+      "pitfall": "Writing the label by looking at the system's answer; the label comes first, running it comes after."
+    },
+    {
+      "term": "Unclear (neutral) label",
+      "definition": "A third label kept for texts that are neither positive nor negative.",
+      "example": "The sentence `Toplantı saat beşte` (The meeting is at five) carries no feeling; its label is unclear.",
+      "pitfall": "Forcing every sentence to count as positive or negative; both the system and the test set get distorted."
+    },
+    {
+      "term": "Variety of cases",
+      "definition": "The set contains easy, hard and borderline cases, and examples of every label.",
+      "example": "You write one easy and one hard case for each label.",
+      "pitfall": "Repeating the same pattern with small changes and thinking it is varied."
+    },
+    {
+      "term": "Repeated case",
+      "definition": "The same input appearing more than once in the set.",
+      "example": "If `Güzel` (Nice) is written three times, the system collects three points from one easy case.",
+      "pitfall": "Thinking repetition makes the measurement stronger; it only inflates or distorts the accuracy."
+    },
+    {
+      "term": "Agreement between labellers",
+      "definition": "Two people giving the same case the same label.",
+      "example": "Give your first five cases to a friend; if your labels differ, the case is unclear.",
+      "pitfall": "Leaving a case you could not agree on as it is; it should either be fixed or taken out."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h4d17-q1",
+      "kind": "mcq",
+      "prompt": "What is the most basic feature of a good test case?",
+      "options": [
+        "The sentence being very long",
+        "Being a case where the system will definitely go wrong",
+        "Being clear enough that two people would give it the same expected label",
+        "Being labelled only positive"
+      ],
+      "answer": 2,
+      "explanation": "If the expected output is not clear, saying the system \"got it wrong\" makes no sense. Length, or a guarantee that the system will go wrong, is not a measure of quality; the set should also be balanced between labels.",
+      "skills": [
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d17-q2",
+      "kind": "numeric",
+      "prompt": "In a set of 10 cases, `Güzel` (Nice) is written 3 times and \"Berbat\" (Awful) 2 times; the remaining 5 cases are all different from each other. How many unique cases are in the set?",
+      "answer": 7,
+      "tolerance": 0,
+      "unit": "cases",
+      "explanation": "1 for Nice, 1 for Awful and the remaining 5 different cases: 1 + 1 + 5 = 7 unique cases. The 3 extra copies (2 + 1) add no new information to the measurement; they only make the accuracy misleading.",
+      "skills": [
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d17-q3",
+      "kind": "predict-output",
+      "prompt": "The sentiment classifier looks at positive and negative words; `değil` (not) flips the score of the word before it; if the score is 0, it says \"unclear\". The set below is run:\n\n```\n(\"Toplantı saat beşte\"     , unclear)\n(\"Kolay değil\"             , negative)\n(\"Güzel\"                   , positive)\n(\"Hızlı ve kullanışsız\"    , negative)\n```\n\nWhat does the report say?",
+      "options": [
+        "4 out of 4 cases correct",
+        "3 correct; the wrong case is the 4th one, \"fast and useless\" (the system says unclear)",
+        "3 correct; the wrong case is the 2nd one, \"not easy\" (the system says positive)",
+        "2 correct, 2 wrong"
+      ],
+      "answer": 1,
+      "explanation": "\"The meeting is at five\" is in no list: unclear. \"Not easy\": easy +1, and \"not\" flips it to -1, negative. \"Nice\": positive. \"Fast and useless\": fast +1, useless -1, total 0, and the system says unclear; the expected label is negative, so this case is wrong. Accuracy 3/4.",
+      "skills": [
+        "eval-basics",
+        "eval-cases"
+      ]
+    },
+    {
+      "id": "m7h4d17-q4",
+      "kind": "find-bug",
+      "prompt": "In the test set below, the expected label of one case has been written wrongly. Which one?\n\n```\n1: (\"Kullanışsız bir araç\"   , negative)\n2: (\"Süper ve eğlenceli\"      , negative)\n3: (\"Ders salı günü\"          , unclear)\n4: (\"Harika bir proje\"        , positive)\n```",
+      "options": [
+        "Line 2: it should be positive",
+        "Line 1: it should be positive",
+        "Line 3: it should be negative",
+        "Line 4: it should be unclear"
+      ],
+      "answer": 0,
+      "explanation": "\"Great and fun\" is clearly positive; labelling it \"negative\" unfairly makes the system look wrong. In an eval, a labelling mistake looks like a system mistake; that is why the labels should also be checked with someone else. The other three lines (\"A useless tool\", \"The lesson is on Tuesday\", \"A great project\") are labelled correctly.",
+      "skills": [
+        "eval-cases",
+        "eval-method"
+      ]
+    },
+    {
+      "id": "m7h4d17-q5",
+      "kind": "mcq",
+      "prompt": "Why are cases labelled \"unclear\" added to a test set?",
+      "options": [
+        "The system must say positive or negative to every sentence",
+        "So that the set gets bigger",
+        "Unclear cases always come out correct",
+        "To test whether it correctly tells apart texts that carry no feeling"
+      ],
+      "answer": 3,
+      "explanation": "Most real texts carry no feeling; the system calling them positive or negative is a mistake, and it can only be caught with cases labelled unclear. A case added just to make the set bigger adds no information.",
+      "skills": [
+        "eval-cases"
+      ]
+    }
+  ]
+}

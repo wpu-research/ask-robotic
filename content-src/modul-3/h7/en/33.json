@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "The I2C bus (SDA and SCL)",
+      "definition": "Communication over two wires: SDA carries data, SCL carries the clock. Several devices can be connected to the same two wires. On the Uno, SDA = A4, SCL = A5.",
+      "example": "The I2C LCD has only 4 pins: SDA, SCL, VCC and GND.",
+      "pitfall": "Connecting SDA and SCL the wrong way round or to pins other than A4-A5: no device is found."
+    },
+    {
+      "term": "I2C address",
+      "definition": "The 7-bit identity number of every device on the bus. The board sends the message to this address; only that device answers.",
+      "example": "Most LCD modules are at address 0x27 or 0x3F.",
+      "pitfall": "Writing an address in the code that is different from the device's real address: the display does not answer."
+    },
+    {
+      "term": "Hexadecimal number (0x)",
+      "definition": "Base-16 notation; it starts with the 0x prefix. The letters A-F stand for the values 10-15.",
+      "example": "0x3F = 3 × 16 + 15 = 63.",
+      "pitfall": "Thinking 0x27 is decimal 27: 0x27 is actually 39."
+    },
+    {
+      "term": "Wire.endTransmission()",
+      "definition": "Sends the prepared message and returns an error code. 0 = the device at the address answered.",
+      "example": "if (Wire.endTransmission() == 0) Serial.println(\"Cihaz var\");",
+      "pitfall": "Never checking the result: the program seems fine even when no device is connected."
+    },
+    {
+      "term": "Address scan",
+      "definition": "A small program that tries every address one after another and lists the ones that answer. It is used to find a device whose address you do not know.",
+      "example": "If the scan finds 0x3F, you write LiquidCrystal_I2C lcd(0x3F, 16, 2); in the code.",
+      "pitfall": "Not noticing an address clash: if two devices are at the same address, they get mixed up."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m3h7d33-q1",
+      "kind": "numeric",
+      "prompt": "An address scan found an I2C LCD at address 0x3F. What is this address in decimal?",
+      "answer": 63,
+      "tolerance": 0,
+      "explanation": "In hexadecimal, 3F is 3 × 16 + 15 = 63 (the digit F is 15). Serial.println(adres, HEX) prints 3F; println(adres) without HEX prints 63.",
+      "skills": [
+        "bits-bytes",
+        "i2c-bus"
+      ]
+    },
+    {
+      "id": "m3h7d33-q2",
+      "kind": "mcq",
+      "prompt": "Which pins is the I2C bus on, on an Arduino Uno?",
+      "options": [
+        "SDA = A4, SCL = A5",
+        "SDA = A5, SCL = A4",
+        "SDA = D2, SCL = D3",
+        "SDA = D4, SCL = D5"
+      ],
+      "answer": 0,
+      "explanation": "The Uno's hardware I2C pins are A4 (SDA) for data and A5 (SCL) for the clock. They cannot be changed. D2-D3 and D4-D5 are digital pins; they are not set aside for I2C.",
+      "skills": [
+        "i2c-bus",
+        "circuit-wiring"
+      ]
+    },
+    {
+      "id": "m3h7d33-q3",
+      "kind": "predict-output",
+      "prompt": "There is only one device on the bus, and its address is 0x3F. What appears in the serial monitor when this program runs?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n  Wire.begin();\n  for (byte adres = 1; adres < 127; adres++) {\n    Wire.beginTransmission(adres);\n    if (Wire.endTransmission() == 0) {\n      Serial.println(adres);\n    }\n  }\n}\n```",
+      "options": [
+        "3F",
+        "0x3F",
+        "63",
+        "Nothing is printed"
+      ],
+      "answer": 2,
+      "explanation": "There is a device at address 0x3F, so one line is printed. Serial.println(adres) prints the number in decimal: 63. To print 3F you need println(adres, HEX); the 0x prefix does not appear unless you print it yourself.",
+      "skills": [
+        "i2c-bus",
+        "bits-bytes"
+      ]
+    },
+    {
+      "id": "m3h7d33-q4",
+      "kind": "find-bug",
+      "prompt": "The address scan found the device at address 0x3F. SDA, SCL, VCC and GND are connected correctly, but the display shows no text. Which line is wrong?\n\n```\n#include <Wire.h>\n#include <LiquidCrystal_I2C.h>\n\nLiquidCrystal_I2C lcd(0x27, 16, 2);\n\nvoid setup() {\n  lcd.init();\n  lcd.backlight();\n  lcd.print(\"Merhaba\");\n}\n```",
+      "options": [
+        "lcd.init();",
+        "LiquidCrystal_I2C lcd(0x27, 16, 2);",
+        "lcd.backlight();",
+        "lcd.print(\"Merhaba\");"
+      ],
+      "answer": 1,
+      "explanation": "The code says 0x27, but the device is at address 0x3F. The board talks to the wrong address, and nobody is at that address. It should be LiquidCrystal_I2C lcd(0x3F, 16, 2);. init, backlight and print are used correctly.",
+      "skills": [
+        "i2c-bus",
+        "lcd-display",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m3h7d33-q5",
+      "kind": "mcq",
+      "prompt": "Two devices are connected to the same I2C bus, and both have the address 0x27. What happens?",
+      "options": [
+        "The board writes to them in turn; there is no problem",
+        "The bus gives out a new address automatically",
+        "Only the one connected first works",
+        "Both devices hear the same message and get mixed up; one of the addresses must be changed"
+      ],
+      "answer": 3,
+      "explanation": "The board calls devices only by their address. If two devices are at the same address, both try to answer and the bus gets mixed up. The solution is to change the address jumpers on the module (the address property in the lab). The bus does not hand out addresses by itself.",
+      "skills": [
+        "i2c-bus"
+      ]
+    }
+  ]
+}

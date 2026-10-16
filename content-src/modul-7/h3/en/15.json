@@ -1,0 +1,119 @@
+{
+  "concepts": [
+    {
+      "term": "Six-part prompt",
+      "definition": "A prompt that contains the parts task, role, context, example, format and constraint.",
+      "example": "Role: mentor; task: summarise; context: age 13; an example; \"at most 3 bullet points\"; \"do not add information\".",
+      "pitfall": "Putting the parts in a random order and writing sentences that contradict each other."
+    },
+    {
+      "term": "Faithfulness constraint",
+      "definition": "A sentence telling the model to use only the information in the text it was given.",
+      "example": "Do not add information that is not in the announcement.",
+      "pitfall": "Treating the constraint as a guarantee; the model may still make things up (covered in lesson 36)."
+    },
+    {
+      "term": "Simplifying",
+      "definition": "Taking out sentences that give no information, so that every sentence does a job.",
+      "example": "Using \"write at most 3 bullet points\" instead of \"write a really nice summary\".",
+      "pitfall": "Taking a sentence out without measuring whether it is unnecessary."
+    },
+    {
+      "term": "Design note",
+      "definition": "A short piece of writing that explains the reasons for the choices in the prompt.",
+      "example": "Writing in three sentences why you chose the role, the example and the format.",
+      "pitfall": "Never writing the note; a few weeks later even you will forget why the prompt is the way it is."
+    },
+    {
+      "term": "Measured evidence",
+      "definition": "Showing the quality of a prompt with results tested on real examples.",
+      "example": "In 9 out of 10 real announcements, the summary did not go over 3 bullet points.",
+      "pitfall": "Treating a high score alone as proof."
+    },
+    {
+      "term": "Simulation honesty",
+      "definition": "The Prompt checker in the Workshop is not a model; it produces no answer.",
+      "example": "The score shows whether the parts are there, not the quality of the output.",
+      "pitfall": "Reading 90 points as \"it will work well on a real model too\"."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m7h3d15-q1",
+      "kind": "mcq",
+      "prompt": "Which two of the six parts are missing from this prompt?\n\n\"Summarise the announcement below for 13-year-old students. Write the summary as at most 3 bullet points. The club members should not miss the meeting.\"",
+      "options": [
+        "Task and format",
+        "Role and example",
+        "Context and constraint",
+        "Format and example"
+      ],
+      "answer": 1,
+      "explanation": "Task: \"summarise\". Context: 13-year-old students and the aim of not missing the meeting. Format and limit: \"at most 3 bullet points\". There is no role (\"You are … a mentor\") and no example (an Input/Output pair). The checker in the Workshop also shows these two parts as missing.",
+      "skills": [
+        "ai-prompt-parts"
+      ]
+    },
+    {
+      "id": "m7h3d15-q2",
+      "kind": "numeric",
+      "prompt": "In the project the prompt must be at least 40 words. Your draft is 27 words. At least how many more words must you add?",
+      "answer": 13,
+      "unit": "words",
+      "explanation": "40 − 27 = 13. Adding meaningless padding to raise the word count does not help; writing one of the missing parts (an example, the context) raises both the count and the quality.",
+      "skills": [
+        "ai-prompt-parts"
+      ]
+    },
+    {
+      "id": "m7h3d15-q3",
+      "kind": "find-bug",
+      "prompt": "Which line in the announcement summariser prompt contradicts the others?\n\n```\n1 You are an experienced robotics club mentor.\n2 Summarise the announcement below for 13-year-old students.\n3 Write the summary as at most 3 bullet points.\n4 Fill in information that is not in the announcement by guessing.\n```",
+      "options": [
+        "Line 1: the role is unnecessary",
+        "Line 2: the age should not be written",
+        "Line 3: the number of bullet points should not be limited",
+        "Line 4: the summary should stay faithful to the source, but this line encourages making things up"
+      ],
+      "answer": 3,
+      "explanation": "A summary should pass on the information in the announcement; \"fill in missing information by guessing\" steers it towards making things up. The right sentence would be \"do not add information that is not in the announcement\". A rule-based checker does not see this contradiction: both versions score 80. That is why the prompt needs to be read and tried.",
+      "skills": [
+        "ai-prompt-parts",
+        "ai-honest-measure"
+      ]
+    },
+    {
+      "id": "m7h3d15-q4",
+      "kind": "mcq",
+      "prompt": "Which of these supports the claim \"this prompt works well\" most strongly?",
+      "options": [
+        "The Prompt checker gave it 90 points",
+        "The prompt is very long and detailed",
+        "I tried the prompt on 10 real announcements and 9 of the summaries stayed faithful to the announcement",
+        "A friend of mine liked the prompt"
+      ],
+      "answer": 2,
+      "explanation": "The strongest evidence is a result measured on real examples. The checker score only says whether the parts are there; length does not guarantee quality; liking it is an opinion. A test stated as a number (9 / 10) can be both repeated and discussed.",
+      "skills": [
+        "ai-honest-measure",
+        "ai-prompt-iterate"
+      ]
+    },
+    {
+      "id": "m7h3d15-q5",
+      "kind": "mcq",
+      "prompt": "Your prompt got 100 points in the Workshop. If you give the same prompt to a real model, what do you expect?",
+      "options": [
+        "An answer comes back, but its quality is not guaranteed; you need to measure it",
+        "The same answer as in the Workshop",
+        "A flawless summary, for certain",
+        "The model does not read the prompt"
+      ],
+      "answer": 0,
+      "explanation": "There is no model answer in the Workshop; the checker only looks at the parts. On a real model the output still varies (temperature, context) and may contain wrong or made-up information. That is why a prompt is measured with real examples.",
+      "skills": [
+        "ai-honest-measure"
+      ]
+    }
+  ]
+}

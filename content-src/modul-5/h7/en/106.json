@@ -1,0 +1,110 @@
+{
+  "concepts": [
+    {
+      "term": "Heading",
+      "definition": "The angle that shows which direction the robot is facing.",
+      "example": "If the robot is facing right at the start, its heading is 0 degrees; if it turns 90 degrees to the left, the heading becomes 90.",
+      "pitfall": "Wrapping the heading to 0-360 and then filtering it: the difference between 359 and 1 degrees looks like 358."
+    },
+    {
+      "term": "Bias",
+      "definition": "The gyroscope giving a non-zero speed reading even when it is still.",
+      "example": "A 2 °/s bias, when integrated, produces a false turn of 48 degrees in 24 seconds.",
+      "pitfall": "Never measuring the bias: when still, gz should be zero; if not, the heading slides over time."
+    },
+    {
+      "term": "Gyroscope scale and saturation",
+      "definition": "The largest speed the gyroscope can measure (±250, ±500 ...). If the real speed is larger, the raw value sticks to the limit.",
+      "example": "While the robot turns at 378 °/s, the ±250 scale gets stuck at 250, and the ±500 scale shows the real value.",
+      "pitfall": "Changing the scale without changing the divisor (65.5 instead of 131): the angles come out at half their value."
+    },
+    {
+      "term": "Encoder heading",
+      "definition": "The direction found by dividing the difference between the right and left wheel distances by the axle width.",
+      "example": "If the right wheel travels one tick further than the left, the heading changes by about 4.95 degrees.",
+      "pitfall": "Always increasing the ticks without looking at the drive direction: a wheel going backwards is also counted as forwards."
+    },
+    {
+      "term": "Complementary filter",
+      "definition": "A fusion that weights two sensors by time scale: the gyroscope for the short term, the encoder for the long term.",
+      "example": "heading = 0.98 · (heading + gz · dt) + 0.02 · encoderHeading",
+      "pitfall": "Assuming dt is constant and not measuring the real time that has passed: if the loop slows down, the integral adds up too little."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h7d106-q1",
+      "kind": "mcq",
+      "prompt": "What is the real reason for combining the encoder and the gyroscope for the robot's heading instead of using a single sensor?",
+      "options": [
+        "Both make the same error, and the average cancels it out",
+        "The gyroscope is smooth but builds up bias; the encoder does not drift but moves in coarse steps. Combined, the two weaknesses cover each other",
+        "The encoder cannot measure fast turns at all, while the gyroscope is always perfect",
+        "As the number of sensors grows, the code automatically gets shorter"
+      ],
+      "answer": 1,
+      "explanation": "Because the gyroscope is integrated, even a small bias builds up and grows; the encoder, worked out from ticks, does not drift but moves in steps of about 5 degrees. The first option is wrong: the errors of the two sensors are not of the same kind. The third option is wrong: the gyroscope drifts too. The fourth is off the topic.",
+      "skills": [
+        "rob-sensor-fusion"
+      ]
+    },
+    {
+      "id": "m5h7d106-q2",
+      "kind": "numeric",
+      "prompt": "The gyroscope is working at the ±500 °/s scale (65.5 LSB/(°/s)). The raw reading came out as 3275. How many °/s is the robot turning at?",
+      "answer": 50,
+      "tolerance": 0.5,
+      "unit": "°/s",
+      "explanation": "°/s = raw / sensitivity = 3275 / 65.5 = 50. If you had divided by 131, you would have found 25; this is the classic mistake where the scale and the divisor do not match.",
+      "skills": [
+        "rob-gyro-scale"
+      ]
+    },
+    {
+      "id": "m5h7d106-q3",
+      "kind": "numeric",
+      "prompt": "One tick is 2π · 0.033 / 20 m of wheel travel; the axle width is 0.12 m. If only the right wheel counts one extra tick, by how many degrees does the encoder heading change? (One decimal place)",
+      "answer": 4.95,
+      "tolerance": 0.1,
+      "unit": "degrees",
+      "explanation": "The distance is 0.010367 m; heading = 0.010367 / 0.12 = 0.0864 rad, that is, 4.95 degrees. If you forget to convert centimetres to metres, you get a result 100 times wrong.",
+      "skills": [
+        "rob-sensor-fusion",
+        "rob-localization"
+      ]
+    },
+    {
+      "id": "m5h7d106-q4",
+      "kind": "predict-output",
+      "prompt": "One filter step runs. What appears in the serial monitor?\n\n```\nfloat yon = 10;\nfloat gz = 50;\nfloat dt = 0.02;\nfloat enk = 20;\nconst float ALFA = 0.98;\n\nvoid setup() {\n  Serial.begin(9600);\n  yon = ALFA * (yon + gz * dt) + (1 - ALFA) * enk;\n  Serial.println(yon, 2);\n}\n\nvoid loop() {}\n```",
+      "options": [
+        "10.78",
+        "11.00",
+        "11.18",
+        "30.00"
+      ],
+      "answer": 2,
+      "explanation": "The gyroscope step: 10 + 50 · 0.02 = 11. 0.98 times this is 10.78; the encoder share is 0.02 · 20 = 0.4. The total is 11.18. 10.78 means forgetting the encoder share, 11.00 means not applying the filter at all; 30 means ignoring the weights and adding everything up.",
+      "skills": [
+        "rob-sensor-fusion"
+      ]
+    },
+    {
+      "id": "m5h7d106-q5",
+      "kind": "find-bug",
+      "prompt": "The robot is working at the ±500 °/s scale, but when it really turns 90 degrees the printed angle is about 45 degrees. Where is the bug?\n\n```\nmpuYaz(0x6B, 0);\nmpuYaz(0x1B, 0x08);   // ±500 °/s\n...\nint16_t ham = (Wire.read() << 8) | Wire.read();\nfloat gz = ham / 131.0;\nyon += gz * dt;\n```",
+      "options": [
+        "The GYRO_CONFIG register should be 0x6B, not 0x1B",
+        "The ±500 scale is selected, but the divisor 131 belongs to ±250; it should be 65.5",
+        "byte should be used instead of int16_t",
+        "In the yon += gz * dt line, it should not be multiplied by dt"
+      ],
+      "answer": 1,
+      "explanation": "At the ±500 scale the sensitivity is 65.5 LSB/(°/s). Dividing by 131 halves every reading and the added-up angle comes out at half (45 instead of 90). 0x1B is the right register; 0x6B is for sleep management. int16_t is the right type: the raw value is a signed 16-bit number. Multiplying by dt is the integral itself.",
+      "skills": [
+        "rob-gyro-scale",
+        "prog-debug"
+      ]
+    }
+  ]
+}

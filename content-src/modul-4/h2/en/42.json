@@ -1,0 +1,121 @@
+{
+  "concepts": [
+    {
+      "term": "IR obstacle sensor",
+      "definition": "A module that sends out infrared light and catches its reflection to tell you whether there is an obstacle in front of it; it does not measure distance.",
+      "example": "An automatic soap dispenser notices your hand this way.",
+      "pitfall": "Expecting a distance in centimetres from it; it only gives \"yes/no\" information."
+    },
+    {
+      "term": "Reflection and surface",
+      "definition": "Detection depends on how much light the object sends back; colour and surface change this.",
+      "example": "A white matt box reflects a lot; a shiny black surface reflects little and may not be detected even when it is closer.",
+      "pitfall": "Thinking every object at the same distance will give the same result."
+    },
+    {
+      "term": "Threshold",
+      "definition": "The level the reflection must pass to count as an \"obstacle\". For the digital output it is set with the screw on the module; for the analogue output it is set in the code.",
+      "example": "In the lab, with the Threshold slider at 0.5, a Proximity of 0.5 or more counts as an obstacle.",
+      "pitfall": "Thinking the screw and the code do the same job; with the digital output the code never sees the threshold."
+    },
+    {
+      "term": "Output level constant",
+      "definition": "Writing once, with const int, which level the module gives when it says \"obstacle\", and using that everywhere in the code.",
+      "example": "const int ENGEL_SEVIYESI = LOW; ... digitalRead(IR) == ENGEL_SEVIYESI",
+      "pitfall": "Assuming every module gives LOW for an obstacle; some modules do the opposite."
+    },
+    {
+      "term": "Hysteresis",
+      "definition": "Using two separate thresholds for the on and off decisions and keeping the previous state in the zone between them.",
+      "example": "With thresholds of 600 and 500, an AO value wobbling around 550 does not make the output flicker.",
+      "pitfall": "Using a single threshold: when the value wobbles around the threshold, the output keeps changing."
+    },
+    {
+      "term": "Counting edges",
+      "definition": "Counting an object only once, at the moment it changes from \"no obstacle\" to \"obstacle\".",
+      "example": "A box that stays in front of the sensor on the belt for 3 seconds is counted once.",
+      "pitfall": "Counting the level: a box that stays still is counted again on every pass."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h2d2-q1",
+      "kind": "mcq",
+      "prompt": "What is the most important difference between the IR obstacle module and the HC-SR04?",
+      "options": [
+        "The IR obstacle module gives distance in centimetres, the HC-SR04 does not",
+        "The IR obstacle module only says obstacle/no obstacle, the HC-SR04 measures distance",
+        "The IR obstacle module uses sound, the HC-SR04 uses light",
+        "The IR obstacle module is not sensitive to surface colour at all"
+      ],
+      "answer": 1,
+      "explanation": "The IR obstacle module's digital output only says \"obstacle / no obstacle\"; the threshold is set with the screw. The one that gives distance in centimetres is the HC-SR04. Both sensors are affected by the surface; neither is passive, because both send out their own signal.",
+      "skills": [
+        "sensor-ir-obstacle"
+      ]
+    },
+    {
+      "id": "m4h2d2-q2",
+      "kind": "mcq",
+      "prompt": "You hold a shiny black box in front of the IR obstacle module but it does not detect it at all; a white box, on the other hand, is detected easily. What is the most likely explanation?",
+      "options": [
+        "The box is too far away, so the sound does not come back",
+        "The black surface reflects little, so the reflection cannot pass the threshold",
+        "INPUT_PULLUP has not been used",
+        "A magnetic field forms in the black box"
+      ],
+      "answer": 1,
+      "explanation": "A dark, shiny surface does not send the light back to the sensor; the reflection cannot pass the threshold. The solution is to make the threshold (the screw) more sensitive, or to calibrate the measurement for the surface. The sensor is not broken and there is no need to look for a code error; the surface effect is a well-known feature of real hardware.",
+      "skills": [
+        "sensor-ir-obstacle"
+      ]
+    },
+    {
+      "id": "m4h2d2-q3",
+      "kind": "numeric",
+      "prompt": "In ir_analog_esik, ESIK_YUKSEK = 600, ESIK_ALCAK = 500 and the starting state is \"no obstacle\". The AO readings are 450, 620, 550, 520, 480, 590 in turn. How many times is an \"Engel var\" or \"Engel yok\" line printed?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "lines",
+      "explanation": "450: stays no obstacle. 620 >= 600: \"Engel var\" (1). 550 and 520 are in between, so the state is kept. 480 <= 500: \"Engel yok\" (2). 590 < 600, still no obstacle. 2 lines in total. With a single threshold of 550, three changes would be printed, at 620, 520 and 590; hysteresis brings this down to two.",
+      "skills": [
+        "prog-hysteresis",
+        "sensor-ir-obstacle"
+      ]
+    },
+    {
+      "id": "m4h2d2-q4",
+      "kind": "predict-output",
+      "prompt": "On the IR obstacle part in the lab, the AO pin is connected to A0. The AO voltage rises in a straight line with proximity (a reading of about 51 for proximity 0 and about 972 for proximity 1). You set the proximity first to 0.4, then to 0.8. What do you see in the serial monitor?\n\n```\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  if (analogRead(A0) >= 600) Serial.println(\"Y\");\n  else Serial.println(\"N\");\n  delay(500);\n}\n```",
+      "options": [
+        "Y all the time first, then N all the time",
+        "N all the time",
+        "Y all the time",
+        "N all the time first, then Y all the time"
+      ],
+      "answer": 3,
+      "explanation": "At proximity 0.4 the AO reading is about 419, below 600: N is printed. At proximity 0.8 it is about 788, above 600: Y is printed. Because AO rises with proximity, the order from N to Y is correct.",
+      "skills": [
+        "sensor-ir-obstacle",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h2d2-q5",
+      "kind": "find-bug",
+      "prompt": "You want to count the boxes on a conveyor belt. A single box stays in front of the sensor for one second and the counter goes up to 10 (it rises every 100 ms). Which line is the problem?\n\n```\nint sayac = 0;\n\nvoid setup() {\n  pinMode(3, INPUT);\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  bool engel = (digitalRead(3) == LOW);\n  if (engel) {\n    sayac++;\n    Serial.println(sayac);\n  }\n  delay(100);\n}\n```",
+      "options": [
+        "pinMode(3, INPUT);",
+        "bool engel = (digitalRead(3) == LOW);",
+        "if (engel) {",
+        "delay(100);"
+      ],
+      "answer": 2,
+      "explanation": "`if (engel)` tests the level: as long as there is an obstacle, the counter rises on every pass. The right way is to test the edge \"there was no obstacle on the previous pass, now there is\" (keep a bool onceki and use `engel && !onceki`). The reading line and pinMode are correct.",
+      "skills": [
+        "prog-edge-detect",
+        "prog-debug"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "concepts": [
+    {
+      "term": "Threshold",
+      "definition": "The number at which a sensor reading splits into \"yes\" and \"no\".",
+      "example": "If you write analogRead(A1) < 473 for dark, the threshold is 473.",
+      "pitfall": "Writing the direction of the threshold without looking at the circuit: if the LDR is on the 5V side the value is small in the dark, if it is on the GND side it is large."
+    },
+    {
+      "term": "Flicker (threshold noise)",
+      "definition": "The output switching on and off quickly when the reading wobbles near the threshold.",
+      "example": "If the value swings between 445 and 488, it crosses the 473 threshold on every swing and the LED blinks.",
+      "pitfall": "Blaming the flicker on a broken sensor; the problem is the single threshold, in the code."
+    },
+    {
+      "term": "Hysteresis",
+      "definition": "Using two separate thresholds for switching on and off, and making the decision depend on the current state as well.",
+      "example": "Light up below 423, go off above 523; in between, nothing changes.",
+      "pitfall": "Writing the on and off thresholds the same: that is still a single threshold and the flicker comes back."
+    },
+    {
+      "term": "Dead band (band)",
+      "definition": "The range between the two thresholds; the output does not change inside this range.",
+      "example": "If the noise is 80 units, a 100-unit band ends the flicker.",
+      "pitfall": "Choosing a band wider than needed: the lamp comes on late, goes off late and the system is less sensitive."
+    },
+    {
+      "term": "Balance of sensitivity and stability",
+      "definition": "A narrow band reacts quickly but may flicker; a wide band is stable but reacts late.",
+      "example": "For a night light, the 423-523 band is more sensitive than the 200-800 band.",
+      "pitfall": "Wanting a system that is both very fast and never flickers; you cannot have both at once."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m4h4d1-q1",
+      "kind": "mcq",
+      "prompt": "The LDR is connected between 5V and A1, and a 10 kΩ resistor between A1 and GND. As the room gets brighter, what does the analogRead(A1) value do?",
+      "options": [
+        "It grows",
+        "It shrinks",
+        "It does not change",
+        "It grows first, then shrinks"
+      ],
+      "answer": 0,
+      "explanation": "When the light increases, the LDR's resistance drops, the voltage from the divider to A1 rises and analogRead grows (23 at a light of 0.1, 977 at 0.9). If you move the LDR to the GND side, the direction flips; that is why you write the comparison to suit the circuit.",
+      "skills": [
+        "sens-ldr-divider"
+      ]
+    },
+    {
+      "id": "m4h4d1-q2",
+      "kind": "numeric",
+      "prompt": "The LED starts off. The program uses two thresholds: it lights up when the value drops below 423 and goes off when it rises above 523. The readings arrive in this order: 500, 460, 480, 450, 490, 440, 400, 510, 540. How many times in total does the LED change state?",
+      "answer": 2,
+      "tolerance": 0,
+      "unit": "times",
+      "explanation": "The value 400 is below 423, so the LED lights up (1). Then 510 stays in the dead band and the LED stays lit. The value 540 is above 523, so the LED goes off (2). If the same sequence were tried with a single threshold (473), the LED would change state 6 times: hysteresis removes the flicker.",
+      "skills": [
+        "sens-hysteresis",
+        "sens-noise"
+      ]
+    },
+    {
+      "id": "m4h4d1-q3",
+      "kind": "predict-output",
+      "prompt": "Someone wrote the on and off thresholds the wrong way round by mistake. The light is steady and analogRead(A1) always reads 480. When this code runs, what does the LED on D13 do?\n\n```\nconst int ACMA = 523;\nconst int KAPAMA = 423;\nbool yanik = false;\n\nvoid loop() {\n  int d = analogRead(A1);\n  if (!yanik && d < ACMA) yanik = true;\n  else if (yanik && d > KAPAMA) yanik = false;\n  digitalWrite(13, yanik);\n}\n```",
+      "options": [
+        "It stays lit all the time",
+        "It stays off all the time",
+        "It switches on and off on every pass (flickers very fast)",
+        "There is a compile error"
+      ],
+      "answer": 2,
+      "explanation": "The value 480 is less than 523, so when the LED is off it lights up; when it is lit, 480 is greater than 423, so it goes off. So the dead band works backwards and the LED changes on every pass. Staying lit or staying off only happens below 423 or above 523. The code compiles; the mistake is only in the behaviour.",
+      "skills": [
+        "sens-hysteresis",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d1-q4",
+      "kind": "find-bug",
+      "prompt": "The circuit is the same as in the lesson (LDR on the 5V side). The night light comes on in the daytime and goes off at night. Where is the mistake?\n\n```\nconst int ESIK = 473;\n\nvoid loop() {\n  int deger = analogRead(A1);\n  bool karanlik = (deger > ESIK);\n  digitalWrite(13, karanlik);\n}\n```",
+      "options": [
+        "The ESIK constant should be float instead of int",
+        "analogWrite should be used instead of digitalWrite",
+        "digitalRead(A1) should be used instead of analogRead(A1)",
+        "The comparison is the wrong way round: in this circuit the value is small in the dark"
+      ],
+      "answer": 3,
+      "explanation": "In this circuit the value grows as the light increases and shrinks in the dark. For dark you must write deger < ESIK; deger > ESIK catches brightness. The other options do not fix the mistake: the number type is right, the LED is a digital output and the sensor is read as analog.",
+      "skills": [
+        "sens-ldr-divider",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m4h4d1-q5",
+      "kind": "mcq",
+      "prompt": "The light noise in the room makes the reading swing by about 80 units peak to peak. Which choice is best for the hysteresis band?",
+      "options": [
+        "0 units (single threshold)",
+        "30 units",
+        "100 units",
+        "900 units"
+      ],
+      "answer": 2,
+      "explanation": "The band must be wider than the peak-to-peak width of the noise: 100 > 80 ends the flicker. 0 and 30 units are narrower than the noise, so the flicker continues. 900 units covers everything; the lamp hardly reacts at all, so the system becomes far too insensitive.",
+      "skills": [
+        "sens-hysteresis",
+        "sens-noise"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,112 @@
+{
+  "concepts": [
+    {
+      "term": "dt",
+      "definition": "The real time between two measurements (in seconds). The angle integral, the filter and PID's derivative and integral terms depend on it.",
+      "example": "Assuming dt = 0.005 while a round takes 5.35 ms makes the angle come out about 6.5% short.",
+      "pitfall": "Writing dt as a constant without measuring whether the loop really runs at that time."
+    },
+    {
+      "term": "Period with delay()",
+      "definition": "delay(5) only waits 5 ms; the round's work is added on top, so the round gets longer by the work and changes.",
+      "example": "If I2C reading and calculation take 0.35 ms, the round takes 5.35 ms.",
+      "pitfall": "Thinking you have made a \"200 Hz loop\" with delay(5)."
+    },
+    {
+      "term": "Planned time (+=)",
+      "definition": "Keeping the time of the next round and adding the period to it every round; small delays do not build up.",
+      "example": "sonPlanUs += 5000; each round is planned 5000 µs apart.",
+      "pitfall": "Writing sonPlanUs = simdi: each delay is added to the next one and the period drifts away from the target."
+    },
+    {
+      "term": "Overrun (missed round)",
+      "definition": "When the work takes longer than one round, the round is missed. It is noticed with a counter, the plan is resynchronised and the real dt is still measured.",
+      "example": "12 ms of heavy work misses one round at a 5 ms period.",
+      "pitfall": "Not keeping an overrun counter: missed rounds go unnoticed and the robot wobbles for no clear reason."
+    },
+    {
+      "term": "micros() wrap-around",
+      "definition": "micros() counts in 32 bits and wraps around after about 71.6 minutes. If the subtraction is done with unsigned long, the difference comes out right even across the wrap-around.",
+      "example": "With simdi = 50 and sonUs = 4294967000, the unsigned difference is 346 µs.",
+      "pitfall": "Taking the difference as an int: on AVR an int is 16 bits and overflows for differences longer than 32.7 ms."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h6d3-q1",
+      "kind": "mcq",
+      "prompt": "There is a delay(5) at the end of a control loop. Which is true about the loop?",
+      "options": [
+        "A round always takes exactly 5 ms",
+        "A round takes 5 ms plus the time of the work in the round, and can change every round",
+        "A round takes less than 5 ms, because delay speeds up the processor",
+        "delay(5) sets up an interrupt and runs every 5 ms"
+      ],
+      "answer": 1,
+      "explanation": "delay adds its waiting time to the round's work: the time for I2C reading, calculation and Serial.print comes on top of the 5 ms. So the round time is neither exactly 5 ms nor constant. In the simulation an average of 5.35 ms and a longest round of 6.64 ms were measured.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h6d3-q2",
+      "kind": "numeric",
+      "prompt": "The gyroscope rotates at a constant 50 °/s for 4 seconds (real angle 200°). The loop really runs every 5.35 ms, but the code writes aci += hiz * 0.005. How many degrees does the code find?",
+      "answer": 186.9,
+      "tolerance": 0.5,
+      "unit": "°",
+      "explanation": "The number of rounds is 4 / 0.00535 ≈ 747.7; each round adds 50·0.005 = 0.25°: 747.7·0.25 ≈ 186.9°. The ratio found is 5/5.35 = 93.5%, so about a 6.5% error. If the real dt had been measured, it would have come out as exactly 200°.",
+      "skills": [
+        "ctrl-fixed-period"
+      ]
+    },
+    {
+      "id": "m5h6d3-q3",
+      "kind": "numeric",
+      "prompt": "micros() counts microseconds in 32 bits (from 0 to 4 294 967 295). How many minutes after the board is switched on does it wrap around?",
+      "answer": 71.6,
+      "tolerance": 0.1,
+      "unit": "min",
+      "explanation": "2^32 µs = 4 294.97 seconds ≈ 71.6 minutes. If the subtraction is done with unsigned long, the difference between two measurements comes out right even at the moment of wrap-around; the only problem is taking the difference in a small type such as int.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h6d3-q4",
+      "kind": "find-bug",
+      "prompt": "With a target of 5 ms, this loop gradually starts running less often than every 5 ms. Which line is wrong?\n\n```\n1  unsigned long simdi = micros();\n2  if (simdi - sonPlanUs < PERIYOT_US) return;\n3  sonPlanUs = simdi;\n4  islemYap();\n```",
+      "options": [
+        "Line 1: millis() should be used instead of micros()",
+        "Line 2: > should be written instead of <",
+        "Line 3: it should be sonPlanUs += PERIYOT_US; assigning simdi builds up the delays",
+        "Line 4: islemYap() should be called outside the loop"
+      ],
+      "answer": 2,
+      "explanation": "The loop may enter the work some time after the period has run out. Writing sonPlanUs = simdi adds this delay to the start of the next round and the period keeps getting longer. With +=, the planned moment moves forward in fixed steps and the delay does not build up. The comparison on line 2 is correct.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h6d3-q5",
+      "kind": "predict-output",
+      "prompt": "This code runs just after micros() has wrapped around. What does it print?\n\n```\nunsigned long simdi = 50;             // sarmadan sonra\nunsigned long sonUs = 4294967000UL;  // sarmadan önce\nSerial.println(simdi - sonUs);\n```",
+      "options": [
+        "-4294966950",
+        "346",
+        "4294966950",
+        "Compile error"
+      ],
+      "answer": 1,
+      "explanation": "unsigned long is calculated modulo 2^32: 50 - 4294967000 = -4294966950, and adding 4294967296 to this gives 346. So there are 346 µs between two measurements taken 296 µs before and 50 µs after the wrap-around. No minus sign appears because the type is unsigned.",
+      "skills": [
+        "ctrl-fixed-period",
+        "prog-timing"
+      ]
+    }
+  ]
+}

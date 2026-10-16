@@ -1,0 +1,120 @@
+{
+  "concepts": [
+    {
+      "term": "Data contract",
+      "definition": "An agreement made at the start between sender and receiver about field names, types, order and value ranges.",
+      "example": "In the line `{\"t\":100,\"x\":0.010,\"y\":0.000,\"th\":0.000,\"d\":242.8}`, the fields are in the order `t, x, y, th, d`.",
+      "pitfall": "Adding a field without versioning the format: old receivers break."
+    },
+    {
+      "term": "JSON lines",
+      "definition": "A plain text format with a single JSON object on each line.",
+      "example": "The robot writes a line every 100 ms; the receiver reads line by line.",
+      "pitfall": "Forgetting the end of the line with `Serial.print`: two objects run together and the JSON breaks."
+    },
+    {
+      "term": "null (no measurement)",
+      "definition": "A value that clearly states that there is no valid measurement.",
+      "example": "When no echo comes back, `\"d\":null` is written.",
+      "pitfall": "Writing 0 or 400 because there is no measurement: it looks like a fake measurement."
+    },
+    {
+      "term": "Angle wrapping",
+      "definition": "Keeping the heading angle in the range (-π, π].",
+      "example": "`while (th > PI) th -= 2 * PI;` and `while (th <= -PI) th += 2 * PI;`",
+      "pitfall": "Not wrapping: after a few turns `th` becomes 7 and goes outside the contract."
+    },
+    {
+      "term": "Mean absolute error",
+      "definition": "The average of the unsigned value of each measurement's error.",
+      "example": "If the errors are 0.5; -2.5; 1.0; -1.0; 2.0, the mean absolute error is 1.4.",
+      "pitfall": "Taking a signed average: +3 and -3 cancel each other out, and the result comes out as 0 while the robot is wrong."
+    },
+    {
+      "term": "Largest absolute error",
+      "definition": "The unsigned error of the worst measurement.",
+      "example": "For the same errors, the largest absolute error is 2.5.",
+      "pitfall": "Reporting only the average: a single bad measurement can be a safety problem."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h8d4-q1",
+      "kind": "predict-output",
+      "prompt": "\"e -4\", \"e 1\", \"e 3\" and then \"r\" are sent to the measurement error counter from the serial port. The counter is in this code:\n```\nfloat hata = fabs(Serial.parseFloat());\nadet++;\ntoplam += hata;\nif (hata > enBuyuk) enBuyuk = hata;\n// r: Serial.print(toplam / adet, 2) ve enBuyuk\n```\nWhat will the result line be?",
+      "options": [
+        "n=3 ort=0.00 maks=3.00",
+        "n=3 ort=2.67 maks=4.00",
+        "n=3 ort=0.00 maks=-4.00",
+        "n=3 ort=2.67 maks=3.00"
+      ],
+      "answer": 1,
+      "explanation": "fabs throws the sign away: 4, 1, 3. The total is 8, the average is 8 / 3 = 2.67; the largest is 4. A signed total would be 0, and a wrong average would come out as zero.",
+      "skills": [
+        "rob-error-stats",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d4-q2",
+      "kind": "numeric",
+      "prompt": "A telemetry line is 60 bytes and is sent over a 9600 baud serial line (10 bits per byte). How many ms does the line take up on the line?",
+      "answer": 62.5,
+      "tolerance": 0.5,
+      "unit": "ms",
+      "explanation": "60 bytes × 10 bits = 600 bits. 600 / 9600 = 0.0625 s = 62.5 ms. Because the period is 100 ms, the line is almost full; at 115200 baud the time is 5.2 ms.",
+      "skills": [
+        "rob-telemetry"
+      ]
+    },
+    {
+      "id": "m5h8d4-q3",
+      "kind": "mcq",
+      "prompt": "The HC-SR04 got no echo. Which is right for the `d` field in the telemetry line?",
+      "options": [
+        "`\"d\":0`",
+        "`\"d\":400`",
+        "`\"d\":null`",
+        "The line is not written at all"
+      ],
+      "answer": 2,
+      "explanation": "`null` means \"no measurement\". 0 cm looks like a valid measurement, and 400 like a real distance; both mislead the receiver. Skipping the line, on the other hand, breaks the 100 ms rhythm in the `t` time stream.",
+      "skills": [
+        "rob-telemetry"
+      ]
+    },
+    {
+      "id": "m5h8d4-q4",
+      "kind": "find-bug",
+      "prompt": "While the robot turns left (right wheel forwards, left backwards), `th` decreases. There is a single bug in the code; which is it?\n```\nfloat dSol = (s - oncekiSol) * TIK_M;\nfloat dSag = (g - oncekiSag) * TIK_M;\nfloat d = (dSol + dSag) / 2.0;\nth += (dSol - dSag) / AKS_M;\n```",
+      "options": [
+        "The change in `th` should be `(dSag - dSol) / AKS_M`; the sign is reversed",
+        "The `d` sum should not be divided by two",
+        "The unit of TIK_M should be centimetres",
+        "`th` should be in degrees, not radians"
+      ],
+      "answer": 0,
+      "explanation": "When the right wheel goes further than the left, the robot turns left and the angle should increase: Δθ = (right - left) / axle. In the code the sign is reversed, so the path is mirrored. The average of the two wheels gives the forward distance, so the division is correct; radians are required by the contract.",
+      "skills": [
+        "rob-telemetry",
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h8d4-q5",
+      "kind": "mcq",
+      "prompt": "According to the contract (t, x, y, th, d; th ∈ (-π, π]; d ∈ [2, 400] or null), which line is valid?",
+      "options": [
+        "{\"t\":100,\"x\":0.1,\"y\":0.2,\"th\":3.200,\"d\":50.0}",
+        "{\"t\":300,\"x\":0.3,\"y\":0.1,\"th\":0.5,\"d\":1.5}",
+        "{\"x\":0.3,\"t\":400,\"y\":0.1,\"th\":0.5,\"d\":60.0}",
+        "{\"t\":200,\"x\":0.021,\"y\":-0.003,\"th\":-3.100,\"d\":null}"
+      ],
+      "answer": 3,
+      "explanation": "In the correct line the key order is t, x, y, th, d; th = -3.100 is in range; d null is valid. The line with th = 3.2 goes past the π (3.14) limit. The line with d = 1.5 is below the 2 cm lower limit. In the line that writes the keys in the order x, t, ..., the order is broken.",
+      "skills": [
+        "rob-telemetry"
+      ]
+    }
+  ]
+}

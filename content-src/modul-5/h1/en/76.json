@@ -1,0 +1,108 @@
+{
+  "concepts": [
+    {
+      "term": "Differential drive",
+      "definition": "The robot changes its direction using the speed difference between two wheels; there is no steering.",
+      "example": "If the right wheel turns faster than the left wheel, the robot curves to the left.",
+      "pitfall": "Thinking you need a separate steering motor to turn."
+    },
+    {
+      "term": "v and ω",
+      "definition": "v is the forward speed of the robot's centre (m/s), ω is the turning speed (rad/s). v = (vR + vL) / 2 and ω = (vR − vL) / L.",
+      "example": "For vL = 0.10 and vR = 0.30 m/s, v = 0.20 m/s.",
+      "pitfall": "Calculating ω from the sum of the two speeds; ω needs the difference, the sum gives v."
+    },
+    {
+      "term": "Axle track (L)",
+      "definition": "The distance between the points where the two wheels touch the ground; it is the divisor in the ω formula. On the robot in the lessons it is 0.12 m.",
+      "example": "The same speed difference gives a faster turn on a robot with a smaller axle track.",
+      "pitfall": "Writing L in centimetres (12) while using speeds in m/s, or putting the wheel radius (0.033) in place of L."
+    },
+    {
+      "term": "Turning radius (R)",
+      "definition": "The radius of the circle the robot draws: R = v / ω. If the speeds are equal, R is infinite (driving straight).",
+      "example": "When one wheel is stopped and the other turns, R = L / 2 = 6 cm.",
+      "pitfall": "Trying to calculate the R formula when vR = vL; the denominator becomes zero."
+    },
+    {
+      "term": "Inverse problem",
+      "definition": "Finding the wheel speeds from the desired v and ω: vR = v + ω·L/2 and vL = v − ω·L/2.",
+      "example": "For v = 0.20 m/s and ω = 1 rad/s you get vR = 0.26 and vL = 0.14 m/s.",
+      "pitfall": "Forgetting that the result is in m/s and writing it straight into analogWrite; it must be converted to PWM first."
+    }
+  ],
+  "quiz": [
+    {
+      "id": "m5h1d76-q1",
+      "kind": "numeric",
+      "prompt": "The robot's axle track is L = 0.12 m. The left wheel turns at 0.10 m/s and the right wheel at 0.25 m/s. What is the robot's turning speed ω in rad/s?",
+      "answer": 1.25,
+      "tolerance": 0.01,
+      "unit": "rad/s",
+      "explanation": "ω = (vR − vL) / L = (0.25 − 0.10) / 0.12 = 1.25 rad/s. Because the right wheel is faster, ω is positive and the robot turns left. Adding the speeds (the formula for v) would be wrong.",
+      "skills": [
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h1d76-q2",
+      "kind": "mcq",
+      "prompt": "If vL = 0.20 m/s and vR = 0.10 m/s, what does the robot do?",
+      "options": [
+        "It spins on the spot",
+        "It goes straight",
+        "It curves to the right",
+        "It curves to the left"
+      ],
+      "answer": 2,
+      "explanation": "ω = (0.10 − 0.20) / 0.12 is negative; a negative ω means a right turn. When the left wheel is faster, the robot bends to the right. Because both speeds are positive it does not spin on the spot, and because the speeds are not equal it does not go straight.",
+      "skills": [
+        "prog-planning"
+      ]
+    },
+    {
+      "id": "m5h1d76-q3",
+      "kind": "numeric",
+      "prompt": "The robot is spinning on the spot: left wheel −0.15 m/s, right wheel +0.15 m/s. L = 0.12 m. About how many seconds does one full turn (2π rad) take?",
+      "answer": 2.51,
+      "tolerance": 0.03,
+      "unit": "s",
+      "explanation": "ω = (0.15 − (−0.15)) / 0.12 = 2.5 rad/s. Time for one turn = 2π / 2.5, about 2.51 s. You need to use the correct ω value, not the speed difference (0.30); v is zero here.",
+      "skills": [
+        "prog-timing"
+      ]
+    },
+    {
+      "id": "m5h1d76-q4",
+      "kind": "find-bug",
+      "prompt": "In the code below, L = 0.12 m and the speeds are in m/s. The robot's turning comes out very different from what is expected. Where is the bug?\n\n```\nfloat v = (vR + vL) / 2;\nfloat w = (vR + vL) / L;\n```",
+      "options": [
+        "Line 1: v needs the difference, not the sum",
+        "Line 2: ω needs the difference (vR − vL), not the sum",
+        "The L constant should not be a float",
+        "Both lines are correct; the bug is in the serial port"
+      ],
+      "answer": 1,
+      "explanation": "ω is the turning speed and comes from the DIFFERENCE between the two wheels: (vR − vL) / L. The sum sets the average forward speed (v); line 1 is correct. With the buggy line, even a robot going straight is calculated as if it were turning.",
+      "skills": [
+        "prog-debug"
+      ]
+    },
+    {
+      "id": "m5h1d76-q5",
+      "kind": "predict-output",
+      "prompt": "The left wheel is at 0.30 m/s and the right wheel is stopped. What does this code print?\n\n```\nfloat vL = 0.30, vR = 0.0;\nfloat w = (vR - vL) / 0.12;\nSerial.println(w, 1);\n```",
+      "options": [
+        "-0.3",
+        "2.5",
+        "-2.5",
+        "0.0"
+      ],
+      "answer": 2,
+      "explanation": "(0 − 0.30) / 0.12 = −2.5. A negative ω means the robot turns right, around the stopped right wheel. 2.5 forgets the sign; 0.0 is the case where the two speeds are equal.",
+      "skills": [
+        "digital-out"
+      ]
+    }
+  ]
+}
