@@ -17,6 +17,12 @@ import { classJoin } from './en/class-join'
 import { teacher } from './en/teacher'
 import { landing } from './en/landing'
 import { schools } from './en/schools'
+import { mikro } from './en/mikro'
+import { lab } from './en/lab'
+import { studios } from './en/studios'
+import { content } from './en/content'
+import { eng } from './en/eng'
+import { consent } from './en/consent'
 
 export const en: Messages = {
   common,
@@ -36,4 +42,10 @@ export const en: Messages = {
   teacher,
   schools,
   landing,
+  mikro,
+  lab,
+  studios,
+  content,
+  eng,
+  consent,
 }

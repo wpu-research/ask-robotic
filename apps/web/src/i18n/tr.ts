@@ -16,6 +16,12 @@ import { classJoin } from './tr/class-join'
 import { teacher } from './tr/teacher'
 import { landing } from './tr/landing'
 import { schools } from './tr/schools'
+import { mikro } from './tr/mikro'
+import { lab } from './tr/lab'
+import { studios } from './tr/studios'
+import { content } from './tr/content'
+import { eng } from './tr/eng'
+import { consent } from './tr/consent'
 
 export const tr = {
   common,
@@ -35,6 +41,12 @@ export const tr = {
   teacher,
   schools,
   landing,
+  mikro,
+  lab,
+  studios,
+  content,
+  eng,
+  consent,
 }
 
 export type Messages = typeof tr
