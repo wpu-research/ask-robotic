@@ -4,7 +4,7 @@ import { Mascot, type Mood } from '@/components/lesson-v2/mascot'
 import { getT } from '@/i18n/server'
 import './auth.css'
 
-/** Giriş/kayıt ekranı: onboarding gibi tam ekran, ortada tek kart, Robi konuşur. */
+/** Giriş/kayıt ekranı: onboarding gibi tam ekran, ortada tek kart, Mac konuşur. */
 export async function AuthScreen({ title, lead, mood = 'happy', children }: { title: string; lead?: ReactNode; mood?: Mood; children: ReactNode }) {
   const t = await getT()
   return (

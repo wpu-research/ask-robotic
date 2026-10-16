@@ -1,4 +1,4 @@
-// Robi sohbet panelinin saf yardımcıları (tarayıcı). Sunucu sınırları: lib/tutor/request.ts.
+// Mac sohbet panelinin saf yardımcıları (tarayıcı). Sunucu sınırları: lib/tutor/request.ts.
 import { MAX_CHARS, MAX_MESSAGES } from './protocol'
 import { translate, type Locale, type MessageKey } from '@/i18n'
 
@@ -14,7 +14,7 @@ export function historyForRequest(msgs: ChatMsg[]): { role: 'user' | 'assistant'
   return out
 }
 
-export const OFFLINE_TEXT = 'Robi şu an çevrimdışı. Biraz sonra yine dene!'
+export const OFFLINE_TEXT = 'Mac şu an çevrimdışı. Biraz sonra yine dene!'
 
 /** Sunucu hata kodu → çocuğa uygun mesaj (arayüz dilinde; varsayılan Türkçe). Metinler: i18n lesson.tutor.err. */
 export function tutorErrorText(code: string | undefined, locale: Locale = 'tr'): string {

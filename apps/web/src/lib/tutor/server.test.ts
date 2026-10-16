@@ -10,7 +10,7 @@ let userId: string
 
 beforeAll(async () => {
   db = await createTestDb()
-  const [m] = await db.insert(modules).values({ slug: 'robi-test', title: 'Robi Test', track: 'maker', position: 99, minAge: 12, published: true }).returning()
+  const [m] = await db.insert(modules).values({ slug: 'robi-test', title: 'Mac Test', track: 'maker', position: 99, minAge: 12, published: true }).returning()
   const [d] = await db.insert(modules).values({ slug: 'robi-taslak', title: 'Taslak', track: 'maker', position: 100, published: false }).returning()
   const [w] = await db.insert(weeks).values({ moduleId: m.id, position: 1, title: 'H1' }).returning()
   const [wd] = await db.insert(weeks).values({ moduleId: d.id, position: 1, title: 'H1' }).returning()
@@ -24,7 +24,7 @@ describe('tutor/server', () => {
   it('yalnız yayındaki dersi adımlarıyla yükler', async () => {
     const l = await loadTutorLesson(db, lessonId)
     expect(l?.steps).toHaveLength(1)
-    expect(l?.moduleTitle).toBe('Robi Test')
+    expect(l?.moduleTitle).toBe('Mac Test')
     expect(l?.minAge).toBe(12)
     expect(await loadTutorLesson(db, draftLessonId)).toBeNull()
     expect(await loadTutorLesson(db, 999_999)).toBeNull()

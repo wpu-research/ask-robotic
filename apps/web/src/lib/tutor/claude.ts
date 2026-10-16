@@ -1,5 +1,5 @@
 // Claude çağrısı (yalnız sunucu). Model: claude-opus-5-5 (düşünme hep açık; `thinking` gönderilmez).
-// Önbellek: sistem istemi (TUTOR_SYSTEM ya da her sayfadaki Robi için ROBI_PAGE_SYSTEM) tek kırılma noktası (ephemeral); ders bağlamı ondan SONRA ikinci sistem bloğunda (önbelleksiz).
+// Önbellek: sistem istemi (TUTOR_SYSTEM ya da her sayfadaki Mac için ROBI_PAGE_SYSTEM) tek kırılma noktası (ephemeral); ders bağlamı ondan SONRA ikinci sistem bloğunda (önbelleksiz).
 // Ret: sunucu tarafı yedek model AÇIK (fallbacks: "default", beta server-side-fallback-2026-07-01); yine de
 // stop_reason === 'refusal' her zaman denetlenir (zincirin tamamı reddetmiş olabilir).
 import Anthropic from '@anthropic-ai/sdk'
@@ -13,7 +13,7 @@ const EFFORTS = ['low', 'medium', 'high', 'xhigh', 'max'] as const
 type Effort = (typeof EFFORTS)[number]
 
 const anthropicEnabled = () => !!process.env.ANTHROPIC_API_KEY?.trim()
-/** Robi açık mı: Claude (öncelikli) ya da geçici yedek NVIDIA anahtarı. */
+/** Mac açık mı: Claude (öncelikli) ya da geçici yedek NVIDIA anahtarı. */
 export const tutorEnabled = () => anthropicEnabled() || nvidiaEnabled()
 export const tutorModel = () => process.env.TUTOR_MODEL?.trim() || TUTOR_MODEL_DEFAULT
 /** Sohbet gecikmesi için varsayılan 'low'; TUTOR_EFFORT ile değiştirilebilir. */

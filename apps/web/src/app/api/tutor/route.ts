@@ -11,7 +11,7 @@ import { countUserMessagesToday, loadPageSource, loadTutorLesson, loadTutorUser,
 import { buildPageContext, ROBI_PAGE_SYSTEM, type PageSource } from '@/lib/tutor/page-context'
 import { TUTOR_SYSTEM } from '@/lib/tutor/prompt'
 
-// Robi: AI öğretmen. İki kip: ders oynatıcısında adım bağlamı (lessonId/stepIndex) ya da her sayfada sayfa bağlamı (page).
+// Mac: AI öğretmen. İki kip: ders oynatıcısında adım bağlamı (lessonId/stepIndex) ya da her sayfada sayfa bağlamı (page).
 // Yanıt düz metin akışıdır (text/plain); sözleşme: lib/tutor/protocol.ts.
 // Ayrıntı: lib/tutor/*. Adım verisi her zaman DB'den yüklenir; istemciden yalnız kimlik ve öğrencinin durumu gelir.
 export const dynamic = 'force-dynamic'

@@ -1,14 +1,14 @@
 // schools ad alanı (Türkçe kaynak): /okullar tanıtım sayfası. İngilizcesi: ../en/schools.ts
 export const schools = {
   metaTitle: 'Okullar için',
-  metaDescription: 'ASK Robotic okul programı: 5–18 yaş, donanımsız robotik ve yapay zekâ dersleri, öğretmen paneli ve ders planları.',
+  metaDescription: 'MacademiaX okul programı: 5–18 yaş, donanımsız robotik ve yapay zekâ dersleri, öğretmen paneli ve ders planları.',
   eyebrow: 'Okullar ve kolejler için',
   title: 'Okulunuzun robotik ve yapay zekâ laboratuvarı, tarayıcıda.',
   lead: '5 yaşından 18 yaşına, bloklarla kodlamadan yapay zekâ mühendisliğine. Hiçbir donanım gerektirmeden, her öğrenciye kendi laboratuvarı.',
   ctaPilot: 'Pilot program için yazın',
   ctaTry: 'Öğrenci gibi deneyin',
-  mailSubject: 'ASK Robotic okul pilotu',
-  whyTitle: 'Neden ASK Robotic',
+  mailSubject: 'MacademiaX okul pilotu',
+  whyTitle: 'Neden MacademiaX',
   why: {
     hardware: { title: 'Donanım gerekmez', text: 'Arduino, devre, robot ve mikro kart tarayıcıda birebir benzetimle çalışır. Kit, lehim, kayıp parça ve laboratuvar sırası derdi yok; her öğrenci kendi laboratuvarında.' },
     ladder: { title: 'Tek merdiven, 5–18 yaş', text: 'Blokla kodlamadan oyun yapımına, Arduino ve sensörlerden robotik ve yapay zekâ mühendisliğine kadar kopmayan bir müfredat.' },
@@ -39,7 +39,7 @@ export const schools = {
   },
   mebTitle: 'Programınızla eşleşme',
   mebLabel: 'MEB dersleriyle eşleşme',
-  mebCols: { course: 'Ders', grade: 'Sınıf', match: 'ASK Robotic karşılığı' },
+  mebCols: { course: 'Ders', grade: 'Sınıf', match: 'MacademiaX karşılığı' },
   meb: {
     bt: { course: 'Bilişim Teknolojileri ve Yazılım', grade: '5–6. sınıf', match: 'Kâşifler ve Yapıcılar bantları' },
     ai: { course: 'Yapay Zekâ Uygulamaları (seçmeli)', grade: '7–8. sınıf', match: 'AI Atölyesi ve AI Mühendisliği uyarlaması' },

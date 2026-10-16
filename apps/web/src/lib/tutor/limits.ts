@@ -1,4 +1,4 @@
-// Robi günlük mesaj kotası. Bellek içi sayaç (tek sunucu örneği) + kullanıcılar için DB sayımı (yeniden başlatmaya dayanıklı).
+// Mac günlük mesaj kotası. Bellek içi sayaç (tek sunucu örneği) + kullanıcılar için DB sayımı (yeniden başlatmaya dayanıklı).
 // Gün sınırı Türkiye günüdür (UTC+3).
 export const GUEST_DAILY = 15
 export const USER_DAILY = 60

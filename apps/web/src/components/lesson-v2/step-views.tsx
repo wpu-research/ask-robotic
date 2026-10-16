@@ -16,7 +16,7 @@ type Of<K extends LessonStep['kind']> = Extract<LessonStep, { kind: K }>
  */
 export interface ViewProps<S> {
   step: S; seed: number; locked: boolean; reveal: boolean; onReady: (check: (() => boolean) | null) => void
-  /** Öğrencinin şu anki cevabının kısa metni (Robi'ye bağlam); boş = henüz cevap yok. */
+  /** Öğrencinin şu anki cevabının kısa metni (Mac'e bağlam); boş = henüz cevap yok. */
   onSnapshot?: (text: string) => void
 }
 

@@ -26,7 +26,7 @@ export const tutorRequestSchema = z.object({
   locale: z.enum(['tr', 'en']).optional(),
 }).strict()
 
-/** Her sayfadaki Robi (ders oynatıcısı dışı): yalnız sayfa yolu gelir, içerik sunucuda yüklenir (lib/tutor/page-context.ts). */
+/** Her sayfadaki Mac (ders oynatıcısı dışı): yalnız sayfa yolu gelir, içerik sunucuda yüklenir (lib/tutor/page-context.ts). */
 export const pageRequestSchema = z.object({
   page: z.string().regex(PAGE_PATH_RE),
   messages: z.array(message).min(1).max(MAX_MESSAGES),

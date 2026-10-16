@@ -1,4 +1,4 @@
-// Robi'nin doğal sesi: metinden konuşma (TTS) servisleri. Yalnız sunucu. Servis ve anahtar ortam değişkenlerinden:
+// Mac'in doğal sesi: metinden konuşma (TTS) servisleri. Yalnız sunucu. Servis ve anahtar ortam değişkenlerinden:
 //   TTS_PROVIDER = azure | google | elevenlabs | openai   (yoksa doğal ses kapalı; tarayıcı sesi kullanılır)
 //   azure:      AZURE_SPEECH_KEY + AZURE_SPEECH_REGION (ör. westeurope)
 //   google:     GOOGLE_TTS_API_KEY
@@ -11,7 +11,7 @@ export type TtsLocale = 'tr' | 'en'
 export type TtsProviderName = 'azure' | 'google' | 'elevenlabs' | 'openai'
 export const TTS_PROVIDERS: readonly TtsProviderName[] = ['azure', 'google', 'elevenlabs', 'openai']
 
-/** Varsayılan sesler (TTS_VOICE_* ile değiştirilebilir). ElevenLabs çok dilli tek ses kullanır: Robi iki dilde de aynı karakter. */
+/** Varsayılan sesler (TTS_VOICE_* ile değiştirilebilir). ElevenLabs çok dilli tek ses kullanır: Mac iki dilde de aynı karakter. */
 export const DEFAULT_VOICES: Record<TtsProviderName, Record<TtsLocale, string>> = {
   azure: { tr: 'tr-TR-EmelNeural', en: 'en-US-JennyNeural' },
   google: { tr: 'tr-TR-Wavenet-A', en: 'en-US-Wavenet-F' },
@@ -91,8 +91,8 @@ export function buildTtsRequest(p: TtsProviderName, text: string, locale: TtsLoc
             input: text,
             response_format: 'mp3',
             instructions: locale === 'en'
-              ? 'You are Robi, a friendly robot tutor for children. Speak clearly, warmly and a little slowly.'
-              : 'Sen Robi\'sin, çocuklara ders anlatan sevimli bir robot. Türkçeyi doğal bir Türk aksanıyla, net, sıcak ve biraz yavaş konuş.',
+              ? 'You are Mac, a friendly robot tutor for children. Speak clearly, warmly and a little slowly.'
+              : 'Sen Mac\'sin, çocuklara ders anlatan sevimli bir robot. Türkçeyi doğal bir Türk aksanıyla, net, sıcak ve biraz yavaş konuş.',
           }),
         },
       }

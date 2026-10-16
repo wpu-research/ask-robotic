@@ -16,7 +16,7 @@ export const LEGAL: Record<string, LegalDoc> = {
     title: 'Mesafeli Satış Sözleşmesi',
     sections: [
       { h: '1. Taraflar', p: ['SATICI: ' + SATICI.join(' · '), 'ALICI: Platformda hesap açarak satın alma yapan kişi; bilgileri hesap kaydındaki ad ve e-postadır.'] },
-      { h: '2. Konu', p: ['Bu sözleşme, ALICI\'nın ASK Robotic çevrim içi öğrenme platformunda elektronik ortamda satın aldığı Premium ya da Aile üyeliğinin (dijital hizmet) satışı ve ifasına ilişkin tarafların hak ve yükümlülüklerini 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca düzenler.'] },
+      { h: '2. Konu', p: ['Bu sözleşme, ALICI\'nın MacademiaX çevrim içi öğrenme platformunda elektronik ortamda satın aldığı Premium ya da Aile üyeliğinin (dijital hizmet) satışı ve ifasına ilişkin tarafların hak ve yükümlülüklerini 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca düzenler.'] },
       { h: '3. Hizmet, bedel ve ödeme', p: [
         'Hizmetin türü, süresi (1 ay ya da 12 ay) ve KDV dahil toplam bedeli ödeme sayfasında ve Ön Bilgilendirme Formu\'nda gösterilir.',
         'Ödeme, ödeme kuruluşu (ör. iyzico) aracılığıyla tek seferde alınır. Üyelik ön ödemelidir: süre bitiminde otomatik yenileme ve karttan otomatik çekim yapılmaz.',
@@ -33,7 +33,7 @@ export const LEGAL: Record<string, LegalDoc> = {
     title: 'Ön Bilgilendirme Formu',
     sections: [
       { h: '1. Satıcı', p: SATICI },
-      { h: '2. Hizmetin temel nitelikleri', p: ['ASK Robotic Premium / Aile: robotik, elektronik ve yapay zekâ derslerine sınırsız erişim, Robi AI öğretmen, kişisel pratik, reklamsız kullanım. Hizmet tamamen çevrim içi sunulur, fiziksel teslimat yoktur.'] },
+      { h: '2. Hizmetin temel nitelikleri', p: ['MacademiaX Premium / Aile: robotik, elektronik ve yapay zekâ derslerine sınırsız erişim, Mac AI öğretmen, kişisel pratik, reklamsız kullanım. Hizmet tamamen çevrim içi sunulur, fiziksel teslimat yoktur.'] },
       { h: '3. Fiyat', p: ['Seçilen plan ve dönemin KDV dahil toplam bedeli ödeme sayfasında gösterilir. Ek ücret (kargo vb.) yoktur.'] },
       { h: '4. Ödeme ve ifa', p: ['Tek seferlik ödeme; ödeme onaylandığında hizmet derhal hesapta etkinleşir. Otomatik yenileme yoktur.'] },
       { h: '5. Cayma hakkı', p: ['Tüketici, 14 gün içinde gerekçe göstermeksizin cayma hakkına sahiptir; ancak elektronik ortamda anında ifa edilen hizmetlerde, tüketicinin onayıyla ifaya başlanmışsa cayma hakkı kullanılamayabilir (Yönetmelik md. 15/1-ğ). Ayrıntı: İade ve İptal Koşulları.'] },

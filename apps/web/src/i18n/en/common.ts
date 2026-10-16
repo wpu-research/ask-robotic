@@ -1,7 +1,7 @@
 import type { common as Tr } from '../tr/common'
 
 export const common: typeof Tr = {
-  appName: 'ASK Robotic',
+  appName: 'MacademiaX',
   tagline: 'From zero to AI robotics engineering',
   metaDescription: 'From zero to AI robotics engineering: step-by-step lessons from Scratch to Arduino, from sensors to robots.',
   loading: 'Loading…',

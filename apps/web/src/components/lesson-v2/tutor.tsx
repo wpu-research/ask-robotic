@@ -10,7 +10,7 @@ import { MAX_CHARS, visibleText } from '@/lib/tutor/protocol'
 import { InlineMd, plain } from './inline-md'
 import { Mascot } from './mascot'
 
-// Robi sohbet paneli: ders oynatıcısında (adım bağlamı) ve her sayfada (RobiDock, sayfa bağlamı) açılır.
+// Mac sohbet paneli: ders oynatıcısında (adım bağlamı) ve her sayfada (RobiDock, sayfa bağlamı) açılır.
 // Sunucu: /api/tutor (düz metin akışı).
 
 export type TutorStatus = 'idle' | 'wrong' | 'correct' | 'revealed'
@@ -149,7 +149,7 @@ export function TutorPanel(p: TutorPanelProps) {
     <section className="tutor-panel" role="dialog" aria-modal="false" aria-label={t('lesson.tutor.dialog')}>
       <header className="tutor-head">
         <Mascot mood={busy ? 'think' : 'idle'} size={34} />
-        <div className="tutor-title"><b>Robi</b><span>{offline ? t('lesson.tutor.offline') : busy ? t('lesson.tutor.thinking') : t('lesson.tutor.ready')}</span></div>
+        <div className="tutor-title"><b>Mac</b><span>{offline ? t('lesson.tutor.offline') : busy ? t('lesson.tutor.thinking') : t('lesson.tutor.ready')}</span></div>
         {p.voice?.supported && (
           <button type="button" className="v2-icon-btn" onClick={p.voice.toggle} aria-pressed={p.voice.on} aria-label={p.voice.on ? t('lesson.player.voiceOff') : t('lesson.player.voiceOn')} title={t('lesson.player.voiceTitle')}>{p.voice.on ? '🔊' : '🔈'}</button>
         )}

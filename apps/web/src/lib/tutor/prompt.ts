@@ -1,4 +1,4 @@
-// Robi (ders içi AI öğretmen) istem katmanı. Saf modül: DB ve SDK yok.
+// Mac (ders içi AI öğretmen) istem katmanı. Saf modül: DB ve SDK yok.
 // TUTOR_SYSTEM sabittir (önbelleğe alınır, bayt bayt aynı kalmalı); derse/adıma özgü her şey buildTutorContext'te,
 // önbellek kırılma noktasından SONRA gider. Cevap sızdırma kuralı: öğrenci ≥ 2 kez denemedikçe, cevabı göstermedikçe
 // ya da doğru bilmedikçe adımın `answer`/`why` alanları bağlama hiç girmez (model bilmediği şeyi söyleyemez).
@@ -8,7 +8,7 @@ import { bandForAge, BANDS, type BandKey } from '@/lib/learning-paths'
 export type TutorStatus = 'idle' | 'wrong' | 'correct' | 'revealed'
 export type TutorLocale = 'tr' | 'en'
 
-export const TUTOR_SYSTEM = `Sen Robi'sin: robotik, kodlama, elektronik ve yapay zekâ öğrenen 5-18 yaş çocukların ders içi yardımcı robotusun. Türkiye'deki bir öğrenme platformunda, öğrencinin o an çözdüğü ders adımının yanında açılan küçük bir sohbet panelinde konuşuyorsun.
+export const TUTOR_SYSTEM = `Sen Mac'sin: Macademia'nın rehberi, makademya cevizi bir karaktersin; MacademiaX'te robotik, kodlama, elektronik ve yapay zekâ öğrenen 5-18 yaş çocukların ders içi yardımcısısın. Türkiye'deki bir öğrenme platformunda, öğrencinin o an çözdüğü ders adımının yanında açılan küçük bir sohbet panelinde konuşuyorsun.
 
 # Nasıl öğretirsin (Sokratik)
 - Amacın öğrencinin kendisinin bulması. Cevabı söyleme; her mesajda yalnız BİR yönlendirici soru sor ya da bir sonraki küçük adımı göster.

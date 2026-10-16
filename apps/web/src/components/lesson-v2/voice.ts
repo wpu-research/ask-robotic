@@ -3,7 +3,7 @@ import { createContext, createElement, useCallback, useContext, useSyncExternalS
 import { useLocale } from '@/i18n/client'
 import { getDeviceId } from '@/lib/events'
 
-// Sesli anlatım ve Robi'nin sesi. Sunucuda doğal ses servisi (TTS_PROVIDER, /api/tts) varsa o çalınır; yoksa ya da
+// Sesli anlatım ve Mac'in sesi. Sunucuda doğal ses servisi (TTS_PROVIDER, /api/tts) varsa o çalınır; yoksa ya da
 // hata verirse tarayıcının konuşma sentezi (Web Speech API, tr-TR / en-US). Okuma bilmeyen küçükler için şart.
 // Tercih (açık/kapalı) tarayıcıda; hiçbir ses yolu yoksa düğme gizlenir.
 const KEY = 'ask:voice:v1'

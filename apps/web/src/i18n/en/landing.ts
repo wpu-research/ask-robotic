@@ -3,9 +3,62 @@ import type { landing as Tr } from '../tr/landing'
 export const landing: typeof Tr = {
   metaTitle: 'Your personal tutor for robotics and AI',
   metaDescription: 'Interactive lessons for ages 5–18, from block coding to electronics, robotics and AI engineering. No hardware required.',
+  /** Home page in the Macademia layout (section label, title, description). */
+  mx: {
+    hero: {
+      eyebrow: 'Robotics and engineering',
+      title1: 'Learn robotics ', em: 'by doing', title2: '.',
+      lead: 'From block coding to Arduino, from sensors to AI engineering. You experiment in a virtual lab and think it through with Mac. No kit needed.',
+      primary: 'Check your level',
+      secondary: 'Explore programmes',
+      card: { label: "Today's plan", tag: 'Sample', title: 'Focus on PWM today', rows: ['PWM and brightness', "Ohm's law", 'Reading sensors'] },
+    },
+    how: {
+      eyebrow: 'How it works',
+      title: 'The same four steps in every lesson',
+      lead: "The same logic as Macademia's learning engine: first we measure where you are, then we build the path around it.",
+      link: 'More about our method →',
+      steps: [
+        { title: 'Level check', text: 'Tell us your age, interests and what you already know; Mac suggests the right starting point.' },
+        { title: 'Personal path', text: 'Topics are ordered for your age and pace; what you already know does not slow you down.' },
+        { title: 'Learn by doing', text: 'Try, check and learn why at every step: circuits, code and robots, all in the browser.' },
+        { title: 'Project', text: 'A project every week: from a traffic light to a line-following robot, then a drone mission.' },
+      ],
+    },
+    programs: {
+      eyebrow: 'Programmes',
+      title: 'Our programmes',
+      lead: '{lessons} interactive lessons, {courses} courses and a {parts}-part encyclopedia. Everything runs in the browser.',
+      engTitle: 'Engineering path',
+      engMeta: '128 real parts · 7 levels',
+      engText: 'From basic components to I²C sensors, from motor drivers to drones. Every part opens wired up in the virtual lab.',
+      courseTitle: 'University course: Robotics',
+      courseMeta: 'ESOF 323 · 14 weeks',
+      courseText: 'Embedded programming, PID, kinematics, computer vision, ROS 2 and drones. 15 simulations and three term projects.',
+      allTopics: 'All topics',
+    },
+    demo: { eyebrow: 'Try it now', title: 'Solve one step right now', lead: 'One of hundreds of steps in the lessons: pick the resistor so the LED lights up without burning out.' },
+    meet: { eyebrow: 'Your guide' },
+    bands: { eyebrow: 'A path for every age' },
+    corporate: {
+      eyebrow: 'For institutions',
+      title: 'A teacher panel for schools and institutions',
+      lead: 'Create a class, add students in minutes with QR cards, assign work and see live who is stuck. 40-minute lesson plans included.',
+      cta: 'Request a quote',
+      ready: 'Ready',
+      items: ['Class, section and student management', 'QR card login (no email needed)', 'Assignments and projector mode', 'Skill heat map and student report card', 'Curriculum outcome mapping'],
+    },
+    about: {
+      eyebrow: 'Why MacademiaX',
+      title1: 'We built it for one robotics course,', title2: 'now we bring it to every age.',
+      p1: "MacademiaX is Macademia's robotics and engineering programme. It started as the lab for a university robotics course; today the same platform runs from a 5-year-old's first block to an engineering student's drone project.",
+      p2: 'Its measuring approach is the same as Macademia’s: first we measure where you are, then we build the plan around it.',
+    },
+    final: { eyebrow: 'Get started', login: 'Student login' },
+  },
   hero: {
     title: 'Your personal tutor for robotics and AI',
-    lead: 'From block coding to Arduino, from robots to AI engineering. Robi thinks with you and never just hands you the answer: you figure it out.',
+    lead: 'From block coding to Arduino, from robots to AI engineering. Mac thinks with you and never just hands you the answer: you figure it out.',
     learner: "I'm a learner",
     adult: "I'm a parent or teacher",
     continue: 'Continue where you left off',
@@ -30,8 +83,8 @@ export const landing: typeof Tr = {
     hardware: 'kit cost',
   },
   meet: {
-    title: 'Meet Robi',
-    lead: 'The guide robot by your side in every lesson. It sees your screen, understands where you’re stuck and guides you with questions.',
+    title: 'Meet Mac',
+    lead: 'Your Macademia guide, by your side in every lesson. It sees your screen, understands where you’re stuck and guides you with questions.',
     tabs: { kodlama: 'Coding', elektronik: 'Electronics', robotik: 'Robotics', ai: 'AI' },
     mock: {
       coach: { kodlama: 'How many milliseconds does delay() wait?', elektronik: 'What happens if you shorten the on-time?', robotik: 'What distance is the sensor reading?', ai: 'Why is “stops” more likely?' },
@@ -91,7 +144,7 @@ export const landing: typeof Tr = {
   how: {
     title: 'How it works',
     steps: [
-      { title: 'Get your plan', text: 'Tell us your age and interests; Robi suggests the right place to start.' },
+      { title: 'Get your plan', text: 'Tell us your age and interests; Mac suggests the right place to start.' },
       { title: 'Learn in short steps', text: 'Try, check and learn why at every step.' },
       { title: 'Build your own project', text: 'A project every week: from a traffic light to driving a robot.' },
     ],

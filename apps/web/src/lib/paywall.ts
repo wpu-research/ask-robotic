@@ -64,7 +64,7 @@ export function paywallCopy(reason: LockReason, o: { loggedIn: boolean; trialAva
   if (reason === 'daily_limit') {
     return {
       title: 'Bugünkü ücretsiz dersini kullandın',
-      lead: 'Ücretsiz planda her gün 1 yeni ders açılır. Premium ile dilediğin kadar ders, Robi AI öğretmen ve kişisel pratik seni bekliyor.',
+      lead: 'Ücretsiz planda her gün 1 yeni ders açılır. Premium ile dilediğin kadar ders, Mac AI öğretmen ve kişisel pratik seni bekliyor.',
       primary, secondary, comeBack: true,
     }
   }

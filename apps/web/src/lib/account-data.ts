@@ -40,7 +40,7 @@ export async function exportUserData(db: Db, userId: string, now = new Date()) {
 
   return {
     exportedAt: now.toISOString(),
-    note: 'ASK Robotic hesabına ait kişisel veriler (KVKK md. 11). Parola ve giriş özetleri güvenlik nedeniyle dahil edilmez.',
+    note: 'MacademiaX hesabına ait kişisel veriler (KVKK md. 11). Parola ve giriş özetleri güvenlik nedeniyle dahil edilmez.',
     user,
     progress: prog,
     enrollments: enr,

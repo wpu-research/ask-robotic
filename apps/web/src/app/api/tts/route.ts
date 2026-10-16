@@ -5,7 +5,7 @@ import { DEVICE_RE } from '@/lib/tutor/request'
 import { refundChars, siteDailyChars, spendChars, TTS_DEVICE_DAILY, TTS_IP_DAILY, TTS_MAX_CHARS } from '@/lib/tts/quota'
 import { cacheGet, cacheSet, synthesize, TtsError, ttsProvider, ttsVoice, type TtsLocale } from '@/lib/tts/providers'
 
-// Robi'nin doğal sesi: POST { text, locale, deviceId? } → audio/mpeg. Servis yoksa 503 (istemci tarayıcı sesine döner).
+// Mac'in doğal sesi: POST { text, locale, deviceId? } → audio/mpeg. Servis yoksa 503 (istemci tarayıcı sesine döner).
 // Maliyet sınırları: önbellekten dönen ses sayılmaz; yeni sentez cihaz, IP ve tüm site için günlük karakter kotasından düşer.
 // Okulda bir sınıf tek IP'den gelir: IP sınırları bu yüzden cihaz sınırlarından geniştir.
 export const dynamic = 'force-dynamic'

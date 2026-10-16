@@ -1,4 +1,4 @@
-// Robi'nin DB katmanı: ders/adım yükleme (istemciye güvenilmez), yetki, günlük sayım ve sohbet kaydı.
+// Mac'in DB katmanı: ders/adım yükleme (istemciye güvenilmez), yetki, günlük sayım ve sohbet kaydı.
 import { and, eq, lessons, modules, sql, tutorMessages, users, weeks, type Db, type LessonStep } from '@ask/db'
 import { loadAccessContext } from '@/lib/entitlements-db'
 import { resolveAccess } from '@/lib/entitlements'
@@ -23,7 +23,7 @@ export async function loadTutorLesson(db: Db, lessonId: number): Promise<TutorLe
   return { ...row, steps: row.steps }
 }
 
-/** Sayfa yolundan Robi bağlamı: ders/parça/kurs içeriği sunucuda yüklenir; bulunamazsa genel bölüm. */
+/** Sayfa yolundan Mac bağlamı: ders/parça/kurs içeriği sunucuda yüklenir; bulunamazsa genel bölüm. */
 export async function loadPageSource(db: Db, path: string, loggedIn: boolean): Promise<PageSource> {
   const r = routeForPath(path, loggedIn)
   if (r.kind === 'lesson') {
@@ -80,7 +80,7 @@ export interface SaveInput {
   flag: string | null
 }
 
-/** Öğrenci sorusu + Robi cevabı. Ret durumunda iki satır da işaretlenir. */
+/** Öğrenci sorusu + Mac cevabı. Ret durumunda iki satır da işaretlenir. */
 export async function saveTutorExchange(db: Db, s: SaveInput) {
   // KVKK: girişsiz (anonim) sohbetler saklanmaz; yalnız hesaplı öğrencinin kaydı öğretmen/veli görsün diye tutulur
   if (!s.userId) return

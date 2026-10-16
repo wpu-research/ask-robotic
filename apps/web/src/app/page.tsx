@@ -13,7 +13,7 @@ export const dynamic = 'force-dynamic'
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT()
-  return { title: { absolute: `ASK Robotic · ${t('landing.metaTitle')}` }, description: t('landing.metaDescription') }
+  return { title: { absolute: `MacademiaX · ${t('landing.metaTitle')}` }, description: t('landing.metaDescription') }
 }
 
 /** "/": giriş yapmış kullanıcıya panel, ziyaretçiye tanıtım sayfası (panel misafir için /panel'de). */

@@ -2,14 +2,14 @@ import type { schools as Tr } from '../tr/schools'
 
 export const schools: typeof Tr = {
   metaTitle: 'For schools',
-  metaDescription: 'The ASK Robotic school programme: robotics and AI lessons for ages 5–18 with no hardware required, a teacher dashboard and lesson plans.',
+  metaDescription: 'The MacademiaX school programme: robotics and AI lessons for ages 5–18 with no hardware required, a teacher dashboard and lesson plans.',
   eyebrow: 'For schools and colleges',
   title: "Your school's robotics and AI lab, in the browser.",
   lead: 'From age 5 to 18, from block coding to AI engineering. No hardware required: every student gets a lab of their own.',
   ctaPilot: 'Get in touch about the pilot',
   ctaTry: 'Try it as a student',
-  mailSubject: 'ASK Robotic school pilot',
-  whyTitle: 'Why ASK Robotic',
+  mailSubject: 'MacademiaX school pilot',
+  whyTitle: 'Why MacademiaX',
   why: {
     hardware: { title: 'No hardware needed', text: 'Arduino, circuits, robots and the micro board run as faithful simulations in the browser. No kits, soldering, missing parts or queues for the lab: every student has their own.' },
     ladder: { title: 'One pathway, ages 5–18', text: 'A continuous curriculum from block coding and game making to Arduino and sensors, robotics and AI engineering.' },
@@ -40,7 +40,7 @@ export const schools: typeof Tr = {
   },
   mebTitle: 'Mapping to your curriculum',
   mebLabel: 'Mapping to Turkish national curriculum (MEB) courses',
-  mebCols: { course: 'Course', grade: 'Grade', match: 'ASK Robotic equivalent' },
+  mebCols: { course: 'Course', grade: 'Grade', match: 'MacademiaX equivalent' },
   meb: {
     bt: { course: 'Information Technologies and Software', grade: 'Grades 5–6', match: 'Explorers and Builders bands' },
     ai: { course: 'Artificial Intelligence Applications (elective)', grade: 'Grades 7–8', match: 'AI Workshop and an adapted AI Engineering course' },

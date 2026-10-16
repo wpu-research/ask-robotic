@@ -1,7 +1,38 @@
 import type { shell as Tr } from '../tr/shell'
 
 export const shell: typeof Tr = {
-  brandAria: 'ASK Robotic, go to dashboard',
+  brandAria: 'MacademiaX home',
+  topbarText: "Macademia's robotics and engineering programme · free level check and a personal learning path",
+  shortLinks: 'Quick links',
+  contactUs: 'Contact us',
+  studentLogin: 'Student login',
+  /** Main menu (same as macademia.online). */
+  mnav: {
+    home: 'Home',
+    about: 'About us',
+    method: 'Our method',
+    programs: 'Programmes',
+    corporate: 'For institutions',
+    contact: 'Contact',
+    cta: 'Free level check',
+  },
+  /** Macademia programmes in the Programmes menu. */
+  macademia: {
+    kodlama: 'Coding',
+    matematik: 'Mathematics',
+    tus: 'TUS prep',
+    hmgs: 'HMGS prep',
+    yds: 'YDS prep',
+    all: 'All programmes →',
+  },
+  foot: {
+    desc: "Macademia's robotics and engineering programme: from block coding to Arduino, from sensors to AI and drones. Everything runs in the browser, no kit needed.",
+    support: 'Support',
+    corporate: 'For institutions',
+    level: 'Level check',
+    credits: 'Photo credits',
+    copy: "© 2026 Macademia. MacademiaX is Macademia's robotics and engineering programme.",
+  },
   skipToContent: 'Skip to content',
   sidebar: 'Sidebar',
   mainMenu: 'Main menu',
@@ -18,7 +49,7 @@ export const shell: typeof Tr = {
   search: 'Search',
   guestTitle: 'Sign-in is off; your progress is saved in this browser',
   guest: 'Guest',
-  footerTagline: 'ASK Robotic · From zero to AI robotics engineering',
+  footerTagline: 'MacademiaX · From zero to AI robotics engineering',
   footerPricing: 'Pricing',
   footerSchools: 'For schools',
   footerKvkk: 'Privacy (KVKK)',
@@ -36,9 +67,11 @@ export const shell: typeof Tr = {
     kids: 'For kids',
     learning: 'Learning',
     adults: 'For adults',
+    macademia: 'Macademia',
   },
   nav: {
     home: 'Home',
+    dashboard: 'My dashboard',
     topics: 'Topics',
     schools: 'For schools',
     blocks: 'Block workshop',

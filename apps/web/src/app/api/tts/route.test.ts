@@ -21,11 +21,11 @@ describe('POST /api/tts', () => {
     expect((await POST(req({ text: 'Merhaba' }))).status).toBe(503)
   })
   it('ses döner; aynı metin önbellekten (servise ikinci istek yok)', async () => {
-    const r = await POST(req({ text: 'Merhaba Robi', locale: 'tr' }))
+    const r = await POST(req({ text: 'Merhaba Mac', locale: 'tr' }))
     expect(r.status).toBe(200)
     expect(r.headers.get('content-type')).toBe('audio/mpeg')
     expect(new Uint8Array(await r.arrayBuffer())).toEqual(new Uint8Array([7, 7, 7]))
-    await POST(req({ text: 'Merhaba   Robi', locale: 'tr' }))
+    await POST(req({ text: 'Merhaba   Mac', locale: 'tr' }))
     expect(fetchMock).toHaveBeenCalledTimes(1)
   })
   it('geçersiz metin 400, başka siteden 403', async () => {

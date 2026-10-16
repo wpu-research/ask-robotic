@@ -106,7 +106,7 @@ export const home = {
   },
   hero: {
     planTitle: 'Sana uygun öğrenme planını 1 dakikada çıkaralım',
-    planText: 'Yaşına ve ilgine göre nereden başlayacağını Robi önersin.',
+    planText: 'Yaşına ve ilgine göre nereden başlayacağını Mac önersin.',
     start: 'Başla',
     streak: 'günlük seri',
     chargesTitle: 'Seri şarjı: çalışmadığın bir günde serini korur. Ders bitirerek kazanılır (en çok 2).',

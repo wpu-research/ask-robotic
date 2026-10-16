@@ -4,11 +4,32 @@ import type { IconName } from './icons'
 export interface NavItem { href: string; /** Türkçe ad (testler ve dil bağımsız tüketiciler); arayüz `key` ile çevirir. */ label: string; key: MessageKey; icon: IconName; soon?: boolean; /** Alt çubukta (mobil) görünür. */ tab?: boolean }
 export interface NavGroup { title: string; key: MessageKey; items: NavItem[]; /** Atölyeler panelindeki alt başlık ve renk tonu. */ desc?: MessageKey; tone?: 'kids' | 'adults' | 'learning' }
 
-/** Üst menüde doğrudan görünen bağlantılar; geri kalanı "Atölyeler" açılır panelinde ve çekmecede. */
-export const TOP_NAV: NavItem[] = [
-  { href: '/panel', label: 'Ana sayfa', key: 'shell.nav.home', icon: 'panel' },
-  { href: '/konular', label: 'Konular', key: 'shell.nav.topics', icon: 'moduller' },
-  { href: '/okullar', label: 'Okullar için', key: 'shell.nav.schools', icon: 'book' },
+/** Macademia ana sitesi: MacademiaX onun robotik ve mühendislik programıdır. */
+export const MACADEMIA_URL = 'https://www.macademia.online/'
+
+/**
+ * Üst menü, macademia.online ile aynı sırada: Anasayfa · Hakkımızda · Yöntemimiz · Eğitimler ▾ · Kurumsal Eğitimler · İletişim.
+ * Hakkımızda, Yöntemimiz ve İletişim Macademia'nın kendi bölümleridir; Kurumsal Eğitimler MacademiaX'in okul sayfasıdır.
+ * `drop`: Eğitimler mega menüsünün yeri.
+ */
+export interface MainLink { key: MessageKey; href: string; external?: boolean; drop?: boolean }
+export const MAIN_NAV: MainLink[] = [
+  { key: 'shell.mnav.home', href: '/' },
+  { key: 'shell.mnav.about', href: `${MACADEMIA_URL}#hakkimizda`, external: true },
+  { key: 'shell.mnav.method', href: `${MACADEMIA_URL}#yontem`, external: true },
+  { key: 'shell.mnav.programs', href: '/konular', drop: true },
+  { key: 'shell.mnav.corporate', href: '/okullar' },
+  { key: 'shell.mnav.contact', href: `${MACADEMIA_URL}#iletisim`, external: true },
+]
+
+/** Eğitimler mega menüsünün son sütunu: Macademia'nın diğer programları. */
+export const MACADEMIA_PROGRAMS: Array<{ key: MessageKey; href: string }> = [
+  { key: 'shell.macademia.kodlama', href: `${MACADEMIA_URL}#p-kodlama` },
+  { key: 'shell.macademia.matematik', href: `${MACADEMIA_URL}#p-matematik` },
+  { key: 'shell.macademia.tus', href: `${MACADEMIA_URL}#p-tus` },
+  { key: 'shell.macademia.hmgs', href: `${MACADEMIA_URL}#p-hmgs` },
+  { key: 'shell.macademia.yds', href: `${MACADEMIA_URL}#p-yds` },
+  { key: 'shell.macademia.all', href: MACADEMIA_URL },
 ]
 
 // `soon: true` işaretli öğeler devre dışı görünür ("Yakında"); şu an hepsi aktiftir.

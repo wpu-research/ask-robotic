@@ -2,6 +2,7 @@ import type { ReactNode } from 'react'
 import './globals.css'
 import './platform.css'
 import './learn-v2.css'
+import './macademia.css'
 import { AppShell } from '@/components/shell/app-shell'
 import { authEnabled } from '@/lib/flags'
 import { tutorEnabled } from '@/lib/tutor/claude'
@@ -18,7 +19,7 @@ const poppins = Poppins({ subsets: ['latin', 'latin-ext'], weight: ['400', '500'
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT()
   return {
-    title: { default: 'ASK Robotic', template: '%s · ASK Robotic' },
+    title: { default: 'MacademiaX', template: '%s · MacademiaX' },
     description: t('common.metaDescription'),
   }
 }

@@ -44,7 +44,7 @@ export function HeroDemo({ L }: { L: L }) {
 const TABS = ['kodlama', 'elektronik', 'robotik', 'ai'] as const
 const TAB_ART: Record<(typeof TABS)[number], string> = { kodlama: '⌨️', elektronik: '💡', robotik: '🤖', ai: '🧠' }
 
-/** "Robi ile tanış": alan sekmeleri, her biri 3 özellik + küçük arayüz görseli. */
+/** "Mac ile tanış": alan sekmeleri, her biri 3 özellik + küçük arayüz görseli. */
 export function MeetTabs({ L }: { L: L }) {
   const [tab, setTab] = useState<(typeof TABS)[number]>('elektronik')
   return (

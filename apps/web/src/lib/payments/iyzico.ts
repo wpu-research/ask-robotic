@@ -72,7 +72,7 @@ export function buildInitializeRequest(init: CheckoutInit) {
     billingAddress: { contactName: `${name} ${surname}`, city: 'Istanbul', country: 'Turkey', address },
     basketItems: [{
       id: `${init.planId}-${init.period}`,
-      name: `ASK Robotic ${init.planTitle} (${init.period === 'yearly' ? '12 ay' : '1 ay'})`,
+      name: `MacademiaX ${init.planTitle} (${init.period === 'yearly' ? '12 ay' : '1 ay'})`,
       category1: 'Eğitim',
       itemType: 'VIRTUAL',
       price,

@@ -6,129 +6,178 @@ import { dictionaries, type Locale } from '@/i18n'
 import { ContinueLink, HeroDemo, MeetTabs } from './landing-client'
 import { WorkshopCards } from '@/components/kids/workshop-cards'
 import { WORKSHOPS } from '@/components/kids/workshops'
+import { MACADEMIA_URL } from '@/components/shell/nav-items'
+import { PHOTOS } from '@/lib/photo-credits'
 import '@/app/landing.css'
 
-const BAND_ART = ['🧩', '🎮', '🔆', '💡', '🤖']
+/** "Bugünün planı" kartındaki örnek ustalık değerleri (belirsizlik aralığıyla; Macademia'daki "TUS örneği" gibi örnek olarak işaretli). */
+const SAMPLE = [{ p: 31, u: 17 }, { p: 58, u: 14 }, { p: 72, u: 11 }]
 
 /**
- * Tanıtım ana sayfası (giriş yapmamış ziyaretçi için "/"), Brilliant ana sayfası düzeninde:
- * kahraman + canlı deneme · güven sayıları · Robi ile tanış · etkili ve güvenilir · yaş bantları ·
- * alışkanlık · okullar · nasıl çalışır · kapanış çağrısı. Sayılar katalogdan gelir (uydurma istatistik yok).
+ * Tanıtım ana sayfası (giriş yapmamış ziyaretçi için "/"), macademia.online'ın bölüm sırasıyla: kahraman (fotoğraf + bugünün
+ * planı kartı) · nasıl çalışır (dört adım) · programlarımız (kartlar) · hemen dene · Mac · yaşa göre yol · kurumsal bant ·
+ * hakkımızda ilkeleri · başla. Sayılar katalogdan gelir (uydurma istatistik yok).
  */
 export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; parts: number; locale: Locale }) {
   const L = dictionaries[locale].landing
   const H = dictionaries[locale].home
+  const X = L.mx
   const lessons = catalog.reduce((n, m) => n + m.weeks.reduce((k, w) => k + w.lessons.length, 0), 0)
-  const stats = [
-    { v: String(lessons), l: L.stats.lessons },
-    { v: String(catalog.length), l: L.stats.courses },
-    { v: String(parts), l: L.stats.parts },
-    { v: '5–18', l: L.stats.ages },
-    { v: locale === 'en' ? '$0' : '0 TL', l: L.stats.hardware },
-  ]
+  const fill = (s: string) => s.replace('{lessons}', String(lessons)).replace('{courses}', String(catalog.length)).replace('{parts}', String(parts))
   return (
-    <div className="ld">
-      <section className="ld-hero">
-        <div className="ld-hero-text">
-          <h1>{L.hero.title}</h1>
-          <p className="ld-lead">{L.hero.lead}</p>
-          <div className="ld-cta">
-            <Link className="v2-btn accent ld-big" href="/basla">{L.hero.learner}</Link>
-            <Link className="v2-btn ghost ld-big" href="/okullar">{L.hero.adult}</Link>
+    <div className="mx-home">
+      <section className="mx-hero">
+        <div className="wrap">
+          <div>
+            <p className="eyebrow">{X.hero.eyebrow}</p>
+            <h1>{X.hero.title1}<em>{X.hero.em}</em>{X.hero.title2}</h1>
+            <p className="lead">{X.hero.lead}</p>
+            <div className="hero-actions">
+              <Link className="btn btn-primary" href="/basla">{X.hero.primary}</Link>
+              <Link className="btn btn-outline" href="#programlar">{X.hero.secondary}</Link>
+            </div>
+            <p className="mx-hero-sub"><ContinueLink label={L.hero.continue} /><span className="muted">{L.hero.noHardware}</span></p>
           </div>
-          <div className="ld-cta-sub"><ContinueLink label={L.hero.continue} /><span className="muted">{L.hero.noHardware}</span></div>
-        </div>
-        <HeroDemo L={L} />
-      </section>
-
-      <ul className="ld-stats" aria-label="ASK Robotic">
-        {stats.map((s) => <li key={s.l}><b>{s.v}</b><span>{s.l}</span></li>)}
-      </ul>
-
-      <section className="ld-section" aria-labelledby="ld-atolye">
-        <h2 id="ld-atolye" className="ld-h2">{H.kids.workshops}</h2>
-        <p className="ld-sub">{H.kids.workshopsLead}</p>
-        <WorkshopCards items={WORKSHOPS.slice(0, 8)} />
-      </section>
-
-      <section className="ld-section">
-        <div className="ld-title"><Mascot size={56} mood="happy" /><div><h2>{L.meet.title}</h2><p>{L.meet.lead}</p></div></div>
-        <MeetTabs L={L} />
-      </section>
-
-      <section className="ld-section">
-        <h2 className="ld-h2">{L.trust.title}</h2>
-        <div className="ld-trust">
-          {L.trust.items.map((it, i) => (
-            <div key={it.title} className="ld-card"><span className="ld-num">{['✦', '🎯', '🔒', '🏫'][i]}</span><b>{it.title}</b><p>{it.text}</p></div>
-          ))}
+          <div className="hero-visual">
+            <div className="hero-photo"><img src={PHOTOS.robotik.file} alt="" width={800} height={500} /></div>
+            <div className="today-card" aria-label={X.hero.card.label}>
+              <div className="label"><span>{X.hero.card.label}</span><span className="chip chip-line">{X.hero.card.tag}</span></div>
+              <strong>{X.hero.card.title}</strong>
+              <ul>
+                {X.hero.card.rows.map((r, i) => (
+                  <li key={r}><span>{r}</span><span className="today-bar" aria-hidden="true"><i style={{ width: `${SAMPLE[i].p}%` }} /></span><b>%{SAMPLE[i].p}</b><small>±{SAMPLE[i].u}</small></li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="ld-section">
-        <h2 className="ld-h2">{L.catalog.title}</h2>
-        <p className="ld-sub">{L.catalog.lead}</p>
-        <div className="ld-bands">
-          {BANDS.map((b, i) => {
-            const bt = bandText(b, locale)
-            return (
-              <div key={b.key} className="ld-band">
-                <span className="ld-band-art" aria-hidden="true">{BAND_ART[i]}</span>
-                <small>{bt.grades} · {bt.ages}</small>
-                <b>{bt.title}</b>
-                <p>{bt.blurb}</p>
-                <ul>
-                  {TOPICS.filter((t) => t.bands.includes(b.key)).map((t) => {
-                    const first = catalog.find((m) => m.slug === t.courses[0])
-                    return <li key={t.key}><Link href={first ? `/moduller/${first.slug}` : '/konular'}>{topicText(t, locale).title} →</Link></li>
-                  })}
-                </ul>
-              </div>
-            )
-          })}
-        </div>
-        <p className="ld-center"><Link className="v2-btn ghost" href="/konular">{L.catalog.all}</Link></p>
-      </section>
-
-      <section className="ld-section ld-split">
-        <div>
-          <h2 className="ld-h2 left">{L.habit.title}</h2>
-          <p className="ld-sub left">{L.habit.lead}</p>
-          <ul className="ld-checks">{L.habit.points.map((p) => <li key={p}>{p}</li>)}</ul>
-        </div>
-        <div className="ld-streak" aria-hidden="true">
-          <div className="ld-streak-top"><span>⚡</span><b>12</b><small>{locale === 'en' ? 'day streak' : 'günlük seri'}</small></div>
-          <div className="ld-week">{(locale === 'en' ? ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'] : ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz']).map((d, i) => <span key={d} className={i < 5 ? 'on' : i === 5 ? 'charge' : ''}><i>{i < 5 ? '⚡' : i === 5 ? '🔋' : ''}</i>{d}</span>)}</div>
-          <div className="ld-goal"><span>{locale === 'en' ? 'Daily goal' : 'Günlük hedef'}</span><div className="v2-progress"><div style={{ width: '80%' }} /></div></div>
+      <section className="section" id="yontem">
+        <div className="wrap">
+          <div className="section-head">
+            <div><p className="eyebrow">{X.how.eyebrow}</p><h2>{X.how.title}</h2></div>
+            <p>{X.how.lead} <a className="mx-link" href={`${MACADEMIA_URL}#yontem`}>{X.how.link}</a></p>
+          </div>
+          <div className="steps">
+            {X.how.steps.map((s) => <div key={s.title} className="step"><h3>{s.title}</h3><p>{s.text}</p></div>)}
+          </div>
         </div>
       </section>
 
-      <section className="ld-section ld-schools">
-        <div>
-          <h2 className="ld-h2 left">{L.schools.title}</h2>
-          <p className="ld-sub left">{L.schools.lead}</p>
-          <ul className="ld-pills">{L.schools.points.map((p) => <li key={p}>{p}</li>)}</ul>
-          <Link className="v2-btn accent" href="/okullar">{L.schools.cta}</Link>
-        </div>
-        <div className="ld-class" aria-hidden="true">
-          {['Ada K.', 'Can D.', 'Elif Ş.', 'Mert A.'].map((n, i) => (
-            <div key={n} className="ld-class-row"><span>{n}</span><div className="ld-dots">{[0, 1, 2, 3, 4].map((j) => <i key={j} className={j < 4 - (i % 3) ? 'ok' : i === 2 && j === 4 ? 'stuck' : ''} />)}</div></div>
-          ))}
+      <section className="section soft" id="programlar">
+        <div className="wrap">
+          <div className="section-head">
+            <div><p className="eyebrow">{X.programs.eyebrow}</p><h2>{X.programs.title}</h2></div>
+            <p>{fill(X.programs.lead)}</p>
+          </div>
+          <div className="mx-cards three mx-feature">
+            <Link href="/muhendislik" className="mx-card">
+              <span className="mx-card-img"><img src={PHOTOS.robotik.file} alt="" width={800} height={500} /></span>
+              <span className="mx-card-body"><h3>{X.programs.engTitle}</h3><span className="mx-card-meta">{X.programs.engMeta}</span><p>{X.programs.engText}</p></span>
+            </Link>
+            <Link href="/muhendislik/robotik" className="mx-card">
+              <span className="mx-card-img"><img src={PHOTOS.gencler.file} alt="" width={800} height={500} /></span>
+              <span className="mx-card-body"><h3>{X.programs.courseTitle}</h3><span className="mx-card-meta">{X.programs.courseMeta}</span><p>{X.programs.courseText}</p></span>
+            </Link>
+            <Link href="/konular" className="mx-card">
+              <span className="mx-card-img"><img src={PHOTOS.kodlama.file} alt="" width={800} height={500} /></span>
+              <span className="mx-card-body"><h3>{X.programs.allTopics}</h3><span className="mx-card-meta">{lessons} {L.stats.lessons} · {catalog.length} {L.stats.courses}</span><p>{L.catalog.lead}</p></span>
+            </Link>
+          </div>
+          <h3 className="mx-subhead">{H.kids.workshops}</h3>
+          <WorkshopCards items={WORKSHOPS} />
         </div>
       </section>
 
-      <section className="ld-section">
-        <h2 className="ld-h2">{L.how.title}</h2>
-        <ol className="ld-how">{L.how.steps.map((s, i) => <li key={s.title}><span>{i + 1}</span><b>{s.title}</b><p>{s.text}</p></li>)}</ol>
+      <section className="section">
+        <div className="wrap mx-demo">
+          <div>
+            <p className="eyebrow">{X.demo.eyebrow}</p>
+            <h2 className="mx-h2">{X.demo.title}</h2>
+            <p className="muted">{X.demo.lead}</p>
+          </div>
+          <HeroDemo L={L} />
+        </div>
       </section>
 
-      <section className="ld-final">
-        <Mascot size={88} mood="happy" />
-        <h2>{L.final.title}</h2>
-        <p>{L.final.lead}</p>
-        <div className="ld-cta center">
-          <Link className="v2-btn accent ld-big" href="/basla">{L.final.cta}</Link>
-          <Link className="v2-btn ghost ld-big" href="/giris">{L.final.login}</Link>
+      <section className="section soft">
+        <div className="wrap">
+          <div className="section-head">
+            <div className="mx-meet-title"><Mascot size={64} mood="happy" /><div><p className="eyebrow">{X.meet.eyebrow}</p><h2>{L.meet.title}</h2></div></div>
+            <p>{L.meet.lead}</p>
+          </div>
+          <MeetTabs L={L} />
+        </div>
+      </section>
+
+      <section className="section">
+        <div className="wrap">
+          <div className="section-head">
+            <div><p className="eyebrow">{X.bands.eyebrow}</p><h2>{L.catalog.title}</h2></div>
+            <p>{L.catalog.lead}</p>
+          </div>
+          <div className="mx-bands">
+            {BANDS.map((b) => {
+              const bt = bandText(b, locale)
+              return (
+                <div key={b.key} className="mx-band">
+                  <span className="mx-card-meta">{bt.grades} · {bt.ages}</span>
+                  <h3>{bt.title}</h3>
+                  <p>{bt.blurb}</p>
+                  <ul>
+                    {TOPICS.filter((t) => t.bands.includes(b.key)).map((t) => {
+                      const first = catalog.find((m) => m.slug === t.courses[0])
+                      return <li key={t.key}><Link href={first ? `/moduller/${first.slug}` : '/konular'}>{topicText(t, locale).title} →</Link></li>
+                    })}
+                  </ul>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      <section className="band" id="kurumsal">
+        <div className="wrap">
+          <div>
+            <p className="eyebrow">{X.corporate.eyebrow}</p>
+            <h2>{X.corporate.title}</h2>
+            <p>{X.corporate.lead}</p>
+            <div className="hero-actions"><Link className="btn btn-primary" href="/okullar">{X.corporate.cta}</Link></div>
+          </div>
+          <ul className="feature-list">
+            {X.corporate.items.map((it) => <li key={it}><span>{it}</span><span className="chip chip-ready">{X.corporate.ready}</span></li>)}
+          </ul>
+        </div>
+      </section>
+
+      <section className="section" id="hakkimizda">
+        <div className="wrap mx-about">
+          <div>
+            <p className="eyebrow">{X.about.eyebrow}</p>
+            <h2 className="mx-h2">{X.about.title1}<br />{X.about.title2}</h2>
+            <p className="muted">{X.about.p1}</p>
+            <p className="muted">{X.about.p2}</p>
+          </div>
+          <div className="principles">
+            {L.trust.items.map((it) => <div key={it.title}><h3>{it.title}</h3><p>{it.text}</p></div>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="section soft">
+        <div className="wrap mx-final">
+          <Mascot size={88} mood="happy" />
+          <div>
+            <p className="eyebrow">{X.final.eyebrow}</p>
+            <h2 className="mx-h2">{L.final.title}</h2>
+            <p className="muted">{L.final.lead}</p>
+          </div>
+          <div className="hero-actions">
+            <Link className="btn btn-primary" href="/basla">{L.final.cta}</Link>
+            <Link className="btn btn-outline" href="/giris">{X.final.login}</Link>
+          </div>
         </div>
       </section>
     </div>

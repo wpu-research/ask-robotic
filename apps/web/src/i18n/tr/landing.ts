@@ -2,9 +2,62 @@
 export const landing = {
   metaTitle: 'Robotik ve yapay zekâ için kişisel öğretmenin',
   metaDescription: '5–18 yaş için bloklarla kodlamadan elektroniğe, robotikten yapay zekâ mühendisliğine etkileşimli dersler. Donanım gerekmez.',
+  /** Macademia düzenindeki ana sayfa (bölüm etiketi, başlık, açıklama). */
+  mx: {
+    hero: {
+      eyebrow: 'Robotik ve mühendislik',
+      title1: 'Robotiği ', em: 'yaparak', title2: ' öğren.',
+      lead: "Bloklarla kodlamadan Arduino'ya, sensörlerden yapay zekâ mühendisliğine. Sanal laboratuvarda dener, Mac'le birlikte düşünürsün. Kit gerekmez.",
+      primary: 'Seviyeni Ölç',
+      secondary: 'Programları incele',
+      card: { label: 'Bugünün planı', tag: 'Örnek', title: "Bugün PWM'e odaklan", rows: ['PWM ve parlaklık', 'Ohm yasası', 'Sensör okuma'] },
+    },
+    how: {
+      eyebrow: 'Nasıl çalışır',
+      title: 'Her derste aynı dört adım',
+      lead: 'Macademia’nın öğrenme motoruyla aynı mantık: önce nerede olduğunu ölçeriz, sonra yolu ona göre kurarız.',
+      link: 'Yöntemimizin ayrıntıları →',
+      steps: [
+        { title: 'Seviye tespiti', text: 'Yaşını, ilgini ve bildiklerini söylersin; Mac sana uygun başlangıcı önerir.' },
+        { title: 'Kişisel yol', text: 'Konular yaşına ve hızına göre sıralanır; bildiğin yerler seni yormaz.' },
+        { title: 'Yaparak öğren', text: 'Her adımda dener, kontrol eder, nedenini öğrenirsin: devre, kod ve robot tarayıcıda.' },
+        { title: 'Proje', text: 'Her hafta bir proje: trafik ışığından çizgi izleyen robota, oradan drone görevine.' },
+      ],
+    },
+    programs: {
+      eyebrow: 'Eğitimler',
+      title: 'Programlarımız',
+      lead: '{lessons} etkileşimli ders, {courses} kurs ve {parts} parçalık ansiklopedi. Her şey tarayıcıda çalışır.',
+      engTitle: 'Mühendislik yolu',
+      engMeta: "128 gerçek parça · 7 seviye",
+      engText: "Temel bileşenlerden I²C sensörlere, motor sürücülerden drone'a. Her parça sanal laboratuvarda takılı açılır.",
+      courseTitle: 'Üniversite dersi: Robotik',
+      courseMeta: 'ESOF 323 · 14 hafta',
+      courseText: 'Gömülü programlama, PID, kinematik, bilgisayarlı görü, ROS 2 ve drone. 15 simülasyon ve üç dönem projesi.',
+      allTopics: 'Tüm konular',
+    },
+    demo: { eyebrow: 'Hemen dene', title: 'Bir adımı şimdi çöz', lead: 'Derslerdeki yüzlerce adımdan biri: direnci seç, LED yansın ama bozulmasın.' },
+    meet: { eyebrow: 'Rehberin' },
+    bands: { eyebrow: 'Yaşa göre yol' },
+    corporate: {
+      eyebrow: 'Kurumsal eğitimler',
+      title: 'Okullar ve kurumlar için öğretmen paneli',
+      lead: 'Sınıf oluştur, QR kartla öğrencileri dakikalar içinde ekle, ödev ver, kimin takıldığını canlı gör. 40 dakikalık ders planları dahil.',
+      cta: 'Teklif isteyin',
+      ready: 'Hazır',
+      items: ['Sınıf, şube ve öğrenci yönetimi', 'QR kartla giriş (e-posta gerekmez)', 'Ödev atama ve projeksiyon modu', 'Beceri ısı haritası ve öğrenci karnesi', 'MEB kazanım eşlemesi'],
+    },
+    about: {
+      eyebrow: 'Neden MacademiaX',
+      title1: 'Bir robotik dersi için kurduk,', title2: 'her yaşa taşıyoruz.',
+      p1: "MacademiaX, Macademia'nın robotik ve mühendislik programıdır. Üniversitedeki robotik dersinin laboratuvarı olarak başladı; bugün 5 yaşındaki bir çocuğun ilk bloğundan mühendislik öğrencisinin drone projesine kadar aynı platformda çalışıyor.",
+      p2: 'Ölçme anlayışı Macademia ile aynıdır: önce nerede olduğunu ölçeriz, sonra planı ona göre kurarız.',
+    },
+    final: { eyebrow: 'Başla', login: 'Öğrenci Girişi' },
+  },
   hero: {
     title: 'Robotik ve yapay zekâ için kişisel öğretmenin',
-    lead: 'Bloklarla kodlamadan Arduino’ya, robotlardan yapay zekâ mühendisliğine. Robi seninle birlikte düşünür, cevabı vermez; sen bulursun.',
+    lead: 'Bloklarla kodlamadan Arduino’ya, robotlardan yapay zekâ mühendisliğine. Mac seninle birlikte düşünür, cevabı vermez; sen bulursun.',
     learner: 'Öğrenciyim',
     adult: 'Veli ya da öğretmenim',
     continue: 'Kaldığın yerden devam et',
@@ -29,8 +82,8 @@ export const landing = {
     hardware: 'kit maliyeti',
   },
   meet: {
-    title: 'Robi ile tanış',
-    lead: 'Her derste yanında olan rehber robot. Ekranını görür, takıldığın yeri anlar, sana soru sorarak yol gösterir.',
+    title: 'Mac ile tanış',
+    lead: 'Her derste yanında olan Macademia rehberin. Ekranını görür, takıldığın yeri anlar, sana soru sorarak yol gösterir.',
     tabs: { kodlama: 'Kodlama', elektronik: 'Elektronik', robotik: 'Robotik', ai: 'Yapay zekâ' },
     mock: {
       coach: { kodlama: 'delay() kaç milisaniye bekler?', elektronik: 'Yanık süreyi kısaltırsan ne olur?', robotik: 'Sensör hangi mesafeyi okuyor?', ai: 'Neden “durur” daha olası?' },
@@ -90,7 +143,7 @@ export const landing = {
   how: {
     title: 'Nasıl çalışır?',
     steps: [
-      { title: 'Planını çıkar', text: 'Yaşını ve ilgini söyle; Robi sana uygun başlangıcı önersin.' },
+      { title: 'Planını çıkar', text: 'Yaşını ve ilgini söyle; Mac sana uygun başlangıcı önersin.' },
       { title: 'Kısa adımlarla öğren', text: 'Her adımda dene, kontrol et, nedenini öğren.' },
       { title: 'Kendi projeni yap', text: 'Her hafta bir proje: trafik ışığından robot sürüşüne.' },
     ],

@@ -1,6 +1,6 @@
 // Ortak metinler (birden çok ekranda). İngilizcesi: ../en/common.ts
 export const common = {
-  appName: 'ASK Robotic',
+  appName: 'MacademiaX',
   tagline: "0'dan AI robotik mühendisliğine",
   metaDescription: "0'dan AI robotik mühendisliğine: Scratch'ten Arduino'ya, sensörlerden robotlara adım adım dersler.",
   loading: 'Yükleniyor…',

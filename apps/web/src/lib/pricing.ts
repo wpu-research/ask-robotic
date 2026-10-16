@@ -119,7 +119,7 @@ export const FEATURE_TABLE: FeatureRow[] = [
   { label: 'Her modülün ilk haftası', free: true, premium: true, family: true },
   { label: 'Yeni ders', free: 'Günde 1', premium: 'Sınırsız', family: 'Sınırsız' },
   { label: 'Simülatörler ve atölyeler', free: true, premium: true, family: true },
-  { label: 'Robi AI öğretmen', free: false, premium: true, family: true },
+  { label: 'Mac AI öğretmen', free: false, premium: true, family: true },
   { label: 'Kişisel pratik ve tekrar', free: false, premium: true, family: true },
   { label: 'İleri atlama', free: false, premium: true, family: true },
   { label: 'Reklamsız', free: false, premium: true, family: true },
@@ -128,7 +128,7 @@ export const FEATURE_TABLE: FeatureRow[] = [
 
 export const PREMIUM_BENEFITS = [
   'Sınırsız ders: istediğin kadar, istediğin sırayla',
-  'Robi AI öğretmen: takıldığında ipucu ve açıklama',
+  'Mac AI öğretmen: takıldığında ipucu ve açıklama',
   'Kişisel pratik: zorlandığın konulara göre tekrar',
   'Reklamsız öğrenme',
 ]

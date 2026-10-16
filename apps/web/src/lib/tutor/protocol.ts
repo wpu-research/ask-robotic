@@ -21,5 +21,5 @@ export const visibleText = (raw: string) => { const i = raw.lastIndexOf(REPLACE)
 export const MAX_MESSAGES = 12
 export const MAX_CHARS = 600
 
-/** Robi'nin 2 yanlıştan sonra kendiliğinden önerdiği yardım. */
+/** Mac'in 2 yanlıştan sonra kendiliğinden önerdiği yardım. */
 export const PROACTIVE_OFFER = 'Takıldıysan birlikte bakalım mı?'

@@ -16,7 +16,7 @@ const base = (over: Partial<TutorContextInput>): TutorContextInput => ({ lesson,
 
 describe('TUTOR_SYSTEM', () => {
   it('sabit ve kişiye/zamana özgü veri içermez (önbellek)', () => {
-    expect(TUTOR_SYSTEM).toContain('Robi')
+    expect(TUTOR_SYSTEM).toContain('Mac')
     expect(TUTOR_SYSTEM).toMatch(/Sokratik/)
     expect(TUTOR_SYSTEM).toMatch(/60 kelime/)
     expect(TUTOR_SYSTEM).toMatch(/Kişisel bilgi asla isteme/)

@@ -6,7 +6,7 @@ import type { MessageKey } from '@/i18n'
 import { TrialButton } from './trial-button'
 import '@/app/odeme.css'
 
-/** Kilitli ders ekranı (Brilliant tarzı): Robi, neden kilitli, Premium faydaları, deneme / planlar, "yarın tekrar gel". */
+/** Kilitli ders ekranı (Brilliant tarzı): Mac, neden kilitli, Premium faydaları, deneme / planlar, "yarın tekrar gel". */
 export async function Paywall({ reason, loggedIn, trialAvailable, lessonTitle }: {
   reason: LockReason
   loggedIn: boolean

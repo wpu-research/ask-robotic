@@ -10,7 +10,7 @@ const OFFSETS = [0, 56, 84, 56, 0, -56, -84, -56]
 
 /**
  * Kurs haritası: her hafta bir "seviye" başlığı, dersler zikzak diskler, hafta sonunda tekrar düğümü.
- * Sıradaki derste Robi durur ve "Başla" kartı çıkar. Etkileşimli (v2) dersler ✦ ile işaretlenir.
+ * Sıradaki derste Mac durur ve "Başla" kartı çıkar. Etkileşimli (v2) dersler ✦ ile işaretlenir.
  */
 export function CourseMap({ m, nextId, onWeekReview }: { m: CatalogModule; nextId: number | null; onWeekReview: (week: number) => void }) {
   const done = useDoneIds()

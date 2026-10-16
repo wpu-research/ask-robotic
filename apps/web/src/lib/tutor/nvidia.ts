@@ -1,4 +1,4 @@
-// Robi için geçici yedek sağlayıcı: NVIDIA API kataloğu (OpenAI uyumlu sohbet, SSE akışı). Yalnız sunucu.
+// Mac için geçici yedek sağlayıcı: NVIDIA API kataloğu (OpenAI uyumlu sohbet, SSE akışı). Yalnız sunucu.
 // ANTHROPIC_API_KEY yokken NVIDIA_API_KEY varsa kullanılır (lib/tutor/claude.ts). Model: NVIDIA_MODEL.
 // Not: ücretsiz katmanda büyük modeller sırada çok bekleyebiliyor; varsayılan, hızlı yanıt veren küçük model.
 import type { TutorResult, TutorTurn } from './claude'

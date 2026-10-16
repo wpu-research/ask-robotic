@@ -57,7 +57,7 @@ describe('istemci yardımcıları', () => {
   })
   it('hata metinleri ve akış ayırıcı', () => {
     expect(tutorErrorText('tutor_disabled')).toBe(OFFLINE_TEXT)
-    expect(OFFLINE_TEXT).toMatch(/Robi şu an çevrimdışı/)
+    expect(OFFLINE_TEXT).toMatch(/Mac şu an çevrimdışı/)
     expect(tutorErrorText('daily_limit')).toMatch(/Bugünlük/)
     expect(visibleText('yarım cevap')).toBe('yarım cevap')
     expect(visibleText(`yarım${REPLACE}yedek`)).toBe('yedek')

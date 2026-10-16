@@ -1,11 +1,11 @@
-// Robi her sayfada (ders oynatıcısı dışı): genel istem + sayfa bağlamı. Saf modül: DB ve SDK yok.
+// Mac her sayfada (ders oynatıcısı dışı): genel istem + sayfa bağlamı. Saf modül: DB ve SDK yok.
 // ROBI_PAGE_SYSTEM sabittir (önbelleğe alınır); sayfaya özgü her şey buildPageContext'te, kırılma noktasından SONRA gider.
 // Sayfa içeriği istemciden ALINMAZ: istemci yalnız yolu (path) gönderir, içerik sunucuda DB'den/katalogdan yüklenir
 // (lib/tutor/server.ts loadPageSource). Klasik derste mini test cevapları bağlama hiç girmez.
 import { BANDS, type BandKey } from '@/lib/learning-paths'
 import { isShortBand, type TutorLocale } from './prompt'
 
-export const ROBI_PAGE_SYSTEM = `Sen Robi'sin: robotik, kodlama, elektronik ve yapay zekâ öğrenen 5-18 yaş çocukların yardımcı robotusun. Türkiye'deki ASK Robotic öğrenme platformunda, öğrencinin o an açık olan sayfasının köşesindeki küçük bir sohbet panelinde konuşuyorsun. Sayfa bir ders, bir parça (ör. LED, direnç) sayfası, bir kurs, laboratuvar/arena/atölye gibi bir araç ya da panel olabilir.
+export const ROBI_PAGE_SYSTEM = `Sen Mac'sin: Macademia'nın rehberi, makademya cevizi bir karaktersin; robotik, kodlama, elektronik ve yapay zekâ öğrenen 5-18 yaş çocuklara yardım ediyorsun. Türkiye'deki MacademiaX öğrenme platformunda, öğrencinin o an açık olan sayfasının köşesindeki küçük bir sohbet panelinde konuşuyorsun. Sayfa bir ders, bir parça (ör. LED, direnç) sayfası, bir kurs, laboratuvar/arena/atölye gibi bir araç ya da panel olabilir.
 
 # Nasıl yardım edersin
 - Öğrencinin kendisinin anlamasını ve bulmasını sağla. Kavramı günlük hayattan bir benzetmeyle anlat, sonra kısa bir kontrol sorusu sor.
@@ -61,7 +61,7 @@ export const SECTIONS = {
   start: 'Başlangıç: yaş ve ilgiye göre öğrenme planı çıkarma.',
   pricing: 'Fiyatlar ve üyelik planları.',
   schools: 'Okullar için tanıtım: öğretmen paneli, sınıflar, QR kartla giriş.',
-  welcome: 'Tanıtım sayfası: ASK Robotic ve Robi ile tanışma, örnek bir Ohm yasası denemesi.',
+  welcome: 'Tanıtım sayfası: MacademiaX ve Mac ile tanışma, örnek bir Ohm yasası denemesi.',
   other: 'Platformda genel bir sayfa.',
 } as const
 export type SectionKey = keyof typeof SECTIONS
@@ -73,7 +73,7 @@ const SECTION_PREFIX: [string, SectionKey][] = [
   ['/basla', 'start'], ['/fiyatlar', 'pricing'], ['/okullar', 'schools'],
 ]
 
-/** Robi paneli bu yollarda gösterilmez (giriş/kayıt/ödeme/yasal/öğretmen sayfaları). */
+/** Mac paneli bu yollarda gösterilmez (giriş/kayıt/ödeme/yasal/öğretmen sayfaları). */
 export const ROBI_HIDDEN_PREFIXES = ['/giris', '/kayit', '/odeme', '/yasal', '/ogretmen', '/sinif/katil', '/hesap']
 export const robiHiddenOn = (path: string) => ROBI_HIDDEN_PREFIXES.some((p) => path === p || path.startsWith(`${p}/`))
 

@@ -52,7 +52,7 @@ export default async function Odeme({ searchParams }: { searchParams: Promise<{ 
         <p className="muted">{t('pricing.checkout.lead')}</p>
       </header>
       <section className="co-card" aria-label={t('pricing.checkout.summary')}>
-        <div className="co-row"><span>{t('pricing.checkout.plan')}</span><b>ASK Robotic {t(`pricing.plans.${planId}.title`)}</b></div>
+        <div className="co-row"><span>{t('pricing.checkout.plan')}</span><b>MacademiaX {t(`pricing.plans.${planId}.title`)}</b></div>
         <div className="co-row"><span>{t('pricing.checkout.period')}</span><b>{periodName} ({t(period === 'yearly' ? 'pricing.period.months12' : 'pricing.period.months1')})</b></div>
         <div className="co-row"><span>{t('pricing.checkout.premiumEnd')}</span><b>{formatDate(locale, newEnd)}</b></div>
         <div className="co-row"><span>{t('pricing.checkout.account')}</span><span>{user.email ?? user.name}</span></div>

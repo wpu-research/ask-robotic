@@ -1,0 +1,10 @@
+// Fotoğraf künyeleri (Macademia ile aynı Openverse/CC fotoğrafları; Akademi/public/img/credits.json). Dosyalar public/img altında.
+export interface PhotoCredit { file: string; title: string; creator: string; creatorUrl: string; license: string; licenseUrl: string; source: string }
+
+export const PHOTOS: Record<'robotik' | 'kodlama' | 'hero' | 'cocuklar' | 'gencler', PhotoCredit> = {
+  robotik: { file: '/img/robotik.jpg', title: 'Robot', creator: 'mutednarayan', creatorUrl: 'https://www.flickr.com/photos/85398171@N00', license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/', source: 'https://www.flickr.com/photos/85398171@N00/3790532890' },
+  kodlama: { file: '/img/kodlama.jpg', title: 'Code Club at the Library', creator: 'Blue Mountains Library', creatorUrl: 'https://www.flickr.com/photos/44572512@N06', license: 'CC BY-SA 2.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/2.0/', source: 'https://www.flickr.com/photos/44572512@N06/33273819546' },
+  hero: { file: '/img/hero.jpg', title: 'Students learning about oysters at Down Township School', creator: 'U. S. Fish and Wildlife Service - Northeast Region', creatorUrl: 'https://www.flickr.com/photos/43322816@N08', license: 'Public Domain Mark 1.0', licenseUrl: 'https://creativecommons.org/publicdomain/mark/1.0/', source: 'https://www.flickr.com/photos/43322816@N08/18394026761' },
+  cocuklar: { file: '/img/cocuklar.jpg', title: 'Book Nook', creator: 'WellspringCS', creatorUrl: 'https://www.flickr.com/photos/47858762@N02', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/', source: 'https://www.flickr.com/photos/47858762@N02/4387574195' },
+  gencler: { file: '/img/gencler.jpg', title: 'Teaching English at Cheongdam Middle School', creator: 'USAG-Humphreys', creatorUrl: 'https://www.flickr.com/photos/31687107@N07', license: 'CC BY 2.0', licenseUrl: 'https://creativecommons.org/licenses/by/2.0/', source: 'https://www.flickr.com/photos/31687107@N07/5510980198' },
+}

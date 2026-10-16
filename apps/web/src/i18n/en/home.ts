@@ -107,7 +107,7 @@ export const home: typeof Tr = {
   },
   hero: {
     planTitle: "Let's make your learning plan in 1 minute",
-    planText: 'Robi will suggest where to start based on your age and interests.',
+    planText: 'Mac will suggest where to start based on your age and interests.',
     start: 'Start',
     streak: 'day streak',
     chargesTitle: 'Streak charge: protects your streak on a day you skip. Earn it by finishing lessons (max 2).',

@@ -228,7 +228,7 @@ describe('POST /api/tutor', () => {
   })
 })
 
-describe('POST /api/tutor — her sayfada Robi', () => {
+describe('POST /api/tutor — her sayfada Mac', () => {
   it('sayfa bağlamı sunucuda yüklenir, sayfa istemiyle akar ve ders kimliğiyle kaydedilir', async () => {
     h.user.mockResolvedValue({ id: 'u1' })
     h.server.loadPageSource.mockResolvedValue({ kind: 'lesson', lessonId: 9, title: 'Klasik LED', moduleTitle: 'Arduino', weekTitle: 'Işık', minAge: 10, question: 'Neden?' })

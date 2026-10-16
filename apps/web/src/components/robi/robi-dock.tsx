@@ -10,8 +10,8 @@ import { robiHiddenOn } from '@/lib/tutor/page-context'
 import { useRobiClaimed } from './presence'
 
 /**
- * Her sayfada Robi: sağ altta düğme, açılınca sohbet paneli. Bağlam olarak yalnız sayfa yolu gider; içerik sunucuda
- * yüklenir (lib/tutor/page-context.ts). Ders oynatıcısı kendi Robi'sini açtığında (useClaimRobi) ve giriş/ödeme/öğretmen
+ * Her sayfada Mac: sağ altta düğme, açılınca sohbet paneli. Bağlam olarak yalnız sayfa yolu gider; içerik sunucuda
+ * yüklenir (lib/tutor/page-context.ts). Ders oynatıcısı kendi Mac'ini açtığında (useClaimRobi) ve giriş/ödeme/öğretmen
  * sayfalarında gizlenir. `enabled`: sunucuda ANTHROPIC_API_KEY var mı.
  */
 export function RobiDock({ enabled }: { enabled: boolean }) {

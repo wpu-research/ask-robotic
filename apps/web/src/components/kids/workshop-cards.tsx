@@ -16,7 +16,7 @@ export function WorkshopCards({ items = WORKSHOPS }: { items?: Workshop[] }) {
             <Art kind={w.art} className="kc-art" />
             <span className="kc-body">
               <b>{t(`home.tools.${w.k}` as MessageKey)}</b>
-              <span className="kc-meta">◆ {w.age}</span>
+              <span className="kc-meta">{w.age}</span>
               <span className="kc-text">{t(`home.tools.${w.k}Text` as MessageKey)}</span>
             </span>
           </Link>

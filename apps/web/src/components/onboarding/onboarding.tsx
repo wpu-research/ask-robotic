@@ -26,7 +26,7 @@ const LEVEL_KEYS: Level[] = ['yeni', 'acemi', 'orta', 'ileri']
 const SAMPLE_CODE: Record<Level, string> = { yeni: '', acemi: 'digitalWrite(13, HIGH);', orta: 'for (int i = 0; i < 4; i++)', ileri: 'void dur(int ms) { … }' }
 
 /**
- * Karşılama akışı (Brilliant'taki gibi kayıttan önce): her ekran tek soru, büyük kartlar, Robi konuşur.
+ * Karşılama akışı (Brilliant'taki gibi kayıttan önce): her ekran tek soru, büyük kartlar, Mac konuşur.
  * Sonunda yaş + ilgi + seviyeye göre öğrenme planı ve "Buradan başla". Cevaplar tarayıcıda (lib/profile.ts); misafire
  * "Planını kaydet" (/kayit?from=basla) önerilir, kayıtta profil hesaba taşınır. Oturum açıksa session-sync sunucuya yazar.
  */

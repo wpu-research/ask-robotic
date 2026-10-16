@@ -9,7 +9,7 @@ const sse = (lines: string[]) => new Response(new ReadableStream({
 }), { headers: { 'content-type': 'text/event-stream' } })
 
 describe('NVIDIA yedek sağlayıcı', () => {
-  it('anahtar varsa Robi açık; gövde sistem + bağlamı tek sistem mesajında taşır', () => {
+  it('anahtar varsa Mac açık; gövde sistem + bağlamı tek sistem mesajında taşır', () => {
     expect(tutorEnabled()).toBe(false)
     process.env.NVIDIA_API_KEY = 'nv'
     expect(tutorEnabled()).toBe(true)
@@ -34,7 +34,7 @@ describe('NVIDIA yedek sağlayıcı', () => {
     expect(out).toBe('Merhaba')
     expect(r.value).toEqual({ stopReason: 'end_turn', model: 'm', fallback: false })
   })
-  it('HTTP hataları Robi hata kodlarına çevrilir', async () => {
+  it('HTTP hataları Mac hata kodlarına çevrilir', async () => {
     process.env.NVIDIA_API_KEY = 'nv'
     for (const [status, code] of [[401, 'tutor_disabled'], [429, 'tutor_busy'], [500, 'tutor_unavailable']] as const) {
       vi.stubGlobal('fetch', vi.fn(async () => new Response('x', { status })))
