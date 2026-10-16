@@ -192,7 +192,7 @@ mount(stage,side){
   const setT=e=>{const m=pos(e);T={x:m.x-bx,y:by-m.y};};
   cv.addEventListener('pointerdown',e=>{if(md.v!=='ik')return;drag=true;cv.setPointerCapture(e.pointerId);setT(e);});
   cv.addEventListener('pointermove',e=>{if(drag)setT(e);});
-  cv.cv.addEventListener('pointerup',()=>{drag=false;});cv.addEventListener('pointerleave',()=>{drag=false;});
+  cv.addEventListener('pointerup',()=>{drag=false;});
   return loop(dt=>{
     if(md.v==='ik'){const r=Math.hypot(T.x,T.y),rmin=Math.abs(l1-l2)+1,rmax=l1+l2-1;reach=r>=rmin&&r<=rmax;const rc=clamp(r,rmin,rmax),an=Math.atan2(T.y,T.x);const x=rc*Math.cos(an),y=rc*Math.sin(an);const D=clamp((x*x+y*y-l1*l1-l2*l2)/(2*l1*l2),-1,1);const t2=Math.acos(D)*(elb.v==='up'?-1:1);const t1=Math.atan2(y,x)-Math.atan2(l2*Math.sin(t2),l1+l2*Math.cos(t2));const k=Math.min(1,dt*10);q1=wrapA(q1+wrapA(t1-q1)*k);q2=wrapA(q2+wrapA(t2-q2)*k);a1.set(Math.round(q1*180/Math.PI));a2.set(Math.round(q2*180/Math.PI));}
     else{q1=a1.v*Math.PI/180;q2=a2.v*Math.PI/180;}
