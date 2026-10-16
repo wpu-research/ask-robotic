@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { PartViewer } from '@/components/parts3d/part-viewer'
 import { Icon } from '@/components/shell/icons'
 import { ENG_PARTS, GROUP_NAME, OFFLINE_TEXT, kitOf, labHref, levelOf, partBySlug, partsOfLevel } from '@/lib/muhendislik/catalog'
 import { wiringRows } from '@/lib/muhendislik/wiring'
@@ -28,6 +29,7 @@ export default async function MuhendislikParca({ params }: { params: Promise<{ s
         <Link href={`/muhendislik/seviye/${p.level}`}>Seviye {p.level}</Link><Icon name="chevronRight" size={14} />
         <span aria-current="page">{p.name}</span>
       </nav>
+      <div className="eng-part-top">
       <header className="page-title eng-part-head">
         <p className="eng-card-top">
           <span className="eng-tag">{GROUP_NAME[p.group] ?? p.group}</span>
@@ -41,6 +43,8 @@ export default async function MuhendislikParca({ params }: { params: Promise<{ s
           </dl>
         )}
       </header>
+      <PartViewer slug={p.slug} group={p.group} name={p.name} />
+      </div>
 
       <div className="part-layout">
         <div className="part-main">

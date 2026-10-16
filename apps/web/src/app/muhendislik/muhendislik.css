@@ -96,3 +96,18 @@
 .eng-course:hover { text-decoration: none; box-shadow: var(--shadow); }
 .eng-course-code { font-family: var(--mono); font-weight: 800; font-size: 1.5rem; color: var(--eng); line-height: 1; }
 @media (max-width: 640px) { .eng-course { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+
+/* 3B parça görünümleri */
+.eng-part-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 24px; align-items: center; }
+@media (max-width: 860px) { .eng-part-top { grid-template-columns: minmax(0, 1fr); } }
+.p3d { margin: 0; display: grid; gap: 6px; }
+.p3d-stage { position: relative; width: 100%; aspect-ratio: 4 / 3; max-width: 100%; border-radius: var(--radius); background: radial-gradient(120% 90% at 50% 35%, var(--surface) 0%, var(--surface-2) 70%, var(--surface-3) 100%); border: 1px solid var(--border); overflow: hidden; cursor: grab; touch-action: none; }
+.p3d-stage:active { cursor: grabbing; }
+.p3d-stage canvas { position: absolute; inset: 0; width: 100% !important; height: 100% !important; }
+.p3d figcaption { font-size: .78rem; color: var(--muted); text-align: center; }
+.p3d-thumb { margin: -16px -16px 4px; aspect-ratio: 4 / 3; background: radial-gradient(120% 90% at 50% 35%, var(--surface) 0%, var(--surface-2) 75%); border-bottom: 1px solid var(--border); border-radius: var(--radius-sm) var(--radius-sm) 0 0; overflow: hidden; display: grid; place-items: center; }
+.p3d-thumb img { width: 100%; height: 100%; object-fit: contain; transition: transform .25s ease; }
+.eng-card:hover .p3d-thumb img { transform: scale(1.06) rotate(-2deg); }
+.p3d-wait { width: 28px; height: 28px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--eng); animation: p3dspin 0.9s linear infinite; }
+@keyframes p3dspin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .p3d-wait { animation: none; } .eng-card:hover .p3d-thumb img { transform: none; } }

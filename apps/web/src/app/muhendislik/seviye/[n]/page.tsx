@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
+import { PartThumb } from '@/components/parts3d/part-thumb'
 import { Icon } from '@/components/shell/icons'
 import { GROUP_NAME, LEVELS, levelOf, partsOfLevel } from '@/lib/muhendislik/catalog'
 
@@ -48,6 +49,7 @@ export default async function Seviye({ params }: { params: Promise<{ n: string }
           {parts.map((p) => (
             <li key={p.slug}>
               <Link href={`/muhendislik/parca/${p.slug}`} className="eng-card" data-testid={`eng-part-${p.slug}`}>
+                <PartThumb slug={p.slug} group={p.group} />
                 <span className="eng-card-top">
                   <span className="eng-tag">{GROUP_NAME[p.group] ?? p.group}</span>
                   {p.lab ? <span className="eng-tag eng-tag-lab">Laboratuvar</span> : <span className="eng-tag eng-tag-off">Tanıtım</span>}
