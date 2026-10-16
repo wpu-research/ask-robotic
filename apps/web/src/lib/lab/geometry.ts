@@ -14,6 +14,8 @@ export interface PartDef {
 
 const row = (names: string[], x0: number, step: number, y: number): Record<string, Pt> =>
   Object.fromEntries(names.map((n, i) => [n, { x: x0 + i * step, y }]))
+const col = (names: string[], x: number, y0: number, step: number): Record<string, Pt> =>
+  Object.fromEntries(names.map((n, i) => [n, { x, y: y0 + i * step }]))
 
 const DIP_X = (i: number) => 14 + i * 16 // 16 bacaklı DIP: üst/alt sıra, 8'er bacak, 16 px aralık
 const dipRow = (names: (string | null)[], y: number): Record<string, Pt> =>
@@ -96,6 +98,37 @@ export const PART_DEFS: Record<PartType, PartDef> = {
   soil: { name: 'Toprak nemi', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
   rain: { name: 'Yağmur sensörü', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
   waterlevel: { name: 'Su seviyesi sensörü', w: 76, h: 136, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 132) },
+  // Aşama D (Hyvex elektronik serisi, büyükler için). Çizim part-art-d.tsx'te.
+  mq3: { name: 'MQ-3 alkol', w: 76, h: 96, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 92) },
+  mq4: { name: 'MQ-4 metan', w: 76, h: 96, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 92) },
+  mq7: { name: 'MQ-7 karbon monoksit', w: 76, h: 96, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 92) },
+  mq135: { name: 'MQ-135 hava kalitesi', w: 76, h: 96, ownLabels: true, pins: hdr(['VCC', 'GND', 'AO', 'DO'], 76, 92) },
+  sharpir: { name: 'Sharp IR mesafe', w: 100, h: 50, ownLabels: true, pins: hdr(['VCC', 'GND', 'VO'], 100, 46) },
+  l298n: {
+    name: 'L298N motor sürücü', w: 150, h: 140, ownLabels: true,
+    pins: {
+      OUT1: { x: 4, y: 40 }, OUT2: { x: 4, y: 62 }, OUT3: { x: 146, y: 62 }, OUT4: { x: 146, y: 40 },
+      ...row(['12V', 'GND', '5V'], 12, 15, 136), ...row(['ENA', 'IN1', 'IN2', 'IN3', 'IN4', 'ENB'], 68, 15, 136),
+    },
+  },
+  tb6612: {
+    name: 'TB6612FNG motor sürücü', w: 96, h: 112, ownLabels: true,
+    pins: { ...col(['VM', 'VCC', 'GND', 'AO1', 'AO2', 'BO2', 'BO1'], 4, 14, 14), ...col(['PWMA', 'AIN2', 'AIN1', 'STBY', 'BIN1', 'BIN2', 'PWMB'], 92, 14, 14) },
+  },
+  drv8833: {
+    name: 'DRV8833 motor sürücü', w: 90, h: 100, ownLabels: true,
+    pins: { ...col(['VCC', 'GND', 'AOUT1', 'AOUT2', 'BOUT2', 'BOUT1'], 4, 16, 14), ...col(['SLP', 'AIN1', 'AIN2', 'BIN1', 'BIN2'], 86, 16, 14) },
+  },
+  bts7960: {
+    name: 'BTS7960 (IBT-2) yüksek akım sürücü', w: 140, h: 120, ownLabels: true,
+    pins: { 'M+': { x: 52, y: 4 }, 'M-': { x: 88, y: 4 }, ...hdr(['RPWM', 'LPWM', 'R_EN', 'L_EN', 'VCC', 'GND'], 140, 116, 18) },
+  },
+  md10c: {
+    name: 'Cytron MD10C sürücü', w: 120, h: 90, ownLabels: true,
+    pins: { MA: { x: 4, y: 30 }, MB: { x: 4, y: 52 }, ...hdr(['VCC', 'GND', 'PWM', 'DIR'], 120, 86, 18) },
+  },
+  stepper: { name: 'Step motor (TMC2209 + NEMA17)', w: 150, h: 104, ownLabels: true, pins: row(['VCC', 'GND', 'EN', 'STEP', 'DIR'], 12, 14, 100) },
+  esc: { name: 'ESC + fırçasız motor', w: 160, h: 76, ownLabels: true, pins: { SIG: { x: 4, y: 28 }, GND: { x: 4, y: 48 } } },
 }
 
 export type Rotation = PartInstance['rotation']

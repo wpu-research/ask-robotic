@@ -36,6 +36,12 @@ export const NAV: NavGroup[] = [
     ],
   },
   {
+    title: 'Büyükler için', key: 'shell.groups.adults',
+    items: [
+      { href: '/muhendislik', label: 'Mühendislik yolu', key: 'shell.nav.engineering', icon: 'drone' },
+    ],
+  },
+  {
     title: 'Öğrenme', key: 'shell.groups.learning',
     items: [
       { href: '/parcalar', label: 'Parçalar', key: 'shell.nav.parts', icon: 'parcalar' },

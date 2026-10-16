@@ -8,20 +8,27 @@ export const STAGE_A_PARTS: PartType[] = ['led', 'resistor', 'button', 'pot', 'l
 export const STAGE_B_PARTS: PartType[] = ['diode', 'npn', 'mosfet', 'dcmotor', 'l293d', 'relay', 'sevenseg', 'sr595', 'lcd1602', 'lcdI2c']
 /** Aşama C (Modül 4): sensörler ve girdi cihazları. */
 export const STAGE_C_PARTS: PartType[] = ['hcsr04', 'dht', 'pir', 'irobstacle', 'reed', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel']
+/** Aşama D (Hyvex elektronik serisi, büyükler için): gaz sensörü ailesi, Sharp IR, motor sürücüler, step motor, ESC. */
+export const STAGE_D_SENSORS: PartType[] = ['mq3', 'mq4', 'mq7', 'mq135', 'sharpir']
+export const STAGE_D_MOTION: PartType[] = ['l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper', 'esc']
+export const STAGE_D_PARTS: PartType[] = [...STAGE_D_SENSORS, ...STAGE_D_MOTION]
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
-export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS]
+export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS]
 
 export interface PartCategory { title: string; types: PartType[] }
 export const PICKER_CATEGORIES: PartCategory[] = [
   { title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', 'dcmotor', 'servo', 'relay'] },
   { title: 'Giriş', types: ['button', 'pot', 'ldr', 'ntc'] },
   { title: 'Aktif devre elemanları', types: ['resistor', 'diode', 'npn', 'mosfet', 'l293d', 'sr595'] },
-  { title: 'Sensörler', types: [...STAGE_C_PARTS] },
+  { title: 'Sensörler', types: [...STAGE_C_PARTS, ...STAGE_D_SENSORS] },
+  { title: 'Motor sürücüler ve hareket', types: [...STAGE_D_MOTION] },
 ]
 
 export const SHORT_NAME: Partial<Record<PartType, string>> = {
   ldr: 'LDR', ntc: 'NTC', pot: 'Potansiyometre', lcd1602: 'LCD 16x2', lcdI2c: 'LCD I2C', npn: 'NPN', sevenseg: '7-segment', relay: 'Röle',
   dht: 'DHT11/22', irobstacle: 'IR engel', reed: 'Reed', encoder: 'Enkoder', keypad: 'Keypad 4x4', rtc: 'RTC DS3231', mq2: 'MQ-2 gaz', soil: 'Toprak nemi', rain: 'Yağmur', waterlevel: 'Su seviyesi',
+  mq3: 'MQ-3 alkol', mq4: 'MQ-4 metan', mq7: 'MQ-7 CO', mq135: 'MQ-135', sharpir: 'Sharp IR', l298n: 'L298N', tb6612: 'TB6612FNG', drv8833: 'DRV8833',
+  bts7960: 'BTS7960', md10c: 'MD10C', stepper: 'Step motor', esc: 'ESC + BLDC',
 }
 
 export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
@@ -47,6 +54,18 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   soil: 'toprak nem sensörü bitki sulama kapasitif',
   rain: 'yağmur sensörü yağış damla ıslaklık hava durumu yl-83',
   waterlevel: 'su seviyesi sensörü depo tank sıvı seviye taşma',
+  mq3: 'alkol gaz sensörü nefes etanol mq-3',
+  mq4: 'metan doğalgaz gaz sensörü mq-4 kaçak',
+  mq7: 'karbon monoksit co gaz sensörü zehirli mq-7 soba',
+  mq135: 'hava kalitesi amonyak nox benzen co2 gaz sensörü mq-135',
+  sharpir: 'sharp ir kızılötesi mesafe uzaklık analog gp2y0a21',
+  l298n: 'motor sürücü h köprü l298n çift kanal dc',
+  tb6612: 'motor sürücü h köprü tb6612fng mosfet verimli çift kanal',
+  drv8833: 'motor sürücü h köprü drv8833 küçük pil n20',
+  bts7960: 'motor sürücü yüksek akım bts7960 ibt-2 43a büyük motor',
+  md10c: 'motor sürücü cytron md10c pwm dir tek kanal',
+  stepper: 'step motor adım nema17 tmc2209 a4988 sürücü cnc 3d yazıcı',
+  esc: 'esc fırçasız bldc motor drone pervane brushless kv lipo',
   lcd1602: 'ekran lcd 16x2 hd44780 yazı display paralel', lcdI2c: 'ekran lcd 16x2 i2c pcf8574 yazı display',
 }
 

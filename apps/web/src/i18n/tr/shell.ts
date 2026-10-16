@@ -33,6 +33,7 @@ export const shell = {
     learn: 'Öğren',
     tools: 'Araçlar',
     learning: 'Öğrenme',
+    adults: 'Büyükler için',
   },
   nav: {
     home: 'Ana sayfa',
@@ -52,6 +53,7 @@ export const shell = {
     progress: 'İlerlemem',
     league: 'Sınıf ligi',
     pricing: 'Planlar ve fiyatlar',
+    engineering: 'Mühendislik yolu',
   },
   /** Alt sekme çubuğundaki kısa adlar. */
   tab: {

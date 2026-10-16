@@ -6,7 +6,7 @@ import type {
   Circuit, LabApi, LabOptions, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
 import { PINS } from './contract.js'
-import { ANALOG_MODULES, MODEL, SEGMENTS, isAnalogModule, ldrOhms, ledSpecs, ntcOhms, num, type LedSpec } from './model.js'
+import { ANALOG_MODULES, MODEL, SEGMENTS, hcsr04Range, isAnalogModule, ldrOhms, ledSpecs, ntcOhms, num, sharpIrVolts, type LedSpec } from './model.js'
 import { buildNetlist, type Netlist } from './netlist.js'
 import { Sr595Chip, attachSr595, buildSr595, simPin, wiredUno } from './peripherals.js'
 import { EncoderModel, PirModel } from './sensors.js'
@@ -82,6 +82,22 @@ const parseAddr = (p: PartInstance): number => {
 }
 const ADC_FRACTION = (base: number, span: number, level: number): number => clamp01(base + span * clamp01(level))
 
+/** Köprü sürücü yarım kolu: 'H' beslemeye, 'L' toprağa sürer; null yüksek empedans (boşta). */
+type Half = 'H' | 'L' | null
+interface BridgeState { powered: boolean; enabled: boolean; halves: Half[] }
+const BRIDGES = {
+  l298n: { outs: ['OUT1', 'OUT2', 'OUT3', 'OUT4'], supply: '12V', drop: MODEL.l298nDrop, lowV: MODEL.l298nLowV },
+  tb6612: { outs: ['AO1', 'AO2', 'BO1', 'BO2'], supply: 'VM', drop: MODEL.fetBridgeDrop, lowV: MODEL.fetBridgeLowV },
+  drv8833: { outs: ['AOUT1', 'AOUT2', 'BOUT1', 'BOUT2'], supply: 'VCC', drop: MODEL.fetBridgeDrop, lowV: MODEL.fetBridgeLowV },
+  bts7960: { outs: ['M+', 'M-'], supply: 'VCC', drop: MODEL.fetBridgeDrop, lowV: MODEL.fetBridgeLowV },
+  md10c: { outs: ['MA', 'MB'], supply: 'VCC', drop: MODEL.fetBridgeDrop, lowV: MODEL.fetBridgeLowV },
+} as const
+type BridgeType = keyof typeof BRIDGES
+const isBridge = (t: string): t is BridgeType => t in BRIDGES
+
+/** ESC kurulum durumu (laboratuvar modeli: ~1 s düşük gaz → kurulur; darbe kesilirse bozulur). */
+interface EscState { lowSince: number | null; armed: boolean }
+
 class LabImpl implements LabApi {
   private readonly circuit: Circuit
   private nl: Netlist
@@ -107,6 +123,9 @@ class LabImpl implements LabApi {
   private keypads = new Map<string, { dev: Keypad; pressed: string | null }>()
   private pirs = new Map<string, PirModel>()
   private encs = new Map<string, EncoderModel>()
+  // Aşama D
+  private steppers = new Map<string, { steps: number }>()
+  private escs = new Map<string, EscState>()
   /** Sim cihaz modellerinin doğrudan sürdüğü Uno pinleri (ECHO, DHT DATA, keypad satırları): düğüm gerilimi bunlara yazılmaz. */
   private devOwned = new Set<string>()
 
@@ -192,7 +211,7 @@ class LabImpl implements LabApi {
   private computeDrivers(): void {
     for (const p of this.circuit.parts) {
       if (p.type === 'buzzer') this.drivers.set(p.id, this.drivingPins({ part: p.id, pin: '+' }, { part: p.id, pin: '-' }))
-      if (p.type === 'servo') this.drivers.set(p.id, this.nl.unoPinsOnNet(this.nl.netOf({ part: p.id, pin: 'SIG' }) ?? -1))
+      if (p.type === 'servo' || p.type === 'esc') this.drivers.set(p.id, this.nl.unoPinsOnNet(this.nl.netOf({ part: p.id, pin: 'SIG' }) ?? -1))
     }
   }
 
@@ -212,7 +231,7 @@ class LabImpl implements LabApi {
     this.key = ''
     this.forced.clear()
     this.pwmCache = null
-    this.servoAngle.clear(); this.servoPulses.clear(); this.overSince.clear()
+    this.servoAngle.clear(); this.servoPulses.clear(); this.overSince.clear(); this.escs.clear()
     this.update(true)
   }
 
@@ -243,6 +262,7 @@ class LabImpl implements LabApi {
   /** Aşama C: Sim cihaz modellerini (HC-SR04, DHT, BMP280, MPU6050, RTC, keypad) ve durum modellerini (PIR, enkoder) kurar. */
   private attachSensors(): void {
     this.hcs.clear(); this.dhts.clear(); this.i2cSensors.clear(); this.keypads.clear(); this.pirs.clear(); this.encs.clear(); this.devOwned.clear()
+    this.steppers.clear()
     const u = (p: PartInstance, pin: string): { name: string; pin: Pin } | undefined => wiredUno(this.nl, p.id, pin)
     for (const p of this.circuit.parts) {
       switch (p.type) {
@@ -279,6 +299,14 @@ class LabImpl implements LabApi {
         }
         case 'pir': this.pirs.set(p.id, new PirModel()); break
         case 'encoder': this.encs.set(p.id, new EncoderModel(Math.round(num(p, 'position', 0)))); break
+        case 'stepper': {
+          const step = u(p, 'STEP')
+          const st = { steps: 0 }
+          this.steppers.set(p.id, st)
+          // Her yükselen STEP kenarında (beslenmiş ve etkinse) DIR yönünde bir mikro adım
+          if (step) this.sim.onPin(step.pin, (high) => { if (high && this.stepperActive(p)) st.steps += this.levelNow(p, 'DIR') ? 1 : -1 })
+          break
+        }
         default: break
       }
     }
@@ -288,7 +316,11 @@ class LabImpl implements LabApi {
   /** Canlı özellikleri (mesafe, sıcaklık, ivme, tuş…) Sim cihaz modellerine yazar. */
   private applyProps(p: PartInstance): void {
     switch (p.type) {
-      case 'hcsr04': { const d = this.hcs.get(p.id); if (d) d.cm = num(p, 'distanceCm', 100); break }
+      case 'hcsr04': {
+        const d = this.hcs.get(p.id)
+        if (d) { d.cm = num(p, 'distanceCm', 100); Object.assign(d, hcsr04Range(p)) }
+        break
+      }
       case 'dht': {
         const d = this.dhts.get(p.id)
         if (d) { d.tempC = num(p, 'tempC', 25); d.humidity = num(p, 'humidity', 50); d.type = p.props.type === 'dht11' ? 'DHT11' : 'DHT22' }
@@ -434,6 +466,69 @@ class LabImpl implements LabApi {
     return this.supplyOk(p, 'VCC', 'GND', v) && this.inLow(p, 'OE', v, fl)
   }
 
+  /** Bir ucun şu anki seviyesi: Uno pinine bağlıysa doğrudan Sim'den (aynı ms içindeki değişiklikler için), değilse son çözümden. */
+  private levelNow(p: PartInstance, pin: string): boolean {
+    const w = wiredUno(this.nl, p.id, pin)
+    if (w) {
+      const st = this.sim.state(w.pin)
+      return st === 'High' || (st !== 'Low' && this.sim.read(w.pin))
+    }
+    return !!this.base && this.inHigh(p, pin, this.base.res.volts, this.base.res.floating)
+  }
+
+  /** TMC2209: beslenmiş ve EN (aktif-LOW) bağlı değil ya da LOW. */
+  private stepperActive(p: PartInstance): boolean {
+    if (!this.base || !this.supplyOk(p, 'VCC', 'GND', this.base.res.volts, MODEL.powerMin3v3)) return false
+    return !this.nl.isWired(this.ref(p, 'EN')) || !this.levelNow(p, 'EN')
+  }
+
+  /** Köprü sürücünün yarım kollarının durumu (BRIDGES[type].outs sırasıyla). Bağlı olmayan EN/SLP köprüsü (jumper) etkin sayılır. */
+  private bridge(p: PartInstance & { type: BridgeType }, v: Float64Array, fl: boolean[]): BridgeState {
+    const hi = (pin: string): boolean => this.inHigh(p, pin, v, fl)
+    const jump = (pin: string): boolean => !this.nl.isWired(this.ref(p, pin)) || hi(pin)
+    const n = BRIDGES[p.type].outs.length
+    const off = (enabled: boolean): BridgeState => ({ powered: false, enabled, halves: new Array<Half>(n).fill(null) })
+    switch (p.type) {
+      case 'l298n': {
+        if (!this.supplyOk(p, '12V', 'GND', v)) return off(false)
+        const ch = (en: string, a: string, b: string): Half[] => (jump(en) ? [hi(a) ? 'H' : 'L', hi(b) ? 'H' : 'L'] : [null, null])
+        return { powered: true, enabled: jump('ENA') || jump('ENB'), halves: [...ch('ENA', 'IN1', 'IN2'), ...ch('ENB', 'IN3', 'IN4')] }
+      }
+      case 'tb6612': {
+        if (!this.supplyOk(p, 'VM', 'GND', v) || !this.supplyOk(p, 'VCC', 'GND', v, MODEL.powerMin3v3)) return off(false)
+        const enabled = hi('STBY')
+        const ch = (pwm: string, a: string, b: string): Half[] => {
+          const i1 = hi(a), i2 = hi(b)
+          if (!enabled || (!i1 && !i2)) return [null, null] // bekleme / serbest dönüş
+          if ((i1 && i2) || !hi(pwm)) return ['L', 'L'] // kısa devre freni
+          return i1 ? ['H', 'L'] : ['L', 'H']
+        }
+        return { powered: true, enabled, halves: [...ch('PWMA', 'AIN1', 'AIN2'), ...ch('PWMB', 'BIN1', 'BIN2')] }
+      }
+      case 'drv8833': {
+        if (!this.supplyOk(p, 'VCC', 'GND', v, MODEL.powerMin3v3)) return off(false)
+        const enabled = jump('SLP')
+        const ch = (a: string, b: string): Half[] => {
+          const i1 = hi(a), i2 = hi(b)
+          if (!enabled || (!i1 && !i2)) return [null, null]
+          if (i1 && i2) return ['L', 'L']
+          return i1 ? ['H', 'L'] : ['L', 'H']
+        }
+        return { powered: true, enabled, halves: [...ch('AIN1', 'AIN2'), ...ch('BIN1', 'BIN2')] }
+      }
+      case 'bts7960': {
+        if (!this.supplyOk(p, 'VCC', 'GND', v)) return off(false)
+        // İki bağımsız yarım köprü: R_EN M+ kolunu, L_EN M- kolunu açar
+        return { powered: true, enabled: hi('R_EN') && hi('L_EN'), halves: [hi('R_EN') ? (hi('RPWM') ? 'H' : 'L') : null, hi('L_EN') ? (hi('LPWM') ? 'H' : 'L') : null] }
+      }
+      case 'md10c': {
+        if (!this.supplyOk(p, 'VCC', 'GND', v)) return off(false)
+        if (!hi('PWM')) return { powered: true, enabled: true, halves: ['L', 'L'] }
+        return { powered: true, enabled: true, halves: hi('DIR') ? ['L', 'H'] : ['H', 'L'] }
+      }
+    }
+  }
+
   // ---- çözüm ----
   private makeKey(): string {
     const m = this.wiredPins.map((n) => {
@@ -493,14 +588,9 @@ class LabImpl implements LabApi {
           input.logic!.push({ node: this.node(ref(p, 'OUT')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) && !(prox >= thr) ? v[vcc] : 0) })
           break
         }
-        case 'mq2': case 'flame': case 'sound': case 'soil': case 'rain': case 'waterlevel': {
-          const cfg = ANALOG_MODULES[p.type]
-          const level = clamp01(num(p, cfg.prop, 0)), thr = clamp01(num(p, 'threshold', 0.5))
-          const f = ADC_FRACTION(cfg.base, cfg.span, level)
-          R(ref(p, 'VCC'), ref(p, 'AO'), Math.max((1 - f) * MODEL.dividerOhms, 0.01))
-          R(ref(p, 'AO'), ref(p, 'GND'), Math.max(f * MODEL.dividerOhms, 0.01))
-          const vcc = this.node(ref(p, 'VCC'))
-          input.logic!.push({ node: this.node(ref(p, 'DO')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) && !(level >= thr) ? v[vcc] : 0) })
+        case 'sharpir': {
+          const vo = sharpIrVolts(num(p, 'distanceCm', 30))
+          input.logic!.push({ node: this.node(ref(p, 'VO')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) ? vo : 0) })
           break
         }
         case 'buzzer': R(ref(p, '+'), ref(p, '-'), MODEL.buzzerOhms); break
@@ -561,7 +651,31 @@ class LabImpl implements LabApi {
           })
           break
         }
-        default: break
+        default: {
+          if (isAnalogModule(p.type)) {
+            const cfg = ANALOG_MODULES[p.type]
+            const level = clamp01(num(p, cfg.prop, 0)), thr = clamp01(num(p, 'threshold', 0.5))
+            const f = ADC_FRACTION(cfg.base, cfg.span, level)
+            R(ref(p, 'VCC'), ref(p, 'AO'), Math.max((1 - f) * MODEL.dividerOhms, 0.01))
+            R(ref(p, 'AO'), ref(p, 'GND'), Math.max(f * MODEL.dividerOhms, 0.01))
+            const vcc = this.node(ref(p, 'VCC'))
+            input.logic!.push({ node: this.node(ref(p, 'DO')), ohms: MODEL.moduleOutOhms, drive: (v) => (this.modPowered(p, v) && !(level >= thr) ? v[vcc] : 0) })
+          } else if (isBridge(p.type)) {
+            const bp = p as PartInstance & { type: BridgeType }
+            const cfg = BRIDGES[bp.type]
+            const sup = this.node(ref(p, cfg.supply))
+            cfg.outs.forEach((out, i) => {
+              input.logic!.push({
+                node: this.node(ref(p, out)), ohms: MODEL.bridgeOutOhms,
+                drive: (v, fl) => {
+                  const h = this.bridge(bp, v, fl).halves[i]
+                  return h === null ? null : h === 'H' ? v[sup] - cfg.drop : cfg.lowV
+                },
+              })
+            })
+          }
+          break
+        }
       }
     }
     if (this.unoId !== undefined) {
@@ -814,7 +928,8 @@ class LabImpl implements LabApi {
         const powered = this.modPowered(p, v)
         if (dev) dev.enabled = powered
         const cm = num(p, 'distanceCm', 100)
-        out.hcsr04 = { powered, distanceCm: cm, inRange: cm >= MODEL.hcsr04MinCm && cm <= MODEL.hcsr04MaxCm, pings: dev?.pings ?? 0 }
+        const rg = hcsr04Range(p)
+        out.hcsr04 = { powered, distanceCm: cm, inRange: cm >= rg.minCm && cm <= rg.maxCm, pings: dev?.pings ?? 0 }
         return true
       }
       case 'dht': {
@@ -856,13 +971,73 @@ class LabImpl implements LabApi {
         return true
       }
       case 'keypad': out.keypad = { key: this.keypads.get(p.id)?.pressed ?? null }; return true
-      case 'mq2': case 'flame': case 'sound': case 'soil': case 'rain': case 'waterlevel': {
-        const level = clamp01(num(p, ANALOG_MODULES[p.type].prop, 0))
-        out.analogModule = { powered: this.modPowered(p, v), level, aoVolts: volts('AO'), doHigh: volts('DO') > MODEL.digitalThreshold }
+      case 'sharpir': {
+        const cm = num(p, 'distanceCm', 30)
+        out.sharpir = { powered: this.modPowered(p, v), distanceCm: cm, voVolts: volts('VO') }
         return true
       }
-      default: return false
+      case 'stepper': {
+        const steps = this.steppers.get(p.id)?.steps ?? 0
+        const micro = Math.max(1, Number(p.props.microsteps ?? 8) || 8)
+        out.stepper = {
+          powered: this.supplyOk(p, 'VCC', 'GND', v, MODEL.powerMin3v3), enabled: this.stepperActive(p),
+          steps, angleDeg: (steps * MODEL.stepDeg) / micro, dirHigh: this.levelNow(p, 'DIR'),
+        }
+        return true
+      }
+      case 'esc': {
+        out.esc = this.escRuntime(p, now)
+        return true
+      }
+      default: {
+        if (isAnalogModule(p.type)) {
+          const level = clamp01(num(p, ANALOG_MODULES[p.type].prop, 0))
+          out.analogModule = { powered: this.modPowered(p, v), level, aoVolts: volts('AO'), doHigh: volts('DO') > MODEL.digitalThreshold }
+          return true
+        }
+        if (isBridge(p.type)) {
+          const bp = p as PartInstance & { type: BridgeType }
+          const cfg = BRIDGES[bp.type]
+          const st = this.bridge(bp, v, this.base.res.floating)
+          const sup = Math.max(volts(cfg.supply), 0.1)
+          const channels: { out: number; brake: boolean }[] = []
+          for (let i = 0; i < cfg.outs.length; i += 2) {
+            const a = cfg.outs[i], b = cfg.outs[i + 1]
+            const out = this.blend((s) => {
+              const d = s.res.volts[this.node(this.ref(p, a))] - s.res.volts[this.node(this.ref(p, b))]
+              return Math.min(1, Math.max(-1, d / sup))
+            }, now)
+            const h1 = st.halves[i], h2 = st.halves[i + 1]
+            channels.push({ out: Math.abs(out) < 1e-4 ? 0 : out, brake: h1 !== null && h1 === h2 })
+          }
+          out.driver = { powered: st.powered, enabled: st.enabled, channels }
+          return true
+        }
+        return false
+      }
     }
+  }
+
+  /** ESC: SIG darbe genişliği (servo gibi) → kurulum ve gaz. GND ortak değilse sinyali görmez. */
+  private escRuntime(p: PartInstance, now: number): NonNullable<PartRuntime['esc']> {
+    const st = this.escs.get(p.id) ?? { lowSince: null, armed: false }
+    this.escs.set(p.id, st)
+    let us = 0, live = false
+    if (this.gndOk(p, 'GND')) {
+      for (const n of this.drivers.get(p.id) ?? []) {
+        const t = this.trackers.get(n)
+        if (!t || t.lastPulseUs === null || t.lastFallMs === null) continue
+        if (now - t.lastFallMs < MODEL.escLossMs && t.lastPulseUs > 400 && t.lastPulseUs < 2700) { us = t.lastPulseUs; live = true }
+      }
+    }
+    if (!live) { st.armed = false; st.lowSince = null }
+    else if (!st.armed) {
+      if (us < MODEL.escArmUs) { st.lowSince ??= now; if (now - st.lowSince >= MODEL.escArmMs) st.armed = true }
+      else st.lowSince = null // gaz açıkken kurulmaz (güvenlik)
+    }
+    const throttle = st.armed ? clamp01((us - MODEL.escMinUs) / (MODEL.escMaxUs - MODEL.escMinUs)) : 0
+    const cells = Number(p.props.cells ?? 3) || 3
+    return { armed: st.armed, pulseUs: live ? Math.round(us) : 0, throttle, rpm: Math.round(num(p, 'kv', 2300) * cells * MODEL.lipoCellV * throttle) }
   }
 
   private computeRuntime(now: number): void {

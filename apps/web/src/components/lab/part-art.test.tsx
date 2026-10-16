@@ -2,7 +2,8 @@ import { createElement } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it } from 'vitest'
 import { PINS, PROPS, type PartInstance, type PartRuntime, type PartType } from '@/lib/lab/contract'
-import { STAGE_B_PARTS, STAGE_C_PARTS } from '@/lib/lab/parts'
+import { STAGE_B_PARTS, STAGE_C_PARTS, STAGE_D_PARTS } from '@/lib/lab/parts'
+import { PART_DEFS } from '@/lib/lab/geometry'
 import { MeasureBox, PropsPanel } from './props-panel'
 import { PartArt, lcdRows } from './part-art'
 
@@ -193,5 +194,31 @@ describe('yeni PROPS', () => {
     expect(PROPS.sevenseg[0].key).toBe('common')
     expect(PROPS.lcdI2c[0].options?.map((o) => o.value)).toEqual(['0x27', '0x3F'])
     expect(PINS.relay).toContain('COM')
+  })
+})
+
+describe('Aşama D çizimleri', () => {
+  it('her parça çalışma zamanı olmadan ve boş çalışma zamanıyla çizilir; her pin için ped var', () => {
+    for (const t of STAGE_D_PARTS) {
+      expect(svg(t).length, t).toBeGreaterThan(200)
+      expect(() => svg(t, {} as PartRuntime), t).not.toThrow()
+      expect(Object.keys(PART_DEFS[t].pins).sort(), t).toEqual([...PINS[t]].sort())
+    }
+  })
+  it('MQ ailesi kendi etiketini taşır', () => {
+    expect(svg('mq135')).toContain('MQ-135'); expect(svg('mq7')).toContain('MQ-7')
+  })
+  it('köprü sürücü: kanal çıkışı ve fren göstergesi', () => {
+    const m = svg('l298n', { driver: { powered: true, enabled: true, channels: [{ out: 0.63, brake: false }, { out: 0, brake: true }] } })
+    expect(m).toContain('data-driver-powered="true"')
+    expect(m).toContain('data-channel="A" data-out="0.63" data-brake="false"')
+    expect(m).toContain('data-channel="B" data-out="0.00" data-brake="true"')
+    expect(m).toContain('FREN')
+  })
+  it('step motor açısı ve ESC kurulumu', () => {
+    expect(svg('stepper', { stepper: { powered: true, enabled: true, steps: 800, angleDeg: 180, dirHigh: true } })).toContain('data-stepper-angle="180.0"')
+    const e = svg('esc', { esc: { armed: true, pulseUs: 1400, throttle: 0.4, rpm: 10212 } })
+    expect(e).toContain('data-esc-armed="true"'); expect(e).toContain('KURULU')
+    expect(svg('esc')).toContain('KURULMADI')
   })
 })

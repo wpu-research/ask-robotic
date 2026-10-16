@@ -56,6 +56,7 @@ export const STATIC_ITEMS: PaletteItem[] = [
   { id: 'p:panel', group: 'Sayfa', title: 'Panel', subtitle: 'Ana sayfa', href: '/panel', keywords: 'ana sayfa devam ilerleme' },
   { id: 'p:moduller', group: 'Sayfa', title: 'Modüller', subtitle: 'Tüm modüller', href: '/moduller', keywords: 'müfredat dersler' },
   { id: 'p:parcalar', group: 'Sayfa', title: 'Parçalar', subtitle: 'Parça ansiklopedisi', href: '/parcalar', keywords: 'led direnç buton potansiyometre buzzer arduino uno ansiklopedi bileşen' },
+  { id: 'p:muhendislik', group: 'Sayfa', title: 'Mühendislik yolu', subtitle: 'Büyükler için robotik: 128 parça, 7 seviye', href: '/muhendislik', keywords: 'büyükler yetişkin üniversite mühendislik hyvex sensör motor sürücü l298n esc drone step servo mq gaz lidar imu güç batarya' },
   { id: 'p:testler', group: 'Sayfa', title: 'Testlerim', subtitle: 'Mini testler ve puanlar', href: '/testler', keywords: 'sınav quiz soru puan' },
   { id: 'p:ilerleme', group: 'Sayfa', title: 'İlerlemem', subtitle: 'Beceri haritası ve özet', href: '/ilerleme', keywords: 'beceri ustalık süre hedef veri verilerimi sil' },
   { id: 'a:atolye', group: 'Araç', title: 'Blok atölyesi', subtitle: 'Serbest blok programlama', href: '/atolye', keywords: 'blok scratch karakter' },

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PINS, type PartType } from './contract'
 import { PART_DEFS, localToWorld, partBounds, pinWorld } from './geometry'
 import { currentArrow, formatMeasurement, formatMilliamps, formatPinBalloon, formatVolts } from './measure'
-import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups } from './parts'
+import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups, STAGE_D_MOTION, STAGE_D_PARTS, STAGE_D_SENSORS } from './parts'
 import { WARNING_META, warningMeta } from './warnings'
 
 const ALL = Object.keys(PINS) as PartType[]
@@ -76,14 +76,15 @@ describe('geometri: Aşama C', () => {
 })
 
 describe('palet', () => {
-  it('varsayılan = A + B + C', () => {
-    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS])
+  it('varsayılan = A + B + C + D', () => {
+    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS])
     expect(new Set(DEFAULT_PARTS).size).toBe(DEFAULT_PARTS.length)
   })
-  it('kategoriler: çıkış, giriş, aktif devre elemanları, sensörler', () => {
+  it('kategoriler: çıkış, giriş, aktif devre elemanları, sensörler, motor sürücüler', () => {
     const g = pickerGroups(DEFAULT_PARTS, '')
-    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler'])
-    expect(g[3].types).toEqual(STAGE_C_PARTS)
+    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler', 'Motor sürücüler ve hareket'])
+    expect(g[3].types).toEqual([...STAGE_C_PARTS, ...STAGE_D_SENSORS])
+    expect(g[4].types).toEqual(STAGE_D_MOTION)
     expect(g[0].types).toContain('relay'); expect(g[1].types).toEqual(['button', 'pot', 'ldr', 'ntc']); expect(g[2].types).toContain('l293d')
     expect(g.flatMap((x) => x.types).sort()).toEqual([...DEFAULT_PARTS].sort())
   })
@@ -113,12 +114,14 @@ describe('palet', () => {
   })
   it('arama: Aşama C Türkçe anahtar sözcükler', () => {
     const t = (q: string) => pickerGroups(DEFAULT_PARTS, q).flatMap((x) => x.types)
-    expect(t('mesafe')).toEqual(['hcsr04'])
-    expect(t('Nem').sort()).toEqual(['dht', 'soil'])
+    expect(t('mesafe')).toEqual(['hcsr04', 'sharpir'])
+    expect(t('Nem').sort()).toEqual(['dht', 'soil', 'stepper']) // step motorun adında NEMA17 geçer
     expect(t('hareket')).toEqual(expect.arrayContaining(['pir', 'mpu6050']))
     expect(t('mıknatıs')).toEqual(['reed'])
     expect(t('Şifre')).toEqual(['keypad'])
-    expect(t('gaz')).toEqual(['mq2'])
+    expect(t('gaz')).toEqual(['mq2', 'mq3', 'mq4', 'mq7', 'mq135'])
+    expect(t('motor sürücü')).toEqual(['l293d', 'l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper'])
+    expect(t('drone')).toEqual(['esc'])
     expect(t('jiroskop')).toEqual(['mpu6050'])
     expect(t('toprak')).toEqual(['soil'])
     expect(t('saat')).toEqual(['rtc'])

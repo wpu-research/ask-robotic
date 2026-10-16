@@ -90,7 +90,40 @@ export const MODEL = {
   hcsr04MaxCm: 400,
   /** RTC'nin açılış zamanı (UTC). */
   rtcStartIso: '2026-01-01T00:00:00.000Z',
+  // ---- Aşama D ----
+  /** Sharp IR (GP2Y0A21 benzeri): VO ≈ sharpK / cm, [sharpMinV, sharpMaxV] ile sınırlı. */
+  sharpK: 26,
+  sharpMinV: 0.3,
+  sharpMaxV: 3.1,
+  /** L298N (bipolar): yüksek taraf düşümü ve alçak taraf gerilimi; toplam ≈ 1,8 V kayıp (Hyvex: 1,5-2 V). */
+  l298nDrop: 1.2,
+  l298nLowV: 0.6,
+  /** MOSFET köprüler (TB6612, DRV8833, BTS7960, MD10C): çok küçük düşüm. */
+  fetBridgeDrop: 0.1,
+  fetBridgeLowV: 0.05,
+  bridgeOutOhms: 0.1,
+  /** Step motor: tam adım açısı (NEMA17). */
+  stepDeg: 1.8,
+  /** ESC: bu genişliğin altındaki darbeler "düşük gaz"; escArmMs boyunca düşük gaz görülünce kurulur. */
+  escArmUs: 1100,
+  escArmMs: 1000,
+  escMinUs: 1000,
+  escMaxUs: 2000,
+  /** Darbe bu kadar süre gelmezse ESC sinyal kaybı sayar ve kurulumu bozar. */
+  escLossMs: 100,
+  lipoCellV: 3.7,
 } as const
+
+/** HC-SR04 ailesi: model → ölçüm aralığı (cm), Hyvex katalog değerleri. */
+export const HCSR04_MODELS: Record<string, { minCm: number; maxCm: number }> = {
+  hcsr04: { minCm: 2, maxCm: 400 },
+  jsnsr04t: { minCm: 25, maxCm: 600 },
+  rcwl1601: { minCm: 2, maxCm: 450 },
+  us100: { minCm: 2, maxCm: 450 },
+}
+export const hcsr04Range = (p: PartInstance): { minCm: number; maxCm: number } => HCSR04_MODELS[String(p.props.model ?? 'hcsr04')] ?? HCSR04_MODELS.hcsr04
+
+export const sharpIrVolts = (cm: number): number => Math.min(MODEL.sharpMaxV, Math.max(MODEL.sharpMinV, MODEL.sharpK / Math.max(cm, 1)))
 
 /**
  * Analog çıkışlı modüller: AO = VCC · clamp(base + span · seviye). `prop` seviyenin özellik anahtarı (0-1).
@@ -106,6 +139,11 @@ export const ANALOG_MODULES = {
   rain: { prop: 'wetness', base: 0.95, span: -0.85, minVolts: 3 },
   /** Su seviyesi çubuğu: boşta ~0,05, su yükseldikçe artar (tam doluda ~0,80; çubuk 5 V'ta tam ölçeğe ulaşmaz). */
   waterlevel: { prop: 'level', base: 0.05, span: 0.75, minVolts: 3 },
+  // Aşama D: MQ ailesi (ısıtıcı 5 V ister; MQ-2 ile aynı modül davranışı)
+  mq3: { prop: 'gas', base: 0.1, span: 0.9, minVolts: 4 },
+  mq4: { prop: 'gas', base: 0.1, span: 0.9, minVolts: 4 },
+  mq7: { prop: 'gas', base: 0.1, span: 0.9, minVolts: 4 },
+  mq135: { prop: 'gas', base: 0.1, span: 0.9, minVolts: 4 },
 } as const
 export type AnalogModuleType = keyof typeof ANALOG_MODULES
 export const isAnalogModule = (t: string): t is AnalogModuleType => t in ANALOG_MODULES

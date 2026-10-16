@@ -3,19 +3,19 @@
 import type { PartInstance, PartRuntime, PartType } from '@/lib/lab/contract'
 import { PART_DEFS } from '@/lib/lab/geometry'
 
-const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
-const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
-const clamp01 = (v: number) => clamp(v, 0, 1)
+export const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
+export const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
+export const clamp01 = (v: number) => clamp(v, 0, 1)
 const METAL = '#b8c0cc'
-const GOLD = '#d4a017'
-const MONO = "ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace"
-const fmt = (v: number, d = 1) => v.toFixed(d).replace('.', ',')
+export const GOLD = '#d4a017'
+export const MONO = "ui-monospace, 'DejaVu Sans Mono', Menlo, Consolas, monospace"
+export const fmt = (v: number, d = 1) => v.toFixed(d).replace('.', ',')
 
-interface Ctx { part: PartInstance; rt?: PartRuntime }
+export interface Ctx { part: PartInstance; rt?: PartRuntime }
 const prop = (c: Ctx, key: string) => c.part.props[key]
 
 /** Sözleşme pinleri üzerine altın pedler + (isteğe bağlı) siyah başlık şeridi ve ipek baskı etiketi. Konumlar PART_DEFS'ten gelir. */
-function Pads({ type, strip = true, label = '#e2e8f0', dy = 6 }: { type: PartType; strip?: boolean; label?: string; dy?: number }) {
+export function Pads({ type, strip = true, label = '#e2e8f0', dy = 6 }: { type: PartType; strip?: boolean; label?: string; dy?: number }) {
   const entries = Object.entries(PART_DEFS[type].pins)
   const xs = entries.map(([, p]) => p.x)
   const y = entries[0][1].y
@@ -33,7 +33,7 @@ function Pads({ type, strip = true, label = '#e2e8f0', dy = 6 }: { type: PartTyp
   )
 }
 
-function Board({ w, h, fill, stroke, hi, r = 5 }: { w: number; h: number; fill: string; stroke: string; hi: string; r?: number }) {
+export function Board({ w, h, fill, stroke, hi, r = 5 }: { w: number; h: number; fill: string; stroke: string; hi: string; r?: number }) {
   return (
     <g>
       <rect x={0} y={0} width={w} height={h} rx={r} fill={fill} stroke={stroke} strokeWidth={1.6} />
@@ -43,7 +43,7 @@ function Board({ w, h, fill, stroke, hi, r = 5 }: { w: number; h: number; fill: 
   )
 }
 
-function SmdLed({ x, y, on, color }: { x: number; y: number; on: boolean; color: string }) {
+export function SmdLed({ x, y, on, color }: { x: number; y: number; on: boolean; color: string }) {
   return (
     <g data-led-on={on ? 'true' : 'false'}>
       {on && <circle cx={x} cy={y} r={7} fill={color} opacity={0.55} filter="url(#lab-glow-s)" />}
@@ -62,7 +62,7 @@ function Trimmer({ x, y, tone = '#1d4ed8' }: { x: number; y: number; tone?: stri
   )
 }
 
-function Chip({ x, y, w = 18, h = 7, text }: { x: number; y: number; w?: number; h?: number; text?: string }) {
+export function Chip({ x, y, w = 18, h = 7, text }: { x: number; y: number; w?: number; h?: number; text?: string }) {
   return (
     <g>
       <rect x={x} y={y} width={w} height={h} rx={1} fill="#111827" stroke="#030712" strokeWidth={0.6} />
@@ -347,7 +347,7 @@ function RtcArt(c: Ctx) {
 }
 
 // ---------------------------------------------------------------- Analog modüller: MQ-2, alev, ses, toprak nemi, yağmur, su seviyesi
-const propLevelKey: Record<string, string> = { mq2: 'gas', flame: 'flame', sound: 'sound', soil: 'moisture', rain: 'wetness', waterlevel: 'level' }
+const propLevelKey: Record<string, string> = { mq2: 'gas', mq3: 'gas', mq4: 'gas', mq7: 'gas', mq135: 'gas', flame: 'flame', sound: 'sound', soil: 'moisture', rain: 'wetness', waterlevel: 'level' }
 
 function analogInfo(c: Ctx) {
   const m = c.rt?.analogModule
@@ -366,8 +366,11 @@ function ModuleLeds({ y, powered, doLow }: { y: number; powered: boolean; doLow:
   )
 }
 
+const MQ_LABEL: Record<string, string> = { mq2: 'MQ-2', mq3: 'MQ-3', mq4: 'MQ-4', mq7: 'MQ-7', mq135: 'MQ-135' }
+
 function Mq2Art(c: Ctx) {
   const { level, powered, doLow } = analogInfo(c)
+  const type = c.part.type
   return (
     <g data-module-level={level.toFixed(2)} data-module-powered={powered ? 'true' : 'false'} data-module-do={doLow ? 'low' : 'high'}>
       <Board w={76} h={96} fill="#1d4ed8" stroke="#1e3a8a" hi="#60a5fa" />
@@ -379,10 +382,10 @@ function Mq2Art(c: Ctx) {
       <circle cx={38} cy={29} r={20} fill="none" stroke="#6b7280" strokeWidth={1.4} />
       <circle cx={38} cy={29} r={5} fill="#374151" stroke="#111827" strokeWidth={0.8} />
       {level > 0.05 && [[56, 8, 4], [62, 18, 3], [50, 2, 3]].map(([x, y, r], i) => <circle key={i} cx={x} cy={y} r={r + level * 3} fill="#94a3b8" opacity={0.25 + level * 0.5} />)}
-      <text x={38} y={61} textAnchor="middle" fontSize={6} fontWeight={800} fill="#dbeafe">MQ-2</text>
+      <text x={38} y={61} textAnchor="middle" fontSize={6} fontWeight={800} fill="#dbeafe">{MQ_LABEL[type] ?? 'MQ-2'}</text>
       <Trimmer x={62} y={72} /><Chip x={22} y={70} w={20} h={6} text="LM393" />
       <ModuleLeds y={72} powered={powered} doLow={doLow} />
-      <Pads type="mq2" />
+      <Pads type={type} />
     </g>
   )
 }
@@ -513,7 +516,7 @@ export function StageCArt({ part, runtime }: { part: PartInstance; runtime?: Par
     case 'encoder': return EncoderArt(c)
     case 'keypad': return KeypadArt(c)
     case 'rtc': return RtcArt(c)
-    case 'mq2': return Mq2Art(c)
+    case 'mq2': case 'mq3': case 'mq4': case 'mq7': case 'mq135': return Mq2Art(c)
     case 'flame': return FlameArt(c)
     case 'sound': return SoundArt(c)
     case 'soil': return SoilArt(c)

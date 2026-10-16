@@ -7,16 +7,16 @@ const US = 16 // 1 µs = 16 çevrim (16 MHz)
 // ---- HC-SR04 ----
 export interface HCSR04Options { trig: Pin; echo: Pin; cm?: number }
 /** `enabled=false`: modül beslenmemiş, tetiklemeye cevap vermez. `pings`: cevap verilen ölçüm sayısı. */
-export interface HCSR04 { cm: number; enabled: boolean; pings: number }
+export interface HCSR04 { cm: number; enabled: boolean; pings: number; minCm: number; maxCm: number }
 
 /** HC-SR04: trig'in düşen kenarından ~450 µs sonra echo'yu mesafeyle orantılı süre HIGH yapar (58,2 µs/cm). */
 export function attachHCSR04(sim: Sim, { trig, echo, cm = 100 }: HCSR04Options): HCSR04 {
-  const dev: HCSR04 = { cm, enabled: true, pings: 0 }
+  const dev: HCSR04 = { cm, enabled: true, pings: 0, minCm: 2, maxCm: 400 }
   sim.drive(echo, false) // echo boşta LOW
   sim.onPin(trig, (high) => {
     if (high) return
     if (!dev.enabled) return
-    if (dev.cm < 2 || dev.cm > 400) return // menzil dışı: echo yok (pulseIn zaman aşımı)
+    if (dev.cm < dev.minCm || dev.cm > dev.maxCm) return // menzil dışı: echo yok (pulseIn zaman aşımı)
     dev.pings++
     const widthUs = dev.cm * 58.2
     sim.cpu.addClockEvent(() => {

@@ -2,6 +2,7 @@ import type { PartInstance, PartRuntime, PartType, PinSnapshot } from '@/lib/lab
 import { PART_DEFS } from '@/lib/lab/geometry'
 import { BAND_COLORS, resistorBands } from '@/lib/lab/ops'
 import { StageCArt } from './part-art-c'
+import { StageDArt } from './part-art-d'
 
 export const LED_COLORS: Record<string, string> = { red: '#ef4444', yellow: '#facc15', green: '#22c55e', blue: '#3b82f6', white: '#f1f5f9' }
 const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
@@ -545,7 +546,7 @@ export function PartArt({ part, runtime, pins }: { part: PartInstance; runtime?:
     case 'sr595': return <Sr595Art rt={runtime} />
     case 'lcd1602': return <Lcd1602Art rt={runtime} />
     case 'lcdI2c': return <LcdI2cArt rt={runtime} />
-    default: return <StageCArt part={part} runtime={runtime} />
+    default: return StageCArt({ part, runtime }) ?? <StageDArt part={part} runtime={runtime} />
   }
 }
 

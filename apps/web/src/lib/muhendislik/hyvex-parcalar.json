@@ -1,0 +1,2542 @@
+[
+ {
+  "slug": "mpu6050",
+  "name": "MPU6050",
+  "level": 5,
+  "group": "sensor-imu",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C",
+  "voltage": "3.3 – 5V",
+  "specs": [
+   "6 eksen",
+   "İvmeölçer ±2/4/8/16 g",
+   "Jiroskop ±250 – ±2000 dps",
+   "Manyetometre yok",
+   "Füzyon yok (manuel)",
+   "~3.9 mA",
+   "Titreşim toleransı düşük",
+   "I²C adres 0x68 (protokol sayfası)"
+  ],
+  "uses": [
+   "Öğrenme, temel eğim ölçümü"
+  ],
+  "warnings": [
+   "Motor titreşiminde gürültülenir, füzyonu sen yapmak zorundasın",
+   "Otomatik olarak MPU6050 seçme"
+  ],
+  "lab": {
+   "kit": "mpu6050"
+  }
+ },
+ {
+  "slug": "bmi270",
+  "name": "BMI270",
+  "level": 5,
+  "group": "sensor-imu",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C / SPI",
+  "voltage": "1.71 – 3.6V",
+  "specs": [
+   "6 eksen",
+   "±2 – ±16 g",
+   "±125 – ±2000 dps",
+   "~0.7 mA",
+   "Titreşim toleransı yüksek"
+  ],
+  "uses": [
+   "Kendini dengeleyen robot, e-bike"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "bno085",
+  "name": "BNO085",
+  "level": 5,
+  "group": "sensor-imu",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C / SPI / UART",
+  "voltage": "1.71 – 3.6V",
+  "specs": [
+   "9 eksen",
+   "Manyetometre var",
+   "Dahili sensör füzyonu (quaternion, Euler, heading)",
+   "~1.2 mA",
+   "Titreşim toleransı yüksek"
+  ],
+  "uses": [
+   "Drone, gimbal, AR/VR, oryantasyon"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "icm-20948",
+  "name": "ICM-20948",
+  "level": 5,
+  "group": "sensor-imu",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C / SPI",
+  "voltage": "1.8 – 3.3V",
+  "specs": [
+   "9 eksen",
+   "Manyetometre var",
+   "Füzyon manuel",
+   "~3.3 mA",
+   "Titreşim toleransı orta"
+  ],
+  "uses": [
+   "GPS destekli navigasyon, heading"
+  ],
+  "warnings": [
+   "Manyetometre: mıknatıs/motor/demirden uzak monte et; hard/soft iron kalibrasyonu"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "dht22",
+  "name": "DHT22",
+  "level": 2,
+  "group": "sensor-sicaklik",
+  "source": "seri-el-sensor.html",
+  "interface": "Tek-tel özel protokol",
+  "voltage": "3.3–6V",
+  "specs": [
+   "−40…+80 °C · ±0.5 °C",
+   "%0–100 RH · ±%2–5",
+   "2 sn güncelleme",
+   "DATA–VCC arası 4.7kΩ pull-up"
+  ],
+  "uses": [
+   "Hava sıcaklığı + nem"
+  ],
+  "warnings": [
+   "Sıvı/yüzey ölçmez"
+  ],
+  "lab": {
+   "kit": "dht22"
+  }
+ },
+ {
+  "slug": "ds18b20",
+  "name": "DS18B20",
+  "level": 2,
+  "group": "sensor-sicaklik",
+  "source": "seri-el-sensor.html",
+  "interface": "1-Wire",
+  "voltage": "3–5.5V",
+  "specs": [
+   "−55…+125 °C · ±0.5 °C",
+   "9–12 bit (12 bit = 0.0625 °C / 750 ms)",
+   "100 m kablo",
+   "64-bit ID, tek hatta onlarca sensör",
+   "4.7kΩ pull-up, parazit besleme"
+  ],
+  "uses": [
+   "Sıvı / prob sıcaklığı",
+   "Uzun kablo, endüstriyel doğruluk"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "mlx90614",
+  "name": "MLX90614",
+  "level": 5,
+  "group": "sensor-sicaklik",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C (0x5A sabit)",
+  "voltage": "",
+  "specs": [
+   "Nesne −70…+380 °C · ±0.5 °C",
+   "Ortam −40…+125 °C",
+   "FOV ~35°",
+   "mesafe:spot = 20:1"
+  ],
+  "uses": [
+   "Temassız yüzey sıcaklığı"
+  ],
+  "warnings": [
+   "Camdan/buhardan ölçmez",
+   "Yüzey emissivity değerini ayarla (malzeme değişince)"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "amg8833",
+  "name": "AMG8833",
+  "level": 5,
+  "group": "sensor-sicaklik",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C (0x69)",
+  "voltage": "3.3V",
+  "specs": [
+   "8×8 = 64 piksel termal dizi",
+   "0…+80 °C · ±2.5 °C · 0.25 °C",
+   "10 FPS",
+   "FOV 60°×60° · 20 cm – 5 m"
+  ],
+  "uses": [
+   "Isı haritası, insan varlığı algılama"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "hc-sr04",
+  "name": "HC-SR04",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "Trig/Echo",
+  "voltage": "",
+  "specs": [
+   "2 – 400 cm",
+   "40 kHz",
+   "Koni ~15°",
+   "Min ~2 cm"
+  ],
+  "uses": [
+   "Öğrenme, temel projeler"
+  ],
+  "warnings": [
+   "5V sinyalini doğrudan ESP32 pinine bağlama (1kΩ/2kΩ bölücü)",
+   "Yumuşak/açılı yüzeyler; birden çok sensör çapraz konuşma — sırayla tetikle, medyan filtre"
+  ],
+  "lab": {
+   "kit": "mesafe",
+   "model": "hcsr04"
+  }
+ },
+ {
+  "slug": "jsn-sr04t",
+  "name": "JSN-SR04T",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "Trig/Echo",
+  "voltage": "",
+  "specs": [
+   "25 – 600 cm",
+   "IP66 su geçirmez, ayrık prob"
+  ],
+  "uses": [
+   "Dış mekân, tank, yağmur"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "mesafe",
+   "model": "jsnsr04t"
+  }
+ },
+ {
+  "slug": "rcwl-1601",
+  "name": "RCWL-1601",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "Trig/Echo",
+  "voltage": "3.3V uyumlu",
+  "specs": [
+   "2 – 450 cm",
+   "Kompakt, düşük güç"
+  ],
+  "uses": [
+   "Mini robot, dar alan"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "mesafe",
+   "model": "rcwl1601"
+  }
+ },
+ {
+  "slug": "us-100",
+  "name": "US-100",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "Trig/Echo + UART",
+  "voltage": "",
+  "specs": [
+   "2 – 450 cm",
+   "Sıcaklık kompanzasyonu"
+  ],
+  "uses": [
+   "Hassas ölçüm"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "mesafe",
+   "model": "us100"
+  }
+ },
+ {
+  "slug": "a02yyuw",
+  "name": "A02YYUW",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "UART",
+  "voltage": "",
+  "specs": [
+   "3 – 450 cm",
+   "IP67, çok kararlı okuma"
+  ],
+  "uses": [
+   "Akıllı tank, endüstriyel"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "maxbotix-mb1010",
+  "name": "MaxBotix MB1010",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "Analog/UART/PWM",
+  "voltage": "",
+  "specs": [
+   "15 – 645 cm",
+   "Yüksek doğruluk, gürültü bastırma"
+  ],
+  "uses": [
+   "Ticari ürün, kritik görev"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "vl53l0x-tof",
+  "name": "VL53L0X ToF",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Lazer, 2 m, mm hassasiyet, dar ışın"
+  ],
+  "uses": [
+   "Ultrasonik alternatifi"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "tf-luna-lidar",
+  "name": "TF-Luna LiDAR",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "8 m, hızlı"
+  ],
+  "uses": [
+   "Ultrasonik alternatifi"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "ir-mesafe-sharp",
+  "name": "IR mesafe (Sharp)",
+  "level": 3,
+  "group": "sensor-mesafe",
+  "source": "seri-el-sensor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Kısa menzil, ucuz"
+  ],
+  "uses": [
+   "Ultrasonik alternatifi"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "sharp"
+  }
+ },
+ {
+  "slug": "mq-2",
+  "name": "MQ-2",
+  "level": 2,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "AO analog + DO dijital (trimpot eşik)",
+  "voltage": "5V (ısıtıcı 800-900 mW)",
+  "specs": [
+   "Algıladığı: LPG, propan, metan, duman",
+   "Trend sensörü, mutlak ppm vermez",
+   "R₀ (temiz hava direnci) kalibrasyonu gerekir"
+  ],
+  "uses": [
+   "Trend/eşik izleme, alarm tetikleme"
+  ],
+  "warnings": [
+   "Warm-up bekle",
+   "Çalışırken metal örgüye dokunma",
+   "Gövde ısınması normaldir (5V ısıtıcı)",
+   "Kalibrasyon: kurulumda + yılda 1"
+  ],
+  "lab": {
+   "kit": "gaz",
+   "model": "mq2"
+  }
+ },
+ {
+  "slug": "mq-3",
+  "name": "MQ-3",
+  "level": 2,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "AO analog + DO dijital (trimpot eşik)",
+  "voltage": "5V (ısıtıcı 800-900 mW)",
+  "specs": [
+   "Algıladığı: Alkol",
+   "Trend sensörü, mutlak ppm vermez",
+   "R₀ (temiz hava direnci) kalibrasyonu gerekir"
+  ],
+  "uses": [
+   "Trend/eşik izleme, alarm tetikleme"
+  ],
+  "warnings": [
+   "Warm-up bekle",
+   "Çalışırken metal örgüye dokunma",
+   "Gövde ısınması normaldir (5V ısıtıcı)",
+   "Kalibrasyon: kurulumda + yılda 1"
+  ],
+  "lab": {
+   "kit": "gaz",
+   "model": "mq3"
+  }
+ },
+ {
+  "slug": "mq-4",
+  "name": "MQ-4",
+  "level": 2,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "AO analog + DO dijital (trimpot eşik)",
+  "voltage": "5V (ısıtıcı 800-900 mW)",
+  "specs": [
+   "Algıladığı: Doğalgaz, metan",
+   "Trend sensörü, mutlak ppm vermez",
+   "R₀ (temiz hava direnci) kalibrasyonu gerekir"
+  ],
+  "uses": [
+   "Trend/eşik izleme, alarm tetikleme"
+  ],
+  "warnings": [
+   "Warm-up bekle",
+   "Çalışırken metal örgüye dokunma",
+   "Gövde ısınması normaldir (5V ısıtıcı)",
+   "Kalibrasyon: kurulumda + yılda 1"
+  ],
+  "lab": {
+   "kit": "gaz",
+   "model": "mq4"
+  }
+ },
+ {
+  "slug": "mq-7",
+  "name": "MQ-7",
+  "level": 2,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "AO analog + DO dijital (trimpot eşik)",
+  "voltage": "5V (ısıtıcı 800-900 mW)",
+  "specs": [
+   "Algıladığı: Karbon monoksit (CO)",
+   "Trend sensörü, mutlak ppm vermez",
+   "R₀ (temiz hava direnci) kalibrasyonu gerekir"
+  ],
+  "uses": [
+   "Trend/eşik izleme, alarm tetikleme"
+  ],
+  "warnings": [
+   "Warm-up bekle",
+   "Çalışırken metal örgüye dokunma",
+   "Gövde ısınması normaldir (5V ısıtıcı)",
+   "Kalibrasyon: kurulumda + yılda 1"
+  ],
+  "lab": {
+   "kit": "gaz",
+   "model": "mq7"
+  }
+ },
+ {
+  "slug": "mq-135",
+  "name": "MQ-135",
+  "level": 2,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "AO analog + DO dijital (trimpot eşik)",
+  "voltage": "5V (ısıtıcı 800-900 mW)",
+  "specs": [
+   "Algıladığı: Hava kalitesi, NH₃, NOx, benzen",
+   "Trend sensörü, mutlak ppm vermez",
+   "R₀ (temiz hava direnci) kalibrasyonu gerekir"
+  ],
+  "uses": [
+   "Trend/eşik izleme, alarm tetikleme"
+  ],
+  "warnings": [
+   "Warm-up bekle",
+   "Çalışırken metal örgüye dokunma",
+   "Gövde ısınması normaldir (5V ısıtıcı)",
+   "Kalibrasyon: kurulumda + yılda 1"
+  ],
+  "lab": {
+   "kit": "gaz",
+   "model": "mq135"
+  }
+ },
+ {
+  "slug": "sgp30",
+  "name": "SGP30",
+  "level": 5,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C",
+  "voltage": "",
+  "specs": [
+   "TVOC (ppb) + eCO₂ (ppm)"
+  ],
+  "uses": [
+   "Dijital hava kalitesi"
+  ],
+  "warnings": [
+   "1–2 saatte bir getBaseline() ile EEPROM'a kalibrasyon kaydet",
+   "Silikon buharı sensörü kalıcı zehirler"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "bme680",
+  "name": "BME680",
+  "level": 5,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C / SPI",
+  "voltage": "",
+  "specs": [
+   "Sıcaklık + nem + basınç + gaz (IAQ 0–500)",
+   "Bosch BSEC kütüphanesi"
+  ],
+  "uses": [
+   "İç hava kalitesi skoru"
+  ],
+  "warnings": [
+   "48 saat burn-in zorunlu",
+   "Her açılışta 30 dk warm-up",
+   "Isı kaynağından uzak monte et"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "pms5003",
+  "name": "PMS5003",
+  "level": 5,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "UART (3.3V)",
+  "voltage": "",
+  "specs": [
+   "PM1.0 / PM2.5 / PM10 partikül",
+   "Fabrika kalibreli"
+  ],
+  "uses": [
+   "Partikül ölçümü"
+  ],
+  "warnings": [
+   "30 sn warm-up",
+   "5V Arduino ile lojik seviye çevirici şart",
+   "Havalandırmayı kapatma"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "ccs811",
+  "name": "CCS811",
+  "level": 5,
+  "group": "sensor-gaz",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C",
+  "voltage": "",
+  "specs": [
+   "eCO₂ + TVOC"
+  ],
+  "uses": [
+   "Dijital hava kalitesi"
+  ],
+  "warnings": [
+   "48 saat burn-in",
+   "Nem kompanzasyonu için harici sıcaklık/nem verisi besle"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "bme280",
+  "name": "BME280",
+  "level": 5,
+  "group": "sensor-diger",
+  "source": "seri-el-protokol.html",
+  "interface": "I²C (0x76)",
+  "voltage": "",
+  "specs": [],
+  "uses": [
+   "I²C bus örneği"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "ldr",
+  "name": "LDR",
+  "level": 1,
+  "group": "sensor-isik",
+  "source": "seri-el-bilesen.html",
+  "interface": "analog (gerilim bölücü)",
+  "voltage": "",
+  "specs": [
+   "CdS fotoiletken",
+   "Karanlıkta MΩ, ışıkta kΩ"
+  ],
+  "uses": [
+   "Karanlık dedektörü (LDR + 10kΩ + BC547 + LED)"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "ldr"
+  }
+ },
+ {
+  "slug": "huskylens",
+  "name": "HuskyLens",
+  "level": 7,
+  "group": "kamera",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C/UART",
+  "voltage": "",
+  "specs": [
+   "Kendryte K210",
+   "2.0\" IPS ekran + dial",
+   "6 yerleşik algoritma: yüz tanıma, nesne takibi, QR, çizgi takibi, renk, nesne tanıma",
+   "~10-15 dk prototip"
+  ],
+  "uses": [
+   "Kod yazmadan hızlı prototip"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "grove-vision-ai-v2",
+  "name": "Grove Vision AI V2",
+  "level": 7,
+  "group": "kamera",
+  "source": "seri-el-sensor.html",
+  "interface": "I²C (0x62)",
+  "voltage": "",
+  "specs": [
+   "Himax WiseEye2 + MicroNPU",
+   "YOLOv5/v8, MobileNet",
+   "0.35 W",
+   "PDM mikrofon, microSD",
+   "~30-45 dk kurulum"
+  ],
+  "uses": [
+   "Kendi TinyML/YOLO modelini çalıştırma"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "pixy2-cmucam5",
+  "name": "Pixy2 (CMUcam5)",
+  "level": 7,
+  "group": "kamera",
+  "source": "seri-el-sensor.html",
+  "interface": "SPI/I²C/UART",
+  "voltage": "",
+  "specs": [
+   "NXP LPC4330 dual-core",
+   "60 FPS renk tabanlı takip",
+   "Çift servo çıkışı (pan/tilt)",
+   "Çizgi + yol işareti tespiti"
+  ],
+  "uses": [
+   "Yüksek hızlı çizgi/renk takibi"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "esp32-cam",
+  "name": "ESP32-CAM",
+  "level": 7,
+  "group": "kamera",
+  "source": "seri-el-sensor.html",
+  "interface": "WiFi",
+  "voltage": "",
+  "specs": [
+   "ESP32-S + OV2640 2MP",
+   "WiFi video stream",
+   "microSD kayıt, flash LED",
+   "Basit yüz tespiti"
+  ],
+  "uses": [
+   "Uzaktan video izleme, ucuz"
+  ],
+  "warnings": [
+   "Ayrı 5V/2A besleme şart; USB-serial adaptörden beslersen sürekli resetlenir; girişe 470µF kondansatör"
+  ],
+  "offline": "ai"
+ },
+ {
+  "slug": "nvidia-jetson-orin-nx-16gb",
+  "name": "NVIDIA Jetson Orin NX 16GB",
+  "level": 7,
+  "group": "ai-kart",
+  "source": "seri-el-ai.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "157 TOPS (INT8)",
+   "10–25 W",
+   "Ampere GPU + CUDA"
+  ],
+  "uses": [
+   "Çoklu model pipeline, otonom robot, 4K görü"
+  ],
+  "warnings": [
+   "Aktif soğutma ister; termal throttling"
+  ],
+  "offline": "ai"
+ },
+ {
+  "slug": "jetson-orin-nano",
+  "name": "Jetson Orin Nano",
+  "level": 7,
+  "group": "ai-kart",
+  "source": "seri-el-ai.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "40 TOPS",
+   "7–15 W"
+  ],
+  "uses": [
+   "Giriş seviyesi otonom platform"
+  ],
+  "warnings": [
+   "Aktif soğutma ister"
+  ],
+  "offline": "ai"
+ },
+ {
+  "slug": "raspberry-pi-ai-hat-hailo-8l",
+  "name": "Raspberry Pi AI HAT+ (Hailo-8L)",
+  "level": 7,
+  "group": "ai-kart",
+  "source": "seri-el-ai.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "13–26 TOPS",
+   "~5 W",
+   "Pi 5 üzerine takılır"
+  ],
+  "uses": [
+   "Pi tabanlı görü projeleri"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "qualcomm-iq9-qcs8550",
+  "name": "Qualcomm IQ9 (QCS8550)",
+  "level": 7,
+  "group": "ai-kart",
+  "source": "seri-el-ai.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "100 TOPS",
+   "~15 W",
+   "Hexagon NPU, 5G/WiFi7, 7 kamera"
+  ],
+  "uses": [
+   "Premium ticari edge platform"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "google-coral-dev-board",
+  "name": "Google Coral Dev Board",
+  "level": 7,
+  "group": "ai-kart",
+  "source": "seri-el-ai.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "4 TOPS",
+   "~2 W",
+   "MobileNetV2 ~400 FPS"
+  ],
+  "uses": [
+   "Düşük güç sınıflandırma, pil ile çalışma"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "esp32-s3-tinyml",
+  "name": "ESP32-S3 (TinyML)",
+  "level": 7,
+  "group": "ai-kart",
+  "source": "seri-el-ai.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "~0.1 TOPS",
+   "0.5 W"
+  ],
+  "uses": [
+   "Anahtar kelime, basit sınıflandırma"
+  ],
+  "warnings": [],
+  "offline": "ai"
+ },
+ {
+  "slug": "arduino-uno-atmega328p",
+  "name": "Arduino UNO (ATmega328P)",
+  "level": 1,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "I²C A4/A5 · SPI D10-D13 · UART D0/D1",
+  "voltage": "5V (giriş 7-12V)",
+  "specs": [
+   "ATmega328P 8-bit 16 MHz",
+   "32 KB Flash · 2 KB SRAM · 1 KB EEPROM",
+   "Pin akımı 20 mA (max 40)",
+   "14 dijital · 6 PWM · 6 analog"
+  ],
+  "uses": [
+   "Öğrenme, gerçek zamanlı kontrol, sensör okuma"
+  ],
+  "warnings": [
+   "Kod yüklerken D0/D1 kablolarını çıkar",
+   "2 KB SRAM büyük ekran framebuffer için yetmez"
+  ],
+  "lab": {
+   "kit": "led"
+  }
+ },
+ {
+  "slug": "esp32-esp32-wroom-devkit",
+  "name": "ESP32 (ESP32-WROOM / DevKit)",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "I²C GPIO21/22 · VSPI/HSPI · UART0/UART2",
+  "voltage": "3.3V (USB 5V)",
+  "specs": [
+   "Xtensa LX6 dual-core 240 MHz",
+   "4 MB Flash · 520 KB SRAM",
+   "WiFi b/g/n + BT 4.2 BLE",
+   "34 GPIO · 16 PWM · 18 ADC · 10 touch",
+   "Deep sleep 10µA"
+  ],
+  "uses": [
+   "IoT, akıllı ev, kablosuz robot, OTA"
+  ],
+  "warnings": [
+   "GPIO6–11 dahili flash'a bağlı, kullanma",
+   "GPIO34–39 sadece giriş",
+   "5V sinyal pini yakar"
+  ],
+  "offline": "mcu"
+ },
+ {
+  "slug": "raspberry-pi-4b",
+  "name": "Raspberry Pi 4B",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "I²C GPIO2/3 · SPI0 · UART GPIO14/15",
+  "voltage": "3.3V GPIO (5V USB-C)",
+  "specs": [
+   "BCM2711 quad Cortex-A72 1.5 GHz",
+   "1/2/4/8 GB LPDDR4",
+   "Linux",
+   "40-pin GPIO · CSI · DSI · HDMI ×2",
+   "2.5 – 10 W"
+  ],
+  "uses": [
+   "AI/görü, sunucu, Linux gerektiren işler"
+  ],
+  "warnings": [
+   "GPIO 3.3V; 5V sinyal çipi kalıcı bozar"
+  ],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-uno-r4-wifi",
+  "name": "Arduino UNO R4 WiFi",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "ARM Cortex-M4 48MHz",
+   "256KB / 32KB",
+   "WiFi+BT, 12×8 LED matris, 12-bit DAC, Qwiic"
+  ],
+  "uses": [
+   "En iyi genel amaçlı, WiFi"
+  ],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-nano-esp32",
+  "name": "Arduino Nano ESP32",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "ESP32-S3 dual 240MHz",
+   "16MB / 512KB",
+   "WiFi+BT 5.0, MicroPython"
+  ],
+  "uses": [
+   "Küçük + kablosuz"
+  ],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-nesso-n1",
+  "name": "Arduino Nesso N1",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "ESP32-C6 RISC-V 160MHz",
+   "WiFi 6 · BT 5.3 · Zigbee · Matter"
+  ],
+  "uses": [
+   "Akıllı ev / IoT mesh"
+  ],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-uno-q",
+  "name": "Arduino UNO Q",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "STM32U585 + Linux SoC",
+   "4GB RAM / 32GB eMMC",
+   "Debian Linux + Zephyr RTOS"
+  ],
+  "uses": [
+   "Linux + gerçek zamanlı kontrol"
+  ],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-ventuno-q",
+  "name": "Arduino Ventuno Q",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-mcu.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "8-çekirdek Qualcomm Dragonwing",
+   "16GB LPDDR5",
+   "40 TOPS AI"
+  ],
+  "uses": [
+   "Yerel AI, görü"
+  ],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-mega",
+  "name": "Arduino Mega",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "5V lojik (max giriş 5.5V)",
+  "specs": [],
+  "uses": [],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "esp8266",
+  "name": "ESP8266",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "3.3V lojik (max giriş 3.6V)",
+  "specs": [],
+  "uses": [],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "stm32",
+  "name": "STM32",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "3.3V lojik (5V tolere yalnız işaretli pinler)",
+  "specs": [],
+  "uses": [
+   "Gerçek zamanlı kontrol katmanı (AI sayfası)"
+  ],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "arduino-due",
+  "name": "Arduino Due",
+  "level": 7,
+  "group": "mcu",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "3.3V lojik (max 3.3V)",
+  "specs": [],
+  "uses": [],
+  "warnings": [],
+  "offline": "mcu"
+ },
+ {
+  "slug": "16x2-lcd-paralel",
+  "name": "16×2 LCD (paralel)",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "Paralel (4-bit: 6 pin)",
+  "voltage": "",
+  "specs": [
+   "16×2 karakter, 32 karakter",
+   "Mono"
+  ],
+  "uses": [
+   "Basit metin"
+  ],
+  "warnings": [
+   "6 GPIO yer; arka ışık sürekli akım çeker"
+  ],
+  "lab": {
+   "kit": "lcd"
+  }
+ },
+ {
+  "slug": "pcf8574-i2c-lcd-adaptoru",
+  "name": "PCF8574 I²C LCD adaptörü",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "I²C (0x20–0x27; PCF8574A 0x38 taban)",
+  "voltage": "VCC → 5V",
+  "specs": [
+   "8-bit I/O genişletici",
+   "A0/A1/A2 adres jumper'ları",
+   "Kontrast trimpot"
+  ],
+  "uses": [
+   "16×2 LCD'yi 2 pine indirir"
+  ],
+  "warnings": [
+   "Ekran boşsa önce kontrast, sonra I²C scanner ile adres (0x27/0x3F)"
+  ],
+  "lab": {
+   "kit": "lcdi2c"
+  }
+ },
+ {
+  "slug": "oled-ssd1306-0-96",
+  "name": "OLED SSD1306 0.96\"",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "I²C (0x3C / 0x3D) veya SPI",
+  "voltage": "3.3–5V",
+  "specs": [
+   "128×64 mono",
+   "~20 mA"
+  ],
+  "uses": [
+   "Küçük gadget, sayaç, menü"
+  ],
+  "warnings": [
+   "UNO'da framebuffer 1 KB RAM yer"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "tft-st7735-1-8",
+  "name": "TFT ST7735 1.8\"",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "SPI (5 pin)",
+  "voltage": "3.3V",
+  "specs": [
+   "128×160, 16-bit renk"
+  ],
+  "uses": [
+   "Grafik, dashboard"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "gc9a01-yuvarlak",
+  "name": "GC9A01 yuvarlak",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "4-wire SPI (7 pin)",
+  "voltage": "",
+  "specs": [
+   "240×240 yuvarlak"
+  ],
+  "uses": [
+   "Saat, hız göstergesi, kadran"
+  ],
+  "warnings": [],
+  "offline": "faz2"
+ },
+ {
+  "slug": "ili9341-xpt2046-dokunmatik-2-4",
+  "name": "ILI9341 + XPT2046 dokunmatik 2.4\"",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "SPI (7–8 pin, paylaşımlı)",
+  "voltage": "3.3V",
+  "specs": [
+   "320×240",
+   "XPT2046 rezistif dokunmatik"
+  ],
+  "uses": [
+   "Dokunmatik menü"
+  ],
+  "warnings": [
+   "İlk kullanımda 4 köşe kalibrasyonu"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "e-paper-2-9",
+  "name": "e-Paper 2.9\"",
+  "level": 5,
+  "group": "ekran",
+  "source": "seri-el-ekran.html",
+  "interface": "SPI (6 pin)",
+  "voltage": "",
+  "specs": [
+   "296×128 S/B",
+   "Bekleme 0 µA, yenileme ~20 mA, 2–15 sn"
+  ],
+  "uses": [
+   "Pil ile aylarca çalışan gösterge, dış mekân"
+  ],
+  "warnings": [
+   "Kısmi yenileme ghosting bırakır, arada tam yenileme"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "bo-motor-sari",
+  "name": "BO motor (sarı)",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Düşük tork, plastik dişli"
+  ],
+  "uses": [],
+  "warnings": [
+   "Yük altında stall, sıyrılan plastik dişli"
+  ],
+  "lab": {
+   "kit": "l298n",
+   "model": "bo"
+  }
+ },
+ {
+  "slug": "metal-disli-dc-motor",
+  "name": "Metal dişli DC motor",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "PWM (açık çevrim)",
+  "voltage": "",
+  "specs": [
+   "50-300 RPM"
+  ],
+  "uses": [
+   "Mobil robot, RC araç, arazi"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "l298n",
+   "model": "metal"
+  }
+ },
+ {
+  "slug": "n20-mikro-motor",
+  "name": "N20 mikro motor",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "açık çevrim",
+  "voltage": "",
+  "specs": [
+   "100-500 RPM",
+   "Metal redüktörlü"
+  ],
+  "uses": [
+   "Çizgi izleyen, akıllı kilit, mini IoT"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "drv8833",
+   "model": "n20"
+  }
+ },
+ {
+  "slug": "555-775-dc-motor",
+  "name": "555 / 775 DC motor",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "açık çevrim + yüksek akım sürücü",
+  "voltage": "",
+  "specs": [
+   "20.000+ RPM, yüksek akım"
+  ],
+  "uses": [
+   "Savaş robotu, CNC, DIY elektrikli araç"
+  ],
+  "warnings": [
+   "Yüksek akım sürücü şart"
+  ],
+  "lab": {
+   "kit": "bts7960",
+   "model": "metal"
+  }
+ },
+ {
+  "slug": "nema17-step-motor",
+  "name": "NEMA17 step motor",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "1.8°/adım, 200 adım/tur",
+   "42×42 mm",
+   "0.4–1.2 N·m tutma (NEMA 17/23)",
+   "1.5–2.8 A/faz"
+  ],
+  "uses": [
+   "3D yazıcı, CNC, kamera slider"
+  ],
+  "warnings": [
+   "300 RPM üstü tork düşer",
+   "Vref ile akım ayarı şart",
+   "Adım kaçırırsa haberin olmaz"
+  ],
+  "lab": {
+   "kit": "stepper"
+  }
+ },
+ {
+  "slug": "nema-23-step-motor",
+  "name": "NEMA 23 step motor",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "0.4–1.2 N·m tutma (NEMA 17/23)",
+   "1.5–2.8 A/faz"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "stepper"
+  }
+ },
+ {
+  "slug": "nema-34-step-motor",
+  "name": "NEMA 34 step motor",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "4–12 N·m",
+   "<300 RPM",
+   "2.8–5.6 A/faz"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "stepper"
+  }
+ },
+ {
+  "slug": "bldc-fircasiz-motor",
+  "name": "BLDC fırçasız motor",
+  "level": 7,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "ESC (3 faz)",
+  "voltage": "",
+  "specs": [
+   "RPM ≈ KV × Volt",
+   "Drone 2000-3000 KV; gimbal düşük KV",
+   "Gimbal 0.05–0.5 N·m; yarış 25.000–35.000 RPM, 20–60 A"
+  ],
+  "uses": [
+   "Drone, gimbal"
+  ],
+  "warnings": [
+   "ESC + 3 faz sürücü şart"
+  ],
+  "lab": {
+   "kit": "esc"
+  }
+ },
+ {
+  "slug": "lineer-aktuator",
+  "name": "Lineer aktüatör",
+  "level": 4,
+  "group": "motor",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Dinamik kuvvet 100 – 1500 N",
+   "5 – 45 mm/s",
+   "Statik tutma 3000 N'e kadar"
+  ],
+  "uses": [
+   "Ağır yük itme"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "bts7960",
+   "model": "metal"
+  }
+ },
+ {
+  "slug": "t8-vidali-mil-lead-screw",
+  "name": "T8 vidalı mil (lead screw)",
+  "level": 4,
+  "group": "diger",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Lead 8 mm/tur",
+   "5–45 mm/s",
+   "Kendinden kilitli"
+  ],
+  "uses": [
+   "Dikey eksen (Z)"
+  ],
+  "warnings": [],
+  "offline": "mekanik"
+ },
+ {
+  "slug": "gt2-kayis-kasnak-20-dis",
+  "name": "GT2 kayış-kasnak (20 diş)",
+  "level": 4,
+  "group": "diger",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "40 mm/devir",
+   "2000 mm/s'e kadar"
+  ],
+  "uses": [
+   "Yatay eksen (X/Y)"
+  ],
+  "warnings": [
+   "Güç kesilince kayar; backlash"
+  ],
+  "offline": "mekanik"
+ },
+ {
+  "slug": "sg90",
+  "name": "SG90",
+  "level": 4,
+  "group": "servo",
+  "source": "seri-el-motor.html",
+  "interface": "PWM 50 Hz (1–2 ms darbe)",
+  "voltage": "",
+  "specs": [
+   "Tork 1.8 kg·cm",
+   "Dişli Plastik",
+   "Ağırlık 9 g"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "servo",
+   "model": "sg90"
+  }
+ },
+ {
+  "slug": "mg90s",
+  "name": "MG90S",
+  "level": 4,
+  "group": "servo",
+  "source": "seri-el-motor.html",
+  "interface": "PWM 50 Hz (1–2 ms darbe)",
+  "voltage": "",
+  "specs": [
+   "Tork 2.2 kg·cm",
+   "Dişli Metal",
+   "Ağırlık 13 g"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "servo",
+   "model": "mg90s"
+  }
+ },
+ {
+  "slug": "mg996r",
+  "name": "MG996R",
+  "level": 4,
+  "group": "servo",
+  "source": "seri-el-motor.html",
+  "interface": "PWM 50 Hz (1–2 ms darbe)",
+  "voltage": "",
+  "specs": [
+   "Tork 11 kg·cm @6V",
+   "Dişli Metal",
+   "Ağırlık 55 g",
+   "0.17 s/60°",
+   "Stall'da 2.5 A"
+  ],
+  "uses": [
+   "Robot kol, gripper, direksiyon"
+  ],
+  "warnings": [
+   "Arduino 5V pininden besleme; ayrı 5V/3A + ortak GND"
+  ],
+  "lab": {
+   "kit": "servo",
+   "model": "mg996r"
+  }
+ },
+ {
+  "slug": "ds3218",
+  "name": "DS3218",
+  "level": 4,
+  "group": "servo",
+  "source": "seri-el-motor.html",
+  "interface": "PWM 50 Hz (1–2 ms darbe)",
+  "voltage": "",
+  "specs": [
+   "Tork 20 kg·cm",
+   "Dişli Metal",
+   "Ağırlık 55 g"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "servo",
+   "model": "ds3218"
+  }
+ },
+ {
+  "slug": "ds3225",
+  "name": "DS3225",
+  "level": 4,
+  "group": "servo",
+  "source": "seri-el-motor.html",
+  "interface": "PWM 50 Hz (1–2 ms darbe)",
+  "voltage": "",
+  "specs": [
+   "Tork 25 kg·cm",
+   "Dişli Metal",
+   "Ağırlık 60 g"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "servo",
+   "model": "ds3225"
+  }
+ },
+ {
+  "slug": "l298n",
+  "name": "L298N",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Bipolar Darlington",
+   "Akım 2 A / 3 A tepe",
+   "Gerilim düşümü 1.5 – 2 V",
+   "PWM ~5 kHz",
+   "Koruma: Termal kapama"
+  ],
+  "uses": [],
+  "warnings": [
+   "2 A yükte ~3.5 W ısı; bataryanın %30'unu ısıya çevirir"
+  ],
+  "lab": {
+   "kit": "l298n"
+  }
+ },
+ {
+  "slug": "tb6612fng",
+  "name": "TB6612FNG",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "MOSFET",
+   "Akım 1.2 A / 3.2 A tepe",
+   "Gerilim düşümü < 0.5 V",
+   "PWM 100 kHz",
+   "Koruma: Termal, UVLO"
+  ],
+  "uses": [
+   "Mini robot, çizgi izleyen"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "tb6612"
+  }
+ },
+ {
+  "slug": "drv8833",
+  "name": "DRV8833",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "MOSFET",
+   "Akım 1.5 A / 2 A tepe",
+   "Gerilim düşümü < 0.4 V",
+   "PWM 250 kHz",
+   "Koruma: Aşırı akım, termal"
+  ],
+  "uses": [
+   "Mini robot, çizgi izleyen"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "drv8833"
+  }
+ },
+ {
+  "slug": "bts7960",
+  "name": "BTS7960",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "NovalithIC MOSFET",
+   "Akım 43 A / 75 A tepe",
+   "Gerilim düşümü < 0.2 V",
+   "PWM 25 kHz",
+   "Koruma: Aşırı akım, aşırı/düşük gerilim, kısa devre"
+  ],
+  "uses": [
+   "Ağır robot, 775 motor, EV"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "bts7960"
+  }
+ },
+ {
+  "slug": "cytron-md10c",
+  "name": "Cytron MD10C",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Senkron MOSFET",
+   "Akım 10 A / 30 A tepe",
+   "Gerilim düşümü < 0.15 V",
+   "PWM 20 kHz",
+   "Koruma: OVP, UVP, OTP, OCP, stall"
+  ],
+  "uses": [
+   "Orta boy robot, RC araç"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "md10c"
+  }
+ },
+ {
+  "slug": "tmc2209",
+  "name": "TMC2209",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Step sürücü",
+   "Akım 2 A RMS / 2.8 A",
+   "Gerilim düşümü Çok düşük",
+   "PWM Sessiz (StealthChop)",
+   "Koruma: Sensörsüz homing"
+  ],
+  "uses": [
+   "3D yazıcı, CNC (step)"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "stepper"
+  }
+ },
+ {
+  "slug": "dm556",
+  "name": "DM556",
+  "level": 4,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [],
+  "uses": [
+   "3D yazıcı, CNC (step)"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "stepper"
+  }
+ },
+ {
+  "slug": "esc-blheli-s-32",
+  "name": "ESC (BLHeli_S / 32)",
+  "level": 7,
+  "group": "surucu",
+  "source": "seri-el-motor.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [],
+  "uses": [
+   "Drone (BLDC)"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "esc"
+  }
+ },
+ {
+  "slug": "lm7805-lineer-regulator",
+  "name": "LM7805 lineer regülatör",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Verim = Vout/Vin (12→5V: %41)",
+   "TO-220, soğutucusuz θJA ≈ 60 °C/W"
+  ],
+  "uses": [
+   "Küçük fark, düşük akım"
+  ],
+  "warnings": [
+   "12V→5V, 0.5A: 3.5 W ısı; termal koruma devreye girer"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "lm2596-buck",
+  "name": "LM2596 buck",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "Giriş 4 – 40V · Çıkış 1.25 – 37V",
+  "specs": [
+   "Max 3A",
+   "~150 kHz",
+   "%92 verim",
+   "43 × 21 × 13 mm"
+  ],
+  "uses": [
+   "Başlangıç / genel amaç"
+  ],
+  "warnings": [
+   "3A sürekli için soğutucu ekle"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "mp1584-mini-360-buck",
+  "name": "MP1584 Mini-360 buck",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "Giriş 4.5 – 28V · Çıkış 0.8 – 20V",
+  "specs": [
+   "2A sürekli",
+   "1.5 MHz",
+   "%94 verim",
+   "17 × 11 × 4 mm"
+  ],
+  "uses": [
+   "Drone, aksiyon kamera, mini robot"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "xl4015-buck",
+  "name": "XL4015 buck",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "Giriş 8–36V",
+  "specs": [
+   "5A",
+   "CC + CV kontrol"
+  ],
+  "uses": [
+   "Li-ion şarj, CNC, büyük motor"
+  ],
+  "warnings": [
+   "Fan/soğutucu şart"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "xl4016-buck",
+  "name": "XL4016 buck",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "Giriş 8–36V",
+  "specs": [
+   "8A+",
+   "CC + CV kontrol"
+  ],
+  "uses": [
+   "Yüksek akım / batarya şarjı"
+  ],
+  "warnings": [
+   "Fan/soğutucu şart"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "ap63200-buck",
+  "name": "AP63200 buck",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "Giriş ≤32V",
+  "specs": [
+   "2 – 3A",
+   "%95 verim"
+  ],
+  "uses": [
+   "Özel PCB / ticari ürün, IoT"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "lm2576-buck",
+  "name": "LM2576 buck",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "Giriş ≤60V · Ayarlanabilir 1.23 – 37V",
+  "specs": [
+   "3A sürekli",
+   "Düşük EMI"
+  ],
+  "uses": [
+   "Endüstriyel / zorlu ortam"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "tp4056-korumali-bms",
+  "name": "TP4056 (korumalı) BMS",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "1S",
+   "1A"
+  ],
+  "uses": [
+   "Ultra kompakt DIY, tek hücreli USB power bank"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "jbd-overkill-solar-bms",
+  "name": "JBD / Overkill Solar BMS",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "8S – 24S",
+   "60 – 200A",
+   "Termal koruma"
+  ],
+  "uses": [
+   "E-motosiklet, e-bisiklet"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "aktif-dengeleme-bms",
+  "name": "Aktif dengeleme BMS",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "4S – 24S",
+   "250A'e kadar"
+  ],
+  "uses": [
+   "Büyük paketler"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "seplos-smart-bms",
+  "name": "SEPLOS Smart BMS",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "16S (48V)",
+   "100 – 200A"
+  ],
+  "uses": [
+   "Ev güneş enerjisi (ESS), sunucu rafı"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "max17048-max17043-yakit-gostergesi",
+  "name": "MAX17048 / MAX17043 yakıt göstergesi",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "I²C (0x36)",
+  "voltage": "",
+  "specs": [
+   "Coulomb sayımı + gerilim modeli",
+   "Gerçek SoC (%)"
+  ],
+  "uses": [
+   "LiPo şarj durumu ölçümü"
+  ],
+  "warnings": [
+   "Bataryayı ADC ile ölçmek yanıltıcıdır"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "kursun-asit-batarya",
+  "name": "Kurşun-Asit batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "12V (6×2V)",
+  "specs": [
+   "Düşük maliyet, yüksek akım, ağır"
+  ],
+  "uses": [
+   "UPS, inverter, solar, araç"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "li-ion-18650-batarya",
+  "name": "Li-ion (18650) batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "3.7V nominal",
+  "specs": [
+   "Yüksek enerji yoğunluğu, hafif"
+  ],
+  "uses": [
+   "Telefon, laptop, power bank, EV"
+  ],
+  "warnings": [
+   "%20-80 arasında tut; BMS'siz kullanma"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "lipo-batarya",
+  "name": "LiPo batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "3.7V nominal",
+  "specs": [
+   "Çok hafif, ince, yüksek deşarj (C-rate)"
+  ],
+  "uses": [
+   "Drone, RC, robot, ince cihaz"
+  ],
+  "warnings": [
+   "Şişmiş, delinmiş veya 3.0V altına düşmüş hücreyi kullanma; LiPo-safe kesede şarj et",
+   "BMS'siz kullanma"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "nimh-batarya",
+  "name": "NiMH batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "1.2V",
+  "specs": [
+   "Şarjlı, Li-ion'dan güvenli, orta kapasite"
+  ],
+  "uses": [
+   "Kumanda, oyuncak, kamera, AA/AAA"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "nicd-batarya",
+  "name": "NiCd batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "1.2V",
+  "specs": [
+   "Uzun çevrim, hafıza etkisi sorunu"
+  ],
+  "uses": [
+   "Acil aydınlatma, kablosuz alet"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "alkalin-batarya",
+  "name": "Alkalin batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "1.5V",
+  "specs": [
+   "Şarj edilemez, uzun raf ömrü, ucuz"
+  ],
+  "uses": [
+   "Saat, TV kumanda, el feneri"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "coin-cell-cr2032-batarya",
+  "name": "Coin cell (CR2032) batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "3V",
+  "specs": [
+   "Çok küçük, uzun ömürlü, düşük akım"
+  ],
+  "uses": [
+   "Anakart CMOS, hesap makinesi, RTC"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "lifepo4-batarya",
+  "name": "LiFePO₄ batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "3.2V (12.8V 4S)",
+  "specs": [
+   "Çok güvenli, uzun ömür, hızlı şarj"
+  ],
+  "uses": [
+   "Solar, EV, marine, yedek güç"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "cinko-karbon-batarya",
+  "name": "Çinko-Karbon batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "1.5V",
+  "specs": [
+   "Çok ucuz, düşük akım için"
+  ],
+  "uses": [
+   "Duvar saati, düşük güçlü oyuncak"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "sodyum-iyon-batarya",
+  "name": "Sodyum-İyon batarya",
+  "level": 6,
+  "group": "guc",
+  "source": "seri-el-guc.html",
+  "interface": "",
+  "voltage": "~3.1V",
+  "specs": [
+   "Eko-dostu, ucuz, düşük sıcaklıkta iyi"
+  ],
+  "uses": [
+   "Enerji depolama, EV (gelişen)"
+  ],
+  "warnings": [],
+  "offline": "guc"
+ },
+ {
+  "slug": "direnc",
+  "name": "Direnç",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Watt · Tolerans",
+   "Renk kodu: 2 rakam + çarpan + tolerans"
+  ],
+  "uses": [
+   "LED akım sınırlama, pull-up/down, gerilim bölücü, biaslama"
+  ],
+  "warnings": [
+   "1/4W direnci 1W yükte kullanmak → yanar"
+  ],
+  "lab": {
+   "kit": "led"
+  }
+ },
+ {
+  "slug": "kondansator-elektrolitik-seramik",
+  "name": "Kondansatör (elektrolitik / seramik)",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Kapasitans (µF) · Gerilim · Polarite",
+   "Decoupling 0.1µF, bulk 100-1000µF"
+  ],
+  "uses": [
+   "Decoupling, bulk, filtreleme, zamanlama"
+  ],
+  "warnings": [
+   "Elektrolitik ters bağlanırsa patlar"
+  ],
+  "offline": "devre"
+ },
+ {
+  "slug": "led",
+  "name": "LED",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "İleri gerilim Vf ≈ 2V",
+   "5V için 220Ω-330Ω seri direnç"
+  ],
+  "uses": [],
+  "warnings": [
+   "LED'i doğrudan 5V'a bağlamak → yanar"
+  ],
+  "lab": {
+   "kit": "led"
+  }
+ },
+ {
+  "slug": "bobin-induktor",
+  "name": "Bobin (indüktör)",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "İndüktans (µH) · Akım · DCR"
+  ],
+  "uses": [
+   "DC-DC çeviriciler, motorlar, solenoid"
+  ],
+  "warnings": [
+   "Endüktif geri tepme — flyback diyot"
+  ],
+  "offline": "devre"
+ },
+ {
+  "slug": "buton-anahtar",
+  "name": "Buton / anahtar",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "digital",
+  "voltage": "",
+  "specs": [
+   "Kontak 1-20 ms zıplar"
+  ],
+  "uses": [],
+  "warnings": [
+   "Debounce şart"
+  ],
+  "lab": {
+   "kit": "buton"
+  }
+ },
+ {
+  "slug": "1n4007-diyot",
+  "name": "1N4007 diyot",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Flyback diyot"
+  ],
+  "uses": [
+   "Motor/röle/solenoid koruması"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "npn"
+  }
+ },
+ {
+  "slug": "bc547",
+  "name": "BC547",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "BJT (akım kontrollü)"
+  ],
+  "uses": [
+   "Karanlık dedektörü (BC547)"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "npn"
+  }
+ },
+ {
+  "slug": "2n2222",
+  "name": "2N2222",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "BJT (akım kontrollü)"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "npn"
+  }
+ },
+ {
+  "slug": "tip122",
+  "name": "TIP122",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "BJT (akım kontrollü)"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "npn"
+  }
+ },
+ {
+  "slug": "irf540",
+  "name": "IRF540",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "MOSFET, düşük RDS(on)"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "mosfet"
+  }
+ },
+ {
+  "slug": "irlz44n",
+  "name": "IRLZ44N",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "MOSFET, düşük RDS(on)"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "mosfet"
+  }
+ },
+ {
+  "slug": "ao3400",
+  "name": "AO3400",
+  "level": 1,
+  "group": "bilesen",
+  "source": "seri-el-bilesen.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "MOSFET, düşük RDS(on)"
+  ],
+  "uses": [],
+  "warnings": [],
+  "lab": {
+   "kit": "mosfet"
+  }
+ },
+ {
+  "slug": "bss138-lojik-seviye-cevirici",
+  "name": "BSS138 lojik seviye çevirici",
+  "level": 5,
+  "group": "bilesen",
+  "source": "seri-el-mcu.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Çift yönlü, I²C uyumlu, hızlı"
+  ],
+  "uses": [
+   "5V ↔ 3.3V"
+  ],
+  "warnings": [
+   "I²C'de gerilim bölücü çalışmaz"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "sm6t36a-tvs-diyot",
+  "name": "SM6T36A TVS diyot",
+  "level": 6,
+  "group": "bilesen",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Kırpma 55.3V",
+   "Akım 11.2A",
+   "Paket SMB"
+  ],
+  "uses": [
+   "Gerilim sıçraması koruması"
+  ],
+  "warnings": [
+   "Korunacak pine yakın yerleştir"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "pesd5v0s1ub-tvs-diyot",
+  "name": "PESD5V0S1UB TVS diyot",
+  "level": 6,
+  "group": "bilesen",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Kırpma 6.2V",
+   "Akım 60A",
+   "Paket DFN1006"
+  ],
+  "uses": [
+   "Gerilim sıçraması koruması"
+  ],
+  "warnings": [
+   "Korunacak pine yakın yerleştir"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "tvs0500-1-6v0-tvs-diyot",
+  "name": "TVS0500-1-6V0 TVS diyot",
+  "level": 6,
+  "group": "bilesen",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Kırpma 6.2V",
+   "Akım 60A",
+   "Paket SOD-523"
+  ],
+  "uses": [
+   "Gerilim sıçraması koruması"
+  ],
+  "warnings": [
+   "Korunacak pine yakın yerleştir"
+  ],
+  "offline": "guc"
+ },
+ {
+  "slug": "mcp2551-can-transceiver",
+  "name": "MCP2551 CAN transceiver",
+  "level": 5,
+  "group": "bilesen",
+  "source": "seri-el-protokol.html",
+  "interface": "CAN",
+  "voltage": "",
+  "specs": [],
+  "uses": [
+   "CAN bus düğümü"
+  ],
+  "warnings": [
+   "Her uçta 120Ω sonlandırma"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "tja1050-can-transceiver",
+  "name": "TJA1050 CAN transceiver",
+  "level": 5,
+  "group": "bilesen",
+  "source": "seri-el-protokol.html",
+  "interface": "CAN",
+  "voltage": "",
+  "specs": [],
+  "uses": [
+   "CAN bus düğümü"
+  ],
+  "warnings": [
+   "Her uçta 120Ω sonlandırma"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "sn65hvd230-can-transceiver",
+  "name": "SN65HVD230 CAN transceiver",
+  "level": 5,
+  "group": "bilesen",
+  "source": "seri-el-protokol.html",
+  "interface": "CAN",
+  "voltage": "",
+  "specs": [],
+  "uses": [
+   "CAN bus düğümü"
+  ],
+  "warnings": [
+   "Her uçta 120Ω sonlandırma"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "hc-05-bluetooth-modulu",
+  "name": "HC-05 Bluetooth modülü",
+  "level": 5,
+  "group": "diger",
+  "source": "seri-el-protokol.html",
+  "interface": "UART",
+  "voltage": "3.3V lojik",
+  "specs": [],
+  "uses": [
+   "UART örneği"
+  ],
+  "warnings": [
+   "TX→RX çapraz, ortak GND"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "ch340-usb-seri-cip",
+  "name": "CH340 USB-seri çip",
+  "level": 5,
+  "group": "diger",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [],
+  "uses": [],
+  "warnings": [
+   "Kod yüklenmiyorsa sürücü/COM port kontrol"
+  ],
+  "offline": "faz2"
+ },
+ {
+  "slug": "st-link-j-link-debugger",
+  "name": "ST-Link / J-Link debugger",
+  "level": 7,
+  "group": "diger",
+  "source": "seri-el-arac.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Breakpoint'li gerçek debug"
+  ],
+  "uses": [],
+  "warnings": [],
+  "offline": "arac"
+ },
+ {
+  "slug": "logic-analyzer",
+  "name": "Logic analyzer",
+  "level": 5,
+  "group": "diger",
+  "source": "seri-el-arac.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "I²C/SPI/UART trafiğini gösterir"
+  ],
+  "uses": [],
+  "warnings": [],
+  "offline": "arac"
+ },
+ {
+  "slug": "osiloskop",
+  "name": "Osiloskop",
+  "level": 6,
+  "group": "diger",
+  "source": "seri-el-arac.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "Analog sinyal ve zamanlama"
+  ],
+  "uses": [],
+  "warnings": [],
+  "offline": "arac"
+ },
+ {
+  "slug": "multimetre",
+  "name": "Multimetre",
+  "level": 1,
+  "group": "diger",
+  "source": "seri-el-hata.html",
+  "interface": "",
+  "voltage": "",
+  "specs": [
+   "V= modu, süreklilik (beep) modu"
+  ],
+  "uses": [
+   "Gerilimi MCU pininde, yük altında ölç"
+  ],
+  "warnings": [],
+  "lab": {
+   "kit": "led"
+  }
+ }
+]

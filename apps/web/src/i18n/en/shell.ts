@@ -34,6 +34,7 @@ export const shell: typeof Tr = {
     learn: 'Learn',
     tools: 'Tools',
     learning: 'Learning',
+    adults: 'For adults',
   },
   nav: {
     home: 'Home',
@@ -53,6 +54,7 @@ export const shell: typeof Tr = {
     progress: 'My progress',
     league: 'Class league',
     pricing: 'Plans & pricing',
+    engineering: 'Engineering path',
   },
   tab: {
     lab: 'Lab',

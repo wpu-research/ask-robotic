@@ -13,6 +13,10 @@ export type PartType =
   // Aşama C (Modül 4): sensörler ve girdi cihazları
   | 'hcsr04' | 'dht' | 'pir' | 'irobstacle' | 'reed' | 'bmp280' | 'mpu6050' | 'joystick' | 'encoder' | 'keypad' | 'rtc'
   | 'mq2' | 'flame' | 'sound' | 'soil' | 'rain' | 'waterlevel'
+  // Aşama D (Hyvex elektronik serisi, büyükler için): aile modelleri
+  | 'mq3' | 'mq4' | 'mq7' | 'mq135' | 'sharpir'
+  | 'l298n' | 'tb6612' | 'drv8833' | 'bts7960' | 'md10c'
+  | 'stepper' | 'esc'
 
 /**
  * Parça pin kimlikleri (devrede kablo uçları böyle adlandırılır). `Record<PartType, readonly string[]>`
@@ -58,6 +62,26 @@ export const PINS: Record<PartType, readonly string[]> = {
   soil: ['VCC', 'GND', 'AO', 'DO'], // kapasitif toprak nemi; AO kuruda yüksek, ıslakta düşük, DO eşik üstü nemde LOW
   rain: ['VCC', 'GND', 'AO', 'DO'], // yağmur sensörü (kart + LM393); AO kuruda yüksek, ıslandıkça düşer, DO eşik üstü ıslaklıkta LOW
   waterlevel: ['VCC', 'GND', 'AO', 'DO'], // su seviyesi (çıplak izli çubuk); AO su yükseldikçe artar, DO eşik üstü seviyede LOW
+  // Aşama D
+  mq3: ['VCC', 'GND', 'AO', 'DO'], // alkol; MQ-2 ile aynı modül düzeni
+  mq4: ['VCC', 'GND', 'AO', 'DO'], // doğalgaz/metan
+  mq7: ['VCC', 'GND', 'AO', 'DO'], // karbon monoksit
+  mq135: ['VCC', 'GND', 'AO', 'DO'], // hava kalitesi (NH3, NOx, benzen)
+  sharpir: ['VCC', 'GND', 'VO'], // Sharp IR mesafe; VO uzaklık arttıkça düşen analog gerilim
+  // L298N modülü: 12V motor beslemesi (laboratuvarda Uno 5V'tan beslenebilir), ENA/ENB PWM, IN1-4 yön
+  l298n: ['12V', 'GND', '5V', 'ENA', 'IN1', 'IN2', 'IN3', 'IN4', 'ENB', 'OUT1', 'OUT2', 'OUT3', 'OUT4'],
+  // TB6612FNG: VM motor, VCC mantık; STBY HIGH olmalı; PWMx hız, xIN1/xIN2 yön
+  tb6612: ['VM', 'VCC', 'GND', 'STBY', 'PWMA', 'AIN1', 'AIN2', 'AO1', 'AO2', 'PWMB', 'BIN1', 'BIN2', 'BO1', 'BO2'],
+  // DRV8833: EN yok; hız ve yön IN pinlerine PWM ile; SLP bağlıysa HIGH olmalı (bağlı değilse modül etkin sayılır)
+  drv8833: ['VCC', 'GND', 'SLP', 'AIN1', 'AIN2', 'AOUT1', 'AOUT2', 'BIN1', 'BIN2', 'BOUT1', 'BOUT2'],
+  // BTS7960 (IBT-2): RPWM ileri, LPWM geri; R_EN ve L_EN HIGH olmalı
+  bts7960: ['VCC', 'GND', 'RPWM', 'LPWM', 'R_EN', 'L_EN', 'M+', 'M-'],
+  // Cytron MD10C: PWM hız, DIR yön
+  md10c: ['VCC', 'GND', 'PWM', 'DIR', 'MA', 'MB'],
+  // TMC2209 + NEMA17 (birleşik): STEP yükselen kenarında bir mikro adım; DIR yön; EN LOW = etkin
+  stepper: ['VCC', 'GND', 'EN', 'STEP', 'DIR'],
+  // ESC + fırçasız (BLDC) motor (birleşik): SIG servo darbesi (1000-2000 µs), GND ortak toprak
+  esc: ['SIG', 'GND'],
 }
 
 export interface PropDef {
@@ -87,18 +111,30 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
   ntc: [{ key: 'tempC', label: 'Sıcaklık', kind: 'number', default: 25, min: -20, max: 120, step: 0.5, unit: '°C', live: true }],
   buzzer: [{ key: 'kind', label: 'Tür', kind: 'select', default: 'passive', options: [{ value: 'active', label: 'Aktif (kendi sesi var)' }, { value: 'passive', label: 'Pasif (tone ile)' }] }],
   rgbled: [{ key: 'common', label: 'Ortak uç', kind: 'select', default: 'cathode', options: [{ value: 'cathode', label: 'Ortak katot' }, { value: 'anode', label: 'Ortak anot' }] }],
-  servo: [],
+  servo: [{ key: 'model', label: 'Model', kind: 'select', default: 'sg90', options: [
+    { value: 'sg90', label: 'SG90 (1.8 kg·cm, plastik dişli)' }, { value: 'mg90s', label: 'MG90S (2.2 kg·cm, metal)' },
+    { value: 'mg996r', label: 'MG996R (11 kg·cm @6V, metal)' }, { value: 'ds3218', label: 'DS3218 (20 kg·cm)' }, { value: 'ds3225', label: 'DS3225 (25 kg·cm)' },
+  ] }],
   diode: [],
   npn: [],
   mosfet: [],
-  dcmotor: [],
+  dcmotor: [{ key: 'model', label: 'Model', kind: 'select', default: 'generic', options: [
+    { value: 'generic', label: 'Küçük DC motor' }, { value: 'bo', label: 'BO motor (sarı, plastik dişli)' },
+    { value: 'n20', label: 'N20 mikro motor (100-500 RPM)' }, { value: 'metal', label: 'Metal dişli DC motor (50-300 RPM)' },
+  ] }],
   l293d: [],
   relay: [{ key: 'trigger', label: 'Tetik', kind: 'select', default: 'high', options: [{ value: 'high', label: 'HIGH ile çeker' }, { value: 'low', label: 'LOW ile çeker (aktif-LOW)' }] }],
   sevenseg: [{ key: 'common', label: 'Ortak uç', kind: 'select', default: 'cathode', options: [{ value: 'cathode', label: 'Ortak katot' }, { value: 'anode', label: 'Ortak anot' }] }],
   sr595: [],
   lcd1602: [],
   lcdI2c: [{ key: 'address', label: 'I2C adresi', kind: 'select', default: '0x27', options: [{ value: '0x27', label: '0x27' }, { value: '0x3F', label: '0x3F' }] }],
-  hcsr04: [{ key: 'distanceCm', label: 'Mesafe', kind: 'number', default: 100, min: 2, max: 400, step: 1, unit: 'cm', live: true }],
+  hcsr04: [
+    { key: 'distanceCm', label: 'Mesafe', kind: 'number', default: 100, min: 2, max: 600, step: 1, unit: 'cm', live: true },
+    { key: 'model', label: 'Model', kind: 'select', default: 'hcsr04', options: [
+      { value: 'hcsr04', label: 'HC-SR04 (2-400 cm)' }, { value: 'jsnsr04t', label: 'JSN-SR04T su geçirmez (25-600 cm)' },
+      { value: 'rcwl1601', label: 'RCWL-1601 (2-450 cm, 3.3V uyumlu)' }, { value: 'us100', label: 'US-100 (2-450 cm)' },
+    ] },
+  ],
   dht: [
     { key: 'type', label: 'Tür', kind: 'select', default: 'dht22', options: [{ value: 'dht11', label: 'DHT11' }, { value: 'dht22', label: 'DHT22' }] },
     { key: 'tempC', label: 'Sıcaklık', kind: 'number', default: 25, min: -40, max: 80, step: 0.5, unit: '°C', live: true },
@@ -161,6 +197,35 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
   waterlevel: [
     { key: 'level', label: 'Su seviyesi', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
     { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
+  mq3: [
+    { key: 'gas', label: 'Alkol düzeyi', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
+    { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
+  mq4: [
+    { key: 'gas', label: 'Metan düzeyi', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
+    { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
+  mq7: [
+    { key: 'gas', label: 'CO düzeyi', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
+    { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
+  mq135: [
+    { key: 'gas', label: 'Kirlilik düzeyi', kind: 'number', default: 0, min: 0, max: 1, step: 0.01, live: true },
+    { key: 'threshold', label: 'Eşik (DO)', kind: 'number', default: 0.5, min: 0, max: 1, step: 0.01, live: true },
+  ],
+  sharpir: [{ key: 'distanceCm', label: 'Mesafe', kind: 'number', default: 30, min: 10, max: 80, step: 1, unit: 'cm', live: true }],
+  l298n: [],
+  tb6612: [],
+  drv8833: [],
+  bts7960: [],
+  md10c: [],
+  stepper: [{ key: 'microsteps', label: 'Mikro adım', kind: 'select', default: '8', options: [
+    { value: '1', label: 'Tam adım (1)' }, { value: '2', label: '1/2' }, { value: '4', label: '1/4' }, { value: '8', label: '1/8' }, { value: '16', label: '1/16' },
+  ] }],
+  esc: [
+    { key: 'kv', label: 'Motor KV', kind: 'number', default: 2300, min: 100, max: 5000, step: 50, unit: 'RPM/V' },
+    { key: 'cells', label: 'LiPo hücre', kind: 'select', default: '3', options: [{ value: '2', label: '2S (7.4 V)' }, { value: '3', label: '3S (11.1 V)' }, { value: '4', label: '4S (14.8 V)' }] },
   ],
 }
 
@@ -233,6 +298,15 @@ export interface PartRuntime {
   keypad?: { key: string | null }
   /** MQ-2 / alev / ses / toprak nemi / yağmur / su seviyesi: level = fiziksel büyüklük (0-1), aoVolts = AO gerilimi, doHigh = DO seviyesi (eşik üstünde LOW). */
   analogModule?: { powered: boolean; level: number; aoVolts: number; doHigh: boolean }
+  // ---- Aşama D ----
+  /** Sharp IR: voVolts = VO ucu gerilimi (uzaklık arttıkça düşer). */
+  sharpir?: { powered: boolean; distanceCm: number; voVolts: number }
+  /** Köprü sürücü modülleri (L298N, TB6612, DRV8833, BTS7960, MD10C): kanal başına çıkış (-1…+1), brake = kısa devre freni. */
+  driver?: { powered: boolean; enabled: boolean; channels: { out: number; brake: boolean }[] }
+  /** TMC2209 + NEMA17: steps = toplam mikro adım (yönlü), angleDeg = mil açısı. */
+  stepper?: { powered: boolean; enabled: boolean; steps: number; angleDeg: number; dirHigh: boolean }
+  /** ESC + BLDC: armed = düşük gazla kurulmuş; throttle 0-1; rpm = KV × gerilim × gaz. */
+  esc?: { armed: boolean; pulseUs: number; throttle: number; rpm: number }
 }
 
 export interface PinSnapshot {

@@ -11,6 +11,7 @@ const PASSIVE: readonly PartType[] = ['resistor', 'button', 'reed', 'pot', 'ldr'
 const ACTIVE: readonly PartType[] = [
   'npn', 'mosfet', 'l293d', 'relay', 'sr595', 'lcd1602', 'lcdI2c',
   'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel',
+  'mq3', 'mq4', 'mq7', 'mq135', 'sharpir', 'l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper', 'esc',
 ]
 
 /** Besleme pinleri (modül/entegre): VCC 5 V hattında (ya da bir Uno pininde), GND toprakta olmalı. */
@@ -35,12 +36,26 @@ const POWER: Partial<Record<PartType, { vcc: string[]; gnd: string; name: string
   soil: { vcc: ['VCC'], gnd: 'GND', name: 'Toprak nemi modülü', v33: true },
   rain: { vcc: ['VCC'], gnd: 'GND', name: 'Yağmur sensörü', v33: true },
   waterlevel: { vcc: ['VCC'], gnd: 'GND', name: 'Su seviyesi sensörü', v33: true },
+  // Aşama D
+  mq3: { vcc: ['VCC'], gnd: 'GND', name: 'MQ-3 modülü' },
+  mq4: { vcc: ['VCC'], gnd: 'GND', name: 'MQ-4 modülü' },
+  mq7: { vcc: ['VCC'], gnd: 'GND', name: 'MQ-7 modülü' },
+  mq135: { vcc: ['VCC'], gnd: 'GND', name: 'MQ-135 modülü' },
+  sharpir: { vcc: ['VCC'], gnd: 'GND', name: 'Sharp IR sensörü' },
+  l298n: { vcc: ['12V'], gnd: 'GND', name: 'L298N' },
+  tb6612: { vcc: ['VM', 'VCC'], gnd: 'GND', name: 'TB6612FNG', v33: true },
+  drv8833: { vcc: ['VCC'], gnd: 'GND', name: 'DRV8833', v33: true },
+  bts7960: { vcc: ['VCC'], gnd: 'GND', name: 'BTS7960' },
+  md10c: { vcc: ['VCC'], gnd: 'GND', name: 'MD10C' },
+  stepper: { vcc: ['VCC'], gnd: 'GND', name: 'TMC2209 step sürücü', v33: true },
 }
 
 /** Doğrudan bir Uno pinine bağlanması gereken sinyal uçları (Sim cihaz modelleri bu pinleri kullanır). */
 const DIRECT_PINS: Partial<Record<PartType, { pins: string[]; name: string }>> = {
   hcsr04: { pins: ['TRIG', 'ECHO'], name: 'HC-SR04' },
   dht: { pins: ['DATA'], name: 'DHT' },
+  stepper: { pins: ['STEP'], name: 'Step sürücü' },
+  esc: { pins: ['SIG'], name: 'ESC' },
   keypad: { pins: ['R1', 'R2', 'R3', 'R4', 'C1', 'C2', 'C3', 'C4'], name: 'Keypad' },
 }
 /** I2C sensörleri: SDA A4'e, SCL A5'e bağlı olmalı. */
