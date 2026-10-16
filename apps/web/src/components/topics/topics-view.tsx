@@ -8,7 +8,7 @@ import { useLocale, useT } from '@/i18n/client'
 import { useProfile } from '@/lib/profile'
 import { useDoneIds } from '@/lib/progress-store'
 
-const ICON: Record<string, string> = { 'blokla-kodlama': '🧩', 'oyun-yapimi': '🎮', 'mikro-kart': '🔆', arduino: '💡', robotik: '🤖', 'yapay-zeka': '🧠' }
+const ICON: Record<string, string> = { 'blokla-kodlama': '🧩', 'oyun-yapimi': '🎮', 'mikro-kart': '🔆', arduino: '💡', 'elektronik-muhendisligi': '🔌', robotik: '🤖', 'robotik-muhendisligi': '🚁', 'yapay-zeka': '🧠' }
 
 /**
  * Konu kataloğu (Brilliant "Topics" gibi): bölüm → konu satırı (seviye etiketi, ad, tek cümlelik vaat).
@@ -89,6 +89,16 @@ export function TopicsView({ catalog }: { catalog: CatalogModule[] }) {
                                 <Link className="v2-btn ghost" href={`/moduller/${slug}`}>{t('topics.map')}</Link>
                                 {first && <Link className="v2-btn accent" href={`/ders/${first.id}`}>{c.done ? t('topics.continue') : t('topics.start')}</Link>}
                               </div>
+                            </li>
+                          )
+                        })}
+                        {tp.links?.map((l, i) => {
+                          const lt = locale === 'en' ? l.en : l
+                          return (
+                            <li key={l.href} className="tp-course">
+                              <span className="tp-step" aria-hidden="true">{tp.courses.length + i + 1}</span>
+                              <div><b>{lt.title}</b><p className="muted">{lt.text}</p></div>
+                              <div className="tp-go"><Link className="v2-btn accent" href={l.href}>{t('topics.start')}</Link></div>
                             </li>
                           )
                         })}

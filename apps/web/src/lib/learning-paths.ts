@@ -27,6 +27,8 @@ export interface Topic {
   bands: BandKey[]
   /** Kurslar, önerilen sırayla (modül slug'ları). */
   courses: string[]
+  /** Modül olmayan bağlantılı içerik (Mühendislik yolu, üniversite dersi); kursların ardından listelenir. */
+  links?: TopicLink[]
   /** Henüz yazılmamış kurslar (katalogda "Yakında"). */
   soon?: string[]
   interests: Interest[]
@@ -34,12 +36,19 @@ export interface Topic {
   en: { title: string; promise: string; label: string; soon?: string[] }
 }
 
+export interface TopicLink { href: string; title: string; text: string; en: { title: string; text: string } }
+
+const ENG_PATH: TopicLink = { href: '/muhendislik', title: 'Mühendislik yolu (Hyvex)', text: '128 gerçek parça, 7 seviye: temel bileşenden drone\'a; 49\'u laboratuvarda takılı açılır.', en: { title: 'Engineering path (Hyvex)', text: '128 real parts in 7 levels, from basic components to drones; 49 open wired up in the lab.' } }
+const ESOF323: TopicLink = { href: '/muhendislik/robotik', title: 'Robotik dersi (ESOF 323)', text: 'Üniversite düzeyi 14 hafta: PID, kinematik, planlama, görü, derin öğrenme, ROS 2 ve drone.', en: { title: 'Robotics course (ESOF 323)', text: 'University-level, 14 weeks: PID, kinematics, planning, vision, deep learning, ROS 2 and drones.' } }
+
 export const TOPICS: Topic[] = [
   { key: 'blokla-kodlama', section: 'Kodlama', title: 'Blokla Kodlama', promise: 'Komut ver, karakter yapsın.', label: '5–7 YAŞ', bands: ['minikler'], courses: ['scratchjr'], interests: ['kodlama', 'oyun'], en: { title: 'Block Coding', promise: 'Give a command, watch your character do it.', label: 'AGES 5–7' } },
   { key: 'oyun-yapimi', section: 'Kodlama', title: 'Oyun Yapımı', promise: 'Hayal ettiğin oyunu bloklarla kur.', label: '8–12 YAŞ', bands: ['kasifler', 'yapicilar'], courses: ['scratch', 'oyun-atolyesi'], interests: ['kodlama', 'oyun'], en: { title: 'Game Making', promise: 'Build the game you dream of with blocks.', label: 'AGES 8–12' } },
   { key: 'mikro-kart', section: 'Elektronik', title: 'Mikro Kart', promise: 'Işık, ses ve sensörlerle ilk kartını programla.', label: '8–12 YAŞ', bands: ['kasifler', 'yapicilar'], courses: ['mikro-kart'], interests: ['elektronik', 'robotik', 'kodlama'], en: { title: 'Micro Board', promise: 'Program your first board with light, sound and sensors.', label: 'AGES 8–12' } },
-  { key: 'arduino', section: 'Elektronik', title: 'Arduino ve Sensörler', promise: 'Devre kur, kodla, dünyayı ölç.', label: '12+ YAŞ', bands: ['muhendis-adaylari', 'muhendisler'], courses: ['arduino-temelleri', 'sensorler-ve-projeler'], interests: ['elektronik', 'robotik', 'kodlama'], en: { title: 'Arduino and Sensors', promise: 'Build circuits, write code, measure the world.', label: 'AGES 12+' } },
-  { key: 'robotik', section: 'Robotik', title: 'Robotik', promise: 'Robotunu sür, engelden kaçır, çizgiyi izlet.', label: '13+ YAŞ', bands: ['muhendis-adaylari', 'muhendisler'], courses: ['robotik'], soon: ['Diğer Kartlar (ESP32, RP2040, Pi)', 'Robot Kol', 'Drone'], interests: ['robotik'], en: { title: 'Robotics', promise: 'Drive your robot, dodge obstacles, follow the line.', label: 'AGES 13+', soon: ['Other Boards (ESP32, RP2040, Pi)', 'Robot Arm', 'Drone'] } },
+  { key: 'arduino', section: 'Elektronik', title: 'Arduino ve Sensörler', promise: 'Devre kur, kodla, dünyayı ölç.', label: '12–14 YAŞ', bands: ['muhendis-adaylari'], courses: ['arduino-temelleri', 'sensorler-ve-projeler'], interests: ['elektronik', 'robotik', 'kodlama'], en: { title: 'Arduino and Sensors', promise: 'Build circuits, write code, measure the world.', label: 'AGES 12–14' } },
+  { key: 'elektronik-muhendisligi', section: 'Elektronik', title: 'Elektronik Mühendisliği', promise: 'Gerçek sensör, sürücü ve kartlarla temelden drone\'a.', label: '14+ YAŞ', bands: ['muhendisler'], courses: ['arduino-temelleri', 'sensorler-ve-projeler'], links: [ENG_PATH], interests: ['elektronik', 'robotik', 'kodlama'], en: { title: 'Electronics Engineering', promise: 'Real sensors, drivers and boards, from the basics to drones.', label: 'AGES 14+' } },
+  { key: 'robotik', section: 'Robotik', title: 'Robotik', promise: 'Robotunu sür, engelden kaçır, çizgiyi izlet.', label: '12–14 YAŞ', bands: ['muhendis-adaylari'], courses: ['robotik'], interests: ['robotik'], en: { title: 'Robotics', promise: 'Drive your robot, dodge obstacles, follow the line.', label: 'AGES 12–14' } },
+  { key: 'robotik-muhendisligi', section: 'Robotik', title: 'Robotik Mühendisliği', promise: 'Kontrol, kinematik, görü ve drone: üniversite düzeyinde robotik.', label: '14+ YAŞ', bands: ['muhendisler'], courses: ['robotik'], links: [ESOF323], interests: ['robotik'], en: { title: 'Robotics Engineering', promise: 'Control, kinematics, vision and drones: university-level robotics.', label: 'AGES 14+' } },
   { key: 'yapay-zeka', section: 'Yapay Zekâ', title: 'Yapay Zekâ Mühendisliği', promise: 'Dil modellerinin içine bak, kendi AI uygulamanı kur.', label: '13+ YAŞ', bands: ['muhendis-adaylari', 'muhendisler'], courses: ['ai-muhendisligi'], soon: ['AI Keşif (10–12 yaş)'], interests: ['ai'], en: { title: 'AI Engineering', promise: 'Look inside language models and build your own AI app.', label: 'AGES 13+', soon: ['AI Discovery (ages 10–12)'] } },
 ]
 
@@ -78,7 +87,9 @@ export function recommend(input: { age: number; interests: Interest[]; level: Le
   const band = bandForAge(input.age)
   const wants = (i: Interest) => input.interests.includes(i)
   const topic = (k: string) => TOPICS.find((t) => t.key === k)!
-  const pick = (k: string, course: string, reason: string, reasonEn: string): Recommendation => ({ band, topic: topic(k), course, reason, reasonEn })
+  // Lise bandında (14+) Arduino ve Robotik konuları mühendislik karşılıklarıyla gösterilir (aynı kurslar)
+  const LISE: Record<string, string> = { arduino: 'elektronik-muhendisligi', robotik: 'robotik-muhendisligi' }
+  const pick = (k: string, course: string, reason: string, reasonEn: string): Recommendation => ({ band, topic: topic(band.key === 'muhendisler' ? (LISE[k] ?? k) : k), course, reason, reasonEn })
 
   if (input.age <= 7) return pick('blokla-kodlama', 'scratchjr', 'Okuma gerektirmeyen bloklarla, hikâye kurarak başlıyoruz.', 'We start with blocks that need no reading, by telling stories.')
   if (input.age <= 11) {
