@@ -1,14 +1,16 @@
 'use client'
 import type { GoalStatus } from '@/lib/jr/analysis'
+import { useT } from '@/i18n/client'
 
 export function GoalsPanel({ status }: { status: GoalStatus[] }) {
+  const t = useT()
   if (!status.length) return null
   const done = status.filter((g) => g.done).length
   const all = done === status.length
   return (
-    <section className={`jr-goals${all ? ' all' : ''}`} aria-label="Hedefler">
+    <section className={`jr-goals${all ? ' all' : ''}`} aria-label={t('studios.jr.goals.aria')}>
       <div className="jr-goals-head">
-        <b>Hedefler</b>
+        <b>{t('studios.jr.goals.title')}</b>
         <span>{done} / {status.length}</span>
       </div>
       <ul>
@@ -22,7 +24,7 @@ export function GoalsPanel({ status }: { status: GoalStatus[] }) {
           </li>
         ))}
       </ul>
-      {all && <p className="jr-goals-ok">Tüm hedefler tamam. Harika iş!</p>}
+      {all && <p className="jr-goals-ok">{t('studios.jr.goals.allDone')}</p>}
     </section>
   )
 }

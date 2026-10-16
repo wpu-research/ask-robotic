@@ -17,6 +17,8 @@ export interface OyunSample {
   level: 1 | 2 | 3
   /** Oyuncuya kısa kullanım notu. */
   controls: string
+  /** İngilizce ad, özet ve kullanım notu (site dili İngilizceyken). */
+  en?: { name: string; summary: string; controls: string }
   project: () => OyunProject
 }
 

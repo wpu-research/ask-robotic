@@ -18,6 +18,8 @@ import { SimPanel } from './sim-panel'
 import { RobotArena } from './robot-arena'
 import { ROBOT_PROFILES, type RobotProfileId, type RobotScene } from '@/lib/mikro/robot'
 import { logEvent } from '@/lib/events'
+import { errorText } from '@/lib/mikro/en'
+import { useI18n } from '@/i18n/client'
 import './mikro.css'
 
 export interface MikroEditorProps {
@@ -58,10 +60,12 @@ function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation, robot?:
   return sim
 }
 
-const fmtTime = (ms: number) => `${(ms / 1000).toFixed(1).replace('.', ',')} sn`
-
 export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject, robot, onProjectChange }: MikroEditorProps) {
-  const base = useMemo(() => initialProject ?? activity?.starter() ?? emptyProject(), [initialProject, activity])
+  const { locale, t } = useI18n()
+  const en = locale === 'en'
+  const fmtTime = (ms: number) => { const n = (ms / 1000).toFixed(1); return t('mikro.common.seconds', { n: en ? n : n.replace('.', ',') }) }
+  const defaultName = t('mikro.editor.defaultName')
+  const base = useMemo(() => initialProject ?? activity?.starter() ?? emptyProject(defaultName), [initialProject, activity, defaultName])
   const [project, setProject] = useState<MikroProject>(base)
   const [resetKey, setResetKey] = useState('0')
   const [loaded, setLoaded] = useState(false)
@@ -195,22 +199,24 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
     setSim(makeSim(p, cards, sim, robot))
   }
   const hasWork = countBlocks(project.workspace) > 0
-  const confirmReplace = () => !hasWork || window.confirm('Şu anki projenin üzerine yazılacak. Devam edelim mi?')
+  const confirmReplace = () => !hasWork || window.confirm(t('mikro.editor.confirmReplace'))
 
   const openExample = (ex: MikroExample) => {
     if (!confirmReplace()) return
-    loadNew(ex.build(), ex.cards ?? 1)
+    const p = ex.build()
+    if (en) p.name = ex.en.title
+    loadNew(p, ex.cards ?? 1)
     setGalleryOpen(false); setTab('blocks')
-    say(`"${ex.title}" örneği açıldı. ${ex.tryIt}`)
+    say(t('mikro.editor.exampleOpened', en ? { title: ex.en.title, tryIt: ex.en.tryIt } : { title: ex.title, tryIt: ex.tryIt }))
   }
   const newProject = () => {
     if (activity) {
-      if (!window.confirm('Etkinliğin başlangıç haline dönmek istiyor musun? Yaptıkların silinir.')) return
+      if (!window.confirm(t('mikro.editor.confirmRestart'))) return
       loadNew(activity.starter(), activity.cards === 2 ? 2 : 1)
       return
     }
-    if (hasWork && !window.confirm('Yeni, boş bir proje açılsın mı? Şu anki projeyi dışa aktarmadıysan kaybolur.')) return
-    loadNew(emptyProject(), 1)
+    if (hasWork && !window.confirm(t('mikro.editor.confirmNew'))) return
+    loadNew(emptyProject(defaultName), 1)
   }
   const doExport = () => {
     const blob = new Blob([exportProject(project)], { type: 'application/json' })
@@ -219,16 +225,16 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
     a.href = url; a.download = fileNameFor(project)
     document.body.appendChild(a); a.click(); a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
-    say('Proje dosyası indirildi.')
+    say(t('mikro.editor.exported'))
   }
   const doImport = async (file: File | undefined) => {
     if (!file) return
     const text = await file.text()
     const r = parseProject(text)
-    if (!r.ok) { say(`İçe aktarılamadı: ${r.error}`); return }
+    if (!r.ok) { say(t('mikro.editor.importFailed', { error: errorText(r.error, locale) })); return }
     if (!confirmReplace()) return
     loadNew(r.project, 1)
-    say(`"${r.project.name}" projesi açıldı.`)
+    say(t('mikro.editor.imported', { name: r.project.name }))
   }
   const toggleMute = () => {
     const next = !muted
@@ -242,65 +248,71 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
   const js = useMemo(() => (tab === 'js' ? toJavaScript(project.workspace) : ''), [tab, project.workspace])
   const py = useMemo(() => (tab === 'py' ? toPython(project.workspace) : ''), [tab, project.workspace])
   const copyCode = async () => {
-    try { await navigator.clipboard.writeText(tab === 'js' ? js : py); say('Kod kopyalandı.') } catch { say('Kopyalanamadı.') }
+    try { await navigator.clipboard.writeText(tab === 'js' ? js : py); say(t('mikro.editor.copied')) } catch { say(t('mikro.editor.copyFailed')) }
   }
 
   const doneCount = goalStatus.filter((g) => g.done).length
   const allDone = goalStatus.length > 0 && doneCount === goalStatus.length
   const allowed = activity?.allowedBlocks ?? null
+  const actEn = en ? activity?.en : undefined
+  const intro = actEn?.intro ?? activity?.intro
 
   return (
     <div className="mk-box"><div className={`mk-ed${robot ? ' mk-robot' : ''}`} data-testid="mikro-editor" data-running={running}>
       {/* üst çubuk */}
-      <div className="mk-bar" role="toolbar" aria-label="Mikro Kart araçları">
+      <div className="mk-bar" role="toolbar" aria-label={t('mikro.editor.toolbar')}>
         <div className="mk-run">
-          <button className="mk-round go" onClick={start} aria-label="Çalıştır" title="Çalıştır" data-testid="mikro-run">{Icon.play}</button>
-          <button className="mk-round halt" onClick={stop} disabled={!running} aria-label="Durdur" title="Durdur" data-testid="mikro-stop">{Icon.stop}</button>
-          <button className="mk-round rst" onClick={reset} aria-label="Sıfırla" title="Sıfırla (kartı temizle)" data-testid="mikro-reset">{Icon.reset}</button>
+          <button className="mk-round go" onClick={start} aria-label={t('mikro.editor.run')} title={t('mikro.editor.run')} data-testid="mikro-run">{Icon.play}</button>
+          <button className="mk-round halt" onClick={stop} disabled={!running} aria-label={t('mikro.editor.stop')} title={t('mikro.editor.stop')} data-testid="mikro-stop">{Icon.stop}</button>
+          <button className="mk-round rst" onClick={reset} aria-label={t('mikro.editor.reset')} title={t('mikro.editor.resetTitle')} data-testid="mikro-reset">{Icon.reset}</button>
         </div>
-        <input className="mk-name" value={project.name} maxLength={60} onChange={(e) => setProject((p) => ({ ...p, name: e.target.value }))} aria-label="Proje adı" data-testid="mikro-name" />
+        <input className="mk-name" value={project.name} maxLength={60} onChange={(e) => setProject((p) => ({ ...p, name: e.target.value }))} aria-label={t('mikro.editor.projectName')} data-testid="mikro-name" />
         <span className="mk-state" data-testid="mikro-state">
-          {error ? <b className="err">Hata</b> : running ? <b className="ok">Çalışıyor</b> : ran ? 'Durdu' : 'Hazır'} · {fmtTime(sim.now)}
+          {error ? <b className="err">{t('mikro.editor.stateError')}</b> : running ? <b className="ok">{t('mikro.editor.stateRunning')}</b> : ran ? t('mikro.editor.stateStopped') : t('mikro.editor.stateReady')} · {fmtTime(sim.now)}
         </span>
-        {dirty && running && <span className="mk-chipnote">Değişiklikler için ▶ düğmesine bas</span>}
+        {dirty && running && <span className="mk-chipnote">{t('mikro.editor.dirtyHint')}</span>}
         <span className="mk-spacer" />
-        {!activity && !robot && <button className="mk-btn" onClick={() => setGalleryOpen(true)} data-testid="mikro-gallery-open">Örnekler</button>}
-        <button className="mk-btn" onClick={newProject} data-testid="mikro-new">{activity ? 'Başa dön' : 'Yeni'}</button>
-        <button className="mk-btn" onClick={doExport} data-testid="mikro-export">Dışa aktar</button>
-        <button className="mk-btn" onClick={() => fileRef.current?.click()} data-testid="mikro-import">İçe aktar</button>
+        {!activity && !robot && <button className="mk-btn" onClick={() => setGalleryOpen(true)} data-testid="mikro-gallery-open">{t('mikro.editor.examples')}</button>}
+        <button className="mk-btn" onClick={newProject} data-testid="mikro-new">{activity ? t('mikro.editor.restart') : t('mikro.editor.newProject')}</button>
+        <button className="mk-btn" onClick={doExport} data-testid="mikro-export">{t('mikro.editor.export')}</button>
+        <button className="mk-btn" onClick={() => fileRef.current?.click()} data-testid="mikro-import">{t('mikro.editor.import')}</button>
         <input ref={fileRef} type="file" accept=".json,application/json" hidden onChange={(e) => { void doImport(e.target.files?.[0]); e.target.value = '' }} data-testid="mikro-import-file" />
       </div>
 
       {notice && <div className="mk-notice" role="status" data-testid="mikro-notice">{notice}</div>}
       {error && (
         <div className="mk-error" role="alert" data-testid="mikro-error">
-          <b>Program durdu{sim.cards.length > 1 ? ` (kart ${error.card + 1})` : ''}:</b> {error.message}
+          <b>{t('mikro.editor.programStopped')}{sim.cards.length > 1 ? t('mikro.editor.onCard', { n: error.card + 1 }) : ''}:</b> {errorText(error.message, locale)}
         </div>
       )}
 
       <div className="mk-main">
         {/* sol: bloklar / kod */}
-        <section className="mk-left" aria-label="Program">
+        <section className="mk-left" aria-label={t('mikro.editor.program')}>
           {activity && (
             <div className={`mk-goals${allDone ? ' all' : ''}`} data-testid="mikro-goals">
-              {activity.intro && <p className="mk-intro">{activity.intro}</p>}
-              <div className="mk-goals-head"><b>Hedefler</b><span>{doneCount} / {goalStatus.length}</span></div>
+              {intro && <p className="mk-intro">{intro}</p>}
+              <div className="mk-goals-head"><b>{t('mikro.editor.goals')}</b><span>{doneCount} / {goalStatus.length}</span></div>
               <ul>
-                {goalStatus.map((g) => (
+                {goalStatus.map((g) => {
+                  const ge = actEn?.goals?.[g.id]
+                  const text = ge?.text ?? g.text, hint = ge ? ge.hint : g.hint
+                  return (
                   <li key={g.id} className={g.done ? 'done' : ''} data-goal={g.id} data-done={g.done}>
                     <span className="mk-goal-mark" aria-hidden="true">{g.done ? '✓' : ''}</span>
-                    <span>{g.text}{!g.done && g.hint && <small>{g.hint}</small>}</span>
+                    <span>{text}{!g.done && hint && <small>{hint}</small>}</span>
                   </li>
-                ))}
+                  )
+                })}
               </ul>
-              {allDone && <p className="mk-goals-ok">Tüm hedefler tamam. Harika iş!</p>}
+              {allDone && <p className="mk-goals-ok">{t('mikro.editor.allDone')}</p>}
             </div>
           )}
-          <div className="mk-tabs" role="tablist" aria-label="Görünüm">
-            {([['blocks', 'Bloklar'], ['js', 'JavaScript'], ['py', 'Python']] as [Tab, string][]).map(([k, label]) => (
+          <div className="mk-tabs" role="tablist" aria-label={t('mikro.editor.view')}>
+            {([['blocks', t('mikro.editor.tabBlocks')], ['js', 'JavaScript'], ['py', 'Python']] as [Tab, string][]).map(([k, label]) => (
               <button key={k} role="tab" aria-selected={tab === k} className={tab === k ? 'on' : ''} onClick={() => setTab(k)} data-testid={`mikro-tab-${k}`}>{label}</button>
             ))}
-            {tab !== 'blocks' && <button className="mk-btn small" onClick={copyCode} data-testid="mikro-copy">Kopyala</button>}
+            {tab !== 'blocks' && <button className="mk-btn small" onClick={copyCode} data-testid="mikro-copy">{t('mikro.editor.copy')}</button>}
           </div>
           <div className="mk-work">
             {/* Blockly sekme değişince yok edilmesin: gizlenir */}
@@ -313,11 +325,11 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
         </section>
 
         {/* sağ: sanal kart(lar) */}
-        <aside className="mk-right" aria-label={sim.robot ? 'Sanal robot' : 'Sanal kart'}>
+        <aside className="mk-right" aria-label={sim.robot ? t('mikro.editor.robotSide') : t('mikro.editor.cardSide')}>
           {sim.robot && <RobotArena robot={sim.robot} device={sim.device} tick={tick} />}
           <div className={`mk-boards${sim.cards.length > 1 ? ' two' : ''}`}>
             {sim.cards.map((c, i) => (
-              <Board key={i} device={c.device} tick={tick} title={sim.robot ? 'ROBOTUN KARTI' : sim.cards.length > 1 ? `KART ${i + 1}` : 'MİKRO KART'} compact={sim.cards.length > 1 || !!sim.robot}
+              <Board key={i} device={c.device} tick={tick} title={sim.robot ? t('mikro.editor.robotCard') : sim.cards.length > 1 ? t('mikro.editor.cardN', { n: i + 1 }) : t('mikro.editor.card')} compact={sim.cards.length > 1 || !!sim.robot}
                 onButton={(b, down) => { if (down) c.device.press(b); else c.device.release(b); bump() }}
                 onLogo={(down) => { c.device.setLogo(down); bump() }}
                 onPin={(p, down) => { c.device.setPinTouch(p, down); bump() }} />
@@ -329,15 +341,15 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
 
       {galleryOpen && (
         <div className="mk-dialog-overlay" onClick={(e) => { if (e.target === e.currentTarget) setGalleryOpen(false) }} data-testid="mikro-gallery">
-          <div className="mk-dialog wide" role="dialog" aria-modal="true" aria-label="Örnek projeler">
-            <div className="mk-gal-head"><h2>Örnek projeler</h2><button className="mk-btn" onClick={() => setGalleryOpen(false)}>Kapat</button></div>
+          <div className="mk-dialog wide" role="dialog" aria-modal="true" aria-label={t('mikro.editor.galleryTitle')}>
+            <div className="mk-gal-head"><h2>{t('mikro.editor.galleryTitle')}</h2><button className="mk-btn" onClick={() => setGalleryOpen(false)}>{t('mikro.editor.close')}</button></div>
             <ul className="mk-gal">
               {EXAMPLES.map((ex) => (
                 <li key={ex.id}>
                   <button className="mk-gal-card" onClick={() => openExample(ex)} data-testid={`mikro-example-${ex.id}`}>
-                    <b>{ex.title}</b>
-                    <span>{ex.description}</span>
-                    {ex.cards === 2 && <em>2 kart</em>}
+                    <b>{en ? ex.en.title : ex.title}</b>
+                    <span>{en ? ex.en.description : ex.description}</span>
+                    {ex.cards === 2 && <em>{t('mikro.editor.twoCards')}</em>}
                   </button>
                 </li>
               ))}

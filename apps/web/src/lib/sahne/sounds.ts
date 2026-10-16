@@ -19,35 +19,35 @@ const note = (freq: number): ToneStep[] => [
   { freq: freq * 2, at: 0, ms: 260, wave: 'sine', vol: 0.06 },
 ]
 
-export interface SoundGalleryItem { id: string; name: string; group: 'notalar' | 'efektler' | 'hayvanlar' | 'oyun'; steps: ToneStep[] }
+export interface SoundGalleryItem { id: string; name: string; nameEn: string; group: 'notalar' | 'efektler' | 'hayvanlar' | 'oyun'; steps: ToneStep[] }
 
 export const SOUND_GALLERY: readonly SoundGalleryItem[] = [
-  { id: 'do', name: 'Do', group: 'notalar', steps: note(261.63) },
-  { id: 're', name: 'Re', group: 'notalar', steps: note(293.66) },
-  { id: 'mi', name: 'Mi', group: 'notalar', steps: note(329.63) },
-  { id: 'fa', name: 'Fa', group: 'notalar', steps: note(349.23) },
-  { id: 'sol', name: 'Sol', group: 'notalar', steps: note(392) },
-  { id: 'la', name: 'La', group: 'notalar', steps: note(440) },
-  { id: 'si', name: 'Si', group: 'notalar', steps: note(493.88) },
-  { id: 'do2', name: 'Tiz Do', group: 'notalar', steps: note(523.25) },
-  { id: 'davul', name: 'Davul', group: 'efektler', steps: [{ freq: 140, to: 50, at: 0, ms: 220, wave: 'sine', vol: 0.4 }, { freq: 0, at: 0, ms: 60, wave: 'noise', vol: 0.12 }] },
-  { id: 'zil', name: 'Zil', group: 'efektler', steps: [{ freq: 1760, at: 0, ms: 600, wave: 'sine', vol: 0.12 }, { freq: 2637, at: 0, ms: 420, wave: 'sine', vol: 0.07 }] },
-  { id: 'alkis', name: 'Alkış', group: 'efektler', steps: [0, 90, 190, 260, 360, 430].map((at) => ({ freq: 0, at, ms: 70, wave: 'noise' as const, vol: 0.16 })) },
-  { id: 'bip', name: 'Bip', group: 'efektler', steps: [{ freq: 880, at: 0, ms: 110, wave: 'square', vol: 0.1 }] },
-  { id: 'pop', name: 'Pop', group: 'efektler', steps: [{ freq: 520, to: 1200, at: 0, ms: 70, wave: 'sine', vol: 0.25 }] },
-  { id: 'lazer', name: 'Lazer', group: 'efektler', steps: [{ freq: 1300, to: 180, at: 0, ms: 200, wave: 'sawtooth', vol: 0.1 }] },
-  { id: 'patlama', name: 'Patlama', group: 'efektler', steps: [{ freq: 0, at: 0, ms: 380, wave: 'noise', vol: 0.28 }] },
-  { id: 'ziplama', name: 'Zıplama', group: 'oyun', steps: [{ freq: 260, to: 720, at: 0, ms: 150, wave: 'triangle', vol: 0.22 }] },
-  { id: 'puan', name: 'Puan', group: 'oyun', steps: [{ freq: 880, at: 0, ms: 80, wave: 'square', vol: 0.1 }, { freq: 1318.5, at: 80, ms: 140, wave: 'square', vol: 0.1 }] },
-  { id: 'kazan', name: 'Kazandın', group: 'oyun', steps: seq([523.25, 659.25, 783.99, 1046.5], 110, 150, 'square') },
-  { id: 'kaybet', name: 'Kaybettin', group: 'oyun', steps: seq([392, 329.63, 261.63, 196], 180, 230, 'triangle', 0.22) },
-  { id: 'miyav', name: 'Miyav', group: 'hayvanlar', steps: [{ freq: 560, to: 920, at: 0, ms: 160, wave: 'sawtooth', vol: 0.1 }, { freq: 920, to: 460, at: 160, ms: 260, wave: 'sawtooth', vol: 0.1 }] },
-  { id: 'hav', name: 'Hav', group: 'hayvanlar', steps: [{ freq: 320, to: 180, at: 0, ms: 130, wave: 'square', vol: 0.12 }, { freq: 300, to: 170, at: 190, ms: 130, wave: 'square', vol: 0.12 }] },
-  { id: 'cik', name: 'Cik cik', group: 'hayvanlar', steps: [0, 120, 240].map((at) => ({ freq: 2300, to: 3100, at, ms: 70, wave: 'sine' as const, vol: 0.1 })) },
+  { id: 'do', name: 'Do', nameEn: 'C (Do)', group: 'notalar', steps: note(261.63) },
+  { id: 're', name: 'Re', nameEn: 'D (Re)', group: 'notalar', steps: note(293.66) },
+  { id: 'mi', name: 'Mi', nameEn: 'E (Mi)', group: 'notalar', steps: note(329.63) },
+  { id: 'fa', name: 'Fa', nameEn: 'F (Fa)', group: 'notalar', steps: note(349.23) },
+  { id: 'sol', name: 'Sol', nameEn: 'G (Sol)', group: 'notalar', steps: note(392) },
+  { id: 'la', name: 'La', nameEn: 'A (La)', group: 'notalar', steps: note(440) },
+  { id: 'si', name: 'Si', nameEn: 'B (Si)', group: 'notalar', steps: note(493.88) },
+  { id: 'do2', name: 'Tiz Do', nameEn: 'High C', group: 'notalar', steps: note(523.25) },
+  { id: 'davul', name: 'Davul', nameEn: 'Drum', group: 'efektler', steps: [{ freq: 140, to: 50, at: 0, ms: 220, wave: 'sine', vol: 0.4 }, { freq: 0, at: 0, ms: 60, wave: 'noise', vol: 0.12 }] },
+  { id: 'zil', name: 'Zil', nameEn: 'Bell', group: 'efektler', steps: [{ freq: 1760, at: 0, ms: 600, wave: 'sine', vol: 0.12 }, { freq: 2637, at: 0, ms: 420, wave: 'sine', vol: 0.07 }] },
+  { id: 'alkis', name: 'Alkış', nameEn: 'Clap', group: 'efektler', steps: [0, 90, 190, 260, 360, 430].map((at) => ({ freq: 0, at, ms: 70, wave: 'noise' as const, vol: 0.16 })) },
+  { id: 'bip', name: 'Bip', nameEn: 'Beep', group: 'efektler', steps: [{ freq: 880, at: 0, ms: 110, wave: 'square', vol: 0.1 }] },
+  { id: 'pop', name: 'Pop', nameEn: 'Pop', group: 'efektler', steps: [{ freq: 520, to: 1200, at: 0, ms: 70, wave: 'sine', vol: 0.25 }] },
+  { id: 'lazer', name: 'Lazer', nameEn: 'Laser', group: 'efektler', steps: [{ freq: 1300, to: 180, at: 0, ms: 200, wave: 'sawtooth', vol: 0.1 }] },
+  { id: 'patlama', name: 'Patlama', nameEn: 'Explosion', group: 'efektler', steps: [{ freq: 0, at: 0, ms: 380, wave: 'noise', vol: 0.28 }] },
+  { id: 'ziplama', name: 'Zıplama', nameEn: 'Jump', group: 'oyun', steps: [{ freq: 260, to: 720, at: 0, ms: 150, wave: 'triangle', vol: 0.22 }] },
+  { id: 'puan', name: 'Puan', nameEn: 'Point', group: 'oyun', steps: [{ freq: 880, at: 0, ms: 80, wave: 'square', vol: 0.1 }, { freq: 1318.5, at: 80, ms: 140, wave: 'square', vol: 0.1 }] },
+  { id: 'kazan', name: 'Kazandın', nameEn: 'You Win', group: 'oyun', steps: seq([523.25, 659.25, 783.99, 1046.5], 110, 150, 'square') },
+  { id: 'kaybet', name: 'Kaybettin', nameEn: 'You Lose', group: 'oyun', steps: seq([392, 329.63, 261.63, 196], 180, 230, 'triangle', 0.22) },
+  { id: 'miyav', name: 'Miyav', nameEn: 'Meow', group: 'hayvanlar', steps: [{ freq: 560, to: 920, at: 0, ms: 160, wave: 'sawtooth', vol: 0.1 }, { freq: 920, to: 460, at: 160, ms: 260, wave: 'sawtooth', vol: 0.1 }] },
+  { id: 'hav', name: 'Hav', nameEn: 'Woof', group: 'hayvanlar', steps: [{ freq: 320, to: 180, at: 0, ms: 130, wave: 'square', vol: 0.12 }, { freq: 300, to: 170, at: 190, ms: 130, wave: 'square', vol: 0.12 }] },
+  { id: 'cik', name: 'Cik cik', nameEn: 'Tweet', group: 'hayvanlar', steps: [0, 120, 240].map((at) => ({ freq: 2300, to: 3100, at, ms: 70, wave: 'sine' as const, vol: 0.1 })) },
 ]
 export const SOUND_BY_ID: Readonly<Record<string, SoundGalleryItem>> = Object.fromEntries(SOUND_GALLERY.map((s) => [s.id, s]))
-export const SOUND_GROUPS: readonly { id: SoundGalleryItem['group']; label: string }[] = [
-  { id: 'notalar', label: 'Notalar' }, { id: 'efektler', label: 'Efektler' }, { id: 'oyun', label: 'Oyun' }, { id: 'hayvanlar', label: 'Hayvanlar' },
+export const SOUND_GROUPS: readonly { id: SoundGalleryItem['group']; label: string; labelEn: string }[] = [
+  { id: 'notalar', label: 'Notalar', labelEn: 'Notes' }, { id: 'efektler', label: 'Efektler', labelEn: 'Effects' }, { id: 'oyun', label: 'Oyun', labelEn: 'Game' }, { id: 'hayvanlar', label: 'Hayvanlar', labelEn: 'Animals' },
 ]
 
 export const makeSound = (gid: string, name?: string): SoundRef => ({ name: name ?? SOUND_BY_ID[gid]?.name ?? gid, gid })

@@ -89,3 +89,70 @@ export const AGENT_KB: Readonly<Record<string, string>> = {
   'servo açı aralığı': '0-180 derece',
   'robot hızı': '5',
 }
+
+// ───────── İngilizce karşılıklar (serbest atölye, site dili İngilizceyken) ─────────
+
+/** Sonraki-kelime oyuncağının İngilizce derlemi (CORPUS_TR'nin karşılığı; BPE derlemi CORPUS_EN'e dokunulmaz). */
+export const NGRAM_EN = `the robot moves forward .
+the robot moves backward .
+the robot turns left .
+the robot turns right .
+the robot sees the obstacle and stops .
+the robot sees the obstacle and turns left .
+the robot measures the distance and makes a decision .
+the sensor measures the distance .
+the sensor measures the light .
+the sensor sees the obstacle .
+the motor turns the wheel .
+the motor turns fast .
+the motor turns slowly .
+the robot moves fast .
+the robot moves slowly .
+the robot follows the line and moves forward .
+the robot sees the line and turns right .
+the camera reads the image .
+the camera sees the obstacle .
+the program controls the robot .
+the program reads the sensor and runs the motor .
+the program makes the decision .
+the student writes the program .
+the student tests the robot .
+the student finds the mistake and fixes the program .
+the student tests the sensor .
+the teacher helps the student .
+the robot keeps going .
+the robot sees the path and moves forward .
+the robot sees the wall and moves backward .
+the robot sees the wall and stops .
+the robot sees the wall and turns right .
+the robot follows the line .
+the robot passes the obstacle .
+the sensor reads the data and the program makes the decision .
+the motor waits for the program .
+the robot moves forward and stops .
+the robot turns right and moves forward .
+the robot turns left and moves forward .
+the robot moves fast and sees the obstacle .`
+
+export const DOCS_ROBOT_EN: readonly Doc[] = [
+  { id: 'd1', title: 'Servo motor', text: 'A servo motor turns to a set angle and stays at that angle.' },
+  { id: 'd2', title: 'Ultrasonic sensor', text: 'An ultrasonic sensor calculates distance from the time a sound wave takes to come back.' },
+  { id: 'd3', title: 'Line-following robot', text: 'A line-following robot sees the black line on the floor with an infrared sensor and tries to stay on the line.' },
+  { id: 'd4', title: 'LED and resistor', text: 'A resistor is placed in front of an LED to limit the current.' },
+  { id: 'd5', title: 'Potentiometer', text: 'A potentiometer is an adjustable resistor whose resistance changes as it is turned.' },
+  { id: 'd6', title: 'Python and sensor', text: 'A program written in Python can read the robot sensor data and change the motor speed.' },
+  { id: 'd7', title: 'Bat', text: 'A sound wave travels through the air; bats use a similar method to find their way.' },
+  { id: 'd8', title: 'Coin toss', text: 'Tossing a coin is the simplest example for explaining randomness in a probability lesson.' },
+]
+
+/** RAG_GUIDE'ın İngilizcesi (kurgusal; ders için uydurulmuştur). */
+export const RAG_GUIDE_EN = `The Online Robotics Club meets every Tuesday evening at 19.00. Meetings last one hour. No registration is needed to join, but the minimum age is 13. Each meeting starts with a short talk, then members split into small groups. Groups have at most four people. The project deadline is the last Friday of every month. Late projects are still reviewed but cannot earn a badge. There are three kinds of badges: bronze, silver and gold. A bronze badge needs at least two finished projects. A gold badge needs presenting a project to another member. When sharing code in the club, no personal information is written; names, addresses and phone numbers are never put in code. To ask for help, use the help topic in the chat channel. Mentors answer help requests within two days at the latest. Members receive monthly announcements by email. The club does not meet during holiday weeks; the holiday calendar is announced at the start of the year.`
+
+/** AGENT_KB'nin İngilizce anahtarları (aynı değerler). */
+export const AGENT_KB_EN: Readonly<Record<string, string>> = {
+  'member count': '24',
+  'group size': '4',
+  'project count': '6',
+  'servo angle range': '0-180 degrees',
+  'robot speed': '5',
+}

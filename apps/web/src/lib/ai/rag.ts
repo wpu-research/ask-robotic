@@ -1,6 +1,7 @@
 // RAG hattı: parçala → vektörleştir → getir → bağlama yerleştir. İlk dört adım GERÇEKTEN hesaplanır.
 // Son adım (sentez) burada bir model DEĞİLDİR: bağlamdan en çok eşleşen cümleyi seçen basit bir şablondur.
 import { rank, terms, type Item, type Method, type Ranked } from './embedding'
+import type { ContentLang } from './text'
 
 export interface Chunk extends Item { index: number; startWord: number; endWord: number }
 
@@ -19,7 +20,7 @@ export function chunkWords(text: string, size: number, overlap: number): Chunk[]
   return out
 }
 
-export interface RagOptions { size: number; overlap: number; topK: number; method?: Method }
+export interface RagOptions { size: number; overlap: number; topK: number; method?: Method; lang?: ContentLang }
 export interface RagRun {
   chunks: Chunk[]
   ranked: Ranked<Chunk>[]
@@ -30,25 +31,31 @@ export interface RagRun {
 }
 
 export const TEMPLATE_LABEL = 'ŞABLON ÇIKTI — sentez adımı burada gerçek bir model olurdu. Bu satır yalnız bağlamdaki en çok eşleşen cümleyi alıntılar.'
+export const TEMPLATE_LABEL_EN = 'TEMPLATE OUTPUT — a real model would do the synthesis step here. This line only quotes the best-matching sentence from the context.'
 
 export function splitSentences(s: string): string[] {
   return s.split(/(?<=[.!?])\s+/).map((x) => x.trim()).filter(Boolean)
 }
 
 export function runRag(text: string, question: string, opt: RagOptions): RagRun {
+  const lang = opt.lang ?? 'tr'
+  const en = lang === 'en'
   const chunks = chunkWords(text, opt.size, opt.overlap)
-  const ranked = rank(question, chunks, opt.method ?? 'tfidf')
+  const ranked = rank(question, chunks, opt.method ?? 'tfidf', true, lang)
   const retrieved = ranked.slice(0, Math.max(1, opt.topK)).filter((r) => r.score > 0)
   const context = retrieved.map((r, i) => `[${i + 1}] ${r.item.text}`).join('\n')
-  const prompt = `Aşağıdaki bağlama dayanarak soruyu yanıtla. Bağlamda yoksa "bilmiyorum" de.\n\nBağlam:\n${context || '(hiçbir parça getirilemedi)'}\n\nSoru: ${question}`
-  const q = new Set(terms(question))
+  const prompt = en
+    ? `Answer the question using the context below. If it is not in the context, say "I don't know".\n\nContext:\n${context || '(no chunks retrieved)'}\n\nQuestion: ${question}`
+    : `Aşağıdaki bağlama dayanarak soruyu yanıtla. Bağlamda yoksa "bilmiyorum" de.\n\nBağlam:\n${context || '(hiçbir parça getirilemedi)'}\n\nSoru: ${question}`
+  const q = new Set(terms(question, true, lang))
   let best: { s: string; n: number } | null = null
   for (const r of retrieved) for (const s of splitSentences(r.item.text)) {
-    const n = terms(s).filter((t) => q.has(t)).length
+    const n = terms(s, true, lang).filter((t) => q.has(t)).length
     if (n > 0 && (!best || n > best.n)) best = { s, n }
   }
   const sentence = best?.s ?? null
-  return { chunks, ranked, retrieved, context, prompt, template: { label: TEMPLATE_LABEL, text: sentence ?? 'Bağlamda yanıt bulunamadı → gerçek bir model "bilmiyorum" demeliydi.', sentence } }
+  const none = en ? 'No answer found in the context → a real model should have said "I don\'t know".' : 'Bağlamda yanıt bulunamadı → gerçek bir model "bilmiyorum" demeliydi.'
+  return { chunks, ranked, retrieved, context, prompt, template: { label: en ? TEMPLATE_LABEL_EN : TEMPLATE_LABEL, text: sentence ?? none, sentence } }
 }
 
 /** Getirilen bağlam bu ifadeyi (büyük/küçük harf fark etmeden) içeriyor mu? */

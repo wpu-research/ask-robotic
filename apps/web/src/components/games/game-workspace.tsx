@@ -3,7 +3,8 @@
 // Seviye değişince bileşen yeniden bağlanır (key), böylece araç kutusu ve blok sınırı temiz kurulur.
 import { useEffect, useRef, useState } from 'react'
 import type * as BlocklyNS from 'blockly'
-import { blockCount, buildToolbox, toolboxCategories } from '@/lib/games/toolbox'
+import { useLocale, useT } from '@/i18n/client'
+import { blockCount, blockJsonFor, buildToolbox, toolboxCategories, type GameLocale } from '@/lib/games/toolbox'
 import type { ProgramState } from '@/lib/games/program'
 import type { GameDef, LevelDef } from '@/lib/games/types'
 
@@ -22,13 +23,17 @@ export interface GameWorkspaceProps {
   onChange: (program: ProgramState, blocks: number) => void
 }
 
-const defined = new Set<string>()
-function defineGameBlocks(Blockly: B, game: GameDef) {
+// Blockly.Blocks küreseldir: tür → hangi dilde tanımlandığı. Dil değişince tanım o dilin metinleriyle yeniden yazılır.
+const defined = new Map<string, GameLocale>()
+function defineGameBlocks(Blockly: B, game: GameDef, locale: GameLocale) {
   const fresh = game.blocks
-    .filter((d) => !defined.has(d.type))
-    .map((d) => ({ colour: d.colour, ...d.json, type: d.type }))
-  if (fresh.length) Blockly.defineBlocksWithJsonArray(fresh)
-  for (const d of game.blocks) defined.add(d.type)
+    .filter((d) => defined.get(d.type) !== locale)
+    .map((d) => blockJsonFor(d, locale))
+  if (fresh.length) {
+    for (const j of fresh) delete (Blockly.Blocks as Record<string, unknown>)[j.type as string]
+    Blockly.defineBlocksWithJsonArray(fresh)
+  }
+  for (const d of game.blocks) defined.set(d.type, locale)
 }
 
 function makeTheme(Blockly: B) {
@@ -62,6 +67,8 @@ export function GameWorkspace({ game, level, initial, readOnly, highlightId, onC
   const cb = useRef(onChange)
   cb.current = onChange
   const lastHl = useRef<string | null>(null)
+  const locale = useLocale()
+  const t = useT()
 
   useEffect(() => {
     let disposed = false
@@ -71,14 +78,14 @@ export function GameWorkspace({ game, level, initial, readOnly, highlightId, onC
     ;(async () => {
       try {
         const Blockly = await import('blockly')
-        const Tr = await import('blockly/msg/tr').catch(() => null)
+        const Msg = await (locale === 'en' ? import('blockly/msg/en') : import('blockly/msg/tr')).catch(() => null)
         if (disposed || !host.current) return
-        if (Tr) Blockly.setLocale(Tr as unknown as Parameters<typeof Blockly.setLocale>[0])
-        defineGameBlocks(Blockly, game)
+        if (Msg) Blockly.setLocale(Msg as unknown as Parameters<typeof Blockly.setLocale>[0])
+        defineGameBlocks(Blockly, game, locale)
         ws = Blockly.inject(host.current, {
           renderer: 'zelos',
           theme: makeTheme(Blockly),
-          toolbox: buildToolbox(game, level) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: buildToolbox(game, level, locale) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
           media: '/blockly/media/',
           sounds: false,
           grid: { spacing: 0, length: 0, colour: '#0000', snap: false },
@@ -130,7 +137,7 @@ export function GameWorkspace({ game, level, initial, readOnly, highlightId, onC
       wsRef.current = null
       setReady(false)
     }
-    // Seviye/oyun değişince üst bileşen `key` ile yeniden bağlar; burada bilinçli olarak yalnız ilk değerler kullanılır.
+    // Seviye/oyun/dil değişince üst bileşen `key` ile yeniden bağlar; burada bilinçli olarak yalnız ilk değerler kullanılır.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -148,15 +155,15 @@ export function GameWorkspace({ game, level, initial, readOnly, highlightId, onC
     lastHl.current = highlightId
   }, [highlightId, ready])
 
-  const cats = toolboxCategories(game, level)
+  const cats = toolboxCategories(game, level, locale)
   const iconCss = cats.map((c, i) => `.blocklyToolboxCategory:has(.gm-ic-${i}), .gm-ic-${i}{--gm-c:${c.colour}}`).join('\n')
 
   return (
     <div className="gm-ws" data-blockly-ready={ready} data-testid="game-blockly">
       <style>{iconCss}</style>
       <div ref={host} className="gm-ws-host" />
-      {ready && empty && <div className="gm-ws-hint" aria-hidden="true">Soldan bir blok seç ve buraya sürükle</div>}
-      {failed && <p className="gm-ws-fail" role="alert">Blok editörü yüklenemedi. Sayfayı yenile.</p>}
+      {ready && empty && <div className="gm-ws-hint" aria-hidden="true">{t('studios.games.ws.hint')}</div>}
+      {failed && <p className="gm-ws-fail" role="alert">{t('studios.games.ws.failed')}</p>}
     </div>
   )
 }

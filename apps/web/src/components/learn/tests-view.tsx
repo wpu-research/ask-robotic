@@ -3,12 +3,14 @@ import Link from 'next/link'
 import { useMemo } from 'react'
 import { useConsent } from '@/lib/consent'
 import { useEvents } from '@/lib/events'
-import { timeAgo } from '@/lib/format'
+import { useFormat, useT } from '@/i18n/client'
 import { quizSummaries } from '@/lib/quiz'
 import type { QuizLessonInfo } from './progress-view'
 
 /** Testlerim: tamamlanan mini testler ve puanlar; henüz çözülmemiş testler ayrı listelenir. */
 export function TestsView({ quizLessons }: { quizLessons: QuizLessonInfo[] }) {
+  const t = useT()
+  const fmt = useFormat()
   const consent = useConsent()
   const events = useEvents()
   const sums = useMemo(() => quizSummaries(events), [events])
@@ -20,15 +22,15 @@ export function TestsView({ quizLessons }: { quizLessons: QuizLessonInfo[] }) {
   return (
     <div className="page">
       <header className="page-title">
-        <h1>Testlerim</h1>
-        <p className="muted">Derslerin sonundaki mini testler. Pilot aşamada yalnız Modül 3 Hafta 1 dersleri testlidir.</p>
+        <h1>{t('content.tests.title')}</h1>
+        <p className="muted">{t('content.tests.intro')}</p>
       </header>
       {!recording && consent !== undefined && (
-        <p className="empty-note" role="note">Test sonuçları yalnız kayıt onayı verirsen saklanır. Testleri yine çözebilirsin; puan anında görünür ama bu sayfaya yazılmaz. Onay için <Link href="/ilerleme">İlerlemem</Link> sayfasındaki ayarları kullan.</p>
+        <p className="empty-note" role="note">{t('content.tests.consentBefore')}<Link href="/ilerleme">{t('content.tests.consentLink')}</Link>{t('content.tests.consentAfter')}</p>
       )}
       <section className="panel" aria-labelledby="t-bitti">
-        <h2 id="t-bitti" className="panel-title">Tamamlanan testler</h2>
-        {doneList.length === 0 ? <p className="muted">Henüz tamamlanmış test yok. Aşağıdaki derslerden birinin Test adımını çöz.</p> : (
+        <h2 id="t-bitti" className="panel-title">{t('content.tests.doneTitle')}</h2>
+        {doneList.length === 0 ? <p className="muted">{t('content.tests.doneEmpty')}</p> : (
           <ul className="history">
             {doneList.map((l) => {
               const s = byId.get(l.id)!
@@ -36,7 +38,7 @@ export function TestsView({ quizLessons }: { quizLessons: QuizLessonInfo[] }) {
                 <li key={l.id}>
                   <span><Link href={`/ders/${l.id}`}>{l.title}</Link><small>{l.weekLabel}</small></span>
                   <b>{s.lastScore} / {s.lastTotal}</b>
-                  <small>en iyi {s.bestScore} · {s.attempts} deneme · {timeAgo(s.lastT, now)}</small>
+                  <small>{t('content.tests.best', { best: s.bestScore, n: s.attempts, ago: fmt.timeAgo(s.lastT, now) })}</small>
                 </li>
               )
             })}
@@ -44,14 +46,14 @@ export function TestsView({ quizLessons }: { quizLessons: QuizLessonInfo[] }) {
         )}
       </section>
       <section className="panel" aria-labelledby="t-bekle">
-        <h2 id="t-bekle" className="panel-title">Çözülebilir testler</h2>
-        {todo.length === 0 ? <p className="muted">Tüm testleri en az bir kez çözdün.</p> : (
+        <h2 id="t-bekle" className="panel-title">{t('content.tests.todoTitle')}</h2>
+        {todo.length === 0 ? <p className="muted">{t('content.tests.todoEmpty')}</p> : (
           <ul className="history">
             {todo.map((l) => (
               <li key={l.id}>
                 <span><Link href={`/ders/${l.id}`}>{l.title}</Link><small>{l.weekLabel}</small></span>
-                <b>{l.total} soru</b>
-                <Link className="btn btn-ghost btn-sm" href={`/ders/${l.id}`}>Derse git</Link>
+                <b>{t('content.tests.questions', { n: l.total })}</b>
+                <Link className="btn btn-ghost btn-sm" href={`/ders/${l.id}`}>{t('content.tests.goLesson')}</Link>
               </li>
             ))}
           </ul>

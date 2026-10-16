@@ -17,6 +17,7 @@ export const goletGame: GameDef<PondFrame> = {
   slug: 'golet',
   title: 'Gölet',
   tagline: 'Ördeğini programla ve rakip ördeklerle yarış.',
+  en: { title: 'Pond', tagline: 'Program your duck and battle rival ducks.' },
   levels,
   blocks: goletBlocks,
   engine: { createRun },

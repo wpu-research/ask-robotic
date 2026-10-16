@@ -34,6 +34,8 @@ export interface GameBlockDef {
   hat?: boolean
   /** true: blok sayısı sınırına katılmaz (örn. başlangıç bloğu). */
   free?: boolean
+  /** İngilizce görünüm: `category` görünen kategori adı; `json` üst düzey anahtarları (message0, tooltip, args0…) İngilizce modda `json` üzerine yazılır. Tür kimliği ve alan değerleri değişmez. */
+  en?: { category?: string; json?: Record<string, unknown> }
 }
 
 export interface LevelDef {
@@ -43,6 +45,8 @@ export interface LevelDef {
   intro: string
   /** Takılınca gösterilen ipucu. */
   hint?: string
+  /** İngilizce metinler (site dili İngilizceyken). */
+  en?: { intro: string; hint?: string }
   /** En çok blok sayısı (yoksa sınırsız). */
   maxBlocks?: number
   /** Araç kutusundaki blok türleri (özel + yerleşik). Kategoriler sırayla gruplanır. */
@@ -62,6 +66,8 @@ export interface RunOutcome {
   ok: boolean
   /** Başarısızlık ya da başarı notu (Türkçe, çocuk dostu): "Duvara çarptın!" gibi. */
   message?: string
+  /** `message`ın İngilizcesi (site dili İngilizceyken gösterilir). */
+  messageEn?: string
 }
 
 /** Bir çalıştırmanın oyun tarafı. Yorumlayıcı `api.blocks` işleyicilerini çağırır; oyun durumu burada tutulur. */
@@ -95,6 +101,8 @@ export interface GameDef<S = any> {
   slug: GameSlug
   title: string
   tagline: string
+  /** İngilizce ad ve kısa açıklama. */
+  en?: { title: string; tagline: string }
   levels: LevelDef[]
   /** Özel blok tanımları (Blockly JSON + kod karşılığı). Yerleşik bloklar için gerekmez. */
   blocks: GameBlockDef[]

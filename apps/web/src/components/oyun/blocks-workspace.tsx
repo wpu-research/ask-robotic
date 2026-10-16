@@ -2,6 +2,7 @@
 // Oyun Atölyesi — Blockly (zelos) blok çalışma alanı. Yalnız istemcide, dinamik import ile yüklenir.
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import type * as BlocklyNS from 'blockly'
+import { useLocale, useT } from '@/i18n/client'
 import { defineOyunBlocks, makeTheme, setOptionProviders, type ImageRef } from '@/lib/oyun/blockly-defs'
 import { CATEGORIES, toolboxJson } from '@/lib/oyun/blocks'
 import type { BlockState } from '@/lib/oyun/types'
@@ -33,6 +34,9 @@ export interface BlocksWorkspaceProps {
 const iconCss = CATEGORIES.map((c) => `.oyb-ic-${c.key}{--oyb-c:${c.colour}}`).join('\n')
 
 export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(function BlocksWorkspace({ state, onChange, allowedBlocks, images, maps, resetKey }, ref) {
+  const t = useT()
+  const locale = useLocale()
+  const localeRef = useRef(locale); localeRef.current = locale
   const host = useRef<HTMLDivElement>(null)
   const wsRef = useRef<BlocklyNS.WorkspaceSvg | null>(null)
   const blocklyRef = useRef<B | null>(null)
@@ -70,16 +74,16 @@ export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(fu
     ;(async () => {
       try {
         const Blockly = await import('blockly')
-        const Tr = await import('blockly/msg/tr').catch(() => null)
+        const Msg = await (locale === 'en' ? import('blockly/msg/en') : import('blockly/msg/tr')).catch(() => null)
         if (disposed || !host.current) return
-        if (Tr) Blockly.setLocale(Tr as unknown as Parameters<typeof Blockly.setLocale>[0])
+        if (Msg) Blockly.setLocale(Msg as unknown as Parameters<typeof Blockly.setLocale>[0])
         setOptionProviders({ images: () => imagesRef.current, maps: () => mapsRef.current })
-        defineOyunBlocks(Blockly)
+        defineOyunBlocks(Blockly, locale)
         blocklyRef.current = Blockly
         ws = Blockly.inject(host.current, {
           renderer: 'zelos',
           theme: makeTheme(Blockly),
-          toolbox: toolboxJson(allowedRef.current) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: toolboxJson(allowedRef.current, locale) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
           media: '/blockly/media/',
           sounds: false,
           grid: { spacing: 0, length: 0, colour: '#0000', snap: false },
@@ -122,9 +126,10 @@ export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(fu
       ro?.disconnect()
       ws?.dispose()
       wsRef.current = null
+      lastSig.current = null // dil değişince yeni çalışma alanına program yeniden yüklensin
       setReady(false)
     }
-  }, [])
+  }, [locale])
 
   // ---- dışarıdan gelen program ----
   useEffect(() => {
@@ -152,15 +157,15 @@ export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(fu
   const allowSig = (allowedBlocks ?? ['*']).join(',')
   useEffect(() => {
     if (!ready || !wsRef.current) return
-    wsRef.current.updateToolbox(toolboxJson(allowedRef.current) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
+    wsRef.current.updateToolbox(toolboxJson(allowedRef.current, localeRef.current) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
   }, [allowSig, ready])
 
   return (
     <div className="oy-blocks" data-blockly-ready={ready} data-testid="oyun-blockly">
       <style>{iconCss}</style>
       <div ref={host} className="oy-blocks-host" />
-      {ready && empty && <div className="oy-blocks-hint" aria-hidden="true">Soldan bir <b>olay</b> bloğu seç (ör. Oyun → &quot;oyun başlayınca&quot;) ve buraya sürükle</div>}
-      {failed && <p className="oy-blocks-fail" role="alert">Blok editörü yüklenemedi. Sayfayı yenile.</p>}
+      {ready && empty && <div className="oy-blocks-hint" aria-hidden="true">{t('studios.oyun.blocks.hintBefore')}<b>{t('studios.oyun.blocks.hintEvent')}</b>{t('studios.oyun.blocks.hintAfter')}</div>}
+      {failed && <p className="oy-blocks-fail" role="alert">{t('studios.oyun.blocks.failed')}</p>}
     </div>
   )
 })

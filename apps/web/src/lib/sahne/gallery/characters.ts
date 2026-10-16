@@ -2,7 +2,7 @@
 import type { Costume } from '../types'
 import { C, E, INK, L, P, R, costume, star } from './draw'
 
-export interface GalleryCharacter { id: string; name: string; group: 'hayvan' | 'nesne' | 'insan' | 'oyun'; costumes: Costume[] }
+export interface GalleryCharacter { id: string; name: string; nameEn: string; group: 'hayvan' | 'nesne' | 'insan' | 'oyun'; costumes: Costume[] }
 
 const kedi = (alt: boolean): Costume => costume(alt ? 'kedi-b' : 'kedi-a', alt ? 'kedi-b' : 'kedi-a', [
   L(alt ? [72, 66, 88, 66, 90, 52] : [72, 66, 86, 58, 84, 42], '#f59e0b', 7),
@@ -130,30 +130,30 @@ const dino: Costume = costume('dino', 'dinozor', [
 ])
 
 export const CHARACTERS: readonly GalleryCharacter[] = [
-  { id: 'kedi', name: 'Tombik Kedi', group: 'hayvan', costumes: [kedi(false), kedi(true)] },
-  { id: 'kopek', name: 'Sevimli Köpek', group: 'hayvan', costumes: [kopek(false), kopek(true)] },
-  { id: 'balik', name: 'Balık', group: 'hayvan', costumes: [balik(false), balik(true)] },
-  { id: 'kus', name: 'Kırmızı Kuş', group: 'hayvan', costumes: [kus(false), kus(true)] },
-  { id: 'dino', name: 'Dinozor', group: 'hayvan', costumes: [dino] },
-  { id: 'robot', name: 'Robot', group: 'insan', costumes: [robot(false), robot(true)] },
-  { id: 'cocuk', name: 'Çocuk', group: 'insan', costumes: [cocuk(false), cocuk(true)] },
-  { id: 'gemi', name: 'Uzay Gemisi', group: 'nesne', costumes: [gemi(false), gemi(true)] },
-  { id: 'araba', name: 'Araba', group: 'nesne', costumes: [araba] },
-  { id: 'elma', name: 'Elma', group: 'oyun', costumes: [elma(false)] },
-  { id: 'altin-elma', name: 'Altın Elma', group: 'oyun', costumes: [elma(true)] },
-  { id: 'sepet', name: 'Sepet', group: 'oyun', costumes: [sepet] },
-  { id: 'top', name: 'Top', group: 'oyun', costumes: [top] },
-  { id: 'yildiz', name: 'Yıldız', group: 'oyun', costumes: [yildiz] },
-  { id: 'kalp', name: 'Kalp', group: 'oyun', costumes: [kalp] },
-  { id: 'hayalet', name: 'Hayalet', group: 'oyun', costumes: [hayalet] },
-  { id: 'balon', name: 'Balon', group: 'nesne', costumes: [balon] },
-  { id: 'cicek', name: 'Çiçek', group: 'nesne', costumes: [cicek] },
-  { id: 'agac', name: 'Ağaç', group: 'nesne', costumes: [agac] },
-  { id: 'bulut', name: 'Bulut', group: 'nesne', costumes: [bulut] },
-  { id: 'davul', name: 'Davul', group: 'nesne', costumes: [davul] },
-  { id: 'dugme', name: 'Renkli Düğme', group: 'nesne', costumes: [dugme('kırmızı', '#ef4444', '#991b1b', 'kirmizi'), dugme('mavi', '#3b82f6', '#1e3a8a'), dugme('yeşil', '#22c55e', '#14532d', 'yesil'), dugme('sarı', '#facc15', '#a16207', 'sari')] },
+  { id: 'kedi', name: 'Tombik Kedi', nameEn: 'Chubby Cat', group: 'hayvan', costumes: [kedi(false), kedi(true)] },
+  { id: 'kopek', name: 'Sevimli Köpek', nameEn: 'Cute Dog', group: 'hayvan', costumes: [kopek(false), kopek(true)] },
+  { id: 'balik', name: 'Balık', nameEn: 'Fish', group: 'hayvan', costumes: [balik(false), balik(true)] },
+  { id: 'kus', name: 'Kırmızı Kuş', nameEn: 'Red Bird', group: 'hayvan', costumes: [kus(false), kus(true)] },
+  { id: 'dino', name: 'Dinozor', nameEn: 'Dinosaur', group: 'hayvan', costumes: [dino] },
+  { id: 'robot', name: 'Robot', nameEn: 'Robot', group: 'insan', costumes: [robot(false), robot(true)] },
+  { id: 'cocuk', name: 'Çocuk', nameEn: 'Kid', group: 'insan', costumes: [cocuk(false), cocuk(true)] },
+  { id: 'gemi', name: 'Uzay Gemisi', nameEn: 'Spaceship', group: 'nesne', costumes: [gemi(false), gemi(true)] },
+  { id: 'araba', name: 'Araba', nameEn: 'Car', group: 'nesne', costumes: [araba] },
+  { id: 'elma', name: 'Elma', nameEn: 'Apple', group: 'oyun', costumes: [elma(false)] },
+  { id: 'altin-elma', name: 'Altın Elma', nameEn: 'Golden Apple', group: 'oyun', costumes: [elma(true)] },
+  { id: 'sepet', name: 'Sepet', nameEn: 'Basket', group: 'oyun', costumes: [sepet] },
+  { id: 'top', name: 'Top', nameEn: 'Ball', group: 'oyun', costumes: [top] },
+  { id: 'yildiz', name: 'Yıldız', nameEn: 'Star', group: 'oyun', costumes: [yildiz] },
+  { id: 'kalp', name: 'Kalp', nameEn: 'Heart', group: 'oyun', costumes: [kalp] },
+  { id: 'hayalet', name: 'Hayalet', nameEn: 'Ghost', group: 'oyun', costumes: [hayalet] },
+  { id: 'balon', name: 'Balon', nameEn: 'Balloon', group: 'nesne', costumes: [balon] },
+  { id: 'cicek', name: 'Çiçek', nameEn: 'Flower', group: 'nesne', costumes: [cicek] },
+  { id: 'agac', name: 'Ağaç', nameEn: 'Tree', group: 'nesne', costumes: [agac] },
+  { id: 'bulut', name: 'Bulut', nameEn: 'Cloud', group: 'nesne', costumes: [bulut] },
+  { id: 'davul', name: 'Davul', nameEn: 'Drum', group: 'nesne', costumes: [davul] },
+  { id: 'dugme', name: 'Renkli Düğme', nameEn: 'Colorful Button', group: 'nesne', costumes: [dugme('kırmızı', '#ef4444', '#991b1b', 'kirmizi'), dugme('mavi', '#3b82f6', '#1e3a8a'), dugme('yeşil', '#22c55e', '#14532d', 'yesil'), dugme('sarı', '#facc15', '#a16207', 'sari')] },
 ]
 export const CHARACTER_BY_ID: Readonly<Record<string, GalleryCharacter>> = Object.fromEntries(CHARACTERS.map((c) => [c.id, c]))
-export const CHARACTER_GROUPS: readonly { id: GalleryCharacter['group']; label: string }[] = [
-  { id: 'hayvan', label: 'Hayvanlar' }, { id: 'insan', label: 'İnsanlar ve robotlar' }, { id: 'oyun', label: 'Oyun nesneleri' }, { id: 'nesne', label: 'Nesneler' },
+export const CHARACTER_GROUPS: readonly { id: GalleryCharacter['group']; label: string; labelEn: string }[] = [
+  { id: 'hayvan', label: 'Hayvanlar', labelEn: 'Animals' }, { id: 'insan', label: 'İnsanlar ve robotlar', labelEn: 'People and robots' }, { id: 'oyun', label: 'Oyun nesneleri', labelEn: 'Game items' }, { id: 'nesne', label: 'Nesneler', labelEn: 'Things' },
 ]

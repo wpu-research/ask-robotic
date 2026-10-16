@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { statsOf, type CopyData, type FreeData, type LevelData } from '@/lib/games/muzik/engine'
 import { BEAT_MS, INSTRUMENTS, solfegeOf, type Ev, type MusicState } from '@/lib/games/muzik/notes'
 import type { SceneProps } from '@/lib/games/types'
+import { useLocale, useT } from '@/i18n/client'
 import { Staff, CH_COLOURS } from './staff'
 import { Synth } from './synth'
 
@@ -11,6 +12,8 @@ const W = 480, STAFF_H = 128
 const KEYS = 21 // Do3 .. Si5 (diyatonik dizin)
 
 function Keyboard({ active }: { active: ReadonlySet<number> }) {
+  const t = useT()
+  const en = useLocale() === 'en'
   const kw = W / KEYS
   const keys = Array.from({ length: KEYS }, (_, k) => {
     const oct = 3 + Math.floor(k / 7), idx = k % 7
@@ -18,11 +21,11 @@ function Keyboard({ active }: { active: ReadonlySet<number> }) {
     return { x: k * kw, midi: 12 * (oct + 1) + semi, idx, oct, name: ['Do', 'Re', 'Mi', 'Fa', 'Sol', 'La', 'Si'][idx] }
   })
   return (
-    <svg viewBox={`0 0 ${W} 58`} role="img" aria-label="Piyano tuşları" style={{ display: 'block', width: '100%', height: 'auto' }}>
+    <svg viewBox={`0 0 ${W} 58`} role="img" aria-label={t('studios.gamesB.muzik.keys')} style={{ display: 'block', width: '100%', height: 'auto' }}>
       {keys.map((k) => (
         <g key={k.midi}>
           <rect x={k.x + 0.5} y={1} width={kw - 1} height={56} rx={3} fill={active.has(k.midi) ? '#ffd23f' : '#fff'} stroke="#8f98ad" strokeWidth={1} />
-          {k.idx === 0 && <text x={k.x + kw / 2} y={52} textAnchor="middle" fontSize={8} fill="#6b7385">Do{k.oct === 3 ? '▼' : k.oct === 5 ? '▲' : ''}</text>}
+          {k.idx === 0 && <text x={k.x + kw / 2} y={52} textAnchor="middle" fontSize={8} fill="#6b7385">{en ? 'C' : 'Do'}{k.oct === 3 ? '▼' : k.oct === 5 ? '▲' : ''}</text>}
         </g>
       ))}
       {keys.map((k) => ([0, 1, 3, 4, 5].includes(k.idx) ? (
@@ -33,6 +36,8 @@ function Keyboard({ active }: { active: ReadonlySet<number> }) {
 }
 
 export default function Scene({ level, frame, running, speed, outcome }: SceneProps<MusicState>) {
+  const t = useT()
+  const en = useLocale() === 'en'
   const data = level.data as LevelData
   const synth = useRef<Synth | null>(null)
   if (!synth.current) synth.current = new Synth()
@@ -106,41 +111,41 @@ export default function Scene({ level, frame, running, speed, outcome }: ScenePr
   const chCount = useMemo(() => new Set([...(target ?? []), ...frame.events].filter((e) => e.p !== null).map((e) => e.ch)).size, [target, frame.events])
   const free = data.kind === 'free' ? (data as FreeData) : null
   const st = useMemo(() => statsOf(frame.events), [frame.events])
-  const instNames = target && (data as CopyData).checkInst ? [...new Set(target.map((e) => e.i))].map((i) => INSTRUMENTS.find((x) => x.id === i)?.label ?? i).join(', ') : null
-  const solName = (p: number | null) => (p === null ? '' : solfegeOf(p)?.name ?? '')
+  const instNames = target && (data as CopyData).checkInst ? [...new Set(target.map((e) => e.i))].map((i) => (en ? INSTRUMENTS.find((x) => x.id === i)?.labelEn : INSTRUMENTS.find((x) => x.id === i)?.label) ?? i).join(', ') : null
+  const solName = (p: number | null) => (p === null ? '' : (en ? solfegeOf(p)?.en : solfegeOf(p)?.name) ?? '')
 
   return (
     <div className="mu-scene" data-running={running} data-ok={outcome?.ok ?? undefined} style={{ display: 'flex', flexDirection: 'column', gap: 6, padding: '8px 10px', background: 'var(--surface, #fff)', color: 'var(--text, #1d2233)', overflow: 'hidden' }}>
       {target ? (
-        <section aria-label="Hedef melodi">
+        <section aria-label={t('studios.gamesB.muzik.targetMelody')}>
           <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 10px', minHeight: 34 }}>
             <button type="button" onClick={listening ? stopAll : listen} data-testid="music-listen"
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 34, padding: '2px 14px', borderRadius: 999, border: '2px solid #2f7de1', background: listening ? '#2f7de1' : 'transparent', color: listening ? '#fff' : '#2f7de1', font: 'inherit', fontWeight: 800, fontSize: 13, cursor: 'pointer', whiteSpace: 'nowrap' }}>
               <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M2 6h3l4-3v10l-4-3H2z" fill="currentColor" />{listening ? <rect x="11" y="5" width="3" height="6" fill="currentColor" /> : <path d="M11 5q2 3 0 6" stroke="currentColor" fill="none" strokeWidth="1.6" strokeLinecap="round" />}</svg>
-              {listening ? 'Durdur' : 'Hedefi dinle'}
+              {listening ? t('studios.gamesB.muzik.stop') : t('studios.gamesB.muzik.listen')}
             </button>
-            <span style={{ fontSize: 12, color: 'var(--muted, #6b7385)' }}>{instNames ? `Enstrüman: ${instNames}` : 'Hedef melodi'}</span>
-            {chCount > 1 && <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 8, fontSize: 11, fontWeight: 700 }}>{Array.from({ length: Math.min(chCount, 4) }, (_, k) => <span key={k} style={{ color: CH_COLOURS[k] }}>● {k + 1}. kanal</span>)}</span>}
+            <span style={{ fontSize: 12, color: 'var(--muted, #6b7385)' }}>{instNames ? t('studios.gamesB.muzik.instrument', { names: instNames }) : t('studios.gamesB.muzik.targetMelody')}</span>
+            {chCount > 1 && <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 8, fontSize: 11, fontWeight: 700 }}>{Array.from({ length: Math.min(chCount, 4) }, (_, k) => <span key={k} style={{ color: CH_COLOURS[k] }}>● {t('studios.gamesB.muzik.channel', { n: k + 1 })}</span>)}</span>}
           </div>
-          <Staff events={target} beats={beats} label="Hedef" activeIndex={tActive} width={W} height={STAFF_H} />
+          <Staff events={target} beats={beats} label={t('studios.gamesB.muzik.target')} activeIndex={tActive} width={W} height={STAFF_H} />
         </section>
       ) : (
-        <section aria-label="Besteleme görevi" style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-          <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--muted, #6b7385)' }}>Görev</div>
+        <section aria-label={t('studios.gamesB.muzik.composeTask')} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--muted, #6b7385)' }}>{t('studios.gamesB.muzik.task')}</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }} data-testid="music-goals">
             {free && ([
-              ['nota', st.notes, free.min.notes], ['farklı nota', st.pitches, free.min.pitches], ['kanal', st.channels, free.min.channels], ['enstrüman', st.instruments, free.min.instruments],
+              [t('studios.gamesB.muzik.goalNotes'), st.notes, free.min.notes], [t('studios.gamesB.muzik.goalPitches'), st.pitches, free.min.pitches], [t('studios.gamesB.muzik.goalChannels'), st.channels, free.min.channels], [t('studios.gamesB.muzik.goalInstruments'), st.instruments, free.min.instruments],
             ] as const).map(([lbl, v, need]) => (
               <span key={lbl} data-met={v >= need} style={{ padding: '3px 10px', borderRadius: 999, fontSize: 12, fontWeight: 800, border: '2px solid', borderColor: v >= need ? '#1fa855' : 'var(--border-strong, #9aa3b5)', color: v >= need ? '#1fa855' : 'var(--muted, #6b7385)' }}>{v >= need ? '✓ ' : ''}{Math.min(v, 99)} / {need} {lbl}</span>
             ))}
           </div>
         </section>
       )}
-      <section aria-label="Çalınan melodi">
+      <section aria-label={t('studios.gamesB.muzik.playedMelody')}>
         <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--muted, #6b7385)', minHeight: 18 }}>
-          Senin melodin{frame.events.length > 0 ? ` · ${frame.events.filter((e) => e.p !== null).length} nota${active >= 0 && frame.events[active]?.p != null ? ` · şimdi: ${solName(frame.events[active].p)}` : ''}` : ''}
+          {t('studios.gamesB.muzik.yourMelody')}{frame.events.length > 0 ? ` · ${t('studios.gamesB.muzik.noteCount', { n: frame.events.filter((e) => e.p !== null).length })}${active >= 0 && frame.events[active]?.p != null ? ` · ${t('studios.gamesB.muzik.now', { note: solName(frame.events[active].p) })}` : ''}` : ''}
         </div>
-        <Staff events={frame.events} beats={beats} label="Çaldığın" activeIndex={running ? active : -1} width={W} height={STAFF_H} />
+        <Staff events={frame.events} beats={beats} label={t('studios.gamesB.muzik.played')} activeIndex={running ? active : -1} width={W} height={STAFF_H} />
       </section>
       <Keyboard active={keys} />
     </div>

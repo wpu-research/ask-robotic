@@ -5,7 +5,8 @@
 //   kapak   -> önceki var, sonraki YOK (terminal)
 //   C       -> 'DO' deyim girişi (container)
 
-import { BLOCKS, CATEGORIES, type BlockDef } from './blocks'
+import type { Locale } from '@/i18n'
+import { BLOCKS, CATEGORIES, blockLabel, categoryLabel, textDefault, unitLabel, type BlockDef } from './blocks'
 import type { BlockType, Category } from './types'
 
 export const BLOCK_PREFIX = 'jr_'
@@ -41,31 +42,32 @@ export interface BlockJson {
   inputsInline: boolean
 }
 
-export function blockJson(def: BlockDef): BlockJson {
+export function blockJson(def: BlockDef, locale: Locale = 'tr'): BlockJson {
   const args0: Record<string, unknown>[] = [{ type: 'field_label', name: 'ICON', text: def.icon }]
-  let message0 = `%1 ${def.label}`
+  const label = blockLabel(def, locale)
+  let message0 = `%1 ${label}`
   const p = def.param
   if (p?.kind === 'number') {
     const num = { type: 'field_number', name: 'VALUE', value: p.default, min: p.min, max: p.max, precision: p.step }
     if (PREFIX_UNITS.has(p.unit)) {
-      message0 += ` ${p.unit} %2`
+      message0 += ` ${unitLabel(p.unit, locale)} %2`
       args0.push(num)
     } else {
       message0 += ' %2'
       args0.push(num)
-      args0.push({ type: 'field_label', name: 'UNIT', text: p.unit })
+      args0.push({ type: 'field_label', name: 'UNIT', text: unitLabel(p.unit, locale) })
       message0 += ' %3'
     }
   } else if (p?.kind === 'text') {
     message0 += ' %2'
-    args0.push({ type: 'field_input', name: 'TEXT', text: p.default, spellcheck: false })
+    args0.push({ type: 'field_input', name: 'TEXT', text: textDefault(p.default, locale), spellcheck: false })
   }
   const json: BlockJson = {
     type: blockName(def.type),
     style: styleName(def.category),
     message0,
     args0,
-    tooltip: def.label,
+    tooltip: label,
     inputsInline: true,
   }
   if (!def.trigger) json.previousStatement = null
@@ -78,7 +80,9 @@ export function blockJson(def: BlockDef): BlockJson {
   return json
 }
 
-export const BLOCK_JSON: BlockJson[] = BLOCKS.map(blockJson)
+export const BLOCK_JSON: BlockJson[] = BLOCKS.map((d) => blockJson(d))
+/** Dile göre blok tanımları (Türkçede BLOCK_JSON ile aynı). */
+export const blockJsonFor = (locale: Locale): BlockJson[] => (locale === 'tr' ? BLOCK_JSON : BLOCKS.map((d) => blockJson(d, locale)))
 
 /** Metin alanının en çok kaç karakter alabileceği (uzantı için). */
 export const TEXT_LIMIT: number = (() => {
@@ -112,10 +116,10 @@ export const CATEGORY_ICON: Record<Category, string> = { start: '🏁', motion: 
 export interface ToolboxCategory { key: Category; name: string; colour: string; types: BlockType[] }
 
 /** Yalnız izinli blok içeren kategoriler (boş kategori yok). */
-export function toolboxCategories(allowed: BlockType[]): ToolboxCategory[] {
+export function toolboxCategories(allowed: BlockType[], locale: Locale = 'tr'): ToolboxCategory[] {
   const ok = new Set<BlockType>(allowed)
   return CATEGORIES
-    .map((c) => ({ key: c.key, name: c.label, colour: c.color, types: BLOCKS.filter((b) => b.category === c.key && ok.has(b.type)).map((b) => b.type) }))
+    .map((c) => ({ key: c.key, name: categoryLabel(c.key, locale), colour: c.color, types: BLOCKS.filter((b) => b.category === c.key && ok.has(b.type)).map((b) => b.type) }))
     .filter((c) => c.types.length > 0)
 }
 
@@ -125,10 +129,10 @@ export function flyoutBlockEntry(type: BlockType): { kind: 'block'; type: string
 }
 
 /** Blockly'nin beklediği araç kutusu JSON'u. */
-export function toolboxJson(allowed: BlockType[]) {
+export function toolboxJson(allowed: BlockType[], locale: Locale = 'tr') {
   return {
     kind: 'categoryToolbox',
-    contents: toolboxCategories(allowed).map((c) => ({
+    contents: toolboxCategories(allowed, locale).map((c) => ({
       kind: 'category',
       name: c.name,
       categorystyle: `jr_cat_${c.key}`,

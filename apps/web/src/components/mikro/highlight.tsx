@@ -1,6 +1,7 @@
 // Salt okunur kod görünümü için çok küçük sözdizimi renklendirici (JS ve Python).
 import type { ReactNode } from 'react'
 import type { Lang } from '@/lib/mikro/codegen'
+import { useT } from '@/i18n/client'
 
 const KW_JS = new Set(['let', 'function', 'if', 'else', 'for', 'while', 'return', 'true', 'false', 'of', 'break', 'continue'])
 const KW_PY = new Set(['def', 'if', 'elif', 'else', 'for', 'while', 'return', 'True', 'False', 'and', 'or', 'not', 'in', 'pass', 'global', 'from', 'import', 'break', 'continue', 'range'])
@@ -31,9 +32,10 @@ export function highlightLine(line: string, lang: Lang): ReactNode[] {
 }
 
 export function CodeView({ code, lang }: { code: string; lang: Lang }) {
+  const t = useT()
   const lines = code.replace(/\n$/, '').split('\n')
   return (
-    <pre className="mk-code" data-testid={`mikro-code-${lang}`} tabIndex={0} aria-label={lang === 'js' ? 'JavaScript kodu' : 'Python kodu'}>
+    <pre className="mk-code" data-testid={`mikro-code-${lang}`} tabIndex={0} aria-label={lang === 'js' ? t('mikro.code.js') : t('mikro.code.py')}>
       {lines.map((l, i) => (
         <div key={i} className="mk-code-line"><span className="mk-code-no" aria-hidden="true">{i + 1}</span><span>{highlightLine(l, lang)}{l === '' ? ' ' : ''}</span></div>
       ))}

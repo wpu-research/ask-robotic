@@ -1,17 +1,23 @@
 import type { Metadata } from 'next'
 import { PartsIndex } from '@/components/learn/parts-index'
-import { PART_GUIDES } from '@/lib/parca-rehberi'
+import { localizedGuides } from '@/lib/parca-rehberi-i18n'
+import { getLocale, getT } from '@/i18n/server'
 
-export const metadata: Metadata = { title: 'Parçalar' }
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())('content.parts.metaTitle') }
+}
 
-export default function Parcalar() {
+export default async function Parcalar() {
+  const locale = await getLocale()
+  const t = await getT()
+  const guides = localizedGuides(locale)
   return (
     <div className="page">
       <header className="page-title">
-        <h1>Parça ansiklopedisi</h1>
-        <p className="muted">Laboratuvardaki parçaların ne işe yaradığı, nasıl çalıştığı, nasıl bağlandığı ve sık yapılan hatalar. Pilot aşamada {PART_GUIDES.length} parça yazıldı; diğerleri dersler yazıldıkça eklenecek.</p>
+        <h1>{t('content.parts.title')}</h1>
+        <p className="muted">{t('content.parts.intro', { n: guides.length })}</p>
       </header>
-      <PartsIndex guides={[...PART_GUIDES]} />
+      <PartsIndex guides={guides} />
     </div>
   )
 }

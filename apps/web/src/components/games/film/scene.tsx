@@ -2,17 +2,19 @@
 // Film sahnesi: solda hedef animasyon, sağda kullanıcının filmi. Altta oynatma çubuğu (kare kare gezinme).
 import { useEffect, useRef, useState } from 'react'
 import type { SceneProps } from '@/lib/games/types'
+import { useT } from '@/i18n/client'
 import { BG_DEFAULT, FRAME_COUNT, type Frame, type MovieSnap } from '@/lib/games/film/model'
 
 const FPS = 24
 const BLANK: Frame = { bg: BG_DEFAULT, shapes: [] }
 
 function Canvas({ frame, label, note, tone }: { frame: Frame; label: string; note?: string; tone: 'target' | 'mine' }) {
+  const t = useT()
   return (
     <figure style={{ margin: 0, flex: '1 1 0', minWidth: 0, minHeight: 0, display: 'flex', flexDirection: 'column', gap: 4 }}>
       <figcaption style={{ fontSize: '.78rem', fontWeight: 800, color: tone === 'target' ? 'var(--muted, #667)' : 'var(--text, #222)', textAlign: 'center', letterSpacing: '.02em' }}>{label}</figcaption>
       <div style={{ flex: 1, minHeight: 0, position: 'relative' }}>
-        <svg viewBox="0 0 100 100" role="img" aria-label={`${label} sahnesi`} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: 8, border: '2px solid var(--border-strong, #bbb)', boxSizing: 'border-box', background: frame.bg }} preserveAspectRatio="xMidYMid meet" data-testid={`film-${tone}`}>
+        <svg viewBox="0 0 100 100" role="img" aria-label={t('studios.gamesB.film.sceneLabel', { label })} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', borderRadius: 8, border: '2px solid var(--border-strong, #bbb)', boxSizing: 'border-box', background: frame.bg }} preserveAspectRatio="xMidYMid meet" data-testid={`film-${tone}`}>
           <rect x="0" y="0" width="100" height="100" fill={frame.bg} />
           {frame.shapes.map((s, i) => {
             if (s.k === 'c') return <circle key={i} cx={s.x} cy={s.y} r={s.r} fill={s.fill} />
@@ -33,6 +35,7 @@ function Canvas({ frame, label, note, tone }: { frame: Frame; label: string; not
 }
 
 export default function FilmScene({ frame, running, speed, outcome }: SceneProps<MovieSnap>) {
+  const t = useT()
   const [pos, setPos] = useState(0)
   const [playing, setPlaying] = useState(true)
   const posRef = useRef(0)
@@ -81,24 +84,24 @@ export default function FilmScene({ frame, running, speed, outcome }: SceneProps
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8, padding: 10, boxSizing: 'border-box', background: 'var(--surface, #fff)' }}>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', gap: 10 }}>
-        <Canvas frame={target} label="Hedef" tone="target" />
-        <Canvas frame={mine} label="Senin filmin" tone="mine" note={!hasRun ? 'Programını çalıştır, filmin burada oynasın.' : missing ? 'Bu kare çizilmedi.' : undefined} />
+        <Canvas frame={target} label={t('studios.gamesB.film.target')} tone="target" />
+        <Canvas frame={mine} label={t('studios.gamesB.film.mine')} tone="mine" note={!hasRun ? t('studios.gamesB.film.runHint') : missing ? t('studios.gamesB.film.frameMissing') : undefined} />
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <button
           type="button"
           onClick={() => { if (!playing && posRef.current >= FRAME_COUNT - 1) setPosBoth(0); setPlaying((p) => !p) }}
           disabled={running}
-          aria-label={playing ? 'Duraklat' : 'Oynat'}
-          title={playing ? 'Duraklat' : 'Oynat'}
+          aria-label={playing ? t('studios.gamesB.film.pause') : t('studios.gamesB.film.play')}
+          title={playing ? t('studios.gamesB.film.pause') : t('studios.gamesB.film.play')}
           style={{ width: 36, height: 36, flex: '0 0 auto', borderRadius: '50%', border: '1px solid var(--border-strong, #bbb)', background: 'var(--surface-2, #f3f3f3)', color: 'var(--text, #222)', cursor: running ? 'not-allowed' : 'pointer', fontSize: 14, fontWeight: 800 }}
         >{playing && !running ? '❚❚' : '▶'}</button>
         <input
           type="range" min={0} max={FRAME_COUNT - 1} step={1} value={idx} disabled={running}
           onChange={(e) => { setPlaying(false); setPosBoth(Number(e.target.value)) }}
-          aria-label="Kare (zaman)" style={{ flex: 1, minWidth: 0, accentColor: 'var(--primary, #4c97ff)' }}
+          aria-label={t('studios.gamesB.film.frameSlider')} style={{ flex: 1, minWidth: 0, accentColor: 'var(--primary, #4c97ff)' }}
         />
-        <span style={{ flex: '0 0 auto', minWidth: 74, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 800, fontSize: '.85rem', color: 'var(--text, #222)' }}>zaman: {idx}</span>
+        <span style={{ flex: '0 0 auto', minWidth: 74, textAlign: 'right', fontVariantNumeric: 'tabular-nums', fontWeight: 800, fontSize: '.85rem', color: 'var(--text, #222)' }}>{t('studios.gamesB.film.timeLabel', { n: idx })}</span>
       </div>
     </div>
   )

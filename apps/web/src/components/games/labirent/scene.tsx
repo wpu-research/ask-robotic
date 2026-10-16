@@ -1,6 +1,7 @@
 'use client'
 // Labirent sahnesi: saf SVG + CSS. Yolcu, çalı duvarlar ve bayrak bu projeye özgü çizimlerdir.
 import { useMemo } from 'react'
+import { useT } from '@/i18n/client'
 import type { SceneProps } from '@/lib/games/types'
 import { dataOf, findCell, mazeStepDelay, type MazeState } from '@/lib/games/labirent/engine'
 
@@ -92,6 +93,7 @@ function Flag({ x, y, won }: { x: number; y: number; won: boolean }) {
 }
 
 export default function Scene({ level, frame, speed, outcome }: SceneProps<MazeState>) {
+  const t = useT()
   const data = dataOf(level)
   const rows = data.grid.length, cols = data.grid[0].length
   const goal = useMemo(() => findCell(data.grid, 'G'), [data.grid])
@@ -117,7 +119,7 @@ export default function Scene({ level, frame, speed, outcome }: SceneProps<MazeS
     <>
       <style>{CSS}</style>
       <svg className="lb-svg" viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="xMidYMid meet" role="img"
-        aria-label={`Labirent haritası, ${cols} sütun ${rows} satır. Yolcu ${frame.x + 1}. sütun ${frame.y + 1}. satırda${frame.atGoal ? ', bayrağa ulaştı' : ''}${frame.crashed ? ', duvara çarptı' : ''}.`}>
+        aria-label={`${t('studios.games.labirent.mapAria', { cols, rows, x: frame.x + 1, y: frame.y + 1 })}${frame.atGoal ? t('studios.games.labirent.atGoal') : ''}${frame.crashed ? t('studios.games.labirent.crashed') : ''}.`}>
         <defs>
           <linearGradient id="lb-grass" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#8fd16b" />

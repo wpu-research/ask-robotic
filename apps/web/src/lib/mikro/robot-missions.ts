@@ -1,6 +1,6 @@
 // Robot Atölyesi görevleri: Mikro Kart'ı iki gövdeden birine takıp sanal arenada görev yapma.
 // Her görev bir MikroActivity'dir; hedefler robotun gerçek konumu ve ölçümleriyle denetlenir. `solution` testte çalıştırılır.
-import type { MikroActivity } from './activity'
+import type { ActivityEn, MikroActivity } from './activity'
 import { evaluateGoals, usesBlocks, type GoalCtx, type GoalStatus, type MikroGoal } from './goals'
 import { oval, rectWalls } from '../arena/geometry'
 import { b, cmp, forever, ifThen, onStart, project, repeat } from './program'
@@ -16,6 +16,8 @@ export interface RobotMission extends MikroActivity {
   scene(): RobotScene
   /** Değerlendirmede programın en çok çalıştırılacağı süre (ms). */
   runMs: number
+  /** İngilizce görünüm metinleri. */
+  en: ActivityEn & { title: string }
 }
 
 // ---------------- blok kısayolları ----------------
@@ -44,6 +46,11 @@ const box = (id: string, title: string, w: number, h: number, o: Partial<RobotSc
 export const ROBOT_MISSIONS: RobotMission[] = [
   {
     id: 'ilk-surus',
+    en: {
+      title: 'First drive',
+      intro: 'The Block Robot is 60 cm behind the target circle. Use the "drive" block to take the robot right to the target and stop there.',
+      goals: { git: { text: 'Use the "drive" block' }, hedef: { text: 'The robot stops inside the target circle', hint: 'The robot\'s center is 60 cm from the target.' } },
+    },
     title: 'İlk sürüş',
     profile: 'blok',
     intro: 'Blok Robotu hedef dairesinin 60 cm gerisinde. "git" bloğuyla robotu tam hedefe götür ve orada durdur.',
@@ -63,6 +70,11 @@ export const ROBOT_MISSIONS: RobotMission[] = [
   },
   {
     id: 'kare',
+    en: {
+      title: 'Draw a square',
+      intro: 'Use the Mini Rover to draw a square with 40 cm sides and come back to where you started. Don\'t write the same blocks four times: use the repeat block.',
+      goals: { tekrar: { text: 'Use the "repeat times" block' }, kare: { text: 'Four sides and four turns: at least 1.5 m driven, at least 350° turned' }, donus: { text: 'Stop within 5 cm of where you started', hint: 'After each side, turn 90 degrees the same way.' } },
+    },
     title: 'Kare çiz',
     profile: 'gezgin',
     intro: 'Mini Gezgin ile kenarı 40 cm olan bir kare çiz ve başladığın yere dön. Aynı blokları dört kez yazma: tekrarla bloğunu kullan.',
@@ -82,6 +94,11 @@ export const ROBOT_MISSIONS: RobotMission[] = [
   },
   {
     id: 'duvarda-dur',
+    en: {
+      title: 'Stop at the wall',
+      intro: 'The robot is driving toward a wall. Use the distance sensor: stop 10 cm before the wall. Don\'t crash!',
+      goals: { mesafe: { text: 'Use the "distance (cm)" block' }, dur: { text: 'Stop 5-15 cm from the wall without crashing', hint: 'Wait while the distance is more than 10 (loop), then stop the motors.' } },
+    },
     title: 'Duvarda dur',
     profile: 'blok',
     intro: 'Robot duvara doğru gidiyor. Mesafe sensörünü kullan: duvara 10 cm kala dur. Duvara çarpma!',
@@ -98,6 +115,11 @@ export const ROBOT_MISSIONS: RobotMission[] = [
   },
   {
     id: 'renkte-dur',
+    en: {
+      title: 'Stop on red',
+      intro: 'There are blue, yellow and red areas on the way. Use the color sensor: the robot should stop on the red area and turn its lights red.',
+      goals: { renk: { text: 'Use a color sensor block' }, kirmizi: { text: 'Stop while the color sensor is over red' }, isik: { text: 'When you stop, turn the lights red' } },
+    },
     title: 'Kırmızıda dur',
     profile: 'blok',
     intro: 'Yolda mavi, sarı ve kırmızı alanlar var. Renk sensörünü kullan: robot kırmızı alanın üstünde dursun ve ışıklarını kırmızı yaksın.',
@@ -120,6 +142,11 @@ export const ROBOT_MISSIONS: RobotMission[] = [
   },
   {
     id: 'cizgi-izle',
+    en: {
+      title: 'Follow the line',
+      intro: 'The Mini Rover is on an oval track. Follow the line with the two line sensors and pass the three checkpoints. If the left sensor sees the line, turn left; if the right sensor sees it, turn right.',
+      goals: { sensor: { text: 'Use the line sensor block' }, n1: { text: 'Pass checkpoint 1' }, n2: { text: 'Pass checkpoint 2' }, n3: { text: 'Pass checkpoint 3', hint: 'The track curves to the left; when the left sensor sees the line, turn left.' } },
+    },
     title: 'Çizgi izle',
     profile: 'gezgin',
     intro: 'Mini Gezgin oval pistin üstünde. İki çizgi sensörüyle çizgiyi izle ve pistin üç kontrol noktasından geç. Sol sensör çizgiyi görürse sola, sağ sensör görürse sağa dön.',
@@ -148,6 +175,11 @@ export const ROBOT_MISSIONS: RobotMission[] = [
   },
   {
     id: 'labirent',
+    en: {
+      title: 'Escape the corridor',
+      intro: 'The Mini Rover is in an L-shaped corridor. Use the distance sensor: stop when you get close to the wall, turn left and reach the target at the exit. Don\'t hit the walls.',
+      goals: { mesafe: { text: 'Use the "distance (cm)" block' }, cikis: { text: 'Reach the target at the exit and stop without crashing' } },
+    },
     title: 'Koridordan çık',
     profile: 'gezgin',
     intro: 'Mini Gezgin L biçimli bir koridorda. Mesafe sensörünü kullanarak duvara yaklaşınca dur, sola dön ve çıkıştaki hedefe ulaş. Duvarlara çarpma.',

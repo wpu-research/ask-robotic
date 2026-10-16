@@ -6,6 +6,7 @@ import { StateEffect, StateField, type Extension } from '@codemirror/state'
 import { Decoration, EditorView, drawSelection, highlightActiveLine, keymap, lineNumbers, type DecorationSet } from '@codemirror/view'
 import { tags as t } from '@lezer/highlight'
 import { useEffect, useImperativeHandle, useRef, type Ref } from 'react'
+import { useT } from '@/i18n/client'
 
 export interface CodePaneApi { goToLine(line: number): void }
 
@@ -60,13 +61,14 @@ export function CodePane({ value, onChange, errorLines, apiRef, height }: Props)
   const view = useRef<EditorView | null>(null)
   const onChangeRef = useRef(onChange)
   onChangeRef.current = onChange
-  const initial = useRef({ value, errorLines })
+  const t = useT()
+  const initial = useRef({ value, errorLines, aria: t('lab.code.aria') })
 
   useEffect(() => {
     const exts: Extension[] = [
       lineNumbers(), highlightActiveLine(), history(), drawSelection(), cpp(), syntaxHighlighting(highlight), theme, errorField,
       keymap.of([...defaultKeymap, ...historyKeymap, indentWithTab]),
-      EditorView.contentAttributes.of({ 'aria-label': 'Arduino C++ kodu' }),
+      EditorView.contentAttributes.of({ 'aria-label': initial.current.aria }),
       EditorView.updateListener.of((u) => { if (u.docChanged) onChangeRef.current(u.state.doc.toString()) }),
     ]
     const v = new EditorView({ doc: initial.current.value, extensions: exts, parent: host.current! })

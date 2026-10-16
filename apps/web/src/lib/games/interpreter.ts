@@ -16,15 +16,19 @@ export interface StepInfo {
 }
 
 /** Oyun kodunun fırlatabileceği "kontrollü durdurma" (çarpma, hedefe varma…). Hata sayılmaz. */
+/** `en`: iletinin İngilizcesi (site dili İngilizceyken RunResult.messageEn olarak gösterilir). */
 export class HaltProgram extends Error {
-  constructor(message = '') { super(message); this.name = 'HaltProgram' }
+  en?: string
+  constructor(message = '', en?: string) { super(message); this.name = 'HaltProgram'; this.en = en }
 }
 export class ProgramError extends Error {
   blockId: string | null
-  constructor(message: string, blockId: string | null = null) { super(message); this.name = 'ProgramError'; this.blockId = blockId }
+  en?: string
+  constructor(message: string, blockId: string | null = null, en?: string) { super(message); this.name = 'ProgramError'; this.blockId = blockId; this.en = en }
 }
 export class LimitError extends Error {
-  constructor(message: string) { super(message); this.name = 'LimitError' }
+  en?: string
+  constructor(message: string, en?: string) { super(message); this.name = 'LimitError'; this.en = en }
 }
 
 export type Signal = undefined | 'break' | 'continue' | 'return'
@@ -86,6 +90,8 @@ export interface RunResult {
   steps: number
   /** error / halted / limit için ileti. */
   message?: string
+  /** `message`ın İngilizcesi (varsa). */
+  messageEn?: string
   /** Son çalışan (ya da hataya yol açan) blok. */
   blockId: string | null
 }
@@ -146,8 +152,8 @@ export class Interpreter {
     this.steps++
     if (blk) this.lastBlockId = blk.id ?? this.lastBlockId
     const max = this.opts.maxSteps ?? DEFAULT_MAX_STEPS
-    if (this.steps > max) throw new LimitError('Program çok uzun sürdü (sonsuz döngü olabilir).')
-    if ((this.steps & 255) === 0 && Date.now() > this.deadline) throw new LimitError('Program çok uzun sürdü (süre doldu).')
+    if (this.steps > max) throw new LimitError('Program çok uzun sürdü (sonsuz döngü olabilir).', 'The program ran too long (maybe an endless loop).')
+    if ((this.steps & 255) === 0 && Date.now() > this.deadline) throw new LimitError('Program çok uzun sürdü (süre doldu).', 'The program ran too long (time is up).')
   }
 
   private varName(v: unknown): string {
@@ -210,7 +216,7 @@ export class Interpreter {
           case 'LTE': return num(a) <= num(c)
           case 'GT': return num(a) > num(c)
           case 'GTE': return num(a) >= num(c)
-          default: throw new ProgramError('Bilinmeyen karşılaştırma', blk.id ?? null)
+          default: throw new ProgramError('Bilinmeyen karşılaştırma', blk.id ?? null, 'Unknown comparison')
         }
       }
       case 'logic_ternary': return truthy(v('IF')) ? v('THEN') : v('ELSE')
@@ -222,7 +228,7 @@ export class Interpreter {
           case 'MULTIPLY': return a * c
           case 'DIVIDE': return c === 0 ? 0 : a / c
           case 'POWER': return Math.pow(a, c)
-          default: throw new ProgramError('Bilinmeyen işlem', blk.id ?? null)
+          default: throw new ProgramError('Bilinmeyen işlem', blk.id ?? null, 'Unknown operation')
         }
       }
       case 'math_modulo': { const c = num(v('DIVISOR')); return c === 0 ? 0 : num(v('DIVIDEND')) % c }
@@ -277,8 +283,8 @@ export class Interpreter {
   private callProc(blk: ProgramBlock, wantValue: boolean): Value {
     const name = String(blk.fields?.NAME ?? (blk.extraState as { name?: unknown } | undefined)?.name ?? '')
     const def = this.procs.get(name)
-    if (!def) throw new ProgramError(`"${name}" adlı işlev yok`, blk.id ?? null)
-    if (++this.depth > MAX_DEPTH) { this.depth = 0; throw new LimitError('İşlev çok derin iç içe çağrıldı.') }
+    if (!def) throw new ProgramError(`"${name}" adlı işlev yok`, blk.id ?? null, `There is no function called "${name}"`)
+    if (++this.depth > MAX_DEPTH) { this.depth = 0; throw new LimitError('İşlev çok derin iç içe çağrıldı.', 'Functions were called inside each other too deeply.') }
     const saved = def.params.map((p) => [p, this.vars.get(p)] as const)
     def.params.forEach((p, i) => this.vars.set(p, this.input(blk, `ARG${i}`)))
     try {
@@ -411,9 +417,10 @@ export class Interpreter {
 
 function classify(e: unknown, it: Interpreter): RunResult {
   const base = { steps: it.steps, blockId: it.lastBlockId }
-  if (e instanceof HaltProgram) return { reason: 'halted', message: e.message, ...base }
-  if (e instanceof LimitError) return { reason: 'limit', message: e.message, ...base }
-  if (e instanceof ProgramError) return { reason: 'error', message: e.message, ...base, blockId: e.blockId ?? base.blockId }
+  const en = (x: { en?: string }) => (x.en ? { messageEn: x.en } : {})
+  if (e instanceof HaltProgram) return { reason: 'halted', message: e.message, ...en(e), ...base }
+  if (e instanceof LimitError) return { reason: 'limit', message: e.message, ...en(e), ...base }
+  if (e instanceof ProgramError) return { reason: 'error', message: e.message, ...en(e), ...base, blockId: e.blockId ?? base.blockId }
   return { reason: 'error', message: e instanceof Error ? e.message : String(e), ...base }
 }
 

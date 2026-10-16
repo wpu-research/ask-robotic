@@ -63,7 +63,8 @@ export function setProp(c: Circuit, id: string, key: string, value: PropValue): 
 
 const samePin = (a: PinRef, b: PinRef) => a.part === b.part && a.pin === b.pin
 
-export type WireCheck = { ok: true } | { ok: false; reason: string }
+/** `code`: arayüz metni anahtarı (lab.canvas.wireErr.*); `reason` Türkçe kaynak. */
+export type WireCheck = { ok: true } | { ok: false; reason: string; code: 'noPart' | 'badPin' | 'self' | 'dup' }
 
 /**
  * Kablo kuralları: iki uç da var olan pinler olmalı; aynı pine kendi kendine kablo yok;
@@ -71,11 +72,11 @@ export type WireCheck = { ok: true } | { ok: false; reason: string }
  */
 export function canAddWire(c: Circuit, a: PinRef, b: PinRef): WireCheck {
   const pa = c.parts.find((p) => p.id === a.part), pb = c.parts.find((p) => p.id === b.part)
-  if (!pa || !pb) return { ok: false, reason: 'Parça bulunamadı.' }
-  if (!PINS[pa.type].includes(a.pin) || !PINS[pb.type].includes(b.pin)) return { ok: false, reason: 'Geçersiz pin.' }
-  if (samePin(a, b)) return { ok: false, reason: 'Bir pini kendisine bağlayamazsın.' }
+  if (!pa || !pb) return { ok: false, reason: 'Parça bulunamadı.', code: 'noPart' }
+  if (!PINS[pa.type].includes(a.pin) || !PINS[pb.type].includes(b.pin)) return { ok: false, reason: 'Geçersiz pin.', code: 'badPin' }
+  if (samePin(a, b)) return { ok: false, reason: 'Bir pini kendisine bağlayamazsın.', code: 'self' }
   if (c.wires.some((w) => (samePin(w.a, a) && samePin(w.b, b)) || (samePin(w.a, b) && samePin(w.b, a)))) {
-    return { ok: false, reason: 'Bu iki pin zaten bağlı.' }
+    return { ok: false, reason: 'Bu iki pin zaten bağlı.', code: 'dup' }
   }
   return { ok: true }
 }

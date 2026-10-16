@@ -5,6 +5,10 @@ import type { GameRun, LevelDef } from '../types'
 import { noteType } from './blocks'
 import { BEAT_MS, compareMelodies, MAX_EVENTS, notesOnly, SOLFEGE, midiOf, type Ev, type Inst, type MusicState } from './notes'
 
+const TOO_MANY = 'Çok fazla nota çaldın!'
+/** Motorun kendi durdurma iletilerinin İngilizcesi (yorumlayıcı iletileri çerçevede çevrilir). */
+const HALT_EN: Record<string, string> = { [TOO_MANY]: 'You played too many notes!' }
+
 export interface CopyData { kind: 'copy'; target: Ev[]; checkInst: boolean }
 export interface FreeData { kind: 'free'; min: { notes: number; pitches: number; channels: number; instruments: number }; goalText: string }
 export type LevelData = CopyData | FreeData
@@ -29,7 +33,7 @@ export function createRun(level: LevelDef): GameRun<MusicState> {
   let maxEnd = 0, paid = 0, depth = 0
 
   const add = (p: number | null, d: number) => {
-    if (events.length >= MAX_EVENTS) throw new HaltProgram('Çok fazla nota çaldın!')
+    if (events.length >= MAX_EVENTS) throw new HaltProgram(TOO_MANY)
     const dur = Number.isFinite(d) && d > 0 ? d : 1
     events.push({ t: cursor, d: dur, p, i: inst, ch })
     cursor += dur
@@ -70,18 +74,18 @@ export function createRun(level: LevelDef): GameRun<MusicState> {
       return owed
     },
     evaluate(result) {
-      if (result.reason === 'halted') return { ok: false, message: result.message || 'Program durdu.' }
-      if (result.reason !== 'finished') return { ok: false, message: 'Program bitmedi.' }
+      if (result.reason === 'halted') return { ok: false, message: result.message || 'Program durdu.', messageEn: result.message ? (HALT_EN[result.message] ?? result.messageEn) : 'The program stopped.' }
+      if (result.reason !== 'finished') return { ok: false, message: 'Program bitmedi.', messageEn: 'The program did not finish.' }
       if (data.kind === 'copy') {
         const diff = compareMelodies(events, data.target, data.checkInst)
-        return diff ? { ok: false, message: diff } : { ok: true, message: 'Melodi birebir tuttu!' }
+        return diff ? { ok: false, message: diff, messageEn: compareMelodies(events, data.target, data.checkInst, true) ?? undefined } : { ok: true, message: 'Melodi birebir tuttu!', messageEn: 'The melody matches exactly!' }
       }
       const s = statsOf(events), m = data.min
-      if (s.notes < m.notes) return { ok: false, message: `En az ${m.notes} nota çalmalısın (şimdi ${s.notes}).` }
-      if (s.pitches < m.pitches) return { ok: false, message: `En az ${m.pitches} farklı nota kullan (şimdi ${s.pitches}).` }
-      if (s.channels < m.channels) return { ok: false, message: '"Aynı anda çal" ile iki kanal kullan.' }
-      if (s.instruments < m.instruments) return { ok: false, message: 'İki farklı enstrüman kullan.' }
-      return { ok: true, message: 'Şarkın çok güzel!' }
+      if (s.notes < m.notes) return { ok: false, message: `En az ${m.notes} nota çalmalısın (şimdi ${s.notes}).`, messageEn: `Play at least ${m.notes} notes (now ${s.notes}).` }
+      if (s.pitches < m.pitches) return { ok: false, message: `En az ${m.pitches} farklı nota kullan (şimdi ${s.pitches}).`, messageEn: `Use at least ${m.pitches} different notes (now ${s.pitches}).` }
+      if (s.channels < m.channels) return { ok: false, message: '"Aynı anda çal" ile iki kanal kullan.', messageEn: 'Use two channels with "play together".' }
+      if (s.instruments < m.instruments) return { ok: false, message: 'İki farklı enstrüman kullan.', messageEn: 'Use two different instruments.' }
+      return { ok: true, message: 'Şarkın çok güzel!', messageEn: 'Your song is lovely!' }
     },
   }
 }

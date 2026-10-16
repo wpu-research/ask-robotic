@@ -76,3 +76,20 @@ describe('Blockly entegrasyonu (başsız)', () => {
     }
   })
 })
+
+describe('Blockly entegrasyonu (İngilizce görünüm)', () => {
+  it('İngilizce tanımlarla örnekler aynı biçimde yüklenip kaydedilir', () => {
+    defineOyunBlocks(Blockly, 'en')
+    try {
+      const ws = new Blockly.Workspace()
+      for (const def of BLOCKS) expect(ws.newBlock(def.type).type).toBe(def.type)
+      ws.dispose()
+      for (const s of SAMPLES) {
+        const st = s.project().blocks
+        expect(toJavaScript(roundTrip(st))).toBe(toJavaScript(st))
+      }
+    } finally {
+      defineOyunBlocks(Blockly, 'tr')
+    }
+  })
+})

@@ -21,6 +21,9 @@ import { SpritePanel } from './sprite-panel'
 import { Stage, type StageSize } from './stage'
 import { useSahnePlayer } from './use-player'
 import { VariablesDialog } from './variables-dialog'
+import { useLocale, useT } from '@/i18n/client'
+import { characterLabel, soundLabel } from '@/lib/sahne/i18n'
+import { BACKDROPS } from '@/lib/sahne/gallery/backdrops'
 import './sahne.css'
 
 export interface SahneEditorProps {
@@ -57,7 +60,10 @@ const uniqueName = (list: { name: string }[], base: string): string => {
 }
 
 export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditorProps) {
-  const [project, setProject] = useState<SahneProject>(() => (activity ? activity.starter() : starterProject()))
+  const t = useT()
+  const locale = useLocale()
+  const en = locale === 'en'
+  const [project, setProject] = useState<SahneProject>(() => (activity ? activity.starter() : starterProject(locale)))
   const [loaded, setLoaded] = useState(false)
   const [progVer, setProgVer] = useState(0)
   const [resetKey, setResetKey] = useState(0)
@@ -182,7 +188,7 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
     if (!ch) return
     const id = newId('s')
     const snd = DEFAULT_SOUND[charId]
-    const sp = spriteFromGallery(charId, { id, name: uniqueName(projectRef.current.sprites, ch.name), sounds: snd ? [makeSound(snd)] : [], ...placeNew(projectRef.current.sprites.length) })
+    const sp = spriteFromGallery(charId, { id, name: uniqueName(projectRef.current.sprites, characterLabel(charId, locale)), sounds: snd ? [en ? makeSound(snd, soundLabel(snd, locale)) : makeSound(snd)] : [], ...placeNew(projectRef.current.sprites.length) })
     edit((p) => ({ ...p, sprites: [...p.sprites, sp] }))
     setSelected(id)
     setTab('kod')
@@ -191,7 +197,7 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
     if (!canAdd) return
     setDlg(null)
     const id = newId('s')
-    const sp = spriteFromCostumes([emptyCostume('kostüm1')], { id, name: uniqueName(projectRef.current.sprites, 'Sprite1'), ...placeNew(projectRef.current.sprites.length) })
+    const sp = spriteFromCostumes([emptyCostume(en ? t('studios.sahne.editor.newCostume') : 'kostüm1')], { id, name: uniqueName(projectRef.current.sprites, en ? t('studios.sahne.editor.newSprite') : 'Sprite1'), ...placeNew(projectRef.current.sprites.length) })
     edit((p) => ({ ...p, sprites: [...p.sprites, sp] }))
     setSelected(id)
     setTab('kostum')
@@ -201,12 +207,13 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
     const s = projectRef.current.sprites.find((x) => x.id === id)
     if (!s) return
     const hasCode = (s.blocks.blocks?.blocks ?? []).length > 0
-    if (hasCode && !window.confirm(`"${s.name}" sprite'ı ve kodu silinsin mi?`)) return
+    if (hasCode && !window.confirm(t('studios.sahne.editor.confirmDeleteSprite', { name: s.name }))) return
     edit((p) => ({ ...p, sprites: p.sprites.filter((x) => x.id !== id) }))
   }
   const addBackdrop = (gid: string) => {
     setDlg(null)
     const c = backdropFromGallery(gid)
+    if (en) c.name = BACKDROPS.find((b) => b.id === gid)?.nameEn ?? c.name
     edit((p) => {
       const taken = p.stage.backdrops
       const named = { ...c, id: newId('c'), name: uniqueName(taken, c.name) }
@@ -245,7 +252,7 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
   }
   const addSound = (gid: string) => {
     setDlg(null)
-    editTarget(selected, (d) => ({ sounds: [...d.sounds, makeSound(gid, uniqueName(d.sounds, makeSound(gid).name))] }))
+    editTarget(selected, (d) => ({ sounds: [...d.sounds, makeSound(gid, uniqueName(d.sounds, en ? soundLabel(gid, locale) : makeSound(gid).name))] }))
   }
 
   // ───────── değişken / blok yap ─────────
@@ -277,52 +284,57 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `${slugify(project.name, 'projem')}.sahne.json`
+    a.download = `${slugify(project.name, en ? t('studios.sahne.editor.fileStem') : 'projem')}.sahne.json`
     document.body.appendChild(a)
     a.click()
     a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
-    setNote('Projen bir dosya olarak indirildi.')
+    setNote(t('studios.sahne.editor.exported'))
   }
   const importJson = async (file: File | undefined) => {
     if (!file) return
-    if (file.size > 3_000_000) { setNote('Dosya çok büyük (en çok 3 MB).'); return }
+    if (file.size > 3_000_000) { setNote(t('studios.sahne.editor.fileTooBig')); return }
     const p = parseProject(await file.text())
-    if (!p) { setNote('Bu dosya geçerli bir Sahne Atölyesi projesi değil.'); return }
-    replaceProject(p, `"${p.name}" projesi açıldı.`)
+    if (!p) { setNote(t('studios.sahne.editor.invalidFile')); return }
+    replaceProject(p, t('studios.sahne.editor.projectOpened', { name: p.name }))
   }
-  const pickSample = (smp: SahneSample) => { setDlg(null); replaceProject(smp.project(), `"${smp.name}" örneği açıldı. Bloklarını değiştirip dene!`) }
-  const newProject = () => { if (window.confirm('Yeni bir proje başlatılsın mı? Şu anki çalışmanın üzerine yazılır (önce Kaydet ile indirebilirsin).')) replaceProject(starterProject(), 'Yeni proje başlatıldı.') }
-  const resetActivity = () => { if (activity && window.confirm('Etkinliğin başlangıç haline dönülsün mü? Yaptıkların silinir.')) replaceProject(activity.starter(), 'Etkinlik başa döndü.') }
+  const pickSample = (smp: SahneSample) => {
+    setDlg(null)
+    const p = smp.project()
+    if (en) p.name = smp.nameEn
+    replaceProject(p, t('studios.sahne.editor.sampleOpened', { name: en ? smp.nameEn : smp.name }))
+  }
+  const newProject = () => { if (window.confirm(t('studios.sahne.editor.confirmNew'))) replaceProject(starterProject(locale), t('studios.sahne.editor.newStarted')) }
+  const resetActivity = () => { if (activity && window.confirm(t('studios.sahne.editor.confirmReset'))) replaceProject(activity.starter(), t('studios.sahne.editor.activityReset')) }
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: 'kod', label: 'Kod', icon: '🧩' },
-    { id: 'kostum', label: sprite ? 'Kostümler' : 'Arka planlar', icon: '🎨' },
-    { id: 'ses', label: 'Sesler', icon: '🔊' },
+    { id: 'kod', label: t('studios.sahne.editor.tabCode'), icon: '🧩' },
+    { id: 'kostum', label: sprite ? t('studios.sahne.editor.tabCostumes') : t('studios.sahne.editor.tabBackdrops'), icon: '🎨' },
+    { id: 'ses', label: t('studios.sahne.editor.tabSounds'), icon: '🔊' },
   ]
 
   return (
     <div className="sh-root" data-activity={!!activity} data-size={stageSize} data-testid="sahne-editor">
       <div className="sh-top">
         {activity ? <h2 className="sh-title">{activity.title}</h2> : (
-          <label className="sh-name"><span className="sr-only">Proje adı</span>
-            <input type="text" value={project.name} maxLength={60} onChange={(e) => edit((p) => ({ ...p, name: e.target.value }), false)} aria-label="Proje adı" data-testid="sahne-project-title" />
+          <label className="sh-name"><span className="sr-only">{t('studios.sahne.editor.projectName')}</span>
+            <input type="text" value={project.name} maxLength={60} onChange={(e) => edit((p) => ({ ...p, name: e.target.value }), false)} aria-label={t('studios.sahne.editor.projectName')} data-testid="sahne-project-title" />
           </label>
         )}
         <span className="sh-spacer" />
-        <button type="button" className="btn btn-sm btn-ghost" onClick={() => setDlg({ t: 'project' })} data-testid="sahne-project-info">📝 Proje bilgisi</button>
-        <button type="button" className="btn btn-sm btn-ghost" onClick={() => setDlg({ t: 'vars' })} data-testid="sahne-vars-btn">▤ Değişkenler</button>
-        {activity && <button type="button" className="btn btn-sm btn-ghost" onClick={() => setGoalsOpen(true)} disabled={goalsOpen} data-testid="sahne-goals-open">◎ Hedefler{evaluation ? ` ${evaluation.results.filter((g) => !g.optional && g.ok).length}/${evaluation.results.filter((g) => !g.optional).length}` : ''}</button>}
+        <button type="button" className="btn btn-sm btn-ghost" onClick={() => setDlg({ t: 'project' })} data-testid="sahne-project-info">📝 {t('studios.sahne.editor.projectInfo')}</button>
+        <button type="button" className="btn btn-sm btn-ghost" onClick={() => setDlg({ t: 'vars' })} data-testid="sahne-vars-btn">▤ {t('studios.sahne.editor.variables')}</button>
+        {activity && <button type="button" className="btn btn-sm btn-ghost" onClick={() => setGoalsOpen(true)} disabled={goalsOpen} data-testid="sahne-goals-open">◎ {t('studios.sahne.editor.goals')}{evaluation ? ` ${evaluation.results.filter((g) => !g.optional && g.ok).length}/${evaluation.results.filter((g) => !g.optional).length}` : ''}</button>}
         {!activity && (
           <>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setDlg({ t: 'samples' })} data-testid="sahne-samples-btn">🎮 Örnekler</button>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={newProject} data-testid="sahne-new">＋ Yeni</button>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={() => fileInput.current?.click()}>📂 Aç</button>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={exportJson} data-testid="sahne-export">💾 Kaydet</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setDlg({ t: 'samples' })} data-testid="sahne-samples-btn">🎮 {t('studios.sahne.editor.samples')}</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={newProject} data-testid="sahne-new">＋ {t('studios.sahne.editor.new')}</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => fileInput.current?.click()}>📂 {t('studios.sahne.editor.open')}</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={exportJson} data-testid="sahne-export">💾 {t('studios.sahne.editor.save')}</button>
             <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={(e) => { void importJson(e.target.files?.[0]); e.target.value = '' }} data-testid="sahne-import" />
           </>
         )}
-        {activity && <button type="button" className="btn btn-sm btn-ghost" onClick={resetActivity}>↺ Başa dön</button>}
+        {activity && <button type="button" className="btn btn-sm btn-ghost" onClick={resetActivity}>↺ {t('studios.sahne.editor.resetActivity')}</button>}
       </div>
       {note && <p className="sh-toast" role="status" onClick={() => setNote(null)}>{note}</p>}
 
@@ -333,26 +345,26 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
             onAddCharacter={() => setDlg({ t: 'chars', mode: 'sprite' })} onDraw={addBlank} onRandom={addRandom} onAddBackdrop={() => setDlg({ t: 'backdrops' })} canAdd={canAdd} />
         </aside>
 
-        <section className="sh-work" aria-label="Düzenleme alanı">
-          <div className="sh-tabs" role="tablist" aria-label="Düzenleme sekmeleri">
-            {tabs.map((t) => (
-              <button key={t.id} type="button" role="tab" id={`sh-tab-${t.id}`} aria-selected={tab === t.id} aria-controls={`sh-panel-${t.id}`} className="sh-tab" onClick={() => setTab(t.id)} data-testid={`sahne-tab-${t.id}`}>
-                <span aria-hidden="true">{t.icon}</span> {t.label}
+        <section className="sh-work" aria-label={t('studios.sahne.editor.editArea')}>
+          <div className="sh-tabs" role="tablist" aria-label={t('studios.sahne.editor.editTabs')}>
+            {tabs.map((tb) => (
+              <button key={tb.id} type="button" role="tab" id={`sh-tab-${tb.id}`} aria-selected={tab === tb.id} aria-controls={`sh-panel-${tb.id}`} className="sh-tab" onClick={() => setTab(tb.id)} data-testid={`sahne-tab-${tb.id}`}>
+                <span aria-hidden="true">{tb.icon}</span> {tb.label}
               </button>
             ))}
             <span className="sh-spacer" />
-            <span className="sh-target" title="Düzenlenen hedef">{sprite ? sprite.name : 'Sahne'}</span>
+            <span className="sh-target" title={t('studios.sahne.editor.editedTarget')}>{sprite ? sprite.name : t('studios.sahne.editor.stage')}</span>
             {tab === 'kod' && (
               <>
-                <button type="button" className="sh-tab-act" onClick={() => blocks.current?.undo()} title="Geri al" aria-label="Geri al">↶</button>
-                <button type="button" className="sh-tab-act" onClick={() => blocks.current?.redo()} title="Yinele" aria-label="Yinele">↷</button>
-                <button type="button" className="sh-tab-act" onClick={() => blocks.current?.arrange()} title="Blokları düzenle">⇅ Düzenle</button>
+                <button type="button" className="sh-tab-act" onClick={() => blocks.current?.undo()} title={t('studios.sahne.editor.undo')} aria-label={t('studios.sahne.editor.undo')}>↶</button>
+                <button type="button" className="sh-tab-act" onClick={() => blocks.current?.redo()} title={t('studios.sahne.editor.redo')} aria-label={t('studios.sahne.editor.redo')}>↷</button>
+                <button type="button" className="sh-tab-act" onClick={() => blocks.current?.arrange()} title={t('studios.sahne.editor.arrangeTitle')}>⇅ {t('studios.sahne.editor.arrange')}</button>
               </>
             )}
           </div>
           <div className="sh-panels">
             <div role="tabpanel" id="sh-panel-kod" aria-labelledby="sh-tab-kod" hidden={tab !== 'kod'} className="sh-panel">
-              <BlocksWorkspace ref={blocks} state={wsState} loadKey={loadKey} onChange={onBlocks} allowedBlocks={activity?.allowedBlocks}
+              <BlocksWorkspace key={locale} ref={blocks} state={wsState} loadKey={loadKey} onChange={onBlocks} allowedBlocks={activity?.allowedBlocks}
                 procs={targetDef.procs} allProcs={allProcs} vars={project.variables} onNewVar={(k) => setDlg({ t: 'var', list: k === 'list' })} onNewProc={() => setDlg({ t: 'proc' })}
                 glowIds={player.glow} onRunStack={(top) => player.runStack(selected, top)} />
             </div>
@@ -374,16 +386,16 @@ export function SahneEditor({ activity, storageKey, onGoalsChange }: SahneEditor
       </div>
 
       {dlg?.t === 'var' && (
-        <NameDialog title={dlg.list ? 'Liste oluştur' : 'Değişken oluştur'} label={dlg.list ? 'Listenin adı' : 'Değişkenin adı'} placeholder={dlg.list ? 'sorular' : 'skor'} okText="Oluştur"
-          help={dlg.list ? 'Liste, birçok değeri sırayla tutan bir kutudur.' : 'Değişken, üzerine isim yazılı bir kutudur: içine sayı ya da yazı koyabilirsin. Tüm sprite\'lar kullanabilir.'}
-          validate={(n) => (project.variables.some((v) => v.name.toLocaleLowerCase('tr') === n.toLocaleLowerCase('tr')) ? 'Bu adda bir değişken ya da liste zaten var.' : null)}
+        <NameDialog title={dlg.list ? t('studios.sahne.editor.makeList') : t('studios.sahne.editor.makeVar')} label={dlg.list ? t('studios.sahne.editor.listName') : t('studios.sahne.editor.varName')} placeholder={dlg.list ? t('studios.sahne.editor.listPlaceholder') : t('studios.sahne.editor.varPlaceholder')} okText={t('studios.sahne.editor.create')}
+          help={dlg.list ? t('studios.sahne.editor.listHelp') : t('studios.sahne.editor.varHelp')}
+          validate={(n) => (project.variables.some((v) => v.name.toLocaleLowerCase('tr') === n.toLocaleLowerCase('tr')) ? t('studios.sahne.editor.varExists') : null)}
           onOk={(n) => createVar(n, dlg.list)} onClose={() => setDlg(null)} testid="sahne-var-dialog" />
       )}
       {dlg?.t === 'proc' && <ProcDialog existing={targetDef.procs.map((p) => p.name)} onOk={createProc} onClose={() => setDlg(null)} />}
       {dlg?.t === 'project' && <ProjectDialog name={project.name} notes={project.notes} lockName={false} onOk={(n, t) => { setDlg(null); edit((p) => ({ ...p, name: n, notes: t }), false) }} onClose={() => setDlg(null)} />}
       {dlg?.t === 'vars' && <VariablesDialog project={project} usedIds={usedVarIds} onChange={(vars) => edit((p) => ({ ...p, variables: vars }))} onClose={() => setDlg(null)} />}
       {dlg?.t === 'message' && (
-        <NameDialog title="Yeni mesaj" label="Mesajın adı" placeholder="sıra sende" okText="Oluştur" help={'Bir karakter bu mesajı yayınlayınca, onu "alınca" bloğuyla bekleyen karakterler çalışır.'}
+        <NameDialog title={t('studios.sahne.editor.newMessage')} label={t('studios.sahne.editor.messageName')} placeholder={t('studios.sahne.editor.messagePlaceholder')} okText={t('studios.sahne.editor.create')} help={t('studios.sahne.editor.messageHelp')}
           onOk={(n) => { const done = dlg.done; setDlg(null); edit((p) => ({ ...p, messages: p.messages.includes(n) ? p.messages : [...p.messages, n] }), false); setTimeout(() => done(n), 30) }} onClose={() => setDlg(null)} testid="sahne-message-dialog" />
       )}
       {dlg?.t === 'chars' && <CharacterGallery onPick={(id) => (dlg.mode === 'costume' ? addCostumesFromChar(id) : addCharacter(id))} onDraw={addBlank} onClose={() => setDlg(null)} />}

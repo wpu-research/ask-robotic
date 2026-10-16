@@ -1,6 +1,7 @@
 'use client'
 // Oyunu tarayıcıda çalıştıran kanca: oturum, sabit adımlı döngü, klavye, ses, hata durumu.
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocale } from '@/i18n/client'
 import { DT_MS } from '@/lib/oyun/engine'
 import { FRAME_BYTES, renderFrame } from '@/lib/oyun/render'
 import { OyunSession } from '@/lib/oyun/session'
@@ -51,6 +52,9 @@ export function useOyunPlayer(project: OyunProject): Player {
   const audioRef = useRef<OyunAudio | null>(null)
   const projectRef = useRef(project)
   projectRef.current = project
+  const locale = useLocale()
+  const localeRef = useRef(locale)
+  localeRef.current = locale
   const [status, setStatus] = useState<PlayStatus>('idle')
   const statusRef = useRef<PlayStatus>('idle')
   const [error, setError] = useState<PlayError | null>(null)
@@ -71,7 +75,7 @@ export function useOyunPlayer(project: OyunProject): Player {
     if (!imgRef.current) imgRef.current = ctx.createImageData(SCREEN_W, SCREEN_H)
     const img = imgRef.current
     if (img.data.length !== FRAME_BYTES) return
-    renderFrame(s.engine, img.data)
+    renderFrame(s.engine, img.data, localeRef.current)
     ctx.putImageData(img, 0, 0)
   }, [])
 

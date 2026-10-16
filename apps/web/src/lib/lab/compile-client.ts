@@ -2,7 +2,10 @@
 export interface CompileError { line: number; column?: number; message: string }
 export type CompileOutcome =
   | { ok: true; hex: string; flashBytes?: number; ramBytes?: number }
-  | { ok: false; errors: CompileError[]; message?: string; unavailable?: boolean }
+  | { ok: false; errors: CompileError[]; message?: string; unavailable?: boolean; reason?: CompileFailReason }
+
+/** Bilinen hata durumları: arayüz `lab.compile.<reason>` metnini gösterir (`message` Türkçe kaynak). */
+export type CompileFailReason = 'busy' | 'unavailable' | 'tooMany' | 'tooBig' | 'timeout' | 'tooLong' | 'unreachable' | 'failed'
 
 const asErrors = (v: unknown): CompileError[] =>
   Array.isArray(v)
@@ -34,16 +37,18 @@ export async function compileCode(code: string, fetchImpl: typeof fetch = fetch)
     if (res.status === 503) {
       const busy = typeof body?.error === 'string' && /s[ıi]ra/i.test(body.error)
       return busy
-        ? { ok: false, errors: [], message: 'Derleme sırası dolu, birazdan tekrar dene.' }
-        : { ok: false, errors: [], unavailable: true, message: 'Derleme servisi şu an kapalı. Daha sonra tekrar dene.' }
+        ? { ok: false, errors: [], reason: 'busy', message: 'Derleme sırası dolu, birazdan tekrar dene.' }
+        : { ok: false, errors: [], unavailable: true, reason: 'unavailable', message: 'Derleme servisi şu an kapalı. Daha sonra tekrar dene.' }
     }
-    if (res.status === 429) return { ok: false, errors: [], message: 'Çok fazla derleme isteği gönderdin, bir dakika bekleyip tekrar dene.' }
-    if (res.status === 413) return { ok: false, errors: [], message: 'Kod çok büyük, kısaltıp tekrar dene.' }
-    if (res.status === 504) return { ok: false, errors: [], message: 'Derleme zaman aşımına uğradı.' }
-    return { ok: false, errors: [], message: typeof body?.error === 'string' ? body.error : 'Derleme başarısız oldu.' }
+    if (res.status === 429) return { ok: false, errors: [], reason: 'tooMany', message: 'Çok fazla derleme isteği gönderdin, bir dakika bekleyip tekrar dene.' }
+    if (res.status === 413) return { ok: false, errors: [], reason: 'tooBig', message: 'Kod çok büyük, kısaltıp tekrar dene.' }
+    if (res.status === 504) return { ok: false, errors: [], reason: 'timeout', message: 'Derleme zaman aşımına uğradı.' }
+    return typeof body?.error === 'string' ? { ok: false, errors: [], message: body.error } : { ok: false, errors: [], reason: 'failed', message: 'Derleme başarısız oldu.' }
   } catch (e) {
     const aborted = e instanceof DOMException && e.name === 'AbortError'
-    return { ok: false, errors: [], message: aborted ? 'Derleme çok uzun sürdü.' : 'Derleme servisine ulaşılamadı. Bağlantını kontrol et.' }
+    return aborted
+      ? { ok: false, errors: [], reason: 'tooLong', message: 'Derleme çok uzun sürdü.' }
+      : { ok: false, errors: [], reason: 'unreachable', message: 'Derleme servisine ulaşılamadı. Bağlantını kontrol et.' }
   } finally {
     clearTimeout(timer)
   }

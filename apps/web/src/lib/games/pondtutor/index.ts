@@ -3,7 +3,7 @@ import { HaltProgram, type BlockCtx, type StepInfo } from '../interpreter'
 import type { GameDef, GameRun, LevelDef } from '../types'
 import { pondtutorBlocks } from './blocks'
 import { pondtutorLevels } from './levels'
-import { createWorld, playerFire, playerScan, playerSwim, tick, type PondLevelData, type World } from './world'
+import { createWorld, playerFire, playerScan, playerSwim, tick, WORLD_MESSAGE_EN, type PondLevelData, type World } from './world'
 
 export type PondTutorState = World
 
@@ -41,12 +41,17 @@ function createRun(level: LevelDef, opts?: { seed?: number }): GameRun<PondTutor
     },
     snapshot: () => structuredClone(w),
     evaluate: (result) => {
-      if (w.status === 'won') return { ok: true, message: w.message }
-      if (w.status !== 'playing') return { ok: false, message: w.message }
+      if (w.status === 'won') return { ok: true, message: w.message, messageEn: WORLD_MESSAGE_EN[w.message] }
+      if (w.status !== 'playing') return { ok: false, message: w.message, messageEn: WORLD_MESSAGE_EN[w.message] }
       if (result.reason === 'stopped') return { ok: false }
-      if (w.goal === 'reach') return { ok: false, message: 'Ördek yaprağa varamadı. Yönü ya da bekleme süresini değiştir.' }
+      if (w.goal === 'reach') return { ok: false, message: 'Ördek yaprağa varamadı. Yönü ya da bekleme süresini değiştir.', messageEn: "The duck didn't reach the leaf. Change the direction or the waiting time." }
       const e = w.enemy
-      return { ok: false, message: e && e.health > 0 ? `Rakip hâlâ ayakta (can ${Math.ceil(e.health)}). Daha çok ateş etmen gerek.` : 'Hedefe ulaşılamadı.' }
+      const alive = !!e && e.health > 0
+      return {
+        ok: false,
+        message: alive ? `Rakip hâlâ ayakta (can ${Math.ceil(e.health)}). Daha çok ateş etmen gerek.` : 'Hedefe ulaşılamadı.',
+        messageEn: alive ? `The rival is still afloat (health ${Math.ceil(e.health)}). You need to fire more.` : 'The goal was not reached.',
+      }
     },
   }
 }
@@ -55,6 +60,7 @@ export const pondtutorGame: GameDef<PondTutorState> = {
   slug: 'golet-egitmeni',
   title: 'Gölet Eğitmeni',
   tagline: "Gölet'e hazırlan: ördeğini yönlendirmeyi adım adım öğren.",
+  en: { title: 'Pond Tutor', tagline: 'Get ready for Pond: learn to steer your duck step by step.' },
   levels: pondtutorLevels,
   blocks: pondtutorBlocks,
   engine: { createRun },

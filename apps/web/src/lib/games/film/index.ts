@@ -24,6 +24,7 @@ export const filmGame: GameDef<MovieSnap> = {
   slug: 'film',
   title: 'Film',
   tagline: 'Matematikle hareketli resimler çizip kendi kısa filmini yap.',
+  en: { title: 'Movie', tagline: 'Draw moving pictures with math and make your own short movie.' },
   levels: filmLevels,
   blocks: filmBlocks,
   engine: { createRun },

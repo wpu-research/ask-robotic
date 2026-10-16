@@ -10,6 +10,8 @@ export interface MikroExample {
   cards?: 1 | 2
   /** Nasıl denenir (kısa ipucu). */
   tryIt: string
+  /** İngilizce görünüm metinleri. */
+  en: { title: string; description: string; tryIt: string }
   build(): MikroProject
 }
 
@@ -20,6 +22,7 @@ const num = (v: In) => b('mk_show_number', { i: { VALUE: v } })
 export const EXAMPLES: MikroExample[] = [
   {
     id: 'kalp-atisi',
+    en: { title: 'Heartbeat', description: 'The heart grows and shrinks. Speed it up with A, slow it down with B.', tryIt: 'Press the A and B buttons.' },
     title: 'Kalp atışı',
     description: 'Kalp büyür küçülür. A ile hızlandır, B ile yavaşlat.',
     tryIt: 'A ve B düğmelerine bas.',
@@ -32,6 +35,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'zar',
+    en: { title: 'Dice', description: 'Shake the card to get a random number from 1 to 6.', tryIt: 'Press the "Shake" button or click button A.' },
     title: 'Zar',
     description: 'Kartı salla, 1 ile 6 arasında rastgele bir sayı çıksın.',
     tryIt: '"Salla" düğmesine bas ya da A düğmesine tıkla.',
@@ -42,6 +46,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'sayac',
+    en: { title: 'Counter', description: 'A counts up, B counts down, A+B resets. Uses a variable.', tryIt: 'Try the A, B and A+B buttons.' },
     title: 'Sayaç',
     description: 'A artırır, B azaltır, A+B sıfırlar. Değişken kullanır.',
     tryIt: 'A, B ve A+B düğmelerini dene.',
@@ -54,6 +59,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'pusula',
+    en: { title: 'Compass', description: 'The arrow always points north. Press A to read the degrees.', tryIt: 'Turn the compass dial.' },
     title: 'Pusula',
     description: 'Ok her zaman kuzeyi gösterir. A ile derece değerini oku.',
     tryIt: 'Pusula kadranını döndür.',
@@ -64,6 +70,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'termometre',
+    en: { title: 'Thermometer', description: 'The LED bar fills up as it gets warmer. Press B to read the degrees.', tryIt: 'Move the temperature slider.' },
     title: 'Termometre',
     description: 'Sıcaklık arttıkça LED çubuğu dolar. B ile derece değerini oku.',
     tryIt: 'Sıcaklık kaydırıcısını oynat.',
@@ -74,6 +81,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'muzik-kutusu',
+    en: { title: 'Music box', description: 'A, B and shaking play different melodies; touching the logo plays a note.', tryIt: 'Press the buttons, touch the logo.' },
     title: 'Müzik kutusu',
     description: 'A, B ve sallama farklı ezgiler çalar; logoya dokununca nota çalar.',
     tryIt: 'Düğmelere bas, logoya dokun.',
@@ -86,6 +94,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'radyo-sohbet',
+    en: { title: 'Radio chat', description: 'Two cards in the same group. Press A on one and a heart shows on the other; press B and a happy face shows.', tryIt: 'Add the second card, then press a button on one.' },
     title: 'Radyo sohbet',
     description: 'İki kart aynı grupta. Birinde A\'ya basınca kalp, B\'ye basınca mutlu yüz diğerinde görünür.',
     cards: 2,
@@ -102,6 +111,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'ses-olcer',
+    en: { title: 'Sound meter', description: 'The bar fills up as the room gets louder.', tryIt: 'Move the sound slider.' },
     title: 'Ses ölçer',
     description: 'Ortamdaki ses yükseldikçe çubuk dolar.',
     tryIt: 'Ses kaydırıcısını oynat.',
@@ -111,6 +121,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'gece-lambasi',
+    en: { title: 'Night light', description: 'All LEDs light up when it gets dark and turn off when it gets bright.', tryIt: 'Turn the light slider down.' },
     title: 'Gece lambası',
     description: 'Ortam kararınca tüm LED\'ler yanar, aydınlanınca söner.',
     tryIt: 'Işık kaydırıcısını azalt.',
@@ -120,6 +131,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'tepki-oyunu',
+    en: { title: 'Reaction game', description: 'Press A and wait; when the icon appears, press B as fast as you can. Your time shows in ms.', tryIt: 'Press A, wait for the icon, press B.' },
     title: 'Tepki oyunu',
     description: 'A\'ya bas ve bekle; simge çıkınca B\'ye olabildiğince çabuk bas. Süren ms olarak görünür.',
     tryIt: 'A\'ya bas, simgeyi bekle, B\'ye bas.',
@@ -138,6 +150,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'mesaj-listesi',
+    en: { title: 'Message list', description: 'Each time you press A, the next message in the list scrolls by. Uses a list and a function.', tryIt: 'Press button A a few times.' },
     title: 'Mesaj listesi',
     description: 'A\'ya her basışta listedeki sıradaki mesaj kayarak görünür. Liste ve fonksiyon kullanır.',
     tryIt: 'A düğmesine birkaç kez bas.',
@@ -152,6 +165,7 @@ export const EXAMPLES: MikroExample[] = [
   },
   {
     id: 'pin-servo',
+    en: { title: 'Pin and servo', description: 'The analog value on pin P1 sets the angle of the servo on pin P0.', tryIt: 'Move the P1 analog slider and watch the servo dial.' },
     title: 'Pin ve servo',
     description: 'P1 pinindeki analog değer, P0 pinindeki servonun açısını belirler.',
     tryIt: 'P1 analog kaydırıcısını oynat, servo kadranına bak.',

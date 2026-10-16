@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { SahneProject, SpriteDef } from '@/lib/sahne/types'
 import type { Player } from './use-player'
+import { useLocale, useT } from '@/i18n/client'
+import { localizeMessage } from '@/lib/sahne/i18n'
 
 export type StageSize = 'small' | 'large'
 
@@ -32,6 +34,8 @@ function NumField({ label, value, onCommit, step = 1, min, max, testid }: { labe
 }
 
 export function Stage({ player, size, onSize, sprite, lockNames, onSpritePatch, onShowBlock }: StageProps) {
+  const t = useT()
+  const locale = useLocale()
   const [fs, setFs] = useState<'off' | 'native' | 'css'>('off')
   const [answer, setAnswer] = useState('')
   const wrap = useRef<HTMLDivElement>(null)
@@ -66,53 +70,53 @@ export function Stage({ player, size, onSize, sprite, lockNames, onSpritePatch, 
   return (
     <div className="sh-stagebox" data-size={size} data-fs={fs} data-status={status}>
       <div ref={wrap} className="sh-stage" data-fs={fs}>
-        <div className="sh-bar" role="toolbar" aria-label="Sahne denetimleri">
-          <button type="button" className="sh-flag" onClick={player.flag} title="Yeşil bayrak: programı başlat" aria-label="Yeşil bayrak" data-testid="sahne-flag" data-running={running}><span aria-hidden="true">⚑</span></button>
-          <button type="button" className="sh-stop" onClick={player.stop} title="Durdur" aria-label="Durdur" data-testid="sahne-stop" disabled={status === 'idle'}><span aria-hidden="true">⬣</span></button>
-          <button type="button" className="sh-ctl" onClick={player.reset} title="Başa sar: sprite'ları ve değişkenleri ilk haline getir" aria-label="Başa sar" data-testid="sahne-reset"><span aria-hidden="true">↺</span></button>
+        <div className="sh-bar" role="toolbar" aria-label={t('studios.sahne.stage.controls')}>
+          <button type="button" className="sh-flag" onClick={player.flag} title={t('studios.sahne.stage.flagTitle')} aria-label={t('studios.sahne.stage.flag')} data-testid="sahne-flag" data-running={running}><span aria-hidden="true">⚑</span></button>
+          <button type="button" className="sh-stop" onClick={player.stop} title={t('studios.sahne.stage.stop')} aria-label={t('studios.sahne.stage.stop')} data-testid="sahne-stop" disabled={status === 'idle'}><span aria-hidden="true">⬣</span></button>
+          <button type="button" className="sh-ctl" onClick={player.reset} title={t('studios.sahne.stage.resetTitle')} aria-label={t('studios.sahne.stage.reset')} data-testid="sahne-reset"><span aria-hidden="true">↺</span></button>
           <span className="sh-spacer" />
-          <button type="button" className="sh-ctl" onClick={() => player.setMuted(!player.muted)} aria-pressed={player.muted} title={player.muted ? 'Sesi aç' : 'Sesi kapat'} aria-label={player.muted ? 'Sesi aç' : 'Sesi kapat'}><span aria-hidden="true">{player.muted ? '🔇' : '🔊'}</span></button>
-          <span className="sh-sizes" role="group" aria-label="Sahne boyutu">
-            <button type="button" className="sh-ctl" aria-pressed={size === 'small'} onClick={() => onSize('small')} title="Küçük sahne" aria-label="Küçük sahne" data-testid="sahne-size-small"><span className="sh-ic-small" aria-hidden="true" /></button>
-            <button type="button" className="sh-ctl" aria-pressed={size === 'large'} onClick={() => onSize('large')} title="Büyük sahne" aria-label="Büyük sahne" data-testid="sahne-size-large"><span className="sh-ic-large" aria-hidden="true" /></button>
+          <button type="button" className="sh-ctl" onClick={() => player.setMuted(!player.muted)} aria-pressed={player.muted} title={player.muted ? t('studios.sahne.stage.unmute') : t('studios.sahne.stage.mute')} aria-label={player.muted ? t('studios.sahne.stage.unmute') : t('studios.sahne.stage.mute')}><span aria-hidden="true">{player.muted ? '🔇' : '🔊'}</span></button>
+          <span className="sh-sizes" role="group" aria-label={t('studios.sahne.stage.size')}>
+            <button type="button" className="sh-ctl" aria-pressed={size === 'small'} onClick={() => onSize('small')} title={t('studios.sahne.stage.small')} aria-label={t('studios.sahne.stage.small')} data-testid="sahne-size-small"><span className="sh-ic-small" aria-hidden="true" /></button>
+            <button type="button" className="sh-ctl" aria-pressed={size === 'large'} onClick={() => onSize('large')} title={t('studios.sahne.stage.large')} aria-label={t('studios.sahne.stage.large')} data-testid="sahne-size-large"><span className="sh-ic-large" aria-hidden="true" /></button>
           </span>
-          <button type="button" className="sh-ctl" onClick={toggleFs} title={fs === 'off' ? 'Tam ekran' : 'Tam ekrandan çık'} aria-label={fs === 'off' ? 'Tam ekran' : 'Tam ekrandan çık'} data-testid="sahne-fullscreen"><span aria-hidden="true">{fs === 'off' ? '⛶' : '✕'}</span></button>
+          <button type="button" className="sh-ctl" onClick={toggleFs} title={fs === 'off' ? t('studios.sahne.stage.fullscreen') : t('studios.sahne.stage.exitFullscreen')} aria-label={fs === 'off' ? t('studios.sahne.stage.fullscreen') : t('studios.sahne.stage.exitFullscreen')} data-testid="sahne-fullscreen"><span aria-hidden="true">{fs === 'off' ? '⛶' : '✕'}</span></button>
         </div>
-        <div className="sh-screen" ref={player.stageRef} tabIndex={0} aria-label="Sahne. Tuşları kullanmak için buraya tıkla." data-testid="sahne-screen">
-          <canvas ref={player.canvasRef} className="sh-canvas" width={960} height={720} aria-label="Sahne (480 x 360)" data-testid="sahne-canvas" {...player.pointer} />
+        <div className="sh-screen" ref={player.stageRef} tabIndex={0} aria-label={t('studios.sahne.stage.screen')} data-testid="sahne-screen">
+          <canvas ref={player.canvasRef} className="sh-canvas" width={960} height={720} aria-label={t('studios.sahne.stage.canvas')} data-testid="sahne-canvas" {...player.pointer} />
           {player.asking !== null && (
             <form className="sh-ask" onSubmit={(e) => { e.preventDefault(); player.answer(answer); setAnswer('') }} data-testid="sahne-ask">
               <span className="sh-ask-q">{player.asking}</span>
-              <input autoFocus value={answer} onChange={(e) => setAnswer(e.target.value)} aria-label="Cevabın" data-testid="sahne-answer" maxLength={200} />
-              <button type="submit" aria-label="Gönder">✓</button>
+              <input autoFocus value={answer} onChange={(e) => setAnswer(e.target.value)} aria-label={t('studios.sahne.stage.answer')} data-testid="sahne-answer" maxLength={200} />
+              <button type="submit" aria-label={t('studios.sahne.stage.send')}>✓</button>
             </form>
           )}
         </div>
-        {player.stale && running && <p className="sh-note" role="status">Programı değiştirdin. Yeni halini görmek için bayrağa bas.</p>}
+        {player.stale && running && <p className="sh-note" role="status">{t('studios.sahne.stage.stale')}</p>}
         {player.error && (
           <div className="sh-error" role="alert" data-testid="sahne-error">
-            <b>Bir sorun var:</b> {player.error.message}
-            {player.error.blockId && onShowBlock && <button type="button" className="sh-link" onClick={() => onShowBlock(player.error?.blockId)}>Bloğu göster</button>}
+            <b>{t('studios.sahne.stage.problem')}</b> {localizeMessage(player.error.message, locale)}
+            {player.error.blockId && onShowBlock && <button type="button" className="sh-link" onClick={() => onShowBlock(player.error?.blockId)}>{t('studios.sahne.stage.showBlock')}</button>}
           </div>
         )}
       </div>
       {info && sprite ? (
-        <div className="sh-info" data-testid="sahne-info" aria-label="Seçili sprite bilgisi">
+        <div className="sh-info" data-testid="sahne-info" aria-label={t('studios.sahne.stage.info')}>
           <label className="sh-num sh-num-name">
-            <span>Sprite</span>
-            <input type="text" value={sprite.name} maxLength={30} disabled={lockNames} onChange={(e) => onSpritePatch(sprite.id, { name: e.target.value })} aria-label="Sprite adı" data-testid="sahne-name" />
+            <span>{t('studios.sahne.stage.sprite')}</span>
+            <input type="text" value={sprite.name} maxLength={30} disabled={lockNames} onChange={(e) => onSpritePatch(sprite.id, { name: e.target.value })} aria-label={t('studios.sahne.stage.spriteName')} data-testid="sahne-name" />
           </label>
           <NumField label="x" value={info.x} onCommit={(n) => onSpritePatch(sprite.id, { x: n })} testid="sahne-x" />
           <NumField label="y" value={info.y} onCommit={(n) => onSpritePatch(sprite.id, { y: n })} testid="sahne-y" />
-          <span className="sh-vis" role="group" aria-label="Görünürlük">
-            <button type="button" aria-pressed={info.visible} onClick={() => onSpritePatch(sprite.id, { visible: true })} title="Göster" aria-label="Göster">👁</button>
-            <button type="button" aria-pressed={!info.visible} onClick={() => onSpritePatch(sprite.id, { visible: false })} title="Gizle" aria-label="Gizle">⊘</button>
+          <span className="sh-vis" role="group" aria-label={t('studios.sahne.stage.visibility')}>
+            <button type="button" aria-pressed={info.visible} onClick={() => onSpritePatch(sprite.id, { visible: true })} title={t('studios.sahne.stage.show')} aria-label={t('studios.sahne.stage.show')}>👁</button>
+            <button type="button" aria-pressed={!info.visible} onClick={() => onSpritePatch(sprite.id, { visible: false })} title={t('studios.sahne.stage.hide')} aria-label={t('studios.sahne.stage.hide')}>⊘</button>
           </span>
-          <NumField label="boyut" value={info.size} onCommit={(n) => onSpritePatch(sprite.id, { size: n })} min={5} max={800} testid="sahne-size" />
-          <NumField label="yön" value={info.dir} onCommit={(n) => onSpritePatch(sprite.id, { dir: n })} min={-180} max={180} testid="sahne-dir" />
+          <NumField label={t('studios.sahne.stage.sizeField')} value={info.size} onCommit={(n) => onSpritePatch(sprite.id, { size: n })} min={5} max={800} testid="sahne-size" />
+          <NumField label={t('studios.sahne.stage.dirField')} value={info.dir} onCommit={(n) => onSpritePatch(sprite.id, { dir: n })} min={-180} max={180} testid="sahne-dir" />
         </div>
       ) : (
-        <div className="sh-info sh-info-stage" data-testid="sahne-info"><b>Sahne</b><span className="muted">Arka plan seçmek için Arka planlar sekmesine bak.</span></div>
+        <div className="sh-info sh-info-stage" data-testid="sahne-info"><b>{t('studios.sahne.stage.stageName')}</b><span className="muted">{t('studios.sahne.stage.stageHint')}</span></div>
       )}
     </div>
   )

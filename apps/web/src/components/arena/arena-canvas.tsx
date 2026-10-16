@@ -3,6 +3,8 @@ import { useMemo, useRef } from 'react'
 import { DEG } from '@/lib/arena/geometry'
 import { armTip } from '@/lib/arena/runtime'
 import type { ArenaScene, ArenaSnapshot, ArmScene, ArmSnapshot, BalancerScene, BalancerSnapshot, RoverScene, RoverSnapshot } from '@/lib/arena/types'
+import { useT } from '@/i18n/client'
+import { useSceneText } from './scene-text'
 
 const CM = 100 // 1 m = 100 çizim birimi (1 birim = 1 cm)
 const ROBOT_R = 7.5
@@ -27,6 +29,8 @@ export function ArenaCanvas(p: Props) {
 const zoneColor = (k: string) => (k === 'goal' ? '#16a34a' : k === 'checkpoint' ? '#d97706' : k === 'target' ? '#0891b2' : '#6366f1')
 
 function RoverCanvas({ scene, snap, trail, servoDeg, onDrag }: { scene: RoverScene; snap: RoverSnapshot; trail?: Props['trail']; servoDeg: number; onDrag?: Props['onDrag'] }) {
+  const t = useT()
+  const st = useSceneText()
   const svgRef = useRef<SVGSVGElement>(null)
   const dragging = useRef(false)
   const movable = !!scene.movable && !!onDrag
@@ -58,7 +62,7 @@ function RoverCanvas({ scene, snap, trail, servoDeg, onDrag }: { scene: RoverSce
 
   return (
     <svg
-      ref={svgRef} className="arena-svg" viewBox={`-6 -6 ${W + 12} ${H + 12}`} role="img" aria-label={`${scene.title}: üstten görünüş`} data-testid="arena-canvas" data-scene={scene.id}
+      ref={svgRef} className="arena-svg" viewBox={`-6 -6 ${W + 12} ${H + 12}`} role="img" aria-label={t('lab.arena.canvas.top', { title: st(scene.title) })} data-testid="arena-canvas" data-scene={scene.id}
       onPointerMove={movable ? (e) => {
         if (!dragging.current || !svgRef.current) return
         const ctm = svgRef.current.getScreenCTM()
@@ -74,7 +78,7 @@ function RoverCanvas({ scene, snap, trail, servoDeg, onDrag }: { scene: RoverSce
       {scene.zones.map((z) => (
         <g key={z.id} className="arena-zone" data-zone={z.id} data-in={snap.inZone.has(z.id) ? 'true' : undefined}>
           <circle cx={X(z.x)} cy={Y(z.y)} r={z.r * CM} fill={zoneColor(z.kind)} fillOpacity={snap.visited.has(z.id) ? 0.28 : 0.12} stroke={zoneColor(z.kind)} strokeDasharray="5 4" />
-          {z.label && <text x={X(z.x)} y={Y(z.y) + 3} textAnchor="middle" className="arena-ztext">{z.label}</text>}
+          {z.label && <text x={X(z.x)} y={Y(z.y) + 3} textAnchor="middle" className="arena-ztext">{st(z.label)}</text>}
         </g>
       ))}
       {scene.lines.map((l, i) => <polyline key={i} className="arena-line" points={l.map(([x, y]) => `${X(x)},${Y(y)}`).join(' ')} strokeWidth={lineW} />)}
@@ -102,6 +106,8 @@ function RoverCanvas({ scene, snap, trail, servoDeg, onDrag }: { scene: RoverSce
 }
 
 function ArmCanvas({ scene, snap }: { scene: ArmScene; snap: ArmSnapshot }) {
+  const t = useT()
+  const st = useSceneText()
   const v = scene.view
   const w = v.xMax - v.xMin, h = v.yMax - v.yMin
   const X = (x: number) => x - v.xMin, Y = (y: number) => v.yMax - y
@@ -110,13 +116,13 @@ function ArmCanvas({ scene, snap }: { scene: ArmScene; snap: ArmSnapshot }) {
   const tip = armTip(scene, snap.q1, snap.q2)
   const open = !snap.gripClosed
   return (
-    <svg className="arena-svg" viewBox={`-2 -2 ${w + 4} ${h + 4}`} role="img" aria-label={`${scene.title}: robot kol, yandan görünüş`} data-testid="arena-canvas" data-scene={scene.id}>
+    <svg className="arena-svg" viewBox={`-2 -2 ${w + 4} ${h + 4}`} role="img" aria-label={t('lab.arena.canvas.armSide', { title: st(scene.title) })} data-testid="arena-canvas" data-scene={scene.id}>
       <rect className="arena-floor" x={0} y={0} width={w} height={h} />
       <line className="arena-wall" x1={0} y1={Y(0)} x2={w} y2={Y(0)} />
       {scene.zones.map((z) => (
         <g key={z.id} className="arena-zone" data-zone={z.id}>
           <circle cx={X(z.x)} cy={Y(z.y)} r={z.r} fill="#16a34a" fillOpacity={0.15} stroke="#16a34a" strokeDasharray="1.5 1.2" strokeWidth={0.35} />
-          {z.label && <text x={X(z.x)} y={Y(z.y) + Math.max(z.r, 2) + 2.5} textAnchor="middle" className="arena-ztext" style={{ fontSize: 2.4 }}>{z.label}</text>}
+          {z.label && <text x={X(z.x)} y={Y(z.y) + Math.max(z.r, 2) + 2.5} textAnchor="middle" className="arena-ztext" style={{ fontSize: 2.4 }}>{st(z.label)}</text>}
         </g>
       ))}
       {snap.objects.map((o) => (
@@ -135,13 +141,15 @@ function ArmCanvas({ scene, snap }: { scene: ArmScene; snap: ArmSnapshot }) {
 
 function BalancerCanvas({ scene, snap }: { scene: BalancerScene; snap: BalancerSnapshot }) {
   // Yandan görünüş: yer çizgisi, tekerlek, gövde. Eğim θ > 0 ileri (sağa) yatar. Zemin işaretleri robotun konumuna göre kayar.
+  const t = useT()
+  const st = useSceneText()
   const GY = 170, R = 18, H = 90
   const off = (((-snap.x * 200) % 50) + 50) % 50
   const ticks = Array.from({ length: 10 }, (_, i) => i * 50 - 50 + off)
   const fell = snap.fell
   const tilt = Math.max(-90, Math.min(90, snap.thetaDeg))
   return (
-    <svg className="arena-svg" viewBox="0 0 400 200" role="img" aria-label={`${scene.title}: yandan görünüş`} data-testid="arena-canvas" data-scene={scene.id}>
+    <svg className="arena-svg" viewBox="0 0 400 200" role="img" aria-label={t('lab.arena.canvas.side', { title: st(scene.title) })} data-testid="arena-canvas" data-scene={scene.id}>
       <rect className="arena-floor" x={0} y={0} width={400} height={200} />
       <line className="arena-wall" x1={0} y1={GY + R} x2={400} y2={GY + R} />
       {ticks.map((t) => <line key={t} className="arena-grid" x1={t} y1={GY + R} x2={t - 8} y2={GY + R + 12} />)}
@@ -152,8 +160,8 @@ function BalancerCanvas({ scene, snap }: { scene: BalancerScene; snap: BalancerS
         <circle className="arena-joint" cx={0} cy={0} r={3.5} />
       </g>
       <line className="arena-ray" x1={200} y1={GY} x2={200} y2={GY - H - 20} />
-      <text x={12} y={22} className="arena-ztext" style={{ fontSize: 13 }}>{fell ? 'DÜŞTÜ' : 'AYAKTA'}</text>
-      <text x={12} y={40} className="arena-ztext" style={{ fontSize: 12 }}>eğim {snap.thetaDeg.toFixed(1)}°</text>
+      <text x={12} y={22} className="arena-ztext" style={{ fontSize: 13 }}>{fell ? t('lab.arena.panel.fell') : t('lab.arena.panel.uprightCaps')}</text>
+      <text x={12} y={40} className="arena-ztext" style={{ fontSize: 12 }}>{t('lab.arena.panel.tiltValue', { v: snap.thetaDeg.toFixed(1) })}</text>
     </svg>
   )
 }

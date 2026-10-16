@@ -1,6 +1,7 @@
 'use client'
 // Kuş sahnesi: saf SVG/CSS (özgün çizimler). Dünya 400x400, y yukarı; çizimde y ters çevrilir.
 import { useId } from 'react'
+import { useT } from '@/i18n/client'
 import type { SceneProps } from '@/lib/games/types'
 import { KUS_STEP_DELAY } from '@/lib/games/kus'
 import type { BirdState } from '@/lib/games/kus/engine'
@@ -68,6 +69,7 @@ function BirdBody({ crashed, won, hasWorm, flap }: { crashed: boolean; won: bool
 }
 
 export default function Scene({ level, frame, running, speed, outcome }: SceneProps<BirdState>) {
+  const t = useT()
   const uid = useId().replace(/:/g, '')
   const dur = Math.round((KUS_STEP_DELAY * 0.92) / Math.max(0.1, speed))
   const faceLeft = frame.heading > 90 && frame.heading < 270
@@ -77,7 +79,7 @@ export default function Scene({ level, frame, running, speed, outcome }: ScenePr
   const tilt = crashed ? 25 : 0
 
   return (
-    <svg viewBox={`0 0 ${W} ${W}`} role="img" aria-label={`Kuş sahnesi, seviye ${level.id}`} style={{ width: '100%', height: '100%', display: 'block', borderRadius: 12, background: '#bfe3ff' }}>
+    <svg viewBox={`0 0 ${W} ${W}`} role="img" aria-label={t('studios.games.kus.sceneAria', { n: level.id })} style={{ width: '100%', height: '100%', display: 'block', borderRadius: 12, background: '#bfe3ff' }}>
       <style>{`
         .kus-wiggle{animation:kus-wig 1.4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
         @keyframes kus-wig{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.82)}}

@@ -1,11 +1,11 @@
 // Sonraki-kelime tahmini: derlemden gerçekten sayılan n-gram modeli + gerçek softmax/sıcaklık.
-import { CORPUS_TR } from './corpus'
-import { mulberry32, trLower } from './text'
+import { CORPUS_TR, NGRAM_EN } from './corpus'
+import { lowerOf, mulberry32, type ContentLang } from './text'
 
 export interface NgramModel { start: Map<string, number>; uni: Map<string, number>; bi: Map<string, Map<string, number>>; tri: Map<string, Map<string, number>>; total: number }
 
-export function tokenizeWords(s: string): string[] {
-  return trLower(s).match(/[\p{L}\p{N}]+|[.!?]/gu) ?? []
+export function tokenizeWords(s: string, lang: ContentLang = 'tr'): string[] {
+  return lowerOf(s, lang).match(/[\p{L}\p{N}]+|[.!?]/gu) ?? []
 }
 
 export function trainNgram(corpus: string): NgramModel {
@@ -32,6 +32,9 @@ export function trainNgram(corpus: string): NgramModel {
 
 let DEFAULT: NgramModel | null = null
 export const defaultModel = (): NgramModel => (DEFAULT ??= trainNgram(CORPUS_TR))
+let DEFAULT_EN: NgramModel | null = null
+/** Dile göre model: 'tr' = CORPUS_TR (varsayılan), 'en' = NGRAM_EN. */
+export const modelFor = (lang: ContentLang = 'tr'): NgramModel => (lang === 'en' ? (DEFAULT_EN ??= trainNgram(NGRAM_EN)) : defaultModel())
 
 export interface NextCounts { counts: Map<string, number>; usedOrder: 0 | 1 | 2; context: string[] }
 const isEnd = (w: string | undefined) => w === '.' || w === '!' || w === '?'
@@ -81,9 +84,9 @@ export function sampleWord(d: Candidate[], rnd: () => number): string {
 
 export interface Generated { words: string[]; steps: { word: string; dist: Candidate[]; usedOrder: number }[] }
 /** Aynı (başlangıç, sıcaklık, mertebe, tohum, n) her zaman aynı metni üretir. */
-export function generate(model: NgramModel, start: string, n: number, temperature: number, order: 1 | 2, seed: number): Generated {
+export function generate(model: NgramModel, start: string, n: number, temperature: number, order: 1 | 2, seed: number, lang: ContentLang = 'tr'): Generated {
   const rnd = mulberry32(seed)
-  const ctx = tokenizeWords(start)
+  const ctx = tokenizeWords(start, lang)
   const words: string[] = []; const steps: Generated['steps'] = []
   for (let i = 0; i < n; i++) {
     const nc = nextCounts(model, ctx, order)

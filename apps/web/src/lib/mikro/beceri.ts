@@ -8,7 +8,8 @@ import { Simulation } from './sim'
 import type { MikroProject, PBlock } from './types'
 
 
-export interface ScorePart { label: string; points: number }
+/** `en`: aynı satırın İngilizce yazısı (yalnız gösterim). */
+export interface ScorePart { label: string; en?: string; points: number }
 export interface SkillChallenge {
   id: string
   title: string
@@ -22,6 +23,8 @@ export interface SkillChallenge {
   parts(r: DriveBase, finishMs: number | null): ScorePart[]
   /** YALNIZ TEST: puan alan örnek çözüm. */
   sample(): MikroProject
+  /** İngilizce görünüm metinleri. */
+  en: { title: string; summary: string; rules: string[] }
 }
 
 export interface SkillResult { score: number; parts: ScorePart[]; finishMs: number | null; timeMs: number; error: string | null }
@@ -32,7 +35,7 @@ const POLL_MS = 50
 const PENALTY = 5
 
 const timeBonus = (finishMs: number | null, limitS: number) => (finishMs == null ? 0 : Math.max(0, Math.floor((limitS * 1000 - finishMs) / 2000)))
-const collisionPart = (r: DriveBase): ScorePart => ({ label: `Çarpma (${r.collisions} × -${PENALTY})`, points: r.collisions ? -PENALTY * r.collisions : 0 })
+const collisionPart = (r: DriveBase): ScorePart => ({ label: `Çarpma (${r.collisions} × -${PENALTY})`, en: `Crashes (${r.collisions} × -${PENALTY})`, points: r.collisions ? -PENALTY * r.collisions : 0 })
 
 const box = (id: string, title: string, w: number, h: number, o: Partial<RobotScene>): RobotScene => ({
   id, title, width: w, height: h, walls: rectWalls(0, 0, w, h), lines: [], patches: [], zones: [], pose: { x: 0.3, y: 0.3, theta: 0 }, ...o,
@@ -44,6 +47,16 @@ const COLORS = ['sari', 'mavi', 'yesil'] as const
 export const SKILL_CHALLENGES: SkillChallenge[] = [
   {
     id: 'kontrol-turu',
+    en: {
+      title: 'Checkpoint tour',
+      summary: 'Drive the Mini Rover through five checkpoints and stop in the finish circle. You have 60 seconds.',
+      rules: [
+        'Each checkpoint (A-E) is worth 10 points; it counts when the robot\'s center enters the circle.',
+        'Pass all five and stop in the finish circle for +20 points.',
+        'If you finish, +1 point for every 2 seconds left.',
+        `Each crash is -${PENALTY} points. The score never goes below zero.`,
+      ],
+    },
     title: 'Kontrol noktası turu',
     profile: 'gezgin',
     summary: 'Mini Gezgin ile beş kontrol noktasından geç, bitiş dairesinde dur. 60 saniyen var.',
@@ -70,9 +83,9 @@ export const SKILL_CHALLENGES: SkillChallenge[] = [
     parts(r, finishMs) {
       const n = CHECKPOINTS.filter((c) => r.visited.has(c)).length
       return [
-        { label: `Kontrol noktası (${n} × 10)`, points: n * 10 },
-        { label: 'Bitişte durma', points: finishMs != null ? 20 : 0 },
-        { label: 'Zaman bonusu', points: timeBonus(finishMs, 60) },
+        { label: `Kontrol noktası (${n} × 10)`, en: `Checkpoints (${n} × 10)`, points: n * 10 },
+        { label: 'Bitişte durma', en: 'Stopped at the finish', points: finishMs != null ? 20 : 0 },
+        { label: 'Zaman bonusu', en: 'Time bonus', points: timeBonus(finishMs, 60) },
         collisionPart(r),
       ]
     },
@@ -83,6 +96,16 @@ export const SKILL_CHALLENGES: SkillChallenge[] = [
   },
   {
     id: 'renk-avcisi',
+    en: {
+      title: 'Color hunter',
+      summary: 'Drive the Block Robot over the yellow, blue and green areas, then stop on the red area. You have 60 seconds.',
+      rules: [
+        'The yellow, blue and green areas are worth 10 points each; they count when the robot\'s center enters the circle.',
+        'Pass all three and stop while the color sensor is over red for +30 points.',
+        'If you finish, +1 point for every 2 seconds left.',
+        `Each crash is -${PENALTY} points. The score never goes below zero.`,
+      ],
+    },
     title: 'Renk avcısı',
     profile: 'blok',
     summary: 'Blok Robotu ile sarı, mavi ve yeşil alanlardan geç, sonunda kırmızı alanın üstünde dur. 60 saniyen var.',
@@ -111,9 +134,9 @@ export const SKILL_CHALLENGES: SkillChallenge[] = [
     parts(r, finishMs) {
       const n = COLORS.filter((c) => r.visited.has(c)).length
       return [
-        { label: `Renk alanı (${n} × 10)`, points: n * 10 },
-        { label: 'Kırmızıda durma', points: finishMs != null ? 30 : 0 },
-        { label: 'Zaman bonusu', points: timeBonus(finishMs, 60) },
+        { label: `Renk alanı (${n} × 10)`, en: `Color areas (${n} × 10)`, points: n * 10 },
+        { label: 'Kırmızıda durma', en: 'Stopped on red', points: finishMs != null ? 30 : 0 },
+        { label: 'Zaman bonusu', en: 'Time bonus', points: timeBonus(finishMs, 60) },
         collisionPart(r),
       ]
     },

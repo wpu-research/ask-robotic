@@ -7,12 +7,13 @@ export interface WireRow { from: string; to: string }
 
 const UNO_GND = /^GND\d?$/
 
-export function wiringRows(c: Circuit): WireRow[] {
+/** `nameOf`: parça türünün görünen adı (verilmezse Türkçe kısa ad). */
+export function wiringRows(c: Circuit, nameOf?: (type: Circuit['parts'][number]['type']) => string): WireRow[] {
   const name = (id: string, pin: string): string => {
     const p = c.parts.find((x) => x.id === id)
     if (!p) return `${id}.${pin}`
     if (p.type === 'uno') return `Uno ${UNO_GND.test(pin) ? 'GND' : pin}`
-    return `${SHORT_NAME[p.type] ?? PART_DEFS[p.type].name} ${pin}`
+    return `${nameOf ? nameOf(p.type) : (SHORT_NAME[p.type] ?? PART_DEFS[p.type].name)} ${pin}`
   }
   // Uno ucu hep sağda: "parça ucu → Uno pini"
   return c.wires.map((w) => {

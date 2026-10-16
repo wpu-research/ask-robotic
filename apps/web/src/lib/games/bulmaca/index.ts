@@ -12,6 +12,7 @@ export const bulmacaGame: GameDef<PuzzleState> = {
   slug: 'bulmaca',
   title: 'Bulmaca',
   tagline: 'Hayvan resimlerini doğru bloklarla eşleştirerek blokların nasıl birleştiğini öğren.',
+  en: { title: 'Puzzle', tagline: 'Match animal pictures with the right blocks and learn how blocks fit together.' },
   levels,
   blocks: bulmacaBlocks,
   engine: { createRun: (level) => createPuzzleRun(level) },

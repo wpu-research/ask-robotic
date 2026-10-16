@@ -1,5 +1,6 @@
-// Uyarı türleri için Türkçe başlık ve simge.
-import type { WarningKind } from './contract'
+// Uyarı türleri için Türkçe başlık ve simge; dile bağlı başlık ve ileti (sim iletileri Türkçedir, burada çevrilir).
+import type { Locale, MessageKey, TFunction } from '@/i18n'
+import type { LabWarning, WarningKind } from './contract'
 
 export const WARNING_META: Partial<Record<WarningKind, { icon: string; title: string }>> = {
   'short-circuit': { icon: '✖', title: 'Kısa devre' },
@@ -14,3 +15,56 @@ export const WARNING_META: Partial<Record<WarningKind, { icon: string; title: st
 }
 
 export const warningMeta = (kind: string) => WARNING_META[kind as WarningKind] ?? { icon: '⚠', title: 'Uyarı' }
+
+/** Uyarı başlığı, seçili dilde. */
+export function warningTitle(t: TFunction, kind: string): string {
+  if (!WARNING_META[kind as WarningKind]) return t('lab.warn.title.generic')
+  return t(`lab.warn.title.${kind}` as MessageKey)
+}
+
+// Sim iletilerindeki Türkçe modül adları → sözlük anahtarı (lab.warn.name.*).
+const MODULE_NAMES: Record<string, string> = {
+  'Röle modülü': 'relay', 'DHT sensörü': 'dht', 'PIR modülü': 'pir', 'IR engel modülü': 'irobstacle', 'RTC modülü': 'rtc',
+  'MQ-2 modülü': 'mq2', 'MQ-3 modülü': 'mq3', 'MQ-4 modülü': 'mq4', 'MQ-7 modülü': 'mq7', 'MQ-135 modülü': 'mq135',
+  'Alev modülü': 'flame', 'Ses modülü': 'sound', 'Toprak nemi modülü': 'soil', 'Yağmur sensörü': 'rain', 'Su seviyesi sensörü': 'waterlevel',
+  'Sharp IR sensörü': 'sharpir', 'TMC2209 step sürücü': 'stepper', 'Step sürücü': 'stepDriver',
+}
+const moduleName = (t: TFunction, s: string) => (MODULE_NAMES[s] ? t(`lab.warn.name.${MODULE_NAMES[s]}` as MessageKey) : s)
+
+type Rule = [RegExp, (t: TFunction, m: RegExpMatchArray) => string]
+const M = (k: string) => `lab.warn.msg.${k}` as MessageKey
+// packages/sim/src/circuit/analysis.ts ve lab.ts'teki iletilerle eşleşir. Yeni bir ileti eşleşmezse tür başlığına bağlı genel metin değil, özgün ileti gösterilir.
+const RULES: Rule[] = [
+  [/^(5V|3V3) hattı doğrudan GND'ye bağlı \(kısa devre\)\.$/, (t, m) => t(M('railShort'), { rail: m[1] })],
+  [/^5V ile 3V3 hatları birbirine bağlı\.$/, (t) => t(M('railsJoined'))],
+  [/^LED ters bağlı: /, (t) => t(M('ledReversed'))],
+  [/^LED'in seri direnci yok; /, (t) => t(M('ledNoResistor'))],
+  [/^LED'in seri direnci yok ya da çok küçük/, (t) => t(M('ledOvercurrent'))],
+  [/^(\S+) pinine bağlı hat toprağa/, (t, m) => t(M('floatingPin'), { pin: m[1] })],
+  [/^(.+) beslenmemiş: (.+) 5 V \/ GND hattına bağlı değil\.$/, (t, m) => t(M('unpowered'), { name: moduleName(t, m[1]), pins: m[2].replace('(motor beslemesi)', t(M('motorSupply'))) })],
+  [/^(.+) (\S+) ucu bağlı değil: sensör çalışmaz\.$/, (t, m) => t(M('sensorPin'), { name: moduleName(t, m[1]), pin: m[2] })],
+  [/^(.+) (\S+) ucu doğrudan bir Arduino pinine bağlı olmalı/, (t, m) => t(M('directPin'), { name: moduleName(t, m[1]), pin: m[2] })],
+  [/^(.+) (\S+) ucu (\S+) pinine bağlı değil: I2C/, (t, m) => t(M('i2cPin'), { name: moduleName(t, m[1]), pin: m[2], uno: m[3] })],
+  [/^74HC595 (\S+) ucu bağlı değil \(yüzen giriş\): (.+)\.$/, (t, m) => t(M('sr595'), {
+    pin: m[1], note: t(M(m[2].startsWith('çıkışlar') ? 'sr595Oe' : m[2].startsWith('kaydırma') ? 'sr595Srclr' : 'sr595Dead')),
+  })],
+  [/^Transistörün tabanında seri direnç yok/, (t) => t(M('baseNoResistor'))],
+  [/^Motorun flyback diyodu ters bağlı/, (t) => t(M('flybackReversed'))],
+  [/^Motor transistör\/MOSFET ile sürülüyor/, (t) => t(M('flybackMissing'))],
+  [/^LED yandı \((\d+) mA\)/, (t, m) => t(M('ledBurnt'), { ma: m[1] })],
+  [/^Taban akımı (\d+) mA: /, (t, m) => t(M('baseHigh'), { ma: m[1] })],
+  [/^(\S+) hattı dirençsiz bir yolla topraklandı/, (t, m) => t(M('railGrounded'), { name: m[1] })],
+  [/^(\S+) pini doğrudan GND'ye bağlı/, (t, m) => t(M('pinToGnd'), { name: m[1] })],
+  [/^(\S+) pini doğrudan 5V'a bağlı/, (t, m) => t(M('pinTo5v'), { name: m[1] })],
+  [/^(\S+) pininden (\d+) mA geçiyor/, (t, m) => t(M('pinOvercurrent'), { name: m[1], ma: m[2] })],
+]
+
+/** Uyarı iletisi, seçili dilde. Türkçede sim iletisi aynen döner; tanınmayan ileti de aynen döner. */
+export function warningMessage(t: TFunction, locale: Locale, w: Pick<LabWarning, 'message'>): string {
+  if (locale === 'tr') return w.message
+  for (const [re, fn] of RULES) {
+    const m = w.message.match(re)
+    if (m) return fn(t, m)
+  }
+  return w.message
+}

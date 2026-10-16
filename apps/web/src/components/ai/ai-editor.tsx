@@ -3,7 +3,8 @@
 //   <AiEditor activity={...} storageKey="..." onGoalsChange={...} />
 // Etkinlik verilmezse `tool` ile serbest araç kipi açılır. Her şey tarayıcıda çalışır; ağ çağrısı yoktur.
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { DEFAULT_STATE, clearAiState, evaluateAi, loadAiState, saveAiState, type AiActivity, type AiGoalResult, type AiTool, type ToolStates } from '@/lib/ai/activity'
+import { useLocale, useT } from '@/i18n/client'
+import { defaultStateFor, clearAiState, evaluateAi, loadAiState, saveAiState, type AiActivity, type AiGoalResult, type AiTool, type ToolStates } from '@/lib/ai/activity'
 import { AiEtkinlikBilesen } from './ai-etkinlik'
 import { GoalsPanel } from './goals-panel'
 import './ai.css'
@@ -20,8 +21,12 @@ export interface AiEditorProps {
 }
 
 export function AiEditor({ activity, tool, storageKey, onGoalsChange }: AiEditorProps) {
+  const t = useT()
+  const locale = useLocale()
+  // Ders etkinlikleri (hedefleri Türkçe metinler üzerinde hesaplanır) her zaman Türkçe içerikle çalışır; serbest atölye site diline uyar.
+  const lang = activity ? 'tr' : locale
   const kind: AiTool = activity?.tool ?? tool ?? 'tokenizer'
-  const makeInitial = useCallback((): ToolStates[AiTool] => (activity ? (activity.initial() as ToolStates[AiTool]) : (DEFAULT_STATE[kind]() as ToolStates[AiTool])), [activity, kind])
+  const makeInitial = useCallback((): ToolStates[AiTool] => (activity ? (activity.initial() as ToolStates[AiTool]) : (defaultStateFor(kind, lang) as ToolStates[AiTool])), [activity, kind, lang])
   const [state, setState] = useState<ToolStates[AiTool]>(makeInitial)
   const [loaded, setLoaded] = useState(false)
   const onGoalsRef = useRef(onGoalsChange); onGoalsRef.current = onGoalsChange
@@ -56,10 +61,10 @@ export function AiEditor({ activity, tool, storageKey, onGoalsChange }: AiEditor
             <p className="ai-intro">{activity.intro}</p>
           </div>
         )}
-        <p className="ai-notice"><strong>Tamamen yerel.</strong> Bu araç tarayıcında çalışır; dış servise bağlanmaz, anahtar istemez. Hesaplar gerçektir; ancak bir dil modelinin yerini tutan her adım "simülasyon" ya da "şablon" olarak açıkça etiketlenmiştir.</p>
-        <AiEtkinlikBilesen tool={kind} state={state as never} onChange={setState as never} locked={!!activity} />
+        <p className="ai-notice"><strong>{t('studios.ai.editor.localTitle')}</strong> {t('studios.ai.editor.localBody')}</p>
+        <AiEtkinlikBilesen tool={kind} state={state as never} onChange={setState as never} locked={!!activity} lang={lang} />
         <div className="ai-topbar">
-          <button type="button" className="ai-btn" onClick={reset}>Baştan başla</button>
+          <button type="button" className="ai-btn" onClick={reset}>{t('studios.ai.editor.reset')}</button>
         </div>
       </div>
       {evaluation && <aside className="ai-side"><GoalsPanel evaluation={evaluation} /></aside>}

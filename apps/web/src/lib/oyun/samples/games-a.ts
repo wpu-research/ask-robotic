@@ -5,6 +5,7 @@ import { bu, diger, makeProject, mapFromRows, oku, olayKaro, tiles, type OyunSam
 export const YAKALAMACA: OyunSample = {
   id: 'yakalamaca', name: 'Yakalamaca', level: 1, controls: 'Sol/sağ tuşlarıyla kediyi hareket ettir.',
   summary: 'Gökten düşen meyveleri yakala. Kaçırdığın her meyve bir canını götürür.',
+  en: { name: 'Catch!', summary: 'Catch the fruit falling from the sky. Every fruit you miss costs you a life.', controls: 'Move the cat with the left/right keys.' },
   project: () => makeProject('Yakalamaca', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 10 }),
@@ -41,6 +42,7 @@ export const YAKALAMACA: OyunSample = {
 export const UZAY_GEMISI: OyunSample = {
   id: 'uzay-gemisi', name: 'Uzay gemisi', level: 2, controls: 'Ok tuşlarıyla uç, A (boşluk) ile ateş et.',
   summary: 'Gelen uzaylıları lazerle vur. Gemine çarparlarsa can kaybedersin.',
+  en: { name: 'Spaceship', summary: 'Zap the incoming aliens with your laser. If they crash into your ship, you lose a life.', controls: 'Fly with the arrow keys, shoot with A (space).' },
   project: () => makeProject('Uzay gemisi', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 0 }),
@@ -99,6 +101,7 @@ export const LABIRENT_HARITA = [
 export const LABIRENT: OyunSample = {
   id: 'labirent', name: 'Labirent', level: 2, controls: 'Ok tuşlarıyla yürü. Hayalet seni kovalar!',
   summary: 'Labirentteki tüm altınları topla. Kamera seni takip eder; hayalet duvarlardan geçer.',
+  en: { name: 'Maze', summary: 'Collect all the gold in the maze. The camera follows you; the ghost can go through walls.', controls: 'Walk with the arrow keys. The ghost chases you!' },
   project: () => makeProject('Labirent', [
     b('oyun_baslangic', {}, [
       b('sahne_dosemesi', { IMG: 'karo-zemin' }),
@@ -156,6 +159,7 @@ function platformRows(): string[] {
 export const PLATFORM: OyunSample = {
   id: 'platform-atlayici', name: 'Platform atlayıcı', level: 3, controls: 'Sağ/sol ile yürü, A (boşluk) ya da yukarı ile zıpla. Düşmanın üstüne atla!',
   summary: 'Altınları topla, dikenlerden kaç, düşmanların üstüne atlayarak onları yen ve kapıya ulaş.',
+  en: { name: 'Platform jumper', summary: 'Collect the gold, dodge the spikes, beat enemies by jumping on them and reach the door.', controls: 'Walk with right/left, jump with A (space) or up. Jump on the enemies!' },
   project: () => makeProject('Platform atlayıcı', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 10 }),

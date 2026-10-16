@@ -1,16 +1,21 @@
 import type { Metadata } from 'next'
 import { JrEditor } from '@/components/jr/jr-editor'
+import { getT } from '@/i18n/server'
 import { emptyProject } from '@/lib/jr/starters'
 
-export const metadata: Metadata = { title: 'Atölye' }
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT()
+  return { title: t('studios.jr.page.title') }
+}
 
-export default function Atolye() {
+export default async function Atolye() {
+  const t = await getT()
   return (
     <div className="page page-tool">
       <header className="page-title">
-        <h1>Atölye</h1>
+        <h1>{t('studios.jr.page.title')}</h1>
         <p className="muted">
-          Blokları sürükleyip bırakarak karakterini programla. Derslerdeki etkinlikleri burada da deneyebilirsin. Çalışman bu tarayıcıda saklanır.
+          {t('studios.jr.page.intro')}
         </p>
       </header>
       <div className="tool-body">

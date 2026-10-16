@@ -4,6 +4,7 @@
 
 import { KINDS } from './types'
 import { PALETTE } from './palette'
+import { BLOCK_EN, CATEGORY_EN, KIND_EN, OPTION_EN, PALETTE_NAME_EN, type Locale } from './i18n-en'
 
 export type CatKey = 'sprite' | 'hareket' | 'denetleyici' | 'oyun' | 'sahne' | 'ses' | 'mantik' | 'dongu' | 'degisken' | 'matematik' | 'metin' | 'fonksiyon'
 
@@ -204,11 +205,15 @@ export const swatch = (hex: string): string =>
 
 const CHECK: Partial<Record<Arg['t'], string>> = { spr: 'Sprite', num: 'Number', txt: 'String', img: 'Image', map: 'Map', bool: 'Boolean' }
 
-function argJson(name: string, a: Arg): Record<string, unknown> {
+/** Açılır liste etiketi (İngilizcede çeviri tablosundan; yoksa olduğu gibi). Değer değişmez. */
+const optLabel = (label: string, locale: Locale): string => (locale === 'en' ? OPTION_EN[label] ?? label : label)
+
+function argJson(name: string, a: Arg, locale: Locale = 'tr'): Record<string, unknown> {
+  const en = locale === 'en'
   switch (a.t) {
-    case 'dd': return { type: 'field_dropdown', name, options: a.opts }
-    case 'kind': return { type: 'field_dropdown', name, options: [...(a.all ? [['hepsi', 'hepsi']] : []), ...KINDS.map((k) => [k.label, k.id])] }
-    case 'col': return { type: 'field_dropdown', name, options: PALETTE.map((p) => [{ src: swatch(p.hex), width: 22, height: 22, alt: p.name }, p.hex]) }
+    case 'dd': return { type: 'field_dropdown', name, options: en ? a.opts.map(([l, v]) => [optLabel(l, locale), v]) : a.opts }
+    case 'kind': return { type: 'field_dropdown', name, options: [...(a.all ? [[optLabel('hepsi', locale), 'hepsi']] : []), ...KINDS.map((k) => [en ? KIND_EN[k.id] ?? k.label : k.label, k.id])] }
+    case 'col': return { type: 'field_dropdown', name, options: PALETTE.map((p) => [{ src: swatch(p.hex), width: 22, height: 22, alt: en ? PALETTE_NAME_EN[p.index] ?? p.name : p.name }, p.hex]) }
     case 'fnum': return { type: 'field_number', name, value: a.v, min: a.min, max: a.max, precision: 1 }
     case 'ftxt': return { type: 'field_input', name, text: a.v, spellcheck: false }
     case 'any': return { type: 'input_value', name }
@@ -216,16 +221,17 @@ function argJson(name: string, a: Arg): Record<string, unknown> {
   }
 }
 
-export function blockJson(def: BlockDef): BlockJson {
+export function blockJson(def: BlockDef, locale: Locale = 'tr'): BlockJson {
   const args0: Record<string, unknown>[] = []
   let n = 0
-  const message0 = def.msg.replace(/\{([A-Z0-9_]+)\}/g, (_m, name: string) => {
+  const en = locale === 'en' ? BLOCK_EN[def.type] : undefined
+  const message0 = (en?.msg ?? def.msg).replace(/\{([A-Z0-9_]+)\}/g, (_m, name: string) => {
     const a = def.args[name]
     if (!a) throw new Error(`${def.type}: '${name}' girişi tanımlı değil`)
-    args0.push(argJson(name, a))
+    args0.push(argJson(name, a, locale))
     return `%${++n}`
   })
-  const json: BlockJson = { type: def.type, style: `oyun_${def.cat}`, message0, args0, tooltip: def.tip, inputsInline: true }
+  const json: BlockJson = { type: def.type, style: `oyun_${def.cat}`, message0, args0, tooltip: en?.tip ?? def.tip, inputsInline: true }
   if (def.shape === 'val') json.output = def.out ?? null
   else {
     if (def.shape !== 'hat') { json.previousStatement = null; json.nextStatement = null }
@@ -236,15 +242,22 @@ export function blockJson(def: BlockDef): BlockJson {
   }
   return json
 }
-export const BLOCK_JSON: readonly BlockJson[] = BLOCKS.map(blockJson)
+export const BLOCK_JSON: readonly BlockJson[] = BLOCKS.map((d) => blockJson(d))
+/** Dile göre blok tanımları (Türkçe: BLOCK_JSON). */
+export const blockJsonFor = (locale: Locale): readonly BlockJson[] => (locale === 'tr' ? BLOCK_JSON : BLOCKS.map((d) => blockJson(d, locale)))
+/** Kategorinin görünen adı. */
+export const categoryLabel = (c: CategoryDef, locale: Locale = 'tr'): string => (locale === 'en' ? CATEGORY_EN[c.key] : c.label)
 
 // ───────── Araç kutusu ─────────
 
 interface ShadowSpec { type: string; fields?: Record<string, unknown> }
-function shadowOf(a: Arg): ShadowSpec | null {
+/** Araç kutusundaki hazır metin (yalnız başlangıç değeri; davranışı etkilemez). */
+const TEXT_EN: Readonly<Record<string, string>> = { 'Merhaba!': 'Hello!' }
+
+function shadowOf(a: Arg, locale: Locale = 'tr'): ShadowSpec | null {
   switch (a.t) {
     case 'num': return { type: 'math_number', fields: { NUM: a.v } }
-    case 'txt': return { type: 'text', fields: { TEXT: a.v } }
+    case 'txt': return { type: 'text', fields: { TEXT: locale === 'en' ? TEXT_EN[a.v] ?? a.v : a.v } }
     case 'spr': return { type: 'oyun_bu_sprite' }
     case 'img': return { type: 'oyun_resim' }
     case 'map': return { type: 'oyun_harita' }
@@ -252,10 +265,10 @@ function shadowOf(a: Arg): ShadowSpec | null {
   }
 }
 
-export function flyoutEntry(def: BlockDef): Record<string, unknown> {
+export function flyoutEntry(def: BlockDef, locale: Locale = 'tr'): Record<string, unknown> {
   const inputs: Record<string, unknown> = {}
   for (const [name, a] of Object.entries(def.args)) {
-    const sh = shadowOf(a)
+    const sh = shadowOf(a, locale)
     if (sh) inputs[name] = { shadow: sh }
   }
   const fields: Record<string, unknown> = {}
@@ -294,7 +307,7 @@ const STD_FLYOUT: Partial<Record<CatKey, unknown[]>> = {
 }
 
 /** Blockly araç kutusu JSON'u (kategori sırası: Sprite … Fonksiyon). `allowed` verilmezse hepsi. */
-export function toolboxJson(allowed?: readonly string[]): { kind: 'categoryToolbox'; contents: Record<string, unknown>[] } {
+export function toolboxJson(allowed?: readonly string[], locale: Locale = 'tr'): { kind: 'categoryToolbox'; contents: Record<string, unknown>[] } {
   const ok = allowed ? new Set(allowed) : null
   const contents: Record<string, unknown>[] = []
   for (const c of CATEGORIES) {
@@ -307,12 +320,12 @@ export function toolboxJson(allowed?: readonly string[]): { kind: 'categoryToolb
       if (ok && !['procedures_defnoreturn', 'procedures_defreturn', 'procedures_callnoreturn', 'procedures_callreturn'].some((t) => ok.has(t))) continue
       custom = 'PROCEDURE'
     } else {
-      const own = BLOCKS.filter((b) => b.cat === c.key && (!ok || ok.has(b.type))).map(flyoutEntry)
+      const own = BLOCKS.filter((b) => b.cat === c.key && (!ok || ok.has(b.type))).map((d) => flyoutEntry(d, locale))
       const std = (STD_FLYOUT[c.key] ?? []).filter((e) => !ok || ok.has((e as { type: string }).type))
       items = [...own, ...std]
       if (!items.length) continue
     }
-    const cat: Record<string, unknown> = { kind: 'category', name: c.label, categorystyle: `oyun_cat_${c.key}`, cssConfig: { icon: `oyb-ic-${c.key}` }, contents: items }
+    const cat: Record<string, unknown> = { kind: 'category', name: categoryLabel(c, locale), categorystyle: `oyun_cat_${c.key}`, cssConfig: { icon: `oyb-ic-${c.key}` }, contents: items }
     if (custom) { cat.custom = custom; if (!items.length) delete cat.contents }
     contents.push(cat)
   }

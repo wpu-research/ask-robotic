@@ -2,10 +2,12 @@
 // Oyun Atölyesi — bütünleşik editör: sahne + (bloklar | JavaScript | resimler | harita). Tam genişlik / tam yükseklik.
 // Ders oynatıcıya bağlanacak bileşen budur: <OyunEditor activity={...} storageKey="..." onGoalsChange={...} />
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useLocale, useT } from '@/i18n/client'
 import { evaluateGoals, type GoalEvaluation, type GoalResult, type OyunActivity } from '@/lib/oyun/activity'
 import { GALLERY_BY_ID } from '@/lib/oyun/assets'
 import type { ImageRef } from '@/lib/oyun/blockly-defs'
 import { toJavaScript } from '@/lib/oyun/codegen'
+import { oyunErrorText } from '@/lib/oyun/i18n-en'
 import { PROJECT_STORAGE_KEY, exportProject, gameSignature, imagesUsedByBlocks, loadProject, mapsUsedByBlocks, parseProject, saveProject, slugify, starterProject, withGalleryImages } from '@/lib/oyun/project'
 import type { OyunSample } from '@/lib/oyun/samples'
 import type { BlockState, OyunProject } from '@/lib/oyun/types'
@@ -28,17 +30,21 @@ export interface OyunEditorProps {
 }
 
 type Tab = 'bloklar' | 'javascript' | 'resimler' | 'harita'
-const TABS: { id: Tab; label: string; icon: string }[] = [
-  { id: 'bloklar', label: 'Bloklar', icon: '🧩' },
-  { id: 'javascript', label: 'JavaScript', icon: '📜' },
-  { id: 'resimler', label: 'Resimler', icon: '🎨' },
-  { id: 'harita', label: 'Harita', icon: '🗺️' },
+const TABS: { id: Tab; icon: string }[] = [
+  { id: 'bloklar', icon: '🧩' },
+  { id: 'javascript', icon: '📜' },
+  { id: 'resimler', icon: '🎨' },
+  { id: 'harita', icon: '🗺️' },
 ]
 
 const PLACEHOLDER_ROWS = ['2b2b2b2b', 'b2b2b2b2', '2b2b2b2b', 'b2b2b2b2', '2b2b2b2b', 'b2b2b2b2', '2b2b2b2b', 'b2b2b2b2']
 
 export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorProps) {
-  const [project, setProject] = useState<OyunProject>(() => (activity ? activity.starter() : starterProject()))
+  const t = useT()
+  const locale = useLocale()
+  /** Serbest atölyenin başlangıç projesi (adı dile göre; bloklar aynı). */
+  const starter = () => ({ ...starterProject(), name: t('studios.oyun.editor.starterName') })
+  const [project, setProject] = useState<OyunProject>(() => (activity ? activity.starter() : starter()))
   const [loaded, setLoaded] = useState(false)
   const [resetKey, setResetKey] = useState(0)
   const [tab, setTab] = useState<Tab>('bloklar')
@@ -106,7 +112,7 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
 
   const usedIds = useMemo(() => new Set(imagesUsedByBlocks(project.blocks)), [project.blocks])
   const tileIds = useMemo(() => new Set(project.tileset.map((t) => t.image)), [project.tileset])
-  const code = useMemo(() => toJavaScript(project.blocks), [project.blocks])
+  const code = useMemo(() => toJavaScript(project.blocks, locale), [project.blocks, locale])
 
   const onBlocks = useCallback((s: BlockState) => setProject((p) => ({ ...p, blocks: s })), [])
 
@@ -129,18 +135,23 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
     a.click()
     a.remove()
     setTimeout(() => URL.revokeObjectURL(url), 1000)
-    setNote('Projen bir dosya olarak indirildi.')
+    setNote(t('studios.oyun.editor.exported'))
   }
   const importJson = async (file: File | undefined) => {
     if (!file) return
-    if (file.size > 2_000_000) { setNote('Dosya çok büyük (en çok 2 MB).'); return }
+    if (file.size > 2_000_000) { setNote(t('studios.oyun.editor.fileTooBig')); return }
     const p = parseProject(await file.text())
-    if (!p) { setNote('Bu dosya geçerli bir Oyun Atölyesi projesi değil.'); return }
-    replaceProject(p, `"${p.name}" projesi açıldı.`)
+    if (!p) { setNote(t('studios.oyun.editor.fileInvalid')); return }
+    replaceProject(p, t('studios.oyun.editor.projectOpened', { name: p.name }))
   }
-  const pickSample = (s: OyunSample) => { setSamples(false); replaceProject(s.project(), `"${s.name}" örneği açıldı. Bloklarını değiştirip dene!`) }
-  const newProject = () => { if (window.confirm('Yeni bir proje başlatılsın mı? Şu anki çalışmanın üzerine yazılır (önce Kaydet ile indirebilirsin).')) replaceProject(starterProject(), 'Yeni proje başlatıldı.') }
-  const resetActivity = () => { if (activity && window.confirm('Etkinliğin başlangıç haline dönülsün mü? Yaptıkların silinir.')) replaceProject(activity.starter(), 'Etkinlik başa döndü.') }
+  const pickSample = (s: OyunSample) => {
+    setSamples(false)
+    const name = locale === 'en' && s.en ? s.en.name : s.name
+    const p = s.project()
+    replaceProject(locale === 'en' && s.en ? { ...p, name } : p, t('studios.oyun.editor.sampleOpened', { name }))
+  }
+  const newProject = () => { if (window.confirm(t('studios.oyun.editor.confirmNew'))) replaceProject(starter(), t('studios.oyun.editor.newStarted')) }
+  const resetActivity = () => { if (activity && window.confirm(t('studios.oyun.editor.confirmReset'))) replaceProject(activity.starter(), t('studios.oyun.editor.activityReset')) }
 
   const showBlock = (id: string | null | undefined) => { setTab('bloklar'); setTimeout(() => blocks.current?.focusBlock(id), 80) }
 
@@ -151,21 +162,21 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
           <h2 className="oy-title">{activity.title}</h2>
         ) : (
           <label className="oy-name">
-            <span className="sr-only">Proje adı</span>
-            <input type="text" value={project.name} maxLength={60} onChange={(e) => setProject((p) => ({ ...p, name: e.target.value }))} aria-label="Proje adı" data-testid="oyun-name" />
+            <span className="sr-only">{t('studios.oyun.editor.projectName')}</span>
+            <input type="text" value={project.name} maxLength={60} onChange={(e) => setProject((p) => ({ ...p, name: e.target.value }))} aria-label={t('studios.oyun.editor.projectName')} data-testid="oyun-name" />
           </label>
         )}
         <span className="oy-spacer" />
         {!activity && (
           <>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setSamples(true)} data-testid="oyun-samples-btn">🎮 Örnekler</button>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={newProject}>＋ Yeni</button>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={() => fileInput.current?.click()}>📂 Aç</button>
-            <button type="button" className="btn btn-sm btn-ghost" onClick={exportJson} data-testid="oyun-export">💾 Kaydet</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setSamples(true)} data-testid="oyun-samples-btn">{t('studios.oyun.editor.samples')}</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={newProject}>{t('studios.oyun.editor.new')}</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => fileInput.current?.click()}>{t('studios.oyun.editor.open')}</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={exportJson} data-testid="oyun-export">{t('studios.oyun.editor.save')}</button>
             <input ref={fileInput} type="file" accept=".json,application/json" hidden onChange={(e) => { void importJson(e.target.files?.[0]); e.target.value = '' }} data-testid="oyun-import" />
           </>
         )}
-        {activity && <button type="button" className="btn btn-sm btn-ghost" onClick={resetActivity}>↺ Başa dön</button>}
+        {activity && <button type="button" className="btn btn-sm btn-ghost" onClick={resetActivity}>{t('studios.oyun.editor.resetActivity')}</button>}
       </div>
       {note && <p className="oy-toast" role="status" onClick={() => setNote(null)}>{note}</p>}
 
@@ -174,8 +185,8 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
           <OyunStage player={player} changed={changedWhileRunning} />
           {player.error && (
             <div className="oy-error" role="alert" data-testid="oyun-error">
-              <b>Bir sorun var:</b> {player.error.message}
-              {player.error.blockId && <button type="button" className="oy-link" onClick={() => showBlock(player.error?.blockId)}>Bloğu göster</button>}
+              <b>{t('studios.oyun.editor.problem')}</b> {oyunErrorText(player.error.message, locale)}
+              {player.error.blockId && <button type="button" className="oy-link" onClick={() => showBlock(player.error?.blockId)}>{t('studios.oyun.editor.showBlock')}</button>}
             </div>
           )}
           {activity && (
@@ -186,19 +197,19 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
           )}
         </aside>
 
-        <section className="oy-work" aria-label="Düzenleme alanı">
-          <div className="oy-tabs" role="tablist" aria-label="Düzenleme sekmeleri">
-            {TABS.map((t) => (
-              <button key={t.id} type="button" role="tab" id={`oy-tab-${t.id}`} aria-selected={tab === t.id} aria-controls={`oy-panel-${t.id}`} className="oy-tab" onClick={() => setTab(t.id)} data-testid={`oyun-tab-${t.id}`}>
-                <span aria-hidden="true">{t.icon}</span> {t.label}
+        <section className="oy-work" aria-label={t('studios.oyun.editor.workArea')}>
+          <div className="oy-tabs" role="tablist" aria-label={t('studios.oyun.editor.tabsLabel')}>
+            {TABS.map((tb) => (
+              <button key={tb.id} type="button" role="tab" id={`oy-tab-${tb.id}`} aria-selected={tab === tb.id} aria-controls={`oy-panel-${tb.id}`} className="oy-tab" onClick={() => setTab(tb.id)} data-testid={`oyun-tab-${tb.id}`}>
+                <span aria-hidden="true">{tb.icon}</span> {t(`studios.oyun.editor.tabs.${tb.id}`)}
               </button>
             ))}
             <span className="oy-spacer" />
             {tab === 'bloklar' && (
               <span className="oy-tab-acts">
-                <button type="button" className="oy-tab-act" onClick={() => blocks.current?.undo()} title="Geri al">↶</button>
-                <button type="button" className="oy-tab-act" onClick={() => blocks.current?.redo()} title="Yinele">↷</button>
-                <button type="button" className="oy-tab-act" onClick={() => blocks.current?.arrange()} title="Blokları düzenle">⇅ Düzenle</button>
+                <button type="button" className="oy-tab-act" onClick={() => blocks.current?.undo()} title={t('studios.oyun.editor.undo')}>↶</button>
+                <button type="button" className="oy-tab-act" onClick={() => blocks.current?.redo()} title={t('studios.oyun.editor.redo')}>↷</button>
+                <button type="button" className="oy-tab-act" onClick={() => blocks.current?.arrange()} title={t('studios.oyun.editor.arrangeTitle')}>{t('studios.oyun.editor.arrange')}</button>
               </span>
             )}
           </div>
@@ -209,11 +220,11 @@ export function OyunEditor({ activity, storageKey, onGoalsChange }: OyunEditorPr
             <div role="tabpanel" id="oy-panel-javascript" aria-labelledby="oy-tab-javascript" hidden={tab !== 'javascript'} className="oy-panel">
               <div className="oy-js">
                 <div className="oy-js-bar">
-                  <span className="muted">Bloklarının JavaScript karşılığı (salt okunur). Oyun doğrudan bloklardan çalışır.</span>
+                  <span className="muted">{t('studios.oyun.editor.jsNote')}</span>
                   <span className="oy-spacer" />
-                  <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void navigator.clipboard?.writeText(code).then(() => setNote('Kod panoya kopyalandı.')).catch(() => setNote('Kopyalanamadı; kodu elle seçip kopyala.')) }}>Kopyala</button>
+                  <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void navigator.clipboard?.writeText(code).then(() => setNote(t('studios.oyun.editor.copied'))).catch(() => setNote(t('studios.oyun.editor.copyFailed'))) }}>{t('studios.oyun.editor.copy')}</button>
                 </div>
-                <pre className="oy-code" tabIndex={0} aria-label="JavaScript kodu" data-testid="oyun-js"><code>{code}</code></pre>
+                <pre className="oy-code" tabIndex={0} aria-label={t('studios.oyun.editor.jsCode')} data-testid="oyun-js"><code>{code}</code></pre>
               </div>
             </div>
             <div role="tabpanel" id="oy-panel-resimler" aria-labelledby="oy-tab-resimler" hidden={tab !== 'resimler'} className="oy-panel">

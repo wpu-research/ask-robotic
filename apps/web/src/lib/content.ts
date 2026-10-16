@@ -67,7 +67,7 @@ export async function completeLesson(db: Db, userId: string, lessonId: number) {
 
 /** Ders anahtarlarını ("modül-slug:hafta:ders") ders kimliği ve başlığa çözer; bulunamayanlar atlanır. */
 export async function resolveLessonKeys(db: Db, keys: string[]) {
-  const out: { key: string; id: number; title: string; weekTitle: string; moduleTitle: string }[] = []
+  const out: { key: string; id: number; title: string; weekTitle: string; moduleTitle: string; moduleSlug: string; weekPos: number; weekName: string }[] = []
   const trees = new Map<string, Awaited<ReturnType<typeof getModuleTree>>>()
   for (const key of keys) {
     const m = key.match(/^([a-z0-9-]+):(\d+):(\d+)$/)
@@ -76,19 +76,20 @@ export async function resolveLessonKeys(db: Db, keys: string[]) {
     const tree = trees.get(m[1])
     const lesson = tree?.weeks.find((w) => w.position === Number(m[2]))?.lessons.find((l) => l.position === Number(m[3]))
     const week = tree?.weeks.find((w) => w.position === Number(m[2]))
-    if (tree && lesson && week) out.push({ key, id: lesson.id, title: lesson.title, weekTitle: `${week.position}. hafta: ${week.title}`, moduleTitle: tree.module.title })
+    if (tree && lesson && week) out.push({ key, id: lesson.id, title: lesson.title, weekTitle: `${week.position}. hafta: ${week.title}`, moduleTitle: tree.module.title, moduleSlug: tree.module.slug, weekPos: week.position, weekName: week.title })
   }
   return out
 }
 
-/** Mini testi olan dersler (Testlerim ve İlerlemem için): kimlik, başlık, soru sayısı ve konum. */
+/** Mini testi olan dersler (Testlerim ve İlerlemem için): kimlik, başlık, soru sayısı ve konum.
+ * weekLabel Türkçe hazır etikettir; dile göre etiket için moduleSlug/moduleTitle/weekPos/weekTitle (lib/catalog-en.ts). */
 export async function listQuizLessons(db: Db) {
   const rows = await db
-    .select({ id: lessons.id, title: lessons.title, quiz: lessons.quiz, weekPos: weeks.position, weekTitle: weeks.title, moduleTitle: modules.title })
+    .select({ id: lessons.id, title: lessons.title, quiz: lessons.quiz, weekPos: weeks.position, weekTitle: weeks.title, moduleTitle: modules.title, moduleSlug: modules.slug })
     .from(lessons)
     .innerJoin(weeks, eq(weeks.id, lessons.weekId))
     .innerJoin(modules, eq(modules.id, weeks.moduleId))
     .where(and(eq(modules.published, true), sql`${lessons.quiz} is not null`))
     .orderBy(asc(modules.position), asc(weeks.position), asc(lessons.position))
-  return rows.map((r) => ({ id: r.id, title: r.title, total: r.quiz?.length ?? 0, weekLabel: `${r.moduleTitle} › ${r.weekPos}. hafta: ${r.weekTitle}` }))
+  return rows.map((r) => ({ id: r.id, title: r.title, total: r.quiz?.length ?? 0, weekLabel: `${r.moduleTitle} › ${r.weekPos}. hafta: ${r.weekTitle}`, moduleSlug: r.moduleSlug, moduleTitle: r.moduleTitle, weekPos: r.weekPos, weekTitle: r.weekTitle }))
 }

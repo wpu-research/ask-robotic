@@ -1,6 +1,7 @@
 'use client'
 // 3B / 2B görünüm seçimi ve kamera kipi. Tercih tarayıcıda saklanır; WebGL yoksa 2B'de kalır ve seçici gösterilmez.
 import { useEffect, useState } from 'react'
+import { useLocale } from '@/i18n/client'
 import { hasWebGL, type CamMode } from './core'
 
 const KEY = 'ask:view3d:v1'
@@ -25,11 +26,10 @@ export function useView3D(): ViewState {
   return { is3d: supported && is3d, supported, mode, set3d, setMode }
 }
 
-const MODES: [CamMode, string, string][] = [
-  ['genel', 'Genel', 'Sürükleyerek döndür, tekerlekle yakınlaştır'],
-  ['takip', 'Takip', 'Kamera robotu arkadan izler'],
-  ['ustten', 'Üstten', 'Kuşbakışı'],
-]
+const MODES: Record<'tr' | 'en', [CamMode, string, string][]> = {
+  tr: [['genel', 'Genel', 'Sürükleyerek döndür, tekerlekle yakınlaştır'], ['takip', 'Takip', 'Kamera robotu arkadan izler'], ['ustten', 'Üstten', 'Kuşbakışı']],
+  en: [['genel', 'Overview', 'Drag to rotate, scroll to zoom'], ['takip', 'Follow', 'The camera follows the robot from behind'], ['ustten', 'Top', "Bird's-eye view"]],
+}
 
 /** Tam ekran (sahne büyütme) durumu; Esc kapatır. */
 export function useFullView(): [boolean, (v: boolean) => void] {
@@ -46,22 +46,23 @@ export function useFullView(): [boolean, (v: boolean) => void] {
 
 /** `cams`: kamera kipleri gösterilsin mi (yalnız arenada gezen robotlar için anlamlı). `onFull`: büyüt düğmesi. */
 export function ViewBar({ v, cams = true, full, onFull }: { v: ViewState; cams?: boolean; full?: boolean; onFull?: (v: boolean) => void }) {
+  const en = useLocale() === 'en'
   const big = onFull && (
-    <button type="button" className="v3-full" aria-pressed={!!full} onClick={() => onFull(!full)} data-testid="view-full" title={full ? 'Küçült (Esc)' : 'Büyüt'}>
-      {full ? '✕ Küçült' : '⛶ Büyüt'}
+    <button type="button" className="v3-full" aria-pressed={!!full} onClick={() => onFull(!full)} data-testid="view-full" title={full ? (en ? 'Shrink (Esc)' : 'Küçült (Esc)') : (en ? 'Enlarge' : 'Büyüt')}>
+      {full ? (en ? '✕ Shrink' : '✕ Küçült') : (en ? '⛶ Enlarge' : '⛶ Büyüt')}
     </button>
   )
   if (!v.supported) return big ? <div className="v3-bar">{big}</div> : null
   return (
-    <div className="v3-bar" role="group" aria-label="Görünüm">
+    <div className="v3-bar" role="group" aria-label={en ? 'View' : 'Görünüm'}>
       <div className="v3-seg">
-        <button type="button" aria-pressed={v.is3d} onClick={() => v.set3d(true)} data-testid="view-3d">3B</button>
-        <button type="button" aria-pressed={!v.is3d} onClick={() => v.set3d(false)} data-testid="view-2d">2B</button>
+        <button type="button" aria-pressed={v.is3d} onClick={() => v.set3d(true)} data-testid="view-3d">{en ? '3D' : '3B'}</button>
+        <button type="button" aria-pressed={!v.is3d} onClick={() => v.set3d(false)} data-testid="view-2d">{en ? '2D' : '2B'}</button>
       </div>
       {big}
       {v.is3d && cams && (
         <div className="v3-seg">
-          {MODES.map(([m, label, tip]) => (
+          {MODES[en ? 'en' : 'tr'].map(([m, label, tip]) => (
             <button key={m} type="button" title={tip} aria-pressed={v.mode === m} onClick={() => v.setMode(m)} data-testid={`view-cam-${m}`}>{label}</button>
           ))}
         </div>

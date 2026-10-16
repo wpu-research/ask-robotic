@@ -3,6 +3,10 @@ import { HaltProgram, type BlockCtx, type RunApi } from '../interpreter'
 import type { GameRun, LevelDef } from '../types'
 import { DEFAULT_COLOUR, DEFAULT_WIDTH, MATCH_THRESHOLD, hueToHex, similarity, type Stroke } from './geometry'
 
+const TOO_MANY = 'Çok fazla hareket yaptın! Kaplumbağa yoruldu.'
+/** Motorun kendi durdurma iletilerinin İngilizcesi (yorumlayıcı iletileri çerçevede çevrilir). */
+const HALT_EN: Record<string, string> = { [TOO_MANY]: 'Too many moves! The turtle is tired.' }
+
 export interface TurtleStart { x: number; y: number; heading: number }
 export interface TurtleLevelData {
   start: TurtleStart
@@ -47,7 +51,7 @@ export function createTurtleRun(level: LevelDef): GameRun<TurtleState> {
   let pending = 0
 
   const push = (op: TurtleOp) => {
-    if (st.ops.length >= MAX_OPS) throw new HaltProgram('Çok fazla hareket yaptın! Kaplumbağa yoruldu.')
+    if (st.ops.length >= MAX_OPS) throw new HaltProgram(TOO_MANY)
     st.ops.push(op)
     pending += op.ms
   }
@@ -88,16 +92,16 @@ export function createTurtleRun(level: LevelDef): GameRun<TurtleState> {
     snapshot: () => ({ ...st, start: { ...st.start }, ops: st.ops.slice() }),
     stepDelay: () => { const d = pending; pending = 0; return d },
     evaluate(result) {
-      if (result.reason === 'halted') return { ok: false, message: result.message || 'Program durdu.' }
-      if (result.reason !== 'finished') return { ok: false, message: result.message || 'Program tamamlanamadı.' }
+      if (result.reason === 'halted') return { ok: false, message: result.message || 'Program durdu.', messageEn: result.message ? (HALT_EN[result.message] ?? result.messageEn) : 'The program stopped.' }
+      if (result.reason !== 'finished') return { ok: false, message: result.message || 'Program tamamlanamadı.', messageEn: result.message ? (HALT_EN[result.message] ?? result.messageEn) : 'The program could not finish.' }
       const drawn = strokesOf(st.ops)
-      if (!drawn.length) return { ok: false, message: 'Henüz hiçbir şey çizmedin. Kalem aşağıdayken ileri git!' }
+      if (!drawn.length) return { ok: false, message: 'Henüz hiçbir şey çizmedin. Kalem aşağıdayken ileri git!', messageEn: "You haven't drawn anything yet. Move forward while the pen is down!" }
       const s = similarity(data.target, drawn, !!data.colours)
       const pct = (v: number) => Math.round(v * 100)
-      if (s.recall < MATCH_THRESHOLD) return { ok: false, message: `Hedef çizimin %${pct(s.recall)}'ini çizdin. Gri şablonun eksik kalan kısımlarına bak.` }
-      if (s.precision < MATCH_THRESHOLD) return { ok: false, message: `Şablonda olmayan çizgiler var (%${pct(s.precision)} örtüştü). Yönleri ve uzunlukları kontrol et.` }
-      if (data.width && (s.inkRatio < 0.7 || s.inkRatio > 1.6)) return { ok: false, message: 'Şekil doğru ama çizgilerin kalınlığı şablona benzemiyor.' }
-      return { ok: true, message: 'Çizim şablonla örtüştü!' }
+      if (s.recall < MATCH_THRESHOLD) return { ok: false, message: `Hedef çizimin %${pct(s.recall)}'ini çizdin. Gri şablonun eksik kalan kısımlarına bak.`, messageEn: `You drew ${pct(s.recall)}% of the target. Look at the parts of the grey outline that are still missing.` }
+      if (s.precision < MATCH_THRESHOLD) return { ok: false, message: `Şablonda olmayan çizgiler var (%${pct(s.precision)} örtüştü). Yönleri ve uzunlukları kontrol et.`, messageEn: `Some lines are not on the outline (${pct(s.precision)}% matched). Check the directions and lengths.` }
+      if (data.width && (s.inkRatio < 0.7 || s.inkRatio > 1.6)) return { ok: false, message: 'Şekil doğru ama çizgilerin kalınlığı şablona benzemiyor.', messageEn: "The shape is right, but the line width doesn't match the outline." }
+      return { ok: true, message: 'Çizim şablonla örtüştü!', messageEn: 'Your drawing matches the outline!' }
     },
   }
 }

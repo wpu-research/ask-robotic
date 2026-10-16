@@ -1,7 +1,7 @@
 // Bulmaca motoru: blok programı bir hayvan "kurar"; zafer = kurulan hayvan karttakiyle birebir aynı.
 import { HaltProgram, type BlockCtx, type BlockHandler, type RunApi } from '../interpreter'
 import type { GameRun, LevelDef } from '../types'
-import { COLORS, FEATURE_INFO, FEATURE_ORDER, featureCount, firstDifference, makeFeatures, type Card, type ColorKey, type Features, type FeatureKey } from './features'
+import { COLORS, FEATURE_INFO, FEATURE_ORDER, featureCount, firstDifference, firstDifferenceEn, makeFeatures, type Card, type ColorKey, type Features, type FeatureKey } from './features'
 
 export interface PuzzleLevelData {
   cards: Card[]
@@ -16,6 +16,8 @@ export interface PuzzleState {
   index: number
   target: Features
   targetTitle: string
+  /** Kart başlığının İngilizcesi (yoksa Türkçesi). */
+  targetTitleEn: string
   built: Features
   /** Kart başına sonuç (null: henüz bakılmadı). */
   results: (boolean | null)[]
@@ -42,13 +44,22 @@ const PLURAL_MSG: Record<FeatureKey, string> = {
   KUYRUK: 'Bir hayvanın tek kuyruğu olur!',
   BIYIK: 'Bıyıklar bir kere eklenir!',
 }
+const PLURAL_MSG_EN: Record<FeatureKey, string> = {
+  BACAK: 'An animal can have at most 8 legs!',
+  KANAT: 'An animal has at most 2 wings!',
+  GOZ: 'An animal has at most 2 eyes!',
+  KULAK: 'An animal has at most 2 ears!',
+  GAGA: 'An animal has only one beak!',
+  KUYRUK: 'An animal has only one tail!',
+  BIYIK: 'Whiskers are added only once!',
+}
 
 export function createPuzzleRun(level: LevelDef): GameRun<PuzzleState> {
   const data = level.data as PuzzleLevelData
   const cards = data.cards
   const multi = !!data.multi
   const st: PuzzleState = {
-    cards, multi, index: 0, target: cards[0].f, targetTitle: cards[0].title, built: makeFeatures({}),
+    cards, multi, index: 0, target: cards[0].f, targetTitle: cards[0].title, targetTitleEn: cards[0].titleEn ?? cards[0].title, built: makeFeatures({}),
     results: cards.map(() => null), current: null, error: null, lastAdded: null, tick: 0,
   }
 
@@ -56,7 +67,7 @@ export function createPuzzleRun(level: LevelDef): GameRun<PuzzleState> {
   const add = (k: FeatureKey, n = 1): void => {
     const info = FEATURE_INFO[k]
     for (let i = 0; i < n; i++) {
-      if (featureCount(st.built, k) >= info.max) { st.error = PLURAL_MSG[k]; throw new HaltProgram(PLURAL_MSG[k]) }
+      if (featureCount(st.built, k) >= info.max) { st.error = PLURAL_MSG[k]; throw new HaltProgram(PLURAL_MSG[k], PLURAL_MSG_EN[k]) }
       if (typeof st.built[info.prop] === 'boolean') (st.built as unknown as Record<string, unknown>)[info.prop] = true
       else (st.built as unknown as Record<string, number>)[info.prop] += 1
       st.lastAdded = k
@@ -67,7 +78,7 @@ export function createPuzzleRun(level: LevelDef): GameRun<PuzzleState> {
   const addOne = (k: FeatureKey): BlockHandler => () => add(k)
   const intN = (c: BlockCtx, name: string): number => Math.max(0, Math.min(20, Math.floor(c.num(name, 0))))
   const needCurrent = (): FeatureKey => {
-    if (!st.current) throw new HaltProgram('Bu blok yalnızca "her özellik için" bloğunun içinde çalışır.')
+    if (!st.current) throw new HaltProgram('Bu blok yalnızca "her özellik için" bloğunun içinde çalışır.', 'This block only works inside the "for each feature" block.')
     return st.current
   }
   /** Yorumlayıcıya "bir an göster" adımı: sahne anlık görüntüyü yeniler. */
@@ -103,6 +114,7 @@ export function createPuzzleRun(level: LevelDef): GameRun<PuzzleState> {
         st.index = i
         st.target = cards[i].f
         st.targetTitle = cards[i].title
+        st.targetTitleEn = cards[i].titleEn ?? cards[i].title
         st.built = makeFeatures({})
         st.current = null
         st.error = null
@@ -113,7 +125,7 @@ export function createPuzzleRun(level: LevelDef): GameRun<PuzzleState> {
         st.results[i] = diff === null
         st.tick++
         yield pause(c) // sonuç görünsün
-        if (diff !== null) { st.error = `${i + 1}. kart: ${diff}`; throw new HaltProgram(st.error) }
+        if (diff !== null) { st.error = `${i + 1}. kart: ${diff}`; throw new HaltProgram(st.error, `Card ${i + 1}: ${firstDifferenceEn(cards[i].f, st.built)}`) }
       }
     },
   }
@@ -124,16 +136,16 @@ export function createPuzzleRun(level: LevelDef): GameRun<PuzzleState> {
     snapshot: () => structuredClone(st),
     evaluate: (result) => {
       if (multi) {
-        if (st.results.every((r) => r === true)) return { ok: true, message: 'Bütün kartları doğru yaptın!' }
-        if (result.reason === 'halted' && result.message) return { ok: false, message: result.message }
-        return { ok: false, message: 'Programın her kart için çalışmalı: blokları "her kart için" bloğunun içine koy.' }
+        if (st.results.every((r) => r === true)) return { ok: true, message: 'Bütün kartları doğru yaptın!', messageEn: 'You got every card right!' }
+        if (result.reason === 'halted' && result.message) return { ok: false, message: result.message, messageEn: result.messageEn }
+        return { ok: false, message: 'Programın her kart için çalışmalı: blokları "her kart için" bloğunun içine koy.', messageEn: 'Your program must run for every card: put the blocks inside the "for each card" block.' }
       }
-      if (result.reason === 'halted' && result.message) return { ok: false, message: result.message }
-      if (result.reason !== 'finished') return { ok: false, message: result.message ?? 'Program tamamlanamadı.' }
+      if (result.reason === 'halted' && result.message) return { ok: false, message: result.message, messageEn: result.messageEn }
+      if (result.reason !== 'finished') return { ok: false, message: result.message ?? 'Program tamamlanamadı.', messageEn: result.message ? result.messageEn : 'The program could not finish.' }
       const diff = firstDifference(card().f, st.built)
-      if (diff === null) { st.results[0] = true; return { ok: true, message: 'Hayvanın karttakiyle birebir aynı!' } }
+      if (diff === null) { st.results[0] = true; return { ok: true, message: 'Hayvanın karttakiyle birebir aynı!', messageEn: 'Your animal is exactly the same as the card!' } }
       st.results[0] = false
-      return { ok: false, message: diff }
+      return { ok: false, message: diff, messageEn: firstDifferenceEn(card().f, st.built) ?? undefined }
     },
     stepDelay: (info) => (info.type === 'bulmaca_her_kart' ? 700 : undefined),
   }

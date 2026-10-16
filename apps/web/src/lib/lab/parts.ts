@@ -15,13 +15,15 @@ export const STAGE_D_PARTS: PartType[] = [...STAGE_D_SENSORS, ...STAGE_D_MOTION]
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
 export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS]
 
-export interface PartCategory { title: string; types: PartType[] }
+/** `key`: sözlükteki kategori adı (lab.picker.cat.*); `title` Türkçe kaynak. */
+export interface PartCategory { key: PickerCategoryKey; title: string; types: PartType[] }
+export type PickerCategoryKey = 'output' | 'input' | 'active' | 'sensors' | 'motion' | 'other'
 export const PICKER_CATEGORIES: PartCategory[] = [
-  { title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', 'dcmotor', 'servo', 'relay'] },
-  { title: 'Giriş', types: ['button', 'pot', 'ldr', 'ntc'] },
-  { title: 'Aktif devre elemanları', types: ['resistor', 'diode', 'npn', 'mosfet', 'l293d', 'sr595'] },
-  { title: 'Sensörler', types: [...STAGE_C_PARTS, ...STAGE_D_SENSORS] },
-  { title: 'Motor sürücüler ve hareket', types: [...STAGE_D_MOTION] },
+  { key: 'output', title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', 'dcmotor', 'servo', 'relay'] },
+  { key: 'input', title: 'Giriş', types: ['button', 'pot', 'ldr', 'ntc'] },
+  { key: 'active', title: 'Aktif devre elemanları', types: ['resistor', 'diode', 'npn', 'mosfet', 'l293d', 'sr595'] },
+  { key: 'sensors', title: 'Sensörler', types: [...STAGE_C_PARTS, ...STAGE_D_SENSORS] },
+  { key: 'motion', title: 'Motor sürücüler ve hareket', types: [...STAGE_D_MOTION] },
 ]
 
 export const SHORT_NAME: Partial<Record<PartType, string>> = {
@@ -69,20 +71,44 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   lcd1602: 'ekran lcd 16x2 hd44780 yazı display paralel', lcdI2c: 'ekran lcd 16x2 i2c pcf8574 yazı display',
 }
 
+/** İngilizce arama sözcükleri (İngilizce ad dahil); arama her iki dilde de çalışır. */
+export const PART_KEYWORDS_EN: Partial<Record<PartType, string>> = {
+  uno: 'arduino board microcontroller', led: 'light diode lamp', rgbled: 'color colour light led', buzzer: 'sound beeper speaker piezo tone',
+  servo: 'motor arm angle', button: 'push button switch key tactile', pot: 'potentiometer variable resistor knob trimmer',
+  ldr: 'light sensor photoresistor photocell', ntc: 'temperature sensor thermistor', resistor: 'resistor ohm', diode: 'diode rectifier flyback',
+  npn: 'transistor bjt switch', mosfet: 'transistor fet switch', dcmotor: 'dc motor brushed propeller fan', l293d: 'motor driver h bridge chip ic',
+  relay: 'relay switch contact', sevenseg: 'seven segment digit display', sr595: 'shift register chip ic port expander',
+  lcd1602: 'lcd screen display text', lcdI2c: 'lcd screen display text i2c',
+  hcsr04: 'distance ultrasonic sonar range echo', dht: 'temperature humidity sensor weather', pir: 'motion sensor infrared human presence',
+  irobstacle: 'obstacle infrared proximity detector line follower', reed: 'reed switch magnet magnetic door window',
+  bmp280: 'pressure barometer altitude temperature sensor', mpu6050: 'accelerometer gyroscope gyro imu tilt balance motion sensor',
+  joystick: 'joystick analog stick gamepad thumbstick', encoder: 'rotary encoder knob dial', keypad: 'keypad matrix keyboard password keys',
+  rtc: 'real time clock date time battery', mq2: 'gas smoke sensor lpg leak', flame: 'flame fire sensor infrared', sound: 'sound microphone noise clap sensor',
+  soil: 'soil moisture sensor plant watering capacitive', rain: 'rain sensor raindrop wet weather', waterlevel: 'water level sensor tank liquid overflow',
+  mq3: 'alcohol gas sensor breath ethanol', mq4: 'methane natural gas sensor leak', mq7: 'carbon monoxide co gas sensor',
+  mq135: 'air quality ammonia benzene co2 gas sensor', sharpir: 'infrared distance range analog sensor',
+  l298n: 'motor driver h bridge dual channel', tb6612: 'motor driver h bridge mosfet dual channel', drv8833: 'motor driver h bridge small battery',
+  bts7960: 'motor driver high current big motor', md10c: 'motor driver pwm dir single channel',
+  stepper: 'stepper motor step nema17 driver cnc 3d printer', esc: 'esc brushless bldc motor drone propeller lipo',
+}
+
 /** Küçük harfe indirir, Türkçe aksanları (ö→o, ı→i…) ve tireyi sadeleştirir: "ROLE", "rele", "transistor", "7 segment" bulunur. */
 const norm = (s: string) => s.toLocaleLowerCase('tr-TR').replace(/[ıöüşçğ]/g, (c) => ({ ı: 'i', ö: 'o', ü: 'u', ş: 's', ç: 'c', ğ: 'g' })[c]!).replace(/[-_/]+/g, ' ')
 
-export interface PartGroup { title: string; types: PartType[] }
+export interface PartGroup { key: PickerCategoryKey; title: string; types: PartType[] }
 
-/** İzinli parçaları kategorilere böler; `query` ad ve anahtar sözcüklerde aranır (Türkçe büyük/küçük harf duyarsız). */
-export function pickerGroups(allowed: readonly PartType[], query: string): PartGroup[] {
+/**
+ * İzinli parçaları kategorilere böler; `query` ad ve anahtar sözcüklerde (Türkçe + İngilizce) aranır (Türkçe büyük/küçük harf duyarsız).
+ * `extra`: aramaya eklenecek metin (ör. arayüz dilindeki parça adı).
+ */
+export function pickerGroups(allowed: readonly PartType[], query: string, extra?: (t: PartType) => string): PartGroup[] {
   const words = norm(query.trim()).split(/\s+/).filter(Boolean)
   const match = (t: PartType) => {
     if (!words.length) return true
-    const hay = norm(`${PART_DEFS[t].name} ${SHORT_NAME[t] ?? ''} ${PART_KEYWORDS[t] ?? ''}`)
+    const hay = norm(`${PART_DEFS[t].name} ${SHORT_NAME[t] ?? ''} ${PART_KEYWORDS[t] ?? ''} ${PART_KEYWORDS_EN[t] ?? ''} ${extra?.(t) ?? ''}`)
     return words.every((w) => hay.includes(w))
   }
   const known = new Set(PICKER_CATEGORIES.flatMap((c) => c.types))
-  const cats: PartCategory[] = [...PICKER_CATEGORIES, { title: 'Diğer', types: allowed.filter((t) => !known.has(t)) }]
-  return cats.map((c) => ({ title: c.title, types: c.types.filter((t) => allowed.includes(t) && match(t)) })).filter((c) => c.types.length)
+  const cats: PartCategory[] = [...PICKER_CATEGORIES, { key: 'other', title: 'Diğer', types: allowed.filter((t) => !known.has(t)) }]
+  return cats.map((c) => ({ key: c.key, title: c.title, types: c.types.filter((t) => allowed.includes(t) && match(t)) })).filter((c) => c.types.length)
 }

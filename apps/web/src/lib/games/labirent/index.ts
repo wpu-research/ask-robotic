@@ -8,6 +8,7 @@ export const labirentGame: GameDef<MazeState> = {
   slug: 'labirent',
   title: 'Labirent',
   tagline: 'Küçük yolcuyu bloklarla yönlendirip labirentin çıkışına ulaştır.',
+  en: { title: 'Maze', tagline: 'Guide the little traveler through the maze to the exit with blocks.' },
   levels: labirentLevels,
   blocks: labirentBlocks,
   engine: { createRun: (level) => createMazeRun(level) },

@@ -9,23 +9,25 @@ const MOVE = '#4c97ff', PEN = '#0fbd8c', PAINT = '#ff6680'
 // Blockly 13 çekirdeğinde renk alanı yok: renkli kare resimli açılır liste kullanıyoruz (özgün SVG örnekleri).
 const swatch = (hex: string) => `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="28" height="22"><rect x="1" y="1" width="26" height="20" rx="6" fill="${hex}" stroke="#ffffff" stroke-width="2"/></svg>`)}`
 const swatches = Object.entries(COLOURS).map(([name, hex]) => [{ src: swatch(hex), width: 28, height: 22, alt: name === 'kirmizi' ? 'kırmızı' : name === 'sari' ? 'sarı' : name === 'yesil' ? 'yeşil' : name }, hex])
+const COLOUR_EN: Record<string, string> = { kirmizi: 'red', turuncu: 'orange', sari: 'yellow', yesil: 'green', mavi: 'blue', mor: 'purple', pembe: 'pink', siyah: 'black', beyaz: 'white', kahverengi: 'brown', gri: 'grey', lacivert: 'navy' }
+const swatchesEn = Object.entries(COLOURS).map(([name, hex]) => [{ src: swatch(hex), width: 28, height: 22, alt: COLOUR_EN[name] ?? name }, hex])
 const stmt = { previousStatement: null, nextStatement: null }
 
 const blocks: GameDef['blocks'] = [
-  { type: 'kaplumbaga_ileri', category: 'Hareket', colour: MOVE, json: { message0: 'ileri git %1', args0: [{ type: 'input_value', name: 'DIST', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa baktığı yöne doğru ilerler.' }, js: 'ileri({DIST});' },
-  { type: 'kaplumbaga_geri', category: 'Hareket', colour: MOVE, json: { message0: 'geri git %1', args0: [{ type: 'input_value', name: 'DIST', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa geri geri yürür.' }, js: 'geri({DIST});' },
-  { type: 'kaplumbaga_saga', category: 'Hareket', colour: MOVE, json: { message0: 'sağa dön %1 derece', args0: [{ type: 'input_value', name: 'ANGLE', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa olduğu yerde saat yönünde döner.' }, js: 'sagaDon({ANGLE});' },
-  { type: 'kaplumbaga_sola', category: 'Hareket', colour: MOVE, json: { message0: 'sola dön %1 derece', args0: [{ type: 'input_value', name: 'ANGLE', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa olduğu yerde saat yönünün tersine döner.' }, js: 'solaDon({ANGLE});' },
-  { type: 'kaplumbaga_kalem_kaldir', category: 'Kalem', colour: PEN, json: { message0: 'kalemi kaldır', ...stmt, tooltip: 'Kaplumbağa yürürken iz bırakmaz.' }, js: 'kalemiKaldir();' },
-  { type: 'kaplumbaga_kalem_indir', category: 'Kalem', colour: PEN, json: { message0: 'kalemi indir', ...stmt, tooltip: 'Kaplumbağa yürürken çizgi çizer.' }, js: 'kalemiIndir();' },
-  { type: 'kaplumbaga_kalinlik', category: 'Kalem', colour: PEN, json: { message0: 'kalem kalınlığı %1', args0: [{ type: 'input_value', name: 'WIDTH', check: 'Number' }], ...stmt, tooltip: 'Çizginin kalınlığını belirler.' }, js: 'kalinlik({WIDTH});' },
-  { type: 'kaplumbaga_renk', category: 'Renk', colour: PAINT, json: { message0: 'rengi %1 yap', args0: [{ type: 'input_value', name: 'COLOUR', check: 'Colour' }], ...stmt, tooltip: 'Kalemin rengini değiştirir.' }, js: 'renk({COLOUR});' },
+  { type: 'kaplumbaga_ileri', category: 'Hareket', colour: MOVE, json: { message0: 'ileri git %1', args0: [{ type: 'input_value', name: 'DIST', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa baktığı yöne doğru ilerler.' }, en: { category: 'Movement', json: { message0: 'move forward %1', tooltip: 'The turtle moves the way it is facing.' } }, js: 'ileri({DIST});' },
+  { type: 'kaplumbaga_geri', category: 'Hareket', colour: MOVE, json: { message0: 'geri git %1', args0: [{ type: 'input_value', name: 'DIST', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa geri geri yürür.' }, en: { category: 'Movement', json: { message0: 'move back %1', tooltip: 'The turtle walks backwards.' } }, js: 'geri({DIST});' },
+  { type: 'kaplumbaga_saga', category: 'Hareket', colour: MOVE, json: { message0: 'sağa dön %1 derece', args0: [{ type: 'input_value', name: 'ANGLE', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa olduğu yerde saat yönünde döner.' }, en: { category: 'Movement', json: { message0: 'turn right %1 degrees', tooltip: 'The turtle turns clockwise on the spot.' } }, js: 'sagaDon({ANGLE});' },
+  { type: 'kaplumbaga_sola', category: 'Hareket', colour: MOVE, json: { message0: 'sola dön %1 derece', args0: [{ type: 'input_value', name: 'ANGLE', check: 'Number' }], ...stmt, tooltip: 'Kaplumbağa olduğu yerde saat yönünün tersine döner.' }, en: { category: 'Movement', json: { message0: 'turn left %1 degrees', tooltip: 'The turtle turns counterclockwise on the spot.' } }, js: 'solaDon({ANGLE});' },
+  { type: 'kaplumbaga_kalem_kaldir', category: 'Kalem', colour: PEN, json: { message0: 'kalemi kaldır', ...stmt, tooltip: 'Kaplumbağa yürürken iz bırakmaz.' }, en: { category: 'Pen', json: { message0: 'pen up', tooltip: 'The turtle walks without leaving a line.' } }, js: 'kalemiKaldir();' },
+  { type: 'kaplumbaga_kalem_indir', category: 'Kalem', colour: PEN, json: { message0: 'kalemi indir', ...stmt, tooltip: 'Kaplumbağa yürürken çizgi çizer.' }, en: { category: 'Pen', json: { message0: 'pen down', tooltip: 'The turtle draws a line as it walks.' } }, js: 'kalemiIndir();' },
+  { type: 'kaplumbaga_kalinlik', category: 'Kalem', colour: PEN, json: { message0: 'kalem kalınlığı %1', args0: [{ type: 'input_value', name: 'WIDTH', check: 'Number' }], ...stmt, tooltip: 'Çizginin kalınlığını belirler.' }, en: { category: 'Pen', json: { message0: 'pen width %1', tooltip: 'Sets how thick the line is.' } }, js: 'kalinlik({WIDTH});' },
+  { type: 'kaplumbaga_renk', category: 'Renk', colour: PAINT, json: { message0: 'rengi %1 yap', args0: [{ type: 'input_value', name: 'COLOUR', check: 'Colour' }], ...stmt, tooltip: 'Kalemin rengini değiştirir.' }, en: { category: 'Colour', json: { message0: 'set colour to %1', tooltip: 'Changes the pen colour.' } }, js: 'renk({COLOUR});' },
   {
     type: 'kaplumbaga_renk_sec', category: 'Renk', colour: PAINT, free: true,
     json: { message0: '%1', args0: [{ type: 'field_dropdown', name: 'COLOUR', options: swatches }], output: 'Colour', tooltip: 'Bir renk seç.' },
-    js: (c) => `'${c.field('COLOUR')}'`,
+    en: { category: 'Colour', json: { args0: [{ type: 'field_dropdown', name: 'COLOUR', options: swatchesEn }], tooltip: 'Pick a colour.' } }, js: (c) => `'${c.field('COLOUR')}'`,
   },
-  { type: 'kaplumbaga_renk_ton', category: 'Renk', colour: PAINT, json: { message0: 'ton %1 (0-360)', args0: [{ type: 'input_value', name: 'HUE', check: 'Number' }], output: 'Colour', tooltip: 'Gökkuşağındaki bir renk: 0 kırmızı, 120 yeşil, 240 mavi.' }, js: 'tonRengi({HUE})' },
+  { type: 'kaplumbaga_renk_ton', category: 'Renk', colour: PAINT, json: { message0: 'ton %1 (0-360)', args0: [{ type: 'input_value', name: 'HUE', check: 'Number' }], output: 'Colour', tooltip: 'Gökkuşağındaki bir renk: 0 kırmızı, 120 yeşil, 240 mavi.' }, en: { category: 'Colour', json: { message0: 'hue %1 (0-360)', tooltip: 'A rainbow colour: 0 is red, 120 green, 240 blue.' } }, js: 'tonRengi({HUE})' },
 ]
 
 const DEFAULTS: Record<string, Record<string, unknown>> = {
@@ -51,6 +53,7 @@ export const kaplumbagaGame: GameDef<TurtleState> = {
   slug: 'kaplumbaga',
   title: 'Kaplumbağa',
   tagline: 'Kaplumbağayla ekrana şekiller ve renkli desenler çiz.',
+  en: { title: 'Turtle', tagline: 'Draw shapes and colourful patterns on the screen with the turtle.' },
   levels,
   blocks,
   engine: { createRun: (level) => createTurtleRun(level) },

@@ -4,6 +4,7 @@
 import { ARROWS, ICONS } from './icons'
 import { BEATS, MELODIES, NOTES } from './music'
 import type { RobotProfile, RobotSensor } from './robot'
+import { BLOCK_EN, CATEGORY_EN, TEXT_DEFAULT_EN, optionEn, type MikroLocale } from './en'
 
 export type CatKey = 'robot' | 'basic' | 'input' | 'led' | 'music' | 'radio' | 'loops' | 'logic' | 'vars' | 'math' | 'text' | 'list' | 'func' | 'pins'
 
@@ -221,36 +222,42 @@ export interface BlockJson {
 
 export const styleName = (c: CatKey) => `mk_${c}`
 
-export function blockJson(s: Spec): BlockJson {
+/** `locale` yalnız görünen yazıları (etiket, ipucu, açılır liste yazıları) değiştirir; tür ve alan değerleri aynı kalır. */
+export function blockJson(s: Spec, locale: MikroLocale = 'tr'): BlockJson {
+  const en = locale === 'en' ? BLOCK_EN[s.type] : undefined
   const args = s.args ?? []
   const args0: Record<string, unknown>[] = []
-  let message0 = s.label
+  const label = en?.label ?? s.label
+  let message0 = label
   args.forEach((a, i) => {
     message0 = message0.replace(`{${a.n}}`, `%${i + 1}`)
     switch (a.k) {
       case 'val': case 'any': args0.push({ type: 'input_value', name: a.n }); break
       case 'bool': args0.push({ type: 'input_value', name: a.n, check: 'Boolean' }); break
-      case 'drop': args0.push({ type: 'field_dropdown', name: a.n, options: a.opts }); break
+      case 'drop': args0.push({ type: 'field_dropdown', name: a.n, options: en ? a.opts.map(([t, v]) => [optionEn(s.type, a.n, v, t), v]) : a.opts }); break
       case 'num': args0.push({ type: 'field_number', name: a.n, value: a.def, min: a.min, max: a.max, precision: 1 }); break
       case 'leds': args0.push({ type: 'field_mk_leds', name: a.n, value: '0'.repeat(25) }); break
     }
   })
-  const j: BlockJson = { type: s.type, style: styleName(s.cat), message0, args0, tooltip: s.tip ?? s.label.replace(/\{(\w+)\}/g, '…'), inputsInline: true }
+  const j: BlockJson = { type: s.type, style: styleName(s.cat), message0, args0, tooltip: (en ? en.tip : s.tip) ?? label.replace(/\{(\w+)\}/g, '…'), inputsInline: true }
   if (s.kind === 'hat') { j.message1 = '%1'; j.args1 = [{ type: 'input_statement', name: 'DO' }] }
   else if (s.kind === 'stmt') { j.previousStatement = null; j.nextStatement = null }
   else if (s.kind === 'bool') j.output = 'Boolean'
   else j.output = null
   return j
 }
-export const BLOCK_JSON: BlockJson[] = SPECS.map(blockJson)
+export const BLOCK_JSON: BlockJson[] = SPECS.map((s) => blockJson(s))
+const BLOCK_JSON_EN: BlockJson[] = SPECS.map((s) => blockJson(s, 'en'))
+export const blockJsonFor = (locale: MikroLocale): BlockJson[] => (locale === 'en' ? BLOCK_JSON_EN : BLOCK_JSON)
+export const categoryLabel = (c: Category, locale: MikroLocale = 'tr'): string => (locale === 'en' ? CATEGORY_EN[c.key] : c.label)
 
 /** Blok için araç kutusu girdisi: gölge (shadow) blok değerleriyle. */
-export function flyoutEntry(s: Spec): { kind: 'block'; type: string; inputs?: Record<string, unknown>; fields?: Record<string, unknown> } {
+export function flyoutEntry(s: Spec, locale: MikroLocale = 'tr'): { kind: 'block'; type: string; inputs?: Record<string, unknown>; fields?: Record<string, unknown> } {
   const inputs: Record<string, unknown> = {}
   const fields: Record<string, unknown> = {}
   for (const a of s.args ?? []) {
     if (a.k === 'val' && a.shadow === 'num') inputs[a.n] = { shadow: { type: 'math_number', fields: { NUM: a.def ?? 0 } } }
-    else if (a.k === 'val' && a.shadow === 'text') inputs[a.n] = { shadow: { type: 'text', fields: { TEXT: a.def ?? '' } } }
+    else if (a.k === 'val' && a.shadow === 'text') inputs[a.n] = { shadow: { type: 'text', fields: { TEXT: (locale === 'en' && TEXT_DEFAULT_EN[String(a.def)]) || (a.def ?? '') } } }
     else if (a.k === 'drop' && a.def !== undefined) fields[a.n] = a.def
     else if (a.k === 'num') fields[a.n] = a.def
   }
@@ -312,31 +319,31 @@ export const specFitsRobot = (s: Spec, robot: RobotProfile | null | undefined): 
   s.cat !== 'robot' || (!!robot && (!s.sensor || robot.sensors.includes(s.sensor)))
 
 /** `allowed` verilirse yalnız o türler; boş kategori gösterilmez. Robot kategorisi yalnız `robot` verilince ve gövdenin sensörlerine göre. */
-export function toolboxCategories(allowed?: readonly string[] | null, robot?: RobotProfile | null): ToolboxCat[] {
+export function toolboxCategories(allowed?: readonly string[] | null, robot?: RobotProfile | null, locale: MikroLocale = 'tr'): ToolboxCat[] {
   const ok = allowed ? new Set(allowed) : null
   const out: ToolboxCat[] = []
   for (const c of CATEGORIES) {
     if (c.key === 'robot' && !robot) continue
     if (c.custom) {
       const types = c.custom === 'VARIABLE' ? VARIABLE_TYPES : PROCEDURE_TYPES
-      if (!ok || types.some((t) => ok.has(t))) out.push({ key: c.key, label: c.label, color: c.color, custom: c.custom, entries: [] })
+      if (!ok || types.some((t) => ok.has(t))) out.push({ key: c.key, label: categoryLabel(c, locale), color: c.color, custom: c.custom, entries: [] })
       continue
     }
     const entries: Record<string, unknown>[] = []
-    for (const s of SPECS) if (s.cat === c.key && !s.hidden && specFitsRobot(s, robot) && (!ok || ok.has(s.type))) entries.push(flyoutEntry(s))
+    for (const s of SPECS) if (s.cat === c.key && !s.hidden && specFitsRobot(s, robot) && (!ok || ok.has(s.type))) entries.push(flyoutEntry(s, locale))
     for (const b of BUILTIN_ENTRIES[c.key] ?? []) {
       if (ok && !ok.has(b.type)) continue
       entries.push({ kind: 'block', type: b.type, ...(b.inputs ? { inputs: b.inputs } : {}), ...(b.fields ? { fields: b.fields } : {}), ...(b.extraState ? { extraState: b.extraState } : {}) })
     }
-    if (entries.length) out.push({ key: c.key, label: c.label, color: c.color, entries })
+    if (entries.length) out.push({ key: c.key, label: categoryLabel(c, locale), color: c.color, entries })
   }
   return out
 }
 
-export function toolboxJson(allowed?: readonly string[] | null, robot?: RobotProfile | null) {
+export function toolboxJson(allowed?: readonly string[] | null, robot?: RobotProfile | null, locale: MikroLocale = 'tr') {
   return {
     kind: 'categoryToolbox',
-    contents: toolboxCategories(allowed, robot).map((c) => ({
+    contents: toolboxCategories(allowed, robot, locale).map((c) => ({
       kind: 'category',
       name: c.label,
       categorystyle: `mk_cat_${c.key}`,

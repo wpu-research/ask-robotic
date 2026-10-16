@@ -5,6 +5,7 @@ import type * as BlocklyNS from 'blockly'
 import { CATEGORIES, PROC_DEF_PREFIX, toolboxJson } from '@/lib/sahne/blocks'
 import { defineProcBlocks, defineSahneBlocks, makeTheme, registerFlyouts } from '@/lib/sahne/blockly-defs'
 import type { BlockState, ProcDef, VarDef } from '@/lib/sahne/types'
+import { useLocale, useT } from '@/i18n/client'
 
 type B = typeof BlocklyNS
 
@@ -42,6 +43,11 @@ const iconCss = CATEGORIES.map((c) => `.blocklyToolboxCategory:has(.shb-ic-${c.k
 
 export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(function BlocksWorkspace(props, ref) {
   const { state, loadKey, onChange, allowedBlocks, procs, allProcs, vars, glowIds } = props
+  // Dil değişince üst bileşen bu bileşeni `key={locale}` ile yeniden kurar; bloklar o dille yeniden tanımlanır.
+  const t = useT()
+  const locale = useLocale()
+  const localeRef = useRef(locale)
+  localeRef.current = locale
   const host = useRef<HTMLDivElement>(null)
   const wsRef = useRef<BlocklyNS.WorkspaceSvg | null>(null)
   const blocklyRef = useRef<B | null>(null)
@@ -101,16 +107,17 @@ export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(fu
     ;(async () => {
       try {
         const Blockly = await import('blockly')
-        const Tr = await import('blockly/msg/tr').catch(() => null)
+        const loc = localeRef.current
+        const Msgs = await (loc === 'en' ? import('blockly/msg/en') : import('blockly/msg/tr')).catch(() => null)
         if (disposed || !host.current) return
-        if (Tr) Blockly.setLocale(Tr as unknown as Parameters<typeof Blockly.setLocale>[0])
-        defineSahneBlocks(Blockly)
+        if (Msgs) Blockly.setLocale(Msgs as unknown as Parameters<typeof Blockly.setLocale>[0])
+        defineSahneBlocks(Blockly, loc)
         defineProcBlocks(Blockly, live.current.allProcs)
         blocklyRef.current = Blockly
         ws = Blockly.inject(host.current, {
           renderer: 'zelos',
           theme: makeTheme(Blockly),
-          toolbox: toolboxJson(live.current.allowedBlocks) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: toolboxJson(live.current.allowedBlocks, loc) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
           media: '/blockly/media/',
           sounds: false,
           grid: { spacing: 0, length: 0, colour: '#0000', snap: false },
@@ -234,7 +241,7 @@ export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(fu
   const allowSig = (allowedBlocks ?? ['*']).join(',')
   useEffect(() => {
     if (!ready || !wsRef.current) return
-    wsRef.current.updateToolbox(toolboxJson(live.current.allowedBlocks) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
+    wsRef.current.updateToolbox(toolboxJson(live.current.allowedBlocks, localeRef.current) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
   }, [allowSig, ready])
 
   const glowSig = (glowIds ?? []).join(',')
@@ -244,8 +251,8 @@ export const BlocksWorkspace = forwardRef<BlocksHandle, BlocksWorkspaceProps>(fu
     <div className="shb-ws" data-blockly-ready={ready} data-testid="sahne-blockly">
       <style>{iconCss}</style>
       <div ref={host} className="shb-host" />
-      {ready && empty && <div className="shb-hint" aria-hidden="true">Soldan bir blok seç ve buraya sürükle. Önce bir <b>olay</b> bloğu (ör. 🏁 tıklanınca) ile başla.</div>}
-      {failed && <p className="shb-fail" role="alert">Blok editörü yüklenemedi. Sayfayı yenile.</p>}
+      {ready && empty && <div className="shb-hint" aria-hidden="true">{t('studios.sahne.blocks.emptyHintA')}<b>{t('studios.sahne.blocks.emptyHintEvent')}</b>{t('studios.sahne.blocks.emptyHintB')}</div>}
+      {failed && <p className="shb-fail" role="alert">{t('studios.sahne.blocks.failed')}</p>}
     </div>
   )
 })

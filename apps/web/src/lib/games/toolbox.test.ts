@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { b, program, seq } from './program'
-import { allowedTypes, blockCount, buildToolbox, toolboxCategories } from './toolbox'
+import { allowedTypes, blockCount, blockJsonFor, buildToolbox, localizeToolbox, toolboxCategories } from './toolbox'
 import type { GameBlockDef, LevelDef } from './types'
 
 const blocks: GameBlockDef[] = [
@@ -30,5 +30,16 @@ describe('araç kutusu', () => {
     expect(blockCount(game, program(seq(b('g_basla'), b('g_ileri'), b('g_don'))))).toBe(2)
     expect(allowedTypes(game, level).has('g_basla')).toBe(true)
     expect(allowedTypes(game, level).has('g_yok')).toBe(false)
+  })
+  it('İngilizce: kategori adları ve blok metinleri çevrilir, iç anahtar ve tür değişmez', () => {
+    const g = { blocks: [{ ...blocks[0], en: { category: 'Motion', json: { message0: 'forward' } } }, ...blocks.slice(1)] }
+    const cats = toolboxCategories(g, level, 'en')
+    expect(cats.map((c) => c.name)).toEqual(['Hareket', 'Döngüler', 'Değişkenler', 'Mantık'])
+    expect(cats.map((c) => c.label)).toEqual(['Motion', 'Loops', 'Variables', 'Logic'])
+    expect(buildToolbox(g, level, 'en').contents.map((c) => c.name)).toEqual(['Motion', 'Loops', 'Variables', 'Logic'])
+    expect(buildToolbox(g, level).contents.map((c) => c.name)).toEqual(['Hareket', 'Döngüler', 'Değişkenler', 'Mantık'])
+    expect(localizeToolbox(g, buildToolbox(g, level), 'en').contents.map((c) => c.name)).toEqual(['Motion', 'Loops', 'Variables', 'Logic'])
+    expect(blockJsonFor(g.blocks[0], 'en')).toMatchObject({ type: 'g_ileri', message0: 'forward' })
+    expect(blockJsonFor(g.blocks[0], 'tr').message0).toBeUndefined()
   })
 })

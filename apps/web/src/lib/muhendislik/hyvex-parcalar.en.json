@@ -1,0 +1,1785 @@
+{
+  "mpu6050": {
+    "name": "MPU6050",
+    "interface": "I²C",
+    "voltage": "3.3 – 5V",
+    "specs": [
+      "6 axes",
+      "Accelerometer ±2/4/8/16 g",
+      "Gyroscope ±250 – ±2000 dps",
+      "No magnetometer",
+      "No fusion (manual)",
+      "~3.9 mA",
+      "Low vibration tolerance",
+      "I²C address 0x68 (protocol page)"
+    ],
+    "uses": [
+      "Learning, basic tilt measurement"
+    ],
+    "warnings": [
+      "Gets noisy under motor vibration, you have to do the fusion yourself",
+      "Do not pick the MPU6050 by default"
+    ]
+  },
+  "bmi270": {
+    "name": "BMI270",
+    "interface": "I²C / SPI",
+    "voltage": "1.71 – 3.6V",
+    "specs": [
+      "6 axes",
+      "±2 – ±16 g",
+      "±125 – ±2000 dps",
+      "~0.7 mA",
+      "High vibration tolerance"
+    ],
+    "uses": [
+      "Self-balancing robot, e-bike"
+    ],
+    "warnings": []
+  },
+  "bno085": {
+    "name": "BNO085",
+    "interface": "I²C / SPI / UART",
+    "voltage": "1.71 – 3.6V",
+    "specs": [
+      "9 axes",
+      "Has magnetometer",
+      "Built-in sensor fusion (quaternion, Euler, heading)",
+      "~1.2 mA",
+      "High vibration tolerance"
+    ],
+    "uses": [
+      "Drone, gimbal, AR/VR, orientation"
+    ],
+    "warnings": []
+  },
+  "icm-20948": {
+    "name": "ICM-20948",
+    "interface": "I²C / SPI",
+    "voltage": "1.8 – 3.3V",
+    "specs": [
+      "9 axes",
+      "Has magnetometer",
+      "Manual fusion",
+      "~3.3 mA",
+      "Medium vibration tolerance"
+    ],
+    "uses": [
+      "GPS-aided navigation, heading"
+    ],
+    "warnings": [
+      "Magnetometer: mount away from magnets/motors/iron; hard/soft iron calibration"
+    ]
+  },
+  "dht22": {
+    "name": "DHT22",
+    "interface": "Single-wire custom protocol",
+    "voltage": "3.3–6V",
+    "specs": [
+      "−40…+80 °C · ±0.5 °C",
+      "0–100% RH · ±2–5%",
+      "2 s update",
+      "4.7kΩ pull-up between DATA and VCC"
+    ],
+    "uses": [
+      "Air temperature + humidity"
+    ],
+    "warnings": [
+      "Cannot measure liquids/surfaces"
+    ]
+  },
+  "ds18b20": {
+    "name": "DS18B20",
+    "interface": "1-Wire",
+    "voltage": "3–5.5V",
+    "specs": [
+      "−55…+125 °C · ±0.5 °C",
+      "9–12 bit (12 bit = 0.0625 °C / 750 ms)",
+      "100 m cable",
+      "64-bit ID, dozens of sensors on one line",
+      "4.7kΩ pull-up, parasitic power"
+    ],
+    "uses": [
+      "Liquid / probe temperature",
+      "Long cable, industrial accuracy"
+    ],
+    "warnings": []
+  },
+  "mlx90614": {
+    "name": "MLX90614",
+    "interface": "I²C (0x5A fixed)",
+    "voltage": "",
+    "specs": [
+      "Object −70…+380 °C · ±0.5 °C",
+      "Ambient −40…+125 °C",
+      "FOV ~35°",
+      "distance:spot = 20:1"
+    ],
+    "uses": [
+      "Contactless surface temperature"
+    ],
+    "warnings": [
+      "Cannot measure through glass/steam",
+      "Set the surface emissivity value (when the material changes)"
+    ]
+  },
+  "amg8833": {
+    "name": "AMG8833",
+    "interface": "I²C (0x69)",
+    "voltage": "3.3V",
+    "specs": [
+      "8×8 = 64 pixel thermal array",
+      "0…+80 °C · ±2.5 °C · 0.25 °C",
+      "10 FPS",
+      "FOV 60°×60° · 20 cm – 5 m"
+    ],
+    "uses": [
+      "Heat map, human presence detection"
+    ],
+    "warnings": []
+  },
+  "hc-sr04": {
+    "name": "HC-SR04",
+    "interface": "Trig/Echo",
+    "voltage": "",
+    "specs": [
+      "2 – 400 cm",
+      "40 kHz",
+      "Cone ~15°",
+      "Min ~2 cm"
+    ],
+    "uses": [
+      "Learning, basic projects"
+    ],
+    "warnings": [
+      "Do not connect the 5V signal directly to an ESP32 pin (1kΩ/2kΩ divider)",
+      "Soft/angled surfaces; crosstalk between multiple sensors: trigger them in turn, use a median filter"
+    ]
+  },
+  "jsn-sr04t": {
+    "name": "JSN-SR04T",
+    "interface": "Trig/Echo",
+    "voltage": "",
+    "specs": [
+      "25 – 600 cm",
+      "IP66 waterproof, separate probe"
+    ],
+    "uses": [
+      "Outdoors, tank, rain"
+    ],
+    "warnings": []
+  },
+  "rcwl-1601": {
+    "name": "RCWL-1601",
+    "interface": "Trig/Echo",
+    "voltage": "3.3V compatible",
+    "specs": [
+      "2 – 450 cm",
+      "Compact, low power"
+    ],
+    "uses": [
+      "Mini robot, tight spaces"
+    ],
+    "warnings": []
+  },
+  "us-100": {
+    "name": "US-100",
+    "interface": "Trig/Echo + UART",
+    "voltage": "",
+    "specs": [
+      "2 – 450 cm",
+      "Temperature compensation"
+    ],
+    "uses": [
+      "Precise measurement"
+    ],
+    "warnings": []
+  },
+  "a02yyuw": {
+    "name": "A02YYUW",
+    "interface": "UART",
+    "voltage": "",
+    "specs": [
+      "3 – 450 cm",
+      "IP67, very stable readings"
+    ],
+    "uses": [
+      "Smart tank, industrial"
+    ],
+    "warnings": []
+  },
+  "maxbotix-mb1010": {
+    "name": "MaxBotix MB1010",
+    "interface": "Analog/UART/PWM",
+    "voltage": "",
+    "specs": [
+      "15 – 645 cm",
+      "High accuracy, noise suppression"
+    ],
+    "uses": [
+      "Commercial product, mission-critical"
+    ],
+    "warnings": []
+  },
+  "vl53l0x-tof": {
+    "name": "VL53L0X ToF",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Laser, 2 m, mm precision, narrow beam"
+    ],
+    "uses": [
+      "Alternative to ultrasonic"
+    ],
+    "warnings": []
+  },
+  "tf-luna-lidar": {
+    "name": "TF-Luna LiDAR",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "8 m, fast"
+    ],
+    "uses": [
+      "Alternative to ultrasonic"
+    ],
+    "warnings": []
+  },
+  "ir-mesafe-sharp": {
+    "name": "IR distance (Sharp)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Short range, cheap"
+    ],
+    "uses": [
+      "Alternative to ultrasonic"
+    ],
+    "warnings": []
+  },
+  "mq-2": {
+    "name": "MQ-2",
+    "interface": "AO analog + DO digital (trimpot threshold)",
+    "voltage": "5V (heater 800-900 mW)",
+    "specs": [
+      "Detects: LPG, propane, methane, smoke",
+      "Trend sensor, does not give absolute ppm",
+      "Requires R₀ (clean-air resistance) calibration"
+    ],
+    "uses": [
+      "Trend/threshold monitoring, alarm triggering"
+    ],
+    "warnings": [
+      "Wait for warm-up",
+      "Do not touch the metal mesh while running",
+      "Body heating up is normal (5V heater)",
+      "Calibration: at installation + once a year"
+    ]
+  },
+  "mq-3": {
+    "name": "MQ-3",
+    "interface": "AO analog + DO digital (trimpot threshold)",
+    "voltage": "5V (heater 800-900 mW)",
+    "specs": [
+      "Detects: alcohol",
+      "Trend sensor, does not give absolute ppm",
+      "Requires R₀ (clean-air resistance) calibration"
+    ],
+    "uses": [
+      "Trend/threshold monitoring, alarm triggering"
+    ],
+    "warnings": [
+      "Wait for warm-up",
+      "Do not touch the metal mesh while running",
+      "Body heating up is normal (5V heater)",
+      "Calibration: at installation + once a year"
+    ]
+  },
+  "mq-4": {
+    "name": "MQ-4",
+    "interface": "AO analog + DO digital (trimpot threshold)",
+    "voltage": "5V (heater 800-900 mW)",
+    "specs": [
+      "Detects: natural gas, methane",
+      "Trend sensor, does not give absolute ppm",
+      "Requires R₀ (clean-air resistance) calibration"
+    ],
+    "uses": [
+      "Trend/threshold monitoring, alarm triggering"
+    ],
+    "warnings": [
+      "Wait for warm-up",
+      "Do not touch the metal mesh while running",
+      "Body heating up is normal (5V heater)",
+      "Calibration: at installation + once a year"
+    ]
+  },
+  "mq-7": {
+    "name": "MQ-7",
+    "interface": "AO analog + DO digital (trimpot threshold)",
+    "voltage": "5V (heater 800-900 mW)",
+    "specs": [
+      "Detects: carbon monoxide (CO)",
+      "Trend sensor, does not give absolute ppm",
+      "Requires R₀ (clean-air resistance) calibration"
+    ],
+    "uses": [
+      "Trend/threshold monitoring, alarm triggering"
+    ],
+    "warnings": [
+      "Wait for warm-up",
+      "Do not touch the metal mesh while running",
+      "Body heating up is normal (5V heater)",
+      "Calibration: at installation + once a year"
+    ]
+  },
+  "mq-135": {
+    "name": "MQ-135",
+    "interface": "AO analog + DO digital (trimpot threshold)",
+    "voltage": "5V (heater 800-900 mW)",
+    "specs": [
+      "Detects: air quality, NH₃, NOx, benzene",
+      "Trend sensor, does not give absolute ppm",
+      "Requires R₀ (clean-air resistance) calibration"
+    ],
+    "uses": [
+      "Trend/threshold monitoring, alarm triggering"
+    ],
+    "warnings": [
+      "Wait for warm-up",
+      "Do not touch the metal mesh while running",
+      "Body heating up is normal (5V heater)",
+      "Calibration: at installation + once a year"
+    ]
+  },
+  "sgp30": {
+    "name": "SGP30",
+    "interface": "I²C",
+    "voltage": "",
+    "specs": [
+      "TVOC (ppb) + eCO₂ (ppm)"
+    ],
+    "uses": [
+      "Digital air quality"
+    ],
+    "warnings": [
+      "Save the calibration to EEPROM with getBaseline() every 1–2 hours",
+      "Silicone vapor permanently poisons the sensor"
+    ]
+  },
+  "bme680": {
+    "name": "BME680",
+    "interface": "I²C / SPI",
+    "voltage": "",
+    "specs": [
+      "Temperature + humidity + pressure + gas (IAQ 0–500)",
+      "Bosch BSEC library"
+    ],
+    "uses": [
+      "Indoor air quality score"
+    ],
+    "warnings": [
+      "48 h burn-in required",
+      "30 min warm-up at every power-up",
+      "Mount away from heat sources"
+    ]
+  },
+  "pms5003": {
+    "name": "PMS5003",
+    "interface": "UART (3.3V)",
+    "voltage": "",
+    "specs": [
+      "PM1.0 / PM2.5 / PM10 particulates",
+      "Factory calibrated"
+    ],
+    "uses": [
+      "Particulate measurement"
+    ],
+    "warnings": [
+      "30 s warm-up",
+      "A logic level shifter is required with a 5V Arduino",
+      "Do not block the ventilation"
+    ]
+  },
+  "ccs811": {
+    "name": "CCS811",
+    "interface": "I²C",
+    "voltage": "",
+    "specs": [
+      "eCO₂ + TVOC"
+    ],
+    "uses": [
+      "Digital air quality"
+    ],
+    "warnings": [
+      "48 h burn-in",
+      "Feed external temperature/humidity data for humidity compensation"
+    ]
+  },
+  "bme280": {
+    "name": "BME280",
+    "interface": "I²C (0x76)",
+    "voltage": "",
+    "specs": [],
+    "uses": [
+      "I²C bus example"
+    ],
+    "warnings": []
+  },
+  "ldr": {
+    "name": "LDR",
+    "interface": "analog (voltage divider)",
+    "voltage": "",
+    "specs": [
+      "CdS photoconductor",
+      "MΩ in the dark, kΩ in light"
+    ],
+    "uses": [
+      "Darkness detector (LDR + 10kΩ + BC547 + LED)"
+    ],
+    "warnings": []
+  },
+  "huskylens": {
+    "name": "HuskyLens",
+    "interface": "I²C/UART",
+    "voltage": "",
+    "specs": [
+      "Kendryte K210",
+      "2.0\" IPS display + dial",
+      "6 built-in algorithms: face recognition, object tracking, QR, line tracking, color, object recognition",
+      "~10-15 min prototype"
+    ],
+    "uses": [
+      "Fast prototyping without writing code"
+    ],
+    "warnings": []
+  },
+  "grove-vision-ai-v2": {
+    "name": "Grove Vision AI V2",
+    "interface": "I²C (0x62)",
+    "voltage": "",
+    "specs": [
+      "Himax WiseEye2 + MicroNPU",
+      "YOLOv5/v8, MobileNet",
+      "0.35 W",
+      "PDM microphone, microSD",
+      "~30-45 min setup"
+    ],
+    "uses": [
+      "Running your own TinyML/YOLO model"
+    ],
+    "warnings": []
+  },
+  "pixy2-cmucam5": {
+    "name": "Pixy2 (CMUcam5)",
+    "interface": "SPI/I²C/UART",
+    "voltage": "",
+    "specs": [
+      "NXP LPC4330 dual-core",
+      "60 FPS color-based tracking",
+      "Dual servo output (pan/tilt)",
+      "Line + road sign detection"
+    ],
+    "uses": [
+      "High-speed line/color tracking"
+    ],
+    "warnings": []
+  },
+  "esp32-cam": {
+    "name": "ESP32-CAM",
+    "interface": "WiFi",
+    "voltage": "",
+    "specs": [
+      "ESP32-S + OV2640 2MP",
+      "WiFi video stream",
+      "microSD recording, flash LED",
+      "Simple face detection"
+    ],
+    "uses": [
+      "Remote video monitoring, cheap"
+    ],
+    "warnings": [
+      "A separate 5V/2A supply is required; powered from a USB-serial adapter it keeps resetting; 470µF capacitor on the input"
+    ]
+  },
+  "nvidia-jetson-orin-nx-16gb": {
+    "name": "NVIDIA Jetson Orin NX 16GB",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "157 TOPS (INT8)",
+      "10–25 W",
+      "Ampere GPU + CUDA"
+    ],
+    "uses": [
+      "Multi-model pipeline, autonomous robot, 4K vision"
+    ],
+    "warnings": [
+      "Needs active cooling; thermal throttling"
+    ]
+  },
+  "jetson-orin-nano": {
+    "name": "Jetson Orin Nano",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "40 TOPS",
+      "7–15 W"
+    ],
+    "uses": [
+      "Entry-level autonomous platform"
+    ],
+    "warnings": [
+      "Needs active cooling"
+    ]
+  },
+  "raspberry-pi-ai-hat-hailo-8l": {
+    "name": "Raspberry Pi AI HAT+ (Hailo-8L)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "13–26 TOPS",
+      "~5 W",
+      "Mounts on a Pi 5"
+    ],
+    "uses": [
+      "Pi-based vision projects"
+    ],
+    "warnings": []
+  },
+  "qualcomm-iq9-qcs8550": {
+    "name": "Qualcomm IQ9 (QCS8550)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "100 TOPS",
+      "~15 W",
+      "Hexagon NPU, 5G/WiFi7, 7 cameras"
+    ],
+    "uses": [
+      "Premium commercial edge platform"
+    ],
+    "warnings": []
+  },
+  "google-coral-dev-board": {
+    "name": "Google Coral Dev Board",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "4 TOPS",
+      "~2 W",
+      "MobileNetV2 ~400 FPS"
+    ],
+    "uses": [
+      "Low-power classification, battery operation"
+    ],
+    "warnings": []
+  },
+  "esp32-s3-tinyml": {
+    "name": "ESP32-S3 (TinyML)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "~0.1 TOPS",
+      "0.5 W"
+    ],
+    "uses": [
+      "Keyword spotting, simple classification"
+    ],
+    "warnings": []
+  },
+  "arduino-uno-atmega328p": {
+    "name": "Arduino UNO (ATmega328P)",
+    "interface": "I²C A4/A5 · SPI D10-D13 · UART D0/D1",
+    "voltage": "5V (input 7-12V)",
+    "specs": [
+      "ATmega328P 8-bit 16 MHz",
+      "32 KB Flash · 2 KB SRAM · 1 KB EEPROM",
+      "Pin current 20 mA (max 40)",
+      "14 digital · 6 PWM · 6 analog"
+    ],
+    "uses": [
+      "Learning, real-time control, sensor reading"
+    ],
+    "warnings": [
+      "Disconnect the D0/D1 wires while uploading code",
+      "2 KB SRAM is not enough for a large display framebuffer"
+    ]
+  },
+  "esp32-esp32-wroom-devkit": {
+    "name": "ESP32 (ESP32-WROOM / DevKit)",
+    "interface": "I²C GPIO21/22 · VSPI/HSPI · UART0/UART2",
+    "voltage": "3.3V (USB 5V)",
+    "specs": [
+      "Xtensa LX6 dual-core 240 MHz",
+      "4 MB Flash · 520 KB SRAM",
+      "WiFi b/g/n + BT 4.2 BLE",
+      "34 GPIO · 16 PWM · 18 ADC · 10 touch",
+      "Deep sleep 10µA"
+    ],
+    "uses": [
+      "IoT, smart home, wireless robot, OTA"
+    ],
+    "warnings": [
+      "GPIO6–11 are connected to the internal flash, do not use them",
+      "GPIO34–39 are input only",
+      "A 5V signal burns the pin"
+    ]
+  },
+  "raspberry-pi-4b": {
+    "name": "Raspberry Pi 4B",
+    "interface": "I²C GPIO2/3 · SPI0 · UART GPIO14/15",
+    "voltage": "3.3V GPIO (5V USB-C)",
+    "specs": [
+      "BCM2711 quad Cortex-A72 1.5 GHz",
+      "1/2/4/8 GB LPDDR4",
+      "Linux",
+      "40-pin GPIO · CSI · DSI · HDMI ×2",
+      "2.5 – 10 W"
+    ],
+    "uses": [
+      "AI/vision, server, tasks that need Linux"
+    ],
+    "warnings": [
+      "GPIO is 3.3V; a 5V signal permanently damages the chip"
+    ]
+  },
+  "arduino-uno-r4-wifi": {
+    "name": "Arduino UNO R4 WiFi",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "ARM Cortex-M4 48MHz",
+      "256KB / 32KB",
+      "WiFi+BT, 12×8 LED matrix, 12-bit DAC, Qwiic"
+    ],
+    "uses": [
+      "Best general purpose, WiFi"
+    ],
+    "warnings": []
+  },
+  "arduino-nano-esp32": {
+    "name": "Arduino Nano ESP32",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "ESP32-S3 dual 240MHz",
+      "16MB / 512KB",
+      "WiFi+BT 5.0, MicroPython"
+    ],
+    "uses": [
+      "Small + wireless"
+    ],
+    "warnings": []
+  },
+  "arduino-nesso-n1": {
+    "name": "Arduino Nesso N1",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "ESP32-C6 RISC-V 160MHz",
+      "WiFi 6 · BT 5.3 · Zigbee · Matter"
+    ],
+    "uses": [
+      "Smart home / IoT mesh"
+    ],
+    "warnings": []
+  },
+  "arduino-uno-q": {
+    "name": "Arduino UNO Q",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "STM32U585 + Linux SoC",
+      "4GB RAM / 32GB eMMC",
+      "Debian Linux + Zephyr RTOS"
+    ],
+    "uses": [
+      "Linux + real-time control"
+    ],
+    "warnings": []
+  },
+  "arduino-ventuno-q": {
+    "name": "Arduino Ventuno Q",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "8-core Qualcomm Dragonwing",
+      "16GB LPDDR5",
+      "40 TOPS AI"
+    ],
+    "uses": [
+      "Local AI, vision"
+    ],
+    "warnings": []
+  },
+  "arduino-mega": {
+    "name": "Arduino Mega",
+    "interface": "",
+    "voltage": "5V logic (max input 5.5V)",
+    "specs": [],
+    "uses": [],
+    "warnings": []
+  },
+  "esp8266": {
+    "name": "ESP8266",
+    "interface": "",
+    "voltage": "3.3V logic (max input 3.6V)",
+    "specs": [],
+    "uses": [],
+    "warnings": []
+  },
+  "stm32": {
+    "name": "STM32",
+    "interface": "",
+    "voltage": "3.3V logic (5V tolerant only on marked pins)",
+    "specs": [],
+    "uses": [
+      "Real-time control layer (AI page)"
+    ],
+    "warnings": []
+  },
+  "arduino-due": {
+    "name": "Arduino Due",
+    "interface": "",
+    "voltage": "3.3V logic (max 3.3V)",
+    "specs": [],
+    "uses": [],
+    "warnings": []
+  },
+  "16x2-lcd-paralel": {
+    "name": "16×2 LCD (parallel)",
+    "interface": "Parallel (4-bit: 6 pins)",
+    "voltage": "",
+    "specs": [
+      "16×2 characters, 32 characters",
+      "Mono"
+    ],
+    "uses": [
+      "Simple text"
+    ],
+    "warnings": [
+      "Takes 6 GPIOs; the backlight draws current constantly"
+    ]
+  },
+  "pcf8574-i2c-lcd-adaptoru": {
+    "name": "PCF8574 I²C LCD adapter",
+    "interface": "I²C (0x20–0x27; PCF8574A 0x38 base)",
+    "voltage": "VCC → 5V",
+    "specs": [
+      "8-bit I/O expander",
+      "A0/A1/A2 address jumpers",
+      "Contrast trimpot"
+    ],
+    "uses": [
+      "Reduces a 16×2 LCD to 2 pins"
+    ],
+    "warnings": [
+      "If the screen is blank, check contrast first, then the address with an I²C scanner (0x27/0x3F)"
+    ]
+  },
+  "oled-ssd1306-0-96": {
+    "name": "OLED SSD1306 0.96\"",
+    "interface": "I²C (0x3C / 0x3D) or SPI",
+    "voltage": "3.3–5V",
+    "specs": [
+      "128×64 mono",
+      "~20 mA"
+    ],
+    "uses": [
+      "Small gadget, counter, menu"
+    ],
+    "warnings": [
+      "On the UNO the framebuffer takes 1 KB of RAM"
+    ]
+  },
+  "tft-st7735-1-8": {
+    "name": "TFT ST7735 1.8\"",
+    "interface": "SPI (5 pins)",
+    "voltage": "3.3V",
+    "specs": [
+      "128×160, 16-bit color"
+    ],
+    "uses": [
+      "Graphics, dashboard"
+    ],
+    "warnings": []
+  },
+  "gc9a01-yuvarlak": {
+    "name": "GC9A01 round",
+    "interface": "4-wire SPI (7 pins)",
+    "voltage": "",
+    "specs": [
+      "240×240 round"
+    ],
+    "uses": [
+      "Watch, speedometer, dial"
+    ],
+    "warnings": []
+  },
+  "ili9341-xpt2046-dokunmatik-2-4": {
+    "name": "ILI9341 + XPT2046 touchscreen 2.4\"",
+    "interface": "SPI (7–8 pins, shared)",
+    "voltage": "3.3V",
+    "specs": [
+      "320×240",
+      "XPT2046 resistive touch"
+    ],
+    "uses": [
+      "Touch menu"
+    ],
+    "warnings": [
+      "4-corner calibration on first use"
+    ]
+  },
+  "e-paper-2-9": {
+    "name": "e-Paper 2.9\"",
+    "interface": "SPI (6 pins)",
+    "voltage": "",
+    "specs": [
+      "296×128 B/W",
+      "Standby 0 µA, refresh ~20 mA, 2–15 s"
+    ],
+    "uses": [
+      "Display running for months on battery, outdoors"
+    ],
+    "warnings": [
+      "Partial refresh leaves ghosting, do a full refresh in between"
+    ]
+  },
+  "bo-motor-sari": {
+    "name": "BO motor (yellow)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Low torque, plastic gears"
+    ],
+    "uses": [],
+    "warnings": [
+      "Stalls under load, plastic gears strip"
+    ]
+  },
+  "metal-disli-dc-motor": {
+    "name": "Metal gear DC motor",
+    "interface": "PWM (open loop)",
+    "voltage": "",
+    "specs": [
+      "50-300 RPM"
+    ],
+    "uses": [
+      "Mobile robot, RC car, off-road"
+    ],
+    "warnings": []
+  },
+  "n20-mikro-motor": {
+    "name": "N20 micro motor",
+    "interface": "open loop",
+    "voltage": "",
+    "specs": [
+      "100-500 RPM",
+      "Metal gearbox"
+    ],
+    "uses": [
+      "Line follower, smart lock, mini IoT"
+    ],
+    "warnings": []
+  },
+  "555-775-dc-motor": {
+    "name": "555 / 775 DC motor",
+    "interface": "open loop + high-current driver",
+    "voltage": "",
+    "specs": [
+      "20,000+ RPM, high current"
+    ],
+    "uses": [
+      "Combat robot, CNC, DIY electric vehicle"
+    ],
+    "warnings": [
+      "High-current driver required"
+    ]
+  },
+  "nema17-step-motor": {
+    "name": "NEMA17 stepper motor",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "1.8°/step, 200 steps/rev",
+      "42×42 mm",
+      "0.4–1.2 N·m holding (NEMA 17/23)",
+      "1.5–2.8 A/phase"
+    ],
+    "uses": [
+      "3D printer, CNC, camera slider"
+    ],
+    "warnings": [
+      "Torque drops above 300 RPM",
+      "Current must be set with Vref",
+      "If it skips steps you will not know"
+    ]
+  },
+  "nema-23-step-motor": {
+    "name": "NEMA 23 stepper motor",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "0.4–1.2 N·m holding (NEMA 17/23)",
+      "1.5–2.8 A/phase"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "nema-34-step-motor": {
+    "name": "NEMA 34 stepper motor",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "4–12 N·m",
+      "<300 RPM",
+      "2.8–5.6 A/phase"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "bldc-fircasiz-motor": {
+    "name": "BLDC brushless motor",
+    "interface": "ESC (3-phase)",
+    "voltage": "",
+    "specs": [
+      "RPM ≈ KV × Volts",
+      "Drone 2000-3000 KV; gimbal low KV",
+      "Gimbal 0.05–0.5 N·m; racing 25,000–35,000 RPM, 20–60 A"
+    ],
+    "uses": [
+      "Drone, gimbal"
+    ],
+    "warnings": [
+      "ESC + 3-phase driver required"
+    ]
+  },
+  "lineer-aktuator": {
+    "name": "Linear actuator",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Dynamic force 100 – 1500 N",
+      "5 – 45 mm/s",
+      "Static holding up to 3000 N"
+    ],
+    "uses": [
+      "Pushing heavy loads"
+    ],
+    "warnings": []
+  },
+  "t8-vidali-mil-lead-screw": {
+    "name": "T8 lead screw",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Lead 8 mm/rev",
+      "5–45 mm/s",
+      "Self-locking"
+    ],
+    "uses": [
+      "Vertical axis (Z)"
+    ],
+    "warnings": []
+  },
+  "gt2-kayis-kasnak-20-dis": {
+    "name": "GT2 belt and pulley (20 teeth)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "40 mm/rev",
+      "Up to 2000 mm/s"
+    ],
+    "uses": [
+      "Horizontal axis (X/Y)"
+    ],
+    "warnings": [
+      "Slips when power is cut; backlash"
+    ]
+  },
+  "sg90": {
+    "name": "SG90",
+    "interface": "PWM 50 Hz (1–2 ms pulse)",
+    "voltage": "",
+    "specs": [
+      "Torque 1.8 kg·cm",
+      "Gears plastic",
+      "Weight 9 g"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "mg90s": {
+    "name": "MG90S",
+    "interface": "PWM 50 Hz (1–2 ms pulse)",
+    "voltage": "",
+    "specs": [
+      "Torque 2.2 kg·cm",
+      "Gears metal",
+      "Weight 13 g"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "mg996r": {
+    "name": "MG996R",
+    "interface": "PWM 50 Hz (1–2 ms pulse)",
+    "voltage": "",
+    "specs": [
+      "Torque 11 kg·cm @6V",
+      "Gears metal",
+      "Weight 55 g",
+      "0.17 s/60°",
+      "2.5 A at stall"
+    ],
+    "uses": [
+      "Robot arm, gripper, steering"
+    ],
+    "warnings": [
+      "Do not power from the Arduino 5V pin; use a separate 5V/3A supply + common GND"
+    ]
+  },
+  "ds3218": {
+    "name": "DS3218",
+    "interface": "PWM 50 Hz (1–2 ms pulse)",
+    "voltage": "",
+    "specs": [
+      "Torque 20 kg·cm",
+      "Gears metal",
+      "Weight 55 g"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "ds3225": {
+    "name": "DS3225",
+    "interface": "PWM 50 Hz (1–2 ms pulse)",
+    "voltage": "",
+    "specs": [
+      "Torque 25 kg·cm",
+      "Gears metal",
+      "Weight 60 g"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "l298n": {
+    "name": "L298N",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Bipolar Darlington",
+      "Current 2 A / 3 A peak",
+      "Voltage drop 1.5 – 2 V",
+      "PWM ~5 kHz",
+      "Protection: thermal shutdown"
+    ],
+    "uses": [],
+    "warnings": [
+      "~3.5 W of heat at a 2 A load; turns 30% of the battery into heat"
+    ]
+  },
+  "tb6612fng": {
+    "name": "TB6612FNG",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "MOSFET",
+      "Current 1.2 A / 3.2 A peak",
+      "Voltage drop < 0.5 V",
+      "PWM 100 kHz",
+      "Protection: thermal, UVLO"
+    ],
+    "uses": [
+      "Mini robot, line follower"
+    ],
+    "warnings": []
+  },
+  "drv8833": {
+    "name": "DRV8833",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "MOSFET",
+      "Current 1.5 A / 2 A peak",
+      "Voltage drop < 0.4 V",
+      "PWM 250 kHz",
+      "Protection: overcurrent, thermal"
+    ],
+    "uses": [
+      "Mini robot, line follower"
+    ],
+    "warnings": []
+  },
+  "bts7960": {
+    "name": "BTS7960",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "NovalithIC MOSFET",
+      "Current 43 A / 75 A peak",
+      "Voltage drop < 0.2 V",
+      "PWM 25 kHz",
+      "Protection: overcurrent, over/undervoltage, short circuit"
+    ],
+    "uses": [
+      "Heavy robot, 775 motor, EV"
+    ],
+    "warnings": []
+  },
+  "cytron-md10c": {
+    "name": "Cytron MD10C",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Synchronous MOSFET",
+      "Current 10 A / 30 A peak",
+      "Voltage drop < 0.15 V",
+      "PWM 20 kHz",
+      "Protection: OVP, UVP, OTP, OCP, stall"
+    ],
+    "uses": [
+      "Mid-size robot, RC car"
+    ],
+    "warnings": []
+  },
+  "tmc2209": {
+    "name": "TMC2209",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Stepper driver",
+      "Current 2 A RMS / 2.8 A",
+      "Voltage drop very low",
+      "PWM silent (StealthChop)",
+      "Protection: sensorless homing"
+    ],
+    "uses": [
+      "3D printer, CNC (stepper)"
+    ],
+    "warnings": []
+  },
+  "dm556": {
+    "name": "DM556",
+    "interface": "",
+    "voltage": "",
+    "specs": [],
+    "uses": [
+      "3D printer, CNC (stepper)"
+    ],
+    "warnings": []
+  },
+  "esc-blheli-s-32": {
+    "name": "ESC (BLHeli_S / 32)",
+    "interface": "",
+    "voltage": "",
+    "specs": [],
+    "uses": [
+      "Drone (BLDC)"
+    ],
+    "warnings": []
+  },
+  "lm7805-lineer-regulator": {
+    "name": "LM7805 linear regulator",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Efficiency = Vout/Vin (12→5V: 41%)",
+      "TO-220, without heatsink θJA ≈ 60 °C/W"
+    ],
+    "uses": [
+      "Small voltage difference, low current"
+    ],
+    "warnings": [
+      "12V→5V, 0.5A: 3.5 W of heat; thermal protection kicks in"
+    ]
+  },
+  "lm2596-buck": {
+    "name": "LM2596 buck",
+    "interface": "",
+    "voltage": "Input 4 – 40V · Output 1.25 – 37V",
+    "specs": [
+      "Max 3A",
+      "~150 kHz",
+      "92% efficiency",
+      "43 × 21 × 13 mm"
+    ],
+    "uses": [
+      "Beginner / general purpose"
+    ],
+    "warnings": [
+      "Add a heatsink for continuous 3A"
+    ]
+  },
+  "mp1584-mini-360-buck": {
+    "name": "MP1584 Mini-360 buck",
+    "interface": "",
+    "voltage": "Input 4.5 – 28V · Output 0.8 – 20V",
+    "specs": [
+      "2A continuous",
+      "1.5 MHz",
+      "94% efficiency",
+      "17 × 11 × 4 mm"
+    ],
+    "uses": [
+      "Drone, action camera, mini robot"
+    ],
+    "warnings": []
+  },
+  "xl4015-buck": {
+    "name": "XL4015 buck",
+    "interface": "",
+    "voltage": "Input 8–36V",
+    "specs": [
+      "5A",
+      "CC + CV control"
+    ],
+    "uses": [
+      "Li-ion charging, CNC, large motor"
+    ],
+    "warnings": [
+      "Fan/heatsink required"
+    ]
+  },
+  "xl4016-buck": {
+    "name": "XL4016 buck",
+    "interface": "",
+    "voltage": "Input 8–36V",
+    "specs": [
+      "8A+",
+      "CC + CV control"
+    ],
+    "uses": [
+      "High current / battery charging"
+    ],
+    "warnings": [
+      "Fan/heatsink required"
+    ]
+  },
+  "ap63200-buck": {
+    "name": "AP63200 buck",
+    "interface": "",
+    "voltage": "Input ≤32V",
+    "specs": [
+      "2 – 3A",
+      "95% efficiency"
+    ],
+    "uses": [
+      "Custom PCB / commercial product, IoT"
+    ],
+    "warnings": []
+  },
+  "lm2576-buck": {
+    "name": "LM2576 buck",
+    "interface": "",
+    "voltage": "Input ≤60V · Adjustable 1.23 – 37V",
+    "specs": [
+      "3A continuous",
+      "Low EMI"
+    ],
+    "uses": [
+      "Industrial / harsh environments"
+    ],
+    "warnings": []
+  },
+  "tp4056-korumali-bms": {
+    "name": "TP4056 (protected) BMS",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "1S",
+      "1A"
+    ],
+    "uses": [
+      "Ultra-compact DIY, single-cell USB power bank"
+    ],
+    "warnings": []
+  },
+  "jbd-overkill-solar-bms": {
+    "name": "JBD / Overkill Solar BMS",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "8S – 24S",
+      "60 – 200A",
+      "Thermal protection"
+    ],
+    "uses": [
+      "E-motorcycle, e-bike"
+    ],
+    "warnings": []
+  },
+  "aktif-dengeleme-bms": {
+    "name": "Active balancing BMS",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "4S – 24S",
+      "Up to 250A"
+    ],
+    "uses": [
+      "Large packs"
+    ],
+    "warnings": []
+  },
+  "seplos-smart-bms": {
+    "name": "SEPLOS Smart BMS",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "16S (48V)",
+      "100 – 200A"
+    ],
+    "uses": [
+      "Home solar (ESS), server rack"
+    ],
+    "warnings": []
+  },
+  "max17048-max17043-yakit-gostergesi": {
+    "name": "MAX17048 / MAX17043 fuel gauge",
+    "interface": "I²C (0x36)",
+    "voltage": "",
+    "specs": [
+      "Coulomb counting + voltage model",
+      "True SoC (%)"
+    ],
+    "uses": [
+      "LiPo state-of-charge measurement"
+    ],
+    "warnings": [
+      "Measuring the battery with an ADC is misleading"
+    ]
+  },
+  "kursun-asit-batarya": {
+    "name": "Lead-acid battery",
+    "interface": "",
+    "voltage": "12V (6×2V)",
+    "specs": [
+      "Low cost, high current, heavy"
+    ],
+    "uses": [
+      "UPS, inverter, solar, vehicle"
+    ],
+    "warnings": []
+  },
+  "li-ion-18650-batarya": {
+    "name": "Li-ion (18650) battery",
+    "interface": "",
+    "voltage": "3.7V nominal",
+    "specs": [
+      "High energy density, light"
+    ],
+    "uses": [
+      "Phone, laptop, power bank, EV"
+    ],
+    "warnings": [
+      "Keep between 20-80%; do not use without a BMS"
+    ]
+  },
+  "lipo-batarya": {
+    "name": "LiPo battery",
+    "interface": "",
+    "voltage": "3.7V nominal",
+    "specs": [
+      "Very light, thin, high discharge (C-rate)"
+    ],
+    "uses": [
+      "Drone, RC, robot, thin devices"
+    ],
+    "warnings": [
+      "Do not use a swollen, punctured or below-3.0V cell; charge in a LiPo-safe bag",
+      "Do not use without a BMS"
+    ]
+  },
+  "nimh-batarya": {
+    "name": "NiMH battery",
+    "interface": "",
+    "voltage": "1.2V",
+    "specs": [
+      "Rechargeable, safer than Li-ion, medium capacity"
+    ],
+    "uses": [
+      "Remote control, toy, camera, AA/AAA"
+    ],
+    "warnings": []
+  },
+  "nicd-batarya": {
+    "name": "NiCd battery",
+    "interface": "",
+    "voltage": "1.2V",
+    "specs": [
+      "Long cycle life, memory effect problem"
+    ],
+    "uses": [
+      "Emergency lighting, cordless tools"
+    ],
+    "warnings": []
+  },
+  "alkalin-batarya": {
+    "name": "Alkaline battery",
+    "interface": "",
+    "voltage": "1.5V",
+    "specs": [
+      "Not rechargeable, long shelf life, cheap"
+    ],
+    "uses": [
+      "Clock, TV remote, flashlight"
+    ],
+    "warnings": []
+  },
+  "coin-cell-cr2032-batarya": {
+    "name": "Coin cell (CR2032) battery",
+    "interface": "",
+    "voltage": "3V",
+    "specs": [
+      "Very small, long-lasting, low current"
+    ],
+    "uses": [
+      "Motherboard CMOS, calculator, RTC"
+    ],
+    "warnings": []
+  },
+  "lifepo4-batarya": {
+    "name": "LiFePO₄ battery",
+    "interface": "",
+    "voltage": "3.2V (12.8V 4S)",
+    "specs": [
+      "Very safe, long life, fast charging"
+    ],
+    "uses": [
+      "Solar, EV, marine, backup power"
+    ],
+    "warnings": []
+  },
+  "cinko-karbon-batarya": {
+    "name": "Zinc-carbon battery",
+    "interface": "",
+    "voltage": "1.5V",
+    "specs": [
+      "Very cheap, for low current"
+    ],
+    "uses": [
+      "Wall clock, low-power toy"
+    ],
+    "warnings": []
+  },
+  "sodyum-iyon-batarya": {
+    "name": "Sodium-ion battery",
+    "interface": "",
+    "voltage": "~3.1V",
+    "specs": [
+      "Eco-friendly, cheap, good at low temperatures"
+    ],
+    "uses": [
+      "Energy storage, EV (emerging)"
+    ],
+    "warnings": []
+  },
+  "direnc": {
+    "name": "Resistor",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Watts · Tolerance",
+      "Color code: 2 digits + multiplier + tolerance"
+    ],
+    "uses": [
+      "LED current limiting, pull-up/down, voltage divider, biasing"
+    ],
+    "warnings": [
+      "Using a 1/4W resistor at a 1W load → it burns out"
+    ]
+  },
+  "kondansator-elektrolitik-seramik": {
+    "name": "Capacitor (electrolytic / ceramic)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Capacitance (µF) · Voltage · Polarity",
+      "Decoupling 0.1µF, bulk 100-1000µF"
+    ],
+    "uses": [
+      "Decoupling, bulk, filtering, timing"
+    ],
+    "warnings": [
+      "An electrolytic connected in reverse explodes"
+    ]
+  },
+  "led": {
+    "name": "LED",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Forward voltage Vf ≈ 2V",
+      "220Ω-330Ω series resistor for 5V"
+    ],
+    "uses": [],
+    "warnings": [
+      "Connecting an LED directly to 5V → it burns out"
+    ]
+  },
+  "bobin-induktor": {
+    "name": "Coil (inductor)",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Inductance (µH) · Current · DCR"
+    ],
+    "uses": [
+      "DC-DC converters, motors, solenoids"
+    ],
+    "warnings": [
+      "Inductive kickback: flyback diode"
+    ]
+  },
+  "buton-anahtar": {
+    "name": "Button / switch",
+    "interface": "digital",
+    "voltage": "",
+    "specs": [
+      "Contacts bounce for 1-20 ms"
+    ],
+    "uses": [],
+    "warnings": [
+      "Debounce required"
+    ]
+  },
+  "1n4007-diyot": {
+    "name": "1N4007 diode",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Flyback diode"
+    ],
+    "uses": [
+      "Motor/relay/solenoid protection"
+    ],
+    "warnings": []
+  },
+  "bc547": {
+    "name": "BC547",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "BJT (current controlled)"
+    ],
+    "uses": [
+      "Darkness detector (BC547)"
+    ],
+    "warnings": []
+  },
+  "2n2222": {
+    "name": "2N2222",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "BJT (current controlled)"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "tip122": {
+    "name": "TIP122",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "BJT (current controlled)"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "irf540": {
+    "name": "IRF540",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "MOSFET, low RDS(on)"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "irlz44n": {
+    "name": "IRLZ44N",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "MOSFET, low RDS(on)"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "ao3400": {
+    "name": "AO3400",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "MOSFET, low RDS(on)"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "bss138-lojik-seviye-cevirici": {
+    "name": "BSS138 logic level shifter",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Bidirectional, I²C compatible, fast"
+    ],
+    "uses": [
+      "5V ↔ 3.3V"
+    ],
+    "warnings": [
+      "A voltage divider does not work on I²C"
+    ]
+  },
+  "sm6t36a-tvs-diyot": {
+    "name": "SM6T36A TVS diode",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Clamping 55.3V",
+      "Current 11.2A",
+      "Package SMB"
+    ],
+    "uses": [
+      "Voltage spike protection"
+    ],
+    "warnings": [
+      "Place close to the pin being protected"
+    ]
+  },
+  "pesd5v0s1ub-tvs-diyot": {
+    "name": "PESD5V0S1UB TVS diode",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Clamping 6.2V",
+      "Current 60A",
+      "Package DFN1006"
+    ],
+    "uses": [
+      "Voltage spike protection"
+    ],
+    "warnings": [
+      "Place close to the pin being protected"
+    ]
+  },
+  "tvs0500-1-6v0-tvs-diyot": {
+    "name": "TVS0500-1-6V0 TVS diode",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Clamping 6.2V",
+      "Current 60A",
+      "Package SOD-523"
+    ],
+    "uses": [
+      "Voltage spike protection"
+    ],
+    "warnings": [
+      "Place close to the pin being protected"
+    ]
+  },
+  "mcp2551-can-transceiver": {
+    "name": "MCP2551 CAN transceiver",
+    "interface": "CAN",
+    "voltage": "",
+    "specs": [],
+    "uses": [
+      "CAN bus node"
+    ],
+    "warnings": [
+      "120Ω termination at each end"
+    ]
+  },
+  "tja1050-can-transceiver": {
+    "name": "TJA1050 CAN transceiver",
+    "interface": "CAN",
+    "voltage": "",
+    "specs": [],
+    "uses": [
+      "CAN bus node"
+    ],
+    "warnings": [
+      "120Ω termination at each end"
+    ]
+  },
+  "sn65hvd230-can-transceiver": {
+    "name": "SN65HVD230 CAN transceiver",
+    "interface": "CAN",
+    "voltage": "",
+    "specs": [],
+    "uses": [
+      "CAN bus node"
+    ],
+    "warnings": [
+      "120Ω termination at each end"
+    ]
+  },
+  "hc-05-bluetooth-modulu": {
+    "name": "HC-05 Bluetooth module",
+    "interface": "UART",
+    "voltage": "3.3V logic",
+    "specs": [],
+    "uses": [
+      "UART example"
+    ],
+    "warnings": [
+      "TX→RX crossed, common GND"
+    ]
+  },
+  "ch340-usb-seri-cip": {
+    "name": "CH340 USB-serial chip",
+    "interface": "",
+    "voltage": "",
+    "specs": [],
+    "uses": [],
+    "warnings": [
+      "If code will not upload, check the driver/COM port"
+    ]
+  },
+  "st-link-j-link-debugger": {
+    "name": "ST-Link / J-Link debugger",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Real debugging with breakpoints"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "logic-analyzer": {
+    "name": "Logic analyzer",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Shows I²C/SPI/UART traffic"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "osiloskop": {
+    "name": "Oscilloscope",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "Analog signals and timing"
+    ],
+    "uses": [],
+    "warnings": []
+  },
+  "multimetre": {
+    "name": "Multimeter",
+    "interface": "",
+    "voltage": "",
+    "specs": [
+      "V= mode, continuity (beep) mode"
+    ],
+    "uses": [
+      "Measure voltage at the MCU pin, under load"
+    ],
+    "warnings": []
+  }
+}

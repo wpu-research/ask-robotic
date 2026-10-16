@@ -7,7 +7,10 @@ import { PART_DEFS } from '@/lib/lab/geometry'
 import { evaluateLabGoals, type LabGoal, type LabGoalResult } from '@/lib/lab/goals'
 import { addPart, hasParts, isCircuit, normalizeCircuit, removePart, removeWire, rotatePart, setProp } from '@/lib/lab/ops'
 import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS } from '@/lib/lab/parts'
-import { warningMeta } from '@/lib/lab/warnings'
+import { warningMeta, warningMessage, warningTitle } from '@/lib/lab/warnings'
+import { percent } from '@/lib/lab/text'
+import type { MessageKey } from '@/i18n'
+import { useLocale, useT } from '@/i18n/client'
 import { StatsTracker } from '@/lib/lab/stats'
 import { analyze, createRuntime } from '@/lib/lab/runtime'
 import { isBuzzerMuted, setBuzzer, setBuzzerMuted, unlockAudio } from '@/lib/lab/sound'
@@ -41,9 +44,12 @@ type CompileView =
   | { status: 'failed'; message: string; unavailable?: boolean }
 
 const FLASH_MAX = 32256, RAM_MAX = 2048
-const pct = (n: number, max: number) => `%${((n / max) * 100).toFixed(1).replace('.', ',')}`
 
 export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact }: LabEditorProps) {
+  const t = useT()
+  const locale = useLocale()
+  const tRef = useRef(t); tRef.current = t
+  const pct = (n: number, max: number) => percent(t, locale, (n / max) * 100)
   const locked = useMemo(() => new Set(lockedPartIds ?? initial.parts.filter((p) => p.type === 'uno').map((p) => p.id)), [lockedPartIds, initial])
   const [circuit, setCircuit] = useState<Circuit>(initial)
   const [code, setCode] = useState(initialCode)
@@ -143,7 +149,7 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
         }
       } catch (e) {
         console.error(e)
-        say('Benzetim hata verdi ve durduruldu.')
+        say(tRef.current('lab.editor.simError'))
         stopRun()
         return
       }
@@ -189,13 +195,13 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
     if (id !== runId.current) return // Dur'a basıldı ya da yeni çalıştırma başladı
     logEvent('compile', { p: { ok: out.ok, kind: 'lab' } })
     if (!out.ok) {
-      setCompile(out.errors.length ? { status: 'errors', errors: out.errors } : { status: 'failed', message: out.message ?? 'Derleme başarısız oldu.', unavailable: out.unavailable })
+      setCompile(out.errors.length ? { status: 'errors', errors: out.errors } : { status: 'failed', message: out.reason ? t(`lab.compile.${out.reason}` as MessageKey) : out.message ?? t('lab.compile.failed'), unavailable: out.unavailable })
       return
     }
     try {
       const kept = eepromRef.current
       const l = createRuntime(circuitRef.current, out.hex, kept ? { eeprom: kept } : undefined)
-      if (kept) say('EEPROM önceki çalıştırmadaki içeriğiyle başladı (güç kesilince korunur). Boşaltmak için ↺ Sıfırla.')
+      if (kept) say(t('lab.editor.eepromKept'))
       lab.current = l
       tracker.current.reset()
       setSerialBase(0); setLastSerial(''); setPaused(false); speedRef.current = 1
@@ -204,7 +210,7 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
       logEvent('run', { p: { kind: 'lab' } })
     } catch (e) {
       console.error(e)
-      setCompile({ status: 'failed', message: 'Benzetim başlatılamadı. Hex dosyası ya da devre geçersiz olabilir.' })
+      setCompile({ status: 'failed', message: t('lab.editor.startFailed') })
     }
   }
 
@@ -222,7 +228,7 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
   const change = useCallback((c: Circuit) => { if (!lab.current) setCircuit(c) }, [])
 
   const placeAt = (type: PartType, x: number, y: number) => {
-    if (!editable) { say('Benzetim çalışırken parça ekleyemezsin. Önce Dur.'); return }
+    if (!editable) { say(t('lab.editor.cantAdd')); return }
     const r = addPart(circuitRef.current, type, x, y)
     setCircuit(r.circuit); setSelection({ kind: 'part', id: r.part.id })
   }
@@ -283,15 +289,15 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
     const t = Math.max(0, Math.floor(ms)), m = Math.floor(t / 60000), sec = Math.floor((t % 60000) / 1000)
     return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}.${String(t % 1000).padStart(3, '0')}`
   }
-  const statusText = compile.status === 'compiling' ? 'Derleniyor…' : running ? (paused ? 'Duraklatıldı' : 'Çalışıyor') : 'Durdu'
+  const statusText = compile.status === 'compiling' ? t('lab.editor.compiling') : running ? (paused ? t('lab.editor.status.paused') : t('lab.editor.status.running')) : t('lab.editor.status.stopped')
 
   return (
     <div className="jr-host lab-host">
       <div className={`lab${compact ? ' compact' : ''}`} data-running={running ? 'true' : 'false'}>
         {/* Sol: kod düzenleyici (Wokwi gibi) */}
         <div className="lab-left">
-          <section className="lab-codecard" aria-label="Kod düzenleyici">
-            <div className="lab-tabs" role="tablist" aria-label="Dosyalar">
+          <section className="lab-codecard" aria-label={t('lab.editor.codeEditor')}>
+            <div className="lab-tabs" role="tablist" aria-label={t('lab.editor.files')}>
               <span className="lab-tab" role="tab" aria-selected="true">sketch.ino</span>
               {/* İleride: Tinkercad gibi "Bloklar | Metin" geçişi bu yuvaya eklenecek. */}
               <div className="lab-tabs-slot" data-slot="code-mode" />
@@ -299,22 +305,22 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
             <CodePane value={code} onChange={setCode} errorLines={errorLines} apiRef={codeApi} height={codeH} />
           </section>
           <div className="lab-compile" data-testid="lab-compile" data-status={compile.status} aria-live="polite">
-            {compile.status === 'idle' && <p className="muted">Kodu yaz, devreyi kur, sonra ▶ Başlat’a bas.</p>}
-            {compile.status === 'compiling' && <p>Derleniyor…</p>}
+            {compile.status === 'idle' && <p className="muted">{t('lab.editor.idleHint')}</p>}
+            {compile.status === 'compiling' && <p>{t('lab.editor.compiling')}</p>}
             {compile.status === 'ok' && (
               <p className="lab-ok">
-                Derleme başarılı.
-                {compile.flashBytes !== undefined && <> Program: {compile.flashBytes} bayt ({pct(compile.flashBytes, FLASH_MAX)}).</>}
-                {compile.ramBytes !== undefined && <> RAM: {compile.ramBytes} bayt ({pct(compile.ramBytes, RAM_MAX)}).</>}
+                {t('lab.editor.compileOk')}
+                {compile.flashBytes !== undefined && <> {t('lab.editor.flash', { n: compile.flashBytes, pct: pct(compile.flashBytes, FLASH_MAX) })}</>}
+                {compile.ramBytes !== undefined && <> {t('lab.editor.ram', { n: compile.ramBytes, pct: pct(compile.ramBytes, RAM_MAX) })}</>}
               </p>
             )}
             {compile.status === 'failed' && <p className="lab-err" role="alert" data-unavailable={compile.unavailable ? 'true' : undefined}>{compile.message}</p>}
             {compile.status === 'errors' && (
               <div role="alert">
-                <p className="lab-err">{compile.errors.length} derleme hatası:</p>
+                <p className="lab-err">{t('lab.editor.errorCount', { n: compile.errors.length })}</p>
                 <ul className="lab-errors">
                   {compile.errors.map((e, i) => (
-                    <li key={i}><button type="button" data-error-goto={e.line} onClick={() => codeApi.current?.goToLine(e.line)}><b>Satır {e.line}</b>: {e.message}</button></li>
+                    <li key={i}><button type="button" data-error-goto={e.line} onClick={() => codeApi.current?.goToLine(e.line)}><b>{t('lab.editor.line', { n: e.line })}</b>: {e.message}</button></li>
                   ))}
                 </ul>
               </div>
@@ -327,20 +333,20 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
         <div className="lab-sim">
           <div className="lab-simbar">
             <PartPicker types={allowedParts} disabled={!editable} onDrop={dropFromPalette} onAdd={addFromPalette} />
-            <div className="lab-ctl" role="group" aria-label="Benzetim denetimi">
-              <button type="button" className="lab-round go" data-testid="lab-run" onClick={run} disabled={compile.status === 'compiling'} aria-label={running ? 'Yeniden derle ve başlat' : 'Derle ve başlat'} title={running ? 'Yeniden derle ve başlat' : 'Derle ve başlat'}>▶</button>
-              <button type="button" className="lab-round" data-testid="lab-pause" onClick={() => setPaused((p) => !p)} disabled={!running} aria-pressed={paused} aria-label={paused ? 'Sürdür' : 'Duraklat'} title={paused ? 'Sürdür' : 'Duraklat'}>{paused ? '▶' : '⏸'}</button>
-              <button type="button" className="lab-round stop" data-testid="lab-stop" onClick={stopRun} disabled={!running && compile.status !== 'compiling'} aria-label="Dur" title="Dur">■</button>
-              <button type="button" className="lab-round" data-testid="lab-reset" onClick={resetRun} aria-label="Sıfırla (yanmış LED dahil)" title="Sıfırla (yanmış LED dahil)">↺</button>
+            <div className="lab-ctl" role="group" aria-label={t('lab.editor.simControl')}>
+              <button type="button" className="lab-round go" data-testid="lab-run" onClick={run} disabled={compile.status === 'compiling'} aria-label={running ? t('lab.editor.rerun') : t('lab.editor.run')} title={running ? t('lab.editor.rerun') : t('lab.editor.run')}>▶</button>
+              <button type="button" className="lab-round" data-testid="lab-pause" onClick={() => setPaused((p) => !p)} disabled={!running} aria-pressed={paused} aria-label={paused ? t('lab.editor.resume') : t('lab.editor.pause')} title={paused ? t('lab.editor.resume') : t('lab.editor.pause')}>{paused ? '▶' : '⏸'}</button>
+              <button type="button" className="lab-round stop" data-testid="lab-stop" onClick={stopRun} disabled={!running && compile.status !== 'compiling'} aria-label={t('lab.editor.stop')} title={t('lab.editor.stop')}>■</button>
+              <button type="button" className="lab-round" data-testid="lab-reset" onClick={resetRun} aria-label={t('lab.editor.reset')} title={t('lab.editor.reset')}>↺</button>
               <button
-                type="button" className="lab-round" aria-pressed={muted} aria-label={muted ? 'Sesi aç' : 'Sesi kapat'} title={muted ? 'Sesi aç' : 'Sesi kapat'}
+                type="button" className="lab-round" aria-pressed={muted} aria-label={muted ? t('lab.editor.unmute') : t('lab.editor.mute')} title={muted ? t('lab.editor.unmute') : t('lab.editor.mute')}
                 onClick={() => { const m = !isBuzzerMuted(); setBuzzerMuted(m); setMutedState(m) }}
               >{muted ? '🔇' : '🔊'}</button>
             </div>
-            <div className={`lab-meter${running && !paused ? ' on' : ''}`} role="status" aria-label="Benzetim durumu">
+            <div className={`lab-meter${running && !paused ? ' on' : ''}`} role="status" aria-label={t('lab.editor.simStatus')}>
               <span className="lab-state" data-testid="lab-status">{statusText}</span>
               <span className="lab-timer" data-testid="lab-timer">{fmtTime(state?.timeMs ?? 0)}</span>
-              <span className="lab-speed" data-testid="lab-speed" title="Benzetim hızı">%{running ? Math.round(speedRef.current * 100) : 0}</span>
+              <span className="lab-speed" data-testid="lab-speed" title={t('lab.editor.simSpeed')}>{t('lab.editor.pct', { p: running ? Math.round(speedRef.current * 100) : 0 })}</span>
             </div>
           </div>
           <div className="lab-stage">
@@ -350,15 +356,15 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
               apiRef={canvasApi} height={canvasH} onNotice={say}
             />
             {notice && <div className="lab-toast" role="status">{notice}</div>}
-            {!editable && <p className="lab-lockhint" data-testid="lab-locked">Çalışırken devre düzenlenemez (önce ■ Dur). Buton, potansiyometre, LDR ve NTC canlı ayarlanabilir.</p>}
+            {!editable && <p className="lab-lockhint" data-testid="lab-locked">{t('lab.editor.lockHint')}</p>}
           </div>
           {warnings.length > 0 && (
-            <ul className="lab-warnings" role="alert" aria-label="Uyarılar" data-testid="lab-warnings">
+            <ul className="lab-warnings" role="alert" aria-label={t('lab.editor.warnings')} data-testid="lab-warnings">
               {warnings.map((w, i) => (
                 <li key={`${w.kind}-${w.partId ?? ''}-${i}`} data-warning={w.kind}>
                   <span aria-hidden="true" className="lab-warn-icon">{warningMeta(w.kind).icon}</span>
-                  <b className="lab-warn-title">{warningMeta(w.kind).title}</b>
-                  {w.partId ? <button type="button" title="İlgili parçayı seç" onClick={() => setSelection({ kind: 'part', id: w.partId! })}>{w.message}</button> : <span>{w.message}</span>}
+                  <b className="lab-warn-title">{warningTitle(t, w.kind)}</b>
+                  {w.partId ? <button type="button" title={t('lab.editor.selectPart')} onClick={() => setSelection({ kind: 'part', id: w.partId! })}>{warningMessage(t, locale, w)}</button> : <span>{warningMessage(t, locale, w)}</span>}
                 </li>
               ))}
             </ul>

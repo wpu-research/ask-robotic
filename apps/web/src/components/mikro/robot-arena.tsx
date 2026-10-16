@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic'
 import type { Device } from '@/lib/mikro/device'
 import { FLOOR_COLORS, type DriveBase, type LightColor } from '@/lib/mikro/robot'
 import { useFullView, useView3D, ViewBar } from '../three/view-bar'
+import { FLOOR_EN, PROFILE_EN, SCENE_EN, ZONE_EN } from '@/lib/mikro/en'
+import { useI18n } from '@/i18n/client'
 
 const RobotArena3D = dynamic(() => import('./robot-arena-3d').then((m) => m.RobotArena3D), { ssr: false, loading: () => <div className="rb-3d" /> })
 
@@ -15,25 +17,27 @@ const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1' } as
 export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: Device; tick: number }) {
   const v = useView3D()
   const [full, setFull] = useFullView()
+  const { locale, t } = useI18n()
+  const en = locale === 'en'
   const dist = robot.has('distance') ? robot.distanceCm : null
-  const status = robot.collisions ? `${robot.collisions} çarpma` : 'çarpma yok'
+  const status = robot.collisions ? t('mikro.arena.collisions', { n: robot.collisions }) : t('mikro.arena.noCollisions')
   return (
     <figure className={`rb-arena${full ? ' rb-full' : ''}`} data-testid="robot-arena" data-tick={tick} data-view={v.is3d ? '3d' : '2d'}>
       <ViewBar v={v} full={full} onFull={setFull} />
-      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} />}
+      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} en={en} label={t('mikro.arena.topView', { scene: en ? SCENE_EN[robot.scene.id] ?? robot.scene.title : robot.scene.title, robot: en ? PROFILE_EN[robot.profile.id].title : robot.profile.title })} />}
       <figcaption className="rb-readout" aria-live="off">
-        {dist != null && <span>mesafe <b>{dist.toFixed(0)} cm</b></span>}
-        {robot.has('color') && <span>renk <b>{FLOOR_COLORS[robot.color].label}</b></span>}
-        {robot.has('line') && <span>çizgi <b>{robot.lineOn('left') ? '●' : '○'}{robot.lineOn('right') ? '●' : '○'}</b></span>}
-        <span>yön <b>{robot.headingDeg}°</b></span>
-        <span>yol <b>{(robot.distanceM * 100).toFixed(0)} cm</b></span>
+        {dist != null && <span>{t('mikro.arena.distance')} <b>{dist.toFixed(0)} cm</b></span>}
+        {robot.has('color') && <span>{t('mikro.arena.color')} <b>{en ? FLOOR_EN[robot.color] : FLOOR_COLORS[robot.color].label}</b></span>}
+        {robot.has('line') && <span>{t('mikro.arena.line')} <b>{robot.lineOn('left') ? '●' : '○'}{robot.lineOn('right') ? '●' : '○'}</b></span>}
+        <span>{t('mikro.arena.heading')} <b>{robot.headingDeg}°</b></span>
+        <span>{t('mikro.arena.path')} <b>{(robot.distanceM * 100).toFixed(0)} cm</b></span>
         <span className={robot.collisions ? 'bad' : undefined}>{status}</span>
       </figcaption>
     </figure>
   )
 }
 
-function TopView({ robot }: { robot: DriveBase }) {
+function TopView({ robot, en, label }: { robot: DriveBase; en: boolean; label: string }) {
   const s = robot.scene
   const W = s.width * CM, H = s.height * CM
   const X = (x: number) => x * CM, Y = (y: number) => (s.height - y) * CM
@@ -46,7 +50,7 @@ function TopView({ robot }: { robot: DriveBase }) {
   const light = LIGHT_CSS[robot.lights]
 
   return (
-      <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} role="img" aria-label={`${s.title}: ${p.title} üstten görünüş`}>
+      <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} role="img" aria-label={label}>
         <rect x={0} y={0} width={W} height={H} className="rb-floor" />
         {s.patches.map((q, i) => (
           <rect key={i} x={X(Math.min(q.x1, q.x2))} y={Y(Math.max(q.y1, q.y2))} width={Math.abs(q.x2 - q.x1) * CM} height={Math.abs(q.y2 - q.y1) * CM} fill={FLOOR_COLORS[q.color].css} rx={2} />
@@ -55,7 +59,7 @@ function TopView({ robot }: { robot: DriveBase }) {
         {s.zones.map((z) => (
           <g key={z.id} data-zone={z.id} data-visited={robot.visited.has(z.id) || undefined}>
             <circle cx={X(z.x)} cy={Y(z.y)} r={z.r * CM} fill={ZONE_CSS[z.kind]} fillOpacity={robot.visited.has(z.id) ? 0.3 : 0.12} stroke={ZONE_CSS[z.kind]} strokeDasharray="4 3" />
-            {z.label && <text x={X(z.x)} y={Y(z.y) + 3} textAnchor="middle" className="rb-ztext">{z.label}</text>}
+            {z.label && <text x={X(z.x)} y={Y(z.y) + 3} textAnchor="middle" className="rb-ztext">{en ? ZONE_EN[z.label] ?? z.label : z.label}</text>}
           </g>
         ))}
         {s.walls.map(([x1, y1, x2, y2], i) => <line key={i} x1={X(x1)} y1={Y(y1)} x2={X(x2)} y2={Y(y2)} className="rb-wall" />)}

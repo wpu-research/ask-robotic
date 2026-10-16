@@ -1,7 +1,8 @@
 // Blockly'ye Sahne Atölyesi bloklarını yükler (tarayıcıda ve başsız Node testlerinde). Blockly modülü dışarıdan verilir.
 // Dinamik açılır listeler (kostüm, ses, sprite, mesaj…) `setOptionProviders` ile projeye bağlanır.
 import type * as BlocklyNS from 'blockly'
-import { ARG_BLOCK, BLOCK_BY_TYPE, BLOCK_JSON, CATEGORIES, PROCS_CALLBACK, PROC_CALL_PREFIX, PROC_DEF_PREFIX, VARS_CALLBACK, VAR_GET, shadowOf, styleName, type DynKind } from './blocks'
+import type { Locale } from '@/i18n'
+import { ARG_BLOCK, BLOCK_BY_TYPE, CATEGORIES, blockJsonFor, PROCS_CALLBACK, PROC_CALL_PREFIX, PROC_DEF_PREFIX, VARS_CALLBACK, VAR_GET, shadowOf, styleName, type DynKind } from './blocks'
 import type { ProcDef, VarDef } from './types'
 
 type B = typeof BlocklyNS
@@ -22,23 +23,41 @@ export const setOptionProviders = (p: Partial<OptionProviders>): void => { provi
 
 export const NEW_MESSAGE = '__yeni__'
 
+/** Blokların ve açılır listelerin görünen dili (defineSahneBlocks ile ayarlanır). */
+let curLocale: Locale = 'tr'
+const TXT = {
+  tr: {
+    noCostume: '(kostüm yok)', noBackdrop: '(arka plan yok)', noSound: '(ses yok)', mouse: 'fare imleci', edge: 'kenar', random: 'rastgele konum',
+    myself: 'kendimin', stage: 'sahne', newMessage: 'Yeni mesaj…', argText: 'girdi', argTip: 'Bu bloğun girdisi', define: 'tanımla',
+    defTip: (n: string) => `'${n}' bloğunun ne yaptığını altına yaz.`, callTip: (n: string) => `'${n}' bloğunu çalıştırır.`,
+    makeVar: 'Değişken oluştur', makeList: 'Liste oluştur', makeBlock: 'Bir blok yap', inputs: 'Girdiler',
+  },
+  en: {
+    noCostume: '(no costumes)', noBackdrop: '(no backdrops)', noSound: '(no sounds)', mouse: 'mouse-pointer', edge: 'edge', random: 'random position',
+    myself: 'myself', stage: 'Stage', newMessage: 'New message…', argText: 'input', argTip: 'An input of this block', define: 'define',
+    defTip: (n: string) => `Put what the '${n}' block does underneath.`, callTip: (n: string) => `Runs the '${n}' block.`,
+    makeVar: 'Make a Variable', makeList: 'Make a List', makeBlock: 'Make a Block', inputs: 'Inputs',
+  },
+} as const
+const tx = () => TXT[curLocale]
+
 type Opts = [string, string][]
 const names = (xs: string[], empty: string): Opts => (xs.length ? xs.map((x) => [x, x] as [string, string]) : [[empty, '']])
 const spriteOpts = (): Opts => providers.sprites().map((s) => [s.name, s.id] as [string, string])
 
 export function dynOptions(kind: DynKind): Opts {
   switch (kind) {
-    case 'costume': return names(providers.costumes(), '(kostüm yok)')
-    case 'backdrop': return names(providers.backdrops(), '(arka plan yok)')
-    case 'sound': return names(providers.sounds(), '(ses yok)')
-    case 'touch': return [['fare imleci', '_mouse_'], ['kenar', '_edge_'], ...spriteOpts()]
-    case 'goto': return [['rastgele konum', '_random_'], ['fare imleci', '_mouse_'], ...spriteOpts()]
-    case 'towards': return [['fare imleci', '_mouse_'], ...spriteOpts()]
-    case 'clone': return [['kendimin', '_myself_'], ...spriteOpts()]
-    case 'ofTarget': return [['sahne', '_stage_'], ...spriteOpts()]
+    case 'costume': return names(providers.costumes(), tx().noCostume)
+    case 'backdrop': return names(providers.backdrops(), tx().noBackdrop)
+    case 'sound': return names(providers.sounds(), tx().noSound)
+    case 'touch': return [[tx().mouse, '_mouse_'], [tx().edge, '_edge_'], ...spriteOpts()]
+    case 'goto': return [[tx().random, '_random_'], [tx().mouse, '_mouse_'], ...spriteOpts()]
+    case 'towards': return [[tx().mouse, '_mouse_'], ...spriteOpts()]
+    case 'clone': return [[tx().myself, '_myself_'], ...spriteOpts()]
+    case 'ofTarget': return [[tx().stage, '_stage_'], ...spriteOpts()]
     case 'message': {
       const m = providers.messages()
-      return [...(m.length ? m.map((x) => [x, x] as [string, string]) : [['mesaj1', 'mesaj1'] as [string, string]]), ['Yeni mesaj…', NEW_MESSAGE]]
+      return [...(m.length ? m.map((x) => [x, x] as [string, string]) : [['mesaj1', 'mesaj1'] as [string, string]]), [tx().newMessage, NEW_MESSAGE]]
     }
   }
 }
@@ -82,10 +101,18 @@ export function makeTheme(Blockly: B): BlocklyNS.Theme {
   })
 }
 
-let defined = false
-export function defineSahneBlocks(Blockly: B): void {
-  if (defined) return
-  defined = true
+let fieldRegistered = false
+let definedLocale: Locale | null = null
+/** Blokları verilen dille tanımlar; dil değişince yeniden tanımlar (çalışma alanı sonra yeniden kurulmalı). */
+export function defineSahneBlocks(Blockly: B, locale: Locale = 'tr'): void {
+  curLocale = locale
+  if (definedLocale === locale) return
+  const redefine = definedLocale !== null
+  definedLocale = locale
+  const json = blockJsonFor(locale)
+  if (redefine) { for (const j of json) delete Blockly.Blocks[j.type]; delete Blockly.Blocks[ARG_BLOCK] }
+  if (fieldRegistered) { Blockly.defineBlocksWithJsonArray(json as unknown as object[]); defineArg(Blockly); return }
+  fieldRegistered = true
 
   class DynField extends Blockly.FieldDropdown {
     kind: DynKind
@@ -105,10 +132,14 @@ export function defineSahneBlocks(Blockly: B): void {
     static override fromJson(o: BlocklyNS.FieldDropdownFromJsonConfig): DynField { return new DynField((o as unknown as { kind: DynKind }).kind) }
   }
   Blockly.fieldRegistry.register('field_sh_dyn', DynField as unknown as Parameters<typeof Blockly.fieldRegistry.register>[1])
-  Blockly.defineBlocksWithJsonArray(BLOCK_JSON as unknown as object[])
+  Blockly.defineBlocksWithJsonArray(json as unknown as object[])
+  defineArg(Blockly)
+}
+
+function defineArg(Blockly: B): void {
   Blockly.defineBlocksWithJsonArray([{
-    type: ARG_BLOCK, message0: '%1', args0: [{ type: 'field_label_serializable', name: 'NAME', text: 'girdi' }],
-    output: null, style: styleName('bloklarim'), tooltip: 'Bu bloğun girdisi', inputsInline: true,
+    type: ARG_BLOCK, message0: '%1', args0: [{ type: 'field_label_serializable', name: 'NAME', text: tx().argText }],
+    output: null, style: styleName('bloklarim'), tooltip: tx().argTip, inputsInline: true,
   }])
 }
 
@@ -117,12 +148,12 @@ export function defineProcBlocks(Blockly: B, procs: ProcDef[]): void {
   for (const p of procs) {
     Blockly.Blocks[PROC_DEF_PREFIX + p.id] = {
       init(this: BlocklyNS.Block) {
-        const row = this.appendDummyInput().appendField('tanımla')
+        const row = this.appendDummyInput().appendField(tx().define)
         row.appendField(new Blockly.FieldLabel(p.name), 'PNAME')
         for (const prm of p.params) row.appendField(new Blockly.FieldLabel(`(${prm})`))
         this.setNextStatement(true)
         this.setStyle(styleName('bloklarim'))
-        this.setTooltip(`'${p.name}' bloğunun ne yaptığını altına yaz.`)
+        this.setTooltip(tx().defTip(p.name))
       },
     }
     Blockly.Blocks[PROC_CALL_PREFIX + p.id] = {
@@ -133,7 +164,7 @@ export function defineProcBlocks(Blockly: B, procs: ProcDef[]): void {
         this.setPreviousStatement(true)
         this.setNextStatement(true)
         this.setStyle(styleName('bloklarim'))
-        this.setTooltip(`'${p.name}' bloğunu çalıştırır.`)
+        this.setTooltip(tx().callTip(p.name))
       },
     }
   }
@@ -162,7 +193,7 @@ export function registerFlyouts(ws: BlocklyNS.WorkspaceSvg, h: FlyoutHandlers): 
     const def = BLOCK_BY_TYPE[type]
     const e: Entry = { kind: 'block', type }
     const inputs: Record<string, unknown> = {}
-    if (def) for (const [n, a] of Object.entries(def.args)) { const s = shadowOf(a); if (s) inputs[n] = { shadow: s } }
+    if (def) for (const [n, a] of Object.entries(def.args)) { const s = shadowOf(a, curLocale); if (s) inputs[n] = { shadow: s } }
     if (Object.keys(inputs).length) e.inputs = inputs
     if (field && v) e.fields = { [field]: varField(v) }
     return e
@@ -174,14 +205,14 @@ export function registerFlyouts(ws: BlocklyNS.WorkspaceSvg, h: FlyoutHandlers): 
     const all = h.vars()
     const vars = all.filter((v) => v.type === '')
     const lists = all.filter((v) => v.type === 'List')
-    const out: Entry[] = [{ kind: 'button', text: 'Değişken oluştur', callbackKey: 'SAHNE_NEWVAR' }]
+    const out: Entry[] = [{ kind: 'button', text: tx().makeVar, callbackKey: 'SAHNE_NEWVAR' }]
     for (const v of vars) if (allow(VAR_GET)) out.push({ kind: 'block', type: VAR_GET, fields: { VAR: varField(v) } })
     if (vars.length) {
       out.push({ kind: 'sep', gap: 14 })
       for (const t of ['sh_var_set', 'sh_var_change', 'sh_var_show', 'sh_var_hide']) if (allow(t)) out.push(blockEntry(t, 'V', vars[0]))
     }
     if (allow('sh_list_add')) {
-      out.push({ kind: 'sep', gap: 22 }, { kind: 'button', text: 'Liste oluştur', callbackKey: 'SAHNE_NEWLIST' })
+      out.push({ kind: 'sep', gap: 22 }, { kind: 'button', text: tx().makeList, callbackKey: 'SAHNE_NEWLIST' })
       for (const v of lists) out.push(blockEntry('sh_list_ref', 'L', v))
       if (lists.length) {
         out.push({ kind: 'sep', gap: 14 })
@@ -195,7 +226,7 @@ export function registerFlyouts(ws: BlocklyNS.WorkspaceSvg, h: FlyoutHandlers): 
 
   ws.registerToolboxCategoryCallback(PROCS_CALLBACK, () => {
     const procs = h.procs()
-    const out: Entry[] = [{ kind: 'button', text: 'Bir blok yap', callbackKey: 'SAHNE_NEWPROC' }]
+    const out: Entry[] = [{ kind: 'button', text: tx().makeBlock, callbackKey: 'SAHNE_NEWPROC' }]
     for (const p of procs) {
       const inputs: Record<string, unknown> = {}
       p.params.forEach((_, i) => { inputs[`P${i}`] = { shadow: { type: 'math_number', fields: { NUM: 0 } } } })
@@ -203,7 +234,7 @@ export function registerFlyouts(ws: BlocklyNS.WorkspaceSvg, h: FlyoutHandlers): 
     }
     const params = [...new Set(procs.flatMap((p) => p.params))]
     if (params.length) {
-      out.push({ kind: 'sep', gap: 14 }, { kind: 'label', text: 'Girdiler' })
+      out.push({ kind: 'sep', gap: 14 }, { kind: 'label', text: tx().inputs })
       for (const n of params) out.push({ kind: 'block', type: ARG_BLOCK, fields: { NAME: n } })
     }
     return out as unknown as BlocklyNS.utils.toolbox.FlyoutItemInfo[]

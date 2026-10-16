@@ -1,6 +1,7 @@
 'use client'
 // Araç türüne göre doğru etkileşimli aracı çizer. Ders oynatıcıya bağlanacak bileşenlerden biri: AiEditor (hedefler + kayıt dahil).
 import type { AiTool, ToolStates } from '@/lib/ai/activity'
+import type { ContentLang } from '@/lib/ai/text'
 import { AgentTool } from './tool-agent'
 import { DetectiveTool } from './tool-detective'
 import { EmbedTool } from './tool-embed'
@@ -18,11 +19,13 @@ export interface AiEtkinlikBilesenProps<K extends AiTool = AiTool> {
   onChange: (s: ToolStates[K]) => void
   /** Etkinlik kipinde görev bağlamı (dünya, hedef sistem, iddia seti, görev) kilitlenir. */
   locked?: boolean
+  /** Örnek metinlerin/hesapların dili (varsayılan 'tr'). */
+  lang?: ContentLang
 }
 
-export function AiEtkinlikBilesen<K extends AiTool>({ tool, state, onChange, locked }: AiEtkinlikBilesenProps<K>) {
+export function AiEtkinlikBilesen<K extends AiTool>({ tool, state, onChange, locked, lang }: AiEtkinlikBilesenProps<K>) {
   // Tür, `tool` ayırt edicisine göre daraltılır; üst bileşen aynı türdeki durumu verir.
-  const p = { state, onChange, locked } as never
+  const p = { state, onChange, locked, lang } as never
   switch (tool as AiTool) {
     case 'tokenizer': return <TokenizerTool {...(p as Parameters<typeof TokenizerTool>[0])} />
     case 'nextword': return <NextwordTool {...(p as Parameters<typeof NextwordTool>[0])} />

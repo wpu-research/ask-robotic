@@ -197,3 +197,11 @@ export function tick(w: World) {
   else if (w.goal === 'kill' && w.enemy && w.enemy.health <= 0) { w.status = 'won'; w.message = 'Rakibi etkisiz hale getirdin!' }
   else if (w.tick >= w.maxTicks) { w.status = 'timeout'; w.message = 'Süre doldu! Daha hızlı olmalısın.' }
 }
+
+/** Dünya iletilerinin (`World.message`) İngilizcesi. */
+export const WORLD_MESSAGE_EN: Record<string, string> = {
+  'Ördeğin battı! Daha dikkatli dene.': 'Your duck sank! Try to be more careful.',
+  'Hedefe ulaştın!': 'You reached the goal!',
+  'Rakibi etkisiz hale getirdin!': 'You knocked out the rival!',
+  'Süre doldu! Daha hızlı olmalısın.': "Time's up! You need to be faster.",
+}

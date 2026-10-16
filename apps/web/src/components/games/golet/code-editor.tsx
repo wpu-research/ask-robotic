@@ -1,8 +1,10 @@
 'use client'
 // Basit JavaScript düzenleyici: satır numaralı metin kutusu (Tab 2 boşluk girer). Gölet'in JavaScript kipi içindir.
 import { useRef, type KeyboardEvent } from 'react'
+import { useT } from '@/i18n/client'
 
 export function CodeEditor({ value, onChange, onRun, disabled }: { value: string; onChange: (v: string) => void; onRun: () => void; disabled?: boolean }) {
+  const tr = useT()
   const gutter = useRef<HTMLDivElement>(null)
   const lines = value.split('\n').length
   const onKey = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -20,7 +22,7 @@ export function CodeEditor({ value, onChange, onRun, disabled }: { value: string
       <div className="gl-gutter" ref={gutter} aria-hidden="true">{Array.from({ length: lines }, (_, i) => i + 1).join('\n')}</div>
       <textarea
         className="gl-code" value={value} spellCheck={false} autoCapitalize="off" autoCorrect="off" wrap="off" disabled={disabled}
-        aria-label="JavaScript kodu: her tikte baştan çalışır. Ctrl+Enter ile çalıştır."
+        aria-label={tr('studios.gamesB.golet.codeLabel')}
         onChange={(e) => onChange(e.target.value)} onKeyDown={onKey}
         onScroll={(e) => { if (gutter.current) gutter.current.scrollTop = e.currentTarget.scrollTop }}
       />

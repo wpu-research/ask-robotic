@@ -5,6 +5,8 @@ import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import type { ArenaScene, ArenaSnapshot, ArmScene, ArmSnapshot, BalancerSnapshot, RoverScene, RoverSnapshot } from '@/lib/arena/types'
 import { applyCamera, createStage, fitShadow, makeFloor, makeTrail, makeWall, mesh, placeWall, std, wallMaterial, type CamMode, type FloorSpec, type Stage } from '../three/core'
+import { useT } from '@/i18n/client'
+import { sceneText } from './scene-text'
 import { makeArenaRover, makeArm, makeBalancer, poseArm, poseBalancer, poseMobile } from '../three/models'
 
 interface Props {
@@ -19,15 +21,18 @@ interface Props {
 const ZONE_CSS: Record<string, string> = { goal: '#16a34a', checkpoint: '#d97706', target: '#0891b2', start: '#6366f1' }
 
 export function Arena3D(p: Props) {
+  const t = useT()
   const host = useRef<HTMLDivElement>(null)
   const live = useRef(p)
   live.current = p
+  const label = useRef((s: string) => sceneText(t, s))
+  label.current = (s: string) => sceneText(t, s)
   const key = `${p.scene.kind}:${p.scene.id}`
 
   useEffect(() => {
     const stage = createStage(host.current!)
     const s = live.current.scene
-    const stop = s.kind === 'rover' ? buildRover(stage, live) : s.kind === 'arm' ? buildArm(stage, s) : buildBalancer(stage)
+    const stop = s.kind === 'rover' ? buildRover(stage, live, label) : s.kind === 'arm' ? buildArm(stage, s) : buildBalancer(stage)
     stage.onFrame = (dt) => stop.frame(live.current, dt)
     return () => { stop.dispose?.(); stage.dispose() }
   }, [key])
@@ -35,7 +40,7 @@ export function Arena3D(p: Props) {
   const snap = p.snap
   return (
     <div className="arena-3d" ref={host} data-testid="arena-3d" data-scene={p.scene.id}>
-      {snap.kind === 'balancer' && <div className="arena-hud" aria-live="polite">{snap.fell ? 'DÜŞTÜ' : 'AYAKTA'} · eğim {snap.thetaDeg.toFixed(1)}°</div>}
+      {snap.kind === 'balancer' && <div className="arena-hud" aria-live="polite">{snap.fell ? t('lab.arena.panel.fell') : t('lab.arena.panel.uprightCaps')} · {t('lab.arena.panel.tiltValue', { v: snap.thetaDeg.toFixed(1) })}</div>}
     </div>
   )
 }
@@ -43,14 +48,14 @@ export function Arena3D(p: Props) {
 interface Built { frame(p: Props, dt: number): void; dispose?(): void }
 
 // ---------------- gezgin ----------------
-function buildRover(stage: Stage, live: { current: Props }): Built {
+function buildRover(stage: Stage, live: { current: Props }, label: { current: (s: string) => string }): Built {
   const scene = live.current.scene as RoverScene
   const snap0 = live.current.snap as RoverSnapshot
   const { width: w, height: h } = scene
   fitShadow(stage, w / 2, -h / 2, Math.max(w, h))
   const spec = (snap: RoverSnapshot): FloorSpec => ({
     w, h, lines: scene.lines, lineWidth: scene.lineWidth ?? 0.02,
-    zones: scene.zones.map((z) => ({ ...z, color: ZONE_CSS[z.kind] ?? '#6366f1', visited: snap.visited.has(z.id) })),
+    zones: scene.zones.map((z) => ({ ...z, label: z.label ? label.current(z.label) : z.label, color: ZONE_CSS[z.kind] ?? '#6366f1', visited: snap.visited.has(z.id) })),
   })
   const floor = makeFloor(spec(snap0))
   stage.scene.add(floor.mesh)

@@ -16,19 +16,27 @@ interface Rec {
 }
 
 const OUTSIDE = 'Çizim bloklarını "her karede" bloğunun içine koy.'
+const TOO_MANY = 'Bir karede çok fazla şekil çizdin!'
+const NESTED = '"her karede" bloğu başka bir bloğun içinde olamaz.'
+/** Motorun kendi durdurma iletilerinin İngilizcesi (yorumlayıcı iletileri çerçevede çevrilir). */
+const HALT_EN: Record<string, string> = {
+  [OUTSIDE]: 'Put the drawing blocks inside the "every frame" block.',
+  [TOO_MANY]: 'You drew too many shapes in one frame!',
+  [NESTED]: 'The "every frame" block can\'t be inside another block.',
+}
 
 export function makeApi(rec: Rec): RunApi {
   const inFrame = () => { if (!rec.cur) throw new HaltProgram(OUTSIDE); return rec.cur }
   const add = (s: Frame['shapes'][number]) => {
     const f = inFrame()
-    if (f.shapes.length >= MAX_SHAPES) throw new HaltProgram('Bir karede çok fazla şekil çizdin!')
+    if (f.shapes.length >= MAX_SHAPES) throw new HaltProgram(TOO_MANY)
     f.shapes.push(s)
   }
   const n = (v: number) => clampNum(v)
   return {
     blocks: {
       film_kare: function* (c) {
-        if (rec.cur) throw new HaltProgram('"her karede" bloğu başka bir bloğun içinde olamaz.')
+        if (rec.cur) throw new HaltProgram(NESTED)
         for (let t = 0; t < FRAME_COUNT; t++) {
           rec.t = t
           rec.color = INK_DEFAULT
@@ -88,12 +96,12 @@ export function createRun(level: LevelDef): GameRun<MovieSnap> {
     // Kareler art arda hesaplanır; oynatma sahnede yapılır, bu yüzden adım başına bekleme yok.
     stepDelay: () => 0,
     evaluate(result: RunResult): RunOutcome {
-      if (result.reason === 'halted' && result.message) return { ok: false, message: result.message }
-      if (rec.frames.length === 0) return { ok: false, message: OUTSIDE }
-      if (rec.frames.length < FRAME_COUNT) return { ok: false, message: 'Film yarıda kaldı. Bütün 100 kare çizilmeli.' }
+      if (result.reason === 'halted' && result.message) return { ok: false, message: result.message, messageEn: (HALT_EN[result.message] ?? result.messageEn) }
+      if (rec.frames.length === 0) return { ok: false, message: OUTSIDE, messageEn: HALT_EN[OUTSIDE] }
+      if (rec.frames.length < FRAME_COUNT) return { ok: false, message: 'Film yarıda kaldı. Bütün 100 kare çizilmeli.', messageEn: 'The movie stopped halfway. All 100 frames must be drawn.' }
       const bad = badFrames(rec.frames, target.frames, target.rasters)
       if (bad.length > BAD_FRAME_LIMIT) {
-        return { ok: false, message: `Filmin ${bad.length} karesi hedefe benzemiyor (ilk fark: kare ${bad[0]}). Çubuğu o kareye getirip hedefle karşılaştır.` }
+        return { ok: false, message: `Filmin ${bad.length} karesi hedefe benzemiyor (ilk fark: kare ${bad[0]}). Çubuğu o kareye getirip hedefle karşılaştır.`, messageEn: `${bad.length} frames of your movie don't look like the target (first difference: frame ${bad[0]}). Move the slider to that frame and compare it with the target.` }
       }
       return { ok: true }
     },

@@ -1,3 +1,4 @@
+import { translate, type Locale } from '@/i18n'
 import type { BlockType, Category } from './types'
 
 export type Param =
@@ -82,3 +83,18 @@ export const BACKGROUNDS: Record<string, { label: string; css: string }> = {
   sea: { label: 'Deniz', css: 'linear-gradient(#9be3ff 0 30%, #2a9df4 30% 100%)' },
   plain: { label: 'Düz', css: '#f8fafc' },
 }
+
+// ---- Görünen metinler (dile göre). Türkçede veri olduğu gibi döner; kimlikler ve alan değerleri değişmez. ----
+const UNIT_KEY: Record<string, string> = { 'adım': 'adim', kez: 'kez', no: 'no', sn: 'sn', sayfa: 'sayfa' }
+export const blockLabel = (def: BlockDef, locale: Locale = 'tr'): string =>
+  locale === 'tr' ? def.label : translate(locale, `studios.jr.blocks.${def.type}`)
+export const unitLabel = (unit: string, locale: Locale = 'tr'): string =>
+  locale === 'tr' || !UNIT_KEY[unit] ? unit : translate(locale, `studios.jr.units.${UNIT_KEY[unit]}`)
+export const categoryLabel = (key: Category, locale: Locale = 'tr'): string =>
+  locale === 'tr' ? CATEGORY_BY_KEY[key].label : translate(locale, `studios.jr.categories.${key}`)
+export const characterLabel = (key: string, locale: Locale = 'tr'): string | undefined =>
+  !CHARACTERS[key] ? undefined : locale === 'tr' ? CHARACTERS[key].label : translate(locale, `studios.jr.characters.${key}`)
+export const backgroundLabel = (key: string, locale: Locale = 'tr'): string | undefined =>
+  !BACKGROUNDS[key] ? undefined : locale === 'tr' ? BACKGROUNDS[key].label : translate(locale, `studios.jr.backgrounds.${key}`)
+export const textDefault = (def: string, locale: Locale = 'tr'): string =>
+  locale === 'tr' || def !== 'Merhaba!' ? def : translate(locale, 'studios.jr.sayDefault')

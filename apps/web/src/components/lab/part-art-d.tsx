@@ -3,6 +3,7 @@
 import type { PartRuntime, PartType } from '@/lib/lab/contract'
 import { PART_DEFS } from '@/lib/lab/geometry'
 import { Board, Chip, clamp01, fmt, GOLD, MONO, num, SmdLed, type Ctx } from './part-art-c'
+import { Tx } from './tx'
 
 /** Pin pedleri; etiket pedin hangi yanında (kenara göre: alt kenardaki pinlerde üstte, sol kenardakilerde sağda…). */
 function SidePads({ type, label = '#f8fafc' }: { type: PartType; label?: string }) {
@@ -67,7 +68,7 @@ function ChannelBar({ x, y, w, out, brake, label }: { x: number; y: number; w: n
       <line x1={x + half} y1={y - 1} x2={x + half} y2={y + 8} stroke="#94a3b8" strokeWidth={0.6} />
       {len > 0.3 && <rect x={out >= 0 ? x + half : x + half - len} y={y + 1} width={len} height={5} rx={1} fill={color} />}
       <text x={x - 2} y={y + 5.6} textAnchor="end" fontSize={5} fontWeight={700} fill="#e2e8f0">{label}</text>
-      <text x={x + w + 2} y={y + 5.6} fontSize={5} fill={brake ? '#fca5a5' : '#e2e8f0'} fontFamily={MONO}>{brake ? 'FREN' : `${Math.round(out * 100)}%`}</text>
+      <text x={x + w + 2} y={y + 5.6} fontSize={5} fill={brake ? '#fca5a5' : '#e2e8f0'} fontFamily={MONO}>{brake ? <Tx k="lab.art.brake" /> : `${Math.round(out * 100)}%`}</text>
     </g>
   )
 }
@@ -189,7 +190,7 @@ function StepperArt(c: Ctx) {
         <circle cx={115} cy={35} r={4} fill={METAL_SHAFT} />
         <rect x={113.5} y={22} width={3} height={13} rx={1} fill="#f59e0b" data-stepper-pointer />
       </g>
-      <text x={115} y={76} textAnchor="middle" fontSize={5.4} fontFamily={MONO} fill="#1e293b">{fmt(angle, 0)}° · {s?.steps ?? 0} adım</text>
+      <text x={115} y={76} textAnchor="middle" fontSize={5.4} fontFamily={MONO} fill="#1e293b">{fmt(angle, 0)}° · <Tx k="lab.art.steps" params={{ n: s?.steps ?? 0 }} /></text>
       <SidePads type="stepper" />
     </g>
   )
@@ -207,7 +208,7 @@ function EscArt(c: Ctx) {
       <text x={53} y={34} textAnchor="middle" fontSize={7} fontWeight={800} fill="#dbeafe">ESC 30A</text>
       <rect x={30} y={40} width={46} height={7} rx={2} fill="#0f172a" />
       <rect x={31} y={41} width={44 * clamp01(thr)} height={5} rx={1} fill={armed ? '#22c55e' : '#64748b'} />
-      <text x={53} y={54} textAnchor="middle" fontSize={5} fontWeight={700} fill={armed ? '#bbf7d0' : '#fecaca'}>{armed ? 'KURULU' : 'KURULMADI'}</text>
+      <text x={53} y={54} textAnchor="middle" fontSize={5} fontWeight={700} fill={armed ? '#bbf7d0' : '#fecaca'}>{armed ? <Tx k="lab.art.armed" /> : <Tx k="lab.art.disarmed" />}</text>
       {[0, 1, 2].map((i) => <line key={i} x1={84} y1={30 + i * 8} x2={104} y2={30 + i * 8} stroke={['#ef4444', '#111827', '#facc15'][i]} strokeWidth={2.2} />)}
       {/* motor çanı */}
       <circle cx={128} cy={38} r={26} fill="#374151" stroke="#111827" strokeWidth={1.4} />

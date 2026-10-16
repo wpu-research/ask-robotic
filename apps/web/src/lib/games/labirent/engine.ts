@@ -79,11 +79,11 @@ export function createMazeRun(level: LevelDef): GameRun<MazeState> {
         const nx = st.x + DX[d], ny = st.y + DY[d]
         if (!isOpen(data.grid, nx, ny)) {
           st.crashed = true
-          throw new HaltProgram('Duvara çarptın!')
+          throw new HaltProgram('Duvara çarptın!', 'You bumped into a wall!')
         }
         st.x = nx; st.y = ny; st.moves++
         st.trail.push([nx, ny])
-        if (nx === gx && ny === gy) { st.atGoal = true; throw new HaltProgram('Hedefe vardın!') }
+        if (nx === gx && ny === gy) { st.atGoal = true; throw new HaltProgram('Hedefe vardın!', 'You reached the goal!') }
       },
       labirent_sol: () => { st.angle -= 90 },
       labirent_sag: () => { st.angle += 90 },
@@ -93,7 +93,7 @@ export function createMazeRun(level: LevelDef): GameRun<MazeState> {
           const before = `${st.x},${st.y},${st.angle}`
           yield* c.statements('DO')
           idle = before === `${st.x},${st.y},${st.angle}` ? idle + 1 : 0
-          if (idle > IDLE_LIMIT) throw new HaltProgram('Döngünün içi boş görünüyor.')
+          if (idle > IDLE_LIMIT) throw new HaltProgram('Döngünün içi boş görünüyor.', 'The loop looks empty inside.')
         }
       },
       labirent_eger: function* (c) {
@@ -111,11 +111,11 @@ export function createMazeRun(level: LevelDef): GameRun<MazeState> {
     stepDelay: () => mazeStepDelay(level.id),
     snapshot: () => ({ ...st, trail: st.trail.map((p) => [p[0], p[1]] as [number, number]) }),
     evaluate(result): RunOutcome {
-      if (st.atGoal) return { ok: true, message: 'Hedefe ulaştın!' }
-      if (st.crashed) return { ok: false, message: 'Duvara çarptın! Yolu bloklarla dikkatle planla.' }
-      if (result.reason === 'limit') return { ok: false, message: 'Yolcu hedefe varamadan dönüp duruyor. Programında takıldığı bir yer var.' }
-      if (result.reason === 'error') return { ok: false, message: result.message || 'Programda bir sorun var.' }
-      return { ok: false, message: 'Yolcu durdu ama hedefe varamadı. Biraz daha ilerlemesi gerek.' }
+      if (st.atGoal) return { ok: true, message: 'Hedefe ulaştın!', messageEn: 'You reached the goal!' }
+      if (st.crashed) return { ok: false, message: 'Duvara çarptın! Yolu bloklarla dikkatle planla.', messageEn: 'You bumped into a wall! Plan the path carefully with your blocks.' }
+      if (result.reason === 'limit') return { ok: false, message: 'Yolcu hedefe varamadan dönüp duruyor. Programında takıldığı bir yer var.', messageEn: 'The traveler keeps going around without reaching the goal. Something in your program gets stuck.' }
+      if (result.reason === 'error') return { ok: false, message: result.message || 'Programda bir sorun var.', messageEn: result.messageEn || (result.message ? undefined : 'There is a problem in the program.') }
+      return { ok: false, message: 'Yolcu durdu ama hedefe varamadı. Biraz daha ilerlemesi gerek.', messageEn: 'The traveler stopped but did not reach the goal. They need to go a bit further.' }
     },
   }
 }

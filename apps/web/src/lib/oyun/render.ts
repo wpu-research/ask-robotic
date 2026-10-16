@@ -3,6 +3,7 @@ import { PALETTE_RGB } from './palette'
 import { CHAR_ADV, drawText, textWidth, wrapText } from './font'
 import { SCREEN_H, SCREEN_W, TILE } from './types'
 import type { OyunEngine, SpriteState } from './engine'
+import { SCREEN_EN, type Locale } from './i18n-en'
 
 export const FRAME_BYTES = SCREEN_W * SCREEN_H * 4
 
@@ -27,7 +28,10 @@ class Canvas {
   }
 }
 
-export function renderFrame(e: OyunEngine, out: Uint8ClampedArray = new Uint8ClampedArray(FRAME_BYTES)): Uint8ClampedArray {
+/** Ekran yazısı (İngilizcede SCREEN_EN karşılığı). */
+const scr = (s: string, locale: Locale): string => (locale === 'en' ? SCREEN_EN[s] ?? s : s)
+
+export function renderFrame(e: OyunEngine, out: Uint8ClampedArray = new Uint8ClampedArray(FRAME_BYTES), locale: Locale = 'tr'): Uint8ClampedArray {
   const cv = new Canvas(out)
   const sh = e.shakeOffset()
   const cx = Math.round(e.camera.x) - sh.x, cy = Math.round(e.camera.y) - sh.y
@@ -39,10 +43,10 @@ export function renderFrame(e: OyunEngine, out: Uint8ClampedArray = new Uint8Cla
   for (const s of order) if (!s.hidden) drawSprite(cv, e, s, cx, cy)
   for (const p of e.particles) cv.rect(Math.round(p.x) - cx, Math.round(p.y) - cy, p.size, p.size, p.color)
   for (const s of order) if (s.speech && !s.hidden) drawBubble(cv, s, cx, cy)
-  drawHud(cv, e)
+  drawHud(cv, e, locale)
   if (e.toast) drawToast(cv, e.toast.text)
-  if (e.state === 'over') drawOver(cv, e)
-  else if (e.paused) drawBanner(cv, 'DURAKLATILDI', 4)
+  if (e.state === 'over') drawOver(cv, e, locale)
+  else if (e.paused) drawBanner(cv, scr('DURAKLATILDI', locale), 4)
   return out
 }
 
@@ -95,8 +99,8 @@ function drawBubble(cv: Canvas, s: SpriteState, cx: number, cy: number): void {
   cv.put(tx, y + h + 1, 0)
 }
 
-function drawHud(cv: Canvas, e: OyunEngine): void {
-  if (e.hud.score) cv.label(`SKOR ${e.score}`, 2, 3)
+function drawHud(cv: Canvas, e: OyunEngine, locale: Locale): void {
+  if (e.hud.score) cv.label(`${scr('SKOR', locale)} ${e.score}`, 2, 3)
   if (e.hud.time && e.countdownMs !== null) {
     const t = `${Math.ceil(e.countdownMs / 1000)}`
     cv.label(t, Math.floor((SCREEN_W - textWidth(t)) / 2), 3, e.countdownMs < 5000 ? 4 : 12)
@@ -128,16 +132,16 @@ function drawBanner(cv: Canvas, text: string, color: number): void {
   cv.text(text, x + 4, 52, color, 2)
 }
 
-function drawOver(cv: Canvas, e: OyunEngine): void {
+function drawOver(cv: Canvas, e: OyunEngine, locale: Locale): void {
   for (let y = 0; y < SCREEN_H; y++) for (let x = (y & 1); x < SCREEN_W; x += 2) cv.put(x, y, 0)
   const win = e.result === 'win'
-  const msg = e.overMessage
+  const msg = scr(e.overMessage, locale)
   const w = Math.min(SCREEN_W - 8, textWidth(msg) * 2 + 12), x = Math.floor((SCREEN_W - w) / 2)
   cv.rect(x, 32, w, 54, 0)
   cv.rect(x, 32, w, 1, win ? 4 : 2); cv.rect(x, 85, w, 1, win ? 4 : 2)
   cv.text(msg, Math.floor((SCREEN_W - textWidth(msg) * 2) / 2), 40, win ? 4 : 2, 2)
-  if (e.hud.score) { const t = `SKOR ${e.score}`; cv.text(t, Math.floor((SCREEN_W - textWidth(t)) / 2), 60, 12) }
-  const hint = 'A: TEKRAR'
+  if (e.hud.score) { const t = `${scr('SKOR', locale)} ${e.score}`; cv.text(t, Math.floor((SCREEN_W - textWidth(t)) / 2), 60, 12) }
+  const hint = scr('A: TEKRAR', locale)
   cv.text(hint, Math.floor((SCREEN_W - textWidth(hint)) / 2), 74, 13)
 }
 

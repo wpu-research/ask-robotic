@@ -2,6 +2,9 @@
 // Her giriş hem Blockly tanımını (blockJson) hem araç kutusunu hem de yorumlayıcının bilmesi gereken şekli üretir.
 // Şekiller: hat (kubbeli başlık) · stmt (yığın) · cap (kapak, altına blok gelmez) · c (C biçimli) · ccap (C + kapak)
 //           ifelse (iki ağızlı C) · val (yuvarlak değer) · bool (altıgen koşul). Bloklar özgün tasarımdır.
+// Görünen metin dile bağlıdır: `locale` 'en' iken blocks-en.ts kullanılır (tür kimlikleri ve alan değerleri aynı kalır).
+import type { Locale } from '@/i18n'
+import { BLOCK_MSG_EN, CATEGORY_LABEL_EN, OPTION_LABEL_EN, SHADOW_TEXT_EN } from './blocks-en'
 
 export type CatKey = 'hareket' | 'gorunum' | 'ses' | 'olaylar' | 'kontrol' | 'algilama' | 'islemler' | 'degiskenler' | 'bloklarim' | 'kalem'
 export interface CategoryDef { key: CatKey; label: string; colour: string; icon: string }
@@ -18,6 +21,11 @@ export const CATEGORIES: readonly CategoryDef[] = [
   { key: 'kalem', label: 'Kalem', colour: '#0fa97d', icon: '✎' },
 ]
 export const CATEGORY_BY_KEY = Object.fromEntries(CATEGORIES.map((c) => [c.key, c])) as Record<CatKey, CategoryDef>
+/** Kategorinin görünen adı (dile göre). */
+export const categoryLabel = (c: CategoryDef, locale: Locale = 'tr'): string => (locale === 'en' ? CATEGORY_LABEL_EN[c.key] ?? c.label : c.label)
+/** Bloğun görünen iletisi (dile göre; yer tutucular aynı). */
+export const blockMsg = (def: BlockDef, locale: Locale = 'tr'): string => (locale === 'en' ? BLOCK_MSG_EN[def.type] ?? def.msg : def.msg)
+const optLabel = (label: string, locale: Locale): string => (locale === 'en' ? OPTION_LABEL_EN[label] ?? label : label)
 
 /** Açılır listesi çalışma zamanında (projeye göre) üretilen alan türleri. */
 export type DynKind = 'costume' | 'backdrop' | 'sound' | 'touch' | 'goto' | 'towards' | 'clone' | 'ofTarget' | 'message'
@@ -272,26 +280,31 @@ export interface BlockJson {
 
 export const styleName = (c: CatKey): string => `sh_${c}`
 
-function argJson(name: string, a: Arg): Record<string, unknown> {
+function argJson(name: string, a: Arg, locale: Locale): Record<string, unknown> {
   switch (a.t) {
     case 'num': case 'txt': case 'any': return { type: 'input_value', name }
     case 'bool': return { type: 'input_value', name, check: 'Boolean' }
-    case 'dd': return { type: 'field_dropdown', name, options: a.opts }
+    case 'dd': return { type: 'field_dropdown', name, options: locale === 'en' ? a.opts.map(([l, v]) => [optLabel(l, locale), v]) : a.opts }
     case 'dyn': return { type: 'field_sh_dyn', name, kind: a.kind }
     case 'var': return { type: 'field_variable', name, variable: '', variableTypes: [''], defaultType: '' }
     case 'list': return { type: 'field_variable', name, variable: '', variableTypes: ['List'], defaultType: 'List' }
   }
 }
 
-export function blockJson(def: BlockDef): BlockJson {
+export function blockJson(def: BlockDef, locale: Locale = 'tr'): BlockJson {
   const names = INPUT_NAMES(def)
   const args0: Record<string, unknown>[] = []
-  let message0 = def.msg
-  names.forEach((n, i) => {
+  const msg = blockMsg(def, locale)
+  // İletideki yer tutucu sırası dile göre değişebilir; %n numarası ileti içindeki sıraya göre verilir.
+  // Türkçede eski sıra (args sırası) korunur.
+  const order = locale === 'tr' ? names : [...msg.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).filter((n) => names.includes(n))
+  for (const n of names) if (!order.includes(n)) order.push(n)
+  let message0 = msg
+  order.forEach((n, i) => {
     message0 = message0.replace(`{${n}}`, `%${i + 1}`)
-    args0.push(argJson(n, def.args[n]))
+    args0.push(argJson(n, def.args[n], locale))
   })
-  const j: BlockJson = { type: def.type, style: styleName(def.cat), message0, args0, tooltip: def.msg.replace(/\{(\w+)\}/g, '…'), inputsInline: true }
+  const j: BlockJson = { type: def.type, style: styleName(def.cat), message0, args0, tooltip: msg.replace(/\{(\w+)\}/g, '…'), inputsInline: true }
   switch (def.shape) {
     case 'hat': j.nextStatement = null; break
     case 'stmt': j.previousStatement = null; j.nextStatement = null; break
@@ -301,7 +314,7 @@ export function blockJson(def: BlockDef): BlockJson {
     case 'ifelse':
       j.previousStatement = null; j.nextStatement = null
       j.message1 = '%1'; j.args1 = [{ type: 'input_statement', name: 'DO' }]
-      j.message2 = 'değilse'; j.args2 = []
+      j.message2 = locale === 'en' ? 'else' : 'değilse'; j.args2 = []
       j.message3 = '%1'; j.args3 = [{ type: 'input_statement', name: 'ELSE' }]
       break
     case 'val': j.output = null; break
@@ -309,19 +322,21 @@ export function blockJson(def: BlockDef): BlockJson {
   }
   return j
 }
-export const BLOCK_JSON: BlockJson[] = BLOCKS.map(blockJson)
+export const BLOCK_JSON: BlockJson[] = BLOCKS.map((d) => blockJson(d))
+/** Belirli bir dil için tüm blok tanımları. */
+export const blockJsonFor = (locale: Locale): BlockJson[] => (locale === 'tr' ? BLOCK_JSON : BLOCKS.map((d) => blockJson(d, locale)))
 
 // ───────── Araç kutusu ─────────
 export interface Shadow { type: string; fields?: Record<string, unknown> }
-export function shadowOf(a: Arg): Shadow | null {
+export function shadowOf(a: Arg, locale: Locale = 'tr'): Shadow | null {
   if (a.t === 'num') return { type: 'math_number', fields: { NUM: a.v } }
-  if (a.t === 'txt') return { type: 'text', fields: { TEXT: a.v } }
+  if (a.t === 'txt') return { type: 'text', fields: { TEXT: locale === 'en' ? SHADOW_TEXT_EN[a.v] ?? a.v : a.v } }
   return null
 }
 
-export function flyoutEntry(def: BlockDef): Record<string, unknown> {
+export function flyoutEntry(def: BlockDef, locale: Locale = 'tr'): Record<string, unknown> {
   const inputs: Record<string, unknown> = {}
-  for (const [n, a] of Object.entries(def.args)) { const s = shadowOf(a); if (s) inputs[n] = { shadow: s } }
+  for (const [n, a] of Object.entries(def.args)) { const s = shadowOf(a, locale); if (s) inputs[n] = { shadow: s } }
   const e: Record<string, unknown> = { kind: 'block', type: def.type }
   if (Object.keys(inputs).length) e.inputs = inputs
   return e
@@ -331,11 +346,11 @@ export const VARS_CALLBACK = 'SAHNE_DEGISKENLER'
 export const PROCS_CALLBACK = 'SAHNE_BLOKLARIM'
 
 /** Blockly araç kutusu JSON'u. `allowed` verilmezse hepsi. Değişkenler ve Bloklarım kategorileri özeldir (özel liste). */
-export function toolboxJson(allowed?: readonly string[]) {
+export function toolboxJson(allowed?: readonly string[], locale: Locale = 'tr') {
   const ok = allowed ? new Set(allowed) : null
   const contents: Record<string, unknown>[] = []
   for (const c of CATEGORIES) {
-    const base = { kind: 'category', name: c.label, categorystyle: `sh_cat_${c.key}`, cssConfig: { icon: `shb-ic-${c.key}` } }
+    const base = { kind: 'category', name: categoryLabel(c, locale), categorystyle: `sh_cat_${c.key}`, cssConfig: { icon: `shb-ic-${c.key}` } }
     if (c.key === 'degiskenler') {
       if (ok && !BLOCK_GROUPS.degiskenler.some((t) => ok.has(t))) continue
       contents.push({ ...base, custom: VARS_CALLBACK })
@@ -350,7 +365,7 @@ export function toolboxJson(allowed?: readonly string[]) {
     for (const b of BLOCKS) {
       if (b.cat !== c.key || (ok && !ok.has(b.type))) continue
       if (b.sep && items.length) items.push({ kind: 'sep', gap: 22 })
-      items.push(flyoutEntry(b))
+      items.push(flyoutEntry(b, locale))
     }
     if (!items.length) continue
     contents.push({ ...base, contents: items })

@@ -4,6 +4,9 @@ export type Mark = 'ok' | 'celisir' | 'yok'
 export const MARK_LABEL: Record<Mark, string> = { ok: 'Kaynakla uyumlu', celisir: 'Kaynakla çelişiyor', yok: 'Kaynakta yok' }
 export interface Claim { id: string; text: string; key: Mark; why: string }
 export interface DetSet { id: string; title: string; kind: 'metin' | 'kod'; source: string; claims: Claim[] }
+/** Bir vakanın İngilizcesi: aynı iddia kimlikleri ve doğru cevaplar; yalnız metinler çevrilir. */
+export interface DetSetEn { title: string; source: string; claims: Record<string, { text: string; why: string }> }
+export const MARK_LABEL_EN: Record<Mark, string> = { ok: 'Matches the source', celisir: 'Contradicts the source', yok: 'Not in the source' }
 
 export const SETS: Record<string, DetSet> = {
   sensor: {
@@ -55,4 +58,48 @@ export function scoreMarks(setId: string, marks: Record<string, Mark | undefined
   const marked = set.claims.filter((c) => marks[c.id]).length
   const wrong = set.claims.filter((c) => marks[c.id] && marks[c.id] !== c.key).map((c) => c.id)
   return { total: set.claims.length, marked, correct: marked - wrong.length, wrong }
+}
+
+/** SETS'in İngilizce metinleri (serbest atölye, site dili İngilizceyken). */
+export const SETS_EN: Record<string, DetSetEn> = {
+  sensor: {
+    title: 'Ultrasonic sensor note',
+    source: 'An ultrasonic sensor sends out a sound wave and measures the time it takes for the echo to come back. The longer the time, the farther away the object is. This sensor works well for distances up to about two metres. Soft and slanted surfaces can weaken the echo, so the measurement may be wrong. Because the sensor uses sound, not light, it also works in the dark.',
+    claims: {
+      c1: { text: 'The sensor sends a sound wave and measures how long the echo takes to return.', why: 'The first sentence of the source.' },
+      c2: { text: 'The longer the echo takes to return, the closer the object is.', why: 'The source says the opposite: the longer the time, the farther the object.' },
+      c3: { text: 'The sensor works well up to about two metres.', why: 'Stated in the source.' },
+      c4: { text: 'The sensor also measures objects ten metres away precisely.', why: 'The source says about two metres.' },
+      c5: { text: 'Because it uses sound, it also works in the dark.', why: 'The last sentence of the source.' },
+      c6: { text: 'The sensor measures with infrared light.', why: 'The source says "sound, not light".' },
+      c7: { text: 'A Japanese engineer first developed this sensor in 1998.', why: 'The source says nothing like this: an invented detail.' },
+      c8: { text: 'Soft surfaces can spoil the measurement.', why: 'Stated in the source.' },
+    },
+  },
+  kulup: {
+    title: 'Club announcement (fictional)',
+    source: 'The Online Robotics Club meets every Tuesday evening at 19.00. Meetings last one hour. No registration is needed to join. Groups have at most four people. The project deadline is the last Friday of every month. Mentors answer help requests within two days at the latest.',
+    claims: {
+      k1: { text: 'The club meets every Tuesday evening at 19.00.', why: 'Stated in the source.' },
+      k2: { text: 'Meetings last two hours.', why: 'The source says one hour.' },
+      k3: { text: 'Registration is required to join.', why: 'The source says "no registration is needed".' },
+      k4: { text: 'Groups have at most four people.', why: 'Stated in the source.' },
+      k5: { text: 'Members pay a monthly fee to join the club.', why: 'A fee is never mentioned.' },
+      k6: { text: 'Projects are due on the last Friday of each month.', why: 'Stated in the source.' },
+      k7: { text: 'Mentors answer help requests within two days.', why: 'Consistent with "within two days at the latest".' },
+    },
+  },
+  kod: {
+    title: 'Code explanation (code review)',
+    source: 'def average(numbers):\n    total = 0\n    for x in numbers:\n        total += x\n    return total / len(numbers)\n\nprint(average([4, 8, 6]))',
+    claims: {
+      p1: { text: 'The function calculates the average of the numbers in the list.', why: 'It divides the total by the number of items.' },
+      p2: { text: 'The program prints 6.0.', why: '(4+8+6)/3 = 6.0; in Python 3 division gives a decimal.' },
+      p3: { text: 'The program prints 18.', why: '18 is the total; the function divides by 3 and returns 6.0.' },
+      p4: { text: 'If the list is empty, the function returns 0.', why: 'len([]) = 0, so a division-by-zero error (ZeroDivisionError) occurs.' },
+      p5: { text: 'The function sorts the input list from smallest to largest.', why: 'There is no sorting in the code; the list is never changed.' },
+      p6: { text: 'The function saves the result to a file.', why: 'There is no file operation in the code.' },
+      p7: { text: 'The for loop adds each number to the total variable.', why: 'The `total += x` line.' },
+    },
+  },
 }

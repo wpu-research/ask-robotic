@@ -3,7 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 import type * as BlocklyNS from 'blockly'
 import { MESSAGES_TR } from '@/lib/mikro/messages'
-import { BLOCK_BY_TYPE, BLOCK_JSON, CATEGORIES, shade, styleName, toolboxJson } from '@/lib/mikro/blocks'
+import { MESSAGES_EN } from '@/lib/mikro/en'
+import { BLOCK_BY_TYPE, CATEGORIES, blockJsonFor, shade, styleName, toolboxJson } from '@/lib/mikro/blocks'
+import { useI18n } from '@/i18n/client'
+import type { Locale } from '@/i18n'
 import type { RobotProfile } from '@/lib/mikro/robot'
 import type { WorkspaceState } from '@/lib/mikro/types'
 import { askText } from './dialogs'
@@ -26,10 +29,19 @@ export interface BlocklyPaneProps {
   robot?: RobotProfile | null
 }
 
-let defined = false
-function defineOnce(Blockly: B) {
-  if (defined) return
-  defined = true
+let fieldRegistered = false
+let definedLocale: Locale | null = null
+/** Alan türü bir kez kaydedilir; blok tanımları dil değişince o dilin yazılarıyla yeniden tanımlanır (tür adları aynı). */
+function defineFor(Blockly: B, locale: Locale) {
+  if (!fieldRegistered) { fieldRegistered = true; registerLedField(Blockly) }
+  if (definedLocale === locale) return
+  const json = blockJsonFor(locale)
+  if (definedLocale) for (const j of json) delete (Blockly.Blocks as Record<string, unknown>)[j.type]
+  definedLocale = locale
+  Blockly.defineBlocksWithJsonArray(json as unknown as object[])
+}
+
+function registerLedField(Blockly: B) {
 
   // 5x5 LED deseni alanı: 25 karakterlik '0'/'1' dizisi; kutulara tıklayarak yakılır/söndürülür.
   const CELL = 13, GAP = 3
@@ -76,7 +88,6 @@ function defineOnce(Blockly: B) {
     getText_(): string { return '' }
   }
   Blockly.fieldRegistry.register('field_mk_leds', FieldLeds as unknown as Parameters<typeof Blockly.fieldRegistry.register>[1])
-  Blockly.defineBlocksWithJsonArray(BLOCK_JSON as unknown as object[])
 }
 
 const BUILTIN_STYLE: Record<string, string> = {
@@ -135,6 +146,8 @@ function showTopLeft(ws: BlocklyNS.WorkspaceSvg) {
 const isHatLike = (type: string) => BLOCK_BY_TYPE[type]?.kind === 'hat' || type === 'procedures_defnoreturn' || type === 'procedures_defreturn'
 
 export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, activeHatIds, errorBlockId, robot }: BlocklyPaneProps) {
+  const { locale, t } = useI18n()
+  const tRef = useRef(t); tRef.current = t
   const host = useRef<HTMLDivElement>(null)
   const wsRef = useRef<BlocklyNS.WorkspaceSvg | null>(null)
   const blocklyRef = useRef<B | null>(null)
@@ -171,19 +184,19 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
     ;(async () => {
       try {
         const Blockly = await import('blockly')
-        const Tr = await import('blockly/msg/tr').catch(() => null)
+        const Msg = await (locale === 'en' ? import('blockly/msg/en') : import('blockly/msg/tr')).catch(() => null)
         if (disposed || !host.current) return
-        if (Tr) Blockly.setLocale(Tr as unknown as Parameters<typeof Blockly.setLocale>[0])
-        Object.assign(Blockly.Msg, MESSAGES_TR)
-        defineOnce(Blockly)
-        Blockly.dialog.setPrompt((message, defaultValue, callback) => askText(message, defaultValue, callback))
+        if (Msg) Blockly.setLocale(Msg as unknown as Parameters<typeof Blockly.setLocale>[0])
+        Object.assign(Blockly.Msg, locale === 'en' ? MESSAGES_EN : MESSAGES_TR)
+        defineFor(Blockly, locale)
+        Blockly.dialog.setPrompt((message, defaultValue, callback) => askText(message, defaultValue, callback, { ok: tRef.current('mikro.dialog.ok'), cancel: tRef.current('mikro.dialog.cancel') }))
         Blockly.dialog.setConfirm((message, callback) => callback(window.confirm(message)))
         Blockly.dialog.setAlert((message, callback) => { window.alert(message); callback?.() })
         blocklyRef.current = Blockly
         ws = Blockly.inject(host.current, {
           renderer: 'zelos',
           theme: makeTheme(Blockly),
-          toolbox: toolboxJson(cb.current.allowedBlocks, cb.current.robot) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: toolboxJson(cb.current.allowedBlocks, cb.current.robot, locale) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
           media: '/blockly/media/',
           sounds: false,
           grid: { spacing: 0, length: 0, colour: '#0000', snap: false },
@@ -231,9 +244,10 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
       ro?.disconnect()
       ws?.dispose()
       wsRef.current = null
+      lastSig.current = null // dil değişip yeniden kurulunca proje yeniden yüklensin
       setReady(false)
     }
-  }, [])
+  }, [locale])
 
   // ---- dışarıdan gelen proje / sıfırlama ----
   useEffect(() => {
@@ -265,8 +279,8 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
   const allowSig = `${(allowedBlocks ?? ['*']).join(',')}|${robot?.id ?? ''}`
   useEffect(() => {
     if (!ready || !wsRef.current) return
-    wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks, cb.current.robot) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
-  }, [allowSig, ready])
+    wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks, cb.current.robot, locale) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
+  }, [allowSig, ready, locale])
 
   const glowSig = (activeHatIds ?? []).join(',')
   useEffect(() => { decorate() }, [glowSig, ready])
@@ -287,8 +301,8 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
     <div className="mkb-ws" data-blockly-ready={ready} data-testid="mikro-blockly">
       <style>{iconCss()}</style>
       <div ref={host} className="mkb-host" />
-      {ready && empty && <div className="mkb-hint" aria-hidden="true">Soldan bir <b>başlık</b> bloğu seç ve buraya sürükle</div>}
-      {failed && <p className="mkb-fail" role="alert">Blok editörü yüklenemedi. Sayfayı yenile.</p>}
+      {ready && empty && <div className="mkb-hint" aria-hidden="true">{t('mikro.blockly.hintBefore')}<b>{t('mikro.blockly.hintHat')}</b>{t('mikro.blockly.hintAfter')}</div>}
+      {failed && <p className="mkb-fail" role="alert">{t('mikro.blockly.failed')}</p>}
     </div>
   )
 }

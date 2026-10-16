@@ -4,14 +4,15 @@ import { getCatalogModule } from '@/lib/catalog'
 import { getDb } from '@/lib/db'
 import { getModuleTree } from '@/lib/content'
 import { ModuleView } from '@/components/module/module-view'
-import { getT } from '@/i18n/server'
+import { getLocale, getT } from '@/i18n/server'
+import { moduleTitle } from '@/lib/catalog-en'
 
 export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params
   const m = await getCatalogModule(getDb(), slug).catch(() => null)
-  return { title: m?.title ?? (await getT())('moduleView.metaModule') }
+  return { title: m ? moduleTitle(m.slug, m.title, await getLocale()) : (await getT())('moduleView.metaModule') }
 }
 
 export default async function ModulSayfasi({ params }: { params: Promise<{ slug: string }> }) {

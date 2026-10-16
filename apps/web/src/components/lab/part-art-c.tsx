@@ -2,6 +2,7 @@
 // Her çizim PartRuntime alanlarına göre canlı durum gösterir; çalışma zamanı yoksa (palet simgesi, durdurulmuş) özelliklerden (props) çizer.
 import type { PartInstance, PartRuntime, PartType } from '@/lib/lab/contract'
 import { PART_DEFS } from '@/lib/lab/geometry'
+import { Tx } from './tx'
 
 export const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
 export const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v))
@@ -96,7 +97,7 @@ function Hcsr04Art(c: Ctx) {
       <rect x={52} y={14} width={16} height={7} rx={3} fill="#cbd5e1" stroke="#64748b" strokeWidth={0.7} />
       <Chip x={52} y={26} w={16} h={8} />
       <text x={60} y={44} textAnchor="middle" fontSize={6} fontWeight={800} fill="#dbeafe">HC-SR04</text>
-      <text x={60} y={52} textAnchor="middle" fontSize={5} fontFamily={MONO} fill={active ? '#bbf7d0' : '#93c5fd'}>{powered ? (inRange ? `${fmt(num(h?.distanceCm, 0), 0)} cm` : 'menzil dışı') : '—'}</text>
+      <text x={60} y={52} textAnchor="middle" fontSize={5} fontFamily={MONO} fill={active ? '#bbf7d0' : '#93c5fd'}>{powered ? (inRange ? `${fmt(num(h?.distanceCm, 0), 0)} cm` : <Tx k="lab.art.outOfRange" />) : '—'}</text>
       <Pads type="hcsr04" />
     </g>
   )
@@ -408,7 +409,7 @@ function FlameArt(c: Ctx) {
           <path d="M62 16 C66 21 66 26 63 29 C60 29 58 26 59 23 C60 20 62 19 62 16 Z" fill="#fde047" />
         </g>
       )}
-      <text x={38} y={52} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">ALEV</text>
+      <text x={38} y={52} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe"><Tx k="lab.art.flame" /></text>
       <Trimmer x={62} y={60} /><Chip x={22} y={58} w={20} h={6} text="LM393" />
       <ModuleLeds y={60} powered={powered} doLow={doLow} />
       <Pads type="flame" />
@@ -429,7 +430,7 @@ function SoundArt(c: Ctx) {
       {/* ses dalgaları */}
       {level > 0.03 && [18, 23, 28].map((r, k) => <path key={r} d={`M${24 + r * 0.6} ${26 - r * 0.6} A${r} ${r} 0 0 1 ${24 + r * 0.6} ${26 + r * 0.6}`} fill="none" stroke="#7dd3fc" strokeWidth={1.6} strokeLinecap="round" opacity={clamp01(level * 1.4 - k * 0.25)} data-sound-wave />)}
       <Trimmer x={58} y={30} />
-      <text x={38} y={52} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">SES</text>
+      <text x={38} y={52} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe"><Tx k="lab.art.sound" /></text>
       <Chip x={44} y={58} w={20} h={6} text="LM393" />
       <ModuleLeds y={62} powered={powered} doLow={doLow} />
       <Pads type="sound" />
@@ -449,7 +450,7 @@ function SoilArt(c: Ctx) {
       {level > 0.4 && [0, 1, 2].map((k) => <circle key={k} cx={30 + k * 8} cy={78 - fillH / 2 - (k % 2) * 6} r={1.6} fill="#e0f2fe" opacity={0.7} />)}
       <rect x={0} y={78} width={76} height={58} rx={5} fill="#1d4ed8" stroke="#1e3a8a" strokeWidth={1.6} />
       <rect x={2.5} y={80.5} width={71} height={53} rx={4} fill="none" stroke="#60a5fa" strokeWidth={0.7} opacity={0.6} />
-      <text x={38} y={90} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">TOPRAK NEMİ</text>
+      <text x={38} y={90} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe"><Tx k="lab.art.soil" /></text>
       <Trimmer x={62} y={104} /><Chip x={22} y={102} w={20} h={6} text="LM393" />
       <ModuleLeds y={104} powered={powered} doLow={doLow} />
       <Pads type="soil" />
@@ -473,7 +474,7 @@ function RainArt(c: Ctx) {
       ))}
       <rect x={0} y={72} width={76} height={64} rx={5} fill="#1d4ed8" stroke="#1e3a8a" strokeWidth={1.6} />
       <rect x={2.5} y={74.5} width={71} height={59} rx={4} fill="none" stroke="#60a5fa" strokeWidth={0.7} opacity={0.6} />
-      <text x={38} y={85} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">YAĞMUR</text>
+      <text x={38} y={85} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe"><Tx k="lab.art.rain" /></text>
       <Trimmer x={62} y={104} /><Chip x={22} y={102} w={20} h={6} text="LM393" />
       <ModuleLeds y={104} powered={powered} doLow={doLow} />
       <Pads type="rain" />
@@ -493,7 +494,7 @@ function WaterLevelArt(c: Ctx) {
       {fillH > 3 && <path d={`M21 ${78 - fillH} q4 -2.4 8.5 0 t8.5 0 t8.5 0 t8.5 0`} fill="none" stroke="#e0f2fe" strokeWidth={1} opacity={0.9} />}
       <rect x={0} y={78} width={76} height={58} rx={5} fill="#1d4ed8" stroke="#1e3a8a" strokeWidth={1.6} />
       <rect x={2.5} y={80.5} width={71} height={53} rx={4} fill="none" stroke="#60a5fa" strokeWidth={0.7} opacity={0.6} />
-      <text x={38} y={90} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe">SU SEVİYESİ</text>
+      <text x={38} y={90} textAnchor="middle" fontSize={5.4} fontWeight={800} fill="#dbeafe"><Tx k="lab.art.water" /></text>
       <Trimmer x={62} y={104} /><Chip x={22} y={102} w={20} h={6} text="LM393" />
       <ModuleLeds y={104} powered={powered} doLow={doLow} />
       <Pads type="waterlevel" />

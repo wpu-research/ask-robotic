@@ -1,8 +1,9 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { PartType } from '@/lib/lab/contract'
-import { PART_DEFS } from '@/lib/lab/geometry'
-import { pickerGroups, SHORT_NAME } from '@/lib/lab/parts'
+import { pickerGroups } from '@/lib/lab/parts'
+import { partName, partShortName } from '@/lib/lab/text'
+import { useLocale, useT } from '@/i18n/client'
 import { PartIcon } from './part-art'
 
 interface Props {
@@ -15,6 +16,8 @@ interface Props {
 }
 
 export function PartPicker({ types, disabled, onDrop, onAdd }: Props) {
+  const t = useT()
+  const locale = useLocale()
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const [ghost, setGhost] = useState<{ type: PartType; x: number; y: number } | null>(null)
@@ -54,34 +57,34 @@ export function PartPicker({ types, disabled, onDrop, onAdd }: Props) {
     return () => { document.removeEventListener('pointerdown', onDoc); document.removeEventListener('keydown', onKey) }
   }, [open])
 
-  const groups = useMemo(() => pickerGroups(types, q), [q, types])
+  const groups = useMemo(() => pickerGroups(types, q, locale === 'tr' ? undefined : (ty) => `${partName(t, ty)} ${partShortName(t, ty)}`), [q, types, locale, t])
 
   return (
     <div className="lab-picker" ref={root}>
-      <button type="button" className="lab-addbtn" data-testid="lab-add" aria-expanded={open} aria-haspopup="dialog" disabled={disabled} onClick={() => setOpen((o) => !o)} title="Parça ekle">
-        <span aria-hidden="true">＋</span> Parça ekle
+      <button type="button" className="lab-addbtn" data-testid="lab-add" aria-expanded={open} aria-haspopup="dialog" disabled={disabled} onClick={() => setOpen((o) => !o)} title={t('lab.picker.add')}>
+        <span aria-hidden="true">＋</span> {t('lab.picker.add')}
       </button>
       {open && (
-        <div className={`lab-picker-panel${ghost ? ' dragging' : ''}`} role="dialog" aria-label="Parça seçici">
+        <div className={`lab-picker-panel${ghost ? ' dragging' : ''}`} role="dialog" aria-label={t('lab.picker.dialog')}>
           <input
             type="search" className="lab-picker-search" value={q} onChange={(e) => setQ(e.target.value)} autoFocus
-            placeholder="Parça ara…" aria-label="Parça ara"
+            placeholder={t('lab.picker.search')} aria-label={t('lab.picker.searchAria')}
           />
           <div className="lab-picker-list">
-            {groups.length === 0 && <p className="lab-hint">Eşleşen parça yok.</p>}
+            {groups.length === 0 && <p className="lab-hint">{t('lab.picker.none')}</p>}
             {groups.map((g) => (
-              <div key={g.title} className="lab-picker-group">
-                <h4>{g.title}</h4>
+              <div key={g.key} className="lab-picker-group">
+                <h4>{t(`lab.picker.cat.${g.key}`)}</h4>
                 <div className="lab-picker-items">
-                  {g.types.map((t) => (
+                  {g.types.map((pt) => (
                     <button
-                      key={t} type="button" className="lab-pitem" data-palette={t}
-                      aria-label={`${PART_DEFS[t].name} ekle`} title={`${PART_DEFS[t].name}: sürükleyip bırak ya da tıkla`}
-                      onPointerDown={(e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; drag.current = { type: t, sx: e.clientX, sy: e.clientY, active: false } }}
-                      onClick={(e) => { if (e.detail === 0) { onAdd(t); setOpen(false) } }}
+                      key={pt} type="button" className="lab-pitem" data-palette={pt}
+                      aria-label={t('lab.picker.addItem', { name: partName(t, pt) })} title={t('lab.picker.itemTitle', { name: partName(t, pt) })}
+                      onPointerDown={(e) => { if (e.pointerType === 'mouse' && e.button !== 0) return; drag.current = { type: pt, sx: e.clientX, sy: e.clientY, active: false } }}
+                      onClick={(e) => { if (e.detail === 0) { onAdd(pt); setOpen(false) } }}
                     >
-                      <PartIcon type={t} size={36} />
-                      <span>{SHORT_NAME[t] ?? PART_DEFS[t].name}</span>
+                      <PartIcon type={pt} size={36} />
+                      <span>{partShortName(t, pt)}</span>
                     </button>
                   ))}
                 </div>

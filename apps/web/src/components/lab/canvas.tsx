@@ -6,6 +6,9 @@ import { addWire, canAddWire, formatOhms, movePart, removePart, removeWire, rota
 import { formatPinBalloon } from '@/lib/lab/measure'
 import { layoutCanvasLabels } from '@/lib/lab/label-layout'
 import { PartArt } from './part-art'
+import { partName } from '@/lib/lab/text'
+import type { MessageKey } from '@/i18n'
+import { useLocale, useT } from '@/i18n/client'
 
 export type Selection = { kind: 'part'; id: string } | { kind: 'wire'; id: string } | null
 
@@ -43,9 +46,12 @@ type Gesture =
 
 const K_MIN = 0.3, K_MAX = 2.6
 
-const partLabel = (type: string, id: string) => `${PART_DEFS[type as keyof typeof PART_DEFS]?.name ?? type} (${id})`
 
 export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, selection, onSelect, warnParts, onPress, fitKey, apiRef, height, onNotice }: Props) {
+  const t = useT()
+  const locale = useLocale()
+  const tRef = useRef(t); tRef.current = t
+  const partLabel = (type: string, id: string) => `${type in PART_DEFS ? partName(t, type as keyof typeof PART_DEFS) : type} (${id})`
   const svgRef = useRef<SVGSVGElement>(null)
   const [view, setView] = useState({ tx: 8, ty: 8, k: 1 })
   const viewRef = useRef(view)
@@ -136,7 +142,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     const wireEl = t.closest('[data-wire]') as SVGElement | null
     const w = toWorld(e.clientX, e.clientY)!
     if (pinEl) {
-      if (editLocked) { onNotice?.('Benzetim çalışırken kablo çizemezsin. Önce Dur\'a bas.'); return }
+      if (editLocked) { onNotice?.(tRef.current('lab.canvas.noWire')); return }
       const from = { part: pinEl.dataset.pinPart!, pin: pinEl.dataset.pinName! }
       gesture.current = { kind: 'wire', from }
       setDraft({ from, x: w.x, y: w.y, target: null })
@@ -203,7 +209,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
       const to = pinAt(e.clientX, e.clientY)
       if (!to) return
       const chk = canAddWire(circuitRef.current, g.from, to)
-      if (!chk.ok) { if (to.part !== g.from.part || to.pin !== g.from.pin) onNotice?.(chk.reason); return }
+      if (!chk.ok) { if (to.part !== g.from.part || to.pin !== g.from.pin) onNotice?.(tRef.current(`lab.canvas.wireErr.${chk.code}` as MessageKey)); return }
       const r = addWire(circuitRef.current, g.from, to)
       if (r) { onChange(r.circuit); onSelect({ kind: 'wire', id: r.wire.id }) }
     } else if (g.kind === 'press') {
@@ -215,7 +221,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     if (!selection) return
     const c = circuitRef.current
     if (e.key === 'Delete' || e.key === 'Backspace') {
-      if (editLocked) { onNotice?.('Benzetim çalışırken silemezsin. Önce Dur\'a bas.'); return }
+      if (editLocked) { onNotice?.(tRef.current('lab.canvas.noDelete')); return }
       if (selection.kind === 'wire') { onChange(removeWire(c, selection.id)); onSelect(null); e.preventDefault() }
       else if (!lockedIds.has(selection.id)) { onChange(removePart(c, selection.id)); onSelect(null); e.preventDefault() }
       return
@@ -249,9 +255,9 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     const n = (k: string, d: number) => (typeof p.props[k] === 'number' ? (p.props[k] as number) : d)
     switch (p.type) {
       case 'resistor': return formatOhms(n('ohms', 330))
-      case 'pot': return `%${Math.round(n('position', 0.5) * 100)}`
+      case 'pot': return t('lab.canvas.pct', { p: Math.round(n('position', 0.5) * 100) })
       case 'ntc': return `${n('tempC', 25)} °C`
-      case 'ldr': return `ışık %${Math.round(n('light', 0.5) * 100)}`
+      case 'ldr': return t('lab.canvas.light', { p: Math.round(n('light', 0.5) * 100) })
       case 'uno': return null
       default: return null
     }
@@ -264,13 +270,13 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     for (const p of circuit.parts) { const t = caption(p.id); if (t) caps.set(p.id, t) }
     return layoutCanvasLabels(circuit.parts, caps, labelFs)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [circuit.parts, labelFs])
+  }, [circuit.parts, labelFs, t])
 
   return (
     <div className="lab-canvas-wrap" style={{ height: `clamp(320px, 75vw, ${height}px)` }}>
       <svg
         ref={svgRef} className="lab-canvas" data-testid="lab-canvas" tabIndex={0} role="application"
-        aria-label="Devre tuvali. Parçaları sürükleyip taşı, pinlerden kablo çek. Seçili parçayı ok tuşlarıyla taşı, R ile döndür, Delete ile sil."
+        aria-label={t('lab.canvas.aria')}
         onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endPointer} onPointerCancel={(e) => endPointer(e, true)}
         onKeyDown={onKeyDown}
       >
@@ -292,7 +298,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
               const sel = selection?.kind === 'wire' && selection.id === w.id
               const col = w.color ?? '#3b82f6'
               return (
-                <g key={w.id} data-wire={w.id} data-color={col} role="button" aria-label={`Kablo: ${w.a.part} ${w.a.pin} ile ${w.b.part} ${w.b.pin} arası${sel ? ' (seçili)' : ''}`} className={sel ? 'lab-wire sel' : 'lab-wire'}>
+                <g key={w.id} data-wire={w.id} data-color={col} role="button" aria-label={t(sel ? 'lab.canvas.wireSelected' : 'lab.canvas.wire', { a: w.a.part, ap: w.a.pin, b: w.b.part, bp: w.b.pin })} className={sel ? 'lab-wire sel' : 'lab-wire'}>
                   <path d={d} fill="none" stroke="transparent" strokeWidth={14} strokeLinecap="round" />
                   {sel && <path d={d} fill="none" stroke="var(--primary)" strokeOpacity={0.4} strokeWidth={11} strokeLinecap="round" />}
                   <path d={d} fill="none" stroke="#fff" strokeOpacity={0.35} strokeWidth={(sel ? 6.6 : 4.6) + 1.6} strokeLinecap="round" pointerEvents="none" />
@@ -311,7 +317,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
               return (
                 <g
                   key={p.id} data-part={p.id} data-type={p.type} tabIndex={0} role="button"
-                  aria-label={`${partLabel(p.type, p.id)}${lockedIds.has(p.id) ? ', kilitli' : ''}${sel ? ', seçili' : ''}`}
+                  aria-label={`${partLabel(p.type, p.id)}${lockedIds.has(p.id) ? t('lab.canvas.lockedSuffix') : ''}${sel ? t('lab.canvas.selectedSuffix') : ''}`}
                   className={`lab-part${sel ? ' sel' : ''}${lockedIds.has(p.id) ? ' locked' : ''}`}
                   transform={`translate(${p.x} ${p.y}) rotate(${p.rotation} ${d.w / 2} ${d.h / 2})`}
                   onFocus={() => { if (!sel) onSelect({ kind: 'part', id: p.id }) }}
@@ -366,7 +372,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
             const snap = runtime?.pins[hoverPin.pin]
             const pt = pinPos(hoverPin)
             if (!snap || !pt) return null
-            const text = formatPinBalloon(hoverPin.pin, snap)
+            const text = formatPinBalloon(hoverPin.pin, snap, locale, t(`lab.canvas.pinMode.${snap.mode}`))
             const bw = text.length * 5.6 + 14
             const below = pt.y < 40
             const by = below ? pt.y + 14 : pt.y - 34
@@ -395,11 +401,11 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
           })()}
         </g>
       </svg>
-      <div className="lab-zoom" role="group" aria-label="Yakınlaştırma">
-        <button type="button" className="lab-zbtn" onClick={() => zoomAt(1.25)} aria-label="Yakınlaştır">+</button>
-        <button type="button" className="lab-zbtn" onClick={() => zoomAt(0.8)} aria-label="Uzaklaştır">−</button>
-        <button type="button" className="lab-zbtn" onClick={fit} aria-label="Sığdır" title="Sığdır">⤢</button>
-        <button type="button" className="lab-zbtn" onClick={() => zoomAt(1 / viewRef.current.k)} aria-label="Gerçek boyut (%100)" title="Gerçek boyut (%100): bacak adları okunur" data-testid="lab-zoom-100">1:1</button>
+      <div className="lab-zoom" role="group" aria-label={t('lab.canvas.zoom')}>
+        <button type="button" className="lab-zbtn" onClick={() => zoomAt(1.25)} aria-label={t('lab.canvas.zoomIn')}>+</button>
+        <button type="button" className="lab-zbtn" onClick={() => zoomAt(0.8)} aria-label={t('lab.canvas.zoomOut')}>−</button>
+        <button type="button" className="lab-zbtn" onClick={fit} aria-label={t('lab.canvas.fit')} title={t('lab.canvas.fit')}>⤢</button>
+        <button type="button" className="lab-zbtn" onClick={() => zoomAt(1 / viewRef.current.k)} aria-label={t('lab.canvas.actual')} title={t('lab.canvas.actualTitle')} data-testid="lab-zoom-100">1:1</button>
       </div>
     </div>
   )

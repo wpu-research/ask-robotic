@@ -27,3 +27,19 @@ export function runInWorker(code: string, data: PondData, seed = 1, timeoutMs = 
     worker.postMessage(req)
   })
 }
+
+/** Gölet JavaScript kipi hata iletilerinin İngilizcesi (bilinmeyenler olduğu gibi döner). */
+export function goletErrorEn(msg: string): string {
+  const fixed: Record<string, string> = {
+    'Bu tarayıcıda kod çalıştırılamıyor (Web Worker yok).': "Code can't run in this browser (no Web Worker).",
+    'Kodun çok uzun sürdü. Sonsuz bir döngü olabilir mi? ("while (true)" yazma: kod zaten her tikte tekrar çalışır.)': 'Your code took too long. Could there be an endless loop? (Don\'t write "while (true)": the code already runs again every tick.)',
+    'Maç çalıştırılamadı.': "The match couldn't be run.",
+    'Kod çalışırken hata oluştu.': 'Something went wrong while the code was running.',
+  }
+  if (fixed[msg]) return fixed[msg]
+  let m = /^Kodda yazım hatası: ([\s\S]*)$/.exec(msg)
+  if (m) return `Syntax error in your code: ${m[1]}`
+  m = /^Kodun (\d+)\. tikte hata verdi: ([\s\S]*)$/.exec(msg)
+  if (m) return `Your code failed on tick ${m[1]}: ${m[2]}`
+  return msg
+}

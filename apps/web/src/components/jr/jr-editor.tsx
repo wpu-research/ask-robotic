@@ -1,7 +1,8 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { evaluateGoals, type Goal } from '@/lib/jr/analysis'
-import { ALL_BLOCK_TYPES, BACKGROUNDS, CHARACTERS } from '@/lib/jr/blocks'
+import { ALL_BLOCK_TYPES, BACKGROUNDS, CHARACTERS, backgroundLabel, characterLabel } from '@/lib/jr/blocks'
+import { useLocale, useT } from '@/i18n/client'
 import { Engine } from '@/lib/jr/engine'
 import { addPageTo, addSpriteTo, editScripts, removePageAt, removeSpriteFrom, setBackground } from '@/lib/jr/project-edit'
 import { isMuted, playSound, setMuted } from '@/lib/jr/sound'
@@ -48,6 +49,8 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
   const [addOpen, setAddOpen] = useState(false)
   const [muted, setMutedState] = useState(false)
   const [loaded, setLoaded] = useState(!storageKey)
+  const t = useT()
+  const locale = useLocale()
 
   const engine = useRef<Engine | null>(null)
   if (!engine.current) engine.current = new Engine(initial, { onSound: playSound })
@@ -144,7 +147,7 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
 
   const stagePage = ran && snap ? project.pages[snap.pageIndex] ?? page : page
   const resetProject = () => {
-    if (!window.confirm('Projeyi başlangıç haline döndürmek istiyor musun? Yaptıkların silinir.')) return
+    if (!window.confirm(t('studios.jr.resetConfirm'))) return
     if (storageKey) { try { localStorage.removeItem(storageKey) } catch { /* yoksay */ } }
     setProject(initial); setPageIndex(0); setSpriteId(initial.pages[0]?.sprites[0]?.id ?? null)
   }
@@ -159,11 +162,11 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
     <div className="jrb" data-jr data-running={running}>
       <div className="jrb-stagecol">
         <div className="jrb-bar">
-          <button type="button" className="jrb-flag" onClick={start} aria-label="Başlat (yeşil bayrak)" data-action="start" title="Başlat"><span aria-hidden="true">🏁</span><b>Başlat</b></button>
-          <button type="button" className="jrb-stop" onClick={stop} disabled={!running} aria-label="Dur" data-action="stop" title="Dur"><span aria-hidden="true">⏹</span><b>Dur</b></button>
+          <button type="button" className="jrb-flag" onClick={start} aria-label={t('studios.jr.toolbar.startAria')} data-action="start" title={t('studios.jr.toolbar.start')}><span aria-hidden="true">🏁</span><b>{t('studios.jr.toolbar.start')}</b></button>
+          <button type="button" className="jrb-stop" onClick={stop} disabled={!running} aria-label={t('studios.jr.toolbar.stop')} data-action="stop" title={t('studios.jr.toolbar.stop')}><span aria-hidden="true">⏹</span><b>{t('studios.jr.toolbar.stop')}</b></button>
           <span className="jrb-spacer" />
-          <button type="button" className="jr-btn" onClick={resetRun} disabled={!ran} data-action="reset">↺ Başa al</button>
-          <button type="button" className="jr-btn icon" aria-label={muted ? 'Sesi aç' : 'Sesi kapat'} onClick={() => { setMuted(!isMuted()); setMutedState(isMuted()) }}>{muted ? '🔇' : '🔊'}</button>
+          <button type="button" className="jr-btn" onClick={resetRun} disabled={!ran} data-action="reset">{t('studios.jr.toolbar.reset')}</button>
+          <button type="button" className="jr-btn icon" aria-label={muted ? t('studios.jr.toolbar.unmute') : t('studios.jr.toolbar.mute')} onClick={() => { setMuted(!isMuted()); setMutedState(isMuted()) }}>{muted ? '🔇' : '🔊'}</button>
         </div>
         <Stage
           page={stagePage}
@@ -174,13 +177,13 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
           onTap={tapSprite}
         />
         {sprite && info && (
-          <div className="jrb-info" aria-label="Karakter bilgisi" data-testid="jr-info">
-            <span className="jrb-info-name">{CHARACTERS[sprite.character]?.glyph} <b>{CHARACTERS[sprite.character]?.label}</b></span>
+          <div className="jrb-info" aria-label={t('studios.jr.info.aria')} data-testid="jr-info">
+            <span className="jrb-info-name">{CHARACTERS[sprite.character]?.glyph} <b>{characterLabel(sprite.character, locale)}</b></span>
             <span>x <b>{Math.round(info.x)}</b></span>
             <span>y <b>{Math.round(info.y)}</b></span>
-            <span>boyut <b>{Math.round(info.scale * 100)}%</b></span>
-            <span>yön <b>{Math.round(info.heading)}°</b></span>
-            <span className="jrb-info-vis" data-visible={info.visible}>{info.visible ? '👁 Görünür' : '🙈 Gizli'}</span>
+            <span>{t('studios.jr.info.size')} <b>{Math.round(info.scale * 100)}%</b></span>
+            <span>{t('studios.jr.info.heading')} <b>{Math.round(info.heading)}°</b></span>
+            <span className="jrb-info-vis" data-visible={info.visible}>{info.visible ? t('studios.jr.info.visible') : t('studios.jr.info.hidden')}</span>
           </div>
         )}
       </div>
@@ -197,47 +200,47 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
       </div>
 
       <div className="jrb-extras">
-        <div className="jr-sprites" aria-label="Karakterler">
+        <div className="jr-sprites" aria-label={t('studios.jr.sprites.aria')}>
           {page.sprites.map((s) => (
-            <button key={s.id} type="button" className={`jr-spr${s.id === sprite?.id ? ' on' : ''}`} onClick={() => setSpriteId(s.id)} aria-label={CHARACTERS[s.character]?.label} aria-pressed={s.id === sprite?.id}>
+            <button key={s.id} type="button" className={`jr-spr${s.id === sprite?.id ? ' on' : ''}`} onClick={() => setSpriteId(s.id)} aria-label={characterLabel(s.character, locale)} aria-pressed={s.id === sprite?.id}>
               {CHARACTERS[s.character]?.glyph}
             </button>
           ))}
           {allowSprites && (
             <>
-              <button type="button" className="jr-spr add" onClick={() => setAddOpen((v) => !v)} aria-expanded={addOpen} aria-label="Karakter ekle">+</button>
+              <button type="button" className="jr-spr add" onClick={() => setAddOpen((v) => !v)} aria-expanded={addOpen} aria-label={t('studios.jr.sprites.add')}>+</button>
               {sprite && page.sprites.length > 0 && (
-                <button type="button" className="jr-btn small" onClick={() => { const left = page.sprites.filter((s) => s.id !== sprite.id); setProject((p) => removeSpriteFrom(p, pageIndex, sprite.id)); setSpriteId(left[0]?.id ?? null) }}>Karakteri sil</button>
+                <button type="button" className="jr-btn small" onClick={() => { const left = page.sprites.filter((s) => s.id !== sprite.id); setProject((p) => removeSpriteFrom(p, pageIndex, sprite.id)); setSpriteId(left[0]?.id ?? null) }}>{t('studios.jr.sprites.remove')}</button>
               )}
             </>
           )}
           {addOpen && (
             <div className="jr-addmenu">
               {Object.entries(CHARACTERS).map(([k, c]) => (
-                <button key={k} type="button" onClick={() => { const r = addSpriteTo(project, pageIndex, k); setProject(r.project); setSpriteId(r.spriteId); setAddOpen(false) }} aria-label={`${c.label} ekle`}>{c.glyph}</button>
+                <button key={k} type="button" onClick={() => { const r = addSpriteTo(project, pageIndex, k); setProject(r.project); setSpriteId(r.spriteId); setAddOpen(false) }} aria-label={t('studios.jr.sprites.addOne', { name: characterLabel(k, locale) ?? c.label })}>{c.glyph}</button>
               ))}
             </div>
           )}
         </div>
         {allowPages && (
-          <div className="jr-pages" aria-label="Sayfalar">
+          <div className="jr-pages" aria-label={t('studios.jr.pages.aria')}>
             {project.pages.map((p, i) => (
-              <button key={p.id} type="button" className={`jr-page${i === pageIndex ? ' on' : ''}`} onClick={() => setPageIndex(i)} aria-label={`Sayfa ${i + 1}`} aria-current={i === pageIndex ? 'page' : undefined}
+              <button key={p.id} type="button" className={`jr-page${i === pageIndex ? ' on' : ''}`} onClick={() => setPageIndex(i)} aria-label={t('studios.jr.pages.page', { n: i + 1 })} aria-current={i === pageIndex ? 'page' : undefined}
                 style={{ background: BACKGROUNDS[p.background]?.css }}><span>{i + 1}</span></button>
             ))}
             {project.pages.length < 8 && (
-              <button type="button" className="jr-page add" onClick={() => { setProject((p) => addPageTo(p)); setPageIndex(project.pages.length) }} aria-label="Sayfa ekle">+</button>
+              <button type="button" className="jr-page add" onClick={() => { setProject((p) => addPageTo(p)); setPageIndex(project.pages.length) }} aria-label={t('studios.jr.pages.add')}>+</button>
             )}
-            <select className="jr-select" value={page.background} aria-label="Arka plan" onChange={(e) => setProject((p) => setBackground(p, pageIndex, e.target.value))}>
-              {Object.entries(BACKGROUNDS).map(([k, b]) => <option key={k} value={k}>{b.label}</option>)}
+            <select className="jr-select" value={page.background} aria-label={t('studios.jr.pages.background')} onChange={(e) => setProject((p) => setBackground(p, pageIndex, e.target.value))}>
+              {Object.entries(BACKGROUNDS).map(([k, b]) => <option key={k} value={k}>{backgroundLabel(k, locale) ?? b.label}</option>)}
             </select>
             {project.pages.length > 1 && (
-              <button type="button" className="jr-btn small" onClick={() => { setProject((p) => removePageAt(p, pageIndex)); setPageIndex(Math.max(0, pageIndex - 1)) }}>Sayfayı sil</button>
+              <button type="button" className="jr-btn small" onClick={() => { setProject((p) => removePageAt(p, pageIndex)); setPageIndex(Math.max(0, pageIndex - 1)) }}>{t('studios.jr.pages.remove')}</button>
             )}
           </div>
         )}
         <GoalsPanel status={goalStatus} />
-        <div className="jrb-footer"><button type="button" className="jr-btn small" onClick={resetProject}>Projeyi başa döndür</button></div>
+        <div className="jrb-footer"><button type="button" className="jr-btn small" onClick={resetProject}>{t('studios.jr.resetProject')}</button></div>
       </div>
     </div>
     </div>

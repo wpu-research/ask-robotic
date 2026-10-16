@@ -44,6 +44,17 @@ export const DEFAULT_STATE: { [K in AiTool]: () => ToolStates[K] } = {
   detective: () => ({ setId: 'sensor', marks: {} }),
 }
 
+/** Serbest atölyenin İngilizce başlangıç durumları (site dili İngilizceyken; ders etkinlikleri hep Türkçe kalır). */
+export const DEFAULT_STATE_EN: { [K in AiTool]: () => ToolStates[K] } = {
+  ...DEFAULT_STATE,
+  tokenizer: () => ({ text: 'The robot sees the obstacle and turns left.', corpus: 'en', merges: 0, window: 0 }),
+  nextword: () => ({ text: 'the robot', temperature: 1, order: 1, seed: 1, count: 0, tried: [] }),
+  embed: () => ({ query: 'measuring distance', method: 'tfidf' }),
+  rag: () => ({ question: 'When is the project deadline?', size: 30, overlap: 5, topK: 2 }),
+  eval: () => ({ target: 'sentiment', cases: [{ text: 'This app is great', expected: 'olumlu' }] }),
+}
+export const defaultStateFor = <K extends AiTool>(tool: K, lang: 'tr' | 'en' = 'tr'): ToolStates[K] => (lang === 'en' ? DEFAULT_STATE_EN : DEFAULT_STATE)[tool]()
+
 export interface AiGoal<S> { id: string; label: string; hint?: string; test: (s: S) => boolean }
 export interface AiActivityOf<K extends AiTool> {
   id: string

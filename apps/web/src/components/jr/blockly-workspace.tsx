@@ -2,10 +2,12 @@
 // ASK Jr — Blockly tabanlı blok çalışma alanı (Scratch görünümü: zelos çizici). Yalnız istemcide, dinamik import ile yüklenir.
 import { useEffect, useRef, useState } from 'react'
 import type * as BlocklyNS from 'blockly'
-import { BLOCK_JSON, TEXT_LIMIT, blockStyles, toolboxJson, typeOfName } from '@/lib/jr/blockly-blocks'
+import { TEXT_LIMIT, blockJsonFor, blockStyles, toolboxJson, typeOfName } from '@/lib/jr/blockly-blocks'
 import { blockChainFromJson, scriptsToState, stateToScripts, type BlocklyJsonBlock } from '@/lib/jr/blockly-convert'
 import { BLOCK_BY_TYPE, CATEGORIES } from '@/lib/jr/blocks'
 import type { Block, BlockType, Script } from '@/lib/jr/types'
+import { useLocale, useT } from '@/i18n/client'
+import type { Locale } from '@/i18n'
 import './jr-blockly.css'
 
 type B = typeof BlocklyNS
@@ -22,14 +24,19 @@ export interface BlockWorkspaceProps {
   glowIds?: string[]
 }
 
-let defined = false
-function defineOnce(Blockly: B) {
-  if (defined) return
-  defined = true
-  Blockly.Extensions.register('jr_text_limit', function (this: BlocklyNS.Block) {
-    this.getField('TEXT')?.setValidator((v: unknown) => String(v ?? '').slice(0, TEXT_LIMIT))
-  })
-  Blockly.defineBlocksWithJsonArray(BLOCK_JSON as unknown as object[])
+let extDefined = false
+let definedLocale: Locale | null = null
+/** Uzantıyı bir kez kaydeder; blok tanımlarını etkin dile göre (dil değişince yeniden) kaydeder. */
+function defineFor(Blockly: B, locale: Locale) {
+  if (!extDefined) {
+    extDefined = true
+    Blockly.Extensions.register('jr_text_limit', function (this: BlocklyNS.Block) {
+      this.getField('TEXT')?.setValidator((v: unknown) => String(v ?? '').slice(0, TEXT_LIMIT))
+    })
+  }
+  if (definedLocale === locale) return
+  definedLocale = locale
+  Blockly.defineBlocksWithJsonArray(blockJsonFor(locale) as unknown as object[])
 }
 
 function makeTheme(Blockly: B) {
@@ -67,6 +74,10 @@ export function BlockWorkspace({ scripts, onChange, allowedBlocks, onRunStack, r
   const [ready, setReady] = useState(false)
   const [empty, setEmpty] = useState(scripts.length === 0)
   const [failed, setFailed] = useState(false)
+  const t = useT()
+  const locale = useLocale()
+  const localeRef = useRef(locale)
+  localeRef.current = locale
 
   const cb = useRef({ onChange, onRunStack, allowedBlocks })
   cb.current = { onChange, onRunStack, allowedBlocks }
@@ -138,15 +149,15 @@ export function BlockWorkspace({ scripts, onChange, allowedBlocks, onRunStack, r
     ;(async () => {
       try {
         const Blockly = await import('blockly')
-        const Tr = await import('blockly/msg/tr').catch(() => null)
+        const Msg = await (locale === 'en' ? import('blockly/msg/en') : import('blockly/msg/tr')).catch(() => null)
         if (disposed || !host.current) return
-        if (Tr) Blockly.setLocale(Tr as unknown as Parameters<typeof Blockly.setLocale>[0])
-        defineOnce(Blockly)
+        if (Msg) Blockly.setLocale(Msg as unknown as Parameters<typeof Blockly.setLocale>[0])
+        defineFor(Blockly, locale)
         blocklyRef.current = Blockly
         ws = Blockly.inject(host.current, {
           renderer: 'zelos',
           theme: makeTheme(Blockly),
-          toolbox: toolboxJson(cb.current.allowedBlocks) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: toolboxJson(cb.current.allowedBlocks, locale) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo,
           media: '/blockly/media/',
           sounds: false,
           grid: { spacing: 0, length: 0, colour: '#0000', snap: false },
@@ -236,9 +247,10 @@ export function BlockWorkspace({ scripts, onChange, allowedBlocks, onRunStack, r
       removeListeners?.()
       ws?.dispose()
       wsRef.current = null
+      lastSig.current = null // dil değişince yeni çalışma alanı betikleri yeniden yüklesin
       setReady(false)
     }
-  }, [])
+  }, [locale])
 
   // ---- Dışarıdan gelen betikler / sıfırlama ----
   useEffect(() => {
@@ -267,7 +279,7 @@ export function BlockWorkspace({ scripts, onChange, allowedBlocks, onRunStack, r
   const allowSig = allowedBlocks.join(',')
   useEffect(() => {
     if (!ready || !wsRef.current) return
-    wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
+    wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks, localeRef.current) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)
   }, [allowSig, ready])
 
   const glowSig = (glowIds ?? []).join(',')
@@ -277,8 +289,8 @@ export function BlockWorkspace({ scripts, onChange, allowedBlocks, onRunStack, r
     <div className="jrb-ws" data-blockly-ready={ready} data-testid="jr-blockly">
       <style>{iconCss()}</style>
       <div ref={host} className="jrb-host" />
-      {ready && empty && <div className="jrb-hint" aria-hidden="true">Soldan bir blok seç ve buraya sürükle</div>}
-      {failed && <p className="jrb-fail" role="alert">Blok editörü yüklenemedi. Sayfayı yenile.</p>}
+      {ready && empty && <div className="jrb-hint" aria-hidden="true">{t('studios.jr.workspace.hint')}</div>}
+      {failed && <p className="jrb-fail" role="alert">{t('studios.jr.workspace.failed')}</p>}
     </div>
   )
 }

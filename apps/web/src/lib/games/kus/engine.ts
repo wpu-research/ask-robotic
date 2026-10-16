@@ -93,11 +93,11 @@ export function fly(st: BirdState, angle: number): void {
     if (x < 0 || x > WORLD || y < 0 || y > WORLD) {
       st.x = Math.min(WORLD, Math.max(0, x)); st.y = Math.min(WORLD, Math.max(0, y))
       st.status = 'edge'; finish()
-      throw new HaltProgram('Kuş dünyanın kenarından dışarı uçtu!')
+      throw new HaltProgram('Kuş dünyanın kenarından dışarı uçtu!', 'The bird flew off the edge of the world!')
     }
     if (st.walls.some((w) => inWall(x, y, w))) {
       st.x = x; st.y = y; st.status = 'wall'; finish()
-      throw new HaltProgram('Kuş duvara çarptı!')
+      throw new HaltProgram('Kuş duvara çarptı!', 'The bird hit a wall!')
     }
     const p: Pt = [x, y]
     if (!st.hasWorm && dist(p, st.worm) <= WORM_R) {
@@ -106,9 +106,9 @@ export function fly(st: BirdState, angle: number): void {
     }
     if (dist(p, st.nest) <= NEST_R) {
       st.x = st.nest[0]; st.y = st.nest[1]
-      if (st.hasWorm) { st.status = 'won'; finish(); throw new HaltProgram('Kuş solucanı yuvaya götürdü!') }
+      if (st.hasWorm) { st.status = 'won'; finish(); throw new HaltProgram('Kuş solucanı yuvaya götürdü!', 'The bird took the worm to the nest!') }
       st.status = 'empty-nest'; finish()
-      throw new HaltProgram('Kuş yuvaya solucansız vardı. Önce solucanı almalı!')
+      throw new HaltProgram('Kuş yuvaya solucansız vardı. Önce solucanı almalı!', 'The bird reached the nest without the worm. It must get the worm first!')
     }
   }
   st.x = r4(sx + dx * LEG); st.y = r4(sy + dy * LEG)
@@ -119,12 +119,14 @@ export function fly(st: BirdState, angle: number): void {
 export const atan2Deg = (dy: number, dx: number): number => Math.round(norm360((Math.atan2(dy, dx) * 180) / Math.PI) * 100) / 100
 
 export function evaluateState(st: BirdState, result: RunResult): RunOutcome {
-  if (st.status === 'won') return { ok: true, message: 'Harika! Kuş solucanı yuvaya götürdü.' }
-  if (st.status === 'wall') return { ok: false, message: 'Kuş duvara çarptı! Başka bir yoldan gitmeyi dene.' }
-  if (st.status === 'edge') return { ok: false, message: 'Kuş dünyanın kenarından dışarı uçtu! Açıyı kontrol et.' }
-  if (st.status === 'empty-nest') return { ok: false, message: 'Yuvaya solucansız vardın. Önce solucanı al!' }
-  if (result.reason === 'limit') return { ok: false, message: 'Kuş durmadan uçtu ama yuvaya varamadı. Yönleri gözden geçir.' }
-  return { ok: false, message: st.hasWorm ? 'Solucanı aldın, şimdi yuvaya götürmelisin!' : 'Kuş solucana ulaşamadı. Açıları ve uçuş sayısını dene.' }
+  if (st.status === 'won') return { ok: true, message: 'Harika! Kuş solucanı yuvaya götürdü.', messageEn: 'Great! The bird took the worm to the nest.' }
+  if (st.status === 'wall') return { ok: false, message: 'Kuş duvara çarptı! Başka bir yoldan gitmeyi dene.', messageEn: 'The bird hit a wall! Try going another way.' }
+  if (st.status === 'edge') return { ok: false, message: 'Kuş dünyanın kenarından dışarı uçtu! Açıyı kontrol et.', messageEn: 'The bird flew off the edge of the world! Check the angle.' }
+  if (st.status === 'empty-nest') return { ok: false, message: 'Yuvaya solucansız vardın. Önce solucanı al!', messageEn: 'You reached the nest without the worm. Get the worm first!' }
+  if (result.reason === 'limit') return { ok: false, message: 'Kuş durmadan uçtu ama yuvaya varamadı. Yönleri gözden geçir.', messageEn: 'The bird kept flying but never reached the nest. Check your directions.' }
+  return st.hasWorm
+    ? { ok: false, message: 'Solucanı aldın, şimdi yuvaya götürmelisin!', messageEn: 'You have the worm, now take it to the nest!' }
+    : { ok: false, message: 'Kuş solucana ulaşamadı. Açıları ve uçuş sayısını dene.', messageEn: 'The bird did not reach the worm. Try other angles and number of flights.' }
 }
 
 export function createBirdRun(level: LevelDef, seed = 1): GameRun<BirdState> {

@@ -3,6 +3,7 @@
 import { useRef } from 'react'
 import type { Device } from '@/lib/mikro/device'
 import type { ButtonName, PinName } from '@/lib/mikro/types'
+import { useT } from '@/i18n/client'
 
 export interface BoardProps {
   device: Device
@@ -47,6 +48,7 @@ function Btn({ cx, cy, r, label, down, onDown, onUp, aria, testId }: { cx: numbe
 
 export function Board({ device, tick, title, onButton, onLogo, onPin, compact }: BoardProps) {
   void tick
+  const t = useT()
   const f = device.frame()
   const tone = device.toneNow()
   const pinKeys: PinName[] = ['P0', 'P1', 'P2']
@@ -72,7 +74,7 @@ export function Board({ device, tick, title, onButton, onLogo, onPin, compact }:
       <text x="160" y="22" textAnchor="middle" className="mk-board-title">{title}</text>
 
       {/* dokunmatik logo (yıldız) */}
-      <g className={`mk-logo${device.logo ? ' down' : ''}`} role="button" tabIndex={0} aria-label="Dokunmatik logo" aria-pressed={device.logo} data-testid={`mikro-logo-${device.id}`} {...logoHold}>
+      <g className={`mk-logo${device.logo ? ' down' : ''}`} role="button" tabIndex={0} aria-label={t('mikro.board.logo')} aria-pressed={device.logo} data-testid={`mikro-logo-${device.id}`} {...logoHold}>
         <rect x="132" y="28" width="56" height="26" rx="13" className="mk-logo-pad" />
         <polygon points="160,32 163,40 172,40 165,45 168,52 160,47 152,52 155,45 148,40 157,40" className="mk-logo-star" />
       </g>
@@ -80,7 +82,7 @@ export function Board({ device, tick, title, onButton, onLogo, onPin, compact }:
 
       {/* LED matrisi */}
       <rect x={MX - 14} y={MY - 12} width={5 * CELL + 4 * GAP + 28} height={5 * CELL + 4 * GAP + 24} rx="18" className="mk-plate" />
-      <g aria-label="LED ekranı" role="img" data-testid={`mikro-leds-${device.id}`} data-pattern={device.pattern()}>
+      <g aria-label={t('mikro.board.leds')} role="img" data-testid={`mikro-leds-${device.id}`} data-pattern={device.pattern()}>
         {Array.from({ length: 25 }, (_, i) => {
           const v = f[i]
           const x = MX + (i % 5) * (CELL + GAP), y = MY + Math.floor(i / 5) * (CELL + GAP)
@@ -94,9 +96,9 @@ export function Board({ device, tick, title, onButton, onLogo, onPin, compact }:
       </g>
 
       {/* düğmeler */}
-      <Btn cx={38} cy={162} r={24} label="A" down={device.btn.A} aria="A düğmesi" testId={`mikro-btn-A-${device.id}`} onDown={() => onButton('A', true)} onUp={() => onButton('A', false)} />
-      <Btn cx={282} cy={162} r={24} label="B" down={device.btn.B} aria="B düğmesi" testId={`mikro-btn-B-${device.id}`} onDown={() => onButton('B', true)} onUp={() => onButton('B', false)} />
-      <g className={`mk-ab${abDown ? ' down' : ''}`} role="button" tabIndex={0} aria-label="A ve B birlikte" aria-pressed={abDown} data-testid={`mikro-btn-AB-${device.id}`} {...abHold}>
+      <Btn cx={38} cy={162} r={24} label="A" down={device.btn.A} aria={t('mikro.board.buttonA')} testId={`mikro-btn-A-${device.id}`} onDown={() => onButton('A', true)} onUp={() => onButton('A', false)} />
+      <Btn cx={282} cy={162} r={24} label="B" down={device.btn.B} aria={t('mikro.board.buttonB')} testId={`mikro-btn-B-${device.id}`} onDown={() => onButton('B', true)} onUp={() => onButton('B', false)} />
+      <g className={`mk-ab${abDown ? ' down' : ''}`} role="button" tabIndex={0} aria-label={t('mikro.board.buttonAB')} aria-pressed={abDown} data-testid={`mikro-btn-AB-${device.id}`} {...abHold}>
         <rect x="124" y="272" width="72" height="26" rx="13" className="mk-ab-face" />
         <text x="160" y="290" textAnchor="middle" className="mk-btn-text small">A+B</text>
       </g>
@@ -111,11 +113,12 @@ export function Board({ device, tick, title, onButton, onLogo, onPin, compact }:
 }
 
 function Pin({ x, pin, device, onPin }: { x: number; pin: PinName; device: Device; onPin(p: PinName, down: boolean): void }) {
+  const t = useT()
   const h = useHold(() => onPin(pin, true), () => onPin(pin, false))
   const s = device.pins[pin]
   const out = s.out
   return (
-    <g className={`mk-pin${s.touch ? ' down' : ''}`} role="button" tabIndex={0} aria-label={`${pin} pini (dokun)`} aria-pressed={s.touch} data-testid={`mikro-pin-${pin}-${device.id}`} {...h}>
+    <g className={`mk-pin${s.touch ? ' down' : ''}`} role="button" tabIndex={0} aria-label={t('mikro.board.pin', { pin })} aria-pressed={s.touch} data-testid={`mikro-pin-${pin}-${device.id}`} {...h}>
       <rect x={x - 22} y="300" width="44" height="30" rx="8" className="mk-pin-pad" />
       <text x={x} y="320" textAnchor="middle" className="mk-pin-text">{pin.slice(1)}</text>
       {out && <circle cx={x + 18} cy={304} r="5" className={`mk-pin-out${out.mode === 'digital' && !out.value ? ' off' : ''}`} />}

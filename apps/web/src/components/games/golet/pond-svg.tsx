@@ -1,5 +1,6 @@
 // Gölet havuzu: saf SVG çizim (özgün ördekler, nilüferler, patlamalar). Üstten görünüş; 0° sağ, 90° yukarı.
-import { BLAST_LIFE, BLAST_R, DUCK_R, RELOAD, type DuckFrame, type PondFrame } from '@/lib/games/golet/sim'
+import { BLAST_LIFE, BLAST_R, DUCK_R, RELOAD, duckDisplayName, type DuckFrame, type PondFrame } from '@/lib/games/golet/sim'
+import { useLocale, useT } from '@/i18n/client'
 
 const PADS: [number, number, number, number][] = [[16, 22, 4.6, 40], [84, 78, 5.2, 200], [70, 14, 3.8, 110], [30, 84, 4.2, 300], [90, 30, 3.4, 20], [46, 52, 3, 250]]
 const REEDS: [number, number][] = [[4, 4], [96, 6], [5, 95], [95, 94]]
@@ -12,6 +13,7 @@ const shade = (hex: string, k: number): string => {
 }
 
 function Duck({ d }: { d: DuckFrame }) {
+  const en = useLocale() === 'en'
   const body = d.color
   const dark = shade(body, 0.72)
   const light = shade(body, 1.18)
@@ -54,7 +56,7 @@ function Duck({ d }: { d: DuckFrame }) {
         <g transform={`translate(0 ${-r - 2.4})`}>
           <rect x="-4" y="-0.9" width="8" height="1.8" rx=".9" fill="#0b2a4a" opacity=".75" />
           <rect x="-4" y="-0.9" width={Math.max(0, (8 * d.hp) / 100)} height="1.8" rx=".9" fill={hpColor(d.hp)} />
-          <text className="gl-name" y="-1.6">{d.name}</text>
+          <text className="gl-name" y="-1.6">{duckDisplayName(d, en)}</text>
         </g>
       )}
     </g>
@@ -62,10 +64,12 @@ function Duck({ d }: { d: DuckFrame }) {
 }
 
 export function PondSvg({ frame }: { frame: PondFrame }) {
+  const t = useT()
+  const en = useLocale() === 'en'
   const ducks = [...frame.ducks].sort((a, b) => Number(b.alive === false) - Number(a.alive === false) || a.y - b.y)
   return (
     <svg className="gl-svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet" role="img"
-      aria-label={`Gölet havuzu. ${frame.ducks.map((d) => `${d.name}: ${d.alive ? `can ${Math.round(d.hp)}` : 'battı'}`).join(', ')}.`}>
+      aria-label={t('studios.gamesB.golet.poolLabel', { ducks: frame.ducks.map((d) => `${duckDisplayName(d, en)}: ${d.alive ? t('studios.gamesB.golet.duckHp', { hp: Math.round(d.hp) }) : t('studios.gamesB.golet.duckSunk')}`).join(', ') })}>
       <defs>
         <radialGradient id="gl-water" cx="50%" cy="45%" r="75%">
           <stop offset="0" stopColor="#57c2ea" />

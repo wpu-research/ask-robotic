@@ -3,12 +3,14 @@ import { useEffect, useRef } from 'react'
 import type { SceneProps } from '@/lib/games/types'
 import type { TurtleLevelData, TurtleState } from '@/lib/games/kaplumbaga/engine'
 import { DEFAULT_COLOUR, DEFAULT_WIDTH, SIZE } from '@/lib/games/kaplumbaga/geometry'
+import { useT } from '@/i18n/client'
 import { render } from './draw'
 
 const DPR = 2
 
 /** Kaplumbağa sahnesi: ops listesini canvas üzerinde animasyonla oynatır (süreler hız çarpanına bölünür). */
 export default function Scene({ level, frame, speed }: SceneProps<TurtleState>) {
+  const t = useT()
   const canvas = useRef<HTMLCanvasElement>(null)
   const anim = useRef({ idx: 0, t: 0, last: 0, raf: 0 })
   const live = useRef({ frame, speed, level })
@@ -58,7 +60,7 @@ export default function Scene({ level, frame, speed }: SceneProps<TurtleState>) 
       width={SIZE * DPR}
       height={SIZE * DPR}
       role="img"
-      aria-label="Kaplumbağanın çizim alanı. Gri noktalı çizgiler hedef şablondur."
+      aria-label={t('studios.gamesB.kaplumbaga.canvasLabel')}
       style={{ width: '100%', height: '100%', display: 'block' }}
     />
   )

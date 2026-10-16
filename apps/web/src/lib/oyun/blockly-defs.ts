@@ -1,6 +1,7 @@
 // Blockly'ye özel blok tanımlarını yükler (tarayıcıda ve başsız Node testlerinde). Blockly modülü dışarıdan verilir.
 import type * as BlocklyNS from 'blockly'
-import { BLOCK_JSON, CATEGORIES } from './blocks'
+import { CATEGORIES, blockJsonFor } from './blocks'
+import { BLOCKLY_TEXT_EN, EN_OVERRIDES, type Locale } from './i18n-en'
 import { PALETTE } from './palette'
 import { applyTurkishMessages } from './messages'
 import { parse } from './pixels'
@@ -14,6 +15,7 @@ export interface OptionProviders {
   /** Harita açılır listesindeki harita adları. */
   maps: () => string[]
 }
+let blockLocale: Locale = 'tr'
 let providers: OptionProviders = { images: () => [], maps: () => [] }
 export const setOptionProviders = (p: OptionProviders): void => { providers = p }
 
@@ -45,7 +47,7 @@ export function thumbnail(rows: string[]): string | null {
 
 function imageOptions(): [string | { src: string; width: number; height: number; alt: string }, string][] {
   const list = providers.images()
-  if (!list.length) return [['(resim yok)', '']]
+  if (!list.length) return [[blockLocale === 'en' ? BLOCKLY_TEXT_EN.noImage : '(resim yok)', '']]
   return list.map((im) => {
     const src = thumbnail(im.rows)
     const label = im.name || im.id
@@ -57,21 +59,26 @@ function imageOptions(): [string | { src: string; width: number; height: number;
 }
 function mapOptions(): [string, string][] {
   const l = providers.maps()
-  return l.length ? l.map((n) => [n, n] as [string, string]) : [['(harita yok)', '']]
+  return l.length ? l.map((n) => [n, n] as [string, string]) : [[blockLocale === 'en' ? BLOCKLY_TEXT_EN.noMap : '(harita yok)', '']]
 }
 
-let defined = false
-export function defineOyunBlocks(Blockly: B): void {
-  if (defined) return
-  defined = true
-  applyTurkishMessages(Blockly.Msg as unknown as Record<string, string>)
-  Blockly.defineBlocksWithJsonArray(BLOCK_JSON as unknown as object[])
+let defined: Locale | null = null
+/** Blokları verilen dilde tanımlar (Türkçe varsayılan). Dil değişince yeniden tanımlar; çağırmadan önce Blockly.setLocale ile çekirdek iletileri yükle. */
+export function defineOyunBlocks(Blockly: B, locale: Locale = 'tr'): void {
+  if (locale === 'en') Object.assign(Blockly.Msg as unknown as Record<string, string>, EN_OVERRIDES)
+  else applyTurkishMessages(Blockly.Msg as unknown as Record<string, string>)
+  blockLocale = locale
+  if (defined === locale) return
+  defined = locale
+  const json = blockJsonFor(locale) as unknown as { type: string }[]
+  for (const j of json) delete (Blockly.Blocks as Record<string, unknown>)[j.type]
+  Blockly.defineBlocksWithJsonArray(json as unknown as object[])
   Blockly.Blocks['oyun_resim'] = {
     init(this: BlocklyNS.Block) {
       this.appendDummyInput().appendField(new Blockly.FieldDropdown(imageOptions as unknown as BlocklyNS.MenuGenerator), 'IMG')
       this.setOutput(true, 'Image')
       this.setStyle('oyun_sprite')
-      this.setTooltip('Bir resim seç.')
+      this.setTooltip(blockLocale === 'en' ? BLOCKLY_TEXT_EN.pickImage : 'Bir resim seç.')
     },
   }
   Blockly.Blocks['oyun_harita'] = {
@@ -79,7 +86,7 @@ export function defineOyunBlocks(Blockly: B): void {
       this.appendDummyInput().appendField(new Blockly.FieldDropdown(mapOptions as unknown as BlocklyNS.MenuGenerator), 'MAP')
       this.setOutput(true, 'Map')
       this.setStyle('oyun_sahne')
-      this.setTooltip('Bir harita seç.')
+      this.setTooltip(blockLocale === 'en' ? BLOCKLY_TEXT_EN.pickMap : 'Bir harita seç.')
     },
   }
 }

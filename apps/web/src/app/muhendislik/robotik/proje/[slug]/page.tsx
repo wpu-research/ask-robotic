@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import { CodeBlock } from '@/components/robotik/code-block'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
-import { partBySlug, type EngPart } from '@/lib/muhendislik/catalog'
+import { partBySlug, partText, type EngPart } from '@/lib/muhendislik/catalog'
 import { COURSE, weekOf } from '@/lib/robotik/course'
 import { PROJECTS, projectOf } from '@/lib/robotik/projects'
 
@@ -55,7 +55,7 @@ export default async function Proje({ params }: { params: Promise<{ slug: string
           <section className="panel" aria-labelledby="pj-bom">
             <h2 id="pj-bom" className="panel-title">{en ? 'A real build would use (Hyvex)' : 'Gerçek yapımda (Hyvex)'}</h2>
             <p className="muted rb-small">{en ? 'Everything runs in simulation; this list maps each simulated component to a real part.' : 'Her şey simülasyonda; bu liste simüle edilen her bileşenin gerçek parça karşılığıdır.'}</p>
-            <ul className="eng-sib">{bom.map((b) => <li key={b.slug}><Link href={`/muhendislik/parca/${b.slug}`}>{b.name}</Link><small>S{b.level}</small></li>)}</ul>
+            <ul className="eng-sib">{bom.map((b) => <li key={b.slug}><Link href={`/muhendislik/parca/${b.slug}`}>{partText(b, lang).name}</Link><small>{en ? 'L' : 'S'}{b.level}</small></li>)}</ul>
           </section>
           <section className="panel" aria-labelledby="pj-gr">
             <h2 id="pj-gr" className="panel-title">{en ? 'Grading (15% of the course)' : 'Notlandırma (dersin %15\'i)'}</h2>

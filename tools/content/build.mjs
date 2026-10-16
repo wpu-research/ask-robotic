@@ -3,7 +3,7 @@
 import { readFileSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { ROOT, SRC, loadWeek } from '../sim/lessons.mjs'
-import { loadLessonExtras, loadParts, loadWeekGuide } from './ek.mjs'
+import { loadLessonExtras, loadParts, loadPartsEn, loadWeekGuide } from './ek.mjs'
 
 const moduleDir = process.argv[2]
 if (!moduleDir) { console.error('Kullanım: node tools/content/build.mjs modul-3 | parcalar'); process.exit(2) }
@@ -21,6 +21,16 @@ export const parcalar: ComponentGuide[] = ${JSON.stringify(parts, null, 2)}
   const target = join(ROOT, 'packages', 'db', 'src', 'content', 'parcalar.generated.ts')
   writeFileSync(target, out)
   console.log(`${target}\n${parts.length} parça`)
+  // İngilizce: content-src/parcalar/en/*.md -> apps/web/src/lib/parca-rehberi.en.generated.ts (görüntülemede Türkçeyle birleşir)
+  const en = loadPartsEn(parts)
+  const outEn = `// OTOMATİK ÜRETİLDİ — elle düzenleme. Kaynak: content-src/parcalar/en/ · Komut: node tools/content/build.mjs parcalar
+import type { ComponentGuideText } from './parca-rehberi-types'
+
+export const parcalarEn: Record<string, ComponentGuideText> = ${JSON.stringify(en, null, 2)}
+`
+  const targetEn = join(ROOT, 'apps', 'web', 'src', 'lib', 'parca-rehberi.en.generated.ts')
+  writeFileSync(targetEn, outEn)
+  console.log(`${targetEn}\n${Object.keys(en).length} / ${parts.length} parçanın İngilizcesi var`)
   process.exit(0)
 }
 // Beceri kimlikleri apps/web/src/lib/skills.ts'ten okunur (tek kaynak): SKILLS = [{ id: '...' }, ...]

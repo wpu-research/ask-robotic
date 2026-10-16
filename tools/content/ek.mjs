@@ -266,3 +266,83 @@ export function loadParts() {
   if (!existsSync(dir)) return []
   return readdirSync(dir).filter((f) => f.endsWith('.md') && !f.startsWith('_')).sort().map((f) => parsePart(readFileSync(join(dir, f), 'utf8'), `parcalar/${f}`))
 }
+
+// ---- Parça ansiklopedisi, İngilizce: content-src/parcalar/en/<slug>.md ----
+// Biçim Türkçeyle aynı; başlık satırları `slug:`, `category:`, `summary:`; bölümler İngilizce adlı.
+// "İlgili dersler" bölümü yoktur (Türkçeden gelir). Pin adları/sırası ve tipik değer sayısı Türkçeyle birebir olmalı (mirrorPart).
+const SECTION_EN = {
+  'Pins': 'pins', 'How it works': 'how', 'Wiring in the lab': 'wiring', 'Typical values': 'values', 'Common mistakes': 'mistakes',
+}
+
+export function parsePartEn(text, file) {
+  const fail = (m) => { throw new Error(`${file}: ${m}`) }
+  const lines = text.replace(/\r\n/g, '\n').split('\n')
+  const title = lines.find((l) => l.startsWith('# '))?.slice(2).trim()
+  if (!title) fail('"# Title" yok')
+  const head = {}
+  const sections = {}
+  let cur = null
+  for (const l of lines) {
+    const m = l.match(/^## (.+?)\s*$/)
+    if (m) { cur = SECTION_EN[m[1]]; if (!cur) fail(`bilinmeyen bölüm "${m[1]}" (${Object.keys(SECTION_EN).join(', ')})`); sections[cur] = []; continue }
+    if (cur) { sections[cur].push(l); continue }
+    const h = l.match(/^(slug|category|summary):\s*(.+)$/)
+    if (h) head[h[1]] = h[2].trim()
+  }
+  for (const k of ['slug', 'category', 'summary']) if (!head[k]) fail(`"${k}:" satırı yok`)
+  for (const k of Object.values(SECTION_EN)) if (!sections[k] || !sections[k].join('').trim()) fail(`"${Object.keys(SECTION_EN).find((x) => SECTION_EN[x] === k)}" bölümü yok ya da boş`)
+  const bullets = (k) => sections[k].filter((l) => /^- /.test(l)).map((l) => l.slice(2).trim())
+  const pins = bullets('pins').map((b) => {
+    const m = b.match(/^`?([\w+\-]+)`?:\s*(.+)$/)
+    if (!m) fail(`pin satırı "name: description" olmalı: ${b}`)
+    return { name: m[1], description: m[2] }
+  })
+  const typicalValues = bullets('values').map((b) => {
+    const [label, value, note] = b.split('|').map((x) => x.trim())
+    if (!label || !value) fail(`tipik değer satırı "label | value | note" olmalı: ${b}`)
+    return note ? { label, value, note } : { label, value }
+  })
+  return {
+    slug: head.slug, title, category: head.category, summary: head.summary,
+    pins,
+    howItWorksMd: sections.how.join('\n').trim(),
+    wiringMd: sections.wiring.join('\n').trim(),
+    typicalValues,
+    commonMistakesMd: sections.mistakes.join('\n').trim(),
+  }
+}
+
+/** İngilizce parça, Türkçesinin aynası olmalı: aynı pin adları (aynı sıra), aynı sayıda tipik değer, not varlığı aynı. */
+export function mirrorPart(tr, en, where) {
+  if (tr.slug !== en.slug) throw new Error(`${where}: slug "${tr.slug}" olmalı (${en.slug})`)
+  const a = tr.pins.map((p) => p.name).join(','), b = en.pins.map((p) => p.name).join(',')
+  if (a !== b) throw new Error(`${where}: pinler Türkçeyle aynı olmalı (${a} ≠ ${b})`)
+  if (tr.typicalValues.length !== en.typicalValues.length) throw new Error(`${where}: ${tr.typicalValues.length} tipik değer olmalı (${en.typicalValues.length} var)`)
+  tr.typicalValues.forEach((v, i) => {
+    if (!!v.note !== !!en.typicalValues[i].note) throw new Error(`${where}: tipik değer [${i}] notu Türkçeyle aynı biçimde olmalı`)
+  })
+  return en
+}
+
+/** content-src/parcalar/en/*.md: slug -> İngilizce metin. Her İngilizce dosyanın Türkçesi olmalı; kategori çevirileri tutarlı olmalı. */
+export function loadPartsEn(trParts) {
+  const dir = join(SRC, 'parcalar', 'en')
+  if (!existsSync(dir)) return {}
+  const bySlug = new Map(trParts.map((p) => [p.slug, p]))
+  const cats = new Map()
+  const out = {}
+  for (const f of readdirSync(dir).filter((x) => x.endsWith('.md') && !x.startsWith('_')).sort()) {
+    const where = `parcalar/en/${f}`
+    const en = parsePartEn(readFileSync(join(dir, f), 'utf8'), where)
+    const tr = bySlug.get(en.slug)
+    if (!tr) throw new Error(`${where}: Türkçe parça yok (${en.slug})`)
+    if (out[en.slug]) throw new Error(`${where}: slug tekrar: ${en.slug}`)
+    mirrorPart(tr, en, where)
+    const prev = cats.get(tr.category)
+    if (prev && prev !== en.category) throw new Error(`${where}: "${tr.category}" kategorisi başka dosyada "${prev}" diye çevrildi (${en.category})`)
+    cats.set(tr.category, en.category)
+    const { slug, ...text } = en
+    out[slug] = text
+  }
+  return out
+}

@@ -48,7 +48,14 @@ export function newProject(name = 'Projem'): SahneProject {
   return { version: 1, name, notes: '', stage: emptyStage(), sprites: [], variables: [], messages: [] }
 }
 /** Serbest atölyenin başlangıcı: tek sprite, boş betik. */
-export function starterProject(): SahneProject {
+export function starterProject(locale: 'tr' | 'en' = 'tr'): SahneProject {
+  if (locale === 'en') {
+    // İngilizce arayüzde yeni projenin varsayılan adları İngilizce (yalnız ilk adlar; kayıt biçimi aynı).
+    const p = newProject('My project')
+    p.stage.backdrops[0].name = 'white'
+    p.sprites = [spriteFromGallery('kedi', { id: 'sprite1', name: 'Cat', sounds: [makeSound('miyav', 'Meow')] })]
+    return p
+  }
   const p = newProject('Projem')
   p.sprites = [spriteFromGallery('kedi', { id: 'sprite1', name: 'Kedi', sounds: [makeSound('miyav')] })]
   return p

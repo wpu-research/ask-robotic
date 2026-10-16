@@ -7,16 +7,18 @@ import { flipShape, hitShape, topShapeAt, translateShape } from '@/lib/sahne/geo
 import { cloneCostume, emptyCostume, newId } from '@/lib/sahne/project'
 import { RES, drawShapes, onBitmapLoaded, paintThumb } from '@/lib/sahne/render'
 import { MAX_COSTUMES, type Costume, type Shape } from '@/lib/sahne/types'
+import { useLocale, useT } from '@/i18n/client'
+import type { MessageKey } from '@/i18n'
 
 type Tool = 'select' | 'brush' | 'line' | 'rect' | 'ellipse' | 'fill' | 'eraser'
-const TOOLS: { id: Tool; label: string; icon: string; bitmap?: boolean }[] = [
-  { id: 'select', label: 'Seç ve taşı', icon: '⇱', bitmap: false },
-  { id: 'brush', label: 'Fırça', icon: '🖌' },
-  { id: 'line', label: 'Çizgi', icon: '╱' },
-  { id: 'rect', label: 'Dikdörtgen', icon: '▭' },
-  { id: 'ellipse', label: 'Daire / oval', icon: '◯' },
-  { id: 'fill', label: 'Doldur', icon: '🪣' },
-  { id: 'eraser', label: 'Silgi', icon: '⌫' },
+const TOOLS: { id: Tool; label: MessageKey; icon: string; bitmap?: boolean }[] = [
+  { id: 'select', label: 'studios.sahne.costume.toolSelect', icon: '⇱', bitmap: false },
+  { id: 'brush', label: 'studios.sahne.costume.toolBrush', icon: '🖌' },
+  { id: 'line', label: 'studios.sahne.costume.toolLine', icon: '╱' },
+  { id: 'rect', label: 'studios.sahne.costume.toolRect', icon: '▭' },
+  { id: 'ellipse', label: 'studios.sahne.costume.toolEllipse', icon: '◯' },
+  { id: 'fill', label: 'studios.sahne.costume.toolFill', icon: '🪣' },
+  { id: 'eraser', label: 'studios.sahne.costume.toolEraser', icon: '⌫' },
 ]
 const PALETTE = ['#e53935', '#fb8c00', '#fdd835', '#43a047', '#1e88e5', '#8e24aa', '#ec407a', '#00acc1', '#6d4c41', '#212121', '#9e9e9e', '#ffffff', '#f59e0b', '#38bdf8', '#a3e635', '#fcd9b6']
 const BMP_RES = 2
@@ -36,19 +38,22 @@ const loadImage = (src: string): Promise<HTMLImageElement> => new Promise((res, 
 const nameFor = (list: Costume[], base: string): string => { let n = 1; while (list.some((c) => c.name === `${base}${n}`)) n++; return `${base}${n}` }
 
 function ColorRow({ label, value, onChange, allowNone }: { label: string; value: string | null; onChange: (c: string | null) => void; allowNone?: boolean }) {
+  const t = useT()
   return (
     <div className="sh-ce-colors" role="group" aria-label={label}>
       <span className="sh-ce-lab">{label}</span>
       <div className="sh-swatches">
-        {allowNone && <button type="button" className="sh-sw sh-sw-none" aria-pressed={value === null} aria-label={`${label}: yok`} title="Yok" onClick={() => onChange(null)}>∅</button>}
+        {allowNone && <button type="button" className="sh-sw sh-sw-none" aria-pressed={value === null} aria-label={t('studios.sahne.costume.none', { label })} title={t('studios.sahne.costume.noneTitle')} onClick={() => onChange(null)}>∅</button>}
         {PALETTE.map((c) => <button key={c} type="button" className="sh-sw" style={{ background: c }} aria-pressed={value === c} aria-label={`${label}: ${c}`} onClick={() => onChange(c)} />)}
-        <input type="color" className="sh-sw-pick" value={value && /^#[0-9a-f]{6}$/i.test(value) ? value : '#000000'} onChange={(e) => onChange(e.target.value)} aria-label={`${label}: özel renk`} title="Özel renk" />
+        <input type="color" className="sh-sw-pick" value={value && /^#[0-9a-f]{6}$/i.test(value) ? value : '#000000'} onChange={(e) => onChange(e.target.value)} aria-label={t('studios.sahne.costume.custom', { label })} title={t('studios.sahne.costume.customTitle')} />
       </div>
     </div>
   )
 }
 
 export function CostumeEditor({ costumes, index, kind, onChange, onRename, onOpenGallery }: CostumeEditorProps) {
+  const t = useT()
+  const en = useLocale() === 'en'
   const cur: Costume | undefined = costumes[index]
   const [tool, setTool] = useState<Tool>('brush')
   const [fill, setFill] = useState<string | null>('#f59e0b')
@@ -283,13 +288,13 @@ export function CostumeEditor({ costumes, index, kind, onChange, onRename, onOpe
     setSel(-1)
     replace({ ...cur, bitmap: url, shapes: [] })
   }
-  const clearAll = () => { if (cur && window.confirm('Bu kostümdeki tüm çizim silinsin mi?')) { if (work.current) { work.current.getContext('2d')!.clearRect(0, 0, work.current.width, work.current.height) } replace({ ...cur, shapes: [], bitmap: cur.bitmap ? work.current?.toDataURL('image/png') : undefined }); setSel(-1) } }
+  const clearAll = () => { if (cur && window.confirm(t('studios.sahne.costume.confirmClear'))) { if (work.current) { work.current.getContext('2d')!.clearRect(0, 0, work.current.width, work.current.height) } replace({ ...cur, shapes: [], bitmap: cur.bitmap ? work.current?.toDataURL('image/png') : undefined }); setSel(-1) } }
 
   // ---- kostüm listesi işlemleri ----
   const select = (i: number) => { setSel(-1); onChange(costumes, i) }
   const addBlank = () => {
     if (costumes.length >= MAX_COSTUMES) return
-    const c = kind === 'backdrop' ? { ...emptyCostume(nameFor(costumes, 'arka plan'), 480, 360), shapes: [{ t: 'rect', x: 0, y: 0, w: 480, h: 360, f: '#ffffff', s: null, sw: 0 } as Shape] } : emptyCostume(nameFor(costumes, 'kostüm'))
+    const c = kind === 'backdrop' ? { ...emptyCostume(nameFor(costumes, en ? t('studios.sahne.costume.newBackdrop') : 'arka plan'), 480, 360), shapes: [{ t: 'rect', x: 0, y: 0, w: 480, h: 360, f: '#ffffff', s: null, sw: 0 } as Shape] } : emptyCostume(nameFor(costumes, en ? t('studios.sahne.costume.newCostume') : 'kostüm'))
     const list = [...costumes.slice(0, index + 1), c, ...costumes.slice(index + 1)]
     setSel(-1); onChange(list, index + 1)
   }
@@ -320,13 +325,13 @@ export function CostumeEditor({ costumes, index, kind, onChange, onRename, onOpe
 
   const thumbs = useMemo(() => costumes, [costumes])
 
-  if (!cur) return <p className="muted" style={{ padding: 16 }}>Bu hedefte kostüm yok.</p>
+  if (!cur) return <p className="muted" style={{ padding: 16 }}>{t('studios.sahne.costume.noCostume')}</p>
   const toolList = TOOLS.filter((t) => !(isBitmap && t.id === 'select' && !cur.shapes.length))
   const canSel = selShape >= 0 && !!cur.shapes[selShape]
 
   return (
     <div className="sh-ce" data-kind={kind} data-testid="sahne-costume-editor">
-      <aside className="sh-ce-list" aria-label={kind === 'sprite' ? 'Kostümler' : 'Arka planlar'}>
+      <aside className="sh-ce-list" aria-label={kind === 'sprite' ? t('studios.sahne.costume.costumes') : t('studios.sahne.costume.backdrops')}>
         <ol>
           {thumbs.map((c, i) => (
             <li key={c.id}>
@@ -334,61 +339,61 @@ export function CostumeEditor({ costumes, index, kind, onChange, onRename, onOpe
                 <span className="sh-ce-no">{i + 1}</span>
                 <Thumb c={c} />
                 <span className="sh-ce-nm">{c.name}</span>
-                {costumes.length > 1 && <button type="button" className="sh-ce-del" aria-label={`${c.name} kostümünü sil`} title="Sil" onClick={(e) => { e.stopPropagation(); remove(i) }}>✕</button>}
+                {costumes.length > 1 && <button type="button" className="sh-ce-del" aria-label={t('studios.sahne.costume.deleteCostume', { name: c.name })} title={t('studios.sahne.costume.delete')} onClick={(e) => { e.stopPropagation(); remove(i) }}>✕</button>}
               </div>
             </li>
           ))}
         </ol>
         <div className="sh-ce-add">
-          <button type="button" className="btn btn-sm" onClick={addBlank} data-testid="sahne-costume-new">＋ Çiz</button>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={onOpenGallery} data-testid="sahne-costume-gallery">🖼 Galeri</button>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={duplicate}>⧉ Kopyala</button>
+          <button type="button" className="btn btn-sm" onClick={addBlank} data-testid="sahne-costume-new">＋ {t('studios.sahne.costume.draw')}</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={onOpenGallery} data-testid="sahne-costume-gallery">🖼 {t('studios.sahne.costume.gallery')}</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={duplicate}>⧉ {t('studios.sahne.costume.duplicate')}</button>
         </div>
       </aside>
 
       <section className="sh-ce-main">
         <div className="sh-ce-top">
-          <label className="sh-ce-name"><span>{kind === 'sprite' ? 'Kostüm adı' : 'Arka plan adı'}</span>
+          <label className="sh-ce-name"><span>{kind === 'sprite' ? t('studios.sahne.costume.costumeName') : t('studios.sahne.costume.backdropName')}</span>
             <input type="text" value={cur.name} maxLength={30} onFocus={() => { nameAtFocus.current = cur.name }} onChange={(e) => rename(e.target.value)} onBlur={() => renameDone(nameAtFocus.current || cur.name)} onKeyDown={(e) => { if (e.key === 'Enter') (e.target as HTMLElement).blur() }} data-testid="sahne-costume-name" />
           </label>
           <span className="sh-spacer" />
-          <span className="sh-ce-mode" data-bitmap={isBitmap} title={isBitmap ? 'Piksel (bitmap) kipi: boyadığın yerler piksel olur.' : 'Vektör kipi: çizdiklerin ayrı şekillerdir, seçip taşıyabilirsin.'}>{isBitmap ? 'Bitmap kipi' : 'Vektör kipi'}</span>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={undo} disabled={!h(cur.id).past.length} title="Geri al" aria-label="Geri al">↶</button>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={redo} disabled={!h(cur.id).future.length} title="Yinele" aria-label="Yinele">↷</button>
+          <span className="sh-ce-mode" data-bitmap={isBitmap} title={isBitmap ? t('studios.sahne.costume.bitmapTitle') : t('studios.sahne.costume.vectorTitle')}>{isBitmap ? t('studios.sahne.costume.bitmapMode') : t('studios.sahne.costume.vectorMode')}</span>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={undo} disabled={!h(cur.id).past.length} title={t('studios.sahne.costume.undo')} aria-label={t('studios.sahne.costume.undo')}>↶</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={redo} disabled={!h(cur.id).future.length} title={t('studios.sahne.costume.redo')} aria-label={t('studios.sahne.costume.redo')}>↷</button>
         </div>
 
-        <div className="sh-ce-tools" role="toolbar" aria-label="Çizim araçları">
-          {toolList.map((t) => (
-            <button key={t.id} type="button" className="sh-tool" aria-pressed={tool === t.id} onClick={() => { setTool(t.id); if (t.id !== 'select') setSel(-1) }} title={t.label} aria-label={t.label} data-testid={`sahne-tool-${t.id}`}>
-              <span aria-hidden="true">{t.icon}</span><small>{t.label}</small>
+        <div className="sh-ce-tools" role="toolbar" aria-label={t('studios.sahne.costume.tools')}>
+          {toolList.map((tl) => (
+            <button key={tl.id} type="button" className="sh-tool" aria-pressed={tool === tl.id} onClick={() => { setTool(tl.id); if (tl.id !== 'select') setSel(-1) }} title={t(tl.label)} aria-label={t(tl.label)} data-testid={`sahne-tool-${tl.id}`}>
+              <span aria-hidden="true">{tl.icon}</span><small>{t(tl.label)}</small>
             </button>
           ))}
         </div>
 
         <div className="sh-ce-canvaswrap" data-backdrop={kind === 'backdrop'} style={{ aspectRatio: `${cur.w} / ${cur.h}` }}>
-          <canvas ref={cv} className="sh-ce-canvas" data-testid="sahne-costume-canvas" aria-label="Çizim alanı" onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} data-tool={tool} />
+          <canvas ref={cv} className="sh-ce-canvas" data-testid="sahne-costume-canvas" aria-label={t('studios.sahne.costume.canvas')} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} data-tool={tool} />
         </div>
 
         <div className="sh-ce-opts">
-          <ColorRow label="Dolgu" value={fill} onChange={setFill} allowNone />
-          <ColorRow label="Çizgi" value={line} onChange={setLine} allowNone />
-          <label className="sh-ce-width"><span>Kalınlık {width}</span><input type="range" min={1} max={40} value={width} onChange={(e) => setWidth(Number(e.target.value))} aria-label="Çizgi kalınlığı" /></label>
+          <ColorRow label={t('studios.sahne.costume.fill')} value={fill} onChange={setFill} allowNone />
+          <ColorRow label={t('studios.sahne.costume.line')} value={line} onChange={setLine} allowNone />
+          <label className="sh-ce-width"><span>{t('studios.sahne.costume.width', { n: width })}</span><input type="range" min={1} max={40} value={width} onChange={(e) => setWidth(Number(e.target.value))} aria-label={t('studios.sahne.costume.widthLabel')} /></label>
         </div>
 
         <div className="sh-ce-actions">
-          <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void flip('h') }} title="Yatay çevir">⇋ Yatay çevir</button>
-          <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void flip('v') }} title="Dikey çevir">⇅ Dikey çevir</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void flip('h') }} title={t('studios.sahne.costume.flipH')}>⇋ {t('studios.sahne.costume.flipH')}</button>
+          <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void flip('v') }} title={t('studios.sahne.costume.flipV')}>⇅ {t('studios.sahne.costume.flipV')}</button>
           {tool === 'select' && (
             <>
-              <button type="button" className="btn btn-sm btn-ghost" onClick={front} disabled={!canSel}>Öne al</button>
-              <button type="button" className="btn btn-sm btn-ghost" onClick={back} disabled={!canSel}>Arkaya al</button>
-              <button type="button" className="btn btn-sm btn-ghost" onClick={dup} disabled={!canSel}>Şekli kopyala</button>
-              <button type="button" className="btn btn-sm btn-ghost" onClick={delSel} disabled={!canSel}>Şekli sil</button>
+              <button type="button" className="btn btn-sm btn-ghost" onClick={front} disabled={!canSel}>{t('studios.sahne.costume.front')}</button>
+              <button type="button" className="btn btn-sm btn-ghost" onClick={back} disabled={!canSel}>{t('studios.sahne.costume.back')}</button>
+              <button type="button" className="btn btn-sm btn-ghost" onClick={dup} disabled={!canSel}>{t('studios.sahne.costume.dupShape')}</button>
+              <button type="button" className="btn btn-sm btn-ghost" onClick={delSel} disabled={!canSel}>{t('studios.sahne.costume.delShape')}</button>
             </>
           )}
           <span className="sh-spacer" />
-          {!isBitmap && <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void toBitmap() }} title="Çizimi piksellere çevir: sonra fırçayla pikselleri boyayabilir, silgiyle silebilirsin" data-testid="sahne-to-bitmap">Bitmap&apos;e çevir</button>}
-          <button type="button" className="btn btn-sm btn-ghost" onClick={clearAll}>Temizle</button>
+          {!isBitmap && <button type="button" className="btn btn-sm btn-ghost" onClick={() => { void toBitmap() }} title={t('studios.sahne.costume.toBitmapTitle')} data-testid="sahne-to-bitmap">{t('studios.sahne.costume.toBitmap')}</button>}
+          <button type="button" className="btn btn-sm btn-ghost" onClick={clearAll}>{t('studios.sahne.costume.clear')}</button>
         </div>
       </section>
     </div>

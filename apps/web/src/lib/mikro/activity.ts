@@ -19,6 +19,14 @@ export interface MikroActivity {
   scenario?: (s: MikroScenario) => void
   /** Benzetimdeki kart sayısı (varsayılan 1). Radyo etkinlikleri için 2. */
   cards?: 1 | 2
+  /** İngilizce görünüm metinleri (yalnız gösterim; hedef kimlikleri aynı). Yoksa Türkçe gösterilir. */
+  en?: ActivityEn
+}
+
+export interface ActivityEn {
+  intro?: string
+  /** Hedef kimliği → İngilizce yazı ve ipucu. */
+  goals?: Record<string, { text: string; hint?: string }>
 }
 
 /** Bir projeyi etkinliğin senaryosuyla başsız çalıştırıp hedefleri değerlendirir (testler ve "kontrol et" için). */

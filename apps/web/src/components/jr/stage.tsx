@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
-import { BACKGROUNDS, CHARACTERS } from '@/lib/jr/blocks'
+import { BACKGROUNDS, CHARACTERS, characterLabel } from '@/lib/jr/blocks'
+import { useLocale, useT } from '@/i18n/client'
 import type { Page, RuntimeSprite } from '@/lib/jr/types'
 import { STAGE_H, STAGE_W } from '@/lib/jr/types'
 
@@ -17,6 +18,8 @@ interface Props {
 export function Stage({ page, runtime, hops, selectedId, onTap, onSelect }: Props) {
   const outer = useRef<HTMLDivElement>(null)
   const [scale, setScale] = useState(1)
+  const t = useT()
+  const locale = useLocale()
   useEffect(() => {
     const el = outer.current
     if (!el) return
@@ -49,7 +52,7 @@ export function Stage({ page, runtime, hops, selectedId, onTap, onSelect }: Prop
                 data-y={Math.round(s.y)}
                 data-heading={Math.round(s.heading)}
                 data-scale={s.scale.toFixed(2)}
-                aria-label={`${CHARACTERS[s.character]?.label ?? 'Karakter'} (dokununca başlayan betiği çalıştırır)`}
+                aria-label={t('studios.jr.stage.spriteAria', { name: characterLabel(s.character, locale) ?? t('studios.jr.stage.spriteFallback') })}
                 onClick={() => { onSelect(s.id); onTap(s.id) }}
               >
                 <span key={hops[s.id] ?? 0} className={hops[s.id] ? 'jr-hop' : undefined} style={{ display: 'block', transform: `rotate(${s.heading}deg) scale(${s.scale})` }}>

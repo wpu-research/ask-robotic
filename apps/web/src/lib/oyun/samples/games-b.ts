@@ -5,6 +5,7 @@ import { bu, diger, makeProject, mapFromRows, oku, tiles, type OyunSample } from
 export const YILAN: OyunSample = {
   id: 'yilan', name: 'Yılan', level: 3, controls: 'Ok tuşlarıyla yönünü değiştir. Kendine ve duvara çarpma!',
   summary: 'Elmaları ye, uzadıkça uzan. Gövde parçaları belli bir süre sonra yok olur; uzunluk değişkeni bunu belirler.',
+  en: { name: 'Snake', summary: 'Eat the apples and grow longer and longer. Body parts disappear after a while; the length variable decides when.', controls: 'Change direction with the arrow keys. Don\'t crash into yourself or the wall!' },
   project: () => makeProject('Yılan', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 15 }),
@@ -48,6 +49,7 @@ export const YILAN: OyunSample = {
 export const TUGLA: OyunSample = {
   id: 'tugla-kirma', name: 'Tuğla kırma', level: 2, controls: 'Sol/sağ tuşlarıyla raketi hareket ettir.',
   summary: 'Topu raketle zıplat ve tüm tuğlaları kır. Top aşağı kaçarsa can gider.',
+  en: { name: 'Brick breaker', summary: 'Bounce the ball with your paddle and break all the bricks. If the ball falls down, you lose a life.', controls: 'Move the paddle with the left/right keys.' },
   project: () => makeProject('Tuğla kırma', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 15 }),
@@ -114,6 +116,7 @@ export const TUGLA: OyunSample = {
 export const KOSUCU: OyunSample = {
   id: 'kosucu', name: 'Koşucu', level: 2, controls: 'A (boşluk) ya da yukarı ile zıpla.',
   summary: 'Kaktüslerin üstünden zıpla, altınları topla. Zamanla oyun hızlanır.',
+  en: { name: 'Runner', summary: 'Jump over the cacti and collect the gold. The game gets faster over time.', controls: 'Jump with A (space) or up.' },
   project: () => makeProject('Koşucu', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 10 }),
@@ -168,6 +171,7 @@ export const KOSUCU: OyunSample = {
 export const BALON: OyunSample = {
   id: 'balon-patlat', name: 'Balon patlat', level: 1, controls: 'Ok tuşlarıyla nişangâhı gezdir, A (boşluk) ile patlat.',
   summary: '40 saniyede olabildiğince çok balon patlat. Yukarı kaçan balon bir canını götürür.',
+  en: { name: 'Balloon pop', summary: 'Pop as many balloons as you can in 40 seconds. Each balloon that escapes at the top costs you a life.', controls: 'Move the crosshair with the arrow keys, pop with A (space).' },
   project: () => makeProject('Balon patlat', [
     b('oyun_baslangic', {}, [
       b('sahne_renk', { C: 10 }),

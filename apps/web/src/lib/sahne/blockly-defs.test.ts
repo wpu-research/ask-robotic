@@ -85,3 +85,28 @@ describe('Blockly entegrasyonu (başsız)', () => {
     expect(json).toContain('sh_def_p1'); expect(json).toContain('sh_call_p1'); expect(json).toContain('sh_arg')
   })
 })
+
+describe('İngilizce görünüm', () => {
+  it('her bloğun İngilizce iletisi aynı girişleri içerir; araç kutusu İngilizce adlıdır', async () => {
+    const { BLOCK_MSG_EN } = await import('./blocks-en')
+    const names = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort()
+    for (const def of BLOCKS) expect(names(BLOCK_MSG_EN[def.type] ?? ''), def.type).toEqual(names(def.msg))
+    const small = toolboxJson(['sh_move', 'sh_when_flag'], 'en') as unknown as { contents: { name: string }[] }
+    expect(small.contents.map((c) => c.name)).toEqual(['Motion', 'Events'])
+  })
+
+  it('İngilizce tanımlar Blockly\'de kurulur, sonra Türkçeye geri döner', () => {
+    defineSahneBlocks(Blockly, 'en')
+    const ws = new Blockly.Workspace()
+    for (const def of BLOCKS) {
+      const blk = ws.newBlock(def.type)
+      for (const n of Object.keys(def.args)) expect(blk.getField(n) ?? blk.getInput(n), `${def.type}.${n}`).toBeTruthy()
+    }
+    expect(ws.newBlock('sh_move').toString()).toContain('move')
+    ws.dispose()
+    defineSahneBlocks(Blockly, 'tr')
+    const ws2 = new Blockly.Workspace()
+    expect(ws2.newBlock('sh_move').toString()).toContain('adım git')
+    ws2.dispose()
+  })
+})

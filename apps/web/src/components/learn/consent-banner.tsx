@@ -2,24 +2,22 @@
 import { useState } from 'react'
 import { setConsent, useConsent, type ConsentMode } from '@/lib/consent'
 import { deleteMyData, useEvents } from '@/lib/events'
+import { useT } from '@/i18n/client'
+import { consent as consentTr } from '@/i18n/tr/consent'
 
-export const CONSENT_TEXT = {
-  title: 'Öğrenme verisi (taslak, pilot)',
-  body: 'Hangi derslere baktığını, mini testlerde neyi doğru yaptığını ve ekranda geçirdiğin süreyi kaydedip İlerlemem sayfasında beceri haritası çıkarabiliriz. Ad, e-posta ya da IP adresi kaydedilmez; yalnızca bu cihazda rastgele üretilen anonim bir kimlik kullanılır. Kaydı istediğin zaman "Verilerimi sil" ile hem bu cihazdan hem sunucudan silebilirsin.',
-  minor: '16 yaşından küçükseniz kayıt için ebeveyn ya da yasal vasinin onayı gerekir. Onayı vermeden önce bir yetişkinle birlikte okuyun.',
-  draft: 'Bu metin pilot için hazırlanmış bir taslaktır; hukuki KVKK aydınlatma metninin yerini tutmaz.',
-  ack: '16 yaşından büyüğüm ya da ebeveynim/vasim bu kaydı onayladı.',
-} as const
+/** Onay metninin Türkçe kaynağı (i18n/tr/consent.ts notice). Görüntüleme dile göre t('consent.notice.*') ile. */
+export const CONSENT_TEXT = consentTr.notice
 
 function Choices({ onChoose }: { onChoose: (mode: ConsentMode, ack: boolean) => void }) {
+  const t = useT()
   const [ack, setAck] = useState(false)
   return (
     <>
-      <label className="consent-ack"><input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} /> <span>{CONSENT_TEXT.ack}</span></label>
+      <label className="consent-ack"><input type="checkbox" checked={ack} onChange={(e) => setAck(e.target.checked)} /> <span>{t('consent.notice.ack')}</span></label>
       <div className="consent-actions">
-        <button type="button" className="btn btn-primary btn-sm" disabled={!ack} onClick={() => onChoose('local', true)}>Yalnız bu cihazda tut</button>
-        <button type="button" className="btn btn-ghost btn-sm" disabled={!ack} onClick={() => onChoose('sync', true)}>Tut ve anonim olarak sunucuya da gönder</button>
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChoose('denied', false)}>Kaydetme</button>
+        <button type="button" className="btn btn-primary btn-sm" disabled={!ack} onClick={() => onChoose('local', true)}>{t('consent.local')}</button>
+        <button type="button" className="btn btn-ghost btn-sm" disabled={!ack} onClick={() => onChoose('sync', true)}>{t('consent.sync')}</button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => onChoose('denied', false)}>{t('consent.deny')}</button>
       </div>
     </>
   )
@@ -27,27 +25,23 @@ function Choices({ onChoose }: { onChoose: (mode: ConsentMode, ack: boolean) => 
 
 /** Karar verilmemişse sayfanın altında görünen onay bandı. Karar verilene kadar hiçbir olay kaydedilmez. */
 export function ConsentBanner() {
+  const t = useT()
   const consent = useConsent()
   if (consent !== null) return null // undefined: henüz okunmadı; nesne: karar verilmiş
   return (
-    <aside className="consent-banner" role="region" aria-label="Veri kaydı onayı">
-      <h2>{CONSENT_TEXT.title}</h2>
-      <p>{CONSENT_TEXT.body}</p>
-      <p><b>{CONSENT_TEXT.minor}</b></p>
-      <p className="consent-draft">{CONSENT_TEXT.draft}</p>
+    <aside className="consent-banner" role="region" aria-label={t('consent.bannerLabel')}>
+      <h2>{t('consent.notice.title')}</h2>
+      <p>{t('consent.notice.body')}</p>
+      <p><b>{t('consent.notice.minor')}</b></p>
+      <p className="consent-draft">{t('consent.notice.draft')}</p>
       <Choices onChoose={setConsent} />
     </aside>
   )
 }
 
-const MODE_TEXT: Record<ConsentMode, string> = {
-  local: 'Olaylar yalnız bu tarayıcıda saklanıyor.',
-  sync: 'Olaylar bu tarayıcıda saklanıyor ve anonim olarak sunucuya gönderiliyor.',
-  denied: 'Hiçbir şey kaydedilmiyor.',
-}
-
 /** İlerlemem sayfasındaki ayar kutusu: onayı değiştir ve "Verilerimi sil". */
 export function ConsentSettings() {
+  const t = useT()
   const consent = useConsent()
   const events = useEvents()
   const [confirm, setConfirm] = useState(false)
@@ -58,27 +52,25 @@ export function ConsentSettings() {
     setMsg('')
     const r = await deleteMyData()
     setConfirm(false)
-    setMsg(r.server === 'hata'
-      ? 'Sunucudaki kayıtlar silinemedi; hiçbir şey silinmedi. Bağlantını kontrol edip yeniden dene.'
-      : `Silindi: bu tarayıcıdaki olay günlüğü, cihaz kimliği ve onay${r.server === 'silindi' ? ' ile sunucudaki kayıtların' : ''}. Ders ilerlemen ve çalışma dosyaların etkilenmedi.`)
+    setMsg(t(r.server === 'hata' ? 'consent.deleteError' : r.server === 'silindi' ? 'consent.deletedServer' : 'consent.deletedLocal'))
   }
 
   return (
     <section className="panel consent-settings" aria-labelledby="veri-ayar">
-      <h2 id="veri-ayar">Verilerim (taslak, pilot)</h2>
-      <p>{consent ? MODE_TEXT[consent.mode] : 'Henüz bir karar vermedin; hiçbir şey kaydedilmiyor.'} Kayıtlı olay sayısı: <b>{events.length}</b>.</p>
-      <p className="muted">{CONSENT_TEXT.body}</p>
-      <p className="muted">{CONSENT_TEXT.minor} {CONSENT_TEXT.draft}</p>
-      <h3>Tercihini değiştir</h3>
+      <h2 id="veri-ayar">{t('consent.settingsTitle')}</h2>
+      <p>{consent ? t(`consent.mode.${consent.mode}`) : t('consent.undecided')} {t('consent.eventCount')} <b>{events.length}</b>.</p>
+      <p className="muted">{t('consent.notice.body')}</p>
+      <p className="muted">{t('consent.notice.minor')} {t('consent.notice.draft')}</p>
+      <h3>{t('consent.change')}</h3>
       <Choices onChoose={setConsent} />
-      <h3>Verilerimi sil</h3>
+      <h3>{t('consent.deleteTitle')}</h3>
       {!confirm ? (
-        <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setConfirm(true); setMsg('') }}>Verilerimi sil</button>
+        <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setConfirm(true); setMsg('') }}>{t('consent.deleteButton')}</button>
       ) : (
-        <div className="consent-actions" role="alertdialog" aria-label="Silme onayı">
-          <span>Olay günlüğü, cihaz kimliği ve onay bu cihazdan ve sunucudan kalıcı olarak silinecek. Emin misin?</span>
-          <button type="button" className="btn btn-primary btn-sm" onClick={wipe}>Evet, sil</button>
-          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirm(false)}>Vazgeç</button>
+        <div className="consent-actions" role="alertdialog" aria-label={t('consent.deleteDialog')}>
+          <span>{t('consent.deleteConfirm')}</span>
+          <button type="button" className="btn btn-primary btn-sm" onClick={wipe}>{t('consent.deleteYes')}</button>
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirm(false)}>{t('consent.deleteNo')}</button>
         </div>
       )}
       {msg && <p role="status" className="consent-msg">{msg}</p>}

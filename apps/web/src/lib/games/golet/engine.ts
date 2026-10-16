@@ -7,12 +7,13 @@ import { advance, apiFor, createWorld, settle, snapshot, type PondData, type Pon
 
 export const MATCH_OVER = 'Maç bitti.'
 
-export function outcomeMessage(frame: PondFrame, won: boolean): string {
-  if (won) return frame.tick < 200 ? 'Rakipleri hızla yendin!' : 'Maçı kazandın!'
+export function outcomeMessage(frame: PondFrame, won: boolean, en = false): string {
+  if (won) return frame.tick < 200 ? (en ? 'You beat the rivals fast!' : 'Rakipleri hızla yendin!') : (en ? 'You won the match!' : 'Maçı kazandın!')
   const me = frame.ducks[0]
-  if (!me.alive) return 'Ördeğin yenildi. Hareket etmeyi ve kaçmayı dene.'
+  if (!me.alive) return en ? 'Your duck was beaten. Try moving and dodging.' : 'Ördeğin yenildi. Hareket etmeyi ve kaçmayı dene.'
   const left = frame.ducks.slice(1).filter((d) => d.alive).length
-  if (frame.reason === 'timeout') return `Süre doldu, ${left} rakip hâlâ yüzüyor. Daha çok isabet gerek.`
+  if (frame.reason === 'timeout') return en ? `Time's up, ${left} rival(s) still swimming. You need more hits.` : `Süre doldu, ${left} rakip hâlâ yüzüyor. Daha çok isabet gerek.`
+  if (en) return left === 1 ? 'One rival is still swimming. Your program may have ended too early.' : `${left} rivals are still swimming. Your program may have ended too early.`
   return left === 1 ? 'Bir rakip hâlâ yüzüyor. Programın erken bitmiş olabilir.' : `${left} rakip hâlâ yüzüyor. Programın erken bitmiş olabilir.`
 }
 
@@ -49,7 +50,7 @@ export function createRun(level: LevelDef, opts: { seed?: number } = {}): GameRu
       settle(world)
       const won = me.alive && world.ducks.slice(1).every((d) => !d.alive)
       const f = snapshot(world)
-      return won ? { ok: true, message: outcomeMessage(f, true) } : { ok: false, message: outcomeMessage(f, false) }
+      return won ? { ok: true, message: outcomeMessage(f, true), messageEn: outcomeMessage(f, true, true) } : { ok: false, message: outcomeMessage(f, false), messageEn: outcomeMessage(f, false, true) }
     },
   }
 }

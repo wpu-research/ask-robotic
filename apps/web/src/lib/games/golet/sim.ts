@@ -120,6 +120,15 @@ export const DUCK_COLORS: Record<Duck['kind'], string> = {
   player: '#ffc93c', sitter: '#9fb4c8', wanderer: '#5cc08a', hunter: '#ef5f5f', sniper: '#a07be0', master: '#2f3a4f',
 }
 export const KIND_NAMES: Record<AiKind, string> = { sitter: 'Dümdüz', wanderer: 'Gezgin', hunter: 'Avcı', sniper: 'Nişancı', master: 'Usta' }
+/** Rakip türlerinin İngilizce adları (yalnız görünüm). */
+export const KIND_NAMES_EN: Record<AiKind, string> = { sitter: 'Sitter', wanderer: 'Wanderer', hunter: 'Hunter', sniper: 'Sniper', master: 'Master' }
+/** Ördeğin görünen adı: İngilizcede "Sen" → "You", "Gezgin 2" → "Wanderer 2". Kayıtlı ad değişmez. */
+export function duckDisplayName(d: { name: string; kind: 'player' | AiKind }, en: boolean): string {
+  if (!en) return d.name
+  if (d.kind === 'player') return 'You'
+  const tr = KIND_NAMES[d.kind]
+  return d.name.startsWith(tr) ? KIND_NAMES_EN[d.kind] + d.name.slice(tr.length) : d.name
+}
 
 export interface FoeSpec {
   kind: AiKind

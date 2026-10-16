@@ -2,6 +2,7 @@
 import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Icon } from '@/components/shell/icons'
+import { useLocale, useT } from '@/i18n/client'
 import { GAME_META, LEVEL_COUNT } from '@/lib/games/meta'
 import { doneCount, nextOpenLevel } from '@/lib/games/progress'
 import { useGameProgress } from './use-progress'
@@ -21,6 +22,8 @@ const GLYPH: Record<string, ReactNode> = {
 
 export function GameList({ available }: { available: Record<string, boolean> }) {
   const progress = useGameProgress()
+  const t = useT()
+  const en = useLocale() === 'en'
   return (
     <ul className="gm-cards">
       {GAME_META.map((g) => {
@@ -32,15 +35,15 @@ export function GameList({ available }: { available: Record<string, boolean> }) 
               <svg viewBox="0 0 48 48" width="56" height="56" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">{GLYPH[g.slug]}</svg>
             </span>
             <span className="gm-card-text">
-              <b className="gm-card-title">{g.title}{!ok && <span className="badge-soon">Yakında</span>}</b>
-              <span className="gm-card-tag">{g.tagline}</span>
+              <b className="gm-card-title">{en ? g.titleEn : g.title}{!ok && <span className="badge-soon">{t('studios.games.list.soon')}</span>}</b>
+              <span className="gm-card-tag">{en ? g.taglineEn : g.tagline}</span>
             </span>
             <span className="gm-card-foot">
-              <span className="gm-card-prog" aria-label={`İlerleme: ${n} / ${LEVEL_COUNT}`}>
+              <span className="gm-card-prog" aria-label={t('studios.games.list.progress', { n, total: LEVEL_COUNT })}>
                 <span className="gm-bar"><span style={{ width: `${(n / LEVEL_COUNT) * 100}%` }} /></span>
                 <span className="gm-card-count">{n}/{LEVEL_COUNT}</span>
               </span>
-              {ok && <span className="gm-card-go">{n === 0 ? 'Başla' : n >= LEVEL_COUNT ? 'Tekrar oyna' : 'Devam et'} <Icon name="arrowRight" size={16} /></span>}
+              {ok && <span className="gm-card-go">{n === 0 ? t('studios.games.list.start') : n >= LEVEL_COUNT ? t('studios.games.list.replay') : t('studios.games.list.continue')} <Icon name="arrowRight" size={16} /></span>}
             </span>
           </>
         )

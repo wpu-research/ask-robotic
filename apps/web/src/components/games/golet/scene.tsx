@@ -4,9 +4,11 @@ import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from 'rea
 import { markLevelDone } from '@/lib/games/progress'
 import { outcomeMessage } from '@/lib/games/golet/engine'
 import { getRecording } from '@/lib/games/golet/recording'
-import { ranking, type PondData, type PondFrame } from '@/lib/games/golet/sim'
+import { duckDisplayName, ranking, type PondData, type PondFrame } from '@/lib/games/golet/sim'
 import { STARTER, TEMPLATES } from '@/lib/games/golet/templates'
-import { runInWorker } from '@/lib/games/golet/text-client'
+import { goletErrorEn, runInWorker } from '@/lib/games/golet/text-client'
+import { useLocale, useT } from '@/i18n/client'
+import type { MessageKey } from '@/i18n'
 import type { SceneProps } from '@/lib/games/types'
 import { CodeEditor } from './code-editor'
 import { PondSvg } from './pond-svg'
@@ -26,17 +28,12 @@ const saveCode = (level: number, code: string) => {
 interface Play { frames: PondFrame[]; i: number; kind: 'js' | 'replay' | 'settle' }
 interface JsResult { won: boolean; message: string; frames: PondFrame[] }
 
-const HELP: [string, string][] = [
-  ['swim(yön, hız)', 'Yönünü (0 sağ, 90 yukarı, 180 sol, 270 aşağı) ve hızını (0–100) ayarlar. Değiştirene kadar sürer.'],
-  ['cannon(yön, menzil)', 'Top atar. Menzil en çok 70. Top 16 tikte bir hazır olur.'],
-  ['scan(yön)', 'O yöne bakar (5° genişlik): en yakın rakibin uzaklığı, yoksa Infinity. scan(yön, genişlik) de olur.'],
-  ['health()', 'Kalan canın (0–100).'],
-  ['getX()  getY()', 'Konumun (0–100). Sol alt köşe 0,0.'],
-  ['speed()', 'Şu anki hızın.'],
-  ['hafiza', 'Tikler arasında bilgi taşıyan nesne: hafiza.sayac = 5.'],
-]
+/** Komut yardımı: imza ve açıklama metinleri studios.gamesB.golet.help.<ad> altında. */
+const HELP = ['swim', 'cannon', 'scan', 'health', 'xy', 'speed', 'hafiza'] as const
 
 export default function Scene({ level, frame, running, outcome }: SceneProps<PondFrame>) {
+  const t = useT()
+  const en = useLocale() === 'en'
   const data = level.data as PondData
   const [mode, setMode] = useState<'blocks' | 'js'>('blocks')
   const [editing, setEditing] = useState(true)
@@ -95,17 +92,17 @@ export default function Scene({ level, frame, running, outcome }: SceneProps<Pon
     saveCode(level.id, code)
     const r = await runInWorker(code, data, 1)
     setBusy(false)
-    if (!r.ok) { setErr(r.error); return }
+    if (!r.ok) { setErr(en ? goletErrorEn(r.error) : r.error); return }
     const m = r.result
-    if (m.error) { setErr(m.error); return }
+    if (m.error) { setErr(en ? goletErrorEn(m.error) : m.error); return }
     const last = m.frames[m.frames.length - 1]
-    const message = outcomeMessage(last, m.won)
+    const message = outcomeMessage(last, m.won, en)
     setJs({ won: m.won, message, frames: m.frames })
     if (m.won) markLevelDone('golet', level.id)
     setEditing(false)
     setPlay({ frames: m.frames, i: 0, kind: 'js' })
     setPlaying(true)
-  }, [busy, code, data, level.id])
+  }, [busy, code, data, level.id, en])
 
   const replay = () => {
     const frames = recFrames
@@ -127,41 +124,41 @@ export default function Scene({ level, frame, running, outcome }: SceneProps<Pon
           <div key={d.id} className="gl-chip" data-dead={!d.alive}>
             <span className="gl-chip-dot" style={{ background: d.color }} />
             {ranks && <span className="gl-chip-rank">{ranks.get(d.id)}.</span>}
-            <span className="gl-chip-name">{d.name}</span>
+            <span className="gl-chip-name">{duckDisplayName(d, en)}</span>
             <span className="gl-chip-bar"><span data-low={d.hp <= 25} style={{ width: `${d.hp}%` }} /></span>
             <span className="gl-chip-hp">{Math.round(d.hp)}</span>
           </div>
         ))}
       </div>
 
-      {!showEditor && <div className="gl-tick" aria-hidden="true">Tik {shown.tick} / {shown.maxTicks}</div>}
+      {!showEditor && <div className="gl-tick" aria-hidden="true">{t('studios.gamesB.golet.tick', { n: shown.tick, max: shown.maxTicks })}</div>}
 
       {finished && mode === 'js' && js && (
         <div className="gl-result" data-ok={js.won} role="status">
-          <h3>{js.won ? 'Kazandın!' : 'Bu sefer olmadı'}</h3>
+          <h3>{js.won ? t('studios.gamesB.golet.won') : t('studios.gamesB.golet.lost')}</h3>
           <p>{js.message}</p>
           <div className="gl-result-actions">
-            {js.won && <a className="gl-primary" href={nextHref}>{level.id < 10 ? 'Sonraki meydan okuma' : 'Oyunlara dön'}</a>}
-            <button type="button" onClick={replay}>Tekrar izle</button>
-            <button type="button" onClick={() => { setEditing(true); setPlay(null) }}>Kodu düzenle</button>
+            {js.won && <a className="gl-primary" href={nextHref}>{level.id < 10 ? t('studios.gamesB.golet.nextChallenge') : t('studios.gamesB.golet.backToGames')}</a>}
+            <button type="button" onClick={replay}>{t('studios.gamesB.golet.replay')}</button>
+            <button type="button" onClick={() => { setEditing(true); setPlay(null) }}>{t('studios.gamesB.golet.editCode')}</button>
           </div>
         </div>
       )}
 
       <div className="gl-bar" data-editor={showEditor}>
-        <div className="gl-seg" role="group" aria-label="Programlama kipi">
-          <button type="button" aria-pressed={mode === 'blocks'} onClick={() => { setMode('blocks'); setEditing(true) }}>Bloklar</button>
+        <div className="gl-seg" role="group" aria-label={t('studios.gamesB.golet.modeLabel')}>
+          <button type="button" aria-pressed={mode === 'blocks'} onClick={() => { setMode('blocks'); setEditing(true) }}>{t('studios.gamesB.golet.blocks')}</button>
           <button type="button" aria-pressed={mode === 'js'} onClick={() => { setMode('js'); setEditing(!js || !play) }} disabled={running}>JavaScript</button>
         </div>
         {!showEditor && (
           <div className="gl-right">
             {play && playing && (
-              <button type="button" className="gl-pill" onClick={() => { setSpeedX((s) => (s >= 8 ? 1 : s * 2)) }} aria-label={`Oynatma hızı ${speedX} kat, değiştir`}>×{speedX}</button>
+              <button type="button" className="gl-pill" onClick={() => { setSpeedX((s) => (s >= 8 ? 1 : s * 2)) }} aria-label={t('studios.gamesB.golet.speedLabel', { n: speedX })}>×{speedX}</button>
             )}
-            {play && playing && <button type="button" className="gl-pill" onClick={() => setPlay((p) => (p ? { ...p, i: p.frames.length - 1 } : p))}>Sonuca atla</button>}
-            {recFrames && !playing && !finished && <button type="button" className="gl-pill" onClick={replay}>Tekrar izle</button>}
-            {recFrames && !playing && finished && mode === 'blocks' && <button type="button" className="gl-pill" onClick={replay}>Tekrar izle</button>}
-            {mode === 'js' && !playing && !busy && <button type="button" className="gl-pill" onClick={() => { setEditing(true); setPlay(null) }}>Kodu düzenle</button>}
+            {play && playing && <button type="button" className="gl-pill" onClick={() => setPlay((p) => (p ? { ...p, i: p.frames.length - 1 } : p))}>{t('studios.gamesB.golet.skipToEnd')}</button>}
+            {recFrames && !playing && !finished && <button type="button" className="gl-pill" onClick={replay}>{t('studios.gamesB.golet.replay')}</button>}
+            {recFrames && !playing && finished && mode === 'blocks' && <button type="button" className="gl-pill" onClick={replay}>{t('studios.gamesB.golet.replay')}</button>}
+            {mode === 'js' && !playing && !busy && <button type="button" className="gl-pill" onClick={() => { setEditing(true); setPlay(null) }}>{t('studios.gamesB.golet.editCode')}</button>}
           </div>
         )}
       </div>
@@ -169,25 +166,25 @@ export default function Scene({ level, frame, running, outcome }: SceneProps<Pon
       {showEditor && (
         <div className="gl-editor">
           <div className="gl-ed-head">
-            <h2 className="gl-ed-title">JavaScript ile programla</h2>
-            <select className="gl-select" aria-label="Örnek kod seç" value="" onChange={(e) => { const t = TEMPLATES.find((x) => x.id === e.target.value); if (t) { setCode(t.code); setErr(null) } }}>
-              <option value="">Örnek kod…</option>
-              {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+            <h2 className="gl-ed-title">{t('studios.gamesB.golet.jsTitle')}</h2>
+            <select className="gl-select" aria-label={t('studios.gamesB.golet.pickSample')} value="" onChange={(e) => { const tp = TEMPLATES.find((x) => x.id === e.target.value); if (tp) { setCode(tp.code); setErr(null) } }}>
+              <option value="">{t('studios.gamesB.golet.sampleCode')}</option>
+              {TEMPLATES.map((tp) => <option key={tp.id} value={tp.id}>{en ? tp.nameEn : tp.name}</option>)}
             </select>
-            <button type="button" className="gl-select" onClick={() => setHelpOpen((o) => !o)} aria-expanded={helpOpen}>{helpOpen ? 'Kodu göster' : 'Komutlar'}</button>
+            <button type="button" className="gl-select" onClick={() => setHelpOpen((o) => !o)} aria-expanded={helpOpen}>{helpOpen ? t('studios.gamesB.golet.showCode') : t('studios.gamesB.golet.commands')}</button>
           </div>
           {helpOpen ? (
             <div className="gl-help">
-              <h3>Komutlar</h3>
-              <dl>{HELP.map(([k, v]) => (<Fragment key={k}><dt>{k}</dt><dd>{v}</dd></Fragment>))}</dl>
-              <p>Kodun her tikte baştan çalışır, o yüzden <code>while (true)</code> yazma. Bir tik, havuzdaki her şeyin bir adım ilerlemesidir.</p>
+              <h3>{t('studios.gamesB.golet.commands')}</h3>
+              <dl>{HELP.map((k) => (<Fragment key={k}><dt>{t(`studios.gamesB.golet.help.${k}.sig` as MessageKey)}</dt><dd>{t(`studios.gamesB.golet.help.${k}.text` as MessageKey)}</dd></Fragment>))}</dl>
+              <p>{t('studios.gamesB.golet.helpNoteBefore')}<code>while (true)</code>{t('studios.gamesB.golet.helpNoteAfter')}</p>
             </div>
           ) : (
             <CodeEditor value={code} onChange={(v) => { setCode(v); saveCode(level.id, v) }} onRun={run} disabled={busy} />
           )}
           <div className="gl-ed-foot">
-            <button type="button" className="gl-run" onClick={run} disabled={busy}>{busy ? 'Çalışıyor…' : 'Maçı başlat'}</button>
-            <p className="gl-msg" data-kind={err ? 'err' : undefined} role="status">{err ?? 'Ctrl+Enter ile de başlatabilirsin.'}</p>
+            <button type="button" className="gl-run" onClick={run} disabled={busy}>{busy ? t('studios.gamesB.golet.running') : t('studios.gamesB.golet.startMatch')}</button>
+            <p className="gl-msg" data-kind={err ? 'err' : undefined} role="status">{err ?? t('studios.gamesB.golet.ctrlEnter')}</p>
           </div>
         </div>
       )}

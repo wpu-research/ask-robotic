@@ -4,7 +4,8 @@ import { useEffect, useState } from 'react'
 import type { CatalogModule, CatalogWeek } from '@/lib/catalog'
 import { useActivity } from '@/lib/activity-store'
 import { countDone, lastOpenedLesson, flattenCatalog, lessonStatus, moduleLessonIds } from '@/lib/dashboard'
-import { ageLabel, MODULE_META } from '@/lib/module-meta'
+import { MODULE_META } from '@/lib/module-meta'
+import { localizedAgeLabel, localizeModule, moduleCallout } from '@/lib/catalog-en'
 import { useFormat, useLocale, useT } from '@/i18n/client'
 import { useDoneIds } from '@/lib/progress-store'
 import { KindBadge, LessonKindBadge, StatusPill } from '../badges'
@@ -27,19 +28,19 @@ function WeekProgress({ w }: { w: CatalogWeek }) {
   )
 }
 
-export function ModuleView({ m, guides = {} }: { m: CatalogModule; /** Hafta sırası -> haftalık çalışma rehberi (Markdown). */ guides?: Record<number, string> }) {
+export function ModuleView({ m: mTr, guides = {} }: { m: CatalogModule; /** Hafta sırası -> haftalık çalışma rehberi (Markdown). */ guides?: Record<number, string> }) {
   const done = useDoneIds()
   const act = useActivity()
   const t = useT()
   const locale = useLocale()
   const fmt = useFormat()
-  const meta = MODULE_META[m.slug]
+  // Modül adı, tanıtım, kitle ve hafta adları dile göre (lib/catalog-en.ts); ders başlıkları Türkçe kalır
+  const m = localizeModule(mTr, locale)
+  const meta = MODULE_META[m.slug] ? { audience: m.audience || MODULE_META[m.slug].audience, callout: moduleCallout(m.slug, locale) } : undefined
   const ids = moduleLessonIds(m)
   const c = countDone(ids, done)
   const minutes = m.weeks.reduce((n, w) => n + w.lessons.reduce((k, l) => k + l.durationMin, 0), 0)
-  const ageTr = ageLabel(m.slug, m.minAge)
-  // MODULE_META.ages Türkçe ('5-7 yaş', '8+ yaş'): İngilizcede 'Ages 5-7'
-  const age = ageTr && locale === 'en' ? `Ages ${ageTr.replace(/ yaş$/, '')}` : ageTr
+  const age = localizedAgeLabel(m.slug, m.minAge, locale)
 
   // Devam noktası: modüldeki son açılan bitmemiş ders, yoksa ilk yapılmamış ders.
   const flat = flattenCatalog([m])

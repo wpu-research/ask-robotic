@@ -73,13 +73,14 @@ if (getX() < 16 || getX() > 84 || getY() < 16 || getY() > 84) {
 }
 `
 
-export interface Template { id: string; name: string; code: string }
+/** `nameEn`: İngilizce arayüzdeki ad. Kod (yorumlar ve `hafiza` gibi adlar dahil) çalışma biçimini korumak için değişmez. */
+export interface Template { id: string; name: string; nameEn: string; code: string }
 export const TEMPLATES: Template[] = [
-  { id: 'baslangic', name: 'Tara ve ateş et', code: STARTER },
-  { id: 'kacis', name: 'Ateş et ve kaç', code: ORBIT },
-  { id: 'zikzak', name: 'Zikzak kaçış (final)', code: ZIGZAG },
-  { id: 'can', name: 'Canına göre hız', code: DODGE },
-  { id: 'gezgin', name: 'Dolaşma (hafiza)', code: WANDER },
+  { id: 'baslangic', name: 'Tara ve ateş et', nameEn: 'Scan and fire', code: STARTER },
+  { id: 'kacis', name: 'Ateş et ve kaç', nameEn: 'Fire and dodge', code: ORBIT },
+  { id: 'zikzak', name: 'Zikzak kaçış (final)', nameEn: 'Zigzag escape (final)', code: ZIGZAG },
+  { id: 'can', name: 'Canına göre hız', nameEn: 'Speed by health', code: DODGE },
+  { id: 'gezgin', name: 'Dolaşma (hafiza)', nameEn: 'Wandering (hafiza memory)', code: WANDER },
 ]
 
 /** Seviye çözümleri (JavaScript kipi); testte her seviyede kazandığı doğrulanır. */

@@ -4,6 +4,7 @@
 import { useId } from 'react'
 import type { SceneProps } from '@/lib/games/types'
 import { BLAST, SCAN_HALF, type Duck, type World } from '@/lib/games/pondtutor/world'
+import { useT } from '@/i18n/client'
 
 const STEP_MS = 90
 const Y = (y: number) => 100 - y
@@ -43,6 +44,7 @@ function DuckSprite({ d, dur, color, belly, label, hurt, hurtKey }: { d: Duck; d
 }
 
 export default function Scene({ frame, speed, running }: SceneProps<World>) {
+  const t = useT()
   const w = frame
   const uid = useId().replace(/:/g, '')
   const dur = Math.max(20, STEP_MS / Math.max(0.1, speed))
@@ -55,9 +57,9 @@ export default function Scene({ frame, speed, running }: SceneProps<World>) {
     return `M ${cx} ${Y(cy)} L ${cx + Math.cos(a1) * len} ${Y(cy + Math.sin(a1) * len)} L ${cx + Math.cos(a2) * len} ${Y(cy + Math.sin(a2) * len)} Z`
   }
   const reloadFrac = Math.min(1, Math.max(0, 1 - p.reload / 8))
-  const live = w.status === 'playing' ? 'oynuyor' : w.status
+  const live = w.status === 'playing' ? t('studios.gamesB.pondtutor.playing') : w.status
   return (
-    <svg viewBox="0 0 100 100" className="pt-scene" role="img" aria-label={`Gölet sahnesi. Ördeğin x ${Math.round(p.x)}, y ${Math.round(p.y)}, can ${Math.ceil(p.health)}.${e ? ` Rakip canı ${Math.ceil(e.health)}.` : ''} Durum: ${live}.`} data-testid="pondtutor-scene" data-tick={w.tick} data-status={w.status} data-running={running}>
+    <svg viewBox="0 0 100 100" className="pt-scene" role="img" aria-label={t('studios.gamesB.pondtutor.sceneLabel', { x: Math.round(p.x), y: Math.round(p.y), hp: Math.ceil(p.health), enemy: e ? t('studios.gamesB.pondtutor.enemyHealth', { hp: Math.ceil(e.health) }) : '', status: live })} data-testid="pondtutor-scene" data-tick={w.tick} data-status={w.status} data-running={running}>
       <style>{`
         .pt-scene{display:block;width:100%;height:100%;font-family:system-ui,sans-serif}
         .pt-duck{will-change:transform}

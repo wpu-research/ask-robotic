@@ -1,6 +1,8 @@
 'use client'
 // Karo haritası editörü: harita seç / oluştur, karo takımı (duvar işareti) ve boyama.
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLocale, useT } from '@/i18n/client'
+import { ASSET_NAME_EN } from '@/lib/oyun/i18n-en'
 import { PALETTE_RGB } from '@/lib/oyun/palette'
 import { parse } from '@/lib/oyun/pixels'
 import { ensureTile, newMap, removeTileEntry, renameMapRefs, resizeMap, setCell, tileKey } from '@/lib/oyun/project'
@@ -36,6 +38,8 @@ function DraftInput({ value, onCommit }: { value: string; onCommit: (v: string) 
 export interface MapEditorProps { project: OyunProject; onChange: (p: OyunProject) => void }
 
 export function MapEditor({ project, onChange }: MapEditorProps) {
+  const t = useT()
+  const locale = useLocale()
   const [sel, setSel] = useState(0)
   const [tile, setTile] = useState(0)
   const [tool, setTool] = useState<MTool>('paint')
@@ -122,7 +126,7 @@ export function MapEditor({ project, onChange }: MapEditorProps) {
     e.preventDefault()
     ;(e.target as Element).setPointerCapture?.(e.pointerId)
     if (tool === 'fill') { updateMap(floodCells(map, c[0], c[1], tileKey(tile))); return }
-    if (tool === 'paint' && !project.tileset[tile]) { setMsg('Önce karo takımından bir karo seç ya da ekle.'); return }
+    if (tool === 'paint' && !project.tileset[tile]) { setMsg(t('studios.oyun.map.pickTileFirst')); return }
     painting.current = true
     updateMap(paintAt(map, c[0], c[1]))
   }
@@ -143,7 +147,7 @@ export function MapEditor({ project, onChange }: MapEditorProps) {
     setSel(project.maps.length)
   }
   const removeMap = () => {
-    if (!map || !window.confirm(`"${map.name}" haritasını silmek istiyor musun?`)) return
+    if (!map || !window.confirm(t('studios.oyun.map.confirmDelete', { name: map.name }))) return
     onChange({ ...project, maps: project.maps.filter((_, i) => i !== mapIndex) })
     setSel(0)
   }
@@ -159,7 +163,7 @@ export function MapEditor({ project, onChange }: MapEditorProps) {
   const addTile = (image: string) => {
     const p = { ...project, tileset: [...project.tileset] }
     const idx = ensureTile(p, image, false)
-    if (idx < 0) { setMsg(`Karo takımı dolu (en çok ${MAX_TILESET}).`); return }
+    if (idx < 0) { setMsg(t('studios.oyun.map.tilesetFull', { n: MAX_TILESET })); return }
     onChange(p)
     setTile(idx)
     setAddOpen(false)
@@ -167,72 +171,72 @@ export function MapEditor({ project, onChange }: MapEditorProps) {
   }
   const toggleWall = (i: number) => onChange({ ...project, tileset: project.tileset.map((t, k) => (k === i ? { ...t, wall: !t.wall } : t)) })
   const removeTile = (i: number) => {
-    if (!window.confirm('Bu karoyu takımdan çıkarmak, haritalardaki bütün örneklerini de siler. Devam edilsin mi?')) return
+    if (!window.confirm(t('studios.oyun.map.confirmRemoveTile'))) return
     onChange(removeTileEntry(project, i))
     setTile(0)
   }
 
   const own = Object.entries(project.images).filter(([, im]) => im.rows.length === 16 && im.rows[0].length === 16)
-  const tileImages: [string, { name?: string; rows: string[] }][] = [...own, ...galleryOf('karo').filter((a) => !project.images[a.id]).map((a) => [a.id, { name: a.name, rows: a.rows }] as [string, { name?: string; rows: string[] }])]
+  const tileImages: [string, { name?: string; rows: string[] }][] = [...own, ...galleryOf('karo').filter((a) => !project.images[a.id]).map((a) => [a.id, { name: locale === 'en' ? ASSET_NAME_EN[a.id] ?? a.name : a.name, rows: a.rows }] as [string, { name?: string; rows: string[] }])]
 
   return (
     <div className="oy-mapEd" data-testid="oyun-map-editor">
       <div className="oy-map-top">
         <label className="oy-field">
-          <span className="oy-label">Harita</span>
+          <span className="oy-label">{t('studios.oyun.map.map')}</span>
           <select value={Math.max(0, mapIndex)} onChange={(e) => setSel(Number(e.target.value))} disabled={!project.maps.length}>
             {project.maps.map((m, i) => <option key={m.name} value={i}>{m.name}</option>)}
-            {!project.maps.length && <option>(harita yok)</option>}
+            {!project.maps.length && <option>{t('studios.oyun.map.none')}</option>}
           </select>
         </label>
-        <button type="button" className="btn btn-sm btn-primary" onClick={addMap}>＋ Yeni harita</button>
+        <button type="button" className="btn btn-sm btn-primary" onClick={addMap}>{t('studios.oyun.map.newMap')}</button>
         {map && <>
-          <label className="oy-field"><span className="oy-label">Adı</span><DraftInput key={map.name + mapIndex} value={map.name} onCommit={rename} /></label>
-          <label className="oy-field oy-num"><span className="oy-label">Sütun</span><input type="number" min={1} max={MAX_MAP_COLS} value={map.cols} onChange={(e) => resize(Number(e.target.value), map.rows)} /></label>
-          <label className="oy-field oy-num"><span className="oy-label">Satır</span><input type="number" min={1} max={MAX_MAP_ROWS} value={map.rows} onChange={(e) => resize(map.cols, Number(e.target.value))} /></label>
-          <button type="button" className="btn btn-sm btn-ghost oy-danger" onClick={removeMap}>Sil</button>
+          <label className="oy-field"><span className="oy-label">{t('studios.oyun.map.name')}</span><DraftInput key={map.name + mapIndex} value={map.name} onCommit={rename} /></label>
+          <label className="oy-field oy-num"><span className="oy-label">{t('studios.oyun.map.cols')}</span><input type="number" min={1} max={MAX_MAP_COLS} value={map.cols} onChange={(e) => resize(Number(e.target.value), map.rows)} /></label>
+          <label className="oy-field oy-num"><span className="oy-label">{t('studios.oyun.map.rows')}</span><input type="number" min={1} max={MAX_MAP_ROWS} value={map.rows} onChange={(e) => resize(map.cols, Number(e.target.value))} /></label>
+          <button type="button" className="btn btn-sm btn-ghost oy-danger" onClick={removeMap}>{t('studios.oyun.map.delete')}</button>
         </>}
       </div>
       {msg && <p className="oy-note" role="status">{msg}</p>}
       <div className="oy-map-body">
         <div className="oy-map-side">
-          <div className="oy-tools-row" role="toolbar" aria-label="Harita araçları">
-            {([['paint', '✏️', 'Boya'], ['erase', '🧽', 'Sil'], ['fill', '🪣', 'Doldur']] as const).map(([id, ic, label]) => (
+          <div className="oy-tools-row" role="toolbar" aria-label={t('studios.oyun.map.tools')}>
+            {([['paint', '✏️', t('studios.oyun.map.paint')], ['erase', '🧽', t('studios.oyun.map.erase')], ['fill', '🪣', t('studios.oyun.map.fill')]] as const).map(([id, ic, label]) => (
               <button key={id} type="button" className="oy-tool" aria-pressed={tool === id} onClick={() => setTool(id)}><span aria-hidden="true">{ic}</span><span className="oy-tool-l">{label}</span></button>
             ))}
           </div>
-          <span className="oy-label">Karo takımı</span>
-          <ul className="oy-tileset" aria-label="Karo takımı">
-            {project.tileset.map((t, i) => {
-              const rows = rowsOf(project, t.image)
+          <span className="oy-label">{t('studios.oyun.map.tileset')}</span>
+          <ul className="oy-tileset" aria-label={t('studios.oyun.map.tileset')}>
+            {project.tileset.map((tl, i) => {
+              const rows = rowsOf(project, tl.image)
               return (
-                <li key={`${t.image}-${i}`} className="oy-tile" data-selected={i === tile && tool !== 'erase'}>
-                  <button type="button" className="oy-tile-pick" onClick={() => { setTile(i); if (tool === 'erase') setTool('paint') }} title={`${t.image}`}>
+                <li key={`${tl.image}-${i}`} className="oy-tile" data-selected={i === tile && tool !== 'erase'}>
+                  <button type="button" className="oy-tile-pick" onClick={() => { setTile(i); if (tool === 'erase') setTool('paint') }} title={`${tl.image}`}>
                     {rows ? <PixelThumb rows={rows} scale={2} /> : <span className="oy-missing">?</span>}
                   </button>
-                  <label className="oy-wall" title="Duvar karosuna sprite'lar giremez"><input type="checkbox" checked={t.wall} onChange={() => toggleWall(i)} /> duvar</label>
-                  <button type="button" className="oy-x" aria-label="Karoyu takımdan çıkar" onClick={() => removeTile(i)}>×</button>
+                  <label className="oy-wall" title={t('studios.oyun.map.wallTitle')}><input type="checkbox" checked={tl.wall} onChange={() => toggleWall(i)} /> {t('studios.oyun.map.wall')}</label>
+                  <button type="button" className="oy-x" aria-label={t('studios.oyun.map.removeTile')} onClick={() => removeTile(i)}>×</button>
                 </li>
               )
             })}
           </ul>
           <div className="oy-menuwrap">
-            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setAddOpen((o) => !o)} aria-expanded={addOpen}>＋ Karo ekle</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setAddOpen((o) => !o)} aria-expanded={addOpen}>{t('studios.oyun.map.addTile')}</button>
             {addOpen && (
               <div className="oy-menu oy-menu-tiles">
                 {tileImages.length ? tileImages.map(([id, im]) => (
                   <button key={id} type="button" onClick={() => addTile(id)} title={im.name ?? id}><PixelThumb rows={im.rows} scale={2} /></button>
-                )) : <span className="oy-empty">Resimler sekmesinde 16 × 16 bir resim ekle (ör. galeriden "Karolar").</span>}
+                )) : <span className="oy-empty">{t('studios.oyun.map.noTileImages')}</span>}
               </div>
             )}
           </div>
-          <p className="oy-hint">Kırmızı kesikli çerçeve oyunun ilk ekranını gösterir. Harita ekrandan büyükse kamera sprite&apos;ı izler.</p>
+          <p className="oy-hint">{t('studios.oyun.map.hint')}</p>
         </div>
         <div className="oy-map-canvaswrap">
           {map ? (
-            <canvas ref={cv} className="oy-map-canvas" style={{ width: map.cols * TILE * ZOOM, height: map.rows * TILE * ZOOM }} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} aria-label={`${map.cols} x ${map.rows} karo harita`} />
+            <canvas ref={cv} className="oy-map-canvas" style={{ width: map.cols * TILE * ZOOM, height: map.rows * TILE * ZOOM }} onPointerDown={down} onPointerMove={move} onPointerUp={up} onPointerCancel={up} aria-label={t('studios.oyun.map.canvas', { cols: map.cols, rows: map.rows })} />
           ) : (
-            <p className="oy-empty">Henüz harita yok. &quot;Yeni harita&quot; ile başla; bloklarda &quot;haritayı yükle&quot; ile kullanırsın.</p>
+            <p className="oy-empty">{t('studios.oyun.map.empty')}</p>
           )}
         </div>
       </div>

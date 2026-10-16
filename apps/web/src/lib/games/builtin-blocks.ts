@@ -51,6 +51,16 @@ export const CATEGORY_COLOURS: Record<string, string> = {
   İşlevler: '#995ba5',
 }
 
+/** Yerleşik kategorilerin İngilizce görünen adları (Türkçe adlar iç anahtardır). */
+export const CATEGORY_EN: Record<string, string> = {
+  Döngüler: 'Loops',
+  Mantık: 'Logic',
+  Matematik: 'Math',
+  Metin: 'Text',
+  Değişkenler: 'Variables',
+  İşlevler: 'Functions',
+}
+
 export const isBuiltinType = (t: string): boolean => t in BUILTIN_BLOCKS
 
 /** Blockly'nin dinamik değişken/işlev kategorileriyle sunulan yerleşik türler. */

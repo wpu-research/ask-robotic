@@ -4,6 +4,7 @@ import { BLOCK_BY_TYPE } from './blocks'
 import { colorIndex } from './palette'
 import { HAT_TYPES, isEnabled, topBlocks } from './interp'
 import type { BlockNode, BlockState } from './types'
+import type { Locale } from './i18n-en'
 
 const IND = '  '
 const indent = (s: string): string => s.split('\n').map((l) => (l ? IND + l : l)).join('\n')
@@ -23,7 +24,7 @@ const RAW_FIELDS: Record<string, Record<string, string>> = {
 }
 const LOOP_VARS = ['i', 'j', 'k', 'l', 'm', 'n']
 
-export function toJavaScript(state: BlockState): string {
+export function toJavaScript(state: BlockState, locale: Locale = 'tr'): string {
   const names = new Map((state.variables ?? []).map((x) => [x.id, ident(x.name, 'degisken')]))
   const varOf = (b: BlockNode): string => {
     const f = b.fields?.VAR as { id?: string } | string | undefined
@@ -177,6 +178,8 @@ export function toJavaScript(state: BlockState): string {
   }
   const out = [...header, ...parts]
   const code = out.join('\n\n')
-  const note = loose.length ? `\n\n// ${loose.length} blok grubu bir olaya bağlı olmadığı için çalışmaz.` : ''
-  return (code || '// Henüz blok yok. Soldan bir "olay" bloğu seç ve çalışma alanına sürükle.') + note + (code ? '\n' : '')
+  const en = locale === 'en'
+  const note = loose.length ? (en ? `\n\n// ${loose.length} block group(s) won't run because they are not attached to an event.` : `\n\n// ${loose.length} blok grubu bir olaya bağlı olmadığı için çalışmaz.`) : ''
+  const empty = en ? '// No blocks yet. Pick an "event" block on the left and drag it into the work area.' : '// Henüz blok yok. Soldan bir "olay" bloğu seç ve çalışma alanına sürükle.'
+  return (code || empty) + note + (code ? '\n' : '')
 }

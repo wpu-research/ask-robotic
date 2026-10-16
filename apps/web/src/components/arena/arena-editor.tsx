@@ -14,6 +14,10 @@ import { useFullView, useView3D, ViewBar } from '../three/view-bar'
 
 const Arena3D = dynamic(() => import('./arena-3d').then((m) => m.Arena3D), { ssr: false, loading: () => <div className="arena-3d" /> })
 import { ArenaGoals, SensorPanel } from './arena-panels'
+import { useSceneText } from './scene-text'
+import { dec, percent } from '@/lib/lab/text'
+import type { MessageKey } from '@/i18n'
+import { useLocale, useT } from '@/i18n/client'
 
 export interface ArenaEditorProps {
   scene: ArenaScene
@@ -39,7 +43,6 @@ type CompileView =
   | { status: 'failed'; message: string; unavailable?: boolean }
 
 const FLASH_MAX = 32256, RAM_MAX = 2048
-const pct = (n: number, max: number) => `%${((n / max) * 100).toFixed(1).replace('.', ',')}`
 const SPEEDS = [1, 2, 4] as const
 const fmtTime = (s: number) => {
   const t = Math.max(0, Math.floor(s * 1000)), m = Math.floor(t / 60000), sec = Math.floor((t % 60000) / 1000)
@@ -47,6 +50,11 @@ const fmtTime = (s: number) => {
 }
 
 function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goals, storageKey, quickSend, onGoalsComplete, compact }: ArenaEditorProps) {
+  const t = useT()
+  const locale = useLocale()
+  const st = useSceneText()
+  const tRef = useRef(t); tRef.current = t
+  const pct = (n: number, max: number) => percent(t, locale, (n / max) * 100)
   const free = !!scenes?.length
   const [sceneId, setSceneId] = useState(sceneProp.id)
   const scene = useMemo(() => (free ? scenes!.find((s) => s.id === sceneId) ?? sceneProp : sceneProp), [free, scenes, sceneId, sceneProp])
@@ -159,13 +167,13 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
         }
       } catch (e) {
         console.error(e)
-        say('Benzetim hata verdi ve durduruldu.')
+        say(tRef.current('lab.editor.simError'))
         stopRun()
         return
       }
       if (++n % 6 === 0) evalGoals()
       const limit = sceneRef.current.timeLimitS
-      if (limit && snapRef.current.timeS >= limit) { say('Süre doldu. ↺ ile baştan başlayabilir, ▶ ile yeniden çalıştırabilirsin.'); stopRun(); setFrame((f) => f + 1); return }
+      if (limit && snapRef.current.timeS >= limit) { say(tRef.current('lab.arena.editor.timeUp')); stopRun(); setFrame((f) => f + 1); return }
       setFrame((f) => f + 1)
       raf = requestAnimationFrame(loop)
     }
@@ -185,7 +193,7 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
     if (id !== runId.current) return
     logEvent('compile', { p: { ok: out.ok, kind: 'arena' } })
     if (!out.ok) {
-      setCompile(out.errors.length ? { status: 'errors', errors: out.errors } : { status: 'failed', message: out.message ?? 'Derleme başarısız oldu.', unavailable: out.unavailable })
+      setCompile(out.errors.length ? { status: 'errors', errors: out.errors } : { status: 'failed', message: out.reason ? t(`lab.compile.${out.reason}` as MessageKey) : out.message ?? t('lab.compile.failed'), unavailable: out.unavailable })
       return
     }
     try {
@@ -199,7 +207,7 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
       logEvent('run', { p: { kind: 'arena' } })
     } catch (e) {
       console.error(e)
-      setCompile({ status: 'failed', message: 'Benzetim başlatılamadı. Hex dosyası geçersiz olabilir.' })
+      setCompile({ status: 'failed', message: t('lab.arena.editor.startFailed') })
     }
   }
 
@@ -223,11 +231,11 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
   const errorLines = useMemo(() => (compile.status === 'errors' ? compile.errors.map((e) => e.line) : []), [compile])
   const serialText = rt ? rt.sim.serial.slice(serialBase) : ''
   useEffect(() => { if (serialText && !serialSeen.current) { serialSeen.current = true; setSerialOpen(true) } }, [serialText])
-  const statusText = compile.status === 'compiling' ? 'Derleniyor…' : running ? (paused ? 'Duraklatıldı' : 'Çalışıyor') : rt ? 'Durdu' : 'Hazır'
+  const statusText = compile.status === 'compiling' ? t('lab.editor.compiling') : running ? (paused ? t('lab.editor.status.paused') : t('lab.editor.status.running')) : rt ? t('lab.editor.status.stopped') : t('lab.editor.status.ready')
   const trail = rt?.rover?.state.trail
   const place = (p: { x?: number; y?: number; theta?: number }) => {
     const r = rtRef.current
-    if (!r) { say('Robotu kaydırmak için önce ▶ ile programı başlat.'); return }
+    if (!r) { say(t('lab.arena.editor.placeFirst')); return }
     r.place(p)
     snapRef.current = r.snapshot()
     setFrame((f) => f + 1)
@@ -243,30 +251,30 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
     <div className="jr-host lab-host arena-host">
       <div className={`lab arena${compact ? ' compact' : ''}`} data-running={running ? 'true' : 'false'} data-testid="arena-editor">
         <div className="lab-left">
-          <section className="lab-codecard" aria-label="Kod düzenleyici">
-            <div className="lab-tabs" role="tablist" aria-label="Dosyalar">
+          <section className="lab-codecard" aria-label={t('lab.editor.codeEditor')}>
+            <div className="lab-tabs" role="tablist" aria-label={t('lab.editor.files')}>
               <span className="lab-tab" role="tab" aria-selected="true">robot.ino</span>
               <div className="lab-tabs-slot" data-slot="code-mode" />
             </div>
             <CodePane value={code} onChange={setCode} errorLines={errorLines} apiRef={codeApi} height={compact ? 300 : 460} />
           </section>
           <div className="lab-compile" data-testid="arena-compile" data-status={compile.status} aria-live="polite">
-            {compile.status === 'idle' && <p className="muted">Kodu yaz, sonra ▶ ile derle ve robotu çalıştır.</p>}
-            {compile.status === 'compiling' && <p>Derleniyor…</p>}
+            {compile.status === 'idle' && <p className="muted">{t('lab.arena.editor.idleHint')}</p>}
+            {compile.status === 'compiling' && <p>{t('lab.editor.compiling')}</p>}
             {compile.status === 'ok' && (
               <p className="lab-ok">
-                Derleme başarılı.
-                {compile.flashBytes !== undefined && <> Program: {compile.flashBytes} bayt ({pct(compile.flashBytes, FLASH_MAX)}).</>}
-                {compile.ramBytes !== undefined && <> RAM: {compile.ramBytes} bayt ({pct(compile.ramBytes, RAM_MAX)}).</>}
+                {t('lab.editor.compileOk')}
+                {compile.flashBytes !== undefined && <> {t('lab.editor.flash', { n: compile.flashBytes, pct: pct(compile.flashBytes, FLASH_MAX) })}</>}
+                {compile.ramBytes !== undefined && <> {t('lab.editor.ram', { n: compile.ramBytes, pct: pct(compile.ramBytes, RAM_MAX) })}</>}
               </p>
             )}
             {compile.status === 'failed' && <p className="lab-err" role="alert" data-unavailable={compile.unavailable ? 'true' : undefined}>{compile.message}</p>}
             {compile.status === 'errors' && (
               <div role="alert">
-                <p className="lab-err">{compile.errors.length} derleme hatası:</p>
+                <p className="lab-err">{t('lab.editor.errorCount', { n: compile.errors.length })}</p>
                 <ul className="lab-errors">
                   {compile.errors.map((e, i) => (
-                    <li key={i}><button type="button" data-error-goto={e.line} onClick={() => codeApi.current?.goToLine(e.line)}><b>Satır {e.line}</b>: {e.message}</button></li>
+                    <li key={i}><button type="button" data-error-goto={e.line} onClick={() => codeApi.current?.goToLine(e.line)}><b>{t('lab.editor.line', { n: e.line })}</b>: {e.message}</button></li>
                   ))}
                 </ul>
               </div>
@@ -279,27 +287,27 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
           <div className="lab-simbar">
             {free && (
               <label className="arena-scenepick">
-                <span className="sr-only">Arena sahnesi</span>
-                <select value={scene.id} onChange={(e) => setSceneId(e.target.value)} data-testid="arena-scene-select" aria-label="Arena sahnesi">
-                  {scenes!.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
+                <span className="sr-only">{t('lab.arena.editor.scene')}</span>
+                <select value={scene.id} onChange={(e) => setSceneId(e.target.value)} data-testid="arena-scene-select" aria-label={t('lab.arena.editor.scene')}>
+                  {scenes!.map((s) => <option key={s.id} value={s.id}>{st(s.title)}</option>)}
                 </select>
               </label>
             )}
-            <div className="lab-ctl" role="group" aria-label="Benzetim denetimi">
-              <button type="button" className="lab-round go" data-testid="arena-run" onClick={run} disabled={compile.status === 'compiling'} aria-label={running ? 'Yeniden derle ve başlat' : 'Derle ve başlat'} title={running ? 'Yeniden derle ve başlat' : 'Derle ve başlat'}>▶</button>
-              <button type="button" className="lab-round" data-testid="arena-pause" onClick={() => setPaused((p) => !p)} disabled={!running} aria-pressed={paused} aria-label={paused ? 'Sürdür' : 'Duraklat'} title={paused ? 'Sürdür' : 'Duraklat'}>{paused ? '▶' : '⏸'}</button>
-              <button type="button" className="lab-round stop" data-testid="arena-stop" onClick={stopRun} disabled={!running && compile.status !== 'compiling'} aria-label="Dur" title="Dur">■</button>
-              <button type="button" className="lab-round" data-testid="arena-reset" onClick={resetAll} aria-label="Sıfırla (robotu başa al)" title="Sıfırla (robotu başa al)">↺</button>
+            <div className="lab-ctl" role="group" aria-label={t('lab.editor.simControl')}>
+              <button type="button" className="lab-round go" data-testid="arena-run" onClick={run} disabled={compile.status === 'compiling'} aria-label={running ? t('lab.editor.rerun') : t('lab.editor.run')} title={running ? t('lab.editor.rerun') : t('lab.editor.run')}>▶</button>
+              <button type="button" className="lab-round" data-testid="arena-pause" onClick={() => setPaused((p) => !p)} disabled={!running} aria-pressed={paused} aria-label={paused ? t('lab.editor.resume') : t('lab.editor.pause')} title={paused ? t('lab.editor.resume') : t('lab.editor.pause')}>{paused ? '▶' : '⏸'}</button>
+              <button type="button" className="lab-round stop" data-testid="arena-stop" onClick={stopRun} disabled={!running && compile.status !== 'compiling'} aria-label={t('lab.editor.stop')} title={t('lab.editor.stop')}>■</button>
+              <button type="button" className="lab-round" data-testid="arena-reset" onClick={resetAll} aria-label={t('lab.arena.editor.reset')} title={t('lab.arena.editor.reset')}>↺</button>
             </div>
-            <div className="arena-speed" role="group" aria-label="Benzetim hızı">
+            <div className="arena-speed" role="group" aria-label={t('lab.editor.simSpeed')}>
               {SPEEDS.map((s) => (
                 <button key={s} type="button" className="arena-speedbtn" data-testid={`arena-speed-${s}`} aria-pressed={speed === s} onClick={() => setSpeed(s)}>{s}x</button>
               ))}
             </div>
-            <div className={`lab-meter${running && !paused ? ' on' : ''}`} role="status" aria-label="Benzetim durumu">
+            <div className={`lab-meter${running && !paused ? ' on' : ''}`} role="status" aria-label={t('lab.editor.simStatus')}>
               <span className="lab-state" data-testid="arena-status">{statusText}</span>
               <span className="lab-timer" data-testid="arena-timer">{fmtTime(snap.timeS)}</span>
-              <span className="lab-speed" data-testid="arena-measured" title="Gerçekleşen benzetim hızı">{running ? `×${(speed * measured.current).toFixed(1).replace('.', ',')}` : '×0'}</span>
+              <span className="lab-speed" data-testid="arena-measured" title={t('lab.arena.editor.measured')}>{running ? `×${dec(locale, (speed * measured.current).toFixed(1))}` : '×0'}</span>
             </div>
           </div>
           <div className={`arena-stage${full ? ' is-full' : ''}`}>
@@ -308,14 +316,14 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
               ? <Arena3D scene={scene} snap={snap} trail={trail} servoDeg={rt?.servoDeg()} onDrag={rt ? (x, y) => place({ x, y }) : undefined} mode={scene.kind === 'rover' ? view.mode : 'genel'} />
               : <ArenaCanvas scene={scene} snap={snap} trail={trail} servoDeg={rt?.servoDeg()} onDrag={rt ? (x, y) => place({ x, y }) : undefined} />}
             {notice && <div className="lab-toast" role="status">{notice}</div>}
-            {stale && rt && <p className="lab-lockhint" data-testid="arena-stale">Kodu değiştirdin; sonuçlar eski çalıştırmaya ait. ▶ ile yeniden çalıştır.</p>}
+            {stale && rt && <p className="lab-lockhint" data-testid="arena-stale">{t('lab.arena.editor.stale')}</p>}
           </div>
-          {scene.description && <p className="arena-desc muted">{scene.description}</p>}
+          {scene.description && <p className="arena-desc muted">{st(scene.description)}</p>}
           {scene.kind === 'balancer' && (
-            <div className="arena-quick" role="group" aria-label="Dışarıdan itme" data-testid="arena-push">
-              <span className="muted">İtme (eğim hızına ekler):</span>
-              {([[200, 'İleri it +200 °/s'], [-200, 'Geri it −200 °/s'], [500, 'Sert it +500 °/s']] as const).map(([dps, label]) => (
-                <button key={dps} type="button" className="jr-btn small" disabled={!running} data-push={dps} onClick={() => rtRef.current?.push(dps)}>{label}</button>
+            <div className="arena-quick" role="group" aria-label={t('lab.arena.editor.push')} data-testid="arena-push">
+              <span className="muted">{t('lab.arena.editor.pushLabel')}</span>
+              {([[200, 'lab.arena.editor.pushFwd'], [-200, 'lab.arena.editor.pushBack'], [500, 'lab.arena.editor.pushHard']] as const).map(([dps, label]) => (
+                <button key={dps} type="button" className="jr-btn small" disabled={!running} data-push={dps} onClick={() => rtRef.current?.push(dps)}>{t(label)}</button>
               ))}
             </div>
           )}
@@ -324,8 +332,8 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
 
         <div className="lab-bottom">
           {quickSend?.length ? (
-            <div className="arena-quick" role="group" aria-label="Hızlı komutlar" data-testid="arena-quick">
-              <span className="muted">Hızlı komut:</span>
+            <div className="arena-quick" role="group" aria-label={t('lab.arena.editor.quick')} data-testid="arena-quick">
+              <span className="muted">{t('lab.arena.editor.quickLabel')}</span>
               {quickSend.map((q) => (
                 <button key={q.label} type="button" className="jr-btn small" disabled={!running} onClick={() => rtRef.current?.sendSerial(q.text)}>{q.label}</button>
               ))}
@@ -343,6 +351,7 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
 
 /** Dersin birden çok yolu varsa (A/B/C) yol sekmelerini gösterir; her yolun kodu ve hedefleri ayrı saklanır. */
 function VariantHost({ variants, ...props }: ArenaEditorProps & { variants: ArenaVariantEntry[] }) {
+  const t = useT()
   const base = variants[0]
   const vKey = props.storageKey ? `${props.storageKey}:yol` : undefined
   const [vid, setVid] = useState<string>(base.activity.variant?.id ?? 'a')
@@ -357,8 +366,8 @@ function VariantHost({ variants, ...props }: ArenaEditorProps & { variants: Aren
   const code = useMemo(() => (isBase ? props.initialCode : a.starter()), [isBase, a, props.initialCode])
   return (
     <div className="arena-variants" data-testid="arena-variants">
-      <div className="arena-quick" role="tablist" aria-label="Yol seç">
-        <span className="muted">Yol:</span>
+      <div className="arena-quick" role="tablist" aria-label={t('lab.arena.editor.pathPick')}>
+        <span className="muted">{t('lab.arena.editor.path')}</span>
         {variants.map((v) => {
           const id = v.activity.variant?.id ?? v.key
           return <button key={v.key} type="button" role="tab" className="jr-btn small" aria-selected={cur === v} aria-pressed={cur === v} data-variant={id} onClick={() => pick(id)}>{v.activity.variant?.label ?? id}</button>

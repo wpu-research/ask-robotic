@@ -53,5 +53,6 @@ const orman = bd('orman', 'orman', [
 ])
 const beyaz = bd('beyaz', 'beyaz', [R(0, 0, W, H, '#ffffff')])
 
-export const BACKDROPS: readonly { id: string; name: string; costume: Costume }[] = [beyaz, gokyuzu, gece, uzay, deniz, oda, sahne, orman, izgara].map((c) => ({ id: c.id, name: c.name, costume: c }))
+const NAME_EN: Record<string, string> = { beyaz: 'white', gokyuzu: 'sky and grass', gece: 'night', uzay: 'space', deniz: 'underwater', oda: 'room', sahne: 'theater stage', orman: 'forest', izgara: 'grid' }
+export const BACKDROPS: readonly { id: string; name: string; nameEn: string; costume: Costume }[] = [beyaz, gokyuzu, gece, uzay, deniz, oda, sahne, orman, izgara].map((c) => ({ id: c.id, name: c.name, nameEn: NAME_EN[c.id] ?? c.name, costume: c }))
 export const BACKDROP_BY_ID: Readonly<Record<string, Costume>> = Object.fromEntries(BACKDROPS.map((b) => [b.id, b.costume]))

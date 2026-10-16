@@ -9,6 +9,7 @@ export const muzikGame: GameDef<MusicState> = {
   slug: 'muzik',
   title: 'Müzik',
   tagline: 'Notaları dizip tekrarlayarak kendi melodini besteler.',
+  en: { title: 'Music', tagline: 'Line up and repeat notes to compose your own melody.' },
   levels,
   blocks,
   engine: { createRun },

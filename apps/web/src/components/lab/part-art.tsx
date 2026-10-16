@@ -3,6 +3,8 @@ import { PART_DEFS } from '@/lib/lab/geometry'
 import { BAND_COLORS, resistorBands } from '@/lib/lab/ops'
 import { StageCArt } from './part-art-c'
 import { StageDArt } from './part-art-d'
+import { Tx } from './tx'
+import { useT } from '@/i18n/client'
 
 export const LED_COLORS: Record<string, string> = { red: '#ef4444', yellow: '#facc15', green: '#22c55e', blue: '#3b82f6', white: '#f1f5f9' }
 const num = (v: unknown, d: number) => (typeof v === 'number' && Number.isFinite(v) ? v : d)
@@ -37,7 +39,7 @@ function UnoArt({ pins }: { pins?: Record<string, PinSnapshot> }) {
       {/* sıfırlama düğmesi (kırmızı) */}
       <rect x={40} y={34} width={22} height={22} rx={3} fill="#9ca3af" stroke="#4b5563" />
       <circle cx={51} cy={45} r={7} fill="#dc2626" stroke="#7f1d1d" strokeWidth={1.2} />
-      <text x={51} y={67} textAnchor="middle" fontSize={5} fill="#dbeafe">SIFIRLA</text>
+      <text x={51} y={67} textAnchor="middle" fontSize={5} fill="#dbeafe"><Tx k="lab.art.reset" /></text>
       {/* ATmega328P (siyah çip) */}
       <rect x={96} y={52} width={92} height={24} rx={2} fill="#111827" stroke="#030712" />
       <path d="M96 58 a4 4 0 0 1 0 12" fill="#030712" />
@@ -58,14 +60,15 @@ function UnoArt({ pins }: { pins?: Record<string, PinSnapshot> }) {
       <rect x={156} y={130} width={96} height={16} rx={2} fill="#0b1220" />
       {UNO_TOP.map((p) => <text key={p} x={d[p].x} y={30} textAnchor="middle" fontSize={5.6} fill="#e0f2fe">{unoLabel(p)}</text>)}
       {UNO_BOTTOM.map((p) => <text key={p} x={d[p].x} y={124} textAnchor="middle" fontSize={5.6} fill="#e0f2fe">{unoLabel(p)}</text>)}
-      <text x={200} y={43} textAnchor="middle" fontSize={5.6} fontWeight={700} fill="#bae6fd">SAYISAL (PWM ~)</text>
-      <text x={208} y={116} textAnchor="middle" fontSize={5.6} fontWeight={700} fill="#bae6fd">ANALOG GİRİŞ</text>
-      <text x={92} y={116} textAnchor="middle" fontSize={5.6} fontWeight={700} fill="#bae6fd">GÜÇ</text>
+      <text x={200} y={43} textAnchor="middle" fontSize={5.6} fontWeight={700} fill="#bae6fd"><Tx k="lab.art.digital" /></text>
+      <text x={208} y={116} textAnchor="middle" fontSize={5.6} fontWeight={700} fill="#bae6fd"><Tx k="lab.art.analogIn" /></text>
+      <text x={92} y={116} textAnchor="middle" fontSize={5.6} fontWeight={700} fill="#bae6fd"><Tx k="lab.art.power" /></text>
     </g>
   )
 }
 
 function LedArt({ part, rt }: { part: PartInstance; rt?: PartRuntime }) {
+  const t = useT()
   const color = LED_COLORS[String(part.props.color)] ?? LED_COLORS.red
   const led = rt?.led
   const burnt = led?.burnt === true
@@ -85,7 +88,7 @@ function LedArt({ part, rt }: { part: PartInstance; rt?: PartRuntime }) {
       <path d="M36 28 V38" stroke="#fff" strokeOpacity={0.5} strokeWidth={1} />
       {/* parlama */}
       <ellipse cx={13} cy={14} rx={3} ry={6} fill="#fff" opacity={0.3 + 0.4 * b} />
-      {burnt && <g stroke="#f87171" strokeWidth={2.5} strokeLinecap="round" aria-label="Yanmış LED"><line x1={12} y1={12} x2={28} y2={28} /><line x1={28} y1={12} x2={12} y2={28} /></g>}
+      {burnt && <g stroke="#f87171" strokeWidth={2.5} strokeLinecap="round" aria-label={t('lab.art.burntLed')}><line x1={12} y1={12} x2={28} y2={28} /><line x1={28} y1={12} x2={12} y2={28} /></g>}
     </g>
   )
 }
@@ -383,7 +386,7 @@ function RelayArt({ part, rt }: { part: PartInstance; rt?: PartRuntime }) {
       <text x={68} y={30} textAnchor="middle" fontSize={7} fontWeight={800} fill="#dbeafe">SRD-05VDC</text>
       <text x={68} y={39} textAnchor="middle" fontSize={5.2} fill="#bfdbfe">10A 250VAC</text>
       <text x={68} y={47} textAnchor="middle" fontSize={5.2} fill="#bfdbfe">10A 30VDC</text>
-      <text x={68} y={56} textAnchor="middle" fontSize={5.2} fill="#bfdbfe">5 V RÖLE</text>
+      <text x={68} y={56} textAnchor="middle" fontSize={5.2} fill="#bfdbfe"><Tx k="lab.art.relay" /></text>
       {/* vidalı terminal bloğu: NO / COM / NC */}
       <rect x={108} y={11} width={40} height={74} rx={3} fill="#15803d" stroke="#14532d" strokeWidth={1.2} />
       {[24, 48, 72].map((y) => (

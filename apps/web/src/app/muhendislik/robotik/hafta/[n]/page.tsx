@@ -6,7 +6,7 @@ import { Quiz } from '@/components/robotik/quiz'
 import { SimBox } from '@/components/robotik/sim-box'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
-import { labHref } from '@/lib/muhendislik/catalog'
+import { labHref, partText } from '@/lib/muhendislik/catalog'
 import { COURSE, WEEKS, WOKWI, kitPartsOf, partsOf, weekOf } from '@/lib/robotik/course'
 import { courseKitOf } from '@/lib/robotik/kits'
 import { milestonesOfWeek } from '@/lib/robotik/projects'
@@ -107,7 +107,7 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
               {t.lab && <p>{t.lab}</p>}
               {(kits.length > 0 || w.wokwi.length > 0) && (
                 <ul className="rb-links">
-                  {kits.map((p) => <li key={p.slug}><Link href={labHref(p)!}>{en ? 'Open in our lab' : 'Laboratuvarda aç'}: {p.name}</Link></li>)}
+                  {kits.map((p) => <li key={p.slug}><Link href={labHref(p)!}>{en ? 'Open in our lab' : 'Laboratuvarda aç'}: {partText(p, lang).name}</Link></li>)}
                   {w.wokwi.map((b) => <li key={b}><a href={WOKWI[b].href} target="_blank" rel="noreferrer">{WOKWI[b][lang]}</a></li>)}
                 </ul>
               )}
@@ -128,7 +128,7 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
               <h2 id="rb-hw">{en ? 'Hardware this week (Hyvex)' : 'Bu haftanın donanımı (Hyvex)'}</h2>
               <ul className="eng-chips">
                 {parts.map((p) => (
-                  <li key={p.slug}><Link className="eng-chip" href={`/muhendislik/parca/${p.slug}`}><span className="eng-chip-lv">S{p.level}</span>{p.name}</Link></li>
+                  <li key={p.slug}><Link className="eng-chip" href={`/muhendislik/parca/${p.slug}`}><span className="eng-chip-lv">{en ? 'L' : 'S'}{p.level}</span>{partText(p, lang).name}</Link></li>
                 ))}
               </ul>
             </section>
