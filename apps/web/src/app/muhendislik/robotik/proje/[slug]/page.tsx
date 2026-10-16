@@ -38,7 +38,7 @@ export default async function Proje({ params }: { params: Promise<{ slug: string
           <section aria-labelledby="pj-sc"><h2 id="pj-sc">{en ? 'Scenario' : 'Senaryo'}</h2><p>{t.scenario}</p></section>
           <section aria-labelledby="pj-ac"><h2 id="pj-ac">{en ? 'Acceptance criteria' : 'Kabul ölçütleri'}</h2><ul className="eng-list">{t.acceptance.map((a) => <li key={a}>{a}</li>)}</ul></section>
           <section aria-labelledby="pj-su"><h2 id="pj-su">{en ? 'Setting up the simulation' : 'Simülasyonu kurmak'}</h2><ol className="rb-steps">{t.setup.map((s) => <li key={s}>{s}</li>)}</ol></section>
-          <section aria-labelledby="pj-st"><h2 id="pj-st">{en ? 'Starter code' : 'Başlangıç kodu'}</h2><CodeBlock title={p.starter.title} src={p.starter.src} lang={lang} /></section>
+          <section aria-labelledby="pj-st"><h2 id="pj-st">{en ? 'Starter code' : 'Başlangıç kodu'}</h2><CodeBlock title={en ? p.starter.titleEn : p.starter.title} src={p.starter.src} lang={lang} /></section>
           <section aria-labelledby="pj-ms">
             <h2 id="pj-ms">{en ? 'Milestones' : 'Ara teslimler'}</h2>
             <ol className="rb-milestones">

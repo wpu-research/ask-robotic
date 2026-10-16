@@ -12,7 +12,7 @@ export interface Project {
   /** Gerçek yapımda kullanılacak Hyvex parçaları (slug). */
   bom: string[]
   milestones: Milestone[]
-  starter: { title: string; lang: string; src: string }
+  starter: { title: string; titleEn: string; lang: string; src: string }
 }
 
 const M = (week: number, tr: [string, string], en: [string, string]): Milestone => ({ week, tr: { title: tr[0], deliver: tr[1] }, en: { title: en[0], deliver: en[1] } })
@@ -52,7 +52,7 @@ export const PROJECTS: Project[] = [
       M(13, ['Bütünleştirme ve SIL testleri', 'Tüm kabul ölçütleri otomatik senaryolarla (Webots --batch) ölçülüyor.'], ['Integration and SIL tests', 'All acceptance criteria measured by automated scenarios (Webots --batch).']),
     ]),
     starter: {
-      title: 'Webots Python: şerit takibi için başlangıç denetleyicisi', lang: 'python',
+      title: 'Webots Python: şerit takibi için başlangıç denetleyicisi', titleEn: 'Webots Python: starter controller for lane following', lang: 'python',
       src: `# Webots vehicle denetleyicisi (BMW X5, city.wbt). Kamera görüntüsünden şerit sapması, PID ile direksiyon.
 import numpy as np
 from vehicle import Driver
@@ -112,7 +112,7 @@ while driver.step() != -1:
       M(13, ['Rüzgâr ve failsafe testleri', 'Rüzgâr ve bağlantı kesilmesi senaryoları otomatik çalışıyor.'], ['Wind and failsafe tests', 'Wind and link-loss scenarios run automatically.']),
     ]),
     starter: {
-      title: 'MAVSDK Python: kalkış, ara noktalar, iniş (PX4 SITL)', lang: 'python',
+      title: 'MAVSDK Python: kalkış, ara noktalar, iniş (PX4 SITL)', titleEn: 'MAVSDK Python: take-off, waypoints, landing (PX4 SITL)', lang: 'python',
       src: `# PX4 SITL: make px4_sitl gz_x500_mono_cam_down   (Gazebo Harmonic)
 import asyncio
 from mavsdk import System
@@ -168,7 +168,7 @@ asyncio.run(main())`,
       M(13, ['Bütünleştirme ve ölçüm', '10 küplük otomatik deneme; başarı oranı ve konum hatası grafiği.'], ['Integration and measurement', 'Automated 10-cube trial; success rate and position error plot.']),
     ]),
     starter: {
-      title: 'Webots Python: ikpy ile hedefe uzanma', lang: 'python',
+      title: 'Webots Python: ikpy ile hedefe uzanma', titleEn: 'Webots Python: reaching a target with ikpy', lang: 'python',
       src: `# Webots denetleyicisi: kolun URDF'inden ikpy zinciri kur, hedef noktaya ters kinematikle uzan.
 import tempfile
 import ikpy.chain

@@ -355,7 +355,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
               const cls = `lab-pin${connected.has(`${p.id}:${pin}`) ? ' wired' : ''}${isTarget ? ' target' : ''}${isFrom ? ' from' : ''}`
               return (
                 <g
-                  key={`${p.id}:${pin}`} className={cls} data-pin-part={p.id} data-pin-name={pin} transform={`translate(${pt.x} ${pt.y})`} role="button" aria-label={`${PART_DEFS[p.type].name} ${p.id}, pin ${pin}`}
+                  key={`${p.id}:${pin}`} className={cls} data-pin-part={p.id} data-pin-name={pin} transform={`translate(${pt.x} ${pt.y})`} role="button" aria-label={`${partName(t, p.type)} ${p.id}, pin ${pin}`}
                   onPointerEnter={p.type === 'uno' ? () => setHoverPin({ part: p.id, pin }) : undefined}
                   onPointerLeave={p.type === 'uno' ? () => setHoverPin((h) => (h && h.part === p.id && h.pin === pin ? null : h)) : undefined}
                 >
