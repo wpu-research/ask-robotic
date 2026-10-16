@@ -136,6 +136,11 @@ export const PART_DEFS: Record<PartType, PartDef> = {
   vl53l0x: { name: 'VL53L0X lazer mesafe (ToF)', w: 100, h: 62, ownLabels: true, pins: hdr(['VCC', 'GND', 'SCL', 'SDA', 'XSHUT'], 100, 58, 17) },
   // ZS-040 kartı: başlık alt kenarda, gerçekteki sırayla (EN VCC GND TXD RXD STATE)
   hc05: { name: 'HC-05 Bluetooth (UART)', w: 120, h: 70, ownLabels: true, pins: hdr(['EN', 'VCC', 'GND', 'TXD', 'RXD', 'STATE'], 120, 66) },
+  // Aşama F (güç). Çizim part-art-f.tsx'te.
+  battery: { name: 'Pil / batarya paketi', w: 110, h: 64, ownLabels: true, pins: { '+': { x: 4, y: 20 }, '-': { x: 4, y: 44 } } },
+  lm7805: { name: 'LM7805 regülatör (5 V)', w: 62, h: 92, ownLabels: true, pins: hdr(['IN', 'GND', 'OUT'], 62, 88, 18) },
+  buck: { name: 'Buck (düşürücü) modül', w: 124, h: 66, ownLabels: true, pins: { VIN: { x: 4, y: 20 }, GND: { x: 4, y: 46 }, VOUT: { x: 120, y: 20 } } },
+  max17048: { name: 'MAX17048 yakıt göstergesi', w: 84, h: 56, ownLabels: true, pins: hdr(['CELL', 'GND', 'SDA', 'SCL'], 84, 52) },
 }
 
 export type Rotation = PartInstance['rotation']

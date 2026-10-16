@@ -83,6 +83,6 @@ describe('dile bağlı biçim ve arama', () => {
     expect(q('humidity')).toEqual(['dht', 'bme280'])
     expect(q('one wire')).toEqual(['ds18b20'])
     expect(q('flame')).toEqual(['flame'])
-    expect(pickerGroups(DEFAULT_PARTS, '').map((g) => g.key)).toEqual(['output', 'input', 'active', 'sensors', 'motion', 'comm'])
+    expect(pickerGroups(DEFAULT_PARTS, '').map((g) => g.key)).toEqual(['output', 'input', 'active', 'sensors', 'motion', 'comm', 'power'])
   })
 })

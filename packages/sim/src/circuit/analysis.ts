@@ -13,6 +13,7 @@ const ACTIVE: readonly PartType[] = [
   'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel',
   'mq3', 'mq4', 'mq7', 'mq135', 'sharpir', 'l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper', 'esc',
   'oled', 'bme280', 'ds18b20', 'vl53l0x', 'hc05',
+  'battery', 'lm7805', 'buck', 'max17048',
 ]
 
 /** Besleme pinleri (modül/entegre): VCC 5 V hattında (ya da bir Uno pininde), GND toprakta olmalı. */
@@ -67,7 +68,7 @@ const DIRECT_PINS: Partial<Record<PartType, { pins: string[]; name: string }>> =
   ds18b20: { pins: ['DQ'], name: 'DS18B20' },
 }
 /** I2C sensörleri: SDA A4'e, SCL A5'e bağlı olmalı. */
-const I2C_PARTS: readonly PartType[] = ['bmp280', 'mpu6050', 'rtc', 'oled', 'bme280', 'vl53l0x']
+const I2C_PARTS: readonly PartType[] = ['bmp280', 'mpu6050', 'rtc', 'oled', 'bme280', 'vl53l0x', 'max17048']
 
 /** 1-Wire pull-up için kabul edilen en büyük direnç (Ω): gerçekte 4,7 kΩ; 1-10 kΩ arası çalışır. */
 export const ONEWIRE_PULLUP_MAX_OHMS = 10_000
@@ -230,6 +231,7 @@ function staticPartWarnings(circuit: Circuit, nl: Netlist, out: LabWarning[]): v
       }
     }
     if (p.type === 'hc05') hc05Warnings(circuit, nl, p, out)
+    if (p.type === 'battery' || p.type === 'lm7805' || p.type === 'buck' || p.type === 'max17048') powerWarnings(nl, p, out)
     if (p.type === 'ds18b20' && nl.isWired(ref(p.id, 'DQ')) && oneWirePullupNets(circuit, nl, p).length === 0) {
       out.push({ kind: 'floating-input', partId: p.id, message: 'DS18B20 DQ hattında pull-up direnci yok: DQ ile VCC arasına 4,7 kΩ direnç bağla (yoksa sensör bulunamaz).' })
     }
@@ -301,4 +303,35 @@ function hc05Warnings(circuit: Circuit, nl: Netlist, p: PartInstance, out: LabWa
   if (txPin === 'D0' || txPin === 'D1' || rx?.pin === 'D0' || rx?.pin === 'D1') {
     out.push({ kind: 'floating-input', partId: p.id, message: 'HC-05 D0/D1\'e bağlı: bu pinler USB seri hattıdır (yükleme ve seri monitörle çakışır). SoftwareSerial ile başka pinlere bağla (ör. D10/D11).' })
   }
+}
+
+/**
+ * Güç parçaları. Laboratuvarda Uno USB'den beslenir ve 5V/VIN hattı ideal kaynaktır: harici bir kaynağı bu hatta bağlamak
+ * modellenmez (gerçekte de 5V pinine dışarıdan gerilim vermek kartı bozabilir). Pilin − ucu ortak toprakta olmalı.
+ */
+export function powerSourceOk(nl: Netlist, p: PartInstance): boolean {
+  const pos = nl.netOf({ part: p.id, pin: p.type === 'battery' ? '+' : p.type === 'lm7805' ? 'OUT' : 'VOUT' })
+  return pos !== undefined && pos !== nl.rail5 && pos !== nl.rail3 && pos !== nl.ground
+}
+function powerWarnings(nl: Netlist, p: PartInstance, out: LabWarning[]): void {
+  const r = (pin: string): PinRef => ({ part: p.id, pin })
+  const net = (pin: string) => (nl.isWired(r(pin)) ? nl.netOf(r(pin)) : undefined)
+  const onRail = (n: number | undefined) => n !== undefined && (n === nl.rail5 || n === nl.rail3)
+  if (p.type === 'battery') {
+    const plus = net('+'), minus = net('-')
+    if (plus !== undefined && minus !== undefined && plus === minus) out.push({ kind: 'short-circuit', partId: p.id, message: 'Pilin + ve − uçları doğrudan birbirine bağlı (kısa devre): gerçekte pil ısınır, Li-ion ve LiPo tutuşabilir.' })
+    else if (plus !== undefined && plus === nl.ground) out.push({ kind: 'short-circuit', partId: p.id, message: 'Pilin + ucu GND\'ye bağlı (kısa devre).' })
+    if (nl.isWired(r('+')) && minus !== nl.ground) out.push({ kind: 'power', partId: p.id, message: 'Pilin − ucu Arduino GND\'sine bağlı değil: ortak toprak olmadan devre kapanmaz (pil devre dışı).' })
+    if (onRail(plus)) out.push({ kind: 'power', partId: p.id, message: 'Pil Uno\'nun 5V/VIN hattına bağlı: laboratuvarda Uno USB\'den beslenir, bu bağlantı modellenmez. Pili yüke, motor sürücüsüne ya da bir regülatöre bağla.' })
+    return
+  }
+  if (p.type === 'max17048') {
+    if (!nl.isWired(r('CELL'))) out.push({ kind: 'unpowered', partId: p.id, message: 'MAX17048 beslenmemiş: CELL, GND 5 V / GND hattına bağlı değil.' })
+    return
+  }
+  const name = p.type === 'lm7805' ? 'LM7805' : 'Buck modülü'
+  const outPin = p.type === 'lm7805' ? 'OUT' : 'VOUT', inPin = p.type === 'lm7805' ? 'IN' : 'VIN'
+  if (net('GND') !== nl.ground) out.push({ kind: 'power', partId: p.id, message: `${name} GND ucu Arduino GND'sine bağlı değil: regülatör çalışmaz.` })
+  if (!nl.isWired(r(inPin))) out.push({ kind: 'power', partId: p.id, message: `${name} girişi (${inPin}) bağlı değil: bir pil ya da güç kaynağı bağla.` })
+  if (onRail(net(outPin))) out.push({ kind: 'power', partId: p.id, message: `${name} çıkışı Uno'nun 5V/VIN hattına bağlı: laboratuvarda Uno USB'den beslenir, bu bağlantı modellenmez. Çıkışı yüke bağla.` })
 }

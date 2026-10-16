@@ -17,12 +17,14 @@ export const STAGE_E_OUTPUTS: PartType[] = ['oled']
 export const STAGE_E_SENSORS: PartType[] = ['bme280', 'ds18b20', 'vl53l0x']
 export const STAGE_E_COMM: PartType[] = ['hc05']
 export const STAGE_E_PARTS: PartType[] = [...STAGE_E_OUTPUTS, ...STAGE_E_SENSORS, ...STAGE_E_COMM]
+/** Aşama F (güç): pil kimyaları, regülatörler, yakıt göstergesi. */
+export const STAGE_F_POWER: PartType[] = ['battery', 'lm7805', 'buck', 'max17048']
 /** Varsayılan palet (ders etkinliği `allowedParts` ile kısıtlayabilir). */
-export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS, ...STAGE_E_PARTS]
+export const DEFAULT_PARTS: PartType[] = [...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS, ...STAGE_E_PARTS, ...STAGE_F_POWER]
 
 /** `key`: sözlükteki kategori adı (lab.picker.cat.*); `title` Türkçe kaynak. */
 export interface PartCategory { key: PickerCategoryKey; title: string; types: PartType[] }
-export type PickerCategoryKey = 'output' | 'input' | 'active' | 'sensors' | 'motion' | 'comm' | 'other'
+export type PickerCategoryKey = 'output' | 'input' | 'active' | 'sensors' | 'motion' | 'comm' | 'power' | 'other'
 export const PICKER_CATEGORIES: PartCategory[] = [
   { key: 'output', title: 'Çıkış', types: ['led', 'rgbled', 'buzzer', 'sevenseg', 'lcd1602', 'lcdI2c', ...STAGE_E_OUTPUTS, 'dcmotor', 'servo', 'relay'] },
   { key: 'input', title: 'Giriş', types: ['button', 'pot', 'ldr', 'ntc'] },
@@ -30,6 +32,7 @@ export const PICKER_CATEGORIES: PartCategory[] = [
   { key: 'sensors', title: 'Sensörler', types: [...STAGE_C_PARTS, ...STAGE_D_SENSORS, ...STAGE_E_SENSORS] },
   { key: 'motion', title: 'Motor sürücüler ve hareket', types: [...STAGE_D_MOTION] },
   { key: 'comm', title: 'Haberleşme', types: [...STAGE_E_COMM] },
+  { key: 'power', title: 'Güç', types: [...STAGE_F_POWER] },
 ]
 
 export const SHORT_NAME: Partial<Record<PartType, string>> = {
@@ -38,6 +41,7 @@ export const SHORT_NAME: Partial<Record<PartType, string>> = {
   mq3: 'MQ-3 alkol', mq4: 'MQ-4 metan', mq7: 'MQ-7 CO', mq135: 'MQ-135', sharpir: 'Sharp IR', l298n: 'L298N', tb6612: 'TB6612FNG', drv8833: 'DRV8833',
   bts7960: 'BTS7960', md10c: 'MD10C', stepper: 'Step motor', esc: 'ESC + BLDC',
   oled: 'OLED 0.96"', bme280: 'BME280', ds18b20: 'DS18B20', vl53l0x: 'VL53L0X', hc05: 'HC-05',
+  battery: 'Pil', lm7805: 'LM7805', buck: 'Buck', max17048: 'MAX17048',
 }
 
 export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
@@ -81,6 +85,10 @@ export const PART_KEYWORDS: Partial<Record<PartType, string>> = {
   ds18b20: 'sıcaklık termometre su geçirmez prob 1-wire onewire dallas',
   vl53l0x: 'mesafe uzaklık lazer tof uçuş süresi i2c',
   hc05: 'bluetooth kablosuz telefon seri uart haberleşme softwareserial at komut zs-040',
+  battery: 'pil batarya lipo li-ion 18650 alkalin nimh nicd lifepo4 kurşun asit akü cr2032 düğme sodyum güç kaynağı',
+  lm7805: 'regülatör 7805 doğrusal lineer 5v güç',
+  buck: 'buck düşürücü dc-dc lm2596 mp1584 xl4015 xl4016 ap63200 lm2576 regülatör güç',
+  max17048: 'yakıt göstergesi fuel gauge şarj soc batarya izleme i2c max17043',
 }
 
 /** İngilizce arama sözcükleri (İngilizce ad dahil); arama her iki dilde de çalışır. */
@@ -105,6 +113,8 @@ export const PART_KEYWORDS_EN: Partial<Record<PartType, string>> = {
   oled: 'oled screen display graphics pixel', bme280: 'temperature pressure humidity barometer weather station',
   ds18b20: 'temperature thermometer waterproof probe one wire', vl53l0x: 'distance range laser time of flight tof',
   hc05: 'bluetooth radio phone serial uart communication at command',
+  battery: 'battery cell pack lipo lithium alkaline lead acid coin power supply', lm7805: 'regulator linear voltage 5v power',
+  buck: 'buck step down converter dc dc regulator power', max17048: 'fuel gauge state of charge battery monitor',
 }
 
 /** Küçük harfe indirir, Türkçe aksanları (ö→o, ı→i…) ve tireyi sadeleştirir: "ROLE", "rele", "transistor", "7 segment" bulunur. */

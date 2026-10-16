@@ -62,6 +62,17 @@ const EXPECT: Record<KitName, { ms: number; check: (lab: LabApi, model?: string)
   },
   ds18b20: { ms: 1100, check: (l) => { expect(serialLines(l)[0]).toBe('sensor sayisi=1'); expect(serialLines(l).at(-1)).toBe('T=24.00') } },
   vl53l0x: { ms: 600, check: (l) => expect(serialLines(l)).toContain('mm=350') },
+  pil: {
+    ms: 700, check: (l) => {
+      const b = rt(l, 'b').battery!
+      expect(b.active).toBe(true)
+      const v = Number(/pil=([\d.]+)/.exec(serialLines(l).at(-1)!)![1])
+      expect(Math.abs(v - b.volts)).toBeLessThan(0.2)
+    },
+  },
+  lm7805: { ms: 700, check: (l) => { expect(rt(l, 'u').regulator!.inReg).toBe(true); expect(Number(/cikis=([\d.]+)/.exec(serialLines(l).at(-1)!)![1])).toBeCloseTo(5, 1) } },
+  buck: { ms: 700, check: (l) => { expect(rt(l, 'u').regulator!.inReg).toBe(true); expect(Number(/cikis=([\d.]+)/.exec(serialLines(l).at(-1)!)![1])).toBeCloseTo(5, 1) } },
+  max17048: { ms: 1300, check: (l) => { expect(Number(/SOC=([\d.]+)/.exec(serialLines(l).at(-1)!)![1])).toBeCloseTo(60, 0) } },
   hc05: {
     ms: 300, check: (l) => {
       expect(serialLines(l)).toContain('telefon bagli')
@@ -99,7 +110,7 @@ describe('katalog', () => {
 
 describe('laboratuvarlı her parça kitinde çalışır', () => {
   const withLab = ENG_PARTS.filter((p) => p.lab)
-  it('54 parça laboratuvarda açılır', () => expect(withLab).toHaveLength(54))
+  it('72 parça laboratuvarda açılır', () => expect(withLab).toHaveLength(72))
   it.each(withLab.map((p) => [p.slug, p] as const))('%s', (_slug, p) => {
     const kit = kitOf(p)!
     const circuit = kit.circuit(p.lab!.model)

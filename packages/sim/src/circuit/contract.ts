@@ -19,6 +19,8 @@ export type PartType =
   | 'stepper' | 'esc'
   // Aşama E (Hyvex, büyükler için): veri yolu cihazları — gerçek Arduino kütüphaneleriyle çalışır
   | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x' | 'hc05'
+  // Aşama F (güç): pil, doğrusal regülatör, buck modülü, yakıt göstergesi
+  | 'battery' | 'lm7805' | 'buck' | 'max17048'
 
 /**
  * Parça pin kimlikleri (devrede kablo uçları böyle adlandırılır). `Record<PartType, readonly string[]>`
@@ -92,6 +94,11 @@ export const PINS: Record<PartType, readonly string[]> = {
   // HC-05 Bluetooth (ZS-040 kartı, başlık sırası): EN/KEY güç verilirken HIGH = AT kipi; TXD doğrudan bir Uno pinine (SoftwareSerial RX),
   // RXD bir Uno pininden (SoftwareSerial TX) — 3,3 V lojik: 1 kΩ / 2 kΩ gerilim bölücüyle; STATE bağlıyken HIGH
   hc05: ['EN', 'VCC', 'GND', 'TXD', 'RXD', 'STATE'],
+  // Aşama F. Pil: − ucu toprağa (ortak GND) bağlı olmalı; + ucu Uno'nun 5V/VIN hattına değil, yüke ya da regülatöre.
+  battery: ['+', '-'],
+  lm7805: ['IN', 'GND', 'OUT'], // TO-220 bacak sırası
+  buck: ['VIN', 'GND', 'VOUT'], // modülde IN− ve OUT− ortak (GND)
+  max17048: ['CELL', 'GND', 'SDA', 'SCL'], // I2C 0x36; hücrenin + ucu CELL'e
 }
 
 export interface PropDef {
@@ -248,6 +255,25 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
   // 2000 mm üstü sensörün menzili dışıdır (8190 okunur); kaydırıcı bunu denemek için 2500'e kadar gider
   vl53l0x: [{ key: 'distanceMm', label: 'Mesafe', kind: 'number', default: 500, min: 30, max: 2500, step: 5, unit: 'mm', live: true }],
   hc05: [{ key: 'connected', label: 'Telefon bağlı', kind: 'bool', default: true, live: true }],
+  battery: [
+    { key: 'chemistry', label: 'Kimya', kind: 'select', default: 'lipo', options: [
+      { value: 'alkalin', label: 'Alkalin 1,5 V' }, { value: 'cinko-karbon', label: 'Çinko-karbon 1,5 V' }, { value: 'nimh', label: 'NiMH 1,2 V' },
+      { value: 'nicd', label: 'NiCd 1,2 V' }, { value: 'liion', label: 'Li-ion 18650 3,7 V' }, { value: 'lipo', label: 'LiPo 3,7 V' },
+      { value: 'lifepo4', label: 'LiFePO₄ 3,2 V' }, { value: 'kursun-asit', label: 'Kurşun-asit 2 V/hücre' }, { value: 'cr2032', label: 'CR2032 3 V' },
+      { value: 'sodyum-iyon', label: 'Sodyum-iyon 3,1 V' },
+    ] },
+    { key: 'cells', label: 'Seri hücre', kind: 'number', default: 2, min: 1, max: 8, step: 1, unit: 'S' },
+    { key: 'charge', label: 'Şarj', kind: 'number', default: 80, min: 0, max: 100, step: 1, unit: '%', live: true },
+  ],
+  lm7805: [],
+  buck: [
+    { key: 'model', label: 'Model', kind: 'select', default: 'lm2596', options: [
+      { value: 'lm2596', label: 'LM2596 (40 V, 3 A)' }, { value: 'mp1584', label: 'MP1584 Mini-360 (28 V, 3 A)' }, { value: 'xl4015', label: 'XL4015 (36 V, 5 A)' },
+      { value: 'xl4016', label: 'XL4016 (36 V, 8 A)' }, { value: 'ap63200', label: 'AP63200 (32 V, 2 A)' }, { value: 'lm2576', label: 'LM2576 (60 V, 3 A)' },
+    ] },
+    { key: 'vout', label: 'Çıkış (trimpot)', kind: 'number', default: 5, min: 0.8, max: 24, step: 0.05, unit: 'V', live: true },
+  ],
+  max17048: [],
 }
 
 export interface PartInstance {
@@ -344,6 +370,13 @@ export interface PartRuntime {
    * phone = telefondaki terminalin son metni (Uno'dan gelen + telefondan gönderilen); framingErrors > 0 genelde baud uyuşmazlığıdır.
    */
   hc05?: { powered: boolean; mode: 'data' | 'at'; connected: boolean; baud: number; name: string; phone: string; rxBytes: number; txBytes: number; framingErrors: number }
+  // ---- Aşama F ----
+  /** Pil: ocv = açık devre gerilimi, volts = uçlardaki gerilim (iç direnç düşümüyle), currentMa = verdiği akım. active = devreye bağlı (− toprakta). */
+  battery?: { active: boolean; ocv: number; volts: number; currentMa: number; charge: number; cells: number; chemistry: string }
+  /** Regülatör: inReg = çıkış hedefte (giriş yeterli); pdissW = ısıya giden güç. */
+  regulator?: { vin: number; vout: number; ioutMa: number; iinMa: number; pdissW: number; inReg: boolean; on: boolean }
+  /** Yakıt göstergesi: hücre gerilimi ve tahmini şarj (%). */
+  fuel?: { present: boolean; vcell: number; soc: number }
 }
 
 export interface PinSnapshot {
@@ -353,7 +386,7 @@ export interface PinSnapshot {
   volts: number
 }
 
-export type WarningKind = 'short-circuit' | 'led-no-resistor' | 'led-burnt' | 'floating-input' | 'reversed-polarity' | 'pin-overcurrent' | 'flyback-missing' | 'unpowered' | 'base-overcurrent' | 'logic-level'
+export type WarningKind = 'short-circuit' | 'led-no-resistor' | 'led-burnt' | 'floating-input' | 'reversed-polarity' | 'pin-overcurrent' | 'flyback-missing' | 'unpowered' | 'base-overcurrent' | 'logic-level' | 'power'
 export interface LabWarning { kind: WarningKind; partId?: string; message: string }
 
 export interface LabState {

@@ -1707,7 +1707,9 @@
   "warnings": [
    "12V→5V, 0.5A: 3.5 W ısı; termal koruma devreye girer"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "lm7805"
+  }
  },
  {
   "slug": "lm2596-buck",
@@ -1729,7 +1731,10 @@
   "warnings": [
    "3A sürekli için soğutucu ekle"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "buck",
+   "model": "lm2596"
+  }
  },
  {
   "slug": "mp1584-mini-360-buck",
@@ -1749,7 +1754,10 @@
    "Drone, aksiyon kamera, mini robot"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "buck",
+   "model": "mp1584"
+  }
  },
  {
   "slug": "xl4015-buck",
@@ -1769,7 +1777,10 @@
   "warnings": [
    "Fan/soğutucu şart"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "buck",
+   "model": "xl4015"
+  }
  },
  {
   "slug": "xl4016-buck",
@@ -1789,7 +1800,10 @@
   "warnings": [
    "Fan/soğutucu şart"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "buck",
+   "model": "xl4016"
+  }
  },
  {
   "slug": "ap63200-buck",
@@ -1807,7 +1821,10 @@
    "Özel PCB / ticari ürün, IoT"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "buck",
+   "model": "ap63200"
+  }
  },
  {
   "slug": "lm2576-buck",
@@ -1825,7 +1842,10 @@
    "Endüstriyel / zorlu ortam"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "buck",
+   "model": "lm2576"
+  }
  },
  {
   "slug": "tp4056-korumali-bms",
@@ -1918,7 +1938,9 @@
   "warnings": [
    "Bataryayı ADC ile ölçmek yanıltıcıdır"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "max17048"
+  }
  },
  {
   "slug": "kursun-asit-batarya",
@@ -1935,7 +1957,10 @@
    "UPS, inverter, solar, araç"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "kursun-asit"
+  }
  },
  {
   "slug": "li-ion-18650-batarya",
@@ -1954,7 +1979,10 @@
   "warnings": [
    "%20-80 arasında tut; BMS'siz kullanma"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "liion"
+  }
  },
  {
   "slug": "lipo-batarya",
@@ -1974,7 +2002,10 @@
    "Şişmiş, delinmiş veya 3.0V altına düşmüş hücreyi kullanma; LiPo-safe kesede şarj et",
    "BMS'siz kullanma"
   ],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "lipo"
+  }
  },
  {
   "slug": "nimh-batarya",
@@ -1991,7 +2022,10 @@
    "Kumanda, oyuncak, kamera, AA/AAA"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "nimh"
+  }
  },
  {
   "slug": "nicd-batarya",
@@ -2008,7 +2042,10 @@
    "Acil aydınlatma, kablosuz alet"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "nicd"
+  }
  },
  {
   "slug": "alkalin-batarya",
@@ -2025,7 +2062,10 @@
    "Saat, TV kumanda, el feneri"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "alkalin"
+  }
  },
  {
   "slug": "coin-cell-cr2032-batarya",
@@ -2042,7 +2082,10 @@
    "Anakart CMOS, hesap makinesi, RTC"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "cr2032"
+  }
  },
  {
   "slug": "lifepo4-batarya",
@@ -2059,7 +2102,10 @@
    "Solar, EV, marine, yedek güç"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "lifepo4"
+  }
  },
  {
   "slug": "cinko-karbon-batarya",
@@ -2076,7 +2122,10 @@
    "Duvar saati, düşük güçlü oyuncak"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "cinko-karbon"
+  }
  },
  {
   "slug": "sodyum-iyon-batarya",
@@ -2093,7 +2142,10 @@
    "Enerji depolama, EV (gelişen)"
   ],
   "warnings": [],
-  "offline": "guc"
+  "lab": {
+   "kit": "pil",
+   "model": "sodyum-iyon"
+  }
  },
  {
   "slug": "direnc",

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { PINS, type PartType } from './contract'
 import { PART_DEFS, localToWorld, partBounds, pinWorld } from './geometry'
 import { currentArrow, formatMeasurement, formatMilliamps, formatPinBalloon, formatVolts } from './measure'
-import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups, STAGE_D_MOTION, STAGE_D_PARTS, STAGE_D_SENSORS, STAGE_E_PARTS, STAGE_E_SENSORS } from './parts'
+import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS, STAGE_C_PARTS, pickerGroups, STAGE_D_MOTION, STAGE_D_PARTS, STAGE_D_SENSORS, STAGE_E_PARTS, STAGE_F_POWER, STAGE_E_SENSORS } from './parts'
 import { WARNING_META, warningMeta } from './warnings'
 
 const ALL = Object.keys(PINS) as PartType[]
@@ -94,13 +94,13 @@ describe('geometri: Aşama E', () => {
 })
 
 describe('palet', () => {
-  it('varsayılan = A + B + C + D + E', () => {
-    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS, ...STAGE_E_PARTS])
+  it('varsayılan = A + B + C + D + E + F', () => {
+    expect(DEFAULT_PARTS).toEqual([...STAGE_A_PARTS, ...STAGE_B_PARTS, ...STAGE_C_PARTS, ...STAGE_D_PARTS, ...STAGE_E_PARTS, ...STAGE_F_POWER])
     expect(new Set(DEFAULT_PARTS).size).toBe(DEFAULT_PARTS.length)
   })
   it('kategoriler: çıkış, giriş, aktif devre elemanları, sensörler, motor sürücüler', () => {
     const g = pickerGroups(DEFAULT_PARTS, '')
-    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler', 'Motor sürücüler ve hareket', 'Haberleşme'])
+    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler', 'Motor sürücüler ve hareket', 'Haberleşme', 'Güç'])
     expect(g[3].types).toEqual([...STAGE_C_PARTS, ...STAGE_D_SENSORS, ...STAGE_E_SENSORS])
     expect(g[0].types).toContain('oled')
     expect(g[4].types).toEqual(STAGE_D_MOTION)

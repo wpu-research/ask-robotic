@@ -7,6 +7,7 @@ export type KitName =
   | 'led' | 'buton' | 'ldr' | 'npn' | 'mosfet' | 'gaz' | 'dht22' | 'mesafe' | 'sharp'
   | 'l298n' | 'tb6612' | 'drv8833' | 'bts7960' | 'md10c' | 'stepper' | 'esc' | 'servo' | 'mpu6050' | 'lcd' | 'lcdi2c'
   | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x' | 'hc05'
+  | 'pil' | 'lm7805' | 'buck' | 'max17048'
 
 export interface Kit {
   /** Laboratuvar başlığında görünen kısa ad. */
@@ -37,6 +38,19 @@ export const hc05Circuit = (at = false): Circuit => build(
   [part('h', 'hc05', 440, 250), part('r1', 'resistor', 400, 110, { ohms: 1000 }), part('r2', 'resistor', 520, 110, { ohms: 2000 })],
   [['h.VCC', 'uno.5V'], ['h.GND', 'uno.GND'], ['h.TXD', 'uno.D10'], ['h.STATE', 'uno.D4'], ['r1.1', 'uno.D11'], ['r1.2', 'h.RXD'], ['r2.1', 'h.RXD'], ['r2.2', 'uno.GND2'], ...(at ? [['h.EN', 'uno.3V3'] as [string, string]] : [])],
 )
+
+/** Kimyaya göre tipik seri hücre sayısı (pil kiti): 9 V civarı ya da tek hücre. */
+export const KIT_CELLS: Record<string, number> = { alkalin: 4, 'cinko-karbon': 4, nimh: 4, nicd: 4, liion: 2, lipo: 2, lifepo4: 2, 'kursun-asit': 6, cr2032: 1, 'sodyum-iyon': 2 }
+
+/** Pil → regülatör → 100 Ω yük; A0 çıkış (≤ 5 V), A1 giriş 10 kΩ / 3,3 kΩ bölücüyle. */
+const regulatorKit = (reg: PartInstance, battery: Record<string, PropValue>): Circuit => {
+  const inPin = reg.type === 'lm7805' ? 'IN' : 'VIN', outPin = reg.type === 'lm7805' ? 'OUT' : 'VOUT'
+  return build(
+    [part('b', 'battery', 380, 300, battery), reg, part('rl', 'resistor', 660, 300, { ohms: 100 }), part('r1', 'resistor', 380, 420, { ohms: 10000 }), part('r2', 'resistor', 520, 420, { ohms: 3300 })],
+    [['b.-', 'uno.GND'], ['b.+', `u.${inPin}`], ['u.GND', 'uno.GND2'], [`u.${outPin}`, 'rl.1'], ['rl.2', 'uno.GND3'], [`u.${outPin}`, 'uno.A0'],
+      ['b.+', 'r1.1'], ['r1.2', 'uno.A1'], ['uno.A1', 'r2.1'], ['r2.2', 'uno.GND']],
+  )
+}
 
 /** Köprü sürücü + DC motor (motor modeli isteğe bağlı). */
 const motor = (model?: string): PartInstance => part('m', 'dcmotor', 620, 300, model ? { model } : {})
@@ -217,6 +231,38 @@ export const KITS: Record<KitName, Kit> = {
     watch: 'Çalıştır, HC-05\'e tıkla: altta telefonun Bluetooth terminali açılır. "1" LED\'i yakar, "0" söndürür, "?" durumu sorar. "Telefon bağlı" kutusunu kaldır: STATE LOW olur, seri monitörde "baglanti yok" yazar. RXD\'deki 1 kΩ / 2 kΩ bölücü 5 V\'u 3,3 V\'a indirir.',
     en: { title: 'LED over HC-05 Bluetooth (SoftwareSerial, 9600 baud)', watch: 'Run it and click the HC-05: the phone\'s Bluetooth terminal opens below. "1" turns the LED on, "0" off, "?" asks for the state. Untick "Phone connected": STATE goes LOW and the serial monitor prints "baglanti yok" (no connection). The 1 k\u03a9 / 2 k\u03a9 divider on RXD drops 5 V to 3.3 V.' },
     circuit: () => hc05Circuit(),
+  },
+  pil: {
+    title: 'Pil gerilimi ve iç direnç', sketch: 'pil_olcum',
+    watch: 'Pil 470 Ω + LED yükünü besler; 10 kΩ / 3,3 kΩ bölücü gerilimi A0\'ın okuyabileceği aralığa indirir. Pile tıkla: "Şarj" kaydırıcısıyla gerilim düşer. Kimyayı değiştir: düğme pilde (CR2032) iç direnç yüzünden yük altında gerilim çöker.',
+    en: { title: 'Battery voltage and internal resistance', watch: 'The battery feeds a 470 Ω + LED load; a 10 kΩ / 3.3 kΩ divider brings the voltage into the range A0 can read. Click the battery: the "Charge" slider lowers the voltage. Change the chemistry: on a coin cell (CR2032) the voltage sags under load because of its internal resistance.' },
+    circuit: (model) => {
+      const chem = model ?? 'lipo'
+      return build(
+        [part('b', 'battery', 380, 300, { chemistry: chem, cells: KIT_CELLS[chem] ?? 2, charge: 80 }), part('r1', 'resistor', 560, 240, { ohms: 10000 }), part('r2', 'resistor', 700, 240, { ohms: 3300 }),
+          part('rl', 'resistor', 560, 380, { ohms: 470 }), part('l', 'led', 700, 360, { color: 'red' })],
+        [['b.-', 'uno.GND'], ['b.+', 'r1.1'], ['r1.2', 'uno.A0'], ['uno.A0', 'r2.1'], ['r2.2', 'uno.GND2'], ['b.+', 'rl.1'], ['rl.2', 'l.A'], ['l.K', 'uno.GND3']],
+      )
+    },
+  },
+  lm7805: {
+    title: 'LM7805 doğrusal regülatör (9 V → 5 V)', sketch: 'regulator_olcum',
+    watch: 'Altı alkalin pil (≈ 8–9 V) LM7805\'e girer, çıkış 5 V\'ta sabit kalır. Fark ısıya gider: (Vgiriş − 5) × akım. Pilin şarjını %5\'e indir: giriş 7 V\'un altına düşünce regülatör çıkışı tutamaz (düşüm gerilimi ~2 V).',
+    en: { title: 'LM7805 linear regulator (9 V → 5 V)', watch: 'Six alkaline cells (≈ 8–9 V) feed the LM7805 and the output stays at 5 V. The difference becomes heat: (Vin − 5) × current. Lower the battery charge to 5%: once the input drops below 7 V the regulator cannot hold the output (dropout ≈ 2 V).' },
+    circuit: () => regulatorKit(part('u', 'lm7805', 520, 160), { chemistry: 'alkalin', cells: 6, charge: 70 }),
+  },
+  buck: {
+    title: 'Buck (düşürücü) modül: 3S LiPo → 5 V', sketch: 'regulator_olcum',
+    watch: 'Anahtarlamalı regülatör gerilimi düşürürken akımı artırır: çıkıştan 50 mA çekilirken girişten yaklaşık yarısı çekilir (verim %85–92). Modüle tıkla, "Çıkış (trimpot)" kaydırıcısını çevir: seri monitörde çıkış gerilimi değişir.',
+    en: { title: 'Buck (step-down) module: 3S LiPo → 5 V', watch: 'A switching regulator lowers the voltage and raises the current: while 50 mA flows out, only about half of that flows in (85–92% efficiency). Click the module and turn the "Output (trimpot)" slider: the serial monitor shows the output change.' },
+    circuit: (model) => regulatorKit(part('u', 'buck', 520, 160, { model: model ?? 'lm2596', vout: 5 }), { chemistry: 'lipo', cells: 3, charge: 80 }),
+  },
+  max17048: {
+    title: 'MAX17048 yakıt göstergesi (I2C)', sketch: 'max17048_oku',
+    watch: 'Tek hücreli LiPo\'nun gerilimini (VCELL) ve tahmini şarjını (SOC) I2C ile okur. Pilin "Şarj" kaydırıcısını değiştir: bir sonraki okumada V ve SOC birlikte değişir.',
+    en: { title: 'MAX17048 fuel gauge (I2C)', watch: 'Reads the voltage (VCELL) and estimated charge (SOC) of a single-cell LiPo over I2C. Move the battery "Charge" slider: V and SOC change together on the next reading.' },
+    circuit: () => build([part('b', 'battery', 380, 300, { chemistry: 'lipo', cells: 1, charge: 60 }), part('g', 'max17048', 560, 240)],
+      [['b.-', 'uno.GND'], ['b.+', 'g.CELL'], ['g.GND', 'uno.GND2'], ['g.SDA', 'uno.A4'], ['g.SCL', 'uno.A5']]),
   },
 }
 

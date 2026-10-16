@@ -2,7 +2,8 @@
 import { toBase64, type BME280, type DS18B20, type HC05, type SSD1306, type VL53L0X, VL53L0X_MAX_MM } from '../bus-devices.js'
 import { HD44780, type BMP280, type DHT, type HCSR04, type I2CDevice, type Keypad, type LCDI2C, type MPU6050, type RTC } from '../devices.js'
 import { Sim, type Pin, type PinStateName } from '../sim.js'
-import { hc05RxdSource, oneWirePullupNets, staticWarnings } from './analysis.js'
+import { hc05RxdSource, oneWirePullupNets, powerSourceOk, staticWarnings } from './analysis.js'
+import { BUCKS, CHEMS, LM7805, buckTarget, cellOcv, fuelGauge, lipoSoc, lm7805Target, type BuckModel, type Chemistry, type FuelGauge } from './power.js'
 import type {
   Circuit, LabApi, LabOptions, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
@@ -68,14 +69,16 @@ class PinTracker {
   }
 }
 
-interface SrcMeta { kind: 'rail' | 'pin'; name: string; volts: number }
-interface Compiled { input: SolverInput; src: SrcMeta[]; leds: LedSpec[]; npnIds: string[] }
+interface SrcMeta { kind: 'rail' | 'pin' | 'battery'; name: string; volts: number }
+/** Güç parçalarının çözücüdeki yeri: pil kaynağının indeksi, regülatör çıkış/lavabo mantık indeksleri. */
+interface PowerIdx { bat: Map<string, number>; reg: Map<string, { out: number; sink: number }> }
+interface Compiled { input: SolverInput; src: SrcMeta[]; leds: LedSpec[]; npnIds: string[]; power: PowerIdx }
 interface Sol { res: SolverResult; comp: Compiled }
 interface I2cEntry { lcd: LCDI2C; dev: I2CDevice | undefined; reg: number | null }
 /** Aşama C I2C sensörü: cihaz veri yoluna yalnız bağlı ve beslenmişse girer (syncI2c). */
-interface I2cSensor { dev: I2CDevice | undefined; reg: number | null; model: BMP280 | MPU6050 | RTC | SSD1306 | BME280 | VL53L0X; powered?: boolean }
+interface I2cSensor { dev: I2CDevice | undefined; reg: number | null; model: BMP280 | MPU6050 | RTC | SSD1306 | BME280 | VL53L0X | FuelGauge; powered?: boolean }
 
-const DEFAULT_ADDR: Partial<Record<string, number>> = { lcdI2c: 0x27, bmp280: 0x76, mpu6050: 0x68, rtc: 0x68, oled: 0x3c, bme280: 0x76, vl53l0x: 0x29 }
+const DEFAULT_ADDR: Partial<Record<string, number>> = { lcdI2c: 0x27, bmp280: 0x76, mpu6050: 0x68, rtc: 0x68, oled: 0x3c, bme280: 0x76, vl53l0x: 0x29, max17048: 0x36 }
 const parseAddr = (p: PartInstance): number => {
   const def = DEFAULT_ADDR[p.type] ?? 0x27
   const n = Number(String(p.props.address ?? def))
@@ -309,6 +312,11 @@ class LabImpl implements LabApi {
         case 'ds18b20': {
           const dq = u(p, 'DQ')
           if (dq) { this.ds18.set(p.id, this.sim.ds18b20({ pin: dq.pin, tempC: num(p, 'tempC', 25) })); this.devOwned.add(dq.name) }
+          break
+        }
+        case 'max17048': {
+          const fg = fuelGauge(() => this.cellVolts(p))
+          this.i2cSensors.set(p.id, { dev: fg.device, reg: null, model: fg })
           break
         }
         case 'hc05': {
@@ -739,6 +747,43 @@ class LabImpl implements LabApi {
         }
       }
     }
+    // ---- güç parçaları (Aşama F) ----
+    const power: PowerIdx = { bat: new Map(), reg: new Map() }
+    const SINK_OHMS = 1e4 // girişten çekilen akımı enjekte eden yüksek dirençli "lavabo" (çözücüde hızlı yakınsar)
+    for (const p of this.circuit.parts) {
+      if (p.type === 'battery') {
+        if (!powerSourceOk(nl, p) || nl.netOf(ref(p, '-')) !== nl.ground || !nl.isWired(ref(p, '-'))) continue
+        const chem = (String(p.props.chemistry ?? 'lipo') as Chemistry), cells = Math.max(1, Math.round(num(p, 'cells', 2)))
+        const ocv = cellOcv(chem, num(p, 'charge', 80)) * cells
+        power.bat.set(p.id, input.sources.length)
+        input.sources.push({ node: this.node(ref(p, '+')), volts: ocv, ohms: (CHEMS[chem] ?? CHEMS.lipo).rint * cells })
+        src.push({ kind: 'battery', name: p.id, volts: ocv })
+      } else if (p.type === 'lm7805' || p.type === 'buck') {
+        const outPin = p.type === 'lm7805' ? 'OUT' : 'VOUT', inPin = p.type === 'lm7805' ? 'IN' : 'VIN'
+        if (!powerSourceOk(nl, p) || nl.netOf(ref(p, 'GND')) !== nl.ground || !nl.isWired(ref(p, inPin))) continue
+        const nIn = this.node(ref(p, inPin)), nOut = this.node(ref(p, outPin))
+        const model = String(p.props.model ?? 'lm2596') as BuckModel, vset = num(p, 'vout', 5)
+        const target = (vin: number) => (p.type === 'lm7805' ? lm7805Target(vin) : buckTarget(model, vset, vin))
+        const outOhms = LM7805.outOhms
+        // akım sınırı (gerçek regülatör de kısa devrede sınırlar): ilk yinelemede çıkış henüz sürülmemişken aşırı tahmini de keser
+        const ilim = p.type === 'lm7805' ? 2.2 : (BUCKS[model] ?? BUCKS.lm2596).imax * 1.5
+        // Çıkış akımı, son doğrusal çözümde gerçekten kullanılan çıkış gerilimiyle hesaplanır (aynı yinelemede değişen hedefle
+        // değil): böylece lavabo çözümdeki gerçek akımı görür ve yineleme salınmaz. Çıkış mantığı lavabodan önce değerlendirilir.
+        let cur: number | null = null, used: number | null = null
+        const iout = (v: Float64Array) => (used === null ? 0 : Math.min(ilim, Math.max(0, (used - v[nOut]) / outOhms)))
+        const iin = (v: Float64Array) => {
+          const io = iout(v), vin = v[nIn]
+          if (vin <= 0.1) return 0
+          if (p.type === 'lm7805') return io + LM7805.iq
+          const b = BUCKS[model] ?? BUCKS.lm2596
+          return (target(vin) * io) / (b.eff * vin) + 0.005
+        }
+        const out = input.logic!.length
+        input.logic!.push({ node: nOut, ohms: outOhms, drive: (v) => { const t = target(v[nIn]); used = cur; cur = t > 0 ? t : null; return cur } })
+        input.logic!.push({ node: nIn, ohms: SINK_OHMS, drive: (v, fl) => (fl[nIn] ? null : v[nIn] - iin(v) * SINK_OHMS) })
+        power.reg.set(p.id, { out, sink: out + 1 })
+      }
+    }
     if (this.unoId !== undefined) {
       const uid = this.unoId
       if (nl.isWired({ part: uid, pin: '5V' }) || nl.isWired({ part: uid, pin: 'VIN' })) {
@@ -766,7 +811,7 @@ class LabImpl implements LabApi {
     for (const s of this.specs) {
       input.leds.push({ a: this.node(s.a), k: this.node(s.k), vf: s.vf, rs: s.rs, disabled: this.burnt.has(s.key) })
     }
-    return { input, src, leds: this.specs, npnIds }
+    return { input, src, leds: this.specs, npnIds, power }
   }
 
   private runSolve(override?: { pin: string; high: boolean }): Sol {
@@ -791,12 +836,32 @@ class LabImpl implements LabApi {
         this.warn('led-burnt', s.partId, `LED yandı (${(a * 1000).toFixed(0)} mA). Sıfırlayınca düzelir; seri direnç ekle.`)
       }
     })
+    for (const [id, r] of comp.power.reg) {
+      const p = this.circuit.parts.find((x) => x.id === id)!
+      const io = Math.max(0, res.logicAmps[r.out]), ii = Math.max(0, -res.logicAmps[r.sink])
+      const vin = res.volts[this.node({ part: id, pin: p.type === 'lm7805' ? 'IN' : 'VIN' })], vout = res.volts[this.node({ part: id, pin: p.type === 'lm7805' ? 'OUT' : 'VOUT' })]
+      if (p.type === 'lm7805') {
+        const pd = vin * ii - vout * io
+        if (pd > LM7805.pWarn) this.warn('power', id, `LM7805 ${pd.toFixed(1)} W ısı üretiyor ((${vin.toFixed(1)} − ${vout.toFixed(1)}) V × ${(io * 1000).toFixed(0)} mA): soğutucu gerekir, yaklaşık ${LM7805.pShutdown} W'ta ısıl korumaya girer.`)
+        if (io > LM7805.imax) this.warn('power', id, `LM7805 ${io.toFixed(2)} A veriyor: sınır ${LM7805.imax} A.`)
+      } else {
+        const b = BUCKS[String(p.props.model ?? 'lm2596') as BuckModel] ?? BUCKS.lm2596
+        if (vin > b.vinMax) this.warn('power', id, `${b.label} girişi ${vin.toFixed(1)} V: sınır ${b.vinMax} V. Gerçekte modül yanar.`)
+        if (io > b.imax) this.warn('power', id, `${b.label} ${io.toFixed(2)} A veriyor: sınır ${b.imax} A.`)
+      }
+    }
     comp.npnIds.forEach((id, i) => {
       if (res.npnIb[i] > MODEL.baseOverA) this.warn('base-overcurrent', id, `Taban akımı ${(res.npnIb[i] * 1000).toFixed(0)} mA: çok yüksek. Tabana seri direnç (örn. 1 kΩ) ekle.`)
     })
     comp.input.sources.forEach((s, i) => {
       const m = comp.src[i]
       const amps = res.sourceAmps[i]
+      if (m.kind === 'battery') {
+        const p = this.circuit.parts.find((x) => x.id === m.name)
+        const spec = CHEMS[String(p?.props.chemistry ?? 'lipo') as Chemistry] ?? CHEMS.lipo
+        if (amps > spec.imax) this.warn('power', m.name, `Pil ${(amps).toFixed(2)} A veriyor: ${spec.label} için sürekli sınır ${spec.imax} A. Gerilim çöker, pil ısınır.`)
+        return
+      }
       if (m.kind === 'rail') {
         if (Math.abs(amps) > MODEL.railShortA) this.warn('short-circuit', this.unoId, `${m.name} hattı dirençsiz bir yolla topraklandı (kısa devre).`)
       } else if (m.name) {
@@ -939,6 +1004,13 @@ class LabImpl implements LabApi {
   }
 
   /** I2C LCD'leri veri yoluna ekler/çıkarır: beslenmiş ve SDA→A4, SCL→A5 kablolu ise adreste cevap verir. */
+  /** MAX17048: CELL ile GND arasındaki gerilim (son çözümden). */
+  private cellVolts(p: PartInstance): number {
+    if (!this.base || !this.nl.isWired(this.ref(p, 'CELL'))) return 0
+    const v = this.base.res.volts
+    return v[this.node(this.ref(p, 'CELL'))] - v[this.node(this.ref(p, 'GND'))]
+  }
+
   private i2cPresent(p: PartInstance, v: Float64Array): boolean {
     const sda = this.nl.netOf(this.ref(p, 'SDA')), scl = this.nl.netOf(this.ref(p, 'SCL'))
     if (sda === undefined || scl === undefined) return false
@@ -1051,6 +1123,33 @@ class LabImpl implements LabApi {
           const mm = num(p, 'distanceMm', 500)
           out.vl53l0x = { powered, present, distanceMm: mm, inRange: mm <= VL53L0X_MAX_MM, continuous: present && !!m?.continuous, measurements: m?.measurements ?? 0 }
         }
+        return true
+      }
+      case 'battery': {
+        const comp = this.base.comp, idx = comp.power.bat.get(p.id)
+        const chem = String(p.props.chemistry ?? 'lipo'), cells = Math.max(1, Math.round(num(p, 'cells', 2)))
+        const ocv = cellOcv(chem as Chemistry, num(p, 'charge', 80)) * cells
+        const amps = idx === undefined ? 0 : this.base.res.sourceAmps[idx]
+        out.battery = { active: idx !== undefined, ocv, volts: idx === undefined ? 0 : volts('+') - volts('-'), currentMa: amps * 1000, charge: num(p, 'charge', 80), cells, chemistry: chem }
+        return true
+      }
+      case 'lm7805': case 'buck': {
+        const r = this.base.comp.power.reg.get(p.id), res = this.base.res
+        const vin = volts(p.type === 'lm7805' ? 'IN' : 'VIN'), vout = volts(p.type === 'lm7805' ? 'OUT' : 'VOUT')
+        const io = r ? Math.max(0, res.logicAmps[r.out]) : 0, ii = r ? Math.max(0, -res.logicAmps[r.sink]) : 0
+        const on = !!r && res.logicVolts[r.out] !== null
+        const nominal = p.type === 'lm7805' ? LM7805.vout : num(p, 'vout', 5)
+        out.regulator = { vin, vout, ioutMa: io * 1000, iinMa: ii * 1000, pdissW: Math.max(0, vin * ii - vout * io), inReg: on && Math.abs(vout - nominal) < 0.15, on }
+        return true
+      }
+      case 'max17048': {
+        const e = this.i2cSensors.get(p.id)
+        const sda = this.nl.netOf(this.ref(p, 'SDA')), scl = this.nl.netOf(this.ref(p, 'SCL'))
+        const vc = this.cellVolts(p)
+        const present = vc >= 2.5 && sda !== undefined && scl !== undefined && this.nl.unoPinsOnNet(sda).includes('A4') && this.nl.unoPinsOnNet(scl).includes('A5')
+        this.syncI2c(p, present)
+        void e
+        out.fuel = { present, vcell: vc, soc: lipoSoc(vc) }
         return true
       }
       case 'hc05': {

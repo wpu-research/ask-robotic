@@ -129,6 +129,7 @@ export const lab = {
       sensors: 'Sensörler',
       motion: 'Motor sürücüler ve hareket',
       comm: 'Haberleşme',
+      power: 'Güç',
       other: 'Diğer',
     },
   },
@@ -193,6 +194,7 @@ export const lab = {
       unpowered: 'Besleme yok',
       'base-overcurrent': 'Taban akımı çok yüksek',
       'logic-level': 'Lojik seviye uyumsuz',
+      power: 'Güç uyarısı',
       generic: 'Uyarı',
     },
     // İngilizce kipte sim iletileri bu kalıplara çevrilir (lib/lab/warnings.ts). Türkçe kipte sim iletisi aynen gösterilir.
@@ -225,6 +227,17 @@ export const lab = {
       btNoData: 'HC-05 TXD ve RXD bağlı değil: modül Arduino ile konuşamaz (TXD → SoftwareSerial RX, RXD ← SoftwareSerial TX).',
       btRxd: 'HC-05 RXD ucu bir Arduino pinine (doğrudan ya da bölücü direnciyle) bağlı değil: modül Arduino\'dan veri alamaz.',
       btLevel: 'HC-05 RXD 3,3 V lojik girişidir: Arduino\'nun 5 V TX ucunu 1 kΩ / 2 kΩ gerilim bölücüyle bağla (doğrudan bağlantı modülü zamanla bozar).',
+      batShort: 'Pilin + ve − uçları doğrudan birbirine bağlı (kısa devre): gerçekte pil ısınır, Li-ion ve LiPo tutuşabilir.',
+      batPlusGnd: 'Pilin + ucu GND\'ye bağlı (kısa devre).',
+      batNoGnd: 'Pilin − ucu Arduino GND\'sine bağlı değil: ortak toprak olmadan devre kapanmaz (pil devre dışı).',
+      batOnRail: 'Pil Uno\'nun 5V/VIN hattına bağlı: laboratuvarda Uno USB\'den beslenir, bu bağlantı modellenmez. Pili yüke, motor sürücüsüne ya da bir regülatöre bağla.',
+      regNoGnd: '{name} GND ucu Arduino GND\'sine bağlı değil: regülatör çalışmaz.',
+      regNoIn: '{name} girişi ({pin}) bağlı değil: bir pil ya da güç kaynağı bağla.',
+      regOnRail: '{name} çıkışı Uno\'nun 5V/VIN hattına bağlı: laboratuvarda Uno USB\'den beslenir, bu bağlantı modellenmez. Çıkışı yüke bağla.',
+      batOver: 'Pil {a} A veriyor: {chem} için sürekli sınır {max} A. Gerilim çöker, pil ısınır.',
+      regHot: 'LM7805 {w} W ısı üretiyor: soğutucu gerekir, yaklaşık {cut} W\'ta ısıl korumaya girer.',
+      regOver: '{name} {a} A veriyor: sınır {max} A.',
+      buckVin: '{name} girişi {v} V: sınır {max} V. Gerçekte modül yanar.',
       btUsb: 'HC-05 D0/D1\'e bağlı: bu pinler USB seri hattıdır (yükleme ve seri monitörle çakışır). SoftwareSerial ile başka pinlere bağla (ör. D10/D11).',
     },
     // Sim iletilerindeki Türkçe modül adları.
@@ -247,6 +260,7 @@ export const lab = {
       sharpir: 'Sharp IR sensörü',
       stepper: 'TMC2209 step sürücü',
       stepDriver: 'Step sürücü',
+      buck: 'Buck modülü',
     },
   },
   /** Parça tam adları (PART_DEFS.name). */
@@ -305,6 +319,10 @@ export const lab = {
     ds18b20: 'DS18B20 sıcaklık (1-Wire)',
     vl53l0x: 'VL53L0X lazer mesafe (ToF)',
     hc05: 'HC-05 Bluetooth (UART)',
+    battery: 'Pil / batarya paketi',
+    lm7805: 'LM7805 regülatör (5 V)',
+    buck: 'Buck (düşürücü) modül',
+    max17048: 'MAX17048 yakıt göstergesi',
   },
   /** Paletteki kısa adlar (SHORT_NAME). */
   short: {
@@ -343,6 +361,10 @@ export const lab = {
     ds18b20: 'DS18B20',
     vl53l0x: 'VL53L0X',
     hc05: 'HC-05',
+    battery: 'Pil',
+    lm7805: 'LM7805',
+    buck: 'Buck',
+    max17048: 'MAX17048',
   },
   /** Özellik etiketleri: parça türü → özellik anahtarı (packages/sim PROPS[tür][].label). */
   propLabel: {
@@ -387,6 +409,8 @@ export const lab = {
     ds18b20: { tempC: 'Sıcaklık' },
     vl53l0x: { distanceMm: 'Mesafe' },
     hc05: { connected: 'Telefon bağlı' },
+    battery: { chemistry: 'Kimya', cells: 'Seri hücre', charge: 'Şarj' },
+    buck: { model: 'Model', vout: 'Çıkış (trimpot)' },
   },
   /** Seçenek etiketleri (yalnız çevrilmesi gerekenler): tür → anahtar → değer. Boş değer için `none`. */
   propOpt: {
@@ -400,6 +424,8 @@ export const lab = {
     hcsr04: { model: { jsnsr04t: 'JSN-SR04T su geçirmez (25-600 cm)', rcwl1601: 'RCWL-1601 (2-450 cm, 3.3V uyumlu)' } },
     keypad: { key: { none: 'Yok' } },
     stepper: { microsteps: { '1': 'Tam adım (1)' } },
+    battery: { chemistry: { alkalin: 'Alkalin 1,5 V', 'cinko-karbon': 'Çinko-karbon 1,5 V', nimh: 'NiMH 1,2 V', nicd: 'NiCd 1,2 V', liion: 'Li-ion 18650 3,7 V', lipo: 'LiPo 3,7 V', lifepo4: 'LiFePO₄ 3,2 V', 'kursun-asit': 'Kurşun-asit 2 V/hücre', cr2032: 'CR2032 3 V', 'sodyum-iyon': 'Sodyum-iyon 3,1 V' } },
+    buck: { model: { mp1584: 'MP1584 Mini-360 (28 V, 3 A)' } },
   },
   arena: {
     page: {

@@ -128,6 +128,7 @@ export const lab = {
       sensors: 'Sensors',
       motion: 'Motor drivers and motion',
       comm: 'Communication',
+      power: 'Power',
       other: 'Other',
     },
   },
@@ -192,6 +193,7 @@ export const lab = {
       unpowered: 'No power',
       'base-overcurrent': 'Base current too high',
       'logic-level': 'Logic level mismatch',
+      power: 'Power warning',
       generic: 'Warning',
     },
     msg: {
@@ -223,6 +225,17 @@ export const lab = {
       btNoData: 'HC-05 TXD and RXD are not connected: the module cannot talk to the Arduino (TXD → SoftwareSerial RX, RXD ← SoftwareSerial TX).',
       btRxd: 'HC-05 RXD is not connected to an Arduino pin (directly or through the divider resistor): the module cannot receive from the Arduino.',
       btLevel: 'HC-05 RXD is a 3.3 V logic input: connect the Arduino\'s 5 V TX pin through a 1 kΩ / 2 kΩ voltage divider (a direct connection wears the module out).',
+      batShort: 'The battery + and − terminals are wired together (short circuit): a real battery heats up, Li-ion and LiPo can catch fire.',
+      batPlusGnd: 'The battery + terminal is connected to GND (short circuit).',
+      batNoGnd: 'The battery − terminal is not on the Arduino GND: without a common ground the circuit does not close (battery inactive).',
+      batOnRail: 'The battery is on the Uno 5V/VIN rail: in the lab the Uno runs from USB, so this connection is not modelled. Connect the battery to a load, a motor driver or a regulator.',
+      regNoGnd: '{name} GND is not on the Arduino GND: the regulator does not work.',
+      regNoIn: '{name} input ({pin}) is not connected: connect a battery or a power supply.',
+      regOnRail: '{name} output is on the Uno 5V/VIN rail: in the lab the Uno runs from USB, so this connection is not modelled. Connect the output to a load.',
+      batOver: 'The battery delivers {a} A: the continuous limit for {chem} is {max} A. The voltage sags and the battery heats up.',
+      regHot: 'The LM7805 turns {w} W into heat: it needs a heat sink, and thermal protection kicks in at about {cut} W.',
+      regOver: '{name} delivers {a} A: limit {max} A.',
+      buckVin: '{name} input is {v} V: limit {max} V. A real module would burn out.',
       btUsb: 'HC-05 is on D0/D1: these are the USB serial lines (they clash with uploading and the serial monitor). Use SoftwareSerial on other pins (e.g. D10/D11).',
     },
     name: {
@@ -244,6 +257,7 @@ export const lab = {
       sharpir: 'Sharp IR sensor',
       stepper: 'TMC2209 stepper driver',
       stepDriver: 'Stepper driver',
+      buck: 'Buck module',
     },
   },
   parts: {
@@ -301,6 +315,10 @@ export const lab = {
     ds18b20: 'DS18B20 temperature (1-Wire)',
     vl53l0x: 'VL53L0X laser distance (ToF)',
     hc05: 'HC-05 Bluetooth (UART)',
+    battery: 'Battery / battery pack',
+    lm7805: 'LM7805 regulator (5 V)',
+    buck: 'Buck (step-down) module',
+    max17048: 'MAX17048 fuel gauge',
   },
   short: {
     ldr: 'LDR',
@@ -338,6 +356,10 @@ export const lab = {
     ds18b20: 'DS18B20',
     vl53l0x: 'VL53L0X',
     hc05: 'HC-05',
+    battery: 'Battery',
+    lm7805: 'LM7805',
+    buck: 'Buck',
+    max17048: 'MAX17048',
   },
   propLabel: {
     led: { color: 'Color' },
@@ -381,6 +403,8 @@ export const lab = {
     ds18b20: { tempC: 'Temperature' },
     vl53l0x: { distanceMm: 'Distance' },
     hc05: { connected: 'Phone connected' },
+    battery: { chemistry: 'Chemistry', cells: 'Cells in series', charge: 'Charge' },
+    buck: { model: 'Model', vout: 'Output (trimpot)' },
   },
   propOpt: {
     led: { color: { red: 'Red', yellow: 'Yellow', green: 'Green', blue: 'Blue', white: 'White' } },
@@ -393,6 +417,8 @@ export const lab = {
     hcsr04: { model: { jsnsr04t: 'JSN-SR04T waterproof (25-600 cm)', rcwl1601: 'RCWL-1601 (2-450 cm, 3.3V compatible)' } },
     keypad: { key: { none: 'None' } },
     stepper: { microsteps: { '1': 'Full step (1)' } },
+    battery: { chemistry: { alkalin: 'Alkaline 1.5 V', 'cinko-karbon': 'Zinc-carbon 1.5 V', nimh: 'NiMH 1.2 V', nicd: 'NiCd 1.2 V', liion: 'Li-ion 18650 3.7 V', lipo: 'LiPo 3.7 V', lifepo4: 'LiFePO₄ 3.2 V', 'kursun-asit': 'Lead-acid 2 V/cell', cr2032: 'CR2032 3 V', 'sodyum-iyon': 'Sodium-ion 3.1 V' } },
+    buck: { model: { mp1584: 'MP1584 Mini-360 (28 V, 3 A)' } },
   },
   arena: {
     page: {

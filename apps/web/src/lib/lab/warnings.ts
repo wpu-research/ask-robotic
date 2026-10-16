@@ -13,6 +13,7 @@ export const WARNING_META: Partial<Record<WarningKind, { icon: string; title: st
   unpowered: { icon: '⏻', title: 'Besleme yok' },
   'base-overcurrent': { icon: '⚠', title: 'Taban akımı çok yüksek' },
   'logic-level': { icon: '⚡', title: 'Lojik seviye uyumsuz' },
+  power: { icon: '🔋', title: 'Güç uyarısı' },
 }
 
 export const warningMeta = (kind: string) => WARNING_META[kind as WarningKind] ?? { icon: '⚠', title: 'Uyarı' }
@@ -28,7 +29,7 @@ const MODULE_NAMES: Record<string, string> = {
   'Röle modülü': 'relay', 'DHT sensörü': 'dht', 'PIR modülü': 'pir', 'IR engel modülü': 'irobstacle', 'RTC modülü': 'rtc',
   'MQ-2 modülü': 'mq2', 'MQ-3 modülü': 'mq3', 'MQ-4 modülü': 'mq4', 'MQ-7 modülü': 'mq7', 'MQ-135 modülü': 'mq135',
   'Alev modülü': 'flame', 'Ses modülü': 'sound', 'Toprak nemi modülü': 'soil', 'Yağmur sensörü': 'rain', 'Su seviyesi sensörü': 'waterlevel',
-  'Sharp IR sensörü': 'sharpir', 'TMC2209 step sürücü': 'stepper', 'Step sürücü': 'stepDriver',
+  'Sharp IR sensörü': 'sharpir', 'TMC2209 step sürücü': 'stepper', 'Step sürücü': 'stepDriver', 'Buck modülü': 'buck',
 }
 const moduleName = (t: TFunction, s: string) => (MODULE_NAMES[s] ? t(`lab.warn.name.${MODULE_NAMES[s]}` as MessageKey) : s)
 
@@ -58,6 +59,17 @@ const RULES: Rule[] = [
   [/^(\S+) pini doğrudan GND'ye bağlı/, (t, m) => t(M('pinToGnd'), { name: m[1] })],
   [/^(\S+) pini doğrudan 5V'a bağlı/, (t, m) => t(M('pinTo5v'), { name: m[1] })],
   [/^(.+) DQ hattında pull-up direnci yok/, (t, m) => t(M('oneWirePullup'), { name: moduleName(t, m[1]) })],
+  [/^Pilin \+ ve − uçları doğrudan/, (t) => t(M('batShort'))],
+  [/^Pilin \+ ucu GND'ye bağlı/, (t) => t(M('batPlusGnd'))],
+  [/^Pilin − ucu Arduino GND'sine bağlı değil/, (t) => t(M('batNoGnd'))],
+  [/^Pil Uno'nun 5V\/VIN hattına bağlı/, (t) => t(M('batOnRail'))],
+  [/^(.+) GND ucu Arduino GND'sine bağlı değil: regülatör/, (t, m) => t(M('regNoGnd'), { name: moduleName(t, m[1]) })],
+  [/^(.+) girişi \((\S+)\) bağlı değil: bir pil/, (t, m) => t(M('regNoIn'), { name: moduleName(t, m[1]), pin: m[2] })],
+  [/^(.+) çıkışı Uno'nun 5V\/VIN hattına bağlı/, (t, m) => t(M('regOnRail'), { name: moduleName(t, m[1]) })],
+  [/^Pil ([\d.]+) A veriyor: (.+) için sürekli sınır ([\d.]+) A/, (t, m) => t(M('batOver'), { a: m[1], chem: m[2], max: m[3] })],
+  [/^LM7805 ([\d.]+) W ısı üretiyor.*yaklaşık ([\d.]+) W/, (t, m) => t(M('regHot'), { w: m[1], cut: m[2] })],
+  [/^(.+) ([\d.]+) A veriyor: sınır ([\d.]+) A\.$/, (t, m) => t(M('regOver'), { name: m[1], a: m[2], max: m[3] })],
+  [/^(.+) girişi ([\d.]+) V: sınır ([\d.]+) V/, (t, m) => t(M('buckVin'), { name: m[1], v: m[2], max: m[3] })],
   [/^HC-05 TXD ve RXD bağlı değil/, (t) => t(M('btNoData'))],
   [/^HC-05 RXD ucu bir Arduino pinine/, (t) => t(M('btRxd'))],
   [/^HC-05 RXD 3,3 V lojik girişidir/, (t) => t(M('btLevel'))],

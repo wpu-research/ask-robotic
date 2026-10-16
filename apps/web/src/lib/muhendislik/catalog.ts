@@ -102,7 +102,7 @@ export const labHref = (p: EngPart): string | null => (p.lab ? `/laboratuvar?par
 export const OFFLINE_TEXT_EN: Record<OfflineReason, string> = {
   mcu: 'This is a microcontroller board. The lab simulates the Arduino Uno (ATmega328P) exactly; this board has no simulation of its own. Read the pin and voltage differences in the specifications below.',
   ai: 'A Linux / AI accelerator board or a camera. It is not simulated on the Uno; level 7 covers it as mission computer architecture.',
-  guc: 'A power part. For now the lab treats the Uno\'s 5V and 3V3 rails as ideal sources; regulator and battery models will be added in the next phase.',
+  guc: 'A power part whose behaviour the lab\'s DC solver cannot capture: charging, cell balancing (BMS) and surge protection (TVS) change over time. Batteries, regulators and the fuel gauge do open in the lab; study the specifications and warnings here.',
   faz2: 'The bus model for this part (I²C / SPI / 1-Wire / UART) will be added to the lab in the next phase. For now, study its specifications and warnings here.',
   mekanik: 'A mechanical part: it has no electrical simulation. Try the step-to-angle relation in the stepper kit; lead screws and belts turn that angle into linear travel.',
   arac: 'A measurement / development tool. In the lab you can click any part to read its voltage and current like a virtual multimeter.',
@@ -112,7 +112,7 @@ export const OFFLINE_TEXT_EN: Record<OfflineReason, string> = {
 export const OFFLINE_TEXT: Record<OfflineReason, string> = {
   mcu: 'Bu bir mikrodenetleyici kartı. Laboratuvar Arduino Uno\'yu (ATmega328P) birebir benzetir; bu kartın kendi benzetimi yok. Pin ve gerilim farklarını aşağıdaki özelliklerden oku.',
   ai: 'Linux / AI hızlandırıcı kartı veya kamera. Uno üzerinde benzetilmez; Seviye 7\'de görev bilgisayarı mimarisi olarak işlenir.',
-  guc: 'Güç parçası. Laboratuvar şimdilik Uno\'nun 5V ve 3V3 hatlarını ideal kaynak sayar; regülatör ve batarya modeli sonraki aşamada eklenecek.',
+  guc: 'Bu güç parçasının davranışı laboratuvarın DC çözücüsüyle modellenemez: şarj, hücre dengeleme (BMS) ve darbe koruması (TVS) zamanla değişir. Piller, regülatörler ve yakıt göstergesi laboratuvarda açılır; bu parçanın özelliklerini ve uyarılarını buradan çalış.',
   faz2: 'Bu parçanın veri yolu modeli (I²C / SPI / 1-Wire / UART) laboratuvara sonraki aşamada eklenecek. Şimdilik özellikleri ve uyarıları buradan çalış.',
   mekanik: 'Mekanik parça: elektriksel benzetimi yok. Step motor kitinde adım → açı ilişkisini dene; vidalı mil ve kayışta açı → doğrusal yol dönüşümü yapılır.',
   arac: 'Ölçüm / geliştirme aracı. Laboratuvarda bir parçaya tıklayınca gerilim ve akımı sanal multimetre gibi okuyabilirsin.',
