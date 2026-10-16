@@ -1,4 +1,4 @@
-// Veri yolu cihaz modelleri (Aşama E): SSD1306 OLED (I2C), BME280 (I2C), DS18B20 (1-Wire), VL53L0X (I2C).
+// Veri yolu cihaz modelleri (Aşama E): SSD1306 OLED (I2C), BME280 (I2C), DS18B20 (1-Wire), VL53L0X (I2C), HC-05 (UART).
 // Hedef: değiştirilmemiş resmî kütüphaneler (Adafruit_SSD1306, Adafruit_BME280, OneWire + DallasTemperature, Pololu VL53L0X)
 // gerçek donanımdaki gibi çalışsın. Tarayıcı ve Node uyumlu (Node'a özgü API yok).
 import type { I2CDevice } from './devices.js'
@@ -640,5 +640,186 @@ export function attachVL53L0X(sim: Sim, { address = 0x29, distanceMm = 500 }: VL
     },
   }))
   defaults()
+  return dev
+}
+
+// =====================================================================================================================
+// HC-05 Bluetooth SPP modülü (UART). Uno tarafı bit düzeyindedir: modülün RXD'si Uno'nun gönderdiği çerçeveleri
+// (başlangıç biti, 8 veri biti LSB önce, durdurma biti) örnekler, TXD'si Uno'nun giriş pinini aynı biçimde sürer.
+// Böylece SoftwareSerial (pin değişim kesmesi) gerçekteki gibi çalışır; baud uyuşmazsa bozuk karakter okunur.
+// Veri kipinde (EN/KEY boşta) baud varsayılan 9600'dür ve baytlar eşleşmiş telefona aktarılır; EN güç verilirken
+// HIGH ise modül AT komut kipindedir (sabit 38400 baud) ve "AT...\r\n" komutlarına cevap verir.
+// =====================================================================================================================
+
+export interface HC05Options {
+  /** Uno'nun dinlediği pin (modülün TXD'si buna bağlı; SoftwareSerial RX). Yoksa modül Uno'ya veri gönderemez. */
+  toUno?: Pin
+  /** Uno'nun gönderdiği pin (modülün RXD'si buna bağlı; SoftwareSerial TX). Yoksa modül Uno'yu duymaz. */
+  fromUno?: Pin
+  name?: string
+}
+export interface HC05 {
+  /** Besleme var (yoksa TXD sürülmez, RXD dinlenmez). */
+  powered: boolean
+  /** AT komut kipi (EN güç verilirken HIGH). Lab bunu güç açılışında ayarlar; değişince reset() çağrılmalı. */
+  atMode: boolean
+  /** Telefon eşleşip bağlandı (yalnız veri kipinde anlamlı). */
+  connected: boolean
+  name: string
+  password: string
+  /** Veri kipinde UART baud'u (AT+UART ile değişir, güç döngüsünde korunur). */
+  dataBaud: number
+  role: number
+  /** Telefondaki terminal: Uno'dan gelen baytlar (bağlıyken) ve telefondan gönderilenler. */
+  phone: string
+  /** Uno'dan alınan / Uno'ya gönderilen bayt sayısı. */
+  rxBytes: number
+  txBytes: number
+  /** Çerçeve hatası (durdurma biti LOW) görülen bayt sayısı: baud uyuşmazlığının işareti. */
+  framingErrors: number
+  /** Şu anki UART hızı (AT kipinde 38400). */
+  baud(): number
+  /** Telefondan metin gönderir (yalnız bağlıyken ve veri kipinde Uno'ya ulaşır). */
+  phoneSend(text: string): void
+  /** Güç döngüsü: alım/gönderim kuyruğu ve AT tamponu sıfırlanır (ad, şifre, baud korunur). */
+  reset(): void
+}
+
+/** HC-05 AT kipi sabit baud'u (EN/KEY HIGH iken güç verilerek girilir). */
+export const HC05_AT_BAUD = 38400
+/** Telefondaki terminal günlüğünün en fazla uzunluğu (karakter). */
+const PHONE_MAX = 4000
+const CPU_HZ_BUS = US * 1_000_000
+
+export function attachHC05(sim: Sim, { toUno, fromUno, name = 'HC-05' }: HC05Options): HC05 {
+  const VALID_BAUDS = [4800, 9600, 19200, 38400, 57600, 115200, 230400, 460800]
+  let gen = 0
+  let rxBusy = false
+  let txQueue: number[] = []
+  let txBusy = false
+  let atBuf = ''
+  /** Hat önce boşta (HIGH) görülmeli: pin çıkışa geçerken oluşan ilk LOW başlangıç biti sayılmaz. */
+  let idleSeen = false
+
+  const dev: HC05 = {
+    powered: true, atMode: false, connected: true, name, password: '1234', dataBaud: 9600, role: 0,
+    phone: '', rxBytes: 0, txBytes: 0, framingErrors: 0,
+    baud: () => (dev.atMode ? HC05_AT_BAUD : dev.dataBaud),
+    phoneSend(text) {
+      if (!dev.powered || dev.atMode || !dev.connected) return
+      log(text)
+      for (const c of text) txQueue.push(c.charCodeAt(0) & 0xff)
+      pump()
+    },
+    reset() {
+      gen++
+      rxBusy = false; txQueue = []; txBusy = false; atBuf = ''
+      idleSeen = fromUno !== undefined && sim.read(fromUno)
+      if (toUno !== undefined) sim.drive(toUno, true)
+    },
+  }
+
+  const log = (s: string): void => {
+    dev.phone += s
+    if (dev.phone.length > PHONE_MAX) dev.phone = dev.phone.slice(-PHONE_MAX)
+  }
+  const bitCycles = (): number => CPU_HZ_BUS / dev.baud()
+
+  // ---- Uno → modül: RXD'de başlangıç bitini yakala, bit ortalarından örnekle ----
+  if (fromUno !== undefined) sim.onPin(fromUno, (high) => {
+    if (high) { idleSeen = true; return }
+    if (!idleSeen || rxBusy || !dev.powered) return
+    rxBusy = true
+    const g = gen
+    const bc = bitCycles()
+    let val = 0
+    for (let k = 0; k < 8; k++) {
+      sim.cpu.addClockEvent(() => { if (g === gen && sim.read(fromUno)) val |= 1 << k }, Math.max(1, Math.round(bc * (k + 1.5))))
+    }
+    sim.cpu.addClockEvent(() => {
+      if (g !== gen) return
+      rxBusy = false
+      if (!sim.read(fromUno)) dev.framingErrors++
+      dev.rxBytes++
+      onByte(val)
+    }, Math.round(bc * 9.5))
+  })
+
+  const onByte = (b: number): void => {
+    if (dev.atMode) {
+      atBuf += String.fromCharCode(b)
+      if (atBuf.length > 128) atBuf = atBuf.slice(-128)
+      if (atBuf.endsWith('\r\n')) {
+        const line = atBuf.slice(0, -2)
+        atBuf = ''
+        const reply = atCommand(line)
+        const g = gen
+        sim.cpu.addClockEvent(() => { if (g === gen) reply.split('').forEach((c) => txQueue.push(c.charCodeAt(0))); pump() }, 2 * CPU_HZ_BUS / 1000)
+      }
+      return
+    }
+    if (dev.connected) log(String.fromCharCode(b))
+  }
+
+  const atCommand = (line: string): string => {
+    const OK = 'OK\r\n'
+    const m = /^AT(?:\+([A-Za-z]+)(\?|=(.*))?)?$/.exec(line.trim())
+    if (!m) return 'ERROR:(0)\r\n'
+    const cmd = (m[1] ?? '').toUpperCase()
+    const query = m[2] === '?'
+    const arg = m[3]
+    switch (cmd) {
+      case '': return OK
+      case 'VERSION': return query ? '+VERSION:2.0-20100601\r\n' + OK : 'ERROR:(0)\r\n'
+      case 'ADDR': return query ? '+ADDR:98d3:31:fd5e12\r\n' + OK : 'ERROR:(0)\r\n'
+      case 'STATE': return query ? '+STATE:INITIALIZED\r\n' + OK : 'ERROR:(0)\r\n'
+      case 'RESET': return OK
+      case 'ORGL': dev.name = 'H-C-2010-06-01'; dev.password = '1234'; dev.dataBaud = 38400; dev.role = 0; return OK
+      case 'NAME':
+        if (query) return `+NAME:${dev.name}\r\n` + OK
+        if (arg !== undefined && arg.length > 0 && arg.length <= 32) { dev.name = arg; return OK }
+        return 'ERROR:(0)\r\n'
+      case 'PSWD': case 'PIN':
+        if (query) return `+PSWD:${dev.password}\r\n` + OK
+        if (arg !== undefined && /^"?[0-9]{4,16}"?$/.test(arg)) { dev.password = arg.replace(/"/g, ''); return OK }
+        return 'ERROR:(0)\r\n'
+      case 'ROLE':
+        if (query) return `+ROLE:${dev.role}\r\n` + OK
+        if (arg === '0' || arg === '1' || arg === '2') { dev.role = Number(arg); return OK }
+        return 'ERROR:(0)\r\n'
+      case 'UART': {
+        if (query) return `+UART:${dev.dataBaud},0,0\r\n` + OK
+        const b = Number((arg ?? '').split(',')[0])
+        if (VALID_BAUDS.includes(b)) { dev.dataBaud = b; return OK }
+        return 'ERROR:(1C)\r\n'
+      }
+      default: return 'ERROR:(0)\r\n'
+    }
+  }
+
+  // ---- modül → Uno: TXD'yi bit bit sür ----
+  const pump = (): void => {
+    if (toUno === undefined) { txQueue = []; return }
+    if (txBusy || !txQueue.length || !dev.powered) return
+    txBusy = true
+    const g = gen
+    const b = txQueue.shift()!
+    const bc = bitCycles()
+    const bits = [0, ...[0, 1, 2, 3, 4, 5, 6, 7].map((k) => (b >> k) & 1), 1]
+    const pin = toUno
+    sim.drive(pin, false)
+    for (let i = 1; i < bits.length; i++) {
+      const level = bits[i] === 1
+      sim.cpu.addClockEvent(() => { if (g === gen) sim.drive(pin, level) }, Math.max(1, Math.round(bc * i)))
+    }
+    sim.cpu.addClockEvent(() => {
+      if (g !== gen) return
+      txBusy = false
+      dev.txBytes++
+      pump()
+    }, Math.max(1, Math.round(bc * 10)))
+  }
+
+  if (toUno !== undefined) sim.drive(toUno, true)
   return dev
 }

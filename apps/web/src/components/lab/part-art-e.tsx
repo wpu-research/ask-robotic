@@ -1,4 +1,4 @@
-// Aşama E parça çizimleri: SSD1306 OLED (çerçeve tamponu canlı çizilir), BME280, DS18B20 (TO-92), VL53L0X.
+// Aşama E parça çizimleri: SSD1306 OLED (çerçeve tamponu canlı çizilir), BME280, DS18B20 (TO-92), VL53L0X, HC-05 Bluetooth.
 // Çalışma zamanı yoksa (palet simgesi, durdurulmuş) özelliklerden boşta durum çizilir.
 import type { PartRuntime } from '@/lib/lab/contract'
 import { Board, Chip, fmt, MONO, num, Pads, SmdLed, type Ctx } from './part-art-c'
@@ -130,6 +130,38 @@ function Vl53l0xArt(c: Ctx) {
   )
 }
 
+// ---------------------------------------------------------------- HC-05 Bluetooth (ZS-040 kartı)
+/** Kart LED'inin yanıp sönme deseni (gerçek modüldeki gibi): bağlantı bekliyor hızlı, AT kipi yavaş, bağlı iki kısa yanıp sönme. */
+export function hc05Blink(rt: PartRuntime['hc05']): { dur: string; values: string } | null {
+  if (!rt?.powered) return null
+  if (rt.mode === 'at') return { dur: '2s', values: '1;1;0;0' }
+  if (rt.connected) return { dur: '2s', values: '1;0;1;0;0;0;0;0;0;0' }
+  return { dur: '0.4s', values: '1;0' }
+}
+function Hc05Art(c: Ctx) {
+  const h = c.rt?.hc05
+  const blink = hc05Blink(h)
+  return (
+    <g data-bt-mode={h?.mode ?? ''} data-bt-connected={h?.connected === true ? 'true' : 'false'} data-bt-powered={h?.powered === true ? 'true' : 'false'}>
+      <Board w={120} h={70} fill="#1d4ed8" stroke="#0b2a7a" hi="#60a5fa" />
+      {/* yeşil çekirdek modül ve PCB anteni */}
+      <rect x={14} y={6} width={74} height={30} rx={1.5} fill="#15803d" stroke="#14532d" strokeWidth={0.9} />
+      <path d="M70 10 h12 v4 h-12 v4 h12 v4 h-12 v4 h12" fill="none" stroke="#fde68a" strokeWidth={1.2} />
+      <Chip x={20} y={12} w={22} h={14} />
+      <Chip x={46} y={16} w={12} h={8} />
+      <text x={51} y={43} textAnchor="middle" fontSize={6} fontWeight={800} fill="#dbeafe">HC-05</text>
+      <text x={51} y={49.5} textAnchor="middle" fontSize={4.4} fontFamily={MONO} fill="#bfdbfe">
+        {h?.powered ? (h.mode === 'at' ? `AT · ${h.baud}` : h.connected ? h.name : <Tx k="lab.art.btWaiting" />) : 'Bluetooth SPP'}
+      </text>
+      <g data-bt-led>
+        <SmdLed x={104} y={14} on={!!blink} color="#ef4444" />
+        {blink && <animate attributeName="opacity" dur={blink.dur} values={blink.values} calcMode="discrete" repeatCount="indefinite" />}
+      </g>
+      <Pads type="hc05" />
+    </g>
+  )
+}
+
 /** Aşama E parçası değilse null. */
 export function StageEArt({ part, runtime }: { part: Ctx['part']; runtime?: PartRuntime }) {
   const c: Ctx = { part, rt: runtime }
@@ -138,6 +170,7 @@ export function StageEArt({ part, runtime }: { part: Ctx['part']; runtime?: Part
     case 'bme280': return Bme280Art(c)
     case 'ds18b20': return Ds18b20Art(c)
     case 'vl53l0x': return Vl53l0xArt(c)
+    case 'hc05': return Hc05Art(c)
     default: return null
   }
 }

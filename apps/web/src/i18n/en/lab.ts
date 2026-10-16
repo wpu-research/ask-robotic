@@ -127,6 +127,7 @@ export const lab = {
       active: 'Active components',
       sensors: 'Sensors',
       motion: 'Motor drivers and motion',
+      comm: 'Communication',
       other: 'Other',
     },
   },
@@ -143,6 +144,22 @@ export const lab = {
     startFirst: 'Start first',
     inputAria: 'Text to send to the serial port',
     send: 'Send',
+  },
+  /** Virtual phone paired with the HC-05 (a Bluetooth serial terminal app). */
+  phone: {
+    title: 'Phone (Bluetooth terminal)',
+    empty: 'Whatever the Arduino writes to Bluetooth appears here.',
+    placeholder: 'Text to send from the phone',
+    inputAria: 'Text to send from the phone over Bluetooth',
+    send: 'Send',
+    startFirst: 'Start first',
+    notConnected: 'The phone is not connected (tick "Phone connected").',
+    atMode: 'The module is in AT mode (EN HIGH at power-up): the phone cannot connect. Type commands in the serial monitor.',
+    unpowered: 'The module has no power.',
+    garbled: '{n} framing errors: the Arduino and the module may be using different baud rates.',
+    status: '{mode} · {baud} baud',
+    modeData: 'data mode',
+    modeAt: 'AT mode',
   },
   art: {
     reset: 'RESET',
@@ -161,6 +178,7 @@ export const lab = {
     brake: 'BRAKE',
     armed: 'ARMED',
     disarmed: 'DISARMED',
+    btWaiting: 'waiting to pair',
   },
   warn: {
     title: {
@@ -173,6 +191,7 @@ export const lab = {
       'flyback-missing': 'Missing flyback diode',
       unpowered: 'No power',
       'base-overcurrent': 'Base current too high',
+      'logic-level': 'Logic level mismatch',
       generic: 'Warning',
     },
     msg: {
@@ -201,6 +220,10 @@ export const lab = {
       pinTo5v: 'Pin {name} is connected straight to 5V (short circuit).',
       pinOvercurrent: '{ma} mA flowing through pin {name} (limit 40 mA).',
       oneWirePullup: '{name} has no pull-up resistor on the DQ line: connect a 4.7 kΩ resistor between DQ and VCC (otherwise the sensor is not found).',
+      btNoData: 'HC-05 TXD and RXD are not connected: the module cannot talk to the Arduino (TXD → SoftwareSerial RX, RXD ← SoftwareSerial TX).',
+      btRxd: 'HC-05 RXD is not connected to an Arduino pin (directly or through the divider resistor): the module cannot receive from the Arduino.',
+      btLevel: 'HC-05 RXD is a 3.3 V logic input: connect the Arduino\'s 5 V TX pin through a 1 kΩ / 2 kΩ voltage divider (a direct connection wears the module out).',
+      btUsb: 'HC-05 is on D0/D1: these are the USB serial lines (they clash with uploading and the serial monitor). Use SoftwareSerial on other pins (e.g. D10/D11).',
     },
     name: {
       relay: 'Relay module',
@@ -277,6 +300,7 @@ export const lab = {
     bme280: 'BME280 temperature/pressure/humidity',
     ds18b20: 'DS18B20 temperature (1-Wire)',
     vl53l0x: 'VL53L0X laser distance (ToF)',
+    hc05: 'HC-05 Bluetooth (UART)',
   },
   short: {
     ldr: 'LDR',
@@ -313,6 +337,7 @@ export const lab = {
     bme280: 'BME280',
     ds18b20: 'DS18B20',
     vl53l0x: 'VL53L0X',
+    hc05: 'HC-05',
   },
   propLabel: {
     led: { color: 'Color' },
@@ -355,6 +380,7 @@ export const lab = {
     bme280: { tempC: 'Temperature', pressureHpa: 'Pressure', humidity: 'Humidity', address: 'I2C address' },
     ds18b20: { tempC: 'Temperature' },
     vl53l0x: { distanceMm: 'Distance' },
+    hc05: { connected: 'Phone connected' },
   },
   propOpt: {
     led: { color: { red: 'Red', yellow: 'Yellow', green: 'Green', blue: 'Blue', white: 'White' } },

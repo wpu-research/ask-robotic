@@ -12,7 +12,7 @@ const ACTIVE: readonly PartType[] = [
   'npn', 'mosfet', 'l293d', 'relay', 'sr595', 'lcd1602', 'lcdI2c',
   'hcsr04', 'dht', 'pir', 'irobstacle', 'bmp280', 'mpu6050', 'joystick', 'encoder', 'keypad', 'rtc', 'mq2', 'flame', 'sound', 'soil', 'rain', 'waterlevel',
   'mq3', 'mq4', 'mq7', 'mq135', 'sharpir', 'l298n', 'tb6612', 'drv8833', 'bts7960', 'md10c', 'stepper', 'esc',
-  'oled', 'bme280', 'ds18b20', 'vl53l0x',
+  'oled', 'bme280', 'ds18b20', 'vl53l0x', 'hc05',
 ]
 
 /** Besleme pinleri (modül/entegre): VCC 5 V hattında (ya da bir Uno pininde), GND toprakta olmalı. */
@@ -54,6 +54,7 @@ const POWER: Partial<Record<PartType, { vcc: string[]; gnd: string; name: string
   bme280: { vcc: ['VCC'], gnd: 'GND', name: 'BME280', v33: true },
   ds18b20: { vcc: ['VCC'], gnd: 'GND', name: 'DS18B20', v33: true },
   vl53l0x: { vcc: ['VCC'], gnd: 'GND', name: 'VL53L0X', v33: true },
+  hc05: { vcc: ['VCC'], gnd: 'GND', name: 'HC-05' },
 }
 
 /** Doğrudan bir Uno pinine bağlanması gereken sinyal uçları (Sim cihaz modelleri bu pinleri kullanır). */
@@ -87,6 +88,24 @@ export function oneWirePullupNets(circuit: Circuit, nl: Netlist, p: PartInstance
     if (e.to === nl.rail5 || e.to === nl.rail3 || e.to === vcc || nl.unoPinsOnNet(e.to).length > 0) out.push(e.to)
   }
   return out
+}
+
+/**
+ * HC-05 RXD ucunu süren Uno pini: doğrudan aynı düğümde ya da tek bir direnç üzerinden (gerilim bölücünün üst direnci).
+ * `direct` = araya direnç konmamış (5 V lojik doğrudan 3,3 V girişe gidiyor).
+ */
+export function hc05RxdSource(circuit: Circuit, nl: Netlist, p: PartInstance): { pin: string; direct: boolean } | undefined {
+  const r = { part: p.id, pin: 'RXD' }
+  const net = nl.netOf(r)
+  if (net === undefined || !nl.isWired(r)) return undefined
+  const here = nl.unoPinsOnNet(net)
+  if (here.length) return { pin: here[0], direct: true }
+  for (const e of nl.neighbors(net, ['resistor'])) {
+    if (e.to === nl.ground || e.to === nl.rail5 || e.to === nl.rail3) continue
+    const pins = nl.unoPinsOnNet(e.to)
+    if (pins.length && circuit.parts.some((x) => x.id === e.partId)) return { pin: pins[0], direct: false }
+  }
+  return undefined
 }
 
 interface Ends { gnd: boolean; rail: boolean; pin: boolean; freeSrc: Set<number>; freeSink: Set<number> }
@@ -210,6 +229,7 @@ function staticPartWarnings(circuit: Circuit, nl: Netlist, out: LabWarning[]): v
         }
       }
     }
+    if (p.type === 'hc05') hc05Warnings(circuit, nl, p, out)
     if (p.type === 'ds18b20' && nl.isWired(ref(p.id, 'DQ')) && oneWirePullupNets(circuit, nl, p).length === 0) {
       out.push({ kind: 'floating-input', partId: p.id, message: 'DS18B20 DQ hattında pull-up direnci yok: DQ ile VCC arasına 4,7 kΩ direnç bağla (yoksa sensör bulunamaz).' })
     }
@@ -265,5 +285,20 @@ export function analyzeCircuit(circuit: Circuit): CircuitAnalysis {
       return nl.reachable(x, via ?? []).has(y)
     },
     warnings: staticWarnings(circuit, nl),
+  }
+}
+
+/** HC-05: TXD doğrudan bir Uno pinine, RXD bölücüyle; D0/D1 donanım seri hattı (USB) laboratuvarda modüle bağlanmaz. */
+function hc05Warnings(circuit: Circuit, nl: Netlist, p: PartInstance, out: LabWarning[]): void {
+  const txd = { part: p.id, pin: 'TXD' }
+  const txWired = nl.isWired(txd), rxWired = nl.isWired({ part: p.id, pin: 'RXD' })
+  const txPin = nl.unoPinOf(txd)
+  const rx = hc05RxdSource(circuit, nl, p)
+  if (!txWired && !rxWired) out.push({ kind: 'floating-input', partId: p.id, message: 'HC-05 TXD ve RXD bağlı değil: modül Arduino ile konuşamaz (TXD → SoftwareSerial RX, RXD ← SoftwareSerial TX).' })
+  if (txWired && txPin === undefined) out.push({ kind: 'floating-input', partId: p.id, message: 'HC-05 TXD ucu doğrudan bir Arduino pinine bağlı olmalı (araya direnç/parça koyma).' })
+  if (rxWired && !rx) out.push({ kind: 'floating-input', partId: p.id, message: 'HC-05 RXD ucu bir Arduino pinine (doğrudan ya da bölücü direnciyle) bağlı değil: modül Arduino\'dan veri alamaz.' })
+  if (rx?.direct) out.push({ kind: 'logic-level', partId: p.id, message: 'HC-05 RXD 3,3 V lojik girişidir: Arduino\'nun 5 V TX ucunu 1 kΩ / 2 kΩ gerilim bölücüyle bağla (doğrudan bağlantı modülü zamanla bozar).' })
+  if (txPin === 'D0' || txPin === 'D1' || rx?.pin === 'D0' || rx?.pin === 'D1') {
+    out.push({ kind: 'floating-input', partId: p.id, message: 'HC-05 D0/D1\'e bağlı: bu pinler USB seri hattıdır (yükleme ve seri monitörle çakışır). SoftwareSerial ile başka pinlere bağla (ör. D10/D11).' })
   }
 }

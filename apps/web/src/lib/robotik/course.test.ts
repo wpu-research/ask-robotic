@@ -2,7 +2,7 @@
 import { describe, expect, it } from 'vitest'
 import { SIM_META } from '@/components/robotik/sim-meta'
 import { partBySlug } from '@/lib/muhendislik/catalog'
-import { WEEKS } from './course'
+import { WEEKS, courseKitNames } from './course'
 
 const tags = (html: string) => (html.match(/<\/?[a-z0-9]+/gi) ?? []).join(' ')
 
@@ -82,6 +82,17 @@ describe('ESOF 323 laboratuvar kitleri', () => {
     expect(lines(lab.state.serial).at(-1)).toBe('tik=6')   // CHANGE: tık başına iki kenar
     lab.setProp('enc', 'position', 1); lab.advance(600)
     expect(lines(lab.state.serial).at(-1)).toBe('tik=2')
+  })
+  it('bluetooth: EN 3V3 → AT kipi; AT+NAME? cevabı seri monitöre gelir', () => {
+    const lab = createRuntime(COURSE_KITS.bluetooth.circuit(), hexOf('hc05_at'))
+    lab.advance(100)
+    expect(lab.state.parts.h.hc05).toMatchObject({ mode: 'at', baud: 38400 })
+    lab.sendSerial('AT+NAME?\n'); lab.advance(200)
+    expect(lab.state.serial).toContain('+NAME:HC-05\r\nOK\r\n')
+  })
+  it('haftaların ders kitleri tanımlı', () => {
+    for (const w of WEEKS) for (const k of courseKitNames(w)) expect(COURSE_KITS[k], `${w.n}: ${k}`).toBeTruthy()
+    expect(courseKitNames(WEEKS[2])).toEqual(['kesme', 'bluetooth'])
   })
 })
 

@@ -6,7 +6,7 @@ import type { SketchName } from './sketches'
 export type KitName =
   | 'led' | 'buton' | 'ldr' | 'npn' | 'mosfet' | 'gaz' | 'dht22' | 'mesafe' | 'sharp'
   | 'l298n' | 'tb6612' | 'drv8833' | 'bts7960' | 'md10c' | 'stepper' | 'esc' | 'servo' | 'mpu6050' | 'lcd' | 'lcdi2c'
-  | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x'
+  | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x' | 'hc05'
 
 export interface Kit {
   /** Laboratuvar başlığında görünen kısa ad. */
@@ -28,6 +28,15 @@ export const build = (parts: PartInstance[], wires: Array<[string, string]>): Ci
   parts: [{ ...UNO, props: {} }, ...parts],
   wires: wires.map(([a, b], i) => ({ id: `k${i + 1}`, a: ref(a), b: ref(b) })),
 })
+
+/**
+ * HC-05 devresi: TXD → D10 (SoftwareSerial RX), STATE → D4, D11 → 1 kΩ → RXD → 2 kΩ → GND (5 V → 3,3 V bölücü).
+ * `at`: EN (KEY) → 3V3, güç verilirken HIGH olduğu için modül AT komut kipinde açılır.
+ */
+export const hc05Circuit = (at = false): Circuit => build(
+  [part('h', 'hc05', 440, 250), part('r1', 'resistor', 400, 110, { ohms: 1000 }), part('r2', 'resistor', 520, 110, { ohms: 2000 })],
+  [['h.VCC', 'uno.5V'], ['h.GND', 'uno.GND'], ['h.TXD', 'uno.D10'], ['h.STATE', 'uno.D4'], ['r1.1', 'uno.D11'], ['r1.2', 'h.RXD'], ['r2.1', 'h.RXD'], ['r2.2', 'uno.GND2'], ...(at ? [['h.EN', 'uno.3V3'] as [string, string]] : [])],
+)
 
 /** Köprü sürücü + DC motor (motor modeli isteğe bağlı). */
 const motor = (model?: string): PartInstance => part('m', 'dcmotor', 620, 300, model ? { model } : {})
@@ -202,6 +211,12 @@ export const KITS: Record<KitName, Kit> = {
     watch: 'Tek atış ölçüm ~33 ms sürer, mesafe mm olarak yazılır. 2000 mm\'nin ötesinde 8190 (hedef yok) okunur. XSHUT\'u GND\'ye bağla: sensör kapanır.',
     en: { title: 'VL53L0X laser distance (ToF, Pololu library)', watch: 'A single-shot measurement takes about 33 ms and the distance is printed in mm. Beyond 2000 mm it reads 8190 (no target). Tie XSHUT to GND and the sensor shuts down.' },
     circuit: () => build([part('v', 'vl53l0x', 440, 230, { distanceMm: 350 })], [['v.VCC', 'uno.5V'], ['v.GND', 'uno.GND'], ['v.SDA', 'uno.A4'], ['v.SCL', 'uno.A5']]),
+  },
+  hc05: {
+    title: 'HC-05 Bluetooth ile LED (SoftwareSerial, 9600 baud)', sketch: 'hc05_led',
+    watch: 'Çalıştır, HC-05\'e tıkla: altta telefonun Bluetooth terminali açılır. "1" LED\'i yakar, "0" söndürür, "?" durumu sorar. "Telefon bağlı" kutusunu kaldır: STATE LOW olur, seri monitörde "baglanti yok" yazar. RXD\'deki 1 kΩ / 2 kΩ bölücü 5 V\'u 3,3 V\'a indirir.',
+    en: { title: 'LED over HC-05 Bluetooth (SoftwareSerial, 9600 baud)', watch: 'Run it and click the HC-05: the phone\'s Bluetooth terminal opens below. "1" turns the LED on, "0" off, "?" asks for the state. Untick "Phone connected": STATE goes LOW and the serial monitor prints "baglanti yok" (no connection). The 1 k\u03a9 / 2 k\u03a9 divider on RXD drops 5 V to 3.3 V.' },
+    circuit: () => hc05Circuit(),
   },
 }
 

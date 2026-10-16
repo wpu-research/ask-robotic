@@ -7,7 +7,7 @@ import { SimBox } from '@/components/robotik/sim-box'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
 import { labHref, partText } from '@/lib/muhendislik/catalog'
-import { COURSE, WEEKS, WOKWI, kitPartsOf, partsOf, weekOf } from '@/lib/robotik/course'
+import { COURSE, WEEKS, WOKWI, courseKitNames, kitPartsOf, partsOf, weekOf } from '@/lib/robotik/course'
 import { courseKitOf } from '@/lib/robotik/kits'
 import { milestonesOfWeek } from '@/lib/robotik/projects'
 
@@ -25,7 +25,7 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
   const t = w[lang]
   const prev = weekOf(w.n - 1), next = weekOf(w.n + 1)
   const parts = partsOf(w), kits = kitPartsOf(w)
-  const ck = w.courseKit ? courseKitOf(w.courseKit) : undefined
+  const cks = courseKitNames(w).flatMap((name) => { const kit = courseKitOf(name); return kit ? [{ name, kit }] : [] })
   const steps = milestonesOfWeek(w.n)
   return (
     <div className="page eng rb">
@@ -93,13 +93,13 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
             </section>
           )}
 
-          {ck && (
-            <section className="eng-labbox rb-kitbox" aria-labelledby="rb-kit">
-              <h2 id="rb-kit">{en ? 'In the lab' : 'Laboratuvarda'}: {en ? ck.en.title : ck.title}</h2>
+          {cks.map(({ name, kit: ck }) => (
+            <section key={name} className="eng-labbox rb-kitbox" aria-labelledby={`rb-kit-${name}`}>
+              <h2 id={`rb-kit-${name}`}>{en ? 'In the lab' : 'Laboratuvarda'}: {en ? ck.en.title : ck.title}</h2>
               <p>{en ? ck.en.watch : ck.watch}</p>
-              <Link className="btn btn-primary" href={`/laboratuvar?kit=${w.courseKit}`} data-testid="rb-open-kit">{en ? 'Open in the lab' : 'Laboratuvarda aç'} <Icon name="arrowRight" size={16} /></Link>
+              <Link className="btn btn-primary" href={`/laboratuvar?kit=${name}`} data-testid="rb-open-kit">{en ? 'Open in the lab' : 'Laboratuvarda aç'} <Icon name="arrowRight" size={16} /></Link>
             </section>
-          )}
+          ))}
 
           {(t.lab || kits.length > 0 || w.wokwi.length > 0) && (
             <section className="rb-box">

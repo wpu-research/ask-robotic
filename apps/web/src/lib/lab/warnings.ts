@@ -12,6 +12,7 @@ export const WARNING_META: Partial<Record<WarningKind, { icon: string; title: st
   'flyback-missing': { icon: '↯', title: 'Geri tepme diyotu yok' },
   unpowered: { icon: '⏻', title: 'Besleme yok' },
   'base-overcurrent': { icon: '⚠', title: 'Taban akımı çok yüksek' },
+  'logic-level': { icon: '⚡', title: 'Lojik seviye uyumsuz' },
 }
 
 export const warningMeta = (kind: string) => WARNING_META[kind as WarningKind] ?? { icon: '⚠', title: 'Uyarı' }
@@ -57,6 +58,10 @@ const RULES: Rule[] = [
   [/^(\S+) pini doğrudan GND'ye bağlı/, (t, m) => t(M('pinToGnd'), { name: m[1] })],
   [/^(\S+) pini doğrudan 5V'a bağlı/, (t, m) => t(M('pinTo5v'), { name: m[1] })],
   [/^(.+) DQ hattında pull-up direnci yok/, (t, m) => t(M('oneWirePullup'), { name: moduleName(t, m[1]) })],
+  [/^HC-05 TXD ve RXD bağlı değil/, (t) => t(M('btNoData'))],
+  [/^HC-05 RXD ucu bir Arduino pinine/, (t) => t(M('btRxd'))],
+  [/^HC-05 RXD 3,3 V lojik girişidir/, (t) => t(M('btLevel'))],
+  [/^HC-05 D0\/D1'e bağlı/, (t) => t(M('btUsb'))],
   [/^(\S+) pininden (\d+) mA geçiyor/, (t, m) => t(M('pinOvercurrent'), { name: m[1], ma: m[2] })],
 ]
 

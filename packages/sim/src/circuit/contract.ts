@@ -18,7 +18,7 @@ export type PartType =
   | 'l298n' | 'tb6612' | 'drv8833' | 'bts7960' | 'md10c'
   | 'stepper' | 'esc'
   // Aşama E (Hyvex, büyükler için): veri yolu cihazları — gerçek Arduino kütüphaneleriyle çalışır
-  | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x'
+  | 'oled' | 'bme280' | 'ds18b20' | 'vl53l0x' | 'hc05'
 
 /**
  * Parça pin kimlikleri (devrede kablo uçları böyle adlandırılır). `Record<PartType, readonly string[]>`
@@ -89,6 +89,9 @@ export const PINS: Record<PartType, readonly string[]> = {
   bme280: ['VCC', 'GND', 'SDA', 'SCL'], // I2C sıcaklık/basınç/nem (0x76); SDA = A4, SCL = A5
   ds18b20: ['VCC', 'GND', 'DQ'], // 1-Wire sıcaklık (TO-92); DQ doğrudan bir Uno pinine + DQ ile VCC arasında 4,7 kΩ pull-up
   vl53l0x: ['VCC', 'GND', 'SDA', 'SCL', 'XSHUT'], // I2C ToF lazer mesafe (0x29); XSHUT LOW = kapalı (kartta pull-up var)
+  // HC-05 Bluetooth (ZS-040 kartı, başlık sırası): EN/KEY güç verilirken HIGH = AT kipi; TXD doğrudan bir Uno pinine (SoftwareSerial RX),
+  // RXD bir Uno pininden (SoftwareSerial TX) — 3,3 V lojik: 1 kΩ / 2 kΩ gerilim bölücüyle; STATE bağlıyken HIGH
+  hc05: ['EN', 'VCC', 'GND', 'TXD', 'RXD', 'STATE'],
 }
 
 export interface PropDef {
@@ -244,6 +247,7 @@ export const PROPS: Record<PartType, readonly PropDef[]> = {
   ds18b20: [{ key: 'tempC', label: 'Sıcaklık', kind: 'number', default: 25, min: -55, max: 125, step: 0.5, unit: '°C', live: true }],
   // 2000 mm üstü sensörün menzili dışıdır (8190 okunur); kaydırıcı bunu denemek için 2500'e kadar gider
   vl53l0x: [{ key: 'distanceMm', label: 'Mesafe', kind: 'number', default: 500, min: 30, max: 2500, step: 5, unit: 'mm', live: true }],
+  hc05: [{ key: 'connected', label: 'Telefon bağlı', kind: 'bool', default: true, live: true }],
 }
 
 export interface PartInstance {
@@ -335,6 +339,11 @@ export interface PartRuntime {
   ds18b20?: { powered: boolean; present: boolean; pullup: boolean; tempC: number; resolution: number; conversions: number }
   /** VL53L0X: present = veri yolunda (beslenmiş, SDA/SCL doğru, XSHUT LOW değil); inRange = 2000 mm içinde; continuous = sürekli ölçüm kipi. */
   vl53l0x?: { powered: boolean; present: boolean; distanceMm: number; inRange: boolean; continuous: boolean; measurements: number }
+  /**
+   * HC-05: mode = 'at' (EN güç verilirken HIGH, 38400 baud) ya da 'data'; connected = telefon bağlı (veri kipinde);
+   * phone = telefondaki terminalin son metni (Uno'dan gelen + telefondan gönderilen); framingErrors > 0 genelde baud uyuşmazlığıdır.
+   */
+  hc05?: { powered: boolean; mode: 'data' | 'at'; connected: boolean; baud: number; name: string; phone: string; rxBytes: number; txBytes: number; framingErrors: number }
 }
 
 export interface PinSnapshot {
@@ -344,7 +353,7 @@ export interface PinSnapshot {
   volts: number
 }
 
-export type WarningKind = 'short-circuit' | 'led-no-resistor' | 'led-burnt' | 'floating-input' | 'reversed-polarity' | 'pin-overcurrent' | 'flyback-missing' | 'unpowered' | 'base-overcurrent'
+export type WarningKind = 'short-circuit' | 'led-no-resistor' | 'led-burnt' | 'floating-input' | 'reversed-polarity' | 'pin-overcurrent' | 'flyback-missing' | 'unpowered' | 'base-overcurrent' | 'logic-level'
 export interface LabWarning { kind: WarningKind; partId?: string; message: string }
 
 export interface LabState {
@@ -374,6 +383,8 @@ export interface LabApi {
   /** Benzetimi ms kadar ilerletir (içeride devre çözücü gerektikçe yeniden çalışır). */
   advance(ms: number): void
   sendSerial(text: string): void
+  /** Bluetooth modülüne (HC-05) eşleşmiş telefondan metin gönderir; yalnız veri kipinde ve bağlıyken Uno'ya ulaşır. */
+  phoneSend(partId: string, text: string): void
   /** Başlangıç durumuna döner (yanmış LED'ler dahil). EEPROM de boşaltılır (fabrika ayarı); `{ keepEeprom: true }` ile korunur (yalnız güç döngüsü). */
   reset(opts?: { keepEeprom?: boolean }): void
   dispose(): void

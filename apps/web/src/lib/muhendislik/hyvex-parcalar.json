@@ -2466,7 +2466,9 @@
   "warnings": [
    "TX→RX çapraz, ortak GND"
   ],
-  "offline": "faz2"
+  "lab": {
+   "kit": "hc05"
+  }
  },
  {
   "slug": "ch340-usb-seri-cip",

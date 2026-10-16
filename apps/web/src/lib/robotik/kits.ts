@@ -1,8 +1,8 @@
 // ESOF 323 derse özel laboratuvar kitleri (/laboratuvar?kit=<ad>): haftanın kodu + hazır devre. Sketch'ler
 // content-src/muhendislik/sketches'ten (tools/sim/muhendislik.mjs derler; kits.test.ts gerçek hex'le çalıştırır).
-import { build, part, type Kit } from '@/lib/muhendislik/kits'
+import { build, hc05Circuit, part, type Kit } from '@/lib/muhendislik/kits'
 
-export type CourseKitName = 'cizgi' | 'trafik' | 'kesme'
+export type CourseKitName = 'cizgi' | 'trafik' | 'kesme' | 'bluetooth'
 export interface CourseKit extends Kit { week: number; en: { title: string; watch: string } }
 
 export const COURSE_KITS: Record<CourseKitName, CourseKit> = {
@@ -42,6 +42,13 @@ export const COURSE_KITS: Record<CourseKitName, CourseKit> = {
     circuit: () => build([part('enc', 'encoder', 420, 230)], [
       ['enc.CLK', 'uno.D2'], ['enc.DT', 'uno.D4'], ['enc.SW', 'uno.D5'], ['enc.VCC', 'uno.5V'], ['enc.GND', 'uno.GND'],
     ]),
+  },
+  bluetooth: {
+    week: 3, sketch: 'hc05_at',
+    title: 'UART: HC-05\'i AT komutlarıyla yapılandırmak',
+    watch: 'EN 3V3\'e bağlı olduğu için modül AT kipinde (38400 baud) açılır. Seri monitörden AT, AT+NAME?, AT+NAME=Robotum, AT+UART? yaz. Köprü, HC-05\'in istediği CR+LF\'i ekler. EN kablosunu silip yeniden çalıştır: modül veri kipinde 9600 baud\'dadır, 38400\'deki komutlar anlaşılmaz (baud uyuşmazlığı).',
+    en: { title: 'UART: configuring the HC-05 with AT commands', watch: 'EN is tied to 3V3, so the module boots in AT mode (38400 baud). Type AT, AT+NAME?, AT+NAME=Robotum, AT+UART? in the serial monitor. The bridge adds the CR+LF the HC-05 expects. Delete the EN wire and run again: the module is now in data mode at 9600 baud and commands sent at 38400 are not understood (baud mismatch).' },
+    circuit: () => hc05Circuit(true),
   },
 }
 

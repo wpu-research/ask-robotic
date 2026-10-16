@@ -1,8 +1,8 @@
 // Sanal devre laboratuvarı: Sim (avr8js) + netlist + DC çözücü. Tarayıcı ve Node uyumlu.
-import { toBase64, type BME280, type DS18B20, type SSD1306, type VL53L0X, VL53L0X_MAX_MM } from '../bus-devices.js'
+import { toBase64, type BME280, type DS18B20, type HC05, type SSD1306, type VL53L0X, VL53L0X_MAX_MM } from '../bus-devices.js'
 import { HD44780, type BMP280, type DHT, type HCSR04, type I2CDevice, type Keypad, type LCDI2C, type MPU6050, type RTC } from '../devices.js'
 import { Sim, type Pin, type PinStateName } from '../sim.js'
-import { oneWirePullupNets, staticWarnings } from './analysis.js'
+import { hc05RxdSource, oneWirePullupNets, staticWarnings } from './analysis.js'
 import type {
   Circuit, LabApi, LabOptions, LabState, LabWarning, LedState, Measurement, PartInstance, PartRuntime, PinRef, PinSnapshot, PropValue, WarningKind,
 } from './contract.js'
@@ -130,6 +130,8 @@ class LabImpl implements LabApi {
   // Aşama E
   private ds18 = new Map<string, DS18B20>()
   private oledCache = new Map<string, { version: number; on: boolean; pixels: string }>()
+  /** HC-05: model ve son görülen besleme (güç açılışında EN okunur → AT ya da veri kipi). */
+  private hc05s = new Map<string, { dev: HC05; powered: boolean | undefined }>()
   /** Sim cihaz modellerinin doğrudan sürdüğü Uno pinleri (ECHO, DHT DATA, keypad satırları): düğüm gerilimi bunlara yazılmaz. */
   private devOwned = new Set<string>()
 
@@ -266,7 +268,7 @@ class LabImpl implements LabApi {
   /** Aşama C: Sim cihaz modellerini (HC-SR04, DHT, BMP280, MPU6050, RTC, keypad) ve durum modellerini (PIR, enkoder) kurar. */
   private attachSensors(): void {
     this.hcs.clear(); this.dhts.clear(); this.i2cSensors.clear(); this.keypads.clear(); this.pirs.clear(); this.encs.clear(); this.devOwned.clear()
-    this.steppers.clear(); this.ds18.clear(); this.oledCache.clear()
+    this.steppers.clear(); this.ds18.clear(); this.oledCache.clear(); this.hc05s.clear()
     const u = (p: PartInstance, pin: string): { name: string; pin: Pin } | undefined => wiredUno(this.nl, p.id, pin)
     for (const p of this.circuit.parts) {
       switch (p.type) {
@@ -307,6 +309,17 @@ class LabImpl implements LabApi {
         case 'ds18b20': {
           const dq = u(p, 'DQ')
           if (dq) { this.ds18.set(p.id, this.sim.ds18b20({ pin: dq.pin, tempC: num(p, 'tempC', 25) })); this.devOwned.add(dq.name) }
+          break
+        }
+        case 'hc05': {
+          // Modül TXD'yi doğrudan sürer (Uno'nun RX pini); RXD'yi Uno'nun TX pininden (doğrudan ya da bölücüyle) örnekler.
+          const tx = u(p, 'TXD')
+          const rx = hc05RxdSource(this.circuit, this.nl, p)
+          const usb = (n?: string): boolean => n === 'D0' || n === 'D1' // USB seri hattı: modele bağlanmaz (statik uyarı var)
+          const toUno = tx && !usb(tx.name) ? tx : undefined
+          const fromUno = rx && !usb(rx.pin) ? simPin(rx.pin) : undefined
+          this.hc05s.set(p.id, { dev: this.sim.hc05({ toUno: toUno?.pin, fromUno }), powered: undefined })
+          if (toUno) this.devOwned.add(toUno.name)
           break
         }
         case 'pir': this.pirs.set(p.id, new PirModel()); break
@@ -356,6 +369,11 @@ class LabImpl implements LabApi {
       case 'ds18b20': {
         const d = this.ds18.get(p.id)
         if (d) d.tempC = num(p, 'tempC', 25)
+        break
+      }
+      case 'hc05': {
+        const h = this.hc05s.get(p.id)
+        if (h) h.dev.connected = p.props.connected !== false
         break
       }
       case 'mpu6050': {
@@ -437,6 +455,8 @@ class LabImpl implements LabApi {
   }
 
   sendSerial(text: string): void { this.sim.sendSerial(text) }
+
+  phoneSend(partId: string, text: string): void { this.hc05s.get(partId)?.dev.phoneSend(text) }
 
   reset(opts?: { keepEeprom?: boolean }): void {
     if (opts?.keepEeprom) { this.eepromCarry = this.sim.exportEeprom(); this.eepromRestored = true } else { this.eepromCarry = null; this.eepromRestored = false }
@@ -563,6 +583,7 @@ class LabImpl implements LabApi {
       return s === 'High' ? 'H' : s === 'Low' ? 'L' : s === 'InputPullUp' ? 'P' : 'I'
     }).join('')
     const c = [...this.pirs.values()].map((x) => x.signature()).join('') + '/' + [...this.encs.values()].map((x) => x.signature()).join('')
+      + '/' + [...this.hc05s.values()].map((h) => (h.powered ? (h.dev.atMode ? 'A' : 'D') : '0')).join('')
     return `${m}|${this.version}|${[...this.burnt].sort().join(',')}|${this.chips.map((x) => x.signature()).join(',')}|${c}`
   }
 
@@ -598,6 +619,15 @@ class LabImpl implements LabApi {
           if (e && !e.clk) R(ref(p, 'CLK'), ref(p, 'GND'), MODEL.encoderContactOhms)
           if (e && !e.dt) R(ref(p, 'DT'), ref(p, 'GND'), MODEL.encoderContactOhms)
           if (p.props.pressed === true) R(ref(p, 'SW'), ref(p, 'GND'), MODEL.encoderContactOhms)
+          break
+        }
+        case 'hc05': {
+          // STATE: telefon bağlıyken (veri kipinde) HIGH; kartta LED de bu durumu gösterir
+          const h = this.hc05s.get(p.id)
+          const vcc = this.node(ref(p, 'VCC'))
+          if (nl.isWired(ref(p, 'STATE'))) {
+            input.logic!.push({ node: this.node(ref(p, 'STATE')), ohms: MODEL.moduleOutOhms, drive: (v) => (h && this.modPowered(p, v) && !h.dev.atMode && h.dev.connected ? Math.min(3.3, v[vcc]) : 0) })
+          }
           break
         }
         case 'vl53l0x':
@@ -1020,6 +1050,23 @@ class LabImpl implements LabApi {
           const m = e?.model as VL53L0X | undefined
           const mm = num(p, 'distanceMm', 500)
           out.vl53l0x = { powered, present, distanceMm: mm, inRange: mm <= VL53L0X_MAX_MM, continuous: present && !!m?.continuous, measurements: m?.measurements ?? 0 }
+        }
+        return true
+      }
+      case 'hc05': {
+        const h = this.hc05s.get(p.id)
+        const powered = this.modPowered(p, v)
+        if (h && h.powered !== powered) {
+          // güç açılışında EN/KEY HIGH ise AT komut kipi (38400 baud); güç kesilince alım/gönderim durur
+          h.powered = powered
+          h.dev.powered = powered
+          if (powered) h.dev.atMode = this.levelNow(p, 'EN')
+          h.dev.reset()
+        }
+        const d = h?.dev
+        out.hc05 = {
+          powered, mode: d?.atMode ? 'at' : 'data', connected: !!d && powered && !d.atMode && d.connected, baud: d?.baud() ?? 9600,
+          name: d?.name ?? 'HC-05', phone: d?.phone ?? '', rxBytes: d?.rxBytes ?? 0, txBytes: d?.txBytes ?? 0, framingErrors: d?.framingErrors ?? 0,
         }
         return true
       }

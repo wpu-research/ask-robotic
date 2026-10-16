@@ -376,6 +376,7 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
             onProp={(k, v) => selectedPart && changeProp(selectedPart.id, k, v)}
             onRotate={() => selectedPart && editable && setCircuit(rotatePart(circuit, selectedPart.id))}
             onDelete={deleteSelection}
+            onPhoneSend={(s) => selectedPart && lab.current?.phoneSend(selectedPart.id, s)}
           />
         </div>
 

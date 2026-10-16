@@ -100,7 +100,7 @@ describe('palet', () => {
   })
   it('kategoriler: çıkış, giriş, aktif devre elemanları, sensörler, motor sürücüler', () => {
     const g = pickerGroups(DEFAULT_PARTS, '')
-    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler', 'Motor sürücüler ve hareket'])
+    expect(g.map((x) => x.title)).toEqual(['Çıkış', 'Giriş', 'Aktif devre elemanları', 'Sensörler', 'Motor sürücüler ve hareket', 'Haberleşme'])
     expect(g[3].types).toEqual([...STAGE_C_PARTS, ...STAGE_D_SENSORS, ...STAGE_E_SENSORS])
     expect(g[0].types).toContain('oled')
     expect(g[4].types).toEqual(STAGE_D_MOTION)

@@ -6,6 +6,7 @@ import { useLocale, useT } from '@/i18n/client'
 import { guideForPartType } from '@/lib/parca-rehberi'
 import { logEvent } from '@/lib/events'
 import type { Selection } from './canvas'
+import { PhoneTerminal } from './phone-terminal'
 
 interface Props {
   selection: Selection
@@ -20,6 +21,8 @@ interface Props {
   onProp: (key: string, value: PropValue) => void
   onRotate: () => void
   onDelete: () => void
+  /** HC-05 seçiliyken telefondan Bluetooth ile metin gönderir. */
+  onPhoneSend?: (text: string) => void
 }
 
 function Field({ def, type, value, disabled, onChange, partId }: { def: PropDef; type: PartType; value: PropValue; disabled: boolean; onChange: (v: PropValue) => void; partId: string }) {
@@ -101,7 +104,7 @@ export function MeasureBox({ part, runtime, running }: { part: PartInstance; run
   )
 }
 
-export function PropsPanel({ selection, part, runtime, wireInfo, running, locked, latched, onLatch, onProp, onRotate, onDelete }: Props) {
+export function PropsPanel({ selection, part, runtime, wireInfo, running, locked, latched, onLatch, onProp, onRotate, onDelete, onPhoneSend }: Props) {
   const t = useT()
   if (!selection) {
     return <section className="lab-props" aria-label={t('lab.props.title')}><p className="jr-empty">{t('lab.props.empty')}</p></section>
@@ -142,6 +145,7 @@ export function PropsPanel({ selection, part, runtime, wireInfo, running, locked
           <span>{t('lab.props.latch')}</span>
         </label>
       )}
+      {part.type === 'hc05' && <PhoneTerminal rt={running ? runtime?.hc05 : undefined} running={running} onSend={(s) => onPhoneSend?.(s)} />}
       {running && defs.some((d) => !d.live) && <p className="lab-hint">{t('lab.props.liveOnly')}</p>}
       <div className="jr-controls">
         <button type="button" className="jr-btn small" disabled={running || locked} onClick={onRotate} aria-label={t('lab.props.rotateAria')}>{t('lab.props.rotate')}</button>

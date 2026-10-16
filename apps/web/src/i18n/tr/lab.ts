@@ -128,6 +128,7 @@ export const lab = {
       active: 'Aktif devre elemanları',
       sensors: 'Sensörler',
       motion: 'Motor sürücüler ve hareket',
+      comm: 'Haberleşme',
       other: 'Diğer',
     },
   },
@@ -144,6 +145,22 @@ export const lab = {
     startFirst: 'Önce başlat',
     inputAria: 'Seri porta gönderilecek metin',
     send: 'Gönder',
+  },
+  /** HC-05'e eşleşmiş sanal telefon (Bluetooth seri terminal uygulaması). */
+  phone: {
+    title: 'Telefon (Bluetooth terminal)',
+    empty: 'Arduino\'nun Bluetooth\'a yazdıkları burada görünür.',
+    placeholder: 'Telefondan gönderilecek metin',
+    inputAria: 'Telefondan Bluetooth ile gönderilecek metin',
+    send: 'Gönder',
+    startFirst: 'Önce başlat',
+    notConnected: 'Telefon bağlı değil ("Telefon bağlı" kutusunu işaretle).',
+    atMode: 'Modül AT kipinde (EN güç verilirken HIGH): telefon bağlanamaz. Komutları seri monitörden yaz.',
+    unpowered: 'Modül beslenmiyor.',
+    garbled: '{n} bozuk çerçeve: Arduino ile modülün baud hızı farklı olabilir.',
+    status: '{mode} · {baud} baud',
+    modeData: 'veri kipi',
+    modeAt: 'AT kipi',
   },
   art: {
     reset: 'SIFIRLA',
@@ -162,6 +179,7 @@ export const lab = {
     brake: 'FREN',
     armed: 'KURULU',
     disarmed: 'KURULMADI',
+    btWaiting: 'eşleşme bekliyor',
   },
   warn: {
     title: {
@@ -174,6 +192,7 @@ export const lab = {
       'flyback-missing': 'Geri tepme diyotu yok',
       unpowered: 'Besleme yok',
       'base-overcurrent': 'Taban akımı çok yüksek',
+      'logic-level': 'Lojik seviye uyumsuz',
       generic: 'Uyarı',
     },
     // İngilizce kipte sim iletileri bu kalıplara çevrilir (lib/lab/warnings.ts). Türkçe kipte sim iletisi aynen gösterilir.
@@ -203,6 +222,10 @@ export const lab = {
       pinTo5v: '{name} pini doğrudan 5V\'a bağlı (kısa devre).',
       pinOvercurrent: '{name} pininden {ma} mA geçiyor (sınır 40 mA).',
       oneWirePullup: '{name} DQ hattında pull-up direnci yok: DQ ile VCC arasına 4,7 kΩ direnç bağla (yoksa sensör bulunamaz).',
+      btNoData: 'HC-05 TXD ve RXD bağlı değil: modül Arduino ile konuşamaz (TXD → SoftwareSerial RX, RXD ← SoftwareSerial TX).',
+      btRxd: 'HC-05 RXD ucu bir Arduino pinine (doğrudan ya da bölücü direnciyle) bağlı değil: modül Arduino\'dan veri alamaz.',
+      btLevel: 'HC-05 RXD 3,3 V lojik girişidir: Arduino\'nun 5 V TX ucunu 1 kΩ / 2 kΩ gerilim bölücüyle bağla (doğrudan bağlantı modülü zamanla bozar).',
+      btUsb: 'HC-05 D0/D1\'e bağlı: bu pinler USB seri hattıdır (yükleme ve seri monitörle çakışır). SoftwareSerial ile başka pinlere bağla (ör. D10/D11).',
     },
     // Sim iletilerindeki Türkçe modül adları.
     name: {
@@ -281,6 +304,7 @@ export const lab = {
     bme280: 'BME280 sıcaklık/basınç/nem',
     ds18b20: 'DS18B20 sıcaklık (1-Wire)',
     vl53l0x: 'VL53L0X lazer mesafe (ToF)',
+    hc05: 'HC-05 Bluetooth (UART)',
   },
   /** Paletteki kısa adlar (SHORT_NAME). */
   short: {
@@ -318,6 +342,7 @@ export const lab = {
     bme280: 'BME280',
     ds18b20: 'DS18B20',
     vl53l0x: 'VL53L0X',
+    hc05: 'HC-05',
   },
   /** Özellik etiketleri: parça türü → özellik anahtarı (packages/sim PROPS[tür][].label). */
   propLabel: {
@@ -361,6 +386,7 @@ export const lab = {
     bme280: { tempC: 'Sıcaklık', pressureHpa: 'Basınç', humidity: 'Nem', address: 'I2C adresi' },
     ds18b20: { tempC: 'Sıcaklık' },
     vl53l0x: { distanceMm: 'Mesafe' },
+    hc05: { connected: 'Telefon bağlı' },
   },
   /** Seçenek etiketleri (yalnız çevrilmesi gerekenler): tür → anahtar → değer. Boş değer için `none`. */
   propOpt: {

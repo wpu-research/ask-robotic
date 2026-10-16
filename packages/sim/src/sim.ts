@@ -128,6 +128,7 @@ export class Sim {
   bme280(o?: bus.BME280Options): bus.BME280 { return bus.attachBME280(this, o) }
   ds18b20(o: bus.DS18B20Options): bus.DS18B20 { return bus.attachDS18B20(this, o) }
   vl53l0x(o?: bus.VL53L0XOptions): bus.VL53L0X { return bus.attachVL53L0X(this, o) }
+  hc05(o: bus.HC05Options): bus.HC05 { return bus.attachHC05(this, o) }
   rover(o: robot.RoverConfig): robot.Rover { return robot.attachRover(this, o) }
   balancer(o: robot.BalancerConfig): robot.Balancer { return robot.attachBalancer(this, o) }
 

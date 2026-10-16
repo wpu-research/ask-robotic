@@ -2,6 +2,7 @@
 // weeks.json: 14 hafta, TR/EN. ESOF haftaları ders sitesinden (Türkçesi çeviri), 3/10/11/14. haftalar platform için yazıldı.
 import type { SimId } from '@/components/robotik/sim-meta'
 import { partBySlug, type EngPart } from '@/lib/muhendislik/catalog'
+import type { CourseKitName } from './kits'
 import data from './weeks.json'
 
 export type Lang = 'tr' | 'en'
@@ -28,8 +29,8 @@ export interface Week {
   kits: string[]
   /** Wokwi'de çalışılan kartlar. */
   wokwi: Array<'esp32' | 'stm32'>
-  /** Derse özel laboratuvar kiti (/laboratuvar?kit=). */
-  courseKit?: 'cizgi' | 'trafik' | 'kesme' | null
+  /** Derse özel laboratuvar kit(ler)i (/laboratuvar?kit=). */
+  courseKit?: CourseKitName | CourseKitName[] | null
   exam: boolean
   tr: WeekText
   en: WeekText
@@ -39,6 +40,8 @@ export const WEEKS: readonly Week[] = data as Week[]
 export const weekOf = (n: number): Week | undefined => WEEKS.find((w) => w.n === n)
 export const partsOf = (w: Week): EngPart[] => w.parts.map(partBySlug).filter((p): p is EngPart => !!p)
 export const kitPartsOf = (w: Week): EngPart[] => w.kits.map(partBySlug).filter((p): p is EngPart => !!p && !!p.lab)
+/** Haftanın derse özel laboratuvar kitlerinin adları (tek ya da birden çok). */
+export const courseKitNames = (w: Week): CourseKitName[] => (Array.isArray(w.courseKit) ? w.courseKit : w.courseKit ? [w.courseKit] : [])
 
 export const WOKWI: Record<'esp32' | 'stm32', { href: string; tr: string; en: string }> = {
   esp32: { href: 'https://wokwi.com/projects/new/esp32', tr: 'Wokwi\'de yeni ESP32 projesi', en: 'New ESP32 project in Wokwi' },

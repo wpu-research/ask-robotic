@@ -362,7 +362,10 @@
   "kits": [
    "mpu6050",
    "pcf8574-i2c-lcd-adaptoru",
-   "16x2-lcd-paralel"
+   "16x2-lcd-paralel",
+   "oled-ssd1306-0-96",
+   "bme280",
+   "hc-05-bluetooth-modulu"
   ],
   "wokwi": [
    "esp32",
@@ -525,7 +528,10 @@
     }
    ]
   },
-  "courseKit": "kesme"
+  "courseKit": [
+   "kesme",
+   "bluetooth"
+  ]
  },
  {
   "n": 4,
@@ -552,7 +558,9 @@
    "ir-mesafe-sharp",
    "mpu6050",
    "dht22",
-   "mq-135"
+   "mq-135",
+   "vl53l0x-tof",
+   "ds18b20"
   ],
   "wokwi": [],
   "exam": false,

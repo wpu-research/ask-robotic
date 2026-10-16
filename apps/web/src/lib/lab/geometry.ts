@@ -134,6 +134,8 @@ export const PART_DEFS: Record<PartType, PartDef> = {
   bme280: { name: 'BME280 sıcaklık/basınç/nem', w: 68, h: 62, ownLabels: true, pins: hdr(['VCC', 'GND', 'SCL', 'SDA'], 68, 58) },
   ds18b20: { name: 'DS18B20 sıcaklık (1-Wire)', w: 56, h: 84, ownLabels: true, pins: hdr(['GND', 'DQ', 'VCC'], 56, 80, 14) },
   vl53l0x: { name: 'VL53L0X lazer mesafe (ToF)', w: 100, h: 62, ownLabels: true, pins: hdr(['VCC', 'GND', 'SCL', 'SDA', 'XSHUT'], 100, 58, 17) },
+  // ZS-040 kartı: başlık alt kenarda, gerçekteki sırayla (EN VCC GND TXD RXD STATE)
+  hc05: { name: 'HC-05 Bluetooth (UART)', w: 120, h: 70, ownLabels: true, pins: hdr(['EN', 'VCC', 'GND', 'TXD', 'RXD', 'STATE'], 120, 66) },
 }
 
 export type Rotation = PartInstance['rotation']
