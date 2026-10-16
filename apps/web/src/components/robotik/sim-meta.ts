@@ -1,5 +1,5 @@
 // ESOF 323 simülasyonlarının başlık ve açıklamaları (TR/EN). Kimlikler sims-core.ts'teki SIMS anahtarlarıyla aynı.
-export type SimId = 'line' | 'filter' | 'pwm' | 'pid' | 'diff' | 'arm' | 'path' | 'pf' | 'drone' | 'swarm' | 'ros'
+export type SimId = 'line' | 'filter' | 'pwm' | 'pid' | 'diff' | 'arm' | 'path' | 'pf' | 'drone' | 'swarm' | 'ros' | 'fsm' | 'isr' | 'vision' | 'nn'
 interface Text { title: string; desc: string }
 
 export const SIM_META: Record<SimId, { tr: Text; en: Text }> = {
@@ -46,5 +46,21 @@ export const SIM_META: Record<SimId, { tr: Text; en: Text }> = {
   ros: {
     en: { title: 'ROS 2 computation graph', desc: 'Nodes publish messages on topics and other nodes subscribe to them. Click a node to stop or start it and see which parts of the system go quiet.' },
     tr: { title: 'ROS 2 hesaplama grafiği', desc: 'Düğümler konulara (topic) mesaj yayınlar, diğer düğümler bunlara abone olur. Bir düğümü durdurmak ya da başlatmak için tıkla ve sistemin hangi kısımlarının sustuğunu gör.' },
+  },
+  fsm: {
+    en: { title: 'Blocking delay() vs a millis() state machine', desc: 'Two traffic lights run the same cycle. The left one uses delay() and can only read the pedestrian button when a state ends; the right one is a non-blocking state machine that reads it on every loop. Press the button and compare the response times.' },
+    tr: { title: 'Engelleyen delay() ile millis() durum makinesi', desc: 'İki trafik ışığı aynı döngüyü çalıştırır. Soldaki delay() kullanır ve yaya butonunu yalnız bir durum bittiğinde okuyabilir; sağdaki her döngüde okuyan engellemeyen bir durum makinesidir. Butona bas ve tepki sürelerini karşılaştır.' },
+  },
+  isr: {
+    en: { title: 'Interrupts vs polling: counting encoder ticks', desc: 'An optical encoder produces a pulse per slot. Polling looks at the pin every few milliseconds and misses edges when the wheel is fast; an interrupt catches every edge. Raise the speed or the polling period until polling starts to miss ticks.' },
+    tr: { title: 'Kesme ile yoklama: enkoder tıklarını saymak', desc: 'Optik enkoder her yuvada bir darbe üretir. Yoklama (polling) pine birkaç milisaniyede bir bakar ve tekerlek hızlıyken kenarları kaçırır; kesme (interrupt) her kenarı yakalar. Yoklama tık kaçırmaya başlayana kadar hızı ya da yoklama periyodunu artır.' },
+  },
+  vision: {
+    en: { title: 'Colour and lane segmentation', desc: 'A synthetic camera image is converted to HSV and thresholded into a mask. The centroid of the mask (or the lane centre) becomes a steering error. Tune the ranges, change the lighting, drag the ball, then close the loop with a P controller.' },
+    tr: { title: 'Renk ve şerit ayırma', desc: 'Yapay bir kamera görüntüsü HSV\'ye çevrilir ve eşiklenerek maskeye dönüşür. Maskenin ağırlık merkezi (ya da şerit merkezi) bir direksiyon hatasına dönüşür. Aralıkları ayarla, ışığı değiştir, topu sürükle, sonra döngüyü P denetleyiciyle kapat.' },
+  },
+  nn: {
+    en: { title: 'Training a neural network in the browser', desc: 'A small network (12×12 pixels → hidden layer → 3 classes) learns to tell circles, squares and triangles apart. Change the learning rate, the number of hidden neurons and training images, and turn augmentation off to see overfitting appear.' },
+    tr: { title: 'Tarayıcıda sinir ağı eğitmek', desc: 'Küçük bir ağ (12×12 piksel → gizli katman → 3 sınıf) daireyi, kareyi ve üçgeni ayırt etmeyi öğrenir. Öğrenme oranını, gizli nöron ve eğitim görüntüsü sayısını değiştir; aşırı öğrenmenin ortaya çıktığını görmek için veri çoğaltmayı kapat.' },
   },
 }

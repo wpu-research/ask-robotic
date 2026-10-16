@@ -49,16 +49,6 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
           <h2>{w.exam ? (en ? 'What to prepare' : 'Neye hazırlanmalı') : (en ? 'By the end of this week you can' : 'Bu haftanın sonunda')}</h2>
           <ul className="eng-list">{t.goals.map((g) => <li key={g}>{g}</li>)}</ul>
 
-          {parts.length > 0 && (
-            <section className="rb-hw-box" aria-labelledby="rb-hw">
-              <h2 id="rb-hw">{en ? 'Hardware this week (Hyvex)' : 'Bu haftanın donanımı (Hyvex)'}</h2>
-              <ul className="eng-chips">
-                {parts.map((p) => (
-                  <li key={p.slug}><Link className="eng-chip" href={`/muhendislik/parca/${p.slug}`}><span className="eng-chip-lv">S{p.level}</span>{p.name}</Link></li>
-                ))}
-              </ul>
-            </section>
-          )}
 
           <h2>{w.exam ? (en ? 'Exam guide' : 'Sınav rehberi') : (en ? 'Lecture notes' : 'Ders notları')}</h2>
           {/* İçerik ders notlarıdır (weeks.json, depoda); kullanıcı girdisi değildir. */}
@@ -66,7 +56,7 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
 
           {w.sims.length > 0 && (
             <>
-              <h2>{en ? (w.sims.length > 1 ? 'Simulations' : 'Simulation') : (w.sims.length > 1 ? 'Simülasyonlar' : 'Simülasyon')}</h2>
+              <h2>{w.exam ? (en ? 'Review simulations' : 'Tekrar simülasyonları') : en ? (w.sims.length > 1 ? 'Simulations' : 'Simulation') : (w.sims.length > 1 ? 'Simülasyonlar' : 'Simülasyon')}</h2>
               <div className="rb-sims">{w.sims.map((id) => <SimBox key={id} id={id} lang={lang} cfg={w.simCfg[id]} />)}</div>
             </>
           )}
@@ -91,6 +81,17 @@ export default async function Hafta({ params }: { params: Promise<{ n: string }>
             </section>
           )}
           {t.hw && <section className="rb-box rb-box-hw"><h3>{en ? 'Homework' : 'Ödev'}</h3><p>{t.hw}</p></section>}
+
+          {parts.length > 0 && (
+            <section className="rb-hw-box" aria-labelledby="rb-hw">
+              <h2 id="rb-hw">{en ? 'Hardware this week (Hyvex)' : 'Bu haftanın donanımı (Hyvex)'}</h2>
+              <ul className="eng-chips">
+                {parts.map((p) => (
+                  <li key={p.slug}><Link className="eng-chip" href={`/muhendislik/parca/${p.slug}`}><span className="eng-chip-lv">S{p.level}</span>{p.name}</Link></li>
+                ))}
+              </ul>
+            </section>
+          )}
 
           <nav className="rb-pager" aria-label={en ? 'Weeks' : 'Haftalar'}>
             {prev ? <Link href={`/muhendislik/robotik/hafta/${prev.n}`}><small>{en ? 'Previous week' : 'Önceki hafta'}</small>{prev[lang].title}</Link> : <span />}

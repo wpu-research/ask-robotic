@@ -192,7 +192,7 @@ mount(stage,side){
   const setT=e=>{const m=pos(e);T={x:m.x-bx,y:by-m.y};};
   cv.addEventListener('pointerdown',e=>{if(md.v!=='ik')return;drag=true;cv.setPointerCapture(e.pointerId);setT(e);});
   cv.addEventListener('pointermove',e=>{if(drag)setT(e);});
-  cv.addEventListener('pointerup',()=>{drag=false;});
+  cv.cv.addEventListener('pointerup',()=>{drag=false;});cv.addEventListener('pointerleave',()=>{drag=false;});
   return loop(dt=>{
     if(md.v==='ik'){const r=Math.hypot(T.x,T.y),rmin=Math.abs(l1-l2)+1,rmax=l1+l2-1;reach=r>=rmin&&r<=rmax;const rc=clamp(r,rmin,rmax),an=Math.atan2(T.y,T.x);const x=rc*Math.cos(an),y=rc*Math.sin(an);const D=clamp((x*x+y*y-l1*l1-l2*l2)/(2*l1*l2),-1,1);const t2=Math.acos(D)*(elb.v==='up'?-1:1);const t1=Math.atan2(y,x)-Math.atan2(l2*Math.sin(t2),l1+l2*Math.cos(t2));const k=Math.min(1,dt*10);q1=wrapA(q1+wrapA(t1-q1)*k);q2=wrapA(q2+wrapA(t2-q2)*k);a1.set(Math.round(q1*180/Math.PI));a2.set(Math.round(q2*180/Math.PI));}
     else{q1=a1.v*Math.PI/180;q2=a2.v*Math.PI/180;}
@@ -396,6 +396,185 @@ mount(stage,side){
   });
 }};
 
+
+/* ---------- platform simülasyonları (ESOF 323 genişletmesi): fsm, isr, vision, nn ---------- */
+const T=(en,tr)=>LANG==='tr'?tr:en;
+
+SIMS.fsm={mount(stage,side){
+  const {ctx,W,H}=makeCanvas(stage,640,360);const c=controls(side);
+  const sp=slider(c,T('Simulation speed','Simülasyon hızı'),0.25,3,0.25,1,v=>v+'×');
+  const dG=slider(c,T('Green duration (s)','Yeşil süresi (sn)'),2,8,0.5,4,f1);
+  let reqA=null,reqB=null,latA=[],latB=[];
+  button(c,T('Press pedestrian button','Yaya butonuna bas'),()=>{if(reqA===null)reqA=t;if(reqB===null)reqB=t;});
+  button(c,T('Reset','Sıfırla'),()=>{reset();},'ghost');
+  const ro=readout(c);
+  let t,A,B;
+  const DUR=()=>[dG.v,1,3];
+  function reset(){t=0;A={s:0,t0:0,next:DUR()[0],live:[]};B={s:0,t0:0,live:[]};reqA=reqB=null;latA=[];latB=[];}
+  reset();
+  // A: delay() ile engelleyen döngü: buton yalnız bir durumun bitiminde okunur
+  function stepA(){if(t>=A.next){if(reqA!==null&&A.s===0){/* yeşil zaten bitti */}
+      A.s=(A.s+1)%3;A.t0=t;A.next=t+DUR()[A.s];
+      if(reqA!==null){if(A.s===1){latA.push(t-reqA);reqA=null;}}
+      A.live.push(t);}
+  }
+  // B: millis() durum makinesi: buton her döngüde okunur, yeşil hemen kısalır
+  function stepB(){if(reqB!==null&&B.s===0){latB.push(t-reqB);reqB=null;B.s=1;B.t0=t;}
+    if(t-B.t0>=DUR()[B.s]){B.s=(B.s+1)%3;B.t0=t;}
+    if(!B.live.length||t-B.live[B.live.length-1]>0.05)B.live.push(t);}
+  const COL=p=>[p.green,p.gold,p.red];
+  function light(x,y,s,p,title){rr(ctx,x-34,y-90,68,180,14);ctx.fillStyle=p.ink;ctx.fill();
+    [2,1,0].forEach((k,i)=>{ctx.beginPath();ctx.arc(x,y-55+i*55,20,0,7);ctx.fillStyle=k===s?COL(p)[k]:p.line;ctx.fill();});
+    txt(ctx,title,x,y+110,p.ink,13,'center',700);}
+  function strip(y,live,p,label){txt(ctx,label,20,y-8,p.mute,11.5);ctx.fillStyle=p.grid;ctx.fillRect(20,y,600,14);
+    ctx.fillStyle=p.a;live.forEach(q=>{const x=20+600-(t-q)*60;if(x>20)ctx.fillRect(x-1,y,2.5,14);});}
+  return loop(dt=>{const n=Math.ceil(dt*sp.v*1000);for(let i=0;i<n;i++){t+=0.001;stepA();stepB();}
+    const p=pal();bgGrid(ctx,W,H,40,p);
+    light(170,130,A.s,p,'delay()');light(470,130,B.s,p,'millis() + FSM');
+    if(reqA!==null)txt(ctx,T('waiting…','bekliyor…'),170,250,p.red,12,'center',700);
+    if(reqB!==null)txt(ctx,T('waiting…','bekliyor…'),470,250,p.red,12,'center',700);
+    strip(290,A.live,p,T('delay(): loop runs only when a state ends (each mark = loop reads inputs)','delay(): döngü yalnız durum bitince döner (her çizgi = girişler okundu)'));
+    strip(335,B.live,p,T('millis(): loop runs thousands of times per second','millis(): döngü saniyede binlerce kez döner'));
+    const av=a=>a.length?(a.reduce((x,y)=>x+y,0)/a.length).toFixed(2)+' s':'–';
+    ro.textContent=T(`Response time to the button\ndelay():  last ${latA.length?latA[latA.length-1].toFixed(2)+' s':'–'}, mean ${av(latA)}\nmillis(): last ${latB.length?latB[latB.length-1].toFixed(2)+' s':'–'}, mean ${av(latB)}`,
+      `Butona tepki süresi\ndelay():  son ${latA.length?latA[latA.length-1].toFixed(2)+' sn':'–'}, ort. ${av(latA)}\nmillis(): son ${latB.length?latB[latB.length-1].toFixed(2)+' sn':'–'}, ort. ${av(latB)}`);
+  });
+}};
+
+SIMS.isr={mount(stage,side){
+  const {ctx,W,H}=makeCanvas(stage,640,360);const c=controls(side);
+  const rpm=slider(c,T('Wheel speed (rpm)','Tekerlek hızı (rpm)'),10,600,10,120);
+  const slots=slider(c,T('Encoder slots per turn','Enkoder yuvası / tur'),4,40,1,20);
+  const poll=slider(c,T('Polling period (ms)','Yoklama periyodu (ms)'),1,40,1,10);
+  button(c,T('Reset counters','Sayaçları sıfırla'),()=>{tr=0;pc=0;ic=0;},'ghost');
+  const ro=readout(c);
+  let ang=0,t=0,lastPoll=0,lastLvl=false,lvl=false,tr=0,pc=0,ic=0;const hist=[];
+  return loop(dt=>{const sim=dt*0.25;const steps=Math.max(1,Math.ceil(sim/0.0001));const h=sim/steps;
+    for(let i=0;i<steps;i++){t+=h;ang+=rpm.v/60*2*Math.PI*h;const ph=(ang/(2*Math.PI)*slots.v)%1;const nl=ph<0.5;
+      if(nl&&!lvl){tr++;ic++;}lvl=nl;
+      if(t-lastPoll>=poll.v/1000){lastPoll=t;if(lvl&&!lastLvl)pc++;lastLvl=lvl;hist.push({t,l:lvl,s:1});}
+      if(hist.length===0||t-hist[hist.length-1].t>0.0004)hist.push({t,l:lvl,s:0});}
+    while(hist.length&&t-hist[0].t>0.12)hist.shift();
+    const p=pal();bgGrid(ctx,W,H,40,p);
+    const cx=120,cy=130,R=80;ctx.save();ctx.translate(cx,cy);ctx.rotate(ang);
+    for(let k=0;k<slots.v;k++){const a0=k/slots.v*2*Math.PI,a1=a0+Math.PI/slots.v;ctx.beginPath();ctx.moveTo(0,0);ctx.arc(0,0,R,a0,a1);ctx.closePath();ctx.fillStyle=p.a;ctx.fill();}
+    ctx.restore();ctx.beginPath();ctx.arc(cx,cy,R*0.25,0,7);ctx.fillStyle=p.bg;ctx.fill();
+    ctx.fillStyle=p.red;ctx.fillRect(cx+R-6,cy-4,14,8);txt(ctx,T('optical sensor','optik sensör'),cx+R+12,cy+4,p.mute,11);
+    const x0=260,w=360,y0=60,hh=60;txt(ctx,T('signal (last 120 ms)','sinyal (son 120 ms)'),x0,y0-12,p.mute,11.5);
+    ctx.strokeStyle=p.ink;ctx.lineWidth=1.5;ctx.beginPath();hist.filter(q=>!q.s).forEach((q,i)=>{const x=x0+w-(t-q.t)/0.12*w,y=q.l?y0:y0+hh;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+    hist.filter(q=>q.s).forEach(q=>{const x=x0+w-(t-q.t)/0.12*w;ctx.fillStyle=p.gold;ctx.beginPath();ctx.arc(x,q.l?y0:y0+hh,3.5,0,7);ctx.fill();});
+    txt(ctx,T('gold dots: where polling looked','altın noktalar: yoklamanın baktığı anlar'),x0,y0+hh+20,p.gold,11.5);
+    const miss=tr?Math.max(0,(1-pc/tr)*100):0;
+    const bars=[[T('true ticks','gerçek tık'),tr,p.ink],[T('interrupt','kesme'),ic,p.green],[T('polling','yoklama'),pc,p.red]];
+    bars.forEach(([l,v,col],i)=>{const y=200+i*44;txt(ctx,l,x0,y+14,p.ink,12.5,'left',600);ctx.fillStyle=p.grid;ctx.fillRect(x0+90,y,w-90,20);ctx.fillStyle=col;ctx.fillRect(x0+90,y,(w-90)*(tr?Math.min(1,v/tr):0),20);txt(ctx,String(v),x0+w-4,y+15,p.bg,12,'right',700);});
+    const edgeHz=rpm.v/60*slots.v;
+    ro.textContent=T(`Edge rate: ${edgeHz.toFixed(0)} ticks/s (one tick every ${(1000/edgeHz).toFixed(1)} ms)\nPolling every ${poll.v} ms\nMissed by polling: ${miss.toFixed(1)} %\nRule: poll at least twice per tick (Nyquist), or use an interrupt.`,
+      `Kenar hızı: ${edgeHz.toFixed(0)} tık/sn (her ${(1000/edgeHz).toFixed(1)} ms'de bir tık)\nYoklama her ${poll.v} ms\nYoklamanın kaçırdığı: %${miss.toFixed(1)}\nKural: tık başına en az iki kez yokla (Nyquist) ya da kesme kullan.`);
+  });
+}};
+
+SIMS.vision={mount(stage,side,cfg={}){
+  const {cv,ctx,W,H,pos}=makeCanvas(stage,640,300);const c=controls(side);
+  const mode=select(c,T('Scene','Sahne'),[['ball',T('Colour tracking: red ball','Renk izleme: kırmızı top')],['lane',T('Lane following: road','Şerit takibi: yol')]],cfg.mode||'ball');
+  const hue=slider(c,T('Hue centre (°)','Ton merkezi (°)'),0,359,1,0);
+  const hw=slider(c,T('Hue width (±°)','Ton genişliği (±°)'),2,60,1,15);
+  const smin=slider(c,T('Min saturation','En düşük doygunluk'),0,1,0.01,0.45,f2);
+  const vmin=slider(c,T('Min brightness','En düşük parlaklık'),0,1,0.01,0.25,f2);
+  const light=slider(c,T('Scene lighting','Sahne ışığı'),0.3,1.4,0.05,1,f2);
+  const drive=check(c,T('Close the loop (P control)','Döngüyü kapat (P denetimi)'),false);
+  const ro=readout(c);
+  const IW=160,IH=120,S=2;const img=ctx.createImageData(IW,IH);const off=document.createElement('canvas');off.width=IW;off.height=IH;const octx=off.getContext('2d');
+  let ball={x:110,y:70,vx:22},car=0,t=0,drag=false,lastCentre=IW/2;const noise=new Float32Array(IW*IH*3).map(()=>Math.random()*24-12);
+  cv.addEventListener('pointerdown',e=>{const q=pos(e);if(q.x<IW*S){drag=true;ball.x=q.x/S;ball.y=q.y/S-20;}});
+  cv.addEventListener('pointermove',e=>{if(drag){const q=pos(e);ball.x=clamp(q.x/S,0,IW);ball.y=clamp(q.y/S-20,0,IH);}});
+  cv.addEventListener('pointerup',()=>{drag=false;});cv.addEventListener('pointerleave',()=>{drag=false;});
+  function rgb2hsv(r,g,b){const mx=Math.max(r,g,b),mn=Math.min(r,g,b),d=mx-mn;let h=0;if(d){if(mx===r)h=((g-b)/d)%6;else if(mx===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<0)h+=360;}return[h,mx?d/mx:0,mx/255];}
+  function scene(){const L=light.v;const lane=mode.v==='lane';
+    for(let y=0;y<IH;y++)for(let x=0;x<IW;x++){let r,g,b;
+      if(!lane){const sh=0.75+0.25*x/IW;r=170*sh;g=176*sh;b=160*sh;if(y>80){r=120;g=150;b=95;}
+        const dx=x-ball.x,dy=y-(ball.y+20);if(dx*dx+dy*dy<120){const k=1-0.4*(dx+dy)/22;r=210*k;g=35*k;b=35*k;}
+        if(x>20&&x<44&&y>60&&y<80){r=200;g=110;b=40;}}
+      else{const horizon=30;if(y<horizon){r=150;g=190;b=230;}else{const z=(y-horizon)/(IH-horizon);r=g=b=95;const cxp=IW/2+(-car*40)*z+Math.sin(t*0.4+z*2)*14*z;const half=10+70*z;
+          const lx=cxp-half,rx=cxp+half,lw=1+3*z;if(Math.abs(x-lx)<lw){r=235;g=200;b=40;}if(Math.abs(x-rx)<lw&&((y>>2)%3)){r=g=b=240;}}}
+      const i=(y*IW+x)*4,j=(y*IW+x)*3;img.data[i]=clamp(r*L+noise[j],0,255);img.data[i+1]=clamp(g*L+noise[j+1],0,255);img.data[i+2]=clamp(b*L+noise[j+2],0,255);img.data[i+3]=255;}
+  }
+  return loop(dt=>{t+=dt;if(mode.v==='ball'&&!drag&&!drive.v){ball.x+=ball.vx*dt;if(ball.x<15||ball.x>IW-15)ball.vx*=-1;}
+    scene();const p=pal();ctx.fillStyle=p.bg;ctx.fillRect(0,0,W,H);
+    octx.putImageData(img,0,0);ctx.imageSmoothingEnabled=false;ctx.drawImage(off,0,20,IW*S,IH*S);
+    const mask=ctx.createImageData(IW,IH);let n=0,sx=0,sy=0;const lane=mode.v==='lane';
+    for(let y=0;y<IH;y++){for(let x=0;x<IW;x++){const i=(y*IW+x)*4;const[h,s,v]=rgb2hsv(img.data[i],img.data[i+1],img.data[i+2]);
+        let on;if(lane){on=y>IH*0.55&&v>vmin.v+0.45&&(s<0.25||(h>35&&h<70&&s>smin.v));}else{const dh=Math.min(Math.abs(h-hue.v),360-Math.abs(h-hue.v));on=dh<=hw.v&&s>=smin.v&&v>=vmin.v;}
+        const k=on?255:0;mask.data[i]=mask.data[i+1]=mask.data[i+2]=k;mask.data[i+3]=255;if(on){n++;sx+=x;sy+=y;}}}
+    octx.putImageData(mask,0,0);ctx.drawImage(off,IW*S+0,20,IW*S,IH*S);
+    txt(ctx,T('camera image','kamera görüntüsü'),6,14,p.mute,11.5);txt(ctx,T('mask (white = selected pixels)','maske (beyaz = seçilen pikseller)'),IW*S+6,14,p.mute,11.5);
+    let err=null;
+    if(lane){let ls=0,ln=0,rs=0,rn=0;const prev=lastCentre;
+      for(let y=Math.floor(IH*0.75);y<IH;y++)for(let x=0;x<IW;x++){if(mask.data[(y*IW+x)*4]){if(x<prev){ls+=x;ln++;}else{rs+=x;rn++;}}}
+      if(ln>10&&rn>10){const centre=(ls/ln+rs/rn)/2;lastCentre=centre;err=(centre-IW/2)/(IW/2);
+        ctx.strokeStyle=p.green;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(IW*S+centre*S,20+IH*S*0.6);ctx.lineTo(IW*S+centre*S,20+IH*S);ctx.stroke();}
+      ctx.strokeStyle=p.gold;ctx.setLineDash([4,3]);ctx.strokeRect(IW*S,20+IH*S*0.6,IW*S,IH*S*0.4);ctx.setLineDash([]);
+      if(drive.v&&err!==null)car=clamp(car+err*1.8*dt,-1,1);}
+    else if(n>30){const cx=sx/n,cy=sy/n;err=(cx-IW/2)/(IW/2);[0,IW*S].forEach(o=>{ctx.strokeStyle=p.green;ctx.lineWidth=2;ctx.beginPath();ctx.arc(o+cx*S,20+cy*S,9,0,7);ctx.stroke();});
+      if(drive.v)ball.x=clamp(ball.x-err*60*dt,0,IW);}
+    ctx.strokeStyle=p.mute;ctx.setLineDash([3,4]);[0,IW*S].forEach(o=>{ctx.beginPath();ctx.moveTo(o+IW*S/2,20);ctx.lineTo(o+IW*S/2,20+IH*S);ctx.stroke();});ctx.setLineDash([]);
+    ro.textContent=lane?T(`Lane pixels found: ${n}\nLane offset error: ${err===null?'lane lost':err.toFixed(2)}\nVehicle lateral position: ${car.toFixed(2)}`,`Bulunan şerit pikseli: ${n}\nŞerit sapma hatası: ${err===null?'şerit kayıp':err.toFixed(2)}\nAracın yanal konumu: ${car.toFixed(2)}`)
+      :T(`Selected pixels: ${n}\nSteering error (−1…+1): ${err===null?'no object':err.toFixed(2)}\nTip: lower the lighting and watch RGB fail while a tuned HSV range keeps working.`,`Seçilen piksel: ${n}\nDireksiyon hatası (−1…+1): ${err===null?'nesne yok':err.toFixed(2)}\nİpucu: ışığı azalt; iyi ayarlanmış HSV aralığı çalışmaya devam eder.`);
+  });
+}};
+
+SIMS.nn={mount(stage,side){
+  const {ctx,W,H}=makeCanvas(stage,640,360);const c=controls(side);
+  const hid=slider(c,T('Hidden neurons','Gizli nöron'),2,64,1,16);
+  const lr=slider(c,T('Learning rate (log10)','Öğrenme oranı (log10)'),-3,0.5,0.1,-1.3,v=>Math.pow(10,v).toFixed(3));
+  const nTrain=slider(c,T('Training images','Eğitim görüntüsü'),15,600,15,150);
+  const aug=check(c,T('Data augmentation (shift + noise)','Veri çoğaltma (kaydırma + gürültü)'),true);
+  let running=true;const runB=button(c,T('Pause','Duraklat'),()=>{running=!running;runB.textContent=running?T('Pause','Duraklat'):T('Train','Eğit');});
+  button(c,T('Reset network','Ağı sıfırla'),()=>init(),'ghost');
+  const ro=readout(c);
+  const N=12,D=N*N,K=3;const NAMES=[T('circle','daire'),T('square','kare'),T('triangle','üçgen')];
+  function draw(k,jit,nz){const a=new Float32Array(D);const cx=5.5+(Math.random()*2-1)*jit,cy=5.5+(Math.random()*2-1)*jit,r=2.4+Math.random()*1.6;
+    for(let y=0;y<N;y++)for(let x=0;x<N;x++){const dx=x-cx,dy=y-cy;let on;if(k===0)on=Math.abs(Math.hypot(dx,dy)-r)<0.75;else if(k===1)on=Math.max(Math.abs(dx),Math.abs(dy))<=r&&Math.max(Math.abs(dx),Math.abs(dy))>r-1.1;else{const yy=dy+r*0.6;on=yy>=-0.2&&yy<=r*1.5&&Math.abs(dx)<=yy*0.65+0.6&&(Math.abs(dx)>yy*0.65-0.7||yy>r*1.5-1.1);}
+      a[y*N+x]=(on?1:0)+(Math.random()*2-1)*nz;}return a;}
+  const make=(n,jit,nz)=>Array.from({length:n},(_,i)=>({x:draw(i%K,jit,nz),y:i%K}));
+  let train,val,W1,b1,W2,b2,hN,ep,hist;
+  function init(){hN=hid.v|0;train=make(nTrain.v|0,1.2,0.15);val=make(300,2,0.3);ep=0;hist=[];
+    const g=s=>(Math.random()*2-1)*s;W1=Float32Array.from({length:hN*D},()=>g(Math.sqrt(6/(D+hN))));b1=new Float32Array(hN);W2=Float32Array.from({length:K*hN},()=>g(Math.sqrt(6/(hN+K))));b2=new Float32Array(K);}
+  init();
+  function fwd(x){const h=new Float32Array(hN);for(let j=0;j<hN;j++){let s=b1[j];for(let i=0;i<D;i++)s+=W1[j*D+i]*x[i];h[j]=s>0?s:0;}
+    const z=new Float32Array(K);let m=-1e9;for(let k=0;k<K;k++){let s=b2[k];for(let j=0;j<hN;j++)s+=W2[k*hN+j]*h[j];z[k]=s;m=Math.max(m,s);}
+    let sum=0;for(let k=0;k<K;k++){z[k]=Math.exp(z[k]-m);sum+=z[k];}for(let k=0;k<K;k++)z[k]/=sum;return{h,pr:z};}
+  function augment(x){if(!aug.v)return x;const sx=Math.round(Math.random()*2-1),sy=Math.round(Math.random()*2-1);const o=new Float32Array(D);
+    for(let y=0;y<N;y++)for(let xx=0;xx<N;xx++){const X=xx-sx,Y=y-sy;o[y*N+xx]=(X>=0&&X<N&&Y>=0&&Y<N?x[Y*N+X]:0)+(Math.random()*2-1)*0.25;}return o;}
+  function epoch(){const eta=Math.pow(10,lr.v);const idx=train.map((_,i)=>i).sort(()=>Math.random()-0.5);let loss=0;
+    for(const i of idx){const x=augment(train[i].x),y=train[i].y;const{h,pr}=fwd(x);loss-=Math.log(pr[y]+1e-9);
+      const dz=pr.slice();dz[y]-=1;const dh=new Float32Array(hN);
+      for(let k=0;k<K;k++){for(let j=0;j<hN;j++){dh[j]+=W2[k*hN+j]*dz[k];W2[k*hN+j]-=eta*dz[k]*h[j];}b2[k]-=eta*dz[k];}
+      for(let j=0;j<hN;j++){if(h[j]<=0)continue;const g=dh[j];for(let i2=0;i2<D;i2++)W1[j*D+i2]-=eta*g*x[i2];b1[j]-=eta*g;}}
+    return loss/train.length;}
+  function evalSet(set){let ok=0,loss=0;const cm=[[0,0,0],[0,0,0],[0,0,0]];for(const s of set){const{pr}=fwd(s.x);let a=0;for(let k=1;k<K;k++)if(pr[k]>pr[a])a=k;cm[s.y][a]++;if(a===s.y)ok++;loss-=Math.log(pr[s.y]+1e-9);}return{acc:ok/set.length,loss:loss/set.length,cm};}
+  let last={acc:0,loss:0,cm:[[0,0,0],[0,0,0],[0,0,0]]},trAcc=0,cool=0;
+  return loop(dt=>{if((hid.v|0)!==hN||(nTrain.v|0)!==train.length)init();
+    cool-=dt;if(running&&cool<=0&&ep<400){const l=epoch();ep++;const tr=evalSet(train);trAcc=tr.acc;last=evalSet(val);
+      if(!isFinite(l)){hist.push({tr:9,va:9,ta:tr.acc,vaA:last.acc});}else hist.push({tr:l,va:last.loss,ta:tr.acc,vaA:last.acc});if(hist.length>200)hist.shift();cool=train.length>300?0.12:0.05;}
+    const p=pal();bgGrid(ctx,W,H,40,p);
+    const gx=20,gy=30,gw=380,gh=140;txt(ctx,T('accuracy: training (gold) vs validation (green)','doğruluk: eğitim (altın) ve doğrulama (yeşil)'),gx,gy-10,p.mute,11.5);
+    ctx.strokeStyle=p.line;ctx.strokeRect(gx,gy,gw,gh);
+    [['ta',p.gold],['vaA',p.green]].forEach(([k,col])=>{ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();hist.forEach((q,i)=>{const x=gx+i/200*gw,y=gy+gh-(q[k])*gh;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();});
+    const lx=gx,ly=gy+gh+40;txt(ctx,T('loss (training, red)','kayıp (eğitim, kırmızı)'),lx,ly-10,p.mute,11.5);ctx.strokeStyle=p.line;ctx.strokeRect(lx,ly,gw,100);
+    ctx.strokeStyle=p.red;ctx.lineWidth=2;ctx.beginPath();hist.forEach((q,i)=>{const x=lx+i/200*gw,y=ly+100-Math.min(1,q.tr/1.2)*100;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+    const mx=430,my=40,cs=46;txt(ctx,T('confusion matrix (validation)','karışıklık matrisi (doğrulama)'),mx,my-14,p.mute,11.5);
+    for(let a=0;a<K;a++){txt(ctx,NAMES[a],mx-4,my+a*cs+cs/2+4,p.ink,10.5,'right');txt(ctx,NAMES[a],mx+a*cs+cs/2,my+K*cs+14,p.ink,10.5,'center');
+      const tot=last.cm[a].reduce((x,y)=>x+y,0)||1;for(let b=0;b<K;b++){const v=last.cm[a][b]/tot;ctx.fillStyle=a===b?p.green:p.red;ctx.globalAlpha=0.12+0.88*v;ctx.fillRect(mx+b*cs,my+a*cs,cs-2,cs-2);ctx.globalAlpha=1;txt(ctx,String(last.cm[a][b]),mx+b*cs+cs/2,my+a*cs+cs/2+4,p.ink,11,'center',700);}}
+    txt(ctx,T('rows: true · columns: predicted','satır: gerçek · sütun: tahmin'),mx,my+K*cs+30,p.mute,10.5);
+    const sx0=430,sy0=230;txt(ctx,T('validation samples','doğrulama örnekleri'),sx0,sy0-8,p.mute,11.5);
+    for(let s=0;s<6;s++){const smp=val[s*7%val.length];const{pr}=fwd(smp.x);let a=0;for(let k=1;k<K;k++)if(pr[k]>pr[a])a=k;const ox=sx0+(s%3)*62,oy=sy0+Math.floor(s/3)*62;
+      for(let i=0;i<D;i++){const v=clamp(smp.x[i],0,1);ctx.fillStyle=v>0.5?p.ink:p.grid;ctx.fillRect(ox+(i%N)*4,oy+Math.floor(i/N)*4,4,4);}
+      ctx.strokeStyle=a===smp.y?p.green:p.red;ctx.lineWidth=2;ctx.strokeRect(ox-1,oy-1,50,50);}
+    const gap=(trAcc-last.acc)*100;
+    ro.textContent=T(`Epoch: ${ep}\nTraining accuracy: ${(trAcc*100).toFixed(1)} %\nValidation accuracy: ${(last.acc*100).toFixed(1)} %\nGap: ${gap.toFixed(1)} points${gap>12?' (overfitting)':''}\nParameters: ${hN*D+hN+K*hN+K}`,
+      `Dönem (epoch): ${ep}\nEğitim doğruluğu: %${(trAcc*100).toFixed(1)}\nDoğrulama doğruluğu: %${(last.acc*100).toFixed(1)}\nFark: ${gap.toFixed(1)} puan${gap>12?' (aşırı öğrenme)':''}\nParametre: ${hN*D+hN+K*hN+K}`);
+  });
+}};
 
 export const SIM_IDS = Object.keys(SIMS)
 

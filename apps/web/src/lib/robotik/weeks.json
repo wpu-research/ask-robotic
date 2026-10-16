@@ -56,7 +56,9 @@
  },
  {
   "n": 2,
-  "sims": [],
+  "sims": [
+   "fsm"
+  ],
   "simCfg": {},
   "parts": [
    "arduino-uno-atmega328p",
@@ -115,7 +117,9 @@
  },
  {
   "n": 3,
-  "sims": [],
+  "sims": [
+   "isr"
+  ],
   "simCfg": {},
   "parts": [
    "mpu6050",
@@ -464,7 +468,11 @@
  },
  {
   "n": 8,
-  "sims": [],
+  "sims": [
+   "filter",
+   "pid",
+   "diff"
+  ],
   "simCfg": {},
   "parts": [],
   "kits": [],
@@ -563,7 +571,9 @@
  },
  {
   "n": 10,
-  "sims": [],
+  "sims": [
+   "vision"
+  ],
   "simCfg": {},
   "parts": [
    "esp32-cam",
@@ -622,7 +632,9 @@
  },
  {
   "n": 11,
-  "sims": [],
+  "sims": [
+   "nn"
+  ],
   "simCfg": {},
   "parts": [
    "jetson-orin-nano",
@@ -811,8 +823,18 @@
  },
  {
   "n": 14,
-  "sims": [],
-  "simCfg": {},
+  "sims": [
+   "vision",
+   "drone"
+  ],
+  "simCfg": {
+   "vision": {
+    "mode": "lane"
+   },
+   "drone": {
+    "mode": "mission"
+   }
+  },
   "parts": [],
   "kits": [],
   "wokwi": [],
