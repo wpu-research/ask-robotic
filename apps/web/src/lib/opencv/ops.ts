@@ -319,6 +319,21 @@ export function structuring(shape: SeShape, k: number): Uint8Array {
 /** Aşındırma (min) ya da genişletme (max), yapı elemanı üstünde. Görüntü dışı aşındırmada 255, genişletmede 0 sayılır (OpenCV gibi). */
 export function morph1(g: Gray, se: Uint8Array, k: number, op: 'erode' | 'dilate'): Gray {
   const o = gray(g.w, g.h), r = Math.floor(k / 2), { w, h } = g, er = op === 'erode'
+  // dikdörtgen eleman ayrılabilir: önce satırlarda, sonra sütunlarda en küçük/en büyük (k² yerine 2k karşılaştırma)
+  if (se.every((v) => v === 1)) {
+    const t = new Uint8ClampedArray(w * h), init = er ? 255 : 0
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      let v = init
+      for (let i = Math.max(0, x - r); i <= Math.min(w - 1, x + r); i++) { const p = g.data[y * w + i]; v = er ? (p < v ? p : v) : (p > v ? p : v) }
+      t[y * w + x] = v
+    }
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      let v = init
+      for (let j = Math.max(0, y - r); j <= Math.min(h - 1, y + r); j++) { const p = t[j * w + x]; v = er ? (p < v ? p : v) : (p > v ? p : v) }
+      o.data[y * w + x] = v
+    }
+    return o
+  }
   for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
     let v = er ? 255 : 0
     for (let j = 0; j < k; j++) {

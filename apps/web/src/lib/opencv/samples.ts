@@ -215,7 +215,7 @@ export interface Car { x: number; lane: number; len: number; color: RGB; speed: 
 /** Yukarıdan yol: iki şeritte soldan sağa (üst şerit) ve sağdan sola (alt şerit) giden araçlar. Arka plan çıkarma için. */
 export function trafficCars(t: number, w = 320): Car[] {
   const out: Car[] = []
-  const spec: Array<[number, number, number, RGB, number]> = [[0, 0, 44, [200, 40, 40], 70], [1.7, 0, 52, [240, 240, 240], 70], [3.9, 0, 40, [40, 90, 200], 70], [0.6, 1, 46, [230, 190, 30], 55], [2.8, 1, 60, [40, 40, 40], 55], [4.6, 1, 42, [60, 160, 80], 55]]
+  const spec: Array<[number, number, number, RGB, number]> = [[0, 0, 44, [230, 90, 70], 70], [1.7, 0, 52, [240, 240, 240], 70], [3.9, 0, 40, [70, 130, 230], 70], [0.6, 1, 46, [230, 190, 30], 55], [2.8, 1, 60, [40, 40, 40], 55], [4.6, 1, 42, [60, 160, 80], 55]]
   for (const [ph, lane, len, color, sp] of spec) {
     // konum: sabit hızla ilerler, yolun sonunda baştan girer (ekran dışında 60 px pay)
     const d = (((t * sp + ph * 70) % (w + 120)) + (w + 120)) % (w + 120) - 60
@@ -223,16 +223,25 @@ export function trafficCars(t: number, w = 320): Car[] {
   }
   return out
 }
+const roadCache = new Map<string, Uint8ClampedArray>()
 export function trafficFrame(t: number, w = 320, h = 240, noise = 6, seed = 1): Rgba {
-  const img = rgba(w, h); fill(img, [96, 140, 70])
-  rect(img, 0, 60, w, 120, [86, 86, 90])
-  for (let x = 0; x < w; x += 30) rect(img, x, 118, 16, 4, [230, 230, 230])
+  // sabit yol bir kez çizilir, her karede kopyalanır (kare başına maliyet düşük kalsın)
+  let base = roadCache.get(`${w}x${h}`)
+  if (!base) {
+    const r0 = rgba(w, h); fill(r0, [96, 140, 70])
+    rect(r0, 0, 60, w, 120, [86, 86, 90])
+    for (let x = 0; x < w; x += 30) rect(r0, x, 118, 16, 4, [230, 230, 230])
+    base = r0.data; roadCache.set(`${w}x${h}`, base)
+  }
+  const img: Rgba = { w, h, data: new Uint8ClampedArray(base) }
   for (const c of trafficCars(t, w)) {
     const y = c.lane === 0 ? 78 : 136
     rect(img, Math.round(c.x - c.len / 2), y, c.len, 26, c.color)
     rect(img, Math.round(c.x - c.len / 2 + (c.lane === 0 ? c.len * 0.55 : 6)), y + 4, Math.round(c.len * 0.25), 18, [50, 60, 80])
   }
-  const r = rng(seed + Math.floor(t * 30))
-  if (noise > 0) shade(img, (_x, _y, c) => c.map((v) => v + (r() - 0.5) * 2 * noise) as RGB)
+  if (noise > 0) {
+    const r = rng(seed + Math.floor(t * 30)), d = img.data
+    for (let i = 0; i < d.length; i += 4) { d[i] += (r() - 0.5) * 2 * noise; d[i + 1] += (r() - 0.5) * 2 * noise; d[i + 2] += (r() - 0.5) * 2 * noise }
+  }
   return img
 }

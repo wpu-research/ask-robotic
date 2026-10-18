@@ -214,3 +214,14 @@ describe('örnek sahneler', () => {
     expect(diff).toBeGreaterThan(500); expect(diff).toBeLessThan(0.25 * a.data.length)
   })
 })
+
+describe('trafik sayacı hattı (cv-demo-logic yeniden kullanımı)', () => {
+  it('20 saniyede iki yöndeki sayım gerçeğe ±1 eşit', async () => {
+    const { counterInit, counterStep } = await import('./traffic')
+    const s = counterInit()
+    for (let k = 1; k <= 300; k++) { const t = k / 15; counterStep(s, trafficFrame(t, 320, 240, 6), t, { alpha: 0.05, th: 25, selective: true, clean: true, line: 160 }) }
+    expect(s.truthLr + s.truthRl).toBeGreaterThan(8)
+    expect(Math.abs(s.lr - s.truthLr)).toBeLessThanOrEqual(1)
+    expect(Math.abs(s.rl - s.truthRl)).toBeLessThanOrEqual(1)
+  })
+})
