@@ -76,6 +76,7 @@ export const KMEANS: Lesson<KMeansFrame> = {
     { tr: 'Her nokta en yakın merkeze katılır.', en: 'Every point joins its nearest center.' },
     { tr: 'Her merkez, kendi noktalarının ortalamasına taşınır. Hiçbir merkez kıpırdamayana kadar tekrar.', en: 'Every center moves to the mean of its points. Repeat until no center moves.' },
     { tr: 'Bazı denemeler kötü bir başlangıçta takılır. Bu yüzden on deneme yapılır, toplam kare uzaklığı en küçük olan kalır.', en: 'Some tries get stuck after a bad start, so the program makes ten tries and keeps the one with the smallest total squared distance.' },
+    { tr: 'Şunu dene: k’yı 2 yap. İki grup tek gruba birleşir (200 · 400 nokta). Sonra 5 yap: büyük gruplar ikiye bölünür. k-ortalamalar grup sayısını kendisi bulamaz, onu sen verirsin; doğru k’yı seçmek için grafiğe bakmak ya da farklı k’ları karşılaştırmak gerekir.', en: 'Try this: set k to 2. Two groups merge into one (200 · 400 points). Then set it to 5: the big groups split in two. k-means cannot find the number of groups by itself, you give it; choosing the right k means looking at the plot or comparing different values of k.' },
   ],
   why: {
     tr: "Cevap gerektirmez: kimsenin etiketlemediği verideki grupları bulur. Robotikte LiDAR ve derinlik kamerası noktalarını engellere ayırmakta, renk kümelemede ve harita sıkıştırmada kullanılır. Vektör arama kütüphanesi FAISS da devasa koleksiyonları k-means ile gruplara böler; arama yalnız en yakın birkaç gruba bakar.",

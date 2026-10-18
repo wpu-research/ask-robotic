@@ -20,7 +20,7 @@ export const SECTIONS: Section[] = [
     id: 'klasik-algoritmalar',
     title: { tr: 'Klasik algoritmalar', en: 'Classic algorithms' },
     sub: { tr: 'Komşulara bakmak, olasılık saymak, soru sormak, ağaçları oylatmak ve etiketsiz veride grup bulmak.', en: 'Asking the neighbours, counting probabilities, asking questions, letting trees vote and finding groups in unlabelled data.' },
-    slugs: ['k-en-yakin-komsu', 'naive-bayes', 'karar-agaci', 'rastgele-orman', 'gradyan-artirma', 'destek-vektor-makinesi', 'k-means', 'dbscan', 'pca'],
+    slugs: ['k-en-yakin-komsu', 'naive-bayes', 'spam-filtresi', 'karar-agaci', 'rastgele-orman', 'gradyan-artirma', 'destek-vektor-makinesi', 'k-means', 'dbscan', 'pca'],
   },
   {
     id: 'goren-ve-yazan',

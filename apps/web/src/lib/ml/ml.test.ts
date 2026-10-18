@@ -4,7 +4,7 @@ import { KMEANS, lidarScan, lloyd, sizesOf } from './kmeans'
 import { LESSONS } from './lessons'
 import { rng, choice } from './core'
 import { REGRESSION, gradientDescent, motorData } from './regression'
-import { OVERFIT } from './overfit'
+import { OVERFIT, adamFit, sharpData } from './overfit'
 import { KNN } from './knn'
 import { NAIVE_BAYES } from './naive-bayes'
 import { TREE } from './tree'
@@ -65,11 +65,21 @@ describe('regresyon', () => {
 
 describe('aşırı öğrenme', () => {
   it('eğitim hatası hep düşer; doğrulama hatası ortada en küçük, 12. derecede çok daha büyük', () => {
-    const last = OVERFIT.run({ deg: 12 }).at(-1)!
+    const last = OVERFIT.run({ deg: 12 }).find((f) => f.best !== undefined)!
     for (let i = 1; i < last.train.length; i++) expect(last.train[i]).toBeLessThanOrEqual(last.train[i - 1] * 1.0001)
     expect(last.best!).toBeGreaterThanOrEqual(2)
     expect(last.best!).toBeLessThanOrEqual(9)
     expect(last.test[11]).toBeGreaterThan(last.test[last.best! - 1] * 1.5)
+  })
+  it('erken durdurma: Adam ile eğitimde doğrulama hatası dibe vurup tırmanır, en iyi geçiş erken', () => {
+    const G = adamFit(sharpData())
+    const tr = G.snaps.map((s) => s.train), te = G.snaps.map((s) => s.test)
+    expect(tr.at(-1)!).toBeLessThan(tr[3])
+    expect(G.best.step).toBeLessThan(3000)
+    expect(te.at(-1)!).toBeGreaterThan(G.best.test * 2)
+    const f = OVERFIT.run({ deg: 12 }).at(-1)!
+    expect(f.gd?.best).toBeDefined()
+    expect(f.cap[1]).toBe(`early stopping: pass ${G.best.step.toLocaleString('en-US')}`)
   })
 })
 
@@ -80,6 +90,23 @@ describe('sınıflandırıcılar', () => {
     const a1 = TREE.run({ depth: 1 }).at(-1)!.acc!, a3 = TREE.run({ depth: 3 }).at(-1)!.acc!
     expect(a3).toBeGreaterThan(a1)
     expect(a3).toBeGreaterThanOrEqual(0.8)
+  })
+  it('karar ağacı, kredi verisi: derinlik 3 kuralı bulur (gelir ≈ 3.000 / 5.000, kaçan ≤ 1); derinlik 10 ezberler', () => {
+    const f3 = TREE.run({ depth: 3, veri: 1 }).at(-1)!, f10 = TREE.run({ depth: 10, veri: 1 }).at(-1)!
+    const r = f3.rules!.map((x) => x[0]).join('\n')
+    expect(r).toMatch(/kaçan <= 1/)
+    expect(r).toMatch(/gelir <= (29|30)\d\d/)
+    expect(r).toMatch(/gelir <= (49|50)\d\d/)
+    expect(f3.acc!).toBeGreaterThanOrEqual(0.8)
+    expect(f10.trainAcc!).toBeGreaterThan(f3.trainAcc!)
+    expect(f10.acc!).toBeLessThan(f3.acc!)
+    expect(f10.rules).toBeUndefined()
+  })
+  it('k-means k = 2: iki grup birleşir', () => {
+    expect(KMEANS.run({ k: 2, seed: 17 }).at(-1)!.stat![0]).toMatch(/200 · 400/)
+  })
+  it('regresyon: öğrenme oranı 0,01 yetmez, eğim 0,150', () => {
+    expect(REGRESSION.run({ lr: 0.01 }).at(-1)!.cap[0]).toMatch(/^hız ≈ 0,150/)
   })
   it('perceptron 20 dönem içinde hatasız bir doğru bulur', () => {
     const last = PERCEPTRON.run({ seed: 1 }).at(-1)!

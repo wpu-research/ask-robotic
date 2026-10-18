@@ -34,6 +34,7 @@ import { draw as rakamTanima } from './rakam-tanima'
 import { draw as rastgeleOrman } from './rastgele-orman'
 import { draw as shapDegerleri } from './shap-degerleri'
 import { draw as siralamaAlgoritmalari } from './siralama-algoritmalari'
+import { draw as spamFiltresi } from './spam-filtresi'
 import { draw as yapayZekaAjani } from './yapay-zeka-ajani'
 import { draw as yiginVeObek } from './yigin-ve-obek'
 import { draw as yuzDogrulama } from './yuz-dogrulama'
@@ -74,6 +75,7 @@ export const SCENES: Record<string, Draw> = {
   'rastgele-orman': rastgeleOrman,
   'shap-degerleri': shapDegerleri,
   'siralama-algoritmalari': siralamaAlgoritmalari,
+  'spam-filtresi': spamFiltresi,
   'yapay-zeka-ajani': yapayZekaAjani,
   'yigin-ve-obek': yiginVeObek,
   'yuz-dogrulama': yuzDogrulama,
