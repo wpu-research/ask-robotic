@@ -94,7 +94,9 @@ export function LineChart({ series, w = 640, h = 260, yRange, xLabel, yLabel, hl
     })
     return d
   }
+  const legend = series.filter((s) => s.label)
   return (
+    <figure className="ks-fig">
     <svg viewBox={`0 0 ${w} ${h}`} className="ks-chart" role="img" aria-labelledby={id}>
       <title id={id}>{title}</title>
       <rect x={L} y={T} width={w - L - R} height={h - T - B} fill="var(--sim-bg)" stroke="var(--line)" />
@@ -114,12 +116,9 @@ export function LineChart({ series, w = 640, h = 260, yRange, xLabel, yLabel, hl
       {hlines.filter((l) => l.label).map((l, i) => <text key={i} x={w - R - 4} y={Y(l.y) - 4} textAnchor="end" className="ks-ax" fill={l.color}>{l.label}</text>)}
       {xLabel && <text x={w - R} y={h - 2} textAnchor="end" className="ks-ax">{xLabel}</text>}
       {yLabel && <text x={L} y={13} className="ks-ax">{yLabel}</text>}
-      <g transform={`translate(${L + 150}, 13)`}>
-        {series.filter((s) => s.label).map((s, i) => (
-          <g key={i} transform={`translate(${i * 120}, 0)`}><rect x={0} y={-5} width={14} height={3} fill={s.color} /><text x={18} y={0} className="ks-ax ks-leg">{s.label}</text></g>
-        ))}
-      </g>
     </svg>
+    {legend.length > 0 && <ul className="ks-legend" aria-hidden="true">{legend.map((s, i) => <li key={i}><i style={{ background: s.color, height: 4, verticalAlign: 3 }} />{s.label}</li>)}</ul>}
+    </figure>
   )
 }
 

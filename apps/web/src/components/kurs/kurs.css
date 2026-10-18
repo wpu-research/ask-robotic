@@ -63,6 +63,9 @@
   .ks-units th, .ks-units td { padding: 9px 6px; }
   .ks-units th:nth-child(3), .ks-units td:nth-child(3) { display: none; }
   .rb-sim { padding: 14px; }
+  /* SVG grafikler dar ekranda yarıya küçülür: eksen yazıları kullanıcı biriminde büyütülür */
+  .ks-chart .ks-ax { font-size: 17px; }
+  .ks-chart .ks-leg { font-size: 16px; }
 }
 ol.ks-flow { list-style: none; margin: 0; }
 .ks-pins td, .ks-pins th { vertical-align: top; }
@@ -79,3 +82,11 @@ ol.ks-flow { list-style: none; margin: 0; }
 .ks-slot.run { border-color: var(--sim-a); }
 .ks-slot b { display: block; font-size: 1rem; }
 .rb-sim textarea.ks-in { min-height: 150px; }
+.ks-fig { margin: 0; display: grid; gap: 4px; min-width: 0; }
+@media (max-width: 600px) {
+  /* Pin planlayıcı: dar ekranda her bağlantı bir kart, denetim notu alt satırda */
+  .ks-pins thead { display: none; }
+  .ks-pins tr { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 4px 8px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+  .ks-pins td { border: 0; padding: 0; }
+  .ks-pins td:last-child { grid-column: 1 / -1; }
+}

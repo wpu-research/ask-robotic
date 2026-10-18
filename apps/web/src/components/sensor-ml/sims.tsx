@@ -323,7 +323,7 @@ function TrainSim({ lang }: P) {
             ? <LineChart title={en ? 'Test samples (last 2 days shown in time order): actual vs forecast' : 'Test örnekleri (zaman sırasıyla son 2 gün): gerçek ve tahmin'} xLabel={en ? 'day' : 'gün'} yLabel="°C" h={230}
               series={[
                 { x: last.map((i) => DEFAULT.t[tab.idx[res.idx[i]]] / 1440), y: last.map((i) => res.y[i]), color: 'var(--ink)', width: 1.2, label: en ? 'actual' : 'gerçek' },
-                { x: last.map((i) => DEFAULT.t[tab.idx[res.idx[i]]] / 1440), y: last.map((i) => res.p[i]), color: 'var(--sim-a)', width: 1.8, label: en ? 'model' : 'model' },
+                { x: last.map((i) => DEFAULT.t[tab.idx[res.idx[i]]] / 1440), y: last.map((i) => res.p[i]), color: 'var(--sky)', width: 1.8, label: 'model' },
                 { x: last.map((i) => DEFAULT.t[tab.idx[res.idx[i]]] / 1440), y: last.map((i) => res.base[i]), color: 'var(--mute)', dash: '4 3', width: 1, label: en ? 'no change' : 'değişmez' },
               ]} />
             : <Bars title={en ? 'Confusion matrix: TP, FP, FN, TN' : 'Karışıklık matrisi: DP, YP, YN, DN'} values={[sc!.tp, sc!.fp, sc!.fn, sc!.tn]} labels={en ? ['TP', 'FP', 'FN', 'TN'] : ['DP', 'YP', 'YN', 'DN']} colors={['var(--green)', 'var(--red)', 'var(--gold)', 'var(--sim-a)']} h={200} />}
@@ -417,7 +417,7 @@ function AnomalySim({ lang }: P) {
       stage={
         <>
           <LineChart title={en ? 'Actual vs forecast temperature (trained on days 1–4)' : 'Gerçek ve tahmin sıcaklık (1–4. günlerde eğitildi)'} xLabel={en ? 'day' : 'gün'} yLabel="°C" h={190} bands={band}
-            series={[{ x, y: P.actual, color: 'var(--ink)', width: 1.1, label: en ? 'actual' : 'gerçek' }, { x, y: P.pred, color: 'var(--sim-a)', width: 1.5, label: en ? 'forecast' : 'tahmin' }]} />
+            series={[{ x, y: P.actual, color: 'var(--ink)', width: 1.1, label: en ? 'actual' : 'gerçek' }, { x, y: P.pred, color: 'var(--sky)', width: 1.5, label: en ? 'forecast' : 'tahmin' }]} />
           <LineChart title={en ? 'Residual z-score, thresholds and alerts (circles)' : 'Artık z-skoru, eşikler ve uyarılar (halkalar)'} xLabel={en ? 'day' : 'gün'} h={190} bands={band} yRange={[-8, 12]}
             series={[{ x, y: P.z, color: color(2), width: 1.1, label: 'z' }]} hlines={[{ y: on, color: 'var(--red)', label: en ? 'on' : 'aç' }, { y: Math.min(off, on), color: 'var(--gold)', label: en ? 'off' : 'kapa' }, { y: -on, color: 'var(--red)' }]}
             marks={A.alerts.map((i) => ({ x: x[i], y: Math.max(-8, Math.min(12, P.z[i])), color: 'var(--red)' }))} />

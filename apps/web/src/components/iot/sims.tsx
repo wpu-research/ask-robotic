@@ -86,7 +86,7 @@ function PinSim({ lang }: P) {
       side={
         <>
           <Check label={en ? 'Wi-Fi on' : 'Wi-Fi açık'} value={wifi} onChange={setWifi} />
-          <Readout testid="iot-pins-sum">{en ? `${nErr} errors, ${nWarn} warnings` : `${nErr} hata, ${nWarn} uyarı`}{nErr === 0 && nWarn === 0 ? (en ? '\nClean pin plan.' : '\nTemiz pin planı.') : ''}</Readout>
+          <Readout testid="iot-pins-sum">{en ? `${nErr} error(s), ${nWarn} warning(s)` : `${nErr} hata, ${nWarn} uyarı`}{nErr === 0 && nWarn === 0 ? (en ? '\nClean pin plan.' : '\nTemiz pin planı.') : ''}</Readout>
           <Slider label={en ? 'ADC raw (12 bit)' : 'ADC ham (12 bit)'} min={0} max={4095} step={1} value={raw} onChange={setRaw} />
           <Readout>{`analogRead = ${raw}\n≈ ${nf(lang, 2)(adcToVolt(raw))} V (11 dB)\nUno: ${Math.round((adcToVolt(raw) / 5) * 1023)} / 1023 (5 V)`}</Readout>
         </>
@@ -206,14 +206,17 @@ function RestSim({ lang }: P) {
 
 // --- 4. MQTT broker ---------------------------------------------------------------------------------------------------------
 
-const DEVICES = ['sera-01', 'sera-02', 'kapi-01'] as const
-const willOf = (id: string) => ({ topic: `ev/${id}/durum`, payload: 'offline', qos: 1 as QoS, retain: true })
+const DEVICES = ['sera-01', 'sera-02', 'sera-03'] as const
+/** İstemci kimliği sera-01 → konu kökü sera/01 */
+const root = (id: string) => `sera/${id.slice(-2)}`
+const willOf = (id: string) => ({ topic: `${root(id)}/durum`, payload: 'offline', qos: 1 as QoS, retain: true })
 
 function newBroker() {
   const b = new Broker()
-  for (const id of DEVICES) { b.connect(id, { will: willOf(id) }); b.publish({ topic: `ev/${id}/durum`, payload: 'online', qos: 1, retain: true }) }
+  for (const id of DEVICES) { b.connect(id, { will: willOf(id) }); b.publish({ topic: `${root(id)}/durum`, payload: 'online', qos: 1, retain: true }) }
   b.connect('pano')
-  b.subscribe(DEVICES[0], `ev/${DEVICES[0]}/komut/#`, 1)
+  b.subscribe(DEVICES[0], `${root(DEVICES[0])}/led/set`, 1)
+  b.subscribe(DEVICES[1], `${root(DEVICES[1])}/fan/set`, 1)
   return b
 }
 
@@ -224,16 +227,16 @@ function BrokerSim({ lang }: P) {
   const b = broker.current
   const [, bump] = useReducer((x: number) => x + 1, 0)
   const [log, setLog] = useState<Array<{ t: string; text: React.ReactNode; cls?: string }>>([])
-  const [filter, setFilter] = useState('ev/+/sicaklik')
+  const [filter, setFilter] = useState('sera/+/sicaklik')
   const [subQos, setSubQos] = useState<QoS>(1)
   const [from, setFrom] = useState<string>('sera-01')
-  const [topic, setTopic] = useState('ev/sera-01/sicaklik')
-  const [msg, setMsg] = useState('23.4')
+  const [topic, setTopic] = useState('sera/01/led/set')
+  const [msg, setMsg] = useState('1')
   const [qos, setQos] = useState<QoS>(0)
   const [retain, setRetain] = useState(false)
   const [tick, setTick] = useState(0)
-  const [testF, setTestF] = useState('ev/#')
-  const [testT, setTestT] = useState('ev/sera-02/nem')
+  const [testF, setTestF] = useState('sera/#')
+  const [testT, setTestT] = useState('sera/02/nem')
   const show = (ds: Delivery[], note?: string) => {
     const rows = ds.map((d) => ({ t: `→ ${d.to}`, text: <><code>{d.topic}</code> {d.payload} <span className="dim">QoS {d.qos}{d.retained ? ' · retained' : ''}</span></>, cls: d.retained ? 'dim' : undefined }))
     setLog((l) => [...rows, ...(note ? [{ t: '•', text: note, cls: 'dim' }] : []), ...l].slice(0, 40))
@@ -253,13 +256,13 @@ function BrokerSim({ lang }: P) {
     DEVICES.forEach((id, i) => {
       if (!b.clients.get(id)?.connected) return
       const r = readSensor(k * 600, i + 1, i * 2)
-      if (id === 'kapi-01') ds.push(...b.publish({ topic: `ev/${id}/kapi`, payload: k % 3 === 0 ? 'acik' : 'kapali', qos: 1, retain: true }))
-      else { ds.push(...b.publish({ topic: `ev/${id}/sicaklik`, payload: String(r.temp), qos: 0, retain: false })); ds.push(...b.publish({ topic: `ev/${id}/nem`, payload: String(r.hum), qos: 0, retain: false })) }
+      if (id === 'sera-03') { ds.push(...b.publish({ topic: `${root(id)}/kat/sicaklik`, payload: String(r.temp), qos: 0, retain: false })); ds.push(...b.publish({ topic: `${root(id)}/kapi`, payload: k % 3 === 0 ? 'acik' : 'kapali', qos: 1, retain: true })) }
+      else { ds.push(...b.publish({ topic: `${root(id)}/sicaklik`, payload: String(r.temp), qos: 0, retain: false })); ds.push(...b.publish({ topic: `${root(id)}/nem`, payload: String(r.hum), qos: 0, retain: false })) }
     })
     show(ds, en ? 'Devices published telemetry' : 'Cihazlar telemetri yayımladı')
   }
   const unplug = (id: string) => show(b.drop(id, false), en ? `${id}: cable pulled (no DISCONNECT), broker publishes the will` : `${id}: kablo çekildi (DISCONNECT yok), broker vasiyeti yayımlar`)
-  const reconnect = (id: string) => { b.connect(id, { will: willOf(id) }); show(b.publish({ topic: `ev/${id}/durum`, payload: 'online', qos: 1, retain: true }), en ? `${id} reconnected, birth message "online"` : `${id} yeniden bağlandı, doğum mesajı "online"`) }
+  const reconnect = (id: string) => { b.connect(id, { will: willOf(id) }); show(b.publish({ topic: `${root(id)}/durum`, payload: 'online', qos: 1, retain: true }), en ? `${id} reconnected, birth message "online"` : `${id} yeniden bağlandı, doğum mesajı "online"`) }
   const reset = () => { broker.current = newBroker(); setLog([]); setTick(0); bump() }
   return (
     <Body
@@ -351,7 +354,7 @@ function TelemetrySim({ lang }: P) {
   const [tls, setTls] = useState(true)
   const [dead, setDead] = useState(0.3)
   const [hb, setHb] = useState(15)
-  const topic = 'ev/sera-01/olcum'
+  const topic = 'sera/01/olcum'
   const r = readSensor(12 * 3600)
   const pl = payload(r, fmt)
   const size = publishSize(topic, pl.bytes, qos)
@@ -599,7 +602,7 @@ const SETUP_TEXT: Record<Finding, { tr: string; en: string; bad: { tr: string; e
   signedOta: { tr: 'OTA imzalı ve doğrulanıyor', en: 'OTA signed and verified', bad: { tr: 'İmzasız OTA: ağdaki herkes cihaza yazılım yükleyebilir.', en: 'Unsigned OTA: anyone on the network can flash the device.' } },
   debugPortOpen: { tr: 'Seri/telnet hata ayıklama açık', en: 'Serial/telnet debug left open', bad: { tr: 'Hata ayıklama kapısı açık: fiziksel ya da ağ erişimiyle sırlar okunur.', en: 'Debug port open: secrets readable with physical or network access.' } },
 }
-const ACL0 = ['# anonim istemciye hiçbir şey yok', 'pattern readwrite ev/%c/#', 'pattern write ev/%c/durum', 'user pano', 'topic read ev/#', 'topic write ev/+/komut/#', 'user admin', 'topic readwrite #', 'topic deny ev/kapi-01/komut/#'].join('\n')
+const ACL0 = ['# anonim istemciye hiçbir şey yok', 'pattern write clients/%c/durum', 'user sera-01', 'topic readwrite sera/01/#', 'user sera-02', 'topic readwrite sera/02/#', 'user pano', 'topic read sera/#', 'topic write sera/+/+/set', 'user admin', 'topic readwrite #', 'topic deny sera/03/kapi/#'].join('\n')
 
 function SecuritySim({ lang }: P) {
   const en = lang === 'en'
@@ -607,12 +610,12 @@ function SecuritySim({ lang }: P) {
   const [acl, setAcl] = useState(ACL0)
   const [user, setUser] = useState('sera-01')
   const [client, setClient] = useState('sera-01')
-  const [topic, setTopic] = useState('ev/sera-02/komut/role')
+  const [topic, setTopic] = useState('sera/02/fan/set')
   const [op, setOp] = useState<'read' | 'write'>('write')
   const a = audit(s)
   const parsed = useMemo(() => parseAcl(acl), [acl])
   const dec = aclCheck(parsed.rules, user, client, topic, op)
-  const cases: Array<[string, string, string, 'read' | 'write']> = [['sera-01', 'sera-01', 'ev/sera-01/sicaklik', 'write'], ['sera-01', 'sera-01', 'ev/sera-02/komut/role', 'write'], ['pano', 'pano-web', 'ev/sera-02/nem', 'read'], ['pano', 'pano-web', 'ev/sera-02/komut/role', 'write'], ['admin', 'cli', 'ev/kapi-01/komut/ac', 'write']]
+  const cases: Array<[string, string, string, 'read' | 'write']> = [['sera-01', 'sera-01', 'sera/01/sicaklik', 'write'], ['sera-01', 'sera-01', 'sera/02/fan/set', 'write'], ['pano', 'pano-web', 'sera/02/fan/set', 'read'], ['pano', 'pano-web', 'sera/02/fan/set', 'write'], ['admin', 'cli', 'sera/03/kapi/ac', 'write'], ['sera-03', 'sera-03', 'clients/sera-03/durum', 'write']]
   return (
     <Body
       stage={
