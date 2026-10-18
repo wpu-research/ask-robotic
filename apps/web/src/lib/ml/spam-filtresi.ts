@@ -2,7 +2,7 @@
 // yarısı spam; aralarında zor olanlar var (iş yazışması gibi görünen spam, üye olunan mağazanın bülteni). Her kelimenin spam'de ve
 // normal postada kaç kez geçtiği sayılır, +1 eklenir, iki oranın logaritması kelimenin puanıdır; e-postanın puanı kelimelerin toplamı.
 // Kelimeler dizinle tutulur; Türkçe ve İngilizce sözlük aynı sırada olduğu için iki dilde de model ve sayılar birebir aynıdır.
-import { cap, fmt, rng, type Frame, type Lesson } from './core'
+import { cap, fmt, rng, type Frame, type Lesson, shifted } from './core'
 
 /** [Türkçe, İngilizce] kelime çiftleri; dört grup: spam, kişisel, bülten, nötr. */
 const SP: Array<[string, string]> = [['hemen', 'now'], ['tıkla', 'click'], ['ücretsiz', 'free'], ['kazan', 'win'], ['ödül', 'prize'], ['şimdi', 'instantly'], ['bedava', 'bonus'], ['tebrikler', 'congratulations'], ['onayla', 'confirm'], ['kredi', 'loan'], ['şans', 'lucky'], ['hediye', 'gift'], ['link', 'link'], ['kazandın', 'won'], ['acil', 'urgent']]
@@ -109,7 +109,10 @@ export const SPAM_FILTRESI: Lesson<SpamFrame> = {
   code: [
     ['import math'],
     ['from collections import Counter'],
-    ['from posta import egitim, test', '(kelimeler, spam_mi) çiftleri', '(words, is_spam) pairs'],
+    ['import numpy as np'],
+    ['D = np.genfromtxt(\'spam-epostalar.csv\', delimiter=\',\', names=True, dtype=None, encoding=\'utf-8\')', '400 e-posta', '400 e-mails'],
+    ['posta = [(m.split(), s == 1) for m, s in zip(D[\'metin\'], D[\'spam\'])]', '(kelimeler, spam_mi) çiftleri', '(words, is_spam) pairs'],
+    ['egitim, test = posta[:300], posta[300:]', 'ilk 300 eğitim, son 100 test', 'first 300 training, last 100 test'],
     ['sayac = {True: Counter(), False: Counter()}'],
     ['for kelimeler, spam in egitim:'],
     ['    sayac[spam].update(kelimeler)', 'her kelimeyi say', 'count every word'],
@@ -163,3 +166,5 @@ export const SPAM_FILTRESI: Lesson<SpamFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 2. satırdan sonra 3 satır eklendi: vurgulanan satırlar kayar.
+SPAM_FILTRESI.run = shifted(SPAM_FILTRESI.run, 2, 3)

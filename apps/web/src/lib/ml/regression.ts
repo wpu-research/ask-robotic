@@ -67,7 +67,7 @@ export const REGRESSION: Lesson<RegFrame> = {
   file: 'regresyon.py',
   code: [
     ['import numpy as np'],
-    ['from motor import pwm, speed', '40 ölçüm: PWM, cm/s', '40 measurements: PWM, cm/s'],
+    ['pwm, speed = np.genfromtxt(\'motor-pwm.csv\', delimiter=\',\', skip_header=1, unpack=True)', '40 ölçüm: PWM, cm/s', '40 measurements: PWM, cm/s'],
     ['x = (pwm - pwm.mean()) / pwm.std()', 'ölçekle', 'scale'],
     ['w, b, lr = 0.0, 0.0, 0.1', 'yatay çizgiyle başla', 'start with a flat line'],
     ['for epoch in range(60):'],

@@ -287,7 +287,9 @@ export const DEPO_SINIFLANDIRMA: ProjectDef<DepoView> = {
   file: 'depo_siniflandirma.py',
   code: [
     ['import numpy as np'],
-    ['from depo import X, y, X_yeni, y_yeni', 'özellikler: yuvarlaklık, ton, boy (cm)', 'features: roundness, hue, size (cm)'],
+    ['D = np.genfromtxt(\'depo-nesneleri.csv\', delimiter=\',\', names=True)', '120 etiketli, 200 yeni nesne', '120 labelled, 200 new objects'],
+    ['F, k, et = np.c_[D[\'yuvarlaklik\'], D[\'ton\'], D[\'boy\']], D[\'kutu\'].astype(int), D[\'grup\'] == 0', 'özellikler: yuvarlaklık, ton, boy (cm)', 'features: roundness, hue, size (cm)'],
+    ['X, y, X_yeni, y_yeni = F[et], k[et], F[~et], k[~et]'],
     ['mu, sd = X.mean(0), X.std(0)'],
     ['Z, Z_yeni = (X - mu) / sd, (X_yeni - mu) / sd', 'ölçekle: boy (cm) tonu ezmesin', 'scale: size (cm) must not swamp hue'],
     ['def knn(z, k=5):'],

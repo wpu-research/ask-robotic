@@ -272,7 +272,7 @@ export const NOKTA_BULUTU: ProjectDef<View> = {
   file: 'nokta_bulutu.py',
   code: [
     ['import numpy as np'],
-    ['from lidar import tarama', '(N, 3) nokta, metre: x ileri, y sol, z yukarı', '(N, 3) points, metres: x forward, y left, z up'],
+    ['tarama = np.genfromtxt(\'lidar-3b.csv\', delimiter=\',\', skip_header=1)[:, :3]', '(N, 3) nokta, metre: x ileri, y sol, z yukarı', '(N, 3) points, metres: x forward, y left, z up'],
     ['P = tarama[tarama[:, 2] > 0.08]', 'zemini at', 'drop the floor'],
     ['mu = P.mean(0)'],
     ['val, vec = np.linalg.eigh(np.cov((P - mu).T))', 'kovaryansın özvektörleri', 'eigenvectors of the covariance'],

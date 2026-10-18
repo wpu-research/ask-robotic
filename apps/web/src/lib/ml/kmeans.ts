@@ -85,7 +85,7 @@ export const KMEANS: Lesson<KMeansFrame> = {
   file: 'kmeans.py',
   code: [
     ['import numpy as np'],
-    ['from lidar import X', '600 nokta (x, y), metre', '600 points (x, y), metres'],
+    ['X = np.genfromtxt(\'lidar-2b.csv\', delimiter=\',\', skip_header=1)', '600 nokta (x, y), metre', '600 points (x, y), metres'],
     ['k = 3', 'bulunacak grup sayısı', 'number of groups'],
     ['rng = np.random.default_rng(17)'],
     ['best = np.inf', 'henüz deneme yok', 'no try yet'],

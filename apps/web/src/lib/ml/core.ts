@@ -88,3 +88,10 @@ export interface Lesson<F extends Frame = Frame> {
   params: ParamDef[]
   run: (p: Record<string, number>) => F[]
 }
+
+/**
+ * Kod listesinde `at` satırından sonra `k` satır eklendiyse, iz karelerinin vurguladığı satırları kaydırır. Veri setini CSV'den
+ * açan satırlar eklenince her dersin `run`'ı yeniden numaralanmasın diye kullanılır.
+ */
+export const shifted = <F extends Frame>(run: (p: Record<string, number>) => F[], at: number, k: number) =>
+  (p: Record<string, number>): F[] => run(p).map((f) => (f.line > at ? { ...f, line: f.line + k } : f))

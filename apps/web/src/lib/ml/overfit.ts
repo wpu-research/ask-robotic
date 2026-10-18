@@ -1,6 +1,6 @@
 // Ders 2: aşırı öğrenme ve doğrulama. Sharp IR mesafe sensörü: gerilim uzaklıkla ters orantılı (V ≈ 26/d). 15 eğitim ve 30
 // doğrulama ölçümüne 1'den 12'ye kadar dereceli polinom uydurulur; eğitim hatası hep düşer, doğrulama hatası önce düşer sonra yükselir.
-import { cap, fmt, gauss, mean, rng, type Frame, type Lesson } from './core'
+import { cap, fmt, gauss, mean, rng, type Frame, type Lesson, shifted } from './core'
 
 export interface OverfitFrame extends Frame {
   d: number[]; v: number[]; dt: number[]; vt: number[]
@@ -101,7 +101,8 @@ export const OVERFIT: Lesson<OverfitFrame> = {
   file: 'asiri_ogrenme.py',
   code: [
     ['import numpy as np'],
-    ['from sharp import d, v, d_val, v_val', '15 eğitim, 30 doğrulama ölçümü', '15 training, 30 validation measurements'],
+    ['D = np.genfromtxt(\'sharp-ir.csv\', delimiter=\',\', names=True)', '15 eğitim, 30 doğrulama ölçümü', '15 training, 30 validation measurements'],
+    ['d, v, d_val, v_val = [D[c][D[\'grup\'] == g] for g in (0, 1) for c in (\'uzaklik\', \'gerilim\')]', 'grup 0 eğitim, 1 doğrulama', 'group 0 training, 1 validation'],
     ['x, x_val = (d - 45) / 35, (d_val - 45) / 35', '[-1, 1] aralığına ölçekle', 'scale to [-1, 1]'],
     ['for deg in range(1, 13):'],
     ['    c = np.polyfit(x, v, deg)', 'en küçük kareler', 'least squares'],
@@ -116,7 +117,7 @@ export const OVERFIT: Lesson<OverfitFrame> = {
     ['    w -= .02 * (m / (1 - .9 ** t)) / (np.sqrt(s / (1 - .999 ** t)) + 1e-8)'],
     ['    val = ((A_val @ w - v_val) ** 2).mean()'],
     ['    if val < best[0]: best = (val, t, w.copy())', 'en iyi geçişi sakla', 'keep the best pass'],
-    ['w = best[2]', 'erken durdurma: en iyi geçişe dön', 'early stopping: go back to the best pass'],
+    ['w = best[2]; print("en iyi geçiş", best[1], best[0])', 'erken durdurma: en iyi geçişe dön', 'early stopping: go back to the best pass'],
   ],
   params: [{ key: 'deg', label: { tr: 'Son gösterilecek derece', en: 'Show up to degree' }, min: 1, max: 12, step: 1, value: 12 }],
   run({ deg: maxDeg = 12 }) {
@@ -163,3 +164,5 @@ export const OVERFIT: Lesson<OverfitFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
+OVERFIT.run = shifted(OVERFIT.run, 1, 1)

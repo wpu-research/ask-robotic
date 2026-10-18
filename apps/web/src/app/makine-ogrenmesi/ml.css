@@ -128,3 +128,61 @@
   .mp-3d { aspect-ratio: 4 / 3; }
   .mp-hint { display: none; }
 }
+
+/* Veri seti kutusu (ders ve proje sayfası) */
+.ml-data { padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: grid; gap: 12px; }
+.ml-data-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.ml-data-head h2 { font-size: 20px; margin: 0; }
+.ml-data-none { margin: 0; color: var(--muted); font-size: 14px; }
+.ml-data-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ml-data-item { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 12px; border-radius: calc(var(--radius) * .6); background: var(--bg-soft); }
+.ml-data-item > div { display: grid; gap: 2px; min-width: 0; }
+.ml-data-item b { font-weight: 600; }
+.ml-data-tag { margin-left: 8px; padding: 1px 8px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-size: 11px; font-weight: 600; }
+.ml-data-meta { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+.ml-data-meta code, .vs-meta code { font-size: 12px; }
+
+/* Tarayıcıda Python (Pyodide) */
+.py-run { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.py-run-sum { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; padding: 16px 20px; cursor: pointer; list-style: none; }
+.py-run-sum::-webkit-details-marker { display: none; }
+.py-run-sum b { font-size: 18px; font-weight: 600; }
+.py-run-sum b::before { content: '▸'; display: inline-block; width: 1.2em; color: var(--brand); transition: transform .15s; }
+.py-run[open] .py-run-sum b::before { transform: rotate(90deg); }
+.py-run-sum span { color: var(--muted); font-size: 13px; }
+.py-run-lead { margin: 0 20px 12px; color: var(--muted); font-size: 14px; }
+.py-run-box { margin: 0 20px; border-radius: var(--radius); overflow: hidden; background: #12161f; }
+.py-run-code { display: block; width: 100%; box-sizing: border-box; border: 0; resize: vertical; padding: 10px 14px; background: #12161f; color: #d8dee9; font: 12px/1.7 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; tab-size: 4; white-space: pre; overflow: auto; }
+.py-run-code:focus { outline: 2px solid #e0aa76; outline-offset: -2px; }
+.py-run-ctl { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 12px 20px; }
+.py-run-file { position: relative; display: inline-flex; align-items: center; padding: 6px 12px; border: 1px dashed var(--line); border-radius: var(--radius); font-size: 13px; color: var(--ink); cursor: pointer; }
+.py-run-file:hover { border-color: var(--brand); }
+.py-run-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.py-run-file:focus-within { outline: 2px solid var(--brand); outline-offset: 2px; }
+.py-run-status { margin-left: auto; color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.py-run-hint { margin: 0 20px 10px; font-size: 13px; color: var(--muted); overflow-wrap: anywhere; }
+.py-run-out-wrap { padding: 0 20px 20px; }
+.py-run-out-h { margin: 0 0 6px; font-size: 12px; color: var(--muted); font-weight: 600; }
+.py-run-out { margin: 0; min-height: 64px; max-height: 360px; overflow: auto; padding: 10px 14px; border-radius: calc(var(--radius) * .6); background: var(--bg-soft); border: 1px solid var(--line); font: 12px/1.6 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.py-run-stderr { color: var(--ml-c0); }
+.py-run-info { color: var(--muted); font-style: italic; }
+
+/* Veri setleri sayfası */
+.vs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 18px; }
+.vs-item { padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: grid; gap: 10px; scroll-margin-top: 88px; min-width: 0; }
+.vs-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.vs-head h2 { font-size: 20px; margin: 0 0 4px; }
+.vs-meta, .vs-desc, .vs-used, .vs-load { margin: 0; color: var(--muted); font-size: 14px; }
+.vs-load code { font-size: 12px; overflow-wrap: anywhere; }
+.vs-table-wrap { overflow-x: auto; }
+.vs-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.vs-table th, .vs-table td { border-bottom: 1px solid var(--line); padding: 6px 8px; text-align: left; vertical-align: top; }
+.vs-table thead th { color: var(--muted); font-weight: 600; font-size: 12px; }
+.vs-table tbody th { white-space: nowrap; font-weight: 500; }
+@media (max-width: 600px) {
+  .py-run-sum, .py-run-ctl { padding-left: 14px; padding-right: 14px; }
+  .py-run-lead, .py-run-box, .py-run-hint { margin-left: 14px; margin-right: 14px; }
+  .py-run-out-wrap { padding: 0 14px 14px; }
+  .py-run-status { margin-left: 0; width: 100%; }
+  .vs-item { padding: 16px; }
+}

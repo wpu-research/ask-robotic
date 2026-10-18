@@ -1,6 +1,6 @@
 // Ders 5: karar ağacı. Çizgi izleyen robotun iki sensörü (sol, sağ; 0–1023) ve uzman sürücünün seçtiği eylem (sola, düz, sağa).
 // Ağaç her düğümde Gini safsızlığını en çok azaltan tek eşiği seçer; bölmeler tuvalde eksenlere paralel çizgiler olarak görünür.
-import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt } from './core'
+import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
 
 export type Node = { leaf: true; c: number; n: number } | { leaf: false; f: 0 | 1; t: number; g: number; L: Node; R: Node; n: number }
 export interface Box { x0: number; x1: number; y0: number; y1: number }
@@ -144,8 +144,10 @@ export const TREE: Lesson<TreeFrame> = {
   file: 'karar_agaci.py',
   code: [
     ['import numpy as np'],
-    ['from cizgi import X, y, X_test, y_test', '[sol, sağ], 0 sola 1 düz 2 sağa', '[left, right], 0 left 1 straight 2 right'],
-    ['def gini(y): p = np.bincount(y, minlength=3) / len(y); return 1 - (p ** 2).sum()'],
+    ['D = np.genfromtxt(\'cizgi-izleyen.csv\', delimiter=\',\', names=True)', '160 eğitim, 80 test anı', '160 training, 80 test moments'],
+    ['A, e, tr = np.c_[D[\'sol\'], D[\'sag\']], D[\'eylem\'].astype(int), D[\'grup\'] == 0', '[sol, sağ], 0 sola 1 düz 2 sağa', '[left, right], 0 left 1 straight 2 right'],
+    ['X, y, X_test, y_test = A[tr], e[tr], A[~tr], e[~tr]'],
+    ['def gini(y): p = np.bincount(y, minlength=3) / max(len(y), 1); return 1 - (p ** 2).sum()'],
     ['def best_split(X, y):'],
     ['    best = (gini(y), None, None)'],
     ['    for f in range(2):', 'her sensör', 'every sensor'],
@@ -201,3 +203,5 @@ export const TREE: Lesson<TreeFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 2 satır eklendi: vurgulanan satırlar kayar.
+TREE.run = shifted(TREE.run, 1, 2)

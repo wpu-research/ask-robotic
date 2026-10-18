@@ -24,6 +24,7 @@ export default async function MakineOgrenmesi() {
         <p className="lead">{T.lead}</p>
         <div className="hero-actions">
           <Link className="btn btn-primary" href={`/makine-ogrenmesi/${LESSONS[0].slug}`}>{T.start}</Link>
+          <Link className="btn btn-outline" href="/makine-ogrenmesi/veri-setleri" data-testid="ml-veri-setleri">{T.dataSetsTitle}</Link>
           <span className="ml-count-all">{T.count.replace('{l}', String(LESSONS.length)).replace('{u}', String(SECTIONS.length)).replace('{p}', String(PROJECTS.length))}</span>
         </div>
         <nav className="ml-parts" aria-label={T.units}>

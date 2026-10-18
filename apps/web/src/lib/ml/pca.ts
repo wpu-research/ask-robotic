@@ -59,7 +59,7 @@ export const PCA: Lesson<PcaFrame> = {
   file: 'pca.py',
   code: [
     ['import numpy as np'],
-    ['from imu import A', '200 ölçüm: [ax, ay], m/s²', '200 readings: [ax, ay], m/s²'],
+    ['A = np.genfromtxt(\'imu.csv\', delimiter=\',\', skip_header=1)', '200 ölçüm: [ax, ay], m/s²', '200 readings: [ax, ay], m/s²'],
     ['Z = A - A.mean(0)', 'ortala', 'centre'],
     ['S = Z.T @ Z / len(Z)', 'kovaryans matrisi', 'covariance matrix'],
     ['vals, vecs = np.linalg.eigh(S)', 'özdeğerler, özvektörler', 'eigenvalues, eigenvectors'],

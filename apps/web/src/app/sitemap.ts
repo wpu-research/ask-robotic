@@ -11,7 +11,7 @@ const PAGES = [
   '/makine-ogrenmesi', '/laboratuvar', '/parcalar', '/muhendislik', '/muhendislik/robotik',
   '/muhendislik/drone', '/muhendislik/drone/parcalar', '/muhendislik/drone/simulasyon', '/muhendislik/drone/proje',
   ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
-  ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/oyunlar', '/ai-atolyesi',
+  ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
 ]
 

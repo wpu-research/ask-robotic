@@ -1,6 +1,6 @@
 // Ders 4: Gauss naive Bayes. Robotun önünde engel var mı? Ultrasonik mesafe (cm) ve IR yansıma (0–100) birlikte okunur; her sınıf
 // ve özellik için ortalama ve varyans, sınıfların oranı (önsel) öğrenilir; yeni ölçümde log olasılıkların toplamı karşılaştırılır.
-import { cap, fmt, gauss, mean, rng, variance, type Frame, type Lesson, type Pt } from './core'
+import { cap, fmt, gauss, mean, rng, variance, type Frame, type Lesson, type Pt, shifted } from './core'
 
 export interface NBModel { m: [number, number]; v: [number, number]; prior: number }
 export interface NBFrame extends Frame {
@@ -62,7 +62,9 @@ export const NAIVE_BAYES: Lesson<NBFrame> = {
   file: 'naive_bayes.py',
   code: [
     ['import numpy as np'],
-    ['from robot import X, y, Q', '[mesafe cm, IR], 1 = engel', '[distance cm, IR], 1 = obstacle'],
+    ['D = np.genfromtxt(\'engel-sensoru.csv\', delimiter=\',\', names=True)', '120 eğitim, 30 test ölçümü', '120 training, 30 test readings'],
+    ['A, e, tr = np.c_[D[\'mesafe\'], D[\'ir\']], D[\'engel\'].astype(int), D[\'grup\'] == 0', '[mesafe cm, IR], 1 = engel', '[distance cm, IR], 1 = obstacle'],
+    ['X, y, Q = A[tr], e[tr], A[~tr]'],
     ['def fit(X, y):'],
     ['    return [(X[y == c].mean(0), X[y == c].var(0), (y == c).mean()) for c in (0, 1)]', 'ortalama, varyans, önsel', 'mean, variance, prior'],
     ['def logp(x, m, v, prior):'],
@@ -97,3 +99,5 @@ export const NAIVE_BAYES: Lesson<NBFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 2 satır eklendi: vurgulanan satırlar kayar.
+NAIVE_BAYES.run = shifted(NAIVE_BAYES.run, 1, 2)

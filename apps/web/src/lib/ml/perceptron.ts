@@ -1,6 +1,6 @@
 // Ders 8: perceptron. Otonom araç her an mesafe (m) ve hız (m/s) okur, uzman sürücü fren yapmış mı yapmamış mı? 80 ölçüm,
 // doğrusal olarak ayrılabilir. Her yanlış sınıflanan noktada sınır o noktaya doğru çekilir; bir dönem hatasız geçince durur.
-import { cap, fmt, rng, type Frame, type Lesson, type Pt } from './core'
+import { cap, fmt, rng, type Frame, type Lesson, type Pt, shifted } from './core'
 
 export interface PerFrame extends Frame {
   X: Pt[]
@@ -49,7 +49,8 @@ export const PERCEPTRON: Lesson<PerFrame> = {
   file: 'perceptron.py',
   code: [
     ['import numpy as np'],
-    ['from surus import X, y', '[mesafe m, hız m/s], +1 fren, −1 devam', '[distance m, speed m/s], +1 brake, −1 go'],
+    ['D = np.genfromtxt(\'surus-fren.csv\', delimiter=\',\', names=True)'],
+    ['X, y = np.c_[D[\'mesafe\'], D[\'hiz\']], 2 * D[\'fren\'] - 1', '[mesafe m, hız m/s], +1 fren, −1 devam', '[distance m, speed m/s], +1 brake, −1 go'],
     ['w, b = np.zeros(2), 0.0'],
     ['for epoch in range(20):'],
     ['    mistakes = 0'],
@@ -92,3 +93,5 @@ export const PERCEPTRON: Lesson<PerFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
+PERCEPTRON.run = shifted(PERCEPTRON.run, 1, 1)

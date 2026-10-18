@@ -1,6 +1,6 @@
 // Ders 9: küçük sinir ağı. Robot arenadaki konumunun pistte mi dışında mı olduğunu öğrenir: iki iç içe hilal (doğrusal olarak
 // ayrılamaz). 2 → H (tanh) → 1 (sigmoid), tüm veriyle gradyan inişi ve geri yayılım. Perceptronun çizemediği eğri sınırı çizer.
-import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt } from './core'
+import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
 
 export interface Net { W1: number[][]; b1: number[]; W2: number[]; b2: number }
 export interface MlpFrame extends Frame {
@@ -97,7 +97,8 @@ export const MLP: Lesson<MlpFrame> = {
   file: 'sinir_agi.py',
   code: [
     ['import numpy as np'],
-    ['from pist import X, y', '200 konum, y = 1 pistte', '200 positions, y = 1 on track'],
+    ['D = np.genfromtxt(\'pist-konum.csv\', delimiter=\',\', names=True)'],
+    ['X, y = np.c_[D[\'x\'], D[\'y\']], D[\'pistte\']', '200 konum, y = 1 pistte', '200 positions, y = 1 on track'],
     ['rng, lr, H = np.random.default_rng(0), 0.5, 8', 'H gizli nöron', 'H hidden neurons'],
     ['W1, b1 = rng.normal(size=(2, H)), np.zeros(H)'],
     ['W2, b2 = rng.normal(size=H), 0.0'],
@@ -135,3 +136,5 @@ export const MLP: Lesson<MlpFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
+MLP.run = shifted(MLP.run, 1, 1)

@@ -10,6 +10,9 @@ import type { ProjectDef } from '@/lib/ml/projeler/core'
 import type { Lang } from '@/lib/ml/core'
 import { MlPlayer, Py } from '@/components/ml/ml-player'
 import { ProjectPlayer } from '@/components/ml/projeler/project-player'
+import { DataBlock } from '@/components/ml/data-block'
+import { PyRunner } from '@/components/ml/py-runner'
+import { datasetsFor } from '@/lib/ml/veri'
 import { Icon } from '@/components/shell/icons'
 import '../ml.css'
 
@@ -52,6 +55,8 @@ export default async function MlDers({ params }: { params: Promise<{ slug: strin
       <p className="ml-story"><b>{T.data}.</b> {l.story[lang]}</p>
       <MlPlayer slug={l.slug} />
       <p className="ml-note muted">{T.note}</p>
+      <DataBlock slug={l.slug} lang={lang} />
+      <PyRunner code={l.code} file={l.file} datasets={datasetsFor(l.slug).map((d) => ({ file: d.file, title: d.title }))} />
       <div className="ml-explain">
         <section aria-labelledby="ml-how">
           <h2 id="ml-how">{T.how2}</h2>
@@ -130,6 +135,8 @@ function ProjeSayfasi({ p, lang }: { p: ProjectDef; lang: Lang }) {
           </ol>
         </div>
       </section>
+      <DataBlock slug={p.slug} lang={lang} />
+      <PyRunner code={p.code} file={p.file} datasets={datasetsFor(p.slug).map((d) => ({ file: d.file, title: d.title }))} />
       <nav className="ml-pager" aria-label={T.projects}>
         {prev ? <Link href={`/makine-ogrenmesi/${prev.slug}`} className="btn btn-outline">← {prev.title[lang]}</Link> : <Link href={`/makine-ogrenmesi/${lastLesson.slug}`} className="btn btn-outline">← {lastLesson.title[lang]}</Link>}
         {next ? <Link href={`/makine-ogrenmesi/${next.slug}`} className="btn btn-primary">{next.title[lang]} →</Link> : <Link href="/makine-ogrenmesi" className="btn btn-primary">{T.all} →</Link>}

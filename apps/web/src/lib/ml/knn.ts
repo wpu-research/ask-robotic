@@ -1,6 +1,6 @@
 // Ders 3: k en yakın komşu. Renk sensörü her nesne için iki sayı verir: ton ve parlaklık. 90 etiketli ölçüm (0 kırmızı top, 1 mavi
 // silindir, 2 sarı küp); yeni bir ölçüm, en yakın k ölçümün oyuyla sınıflanır. Sonunda 45 saklı test ölçümünde doğruluk.
-import { cap, d2, gauss, rng, type Frame, type Lesson, type Pt } from './core'
+import { cap, d2, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
 
 export interface KnnFrame extends Frame {
   X: Pt[]
@@ -59,7 +59,10 @@ export const KNN: Lesson<KnnFrame> = {
   file: 'knn.py',
   code: [
     ['import numpy as np'],
-    ['from renk import X, y, Q', '90 ölçüm, etiketleri, yeni ölçümler', '90 readings, labels, new readings'],
+    ['D = np.genfromtxt(\'renk-sensoru.csv\', delimiter=\',\', names=True)', '90 etiketli, 45 test ölçümü', '90 labelled, 45 test readings'],
+    ['A, s, tr = np.c_[D[\'ton\'], D[\'parlaklik\']], D[\'sinif\'].astype(int), D[\'grup\'] == 0', '[ton, parlaklık], sınıf', '[hue, brightness], class'],
+    ['X, y, T, y_test = A[tr], s[tr], A[~tr], s[~tr]'],
+    ['Q = T[:5]', 'ilk beş yeni ölçüm', 'the first five new readings'],
     ['k = 5', 'komşu sayısı', 'number of neighbours'],
     ['for q in Q:'],
     ['    d = ((X - q) ** 2).sum(1)', 'her ölçüme uzaklık²', 'squared distance to every reading'],
@@ -95,3 +98,5 @@ export const KNN: Lesson<KnnFrame> = {
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 3 satır eklendi: vurgulanan satırlar kayar.
+KNN.run = shifted(KNN.run, 1, 3)
