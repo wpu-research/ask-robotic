@@ -4,6 +4,7 @@ import { glyphFrame, scrollDuration, scrollFrame } from './font'
 import type { ButtonEvent, ButtonName, DeviceEvent, FrameEntry, GestureName, InputKey, PinName, RadioMessage } from './types'
 import { PINS } from './types'
 import type { DriveBase } from './robot'
+import type { DonusenBot } from './donusen'
 
 export const LONG_PRESS_MS = 1000
 export const SHAKE_MS = 500
@@ -65,6 +66,8 @@ export class Device {
 
   /** Kart bir robot gövdesine takılıysa (Robot Atölyesi); zamanı kartla birlikte ilerler. */
   robot: DriveBase | null = null
+  /** Kart Dönüşen Robot'a (tek beyin, beş model) takılıysa; zamanı kartla birlikte ilerler. */
+  donusen: DonusenBot | null = null
 
   // ---- Günlük ----
   log: DeviceEvent[] = []
@@ -217,6 +220,7 @@ export class Device {
   tick(now: number) {
     this.now = now
     this.robot?.advanceTo(now)
+    this.donusen?.advanceTo(now)
     for (const b of ['A', 'B', 'AB'] as const) {
       const held = b === 'AB' ? this.abActive : this.btn[b] && !this.abActive
       if (held && !this.longFired[b] && now - this.downAt[b] >= LONG_PRESS_MS) { this.longFired[b] = true; this.emit(`button:${b}:long`) }

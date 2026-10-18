@@ -52,8 +52,8 @@ describe('blok tanımları', () => {
   it('araç kutusu: kategoriler sıralı, süzme çalışır, boş kategori yok', () => {
     const all = toolboxCategories()
     expect(all.map((c) => c.label)).toEqual(expect.arrayContaining(['Temel', 'Giriş', 'LED', 'Müzik', 'Radyo', 'Döngü', 'Mantık', 'Değişken', 'Matematik', 'Liste', 'Fonksiyon', 'Pinler']))
-    expect(all.length).toBe(CATEGORIES.length - 1)
-    expect(all.some((c) => c.key === 'robot')).toBe(false)
+    expect(all.length).toBe(CATEGORIES.length - 2)
+    expect(all.some((c) => c.key === 'robot' || c.key === 'donusen')).toBe(false)
     const small = toolboxCategories(['mk_on_start', 'mk_show_icon'])
     expect(small.map((c) => c.key)).toEqual(['basic'])
     expect(small[0].entries.map((e) => e.type)).toEqual(['mk_on_start', 'mk_show_icon'])

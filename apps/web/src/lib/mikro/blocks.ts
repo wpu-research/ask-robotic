@@ -4,14 +4,16 @@
 import { ARROWS, ICONS } from './icons'
 import { BEATS, MELODIES, NOTES } from './music'
 import type { RobotProfile, RobotSensor } from './robot'
+import type { DonusenModelId } from './donusen'
 import { BLOCK_EN, CATEGORY_EN, TEXT_DEFAULT_EN, optionEn, type MikroLocale } from './en'
 
-export type CatKey = 'robot' | 'basic' | 'input' | 'led' | 'music' | 'radio' | 'loops' | 'logic' | 'vars' | 'math' | 'text' | 'list' | 'func' | 'pins'
+export type CatKey = 'robot' | 'donusen' | 'basic' | 'input' | 'led' | 'music' | 'radio' | 'loops' | 'logic' | 'vars' | 'math' | 'text' | 'list' | 'func' | 'pins'
 
 export interface Category { key: CatKey; label: string; color: string; icon: string; custom?: 'VARIABLE' | 'PROCEDURE' }
 
 export const CATEGORIES: Category[] = [
   { key: 'robot', label: 'Robot', color: '#0d9488', icon: '🤖' },
+  { key: 'donusen', label: 'Dönüşen', color: '#c2410c', icon: '🦾' },
   { key: 'basic', label: 'Temel', color: '#3b82f6', icon: '🏠' },
   { key: 'input', label: 'Giriş', color: '#f43f5e', icon: '👆' },
   { key: 'led', label: 'LED', color: '#8b5cf6', icon: '💡' },
@@ -86,6 +88,8 @@ export interface Spec {
   hidden?: boolean
   /** Robot bloğu: gövdede bu sensör yoksa araç kutusunda gösterilmez. */
   sensor?: RobotSensor
+  /** Dönüşen Robot bloğu: yalnız bu modellerde çalışır ve araç kutusunda görünür. */
+  models?: DonusenModelId[]
 }
 
 const hat = (type: string, cat: CatKey, label: string, call: string, args: Arg[] = [], tip?: string): Spec => ({ type, cat, kind: 'hat', label, args, call, tip })
@@ -117,6 +121,18 @@ export const SPECS: Spec[] = [
   st('rb_grip', 'robot', 'kıskacı {ACTION}', 'robot.grip', [drop('ACTION', [['kapat', 'close'], ['aç', 'open']], 'close')], { sensor: 'gripper', tip: 'Kapatınca önündeki küpü tutar; açınca bırakır.' }),
   bl('rb_holding', 'robot', 'kıskaç küp tutuyor mu?', 'robot.holding', [], { sensor: 'gripper' }),
   bl('rb_held_is', 'robot', 'tutulan küp {C} mi?', 'robot.heldIs', [drop('C', CUBE_OPTS, 'kirmizi')], { sensor: 'gripper', tip: 'Kıskaçtaki renk algılayıcı küpün rengini okur.' }),
+  st('dn_walk', 'donusen', '{DIR} {STEPS} adım yürü', 'bot.walk', [drop('DIR', [['ileri', 'forward'], ['geri', 'back']], 'forward'), num('STEPS', 2)], { models: ['insansi'], tip: 'Her adım 10 cm.' }),
+  st('dn_wave', 'donusen', '{ARM} kolunu salla', 'bot.wave', [drop('ARM', [['sağ', 'right'], ['sol', 'left'], ['iki', 'both']], 'right')], { models: ['insansi'] }),
+  st('dn_turn_around', 'donusen', 'arkanı dön', 'bot.turnAround', [], { models: ['insansi', 'arac'] }),
+  st('dn_say', 'donusen', '{TEXT} de', 'bot.say', [txt('TEXT', 'Merhaba!')], { models: ['insansi', 'kedi', 'arac', 'muzik', 'vinc'], tip: 'Yazı bir konuşma balonunda görünür.' }),
+  st('dn_drive', 'donusen', '{DIR} {CM} cm sür', 'bot.drive', [drop('DIR', [['ileri', 'forward'], ['geri', 'back']], 'forward'), num('CM', 20)], { models: ['arac'] }),
+  st('dn_pose', 'donusen', 'kedi {POSE}', 'bot.pose', [drop('POSE', [['otursun', 'otur'], ['kalksın', 'kalk']], 'otur')], { models: ['kedi'] }),
+  st('dn_tail', 'donusen', 'kuyruğunu {N} kez salla', 'bot.wagTail', [num('N', 2)], { models: ['kedi'] }),
+  st('dn_strum', 'donusen', 'teli çal', 'bot.strum', [], { models: ['muzik'], tip: 'Nota elin uzaklığına göre: el yaklaştıkça ses incelir.' }),
+  st('dn_boom', 'donusen', 'kolu {DEG} dereceye çevir', 'bot.turnArm', [num('DEG', 90)], { models: ['vinc'], tip: '0 ile 180 derece arası.' }),
+  st('dn_hook', 'donusen', 'kancayı {UPDOWN}', 'bot.hook', [drop('UPDOWN', [['indir', 'down'], ['kaldır', 'up']], 'down')], { models: ['vinc'] }),
+  st('dn_grab', 'donusen', 'yükü {ACTION}', 'bot.load', [drop('ACTION', [['tut', 'grab'], ['bırak', 'release']], 'grab')], { models: ['vinc'], tip: 'Kanca yerdeyken altındaki yükü tutar.' }),
+  val('dn_distance', 'donusen', 'mesafe (cm)', 'bot.distance', [], { models: ['insansi', 'kedi', 'arac', 'muzik'], tip: 'İnsansı robotta ve araçta öndeki duvara, kedide ve çalgıda elinin uzaklığı.' }),
   st('rb_lights', 'robot', 'ışıkları {COLOR} yap', 'robot.setLights', [drop('COLOR', LIGHT_OPTS, 'yesil')]),
 
   // ---- Temel ----
@@ -322,19 +338,27 @@ export interface ToolboxCat { key: CatKey; label: string; color: string; custom?
 export const specFitsRobot = (s: Spec, robot: RobotProfile | null | undefined): boolean =>
   s.cat !== 'robot' || (!!robot && (!s.sensor || robot.sensors.includes(s.sensor)))
 
-/** `allowed` verilirse yalnız o türler; boş kategori gösterilmez. Robot kategorisi yalnız `robot` verilince ve gövdenin sensörlerine göre. */
-export function toolboxCategories(allowed?: readonly string[] | null, robot?: RobotProfile | null, locale: MikroLocale = 'tr'): ToolboxCat[] {
+/** Blok bu Dönüşen Robot modelinde kullanılabilir mi (Dönüşen bloğu değilse her zaman). */
+export const specFitsModel = (s: Spec, model: DonusenModelId | null | undefined): boolean =>
+  s.cat !== 'donusen' || (!!model && (!s.models || s.models.includes(model)))
+
+/**
+ * `allowed` verilirse yalnız o türler; boş kategori gösterilmez. Robot kategorisi yalnız `robot` verilince ve gövdenin sensörlerine göre;
+ * Dönüşen kategorisi yalnız `model` verilince ve o modelin bloklarıyla.
+ */
+export function toolboxCategories(allowed?: readonly string[] | null, robot?: RobotProfile | null, locale: MikroLocale = 'tr', model?: DonusenModelId | null): ToolboxCat[] {
   const ok = allowed ? new Set(allowed) : null
   const out: ToolboxCat[] = []
   for (const c of CATEGORIES) {
     if (c.key === 'robot' && !robot) continue
+    if (c.key === 'donusen' && !model) continue
     if (c.custom) {
       const types = c.custom === 'VARIABLE' ? VARIABLE_TYPES : PROCEDURE_TYPES
       if (!ok || types.some((t) => ok.has(t))) out.push({ key: c.key, label: categoryLabel(c, locale), color: c.color, custom: c.custom, entries: [] })
       continue
     }
     const entries: Record<string, unknown>[] = []
-    for (const s of SPECS) if (s.cat === c.key && !s.hidden && specFitsRobot(s, robot) && (!ok || ok.has(s.type))) entries.push(flyoutEntry(s, locale))
+    for (const s of SPECS) if (s.cat === c.key && !s.hidden && specFitsRobot(s, robot) && specFitsModel(s, model) && (!ok || ok.has(s.type))) entries.push(flyoutEntry(s, locale))
     for (const b of BUILTIN_ENTRIES[c.key] ?? []) {
       if (ok && !ok.has(b.type)) continue
       entries.push({ kind: 'block', type: b.type, ...(b.inputs ? { inputs: b.inputs } : {}), ...(b.fields ? { fields: b.fields } : {}), ...(b.extraState ? { extraState: b.extraState } : {}) })
@@ -344,10 +368,10 @@ export function toolboxCategories(allowed?: readonly string[] | null, robot?: Ro
   return out
 }
 
-export function toolboxJson(allowed?: readonly string[] | null, robot?: RobotProfile | null, locale: MikroLocale = 'tr') {
+export function toolboxJson(allowed?: readonly string[] | null, robot?: RobotProfile | null, locale: MikroLocale = 'tr', model?: DonusenModelId | null) {
   return {
     kind: 'categoryToolbox',
-    contents: toolboxCategories(allowed, robot, locale).map((c) => ({
+    contents: toolboxCategories(allowed, robot, locale, model).map((c) => ({
       kind: 'category',
       name: c.label,
       categorystyle: `mk_cat_${c.key}`,
