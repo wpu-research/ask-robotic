@@ -83,7 +83,8 @@ export function runRag(index: readonly RagChunk[], query: string, p: RagParams, 
     if (best && best.o > 0 && !picks.some((x) => x.s === best.s)) picks.push(best)
   }
   picks.sort((a, b) => b.o - a.o)
-  const top = picks.slice(0, 2)
+  // ikinci cümle yalnız en iyisi kadar ilgiliyse eklenir (tek ortak kelimeyle gelen alakasız cümleyi ele)
+  const top = picks.slice(0, 2).filter((x, i) => i === 0 || x.o >= picks[0].o * 0.6)
   if (top.length === 0) return { chunks: index.length, retrieved, reranked, used, answered: false, answer: T[lang].none, sources: [], prompt }
   const answer = top.map((x) => `${x.s.replace(/\s+$/, '')} [${x.id}]`).join(' ')
   return { chunks: index.length, retrieved, reranked, used, answered: true, answer, sources: [...new Set(top.map((x) => x.id))], prompt }

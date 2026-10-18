@@ -106,7 +106,7 @@ const embedSim: Mount = (stage, side, cfg, lang) => {
   const sents = notes.flatMap((n, ni) => sentencesOf(n.text).map((s) => ({ s, ni, title: n.title })))
   const c = controls(side)
   const feat = select(c, t('Özellikler', 'Features'), [['ikisi', t('Kelime + harf üçlüsü', 'Words + trigrams')], ['kelime', t('Yalnız kelime gövdesi', 'Word stems only')], ['uclu', t('Yalnız harf üçlüsü', 'Character trigrams only')]], cfg.features ?? 'ikisi', () => draw())
-  const q = textInput(c, t('Soru', 'Question'), t('Batarya kaç volta kadar boşaltılabilir?', 'How far can a battery be discharged?'), () => draw())
+  const q = textInput(c, t('Soru', 'Question'), t('LiPo hücre gerilimi en az kaç volt olmalı?', 'What voltage must a LiPo cell not go below?'), () => draw())
   const legend = el('ul', { class: 'lm-legend' })
   c.append(legend)
   const cv = el('canvas', { class: 'sim-canvas', role: 'img', 'aria-label': t('Gömme vektörlerinin 2B izdüşümü', '2D projection of the embedding vectors') })
@@ -191,7 +191,7 @@ const schemaSim: Mount = (stage, side, cfg, lang) => {
     const head = ex.trimmed ? `${t('Not: JSON çevresindeki metin atıldı.', 'Note: the text around the JSON was dropped.')}\n` : ''
     out.textContent = errs.length === 0
       ? `${head}✓ ${t('Şemaya uyuyor. Uygulama bu nesneye güvenebilir.', 'Matches the schema. The application can trust this object.')}`
-      : `${head}✗ ${errs.length} ${t('hata', 'errors')}:\n${errs.map((e) => `  ${e.path}: ${e.code} (${e.detail})`).join('\n')}\n\n${t('Onarım mesajı (modele geri gider)', 'Repair message (goes back to the model)')}:\n${repairMessage(errs, undefined, lang)}`
+      : `${head}✗ ${t('Hata', 'Errors')}: ${errs.length}\n${errs.map((e) => `  ${e.path}: ${e.code} (${e.detail})`).join('\n')}\n\n${t('Onarım mesajı (modele geri gider)', 'Repair message (goes back to the model)')}:\n${repairMessage(errs, undefined, lang)}`
   }
   draw()
   return () => {}
@@ -367,7 +367,7 @@ const costSim: Mount = (stage, side, _cfg, lang) => {
     const r = costReport({ requestsPerDay: rpd.v, inputTokens: inp.v, outputTokens: outp.v, cachedShare: cs.v, hitRate: hit.v, batchShare: bs.v, prices })
     const cold = latency({ inputTokens: inp.v, outputTokens: outp.v, cachedShare: cs.v, hitRate: 0 })
     const warm = latency({ inputTokens: inp.v, outputTokens: outp.v, cachedShare: cs.v, hitRate: 1 })
-    const usd = (v: number) => `$${v < 1 ? v.toFixed(5) : int(v)}`
+    const usd = (v: number) => (v === 0 ? '$0' : `$${v < 1 ? v.toFixed(5) : int(v)}`)
     bars.replaceChildren(
       bar(t('Aylık, önbelleksiz', 'Monthly, no cache'), r.plainPerMonth, r.plainPerMonth, 'b0', usd(r.plainPerMonth)),
       bar(t('Aylık, seçtiğin ayarla', 'Monthly, your settings'), r.perMonth, r.plainPerMonth, 'b1', usd(r.perMonth)),
