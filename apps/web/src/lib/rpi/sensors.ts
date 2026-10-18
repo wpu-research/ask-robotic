@@ -59,7 +59,8 @@ export function i2cBus(sel: Array<{ id: I2cId; alt: boolean }>): { addrs: number
   const map = new Map<number, I2cId[]>()
   for (const s of sel) {
     const dev = I2C_DEVICES.find((d) => d.id === s.id)!
-    const a = dev.addrs[s.alt && dev.addrs.length > 1 ? 1 : 0]
+    const addrs: readonly number[] = dev.addrs
+    const a = addrs[s.alt && addrs.length > 1 ? 1 : 0]
     map.set(a, [...(map.get(a) ?? []), s.id])
   }
   return {

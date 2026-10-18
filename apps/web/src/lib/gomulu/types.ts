@@ -72,3 +72,23 @@ export const D = (afterUnit: number, tr: [string, string], en: [string, string])
 type Src = (c: (tr: string, en: string) => string) => string
 /** Kod bloğu: kod aynı, yalnız yorumlar dile göre c(tr, en). Satır sayısı iki dilde eşit kalır (test eder). */
 export const block = (lang: Lang, tr: string, en: string, src: Src): CodeBlock => ({ title: lang === 'en' ? en : tr, src: src((a, b) => (lang === 'en' ? b : a)) })
+
+export interface SimText { title: string; desc: string }
+export type SimMeta<S extends string> = Record<S, { tr: SimText; en: SimText }>
+
+/** Bir kursun tamamı: sayfalar (components/gomulu) yalnız bu nesneyi okur. */
+export interface CourseDef<S extends string> {
+  /** Rota: /muhendislik/<slug>. */
+  slug: string
+  /** Simülasyon bileşen kümesi (components/gomulu/sims). */
+  kit: 'rpi' | 'stm32'
+  /** Kurs kartındaki kısa kod. */
+  code: string
+  text: Record<Lang, CourseText>
+  units: readonly CourseUnit<S>[]
+  sims: SimMeta<S>
+  capstone: Capstone
+  /** Bitirme projesinin başlangıç kodu. */
+  starter: (lang: Lang) => CodeBlock[]
+  related: Array<{ href: string; tr: string; en: string }>
+}

@@ -426,7 +426,14 @@ export function i2cdetectLines(addrs: number[]): string[] {
 /** "Kendin dene" görevleri: durum üzerinde doğrulanır. */
 export interface TermTask { id: string; tr: string; en: string; done: (st: TermState) => boolean }
 const isExec = (st: TermState, path: string) => { const n = getNode(st, path); return !!n && (n.mode & 0o100) !== 0 }
-export const TERM_TASKS: Record<'linux' | 'systemd', TermTask[]> = {
+const ran = (st: TermState, re: RegExp) => st.history.some((h) => re.test(h))
+export const TERM_TASKS: Record<'linux' | 'python' | 'systemd', TermTask[]> = {
+  python: [
+    { id: 'ver', tr: 'Python sürümünü öğren (python3 --version)', en: 'Check the Python version (python3 --version)', done: (st) => ran(st, /^python3? (--version|-V)$/) },
+    { id: 'run', tr: 'blink.py betiğini çalıştır', en: 'Run the blink.py script', done: (st) => ran(st, /^python3? (\.\/)?blink\.py$/) },
+    { id: 'edit', tr: 'nano ile blink.py\'deki bekleme süresini değiştir ve kaydet', en: 'Change the delay in blink.py with nano and save', done: (st) => { const n = getNode(st, `${HOME}/blink.py`); return n?.type === 'file' && n.content !== BLINK_PY && /sleep\(/.test(n.content) } },
+    { id: 'new', tr: 'Yeni bir hello.py yaz (print içeren) ve çalıştır', en: 'Write a new hello.py (with a print) and run it', done: (st) => { const n = getNode(st, `${HOME}/hello.py`); return n?.type === 'file' && /print\(/.test(n.content) && ran(st, /^python3? .*hello\.py$/) } },
+  ],
   linux: [
     { id: 'dir', tr: '~/robot/logs klasörünü oluştur (mkdir)', en: 'Create the ~/robot/logs folder (mkdir)', done: (st) => getNode(st, `${HOME}/robot/logs`)?.type === 'dir' },
     { id: 'note', tr: 'echo ile ~/robot/logs/ilk.txt dosyasına bir satır yaz', en: 'Write a line to ~/robot/logs/first.txt with echo', done: (st) => { const n = getNode(st, `${HOME}/robot/logs`); return n?.type === 'dir' && Object.values(n.children).some((c) => c.type === 'file' && c.content.trim().length > 0) } },
