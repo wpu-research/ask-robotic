@@ -3,7 +3,7 @@ import { MikroError, evNum, type Ctx, type ExprHandler, type StmtHandler } from 
 import { FLOOR_COLORS, type DriveBase, type FloorColor, type LightColor, type RobotSensor } from './robot'
 import type { PBlock } from './types'
 
-const SENSOR_NAME: Record<RobotSensor, string> = { distance: 'mesafe sensörü', color: 'renk sensörü', force: 'tampon (kuvvet) sensörü', line: 'çizgi sensörü', gripper: 'kıskaç' }
+const SENSOR_NAME: Record<RobotSensor, string> = { distance: 'mesafe sensörü', color: 'renk sensörü', force: 'tampon (kuvvet) sensörü', line: 'çizgi sensörü', gripper: 'kıskaç', light: 'ışık sensörü', gyro: 'jiroskop' }
 /** Kıskacın açılıp kapanma süresi (ms). */
 const GRIP_MS = 300
 /** Hareket bloklarında robotun durumu bu aralıkla yoklanır (ms). */
@@ -63,7 +63,7 @@ const exprs: Record<string, ExprHandler> = {
   rb_distance: sense((b, c) => robotOf(b, c, 'distance').distanceCm),
   rb_color_is: sense((b, c) => robotOf(b, c, 'color').color === (f(b, 'C') as FloorColor)),
   rb_color: sense((b, c) => FLOOR_COLORS[robotOf(b, c, 'color').color].label),
-  rb_reflect: sense((b, c) => robotOf(b, c, 'color').reflect),
+  rb_reflect: sense((b, c) => { const r = robotOf(b, c); return robotOf(b, c, r.has('light') ? 'light' : 'color').reflect }),
   rb_line: sense((b, c) => robotOf(b, c, 'line').lineOn(f(b, 'SIDE') === 'right' ? 'right' : 'left')),
   rb_pressed: sense((b, c) => robotOf(b, c, 'force').pressed),
   rb_motor_deg: sense((b, c) => { const r = robotOf(b, c); return f(b, 'SIDE') === 'right' ? r.motorDegR : r.motorDegL }),

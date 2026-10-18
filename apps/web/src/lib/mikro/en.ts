@@ -205,9 +205,9 @@ export const PROFILE_EN: Record<RobotProfileId, { title: string; summary: string
   kiskac: { title: 'Gripper Robot', summary: 'A two-motor robot with a two-finger gripper in front: distance sensor in front, color sensor underneath; the gripper grabs, carries and senses the color of a cube.' },
 }
 const SENSOR_EN: Record<string, string> = {
-  'mesafe sensörü': 'distance sensor', 'renk sensörü': 'color sensor', 'tampon (kuvvet) sensörü': 'bumper (force) sensor', 'çizgi sensörü': 'line sensor', 'kıskaç': 'gripper',
+  'mesafe sensörü': 'distance sensor', 'renk sensörü': 'color sensor', 'tampon (kuvvet) sensörü': 'bumper (force) sensor', 'çizgi sensörü': 'line sensor', 'kıskaç': 'gripper', 'ışık sensörü': 'light sensor', 'jiroskop': 'gyro',
 }
-export const SENSOR_LABEL_EN: Record<RobotSensor, string> = { distance: 'distance sensor', color: 'color sensor', force: 'bumper sensor', line: 'line sensor', gripper: 'gripper' }
+export const SENSOR_LABEL_EN: Record<RobotSensor, string> = { distance: 'distance sensor', color: 'color sensor', force: 'bumper sensor', line: 'line sensor', gripper: 'gripper', light: 'light sensor', gyro: 'gyro' }
 const PROFILE_TITLE_EN: Record<string, string> = { 'Blok Robotu': 'Block Robot', 'Mini Gezgin': 'Mini Rover', 'Kıskaçlı Robot': 'Gripper Robot' }
 
 const MODEL_TITLE_EN: Record<string, string> = Object.fromEntries(DONUSEN_IDS.map((id) => [DONUSEN_MODELS[id].title, DONUSEN_MODELS[id].en.title]))

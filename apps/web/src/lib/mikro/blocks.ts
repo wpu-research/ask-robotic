@@ -87,7 +87,8 @@ export interface Spec {
   /** Araç kutusunda gösterilmez (yalnız programlarda var olabilir). */
   hidden?: boolean
   /** Robot bloğu: gövdede bu sensör yoksa araç kutusunda gösterilmez. */
-  sensor?: RobotSensor
+  /** Gereken sensör; dizi verilirse herhangi biri yeter. */
+  sensor?: RobotSensor | readonly RobotSensor[]
   /** Dönüşen Robot bloğu: yalnız bu modellerde çalışır ve araç kutusunda görünür. */
   models?: DonusenModelId[]
 }
@@ -112,7 +113,7 @@ export const SPECS: Spec[] = [
   val('rb_distance', 'robot', 'mesafe (cm)', 'robot.distance', [], { sensor: 'distance', tip: 'Önündeki engele uzaklık; en çok 250 cm.' }),
   bl('rb_color_is', 'robot', 'zemin rengi {C} mi?', 'robot.isColor', [drop('C', FLOOR_OPTS, 'kirmizi')], { sensor: 'color' }),
   val('rb_color', 'robot', 'zemin rengi', 'robot.color', [], { sensor: 'color' }),
-  val('rb_reflect', 'robot', 'yansıyan ışık (%)', 'robot.reflectedLight', [], { sensor: 'color', tip: 'Beyaz zeminde yüksek, siyah çizgide düşüktür.' }),
+  val('rb_reflect', 'robot', 'yansıyan ışık (%)', 'robot.reflectedLight', [], { sensor: ['color', 'light'], tip: 'Beyaz zeminde yüksek, siyah çizgide düşüktür.' }),
   bl('rb_line', 'robot', '{SIDE} çizgi sensörü çizgide mi?', 'robot.onLine', [drop('SIDE', SIDE_OPTS, 'left')], { sensor: 'line' }),
   bl('rb_pressed', 'robot', 'tampona basılı mı?', 'robot.pressed', [], { sensor: 'force' }),
   val('rb_motor_deg', 'robot', '{SIDE} motor açısı (°)', 'robot.motorAngle', [drop('SIDE', SIDE_OPTS, 'left')], { tip: 'Tekerleğin döndüğü toplam açı.' }),
@@ -336,7 +337,7 @@ export interface ToolboxCat { key: CatKey; label: string; color: string; custom?
 
 /** Blok bu gövdede kullanılabilir mi (robot bloğu değilse her zaman). */
 export const specFitsRobot = (s: Spec, robot: RobotProfile | null | undefined): boolean =>
-  s.cat !== 'robot' || (!!robot && (!s.sensor || robot.sensors.includes(s.sensor)))
+  s.cat !== 'robot' || (!!robot && (!s.sensor || (typeof s.sensor === 'string' ? [s.sensor] : s.sensor).some((x) => robot.sensors.includes(x))))
 
 /** Blok bu Dönüşen Robot modelinde kullanılabilir mi (Dönüşen bloğu değilse her zaman). */
 export const specFitsModel = (s: Spec, model: DonusenModelId | null | undefined): boolean =>

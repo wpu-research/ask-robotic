@@ -24,7 +24,7 @@ export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: 
   return (
     <figure className={`rb-arena${full ? ' rb-full' : ''}`} data-testid="robot-arena" data-tick={tick} data-view={v.is3d ? '3d' : '2d'}>
       <ViewBar v={v} full={full} onFull={setFull} />
-      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} en={en} label={t('mikro.arena.topView', { scene: en ? SCENE_EN[robot.scene.id] ?? robot.scene.title : robot.scene.title, robot: en ? PROFILE_EN[robot.profile.id].title : robot.profile.title })} />}
+      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} en={en} label={t('mikro.arena.topView', { scene: en ? SCENE_EN[robot.scene.id] ?? robot.scene.title : robot.scene.title, robot: en && robot.profile.id !== 'ozel' ? PROFILE_EN[robot.profile.id].title : robot.profile.title })} />}
       <figcaption className="rb-readout" aria-live="off">
         {dist != null && <span>{t('mikro.arena.distance')} <b>{dist.toFixed(0)} cm</b></span>}
         {robot.has('color') && <span>{t('mikro.arena.color')} <b>{en ? FLOOR_EN[robot.color] : FLOOR_COLORS[robot.color].label}</b></span>}

@@ -1,7 +1,7 @@
 // Benzetim: bir ya da iki sanal kart + paylaşılan radyo ortamı. Zaman kuantumlarla ilerler (radyo iletimi bir sonraki kuantumda gelir).
 import { Device } from './device'
 import { Runtime, type RuntimeOptions } from './runtime'
-import { DriveBase, type RobotProfileId, type RobotScene } from './robot'
+import { DriveBase, type RobotProfile, type RobotProfileId, type RobotScene } from './robot'
 import { DonusenBot, type CraneLoad, type DonusenModelId } from './donusen'
 import type { DeviceEvent, MikroProject, RadioMessage, RunError, WorkspaceState } from './types'
 
@@ -14,7 +14,7 @@ export interface SimOptions extends RuntimeOptions {
   /** 1 ya da 2 kart. İkinci kart aynı programı çalıştırır (aynı kodu iki karta yüklemek gibi). */
   cards?: 1 | 2
   /** Verilirse 1. kart bu robot gövdesine takılır ve robot bu sahnede başlar. */
-  robot?: { profile: RobotProfileId; scene: RobotScene }
+  robot?: { profile: RobotProfileId | RobotProfile; scene: RobotScene }
   /** Verilirse 1. kart Dönüşen Robot'un bu modeline takılır. */
   donusen?: { model: DonusenModelId; loads?: CraneLoad[]; handScript?: (tMs: number) => number }
 }
