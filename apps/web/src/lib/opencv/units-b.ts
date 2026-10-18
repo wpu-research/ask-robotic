@@ -134,7 +134,7 @@ export const UNITS_B: KursUnit<CvToolId>[] = [
       title: 'Geometric and perspective transforms: rotate, scale, flatten',
       summary: 'The affine matrix (2×3), getRotationMatrix2D, interpolation; homography (3×3), four point pairs and flattening a document.',
       goals: ['Write rotation, scaling and translation as one 2×3 affine matrix', 'Explain why inverse mapping and interpolation are needed', 'Solve a 3×3 homography from four point pairs', 'Flatten a document shot at an angle as if seen from above'],
-      notes: `<p>A geometric transform changes where pixels are, not their <b>values</b>. An affine transform keeps lines straight and parallels parallel and is written as a 2×3 matrix:</p>
+      notes: `<p>A geometric transform changes not the <b>values</b> of pixels but <b>where</b> they are. An affine transform keeps lines straight and parallels parallel and is written as a 2×3 matrix:</p>
 <div class="eq">[x′; y′] = [a b t<sub>x</sub>; c d t<sub>y</sub>] · [x; y; 1]</div>
 <p><code>cv2.getRotationMatrix2D(centre, angle, scale)</code> gives this matrix; in OpenCV a positive angle is counter-clockwise. An affine transform can also be found from three point pairs (<code>getAffineTransform</code>).</p>
 <h3>Inverse mapping and interpolation</h3>
