@@ -1,8 +1,13 @@
 import { beforeAll, describe, expect, it } from 'vitest'
-import { eq, subscriptions, users, type Db } from '@ask/db'
+import { eq, sessions, subscriptions, users, type Db } from '@ask/db'
 import { registerUser } from './auth/service'
+import { verifyPassword } from './auth/password'
+import { createSession, getSessionUser } from './auth/session'
 import { createT } from '@/i18n'
-import { createUserByAdmin, grantMembership, listUsers, revokeMembership, welcomeNoticeText, welcomeRemaining, WELCOME_LIMIT, WELCOME_PROVIDER } from './membership'
+import {
+  createUserByAdmin, editUserByAdmin, grantMembership, listUsers, resetPasswordByAdmin, revokeMembership,
+  welcomeNoticeText, welcomeRemaining, WELCOME_LIMIT, WELCOME_PROVIDER,
+} from './membership'
 import { createTestDb } from './test-db'
 
 let db: Db
@@ -63,5 +68,75 @@ describe('admin', () => {
     expect(await revokeMembership(db, id)).toBe(true)
     expect((await listUsers(db, 'ece', 10, NOW))[0].plan).toBeNull()
     expect(await grantMembership(db, crypto.randomUUID(), 'premium', null)).toBe(false)
+  })
+})
+
+describe('admin: düzenleme ve parola sıfırlama', () => {
+  const ac = async (name: string, email?: string, username?: string, role = 'student') => {
+    const r = await createUserByAdmin(db, { name, email, username, role })
+    if (!r.ok) throw new Error(r.message)
+    return r.user.id
+  }
+
+  it('ad, e-posta, kullanıcı adı ve rolü değiştirir', async () => {
+    const adminId = await ac('Yönetici', 'yon@t.co', undefined, 'admin')
+    const id = await ac('Fer', 'fer@t.co')
+    const r = await editUserByAdmin(db, adminId, { userId: id, name: ' Feride ', email: '', username: 'Feride.K', role: 'teacher' })
+    expect(r).toMatchObject({ ok: true, user: { id, name: 'Feride', email: null, username: 'feride.k', role: 'teacher' } })
+    const [row] = await db.select().from(users).where(eq(users.id, id))
+    expect(row).toMatchObject({ name: 'Feride', email: null, username: 'feride.k', role: 'teacher' })
+  })
+
+  it('kimliksiz bırakmaz, başkasının e-postasını ya da kullanıcı adını almaz', async () => {
+    const adminId = await ac('Yönetici 2', 'yon2@t.co', undefined, 'admin')
+    await ac('Gül', 'gul@t.co', 'gul.x')
+    const id = await ac('Hak', 'hak@t.co')
+    expect(await editUserByAdmin(db, adminId, { userId: id, name: 'Hak', email: '', username: '', role: 'student' }))
+      .toMatchObject({ ok: false, code: 'invalid_input', message: 'E-posta ya da kullanıcı adı gerekli' })
+    expect(await editUserByAdmin(db, adminId, { userId: id, name: 'Hak', email: 'GUL@t.co', role: 'student' }))
+      .toMatchObject({ ok: false, code: 'taken', message: expect.stringContaining('zaten kayıtlı') })
+    expect(await editUserByAdmin(db, adminId, { userId: id, name: 'Hak', email: 'hak@t.co', username: 'gul.x', role: 'student' }))
+      .toMatchObject({ ok: false, code: 'taken' })
+    expect(await editUserByAdmin(db, adminId, { userId: crypto.randomUUID(), name: 'Yok', email: 'yok@t.co', role: 'student' }))
+      .toMatchObject({ ok: false, code: 'not_found' })
+    const [row] = await db.select().from(users).where(eq(users.id, id))
+    expect(row).toMatchObject({ email: 'hak@t.co', username: null })
+  })
+
+  it('admin kendi admin rolünü kaldıramaz; başka bir admini indirebilir', async () => {
+    const me = await ac('Ben', 'ben@t.co', undefined, 'admin')
+    const other = await ac('Öteki', 'oteki@t.co', undefined, 'admin')
+    expect(await editUserByAdmin(db, me, { userId: me, name: 'Ben', email: 'ben@t.co', role: 'teacher' }))
+      .toMatchObject({ ok: false, code: 'self_demote' })
+    expect((await db.select().from(users).where(eq(users.id, me)))[0].role).toBe('admin')
+    expect(await editUserByAdmin(db, me, { userId: me, name: 'Ben Yeni', email: 'ben@t.co', role: 'admin' })).toMatchObject({ ok: true })
+    expect(await editUserByAdmin(db, me, { userId: other, name: 'Öteki', email: 'oteki@t.co', role: 'student' }))
+      .toMatchObject({ ok: true, user: { role: 'student' } })
+  })
+
+  it('parola sıfırlama özeti değiştirir, tüm oturumları kapatır, yeni parolayla giriş açılır', async () => {
+    const id = await ac('İpek', 'ipek@t.co')
+    const [before] = await db.select({ h: users.passwordHash }).from(users).where(eq(users.id, id))
+    const s1 = await createSession(db, id)
+    await createSession(db, id)
+    const r = await resetPasswordByAdmin(db, { userId: id })
+    expect(r.ok).toBe(true)
+    if (!r.ok) return
+    expect(r.password).toMatch(/^[A-Za-z0-9]{12}$/)
+    expect(r.sessionsEnded).toBe(2)
+    const [after] = await db.select({ h: users.passwordHash }).from(users).where(eq(users.id, id))
+    expect(after.h).not.toBe(before.h)
+    expect(await verifyPassword(r.password, after.h!)).toBe(true)
+    expect(await db.select().from(sessions).where(eq(sessions.userId, id))).toHaveLength(0)
+    expect(await getSessionUser(db, s1.token)).toBeNull()
+  })
+
+  it('QR/resimli hesapta ve bilinmeyen kullanıcıda parola sıfırlamaz', async () => {
+    const [qr] = await db.insert(users).values({ name: 'Kart', username: 'kart.7b', loginMode: 'qr' }).returning({ id: users.id })
+    await createSession(db, qr.id)
+    expect(await resetPasswordByAdmin(db, { userId: qr.id })).toMatchObject({ ok: false, code: 'no_password_login' })
+    expect(await db.select().from(sessions).where(eq(sessions.userId, qr.id))).toHaveLength(1)
+    expect(await resetPasswordByAdmin(db, { userId: crypto.randomUUID() })).toMatchObject({ ok: false, code: 'not_found' })
+    expect(await resetPasswordByAdmin(db, { userId: 'x' })).toMatchObject({ ok: false, code: 'invalid_input' })
   })
 })

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import { getDb } from '@/lib/db'
 import { getAdminUser } from '@/lib/auth/admin'
 import { listUsers, welcomeRemaining, WELCOME_LIMIT, WELCOME_MONTHS, ADMIN_PROVIDER, WELCOME_PROVIDER } from '@/lib/membership'
-import { CreateUserForm, GrantForm } from '@/components/admin/admin-forms'
+import { CreateUserForm, EditUserForm, GrantForm } from '@/components/admin/admin-forms'
 import '../odeme.css'
 import './admin.css'
 
@@ -16,7 +16,8 @@ const date = (d: Date) => d.toLocaleDateString('tr-TR', { timeZone: 'Europe/Ista
 
 export default async function Admin({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   // Admin olmayana sayfanın varlığını da gösterme
-  if (!(await getAdminUser())) notFound()
+  const admin = await getAdminUser()
+  if (!admin) notFound()
   const q = (await searchParams).q ?? ''
   const db = getDb()
   const [rows, remaining] = await Promise.all([listUsers(db, q), welcomeRemaining(db)])
@@ -51,7 +52,10 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
             <tbody>
               {rows.map((r) => (
                 <tr key={r.id}>
-                  <td><b>{r.name}</b><br /><small className="muted">{r.email ?? r.username}</small></td>
+                  <td>
+                    <b>{r.name}</b><br /><small className="muted">{r.email ?? r.username}</small>
+                    <EditUserForm user={{ id: r.id, name: r.name, email: r.email, username: r.username, role: r.role, loginMode: r.loginMode }} self={r.id === admin.id} />
+                  </td>
                   <td>{ROLE[r.role] ?? r.role}</td>
                   <td>{date(r.createdAt)}</td>
                   <td>

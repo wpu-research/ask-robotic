@@ -9,3 +9,9 @@
 .ad-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .ad-ok { color: var(--v2-accent); }
 .ad-err { color: #b91c1c; }
+.ad-edit { margin-top: 6px; }
+.ad-edit > summary { cursor: pointer; width: fit-content; }
+.ad-edit[open] > summary { margin-bottom: 8px; }
+.ad-edit input { flex: 1 1 140px; }
+.ad-edit p { margin: 8px 0 0; }
+.ad-pass { user-select: all; padding: 2px 8px; border-radius: 6px; background: var(--surface); border: 1px solid var(--border); font-size: 1.05em; }

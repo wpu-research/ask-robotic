@@ -3,7 +3,7 @@
 //
 //   - Hoş geldin: provider 'hosgeldin', ref = userId → kullanıcı başına bir kez, ilk WELCOME_LIMIT kayda
 //   - Admin:      provider 'admin',     ref = userId → kullanıcı başına tek satır; yeniden verince plan/bitiş güncellenir
-import { and, eq, inArray, sql, subscriptions, users, type Db } from '@ask/db'
+import { and, eq, inArray, sessions, sql, subscriptions, users, type Db } from '@ask/db'
 import { randomBytes } from 'node:crypto'
 import { z } from 'zod'
 import { hashPassword } from './auth/password'
@@ -125,12 +125,82 @@ export async function createUserByAdmin(db: Db, input: unknown): Promise<CreateU
   }
 }
 
+// Ad/e-posta/kullanıcı adı kuralları hesap açmayla aynı
+const nameField = createUserSchema.innerType().shape.name
+const emailField = createUserSchema.innerType().shape.email
+const usernameField = createUserSchema.innerType().shape.username
+
+/** Admin düzenlemesi: gönderilen alanların hepsi yazılır; boş e-posta/kullanıcı adı = kaldır. */
+export const editUserSchema = z.object({
+  userId: z.string().uuid(),
+  name: nameField,
+  email: emailField,
+  username: usernameField,
+  role: z.enum(['student', 'parent', 'teacher', 'admin']),
+}).refine((v) => v.email || v.username, { message: 'E-posta ya da kullanıcı adı gerekli', path: ['email'] })
+
+export type EditUserResult =
+  | { ok: true; user: { id: string; name: string; email: string | null; username: string | null; role: string } }
+  | { ok: false; code: 'invalid_input' | 'taken' | 'not_found' | 'self_demote'; message: string }
+
+/** actorId: işlemi yapan admin. Kendi admin rolünü kaldıramaz (panelden kilitlenmesin). */
+export async function editUserByAdmin(db: Db, actorId: string, input: unknown): Promise<EditUserResult> {
+  const parsed = editUserSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, code: 'invalid_input', message: parsed.error.issues[0]?.message ?? 'Geçersiz bilgi' }
+  const v = parsed.data
+  if (v.userId === actorId && v.role !== 'admin') {
+    return { ok: false, code: 'self_demote', message: 'Kendi admin rolünü kaldıramazsın' }
+  }
+  try {
+    const [u] = await db.update(users)
+      .set({ name: v.name, email: v.email ?? null, username: v.username ?? null, role: v.role })
+      .where(eq(users.id, v.userId))
+      .returning({ id: users.id, name: users.name, email: users.email, username: users.username, role: users.role })
+    if (!u) return { ok: false, code: 'not_found', message: 'Kullanıcı bulunamadı' }
+    return { ok: true, user: u }
+  } catch (e) {
+    if (isUnique(e)) return { ok: false, code: 'taken', message: 'Bu e-posta ya da kullanıcı adı zaten kayıtlı' }
+    throw e
+  }
+}
+
+export const resetPasswordSchema = z.object({ userId: z.string().uuid() })
+
+export type ResetPasswordResult =
+  | { ok: true; password: string; sessionsEnded: number }
+  | { ok: false; code: 'invalid_input' | 'not_found' | 'no_password_login'; message: string }
+
+/**
+ * Yeni parola üretir, özetini yazar ve kullanıcının tüm oturumlarını kapatır; parola yanıtta bir kez döner.
+ * QR/resimli girişli hesaplarda parola yoktur, reddedilir.
+ */
+export async function resetPasswordByAdmin(db: Db, input: unknown): Promise<ResetPasswordResult> {
+  const parsed = resetPasswordSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, code: 'invalid_input', message: 'Geçersiz istek' }
+  const { userId } = parsed.data
+  const [u] = await db.select({ loginMode: users.loginMode }).from(users).where(eq(users.id, userId)).limit(1)
+  if (!u) return { ok: false, code: 'not_found', message: 'Kullanıcı bulunamadı' }
+  if (u.loginMode !== 'email') {
+    return { ok: false, code: 'no_password_login', message: 'Bu hesap QR/resimle giriyor, parolası yok; kartı öğretmen panelinden yenileyin' }
+  }
+  const password = generatePassword()
+  const passwordHash = await hashPassword(password)
+  const sessionsEnded = await db.transaction(async (tx) => {
+    await tx.update(users).set({ passwordHash }).where(eq(users.id, userId))
+    const r = await tx.delete(sessions).where(eq(sessions.userId, userId)).returning({ id: sessions.id })
+    return r.length
+  })
+  return { ok: true, password, sessionsEnded }
+}
+
 export interface AdminUserRow {
   id: string
   name: string
   email: string | null
   username: string | null
   role: string
+  /** 'email' dışındakiler (QR/resimli) parolasız girer */
+  loginMode: 'email' | 'qr' | 'picture'
   createdAt: Date
   /** Etkin en yüksek plan; yoksa null */
   plan: PaidPlanId | null
@@ -146,7 +216,7 @@ export async function listUsers(db: Db, q = '', limit = 200, now = new Date()): 
   const like = `%${term.replace(/[\\%_]/g, (c) => `\\${c}`)}%`
   const where = term ? sql`(${users.name} ilike ${like} or ${users.email} ilike ${like} or ${users.username} ilike ${like})` : undefined
   const rows = await db.select({
-    id: users.id, name: users.name, email: users.email, username: users.username, role: users.role, createdAt: users.createdAt,
+    id: users.id, name: users.name, email: users.email, username: users.username, role: users.role, loginMode: users.loginMode, createdAt: users.createdAt,
   }).from(users).where(where).orderBy(sql`${users.createdAt} desc`).limit(limit)
   if (!rows.length) return []
   const subs = await db.select({
