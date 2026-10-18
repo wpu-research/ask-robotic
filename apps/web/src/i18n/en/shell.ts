@@ -91,6 +91,7 @@ export const shell: typeof Tr = {
     engineering: 'Engineering path',
     vision: 'Robot Eyes',
     robotics: 'Robotics course (ESOF 323)',
+    drone: 'Drone course',
     ml: 'Machine learning',
   },
   navDesc: {
@@ -106,6 +107,7 @@ export const shell: typeof Tr = {
     ai: 'Token, prompt, RAG and agent tools',
     engineering: '128 real parts, from basics to drones',
     robotics: 'University course: 14 weeks, simulations',
+    drone: 'Parts, simulation, software: 10 units',
     ml: 'From regression to neural networks, step by step',
     parts: 'Parts encyclopedia',
     tests: 'Mini quizzes and scores',

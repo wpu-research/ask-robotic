@@ -41,6 +41,15 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/drone" className="eng-course" data-testid="eng-drone">
+        <span className="eng-course-code">DRONE</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Drone engineering' : 'Ders: Drone mühendisliği'}</b>
+          <span className="eng-level-text">{en ? '10 units with parts, simulation and software together: frame, motor, ESC, LiPo and flight controller; thrust, PID and sensor fusion; PX4, MAVLink, MAVSDK and ROS 2. 7 in-browser simulations and a capstone mission with precision landing.' : 'Parça, simülasyon ve yazılım birlikte 10 ünite: gövde, motor, ESC, LiPo ve uçuş kontrolcüsü; itki, PID ve sensör füzyonu; PX4, MAVLink, MAVSDK ve ROS 2. Tarayıcıda 7 simülasyon ve hassas inişli bir bitirme görevi.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <section aria-labelledby="eng-levels">
         <h2 id="eng-levels" className="sr-only">{en ? 'Levels' : 'Seviyeler'}</h2>
         <ol className="eng-path">
