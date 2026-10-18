@@ -92,6 +92,7 @@ export const shell = {
     robotics: 'Robotik dersi (ESOF 323)',
     drone: 'Drone dersi',
     ml: 'Makine öğrenmesi',
+    cvDemos: 'Gerçek hayat demoları',
   },
   /** Atölyeler panelindeki tek satırlık açıklamalar. */
   navDesc: {
@@ -109,6 +110,7 @@ export const shell = {
     robotics: 'Üniversite dersi: 14 hafta, simülasyonlar',
     drone: 'Parça, simülasyon, yazılım: 10 ünite',
     ml: 'Regresyondan sinir ağına, kodu adım adım',
+    cvDemos: 'Düşme, bölge ihlali, nabız, trafik: kamerayla canlı',
     parts: 'Parça ansiklopedisi',
     tests: 'Mini testler ve puanlar',
     progress: 'Beceri haritan',

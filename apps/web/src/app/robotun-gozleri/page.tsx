@@ -49,6 +49,12 @@ export default async function RobotunGozleri() {
           ))}
         </ul>
       </section>
+
+      <Link href="/robotun-gozleri/demolar" className="gz-adult" data-testid="gz-demolar">
+        <span aria-hidden="true">🏭</span>
+        <span><b>{en ? 'For teens and adults: Real-World Demos' : 'Gençler ve büyükler için: Gerçek Hayat Demoları'}</b><br /><small>{en ? 'Fall detection, zone intrusion, pulse from the camera, traffic counting, fruit ripeness… with the pipeline and Python code.' : 'Düşme tespiti, bölge ihlali, kameradan nabız, trafik sayacı, meyve olgunluğu… boru hattı ve Python koduyla.'}</small></span>
+        <span aria-hidden="true">→</span>
+      </Link>
     </div>
   )
 }

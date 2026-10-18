@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { DEMOS } from '@/lib/cv-demolar'
 import { UNITS } from '@/lib/drone/course'
 import { LESSONS } from '@/lib/ml/lessons'
 import { PROJECTS } from '@/lib/ml/projeler'
@@ -8,6 +9,7 @@ import { LEGAL } from './yasal/metinler'
 // Herkese açık vitrin sayfaları; hesap/öğretmen/sınıf sayfaları robots.ts'te kapalı
 const PAGES = [
   '', '/fiyatlar', '/okullar', '/konular', '/moduller', '/atolye', '/robot-atolyesi', '/robotun-gozleri',
+  '/robotun-gozleri/demolar', ...DEMOS.map((d) => `/robotun-gozleri/demolar/${d.slug}`),
   '/makine-ogrenmesi', '/laboratuvar', '/parcalar', '/muhendislik', '/muhendislik/robotik',
   '/muhendislik/drone', '/muhendislik/drone/parcalar', '/muhendislik/drone/simulasyon', '/muhendislik/drone/proje',
   ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),

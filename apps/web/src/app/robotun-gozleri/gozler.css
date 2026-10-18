@@ -103,3 +103,10 @@
 .gz-inks { display: flex; gap: 6px; margin-top: 4px; }
 .gz-inks button { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; }
 .gz-inks button[aria-pressed='true'] { outline: 3px solid var(--gz-ink, #2a1a12); outline-offset: 1px; }
+/* Robotun Gözleri ana sayfasındaki büyükler bağlantısı */
+.gz-adult { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 16px; align-items: center; padding: 18px 22px; border-radius: 24px; background: #0f172a; color: #e2e8f0; }
+.gz-adult:hover { text-decoration: none; }
+.gz-adult b { font-size: 1.1rem; color: #fff; }
+.gz-adult small { color: #94a3b8; font-size: .92rem; }
+.gz-adult span:first-child { font-size: 2rem; }
+@media (max-width: 600px) { .gz-adult { grid-template-columns: minmax(0, 1fr); } }
