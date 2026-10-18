@@ -1,0 +1,113 @@
+/* Gömülü kurslar (Raspberry Pi, ARM STM32): ESOF 323 .rb-sim görünümü üstüne SVG simülasyonları, terminal, yazmaç tablosu.
+   Renkler site jetonları ve .rb-sim üzerindeki --sim-* / --ink / --mute / --line değişkenleri; açık ve koyu temada aynı kurallar. */
+.gm-sim .rb-sim-body { grid-template-columns: minmax(0, 1fr) 280px; }
+@media (max-width: 900px) { .gm-sim .rb-sim-body { grid-template-columns: minmax(0, 1fr); } }
+.gm-stage { display: grid; gap: 12px; min-width: 0; }
+.gm-svg { touch-action: manipulation; user-select: none; }
+.gm-hint { margin: 0; font-size: .84rem; color: var(--muted); overflow-wrap: anywhere; }
+.gm-small { font-size: .85rem; }
+.gm-facts dd { font-weight: 400; }
+.gm-sum { margin-top: 0; }
+.gm-input { font: inherit; font-family: var(--mono); font-size: .86rem; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); width: 100%; min-width: 0; }
+.gm-chip { font: inherit; font-family: var(--mono); font-size: .74rem; padding: 6px 9px; min-height: 32px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); cursor: pointer; }
+.gm-chip:hover { border-color: var(--eng); }
+.gm-badge { display: inline-block; font-size: .72rem; font-weight: 800; padding: 1px 8px; border-radius: 999px; letter-spacing: .02em; }
+.gm-ok { background: color-mix(in srgb, var(--green, #2f8a57) 18%, transparent); color: var(--green, #2f8a57); }
+.gm-warn { background: color-mix(in srgb, var(--gold, #b7791f) 20%, transparent); color: var(--gold, #b7791f); }
+.gm-error, .gm-err { color: var(--red, #c43d36); }
+.gm-badge.gm-error { background: color-mix(in srgb, var(--red, #c43d36) 16%, transparent); }
+.gm-checks { display: grid; gap: 6px; font-size: .82rem; }
+.gm-checks p { margin: 0; }
+.gm-dev { display: grid; gap: 6px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; }
+.gm-legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: .78rem; color: var(--muted); }
+.gm-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+
+/* Sekmeler */
+.gm-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.gm-tabs button { font: inherit; font-size: .85rem; font-weight: 700; padding: 7px 14px; min-height: 36px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.gm-tabs button.on { background: var(--eng); border-color: var(--eng); color: #fff; }
+
+/* Çubuk grafikleri (kart seçici, güç) */
+.gm-bars { display: grid; gap: 10px; }
+.gm-bar { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 64px; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; }
+.gm-bar.best { border-color: var(--eng); box-shadow: 0 0 0 2px var(--eng-soft); }
+.gm-bar-l { display: grid; min-width: 0; }
+.gm-bar-l small { color: var(--muted); font-size: .76rem; }
+.gm-bar output { text-align: right; font-weight: 800; font-variant-numeric: tabular-nums; }
+.gm-bar-track { display: block; height: 10px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.gm-bar-track span { display: block; height: 100%; border-radius: 999px; background: var(--eng); }
+.gm-bar-track span.neg { background: var(--red, #c43d36); opacity: .6; }
+@media (max-width: 520px) { .gm-bar { grid-template-columns: minmax(0, 1fr) 56px; } .gm-bar-track { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Terminal ve nano */
+.gm-term { background: #17110d; color: #e9dfd3; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; }
+.gm-term-out { font: .8rem/1.5 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; padding: 10px 12px; height: 320px; overflow-y: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.gm-term-out .in { color: #7ee2b8; }
+.gm-term-out .gm-err { color: #ff8f86; }
+.gm-term-in { display: flex; gap: 6px; align-items: baseline; color: #7ee2b8; }
+.gm-term-in span { white-space: nowrap; }
+.gm-term-in input { flex: 1; min-width: 0; font: inherit; background: transparent; border: 0; outline: none; color: #fff; padding: 0; }
+.gm-nano { display: grid; }
+.gm-nano textarea { font: .8rem/1.5 ui-monospace, Menlo, Consolas, monospace; background: #17110d; color: #fff; border: 0; padding: 10px 12px; resize: vertical; min-height: 260px; }
+.gm-nano-bar { display: flex; gap: 10px; flex-wrap: wrap; padding: 6px 10px; background: #e9dfd3; color: #17110d; font: 700 .76rem ui-monospace, Menlo, monospace; }
+.gm-nano-bar button { font: inherit; background: transparent; border: 0; cursor: pointer; padding: 4px 6px; min-height: 32px; }
+.gm-tasks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: .84rem; }
+.gm-tasks li::before { content: '○ '; color: var(--muted); }
+.gm-tasks li.ok { color: var(--muted); text-decoration: line-through; }
+.gm-tasks li.ok::before { content: '● '; color: var(--green, #2f8a57); }
+
+/* Kod çıktısı */
+.gm-code { margin: 0; font: .76rem/1.5 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; overflow-x: auto; white-space: pre; max-width: 100%; }
+.gm-code2 { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+
+/* Görüntü kareleri */
+.gm-frames { display: grid; gap: 10px; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.gm-frames figure { margin: 0; display: grid; gap: 4px; }
+.gm-frames figcaption { font-size: .76rem; color: var(--muted); }
+.gm-pix { width: 100%; height: auto; image-rendering: pixelated; border-radius: 8px; border: 1px solid var(--border); }
+.gm-steer { position: relative; height: 10px; border-radius: 999px; background: var(--surface-2); }
+.gm-steer span { position: absolute; top: -3px; width: 16px; height: 16px; margin-left: -8px; border-radius: 50%; background: var(--eng); transition: left .15s; }
+
+/* Sürüş tuşları, Flask paneli */
+.gm-pad { display: grid; grid-template-columns: repeat(3, 52px); gap: 6px; justify-content: center; }
+.gm-pad .sbtn { min-height: 46px; padding: 0; touch-action: none; }
+.gm-focus { outline: none; border-radius: 10px; }
+.gm-focus:focus-visible { box-shadow: 0 0 0 3px var(--eng-soft); }
+.gm-panel { border: 1px solid var(--border); border-radius: 10px; padding: 12px; display: grid; gap: 10px; background: var(--surface); }
+.gm-panel-head { font: .78rem ui-monospace, Menlo, monospace; color: var(--muted); padding: 6px 10px; border-radius: 999px; background: var(--surface-2); overflow-wrap: anywhere; }
+.gm-drive { display: grid; grid-template-columns: repeat(3, 64px); grid-template-areas: '. f .' 'l s r' '. b .'; gap: 6px; justify-content: center; }
+.gm-dbtn { font-size: 1.2rem; min-height: 52px; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); cursor: pointer; touch-action: none; user-select: none; }
+.gm-dbtn:active { background: var(--eng); color: #fff; }
+.gm-d-forward { grid-area: f; } .gm-d-back { grid-area: b; } .gm-d-left { grid-area: l; } .gm-d-right { grid-area: r; } .gm-d-stop { grid-area: s; color: var(--red, #c43d36); }
+.gm-wheels { display: grid; gap: 6px; font-size: .82rem; }
+.gm-wheels div { display: grid; grid-template-columns: 20px minmax(0, 1fr) 48px; gap: 8px; align-items: center; }
+
+/* Yazmaç tablosu */
+.gm-regtable { width: 100%; border-collapse: collapse; font-size: .78rem; table-layout: fixed; }
+.gm-regtable th { width: 64px; text-align: left; font-family: var(--mono); color: var(--muted); padding: 4px 4px 4px 0; }
+.gm-regtable td { padding: 3px 0; }
+.gm-regtable .gm-hex { width: 98px; font-family: var(--mono); text-align: right; color: var(--muted); font-size: .72rem; }
+.gm-bits { display: grid; gap: 2px; }
+.gm-bits button { font: 700 .62rem ui-monospace, Menlo, monospace; padding: 4px 0; min-height: 26px; border-radius: 4px; border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); cursor: pointer; min-width: 0; }
+.gm-bits button.on { background: color-mix(in srgb, var(--eng) 25%, var(--surface)); color: var(--text); }
+.gm-bits button.hl { border-color: var(--eng); border-width: 2px; }
+.gm-bits button:disabled { cursor: default; }
+@media (max-width: 600px) {
+  .gm-regtable th { width: 48px; font-size: .66rem; }
+  .gm-regtable .gm-hex { display: none; }
+  .gm-bits button { font-size: .5rem; min-height: 24px; }
+}
+
+/* DMA tampon hücreleri */
+.gm-cells { display: grid; grid-template-columns: repeat(auto-fill, minmax(42px, 1fr)); gap: 3px; }
+.gm-cells span { font: .66rem ui-monospace, Menlo, monospace; text-align: center; padding: 4px 0; border-radius: 4px; }
+.gm-cells .lo { background: color-mix(in srgb, var(--gold, #b7791f) 20%, transparent); }
+.gm-cells .hi { background: color-mix(in srgb, var(--sky, #2c6cb0) 20%, transparent); }
+
+.gm-wokwi ul { margin: 0 0 8px; }
+
+/* Dönen motor (UART komut sekmesi); hareket azaltma tercihinde durur */
+@keyframes gm-spin { to { transform: rotate(360deg); } }
+.gm-spin { animation: gm-spin 1s linear infinite; }
+.gm-rev { animation-direction: reverse; }
+@media (prefers-reduced-motion: reduce) { .gm-spin { animation: none; } .gm-steer span { transition: none; } }

@@ -112,7 +112,7 @@ export const STM32_COURSE: CourseDef<StmSimId> = {
   related: [
     { href: '/muhendislik/raspberry-pi', tr: 'Raspberry Pi ile Robotik Programlama: Pi + MCU mimarisinin Pi tarafı', en: 'Robotics Programming with Raspberry Pi: the Pi side of a Pi + MCU architecture' },
     { href: '/muhendislik/robotik/hafta/3', tr: 'ESOF 323, 3. hafta: kesmeler, zamanlayıcılar ve veri yolları', en: 'ESOF 323, week 3: interrupts, timers and buses' },
-    { href: '/muhendislik/drone/unite/6', tr: 'Drone dersi: uçuş kontrolcüsündeki STM32', en: 'Drone course: the STM32 in the flight controller' },
+    { href: '/muhendislik/drone/unite/4', tr: 'Drone dersi: uçuş kontrolcüsündeki STM32 ve sensörler', en: 'Drone course: the STM32 and sensors in the flight controller' },
     { href: '/laboratuvar', tr: 'Devre laboratuvarı: Uno ile PWM, kesme ve seri port', en: 'Circuit lab: PWM, interrupts and serial on the Uno' },
   ],
 }
