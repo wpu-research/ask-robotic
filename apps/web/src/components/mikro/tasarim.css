@@ -1,0 +1,79 @@
+/* Robotunu Tasarla: palet, tezgâh, özellikler. Parça renkleri her iki temada aynı (gerçek parça boyası gibi). */
+.rt { display: grid; gap: 14px; min-width: 0; }
+.rt-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.rt-bar label { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; font-size: .9rem; }
+.rt-bar input, .rt-bar select, .rt-targets select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); min-height: 36px; max-width: 100%; }
+.rt-name input { width: 12em; }
+.rt-mode { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin-left: auto; }
+.rt-mode button { font: inherit; font-weight: 700; font-size: .85rem; padding: 6px 12px; border: 0; background: var(--surface); color: var(--text); cursor: pointer; min-height: 36px; }
+.rt-mode button[aria-pressed='true'] { background: var(--primary); color: var(--primary-ink); }
+
+.rt-main { display: grid; grid-template-columns: 250px minmax(0, 1fr) 290px; gap: 12px; align-items: start; }
+.rt-palette, .rt-props, .rt-stage { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; min-width: 0; }
+.rt-palette { display: grid; gap: 8px; max-height: 760px; overflow-y: auto; }
+.rt-palette h3, .rt-props h3 { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 4px 0; }
+.rt-palette ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rt-tools { display: flex; gap: 6px; }
+.rt-tool { flex: 1; font: inherit; font-weight: 700; padding: 6px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+.rt-tool[aria-pressed='true'] { background: var(--warn); color: #fff; border-color: transparent; }
+.rt-part { display: flex; gap: 8px; align-items: flex-start; width: 100%; text-align: left; font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+.rt-part:hover { border-color: var(--border-strong); }
+.rt-part[aria-pressed='true'] { border-color: var(--primary); box-shadow: inset 0 0 0 2px var(--primary); }
+.rt-part:focus-visible, .rt-cell:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.rt-sw { flex: none; width: 18px; height: 18px; border-radius: 5px; border: 1px solid rgba(0,0,0,.25); margin-top: 2px; }
+.rt-pt { display: grid; gap: 1px; min-width: 0; }
+.rt-pt b { font-size: .88rem; }
+.rt-pt small { color: var(--muted); font-size: .76rem; line-height: 1.3; }
+
+.rt-stage { display: grid; gap: 8px; }
+.rt-3d { height: 420px; border-radius: var(--radius-xs); overflow: hidden; background: #e2e8f0; touch-action: none; }
+.rt-stage-bar { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: .85rem; color: var(--muted); align-items: center; }
+.rt-legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #16a34a; vertical-align: middle; }
+.rt-grid-wrap { position: relative; display: grid; justify-items: center; gap: 2px; }
+.rt-front { font-size: .75rem; color: var(--muted); justify-self: end; }
+.rt-grid { display: grid; gap: 3px; width: min(100%, 420px); padding: 10px 6px; background: #facc15; border-radius: 10px; border-top: 8px solid #1f2937; border-bottom: 8px solid #1f2937; }
+.rt-cell { aspect-ratio: 1; border: 1px solid rgba(0,0,0,.18); border-radius: 6px; background: #fde68a; cursor: pointer; display: grid; place-items: center; padding: 0; color: #fff; font-size: .9rem; min-width: 0; }
+.rt-cell.can:hover { background: #bbf7d0; }
+.rt-cell.card { background: #0f9488; cursor: default; }
+.rt-cell.sel { outline: 3px solid #2563eb; outline-offset: 1px; }
+.rt-glyph { display: inline-block; text-shadow: 0 1px 1px rgba(0,0,0,.5); }
+.rt-sel { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: .9rem; }
+.rt-sel .mk-btn.small { margin-left: 0; }
+.rt-msg { margin: 0; color: var(--warn); font-weight: 600; }
+
+.rt-props { display: grid; gap: 6px; }
+.rt-nums { display: grid; grid-template-columns: auto 1fr; gap: 3px 10px; margin: 0; font-size: .84rem; font-variant-numeric: tabular-nums; }
+.rt-nums dt { color: var(--muted); }
+.rt-nums dd { margin: 0; text-align: right; font-weight: 600; }
+.rt-stars { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.rt-stars li { display: flex; justify-content: space-between; gap: 8px; }
+.rt-star { color: #f59e0b; letter-spacing: 2px; }
+.rt-star i { font-style: normal; color: var(--border-strong); }
+.rt-issues { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: .86rem; }
+.rt-issues li { padding: 6px 8px; border-radius: 8px; border-left: 4px solid; background: var(--surface-2); }
+.rt-issues .err { border-color: #dc2626; }
+.rt-issues .warn { border-color: #d97706; }
+.rt-issues .ok { border-color: #16a34a; }
+.rt-files { display: flex; flex-wrap: wrap; gap: 6px; }
+.rt-files .mk-btn.small { margin-left: 0; }
+.rt-saved ul { list-style: none; padding: 0; margin: 6px 0; display: grid; gap: 2px; }
+.rt-saved li { display: flex; justify-content: space-between; }
+.rt-link { background: none; border: 0; padding: 0; color: var(--primary); text-decoration: underline; cursor: pointer; font: inherit; }
+.rt-x { background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 1.1rem; }
+
+.rt-try { display: grid; gap: 10px; }
+.rt-try h2 { margin: 0; font-size: 1.15rem; }
+.rt-try > p { margin: 0; max-width: 75ch; }
+.rt-targets { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.rt-targets label { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+
+@media (max-width: 1180px) { .rt-main { grid-template-columns: 220px minmax(0, 1fr); } .rt-props { grid-column: 1 / -1; } }
+@media (max-width: 760px) {
+  .rt-main { grid-template-columns: minmax(0, 1fr); }
+  .rt-palette { max-height: none; order: 2; }
+  .rt-palette ul { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+  .rt-stage { order: 1; }
+  .rt-props { order: 3; }
+  .rt-3d { height: 300px; }
+  .rt-mode { margin-left: 0; }
+}

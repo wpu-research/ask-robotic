@@ -1,5 +1,6 @@
 'use client'
 // Robot Atölyesi: görev seçici + Mikro Kart editörü (kart bir robot gövdesine takılı).
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MikroEditor } from './mikro-editor'
 import { MISSION_CHAPTERS, ROBOT_MISSIONS, chapterProgress, freeScene, type RobotMission } from '@/lib/mikro/robot-missions'
@@ -100,6 +101,10 @@ export function RobotStudio() {
         <div className="rb-row">
           <h2>{t('mikro.studio.free')}</h2>
           <ul>{FREE_PROFILES.map((p) => card(p, robotTitle(p), t(SENSOR_KEY[p]), pick.kind === 'free' && pick.profile === p, () => setPick({ kind: 'free', profile: p }), `robot-free-${p}`))}</ul>
+        </div>
+        <div className="rb-row" data-testid="robot-design-row">
+          <h2>{en ? 'Design' : 'Tasarla'}</h2>
+          <ul><li><Link className="rb-card" href="/robot-atolyesi/tasarla" data-testid="robot-design-link"><b>{en ? 'Design your robot' : 'Robotunu Tasarla'}</b><small>{en ? 'Wheels, motors, sensors: build it, then run missions' : 'Teker, motor, sensör: kur, sonra görevde dene'}</small></Link></li></ul>
         </div>
       </nav>
       <div className="rb-ed">
