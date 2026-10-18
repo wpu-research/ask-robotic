@@ -1,15 +1,15 @@
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import { and, eq, payments, subscriptionMembers, subscriptions, users, type Db } from '@ask/db'
 import {
-  PREPAID_PROVIDER, activatePayment, addFamilyMember, completeCheckout, loadAccountSummary, prepaidRef, removeFamilyMember,
-  startCheckout, startTrial,
+  PREPAID_PROVIDER, activatePayment, addFamilyMember, completeCheckout, loadAccountSummary, prepaidRef, projectedPeriodEnd,
+  removeFamilyMember, stackBase, startCheckout, startTrial,
 } from './billing'
 import { loadAccessContext } from './entitlements-db'
 import { resolveAccess } from './entitlements'
 import { mockProvider } from './payments/mock'
 import { addMonths, priceOf } from './pricing'
 import { createTestDb } from './test-db'
-import { WELCOME_MONTHS, WELCOME_PROVIDER } from './membership'
+import { WELCOME_MONTHS, WELCOME_PROVIDER, grantMembership, revokeMembership } from './membership'
 
 let db: Db
 const now = new Date('2026-10-14T10:00:00Z')
@@ -116,6 +116,114 @@ describe('dönem uzatma', () => {
     if (!t.ok) throw new Error()
     await mockOde(u.id, 'premium', 'monthly', 'succeeded', new Date(now.getTime() + gun))
     expect((await prepaid(u.id, 'premium')).currentPeriodEnd).toEqual(addMonths(t.endsAt, 1))
+  })
+  it('hoş geldin hediyesi sürerken Premium alınırsa dönem hediye bitişinden başlar (üst üste binmez)', async () => {
+    const u = await yeni()
+    const hediye = addMonths(now, WELCOME_MONTHS)
+    await db.insert(subscriptions).values({ userId: u.id, planId: 'premium', status: 'active', provider: WELCOME_PROVIDER, providerRef: u.id, currentPeriodEnd: hediye })
+    const { result } = await mockOde(u.id, 'premium', 'monthly', 'succeeded')
+    expect(result).toMatchObject({ ok: true, periodEnd: addMonths(hediye, 1) })
+    expect((await prepaid(u.id, 'premium')).currentPeriodEnd).toEqual(addMonths(hediye, 1))
+  })
+})
+
+describe('ücretsiz dönem sürerken ödeme', () => {
+  const ver = (userId: string, provider: string, planId: 'premium' | 'family', end: Date | null, status: 'active' | 'trialing' | 'expired' = 'active') =>
+    db.insert(subscriptions).values({ userId, planId, status, provider, providerRef: userId, currentPeriodEnd: end })
+
+  it('hoş geldin + yinelenen callback: dönem hediye bitişine bir kez eklenir', async () => {
+    const u = await yeni()
+    const hediye = addMonths(now, WELCOME_MONTHS)
+    await ver(u.id, WELCOME_PROVIDER, 'premium', hediye)
+    const { ref } = await mockOde(u.id, 'premium', 'yearly', 'succeeded')
+    const again = await completeCheckout(db, 'mock', ref, await mockProvider.retrieve(ref), new Date(now.getTime() + gun))
+    expect(again).toMatchObject({ ok: true, already: true, periodEnd: addMonths(hediye, 12) })
+    expect((await prepaid(u.id, 'premium')).currentPeriodEnd).toEqual(addMonths(hediye, 12))
+    // İkinci (gerçek) ödeme ücretli bitişin üstüne
+    await mockOde(u.id, 'premium', 'monthly', 'succeeded')
+    expect((await prepaid(u.id, 'premium')).currentPeriodEnd).toEqual(addMonths(addMonths(hediye, 12), 1))
+  })
+  it('süreli admin Premium sürerken ödeme, admin bitişinden başlar', async () => {
+    const u = await yeni()
+    const adminEnd = new Date(now.getTime() + 40 * gun)
+    await grantMembership(db, u.id, 'premium', adminEnd)
+    const { result } = await mockOde(u.id, 'premium', 'monthly', 'succeeded')
+    expect(result).toMatchObject({ ok: true, periodEnd: addMonths(adminEnd, 1) })
+  })
+  it('admin Aile sürerken Premium alınırsa Aile bitişinden başlar (Aile, Premium erişimini kapsar)', async () => {
+    const u = await yeni()
+    const adminEnd = new Date(now.getTime() + 20 * gun)
+    await grantMembership(db, u.id, 'family', adminEnd)
+    const { result } = await mockOde(u.id, 'premium', 'monthly', 'succeeded')
+    expect(result).toMatchObject({ ok: true, periodEnd: addMonths(adminEnd, 1) })
+    // Aile bitişinde "süren bitiyor" denmez: Premium devam ediyor
+    const s = await loadAccountSummary(db, u.id, new Date(adminEnd.getTime() - 2 * gun))
+    expect(s).toMatchObject({ plan: 'family', grant: 'admin', periodEnd: adminEnd, renewalReminder: false })
+    expect(await loadAccountSummary(db, u.id, new Date(adminEnd.getTime() + gun))).toMatchObject({ plan: 'premium', grant: null, periodEnd: addMonths(adminEnd, 1) })
+  })
+  it('Premium (hoş geldin ya da deneme) sürerken Aile alınırsa yükseltmedir: bugünden başlar', async () => {
+    const u = await yeni()
+    await ver(u.id, WELCOME_PROVIDER, 'premium', addMonths(now, WELCOME_MONTHS))
+    expect((await mockOde(u.id, 'family', 'monthly', 'succeeded')).result).toMatchObject({ ok: true, periodEnd: addMonths(now, 1) })
+    const v = await yeni()
+    await startTrial(db, v.id, now)
+    expect((await mockOde(v.id, 'family', 'monthly', 'succeeded')).result).toMatchObject({ ok: true, periodEnd: addMonths(now, 1) })
+  })
+  it('admin Aile sürerken Aile alınırsa admin bitişinden başlar', async () => {
+    const u = await yeni()
+    const adminEnd = new Date(now.getTime() + 10 * gun)
+    await grantMembership(db, u.id, 'family', adminEnd)
+    expect((await mockOde(u.id, 'family', 'monthly', 'succeeded')).result).toMatchObject({ ok: true, periodEnd: addMonths(adminEnd, 1) })
+  })
+  it('süresiz admin: ödeme bugünden başlar, çökmez; özet süresiz (bitiş yok, hatırlatma yok) gösterir', async () => {
+    const u = await yeni()
+    await grantMembership(db, u.id, 'premium', null)
+    const { result } = await mockOde(u.id, 'premium', 'monthly', 'succeeded')
+    expect(result).toMatchObject({ ok: true, periodEnd: addMonths(now, 1) })
+    const s = await loadAccountSummary(db, u.id, new Date(now.getTime() + 28 * gun))
+    expect(s).toMatchObject({ plan: 'premium', grant: 'admin', periodEnd: null, renewalReminder: false })
+  })
+  it('bitmiş ya da geri alınmış ücretsiz dönem taban olmaz', async () => {
+    const u = await yeni()
+    await ver(u.id, WELCOME_PROVIDER, 'premium', new Date(now.getTime() - gun))
+    expect((await mockOde(u.id, 'premium', 'monthly', 'succeeded')).result).toMatchObject({ periodEnd: addMonths(now, 1) })
+    const v = await yeni()
+    await grantMembership(db, v.id, 'premium', addMonths(now, 3))
+    await revokeMembership(db, v.id)
+    expect((await mockOde(v.id, 'premium', 'monthly', 'succeeded')).result).toMatchObject({ periodEnd: addMonths(now, 1) })
+  })
+  it('başkasının aile planına üyelik taban olmaz', async () => {
+    const o = await yeni()
+    const m = await yeni()
+    await mockOde(o.id, 'family', 'yearly', 'succeeded')
+    await addFamilyMember(db, o.id, m.email!, now)
+    expect((await mockOde(m.id, 'premium', 'monthly', 'succeeded')).result).toMatchObject({ periodEnd: addMonths(now, 1) })
+  })
+  it('hesap özeti ve ödeme sayfası tahmini, yazılan bitişle tutar', async () => {
+    const u = await yeni()
+    const hediye = addMonths(now, WELCOME_MONTHS)
+    await ver(u.id, WELCOME_PROVIDER, 'premium', hediye)
+    const tahmin = await projectedPeriodEnd(db, u.id, 'premium', 'yearly', now)
+    expect(tahmin).toEqual(addMonths(hediye, 12))
+    const { result } = await mockOde(u.id, 'premium', 'yearly', 'succeeded')
+    expect(result).toMatchObject({ periodEnd: tahmin })
+    // Hediye sürerken: Premium, bitiş ücretli dönemin sonu, artık "hediye" etiketi yok
+    expect(await loadAccountSummary(db, u.id, now)).toMatchObject({ plan: 'premium', source: 'own', grant: null, periodEnd: tahmin, renewalReminder: false })
+  })
+})
+
+describe('stackBase (saf)', () => {
+  const r = (planId: string, end: Date | null, status = 'active') => ({ planId, status, currentPeriodEnd: end })
+  const a = new Date(now.getTime() + 3 * gun)
+  const b = new Date(now.getTime() + 9 * gun)
+  it('aynı erişimi veren etkin satırların en geç bitişi', () => {
+    expect(stackBase([r('premium', a, 'trialing'), r('family', b)], 'premium', now)).toEqual(b)
+    expect(stackBase([r('premium', b), r('family', a)], 'family', now)).toEqual(a)
+    expect(stackBase([r('premium', b)], 'family', now)).toBeNull()
+  })
+  it('süresiz, bitmiş, süresi geçmiş ve ücretsiz plan satırları sayılmaz', () => {
+    expect(stackBase([r('premium', null), r('premium', b, 'expired'), r('premium', new Date(now.getTime() - gun)), r('free', b)], 'premium', now)).toBeNull()
+    expect(stackBase([], 'premium', now)).toBeNull()
   })
 })
 

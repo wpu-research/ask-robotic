@@ -3,7 +3,8 @@
 //
 // Abonelik satırları (subscriptions.provider / provider_ref; (provider, provider_ref) unique):
 //   - Deneme: provider 'trial',   ref = userId              → kullanıcı başına tek deneme (DB de garanti eder)
-//   - Ücretli: provider 'prepaid', ref = `${userId}:${planId}` → plan başına tek satır, her ödeme bitişi uzatır
+//   - Ücretli: provider 'prepaid', ref = `${userId}:${planId}` → plan başına tek satır, her ödeme bitişi uzatır;
+//     taban, aynı erişimi veren süren satırların (deneme, hoş geldin, admin dahil) en geç bitişi (stackBase)
 // Ödeme satırları (payments): (provider, provider_ref) unique; etkinleştirme 'pending' → 'succeeded' koşullu
 // güncellemesiyle yapılır, aynı callback iki kez gelse de dönem bir kez uzar (idempotent).
 import {
@@ -104,6 +105,51 @@ export async function startCheckout(
   }
 }
 
+// ---------------------------------------------------------------------------
+// Dönem tabanı: yeni ödeme hangi tarihin üstüne eklenir
+// ---------------------------------------------------------------------------
+
+/** Alınan plan için hangi planların süren satırı "aynı erişim" sayılır (Aile, Premium'un tamamını kapsar). */
+const COVERING_PLANS: Record<PaidPlanId, readonly string[]> = { premium: ['premium', 'family'], family: ['family'] }
+
+type BaseRow = { planId: string; status: string; currentPeriodEnd: Date | null }
+
+/**
+ * Yeni ödemenin dönemi hangi tarihten başlar (extendPeriod tabanı). Saf; satırlar kullanıcının KENDİ abonelikleri.
+ *
+ * Kural: alınan planın erişimini zaten veren etkin satırların en geç bitişi. Böylece ücretsiz dönem (deneme,
+ * hoş geldin, süreli admin) ya da önceki ücretli dönem sürerken ödeme yapan kullanıcının günü yanmaz.
+ *   - Premium alınırken: Premium ve Aile satırları sayılır. Aile, Premium'un tamamını verdiğinden Aile sürerken
+ *     başlayan Premium dönem boşa akardı; Aile bitince başlar.
+ *   - Aile alınırken: yalnız Aile satırları sayılır. Premium (hoş geldin/deneme dahil) sürerken Aile almak bir
+ *     yükseltmedir (koltuklar hemen gerekir), bu yüzden dönem bugünden başlar; süren Premium günleri onunla örtüşür.
+ *   - Bitişi null (süresiz admin) satırlar sayılmaz: sonsuzun üstüne eklenemez, ödeme bugünden başlar (eski davranış;
+ *     zaten ödemeye gerek yok, arayüz yine de engellemez).
+ *   - Başkasının aile planına üyelik sayılmaz (çağıran yalnız sahip olunan satırları verir): sahip üyeyi her an
+ *     çıkarabilir, kendi parasıyla aldığı dönem buna bağlı kalmamalı.
+ * Hiçbiri yoksa null → extendPeriod bugünden başlatır.
+ */
+export function stackBase(rows: readonly BaseRow[], planId: PaidPlanId, now: Date): Date | null {
+  let base: Date | null = null
+  for (const r of rows) {
+    if (!COVERING_PLANS[planId].includes(r.planId) || !r.currentPeriodEnd) continue
+    if (!subscriptionActive({ planId: r.planId as PlanId, status: r.status as SubscriptionStatus, currentPeriodEnd: r.currentPeriodEnd }, now)) continue
+    if (!base || r.currentPeriodEnd > base) base = r.currentPeriodEnd
+  }
+  return base
+}
+
+async function paymentBase(db: Q, userId: string, planId: PaidPlanId, now: Date) {
+  const rows = await db.select({ planId: subscriptions.planId, status: subscriptions.status, currentPeriodEnd: subscriptions.currentPeriodEnd })
+    .from(subscriptions).where(eq(subscriptions.userId, userId))
+  return stackBase(rows, planId, now)
+}
+
+/** Ödeme sayfasında gösterilen "yeni bitiş": activatePayment ile aynı taban (ödeme şimdi tamamlansaydı). */
+export async function projectedPeriodEnd(db: Q, userId: string, planId: PaidPlanId, period: BillingPeriod, now = new Date()) {
+  return extendPeriod(await paymentBase(db, userId, planId, now), period, now)
+}
+
 export type CompleteResult =
   | { ok: true; status: 'succeeded'; paymentId: string; userId: string; periodEnd: Date; already: boolean }
   | { ok: false; status: 'failed' | 'pending' | 'unknown'; paymentId?: string; userId?: string; reason?: string }
@@ -163,16 +209,8 @@ export async function activatePayment(db: Db, paymentId: string, raw: Record<str
     const period = p.period as BillingPeriod
     const ref = prepaidRef(userId, planId)
 
-    // Taban: mevcut ücretli dönemin bitişi; Premium alınırken süren deneme varsa onun bitişi (deneme günü yanmaz)
-    const [cur] = await tx.select({ end: subscriptions.currentPeriodEnd, status: subscriptions.status }).from(subscriptions)
-      .where(and(eq(subscriptions.provider, PREPAID_PROVIDER), eq(subscriptions.providerRef, ref)))
-    let base: Date | null = cur && cur.status !== 'expired' ? cur.end : null
-    if (planId === 'premium') {
-      const [trial] = await tx.select({ end: subscriptions.currentPeriodEnd }).from(subscriptions)
-        .where(and(eq(subscriptions.provider, TRIAL_PROVIDER), eq(subscriptions.providerRef, userId), eq(subscriptions.status, 'trialing')))
-      if (trial?.end && (!base || trial.end > base)) base = trial.end
-    }
-    const end = extendPeriod(base, period, now)
+    // Taban: aynı erişimi veren etkin satırların en geç bitişi (ücretli, deneme, hoş geldin, admin); ayrıntı stackBase
+    const end = extendPeriod(await paymentBase(tx, userId, planId, now), period, now)
 
     const [sub] = await tx.insert(subscriptions).values({
       userId: userId, planId, status: 'active', provider: PREPAID_PROVIDER, providerRef: ref, currentPeriodEnd: end,
@@ -299,8 +337,12 @@ export async function loadAccountSummary(db: Db, userId: string, now = new Date(
   // En yüksek plan; eşitse en geç biten
   cands.sort((a, b) => rank[b.planId] - rank[a.planId] || (b.end?.getTime() ?? Infinity) - (a.end?.getTime() ?? Infinity))
   const best = cands[0]
-  // Aynı planın birden çok satırı varsa (deneme + ücretli) bitiş en geç olan
-  const periodEnd = best ? cands.filter((c) => c.planId === best.planId).reduce<Date | null>((m, c) => (!m || (c.end && c.end > m) ? c.end : m), null) : null
+  // Aynı planın birden çok satırı varsa (deneme/hoş geldin + üstüne eklenmiş ücretli) bitiş en geç olan; biri süresizse null
+  const latestEnd = (cs: Cand[]) => (cs.some((c) => !c.end) ? null : cs.reduce<Date | null>((m, c) => (!m || c.end! > m ? c.end : m), null))
+  const periodEnd = best ? latestEnd(cands.filter((c) => c.planId === best.planId)) : null
+  // Hatırlatma, kullanıcının KENDİ erişiminin gerçekten bittiği güne göre: Aile'nin ardına eklenmiş Premium varsa
+  // Aile bitişinde "süren bitiyor" denmez (stackBase Premium'u Aile bitişinden başlatır)
+  const accessEnd = best ? latestEnd(cands.filter((c) => c.source === 'own')) : null
   const everPaid = owned.some((s) => isPaidPlan(s.planId))
 
   let family: AccountSummary['family'] = null
@@ -321,7 +363,7 @@ export async function loadAccountSummary(db: Db, userId: string, now = new Date(
     grant: best?.source !== 'own' ? null : best.provider === WELCOME_PROVIDER ? 'welcome' : best.provider === ADMIN_PROVIDER ? 'admin' : null,
     // Deneme: 5. gün hatırlatması (bitişe 2 gün); ücretli: bitişe RENEWAL_REMINDER_DAYS gün
     renewalReminder: !!best && best.source === 'own'
-      && needsRenewalReminder(periodEnd, now, best.status === 'trialing' && periodEnd === best.end ? TRIAL_DAYS - TRIAL_REMINDER_DAY : undefined),
+      && needsRenewalReminder(accessEnd, now, best.status === 'trialing' && accessEnd === best.end ? TRIAL_DAYS - TRIAL_REMINDER_DAY : undefined),
     trialAvailable: !owned.some((s) => s.provider === TRIAL_PROVIDER) && !best,
     payments: pays,
     family,

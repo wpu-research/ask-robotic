@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getDb } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth/current'
-import { loadAccountSummary } from '@/lib/billing'
-import { extendPeriod, formatPrice, isPaidPlan, periodFromSlug, priceOf } from '@/lib/pricing'
+import { projectedPeriodEnd } from '@/lib/billing'
+import { formatPrice, isPaidPlan, periodFromSlug, priceOf } from '@/lib/pricing'
 import { getLocale, getT } from '@/i18n/server'
 import { formatDate } from '@/i18n/format'
 import { activeProviderId } from '@/lib/payments'
@@ -37,11 +37,9 @@ export default async function Odeme({ searchParams }: { searchParams: Promise<{ 
     )
   }
 
-  const summary = await loadAccountSummary(getDb(), user.id)
-  const now = new Date()
-  // Aynı plan etkinse yeni dönem mevcut bitişe eklenir (ön ödemeli; gün yanmaz)
-  const base = summary?.plan === planId && summary.source === 'own' ? summary.periodEnd : null
-  const newEnd = extendPeriod(base, period, now)
+  // Aynı erişimi veren dönem (ücretli, deneme, hoş geldin, admin) sürüyorsa yeni dönem onun bitişine eklenir;
+  // taban activatePayment ile aynı (billing.ts stackBase), gösterilen tarih ödemeden sonra yazılanla tutar
+  const newEnd = await projectedPeriodEnd(getDb(), user.id, planId, period)
   const total = priceOf(planId, period)
   const periodName = t(`pricing.period.${period}`)
 
