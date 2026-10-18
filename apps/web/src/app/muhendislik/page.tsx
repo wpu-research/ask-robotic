@@ -51,6 +51,24 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/opencv" className="eng-course" data-testid="eng-opencv">
+        <span className="eng-course-code">OPENCV</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Image processing with OpenCV' : 'Ders: OpenCV ile görüntü işleme'}</b>
+          <span className="eng-level-text">{en ? '12 units, 16+: colour spaces, histograms and thresholds, filters, edges, morphology, contours, colour tracking, perspective, feature matching, face detection and background subtraction. An in-browser playground in every unit (sample image, photo or camera) and Python cv2 code that also runs in the browser. Capstone: a document scanner.' : '12 ünite, 16+: renk uzayları, histogram ve eşikleme, filtreler, kenarlar, morfoloji, konturlar, renk takibi, perspektif, öznitelik eşleştirme, yüz algılama ve arka plan çıkarma. Her ünitede tarayıcıda oyun alanı (örnek görüntü, fotoğraf ya da kamera) ve tarayıcıda da çalışan Python cv2 kodu. Bitirme: belge tarayıcı.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
+      <Link href="/muhendislik/pytorch" className="eng-course" data-testid="eng-pytorch">
+        <span className="eng-course-code">PYTORCH</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Deep learning with PyTorch' : 'Ders: PyTorch ile derin öğrenme'}</b>
+          <span className="eng-level-text">{en ? '10 units, 16+: tensors, autograd, nn.Module, losses and optimisers, the training loop, DataLoader, CNNs, regularisation, RNN/LSTM and attention, transfer learning and deployment. A visualiser in every unit, real PyTorch code and a Colab notebook. Capstone: a digit-recognising CNN that runs in the browser.' : '10 ünite, 16+: tensörler, autograd, nn.Module, kayıp ve optimize ediciler, eğitim döngüsü, DataLoader, CNN, düzenlileştirme, RNN/LSTM ve dikkat, aktarım öğrenmesi ve dağıtım. Her ünitede görselleştirici, gerçek PyTorch kodu ve Colab defteri. Bitirme: tarayıcıda çalışan rakam tanıyan CNN.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <InstructorCard slug="murat-arslan" labelKey="instructor.eyebrow" />
 
       <section aria-labelledby="eng-levels">

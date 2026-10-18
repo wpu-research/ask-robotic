@@ -2,6 +2,8 @@ import type { MetadataRoute } from 'next'
 import { DEMOS } from '@/lib/cv-demolar'
 import { UNITS } from '@/lib/drone/course'
 import { LESSONS } from '@/lib/ml/lessons'
+import { CV_UNITS } from '@/lib/opencv/course'
+import { PT_UNITS } from '@/lib/pytorch/course'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
 import { LEGAL } from './yasal/metinler'
@@ -15,6 +17,8 @@ const PAGES = [
   ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
   ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
+  '/muhendislik/opencv', '/muhendislik/opencv/proje', ...CV_UNITS.map((u) => `/muhendislik/opencv/unite/${u.n}`),
+  '/muhendislik/pytorch', '/muhendislik/pytorch/proje', ...PT_UNITS.map((u) => `/muhendislik/pytorch/unite/${u.n}`),
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

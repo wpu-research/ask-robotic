@@ -97,7 +97,7 @@ from torch import nn
 from sklearn.datasets import make_moons
 
 torch.manual_seed(0)                                     # ${c('tekrarlanabilirlik', 'reproducibility')}
-X, y = make_moons(400, noise=0.2, random_state=0)
+X, y = make_moons(400, noise=0.2, random_state=0)       # ${c('make_moons örnekleri karıştırır', 'make_moons shuffles the samples')}
 X, y = torch.tensor(X, dtype=torch.float32), torch.tensor(y, dtype=torch.float32).unsqueeze(1)
 Xtr, ytr, Xva, yva = X[:300], y[:300], X[300:], y[300:]   # ${c('doğrulama ayrı tutulur', 'validation is held out')}
 
