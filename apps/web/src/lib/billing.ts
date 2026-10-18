@@ -254,7 +254,7 @@ export async function removeFamilyMember(db: Db, ownerId: string, memberId: stri
 // ---------------------------------------------------------------------------
 
 export interface AccountSummary {
-  user: { id: string; name: string; email: string | null; username: string | null }
+  user: { id: string; name: string; email: string | null; username: string | null; hasPassword: boolean }
   /** En yüksek etkin plan (aile üyeliği dahil) */
   plan: 'free' | 'premium' | 'family'
   status: 'none' | 'trialing' | 'active' | 'expired'
@@ -267,8 +267,12 @@ export interface AccountSummary {
 }
 
 export async function loadAccountSummary(db: Db, userId: string, now = new Date()): Promise<AccountSummary | null> {
-  const [user] = await db.select({ id: users.id, name: users.name, email: users.email, username: users.username }).from(users).where(eq(users.id, userId))
-  if (!user) return null
+  const [row] = await db.select({ id: users.id, name: users.name, email: users.email, username: users.username, passwordHash: users.passwordHash })
+    .from(users).where(eq(users.id, userId))
+  if (!row) return null
+  // Parola özeti sayfaya taşınmaz; yalnız var/yok (QR/resimli girişte parola yok)
+  const { passwordHash, ...rest } = row
+  const user = { ...rest, hasPassword: !!passwordHash }
   const cols = { id: subscriptions.id, planId: subscriptions.planId, status: subscriptions.status, end: subscriptions.currentPeriodEnd, provider: subscriptions.provider }
   const [owned, shared, pays] = await Promise.all([
     db.select(cols).from(subscriptions).where(eq(subscriptions.userId, userId)),

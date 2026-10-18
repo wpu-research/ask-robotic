@@ -57,6 +57,18 @@ export const account: typeof Tr = {
     addFailed: "Couldn't add",
     removeFailed: "Couldn't remove",
   },
+  password: {
+    title: 'Password',
+    current: 'Current password',
+    next: 'New password',
+    hint: 'At least 10 characters.',
+    confirm: 'New password (again)',
+    submit: 'Change password',
+    mismatch: "The new passwords don't match",
+    changed: 'Your password was changed. You were signed out on your other devices.',
+    failed: "Couldn't change the password",
+    noPassword: 'This account signs in with a QR card or picture and has no password. Ask your teacher about your sign-in card.',
+  },
   payments: {
     title: 'Payment history',
     none: 'No payments yet.',
@@ -92,5 +104,9 @@ export const account: typeof Tr = {
     tooFrequent: 'Too many requests',
     notLoggedIn: 'Not signed in',
     badRequest: 'Invalid request',
+    currentRequired: 'Enter your current password',
+    badCurrent: 'The current password is wrong',
+    samePassword: 'The new password must be different from the old one',
+    noPassword: "This account signs in with a QR card or picture, not a password; the password can't be changed",
   },
 }

@@ -197,6 +197,12 @@ describe('hesap özeti', () => {
     expect((await loadAccountSummary(db, u.id, new Date(end.getTime() - 3 * gun)))?.renewalReminder).toBe(true)
     expect(await loadAccountSummary(db, u.id, new Date(end.getTime() + gun))).toMatchObject({ plan: 'free', status: 'expired', trialAvailable: false })
   })
+  it('parola özeti taşınmaz; yalnız var/yok bilgisi', async () => {
+    const qr = await yeni({ email: null, username: `qr-${crypto.randomUUID().slice(0, 8)}`, loginMode: 'qr' })
+    const pw = await yeni({ passwordHash: 'scrypt$x' })
+    expect((await loadAccountSummary(db, qr.id, now))?.user).toEqual({ id: qr.id, name: qr.name, email: null, username: qr.username, hasPassword: false })
+    expect((await loadAccountSummary(db, pw.id, now))?.user.hasPassword).toBe(true)
+  })
   it('aile sahibi üyeleri, üye kaynağı görür', async () => {
     const o = await yeni()
     const m = await yeni()

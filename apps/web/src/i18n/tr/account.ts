@@ -56,6 +56,18 @@ export const account = {
     addFailed: 'Eklenemedi',
     removeFailed: 'Çıkarılamadı',
   },
+  password: {
+    title: 'Parola',
+    current: 'Mevcut parola',
+    next: 'Yeni parola',
+    hint: 'En az 10 karakter.',
+    confirm: 'Yeni parola (tekrar)',
+    submit: 'Parolayı değiştir',
+    mismatch: 'Yeni parolalar birbirini tutmuyor',
+    changed: 'Parolan değişti. Diğer cihazlardaki oturumların kapatıldı.',
+    failed: 'Parola değiştirilemedi',
+    noPassword: 'Bu hesap QR kart ya da resimle giriş yapıyor; parolası yok. Giriş kartın için öğretmenine başvur.',
+  },
   payments: {
     title: 'Ödeme geçmişi',
     none: 'Henüz ödeme yok.',
@@ -91,5 +103,9 @@ export const account = {
     tooFrequent: 'Çok sık istek',
     notLoggedIn: 'Giriş yapılmamış',
     badRequest: 'Geçersiz istek',
+    currentRequired: 'Mevcut parolanı yaz',
+    badCurrent: 'Mevcut parola hatalı',
+    samePassword: 'Yeni parola eskisiyle aynı olamaz',
+    noPassword: 'Bu hesap parolayla değil QR kart ya da resimle giriş yapıyor; parola değiştirilemez',
   },
 }

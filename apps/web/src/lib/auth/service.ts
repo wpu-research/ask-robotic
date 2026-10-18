@@ -3,9 +3,11 @@ import { z } from 'zod'
 import { profileSchema } from '@/lib/profile-schema'
 import { DUMMY_HASH, hashPassword, verifyPassword } from './password'
 import { grantWelcome } from '../membership'
-import { createSession } from './session'
+import { createSession, deleteOtherSessions } from './session'
 
 const email = z.string().trim().toLowerCase().email().max(254)
+// Kayıt ve parola değiştirmede aynı kural
+const newPassword = z.string().min(10, 'Parola en az 10 karakter olmalı').max(200)
 
 /** Yalnız doğum yılı tutulduğu için yıl farkı ≤ 16 ise kişi 16 yaşından küçük olabilir: veli onayı istenir. */
 export const mayBeUnder16 = (birthYear: number, now = new Date()) => now.getFullYear() - birthYear <= 16
@@ -14,7 +16,7 @@ export function registerSchemaFor(now = new Date()) {
   const year = now.getFullYear()
   return z.object({
     email,
-    password: z.string().min(10, 'Parola en az 10 karakter olmalı').max(200),
+    password: newPassword,
     name: z.string().trim().min(1, 'Adını yaz').max(80),
     // Okul öğrenci hesaplarını öğretmen açar; burada kendi kaydı yalnız şu rollerle (admin asla)
     role: z.enum(['student', 'parent', 'teacher']).default('student'),
@@ -88,4 +90,31 @@ export async function loginUser(db: Db, input: unknown): Promise<AuthResult> {
   if (!user || !user.passwordHash || !valid) return { ok: false, code: 'bad_credentials', message: 'Kullanıcı adı/e-posta ya da parola hatalı' }
   const { token, expiresAt } = await createSession(db, user.id)
   return { ok: true, token, expiresAt, user: pick(user) }
+}
+
+export const changePasswordSchema = z.object({
+  current: z.string().min(1, 'Mevcut parolanı yaz').max(200),
+  next: newPassword,
+})
+
+export type ChangePasswordResult =
+  | { ok: true; signedOut: number }
+  | { ok: false; code: 'invalid_input' | 'no_password' | 'bad_current' | 'same_password' | 'not_found'; message: string }
+
+/**
+ * Mevcut parolayı doğrulayıp yenisini yazar; keepToken dışındaki tüm oturumları kapatır.
+ * Parolası olmayan hesaplar (QR / resimli giriş) parolayı öğretmeninden değiştirir.
+ */
+export async function changePassword(db: Db, userId: string, input: unknown, keepToken?: string): Promise<ChangePasswordResult> {
+  const parsed = changePasswordSchema.safeParse(input)
+  if (!parsed.success) return { ok: false, code: 'invalid_input', message: parsed.error.issues[0]?.message ?? 'Geçersiz bilgi' }
+  const { current, next } = parsed.data
+  const [user] = await db.select({ id: users.id, passwordHash: users.passwordHash }).from(users).where(eq(users.id, userId)).limit(1)
+  if (!user) return { ok: false, code: 'not_found', message: 'Hesap bulunamadı' }
+  if (!user.passwordHash) return { ok: false, code: 'no_password', message: 'Bu hesap parolayla değil QR kart ya da resimle giriş yapıyor; parola değiştirilemez' }
+  if (!(await verifyPassword(current, user.passwordHash))) return { ok: false, code: 'bad_current', message: 'Mevcut parola hatalı' }
+  if (current === next) return { ok: false, code: 'same_password', message: 'Yeni parola eskisiyle aynı olamaz' }
+  await db.update(users).set({ passwordHash: await hashPassword(next) }).where(eq(users.id, userId))
+  const signedOut = await deleteOtherSessions(db, userId, keepToken)
+  return { ok: true, signedOut }
 }

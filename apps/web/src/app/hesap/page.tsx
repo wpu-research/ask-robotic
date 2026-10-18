@@ -11,6 +11,7 @@ import type { MessageKey, TFunction } from '@/i18n'
 import { TrialButton } from '@/components/paywall/trial-button'
 import { FamilyMembers } from '@/components/account/family-members'
 import { DataRights } from '@/components/account/data-rights'
+import { ChangePassword } from '@/components/account/change-password'
 import { LegalLinks } from '@/components/pricing/legal-links'
 import '../odeme.css'
 
@@ -108,6 +109,11 @@ export default async function Hesap({ searchParams }: { searchParams: Promise<{ 
             <FamilyMembers initial={s.family.members} limit={s.family.limit} />
           </section>
         )}
+
+        <section className="ac-card" aria-labelledby="ac-parola">
+          <h2 id="ac-parola">{t('account.password.title')}</h2>
+          {s.user.hasPassword ? <ChangePassword /> : <p className="muted">{t('account.password.noPassword')}</p>}
+        </section>
 
         <section className="ac-card" aria-labelledby="ac-odeme">
           <h2 id="ac-odeme">{t('account.payments.title')}</h2>
