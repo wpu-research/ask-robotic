@@ -1,6 +1,8 @@
 // Ders: kelime vektörleri. Robotun bakım kayıtlarından 20 kısa cümle; kelimelerin yan yana geçme sayıları (eş-bulunma), PPMI ile
 // "beklenenden sık" birlikteliklere çevrilir, ortalaması çıkarılıp altuzay (güç) yöntemiyle 2B haritaya indirgenir. Komşu = kosinüs.
 import { cap, fmt, rng, type Bi, type Frame, type Lesson } from './core'
+import { explainedRatio, silhouette } from './egitim/metrics'
+import { B, type EgitimRaporu } from './egitim/rapor'
 
 /** Kelimeler: id (Python kodundaki İngilizce yazım), iki dilli etiket ve konu (0 algı, 1 hareket, 2 enerji, −1 robot). */
 export const WORDS: Array<{ id: string; label: Bi; topic: number }> = [
@@ -88,6 +90,73 @@ export function subspace(Z: number[][], iters: number, seed = 4) {
   return { steps, kept: kept / total }
 }
 
+/** Simetrik matrisin özdeğerleri (Jacobi dönüşleri), büyükten küçüğe. Küçük matrisler (19×19) için yeterince hızlı. */
+export function symEig(A0: number[][]): number[] {
+  const n = A0.length
+  const A = A0.map((r) => [...r])
+  for (let sweep = 0; sweep < 60; sweep++) {
+    let off = 0
+    for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) off += A[p][q] ** 2
+    if (off < 1e-22) break
+    for (let p = 0; p < n; p++) for (let q = p + 1; q < n; q++) {
+      if (Math.abs(A[p][q]) < 1e-300) continue
+      const th = (A[q][q] - A[p][p]) / (2 * A[p][q])
+      const t = Math.sign(th || 1) / (Math.abs(th) + Math.sqrt(th * th + 1))
+      const c = 1 / Math.sqrt(t * t + 1), sn = t * c
+      for (let k = 0; k < n; k++) { const akp = A[k][p], akq = A[k][q]; A[k][p] = c * akp - sn * akq; A[k][q] = sn * akp + c * akq }
+      for (let k = 0; k < n; k++) { const apk = A[p][k], aqk = A[q][k]; A[p][k] = c * apk - sn * aqk; A[q][k] = sn * apk + c * aqk }
+    }
+  }
+  return A.map((r, i) => r[i]).sort((a, b) => b - a)
+}
+
+/**
+ * Eğitim paneli (öğrenme değil, gömmenin değerlendirmesi): ortalaması çıkarılmış birim PPMI vektörlerinin bileşen başına açıklanan
+ * varyansı (Python'daki SVD'nin s² / Σs²), 2B haritanın tuttuğu pay, konu siluet skoru, en yakın komşunun aynı konudan olma oranı
+ * ve konular arası ortalama kosinüs.
+ */
+export function wvReport({ win = 2 }: Record<string, number>): EgitimRaporu {
+  const w = Math.max(1, Math.min(3, Math.round(win)))
+  const U = unitRows(ppmi(cooc(corpus(), w)))
+  const n = WORDS.length
+  const mu = U[0].map((_, k) => U.reduce((s, u) => s + u[k], 0) / n)
+  const Z = U.map((u) => u.map((x, k) => x - mu[k]))
+  const C = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => Z.reduce((s, z) => s + z[i] * z[j], 0)))
+  const ev = explainedRatio(symEig(C))
+  const cum: number[] = []
+  ev.forEach((v, i) => cum.push((cum[i - 1] ?? 0) + v))
+  const topic = WORDS.map((x) => x.topic)
+  let same = 0, ns = 0, other = 0, no = 0, nnOk = 0, nnN = 0
+  for (let a = 0; a < n; a++) {
+    if (topic[a] < 0) continue
+    for (let b = a + 1; b < n; b++) { if (topic[b] < 0) continue; const c = cosine(U, a, b); if (topic[a] === topic[b]) { same += c; ns++ } else { other += c; no++ } }
+    nnN++; if (topic[neighbours(U, a, 1)[0][0]] === topic[a]) nnOk++
+  }
+  const T = [-1, 0, 1, 2], TN = ['robot', 'algı', 'hareket', 'enerji']
+  const tm = T.map((ta) => T.map((tb) => {
+    let s = 0, m = 0
+    for (let a = 0; a < n; a++) for (let b = 0; b < n; b++) if (a !== b && topic[a] === ta && topic[b] === tb) { s += cosine(U, a, b); m++ }
+    return m ? s / m : 1
+  }))
+  const comp = ev.map((_, i) => i + 1)
+  return {
+    kind: 'kumeleme', model: `PPMI + SVD, pencere ${w}`, seed: 0, hyper: { window: w, words: n, sentences: corpus().length },
+    history: { x: 'component', cols: { component: comp, explained: ev, cumulative: cum } },
+    final: [
+      { key: 'kept_2d', label: B('2B haritanın tuttuğu varyans', 'variance kept by the 2D map'), value: cum[1], fmt: 'pct' },
+      { key: 'silhouette', label: B('konu siluet skoru', 'topic silhouette'), value: silhouette(U, topic), fmt: 3 },
+      { key: 'nn_topic', label: B('en yakın komşu aynı konuda', 'nearest neighbour in same topic'), value: nnOk / nnN, fmt: 'pct' },
+      { key: 'cos_same', label: B('ort. kosinüs: aynı konu', 'mean cosine: same topic'), value: same / ns, fmt: 3 },
+      { key: 'cos_other', label: B('ort. kosinüs: farklı konu', 'mean cosine: other topic'), value: other / no, fmt: 3 },
+    ],
+    charts: [
+      { kind: 'bar', id: 'scree', title: B('Bileşen başına açıklanan varyans', 'Explained variance per component'), labels: comp.map(String), series: [{ key: 'explained', label: B('pay', 'share'), values: ev, tone: 1 }], yMin: 0 },
+      { kind: 'line', id: 'cumulative', title: B('Birikimli açıklanan varyans', 'Cumulative explained variance'), x: comp, xLabel: B('bileşen sayısı', 'components'), series: [{ key: 'cumulative', label: B('birikimli', 'cumulative'), values: cum, tone: 3 }], yMin: 0, yMax: 1, marker: { x: 2, label: B('2B harita', '2D map') } },
+      { kind: 'heat', id: 'topic-cos', title: B('Konular arası ortalama kosinüs', 'Mean cosine between topics'), rows: TN, cols: TN, values: tm, showValues: true, digits: 2 },
+    ],
+  }
+}
+
 export interface WvFrame extends Frame {
   S: number[][]
   /** Eş-bulunma ya da PPMI matrisi (sahnedeki ısı haritası). */
@@ -149,11 +218,31 @@ export const KELIME_VEKTORLERI: Lesson<WvFrame> = {
     ['Y, cos = u[:, :2] * s[:2], U @ U.T', '2B konumlar, kosinüs', '2D positions, cosine'],
     ['a, b, c = ix["lidar"], ix["sonar"], ix["battery"]'],
     ['print(cos[a, b].round(2), cos[a, c].round(2), Y[a].round(2))'],
+    ['ev = s ** 2 / (s ** 2).sum()', 'bileşen başına açıklanan varyans', 'explained variance per component'],
+    ['history = {"component": list(range(1, 20)),', 'değerlendirme geçmişi', 'evaluation history'],
+    ['           "explained": list(ev), "cumulative": list(ev.cumsum())}'],
+    ['top = {w: i // 2 for i, g in enumerate(T) for w in g}', 'kelimenin konusu', 'topic of each word'],
+    ['tw = [ix[w] for w in V if w in top]'],
+    ['same = [cos[i, j] for i in tw for j in tw if i < j and top[V[i]] == top[V[j]]]'],
+    ['other = [cos[i, j] for i in tw for j in tw if i < j and top[V[i]] != top[V[j]]]'],
+    ['for k, v in [("kept_2d", ev[:2].sum()), ("cos_same", np.mean(same)),', 'son ölçümler', 'final metrics'],
+    ['             ("cos_other", np.mean(other))]: print(f"{k:<10}{v:>8.3f}")'],
+    ['import csv'],
+    ['with open("egitim_gecmisi.csv", "w", newline="") as f:', 'satır başına bir bileşen', 'one row per component'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    plt.bar(history["component"], history["explained"])'],
+    ['    plt.plot(history["component"], history["cumulative"], "o-")'],
+    ['    plt.xlabel("component"); plt.show()'],
+    ['except ImportError:'],
+    ['    print("matplotlib yok: grafik atlandı")'],
   ],
   params: [
     { key: 'word', label: { tr: 'Seçili kelime (1 robot, 2 LiDAR … 19 güç)', en: 'Selected word (1 robot, 2 lidar … 19 power)' }, min: 1, max: 19, step: 1, value: 2 },
     { key: 'win', label: { tr: 'Pencere boyu', en: 'Window size' }, min: 1, max: 3, step: 1, value: 2 },
   ],
+  report: wvReport,
   run({ word = 2, win = 2 }) {
     const S = corpus()
     const sel = Math.max(0, Math.min(WORDS.length - 1, Math.round(word) - 1))

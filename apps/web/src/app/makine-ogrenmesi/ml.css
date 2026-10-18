@@ -186,3 +186,61 @@
   .py-run-status { margin-left: 0; width: 100%; }
   .vs-item { padding: 16px; }
 }
+
+/* Eğitim paneli (ders ve proje): ölçüm kutuları, eşik kaydırıcısı, SVG grafik ızgarası, veri tablosu, dışa aktarım */
+.eg { display: grid; gap: 14px; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); min-width: 0; }
+.eg-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px 20px; flex-wrap: wrap; }
+.eg-head h2 { font-size: 20px; margin: 0 0 4px; }
+.eg-sub { margin: 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.eg-export { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.eg-export > span { font-size: 12px; color: var(--muted); font-weight: 600; margin-right: 2px; }
+.eg-final { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 8px; margin: 0; }
+.eg-m { padding: 8px 10px; border: 1px solid var(--line); border-radius: calc(var(--radius) * .6); background: var(--bg-soft); min-width: 0; }
+.eg-m dt { font-size: 11px; color: var(--muted); line-height: 1.3; }
+.eg-m dd { margin: 2px 0 0; font-size: 17px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.eg-live { margin: 0; font-size: 12px; color: var(--muted); }
+.eg-thr { display: flex; flex-wrap: wrap; gap: 10px 22px; align-items: center; padding: 10px 12px; border: 1px dashed var(--line); border-radius: calc(var(--radius) * .6); }
+.eg-thr label { display: grid; gap: 4px; font-size: 13px; color: var(--muted); flex: 1 1 220px; min-width: 0; }
+.eg-thr label b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.eg-thr input { accent-color: var(--brand); width: 100%; }
+.eg-thr dl { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; }
+.eg-thr dt { font-size: 11px; color: var(--muted); }
+.eg-thr dd { margin: 0; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.eg-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 14px; }
+.eg-chart { margin: 0; min-width: 0; display: grid; align-content: start; gap: 4px; padding: 10px; border: 1px solid var(--line); border-radius: calc(var(--radius) * .6); background: var(--bg-soft); }
+.eg-chart figcaption { font-size: 13px; font-weight: 600; color: var(--ink); }
+.eg-chart svg { display: block; width: 100%; height: auto; overflow: visible; }
+.eg-chart svg text { font: 500 9.5px Poppins, system-ui, sans-serif; fill: var(--muted); font-variant-numeric: tabular-nums; }
+.eg-chart svg text.eg-al { font-size: 10px; fill: var(--ink); }
+.eg-chart svg text.eg-cv { fill: var(--ink); font-weight: 700; }
+.eg-chart svg text.eg-cv-on { fill: #fff; }
+.eg-chart line.eg-grid { stroke: var(--line); stroke-width: .8; }
+.eg-axis { stroke: var(--muted); stroke-width: 1; opacity: .6; }
+.eg-ref { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: .8; }
+.eg-line { fill: none; stroke-width: 1.8; stroke-linejoin: round; stroke-linecap: round; }
+.eg-pt { opacity: .7; }
+.eg-cell { fill: var(--surface); }
+.eg-dot { fill: var(--surface); stroke: var(--ink); stroke-width: 2; }
+.eg-marker line { stroke: var(--ml-c3); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.eg-chart .eg-marker text { fill: var(--ml-c3); font-weight: 600; }
+.eg-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 12px; font-size: 11px; color: var(--muted); }
+.eg-legend li { display: inline-flex; align-items: center; gap: 5px; }
+.eg-legend i { width: 14px; height: 3px; border-radius: 2px; display: inline-block; }
+.eg-legend i.eg-dash { -webkit-mask: repeating-linear-gradient(90deg, #000 0 4px, transparent 4px 6px); mask: repeating-linear-gradient(90deg, #000 0 4px, transparent 4px 6px); }
+.eg-note { margin: 0; font-size: 11.5px; color: var(--muted); }
+.eg-tbtn { justify-self: start; border: 0; background: none; padding: 2px 0; color: var(--brand); font: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+.eg-tbtn:hover { text-decoration: underline; }
+.eg-table { max-height: 220px; overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+.eg-table table { width: 100%; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums; }
+.eg-table th, .eg-table td { padding: 3px 6px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+.eg-table thead th { position: sticky; top: 0; background: var(--bg-soft); color: var(--muted); font-weight: 600; }
+.eg-table tbody th { text-align: left; font-weight: 500; color: var(--muted); }
+@media (max-width: 600px) {
+  .eg { padding: 14px; }
+  .eg-final { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Python çıktısı: matplotlib şekilleri ve indirilebilir dosyalar */
+.py-run-figs { display: grid; gap: 10px; margin-top: 10px; }
+.py-run-figs img { display: block; max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: calc(var(--radius) * .6); background: #fff; }
+.py-run-files { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; font-size: 13px; color: var(--muted); }

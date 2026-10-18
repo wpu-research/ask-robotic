@@ -1,6 +1,8 @@
 // Ders: yüz doğrulama. Sinir ağı her yüzü 64 sayılık bir gömme vektörüne çevirir; iki vektörün kosinüs benzerliği eşiği geçerse
 // "aynı kişi". Eşik yükselince yanlış kabul (FAR) azalır, yanlış ret (FRR) artar; laboratuvar kapısındaki robot bu dengeyi seçer.
 import { cap, fmt, gauss, rng, type Frame, type Lesson } from './core'
+import { histogram } from './egitim/metrics'
+import { B, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 export const DIM = 64
 export const PEOPLE = 6
@@ -57,6 +59,44 @@ export function project2d(X: number[][]): Array<[number, number]> {
     comps.push(v)
   }
   return Z.map((z) => [dotp(z, comps[0]), dotp(z, comps[1])])
+}
+
+/**
+ * Eğitim paneli (doğrulamanın değerlendirmesi): bütün çiftlerin kosinüs benzerliği skor, "aynı kişi" pozitif sınıf. Eşik süpürmesi
+ * (0, 0,01 … 1) FAR, FRR ve doğruluğu verir; seçili eşikte karışıklık matrisi, ROC/AUC ve kesinlik–duyarlılık.
+ */
+export function faceReport({ th = 0.42 }: Record<string, number>): EgitimRaporu {
+  const { X, lab } = embeddings()
+  const y: number[] = [], sc: number[] = []
+  for (let i = 0; i < X.length; i++) for (let j = i + 1; j < X.length; j++) { y.push(lab[i] === lab[j] ? 1 : 0); sc.push(dotp(X[i], X[j])) }
+  const gen = sc.filter((_, k) => y[k] === 1), imp = sc.filter((_, k) => y[k] === 0)
+  const sw = sweep(gen, imp)
+  const acc = sw.th.map((t) => sc.reduce((a, s, k) => a + ((s >= t ? 1 : 0) === y[k] ? 1 : 0), 0) / sc.length)
+  const blk = siniflandirmaBlok({ y, pred: sc.map((s) => (s >= th ? 1 : 0)), labels: ['farklı', 'aynı'], scores: sc, threshold: th, pos: B('aynı kişi', 'same person'), neg: B('farklı kişi', 'different person') })
+  const e = Math.round(sw.eer * 100)
+  const lo = Math.min(...sc), hi = Math.max(...sc)
+  const hg = histogram(gen, 30, lo, hi), hm = histogram(imp, 30, lo, hi)
+  const share = (c: number[], n: number) => c.map((v) => Math.round((1000 * v) / n))
+  return {
+    kind: 'siniflandirma', model: 'kosinüs benzerliği + eşik (64 boyutlu gömme)', seed: 1, hyper: { threshold: th, people: PEOPLE, photos: PEOPLE * PER, pairs: sc.length },
+    history: { x: 'threshold', cols: { threshold: sw.th, far: sw.far, frr: sw.frr, accuracy: acc } },
+    final: [
+      ...blk.final,
+      { key: 'far', label: B('yanlış kabul (FAR)', 'false accept (FAR)'), value: rate(gen, imp, th).far, fmt: 'pct' },
+      { key: 'frr', label: B('yanlış ret (FRR)', 'false reject (FRR)'), value: rate(gen, imp, th).frr, fmt: 'pct' },
+      { key: 'eer_threshold', label: B('eşit hata eşiği', 'equal-error threshold'), value: sw.eer, fmt: 2 },
+      { key: 'eer', label: B('eşit hata oranı', 'equal error rate'), value: (sw.far[e] + sw.frr[e]) / 2, fmt: 'pct' },
+    ],
+    confusion: blk.confusion, scores: blk.scores,
+    charts: [
+      { kind: 'line', id: 'far-frr', title: B('Eşiğe göre FAR ve FRR', 'FAR and FRR by threshold'), x: sw.th, xLabel: B('eşik (kosinüs)', 'threshold (cosine)'), yMin: 0, yMax: 1,
+        series: [{ key: 'far', label: B('yanlış kabul', 'false accept'), values: sw.far, tone: 0 }, { key: 'frr', label: B('yanlış ret', 'false reject'), values: sw.frr, tone: 1 }, { key: 'accuracy', label: B('doğruluk', 'accuracy'), values: acc, tone: 3, dash: true }],
+        marker: { x: sw.eer, label: B(`eşit hata: ${sw.eer.toFixed(2).replace('.', ',')}`, `equal error: ${sw.eer.toFixed(2)}`) } },
+      { kind: 'hist', id: 'scores', title: B('Benzerlik dağılımı (binde)', 'Similarity distribution (per mille)'), edges: hg.edges, xLabel: B('kosinüs benzerliği', 'cosine similarity'),
+        frames: [{ label: 'aynı', counts: share(hg.counts, gen.length) }, { label: 'farklı', counts: share(hm.counts, imp.length) }] },
+      ...blk.charts,
+    ],
+  }
 }
 
 export interface Attempt { probe: number; claim: number; who: number; cos: number; ok: boolean }
@@ -125,8 +165,28 @@ export const YUZ_DOGRULAMA: Lesson<FaceFrame> = {
     ["    print(f'eşik {th}: FAR {far:.1%}, FRR {frr:.1%}')"],
     ['tpl = unit(X[lab == 2][:5].mean(0))', 'kayıt şablonu: 5 foto', 'enrolled template: 5 photos'],
     ['print(X[lab == 2][-1] @ tpl, X[lab == 4][0] @ tpl)', 'kapıda iki deneme', 'two tries at the door'],
+    ["history = {'threshold': [], 'far': [], 'frr': [], 'accuracy': []}", 'eşik süpürme geçmişi', 'threshold sweep history'],
+    ['for th in np.arange(101) / 100:'],
+    ['    acc = ((S[i, j] >= th) == same).mean()'],
+    ['    r = [th, (imp >= th).mean(), (gen < th).mean(), acc]'],
+    ['    for k, v in zip(history, r): history[k].append(float(v))'],
+    ["d = np.abs(np.array(history['far']) - np.array(history['frr']))", 'eşit hata noktası', 'equal-error point'],
+    ["e = d.argmin(); eer = (history['far'][e] + history['frr'][e]) / 2"],
+    ["for k, v in [('eer_esik', history['threshold'][e]), ('eer', eer),", 'son ölçümler', 'final metrics'],
+    ["             ('far_042', history['far'][42]), ('frr_042', history['frr'][42])]:"],
+    ["    print(f'{k:<10}{v:>8.3f}')"],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as f:", 'satır başına bir eşik', 'one row per threshold'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ["    for k in ('far', 'frr'): plt.plot(history['threshold'], history[k], label=k)"],
+    ["    plt.xlabel('threshold'); plt.legend(); plt.show()"],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [{ key: 'th', label: { tr: 'Eşik (kosinüs)', en: 'Threshold (cosine)' }, min: 0.1, max: 0.9, step: 0.01, value: 0.42 }],
+  report: faceReport,
   run({ th = 0.42 }) {
     const { X, lab } = embeddings()
     const P2 = project2d(X)

@@ -39,7 +39,8 @@ describe('ML veri setleri', () => {
     let opened = 0
     for (const l of [...LESSONS, ...PROJECTS]) {
       const src = l.code.map(([c]) => c).join('\n')
-      const files = [...src.matchAll(/'([\w-]+\.csv)'/g)].map((m) => m[1])
+      // egitim_gecmisi.csv kodun yazdığı eğitim geçmişidir, açtığı veri seti değil
+      const files = [...src.matchAll(/'([\w-]+\.csv)'/g)].map((m) => m[1]).filter((f) => f !== 'egitim_gecmisi.csv')
       if (files.length) { opened++; expect(files[0], l.slug).toBe(datasetsFor(l.slug)[0]?.file) }
       expect(src, l.slug).not.toMatch(/^from (sharp|cizgi|surus|renk|pist|robot|lidar|imu|motor|posta|depo) import/m)
     }

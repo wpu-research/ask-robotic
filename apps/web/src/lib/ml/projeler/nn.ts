@@ -45,9 +45,9 @@ export const adamState = (n: NN): Adam => ({ m: new Float64Array(n.w.length), v:
 
 /**
  * Bir mini grup üzerinde ortalama kare hata, geri yayılım ve tek Adam adımı. Dönüş: adımdan önceki kayıp.
- * Kayıp = gruptaki bütün çıktıların (tahmin − hedef)² ortalaması.
+ * Kayıp = gruptaki bütün çıktıların (tahmin − hedef)² ortalaması. `gnorm` verilirse katman başına gradyan normu oraya yazılır.
  */
-export function nnTrainBatch(n: NN, opt: Adam, X: ArrayLike<number>[], Y: ArrayLike<number>[], lr: number): number {
+export function nnTrainBatch(n: NN, opt: Adam, X: ArrayLike<number>[], Y: ArrayLike<number>[], lr: number, gnorm?: number[]): number {
   const g = new Float64Array(n.w.length)
   const L = n.sizes.length - 1, K = n.sizes[L], B = X.length
   let loss = 0
@@ -75,6 +75,8 @@ export function nnTrainBatch(n: NN, opt: Adam, X: ArrayLike<number>[], Y: ArrayL
       d = prev
     }
   }
+  // isteğe bağlı: katman başına gradyan normu (ağırlık + sapma), eğitim paneli için
+  if (gnorm) for (let l = 1; l <= L; l++) { let q = 0; const e = offs[l] + n.sizes[l - 1] * n.sizes[l] + n.sizes[l]; for (let i = offs[l]; i < e; i++) q += g[i] * g[i]; gnorm[l - 1] = Math.sqrt(q) }
   opt.t++
   const c1 = 1 - 0.9 ** opt.t, c2 = 1 - 0.999 ** opt.t
   for (let i = 0; i < n.w.length; i++) {
@@ -90,4 +92,11 @@ export function nnMutate(n: NN, r: () => number, sigma: number, rate = 1): NN {
   const c = nnClone(n)
   for (let i = 0; i < c.w.length; i++) if (r() < rate) c.w[i] += gauss(r) * sigma
   return c
+}
+
+/** Katman `l`'nin (1'den başlar) ağırlıkları (sapmalar hariç), eğitim panelindeki histogramlar için kopya. */
+export function nnLayerWeights(n: NN, l: number): Float64Array {
+  let o = 0
+  for (let k = 1; k < l; k++) o += n.sizes[k - 1] * n.sizes[k] + n.sizes[k]
+  return n.w.slice(o, o + n.sizes[l - 1] * n.sizes[l])
 }

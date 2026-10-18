@@ -7,6 +7,7 @@ import type { Lang } from '@/lib/ml/core'
 import { LESSONS } from '@/lib/ml/lessons'
 import { DRAW, readPal } from './draw'
 import { SCENES } from './scenes'
+import { EgitimPaneli } from './egitim-paneli'
 
 const W = 720, H = 460
 const BASE_MS = 700
@@ -36,6 +37,8 @@ export function MlPlayer({ slug }: { slug: string }) {
   const lang = useLocale() as Lang
   const [params, setParams] = useState<Record<string, number>>(() => Object.fromEntries(lesson.params.map((p) => [p.key, p.value])))
   const frames = useMemo(() => lesson.run(params), [lesson, params])
+  // eğitim paneli: aynı parametrelerle gerçek eğitim (yalnız parametre değişince yeniden hesaplanır)
+  const rapor = useMemo(() => lesson.report?.(params) ?? null, [lesson, params])
   const [idx, setIdx] = useState(0)
   const [playing, setPlaying] = useState(false)
   const [speed, setSpeed] = useState(1)
@@ -74,6 +77,7 @@ export function MlPlayer({ slug }: { slug: string }) {
   const col = Math.min(44, Math.max(...lesson.code.map(([c]) => c.length))) + 2
   const t = (tr: string, en: string) => (lang === 'tr' ? tr : en)
   return (
+    <>
     <section className="ml-player" ref={host} aria-label={lesson.title[lang]} data-testid="ml-player">
       <div className="ml-stage">
         <canvas ref={cv} className="ml-canvas" style={{ aspectRatio: `${W} / ${H}` }} role="img" aria-label={`${f.cap[L]} · ${f.stat?.[L] ?? ''}`} />
@@ -115,5 +119,8 @@ export function MlPlayer({ slug }: { slug: string }) {
         </ol>
       </div>
     </section>
+    {/* ilk karede tüm eğitim görünür; oynatınca eğriler kareyle birlikte açılır */}
+    {rapor && <EgitimPaneli rapor={rapor} lang={lang} slug={lesson.slug} progress={idx === 0 ? 1 : idx / Math.max(1, frames.length - 1)} />}
+    </>
   )
 }

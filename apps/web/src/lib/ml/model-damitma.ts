@@ -1,6 +1,7 @@
 // Ders: model damıtma (bilgi damıtma). Sunucudaki büyük öğretmen ağ (2 → 64 → 3) 1500 sürüşle zemin türünü öğrenir; robotun
 // mikrodenetleyicisine sığan öğrenci (2 → 4 → 3) yalnız 24 örnek görür: bir kez sert etiketlerle, bir kez öğretmenin sıcaklıklı yumuşak çıktılarıyla.
 import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt } from './core'
+import { B, gecmisGrafik, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 export interface Net { W1: number[][]; b1: number[]; W2: number[][]; b2: number[]; h: number }
 /** Zemin türleri: 0 beton, 1 çim, 2 çakıl. Özellikler: titreşim (x) ve tekerlek kayması (y), ölçekli. */
@@ -96,6 +97,53 @@ export function distill(T: number, n: number) {
   return { t, small, soft, hard, dist, hardS, softS, every, hardAcc: hardS.map((s) => accuracy(s, t.test)), softAcc: softS.map((s) => accuracy(s, t.test)) }
 }
 
+/** KL(p ‖ q), sıfır olasılıklar atlanır. */
+const kl = (p: number[], q: number[]) => p.reduce((a, pk, k) => (pk > 0 ? a + pk * Math.log(pk / Math.max(q[k], 1e-12)) : a), 0)
+
+/**
+ * Eğitim paneli: aynı damıtma. Her 40 adımda (dersin anlık görüntüleri) iki öğrencinin 1000 yeni sürüşte doğruluğu, sert öğrencinin
+ * kendi örneklerindeki çapraz entropisi ve damıtılmış öğrencinin öğretmene KL uzaklığı (sıcaklık T'de). Sonda damıtılmış öğrencinin
+ * karışıklık matrisi; sert öğrencinin eğitim − test farkı ezberlemeyi gösterir.
+ */
+export function damitmaReport({ T = 4, n = 24 }: Record<string, number>): EgitimRaporu {
+  const Tm = Math.max(0.5, T), nn = Math.max(6, Math.round(n))
+  const d = distill(Tm, nn)
+  const step = d.hardS.map((_, i) => i * d.every)
+  const hardLoss = d.hardS.map((net) => d.small.reduce((a, q) => a - Math.log(Math.max(softmax(logits(net, q.x, q.y))[q.c], 1e-12)), 0) / d.small.length)
+  const softKl = d.softS.map((net) => d.small.reduce((a, q, i) => a + kl(d.soft[i], softmax(logits(net, q.x, q.y), Tm)), 0) / d.small.length)
+  const r: EgitimRaporu = {
+    kind: 'sinir-agi', model: B('öğretmen MLP 2-64-3 → öğrenci 2-4-3, tanh', 'teacher MLP 2-64-3 → student 2-4-3, tanh'), seed: 3, hyper: { T: Tm, n: nn, lr: 0.75, steps: 2000, teacher_params: paramCount(d.t.net), student_params: paramCount(d.hard) },
+    history: { x: 'step', cols: { step, hard_acc: d.hardAcc, soft_acc: d.softAcc, hard_loss: hardLoss, soft_kl: softKl } },
+    final: [], charts: [],
+  }
+  const tp = d.t.test.map((q) => predict(d.dist, q.x, q.y))
+  const blk = siniflandirmaBlok({ y: d.t.test.map((q) => q.c), pred: tp, labels: ['beton', 'çim', 'çakıl'], prefix: 'soft_', title: B('damıtılmış öğrenci', 'distilled student') })
+  r.confusion = blk.confusion
+  const hardTrain = accuracy(d.hard, d.small)
+  r.final = [
+    { key: 'teacher_acc', label: B('öğretmen test doğruluğu', 'teacher test accuracy'), value: d.t.acc, fmt: 'pct' },
+    { key: 'hard_acc', label: B('sert öğrenci test doğruluğu', 'hard student test accuracy'), value: d.hardAcc.at(-1)!, fmt: 'pct' },
+    { key: 'soft_acc', label: B('damıtılmış öğrenci test doğruluğu', 'distilled student test accuracy'), value: d.softAcc.at(-1)!, fmt: 'pct' },
+    { key: 'hard_gap', label: B('sert öğrenci: eğitim − test', 'hard student: train − test'), value: hardTrain - d.hardAcc.at(-1)!, fmt: 3 },
+    { key: 'soft_kl', label: B('son KL (öğretmen ‖ öğrenci)', 'final KL (teacher ‖ student)'), value: softKl.at(-1)!, fmt: 4 },
+    ...blk.final.filter((f) => f.key !== 'soft_accuracy'),
+  ]
+  r.charts = [
+    {
+      ...gecmisGrafik(r, 'acc', B('Test doğruluğu (1000 yeni sürüş)', 'Test accuracy (1000 new drives)'), [], { yMax: 1 }),
+      series: [
+        { key: 'hard_acc', label: B('sert etiket', 'hard labels'), values: d.hardAcc, tone: 0 },
+        { key: 'soft_acc', label: B('damıtılmış', 'distilled'), values: d.softAcc, tone: 1 },
+        { key: 'teacher', label: B('öğretmen', 'teacher'), values: step.map(() => d.t.acc), tone: 3, dash: true },
+      ],
+    },
+    gecmisGrafik(r, 'hard-loss', B('Sert öğrenci: çapraz entropi (kendi örnekleri)', 'Hard student: cross-entropy (own examples)'), [['hard_loss', B('kayıp', 'loss'), 0]], { logY: true }),
+    gecmisGrafik(r, 'soft-kl', B(`Damıtma kaybı: KL(öğretmen ‖ öğrenci), T = ${String(Tm).replace('.', ',')}`, `Distillation loss: KL(teacher ‖ student), T = ${Tm}`), [['soft_kl', B('KL', 'KL'), 1]], { logY: true }),
+    ...blk.charts,
+  ]
+  return r
+}
+
 export interface DistFrame extends Frame {
   teacher: Net
   big: Pt[]
@@ -145,11 +193,13 @@ export const MODEL_DAMITMA: Lesson<DistFrame> = {
     ['def sm(z, T=1):', 'sıcaklıklı softmax', 'softmax with temperature'],
     ['    e = np.exp((z - z.max(1, keepdims=True)) / T)'],
     ['    return e / e.sum(1, keepdims=True)'],
-    ['def train(X, P, h, T=1, steps=2000, lr=.75):', 'P: hedef olasılıklar', 'P: target probabilities'],
+    ['def train(X, P, h, T=1, steps=2000, lr=.75, snaps=None):', 'P: hedef olasılıklar', 'P: target probabilities'],
     ['    r = np.random.default_rng(1)'],
     ['    W1, W2 = r.normal(0, 1, (2, h)), r.normal(0, .5, (h, 3))'],
     ['    b1, b2 = np.zeros(h), np.zeros(3)'],
-    ['    for _ in range(steps):'],
+    ['    for i in range(steps + 1):'],
+    ['        if snaps is not None and i % 40 == 0: snaps.append((W1.copy(), b1.copy(), W2.copy(), b2.copy()))', 'her 40 adımda ağırlıkları sakla', 'keep the weights every 40 steps'],
+    ['        if i == steps: break'],
     ['        H = np.tanh(X @ W1 + b1)'],
     ['        G = (sm(H @ W2 + b2, T) - P) * T / len(X)', 'gradyan × T²', 'gradient × T²'],
     ['        GH = G @ W2.T * (1 - H ** 2)', 'geri yayılım', 'backprop'],
@@ -158,14 +208,32 @@ export const MODEL_DAMITMA: Lesson<DistFrame> = {
     ['    return lambda X: np.tanh(X @ W1 + b1) @ W2 + b2'],
     ['(A, a), (S, s), (X, y) = data(1500), data(24), data(1000)', 'büyük, küçük, test', 'big, small, test'],
     ['big = train(A, np.eye(3)[a], 64, lr=.3)', 'öğretmen: 387 sayı', 'teacher: 387 numbers'],
-    ['hard = train(S, np.eye(3)[s], 4)', 'öğrenci, sert etiket: 27 sayı', 'student, hard labels: 27 numbers'],
-    ['soft = train(S, sm(big(S), 4), 4, T=4)', 'öğrenci, yumuşak hedef', 'student, soft targets'],
+    ['hs, ss = [], []'],
+    ['hard = train(S, np.eye(3)[s], 4, snaps=hs)', 'öğrenci, sert etiket: 27 sayı', 'student, hard labels: 27 numbers'],
+    ['soft = train(S, sm(big(S), 4), 4, T=4, snaps=ss)', 'öğrenci, yumuşak hedef', 'student, soft targets'],
     ['for f in big, hard, soft: print(np.mean(f(X).argmax(1)==y))', 'test doğruluğu', 'test accuracy'],
+    ['f = lambda w, Z: np.tanh(Z @ w[0] + w[1]) @ w[2] + w[3]'],
+    ['Ps = sm(big(S), 4)', 'öğretmenin yumuşak hedefleri', "the teacher's soft targets"],
+    ['history = {\'step\': [], \'hard_acc\': [], \'soft_acc\': [], \'hard_loss\': [], \'soft_kl\': []}'],
+    ['for i, (wh, ws) in enumerate(zip(hs, ss)):', 'test doğruluğu, sert kayıp, KL(öğretmen ‖ öğrenci)', 'test accuracy, hard loss, KL(teacher ‖ student)'],
+    ['    row = (40 * i, np.mean(f(wh, X).argmax(1) == y), np.mean(f(ws, X).argmax(1) == y), -np.log(sm(f(wh, S))[np.arange(len(s)), s]).mean(), (Ps * np.log(Ps / sm(f(ws, S), 4))).sum(1).mean())'],
+    ['    for k, v in zip(history, row): history[k].append(float(v))'],
+    ['for k in history: print(f\'{k:<10}{history[k][-1]:>10.4f}\')', 'son ölçümler tablosu', 'final metrics table'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as fh:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(fh).writerows([list(history), *zip(*history.values())])', 'satır başına 40 adım', 'one row per 40 steps'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for k in (\'hard_acc\', \'soft_acc\'): plt.plot(history[\'step\'], history[k], label=k)'],
+    ['    plt.xlabel(\'step\'); plt.ylabel(\'test accuracy\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'T', label: { tr: 'Sıcaklık T', en: 'Temperature T' }, min: 1, max: 8, step: 0.5, value: 4 },
     { key: 'n', label: { tr: 'Öğrencinin etiketli örneği', en: "Student's labelled examples" }, min: 12, max: 120, step: 12, value: 24 },
   ],
+  report: damitmaReport,
   run({ T = 4, n = 24 }) {
     const Tm = Math.max(0.5, T)
     const nn = Math.max(6, Math.round(n))
@@ -174,15 +242,15 @@ export const MODEL_DAMITMA: Lesson<DistFrame> = {
     const base = { teacher: d.t.net, big: d.t.big, small: d.small, soft: d.soft, tAcc: d.t.acc, T: Tm }
     const pc = cap(`öğretmen ${paramCount(d.t.net)} sayı · öğrenci ${paramCount(d.hard)} sayı`, `teacher ${paramCount(d.t.net)} numbers · student ${paramCount(d.hard)} numbers`)
     const pct = (x: number) => Math.round(x * 100)
-    F.push({ ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: true, showTeacher: false, step: 0, line: 19, cap: cap('sunucuda 1500 etiketli sürüş', '1500 labelled drives on the server'), stat: pc, hold: 2 })
-    F.push({ ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: true, showTeacher: true, step: 0, line: 20, cap: cap(`öğretmen (64 gizli nöron): test doğruluğu %${pct(d.t.acc)}`, `teacher (64 hidden neurons): test accuracy ${pct(d.t.acc)}%`), stat: pc, hold: 2 })
-    F.push({ ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: false, showTeacher: true, step: 0, line: 19, cap: cap(`robot için yalnız ${nn} etiketli örnek`, `only ${nn} labelled examples for the robot`), stat: pc, hold: 1.8 })
+    F.push({ ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: true, showTeacher: false, step: 0, line: 21, cap: cap('sunucuda 1500 etiketli sürüş', '1500 labelled drives on the server'), stat: pc, hold: 2 })
+    F.push({ ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: true, showTeacher: true, step: 0, line: 22, cap: cap(`öğretmen (64 gizli nöron): test doğruluğu %${pct(d.t.acc)}`, `teacher (64 hidden neurons): test accuracy ${pct(d.t.acc)}%`), stat: pc, hold: 2 })
+    F.push({ ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: false, showTeacher: true, step: 0, line: 21, cap: cap(`robot için yalnız ${nn} etiketli örnek`, `only ${nn} labelled examples for the robot`), stat: pc, hold: 1.8 })
     const names = [{ tr: 'beton', en: 'concrete' }, { tr: 'çim', en: 'grass' }, { tr: 'çakıl', en: 'gravel' }]
     const probes = Math.min(8, nn)
     for (let i = 0; i < probes; i++) {
       const s = d.soft[i], c = d.small[i].c
       F.push({
-        ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: false, showTeacher: true, probe: i, step: 0, line: 22,
+        ...base, hard: null, dist: null, hardAcc: [], softAcc: [], showBig: false, showTeacher: true, probe: i, step: 0, line: 25,
         cap: cap(`örnek ${i + 1}: etiket "${names[c].tr}" · öğretmen (T = ${fmt(Tm, 1, 'tr')}): ${s.map((v, k) => `${names[k].tr} ${fmt(v, 2, 'tr')}`).join(', ')}`, `example ${i + 1}: label "${names[c].en}" · teacher (T = ${Tm.toFixed(1)}): ${s.map((v, k) => `${names[k].en} ${v.toFixed(2)}`).join(', ')}`),
         stat: cap('sert etiket mi, yumuşak hedef mi?', 'hard label or soft target?'), hold: i < 2 ? 1.6 : 0.8,
       })
@@ -191,13 +259,13 @@ export const MODEL_DAMITMA: Lesson<DistFrame> = {
       const step = i * d.every
       const hA = d.hardAcc.slice(0, i + 1), sA = d.softAcc.slice(0, i + 1)
       F.push({
-        ...base, hard: h, dist: d.softS[i], hardAcc: hA, softAcc: sA, showBig: false, showTeacher: true, step, line: i < 2 ? 14 + i : i % 2 ? 21 : 22,
+        ...base, hard: h, dist: d.softS[i], hardAcc: hA, softAcc: sA, showBig: false, showTeacher: true, step, line: i < 2 ? 16 + i : i % 2 ? 24 : 25,
         cap: cap(`adım ${step} · sert %${pct(hA[i])} · damıtılmış %${pct(sA[i])}`, `step ${step} · hard ${pct(hA[i])}% · distilled ${pct(sA[i])}%`), stat: pc, hold: i < 3 ? 1 : 0.22,
       })
     })
     const hA = d.hardAcc.at(-1)!, sA = d.softAcc.at(-1)!
     F.push({
-      ...base, hard: d.hard, dist: d.dist, hardAcc: d.hardAcc, softAcc: d.softAcc, showBig: false, showTeacher: true, step: 2000, line: 23,
+      ...base, hard: d.hard, dist: d.dist, hardAcc: d.hardAcc, softAcc: d.softAcc, showBig: false, showTeacher: true, step: 2000, line: 26,
       cap: cap(`1000 yeni sürüşte: sert etiket %${pct(hA)}, damıtılmış %${pct(sA)}, öğretmen %${pct(d.t.acc)}`, `on 1000 new drives: hard labels ${pct(hA)}%, distilled ${pct(sA)}%, teacher ${pct(d.t.acc)}%`),
       stat: cap(`aynı ${nn} nokta, aynı 27 sayılık ağ; tek fark hedef`, `same ${nn} points, same 27-number network; only the target differs`), hold: 3,
     })

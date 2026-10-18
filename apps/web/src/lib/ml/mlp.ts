@@ -1,6 +1,8 @@
 // Ders 9: küçük sinir ağı. Robot arenadaki konumunun pistte mi dışında mı olduğunu öğrenir: iki iç içe hilal (doğrusal olarak
 // ayrılamaz). 2 → H (tanh) → 1 (sigmoid), tüm veriyle gradyan inişi ve geri yayılım. Perceptronun çizemediği eğri sınırı çizer.
 import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
+import { B, agirlikHistleri, erkenDurdurma, etkinlesmeHist, gecmisGrafik, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
+import { saturatedShare } from './egitim/metrics'
 
 export interface Net { W1: number[][]; b1: number[]; W2: number[]; b2: number }
 export interface MlpFrame extends Frame {
@@ -74,6 +76,93 @@ export function train(X: Pt[], H: number, lr: number, steps: number, every: numb
   return snaps
 }
 
+/**
+ * Eğitim paneli için aynı ağ ve aynı başlangıç (train ile aynı tohum), ama her 5. nokta doğrulamaya ayrılır (sınıflar sırayla
+ * geldiği için 4 değil: her 4. nokta hep aynı sınıftan olurdu) ve gradyan yalnız eğitim noktalarından gelir (Python kodu da böyle). XOR'un 4 noktası bölünmez: doğrulama = eğitim. Her `every` adımda kayıp,
+ * doğruluk ve katman gradyan normları; dört anda ağırlık kopyası; başta ve sonda gizli katman etkinleşmeleri kaydedilir.
+ */
+export function trainWithHistory(X: Pt[], H: number, lr: number, steps: number, every: number, seed = 0) {
+  const r = rng(seed + 1)
+  const net: Net = { W1: [0, 1].map(() => Array.from({ length: H }, () => gauss(r))), b1: new Array(H).fill(0), W2: Array.from({ length: H }, () => gauss(r)), b2: 0 }
+  const split = X.length > 8
+  const isVal = X.map((_, i) => split && i % 5 === 4)
+  const nTr = isVal.filter((v) => !v).length
+  const h = { step: [] as number[], loss: [] as number[], val_loss: [] as number[], acc: [] as number[], val_acc: [] as number[], grad_W1: [] as number[], grad_W2: [] as number[] }
+  const wSnaps: Array<{ label: string; layers: number[][] }> = []
+  const snapAt = new Set([0, Math.round(steps / 4), Math.round(steps / 2), steps])
+  const acts: Array<{ label: string; values: number[] }> = []
+  let lastActs: number[][] = []
+  for (let s = 0; s <= steps; s++) {
+    const gW1 = [new Array(H).fill(0), new Array(H).fill(0)], gb1 = new Array(H).fill(0), gW2 = new Array(H).fill(0)
+    let gb2 = 0, lt = 0, lv = 0, ot = 0, ov = 0
+    const record = s % every === 0 || s === steps
+    const A: number[][] = []
+    X.forEach((q, i) => {
+      const { h: hid, p } = forward(net, q.x, q.y)
+      if (record) A.push(hid)
+      const ce = -(q.c ? Math.log(p + 1e-12) : Math.log(1 - p + 1e-12)), ok = (p > 0.5 ? 1 : 0) === q.c ? 1 : 0
+      if (isVal[i]) { lv += ce; ov += ok; return }
+      lt += ce; ot += ok
+      const g = (p - q.c) / nTr
+      for (let j = 0; j < H; j++) {
+        gW2[j] += hid[j] * g
+        const gh = g * net.W2[j] * (1 - hid[j] * hid[j])
+        gW1[0][j] += q.x * gh; gW1[1][j] += q.y * gh; gb1[j] += gh
+      }
+      gb2 += g
+    })
+    if (record) {
+      const nV = split ? X.length - nTr : nTr
+      if (!split) { lv = lt; ov = ot }
+      h.step.push(s); h.loss.push(lt / nTr); h.val_loss.push(lv / nV); h.acc.push(ot / nTr); h.val_acc.push(ov / nV)
+      h.grad_W1.push(Math.hypot(...gW1[0], ...gW1[1])); h.grad_W2.push(Math.hypot(...gW2))
+      if (s === 0) acts.push({ label: '0', values: A.flat() })
+      lastActs = A
+    }
+    if (snapAt.has(s)) wSnaps.push({ label: `${s}`, layers: [[...net.W1[0], ...net.W1[1]], [...net.W2]] })
+    for (let j = 0; j < H; j++) { net.W2[j] -= lr * gW2[j]; net.W1[0][j] -= lr * gW1[0][j]; net.W1[1][j] -= lr * gW1[1][j]; net.b1[j] -= lr * gb1[j] }
+    net.b2 -= lr * gb2
+  }
+  acts.push({ label: `${steps}`, values: lastActs.flat() })
+  return { net, h, isVal, wSnaps, acts, lastActs, split }
+}
+
+/** Sinir ağı dersinin eğitim raporu. */
+export function mlpReport({ H = 8, lr = 0.5, veri = 0 }: Record<string, number>): EgitimRaporu {
+  const ds = Math.max(0, Math.min(2, Math.round(veri)))
+  const X = DATASETS[ds]()
+  const t = trainWithHistory(X, H, lr, 3000, 75)
+  const { h } = t
+  const vi = X.map((_, i) => i).filter((i) => !t.split || t.isVal[i])
+  const p = vi.map((i) => forward(t.net, X[i].x, X[i].y).p)
+  const y = vi.map((i) => X[i].c)
+  const blk = siniflandirmaBlok({ y, pred: p.map((v) => (v > 0.5 ? 1 : 0)), scores: p, labels: ['dışında', 'pistte'], pos: B('pistte', 'on track'), neg: B('dışında', 'off track'), prefix: 'val_', title: B('doğrulama', 'validation') })
+  const r: EgitimRaporu = {
+    kind: 'sinir-agi', model: `MLP 2-${H}-1 (tanh, sigmoid)`, seed: 1, hyper: { H, lr, steps: 3000, veri: ['hilal', 'XOR', 'daire'][ds], train: X.length - (t.split ? vi.length : 0), val: t.split ? vi.length : 0 },
+    history: { x: 'step', cols: h }, final: [], charts: [],
+  }
+  const best = erkenDurdurma(h.step, h.val_loss)
+  r.final = [
+    { key: 'loss', label: B('eğitim kaybı', 'training loss'), value: h.loss.at(-1)!, fmt: 3 },
+    { key: 'val_loss', label: B('doğrulama kaybı', 'validation loss'), value: h.val_loss.at(-1)!, fmt: 3 },
+    { key: 'acc', label: B('eğitim doğruluğu', 'training accuracy'), value: h.acc.at(-1)!, fmt: 'pct' },
+    ...blk.final,
+    { key: 'gap', label: B('aşırı öğrenme farkı (doğr. − eğit. kaybı)', 'overfitting gap (val − train loss)'), value: h.val_loss.at(-1)! - h.loss.at(-1)!, fmt: 3 },
+    { key: 'saturated', label: B('doymuş tanh payı (|a| > 0,99)', 'saturated tanh share (|a| > 0.99)'), value: saturatedShare(t.lastActs), fmt: 'pct' },
+  ]
+  r.confusion = blk.confusion
+  r.scores = blk.scores
+  r.charts = [
+    gecmisGrafik(r, 'loss', B('Kayıp (çapraz entropi)', 'Loss (cross-entropy)'), [['loss', B('eğitim', 'train'), 1], ['val_loss', B('doğrulama', 'validation'), 0, true]], { marker: best, yLabel: B('kayıp', 'loss') }),
+    gecmisGrafik(r, 'acc', B('Doğruluk', 'Accuracy'), [['acc', B('eğitim', 'train'), 1], ['val_acc', B('doğrulama', 'validation'), 0, true]], { yMin: 0, yMax: 1 }),
+    gecmisGrafik(r, 'grad', B('Katman başına gradyan normu', 'Gradient norm per layer'), [['grad_W1', B('W1 (giriş → gizli)', 'W1 (input → hidden)'), 2], ['grad_W2', B('W2 (gizli → çıkış)', 'W2 (hidden → output)'), 4]], { logY: true, note: B(`Öğrenme oranı sabit: ${String(lr).replace('.', ',')}. Normlar küçüldükçe ağ bir çukura yerleşir.`, `Learning rate is constant: ${lr}. As the norms shrink the network settles into a minimum.`) }),
+    ...agirlikHistleri(t.wSnaps, ['W1', 'W2'], 20),
+    { ...etkinlesmeHist(t.acts, -1, 1, 20), note: B('Gizli katman (tanh). Uçlara (±1) yığılma doymuş nöron demektir.', 'Hidden layer (tanh). Piling up at ±1 means saturated neurons.') },
+    ...blk.charts,
+  ]
+  return r
+}
+
 export const MLP: Lesson<MlpFrame> = {
   slug: 'sinir-agi',
   n: 9,
@@ -102,20 +191,40 @@ export const MLP: Lesson<MlpFrame> = {
     ['rng, lr, H = np.random.default_rng(0), 0.5, 8', 'H gizli nöron', 'H hidden neurons'],
     ['W1, b1 = rng.normal(size=(2, H)), np.zeros(H)'],
     ['W2, b2 = rng.normal(size=H), 0.0'],
+    ['val = np.arange(len(X)) % 5 == 4', 'her 5. konum doğrulamaya ayrılır', 'every 5th position is held out for validation'],
+    ['history = {k: [] for k in (\'step\', \'loss\', \'val_loss\', \'acc\', \'val_acc\', \'grad_W1\', \'grad_W2\')}', 'eğitim geçmişi', 'training history'],
     ['for step in range(3001):'],
     ['    h = np.tanh(X @ W1 + b1)', 'gizli katman', 'hidden layer'],
     ['    p = 1 / (1 + np.exp(-(h @ W2 + b2)))', 'pistte olma olasılığı', 'probability of being on track'],
-    ['    loss = -(y * np.log(p) + (1 - y) * np.log(1 - p)).mean()', 'çapraz entropi', 'cross-entropy'],
-    ['    g = (p - y) / len(X)', 'kaybın çıkışa göre türevi', 'derivative at the output'],
+    ['    ce = -(y * np.log(p) + (1 - y) * np.log(1 - p)); loss = ce[~val].mean()', 'çapraz entropi (eğitim)', 'cross-entropy (training)'],
+    ['    g = np.where(val, 0, p - y) / (~val).sum()', 'kaybın çıkışa göre türevi', 'derivative at the output'],
     ['    gh = np.outer(g, W2) * (1 - h ** 2)', 'geri yayılım: gizli katmana', 'backprop to the hidden layer'],
-    ['    W2 -= lr * h.T @ g; b2 -= lr * g.sum()'],
-    ['    W1 -= lr * X.T @ gh; b1 -= lr * gh.sum(0)'],
+    ['    gW2, gW1 = h.T @ g, X.T @ gh', 'katman gradyanları', 'layer gradients'],
+    ['    if step % 75 == 0:', 'her 75 adımda bir kaydet', 'record every 75 steps'],
+    ['        ok = (p > 0.5) == y; [history[k].append(float(v)) for k, v in zip(history, (step, loss, ce[val].mean(), ok[~val].mean(), ok[val].mean(), np.linalg.norm(gW1), np.linalg.norm(gW2)))]'],
+    ['    W2 -= lr * gW2; b2 -= lr * g.sum()'],
+    ['    W1 -= lr * gW1; b1 -= lr * gh.sum(0)'],
+    ['for k in (\'loss\', \'val_loss\', \'acc\', \'val_acc\'):', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{k:<10}{history[k][-1]:>10.4f}\')'],
+    ['print(\'aşırı öğrenme farkı (val_loss - loss):\', round(history[\'val_loss\'][-1] - history[\'loss\'][-1], 4))'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir kayıt', 'one row per record'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    fig, (a, b) = plt.subplots(1, 2, figsize=(9, 3.5))'],
+    ['    for k in (\'loss\', \'val_loss\'): a.plot(history[\'step\'], history[k], label=k)'],
+    ['    for k in (\'acc\', \'val_acc\'): b.plot(history[\'step\'], history[k], label=k)'],
+    ['    a.legend(); b.legend(); a.set_xlabel(\'step\'); b.set_xlabel(\'step\'); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'H', label: { tr: 'Gizli nöron sayısı', en: 'Hidden neurons' }, min: 1, max: 16, step: 1, value: 8 },
     { key: 'lr', label: { tr: 'Öğrenme oranı', en: 'Learning rate' }, min: 0.05, max: 2, step: 0.05, value: 0.5 },
     { key: 'veri', label: { tr: 'Veri: 0 hilal, 1 XOR, 2 daire', en: 'Data: 0 moons, 1 XOR, 2 circle' }, min: 0, max: 2, step: 1, value: 0 },
   ],
+  report: mlpReport,
   run({ H = 8, lr = 0.5, veri = 0 }) {
     const ds = Math.max(0, Math.min(2, Math.round(veri)))
     const X = DATASETS[ds]()
@@ -136,5 +245,6 @@ export const MLP: Lesson<MlpFrame> = {
     return F
   },
 }
-// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
-MLP.run = shifted(MLP.run, 1, 1)
+// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar. Eğitim geçmişi satırları (doğrulama
+// ayrımı, geçmiş sözlüğü, gradyanlar ve kayıt) eklenince döngü satırları da kayar: 5'ten sonra 2, 13'ten sonra 3 satır daha.
+MLP.run = shifted(shifted(shifted(MLP.run, 1, 1), 5, 2), 13, 3)

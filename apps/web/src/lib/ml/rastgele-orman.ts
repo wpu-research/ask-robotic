@@ -1,6 +1,7 @@
 // Ders: rastgele orman. Motor titreşimi (mm/s) ve sıcaklığından (°C) arıza tahmini; sınır eğri, etiketlerin %12'si hatalı.
 // Her ağaç kendi bootstrap torbasında, her düğümde rastgele seçilen tek özellikle büyür; orman çoğunluk oyuyla karar verir.
 import { cap, fmt, rng, type Frame, type Lesson, type Pt } from './core'
+import { B, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 /** Düz dizide düğüm: f = −1 ise yaprak. p: düğümdeki arıza oranı (yaprağın cevabı p > 0,5). */
 export interface RfNode { f: number; t: number; L: number; R: number; p: number; d: number }
@@ -103,6 +104,67 @@ export function buildForest(nTrees: number) {
   return { X, T, boots, trees, acc }
 }
 
+/**
+ * Eğitim paneli: ormana ağaç ağaç eklerken eğitim, test ve torba dışı (OOB) doğruluğu ile tek ağacın kendi test doğruluğu;
+ * sonuçta oy oranıyla (arıza diyen ağaçların payı) ROC/PR ve karışıklık matrisi. Ormanın kendisi buildForest'tan gelir.
+ */
+export function forestReport({ trees: N = 25 }: Record<string, number>): EgitimRaporu {
+  const nT = Math.max(1, Math.min(25, Math.round(N)))
+  const { X, T, boots, trees, acc } = buildForest(nT)
+  const inBag = boots.map((b) => { const m = new Uint8Array(X.length); b.forEach((i) => { m[i] = 1 }); return m })
+  const vTr = new Array<number>(X.length).fill(0), vOob = new Array<number>(X.length).fill(0), nOob = new Array<number>(X.length).fill(0)
+  const h = { trees: [] as number[], train_acc: [] as number[], test_acc: [] as number[], oob_acc: [] as number[], tree_acc: [] as number[] }
+  for (let j = 0; j < nT; j++) {
+    X.forEach((q, i) => {
+      const v = treeP(trees[j], q.x, q.y) > 0.5 ? 1 : 0
+      vTr[i] += v
+      if (!inBag[j][i]) { vOob[i] += v; nOob[i]++ }
+    })
+    let ok = 0, okO = 0, nO = 0
+    X.forEach((q, i) => {
+      if ((vTr[i] / (j + 1) > 0.5 ? 1 : 0) === q.c) ok++
+      if (nOob[i]) { nO++; if ((vOob[i] / nOob[i] > 0.5 ? 1 : 0) === q.c) okO++ }
+    })
+    h.trees.push(j + 1); h.train_acc.push(ok / X.length); h.test_acc.push(acc[j]); h.oob_acc.push(nO ? okO / nO : NaN)
+    h.tree_acc.push(T.filter((q) => (treeP(trees[j], q.x, q.y) > 0.5 ? 1 : 0) === q.c).length / T.length)
+  }
+  const vote = T.map((q) => forestVote(trees, nT, q.x, q.y))
+  const blk = siniflandirmaBlok({
+    y: T.map((q) => q.c), pred: vote.map((v) => (v > 0.5 ? 1 : 0)), labels: ['sağlam', 'arıza'], scores: vote, threshold: 0.5 + 0.5 / nT,
+    pos: B('arıza', 'failure'), neg: B('sağlam', 'healthy'), prefix: 'test_', title: B('test', 'test'),
+  })
+  const leaves = trees.map((t) => t.filter((n) => n.f < 0).length)
+  const roots = [0, 0]
+  for (const t of trees) for (const n of t) if (n.f >= 0) roots[n.f]++
+  return {
+    kind: 'siniflandirma', model: `rastgele orman, ${nT} ağaç, derinlik ≤ ${MAX_DEPTH}`, seed: 5, hyper: { trees: nT, max_depth: MAX_DEPTH, train: X.length, test: T.length, bootstrap: X.length },
+    history: { x: 'trees', cols: h },
+    final: [
+      { key: 'train_accuracy', label: B('eğitim doğruluğu', 'training accuracy'), value: h.train_acc[nT - 1], fmt: 'pct' },
+      { key: 'oob_accuracy', label: B('torba dışı (OOB) doğruluk', 'out-of-bag accuracy'), value: h.oob_acc[nT - 1], fmt: 'pct' },
+      ...blk.final,
+      { key: 'single_tree_mean', label: B('tek ağaç ort. test doğruluğu', 'mean single-tree test accuracy'), value: h.tree_acc.reduce((a, b) => a + b, 0) / nT, fmt: 'pct' },
+    ],
+    confusion: blk.confusion,
+    scores: blk.scores,
+    charts: [
+      {
+        kind: 'line', id: 'trees', title: B('Ağaç sayısına göre doğruluk', 'Accuracy by number of trees'), x: h.trees, xLabel: B('ağaç sayısı', 'trees'), yLabel: B('doğruluk', 'accuracy'),
+        series: [
+          { key: 'train_acc', label: B('eğitim', 'train'), values: h.train_acc, tone: 1 },
+          { key: 'oob_acc', label: B('torba dışı (OOB)', 'out-of-bag'), values: h.oob_acc, tone: 2 },
+          { key: 'test_acc', label: B('test (orman)', 'test (forest)'), values: h.test_acc, tone: 0 },
+          { key: 'tree_acc', label: B('test (yalnız o ağaç)', 'test (that tree alone)'), values: h.tree_acc, tone: 4, dash: true },
+        ],
+        note: B('Tek tek ağaçlar dalgalanır; oylarının çoğunluğu hepsinden kararlıdır. OOB, test verisi olmadan testi tahmin eder.', 'Single trees fluctuate; their majority vote is steadier than any of them. OOB estimates the test score without test data.'),
+      },
+      { kind: 'bar', id: 'leaves', title: B('Ağaç başına yaprak sayısı', 'Leaves per tree'), labels: h.trees.map(String), series: [{ key: 'leaves', label: B('yaprak', 'leaves'), values: leaves, tone: 2 }] },
+      { kind: 'bar', id: 'feature-use', title: B('Bölmelerde kullanılan özellik', 'Feature used in splits'), labels: ['titreşim', 'sıcaklık'], series: [{ key: 'splits', label: B('bölme sayısı', 'splits'), values: roots, tone: 3 }] },
+      ...blk.charts,
+    ],
+  }
+}
+
 const pct = (a: number, lang: 'tr' | 'en') => (lang === 'tr' ? `%${fmt(a * 100, 1, 'tr')}` : `${(a * 100).toFixed(1)}%`)
 const FEAT: Array<[string, string]> = [['titreşim', 'vibration'], ['sıcaklık', 'temperature']]
 
@@ -152,8 +214,42 @@ export const RASTGELE_ORMAN: Lesson<RfFrame> = {
     ['P = np.array([oy(a, Xt) for a in orman]) > .5', 'her ağacın oyu', "each tree's vote"],
     ['for k in (1, 5, 25):'],
     ["    print(k, 'ağaç', ((P[:k].mean(0) > .5) == yt).mean())", 'çoğunluk oyu', 'majority vote'],
+    ['Pe = np.array([oy(a, X) for a in orman]) > .5', 'eğitimde oylar', 'votes on training'],
+    ['oob = np.array([~np.isin(np.arange(200), b) for b in B])', 'torba dışı', 'out of bag'],
+    ['K = "trees", "train_acc", "test_acc", "oob_acc", "tree_acc"'],
+    ['history = {k: [] for k in K}', 'ağaç sayısına göre', 'by number of trees'],
+    ['for k in range(1, 26):'],
+    ['    v, n = (Pe[:k] & oob[:k]).sum(0), oob[:k].sum(0)'],
+    ['    m = n > 0', 'en az bir ağacın torbası dışında', 'out of at least one bag'],
+    ['    row = (k, ((Pe[:k].mean(0) > .5) == y).mean(),'],
+    ['           ((P[:k].mean(0) > .5) == yt).mean(),'],
+    ['           ((v[m] / n[m] > .5) == y[m]).mean(),'],
+    ['           (P[k - 1] == yt).mean())', 'o ağaç tek başına', 'that tree alone'],
+    ['    for c, x in zip(K, row): history[c].append(float(x))'],
+    ['s, p = P.mean(0), P.mean(0) > .5', 'oy oranı, karar', 'vote share, decision'],
+    ['tp, fp = (p & yt).sum(), (p & ~yt).sum()'],
+    ['prec, rec = tp / max(tp + fp, 1), tp / max(yt.sum(), 1)'],
+    ['pos, neg = s[yt], s[~yt]'],
+    ['auc = ((pos[:, None] > neg).mean()', 'ROC AUC: sıralama olasılığı', 'ROC AUC: ranking probability'],
+    ['       + .5 * (pos[:, None] == neg).mean())'],
+    ['for k, x in [("test_acc", (p == yt).mean()),'],
+    ['             ("precision", prec), ("recall", rec),'],
+    ['             ("f1", 2 * prec * rec / (prec + rec)),'],
+    ['             ("auc", auc)]:', 'son ölçümler', 'final metrics'],
+    ["    print(f'{k:<10}{x:>8.3f}')"],
+    ['import csv'],
+    ['with open("egitim_gecmisi.csv", "w", newline="") as f:'],
+    ['    w = csv.writer(f); w.writerow(K)', 'satır başına bir orman', 'one row per forest size'],
+    ['    w.writerows(zip(*history.values()))'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik', 'plot if available'],
+    ['    for k in K[1:]: plt.plot(history["trees"], history[k])'],
+    ['    plt.legend(K[1:]); plt.xlabel("trees"); plt.show()'],
+    ['except ImportError:'],
+    ['    print("matplotlib yok: grafik atlandı")'],
   ],
   params: [{ key: 'trees', label: { tr: 'Ağaç sayısı', en: 'Number of trees' }, min: 1, max: 25, step: 1, value: 25 }],
+  report: forestReport,
   run({ trees: N = 25 }) {
     const nT = Math.max(1, Math.min(25, Math.round(N)))
     const { X, boots, trees, acc } = buildForest(nT)

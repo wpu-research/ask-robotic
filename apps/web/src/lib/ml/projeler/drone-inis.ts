@@ -4,6 +4,7 @@
 // Eğitim arka planda hızlı bölümlerle sürer; sahnede güncel tabloyla açgözlü uçan bir gösteri drone'u gerçek zamana yakın oynar.
 import { cap, fmt, gauss, rng } from '../core'
 import type { Metric, ProjectDef, ProjectRun } from './core'
+import { B, type EgitimRaporu } from '../egitim/rapor'
 
 /** Fizik sabitleri: benzetim adımı (s), yerçekimi (m/s²), yumuşak iniş sınırı (m/s), en uzun bölüm (adım). */
 export const DT = 0.05
@@ -64,7 +65,8 @@ const argmax = (Q: Float64Array, s: number, r?: () => number) => {
 }
 
 export interface DroneParams { seed: number; wind: number; alpha: number; gamma: number; eps: number }
-export interface EpisodeLog { outcome: Outcome; v: number }
+/** Biten bölüm: sonuç, temas hızı, toplam ödül (getiri), karar sayısı ve bölüm boyunca geçerli ε. */
+export interface EpisodeLog { outcome: Outcome; v: number; ret: number; steps: number; eps: number }
 
 /** Eğitici: ε-açgözlü Q-öğrenme. `ticks(n)` n benzetim adımı ilerletir; bölümler biter, yenisi başlar. */
 export function makeLearner(p: DroneParams) {
@@ -72,7 +74,7 @@ export function makeLearner(p: DroneParams) {
   const Q = new Float64Array(N_STATES * NA)
   const log: EpisodeLog[] = []
   let b = newBody(r, p.wind)
-  let s = stateOf(b.h, b.v, b.gz), a = 2, k = 0
+  let s = stateOf(b.h, b.v, b.gz), a = 2, k = 0, ret = 0, dec = 0
   const epsNow = () => Math.max(0.02, p.eps * 0.997 ** log.length)
   const choose = () => { a = r() < epsNow() ? Math.floor(r() * NA) : argmax(Q, s, r) }
   choose()
@@ -82,11 +84,14 @@ export function makeLearner(p: DroneParams) {
       k++
       if (o || k >= REPEAT) {
         const s2 = stateOf(b.h, b.v, b.gz)
-        const target = reward(o, b.v) + (o ? 0 : p.gamma * Q[s2 * NA + argmax(Q, s2)])
+        const rw = reward(o, b.v)
+        ret += rw; dec++
+        const target = rw + (o ? 0 : p.gamma * Q[s2 * NA + argmax(Q, s2)])
         Q[s * NA + a] += p.alpha * (target - Q[s * NA + a]) // öğrenmenin tamamı bu satır
         k = 0
         if (o) {
-          log.push({ outcome: o, v: b.v })
+          log.push({ outcome: o, v: b.v, ret, steps: dec, eps: epsNow() })
+          ret = 0; dec = 0
           b = newBody(r, p.wind)
           s = stateOf(b.h, b.v, b.gz)
         } else s = s2
@@ -125,6 +130,67 @@ export interface View {
 }
 
 export const MAX_EPISODES = 4000
+
+/** Bölüm geçmişini ve Q tablosunu eğitim raporuna çevirir. Sütunlar artımlı büyür (her çağrıda yalnız yeni bölümler eklenir). */
+export function droneReporter(L: ReturnType<typeof makeLearner>, p: DroneParams, finished: () => boolean) {
+  const W = 50
+  const cols = { episode: [] as number[], return: [] as number[], return_ma: [] as number[], soft: [] as number[], success_ma: [] as number[], epsilon: [] as number[], touchdown_speed: [] as number[], decisions: [] as number[] }
+  let sumR = 0, sumS = 0, cache: { n: number; r: EgitimRaporu } | null = null, greedy = NaN
+  const hLab = ['<0,3', ...H_EDGES.map((e) => `≥${String(e).replace('.', ',')}`)].reverse()
+  const vLab = ['<−6', ...V_EDGES.map((e) => `≥${String(e).replace('-', '−').replace('.', ',')}`)]
+  const thin = (n: number) => { const k = Math.max(1, Math.ceil(n / 600)); const out: number[] = []; for (let i = 0; i < n; i += k) out.push(i); if (n && out[out.length - 1] !== n - 1) out.push(n - 1); return out }
+  return function report(): EgitimRaporu {
+    const log = L.log
+    if (cache && cache.n === log.length && !(finished() && Number.isNaN(greedy))) return cache.r
+    for (let i = cols.episode.length; i < log.length; i++) {
+      const e = log[i], soft = e.outcome === 'soft' ? 1 : 0
+      sumR += e.ret; sumS += soft
+      if (i >= W) { sumR -= log[i - W].ret; sumS -= log[i - W].outcome === 'soft' ? 1 : 0 }
+      const n = Math.min(i + 1, W)
+      cols.episode.push(i + 1); cols.return.push(e.ret); cols.return_ma.push(sumR / n); cols.soft.push(soft); cols.success_ma.push(sumS / n)
+      cols.epsilon.push(e.eps); cols.touchdown_speed.push(Math.abs(e.v)); cols.decisions.push(e.steps)
+    }
+    if (finished() && Number.isNaN(greedy)) greedy = greedyRate(L.Q, p.wind)
+    const n = log.length, last = log.slice(-100)
+    const counts = (['soft', 'hard', 'away', 'time'] as Outcome[]).map((o) => last.filter((e) => e.outcome === o).length)
+    // Q tablosu: rüzgârsız (orta) hamle dilimi, satır yükseklik (üstte yüksek), sütun dikey hız
+    const maxQ: number[][] = [], act: number[][] = []
+    for (let hi = NH - 1; hi >= 0; hi--) {
+      const rq: number[] = [], ra: number[] = []
+      for (let vi = 0; vi < NV; vi++) {
+        const st = (hi * NV + vi) * NW + 1
+        let m = -Infinity, bi = 0, seen = false
+        for (let a = 0; a < NA; a++) { const q = L.Q[st * NA + a]; if (q !== 0) seen = true; if (q > m) { m = q; bi = a } }
+        rq.push(seen ? m : NaN); ra.push(seen ? THROTTLE[bi] * 100 : NaN)
+      }
+      maxQ.push(rq); act.push(ra)
+    }
+    const idx = thin(n), sel = (a: number[]) => idx.map((i) => a[i])
+    const x = sel(cols.episode), xl = B('bölüm', 'episode')
+    const r: EgitimRaporu = {
+      kind: 'pekistirmeli', model: B(`tablo Q-öğrenme · ${N_STATES} durum × ${NA} gaz`, `tabular Q-learning · ${N_STATES} states × ${NA} throttle`), seed: p.seed,
+      hyper: { alpha: p.alpha, gamma: p.gamma, eps0: p.eps, eps_decay: 0.997, eps_min: 0.02, wind: p.wind },
+      history: { x: 'episode', cols: Object.fromEntries(Object.entries(cols).map(([k, v]) => [k, v.slice()])) },
+      final: [
+        { key: 'episodes', label: B('bölüm', 'episodes'), value: n, fmt: 'int' },
+        { key: 'success_100', label: B('yumuşak iniş (son 100)', 'soft landings (last 100)'), value: last.length ? counts[0] / last.length : NaN, fmt: 'pct' },
+        { key: 'return_100', label: B('ortalama getiri (son 100)', 'mean return (last 100)'), value: last.length ? last.reduce((a, e) => a + e.ret, 0) / last.length : NaN, fmt: 1 },
+        { key: 'epsilon', label: B('keşif ε', 'exploration ε'), value: L.eps(), fmt: 3 },
+        { key: 'greedy_success', label: B('açgözlü başarı (100 uçuş)', 'greedy success (100 flights)'), value: greedy, fmt: 'pct' },
+      ],
+      charts: [
+        { kind: 'line', id: 'return', title: B('Bölüm getirisi ve kayan ortalama (50)', 'Episode return and moving average (50)'), x, xLabel: xl, yLabel: B('toplam ödül', 'total reward'), series: [{ key: 'return', label: B('getiri', 'return'), values: sel(cols.return), tone: 1 }, { key: 'return_ma', label: B('ortalama (50)', 'mean (50)'), values: sel(cols.return_ma), tone: 0 }] },
+        { kind: 'line', id: 'success', title: B('Başarı oranı ve keşif ε', 'Success rate and exploration ε'), x, xLabel: xl, yMin: 0, yMax: 1, series: [{ key: 'success_ma', label: B('yumuşak iniş (son 50)', 'soft landing (last 50)'), values: sel(cols.success_ma), tone: 3 }, { key: 'epsilon', label: B('ε', 'ε'), values: sel(cols.epsilon), tone: 4, dash: true }], note: B('Hedef: son 100 eğitim inişinin %90’ı yumuşak.', 'Goal: 90% of the last 100 training landings soft.') },
+        { kind: 'line', id: 'touchdown', title: B('Temas hızı (m/s)', 'Touchdown speed (m/s)'), x, xLabel: xl, yMin: 0, series: [{ key: 'touchdown_speed', label: B('|v|', '|v|'), values: sel(cols.touchdown_speed), tone: 5 }], note: B(`${SOFT} m/s altı yumuşak iniş sayılır.`, `Below ${SOFT} m/s counts as a soft landing.`) },
+        { kind: 'bar', id: 'outcomes', title: B('Son 100 bölümün sonucu', 'Outcome of the last 100 episodes'), labels: ['yumuşak / soft', 'sert / hard', 'kaçtı / away', 'süre / time'], series: [{ key: 'count', label: B('bölüm', 'episodes'), values: counts, tone: 1 }] },
+        { kind: 'heat', id: 'q-max', title: B('Q tablosu: en iyi hamlenin puanı (rüzgârsız)', 'Q table: value of the best action (no gust)'), rows: hLab, cols: vLab, values: maxQ, rowLabel: B('yükseklik (m)', 'height (m)'), colLabel: B('dikey hız (m/s)', 'vertical speed (m/s)') },
+        { kind: 'heat', id: 'q-act', title: B('Öğrenilen politika: gaz % (rüzgârsız)', 'Learned policy: throttle % (no gust)'), rows: hLab, cols: vLab, values: act, rowLabel: B('yükseklik (m)', 'height (m)'), colLabel: B('dikey hız (m/s)', 'vertical speed (m/s)'), showValues: true },
+      ],
+    }
+    cache = { n, r }
+    return r
+  }
+}
 
 export const DRONE_INIS: ProjectDef<View> = {
   slug: 'drone-inis',
@@ -166,9 +232,10 @@ export const DRONE_INIS: ProjectDef<View> = {
     ['durum = lambda h, v, r: (np.digitize(h, HK), np.digitize(v, VK), int(np.sign(r) * (abs(r) > .6)) + 1)'],
     ['Q = np.zeros((10, 11, 3, 4))', '1.320 puan, hepsi sıfır', '1,320 scores, all zero'],
     ['alfa, gama, eps, ruzgar = 0.2, 0.98, 0.3, 0.8'],
+    ['history = {\'episode\': [], \'return\': [], \'soft\': [], \'epsilon\': []}', 'eğitim geçmişi: bölüm başına', 'training history: per episode'],
     ['for bolum in range(4000):'],
     ['    h, v, r = rng.uniform(6, 10), -1.5 * rng.random(), 0.0'],
-    ['    s, sonuc = durum(h, v, r), None'],
+    ['    s, sonuc, getiri = durum(h, v, r), None, 0.0', 'getiri: bölümün toplam ödülü', 'return: total reward of the episode'],
     ['    while sonuc is None:'],
     ['        a = rng.integers(4) if rng.random() < eps else Q[s].argmax()', 'ε-açgözlü', 'ε-greedy'],
     ['        for _ in range(2):', 'karar 0,1 s geçerli', 'a decision holds for 0.1 s'],
@@ -177,11 +244,27 @@ export const DRONE_INIS: ProjectDef<View> = {
     ['            if h <= 0: sonuc = "yumusak" if abs(v) < YUMUSAK else "sert"; break'],
     ['            if h > 16: sonuc = "kacti"; break'],
     ['        odul = {None: -0.1, "yumusak": 100, "kacti": -60}.get(sonuc, -50 - 10 * abs(v))'],
+    ['        getiri += odul'],
     ['        s2 = durum(h, v, r)'],
     ['        hedef = odul + (0 if sonuc else gama * Q[s2].max())'],
     ['        Q[s + (a,)] += alfa * (hedef - Q[s + (a,)])', 'öğrenmenin tamamı bu satır', 'the whole of learning is this line'],
     ['        s = s2'],
+    ['    for k, x in zip(history, (bolum + 1, getiri, int(sonuc == "yumusak"), eps)): history[k].append(x)'],
     ['    eps = max(0.02, eps * 0.997)', 'keşif azalır', 'exploration shrinks'],
+    ['son = slice(-100, None)', 'son 100 bölüm', 'last 100 episodes'],
+    ['print(f\'{"yumuşak iniş (son 100)":<26}{np.mean(history["soft"][son]):>8.2f}\')'],
+    ['print(f\'{"ortalama getiri (son 100)":<26}{np.mean(history["return"][son]):>8.1f}\')'],
+    ['print(f\'{"epsilon":<26}{eps:>8.3f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir bölüm', 'one row per episode'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    ort = np.convolve(history[\'return\'], np.ones(50) / 50, mode=\'valid\')', '50 bölümlük kayan ortalama', '50-episode moving average'],
+    ['    plt.plot(history[\'episode\'], history[\'return\'], alpha=0.3, label=\'return\'); plt.plot(history[\'episode\'][49:], ort, label=\'ma50\')'],
+    ['    plt.xlabel(\'episode\'); plt.ylabel(\'return\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'wind', label: { tr: 'Rüzgâr şiddeti', en: 'Wind strength' }, min: 0, max: 2, step: 0.1, value: 0.8 },
@@ -203,6 +286,7 @@ export const DRONE_INIS: ProjectDef<View> = {
     const view: View = { h: demo.h, v: demo.v, x: 0, throttle: 2, gz: 0, gx: 0, landed: null, flash: 0, episodes: 0 }
     let finished = false
     const goalHit = () => L.log.length >= 100 && softRate(L.log, 100) >= 0.9
+    const report = droneReporter(L, p, () => finished)
     const run: ProjectRun<View> = {
       view,
       step(n) {
@@ -242,6 +326,7 @@ export const DRONE_INIS: ProjectDef<View> = {
         if (lastDemo) m.push({ label: { tr: 'Son gösteri inişi', en: 'Last demo landing' }, value: cap(`${lastDemo.o === 'soft' ? 'yumuşak' : lastDemo.o === 'hard' ? 'sert' : 'başarısız'} · ${fmt(Math.abs(lastDemo.v), 2, 'tr')} m/s`, `${lastDemo.o === 'soft' ? 'soft' : lastDemo.o === 'hard' ? 'hard' : 'failed'} · ${Math.abs(lastDemo.v).toFixed(2)} m/s`), tone: lastDemo.o === 'soft' ? 'good' : 'bad' })
         return m
       },
+      report,
       curves: () => [{ label: { tr: 'Yumuşak iniş oranı (son 50 bölüm)', en: 'Soft landing rate (last 50 episodes)' }, values: curve }],
       done: () => finished,
     }

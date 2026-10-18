@@ -1,6 +1,8 @@
 // Ders: destek vektör makinesi (doğrusal SVM). Ayıklama bandında iki parça türü: yük hücresi ağırlığı (g) ve lazer kapısı
 // uzunluğu (mm). Hinge kaybı + L2 cezası, ikili (dual) problemde nokta nokta çözülür (tek değişkenli SMO); marj öğrenirken daralır.
 import { cap, fmt, gauss, mean, rng, std, type Frame, type Lesson, type Pt } from './core'
+import { B, gecmisGrafik, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
+import { histogram } from './egitim/metrics'
 
 export interface SvmFrame extends Frame {
   /** 80 parça (x: ağırlık g, y: uzunluk mm, c: 0 tip A, 1 tip B). Paylaşılan referans. */
@@ -50,7 +52,7 @@ export const svmObjective = (Z: SvmFit['Z'], y: number[], w: [number, number, nu
   0.5 * (w[0] ** 2 + w[1] ** 2 + w[2] ** 2) + C * Z.reduce((s, z, i) => s + Math.max(0, 1 - y[i] * (w[0] * z[0] + w[1] * z[1] + w[2] * z[2])), 0)
 
 /** İkili koordinat inişi: her nokta için α'yı kendi en iyi değerine taşı, [0, C] aralığına kırp; w = Σ α y z. */
-export function trainSvm(X: Pt[], C: number, seed = 4, maxEpochs = 50): SvmFit {
+export function trainSvm(X: Pt[], C: number, seed = 4, maxEpochs = 50, stopEarly = true): SvmFit {
   const r = rng(seed * 31 + 7)
   const xs = X.map((p) => p.x), ys = X.map((p) => p.y)
   const mu: [number, number] = [mean(xs), mean(ys)], sd: [number, number] = [std(xs), std(ys)]
@@ -77,7 +79,7 @@ export function trainSvm(X: Pt[], C: number, seed = 4, maxEpochs = 50): SvmFit {
       if (e === 0) first.push({ i, G, w: [...w] as [number, number, number], alpha: [...a] })
     }
     epochs.push({ w: [...w] as [number, number, number], alpha: [...a], obj: svmObjective(Z, y, w, C) })
-    if (moved < 1e-7) break
+    if (stopEarly && moved < 1e-7) break
   }
   return { Z, y, mu, sd, w, alpha: a, epochs, first }
 }
@@ -93,6 +95,50 @@ export function svmSummary(fit: SvmFit, C: number) {
   const free = sv.filter((i) => fit.alpha[i] < C - 1e-6)
   const margin = 2 / Math.hypot(fit.w[0], fit.w[1])
   return { f, errors, sv, free, margin }
+}
+
+/**
+ * Eğitim paneli ve Python kodu için: her 4. parça (i % 4 = 3) doğrulamaya ayrılır, SVM kalan 60 parçayla tam 50 dönem eğitilir
+ * (erken durma yok, Python'la aynı satır sayısı). Her dönem sonunda amaç (hinge + ceza), eğitim/doğrulama doğruluğu, marj ve
+ * destek vektörü sayısı; sonuçta doğrulama karar değeriyle ROC/PR ve karışıklık matrisi.
+ */
+export function svmReport({ C = 1 }: Record<string, number>): EgitimRaporu {
+  const X = partsData()
+  const Xtr = X.filter((_, i) => i % 4 !== 3), Xva = X.filter((_, i) => i % 4 === 3)
+  const fit = trainSvm(Xtr, C, 4, 50, false)
+  const h = { epoch: [] as number[], loss: [] as number[], acc: [] as number[], val_acc: [] as number[], margin: [] as number[], n_sv: [] as number[] }
+  fit.epochs.forEach((ep, e) => {
+    const mTr = fit.Z.map((z, i) => fit.y[i] * (ep.w[0] * z[0] + ep.w[1] * z[1] + ep.w[2] * z[2]))
+    const mVa = Xva.map((p) => (p.c ? 1 : -1) * svmF(ep.w, fit.mu, fit.sd, p.x, p.y))
+    h.epoch.push(e + 1); h.loss.push(ep.obj)
+    h.acc.push(mTr.filter((v) => v > 0).length / mTr.length); h.val_acc.push(mVa.filter((v) => v > 0).length / mVa.length)
+    h.margin.push(2 / Math.hypot(ep.w[0], ep.w[1])); h.n_sv.push(ep.alpha.filter((a) => a > 1e-6).length)
+  })
+  const fVa = Xva.map((p) => svmF(fit.w, fit.mu, fit.sd, p.x, p.y))
+  const blk = siniflandirmaBlok({ y: Xva.map((p) => p.c), pred: fVa.map((v) => (v > 0 ? 1 : 0)), labels: ['A', 'B'], scores: fVa, threshold: 0, pos: B('tip B', 'type B'), neg: B('tip A', 'type A'), prefix: 'val_', title: B('doğrulama', 'validation') })
+  const mTr = fit.Z.map((z, i) => fit.y[i] * (fit.w[0] * z[0] + fit.w[1] * z[1] + fit.w[2] * z[2]))
+  const hm = histogram(mTr, 20)
+  const r: EgitimRaporu = {
+    kind: 'siniflandirma', model: B('doğrusal SVM (hinge + L2, ikili koordinat inişi)', 'linear SVM (hinge + L2, dual coordinate descent)'), seed: 4, hyper: { C, epochs: 50, train: Xtr.length, val: Xva.length },
+    history: { x: 'epoch', cols: h },
+    final: [
+      { key: 'objective', label: B('amaç (hinge + ceza)', 'objective (hinge + penalty)'), value: h.loss.at(-1)!, fmt: 3 },
+      { key: 'train_accuracy', label: B('eğitim doğruluğu', 'training accuracy'), value: h.acc.at(-1)!, fmt: 'pct' },
+      ...blk.final,
+      { key: 'margin', label: B('marj genişliği (ölçekli)', 'margin width (scaled)'), value: h.margin.at(-1)!, fmt: 3 },
+      { key: 'n_sv', label: B('destek vektörü', 'support vectors'), value: h.n_sv.at(-1)!, fmt: 'int' },
+    ],
+    confusion: blk.confusion, scores: blk.scores, charts: [],
+  }
+  r.charts = [
+    gecmisGrafik(r, 'loss', B('Amaç: ½‖w‖² + C·Σ hinge', 'Objective: ½‖w‖² + C·Σ hinge'), [['loss', B('amaç', 'objective'), 1]], { logY: true }),
+    gecmisGrafik(r, 'acc', B('Doğruluk: eğitim ve doğrulama', 'Accuracy: training and validation'), [['acc', B('eğitim', 'train'), 1], ['val_acc', B('doğrulama', 'validation'), 0, true]], { yMax: 1 }),
+    gecmisGrafik(r, 'margin', B('Marj genişliği 2/‖w‖', 'Margin width 2/‖w‖'), [['margin', B('marj', 'margin'), 3]]),
+    gecmisGrafik(r, 'nsv', B('Destek vektörü sayısı', 'Number of support vectors'), [['n_sv', B('α > 0', 'α > 0'), 4]]),
+    { kind: 'hist', id: 'yf', title: B('Eğitimde y·f dağılımı', 'Distribution of y·f on training'), edges: hm.edges, frames: [{ label: `C=${C}`, counts: hm.counts }], xLabel: B('y·f (1: kenarda, < 0: yanlış)', 'y·f (1: on the edge, < 0: wrong)') },
+    ...blk.charts,
+  ]
+  return r
 }
 
 const NM: Array<[string, string]> = [['A', 'A'], ['B', 'B']]
@@ -124,23 +170,52 @@ export const SVM: Lesson<SvmFrame> = {
     ['A = rng.normal([24, 32], [2.2, 2.8], (40, 2))', 'tip A: g, mm', 'type A: g, mm'],
     ['B = rng.normal([34, 47], [2.2, 2.8], (40, 2))', 'tip B', 'type B'],
     ['X = np.vstack([A, B]); y = np.r_[-np.ones(40), np.ones(40)]'],
-    ['Z = (X - X.mean(0)) / X.std(0)', 'ölçekle', 'scale'],
+    ['val = np.arange(80) % 4 == 3', 'her 4. parça doğrulama', 'every 4th part: validation'],
+    ['tr = ~val', 'eğitim parçaları', 'training parts'],
+    ['Z = (X - X[tr].mean(0)) / X[tr].std(0)', 'ölçekle', 'scale'],
     ['Z = np.c_[Z, np.ones(80)]', 'b için sabit 1', 'constant 1 for b'],
     ['C = 1.0', 'yumuşak marj', 'soft margin'],
     ['a = np.zeros(80); w = np.zeros(3)', 'her noktaya bir α', 'one α per point'],
+    ["K = 'epoch', 'loss', 'acc', 'val_acc', 'margin', 'n_sv'"],
+    ['history = {k: [] for k in K}', 'eğitim geçmişi', 'training history'],
+    ['def kaydet(e):', 'dönem sonu ölçümleri', 'end-of-epoch metrics'],
+    ['    m = y * (Z @ w)', 'y·f: pozitifse doğru', 'y·f: positive if right'],
+    ['    loss = .5 * w @ w + C * np.maximum(0, 1 - m[tr]).sum()', 'amaç: ceza + hinge', 'objective: penalty + hinge'],
+    ['    acc, vacc = (m[tr] > 0).mean(), (m[val] > 0).mean()'],
+    ['    mg = 2 / np.linalg.norm(w[:2])', 'marj genişliği', 'margin width'],
+    ['    row = e + 1, loss, acc, vacc, mg, (a > 1e-6).sum()'],
+    ['    for k, v in zip(K, row): history[k].append(float(v))'],
     ['for epoch in range(50):'],
-    ['    for i in rng.permutation(80):'],
+    ['    for i in rng.permutation(np.flatnonzero(tr)):'],
     ['        G = y[i] * Z[i] @ w - 1', 'kenara göre pay', 'slack to the edge'],
     ['        new = np.clip(a[i] - G / (Z[i] @ Z[i]), 0, C)', 'α: 0 ile C arası', 'α between 0 and C'],
     ['        w += (new - a[i]) * y[i] * Z[i]', 'w = Σ α·y·z', 'w = Σ α·y·z'],
     ['        a[i] = new'],
+    ['    kaydet(epoch)'],
     ['f = Z @ w', 'karar değeri', 'decision value'],
-    ["print('hata', (np.sign(f) != y).sum())"],
+    ["print('hata', (np.sign(f[tr]) != y[tr]).sum())", 'eğitimde', 'on training'],
     ['sv = a > 1e-6', 'destek vektörleri', 'support vectors'],
     ["print('destek', sv.sum(), np.abs(f[sv]).round(3))", 'kenarda: |f| = 1', 'on the edge: |f| = 1'],
     ["print('marj', 2 / np.linalg.norm(w[:2]))", 'ölçekli birimde', 'in scaled units'],
+    ['pos, neg = f[val & (y > 0)], f[val & (y < 0)]'],
+    ['auc = (pos[:, None] > neg).mean()', 'doğrulamada ROC AUC', 'validation ROC AUC'],
+    ["for k in ('loss', 'acc', 'val_acc', 'margin'):"],
+    ["    print(f'{k:<9}{history[k][-1]:>9.3f}')", 'son ölçümler', 'final metrics'],
+    ["print(f'{\"val_auc\":<9}{auc:>9.3f}')"],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as fh:"],
+    ['    w_ = csv.writer(fh); w_.writerow(K)', 'satır başına bir dönem', 'one row per epoch'],
+    ['    w_.writerows(zip(*history.values()))'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik', 'plot if available'],
+    ["    for k in ('acc', 'val_acc'):"],
+    ["        plt.plot(history['epoch'], history[k], label=k)"],
+    ['    plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [{ key: 'C', label: { tr: 'C (yumuşak marj)', en: 'C (soft margin)' }, min: 0.02, max: 2, step: 0.02, value: 1 }],
+  report: svmReport,
   run({ C = 1 }) {
     const X = partsData()
     const fit = trainSvm(X, C)
@@ -191,3 +266,6 @@ export const SVM: Lesson<SvmFrame> = {
     return F
   },
 }
+// Python koduna doğrulama ayrımı (2 satır), geçmiş kaydı (9 satır) ve dönem sonu kaydı (1 satır) eklendi: vurgular kayar.
+const svmRun = SVM.run
+SVM.run = (p) => svmRun(p).map((f) => ({ ...f, line: f.line <= 4 ? f.line : f.line <= 8 ? f.line + 2 : f.line <= 14 ? f.line + 11 : f.line + 12 }))

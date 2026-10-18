@@ -5,13 +5,37 @@
 // Mesajlar (sayfa → worker): { type: 'run', id, code, files: [{ name, url } | { name, bytes }] }
 // Mesajlar (worker → sayfa): { type: 'progress', stage: 'loading-runtime' | 'loading-numpy' | 'ready' }
 //                            { type: 'out', id, text, stream: 'stdout' | 'stderr' }
+//                            { type: 'figure', id, png }   (matplotlib şekli, base64 PNG)
+//                            { type: 'files', id, files: [{ name, bytes }] }   (çalıştırmanın yazdığı / değiştirdiği dosyalar)
 //                            { type: 'done', id, ok, error?, ms }
+// matplotlib yalnız kod onu içe aktarıyorsa ve ilk kez gerektiğinde yüklenir (Agg arka ucu). plt.show() ve çalıştırmanın sonunda
+// açık kalan şekiller PNG olarak sayfaya gönderilir; sayfa bunları <img> olarak gösterir.
 /* global importScripts, loadPyodide */
 const PYODIDE_VERSION = '0.26.4'
 const PYODIDE_URL = `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`
 
 let ready = null
 let current = null
+let mplReady = null
+const MAX_FILE = 4 * 1024 * 1024
+
+/** Kod matplotlib kullanıyor mu (yorum satırları hariç). */
+const usesMpl = (code) => /^[ \t]*(import\s+matplotlib|from\s+matplotlib)/m.test(code)
+
+// matplotlib kurulumu: Agg arka ucu, plt.show() şekilleri gönderir ve kapatır; _mx_flush() çalıştırma sonunda kalanları gönderir.
+const MPL_SETUP = `
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as _plt, io as _io, base64 as _b64, _mx
+def _mx_flush(*a, **k):
+    for n in list(_plt.get_fignums()):
+        f = _plt.figure(n)
+        b = _io.BytesIO()
+        f.savefig(b, format='png', dpi=110, bbox_inches='tight')
+        _mx.figure(_b64.b64encode(b.getvalue()).decode('ascii'))
+        _plt.close(f)
+_plt.show = _mx_flush
+`
 
 /** Çıktıyı satır satır biriktirip kısa aralıklarla gönderir (her print için ayrı mesaj olmasın). */
 const buf = { stdout: '', stderr: '' }
@@ -58,6 +82,29 @@ function formatError(e) {
   return (start >= 0 ? ['Traceback (most recent call last):', ...lines.slice(start)] : lines.slice(-8)).join('\n').trim()
 }
 
+function loadMpl(py) {
+  if (mplReady) return mplReady
+  mplReady = (async () => {
+    self.postMessage({ type: 'progress', stage: 'loading-matplotlib' })
+    await py.loadPackage('matplotlib')
+    py.registerJsModule('_mx', { figure: (b64) => { flush(); self.postMessage({ type: 'figure', id: current, png: String(b64) }) } })
+    await py.runPythonAsync(MPL_SETUP)
+    self.postMessage({ type: 'progress', stage: 'running' })
+  })()
+  mplReady.catch(() => { mplReady = null })
+  return mplReady
+}
+
+/** Çalışma dizinindeki düz dosyalar: ad → değişiklik zamanı. */
+function listFiles(py) {
+  const out = new Map()
+  for (const name of py.FS.readdir('.')) {
+    if (name === '.' || name === '..') continue
+    try { const st = py.FS.stat(name); if (py.FS.isFile(st.mode)) out.set(name, `${st.mtime && st.mtime.getTime ? st.mtime.getTime() : st.mtime}:${st.size}`) } catch { /* yok say */ }
+  }
+  return out
+}
+
 self.onmessage = async (ev) => {
   const m = ev.data
   if (!m || m.type !== 'run') return
@@ -81,13 +128,28 @@ self.onmessage = async (ev) => {
       }
       if (bytes) py.FS.writeFile(f.name, new Uint8Array(bytes))
     }
+    // önceki çalıştırmanın ürettiği dosyalar silinir (veri dosyaları az önce yeniden yazıldı)
+    const inputs = new Set((m.files || []).map((f) => f.name))
+    for (const name of listFiles(py).keys()) if (!inputs.has(name)) py.FS.unlink(name)
+    const mpl = usesMpl(m.code)
+    if (mpl) await loadMpl(py)
+    const before = listFiles(py)
     const ns = py.globals.get('dict')()
     try {
       await py.runPythonAsync(m.code, { globals: ns })
     } finally {
       ns.destroy()
+      if (mpl) { try { await py.runPythonAsync('_mx_flush()') } catch { /* şekil yoksa önemsiz */ } }
+      flush()
+      // yazılan ya da değişen dosyalar: sayfada indirme bağlantısı olur (hata olsa da o ana kadar yazılanlar)
+      const files = []
+      for (const [name, sig] of listFiles(py)) {
+        if (before.get(name) === sig) continue
+        const bytes = py.FS.readFile(name)
+        if (bytes.length <= MAX_FILE) files.push({ name, bytes: bytes.slice().buffer })
+      }
+      if (files.length) self.postMessage({ type: 'files', id: m.id, files }, files.map((f) => f.bytes))
     }
-    flush()
     self.postMessage({ type: 'done', id: m.id, ok: true, ms: Math.round(performance.now() - t1), loadMs: Math.round(t1 - t0) })
   } catch (e) {
     flush()

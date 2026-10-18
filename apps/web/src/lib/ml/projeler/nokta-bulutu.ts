@@ -4,6 +4,8 @@
 // ölçüm içindir; algoritmalar onları hiç görmez. Koordinatlar robot çerçevesinde metre: x ileri, y sol, z yukarı.
 import { cap, fmt, gauss, rng, type Bi, type Cap } from '../core'
 import type { Curve, Metric, ProjectDef, ProjectRun, Table } from './core'
+import { B, gecmisGrafik, type EgitimRaporu, type Grafik } from '../egitim/rapor'
+import { silhouette } from '../egitim/metrics'
 
 /** Yükseklik eşiği: bunun altındaki noktalar zemin sayılır ve atılır. */
 export const FLOOR_Z = 0.08
@@ -301,6 +303,32 @@ export const NOKTA_BULUTU: ProjectDef<View> = {
     ['        k += 1'],
     ['    return g'],
     ['etiket = dbscan(P)', 'ya da kmeans(Z, 5, np.random.default_rng(0))', 'or kmeans(Z, 5, np.random.default_rng(0))'],
+    ['def siluet(X, g):', 'ortalama siluet skoru (gürültü hariç)', 'mean silhouette score (noise excluded)'],
+    ['    X, g = X[g >= 0], g[g >= 0]'],
+    ['    L = np.unique(g)'],
+    ['    if len(L) < 2: return 0.0'],
+    ['    D = np.sqrt(((X[:, None] - X) ** 2).sum(2))'],
+    ['    ort = np.stack([D[:, g == l].sum(1) / np.maximum(1, (g == l).sum() - (g == l)) for l in L], 1)', 'her kümeye ortalama uzaklık', 'mean distance to every cluster'],
+    ['    a = ort[np.arange(len(g)), np.searchsorted(L, g)]', 'kendi kümesi', 'own cluster'],
+    ['    b = np.where(L[None] == g[:, None], np.inf, ort).min(1)', 'en yakın diğer küme', 'nearest other cluster'],
+    ['    return float(np.mean((b - a) / np.maximum(a, b)))'],
+    ['history = {\'eps\': [], \'clusters\': [], \'noise_share\': [], \'silhouette\': []}', 'geçmiş: eps taraması', 'history: eps sweep'],
+    ['for e in (0.2, 0.3, 0.35, 0.4, 0.5, 0.6):'],
+    ['    g = dbscan(P, eps=e)'],
+    ['    history[\'eps\'].append(e); history[\'clusters\'].append(int(g.max() + 1))'],
+    ['    history[\'noise_share\'].append(float((g < 0).mean())); history[\'silhouette\'].append(siluet(P, g))'],
+    ['for row in zip(*history.values()): print(\'  \'.join(f\'{k}={v:.3f}\' for k, v in zip(history, row)))', 'tablo', 'table'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    fig, (a1, a2) = plt.subplots(1, 2, figsize=(9, 3.5))'],
+    ['    a1.plot(history[\'eps\'], history[\'clusters\'], \'o-\'); a1.set_xlabel(\'eps\'); a1.set_ylabel(\'clusters\')'],
+    ['    a2.scatter(P[:, 0], P[:, 1], c=etiket, s=4, cmap=\'tab10\'); a2.set_aspect(\'equal\')', 'kümeler (üstten görünüş)', 'clusters (top view)'],
+    ['    plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'algo', label: { tr: 'Algoritma: 0 k-ortalamalar, 1 DBSCAN', en: 'Algorithm: 0 k-means, 1 DBSCAN' }, min: 0, max: 1, step: 1, value: 1 },
@@ -334,7 +362,8 @@ export function createRun(p: Record<string, number>): ProjectRun<View> {
   const r = rng(seed * 101 + 3)
   let C: Float64Array | null = null
   let rounds = 0, wait = 0
-  const inertia: number[] = []
+  const inertia: number[] = [], changedHist: number[] = []
+  const dbSteps: number[] = [], dbClusters: number[] = []
   // DBSCAN durumu
   let N: number[][] | null = null, cur = 0, kk = 0, queue: number[] = [], processed = 0
   const progress: number[] = []
@@ -366,7 +395,7 @@ export function createRun(p: Record<string, number>): ProjectRun<View> {
         if (++wait < 8) return
         wait = 0
         const { changed, s } = lloydRound(X, D, C, g)
-        rounds++; inertia.push(s); sync()
+        rounds++; inertia.push(s); changedHist.push(changed); sync()
         if (changed === 0 || rounds >= 60) view.phase = 'done'
       } else {
         if (!N) { N = neighbours3(X, D, eps); return }
@@ -382,12 +411,94 @@ export function createRun(p: Record<string, number>): ProjectRun<View> {
           if (N[j].length >= MIN_PTS) for (const q of N[j]) if (g[q] === -1) { g[q] = g[j]; queue.push(q) }
         }
         progress.push(g.reduce((s, v) => s + (v >= 0 ? 1 : 0), 0) / m)
+        dbSteps.push(processed); dbClusters.push(kk)
         sync()
       }
     }
   }
   const ev = () => evaluate(truthSub, g)
+  // eğitim paneli: sürüme göre önbellek; siluet ve tarama (k / eps) yalnız bitince bir kez hesaplanır
+  let rep: { v: string; r: EgitimRaporu } | null = null
+  let sil = NaN, sweep: Grafik[] | null = null
+  const sub = Array.from({ length: m }, (_, i) => i).filter((i) => i % Math.max(1, Math.ceil(m / 400)) === 0)
+  const subX = sub.map((i) => Array.from(X.subarray(i * D, i * D + D)))
+  const silOf = (lab: ArrayLike<number>) => silhouette(subX, sub.map((i) => lab[i]))
+  const makeSweep = (): Grafik[] => {
+    if (algo === 0) {
+      const ks = [2, 3, 4, 5, 6, 7, 8], ine: number[] = [], sl: number[] = []
+      const rr = rng(seed * 101 + 77)
+      for (const kq of ks) {
+        const Cq = bestStart(X, D, kq, rr, 3), gq = new Int16Array(m).fill(-1)
+        let sq = 0
+        for (let i = 0; i < 100; i++) { const o = lloydRound(X, D, Cq, gq); sq = o.s; if (!o.changed) break }
+        ine.push(sq); sl.push(silOf(gq))
+      }
+      return [
+        { kind: 'line', id: 'elbow', title: B('Dirsek eğrisi: k’ya göre toplam kare uzaklık', 'Elbow curve: total squared distance by k'), x: ks, xLabel: B('k', 'k'), yLabel: B('kare uzaklık', 'squared distance'), series: [{ key: 'inertia', label: B('toplam kare uzaklık', 'inertia'), values: ine, tone: 1 }], marker: { x: k, label: B(`seçilen k = ${k}`, `chosen k = ${k}`) } },
+        { kind: 'line', id: 'silhouette-k', title: B('Siluet skoru (k’ya göre)', 'Silhouette score by k'), x: ks, xLabel: B('k', 'k'), yMin: -0.2, yMax: 1, series: [{ key: 'silhouette', label: B('siluet', 'silhouette'), values: sl, tone: 3 }], marker: { x: k, label: B(`k = ${k}`, `k = ${k}`) } },
+      ]
+    }
+    const es = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0], cl: number[] = [], nz: number[] = [], rc: number[] = []
+    for (const e of es) {
+      const lab = dbscan3(X, D, e)
+      const q = evaluate(truthSub, lab)
+      cl.push(q.K); nz.push(q.noise / m); rc.push(q.recovered)
+    }
+    return [
+      { kind: 'line', id: 'eps-sweep', title: B('eps taraması: küme sayısı ve bulunan nesne', 'eps sweep: clusters and objects found'), x: es, xLabel: B('eps (m)', 'eps (m)'), series: [{ key: 'clusters', label: B('küme', 'clusters'), values: cl, tone: 1 }, { key: 'found', label: B('bulunan nesne', 'objects found'), values: rc, tone: 3 }], marker: { x: eps, label: B(`eps = ${eps}`, `eps = ${eps}`) } },
+      { kind: 'line', id: 'eps-noise', title: B('eps taraması: gürültü payı', 'eps sweep: noise share'), x: es, xLabel: B('eps (m)', 'eps (m)'), yMin: 0, yMax: 1, series: [{ key: 'noise', label: B('gürültü', 'noise'), values: nz, tone: 0 }] },
+    ]
+  }
+  const report = (): EgitimRaporu => {
+    const key = `${view.phase}:${view.version}`
+    if (rep && rep.v === key) return rep.r
+    const clustering = view.phase === 'cluster' || view.phase === 'done'
+    const e = clustering ? ev() : null
+    if (view.phase === 'done') { if (Number.isNaN(sil)) sil = silOf(g); sweep ??= makeSweep() }
+    const history: EgitimRaporu['history'] = algo === 0
+      ? { x: 'round', cols: { round: inertia.map((_, i) => i + 1), inertia: inertia.slice(), changed: changedHist.slice() } }
+      : { x: 'step', cols: { step: dbSteps.slice(), clustered_share: progress.slice(), clusters: dbClusters.slice() } }
+    const sizes = e ? Array.from({ length: e.K }, (_, c) => g.reduce((a, v) => a + (v === c ? 1 : 0), 0)).sort((a, b) => b - a) : []
+    const r: EgitimRaporu = {
+      kind: 'kumeleme', model: `${algo === 0 ? `k-ortalamalar++ (k = ${k})` : `DBSCAN (eps = ${eps} m, min ${MIN_PTS})`}${usePca ? ' · PCA 3→2' : ' · 3B'}`, seed,
+      hyper: algo === 0 ? { algo: 'kmeans', k, starts: 10, pca: usePca ? 1 : 0, floor_z: FLOOR_Z } : { algo: 'dbscan', eps, min_pts: MIN_PTS, pca: usePca ? 1 : 0, floor_z: FLOOR_Z },
+      history, final: [], charts: [],
+    }
+    r.final = [
+      { key: 'points', label: B('zemin dışı nokta', 'off-floor points'), value: m, fmt: 'int' },
+      { key: 'clusters', label: B('küme sayısı', 'clusters'), value: e ? e.K : NaN, fmt: 'int' },
+      { key: 'objects_found', label: B('bulunan nesne (/5)', 'objects found (/5)'), value: e ? e.recovered : NaN, fmt: 'int' },
+      { key: 'purity', label: B('saflık', 'purity'), value: e ? e.purity : NaN, fmt: 'pct' },
+      { key: 'noise_share', label: B('gürültü payı', 'noise share'), value: e ? e.noise / m : NaN, fmt: 'pct' },
+      { key: 'silhouette', label: B('siluet skoru', 'silhouette score'), value: sil, fmt: 3 },
+      { key: 'pca_var_2', label: B('PC1 + PC2 varyansı', 'PC1 + PC2 variance'), value: pc.explained[0] + pc.explained[1], fmt: 'pct' },
+    ]
+    if (algo === 0 && inertia.length) r.final.push({ key: 'inertia', label: B('toplam kare uzaklık', 'inertia'), value: inertia[inertia.length - 1], fmt: 2 })
+    r.charts = algo === 0
+      ? [gecmisGrafik(r, 'inertia', B('Lloyd turu başına toplam kare uzaklık', 'Total squared distance per Lloyd round'), [['inertia', B('toplam kare uzaklık', 'inertia'), 1]], { xLabel: B('tur', 'round'), live: false }),
+        gecmisGrafik(r, 'changed', B('Grubu değişen nokta sayısı', 'Points that changed group'), [['changed', B('değişen', 'changed'), 5]], { xLabel: B('tur', 'round'), yMin: 0, live: false })]
+      : [gecmisGrafik(r, 'grow', B('DBSCAN: kümeye katılan nokta payı', 'DBSCAN: share of points in a cluster'), [['clustered_share', B('kümede', 'clustered'), 1]], { xLabel: B('işlenen nokta', 'points processed'), yMin: 0, yMax: 1, live: false }),
+        gecmisGrafik(r, 'nclusters', B('DBSCAN: küme sayısı', 'DBSCAN: number of clusters'), [['clusters', B('küme', 'clusters'), 3]], { xLabel: B('işlenen nokta', 'points processed'), yMin: 0, live: false })]
+    r.charts.push({ kind: 'bar', id: 'scree', title: B('PCA: açıklanan varyans (scree)', 'PCA: explained variance (scree)'), labels: ['PC1', 'PC2', 'PC3'], yMin: 0, yMax: 1, series: [{ key: 'explained', label: B('varyans payı', 'variance share'), values: pc.explained.slice(), tone: 4 }] })
+    if (e) {
+      r.charts.push({ kind: 'bar', id: 'sizes', title: B('Küme büyüklükleri (nokta)', 'Cluster sizes (points)'), labels: sizes.map((_, i) => `#${i + 1}`), series: [{ key: 'size', label: B('nokta', 'points'), values: sizes, tone: 1 }] })
+      const order: number[] = []
+      e.match.forEach((c) => { if (c >= 0 && !order.includes(c)) order.push(c) })
+      for (let c = 0; c < e.K && order.length < 8; c++) if (!order.includes(c)) order.push(c)
+      const rest = Array.from({ length: e.K }, (_, c) => c).filter((c) => !order.includes(c))
+      const rowOf = (row: number[]) => [...order.map((c) => row[c]), ...(rest.length ? [rest.reduce((a, c) => a + row[c], 0)] : []), row[e.K]]
+      r.charts.push({
+        kind: 'heat', id: 'object-cluster', title: B('Gerçek nesne × bulunan küme', 'True object × found cluster'),
+        rows: [...OBJECTS.map((o) => o.name[0]), 'sahte yansıma'], cols: [...order.map((c) => `K${c + 1}`), ...(rest.length ? ['diğer'] : []), 'gürültü'],
+        values: e.M.map(rowOf), rowLabel: B('nesne', 'object'), colLabel: B('küme', 'cluster'), showValues: true,
+      })
+    }
+    if (sweep) r.charts.push(...sweep)
+    rep = { v: key, r }
+    return r
+  }
   return {
+    report,
     view,
     step(n) { for (let i = 0; i < n && view.phase !== 'done'; i++) unit() },
     done: () => view.phase === 'done',

@@ -1,6 +1,8 @@
 // Ders: mini dil modeli. Robotun görev günlüğünden 16 cümle; her kelime için "sonraki kelime" puanları (29×29), softmax ve
 // çift çift okuyarak öğrenme. Sonra model ağırlıklı zarla yazar; hep en olası kelimeyi seçerse aynı cümlede döner durur.
 import { cap, fmt, rng, type CodeLine, type Frame, type Lesson } from './core'
+import { perplexity } from './egitim/metrics'
+import { B, erkenDurdurma, gecmisGrafik, type EgitimRaporu } from './egitim/rapor'
 
 /** Görev günlüğü (Türkçe; iki arayüz dilinde de aynı korpus). Nokta da bir kelime sayılır. */
 export const STORY = 'robot kırmızı kutuyu aldı ve rafa koydu . robot mavi kutuyu aldı ve banda koydu . kol yeşil kutuyu banda bıraktı . robot şarj istasyonuna gitti ve bekledi . kamera mavi etiketi okudu . kol mavi kutuyu rafa bıraktı . robot engeli gördü ve yavaşça durdu . kamera kırmızı etiketi okudu ve bekledi . robot depoya gitti ve kutuyu aldı . kol kutuyu banda koydu ve durdu . robot şarj istasyonuna hızla döndü . kamera yeşil kutuyu gördü . robot kapıya gitti ve bekledi . kol kırmızı kutuyu depoya taşıdı . robot şarj istasyonuna gitti ve durdu . kamera engeli gördü ve robot durdu .'
@@ -105,11 +107,76 @@ function wrapStory(): CodeLine[] {
     if (c.length > 60) { lines.push(cur); cur = w } else cur = c
   }
   lines.push(cur + "'''")
-  return lines.map((l, i) => (i === 0 ? [l, 'görev günlüğü: 16 cümle', 'task log: 16 sentences'] : [l]))
+  // yorum yok: hikâye üç tırnaklı metnin içinde, yorum eklenirse metne karışır
+  return lines.map((l) => [l])
 }
 const STORY_LINES = wrapStory()
 const S = STORY_LINES.length // hikâye 1..S satırlarında
-const L = { story: 1, vocab: S + 1, table: S + 2, soft: S + 3, tour: S + 4, pair: S + 5, step: S + 6, print: S + 7, seed: S + 8, loop: S + 9, q: S + 10, die: S + 11, top: S + 12, out: S + 13 }
+// S+4..S+11: doğrulama ayrımı ve geçmiş; döngüde S+14..S+16 kayıp kaydı
+const L = { story: 1, vocab: S + 1, table: S + 2, soft: S + 3, tour: S + 11, pair: S + 12, step: S + 13, print: S + 17, seed: S + 18, loop: S + 19, q: S + 20, die: S + 21, top: S + 22, out: S + 23 }
+
+/**
+ * Eğitim paneli için: cümleler sırayla ayrılır, her 4. cümle (i % 4 = 3) doğrulamaya kalır. İki dizi de "." ile başlar (cümle
+ * başı geçişi). Tablo yalnız eğitim dizisinin çiftleriyle, dersteki aynı adımla eğitilir; her turun sonunda iki dizide ortalama
+ * çapraz entropi (kayıp) ve şaşkınlık kaydedilir.
+ */
+export function splitSequences() {
+  const ss = SENTENCES.map((x) => [...x.split(' '), '.'])
+  const tr = ['.'], va = ['.']
+  ss.forEach((x, i) => (i % 4 === 3 ? va : tr).push(...x))
+  return { tr: tr.map(ix), va: va.map(ix), nTrain: ss.filter((_, i) => i % 4 !== 3).length, nVal: ss.filter((_, i) => i % 4 === 3).length }
+}
+/** Bir dizide doğru sonraki kelimenin olasılıkları (şaşkınlık bunlardan). */
+export function nextProbs(P: Float64Array[], seq: number[]): number[] {
+  const out: number[] = []
+  for (let k = 0; k + 1 < seq.length; k++) out.push(softmax(P[seq[k]])[seq[k + 1]])
+  return out
+}
+export function trainSplit(tours = TOURS) {
+  const { tr, va, nTrain, nVal } = splitSequences()
+  const P = Array.from({ length: N }, () => new Float64Array(N))
+  const h = { tour: [] as number[], loss: [] as number[], val_loss: [] as number[], perplexity: [] as number[], val_perplexity: [] as number[] }
+  for (let t = 1; t <= tours; t++) {
+    for (let k = 0; k + 1 < tr.length; k++) {
+      const row = P[tr[k]]
+      const p = softmax(row)
+      p[tr[k + 1]] -= 1
+      for (let j = 0; j < N; j++) row[j] -= LR * p[j]
+    }
+    const lt = Math.log(perplexity(nextProbs(P, tr))), lv = Math.log(perplexity(nextProbs(P, va)))
+    h.tour.push(t); h.loss.push(lt); h.val_loss.push(lv); h.perplexity.push(Math.exp(lt)); h.val_perplexity.push(Math.exp(lv))
+  }
+  return { P, h, nTrain, nVal, tr, va }
+}
+
+let repCache: EgitimRaporu | null = null
+/** Mini dil modelinin eğitim raporu (parametreler yalnız yazmayı etkiler; eğitim sabittir, bir kez hesaplanır). */
+export function lmReport(): EgitimRaporu {
+  if (repCache) return repCache
+  const { P, h, nTrain, nVal } = trainSplit()
+  const r: EgitimRaporu = {
+    kind: 'dil-modeli', model: `bigram softmax ${N}×${N}`, seed: 0, hyper: { lr: LR, tours: TOURS, train_sent: nTrain, val_sent: nVal },
+    history: { x: 'tour', cols: h }, final: [], charts: [],
+  }
+  const bi = h.val_loss.indexOf(Math.min(...h.val_loss))
+  r.final = [
+    { key: 'loss', label: B('eğitim kaybı', 'training loss'), value: h.loss.at(-1)!, fmt: 3 },
+    { key: 'val_loss', label: B('doğrulama kaybı', 'validation loss'), value: h.val_loss.at(-1)!, fmt: 3 },
+    { key: 'perplexity', label: B('eğitim şaşkınlığı', 'training perplexity'), value: h.perplexity.at(-1)!, fmt: 2 },
+    { key: 'val_perplexity', label: B('doğrulama şaşkınlığı', 'validation perplexity'), value: h.val_perplexity.at(-1)!, fmt: 2 },
+    { key: 'best_val_tour', label: B('en iyi doğrulama turu', 'best validation round'), value: h.tour[bi], fmt: 'int' },
+    { key: 'uniform_perplexity', label: B('eşit dağılım şaşkınlığı', 'uniform perplexity'), value: N, fmt: 'int' },
+  ]
+  const q = softmax(P[ix('robot')])
+  const order = q.map((v, j) => [v, j]).sort((a, b) => b[0] - a[0]).slice(0, 8)
+  r.charts = [
+    gecmisGrafik(r, 'loss', B('Kayıp (çapraz entropi)', 'Loss (cross-entropy)'), [['loss', B('eğitim', 'train'), 1], ['val_loss', B('doğrulama', 'validation'), 0, true]], { xLabel: B('tur', 'round'), marker: erkenDurdurma(h.tour, h.val_loss) }),
+    gecmisGrafik(r, 'ppl', B('Şaşkınlık (perplexity)', 'Perplexity'), [['perplexity', B('eğitim', 'train'), 1], ['val_perplexity', B('doğrulama', 'validation'), 0, true]], { xLabel: B('tur', 'round'), logY: true, note: B(`Şaşkınlık = e^kayıp: modelin her adımda kaç kelime arasında kararsız kaldığı. Eşit dağılımda ${N}.`, `Perplexity = e^loss: how many words the model hesitates between at each step. Uniform: ${N}.`) }),
+    { kind: 'bar', id: 'next-robot', title: B('"robot" sonrası en olası 8 kelime', 'Top 8 words after "robot"'), labels: order.map(([, j]) => VOCAB[j]), series: [{ key: 'p', label: B('olasılık', 'probability'), values: order.map(([v]) => v), tone: 1 }], yMin: 0 },
+  ]
+  repCache = r
+  return r
+}
 
 const pc = (x: number, lang: 'tr' | 'en', d = 1) => (lang === 'tr' ? `%${fmt(x * 100, d, 'tr')}` : `${(x * 100).toFixed(d)}%`)
 const top = (q: number[]) => q.reduce((bi, v, j) => (v > q[bi] ? j : bi), 0)
@@ -141,9 +208,19 @@ export const MINI_DIL_MODELI: Lesson<LmFrame> = {
     ['w = story.split(); V = sorted(set(w)); n = len(V)', `${N} farklı kelime`, `${N} different words`],
     ['ix = {s: i for i, s in enumerate(V)}; P = np.zeros((n, n))', `${N}×${N} puan, hepsi 0`, `${N}×${N} scores, all 0`],
     ['sm = lambda v: np.exp(v) / np.exp(v).sum()', 'softmax', 'softmax'],
+    ["j = ' '.join(w).split(' .')[:-1]", '16 cümle', '16 sentences'],
+    ["ss, tr, va = [x.split() + ['.'] for x in j], ['.'], ['.']"],
+    ['for i, x in enumerate(ss): [tr, va][i % 4 > 2].extend(x)', 'her 4. cümle doğrulama', 'every 4th sentence: validation'],
+    ['nll = lambda a, b: -np.log(sm(P[ix[a]])[ix[b]])'],
+    ['ce = lambda q: np.mean([nll(*p) for p in zip(q, q[1:])])', 'ortalama çapraz entropi', 'mean cross-entropy'],
+    ["history = {k: [] for k in ['tour', 'loss', 'val_loss',"],
+    ["           'perplexity', 'val_perplexity']}", 'eğitim geçmişi', 'training history'],
     ['for tour in range(500):'],
-    ['    for a, b in zip(w, w[1:]):', 'çift çift oku', 'read pair by pair'],
+    ['    for a, b in zip(tr, tr[1:]):', 'çift çift oku', 'read pair by pair'],
     ['        p = sm(P[ix[a]]); p[ix[b]] -= 1; P[ix[a]] -= .5 * p', 'hata → küçük adım', 'error → small step'],
+    ['    lt, lv = ce(tr), ce(va)', 'eğitim / doğrulama kaybı', 'train / validation loss'],
+    ['    r = [tour + 1, lt, lv, np.exp(lt), np.exp(lv)]', 'şaşkınlık = e^kayıp', 'perplexity = e^loss'],
+    ['    for k, v in zip(history, r): history[k].append(float(v))'],
     ["print(sm(P[ix['şarj']]).max().round(3))", "'şarj' sonrası en olası", "most likely after 'şarj'"],
     ["rng, t = np.random.default_rng(7), ['.']", 'cümle başından yaz', 'write from a sentence start'],
     ['for _ in range(24):'],
@@ -151,11 +228,24 @@ export const MINI_DIL_MODELI: Lesson<LmFrame> = {
     ['    t.append(V[rng.choice(n, p=q)])', 'ağırlıklı zar', 'weighted die'],
     ['    # t.append(V[q.argmax()])', 'hep en olası: döngüye girer', 'always the top word: loops'],
     ["print(' '.join(t[1:]))"],
+    ["for k in history: print(f'{k:<15}{history[k][-1]:>10.3f}')", 'son ölçümler', 'final metrics'],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as f:", 'satır başına bir tur', 'one row per round'],
+    ['    csv.writer(f).writerows([list(history),'],
+    ['                             *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ["    for k in ('loss', 'val_loss'):"],
+    ["        plt.plot(history['tour'], history[k], label=k)"],
+    ["    plt.xlabel('tour'); plt.legend(); plt.show()"],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [
     { key: 'seed', label: { tr: 'Zar tohumu', en: 'Die seed' }, min: 1, max: 50, step: 1, value: 7 },
     { key: 'mode', label: { tr: 'Yazma: 0 zar, 1 en olası', en: 'Writing: 0 die, 1 most likely' }, min: 0, max: 1, step: 1, value: 0 },
   ],
+  report: lmReport,
   run({ seed = 7, mode = 0 }) {
     const md = mode >= 0.5 ? 1 : 0
     const { P, snaps } = trained()

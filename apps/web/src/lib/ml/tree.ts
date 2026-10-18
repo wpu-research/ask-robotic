@@ -1,6 +1,7 @@
 // Ders 5: karar ağacı. Çizgi izleyen robotun iki sensörü (sol, sağ; 0–1023) ve uzman sürücünün seçtiği eylem (sola, düz, sağa).
 // Ağaç her düğümde Gini safsızlığını en çok azaltan tek eşiği seçer; bölmeler tuvalde eksenlere paralel çizgiler olarak görünür.
 import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
+import { B, ogrenmeEgrisi, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 export type Node = { leaf: true; c: number; n: number } | { leaf: false; f: 0 | 1; t: number; g: number; L: Node; R: Node; n: number }
 export interface Box { x0: number; x1: number; y0: number; y1: number }
@@ -119,6 +120,81 @@ export function treeRules(root: Node, ds = 0): Array<[string, string]> {
   return out
 }
 
+/** Ağacın her düğümüne düşen eğitim örneklerinin sınıf sayıları (yaprak olasılığı ve kırpılmış ağaç için). */
+export function nodeCounts(root: Node, X: Pt[], K = 3): Map<Node, number[]> {
+  const m = new Map<Node, number[]>()
+  for (const p of X) {
+    let n: Node = root
+    for (;;) {
+      if (!m.has(n)) m.set(n, new Array(K).fill(0))
+      m.get(n)![p.c]++
+      if (n.leaf) break
+      n = (n.f ? p.y : p.x) <= n.t ? n.L : n.R
+    }
+  }
+  return m
+}
+/**
+ * Derinliği d'de kırpılmış ağaçla tahmin: d. düzeydeki düğüm, verisinin çoğunluk sınıfını verir. Açgözlü büyüme yukarıdan aşağı
+ * aynı olduğundan bu, grow(X, d) ağacının tahminiyle birebir aynıdır (bir kez büyütüp her derinliği ucuza ölçmek için).
+ */
+function truncLeaf(root: Node, x: number, y: number, d: number): Node {
+  let n = root, k = 0
+  while (!n.leaf && k < d) { n = (n.f ? y : x) <= n.t ? n.L : n.R; k++ }
+  return n
+}
+const argmax = (c: number[]) => c.indexOf(Math.max(...c))
+const truncLeaves = (n: Node, d: number): number => (n.leaf || d === 0 ? 1 : truncLeaves(n.L, d - 1) + truncLeaves(n.R, d - 1))
+
+/**
+ * Eğitim paneli: derinlik 1…10 için eğitim/test doğruluğu ve yaprak sayısı (aynı açgözlü ağaç, kırpılarak), seçili derinlikte
+ * test kümesinde karışıklık matrisi, sınıf başına ölçüler, (kredi verisinde) yaprak olasılığıyla ROC/PR ve öğrenme eğrisi.
+ */
+export function treeReport({ depth = 3, veri = 0 }: Record<string, number>): EgitimRaporu {
+  const ds = veri >= 0.5 ? 1 : 0, K = ds ? 2 : 3
+  const C = ds ? creditData() : null
+  const X = C ? C.slice(0, 400) : lineData(), T = C ? C.slice(400) : lineData(57, 80)
+  const box: Box = { x0: 0, x1: 1, y0: 0, y1: 1 }
+  const D = Math.max(1, Math.min(10, Math.round(depth)))
+  const full = grow(X, 10, box, () => {})
+  const cnt = nodeCounts(full, X, K)
+  const predAt = (p: Pt, d: number) => argmax(cnt.get(truncLeaf(full, p.x, p.y, d))!)
+  const accAt = (S: Pt[], d: number) => S.filter((p) => predAt(p, d) === p.c).length / S.length
+  const depths = Array.from({ length: 10 }, (_, i) => i + 1)
+  const train_acc = depths.map((d) => accAt(X, d)), test_acc = depths.map((d) => accAt(T, d)), leaves = depths.map((d) => truncLeaves(full, d))
+  const labels = TREE_NAMES[ds].cls.map((c) => c[0])
+  const pred = T.map((p) => predAt(p, D))
+  const scores = ds ? T.map((p) => { const c = cnt.get(truncLeaf(full, p.x, p.y, D))!; return c[1] / (c[0] + c[1]) }) : undefined
+  const blk = siniflandirmaBlok({ y: T.map((p) => p.c), pred, labels, scores, threshold: 0.5, prefix: 'test_', title: B('test', 'test') })
+  // öğrenme eğrisi: eğitim kümesinin ilk n örneğiyle aynı derinlikte yeni ağaç
+  const sizes = [1, 2, 3, 4, 5, 6, 7, 8].map((k) => Math.round((X.length * k) / 8))
+  const lc = sizes.map((n) => { const S = X.slice(0, n), t = grow(S, D, box, () => {}); return [S.filter((p) => treePredict(t, p.x, p.y) === p.c).length / n, T.filter((p) => treePredict(t, p.x, p.y) === p.c).length / T.length] })
+  const best = test_acc.indexOf(Math.max(...test_acc))
+  return {
+    kind: 'siniflandirma', model: `karar ağacı (Gini), derinlik ≤ ${D}`, seed: ds ? 14 : 13, hyper: { depth: D, data: ds ? 'kredi' : 'cizgi-izleyen', train: X.length, test: T.length },
+    history: { x: 'depth', cols: { depth: depths, train_acc, test_acc, leaves } },
+    final: [
+      { key: 'train_accuracy', label: B('eğitim doğruluğu', 'training accuracy'), value: train_acc[D - 1], fmt: 'pct' },
+      ...blk.final,
+      { key: 'leaves', label: B('yaprak sayısı', 'leaves'), value: leaves[D - 1], fmt: 'int' },
+      { key: 'gap', label: B('eğitim − test farkı', 'train − test gap'), value: train_acc[D - 1] - test_acc[D - 1], fmt: 3 },
+    ],
+    confusion: blk.confusion,
+    scores: blk.scores,
+    charts: [
+      {
+        kind: 'line', id: 'depth', title: B('Derinliğe göre doğruluk', 'Accuracy by depth'), x: depths, xLabel: B('en büyük derinlik', 'max depth'), yLabel: B('doğruluk', 'accuracy'), yMax: 1,
+        series: [{ key: 'train_acc', label: B('eğitim', 'train'), values: train_acc, tone: 1 }, { key: 'test_acc', label: B('test', 'test'), values: test_acc, tone: 0, dash: true }],
+        marker: { x: depths[best], label: B(`en iyi test: derinlik ${depths[best]}`, `best test: depth ${depths[best]}`) },
+        note: B('Eğitim doğruluğu derinlikle artar; test doğruluğunun durduğu yerden sonrası ezberdir.', 'Training accuracy grows with depth; past the point where test accuracy stalls the tree memorises.'),
+      },
+      { kind: 'bar', id: 'leaves', title: B('Derinliğe göre yaprak sayısı', 'Leaves by depth'), labels: depths.map(String), series: [{ key: 'leaves', label: B('yaprak', 'leaves'), values: leaves, tone: 2 }] },
+      ...blk.charts,
+      ogrenmeEgrisi(sizes, lc.map((v) => v[0]), lc.map((v) => v[1]), B('doğruluk', 'accuracy'), { yMax: 1 }),
+    ],
+  }
+}
+
 export const TREE: Lesson<TreeFrame> = {
   slug: 'karar-agaci',
   n: 5,
@@ -167,11 +243,34 @@ export const TREE: Lesson<TreeFrame> = {
     ['    return t'],
     ['acc = lambda X, y: np.mean([predict(tree, x) == c for x, c in zip(X, y)])'],
     ['print(acc(X, y), acc(X_test, y_test))', 'eğitim ve saklı veride doğruluk', 'accuracy on training and hidden data'],
+    ['n_leaves = lambda t: n_leaves(t[2]) + n_leaves(t[3]) if isinstance(t, tuple) else 1'],
+    ['history = {\'depth\': [], \'train_acc\': [], \'test_acc\': [], \'leaves\': []}', 'derinliğe göre geçmiş', 'history by depth'],
+    ['for d in range(1, 11):'],
+    ['    tree = grow(X, y, d)', 'aynı veriyle daha derin ağaç', 'a deeper tree on the same data'],
+    ['    for k, v in zip(history, (d, acc(X, y), acc(X_test, y_test), n_leaves(tree))): history[k].append(float(v))'],
+    ['tree = grow(X, y, depth=3)'],
+    ['p = np.array([predict(tree, x) for x in X_test])'],
+    ['M = np.zeros((3, 3), int); np.add.at(M, (y_test, p), 1)', 'karışıklık matrisi: satır gerçek, sütun tahmin', 'confusion matrix: row actual, column predicted'],
+    ['print(M)'],
+    ['prec, rec = np.diag(M) / np.maximum(M.sum(0), 1), np.diag(M) / np.maximum(M.sum(1), 1)'],
+    ['f1 = 2 * prec * rec / np.maximum(prec + rec, 1e-12)'],
+    ['for k, v in [(\'test_accuracy\', np.trace(M) / M.sum()), (\'precision_m\', prec.mean()), (\'recall_m\', rec.mean()), (\'f1_m\', f1.mean())]:', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{k:<14}{v:>8.3f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir derinlik', 'one row per depth'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for k in (\'train_acc\', \'test_acc\'): plt.plot(history[\'depth\'], history[k], \'o-\', label=k)'],
+    ['    plt.xlabel(\'depth\'); plt.ylabel(\'accuracy\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'depth', label: { tr: 'En büyük derinlik', en: 'Max depth' }, min: 1, max: 10, step: 1, value: 3 },
     { key: 'veri', label: { tr: 'Veri: 0 çizgi izleyen, 1 kredi', en: 'Data: 0 line follower, 1 loan' }, min: 0, max: 1, step: 1, value: 0 },
   ],
+  report: treeReport,
   run({ depth = 3, veri = 0 }) {
     const ds = veri >= 0.5 ? 1 : 0
     const C = ds ? creditData() : null

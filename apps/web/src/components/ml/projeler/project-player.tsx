@@ -8,6 +8,7 @@ import type { Curve, ProjectRun } from '@/lib/ml/projeler/core'
 import { defaults } from '@/lib/ml/projeler/core'
 import { projectBySlug } from '@/lib/ml/projeler'
 import { SCENE_LOADERS } from './scenes'
+import { EgitimPaneli } from '../egitim-paneli'
 
 const SPEEDS = [1, 2, 4, 8]
 
@@ -91,8 +92,10 @@ export function ProjectPlayer({ slug }: { slug: string }) {
   const curves = run.curves?.() ?? []
   const table = run.table?.() ?? null
   const status = run.status()
+  const rapor = run.report?.() ?? null
 
   return (
+    <>
     <section className="mp-player" aria-label={def.title[lang]} data-testid="mp-player">
       <div className="mp-stage">
         <div className="mp-3d" ref={host} data-testid="mp-3d" data-gl={gl}>
@@ -142,5 +145,7 @@ export function ProjectPlayer({ slug }: { slug: string }) {
         )}
       </aside>
     </section>
+    {rapor && <EgitimPaneli rapor={rapor} lang={lang} slug={def.slug} />}
+    </>
   )
 }

@@ -2,6 +2,8 @@
 // Algoritmalar saf fonksiyondur (DOM yok): bir parametre kümesinden baştan sona bir "iz" (Frame dizisi) üretir; oynatıcı bu izi
 // kare kare çizer ve her karede kodun hangi satırının çalıştığını vurgular. Aynı tohum her zaman aynı sayıları verir.
 
+import type { EgitimRaporu } from './egitim/rapor'
+
 export type Lang = 'tr' | 'en'
 export type Bi = { tr: string; en: string }
 /** İki dilli kısa metin: [Türkçe, İngilizce]. */
@@ -87,6 +89,11 @@ export interface Lesson<F extends Frame = Frame> {
   code: CodeLine[]
   params: ParamDef[]
   run: (p: Record<string, number>) => F[]
+  /**
+   * Eğitim paneli: aynı parametrelerle gerçek eğitimi çalıştırıp geçmişi, son ölçümleri ve grafik tariflerini döndürür
+   * (lib/ml/egitim/rapor.ts). Model eğitmeyen / değerlendirmeyen derslerde yoktur.
+   */
+  report?: (p: Record<string, number>) => EgitimRaporu
 }
 
 /**

@@ -5,6 +5,7 @@
 // kutuya iter. Gerçek etiket bilindiği için doğruluk ve karışıklık matrisi canlı tutulur. Aynı tohum hep aynı bandı verir.
 import { cap, fmt, gauss, rng, type Lang } from '../core'
 import type { Curve, Metric, ProjectDef, ProjectRun, Table } from './core'
+import { B, gecmisGrafik, ogrenmeEgrisi, siniflandirmaBlok, type EgitimRaporu } from '../egitim/rapor'
 
 /** Nesne biçimleri: 0 küp, 1 koni, 2 silindir, 3 küre. */
 export type Shape = 0 | 1 | 2 | 3
@@ -178,6 +179,22 @@ export function createDepo(p: Record<string, number>): ProjectRun<DepoView> {
   const stream = makeItems(rng(s.seed + 1000), TOTAL, s.noise)
   const conf = Array.from({ length: 4 }, () => [0, 0, 0, 0])
   const accHist: number[] = []
+  const H = { n: [] as number[], true: [] as number[], pred: [] as number[], correct: [] as number[], accuracy: [] as number[] }
+  let rep: { n: number; r: EgitimRaporu } | null = null
+  let lc: { sizes: number[]; train: number[]; test: number[] } | null = null
+  /** Öğrenme eğrisi: etiketli örneklerin ilk 20, 40, … tanesiyle aynı model; eğitim doğruluğu ve banttaki 200 nesnede doğruluk. */
+  const learningCurve = () => {
+    if (lc) return lc
+    const sizes: number[] = [], tr: number[] = [], te: number[] = []
+    for (let n = Math.min(20, s.nTrain); n <= s.nTrain; n += 20) {
+      const sub = train.slice(0, n), m = fitModel(s.model, sub, Math.min(s.k, n), s.depth)
+      sizes.push(n)
+      tr.push(sub.filter((q) => m.predict(q.f) === q.c).length / n)
+      te.push(stream.filter((q) => m.predict(q.f) === q.c).length / stream.length)
+    }
+    return (lc = { sizes, train: tr, test: te })
+  }
+  let trainAcc = NaN
   let spawned = 0, scanned = 0, correct = 0, landed = 0
   const view: DepoView = { objs: [], scanTick: -999, tick: 0, binOk: [0, 0, 0, 0], binBad: [0, 0, 0, 0], model: s.model }
 
@@ -199,6 +216,7 @@ export function createDepo(p: Record<string, number>): ProjectRun<DepoView> {
         scanned++
         if (o.pred === o.c) correct++
         accHist.push(correct / scanned)
+        H.n.push(scanned); H.true.push(o.c); H.pred.push(o.pred); H.correct.push(o.pred === o.c ? 1 : 0); H.accuracy.push(correct / scanned)
         view.scanTick = view.tick
       }
       if (o.pred !== undefined && o.x >= BELT.binX[o.pred]) { o.x = BELT.binX[o.pred]; o.push = 0 }
@@ -240,6 +258,32 @@ export function createDepo(p: Record<string, number>): ProjectRun<DepoView> {
         { label: { tr: 'En düşük kesinlik', en: 'Lowest precision' }, value: cap(w(worstP, true), w(worstP, false)) },
         { label: { tr: 'Etiketli örnek', en: 'Labelled examples' }, value: cap(String(s.nTrain), String(s.nTrain)) },
       ]
+    },
+    report(): EgitimRaporu {
+      if (rep && rep.n === scanned) return rep.r
+      if (Number.isNaN(trainAcc)) trainAcc = train.filter((q) => M.predict(q.f) === q.c).length / train.length
+      const labels = BINS.map(([tr]) => tr)
+      const r: EgitimRaporu = {
+        kind: 'siniflandirma', model: MODELS[s.model][0] + (s.model === 0 ? ` (k = ${s.k})` : s.model === 1 ? ` (derinlik ${s.depth})` : ''), seed: s.seed,
+        hyper: { model: MODELS[s.model][1], k: s.k, depth: s.depth, noise: s.noise, train: s.nTrain, belt: TOTAL },
+        history: { x: 'n', cols: Object.fromEntries(Object.entries(H).map(([k, v]) => [k, v.slice()])) },
+        final: [], charts: [],
+      }
+      const blk = siniflandirmaBlok({ y: H.true, pred: H.pred, labels })
+      const L = learningCurve()
+      r.final = [
+        { key: 'scanned', label: B('taranan nesne', 'objects scanned'), value: scanned, fmt: 'int' },
+        ...blk.final,
+        { key: 'train_accuracy', label: B('eğitim doğruluğu', 'training accuracy'), value: trainAcc, fmt: 'pct' },
+      ]
+      r.confusion = blk.confusion
+      r.charts = [
+        gecmisGrafik(r, 'acc', B('Doğruluk (taranan nesneye göre, birikimli)', 'Accuracy (cumulative, by objects scanned)'), [['accuracy', B('doğruluk', 'accuracy'), 1]], { xLabel: B('taranan nesne', 'objects scanned'), yMin: 0, yMax: 1, live: false }),
+        ...blk.charts,
+        ogrenmeEgrisi(L.sizes, L.train, L.test, B('doğruluk', 'accuracy'), { yMin: 0, yMax: 1 }),
+      ]
+      rep = { n: scanned, r }
+      return r
     },
     curves(): Curve[] {
       return [{ label: { tr: 'Doğruluk (taranan nesneye göre)', en: 'Accuracy (by objects scanned)' }, values: accHist }]
@@ -303,13 +347,30 @@ export const DEPO_SINIFLANDIRMA: ProjectDef<DepoView> = {
     ['    lp = np.log(p) - 0.5 * (np.log(2 * np.pi * v) + (x - m) ** 2 / v).sum(1)'],
     ['    return lp.argmax()', 'log olasılığı en büyük kutu', 'bin with the largest log probability'],
     ['M = np.zeros((4, 4), int)', 'karışıklık matrisi', 'confusion matrix'],
+    ['history = {\'n\': [], \'true\': [], \'pred\': [], \'correct\': [], \'accuracy\': []}', 'geçmiş: taranan her nesne bir satır', 'history: one row per scanned object'],
     ['for z, x, c in zip(Z_yeni, X_yeni, y_yeni):', 'banttan gelen her yeni nesne', 'every new object on the belt'],
     ['    tahmin = knn(z)', 'ya da nb(x)', 'or nb(x)'],
     ['    M[c, tahmin] += 1', 'satır gerçek, sütun tahmin', 'row true, column predicted'],
+    ['    for k, v in zip(history, (M.sum(), c, tahmin, c == tahmin, np.trace(M) / M.sum())): history[k].append(float(v) if k == \'accuracy\' else int(v))'],
     ['print(M)'],
     ['print("doğruluk", np.trace(M) / M.sum())', 'köşegen / toplam', 'diagonal / total'],
     ['print("duyarlılık", np.diag(M) / M.sum(1))', 'kutu başına', 'per bin'],
     ['print("kesinlik", np.diag(M) / M.sum(0))'],
+    ['P, R = np.diag(M) / np.maximum(1, M.sum(0)), np.diag(M) / np.maximum(1, M.sum(1))'],
+    ['F1 = 2 * P * R / np.maximum(1e-12, P + R)', 'kutu başına F1', 'F1 per bin'],
+    ['for ad, p_, r_, f_ in zip([\'oyuncak\', \'elektronik\', \'gida\', \'buyuk koli\'], P, R, F1):', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{ad:<12}kesinlik {p_:.2f}  duyarlılık {r_:.2f}  F1 {f_:.2f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    fig, (a1, a2) = plt.subplots(1, 2, figsize=(9, 3.5))'],
+    ['    a1.plot(history[\'n\'], history[\'accuracy\']); a1.set_xlabel(\'n\'); a1.set_ylabel(\'accuracy\')'],
+    ['    a2.imshow(M, cmap=\'Greens\'); a2.set_xlabel(\'tahmin\'); a2.set_ylabel(\'gerçek\')', 'karışıklık matrisi', 'confusion matrix'],
+    ['    plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'model', label: { tr: 'Model: 0 k-NN, 1 ağaç, 2 naive Bayes', en: 'Model: 0 k-NN, 1 tree, 2 naive Bayes' }, min: 0, max: 2, step: 1, value: 0 },

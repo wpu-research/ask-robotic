@@ -1,6 +1,8 @@
 // Ders 4: Gauss naive Bayes. Robotun önünde engel var mı? Ultrasonik mesafe (cm) ve IR yansıma (0–100) birlikte okunur; her sınıf
 // ve özellik için ortalama ve varyans, sınıfların oranı (önsel) öğrenilir; yeni ölçümde log olasılıkların toplamı karşılaştırılır.
 import { cap, fmt, gauss, mean, rng, variance, type Frame, type Lesson, type Pt, shifted } from './core'
+import { B, ogrenmeEgrisi, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
+import { accuracy } from './egitim/metrics'
 
 export interface NBModel { m: [number, number]; v: [number, number]; prior: number }
 export interface NBFrame extends Frame {
@@ -38,6 +40,54 @@ export function logp(x: number, y: number, M: NBModel): number {
 }
 export const nbPredict = (model: NBModel[], x: number, y: number) => (logp(x, y, model[1]) > logp(x, y, model[0]) ? 1 : 0)
 
+/** Log olasılık oranı log p(engel | x) − log p(boş | x): sıfırın üstü engel (eşik kaydırıcısının skoru). */
+export const nbScore = (model: NBModel[], x: number, y: number) => logp(x, y, model[1]) - logp(x, y, model[0])
+
+/**
+ * Eğitim raporu: öğrenme eğrisi (her 12 eğitim ölçümünden ilk m tanesiyle model; eğitim ve test doğruluğu), tam modelin 30 test
+ * ölçümünde karışıklık matrisi, kesinlik/duyarlılık, log oran skoruyla ROC ve kesinlik–duyarlılık eğrileri.
+ */
+export function naiveBayesReport(): EgitimRaporu {
+  const X = obstacleData(), T = obstacleData(77, 18, 12)
+  const yT = T.map((p) => p.c)
+  const h = { n_train: [] as number[], train_acc: [] as number[], test_acc: [] as number[] }
+  for (let m = 1; m <= 12; m++) {
+    const S = X.filter((_, i) => i % 12 < m)
+    const M = fitNB(S)
+    h.n_train.push(S.length)
+    h.train_acc.push(accuracy(S.map((p) => p.c), S.map((p) => nbPredict(M, p.x, p.y))))
+    h.test_acc.push(accuracy(yT, T.map((p) => nbPredict(M, p.x, p.y))))
+  }
+  const full = fitNB(X)
+  const blk = siniflandirmaBlok({
+    y: yT, pred: T.map((p) => nbPredict(full, p.x, p.y)), scores: T.map((p) => nbScore(full, p.x, p.y)), threshold: 0,
+    labels: ['boş / free', 'engel / obstacle'], pos: B('engel', 'obstacle'), neg: B('boş', 'free'), prefix: 'test_', title: B('test', 'test'),
+  })
+  const trAcc = h.train_acc.at(-1)!
+  return {
+    kind: 'siniflandirma', model: 'Gauss naive Bayes (2 özellik)', seed: 21, hyper: { train: X.length, test: T.length, prior_engel: full[1].prior },
+    history: { x: 'n_train', cols: h },
+    final: [
+      { key: 'train_acc', label: B('eğitim doğruluğu', 'training accuracy'), value: trAcc, fmt: 'pct' },
+      ...blk.final,
+      { key: 'gap', label: B('eğitim − test farkı', 'train − test gap'), value: trAcc - h.test_acc.at(-1)!, fmt: 3 },
+    ],
+    confusion: blk.confusion,
+    scores: blk.scores,
+    charts: [
+      ogrenmeEgrisi(h.n_train, h.train_acc, h.test_acc, B('doğruluk', 'accuracy'), { yMin: 0.5, yMax: 1 }),
+      {
+        kind: 'bar', id: 'params', title: B('Öğrenilen ortalamalar (± std)', 'Learned means (± std)'), labels: ['mesafe μ', 'mesafe σ', 'IR μ', 'IR σ'],
+        series: [
+          { key: 'free', label: B('boş yol', 'free path'), values: [full[0].m[0], Math.sqrt(full[0].v[0]), full[0].m[1], Math.sqrt(full[0].v[1])], tone: 1 },
+          { key: 'obstacle', label: B('engel', 'obstacle'), values: [full[1].m[0], Math.sqrt(full[1].v[0]), full[1].m[1], Math.sqrt(full[1].v[1])], tone: 0 },
+        ],
+      },
+      ...blk.charts,
+    ],
+  }
+}
+
 const QUERIES = [{ x: 150, y: 22 }, { x: 40, y: 70 }, { x: 82, y: 46 }, { x: 105, y: 58 }]
 
 export const NAIVE_BAYES: Lesson<NBFrame> = {
@@ -73,8 +123,32 @@ export const NAIVE_BAYES: Lesson<NBFrame> = {
     ['for x in Q:'],
     ['    s = [logp(x, *model[c]) for c in (0, 1)]', 'iki sınıfın puanı', 'score of both classes'],
     ['    print(int(np.argmax(s)))', 'büyük olan kazanır', 'the larger wins'],
+    ['y_test = e[~tr]'],
+    ['def score(M, P):', 'log olasılık oranı: sıfırın üstü engel', 'log-likelihood ratio: above zero is an obstacle'],
+    ['    return np.array([logp(x, *M[1]) - logp(x, *M[0]) for x in P])'],
+    ['history = {\'n_train\': [], \'train_acc\': [], \'test_acc\': []}', 'öğrenme eğrisi', 'learning curve'],
+    ['for m in range(1, 13):'],
+    ['    sub = np.arange(len(X)) % 12 < m', 'her 12 ölçümden ilk m tanesi', 'the first m of every 12 readings'],
+    ['    M = fit(X[sub], y[sub])'],
+    ['    for k, v in zip(history, (sub.sum(), ((score(M, X[sub]) > 0) == y[sub]).mean(), ((score(M, Q) > 0) == y_test).mean())): history[k].append(float(v))'],
+    ['s_test = score(model, Q); flag = s_test > 0'],
+    ['tp, fp, fn = np.sum(flag & (y_test == 1)), np.sum(flag & (y_test == 0)), np.sum(~flag & (y_test == 1))'],
+    ['r = s_test.argsort().argsort() + 1; P1 = y_test.sum()', 'sıralamaya göre ROC AUC', 'rank-based ROC AUC'],
+    ['auc = (r[y_test == 1].sum() - P1 * (P1 + 1) / 2) / (P1 * (len(y_test) - P1))'],
+    ['for k, v in [(\'test_acc\', history[\'test_acc\'][-1]), (\'precision\', tp / max(tp + fp, 1)), (\'recall\', tp / max(tp + fn, 1)), (\'auc\', auc)]:', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{k:<10}{v:>10.4f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir eğitim büyüklüğü', 'one row per training size'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for k in (\'train_acc\', \'test_acc\'): plt.plot(history[\'n_train\'], history[k], marker=\'o\', label=k)'],
+    ['    plt.xlabel(\'n_train\'); plt.ylabel(\'accuracy\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [],
+  report: naiveBayesReport,
   run() {
     const X = obstacleData()
     const T = obstacleData(77, 18, 12)

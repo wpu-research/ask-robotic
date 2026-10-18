@@ -1,6 +1,7 @@
 // Ders 8: perceptron. Otonom araç her an mesafe (m) ve hız (m/s) okur, uzman sürücü fren yapmış mı yapmamış mı? 80 ölçüm,
 // doğrusal olarak ayrılabilir. Her yanlış sınıflanan noktada sınır o noktaya doğru çekilir; bir dönem hatasız geçince durur.
-import { cap, fmt, rng, type Frame, type Lesson, type Pt, shifted } from './core'
+import { cap, fmt, rng, type Frame, type Lesson, type Pt } from './core'
+import { B, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 export interface PerFrame extends Frame {
   X: Pt[]
@@ -27,6 +28,65 @@ export function brakeData(seed = 41, n = 80): Pt[] {
   return X
 }
 
+/** Gezinme sırası: indeksler tohumla karıştırılır (oynatıcı ve eğitim raporu aynı sırayı kullanır). */
+export function visitOrder(n: number, seed: number): number[] {
+  const r = rng(seed)
+  const order = Array.from({ length: n }, (_, i) => i)
+  for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]] }
+  return order
+}
+
+/**
+ * Eğitim paneli ve Python kodu için: her 4. karar (i % 4 = 3) test için ayrılır, perceptron kalan 60 kararla 20 dönem eğitilir
+ * (hatasız dönemden sonra sınır değişmez). Dönem başına hata sayısı, eğitim ve test doğruluğu kaydedilir.
+ */
+export function perceptronReport({ seed = 1 }: Record<string, number>): EgitimRaporu {
+  const X0 = brakeData()
+  const isTest = (i: number) => i % 4 === 3
+  const trIdx = X0.map((_, i) => i).filter((i) => !isTest(i)), teIdx = X0.map((_, i) => i).filter(isTest)
+  const order = visitOrder(trIdx.length, seed).map((k) => trIdx[k])
+  let w: [number, number] = [0, 0], b = 0, updates = 0
+  let stop: number | null = null
+  const sc = (i: number) => w[0] * X0[i].x + w[1] * X0[i].y + b
+  const ok = (I: number[]) => I.filter((i) => (X0[i].c ? 1 : -1) * sc(i) > 0).length / I.length
+  const h = { epoch: [] as number[], mistakes: [] as number[], acc: [] as number[], test_acc: [] as number[], updates: [] as number[] }
+  for (let e = 1; e <= 20; e++) {
+    let mistakes = 0
+    for (const i of order) {
+      const t = X0[i].c ? 1 : -1
+      if (t * sc(i) <= 0) { w = [w[0] + t * X0[i].x, w[1] + t * X0[i].y]; b += t; mistakes++; updates++ }
+    }
+    h.epoch.push(e); h.mistakes.push(mistakes); h.acc.push(ok(trIdx)); h.test_acc.push(ok(teIdx)); h.updates.push(updates)
+    if (mistakes === 0 && stop === null) stop = e
+  }
+  const r: EgitimRaporu = {
+    kind: 'siniflandirma', model: 'perceptron: işaret(w·x + b)', seed, hyper: { epochs: 20, train: trIdx.length, test: teIdx.length },
+    history: { x: 'epoch', cols: { epoch: h.epoch, mistakes: h.mistakes, acc: h.acc, test_acc: h.test_acc } },
+    final: [], charts: [],
+  }
+  const blk = siniflandirmaBlok({ y: teIdx.map((i) => X0[i].c), pred: teIdx.map((i) => (sc(i) > 0 ? 1 : 0)), scores: teIdx.map(sc), threshold: 0, labels: ['devam / go', 'fren / brake'], pos: B('fren', 'brake'), neg: B('devam', 'go'), prefix: 'test_', title: B('test', 'test') })
+  r.final = [
+    { key: 'acc', label: B('eğitim doğruluğu', 'training accuracy'), value: h.acc.at(-1)!, fmt: 'pct' },
+    ...blk.final,
+    { key: 'converged_epoch', label: B('ilk hatasız dönem', 'first error-free epoch'), value: stop ?? NaN, fmt: 'int' },
+    { key: 'updates', label: B('toplam güncelleme', 'total updates'), value: updates, fmt: 'int' },
+  ]
+  r.confusion = blk.confusion
+  r.scores = blk.scores
+  const marker = stop !== null ? { x: stop, label: B(`hatasız: dönem ${stop}`, `error-free: epoch ${stop}`) } : undefined
+  r.charts = [
+    { kind: 'bar', id: 'mistakes', title: B('Dönem başına hata (güncelleme)', 'Mistakes (updates) per epoch'), labels: h.epoch.map(String), series: [{ key: 'mistakes', label: B('hata', 'mistakes'), values: h.mistakes, tone: 0 }] },
+    { kind: 'line', id: 'acc', title: B('Doğruluk: eğitim ve test', 'Accuracy: training and test'), x: h.epoch, xLabel: B('dönem', 'epoch'), yMin: 0, yMax: 1, live: true, marker,
+      series: [{ key: 'acc', label: B('eğitim', 'train'), values: h.acc, tone: 1 }, { key: 'test_acc', label: B('test', 'test'), values: h.test_acc, tone: 0, dash: true }] },
+    { kind: 'line', id: 'updates', title: B('Toplam güncelleme sayısı', 'Cumulative updates'), x: h.epoch, xLabel: B('dönem', 'epoch'), live: true, series: [{ key: 'updates', label: B('güncelleme', 'updates'), values: h.updates, tone: 4 }] },
+    ...blk.charts,
+  ]
+  return r
+}
+
+/** Oynatıcı satırları (eski numara → kod listesindeki yeni numara): veri yükleme, test ayrımı ve geçmiş satırları eklendi. */
+const LINE_MAP: Record<number, number> = { 1: 1, 6: 9, 7: 10, 9: 13 }
+
 export const PERCEPTRON: Lesson<PerFrame> = {
   slug: 'perceptron',
   n: 8,
@@ -51,23 +111,35 @@ export const PERCEPTRON: Lesson<PerFrame> = {
     ['import numpy as np'],
     ['D = np.genfromtxt(\'surus-fren.csv\', delimiter=\',\', names=True)'],
     ['X, y = np.c_[D[\'mesafe\'], D[\'hiz\']], 2 * D[\'fren\'] - 1', '[mesafe m, hız m/s], +1 fren, −1 devam', '[distance m, speed m/s], +1 brake, −1 go'],
+    ['test = np.arange(len(X)) % 4 == 3', 'her 4. karar test için ayrılır', 'every 4th decision is held out for testing'],
     ['w, b = np.zeros(2), 0.0'],
+    ['history, stop = {\'epoch\': [], \'mistakes\': [], \'acc\': [], \'test_acc\': []}, None', 'eğitim geçmişi', 'training history'],
     ['for epoch in range(20):'],
     ['    mistakes = 0'],
-    ['    for x, t in zip(X, y):'],
+    ['    for x, t in zip(X[~test], y[~test]):'],
     ['        if t * (w @ x + b) <= 0:', 'yanlış tarafta', 'wrong side'],
     ['            w += t * x; b += t', 'sınırı noktaya doğru çek', 'pull the border towards it'],
     ['            mistakes += 1'],
-    ['    if mistakes == 0: break', 'hepsi doğru: dur', 'all correct: stop'],
+    ['    for k, v in zip(history, (epoch + 1, mistakes, (y[~test] * (X[~test] @ w + b) > 0).mean(), (y[test] * (X[test] @ w + b) > 0).mean())): history[k].append(float(v))'],
+    ['    if mistakes == 0 and stop is None: stop = epoch + 1', 'hatasız dönem: sınır artık değişmez', 'no mistakes: the border stops moving'],
+    ['print(\'w =\', w, \'b =\', b, \'hatasız dönem:\', stop)'],
+    ['for k in (\'acc\', \'test_acc\'):', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{k:<10}{history[k][-1]:>10.4f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir dönem', 'one row per epoch'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    plt.bar(history[\'epoch\'], history[\'mistakes\']); plt.xlabel(\'epoch\'); plt.ylabel(\'mistakes\'); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [{ key: 'seed', label: { tr: 'Gezinme sırası (tohum)', en: 'Visit order (seed)' }, min: 1, max: 50, step: 1, value: 1 }],
+  report: perceptronReport,
   run({ seed = 1 }) {
     const X0 = brakeData()
     // gezinme sırası tohumla karıştırılır
-    const r = rng(seed)
-    const order = X0.map((_, i) => i)
-    for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]] }
-    const X = order.map((i) => X0[i])
+    const X = visitOrder(X0.length, seed).map((i) => X0[i])
     let w: [number, number] = [0, 0], b = 0
     const F: PerFrame[] = []
     const history: number[] = []
@@ -93,5 +165,6 @@ export const PERCEPTRON: Lesson<PerFrame> = {
     return F
   },
 }
-// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
-PERCEPTRON.run = shifted(PERCEPTRON.run, 1, 1)
+// Kod listesine veri yükleme, test ayrımı ve geçmiş satırları eklendi: vurgulanan satırlar yeni yerlerine eşlenir.
+const runFrames = PERCEPTRON.run
+PERCEPTRON.run = (p) => runFrames(p).map((f) => ({ ...f, line: LINE_MAP[f.line] ?? f.line }))

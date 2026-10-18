@@ -4,7 +4,9 @@
 // Yol ızgarası: 5 cm'lik hücrelerde yolun en yakın orta çizgi noktası (yol dışı −1); sensörler ve ilerleme bu ızgaradan okunur.
 import { cap, fmt, rng } from '../core'
 import type { ProjectDef, ProjectRun } from './core'
-import { nnClone, nnCreate, nnForward, nnMutate, type NN } from './nn'
+import { nnClone, nnCreate, nnForward, nnLayerWeights, nnMutate, type NN } from './nn'
+import { B, agirlikHistleri, gecmisGrafik, type EgitimRaporu } from '../egitim/rapor'
+import { histogram } from '../egitim/metrics'
 
 export interface Track {
   /** Eşit aralıklı orta çizgi noktaları [x0, z0, x1, z1, …]. */
@@ -130,9 +132,17 @@ export function createRun(o: EvoOpts) {
   let cars = Array.from({ length: o.pop }, () => startCar(T, nnCreate(sizes, r, 'tanh')))
   const view: View = { track: T, cars, best: 0, gen: 1, tick: 0, lapTarget: o.laps }
   const hist: number[] = [], meanHist: number[] = []
+  /** Eğitim paneli: nesil başına uygunluk özeti (tur cinsinden), yolda kalan pay, en iyi aracın ağırlıkları. */
+  const gens: Array<{ gen: number; best: number; mean: number; median: number; worst: number; alive: number; fit: number[]; w: NN }> = []
   let record = 0, firstLapGen = 0, finished = false
+  const logGen = () => {
+    const fit = cars.map((c) => c.maxProg / T.length), s = [...fit].sort((a, b) => a - b)
+    const bi = fit.indexOf(s[s.length - 1])
+    gens.push({ gen: view.gen, best: s[s.length - 1], mean: fit.reduce((a, b) => a + b, 0) / fit.length, median: s[Math.floor(s.length / 2)], worst: s[0], alive: cars.filter((c) => c.alive).length / cars.length, fit, w: nnClone(cars[bi].net) })
+  }
 
   const evolve = () => {
+    logGen()
     const fit = cars.map((c) => c.maxProg)
     const order = fit.map((_, i) => i).sort((a, b) => fit[b] - fit[a])
     hist.push(fit[order[0]] / T.length); meanHist.push(fit.reduce((s, x) => s + x, 0) / fit.length / T.length)
@@ -161,13 +171,13 @@ export function createRun(o: EvoOpts) {
       }
       if (bi >= 0) view.best = bi
       else view.best = cars.reduce((b, c, i) => (c.maxProg > cars[b].maxProg ? i : b), 0)
-      if (finished) { hist.push(cars[view.best].maxProg / T.length); break }
+      if (finished) { hist.push(cars[view.best].maxProg / T.length); logGen(); break }
       if (alive === 0 || view.tick >= GEN_TICKS) evolve()
     }
   }
 
   return {
-    view, step, hist, meanHist,
+    view, step, hist, meanHist, gens,
     alive: () => cars.filter((c) => c.alive).length,
     record: () => record,
     firstLapGen: () => firstLapGen,
@@ -180,6 +190,47 @@ export function runUntil(o: EvoOpts, maxGen: number) {
   const R = createRun(o)
   while (!R.done() && R.view.gen <= maxGen) { const g = R.view.gen; while (R.view.gen === g && !R.done()) R.step(50) }
   return { firstLap: R.firstLapGen(), gens: R.view.gen, record: R.record() / R.view.track.length, done: R.done(), hist: R.hist }
+}
+
+/** Nöroevrimin eğitim raporu: biten nesillerin gerçek uygunlukları (tur), yolda kalanlar, en iyi aracın ağırlıkları. */
+const repCache = new WeakMap<object, { n: number; r: EgitimRaporu }>()
+export function evoReport(R: ReturnType<typeof createRun>, o: EvoOpts): EgitimRaporu {
+  const G = R.gens, c = repCache.get(R)
+  if (c && c.n === G.length) return c.r
+  const r: EgitimRaporu = {
+    kind: 'evrim', model: B(`6-${o.hidden}-2 tanh ağ × ${o.pop} araç, nöroevrim`, `6-${o.hidden}-2 tanh net × ${o.pop} cars, neuroevolution`), seed: o.seed,
+    hyper: { pop: o.pop, sigma: o.sigma, hidden: o.hidden, mutation_rate: 0.3, elite: 2, laps: o.laps },
+    history: { x: 'generation', cols: {
+      generation: G.map((g) => g.gen), best: G.map((g) => g.best), mean: G.map((g) => g.mean), median: G.map((g) => g.median),
+      worst: G.map((g) => g.worst), alive_share: G.map((g) => g.alive),
+    } },
+    final: [], charts: [],
+  }
+  const L = G.at(-1)
+  const lapGen = R.firstLapGen()
+  r.final = [
+    { key: 'generations', label: B('biten nesil', 'generations done'), value: G.length, fmt: 'int' },
+    { key: 'record', label: B('rekor (tur)', 'record (laps)'), value: R.record() / R.view.track.length, fmt: 2 },
+    { key: 'best', label: B('son nesil en iyi (tur)', 'last generation best (laps)'), value: L?.best ?? NaN, fmt: 2 },
+    { key: 'mean', label: B('son nesil ortalama (tur)', 'last generation mean (laps)'), value: L?.mean ?? NaN, fmt: 2 },
+    { key: 'first_lap_generation', label: B('ilk tam tur nesli', 'first full lap generation'), value: lapGen || NaN, fmt: 'int' },
+  ]
+  const xl = B('nesil', 'generation')
+  r.charts = [
+    gecmisGrafik(r, 'fitness', B('Uygunluk: nesil başına en iyi, ortalama, ortanca (tur)', 'Fitness per generation: best, mean, median (laps)'), [['best', B('en iyi', 'best'), 3], ['mean', B('ortalama', 'mean'), 1], ['median', B('ortanca', 'median'), 2, true]], { xLabel: xl, yLabel: B('tur', 'laps'), yMin: 0, live: false, marker: lapGen ? { x: lapGen, label: B(`ilk tur: ${lapGen}. nesil`, `first lap: gen ${lapGen}`) } : undefined }),
+    gecmisGrafik(r, 'alive', B('Süre dolduğunda yolda kalan araç payı', 'Share of cars still on the road at the end'), [['alive_share', B('yolda', 'on road'), 4]], { xLabel: xl, yMin: 0, yMax: 1, live: false }),
+  ]
+  if (G.length) {
+    const pick = [...new Set([0, Math.floor((G.length - 1) / 2), G.length - 1])].map((i) => G[i])
+    const hi = Math.max(1e-6, ...pick.flatMap((g) => g.fit))
+    const edges = histogram([], 16, 0, hi).edges
+    r.charts.push(
+      { kind: 'hist', id: 'fit-dist', title: B('Popülasyonun uygunluk dağılımı', 'Fitness distribution of the population'), edges, frames: pick.map((g) => ({ label: `#${g.gen}`, counts: histogram(g.fit, 16, 0, hi).counts })), xLabel: B('tur', 'laps') },
+      ...agirlikHistleri(pick.map((g) => ({ label: `#${g.gen}`, layers: [nnLayerWeights(g.w, 1), nnLayerWeights(g.w, 2)] })), ['L1', 'L2']),
+    )
+  }
+  repCache.set(R, { n: G.length, r })
+  return r
 }
 
 export const OTONOM_ARAC: ProjectDef<View> = {
@@ -259,13 +310,25 @@ export const OTONOM_ARAC: ProjectDef<View> = {
     ['        en_iyi = np.maximum(en_iyi, ilerleme)'],
     ['        if not canli.any(): break'],
     ['    return en_iyi / n', 'uygunluk: tur cinsinden en uzak nokta', 'fitness: furthest point, in laps'],
+    ['history = {\'generation\': [], \'best\': [], \'mean\': [], \'median\': []}', 'eğitim geçmişi: nesil başına uygunluk (tur)', 'training history: fitness per generation (laps)'],
     ['for nesil in range(1, 13):'],
     ['    puan = sur(W1, b1, W2, b2)'],
     ['    sira = np.argsort(-puan)'],
+    ['    for k, v in zip(history, (nesil, puan.max(), puan.mean(), np.median(puan))): history[k].append(v if isinstance(v, int) else float(v))'],
     ['    print(f"nesil {nesil:2d}: en iyi {puan.max():.2f} tur, ortalama {puan.mean():.2f}")'],
     ['    if puan.max() >= 1: print("bir araç tam tur attı"); break'],
     ['    eb = np.r_[sira[:2], sira[(rng.random(N - 2) ** 2 * 12).astype(int)]]', 'en iyi iki aynen, kalanlar iyilerin kopyası', 'best two unchanged, the rest copies of good ones'],
     ['    W1, b1, W2, b2 = [w[eb] + rng.normal(0, .3, w[eb].shape) * (rng.random(w[eb].shape) < .3) * (np.arange(N) >= 2).reshape(-1, *[1] * (w.ndim - 1)) for w in (W1, b1, W2, b2)]', 'mutasyon (ilk ikiye dokunma)', 'mutation (leave the first two alone)'],
+    ['for k in history: print(f\'{k:<12}{history[k][-1]:>10.3f}\')', 'son ölçümler tablosu', 'final metrics table'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir nesil', 'one row per generation'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for k in (\'best\', \'mean\', \'median\'): plt.plot(history[\'generation\'], history[k], label=k)'],
+    ['    plt.xlabel(\'generation\'); plt.ylabel(\'laps\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
 
   params: [
@@ -300,6 +363,7 @@ export const OTONOM_ARAC: ProjectDef<View> = {
           { label: { tr: 'Süre (bu nesil)', en: 'Time (this generation)' }, value: cap(`${fmt(v.tick * DT, 1, 'tr')} sn`, `${fmt(v.tick * DT, 1, 'en')} s`) },
         ]
       },
+      report: () => evoReport(R, o),
       curves() {
         return [
           { label: { tr: 'Nesil başına en iyi araç (tur)', en: 'Best car per generation (laps)' }, values: [...R.hist], tone: 0 },

@@ -1,6 +1,8 @@
 // Ders: gradyan artırma (XGBoost'un temel fikri). Drone bataryasının uçuş süresi ortam sıcaklığıyla eğri biçimde değişir.
 // Her turda tek eşikli bir regresyon kütüğü önceki modelin kalıntısına uydurulur ve öğrenme oranıyla küçültülüp eklenir.
 import { cap, fmt, gauss, mean, rng, type Frame, type Lesson } from './core'
+import { B, erkenDurdurma, gecmisGrafik, regresyonBlok, type EgitimRaporu } from './egitim/rapor'
+import { histogram } from './egitim/metrics'
 
 /** Kütük: x ≤ t ise a, değilse b. */
 export interface Stump { t: number; a: number; b: number }
@@ -72,6 +74,54 @@ export function boost(rounds: number, lr: number) {
   return { T, y, F0, stumps, loss }
 }
 
+/**
+ * Eğitim paneli ve Python kodu için: aynı artırma, ama her 4. uçuş (i % 4 = 3, sıcaklığa göre sıralı) doğrulamaya ayrılır;
+ * kütükler yalnız eğitim uçuşlarının kalıntısına uydurulur. Geçmiş: tur 0 (ortalama) … R, eğitim ve doğrulama MSE.
+ */
+export function boostWithValidation(rounds: number, lr: number) {
+  const { T, y } = batteryData()
+  const val = T.map((_, i) => i % 4 === 3)
+  const tr = T.map((_, i) => i).filter((i) => !val[i]), va = T.map((_, i) => i).filter((i) => val[i])
+  const Tt = tr.map((i) => T[i])
+  const F0 = mean(tr.map((i) => y[i]))
+  const F = T.map(() => F0)
+  const h = { round: [] as number[], loss: [] as number[], val_loss: [] as number[] }
+  const rec = (k: number) => { h.round.push(k); h.loss.push(mean(tr.map((i) => (y[i] - F[i]) ** 2))); h.val_loss.push(mean(va.map((i) => (y[i] - F[i]) ** 2))) }
+  rec(0)
+  const stumps: Stump[] = []
+  for (let k = 0; k < rounds; k++) {
+    const s = fitStump(Tt, tr.map((i) => y[i] - F[i]))
+    stumps.push(s)
+    T.forEach((x, i) => { F[i] += lr * stumpAt(s, x) })
+    rec(k + 1)
+  }
+  return { T, y, tr, va, F0, F, stumps, h }
+}
+
+/** Gradyan artırma dersinin eğitim raporu: kayıp eğrileri, erken durdurma, artıklar, kütük eşiklerinin dağılımı. */
+export function boostReport({ rounds = 100, lr = 0.1 }: Record<string, number>): EgitimRaporu {
+  const R = Math.max(1, Math.round(rounds))
+  const g = boostWithValidation(R, lr)
+  const r: EgitimRaporu = {
+    kind: 'regresyon', model: B(`gradyan artırma, ${R} kütük`, `gradient boosting, ${R} stumps`), seed: 8, hyper: { rounds: R, lr, train: g.tr.length, val: g.va.length },
+    history: { x: 'round', cols: g.h }, final: [], charts: [],
+  }
+  const blk = regresyonBlok({ y: g.va.map((i) => g.y[i]), pred: g.va.map((i) => g.F[i]), x: g.va.map((i) => g.T[i]), xLabel: B('sıcaklık (°C)', 'temperature (°C)'), unit: 'dk', prefix: 'val_' })
+  const bi = g.h.val_loss.indexOf(Math.min(...g.h.val_loss))
+  r.final = [
+    { key: 'loss', label: B('eğitim kaybı (MSE)', 'training loss (MSE)'), value: g.h.loss[R], fmt: 3 },
+    ...blk.final,
+    { key: 'best_round', label: B('en iyi doğrulama turu', 'best validation round'), value: g.h.round[bi], fmt: 'int' },
+  ]
+  const hs = histogram(g.stumps.map((s) => s.t), 20, -10, 50)
+  r.charts = [
+    gecmisGrafik(r, 'loss', B('Kayıp (MSE): eğitim ve doğrulama', 'Loss (MSE): training and validation'), [['loss', B('eğitim', 'train'), 1], ['val_loss', B('doğrulama', 'validation'), 0, true]], { xLabel: B('tur (kütük sayısı)', 'round (stumps)'), yLabel: B('MSE', 'MSE'), logY: true, marker: erkenDurdurma(g.h.round, g.h.val_loss) }),
+    ...blk.charts,
+    { kind: 'hist', id: 'stump-t', title: B('Kütük eşiklerinin dağılımı', 'Where the stumps split'), edges: hs.edges, frames: [{ label: `${R}`, counts: hs.counts }], xLabel: B('eşik sıcaklığı (°C)', 'threshold temperature (°C)'), note: B('Kütükler eğrinin büküldüğü yerlerde (soğuk ve sıcak uçlar) yoğunlaşır.', 'Stumps cluster where the curve bends (the cold and hot ends).') },
+  ]
+  return r
+}
+
 export const GRADYAN_ARTIRMA: Lesson<GbFrame> = {
   slug: 'gradyan-artirma',
   n: 0,
@@ -100,29 +150,53 @@ export const GRADYAN_ARTIRMA: Lesson<GbFrame> = {
     ['y = 62 - 30 * np.exp(-(T + 10) / 10)', 'soğukta düşüş', 'drop in the cold'],
     ['y -= 0.04 * np.maximum(0, T - 30) ** 2', 'sıcakta düşüş', 'drop in the heat'],
     ['y += rng.normal(0, 1.5, 80)', 'uçuş süresi, dk', 'flight time, min'],
+    ['val = np.arange(80) % 4 == 3', 'her 4. uçuş doğrulama', 'every 4th flight: validation'],
+    ['Tt, yt = T[~val], y[~val]', 'eğitim uçuşları', 'training flights'],
     ['def kutuk(r):'],
     ['    best = (np.inf, 0, 0, 0)'],
-    ['    for t in (T[1:] + T[:-1]) / 2:', 'her eşik', 'every threshold'],
-    ['        L = T <= t'],
+    ['    for t in (Tt[1:] + Tt[:-1]) / 2:', 'her eşik', 'every threshold'],
+    ['        L = Tt <= t'],
     ['        a, b = r[L].mean(), r[~L].mean()', 'iki yaprak: ortalama', 'two leaves: mean'],
     ['        e = ((r - np.where(L, a, b)) ** 2).sum()'],
     ['        if e < best[0]: best = (e, t, a, b)'],
     ['    return best[1:]'],
     ['lr = 0.1', 'öğrenme oranı', 'learning rate'],
-    ['F = np.full(80, y.mean())', 'başlangıç: ortalama', 'start: the mean'],
-    ['kayip = [((y - F) ** 2).mean()]'],
+    ['F = np.full(80, yt.mean())', 'başlangıç: ortalama', 'start: the mean'],
+    ['mse = lambda m: float(((y - F)[m] ** 2).mean())', 'MSE (maske)', 'MSE (mask)'],
+    ["history = {'round': [0], 'loss': [mse(~val)],"],
+    ["           'val_loss': [mse(val)]}", 'eğitim geçmişi', 'training history'],
     ['for tur in range(100):'],
-    ['    r = y - F', 'kalıntı', 'residual'],
+    ['    r = yt - F[~val]', 'kalıntı (eğitim)', 'residual (training)'],
     ['    t, a, b = kutuk(r)', 'kalıntıya kütük', 'stump on the residual'],
     ['    F += lr * np.where(T <= t, a, b)', 'küçültüp ekle', 'shrink and add'],
-    ['    kayip.append(((y - F) ** 2).mean())'],
-    ["print('kayıp', kayip[0].round(1), '->', kayip[-1].round(2))"],
+    ['    row = tur + 1, mse(~val), mse(val)'],
+    ['    for k, v in zip(history, row): history[k].append(v)'],
+    ["kayip = history['loss']"],
+    ["print('kayıp', f'{kayip[0]:.1f} -> {kayip[-1]:.2f}')"],
     ["print('oran', kayip[-1] / kayip[0])"],
+    ["vl = history['val_loss']; best = int(np.argmin(vl))", 'erken durdurma', 'early stopping'],
+    ['res = (y - F)[val]', 'doğrulama artıkları', 'validation residuals'],
+    ['r2 = 1 - (res ** 2).mean() / y[val].var()', 'doğrulamada R²', 'validation R²'],
+    ["for k, v in [('loss', kayip[-1]), ('val_loss', vl[-1]),"],
+    ["             ('val_r2', r2), ('best_round', best)]:"],
+    ["    print(f'{k:<11}{v:>9.3f}')", 'son ölçümler', 'final metrics'],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as f:"],
+    ['    w = csv.writer(f); w.writerow(history)', 'satır başına bir tur', 'one row per round'],
+    ['    w.writerows(zip(*history.values()))'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik', 'plot if available'],
+    ["    for k in ('loss', 'val_loss'):"],
+    ["        plt.plot(history['round'], history[k], label=k)"],
+    ["    plt.yscale('log'); plt.legend(); plt.show()"],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [
     { key: 'rounds', label: { tr: 'Tur sayısı', en: 'Rounds' }, min: 1, max: 200, step: 1, value: 100 },
     { key: 'lr', label: { tr: 'Öğrenme oranı', en: 'Learning rate' }, min: 0.02, max: 1, step: 0.02, value: 0.1 },
   ],
+  report: boostReport,
   run({ rounds = 100, lr = 0.1 }) {
     const R = Math.max(1, Math.round(rounds))
     const { T, y, F0, stumps, loss } = boost(R, lr)
@@ -153,3 +227,6 @@ export const GRADYAN_ARTIRMA: Lesson<GbFrame> = {
     return F
   },
 }
+// Python koduna doğrulama ayrımı (2 satır) ve geçmiş kaydı eklendi: vurgulanan satırlar eski satırlarına göre kayar.
+const gbRun = GRADYAN_ARTIRMA.run
+GRADYAN_ARTIRMA.run = (p) => gbRun(p).map((f) => ({ ...f, line: f.line <= 5 ? f.line : f.line <= 16 ? f.line + 2 : f.line <= 21 ? f.line + 4 : f.line + 6 }))

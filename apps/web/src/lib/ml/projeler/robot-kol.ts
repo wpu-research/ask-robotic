@@ -5,7 +5,9 @@
 // olan uzaklıkla (cm) ölçülür. Ağ, dersteki ağın genel hâli (./nn): tanh gizli katmanlar, Adam ve ortalama kare hata.
 import { cap, fmt, rng, type Cap } from '../core'
 import type { Metric, ProjectDef, ProjectRun } from './core'
-import { adamState, nnCreate, nnForward, nnTrainBatch, type NN } from './nn'
+import { adamState, nnCreate, nnForward, nnLayerWeights, nnTrainBatch, type NN } from './nn'
+import { B, agirlikHistleri, erkenDurdurma, etkinlesmeHist, gecmisGrafik, type EgitimRaporu } from '../egitim/rapor'
+import { saturatedShare } from '../egitim/metrics'
 
 /** Kol ölçüleri (m): omuz yüksekliği, üst kol, ön kol. */
 export const ARM = { h0: 0.2, L1: 0.5, L2: 0.4 }
@@ -75,7 +77,7 @@ const MAX_STEPS = 24000
 export const GOAL_CM = 2
 
 /** Bir eğitim koşusu: her iş birimi bir mini grup (32 örnek) üzerinde bir Adam adımı. */
-export function createKol(p: Record<string, number>): ProjectRun<KolView> & { net: NN; steps(): number; errHist: number[]; lossHist: number[] } {
+export function createKol(p: Record<string, number>): ProjectRun<KolView> & { net: NN; steps(): number; errHist: number[]; lossHist: number[]; report(): EgitimRaporu } {
   const seed = Math.round(p.seed ?? 1), H = Math.round(p.H ?? 32), lr = p.lr ?? 0.01, N = Math.round(p.n ?? 2000)
   const r = rng(seed * 7919 + 3)
   const net = nnCreate([3, H, H, 4], r)
@@ -84,7 +86,17 @@ export function createKol(p: Record<string, number>): ProjectRun<KolView> & { ne
   const X = data.map((d) => encodeIn(d.t)), Y = data.map((d) => encodeOut(d.q))
   const test = armData(200, 9001).map((d) => d.t)
   const demo = armData(8, 777 + seed).map((d) => d.t)
+  const testData = armData(200, 9001)
+  const testY = testData.map((d) => encodeOut(d.q)), testX = test.map(encodeIn)
+  const trainProbe = data.slice(0, 200).map((d) => d.t)
   const view: KolView = { demo, demoAngles: demo.map((t) => solve(net, t)), demoErr: [], focus: 0, test, step: 0, err: meanErrorCm(net, test) }
+  // eğitim paneli geçmişi: her değerlendirmede (200 adımda bir) bir satır
+  const H_ = { step: [] as number[], loss: [] as number[], val_loss: [] as number[], train_err_cm: [] as number[], test_err_cm: [] as number[], grad_l1: [] as number[], grad_l2: [] as number[], grad_l3: [] as number[] }
+  const gAcc = [0, 0, 0], gTmp = [0, 0, 0]
+  const wSnaps: Array<{ label: string; layers: Float64Array[] }> = [{ label: '0', layers: [1, 2, 3].map((l) => nnLayerWeights(net, l)) }]
+  const SNAP_AT = new Set([1000, 4000, 12000])
+  let acts: { h1: number[]; h2: number[] } = { h1: [], h2: [] }
+  let rep: EgitimRaporu | null = null
   view.demoErr = demo.map((t, i) => dist(fk(view.demoAngles[i]), t) * 100)
   const errHist = [view.err], lossHist: number[] = []
   let lossAcc = 0, lossN = 0, steps = 0
@@ -94,7 +106,24 @@ export function createKol(p: Record<string, number>): ProjectRun<KolView> & { ne
     view.demoAngles = demo.map((t) => solve(net, t))
     view.demoErr = demo.map((t, i) => dist(fk(view.demoAngles[i]), t) * 100)
     errHist.push(view.err)
-    if (lossN) { lossHist.push(lossAcc / lossN); lossAcc = 0; lossN = 0 }
+    if (lossN) {
+      lossHist.push(lossAcc / lossN)
+      // doğrulama kaybı (aynı MSE, saklı 200 hedefin gerçek açılarıyla) ve gizli katman etkinleşmeleri
+      let vl = 0
+      const ac: Float64Array[] = [], h1: number[] = [], h2: number[] = []
+      for (let i = 0; i < testX.length; i++) {
+        const o = nnForward(net, testX[i], ac)
+        for (let k = 0; k < 4; k++) vl += (o[k] - testY[i][k]) ** 2
+        if (i < 100) { h1.push(...ac[1]); h2.push(...ac[2]) }
+      }
+      acts = { h1, h2 }
+      H_.step.push(steps); H_.loss.push(lossAcc / lossN); H_.val_loss.push(vl / (testX.length * 4))
+      H_.train_err_cm.push(meanErrorCm(net, trainProbe)); H_.test_err_cm.push(view.err)
+      H_.grad_l1.push(gAcc[0] / lossN); H_.grad_l2.push(gAcc[1] / lossN); H_.grad_l3.push(gAcc[2] / lossN)
+      gAcc.fill(0); lossAcc = 0; lossN = 0
+    }
+    if (SNAP_AT.has(steps)) wSnaps.push({ label: String(steps), layers: [1, 2, 3].map((l) => nnLayerWeights(net, l)) })
+    rep = null
   }
   const done = () => view.err < GOAL_CM || steps >= MAX_STEPS
   return {
@@ -103,7 +132,8 @@ export function createKol(p: Record<string, number>): ProjectRun<KolView> & { ne
     step(n) {
       for (let k = 0; k < n && !done(); k++) {
         for (let b = 0; b < BATCH; b++) { const i = Math.floor(r() * N); bx[b] = X[i]; by[b] = Y[i] }
-        lossAcc += nnTrainBatch(net, opt, bx, by, lr); lossN++
+        lossAcc += nnTrainBatch(net, opt, bx, by, lr, gTmp); lossN++
+        gAcc[0] += gTmp[0]; gAcc[1] += gTmp[1]; gAcc[2] += gTmp[2]
         steps++
         view.step = steps
         if (steps % 200 === 0) evaluate()
@@ -132,6 +162,38 @@ export function createKol(p: Record<string, number>): ProjectRun<KolView> & { ne
       ]
     },
     done,
+    report(): EgitimRaporu {
+      // grafikler değerlendirmede (200 adımda bir) yenilenir; adım sayısı her çağrıda güncel
+      if (rep) return rep.final[0].value === steps ? rep : (rep = { ...rep, final: rep.final.map((f) => (f.key === 'steps' ? { ...f, value: steps } : f)) })
+      const r: EgitimRaporu = {
+        kind: 'sinir-agi', model: `MLP 3-${H}-${H}-4, tanh, Adam`, seed, hyper: { lr, hidden: H, samples: N, batch: BATCH, test: 200 },
+        history: { x: 'step', cols: Object.fromEntries(Object.entries(H_).map(([k, v]) => [k, v.slice()])) },
+        final: [], charts: [],
+      }
+      const c = r.history.cols, last = (k: string) => c[k].at(-1) ?? NaN
+      const gap = last('test_err_cm') - last('train_err_cm')
+      r.final = [
+        { key: 'steps', label: B('mini grup adımı', 'mini-batch steps'), value: steps, fmt: 'int' },
+        { key: 'loss', label: B('eğitim kaybı (MSE)', 'training loss (MSE)'), value: last('loss'), fmt: 5 },
+        { key: 'val_loss', label: B('doğrulama kaybı (MSE)', 'validation loss (MSE)'), value: last('val_loss'), fmt: 5 },
+        { key: 'test_err_cm', label: B('saklı hedeflerde hata (cm)', 'error on hidden targets (cm)'), value: last('test_err_cm'), fmt: 2 },
+        { key: 'train_err_cm', label: B('eğitim hedeflerinde hata (cm)', 'error on training targets (cm)'), value: last('train_err_cm'), fmt: 2 },
+        { key: 'gap_cm', label: B('aşırı öğrenme farkı (cm)', 'overfitting gap (cm)'), value: gap, fmt: 2 },
+        { key: 'sat_h1', label: B('doymuş tanh payı (1. katman)', 'saturated tanh share (layer 1)'), value: saturatedShare([acts.h1]), fmt: 'pct' },
+      ]
+      const xl = B('mini grup adımı', 'mini-batch step')
+      const cur = String(steps)
+      const snaps = wSnaps.at(-1)!.label === cur ? wSnaps : [...wSnaps, { label: cur, layers: [1, 2, 3].map((l) => nnLayerWeights(net, l)) }]
+      r.charts = [
+        gecmisGrafik(r, 'loss', B('Kayıp (MSE): eğitim ve doğrulama', 'Loss (MSE): training and validation'), [['loss', B('eğitim', 'train'), 1], ['val_loss', B('doğrulama', 'validation'), 0, true]], { logY: true, xLabel: xl, live: false, marker: erkenDurdurma(c.step, c.val_loss) }),
+        gecmisGrafik(r, 'err', B('Uç hatası (cm): eğitim ve saklı hedefler', 'Tip error (cm): training and hidden targets'), [['train_err_cm', B('eğitim hedefleri', 'training targets'), 1], ['test_err_cm', B('saklı hedefler', 'hidden targets'), 0, true]], { xLabel: xl, live: false, yMin: 0, note: B('İki eğri arasındaki fark büyürse ağ eğitim duruşlarını ezberliyordur.', 'If the gap between the curves grows, the network is memorising the training poses.') }),
+        gecmisGrafik(r, 'grad', B('Katman başına gradyan normu', 'Gradient norm per layer'), [['grad_l1', B('katman 1', 'layer 1'), 1], ['grad_l2', B('katman 2', 'layer 2'), 2], ['grad_l3', B('çıkış', 'output'), 4]], { logY: true, xLabel: xl, live: false }),
+        ...agirlikHistleri(snaps, ['L1', 'L2', 'L3']),
+        etkinlesmeHist([{ label: 'h1', values: acts.h1 }, { label: 'h2', values: acts.h2 }], -1, 1),
+      ]
+      rep = r
+      return r
+    },
   }
 }
 
@@ -181,21 +243,42 @@ export const ROBOT_KOL: ProjectDef<KolView> = {
     ['sizes = [3, 32, 32, 4]'],
     ['W = [rng.normal(0, 1 / np.sqrt(a), (a, b)) for a, b in zip(sizes, sizes[1:])]'],
     ['B = [np.zeros(b) for b in sizes[1:]]'],
-    ['for step in range(20000):'],
+    ['def net(A):', 'ileri hesap: her katmanın çıktısı', 'forward pass: every layer’s output'],
+    ['    a = [A]'],
+    ['    for k in range(3): z = a[-1] @ W[k] + B[k]; a.append(np.tanh(z) if k < 2 else z)'],
+    ['    return a'],
+    ['def ik(P):', 'ters kinematik: ağın cevabı', 'inverse kinematics: the network’s answer'],
+    ['    o = net((P - [0, 0, h0]) / 0.9)[-1]'],
+    ['    return np.c_[np.arctan2(o[:, 1], o[:, 0]), mid[1:] + o[:, 2:] * half[1:]]'],
+    ['qt = rng.uniform(lo, hi, (200, 3)); test = fk(qt)', 'kolun hiç görmediği 200 hedef', '200 targets the arm has never seen'],
+    ['Yt = np.c_[np.cos(qt[:, 0]), np.sin(qt[:, 0]), ((qt - mid) / half)[:, 1:]]'],
+    ['hata = lambda P: np.linalg.norm(fk(ik(P)) - P, axis=1).mean() * 100', 'ucun hedefe ortalama uzaklığı (cm)', 'mean distance of the tip to the target (cm)'],
+    ['history = {\'step\': [], \'loss\': [], \'val_loss\': [], \'test_err_cm\': []}', 'eğitim geçmişi', 'training history'],
+    ['kayip = []'],
+    ['for step in range(1, 20001):'],
     ['    i = rng.integers(0, len(X), 32)', 'mini grup', 'mini-batch'],
-    ['    a = [X[i]]'],
-    ['    for k in range(3): z = a[-1] @ W[k] + B[k]; a.append(np.tanh(z) if k < 2 else z)', 'ileri', 'forward'],
+    ['    a = net(X[i])', 'ileri', 'forward'],
+    ['    kayip.append(((a[-1] - Y[i]) ** 2).mean())', 'ortalama kare hata', 'mean squared error'],
     ['    d = 2 * (a[-1] - Y[i]) / a[-1].size', 'ortalama kare hatanın türevi', 'derivative of mean squared error'],
     ['    for k in (2, 1, 0):', 'geri yayılım', 'backpropagation'],
     ['        gW, gB = a[k].T @ d, d.sum(0)'],
     ['        if k: d = (d @ W[k].T) * (1 - a[k] ** 2)'],
     ['        W[k] -= 0.01 * gW; B[k] -= 0.01 * gB', 'basitlik için düz adım (projede Adam)', 'plain step for simplicity (Adam in the project)'],
-    ['def ik(p):', 'ters kinematik: ağın cevabı', 'inverse kinematics: the network’s answer'],
-    ['    a = (p - [0, 0, h0]) / 0.9'],
-    ['    for k in range(3): a = a @ W[k] + B[k]; a = np.tanh(a) if k < 2 else a'],
-    ['    return np.r_[np.arctan2(a[1], a[0]), mid[1:] + a[2:] * half[1:]]'],
-    ['test = fk(rng.uniform(lo, hi, (200, 3)))'],
-    ['print(np.mean([np.linalg.norm(fk(ik(p)[None])[0] - p) for p in test]) * 100, "cm")', 'ucun hedefe ortalama uzaklığı', 'mean distance of the tip to the target'],
+    ['    if step % 1000 == 0:', 'her 1000 adımda geçmişe bir satır', 'one history row every 1000 steps'],
+    ['        val = ((net((test - [0, 0, h0]) / 0.9)[-1] - Yt) ** 2).mean()', 'doğrulama kaybı: saklı hedefler', 'validation loss: hidden targets'],
+    ['        for k, v in zip(history, (step, np.mean(kayip), val, hata(test))): history[k].append(v if isinstance(v, int) else float(v))'],
+    ['        kayip = []'],
+    ['for k in history: print(f\'{k:<12}{history[k][-1]:>12.5f}\')', 'son ölçümler tablosu', 'final metrics table'],
+    ['print(hata(test), \'cm\')', 'saklı hedeflerde ortalama uzaklık', 'mean distance on hidden targets'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for k in (\'loss\', \'val_loss\'): plt.plot(history[\'step\'], history[k], label=k)'],
+    ['    plt.yscale(\'log\'); plt.xlabel(\'step\'); plt.ylabel(\'MSE\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'H', label: { tr: 'Gizli nöron (katman başına)', en: 'Hidden neurons (per layer)' }, min: 4, max: 64, step: 4, value: 32 },

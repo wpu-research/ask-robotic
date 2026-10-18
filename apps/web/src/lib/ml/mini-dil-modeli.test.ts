@@ -12,7 +12,8 @@ describe('mini dil modeli', () => {
       for (const f of F) expect(f.line).toBeLessThan(MINI_DIL_MODELI.code.length)
     }
     for (const [c] of MINI_DIL_MODELI.code) expect(c.length).toBeLessThanOrEqual(60)
-    expect(MINI_DIL_MODELI.code.length).toBeLessThanOrEqual(24)
+    // çekirdek kod kısa kalır; geçmiş kaydı, CSV ve grafik satırları eklendi
+    expect(MINI_DIL_MODELI.code.length).toBeLessThanOrEqual(48)
   })
   it('korpus: 16 cümle, 105 kelime, 29 farklı; başta her kelime eşit (%3,4)', () => {
     expect(SENTENCES).toHaveLength(16)

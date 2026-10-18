@@ -1,6 +1,8 @@
 // Ders 7: temel bileşen analizi (PCA). Rampa çıkan robotun IMU'su 200 kez ileri (ax) ve yan (ay) ivmeyi ölçer; iki sayı neredeyse
 // aynı şeyi söyler. Kovaryans matrisinin en büyük özvektörü, verinin en çok değiştiği yönü verir; veri tek sayıya iner.
 import { cap, fmt, gauss, mean, rng, type Frame, type Lesson } from './core'
+import { explainedRatio } from './egitim/metrics'
+import { B, type EgitimRaporu } from './egitim/rapor'
 
 export interface PcaFrame extends Frame {
   A: Array<[number, number]>
@@ -37,6 +39,41 @@ export function pca2(Z: Array<[number, number]>) {
 }
 export const varAlong = (Z: Array<[number, number]>, a: number) => mean(Z.map(([x, y]) => (x * Math.cos(a) + y * Math.sin(a)) ** 2))
 
+/**
+ * Eğitim paneli (öğrenme yok, tek adımlık çözüm): 0°–180° arası her 5°'de o eksendeki varyans ve tek sayıya inince kalan
+ * yeniden kurma hatası (toplam varyans − eksendeki varyans), özdeğerler ve açıklanan varyans, izdüşüm artıkları.
+ */
+export function pcaReport(): EgitimRaporu {
+  const A = imuData()
+  const mu = [mean(A.map((a) => a[0])), mean(A.map((a) => a[1]))]
+  const Z = A.map(([x, y]) => [x - mu[0], y - mu[1]] as [number, number])
+  const { l1, l2, angle } = pca2(Z)
+  const tot = mean(Z.map(([x, y]) => x * x + y * y))
+  const h = { angle: [] as number[], variance: [] as number[], recon_error: [] as number[] }
+  for (let d = 0; d <= 180; d += 5) { const v = varAlong(Z, (d * Math.PI) / 180); h.angle.push(d); h.variance.push(v); h.recon_error.push(tot - v) }
+  const ratio = explainedRatio([l1, l2])
+  const deg = ((angle * 180) / Math.PI + 180) % 180
+  const c = Math.cos(angle), sn = Math.sin(angle)
+  return {
+    kind: 'kumeleme', model: 'PCA (2 → 1, kovaryans özvektörü)', seed: 31, hyper: { readings: A.length, components: 1 },
+    history: { x: 'angle', cols: h },
+    final: [
+      { key: 'lambda1', label: B('λ₁ (en büyük özdeğer)', 'λ₁ (largest eigenvalue)'), value: l1, fmt: 3 },
+      { key: 'lambda2', label: B('λ₂', 'λ₂'), value: l2, fmt: 4 },
+      { key: 'kept', label: B('korunan varyans', 'kept variance'), value: ratio[0], fmt: 'pct' },
+      { key: 'recon_mse', label: B('yeniden kurma hatası (MSE)', 'reconstruction error (MSE)'), value: l2, fmt: 4 },
+      { key: 'angle', label: B('ana eksen açısı (°)', 'main axis angle (°)'), value: deg, fmt: 1 },
+    ],
+    charts: [
+      { kind: 'line', id: 'sweep', title: B('Eksen açısına göre varyans ve hata', 'Variance and error by axis angle'), x: h.angle, xLabel: B('eksen açısı (°)', 'axis angle (°)'), yLabel: B('(m/s²)²', '(m/s²)²'), yMin: 0,
+        series: [{ key: 'variance', label: B('eksendeki varyans', 'variance on axis'), values: h.variance, tone: 1 }, { key: 'recon_error', label: B('yeniden kurma hatası', 'reconstruction error'), values: h.recon_error, tone: 0, dash: true }],
+        marker: { x: Math.round(deg), label: B(`ana eksen ${deg.toFixed(0)}°`, `main axis ${deg.toFixed(0)}°`) } },
+      { kind: 'bar', id: 'scree', title: B('Açıklanan varyans (scree)', 'Explained variance (scree)'), labels: ['PC1', 'PC2'], series: [{ key: 'ratio', label: B('pay', 'share'), values: ratio, tone: 3 }], yMin: 0, yMax: 1 },
+      { kind: 'scatter', id: 'residuals', title: B('İzdüşüm ve dik artık', 'Projection and perpendicular residual'), xLabel: B('PC1 değeri', 'PC1 value'), yLabel: B('artık', 'residual'), points: Z.map(([x, y]) => [x * c + y * sn, -x * sn + y * c]), zero: true },
+    ],
+  }
+}
+
 export const PCA: Lesson<PcaFrame> = {
   slug: 'pca',
   n: 7,
@@ -66,8 +103,27 @@ export const PCA: Lesson<PcaFrame> = {
     ['pc = vecs[:, vals.argmax()]', 'en çok değişen yön', 'direction of most variance'],
     ['z = Z @ pc', 'her ölçüm artık tek sayı', 'every reading is now one number'],
     ['print(vals.max() / vals.sum())', 'korunan varyans oranı', 'kept variance ratio'],
+    ['tot = (Z ** 2).sum(1).mean()', 'toplam varyans', 'total variance'],
+    ["history = {'angle': [], 'variance': [], 'recon_error': []}", 'açı taraması', 'angle sweep'],
+    ['for deg in range(0, 181, 5):'],
+    ['    u = np.array([np.cos(np.radians(deg)), np.sin(np.radians(deg))])'],
+    ['    v = ((Z @ u) ** 2).mean()', 'bu eksendeki varyans', 'variance on this axis'],
+    ['    for k, x in zip(history, (deg, v, tot - v)): history[k].append(float(x))'],
+    ["for k, v in [('lambda1', vals.max()), ('lambda2', vals.min()),", 'son ölçümler', 'final metrics'],
+    ["             ('kept', vals.max() / vals.sum()), ('recon_mse', vals.min())]:"],
+    ["    print(f'{k:<10}{v:>8.4f}')"],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as f:", 'satır başına bir açı', 'one row per angle'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ["    for k in ('variance', 'recon_error'): plt.plot(history['angle'], history[k], label=k)"],
+    ["    plt.xlabel('angle (deg)'); plt.legend(); plt.show()"],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [],
+  report: pcaReport,
   run() {
     const A = imuData()
     const mu: [number, number] = [mean(A.map((a) => a[0])), mean(A.map((a) => a[1]))]

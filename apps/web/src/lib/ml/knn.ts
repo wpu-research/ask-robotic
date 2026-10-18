@@ -1,6 +1,8 @@
 // Ders 3: k en yakın komşu. Renk sensörü her nesne için iki sayı verir: ton ve parlaklık. 90 etiketli ölçüm (0 kırmızı top, 1 mavi
 // silindir, 2 sarı küp); yeni bir ölçüm, en yakın k ölçümün oyuyla sınıflanır. Sonunda 45 saklı test ölçümünde doğruluk.
 import { cap, d2, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
+import { B, ogrenmeEgrisi, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
+import { accuracy } from './egitim/metrics'
 
 export interface KnnFrame extends Frame {
   X: Pt[]
@@ -32,6 +34,49 @@ export function knnPredict(X: Pt[], x: number, y: number, k: number) {
   // eşitlikte en küçük sınıf numarası (NumPy argmax gibi)
   const pred = votes.indexOf(Math.max(...votes))
   return { near: order, votes, pred }
+}
+
+/**
+ * Eğitim raporu: dersin 90 eğitim / 45 test ölçümüyle k = 1…25 (tek sayılar) için eğitim ve test doğruluğu, seçilen k'de
+ * karışıklık matrisi ve sınıf başına ölçüler, eğitim kümesi büyüdükçe doğruluk (öğrenme eğrisi). Eğitim doğruluğunda nokta kendi
+ * komşusudur (k = 1'de hep %100): ezberleme budur.
+ */
+export function knnReport({ k = 5 }: Record<string, number>): EgitimRaporu {
+  const X = colorData(), T = colorData(99, 15)
+  const yT = T.map((p) => p.c), yX = X.map((p) => p.c)
+  const pred = (S: Pt[], P: Pt[], kk: number) => P.map((p) => knnPredict(S, p.x, p.y, kk).pred)
+  const ks: number[] = [], tr: number[] = [], te: number[] = []
+  for (let kk = 1; kk <= 25; kk += 2) { ks.push(kk); tr.push(accuracy(yX, pred(X, X, kk))); te.push(accuracy(yT, pred(X, T, kk))) }
+  // öğrenme eğrisi: her 9 ölçümden ilk m tanesi (sınıflar dengeli kalır)
+  const sizes: number[] = [], lcTr: number[] = [], lcTe: number[] = []
+  for (let m = 1; m <= 9; m++) {
+    const S = X.filter((_, i) => i % 9 < m)
+    const kk = Math.min(k, S.length)
+    sizes.push(S.length); lcTr.push(accuracy(S.map((p) => p.c), pred(S, S, kk))); lcTe.push(accuracy(yT, pred(S, T, kk)))
+  }
+  const NAMES = ['kırmızı top / red ball', 'mavi silindir / blue cylinder', 'sarı küp / yellow cube']
+  const pk = pred(X, T, k)
+  const blk = siniflandirmaBlok({ y: yT, pred: pk, labels: NAMES, prefix: 'test_', title: B(`test, k = ${k}`, `test, k = ${k}`) })
+  const trAcc = accuracy(yX, pred(X, X, k))
+  const r: EgitimRaporu = {
+    kind: 'siniflandirma', model: `k-NN (k = ${k}, öklid uzaklığı)`, seed: 5, hyper: { k, train: X.length, test: T.length },
+    history: { x: 'k', cols: { k: ks, train_acc: tr, test_acc: te } },
+    final: [
+      { key: 'train_acc', label: B('eğitim doğruluğu', 'training accuracy'), value: trAcc, fmt: 'pct' },
+      ...blk.final,
+      { key: 'gap', label: B('eğitim − test farkı', 'train − test gap'), value: trAcc - blk.final[0].value, fmt: 3 },
+    ],
+    confusion: blk.confusion,
+    charts: [
+      { kind: 'line', id: 'acc-k', title: B('Doğruluk ve k', 'Accuracy vs k'), x: ks, xLabel: B('komşu sayısı k', 'neighbours k'), yLabel: B('doğruluk', 'accuracy'), yMin: 0.5, yMax: 1,
+        marker: { x: k, label: B(`seçilen k = ${k}`, `chosen k = ${k}`) },
+        series: [{ key: 'train_acc', label: B('eğitim', 'train'), values: tr, tone: 1 }, { key: 'test_acc', label: B('test', 'test'), values: te, tone: 0, dash: true }],
+        note: B('Küçük k eğitimi ezberler (k = 1: %100); büyük k sınırları fazla yumuşatır.', 'Small k memorises the training set (k = 1: 100%); large k smooths the borders too much.') },
+      ogrenmeEgrisi(sizes, lcTr, lcTe, B('doğruluk', 'accuracy'), { yMin: 0, yMax: 1 }),
+      ...blk.charts,
+    ],
+  }
+  return r
 }
 
 /** Sınıf sınırlarına yakın, öğretici sorgu noktaları. */
@@ -71,8 +116,28 @@ export const KNN: Lesson<KnnFrame> = {
     ['    print(votes.argmax())', 'en çok oy alan', 'most votes wins'],
     ['pred = [np.bincount(y[((X - t) ** 2).sum(1).argsort()[:k]], minlength=3).argmax() for t in T]'],
     ['print((np.array(pred) == y_test).mean())', 'test doğruluğu', 'test accuracy'],
+    ['def knn(P, k):', 'her nokta için k-NN tahmini', 'k-NN prediction for every point'],
+    ['    return np.array([np.bincount(y[((X - t) ** 2).sum(1).argsort()[:k]], minlength=3).argmax() for t in P])'],
+    ['history = {\'k\': [], \'train_acc\': [], \'test_acc\': []}', 'k\'ye göre doğruluk', 'accuracy by k'],
+    ['for kk in range(1, 26, 2):'],
+    ['    for key, v in zip(history, (kk, (knn(X, kk) == y).mean(), (knn(T, kk) == y_test).mean())): history[key].append(float(v))'],
+    ['cm = np.zeros((3, 3), int); np.add.at(cm, (y_test, np.array(pred)), 1)', 'karışıklık matrisi: satır gerçek, sütun tahmin', 'confusion matrix: row actual, column predicted'],
+    ['print(cm)'],
+    ['for c in range(3):', 'sınıf başına kesinlik, duyarlılık, F1', 'per-class precision, recall, F1'],
+    ['    P, R = cm[c, c] / max(cm[:, c].sum(), 1), cm[c, c] / max(cm[c].sum(), 1)'],
+    ['    print(f\'sınıf {c}: P={P:.3f} R={R:.3f} F1={2 * P * R / max(P + R, 1e-12):.3f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir k', 'one row per k'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for key in (\'train_acc\', \'test_acc\'): plt.plot(history[\'k\'], history[key], marker=\'o\', label=key)'],
+    ['    plt.xlabel(\'k\'); plt.ylabel(\'accuracy\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [{ key: 'k', label: { tr: 'Komşu sayısı k', en: 'Neighbours k' }, min: 1, max: 25, step: 2, value: 5 }],
+  report: knnReport,
   run({ k = 5 }) {
     const X = colorData()
     const T = colorData(99, 15)

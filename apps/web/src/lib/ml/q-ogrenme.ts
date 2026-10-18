@@ -1,6 +1,8 @@
 // Ders: Q-öğrenme. Depo robotu raflar arasında şarj istasyonunu arıyor; her adım 1 puan götürür. 220 puanlık Q tablosu sıfırdan
 // başlar ve tek bir satırla öğrenir: hamlenin puanı = varılan hücrenin en iyi puanı − 1. Bilgi oyun oyun şarjdan başlangıca akar.
-import { cap, rng, type Frame, type Lesson } from './core'
+import { cap, rng, shifted, type Frame, type Lesson } from './core'
+import { B, gecmisGrafik, type EgitimRaporu } from './egitim/rapor'
+import { movingAverage } from './egitim/metrics'
 
 /** İki depo planı: S başlangıç, G şarj istasyonu, # raf. */
 export const MAZES: string[][] = [
@@ -100,6 +102,54 @@ export function train(L: string[], games: number, seed = 14) {
   return { Q, log }
 }
 
+/**
+ * Eğitim paneli: train() ile aynı oyunlar (aynı tohum), her oyunun sonunda adım, getiri (−adım), 10 oyunluk kayan ortalama, çarpma,
+ * en kısa yol mu, başlangıç hücresinin tahmini (−max Q) ve henüz denenmemiş (0 kalan) Q girdilerinin payı. Keşif ε ile değil
+ * iyimser başlangıçla (her şey 0) yapılır; bu yüzden ε yerine denenmemiş pay çizilir.
+ */
+export function qReport({ games = 60 }: Record<string, number>): EgitimRaporu {
+  const G = Math.max(1, Math.round(games))
+  const L = MAZES[0], H = L.length, W = L[0].length, sp = shortestPath(L)
+  const Q = new Float64Array(H * W * 4)
+  const r = rng(14)
+  const h = { game: [] as number[], steps: [] as number[], return: [] as number[], return_ma: [] as number[], bumps: [] as number[], shortest: [] as number[], q_start: [] as number[], untried: [] as number[] }
+  const greedyOk: number[] = []
+  for (let g = 1; g <= G; g++) {
+    const o = playGame(L, Q, r, true)
+    h.game.push(g); h.steps.push(o.steps); h.return.push(-o.steps); h.bumps.push(o.bumps); h.shortest.push(o.steps === sp ? 1 : 0)
+    h.q_start.push(-Math.max(Q[0], Q[1], Q[2], Q[3]))
+    let z = 0
+    for (let i = 0; i < Q.length; i++) if (Q[i] === 0) z++
+    h.untried.push(z / Q.length)
+    greedyOk.push(greedyPath(L, Q).reached ? 1 : 0)
+  }
+  h.return_ma = movingAverage(h.return, 10)
+  const succ = movingAverage(h.shortest, 10)
+  const heat = Array.from({ length: H }, (_, i) => Array.from({ length: W }, (_, j) => (L[i][j] === '#' ? NaN : Math.max(Q[(i * W + j) * 4], Q[(i * W + j) * 4 + 1], Q[(i * W + j) * 4 + 2], Q[(i * W + j) * 4 + 3]))))
+  const firstOk = h.shortest.findIndex((v, i) => h.shortest.slice(i).every((x) => x === 1))
+  const r0: EgitimRaporu = {
+    kind: 'pekistirmeli', model: B('tablolu Q-öğrenme (5 × 11 × 4)', 'tabular Q-learning (5 × 11 × 4)'), seed: 14, hyper: { games: G, reward: -1, gamma: 1, init: 0 },
+    history: { x: 'game', cols: h }, final: [], charts: [],
+  }
+  r0.final = [
+    { key: 'return_ma', label: B('son 10 oyun ort. getiri', 'mean return, last 10 games'), value: h.return_ma.at(-1)!, fmt: 1 },
+    { key: 'success_10', label: B('en kısa yol oranı (son 10)', 'shortest-route rate (last 10)'), value: succ.at(-1)!, fmt: 'pct' },
+    { key: 'q_start', label: B('başlangıçtan tahmini adım', 'estimated steps from start'), value: h.q_start.at(-1)!, fmt: 'int' },
+    { key: 'shortest', label: B('gerçek en kısa yol', 'true shortest route'), value: sp, fmt: 'int' },
+    { key: 'total_steps', label: B('toplam deneme adımı', 'total steps tried'), value: h.steps.reduce((a, v) => a + v, 0), fmt: 'int' },
+    { key: 'converged_at', label: B('kalıcı en kısa yol (oyun)', 'shortest route for good (game)'), value: firstOk >= 0 ? firstOk + 1 : NaN, fmt: 'int' },
+    { key: 'untried', label: B('denenmemiş Q payı', 'untried Q share'), value: h.untried.at(-1)!, fmt: 'pct' },
+  ]
+  r0.charts = [
+    gecmisGrafik(r0, 'return', B('Bölüm getirisi ve kayan ortalama', 'Episode return and moving average'), [['return', B('getiri (−adım)', 'return (−steps)'), 1], ['return_ma', B('10 oyunluk ortalama', '10-game mean'), 0]], { xLabel: B('oyun', 'game'), yLabel: B('getiri', 'return') }),
+    { kind: 'line', id: 'success', title: B('Başarı oranı (son 10 oyun)', 'Success rate (last 10 games)'), x: h.game, xLabel: B('oyun', 'game'), yMin: 0, yMax: 1, live: true, series: [{ key: 'shortest', label: B('en kısa yol', 'shortest route'), values: succ, tone: 3 }, { key: 'greedy', label: B('açgözlü yol şarja varıyor', 'greedy route reaches charger'), values: movingAverage(greedyOk, 10), tone: 2, dash: true }] },
+    gecmisGrafik(r0, 'explore', B('Keşif: denenmemiş Q payı', 'Exploration: untried Q share'), [['untried', B('denenmemiş', 'untried'), 4]], { xLabel: B('oyun', 'game'), yMin: 0, yMax: 1, note: B('ε yok: robot iyimser başlangıç (her puan 0) sayesinde keşfeder. Pay düştükçe keşif biter.', 'No ε: the robot explores thanks to optimistic initial values (all 0). As the share drops, exploration ends.') }),
+    { kind: 'line', id: 'q-start', title: B('Başlangıç hücresinin tahmini (−max Q)', 'Start-cell estimate (−max Q)'), x: h.game, xLabel: B('oyun', 'game'), live: true, series: [{ key: 'q_start', label: B('tahmini adım', 'estimated steps'), values: h.q_start, tone: 5 }, { key: 'sp', label: B('gerçek en kısa yol', 'true shortest route'), values: h.game.map(() => sp), tone: 3, dash: true }] },
+    { kind: 'heat', id: 'q-heat', title: B('Q tablosu: hücre başına en iyi puan', 'Q table: best score per cell'), rows: L.map((_, i) => String(i)), cols: L[0].split('').map((_, j) => String(j)), values: heat, showValues: true, digits: 0, rowLabel: B('satır', 'row'), colLabel: B('sütun', 'column'), note: B('Boş hücreler raf. −k: "şarja k adım". Şarj 0.', 'Blank cells are shelves. −k: "k steps to the charger". The charger is 0.') },
+  ]
+  return r0
+}
+
 const DIR: Array<[string, string]> = [['yukarı', 'up'], ['aşağı', 'down'], ['sola', 'left'], ['sağa', 'right']]
 
 export const Q_OGRENME: Lesson<QFrame> = {
@@ -134,6 +184,7 @@ export const Q_OGRENME: Lesson<QFrame> = {
     ['Q = np.zeros((H, W, 4))', '5·11·4 = 220 puan, hepsi 0', '5·11·4 = 220 scores, all 0'],
     ['M = [(-1, 0), (1, 0), (0, -1), (0, 1)]', 'yukarı, aşağı, sol, sağ', 'up, down, left, right'],
     ['rng = np.random.default_rng(14)'],
+    ['history = {k: [] for k in (\'game\', \'steps\', \'return\', \'return_ma\', \'bumps\', \'shortest\', \'q_start\', \'untried\')}', 'bölüm geçmişi', 'episode history'],
     ['for game in range(1, 61):'],
     ['    r, c, steps, bumps = 0, 0, 0, 0', 'S hücresinden başla', 'start at S'],
     ['    while L[r][c] != "G":'],
@@ -145,13 +196,27 @@ export const Q_OGRENME: Lesson<QFrame> = {
     ['        target = 0 if L[nr][nc] == "G" else Q[nr, nc].max()'],
     ['        Q[r, c, a] = target - 1', 'öğrenmenin tamamı', 'all of the learning'],
     ['        r, c, steps = nr, nc, steps + 1'],
+    ['    for k, v in zip(history, (game, steps, -steps, np.mean(history[\'return\'][-9:] + [-steps]), bumps, steps == 18, -Q[0, 0].max(), (Q == 0).mean())): history[k].append(float(v))', 'getiri = −adım; 10 oyunluk ortalama; en kısa yol 18', 'return = −steps; 10-game average; shortest route 18'],
     ['    if game in (1, 2, 10, 37, 60):'],
     ['        print(game, steps, bumps)', 'oyun, adım, çarpma', 'game, steps, bumps'],
+    ['print(\'son 10 oyun ortalama getiri:\', history[\'return_ma\'][-1], \'· en kısa yol oranı:\', np.mean(history[\'shortest\'][-10:]))', 'son ölçümler', 'final metrics'],
+    ['print(\'başlangıçtan tahmini adım:\', history[\'q_start\'][-1], \'· denenmemiş Q payı:\', round(history[\'untried\'][-1], 3))'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir oyun', 'one row per game'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    fig, (a, b) = plt.subplots(1, 2, figsize=(9, 3.5))'],
+    ['    a.plot(history[\'game\'], history[\'return\'], label=\'return\'); a.plot(history[\'game\'], history[\'return_ma\'], label=\'10-game mean\'); a.legend()'],
+    ['    b.imshow(Q.max(axis=2), cmap=\'viridis\'); b.set_title(\'max Q\'); plt.show()', 'Q tablosu ısı haritası', 'Q table heatmap'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'games', label: { tr: 'Oyun sayısı', en: 'Games' }, min: 10, max: 100, step: 5, value: 60 },
     { key: 'maze', label: { tr: 'Depo planı (0 / 1: yeni plan)', en: 'Layout (0 / 1: new layout)' }, min: 0, max: 1, step: 1, value: 0 },
   ],
+  report: qReport,
   run({ games = 60, maze = 0 }) {
     const G = Math.max(1, Math.round(games))
     const F: QFrame[] = []
@@ -227,3 +292,5 @@ export const Q_OGRENME: Lesson<QFrame> = {
     return F
   },
 }
+// Eğitim geçmişi satırları eklendi: geçmiş sözlüğü (9. satırdan sonra) ve oyun sonu kaydı (21. satırdan sonra). Vurgular kayar.
+Q_OGRENME.run = shifted(shifted(Q_OGRENME.run, 9, 1), 21, 1)

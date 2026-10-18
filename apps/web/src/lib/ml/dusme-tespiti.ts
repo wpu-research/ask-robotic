@@ -1,6 +1,7 @@
 // Ders: düşme tespiti. Hasta odasındaki kamera, poz tahmininden gelen iskelet noktalarını saniyede 10 kez verir. Gövde açısı,
 // kalça yüksekliği ve iniş hızından zamansal bir kural kurulur: eğilme ve oturma alarm vermez, gerçek düşme verir.
-import { cap, fmt, gauss, rng, type Frame, type Lesson } from './core'
+import { cap, fmt, gauss, rng, shifted, type Frame, type Lesson } from './core'
+import { B, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 export const FPS = 10
 export const DUR = 26
@@ -99,6 +100,43 @@ export function detect(kp: number[][], angThr: number, win: number) {
 /** Bir aralıktaki en uzun "yerde" sayacı. */
 export const maxCount = (cnt: number[], t0: number, t1: number) => Math.max(0, ...cnt.slice(Math.round(t0 * FPS), Math.round(t1 * FPS)))
 
+/**
+ * Eğitim paneli (kuralın değerlendirmesi): her kare için gerçek etiket "düşme anı ya da sonrası" (t ≥ 18 s), kuralın kararı
+ * "yerde sayacı ≥ pencere". Sayaç skor olarak kullanılınca ROC/PR çıkar; karşılaştırma için yalnız açı eşiğinin düşmeden önce
+ * kaç karede yanlış pozitif vereceği de sayılır (eğilme de 75°'ye çıkar). Zaman geçmişi: açı, kalça oranı, iniş hızı ve sayaç.
+ */
+export function fallReport({ ang = 60, win = 2 }: Record<string, number>): EgitimRaporu {
+  const W = Math.max(1, Math.round(win * FPS))
+  const D = detect(skeleton(), ang, W)
+  const t = D.ang.map((_, i) => Math.round((i / FPS) * 10) / 10)
+  const y = t.map((x) => (x >= 18 ? 1 : 0))
+  const blk = siniflandirmaBlok({ y, pred: D.cnt.map((c) => (c >= W ? 1 : 0)), labels: ['normal', 'düşme'], scores: D.cnt, threshold: W, pos: B('düşme', 'fall'), neg: B('normal', 'normal') })
+  const falseA = D.alarms.filter((i) => t[i] < 18), real = D.alarms.filter((i) => t[i] >= 18)
+  const r: EgitimRaporu = {
+    kind: 'siniflandirma', model: 'zamansal kural: açı + kalça oranı + iniş hızı + pencere', seed: 3, hyper: { angle: ang, window_s: win, window_frames: W, fps: FPS },
+    history: { x: 't', cols: { t, ang: D.ang, ratio: D.ratio, drop: D.drop, count: D.cnt } },
+    final: [
+      ...blk.final,
+      { key: 'angle_only_fp', label: B('yalnız açı: yanlış pozitif kare', 'angle alone: false-positive frames'), value: D.ang.filter((a, i) => y[i] === 0 && a > ang).length, fmt: 'int' },
+      { key: 'false_alarms', label: B('yanlış alarm', 'false alarms'), value: falseA.length, fmt: 'int' },
+      { key: 'delay_s', label: B('alarm gecikmesi (s)', 'alarm delay (s)'), value: real.length ? t[real[0]] - 18 : NaN, fmt: 1 },
+    ],
+    confusion: blk.confusion, scores: blk.scores, charts: [],
+  }
+  const line = (id: string, title: [string, string], key: 'ang' | 'ratio' | 'count', tone: number, lim: number, limLabel: [string, string]) => ({
+    kind: 'line' as const, id, title: B(...title), x: t, xLabel: B('zaman (s)', 'time (s)'), live: true,
+    series: [{ key, label: B(...title), values: r.history.cols[key], tone }, { key: `${key}_lim`, label: B(...limLabel), values: t.map(() => lim), tone: 0, dash: true }],
+    marker: { x: 18, label: B('düşme', 'fall') },
+  })
+  r.charts = [
+    line('angle', ['Gövde açısı (°)', 'Trunk angle (°)'], 'ang', 1, ang, ['açı eşiği', 'angle threshold']),
+    line('ratio', ['Kalça yüksekliği / ayakta', 'Hip height / standing'], 'ratio', 2, RATIO, ['oran eşiği', 'ratio threshold']),
+    line('count', ['Yerde sayacı (kare)', 'On-floor counter (frames)'], 'count', 4, W, ['pencere', 'window']),
+    ...blk.charts,
+  ]
+  return r
+}
+
 export interface FallFrame extends Frame {
   i: number
   kp: number[][]
@@ -162,16 +200,35 @@ export const DUSME_TESPITI: Lesson<FallFrame> = {
     ['drop = np.r_[0, 0, 0, hip[:-3, 1] - hip[3:, 1]] * FPS / 3', 'iniş hızı m/s', 'drop speed m/s'],
     ['low = (ang > ANG) & (ratio < 0.5)', 'yerde mi?', 'on the floor?'],
     ['n, last = 0, -99', 'sayaç, son hızlı iniş', 'counter, last fast drop'],
+    ["history = {'t': [], 'ang': [], 'ratio': [], 'drop': [], 'count': []}", 'kare kare geçmiş', 'frame-by-frame history'],
     ['for i in range(len(t)):'],
     ['    if drop[i] > 0.6: last = i', 'hızlı iniş', 'fast drop'],
     ['    n = n + 1 if low[i] and (n or i - last <= 15) else 0', 'yerde kalma sayacı', 'time-on-floor counter'],
+    ['    r = [round(t[i], 1), ang[i], ratio[i], drop[i], n]'],
+    ['    for k, v in zip(history, r): history[k].append(float(v))'],
     ["    if n == WIN: print(f'ALARM: t = {t[i]:.1f} s')"],
     ["print('eğilmede yerde kare:', low[50:75].sum(), '<', WIN)"],
+    ['y = t >= 18', 'gerçek: düşme anı ve sonrası', 'truth: the fall and after'],
+    ["pred = np.array(history['count']) >= WIN", 'kuralın kararı', 'the rule’s decision'],
+    ['tp = (pred & y).sum(); p, r = tp / max(pred.sum(), 1), tp / y.sum()'],
+    ["for k, v in [('precision', p), ('recall', r), ('f1', 2 * p * r / max(p + r, 1e-9))]:", 'son ölçümler', 'final metrics'],
+    ["    print(f'{k:<10}{v:>8.3f}')"],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as f:", 'satır başına bir kare', 'one row per frame'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ["    plt.plot(history['t'], history['ang'], label='ang')"],
+    ["    plt.plot(history['t'], np.array(history['count']) * 3, label='count × 3')"],
+    ["    plt.axvline(18, ls='--'); plt.xlabel('t (s)'); plt.legend(); plt.show()"],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [
     { key: 'ang', label: { tr: 'Açı eşiği (°)', en: 'Angle threshold (°)' }, min: 15, max: 85, step: 5, value: 60 },
     { key: 'win', label: { tr: 'Zaman penceresi (s)', en: 'Time window (s)' }, min: 0.5, max: 4, step: 0.1, value: 2 },
   ],
+  report: fallReport,
   run({ ang = 60, win = 2 }) {
     const W = Math.max(1, Math.round(win * FPS))
     const kp = skeleton()
@@ -209,3 +266,5 @@ export const DUSME_TESPITI: Lesson<FallFrame> = {
     return F
   },
 }
+// Geçmiş kaydı için döngünün önüne 1 (17'den sonra), döngünün içine 2 satır (20'den sonra) eklendi: vurgulanan satırlar kayar.
+DUSME_TESPITI.run = shifted(shifted(DUSME_TESPITI.run, 20, 2), 17, 1)

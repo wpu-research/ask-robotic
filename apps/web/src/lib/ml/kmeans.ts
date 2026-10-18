@@ -1,6 +1,8 @@
 // Ders 6: k-means kümeleme. Robot süpürgenin LiDAR'ı odada 600 nokta görür (250 duvar, 200 kanepe, 150 masa); hangi noktanın
 // hangi nesneye ait olduğunu bilmez. Kod satır satır NumPy sürümüyle aynı adımları izler; on rastgele başlangıçtan en sıkısı kalır.
 import { cap, choice, d2, gauss, rng, type Frame, type Lesson, type Pt } from './core'
+import { B, type EgitimRaporu } from './egitim/rapor'
+import { bestIndex, silhouette } from './egitim/metrics'
 
 export interface KMeansFrame extends Frame {
   pts: Pt[]
@@ -59,6 +61,65 @@ export function lloyd(pts: Pt[], C0: Array<[number, number]>, maxRounds = 50) {
 
 export const sizesOf = (g: number[], k: number): number[] => Array.from({ length: k }, (_, j) => g.filter((x) => x === j).length)
 
+/** k grupla dersteki on deneme (aynı tohum, aynı sıra): en iyi deneme ve hepsinin turları. */
+export function tenTries(pts: Pt[], k: number, seed: number) {
+  const r = rng(seed)
+  return Array.from({ length: 10 }, () => {
+    const C0 = choice(r, pts.length, k).map((i) => [pts[i].x, pts[i].y] as [number, number])
+    return { C0, ...lloyd(pts, C0) }
+  })
+}
+
+/**
+ * Eğitim paneli: dirsek (k = 1…8, her k için dersteki on deneme, en iyi inertia) ve siluet; seçilen k için denemelerin tur tur
+ * inertia'sı, grup büyüklükleri ve gerçek nesnelerle karşılaştırma (veride nesne etiketi var, algoritma görmez).
+ */
+export function kmeansReport({ k = 3, seed = 17 }: Record<string, number>): EgitimRaporu {
+  const pts = lidarScan()
+  const X = pts.map((p) => [p.x, p.y])
+  const h = { k: [] as number[], inertia: [] as number[], silhouette: [] as number[] }
+  let runs: ReturnType<typeof tenTries> = []
+  for (let kk = 1; kk <= 8; kk++) {
+    const rs = tenTries(pts, kk, seed)
+    const best = rs.reduce((a, b) => (b.s < a.s ? b : a))
+    h.k.push(kk); h.inertia.push(best.s); h.silhouette.push(kk > 1 ? silhouette(X, best.g) : 0)
+    if (kk === k) runs = rs
+  }
+  if (!runs.length) runs = tenTries(pts, k, seed)
+  const best = runs.reduce((a, b) => (b.s < a.s ? b : a))
+  const bi = runs.indexOf(best)
+  const sizes = sizesOf(best.g, k)
+  const names = ['duvar', 'kanepe', 'masa']
+  const cont = Array.from({ length: k }, (_, j) => [0, 1, 2].map((c) => pts.filter((p, i) => best.g[i] === j && p.c === c).length))
+  const purity = cont.reduce((a, row) => a + Math.max(...row), 0) / pts.length
+  const sil = silhouette(X, best.g)
+  const conv = runs.map((rn, t) => ({
+    key: `try${t + 1}`, label: B(`deneme ${t + 1}`, `try ${t + 1}`), tone: t === bi ? 3 : t % 6 === 3 ? 4 : t % 6,
+    x: rn.rounds.map((_, i) => i + 1), values: rn.rounds.map((rd) => pts.reduce((a, p, i) => a + d2(p.x, p.y, rd.C[rd.g[i]][0], rd.C[rd.g[i]][1]), 0)),
+  }))
+  const r: EgitimRaporu = {
+    kind: 'kumeleme', model: B(`k-means (k = ${k}, 10 başlangıç)`, `k-means (k = ${k}, 10 starts)`), seed, hyper: { k, starts: 10, points: pts.length },
+    history: { x: 'k', cols: h }, final: [], charts: [],
+  }
+  r.final = [
+    { key: 'inertia', label: B('inertia (Σ d²)', 'inertia (Σ d²)'), value: best.s, fmt: 1 },
+    { key: 'silhouette', label: B('siluet skoru', 'silhouette score'), value: sil, fmt: 3 },
+    { key: 'rounds', label: B('en iyi denemenin turu', 'rounds of the best try'), value: best.rounds.length, fmt: 'int' },
+    { key: 'best_try', label: B('en iyi deneme', 'best try'), value: bi + 1, fmt: 'int' },
+    { key: 'purity', label: B('saflık (gerçek nesnelerle)', 'purity (vs true objects)'), value: purity, fmt: 'pct' },
+    { key: 'best_k_silhouette', label: B('siluete göre en iyi k', 'best k by silhouette'), value: h.k[bestIndex(h.silhouette, 'max')], fmt: 'int' },
+  ]
+  r.charts = [
+    { kind: 'line', id: 'elbow', title: B('Dirsek eğrisi: inertia – k', 'Elbow curve: inertia vs k'), x: h.k, xLabel: B('k (grup sayısı)', 'k (number of groups)'), yLabel: B('inertia', 'inertia'), series: [{ key: 'inertia', label: B('inertia', 'inertia'), values: h.inertia, tone: 1 }], marker: { x: k, label: B(`seçilen k = ${k}`, `chosen k = ${k}`) }, note: B('Eğrinin büküldüğü (dirsek) yerden sonra k artırmak az kazandırır.', 'Past the bend (the elbow), raising k gains little.') },
+    { kind: 'line', id: 'silhouette', title: B('Siluet skoru – k', 'Silhouette score vs k'), x: h.k.slice(1), xLabel: B('k', 'k'), yLabel: B('siluet', 'silhouette'), series: [{ key: 'silhouette', label: B('siluet', 'silhouette'), values: h.silhouette.slice(1), tone: 3 }], marker: { x: k, label: B(`k = ${k}`, `k = ${k}`) } },
+    { kind: 'line', id: 'convergence', title: B(`Yakınsama: on denemenin tur tur inertia'sı (k = ${k})`, `Convergence: inertia per round for the ten tries (k = ${k})`), x: [], xLabel: B('tur', 'round'), yLabel: B('inertia', 'inertia'), series: conv, note: B(`Yeşil: en iyi deneme (${bi + 1}). Yüksekte kalanlar kötü başlangıca takıldı.`, `Green: the best try (${bi + 1}). Those staying high got stuck after a bad start.`) },
+    { kind: 'bar', id: 'tries', title: B('Denemelerin son inertia\'sı', 'Final inertia per try'), labels: runs.map((_, t) => String(t + 1)), series: [{ key: 'inertia', label: B('inertia', 'inertia'), values: runs.map((x) => x.s), tone: 1 }] },
+    { kind: 'bar', id: 'sizes', title: B('Grup büyüklükleri', 'Cluster sizes'), labels: sizes.map((_, j) => `${j + 1}`), series: [{ key: 'n', label: B('nokta', 'points'), values: sizes, tone: 2 }] },
+    { kind: 'heat', id: 'contingency', title: B('Gruplar – gerçek nesneler', 'Clusters vs true objects'), rows: sizes.map((_, j) => `grup ${j + 1}`), cols: names, values: cont, showValues: true, rowLabel: B('grup', 'cluster'), colLabel: B('nesne', 'object'), note: B('Algoritma etiketleri görmez; bu tablo yalnız sonucu denetler.', 'The algorithm never sees the labels; this table only checks the result.') },
+  ]
+  return r
+}
+
 const TR_TRY = (t: number, r: number) => r ? `deneme ${t} · tur ${r}` : `deneme ${t}`
 const EN_TRY = (t: number, r: number) => r ? `try ${t} · round ${r}` : `try ${t}`
 
@@ -100,11 +161,40 @@ export const KMEANS: Lesson<KMeansFrame> = {
     ['    s = d.min(1).sum()', 'toplam kare uzaklık', 'total squared distance'],
     ['    if s < best: best, keep = s, g', 'en sıkısını sakla', 'keep the tightest'],
     ['print(np.bincount(keep))', 'grup başına nokta', 'points per group'],
+    ['history = {\'k\': [], \'inertia\': [], \'silhouette\': []}', 'dirsek: k = 1…8 için aynı on deneme', 'elbow: the same ten tries for k = 1…8'],
+    ['D = np.sqrt(((X[:, None] - X) ** 2).sum(2))', '600 × 600 uzaklık (siluet için)', '600 × 600 distances (for silhouette)'],
+    ['for kk in range(1, 9):'],
+    ['    rng, bs = np.random.default_rng(17), np.inf'],
+    ['    for start in range(10):'],
+    ['        C = X[rng.choice(len(X), kk, replace=False)]'],
+    ['        while True:'],
+    ['            old, g = C.copy(), ((X[:, None] - C) ** 2).sum(2).argmin(1)'],
+    ['            C = np.array([X[g == j].mean(0) if (g == j).any() else C[j] for j in range(kk)])', 'boş grup yerinde kalır', 'an empty group stays put'],
+    ['            if np.allclose(C, old): break'],
+    ['        s = ((X - C[g]) ** 2).sum()', 'inertia: grup içi kare uzaklık', 'inertia: within-group squared distance'],
+    ['        if s < bs: bs, bg = s, g'],
+    ['    M = np.eye(kk)[bg]; n = M.sum(0); S = D @ M', 'her noktadan her gruba toplam uzaklık', 'total distance from each point to each group'],
+    ['    a = (S * M).sum(1) / np.maximum(n[bg] - 1, 1)', 'kendi grubuna ortalama uzaklık', 'mean distance to its own group'],
+    ['    b = np.where((M > 0) | (n == 0), np.inf, S / np.maximum(n, 1)).min(1)', 'en yakın diğer gruba', 'to the nearest other group'],
+    ['    sil = ((b - a) / np.maximum(a, b))[n[bg] > 1].sum() / len(X) if kk > 1 else 0.0', 'siluet skoru (−1…1)', 'silhouette score (−1…1)'],
+    ['    for key, v in zip(history, (kk, bs, sil)): history[key].append(float(v))'],
+    ['    print(f\'k={kk}  inertia={bs:9.1f}  siluet={sil:.3f}\')', 'son ölçümler tablosu', 'final metrics table'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir k', 'one row per k'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    fig, (a1, a2) = plt.subplots(1, 2, figsize=(9, 3.5))'],
+    ['    a1.plot(history[\'k\'], history[\'inertia\'], \'o-\'); a1.set_title(\'elbow\'); a2.plot(history[\'k\'], history[\'silhouette\'], \'o-\')'],
+    ['    a2.set_title(\'silhouette\'); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [
     { key: 'k', label: { tr: 'Grup sayısı k', en: 'Number of groups k' }, min: 2, max: 6, step: 1, value: 3 },
     { key: 'seed', label: { tr: 'Tohum', en: 'Seed' }, min: 1, max: 99, step: 1, value: 17 },
   ],
+  report: kmeansReport,
   run({ k = 3, seed = 17 }) {
     const pts = lidarScan()
     const r = rng(seed)

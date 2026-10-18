@@ -1,6 +1,7 @@
 // Ders: öneri sistemi, matris ayrıştırma. Robotik atölye platformunda 300 öğrenci ve 60 robot projesi; her öğrenci yalnızca ~12
 // projeyi denemiş. Öğrenciye ve projeye birkaç gizli sayı verilir; iki ok sigmoid ile beğeni olasılığına döner, gradyan inişiyle itilir.
 import { cap, choice, fmt, gauss, rng, type Frame, type Lesson } from './core'
+import { B, erkenDurdurma, gecmisGrafik, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
 
 export interface RecData {
   /** Gizli gerçek: öğrenci zevki ve proje tarzı (2 boyut). */
@@ -93,6 +94,55 @@ export function factorize(d: RecData, k: number, rounds: number, seed = 16, onEp
   return { U, V, acc, top3: hit / n, rand: rh / rn }
 }
 
+/** Çiftlerde beğeni olasılıkları (σ(U·V)) ve gerçek beğeniler. */
+function pairProbs(pairs: RecData['train'], U: Float64Array, V: Float64Array, k: number) {
+  const p: number[] = [], y: number[] = []
+  for (const [u, v, l] of pairs) { let s = 0; for (let j = 0; j < k; j++) s += U[u * k + j] * V[v * k + j]; p.push(sig(s)); y.push(l) }
+  return { p, y }
+}
+/** Ortalama ikili çapraz entropi ve 0,5 eşiğinde doğruluk. */
+function lossAcc(pairs: RecData['train'], U: Float64Array, V: Float64Array, k: number): [number, number] {
+  const { p, y } = pairProbs(pairs, U, V, k)
+  let ll = 0, ok = 0
+  p.forEach((q, i) => { ll -= y[i] ? Math.log(q) : Math.log(1 - q); if ((q > 0.5 ? 1 : 0) === y[i]) ok++ })
+  return [ll / p.length, ok / p.length]
+}
+
+/** Eğitim paneli: her turdan sonra eğitim (3000) ve gizli (600) beğenilerde kayıp ve doğruluk; sonda gizli beğenilerde ROC/PR. */
+export function recReport({ rounds = 100, k = 2 }: Record<string, number>): EgitimRaporu {
+  const R = Math.max(1, Math.round(rounds)), K = Math.max(1, Math.round(k))
+  const d = workshopData()
+  const h = { epoch: [] as number[], loss: [] as number[], acc: [] as number[], val_loss: [] as number[], val_acc: [] as number[] }
+  let last: { U: Float64Array; V: Float64Array } | null = null
+  const res = factorize(d, K, R, 16, (e, U, V) => {
+    last = { U, V }
+    if (e === 0) return
+    const [lt, at] = lossAcc(d.train, U, V, K), [lv, av] = lossAcc(d.test, U, V, K)
+    h.epoch.push(e); h.loss.push(lt); h.acc.push(at); h.val_loss.push(lv); h.val_acc.push(av)
+  })
+  const { U, V } = last!
+  const te = pairProbs(d.test, U, V, K)
+  const blk = siniflandirmaBlok({ y: te.y, pred: te.p.map((q) => (q > 0.5 ? 1 : 0)), labels: ['beğenmez', 'beğenir'], scores: te.p, threshold: 0.5, pos: B('beğenir', 'likes'), neg: B('beğenmez', 'dislikes'), prefix: 'test_' })
+  const r: EgitimRaporu = {
+    kind: 'siniflandirma', model: `lojistik matris ayrıştırma, k = ${K}`, seed: 16, hyper: { lr: 0.1, reg: 0.01, k: K, rounds: R, train: d.train.length, test: d.test.length },
+    history: { x: 'epoch', cols: h }, final: [], confusion: blk.confusion, scores: blk.scores, charts: [],
+  }
+  r.final = [
+    ...blk.final,
+    { key: 'bayes', label: B('mümkün en iyi doğruluk', 'best possible accuracy'), value: d.bayes, fmt: 'pct' },
+    { key: 'top3', label: B('ilk 3 öneri zevke uyuyor', 'top-3 picks suit the taste'), value: res.top3, fmt: 'pct' },
+    { key: 'random', label: B('rastgele proje uyuyor', 'random project suits'), value: res.rand, fmt: 'pct' },
+  ]
+  const acc = gecmisGrafik(r, 'acc', B('Doğruluk: eğitim ve gizli beğeniler', 'Accuracy: training and hidden likes'), [['acc', B('eğitim', 'train'), 1], ['val_acc', B('gizli (test)', 'hidden (test)'), 0, true]], { yLabel: B('doğruluk', 'accuracy') })
+  acc.series.push({ key: 'bayes', label: B('mümkün en iyi', 'best possible'), values: h.epoch.map(() => d.bayes), tone: 3, dash: true })
+  r.charts = [
+    gecmisGrafik(r, 'loss', B('Kayıp (ikili çapraz entropi)', 'Loss (binary cross-entropy)'), [['loss', B('eğitim', 'train'), 1], ['val_loss', B('gizli (test)', 'hidden (test)'), 0, true]], { xLabel: B('tur', 'round'), marker: erkenDurdurma(h.epoch, h.val_loss) }),
+    { ...acc, xLabel: B('tur', 'round') },
+    ...blk.charts,
+  ]
+  return r
+}
+
 export const ONERI_SISTEMI: Lesson<RecFrame> = {
   slug: 'oneri-sistemi',
   n: 0,
@@ -129,20 +179,43 @@ export const ONERI_SISTEMI: Lesson<RecFrame> = {
     ['k, lr = 2, 0.1', 'gizli boyut, adım', 'hidden size, step'],
     ['U = rng.normal(0, .1, (300, k))', 'öğrenci okları', 'student arrows'],
     ['V = rng.normal(0, .1, (60, k))', 'proje okları', 'project arrows'],
+    ['def scores(pairs):', 'çiftlerde olasılık ve gerçek', 'probability and truth on pairs'],
+    ['    u, v = np.array(pairs).T'],
+    ['    y = np.array([like[q] for q in pairs], float)'],
+    ['    return sig((U[u] * V[v]).sum(1)), y'],
+    ['def olc(pairs):', 'kayıp ve doğruluk', 'loss and accuracy'],
+    ['    p, y = scores(pairs)'],
+    ['    ll = -(y * np.log(p) + (1 - y) * np.log(1 - p)).mean()'],
+    ['    return ll, ((p > .5) == y).mean()'],
+    ["history = {c: [] for c in ['epoch', 'loss', 'acc',"],
+    ["                          'val_loss', 'val_acc']}", 'eğitim geçmişi', 'training history'],
     ['for epoch in range(1, 101):'],
     ['    for u, v in train:'],
     ['        err = sig(U[u] @ V[v]) - like[(u, v)]', 'olasılık − gerçek', 'probability − truth'],
     ['        U[u], V[v] = (U[u] - lr * (err * V[v] + .01 * U[u]),', 'iki oku it', 'nudge both arrows'],
     ['                      V[v] - lr * (err * U[u] + .01 * V[v]))'],
+    ['    r = [epoch, *olc(train), *olc(test)]', 'eğitim ve gizli beğeniler', 'training and hidden likes'],
+    ['    for c, v in zip(history, r): history[c].append(float(v))'],
     ['    if epoch in (1, 25, 100):'],
     ['        ok = [(sig(U[u] @ V[v]) > .5) == like[(u, v)]'],
     ['              for u, v in test]'],
     ['        print(epoch, f"{np.mean(ok):.1%}")', 'gizli beğenilerde doğru', 'right on hidden likes'],
+    ["for c in history: print(f'{c:<10}{history[c][-1]:>10.4f}')", 'son ölçümler', 'final metrics'],
+    ['import csv'],
+    ["with open('egitim_gecmisi.csv', 'w', newline='') as f:", 'satır başına bir tur', 'one row per round'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ["    for c in ('acc', 'val_acc'): plt.plot(history['epoch'], history[c], label=c)"],
+    ["    plt.xlabel('epoch'); plt.legend(); plt.show()"],
+    ['except ImportError:'],
+    ["    print('matplotlib yok: grafik atlandı')"],
   ],
   params: [
     { key: 'rounds', label: { tr: 'Tur sayısı', en: 'Rounds' }, min: 10, max: 200, step: 10, value: 100 },
     { key: 'k', label: { tr: 'Gizli boyut (k)', en: 'Hidden size (k)' }, min: 1, max: 4, step: 1, value: 2 },
   ],
+  report: recReport,
   run({ rounds = 100, k = 2 }) {
     const R = Math.max(1, Math.round(rounds)), K = Math.max(1, Math.round(k))
     const data = workshopData()
@@ -159,18 +232,18 @@ export const ONERI_SISTEMI: Lesson<RecFrame> = {
         F.push({ ...base, V: snap(V), epoch: 0, acc: [], line: 10, cap: cap('3000 eğitim, 600 gizli beğeni', '3000 for training, 600 hidden likes'), hold: 1.6 })
         F.push({ ...base, V: snap(V), epoch: 0, acc: [], line: 13, cap: cap(`her öğrenciye ve projeye ${K} rastgele küçük sayı`, `${K} small random numbers for every student and project`), stat: cap(`başlangıç: gizli beğenilerde ${pct(a, 'tr')} doğru`, `start: ${pct(a, 'en')} right on hidden likes`), hold: 1.6 })
         const q = data.train[0]
-        F.push({ ...base, V: snap(V), epoch: 0, acc: [], pair: q, line: 16, cap: cap(`öğrenci ${q[0]} · proje ${q[1]}: ${q[2] ? 'beğendi' : 'beğenmedi'}`, `student ${q[0]} · project ${q[1]}: ${q[2] ? 'liked' : 'did not like'}`), stat: cap('olasılık ≈ 0,5 → hata ≈ ' + (q[2] ? '−0,5' : '+0,5'), 'probability ≈ 0.5 → error ≈ ' + (q[2] ? '−0.5' : '+0.5')), hold: 1.6 })
-        F.push({ ...base, V: snap(V), epoch: 0, acc: [], pair: q, line: 17, cap: cap(q[2] ? 'iki ok birbirine doğru itilir' : 'iki ok birbirinden uzağa itilir', q[2] ? 'the two arrows are pushed together' : 'the two arrows are pushed apart'), stat: cap('3000 çiftin her biri için aynı iki satır', 'the same two lines for each of the 3000 pairs'), hold: 1.6 })
+        F.push({ ...base, V: snap(V), epoch: 0, acc: [], pair: q, line: 26, cap: cap(`öğrenci ${q[0]} · proje ${q[1]}: ${q[2] ? 'beğendi' : 'beğenmedi'}`, `student ${q[0]} · project ${q[1]}: ${q[2] ? 'liked' : 'did not like'}`), stat: cap('olasılık ≈ 0,5 → hata ≈ ' + (q[2] ? '−0,5' : '+0,5'), 'probability ≈ 0.5 → error ≈ ' + (q[2] ? '−0.5' : '+0.5')), hold: 1.6 })
+        F.push({ ...base, V: snap(V), epoch: 0, acc: [], pair: q, line: 27, cap: cap(q[2] ? 'iki ok birbirine doğru itilir' : 'iki ok birbirinden uzağa itilir', q[2] ? 'the two arrows are pushed together' : 'the two arrows are pushed apart'), stat: cap('3000 çiftin her biri için aynı iki satır', 'the same two lines for each of the 3000 pairs'), hold: 1.6 })
         return
       }
       accAll.push(a)
       const all = accAll.slice()
       if (e <= 20 || e % every === 0 || e === R) {
-        F.push({ ...base, V: snap(V), epoch: e, acc: all, line: e <= 2 ? 21 : 17, cap: cap(`tur ${e}: gizli beğenilerde doğruluk ${pct(a, 'tr')}`, `round ${e}: ${pct(a, 'en')} of hidden likes right`), stat: best, hold: e <= 2 ? 1.4 : e <= 10 ? 0.6 : 0.35 })
+        F.push({ ...base, V: snap(V), epoch: e, acc: all, line: e <= 2 ? 33 : 27, cap: cap(`tur ${e}: gizli beğenilerde doğruluk ${pct(a, 'tr')}`, `round ${e}: ${pct(a, 'en')} of hidden likes right`), stat: best, hold: e <= 2 ? 1.4 : e <= 10 ? 0.6 : 0.35 })
       }
     })
     const last = F[F.length - 1]
-    F.push({ ...last, top3: res.top3, rand: res.rand, line: 22,
+    F.push({ ...last, top3: res.top3, rand: res.rand, line: 34,
       cap: cap(`${R} tur: ${pct(res.acc[R - 1], 'tr')} doğru (mümkün en iyi ${pct(data.bayes, 'tr')})`, `${R} rounds: ${pct(res.acc[R - 1], 'en')} right (best possible ${pct(data.bayes, 'en')})`),
       stat: cap(`önerilen ilk 3 projede zevke uyan: ${pct(res.top3, 'tr')} · rastgele projede ${pct(res.rand, 'tr')}`, `${pct(res.top3, 'en')} of the top-3 picks suit the taste · random project ${pct(res.rand, 'en')}`), hold: 3 })
     return F

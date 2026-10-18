@@ -2,6 +2,7 @@
 // testte de tarayıcıda da aynı tohumla aynı sonucu verir. Görüntü components/ml/projeler/scenes/<slug>.ts'te; oynatıcı her karede
 // `run.step(perFrame × hız)` çağırır, sonra sahne `run.view`'u okuyup çizer.
 import type { Bi, Cap, CodeLine, ParamDef } from '../core'
+import type { EgitimRaporu } from '../egitim/rapor'
 
 /** Canlı ölçüm kutusu: başlık ve iki dilli değer (sayılar dile göre biçimlenmiş). */
 export interface Metric { label: Bi; value: Cap; tone?: 'good' | 'bad' }
@@ -20,6 +21,8 @@ export interface ProjectRun<V = unknown> {
   metrics(): Metric[]
   curves?(): Curve[]
   table?(): Table | null
+  /** Eğitim paneli için o ana kadarki gerçek geçmiş ve ölçümler (lib/ml/egitim/rapor.ts). Oynatıcı kısıtlı aralıklarla çağırır. */
+  report?(): EgitimRaporu
   /** Hedefe ulaşıldı ya da eğitim bitti: oynatıcı kendiliğinden durur. */
   done(): boolean
 }

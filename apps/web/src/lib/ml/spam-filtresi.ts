@@ -3,6 +3,8 @@
 // normal postada kaç kez geçtiği sayılır, +1 eklenir, iki oranın logaritması kelimenin puanıdır; e-postanın puanı kelimelerin toplamı.
 // Kelimeler dizinle tutulur; Türkçe ve İngilizce sözlük aynı sırada olduğu için iki dilde de model ve sayılar birebir aynıdır.
 import { cap, fmt, rng, type Frame, type Lesson, shifted } from './core'
+import { B, ogrenmeEgrisi, siniflandirmaBlok, type EgitimRaporu } from './egitim/rapor'
+import { accuracy } from './egitim/metrics'
 
 /** [Türkçe, İngilizce] kelime çiftleri; dört grup: spam, kişisel, bülten, nötr. */
 const SP: Array<[string, string]> = [['hemen', 'now'], ['tıkla', 'click'], ['ücretsiz', 'free'], ['kazan', 'win'], ['ödül', 'prize'], ['şimdi', 'instantly'], ['bedava', 'bonus'], ['tebrikler', 'congratulations'], ['onayla', 'confirm'], ['kredi', 'loan'], ['şans', 'lucky'], ['hediye', 'gift'], ['link', 'link'], ['kazandın', 'won'], ['acil', 'urgent']]
@@ -69,6 +71,48 @@ export function evaluate(M: SpamModel, test: Mail[], t = 0) {
   return { by, ok, n: test.length, acc: ok / test.length }
 }
 
+/**
+ * Eğitim raporu: öğrenme eğrisi (ilk 50, 100, … 300 e-postayla sayılan model; eğitim ve test doğruluğu), tam modelin 100 test
+ * e-postasında karışıklık matrisi, e-posta puanıyla (log oran toplamı) ROC ve kesinlik–duyarlılık, tür başına doğruluk ve en
+ * güçlü kelime puanları. Eşik dersin "spam eşiği" parametresidir.
+ */
+export function spamReport({ esik = 0 }: Record<string, number>): EgitimRaporu {
+  const all = inbox(), train = all.slice(0, 300), test = all.slice(300)
+  const yOf = (S: Mail[]) => S.map((m) => (m.spam ? 1 : 0))
+  const predOf = (M: SpamModel, S: Mail[]) => S.map((m) => (isSpam(M, m.w, esik) ? 1 : 0))
+  const h = { n_train: [] as number[], train_acc: [] as number[], test_acc: [] as number[] }
+  for (let n = 50; n <= 300; n += 50) {
+    const M = fitSpam(train.slice(0, n))
+    h.n_train.push(n); h.train_acc.push(accuracy(yOf(train.slice(0, n)), predOf(M, train.slice(0, n)))); h.test_acc.push(accuracy(yOf(test), predOf(M, test)))
+  }
+  const M = fitSpam(train)
+  const blk = siniflandirmaBlok({
+    y: yOf(test), pred: predOf(M, test), scores: test.map((m) => mailScore(M, m.w)), threshold: esik,
+    labels: ['normal', 'spam'], pos: B('spam', 'spam'), neg: B('normal', 'normal'), prefix: 'test_', title: B('test', 'test'),
+  })
+  const ev = evaluate(M, test, esik)
+  const ws = WORDS.map((_, i) => [i, wordScore(M, i)] as const).filter((x): x is readonly [number, number] => x[1] !== null).sort((a, b) => b[1] - a[1])
+  const strong = [...ws.slice(0, 6), ...ws.slice(-6)]
+  const trAcc = h.train_acc.at(-1)!
+  return {
+    kind: 'siniflandirma', model: 'multinomial naive Bayes (+1 ekleme)', seed: 16, hyper: { esik, train: 300, test: 100, vocab: M.V },
+    history: { x: 'n_train', cols: h },
+    final: [
+      { key: 'train_acc', label: B('eğitim doğruluğu', 'training accuracy'), value: trAcc, fmt: 'pct' },
+      ...blk.final,
+      { key: 'gap', label: B('eğitim − test farkı', 'train − test gap'), value: trAcc - h.test_acc.at(-1)!, fmt: 3 },
+    ],
+    confusion: blk.confusion,
+    scores: blk.scores,
+    charts: [
+      ogrenmeEgrisi(h.n_train, h.train_acc, h.test_acc, B('doğruluk', 'accuracy'), { yMin: 0.5, yMax: 1 }),
+      { kind: 'bar', id: 'by-kind', title: B('Tür başına test doğruluğu', 'Test accuracy by kind'), labels: KIND_NAMES.map((k) => k[0]), yMin: 0, yMax: 1, series: [{ key: 'acc', label: B('doğruluk', 'accuracy'), values: ev.by.map(([a, n]) => (n ? a / n : NaN)), tone: 3 }] },
+      { kind: 'bar', id: 'word-scores', title: B('En güçlü kelime puanları (log oran)', 'Strongest word scores (log ratio)'), labels: strong.map(([i]) => WORDS[i][0]), series: [{ key: 'score', label: B('puan', 'score'), values: strong.map(([, v]) => v), tone: 0 }] },
+      ...blk.charts,
+    ],
+  }
+}
+
 export interface SpamFrame extends Frame {
   view: 'inbox' | 'counts' | 'smooth' | 'scores' | 'mail' | 'test'
   /** Gelen kutusu: her e-postanın türü ve eğitimde mi. */
@@ -124,8 +168,31 @@ export const SPAM_FILTRESI: Lesson<SpamFrame> = {
     ['    return sum(puan(k) for k in kelimeler if k in sozluk) > esik', 'eşiğin üstü spam', 'above the threshold is spam'],
     ['dogru = sum(spam_mi(k) == s for k, s in test)'],
     ['print(dogru, "/", len(test))'],
+    ['history = {\'n_train\': [], \'train_acc\': [], \'test_acc\': []}', 'öğrenme eğrisi: 50, 100, … 300 e-posta', 'learning curve: 50, 100, … 300 e-mails'],
+    ['for n in range(50, 301, 50):'],
+    ['    sayac = {True: Counter(), False: Counter()}', 'yalnız ilk n e-postayla yeniden say', 'recount with the first n e-mails only'],
+    ['    for kelimeler, spam in egitim[:n]: sayac[spam].update(kelimeler)'],
+    ['    sozluk = set(sayac[True]) | set(sayac[False])'],
+    ['    toplam = {s: sum(c.values()) + len(sozluk) for s, c in sayac.items()}'],
+    ['    basari = lambda kume: sum(spam_mi(k) == s for k, s in kume) / len(kume)'],
+    ['    for k, v in zip(history, (n, basari(egitim[:n]), basari(test))): history[k].append(float(v))', 'son turda n = 300: tam model', 'last round n = 300: the full model'],
+    ['skor = [sum(puan(k) for k in kel if k in sozluk) for kel, _ in test]', 'e-posta puanları (ROC için)', 'e-mail scores (for ROC)'],
+    ['tp = sum(p > 0 and s for p, (_, s) in zip(skor, test)); fp = sum(p > 0 and not s for p, (_, s) in zip(skor, test))'],
+    ['fn = sum(p <= 0 and s for p, (_, s) in zip(skor, test))'],
+    ['for k, v in [(\'test_acc\', history[\'test_acc\'][-1]), (\'precision\', tp / max(tp + fp, 1)), (\'recall\', tp / max(tp + fn, 1))]:', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{k:<10}{v:>10.4f}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir eğitim büyüklüğü', 'one row per training size'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for k in (\'train_acc\', \'test_acc\'): plt.plot(history[\'n_train\'], history[k], marker=\'o\', label=k)'],
+    ['    plt.xlabel(\'n_train\'); plt.ylabel(\'accuracy\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [{ key: 'esik', label: { tr: 'Spam eşiği', en: 'Spam threshold' }, min: -6, max: 3, step: 0.5, value: 0 }],
+  report: spamReport,
   run({ esik = 0 }) {
     const all = inbox()
     const nTrain = 300

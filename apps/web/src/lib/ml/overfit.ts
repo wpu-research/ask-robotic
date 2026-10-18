@@ -1,6 +1,8 @@
 // Ders 2: aşırı öğrenme ve doğrulama. Sharp IR mesafe sensörü: gerilim uzaklıkla ters orantılı (V ≈ 26/d). 15 eğitim ve 30
 // doğrulama ölçümüne 1'den 12'ye kadar dereceli polinom uydurulur; eğitim hatası hep düşer, doğrulama hatası önce düşer sonra yükselir.
 import { cap, fmt, gauss, mean, rng, type Frame, type Lesson, shifted } from './core'
+import { B, gecmisGrafik, regresyonBlok, type EgitimRaporu } from './egitim/rapor'
+import { bestIndex } from './egitim/metrics'
 
 export interface OverfitFrame extends Frame {
   d: number[]; v: number[]; dt: number[]; vt: number[]
@@ -77,6 +79,55 @@ export function adamFit(D: ReturnType<typeof sharpData>, deg = 12, steps = 20000
   return { snaps, best }
 }
 
+/**
+ * Eğitim paneli: derece 1…12 için eğitim ve doğrulama hatası (aynı polyfit), aşırı öğrenme boşluğu (doğrulama − eğitim), derece 12'nin
+ * Adam eğitimi (erken durdurma eğrisi) ve seçilen derecenin doğrulama artıkları. Parametre yalnız sahnede gösterilen dereceyi sınırlar;
+ * panel her zaman 12 dereceyi de hesaplar (Python koduyla aynı tablo).
+ */
+export function overfitReport(): EgitimRaporu {
+  const D = sharpData()
+  const degree: number[] = [], tr: number[] = [], va: number[] = [], gap: number[] = []
+  for (let deg = 1; deg <= 12; deg++) {
+    const c = polyfit(D.d, D.v, deg)
+    degree.push(deg); tr.push(mse(c, D.d, D.v)); va.push(mse(c, D.dt, D.vt)); gap.push(va.at(-1)! - tr.at(-1)!)
+  }
+  const bi = bestIndex(va), best = bi + 1
+  const G = adamDefault()
+  const r: EgitimRaporu = {
+    kind: 'regresyon', model: B('polinom (en küçük kareler) · derece 12 Adam', 'polynomial (least squares) · degree 12 Adam'), seed: 11, hyper: { train: D.d.length, val: D.dt.length, adam_lr: 0.02, adam_steps: 20000 },
+    history: { x: 'degree', cols: { degree, train_mse: tr, val_mse: va, gap } },
+    final: [], charts: [],
+  }
+  const cb = polyfit(D.d, D.v, best)
+  const blk = regresyonBlok({ y: D.vt, pred: D.dt.map((d) => polyval(cb, d)), x: D.dt, xLabel: B('uzaklık (cm)', 'distance (cm)'), unit: 'V', prefix: 'val_' })
+  r.final = [
+    { key: 'best_degree', label: B('en iyi derece (doğrulama)', 'best degree (validation)'), value: best, fmt: 'int' },
+    { key: 'best_val_mse', label: B('en iyi doğrulama MSE', 'best validation MSE'), value: va[bi], fmt: 5 },
+    { key: 'train_mse_deg12', label: B('derece 12 eğitim MSE', 'degree 12 training MSE'), value: tr[11], fmt: 5 },
+    { key: 'val_mse_deg12', label: B('derece 12 doğrulama MSE', 'degree 12 validation MSE'), value: va[11], fmt: 5 },
+    { key: 'gap_deg12', label: B('aşırı öğrenme boşluğu (derece 12)', 'overfitting gap (degree 12)'), value: gap[11], fmt: 5 },
+    { key: 'early_stop_pass', label: B('erken durdurma geçişi', 'early-stopping pass'), value: G.best.step, fmt: 'int' },
+    { key: 'early_stop_val_mse', label: B('erken durdurmada doğrulama MSE', 'validation MSE at early stop'), value: G.best.test, fmt: 5 },
+    ...blk.final.filter((f) => f.key === 'val_r2'),
+  ]
+  const lg = GD_STEPS.map((s) => Math.log10(s))
+  r.charts = [
+    gecmisGrafik(r, 'deg', B('Hata – derece: eğitim ve doğrulama', 'Error vs degree: training and validation'), [['train_mse', B('eğitim', 'train'), 1], ['val_mse', B('doğrulama', 'validation'), 0, true]], { logY: true, xLabel: B('polinom derecesi', 'polynomial degree'), yLabel: B('MSE (V²)', 'MSE (V²)'), marker: { x: best, label: B(`en iyi: ${best}`, `best: ${best}`) }, live: false }),
+    gecmisGrafik(r, 'gap', B('Aşırı öğrenme boşluğu (doğrulama − eğitim)', 'Overfitting gap (validation − training)'), [['gap', B('boşluk', 'gap'), 5]], { logY: true, xLabel: B('polinom derecesi', 'polynomial degree'), live: false }),
+    {
+      kind: 'line', id: 'early-stop', title: B('Derece 12, Adam: erken durdurma', 'Degree 12, Adam: early stopping'), x: lg, xLabel: B('log₁₀ geçiş', 'log₁₀ pass'), yLabel: B('MSE (V²)', 'MSE (V²)'), logY: true,
+      series: [{ key: 'train', label: B('eğitim', 'train'), values: G.snaps.map((q) => q.train), tone: 1 }, { key: 'val', label: B('doğrulama', 'validation'), values: G.snaps.map((q) => q.test), tone: 0, dash: true }],
+      marker: { x: Math.log10(G.best.step), label: B(`dur: ${G.best.step}`, `stop: ${G.best.step}`) },
+    },
+    ...blk.charts,
+  ]
+  return r
+}
+
+/** Varsayılan verideki derece 12 Adam eğitimi bir kez hesaplanır (sahne ve eğitim paneli aynı sonucu kullanır; ~300 ms). */
+let ADAM: ReturnType<typeof adamFit> | null = null
+export const adamDefault = () => (ADAM ??= adamFit(sharpData()))
+
 export const OVERFIT: Lesson<OverfitFrame> = {
   slug: 'asiri-ogrenme',
   n: 2,
@@ -104,11 +155,13 @@ export const OVERFIT: Lesson<OverfitFrame> = {
     ['D = np.genfromtxt(\'sharp-ir.csv\', delimiter=\',\', names=True)', '15 eğitim, 30 doğrulama ölçümü', '15 training, 30 validation measurements'],
     ['d, v, d_val, v_val = [D[c][D[\'grup\'] == g] for g in (0, 1) for c in (\'uzaklik\', \'gerilim\')]', 'grup 0 eğitim, 1 doğrulama', 'group 0 training, 1 validation'],
     ['x, x_val = (d - 45) / 35, (d_val - 45) / 35', '[-1, 1] aralığına ölçekle', 'scale to [-1, 1]'],
+    ['history = {\'degree\': [], \'train_mse\': [], \'val_mse\': [], \'gap\': []}', 'derece başına geçmiş', 'history per degree'],
     ['for deg in range(1, 13):'],
     ['    c = np.polyfit(x, v, deg)', 'en küçük kareler', 'least squares'],
     ['    train = ((np.polyval(c, x) - v) ** 2).mean()', 'eğitim hatası', 'training error'],
     ['    val = ((np.polyval(c, x_val) - v_val) ** 2).mean()', 'doğrulama hatası', 'validation error'],
     ['    print(deg, train, val)'],
+    ['    for k, q in zip(history, (deg, train, val, val - train)): history[k].append(float(q))', 'boşluk: aşırı öğrenme göstergesi', 'gap: the overfitting indicator'],
     ['A, A_val = np.vander(x, 13), np.vander(x_val, 13)', 'erken durdurma: derece 12, adım adım', 'early stopping: degree 12, step by step'],
     ['w, m, s, best = np.zeros(13), np.zeros(13), np.zeros(13), (1e9, 0, None)'],
     ['for t in range(1, 20001):'],
@@ -118,8 +171,21 @@ export const OVERFIT: Lesson<OverfitFrame> = {
     ['    val = ((A_val @ w - v_val) ** 2).mean()'],
     ['    if val < best[0]: best = (val, t, w.copy())', 'en iyi geçişi sakla', 'keep the best pass'],
     ['w = best[2]; print("en iyi geçiş", best[1], best[0])', 'erken durdurma: en iyi geçişe dön', 'early stopping: go back to the best pass'],
+    ['k = int(np.argmin(history[\'val_mse\']))', 'en iyi derece', 'best degree'],
+    ['for name, v in [(\'best_degree\', k + 1), (\'best_val_mse\', history[\'val_mse\'][k]), (\'gap_deg12\', history[\'gap\'][-1]), (\'early_stop_pass\', best[1])]:', 'son ölçümler tablosu', 'final metrics table'],
+    ['    print(f\'{name:<16}{v:>12.6g}\')'],
+    ['import csv'],
+    ['with open(\'egitim_gecmisi.csv\', \'w\', newline=\'\') as f:', 'geçmişi CSV\'ye yaz', 'write the history to CSV'],
+    ['    csv.writer(f).writerows([list(history), *zip(*history.values())])', 'satır başına bir derece', 'one row per degree'],
+    ['try:'],
+    ['    import matplotlib.pyplot as plt', 'varsa grafik çiz', 'plot if available'],
+    ['    for c in (\'train_mse\', \'val_mse\'): plt.plot(history[\'degree\'], history[c], \'o-\', label=c)'],
+    ['    plt.xlabel(\'degree\'); plt.ylabel(\'MSE\'); plt.yscale(\'log\'); plt.legend(); plt.show()'],
+    ['except ImportError:'],
+    ['    print(\'matplotlib yok: grafik atlandı\')'],
   ],
   params: [{ key: 'deg', label: { tr: 'Son gösterilecek derece', en: 'Show up to degree' }, min: 1, max: 12, step: 1, value: 12 }],
+  report: overfitReport,
   run({ deg: maxDeg = 12 }) {
     const D = sharpData()
     const F: OverfitFrame[] = []
@@ -143,7 +209,7 @@ export const OVERFIT: Lesson<OverfitFrame> = {
       stat: cap(`doğrulama hatası en küçük · eğitime göre seçseydik: ${train.length}`, `smallest validation error · picking by training error: ${train.length}`), hold: 3,
     })
     // erken durdurma: derece 12, Adam ile adım adım
-    const G = adamFit(D)
+    const G = adamDefault()
     const gtr: number[] = [], gte: number[] = []
     const e3 = (x: number, lang: 'tr' | 'en') => fmt(x * 1000, 2, lang)
     G.snaps.forEach((s, i) => {
@@ -164,5 +230,6 @@ export const OVERFIT: Lesson<OverfitFrame> = {
     return F
   },
 }
-// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
-OVERFIT.run = shifted(OVERFIT.run, 1, 1)
+// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar. Sonra eğitim geçmişi için iki satır daha
+// eklendi (döngüden önce `history`, print'ten sonra kayıt).
+OVERFIT.run = shifted(shifted(shifted(OVERFIT.run, 1, 1), 3, 1), 9, 1)
