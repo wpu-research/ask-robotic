@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { SIM_META } from '@/components/robotik/sim-meta'
+import { InstructorCard } from '@/components/egitmen/instructor-card'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
 import { COURSE, WEEKS } from '@/lib/robotik/course'
@@ -31,6 +32,8 @@ export default async function Robotik() {
           </p>
         </div>
       </header>
+
+      <InstructorCard slug="murat-arslan" />
 
       <section aria-labelledby="rb-plan">
         <h2 id="rb-plan">{en ? 'Weekly plan' : 'Haftalık plan'}</h2>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { InstructorCard } from '@/components/egitmen/instructor-card'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
 import { ENG_PARTS, LEVELS, labHref, levelText, partText, partsOfLevel } from '@/lib/muhendislik/catalog'
@@ -40,6 +41,8 @@ export default async function Muhendislik() {
         </span>
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
+
+      <InstructorCard slug="murat-arslan" labelKey="instructor.eyebrow" />
 
       <section aria-labelledby="eng-levels">
         <h2 id="eng-levels" className="sr-only">{en ? 'Levels' : 'Seviyeler'}</h2>
