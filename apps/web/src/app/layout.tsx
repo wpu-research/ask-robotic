@@ -14,14 +14,18 @@ import { getLocale, getT } from '@/i18n/server'
 import type { Metadata } from 'next'
 import { Poppins } from 'next/font/google'
 
+import { SITE_URL } from '@/lib/site'
+
 // Macademia ile aynı yazı tipi; Türkçe karakterler için latin-ext.
 const poppins = Poppins({ subsets: ['latin', 'latin-ext'], weight: ['400', '500', '600', '700', '800'], variable: '--font-sans', display: 'swap' })
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT()
   return {
+    metadataBase: new URL(SITE_URL),
     title: { default: 'MacademiaX', template: '%s · MacademiaX' },
     description: t('common.metaDescription'),
+    openGraph: { type: 'website', siteName: 'MacademiaX', url: SITE_URL, locale: 'tr_TR' },
   }
 }
 

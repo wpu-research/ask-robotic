@@ -14,7 +14,7 @@ export async function GET() {
   return new Response(JSON.stringify(data, null, 2), {
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'content-disposition': `attachment; filename="ask-robotic-verilerim-${day}.json"`,
+      'content-disposition': `attachment; filename="macademiax-verilerim-${day}.json"`,
       'cache-control': 'no-store',
     },
   })

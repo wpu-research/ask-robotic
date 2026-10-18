@@ -55,7 +55,7 @@ export function buildTtsRequest(p: TtsProviderName, text: string, locale: TtsLoc
             'Ocp-Apim-Subscription-Key': env('AZURE_SPEECH_KEY')!,
             'Content-Type': 'application/ssml+xml',
             'X-Microsoft-OutputFormat': 'audio-24khz-48kbitrate-mono-mp3',
-            'User-Agent': 'ask-robotic',
+            'User-Agent': 'macademiax',
           },
           body: `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${lang}"><voice name="${xmlEscape(voice)}"><prosody rate="-5%">${xmlEscape(text)}</prosody></voice></speak>`,
         },
