@@ -243,7 +243,7 @@ def extract(text: str, tries: int = 2) -> dict:
                      {"role": "user", "content": "${t('Şu hataları düzelt', 'Fix these errors')}: " + "; ".join(errors)}]
     raise ValueError("${t('geçerli kayıt alınamadı', 'no valid record obtained')}")
 
-print(extract("${t('Gömülü Sistemler: proje 12. haftanın cuma günü 17.00\\'de teslim.', 'Embedded Systems: project due Friday of week 12 at 17.00.')}"))`,
+print(extract("${t('Gömülü Sistemler: proje 12. haftanın cuma günü 17.00\'de teslim.', 'Embedded Systems: project due Friday of week 12 at 17.00.')}"))`,
   }
 }
 
@@ -364,7 +364,7 @@ function rerank(question, candidates, alpha = 0.7) {
     .sort((a, b) => b.final - a.final)
 }
 
-const note = '${t('Dönem projesi 12. haftanın cuma günü saat 17.00\\'ye kadar teslim edilir. Geç teslimde her gün için yüzde 10 kesilir.', 'The term project is due on Friday of week 12 at 17.00. Late submissions lose 10 percent per day.')}'
+const note = "${t('Dönem projesi 12. haftanın cuma günü saat 17.00\'ye kadar teslim edilir. Geç teslimde her gün için yüzde 10 kesilir.', 'The term project is due on Friday of week 12 at 17.00. Late submissions lose 10 percent per day.')}"
 console.log(chunkWords(note, 8, 2))
 console.log(rerank('${t('proje ne zaman teslim edilir', 'when is the project due')}', [
   { id: 'kurallar#0', score: 0.52, text: note },
