@@ -122,7 +122,7 @@ from collections import Counter
 def normalize(text: str) -> str:
     text = text.replace("I", "ı").replace("İ", "i").lower()  # ${t('Türkçe büyük-küçük harf', 'Turkish casing')}
     text = unicodedata.normalize("NFKC", text)
-    text = re.sub(r"[^\\w\\s%.,]", " ", text)  # ${t('noktalama gürültüsünü at', 'drop punctuation noise')}
+    text = re.sub(r"\\[[^\\]]*\\]|[^\\w\\s%.,]|(?<!\\d)[.,]|[.,](?!\\d)", " ", text)  # ${t('kaynak etiketini ve noktalamayı at, ondalığı koru', 'drop source tags and punctuation, keep decimals')}
     return " ".join(text.split())
 
 def exact_match(pred: str, gold: str) -> int:
