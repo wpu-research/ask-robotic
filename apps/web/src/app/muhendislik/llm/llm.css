@@ -1,0 +1,73 @@
+/* LLM dersi: ESOF 323 (robotik.css) ve Drone (drone.css) üstüne simülasyon gösterim parçaları. Aynı jetonlar. */
+.lm-stage { display: grid; gap: 12px; min-width: 0; }
+.lm-box { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; background: var(--surface-2); min-width: 0; }
+.lm-box h4 { margin: 0 0 8px; font-size: .85rem; color: var(--muted); font-weight: 700; }
+.lm-pre { margin: 0; font: .76rem/1.55 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 320px; overflow: auto; }
+.lm-ta, .lm-in { font: inherit; font-size: .88rem; width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); color: var(--text); min-height: 44px; }
+.lm-ta { resize: vertical; }
+.lm-code { font: .76rem/1.5 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; }
+.lm-two { display: grid; gap: 12px; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+@media (max-width: 700px) { .lm-two { grid-template-columns: minmax(0, 1fr); } }
+
+.lm-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.lm-chip { font: .82rem ui-monospace, Menlo, Consolas, monospace; padding: 3px 6px; border-radius: 6px; border: 1px solid var(--border); }
+.lm-chip.c0 { background: color-mix(in srgb, var(--sim-a) 18%, transparent); }
+.lm-chip.c1 { background: color-mix(in srgb, var(--gold) 20%, transparent); }
+.lm-chip.c2 { background: color-mix(in srgb, var(--sky) 18%, transparent); }
+.lm-chip.c3 { background: color-mix(in srgb, var(--red) 15%, transparent); }
+.lm-chip.c4 { background: color-mix(in srgb, var(--green) 18%, transparent); }
+.lm-chip.c5 { background: color-mix(in srgb, var(--mute) 18%, transparent); }
+.lm-merges { margin: 0; padding-left: 2.6em; font: .78rem/1.6 ui-monospace, Menlo, Consolas, monospace; columns: 2 200px; }
+
+.lm-legend { list-style: none; margin: 0; padding: 0; display: grid; gap: 3px; font-size: .78rem; }
+.lm-legend li { display: flex; gap: 6px; align-items: center; }
+.lm-dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+
+.lm-sections { display: grid; gap: 6px; }
+.lm-sec { border-left: 4px solid var(--mute); border-radius: 0 8px 8px 0; padding: 6px 10px; background: var(--surface-2); min-width: 0; }
+.lm-sec small { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.lm-sec pre { margin: 2px 0 0; font: .8rem/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+.lm-sec.k-rol { border-color: var(--sky); } .lm-sec.k-gorev { border-color: var(--sim-a); } .lm-sec.k-kural { border-color: var(--red); }
+.lm-sec.k-ornek { border-color: var(--gold); } .lm-sec.k-adim { border-color: var(--green); } .lm-sec.k-veri { border-color: var(--mute); }
+.lm-sec.k-bicim { border-color: #7c3aed; } .lm-sec.k-belirsiz { border-color: #db2777; }
+.lm-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; font-size: .84rem; }
+.lm-checks .ok { color: var(--green); } .lm-checks .no { color: var(--red); }
+
+.lm-pipe { margin: 0; padding-left: 1.4em; font-size: .86rem; display: grid; gap: 2px; }
+.lm-table { font-size: .8rem; }
+.lm-table td.ok { color: var(--green); font-weight: 700; } .lm-table td.no { color: var(--red); font-weight: 700; }
+.lm-table tr.on td:first-child { font-weight: 700; color: var(--sim-a); }
+.lm-snip { color: var(--muted); min-width: 180px; }
+.lm-answer { border: 1px solid var(--border); border-left: 4px solid var(--mute); border-radius: 0 8px 8px 0; padding: 8px 12px; background: var(--surface-2); }
+.lm-answer.ok { border-left-color: var(--green); } .lm-answer.no { border-left-color: var(--gold); }
+.lm-answer small { font-size: .74rem; font-weight: 700; color: var(--muted); }
+.lm-answer p { margin: 4px 0 0; }
+.lm-details summary { cursor: pointer; font-weight: 700; font-size: .86rem; min-height: 44px; display: flex; align-items: center; }
+
+.lm-task { margin: 0; font-weight: 700; }
+.lm-timeline { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+.lm-timeline li { border: 1px solid var(--border); border-left: 4px solid var(--green); border-radius: 0 8px 8px 0; padding: 8px 10px; background: var(--surface-2); display: grid; gap: 4px; font-size: .86rem; min-width: 0; }
+.lm-timeline li.no { border-left-color: var(--red); }
+.lm-timeline code { font-size: .78rem; overflow-wrap: anywhere; color: var(--sim-a); }
+.lm-obs { color: var(--muted); overflow-wrap: anywhere; }
+
+.lm-masked { margin: 0; line-height: 1.7; overflow-wrap: anywhere; }
+.lm-masked mark { background: color-mix(in srgb, var(--gold) 35%, transparent); color: inherit; border-radius: 4px; padding: 0 2px; }
+
+.lm-bars { display: grid; gap: 8px; }
+.lm-bar { display: grid; grid-template-columns: minmax(0, 11em) minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .82rem; }
+.lm-bar i { display: block; height: 14px; border-radius: 4px; }
+.lm-bar b { font-variant-numeric: tabular-nums; }
+.lm-bar .b0 { background: var(--mute); } .lm-bar .b1 { background: var(--sim-a); } .lm-bar .b2 { background: var(--gold); } .lm-bar .b3 { background: var(--green); }
+@media (max-width: 520px) { .lm-bar { grid-template-columns: minmax(0, 1fr) auto; } .lm-bar i { grid-column: 1 / -1; grid-row: 2; } }
+
+.lm-chat { display: grid; gap: 8px; min-height: 120px; }
+.lm-msg { max-width: 85%; padding: 8px 12px; border-radius: 12px; font-size: .9rem; line-height: 1.55; overflow-wrap: anywhere; }
+.lm-msg.u { justify-self: end; background: var(--primary); color: var(--primary-ink); }
+.lm-msg.a { justify-self: start; background: var(--surface-2); border: 1px solid var(--border); min-height: 1.6em; }
+.lm-msg.a.cut::after { content: ' ⏹'; color: var(--muted); }
+.lm-stage .readout.log { max-height: 220px; overflow: auto; }
+
+/* Ders sayfaları */
+.lm-teach { margin: 10px 0 0; padding: 10px 12px; border-left: 3px solid var(--gold); background: color-mix(in srgb, var(--gold) 10%, transparent); border-radius: 0 8px 8px 0; font-size: .9rem; }
+.lm-root .rb-sim input[type=text] { min-height: 44px; }
