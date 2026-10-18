@@ -95,6 +95,7 @@ const bl = (type: string, cat: CatKey, label: string, call: string, args: Arg[] 
 
 const SIDE_OPTS: [string, string][] = [['sol', 'left'], ['sağ', 'right']]
 export const FLOOR_OPTS: [string, string][] = [['siyah', 'siyah'], ['beyaz', 'beyaz'], ['kırmızı', 'kirmizi'], ['yeşil', 'yesil'], ['mavi', 'mavi'], ['sarı', 'sari']]
+const CUBE_OPTS: [string, string][] = [['kırmızı', 'kirmizi'], ['yeşil', 'yesil'], ['mavi', 'mavi'], ['sarı', 'sari']]
 export const LIGHT_OPTS: [string, string][] = [['kırmızı', 'kirmizi'], ['yeşil', 'yesil'], ['mavi', 'mavi'], ['sarı', 'sari'], ['beyaz', 'beyaz'], ['kapalı', 'kapali']]
 
 export const SPECS: Spec[] = [
@@ -113,6 +114,9 @@ export const SPECS: Spec[] = [
   val('rb_motor_deg', 'robot', '{SIDE} motor açısı (°)', 'robot.motorAngle', [drop('SIDE', SIDE_OPTS, 'left')], { tip: 'Tekerleğin döndüğü toplam açı.' }),
   val('rb_heading', 'robot', 'dönüş açısı (°)', 'robot.heading', [], { tip: 'Başlangıçtan bu yana ne kadar döndüğü; sola artı, sağa eksi.' }),
   st('rb_reset', 'robot', 'açıları sıfırla', 'robot.resetAngles', [], { tip: 'Motor açılarını ve dönüş açısını sıfırlar.' }),
+  st('rb_grip', 'robot', 'kıskacı {ACTION}', 'robot.grip', [drop('ACTION', [['kapat', 'close'], ['aç', 'open']], 'close')], { sensor: 'gripper', tip: 'Kapatınca önündeki küpü tutar; açınca bırakır.' }),
+  bl('rb_holding', 'robot', 'kıskaç küp tutuyor mu?', 'robot.holding', [], { sensor: 'gripper' }),
+  bl('rb_held_is', 'robot', 'tutulan küp {C} mi?', 'robot.heldIs', [drop('C', CUBE_OPTS, 'kirmizi')], { sensor: 'gripper', tip: 'Kıskaçtaki renk algılayıcı küpün rengini okur.' }),
   st('rb_lights', 'robot', 'ışıkları {COLOR} yap', 'robot.setLights', [drop('COLOR', LIGHT_OPTS, 'yesil')]),
 
   // ---- Temel ----

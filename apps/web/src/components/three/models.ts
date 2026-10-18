@@ -59,6 +59,8 @@ export interface MobileModel {
   servoHead?: THREE.Group
   lineDots?: THREE.Mesh[]
   bumpers?: [THREE.Mesh, THREE.Mesh]
+  /** Kıskaçlı gövde: parmakları açar/kapatır. */
+  setGrip?(closed: boolean): void
 }
 
 /** Blok Robotu: sarı yapı parçası gövde, üstte Mikro Kart, önde mesafe sensörü ve tampon, altta renk sensörü. */
@@ -94,6 +96,22 @@ export function makeBlokRobot(wheelBase: number, wheelDiameter: number): MobileM
   return {
     group, wheelL, wheelR, card, bumper,
     setLights(css) { statusMat.color.set(css ?? '#475569'); statusMat.emissive.set(css ?? '#000000') },
+  }
+}
+
+/** Kıskaçlı Robot: Blok Robotu gövdesi, tampon yerine önde iki parmaklı kıskaç. */
+export function makeKiskacRobot(wheelBase: number, wheelDiameter: number): MobileModel {
+  const m = makeBlokRobot(wheelBase, wheelDiameter)
+  const r = wheelDiameter / 2
+  m.bumper?.removeFromParent()
+  m.group.children.forEach((c) => { if ((c as THREE.Mesh).isMesh && c !== m.bumper) { const mat = (c as THREE.Mesh).material as THREE.MeshStandardMaterial; if (mat?.color?.getHex() === 0xfacc15) mat.color.set(0xfb923c) } })
+  const jawMat = std(0x475569, { metalness: 0.4 })
+  m.group.add(mesh(new THREE.BoxGeometry(0.012, 0.02, 0.07), jawMat, [0.078, r + 0.005, 0]))
+  const fingers = [-1, 1].map((s) => mesh(new THREE.BoxGeometry(0.05, 0.022, 0.006), jawMat, [0.105, r - 0.005, s * 0.03]))
+  m.group.add(...fingers)
+  return {
+    ...m, bumper: undefined,
+    setGrip(closed) { fingers.forEach((f, i) => { f.position.z = (i ? 1 : -1) * (closed ? 0.024 : 0.034) }) },
   }
 }
 

@@ -19,6 +19,10 @@ export const mikro: typeof Tr = {
     skillSub: '{robot} · {s} s · scored',
     sensorsBlok: 'distance · color · bumper',
     sensorsGezgin: 'distance · two line sensors',
+    sensorsKiskac: 'distance · color · gripper',
+    chapterProgress: '{done}/{n} done',
+    notesTitle: 'Notes for teachers and parents',
+    notesIntro: 'The concept your child learns in each chapter:',
     freeName: '{robot} free play',
   },
   skill: {
@@ -99,6 +103,9 @@ export const mikro: typeof Tr = {
     path: 'path',
     collisions: '{n|# crash|# crashes}',
     noCollisions: 'no crashes',
+    gripper: 'gripper',
+    gripOpen: 'open',
+    gripClosed: 'closed',
     topView: '{scene}: {robot} top view',
   },
   sim: {

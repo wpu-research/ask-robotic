@@ -21,9 +21,9 @@ Saf TypeScript (Blockly ve React hariç): Node'da başsız çalışır, Vitest i
 | `examples.ts` | Serbest atölye örnek galerisi (12 proje) |
 | `storage.ts` | localStorage (`ask:mikro:project:v1`) + JSON içe/dışa aktarma ve doğrulama |
 | `program.ts` | Blok kurucu (`b`, `onStart`, `onButton`, `project`...) ve dolaşma yardımcıları |
-| `robot.ts` | Robot gövdesi (`DriveBase`): pinsiz diferansiyel sürüş, Blok Robotu / Mini Gezgin profilleri, mesafe, renk, çizgi, tampon sensörleri |
+| `robot.ts` | Robot gövdesi (`DriveBase`): pinsiz diferansiyel sürüş, Blok Robotu / Mini Gezgin / Kıskaçlı Robot profilleri, mesafe, renk, çizgi, tampon sensörleri, kıskaç; itilebilen ve taşınabilen küpler (`objects`), bölge giriş anları (`visitedAt`) |
 | `robot-ops.ts` | `rb_*` blok işleyicileri (sensör okuması 1 ms sürer; sensör yoklayan döngü zamanı ilerletir) |
-| `robot-missions.ts` | Robot Atölyesi görevleri ve sahneleri; `evaluateMission` (sayfa: `app/robot-atolyesi`) |
+| `robot-missions.ts` | Robot Atölyesi görevleri, bölümleri (`MISSION_CHAPTERS`: Başlangıç / Sensörler / Algoritmalar / Yarışma, öğretmen-veli notlarıyla) ve sahneleri; `evaluateMission` (sayfa: `app/robot-atolyesi`) |
 | `font.ts`, `icons.ts`, `music.ts`, `messages.ts`, `audio.ts` | 5x5 yazı tipi, simgeler/oklar, notalar/ezgiler, Türkçe Blockly metinleri, WebAudio |
 
 Arayüz: `components/mikro/` (`MikroEditor`, `BlocklyPane`, `Board`, `SimPanel`), sayfa: `app/mikro-kart/page.tsx`.

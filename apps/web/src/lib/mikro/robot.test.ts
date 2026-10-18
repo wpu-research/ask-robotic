@@ -62,4 +62,45 @@ describe('sürüş tabanı', () => {
     expect(r.motorDegL).toBe(0)
     expect(r.headingDeg).toBe(0)
   })
+
+  it('kıskaç: yakındaki küpü tutar, taşır, bırakır; uzaktakini tutamaz', () => {
+    const r = new DriveBase('kiskac', scene({ objects: [{ id: 'k', x: 0.42, y: 0.5, color: 'mavi' }, { id: 'u', x: 1.5, y: 0.8, color: 'sari' }] }))
+    expect(r.distanceCm).toBeLessThan(5)
+    r.grip(true)
+    expect(r.held).toBe('k')
+    expect(r.heldColor).toBe('mavi')
+    expect(r.distanceCm).toBeGreaterThan(100)
+    r.move(30); run(r, 4000)
+    expect(r.object('k')!.x).toBeCloseTo(r.x + 0.1, 3)
+    r.grip(false)
+    expect(r.held).toBeNull()
+    r.move(-20); run(r, 3000, 4000)
+    expect(r.object('k')!.x).toBeGreaterThan(r.x + 0.25)
+    const far = new DriveBase('kiskac', scene({ objects: [{ id: 'k', x: 0.6, y: 0.5, color: 'mavi' }] }))
+    far.grip(true)
+    expect(far.held).toBeNull()
+  })
+
+  it('gövde küpü iter; küp duvara dayanınca robot da durur ve çarpma sayılır', () => {
+    const r = new DriveBase('blok', scene({ objects: [{ id: 'k', x: 0.6, y: 0.5, color: 'kirmizi' }] }))
+    r.setMotors(50, 50)
+    run(r, 12000)
+    const o = r.object('k')!
+    expect(o.x).toBeGreaterThan(1.9)
+    expect(o.x).toBeLessThanOrEqual(2 - o.half + 1e-9)
+    expect(r.x).toBeLessThan(o.x - r.profile.radius)
+    expect(r.collisions).toBe(1)
+  })
+
+  it('bölgelere giriş anı ve ışık-zemin eşleri kaydedilir', () => {
+    const r = new DriveBase('blok', scene({
+      patches: [{ x1: 0.5, y1: 0.4, x2: 0.6, y2: 0.6, color: 'yesil' }],
+      zones: [{ id: 'a', kind: 'checkpoint', x: 0.6, y: 0.5, r: 0.05 }, { id: 'b', kind: 'checkpoint', x: 0.9, y: 0.5, r: 0.05 }],
+    }))
+    r.lights = 'yesil'
+    r.move(70); run(r, 6000)
+    expect(r.visitedAt.get('a')!).toBeLessThan(r.visitedAt.get('b')!)
+    expect(r.colorLights).toEqual(['beyaz:yesil', 'yesil:yesil'])
+    expect(r.timeMs).toBeGreaterThan(5000)
+  })
 })

@@ -18,6 +18,10 @@ export const mikro = {
     skillSub: '{robot} · {s} sn · puanlı',
     sensorsBlok: 'mesafe · renk · tampon',
     sensorsGezgin: 'mesafe · iki çizgi sensörü',
+    sensorsKiskac: 'mesafe · renk · kıskaç',
+    chapterProgress: '{done}/{n} tamam',
+    notesTitle: 'Öğretmen / veli notları',
+    notesIntro: 'Her bölümde çocuğun öğrendiği kavram:',
     freeName: '{robot} serbest',
   },
   skill: {
@@ -98,6 +102,9 @@ export const mikro = {
     path: 'yol',
     collisions: '{n} çarpma',
     noCollisions: 'çarpma yok',
+    gripper: 'kıskaç',
+    gripOpen: 'açık',
+    gripClosed: 'kapalı',
     topView: '{scene}: {robot} üstten görünüş',
   },
   sim: {

@@ -69,6 +69,10 @@ describe('blok tanımları', () => {
     expect(gezgin).toEqual(expect.arrayContaining(['rb_move', 'rb_distance', 'rb_line']))
     expect(gezgin).not.toContain('rb_color_is')
     expect(gezgin).not.toContain('rb_pressed')
+    const kiskac = types(ROBOT_PROFILES.kiskac)
+    expect(kiskac).toEqual(expect.arrayContaining(['rb_grip', 'rb_held_is', 'rb_holding', 'rb_color_is', 'rb_distance']))
+    expect(blok).not.toContain('rb_grip')
+    expect(gezgin).not.toContain('rb_held_is')
   })
   it('değişken/fonksiyon kategorileri yalnız izinliyse çıkar', () => {
     expect(toolboxCategories(['variables_set']).some((c) => c.key === 'vars')).toBe(true)

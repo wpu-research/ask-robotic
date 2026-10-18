@@ -28,6 +28,9 @@ export const BLOCK_EN: Record<string, { label: string; tip?: string }> = {
   rb_heading: { label: 'turn angle (°)', tip: 'How far the robot has turned since the start; left is plus, right is minus.' },
   rb_reset: { label: 'reset angles', tip: 'Resets the motor angles and the turn angle.' },
   rb_lights: { label: 'set lights to {COLOR}' },
+  rb_grip: { label: '{ACTION} gripper', tip: 'Closing grabs the cube in front; opening drops it.' },
+  rb_holding: { label: 'gripper holding a cube?' },
+  rb_held_is: { label: 'held cube is {C}?', tip: 'The color sensor in the gripper reads the cube\'s color.' },
 
   mk_on_start: { label: 'on start', tip: 'Runs once when the program starts.' },
   mk_forever: { label: 'forever', tip: 'The blocks inside repeat without stopping.' },
@@ -141,6 +144,7 @@ const OPT_EN: Record<string, string> = {
   shake: 'shaken', tiltLeft: 'tilted left', tiltRight: 'tilted right', tiltForward: 'tilted forward', tiltBack: 'tilted back',
   faceUp: 'face up', faceDown: 'face down', freeFall: 'falling',
   strength: 'strength', pitch: 'pitch (forward +)', roll: 'roll (right +)', min: 'smaller', max: 'larger',
+  close: 'close', open: 'open',
   number: 'number', text: 'text', name: 'name', value: 'value',
   ...FLOOR_EN,
 }
@@ -184,12 +188,13 @@ export const MESSAGES_EN: Record<string, string> = {
 export const PROFILE_EN: Record<RobotProfileId, { title: string; summary: string }> = {
   blok: { title: 'Block Robot', summary: 'A two-motor robot built from construction parts: distance sensor in front, color sensor underneath, bumper (force) sensor in front.' },
   gezgin: { title: 'Mini Rover', summary: 'A small ready-made robot: ultrasonic distance sensor in front, two line sensors underneath, two colored headlights in front.' },
+  kiskac: { title: 'Gripper Robot', summary: 'A two-motor robot with a two-finger gripper in front: distance sensor in front, color sensor underneath; the gripper grabs, carries and senses the color of a cube.' },
 }
 const SENSOR_EN: Record<string, string> = {
-  'mesafe sensörü': 'distance sensor', 'renk sensörü': 'color sensor', 'tampon (kuvvet) sensörü': 'bumper (force) sensor', 'çizgi sensörü': 'line sensor',
+  'mesafe sensörü': 'distance sensor', 'renk sensörü': 'color sensor', 'tampon (kuvvet) sensörü': 'bumper (force) sensor', 'çizgi sensörü': 'line sensor', 'kıskaç': 'gripper',
 }
-export const SENSOR_LABEL_EN: Record<RobotSensor, string> = { distance: 'distance sensor', color: 'color sensor', force: 'bumper sensor', line: 'line sensor' }
-const PROFILE_TITLE_EN: Record<string, string> = { 'Blok Robotu': 'Block Robot', 'Mini Gezgin': 'Mini Rover' }
+export const SENSOR_LABEL_EN: Record<RobotSensor, string> = { distance: 'distance sensor', color: 'color sensor', force: 'bumper sensor', line: 'line sensor', gripper: 'gripper' }
+const PROFILE_TITLE_EN: Record<string, string> = { 'Blok Robotu': 'Block Robot', 'Mini Gezgin': 'Mini Rover', 'Kıskaçlı Robot': 'Gripper Robot' }
 
 /** Çalışma ve dosya hatalarının (lib içinde Türkçe üretilir) görünen İngilizcesi. Tanınmayan metin olduğu gibi kalır. */
 const ERRORS_EN: [RegExp, (m: RegExpMatchArray) => string][] = [
@@ -229,6 +234,8 @@ export function errorText(msg: string, locale: MikroLocale): string {
 export const SCENE_EN: Record<string, string> = {
   'ilk-surus': 'First drive', kare: 'Draw a square', 'duvarda-dur': 'Stop at the wall', 'renkte-dur': 'Stop on red', 'cizgi-izle': 'Follow the line',
   labirent: 'Escape the corridor', serbest: 'Free arena', 'kontrol-turu': 'Checkpoint tour', 'renk-avcisi': 'Color hunter',
+  'park-et': 'Park it', merdiven: 'Climb the stairs', slalom: 'Slalom', 'engelden-don': 'Bump and come back', 'renk-sirasi': 'Color order',
+  'kavsak-say': 'Count the crossings', 'sag-el': 'Maze', 'nesne-tasi': 'Carry the cube', 'hizli-tur': 'Fast lap', sumo: 'Sumo ring', 'renge-gore-ayir': 'Sort by color',
 }
 /** Arenadaki bölge yazıları (Türkçe yazı → İngilizce). */
-export const ZONE_EN: Record<string, string> = { hedef: 'target', 'başlangıç': 'start', 'çıkış': 'exit', 'bitiş': 'finish' }
+export const ZONE_EN: Record<string, string> = { hedef: 'target', 'başlangıç': 'start', 'çıkış': 'exit', 'bitiş': 'finish', park: 'parking', ev: 'home', zirve: 'top' }

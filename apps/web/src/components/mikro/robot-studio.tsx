@@ -2,7 +2,7 @@
 // Robot Atölyesi: görev seçici + Mikro Kart editörü (kart bir robot gövdesine takılı).
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { MikroEditor } from './mikro-editor'
-import { ROBOT_MISSIONS, freeScene, type RobotMission } from '@/lib/mikro/robot-missions'
+import { MISSION_CHAPTERS, ROBOT_MISSIONS, chapterProgress, freeScene, type RobotMission } from '@/lib/mikro/robot-missions'
 import { ROBOT_PROFILES, type RobotProfileId } from '@/lib/mikro/robot'
 import { onStart, project } from '@/lib/mikro/program'
 import { SKILL_CHALLENGES } from '@/lib/mikro/beceri'
@@ -13,6 +13,8 @@ import { useI18n } from '@/i18n/client'
 import './robot.css'
 
 const DONE_KEY = 'ask:robot:done:v1'
+const FREE_PROFILES: RobotProfileId[] = ['blok', 'gezgin', 'kiskac']
+const SENSOR_KEY = { blok: 'mikro.studio.sensorsBlok', gezgin: 'mikro.studio.sensorsGezgin', kiskac: 'mikro.studio.sensorsKiskac' } as const
 type Pick = { kind: 'mission'; id: string } | { kind: 'free'; profile: RobotProfileId } | { kind: 'skill'; id: string }
 
 function loadDone(): Set<string> {
@@ -56,18 +58,34 @@ export function RobotStudio() {
 
   return (
     <div className="rb-studio">
-      <nav className="rb-pick" aria-label={t('mikro.studio.missions')}>
-        <div className="rb-row">
-          <h2>{t('mikro.studio.missions')}</h2>
-          <ul>{ROBOT_MISSIONS.map((m) => card(m.id, en ? m.en.title : m.title, robotTitle(m.profile), pick.kind === 'mission' && pick.id === m.id, () => setPick({ kind: 'mission', id: m.id }), `robot-mission-${m.id}`, done.has(m.id)))}</ul>
-        </div>
+      <nav className="rb-pick" aria-label={t('mikro.studio.missions')}>        {MISSION_CHAPTERS.map((ch) => {
+          const pr = chapterProgress(ch.id, done)
+          return (
+            <div className="rb-row" key={ch.id} data-testid={`robot-chapter-${ch.id}`}>
+              <div className="rb-chap">
+                <h2>{en ? ch.en.title : ch.title}</h2>
+                <small>{en ? ch.en.concept : ch.concept}</small>
+                <meter min={0} max={pr.missions.length} value={pr.done} aria-label={t('mikro.studio.chapterProgress', { done: pr.done, n: pr.missions.length })} />
+                <small className="rb-prog">{t('mikro.studio.chapterProgress', { done: pr.done, n: pr.missions.length })}</small>
+              </div>
+              <ul>{pr.missions.map((m) => card(m.id, en ? m.en.title : m.title, robotTitle(m.profile), pick.kind === 'mission' && pick.id === m.id, () => setPick({ kind: 'mission', id: m.id }), `robot-mission-${m.id}`, done.has(m.id)))}</ul>
+            </div>
+          )
+        })}
+        <details className="rb-notes" data-testid="robot-notes">
+          <summary>{t('mikro.studio.notesTitle')}</summary>
+          <p>{t('mikro.studio.notesIntro')}</p>
+          <dl>{MISSION_CHAPTERS.map((ch) => (
+            <div key={ch.id}><dt>{en ? ch.en.title : ch.title} <span>· {en ? ch.en.concept : ch.concept}</span></dt><dd>{en ? ch.en.note : ch.note}</dd></div>
+          ))}</dl>
+        </details>
         <div className="rb-row">
           <h2>{t('mikro.studio.skills')}</h2>
           <ul>{SKILL_CHALLENGES.map((c) => card(c.id, en ? c.en.title : c.title, t('mikro.studio.skillSub', { robot: robotTitle(c.profile), s: c.timeLimitS }), pick.kind === 'skill' && pick.id === c.id, () => setPick({ kind: 'skill', id: c.id }), `robot-skill-${c.id}`))}</ul>
         </div>
         <div className="rb-row">
           <h2>{t('mikro.studio.free')}</h2>
-          <ul>{(['blok', 'gezgin'] as const).map((p) => card(p, robotTitle(p), ROBOT_PROFILES[p].sensors.length === 3 ? t('mikro.studio.sensorsBlok') : t('mikro.studio.sensorsGezgin'), pick.kind === 'free' && pick.profile === p, () => setPick({ kind: 'free', profile: p }), `robot-free-${p}`))}</ul>
+          <ul>{FREE_PROFILES.map((p) => card(p, robotTitle(p), t(SENSOR_KEY[p]), pick.kind === 'free' && pick.profile === p, () => setPick({ kind: 'free', profile: p }), `robot-free-${p}`))}</ul>
         </div>
       </nav>
       <div className="rb-ed">

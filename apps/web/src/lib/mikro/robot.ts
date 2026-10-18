@@ -4,8 +4,9 @@
 import type { Polyline, Wall } from '@ask/sim'
 import { distToSeg, rayDistance } from '../arena/geometry'
 
-export type RobotProfileId = 'blok' | 'gezgin'
-export type RobotSensor = 'distance' | 'color' | 'force' | 'line'
+export type RobotProfileId = 'blok' | 'gezgin' | 'kiskac'
+/** `gripper`: kıskaç (tutma/bırakma ve tutulan nesnenin rengini algılama); araç kutusu süzgeci için sensörlerle birlikte durur. */
+export type RobotSensor = 'distance' | 'color' | 'force' | 'line' | 'gripper'
 export type FloorColor = 'beyaz' | 'siyah' | 'kirmizi' | 'yesil' | 'mavi' | 'sari'
 export type LightColor = 'kapali' | 'kirmizi' | 'yesil' | 'mavi' | 'sari' | 'beyaz'
 
@@ -42,6 +43,14 @@ export const ROBOT_PROFILES: Record<RobotProfileId, RobotProfile> = {
     sensors: ['distance', 'line'],
     lights: 'eyes',
   },
+  kiskac: {
+    id: 'kiskac',
+    title: 'Kıskaçlı Robot',
+    summary: 'Önünde iki parmaklı kıskaç olan iki motorlu robot: önde mesafe sensörü, altta renk sensörü; kıskaç küpü tutar, taşır ve rengini algılar.',
+    wheelBase: 0.12, wheelDiameter: 0.056, radius: 0.08, maxDegPerS: 700,
+    sensors: ['distance', 'color', 'gripper'],
+    lights: 'status',
+  },
 }
 
 export const FLOOR_COLORS: Record<FloorColor, { label: string; css: string; reflect: number }> = {
@@ -55,6 +64,10 @@ export const FLOOR_COLORS: Record<FloorColor, { label: string; css: string; refl
 
 /** Zemine boyanmış dikdörtgen renk alanı (m). */
 export interface Patch { x1: number; y1: number; x2: number; y2: number; color: FloorColor }
+/** Arenadaki taşınabilir küp (m). Robot gövdesi iterek kaydırır, kıskaç tutup taşır; mesafe sensörü görür. */
+export interface SceneObject { id: string; x: number; y: number; color: FloorColor; /** Kenar uzunluğu (m), varsayılan 0,04. */ size?: number }
+/** Benzetimdeki küp durumu. */
+export interface LiveObject { id: string; x: number; y: number; color: FloorColor; half: number }
 export interface RobotZone { id: string; label?: string; kind: 'start' | 'goal' | 'checkpoint'; x: number; y: number; r: number }
 
 export interface RobotScene {
@@ -68,6 +81,8 @@ export interface RobotScene {
   lineWidth?: number
   patches: Patch[]
   zones: RobotZone[]
+  /** Taşınabilir küpler (yoksa boş). */
+  objects?: SceneObject[]
   pose: { x: number; y: number; theta: number }
 }
 
@@ -77,6 +92,12 @@ const TAU_S = 0.06
 const MAX_RANGE_CM = 250
 const TRAIL_EVERY_MS = 40
 const DEG = 180 / Math.PI
+/** Kıskacın kapanınca küpü yakalayabildiği uzaklık (küp merkezi ile kıskaç ağzı arası, m). */
+const GRAB_TOL = 0.035
+const objWalls = (o: LiveObject): Wall[] => [
+  [o.x - o.half, o.y - o.half, o.x + o.half, o.y - o.half], [o.x + o.half, o.y - o.half, o.x + o.half, o.y + o.half],
+  [o.x + o.half, o.y + o.half, o.x - o.half, o.y + o.half], [o.x - o.half, o.y + o.half, o.x - o.half, o.y - o.half],
+]
 
 type Command = { kind: 'move'; wheelDeg: number; startL: number; startR: number } | { kind: 'turn'; deg: number; startTheta: number }
 
@@ -108,6 +129,15 @@ export class DriveBase {
   touching = false
   /** Robot merkezinin bir kez girdiği bölgeler. */
   visited = new Set<string>()
+  /** Bölgeye ilk giriş anı (ms): sıra denetimi için. */
+  visitedAt = new Map<string, number>()
+  /** Işıklar yanarken görülen "zemin rengi:ışık" eşleri, ilk görülme sırasıyla (ışık kapalıyken kaydedilmez). */
+  colorLights: string[] = []
+  /** Küplerin canlı durumu (sahnedekinin kopyası). */
+  objects: LiveObject[]
+  /** Kıskaçta tutulan küpün kimliği. */
+  held: string | null = null
+  gripClosed = false
   trail: Array<[number, number]> = []
   private cmd: Command | null = null
   private t = 0
@@ -120,6 +150,7 @@ export class DriveBase {
     this.y = scene.pose.y
     this.theta = scene.pose.theta
     this.zeroTheta = this.theta
+    this.objects = (scene.objects ?? []).map((o) => ({ id: o.id, x: o.x, y: o.y, color: o.color, half: (o.size ?? 0.04) / 2 }))
     this.trail.push([this.x, this.y])
   }
 
@@ -147,6 +178,34 @@ export class DriveBase {
     this.powerL = -p; this.powerR = p
     if (deg === 0) this.stop()
   }
+  /** Kıskacı kapat (önündeki küpü tutar) ya da aç (tuttuğunu önüne bırakır). */
+  grip(close: boolean) {
+    this.gripClosed = close
+    if (close) {
+      if (this.held) return
+      let best: LiveObject | null = null, bd = GRAB_TOL
+      for (const o of this.objects) {
+        const [gx, gy] = this.holdPoint(o.half)
+        const d = Math.hypot(o.x - gx, o.y - gy)
+        if (d <= bd) { bd = d; best = o }
+      }
+      if (best) { this.held = best.id; this.carry() }
+    } else this.held = null
+  }
+  /** Tutulan küp gövdenin önüne değecek yerde durur. */
+  private holdPoint(half: number): [number, number] {
+    const d = this.profile.radius + half
+    return [this.x + Math.cos(this.theta) * d, this.y + Math.sin(this.theta) * d]
+  }
+  private carry() {
+    const o = this.heldObject
+    if (o) [o.x, o.y] = this.holdPoint(o.half)
+  }
+  get heldObject(): LiveObject | null { return this.held ? this.objects.find((o) => o.id === this.held) ?? null : null }
+  get heldColor(): FloorColor | null { return this.heldObject?.color ?? null }
+  object(id: string): LiveObject | undefined { return this.objects.find((o) => o.id === id) }
+  /** Küpün altındaki zemin rengi. */
+  objectFloor(id: string): FloorColor | null { const o = this.object(id); return o ? this.floorAtWorld(o.x, o.y) : null }
   get busy(): boolean { return this.cmd !== null }
   resetAngles() { this.zeroL = this.degL; this.zeroR = this.degR; this.zeroTheta = this.theta }
 
@@ -162,13 +221,18 @@ export class DriveBase {
   get distanceCm(): number {
     const ox = this.x + Math.cos(this.theta) * this.profile.radius * 0.8
     const oy = this.y + Math.sin(this.theta) * this.profile.radius * 0.8
-    const d = rayDistance(ox, oy, this.theta, this.scene.walls) * 100
+    const walls = this.objects.length ? [...this.scene.walls, ...this.objects.filter((o) => o.id !== this.held).flatMap(objWalls)] : this.scene.walls
+    const d = rayDistance(ox, oy, this.theta, walls) * 100
     return Math.min(MAX_RANGE_CM, Math.round(d * 10) / 10)
   }
   /** Gövdeye göre (ileri x, sola y) bir noktanın altındaki zemin rengi. */
   floorAt(fx: number, fy: number): FloorColor {
     const px = this.x + Math.cos(this.theta) * fx - Math.sin(this.theta) * fy
     const py = this.y + Math.sin(this.theta) * fx + Math.cos(this.theta) * fy
+    return this.floorAtWorld(px, py)
+  }
+  /** Dünya koordinatındaki zemin rengi. */
+  floorAtWorld(px: number, py: number): FloorColor {
     const half = (this.scene.lineWidth ?? 0.02) / 2
     if (this.scene.lines.some((pl) => pl.slice(1).some((pt, i) => distToSeg(px, py, ...pl[i], ...pt) < half))) return 'siyah'
     for (let i = this.scene.patches.length - 1; i >= 0; i--) {
@@ -192,6 +256,8 @@ export class DriveBase {
     const z = this.scene.zones.find((q) => q.id === id)
     return !!z && Math.hypot(this.x - z.x, this.y - z.y) <= z.r
   }
+  /** Benzetim saati (ms). */
+  get timeMs(): number { return this.t }
   get moving(): boolean { return Math.abs(this.wL) > 1 || Math.abs(this.wR) > 1 }
   /** Motorlar kapalı ve tekerlekler durmuş. */
   get stopped(): boolean { return !this.busy && this.powerL === 0 && this.powerR === 0 && !this.moving }
@@ -215,16 +281,48 @@ export class DriveBase {
     const dth = (sR - sL) / this.profile.wheelBase
     const nt = this.theta + dth
     const nx = this.x + ds * Math.cos(nt), ny = this.y + ds * Math.sin(nt)
-    const blocked = this.scene.walls.some((w) => distToSeg(nx, ny, ...w) < this.profile.radius)
+    let blocked = this.scene.walls.some((w) => distToSeg(nx, ny, ...w) < this.profile.radius)
+    if (!blocked && this.objects.length) blocked = !this.pushObjects(nx, ny, nt)
     this.theta = nt
     this.turnedDeg += Math.abs(dth) * DEG
     if (!blocked) { this.x = nx; this.y = ny; this.distanceM += Math.abs(ds) }
+    this.carry()
     if (blocked && !this.touching) this.collisions++
     this.touching = blocked
-    for (const z of this.scene.zones) if (!this.visited.has(z.id) && Math.hypot(this.x - z.x, this.y - z.y) <= z.r) this.visited.add(z.id)
+    for (const z of this.scene.zones) if (!this.visited.has(z.id) && Math.hypot(this.x - z.x, this.y - z.y) <= z.r) { this.visited.add(z.id); this.visitedAt.set(z.id, this.t + dt * 1000) }
+    if (this.lights !== 'kapali' && this.has('color')) {
+      const k = `${this.color}:${this.lights}`
+      if (!this.colorLights.includes(k)) this.colorLights.push(k)
+    }
     this.trailT += dt * 1000
     if (this.trailT >= TRAIL_EVERY_MS) { this.trailT = 0; this.trail.push([this.x, this.y]); if (this.trail.length > 4000) this.trail.shift() }
     this.checkCommand()
+  }
+
+  /**
+   * Gövde (nx, ny) konumuna giderken değdiği serbest küpleri ileri iter (küp daire gibi ele alınır). Tutulan küp duvara girecekse
+   * ya da itilen küp duvara/başka küpe dayanırsa hareket engellenir (false).
+   */
+  private pushObjects(nx: number, ny: number, nt: number): boolean {
+    const R = this.profile.radius
+    const hit = (o: LiveObject, x: number, y: number) => this.scene.walls.some((w) => distToSeg(x, y, ...w) < o.half)
+      || this.objects.some((q) => q !== o && q.id !== this.held && Math.abs(q.x - x) < q.half + o.half && Math.abs(q.y - y) < q.half + o.half)
+    const held = this.heldObject
+    if (held) {
+      const d = R + held.half
+      if (hit(held, nx + Math.cos(nt) * d, ny + Math.sin(nt) * d)) return false
+    }
+    const moves: Array<[LiveObject, number, number]> = []
+    for (const o of this.objects) {
+      if (o === held) continue
+      const dx = o.x - nx, dy = o.y - ny, dist = Math.hypot(dx, dy), need = R + o.half
+      if (dist >= need || dist === 0) continue
+      const px = nx + (dx / dist) * need, py = ny + (dy / dist) * need
+      if (hit(o, px, py)) return false
+      moves.push([o, px, py])
+    }
+    for (const [o, px, py] of moves) { o.x = px; o.y = py }
+    return true
   }
 
   private checkCommand() {
