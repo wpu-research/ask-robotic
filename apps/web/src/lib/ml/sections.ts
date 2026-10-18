@@ -59,3 +59,14 @@ export const SECTIONS: Section[] = [
     slugs: ['ikili-arama', 'siralama-algoritmalari', 'onbellek', 'cop-toplama', 'yigin-ve-obek', 'olay-dongusu', 'kilitlenme', 'git-dallari', 'ci-cd-hatti', 'konteyner-olcekleme', 'hiz-siniri'],
   },
 ]
+
+/**
+ * Kursun son bölümü: 3B benzetimli projeler. Dersler gibi oynatıcı karesi değil, tarayıcıda canlı eğitilen modeller; bu yüzden
+ * SECTIONS'ta değil, ayrı tutulur (kayıt: lib/ml/projeler). Bölüm listesinde ve ana sayfada en sonda görünür.
+ */
+export const PROJE_BOLUMU: Section = {
+  id: 'projeler',
+  title: { tr: 'Projeler', en: 'Projects' },
+  sub: { tr: 'Öğrendiklerini 3B benzetimde birleştir: tarayıcıda eğitilen modeller araç sürer, kol uzatır, drone indirir, kutu ayırır ve nokta bulutunda nesne bulur.', en: 'Put it all together in 3D simulations: models trained in your browser drive a car, reach with an arm, land a drone, sort parcels and find objects in a point cloud.' },
+  slugs: ['otonom-arac', 'robot-kol', 'drone-inis', 'depo-siniflandirma', 'nokta-bulutu'],
+}

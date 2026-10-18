@@ -13,7 +13,7 @@ const BASE_MS = 700
 const SPEEDS = [0.5, 1, 2, 4]
 
 /** Çok küçük Python renklendirici: yorum, metin, sayı, anahtar sözcük. */
-function Py({ src }: { src: string }) {
+export function Py({ src }: { src: string }) {
   const hash = src.indexOf('#')
   const code = hash >= 0 ? src.slice(0, hash) : src
   const comment = hash >= 0 ? src.slice(hash) : ''

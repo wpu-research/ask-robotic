@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getLocale } from '@/i18n/server'
 import { LESSONS } from '@/lib/ml/lessons'
-import { SECTIONS } from '@/lib/ml/sections'
+import { PROJECTS } from '@/lib/ml/projeler'
+import { PROJE_BOLUMU, SECTIONS } from '@/lib/ml/sections'
 import { ML_TEXT } from '@/lib/ml/text'
 import './ml.css'
 
@@ -23,10 +24,11 @@ export default async function MakineOgrenmesi() {
         <p className="lead">{T.lead}</p>
         <div className="hero-actions">
           <Link className="btn btn-primary" href={`/makine-ogrenmesi/${LESSONS[0].slug}`}>{T.start}</Link>
-          <span className="ml-count-all">{T.count.replace('{l}', String(LESSONS.length)).replace('{u}', String(SECTIONS.length))}</span>
+          <span className="ml-count-all">{T.count.replace('{l}', String(LESSONS.length)).replace('{u}', String(SECTIONS.length)).replace('{p}', String(PROJECTS.length))}</span>
         </div>
         <nav className="ml-parts" aria-label={T.units}>
           {SECTIONS.map((s, k) => <a key={s.id} href={`#bolum-${s.id}`}><b>{k + 1}</b>{s.title[lang]}</a>)}
+          <a href={`#bolum-${PROJE_BOLUMU.id}`} className="ml-parts-proj"><b>3B</b>{PROJE_BOLUMU.title[lang]}</a>
         </nav>
       </header>
 
@@ -60,6 +62,30 @@ export default async function MakineOgrenmesi() {
           </section>
         )
       })}
+
+      <section id={`bolum-${PROJE_BOLUMU.id}`} className="ml-section" aria-labelledby="ml-s-projeler">
+        <div className="section-head">
+          <div>
+            <p className="eyebrow">{T.projectCount.replace('{n}', String(PROJECTS.length))}</p>
+            <h2 id="ml-s-projeler">{PROJE_BOLUMU.title[lang]}</h2>
+            <p>{PROJE_BOLUMU.sub[lang]}</p>
+          </div>
+        </div>
+        <ol className="ml-list">
+          {PROJE_BOLUMU.slugs.map((slug, i) => {
+            const p = PROJECTS.find((x) => x.slug === slug)!
+            return (
+              <li key={slug}>
+                <Link href={`/makine-ogrenmesi/${slug}`} className="ml-item ml-item-proj" data-testid={`ml-${slug}`}>
+                  <span className="ml-n">P{i + 1}</span>
+                  <span className="ml-item-body"><b>{p.title[lang]}</b><span>{p.sub[lang]}</span></span>
+                  <span aria-hidden="true" className="ml-go">→</span>
+                </Link>
+              </li>
+            )
+          })}
+        </ol>
+      </section>
     </div>
   )
 }

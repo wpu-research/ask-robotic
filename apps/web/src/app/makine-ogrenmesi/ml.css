@@ -72,3 +72,59 @@
   .ml-go { display: none; }
   .ml-code code { font-size: 11px; }
 }
+
+/* Projeler: 3B oynatıcı (solda sahne ve düğmeler, sağda canlı ölçümler), dar ekranda alt alta */
+.ml-parts a.ml-parts-proj b { width: auto; padding: 0 7px; border-radius: 999px; background: var(--deep); color: var(--on-deep); }
+.ml-item-proj .ml-n { background: var(--deep); color: var(--on-deep); font-size: 14px; }
+.mp-brief { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.mp-brief .ml-story { max-width: none; }
+.mp-goal { border-left-color: var(--ml-c3); }
+.mp-player { display: grid; grid-template-columns: minmax(0, 1fr) 300px; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); }
+.mp-stage { display: grid; align-content: start; min-width: 0; border-right: 1px solid var(--line); }
+.mp-3d { position: relative; width: 100%; aspect-ratio: 16 / 10; min-height: 260px; background: #e8edf3; overflow: hidden; }
+.mp-3d canvas { position: absolute; inset: 0; }
+.mp-nogl { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 24px; text-align: center; color: var(--muted); font-size: 14px; }
+.mp-status { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--line); background: var(--bg-soft); font-size: 14px; }
+.mp-status b { font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.mp-status span { color: var(--ml-c3); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.mp-ctl { display: flex; align-items: center; gap: 8px; padding: 12px 16px; flex-wrap: wrap; border-top: 1px solid var(--line); }
+.mp-hint { margin-left: auto; color: var(--muted); font-size: 12px; }
+.mp-side { padding: 16px; display: grid; align-content: start; gap: 14px; min-width: 0; }
+.mp-side-h { font-size: 15px; margin: 0; }
+.mp-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 0; }
+.mp-m { padding: 8px 10px; border: 1px solid var(--line); border-radius: calc(var(--radius) * .6); background: var(--bg-soft); min-width: 0; }
+.mp-m dt { font-size: 11px; color: var(--muted); line-height: 1.3; }
+.mp-m dd { margin: 2px 0 0; font-size: 16px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.mp-good dd { color: var(--ml-c3); }
+.mp-bad dd { color: var(--ml-c0); }
+.mp-curve { margin: 0; }
+.mp-curve figcaption { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.mp-curve svg { display: block; width: 100%; height: 56px; border: 1px solid var(--line); border-radius: calc(var(--radius) * .6); background: var(--bg-soft); }
+.mp-axis { stroke: var(--line); stroke-width: 1; }
+.mp-line { fill: none; stroke: var(--brand); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.mp-line2 { fill: none; stroke: var(--ml-c5); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.mp-table { min-width: 0; overflow-x: auto; }
+.mp-table p { margin: 0 0 6px; font-size: 12px; color: var(--muted); }
+.mp-table table { width: 100%; border-collapse: collapse; font-size: 12px; font-variant-numeric: tabular-nums; }
+.mp-table th, .mp-table td { border: 1px solid var(--line); padding: 4px 5px; text-align: center; }
+.mp-table thead th { font-size: 10px; word-break: break-word; }
+.mp-table th { font-weight: 600; color: var(--muted); background: var(--bg-soft); }
+.mp-table td.mp-diag { background: color-mix(in srgb, var(--ml-c3) 18%, transparent); font-weight: 700; }
+.mp-table td.mp-off { background: color-mix(in srgb, var(--ml-c0) 12%, transparent); }
+.mp-used { font-size: 14px; }
+.mp-task { padding: 18px 20px; border: 1px dashed var(--brand); border-radius: var(--radius); background: var(--bg-soft); }
+.mp-task h2 { font-size: 22px; margin: 0 0 10px; }
+.mp-task ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; color: var(--muted); }
+.mp-py h2 { font-size: 22px; margin: 0 0 14px; }
+.mp-py .ml-code { border-radius: var(--radius); overflow: hidden; }
+.mp-py .ml-code ol { max-height: none; }
+@media (max-width: 1000px) {
+  .mp-player { grid-template-columns: 1fr; }
+  .mp-stage { border-right: 0; border-bottom: 1px solid var(--line); }
+  .mp-metrics { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+}
+@media (max-width: 600px) {
+  .mp-brief { grid-template-columns: 1fr; }
+  .mp-3d { aspect-ratio: 4 / 3; }
+  .mp-hint { display: none; }
+}
