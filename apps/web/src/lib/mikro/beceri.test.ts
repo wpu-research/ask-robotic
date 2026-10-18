@@ -35,4 +35,12 @@ describe('sanal beceri', () => {
     expect(Date.now() - t0).toBeLessThan(15000)
     expect(r.score).toBe(0)
   })
+
+  it('küplü sahnede de puan belirlenimci (sunucu ve istemci aynı sonucu bulur)', () => {
+    const base = SKILL_CHALLENGES[1]
+    const ch = { ...base, scene: () => ({ ...base.scene(), objects: [{ id: 'k', x: 0.5, y: 0.6, color: 'mavi' as const }] }) }
+    const a = runSkill(ch, ch.sample())
+    expect(runSkill(ch, ch.sample())).toEqual(a)
+    expect(a.error).toBeNull()
+  })
 })

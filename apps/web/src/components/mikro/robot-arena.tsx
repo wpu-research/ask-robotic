@@ -28,6 +28,7 @@ export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: 
       <figcaption className="rb-readout" aria-live="off">
         {dist != null && <span>{t('mikro.arena.distance')} <b>{dist.toFixed(0)} cm</b></span>}
         {robot.has('color') && <span>{t('mikro.arena.color')} <b>{en ? FLOOR_EN[robot.color] : FLOOR_COLORS[robot.color].label}</b></span>}
+        {robot.has('gripper') && <span>{t('mikro.arena.gripper')} <b>{robot.heldColor ? (en ? FLOOR_EN[robot.heldColor] : FLOOR_COLORS[robot.heldColor].label) : robot.gripClosed ? t('mikro.arena.gripClosed') : t('mikro.arena.gripOpen')}</b></span>}
         {robot.has('line') && <span>{t('mikro.arena.line')} <b>{robot.lineOn('left') ? '●' : '○'}{robot.lineOn('right') ? '●' : '○'}</b></span>}
         <span>{t('mikro.arena.heading')} <b>{robot.headingDeg}°</b></span>
         <span>{t('mikro.arena.path')} <b>{(robot.distanceM * 100).toFixed(0)} cm</b></span>
@@ -63,10 +64,22 @@ function TopView({ robot, en, label }: { robot: DriveBase; en: boolean; label: s
           </g>
         ))}
         {s.walls.map(([x1, y1, x2, y2], i) => <line key={i} x1={X(x1)} y1={Y(y1)} x2={X(x2)} y2={Y(y2)} className="rb-wall" />)}
+        {robot.objects.map((o) => (
+          <rect key={o.id} data-cube={o.id} data-held={robot.held === o.id || undefined} x={X(o.x - o.half)} y={Y(o.y + o.half)} width={o.half * 2 * CM} height={o.half * 2 * CM} rx={1}
+            fill={FLOOR_COLORS[o.color].css} className="rb-cube" transform={robot.held === o.id ? `rotate(${deg} ${X(o.x)} ${Y(o.y)})` : undefined} />
+        ))}
         <path d={trail} className="rb-trail" />
         <g transform={`translate(${X(robot.x)} ${Y(robot.y)}) rotate(${deg})`} data-testid="robot-body">
           {dist != null && <line x1={R * 0.8} y1={0} x2={ray} y2={0} className="rb-ray" />}
-          {p.id === 'blok' ? (
+          {p.id === 'kiskac' ? (
+            <>
+              <rect x={-R * 0.9} y={-R * 0.85} width={R * 1.7} height={R * 1.7} rx={3} className="rb-body kiskac" />
+              <rect x={-R * 0.55} y={-R - 1} width={R * 1.1} height={4} rx={1} className="rb-wheel" />
+              <rect x={-R * 0.55} y={R - 3} width={R * 1.1} height={4} rx={1} className="rb-wheel" />
+              <rect x={-R * 0.35} y={-R * 0.35} width={R * 0.7} height={R * 0.7} rx={2} fill={light} className="rb-hub" />
+              {[-1, 1].map((sd) => <rect key={sd} x={R * 0.75} y={sd * (robot.gripClosed ? 3 : 4.8) - 1} width={R * 0.75} height={2} rx={1} className="rb-jaw" />)}
+            </>
+          ) : p.id === 'blok' ? (
             <>
               <rect x={-R * 0.9} y={-R * 0.85} width={R * 1.8} height={R * 1.7} rx={3} className="rb-body blok" />
               <rect x={-R * 0.55} y={-R - 1} width={R * 1.1} height={4} rx={1} className="rb-wheel" />

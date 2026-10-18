@@ -3,11 +3,12 @@
 // Türkçe kaynak blocks.ts / icons.ts / music.ts / robot.ts / runtime.ts içindedir.
 import type { CatKey } from './blocks'
 import type { FloorColor, RobotProfileId, RobotSensor } from './robot'
+import { DONUSEN_IDS, DONUSEN_MODELS } from './donusen'
 
 export type MikroLocale = 'tr' | 'en'
 
 export const CATEGORY_EN: Record<CatKey, string> = {
-  robot: 'Robot', basic: 'Basic', input: 'Input', led: 'LED', music: 'Music', radio: 'Radio', loops: 'Loops', logic: 'Logic',
+  robot: 'Robot', donusen: 'Transform', basic: 'Basic', input: 'Input', led: 'LED', music: 'Music', radio: 'Radio', loops: 'Loops', logic: 'Logic',
   vars: 'Variables', math: 'Math', text: 'Text', list: 'Lists', func: 'Functions', pins: 'Pins',
 }
 
@@ -28,6 +29,21 @@ export const BLOCK_EN: Record<string, { label: string; tip?: string }> = {
   rb_heading: { label: 'turn angle (°)', tip: 'How far the robot has turned since the start; left is plus, right is minus.' },
   rb_reset: { label: 'reset angles', tip: 'Resets the motor angles and the turn angle.' },
   rb_lights: { label: 'set lights to {COLOR}' },
+  dn_walk: { label: 'walk {DIR} {STEPS} steps', tip: 'Each step is 10 cm.' },
+  dn_wave: { label: 'wave {ARM} arm' },
+  dn_turn_around: { label: 'turn around' },
+  dn_say: { label: 'say {TEXT}', tip: 'The text appears in a speech bubble.' },
+  dn_drive: { label: 'drive {DIR} {CM} cm' },
+  dn_pose: { label: 'cat {POSE}' },
+  dn_tail: { label: 'wag tail {N} times' },
+  dn_strum: { label: 'strum the string', tip: 'The note depends on how far your hand is: the closer the hand, the higher the note.' },
+  dn_boom: { label: 'turn arm to {DEG} degrees', tip: 'Between 0 and 180 degrees.' },
+  dn_hook: { label: '{UPDOWN} the hook' },
+  dn_grab: { label: '{ACTION} the load', tip: 'Grabs the load under the hook when the hook is down.' },
+  dn_distance: { label: 'distance (cm)', tip: 'The wall in front for the humanoid and the car; your hand for the cat and the instrument.' },
+  rb_grip: { label: '{ACTION} gripper', tip: 'Closing grabs the cube in front; opening drops it.' },
+  rb_holding: { label: 'gripper holding a cube?' },
+  rb_held_is: { label: 'held cube is {C}?', tip: 'The color sensor in the gripper reads the cube\'s color.' },
 
   mk_on_start: { label: 'on start', tip: 'Runs once when the program starts.' },
   mk_forever: { label: 'forever', tip: 'The blocks inside repeat without stopping.' },
@@ -141,11 +157,13 @@ const OPT_EN: Record<string, string> = {
   shake: 'shaken', tiltLeft: 'tilted left', tiltRight: 'tilted right', tiltForward: 'tilted forward', tiltBack: 'tilted back',
   faceUp: 'face up', faceDown: 'face down', freeFall: 'falling',
   strength: 'strength', pitch: 'pitch (forward +)', roll: 'roll (right +)', min: 'smaller', max: 'larger',
+  close: 'close', open: 'open', both: 'both', otur: 'sits', kalk: 'stands', down: 'lower', up: 'raise', grab: 'grab',
   number: 'number', text: 'text', name: 'name', value: 'value',
   ...FLOOR_EN,
 }
 const OPT_EN_BY_TYPE: Record<string, Record<string, string>> = {
   mk_gesture_is: { shake: 'shaking', freeFall: 'falling' },
+  dn_grab: { release: 'drop' },
 }
 
 /** Bir açılır liste seçeneğinin görünen yazısı (Türkçe yazı `tr`, değer `value`). */
@@ -184,12 +202,15 @@ export const MESSAGES_EN: Record<string, string> = {
 export const PROFILE_EN: Record<RobotProfileId, { title: string; summary: string }> = {
   blok: { title: 'Block Robot', summary: 'A two-motor robot built from construction parts: distance sensor in front, color sensor underneath, bumper (force) sensor in front.' },
   gezgin: { title: 'Mini Rover', summary: 'A small ready-made robot: ultrasonic distance sensor in front, two line sensors underneath, two colored headlights in front.' },
+  kiskac: { title: 'Gripper Robot', summary: 'A two-motor robot with a two-finger gripper in front: distance sensor in front, color sensor underneath; the gripper grabs, carries and senses the color of a cube.' },
 }
 const SENSOR_EN: Record<string, string> = {
-  'mesafe sensörü': 'distance sensor', 'renk sensörü': 'color sensor', 'tampon (kuvvet) sensörü': 'bumper (force) sensor', 'çizgi sensörü': 'line sensor',
+  'mesafe sensörü': 'distance sensor', 'renk sensörü': 'color sensor', 'tampon (kuvvet) sensörü': 'bumper (force) sensor', 'çizgi sensörü': 'line sensor', 'kıskaç': 'gripper',
 }
-export const SENSOR_LABEL_EN: Record<RobotSensor, string> = { distance: 'distance sensor', color: 'color sensor', force: 'bumper sensor', line: 'line sensor' }
-const PROFILE_TITLE_EN: Record<string, string> = { 'Blok Robotu': 'Block Robot', 'Mini Gezgin': 'Mini Rover' }
+export const SENSOR_LABEL_EN: Record<RobotSensor, string> = { distance: 'distance sensor', color: 'color sensor', force: 'bumper sensor', line: 'line sensor', gripper: 'gripper' }
+const PROFILE_TITLE_EN: Record<string, string> = { 'Blok Robotu': 'Block Robot', 'Mini Gezgin': 'Mini Rover', 'Kıskaçlı Robot': 'Gripper Robot' }
+
+const MODEL_TITLE_EN: Record<string, string> = Object.fromEntries(DONUSEN_IDS.map((id) => [DONUSEN_MODELS[id].title, DONUSEN_MODELS[id].en.title]))
 
 /** Çalışma ve dosya hatalarının (lib içinde Türkçe üretilir) görünen İngilizcesi. Tanınmayan metin olduğu gibi kalır. */
 const ERRORS_EN: [RegExp, (m: RegExpMatchArray) => string][] = [
@@ -205,6 +226,8 @@ const ERRORS_EN: [RegExp, (m: RegExpMatchArray) => string][] = [
   [/^Bu blok için bir liste gerekli\.$/, () => 'This block needs a list.'],
   [/^Robot blokları yalnız Robot Atölyesi'nde, kart bir robota takılıyken çalışır\.$/, () => 'Robot blocks only work in the Robot Workshop, when the card is on a robot.'],
   [/^(.+) gövdesinde (.+) yok\.$/, (m) => `The ${PROFILE_TITLE_EN[m[1]] ?? m[1]} has no ${SENSOR_EN[m[2]] ?? m[2]}.`],
+  [/^Dönüşen Robot blokları yalnız Robot Atölyesi'nde, kart Dönüşen Robot'a takılıyken çalışır\.$/, () => 'Transforming Robot blocks only work in the Robot Workshop, when the card is on the Transforming Robot.'],
+  [/^(.+) modelinde bu blok yok; (.+) modelinde çalışır\.$/, (m) => `The ${MODEL_TITLE_EN[m[1]] ?? m[1]} model has no such block; it works on: ${m[2].split(', ').map((x) => MODEL_TITLE_EN[x] ?? x).join(', ')}.`],
   [/^Bloklar çok derin iç içe\.$/, () => 'Blocks are nested too deeply.'],
   [/^Geçersiz blok\.$/, () => 'Invalid block.'],
   [/^Blok türü eksik\.$/, () => 'A block type is missing.'],
@@ -229,6 +252,8 @@ export function errorText(msg: string, locale: MikroLocale): string {
 export const SCENE_EN: Record<string, string> = {
   'ilk-surus': 'First drive', kare: 'Draw a square', 'duvarda-dur': 'Stop at the wall', 'renkte-dur': 'Stop on red', 'cizgi-izle': 'Follow the line',
   labirent: 'Escape the corridor', serbest: 'Free arena', 'kontrol-turu': 'Checkpoint tour', 'renk-avcisi': 'Color hunter',
+  'park-et': 'Park it', merdiven: 'Climb the stairs', slalom: 'Slalom', 'engelden-don': 'Bump and come back', 'renk-sirasi': 'Color order',
+  'kavsak-say': 'Count the crossings', 'sag-el': 'Maze', 'nesne-tasi': 'Carry the cube', 'hizli-tur': 'Fast lap', sumo: 'Sumo ring', 'renge-gore-ayir': 'Sort by color',
 }
 /** Arenadaki bölge yazıları (Türkçe yazı → İngilizce). */
-export const ZONE_EN: Record<string, string> = { hedef: 'target', 'başlangıç': 'start', 'çıkış': 'exit', 'bitiş': 'finish' }
+export const ZONE_EN: Record<string, string> = { hedef: 'target', 'başlangıç': 'start', 'çıkış': 'exit', 'bitiş': 'finish', park: 'parking', ev: 'home', zirve: 'top' }

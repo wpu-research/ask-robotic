@@ -16,6 +16,8 @@ import { BlocklyPane as BlocklyPaneRaw } from './blockly-pane'
 import { CodeView } from './highlight'
 import { SimPanel } from './sim-panel'
 import { RobotArena } from './robot-arena'
+import { DonusenStage } from './donusen-stage'
+import type { CraneLoad, DonusenModelId } from '@/lib/mikro/donusen'
 import { ROBOT_PROFILES, type RobotProfileId, type RobotScene } from '@/lib/mikro/robot'
 import { logEvent } from '@/lib/events'
 import { errorText } from '@/lib/mikro/en'
@@ -33,11 +35,14 @@ export interface MikroEditorProps {
   initialProject?: MikroProject
   /** Robot Atölyesi: kart bu gövdeye takılır, robot her çalıştırmada `scene()` sahnesinin başında başlar. */
   robot?: RobotSetup
+  /** Robot Atölyesi, Dönüşen Robot: kart bu modele takılır (vinç yükleri, görevin el betiği). */
+  donusen?: DonusenSetup
   /** Proje her değiştiğinde (yükleme dahil) çağrılır. */
   onProjectChange?: (p: MikroProject) => void
 }
 
 export interface RobotSetup { profile: RobotProfileId; scene: () => RobotScene }
+export interface DonusenSetup { model: DonusenModelId; loads?: CraneLoad[]; handScript?: (tMs: number) => number }
 
 const BlocklyPane = memo(BlocklyPaneRaw)
 
@@ -49,8 +54,8 @@ const Icon = {
   reset: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5a7 7 0 1 1-6.7 9" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" /><path d="M4 4v5h5" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" /></svg>,
 }
 
-function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation, robot?: RobotSetup): Simulation {
-  const sim = new Simulation(project, { cards: robot ? 1 : cards, seed: (Date.now() & 0xffff) + 1, robot: robot && { profile: robot.profile, scene: robot.scene() } })
+function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation, robot?: RobotSetup, donusen?: DonusenSetup): Simulation {
+  const sim = new Simulation(project, { cards: robot || donusen ? 1 : cards, seed: (Date.now() & 0xffff) + 1, robot: robot && { profile: robot.profile, scene: robot.scene() }, donusen })
   sim.cards.forEach((c, i) => {
     c.device.soundHook = makeSoundHook()
     const p = prev?.cards[i]
@@ -60,7 +65,8 @@ function makeSim(project: MikroProject, cards: 1 | 2, prev?: Simulation, robot?:
   return sim
 }
 
-export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject, robot, onProjectChange }: MikroEditorProps) {
+export function MikroEditor({ activity, storageKey, onGoalsChange, initialProject, robot, donusen, onProjectChange }: MikroEditorProps) {
+  const body = !!(robot || donusen)
   const { locale, t } = useI18n()
   const en = locale === 'en'
   const fmtTime = (ms: number) => { const n = (ms / 1000).toFixed(1); return t('mikro.common.seconds', { n: en ? n : n.replace('.', ',') }) }
@@ -71,7 +77,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
   const [loaded, setLoaded] = useState(false)
   const [tab, setTab] = useState<Tab>('blocks')
   const [twoCards, setTwoCards] = useState(activity?.cards === 2)
-  const [sim, setSim] = useState<Simulation>(() => makeSim(base, activity?.cards === 2 ? 2 : 1, undefined, robot))
+  const [sim, setSim] = useState<Simulation>(() => makeSim(base, activity?.cards === 2 ? 2 : 1, undefined, robot, donusen))
   const [running, setRunning] = useState(false)
   const [tick, setTick] = useState(0)
   const [error, setError] = useState<RunError | null>(null)
@@ -156,10 +162,10 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
 
   const start = () => {
     unlockAudio()
-    const next = makeSim(projectRef.current, twoCards ? 2 : 1, simRef.current, robot)
+    const next = makeSim(projectRef.current, twoCards ? 2 : 1, simRef.current, robot, donusen)
     next.start()
     setSim(next); setError(null); setRan(true); setDirty(false); setRunning(true)
-    logEvent('run', { p: { kind: robot ? 'robot' : 'mikro' } })
+    logEvent('run', { p: { kind: body ? 'robot' : 'mikro' } })
   }
   const stop = () => {
     sim.stop(); setRunning(false); setGlow('')
@@ -170,14 +176,14 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
   const reset = () => {
     sim.stop()
     setRunning(false); setGlow(''); setError(null); setRan(false); setDirty(false)
-    setSim(makeSim(projectRef.current, twoCards ? 2 : 1, sim, robot))
+    setSim(makeSim(projectRef.current, twoCards ? 2 : 1, sim, robot, donusen))
     setTimeout(evalGoals, 0)
   }
   const toggleTwo = () => {
     const next = !twoCards
     setTwoCards(next)
     const wasRunning = running
-    const ns = makeSim(projectRef.current, next ? 2 : 1, sim, robot)
+    const ns = makeSim(projectRef.current, next ? 2 : 1, sim, robot, donusen)
     sim.stop()
     setSim(ns); setError(null)
     if (wasRunning) { ns.start(); setRunning(true) } else { setRunning(false); setRan(false) }
@@ -196,7 +202,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
     stickyRef.current = new Set()
     setProject(p); setResetKey((k) => `${k}:n`); setRunning(false); setRan(false); setError(null); setGlow(''); setDirty(false)
     setTwoCards(cards === 2)
-    setSim(makeSim(p, cards, sim, robot))
+    setSim(makeSim(p, cards, sim, robot, donusen))
   }
   const hasWork = countBlocks(project.workspace) > 0
   const confirmReplace = () => !hasWork || window.confirm(t('mikro.editor.confirmReplace'))
@@ -258,7 +264,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
   const intro = actEn?.intro ?? activity?.intro
 
   return (
-    <div className="mk-box"><div className={`mk-ed${robot ? ' mk-robot' : ''}`} data-testid="mikro-editor" data-running={running}>
+    <div className="mk-box"><div className={`mk-ed${body ? ' mk-robot' : ''}`} data-testid="mikro-editor" data-running={running}>
       {/* üst çubuk */}
       <div className="mk-bar" role="toolbar" aria-label={t('mikro.editor.toolbar')}>
         <div className="mk-run">
@@ -272,7 +278,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
         </span>
         {dirty && running && <span className="mk-chipnote">{t('mikro.editor.dirtyHint')}</span>}
         <span className="mk-spacer" />
-        {!activity && !robot && <button className="mk-btn" onClick={() => setGalleryOpen(true)} data-testid="mikro-gallery-open">{t('mikro.editor.examples')}</button>}
+        {!activity && !body && <button className="mk-btn" onClick={() => setGalleryOpen(true)} data-testid="mikro-gallery-open">{t('mikro.editor.examples')}</button>}
         <button className="mk-btn" onClick={newProject} data-testid="mikro-new">{activity ? t('mikro.editor.restart') : t('mikro.editor.newProject')}</button>
         <button className="mk-btn" onClick={doExport} data-testid="mikro-export">{t('mikro.editor.export')}</button>
         <button className="mk-btn" onClick={() => fileRef.current?.click()} data-testid="mikro-import">{t('mikro.editor.import')}</button>
@@ -317,7 +323,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
           <div className="mk-work">
             {/* Blockly sekme değişince yok edilmesin: gizlenir */}
             <div className="mk-pane" hidden={tab !== 'blocks'}>
-              <BlocklyPane workspace={project.workspace} onChange={onWorkspace} allowedBlocks={allowed} robot={robot ? ROBOT_PROFILES[robot.profile] : null} resetKey={resetKey} activeHatIds={glowIds} errorBlockId={error?.blockId ?? null} />
+              <BlocklyPane workspace={project.workspace} onChange={onWorkspace} allowedBlocks={allowed} robot={robot ? ROBOT_PROFILES[robot.profile] : null} donusen={donusen?.model ?? null} resetKey={resetKey} activeHatIds={glowIds} errorBlockId={error?.blockId ?? null} />
             </div>
             {tab === 'js' && <div className="mk-pane code"><CodeView code={js} lang="js" /></div>}
             {tab === 'py' && <div className="mk-pane code"><CodeView code={py} lang="py" /></div>}
@@ -325,17 +331,18 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
         </section>
 
         {/* sağ: sanal kart(lar) */}
-        <aside className="mk-right" aria-label={sim.robot ? t('mikro.editor.robotSide') : t('mikro.editor.cardSide')}>
+        <aside className="mk-right" aria-label={sim.robot || sim.donusen ? t('mikro.editor.robotSide') : t('mikro.editor.cardSide')}>
           {sim.robot && <RobotArena robot={sim.robot} device={sim.device} tick={tick} />}
+          {sim.donusen && <DonusenStage bot={sim.donusen} tick={tick} />}
           <div className={`mk-boards${sim.cards.length > 1 ? ' two' : ''}`}>
             {sim.cards.map((c, i) => (
-              <Board key={i} device={c.device} tick={tick} title={sim.robot ? t('mikro.editor.robotCard') : sim.cards.length > 1 ? t('mikro.editor.cardN', { n: i + 1 }) : t('mikro.editor.card')} compact={sim.cards.length > 1 || !!sim.robot}
+              <Board key={i} device={c.device} tick={tick} title={sim.robot || sim.donusen ? t('mikro.editor.robotCard') : sim.cards.length > 1 ? t('mikro.editor.cardN', { n: i + 1 }) : t('mikro.editor.card')} compact={sim.cards.length > 1 || !!sim.robot || !!sim.donusen}
                 onButton={(b, down) => { if (down) c.device.press(b); else c.device.release(b); bump() }}
                 onLogo={(down) => { c.device.setLogo(down); bump() }}
                 onPin={(p, down) => { c.device.setPinTouch(p, down); bump() }} />
             ))}
           </div>
-          <SimPanel sim={sim} tick={tick} bump={bump} twoCards={twoCards} onToggleTwo={toggleTwo} muted={muted} onMute={toggleMute} noRadio={!!robot} />
+          <SimPanel sim={sim} tick={tick} bump={bump} twoCards={twoCards} onToggleTwo={toggleTwo} muted={muted} onMute={toggleMute} noRadio={body} />
         </aside>
       </div>
 

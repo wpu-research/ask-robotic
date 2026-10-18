@@ -2,6 +2,7 @@
 import { Device } from './device'
 import { Runtime, type RuntimeOptions } from './runtime'
 import { DriveBase, type RobotProfileId, type RobotScene } from './robot'
+import { DonusenBot, type CraneLoad, type DonusenModelId } from './donusen'
 import type { DeviceEvent, MikroProject, RadioMessage, RunError, WorkspaceState } from './types'
 
 export const QUANTUM_MS = 10
@@ -14,6 +15,8 @@ export interface SimOptions extends RuntimeOptions {
   cards?: 1 | 2
   /** Verilirse 1. kart bu robot gövdesine takılır ve robot bu sahnede başlar. */
   robot?: { profile: RobotProfileId; scene: RobotScene }
+  /** Verilirse 1. kart Dönüşen Robot'un bu modeline takılır. */
+  donusen?: { model: DonusenModelId; loads?: CraneLoad[]; handScript?: (tMs: number) => number }
 }
 
 export class Simulation {
@@ -32,12 +35,14 @@ export class Simulation {
     const device = new Device(this.cards.length)
     device.onRadioSend = (from, msg) => this.broadcast(from, msg)
     if (opts.robot && this.cards.length === 0) device.robot = new DriveBase(opts.robot.profile, opts.robot.scene)
+    if (opts.donusen && this.cards.length === 0) device.donusen = new DonusenBot(opts.donusen.model, opts.donusen)
     this.cards.push({ device, runtime: new Runtime(device, this.ws, { seed: opts.seed, burstLimit: opts.burstLimit, totalStepLimit: opts.totalStepLimit }) })
   }
 
   get card(): Card { return this.cards[0] }
   get device(): Device { return this.cards[0].device }
   get robot(): DriveBase | null { return this.cards[0].device.robot }
+  get donusen(): DonusenBot | null { return this.cards[0].device.donusen }
 
   start() { for (const c of this.cards) c.runtime.start() }
   stop() { for (const c of this.cards) c.runtime.stop() }

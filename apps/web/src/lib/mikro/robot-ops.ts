@@ -3,7 +3,9 @@ import { MikroError, evNum, type Ctx, type ExprHandler, type StmtHandler } from 
 import { FLOOR_COLORS, type DriveBase, type FloorColor, type LightColor, type RobotSensor } from './robot'
 import type { PBlock } from './types'
 
-const SENSOR_NAME: Record<RobotSensor, string> = { distance: 'mesafe sensörü', color: 'renk sensörü', force: 'tampon (kuvvet) sensörü', line: 'çizgi sensörü' }
+const SENSOR_NAME: Record<RobotSensor, string> = { distance: 'mesafe sensörü', color: 'renk sensörü', force: 'tampon (kuvvet) sensörü', line: 'çizgi sensörü', gripper: 'kıskaç' }
+/** Kıskacın açılıp kapanma süresi (ms). */
+const GRIP_MS = 300
 /** Hareket bloklarında robotun durumu bu aralıkla yoklanır (ms). */
 const POLL_MS = 10
 
@@ -41,6 +43,11 @@ const stmts: Record<string, StmtHandler> = {
     r.speed = Math.max(10, Math.min(100, Math.round(yield* evNum(b, 'P', c))))
   },
   rb_reset(b, c) { robotOf(b, c).resetAngles() },
+  *rb_grip(b, c) {
+    const r = robotOf(b, c, 'gripper')
+    r.grip(f(b, 'ACTION') !== 'open')
+    yield GRIP_MS
+  },
   rb_lights(b, c) { robotOf(b, c).lights = f(b, 'COLOR') as LightColor },
 }
 
@@ -60,6 +67,8 @@ const exprs: Record<string, ExprHandler> = {
   rb_line: sense((b, c) => robotOf(b, c, 'line').lineOn(f(b, 'SIDE') === 'right' ? 'right' : 'left')),
   rb_pressed: sense((b, c) => robotOf(b, c, 'force').pressed),
   rb_motor_deg: sense((b, c) => { const r = robotOf(b, c); return f(b, 'SIDE') === 'right' ? r.motorDegR : r.motorDegL }),
+  rb_holding: sense((b, c) => robotOf(b, c, 'gripper').held !== null),
+  rb_held_is: sense((b, c) => robotOf(b, c, 'gripper').heldColor === (f(b, 'C') as FloorColor)),
   rb_heading: sense((b, c) => robotOf(b, c).headingDeg),
 }
 
