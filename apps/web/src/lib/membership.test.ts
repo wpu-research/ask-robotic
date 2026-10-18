@@ -1,7 +1,8 @@
 import { beforeAll, describe, expect, it } from 'vitest'
 import { eq, subscriptions, users, type Db } from '@ask/db'
 import { registerUser } from './auth/service'
-import { createUserByAdmin, grantMembership, listUsers, revokeMembership, welcomeRemaining, WELCOME_LIMIT, WELCOME_PROVIDER } from './membership'
+import { createT } from '@/i18n'
+import { createUserByAdmin, grantMembership, listUsers, revokeMembership, welcomeNoticeText, welcomeRemaining, WELCOME_LIMIT, WELCOME_PROVIDER } from './membership'
 import { createTestDb } from './test-db'
 
 let db: Db
@@ -28,6 +29,14 @@ describe('hoş geldin üyeliği', () => {
     expect(r.ok).toBe(true)
     if (!r.ok) return
     expect(await db.select().from(subscriptions).where(eq(subscriptions.userId, r.user.id))).toHaveLength(0)
+  })
+})
+
+describe('kampanya notu', () => {
+  it('kalan sayıyla gösterilir, kontenjan dolunca gizlenir', () => {
+    expect(welcomeNoticeText(createT('tr'), 873)).toBe('İlk 1000 kayda 6 ay Premium ücretsiz — kalan: 873')
+    expect(welcomeNoticeText(createT('en'), 1)).toBe('6 months of Premium free for the first 1000 sign-ups — 1 spot left')
+    expect(welcomeNoticeText(createT('tr'), 0)).toBeNull()
   })
 })
 

@@ -41,6 +41,14 @@ export const lesson: typeof Tr = {
     praise5: "You're doing great.",
     praise6: 'Super.',
   },
+  video: {
+    heading: 'Video',
+    frameTitle: 'Lesson video: {title}',
+    open: 'Open the lesson video',
+    close: 'Close the video',
+    inEnglish: 'The video is in English.',
+    inTurkish: 'The video is in Turkish.',
+  },
   steps: {
     options: 'Options',
     yourAnswer: 'Your answer',

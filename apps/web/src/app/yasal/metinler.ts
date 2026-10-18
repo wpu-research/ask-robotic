@@ -1,6 +1,7 @@
 // Yasal metin TASLAKLARI. Hukukçu onayı olmadan yayımlanmamalı. Köşeli parantezli alanlar (ör. [ŞİRKET UNVANI])
 // şirket bilgileriyle doldurulmalı. Fiyat ve planlar lib/pricing.ts'ten gelir (yer tutucu).
 import { FAMILY_SIZE, TRIAL_DAYS } from '@/lib/pricing'
+import { WELCOME_LIMIT, WELCOME_MONTHS } from '@/lib/membership'
 
 export interface LegalDoc { title: string; sections: { h: string; p: string[] }[] }
 
@@ -10,6 +11,9 @@ const SATICI = [
   'MERSİS / Vergi No: [MERSİS NO] / [VERGİ DAİRESİ – NO]',
   'E-posta: [DESTEK E-POSTASI] · KEP: [KEP ADRESİ]',
 ]
+
+// Kayıt kampanyası (lib/membership.ts grantWelcome); mesafeli satış ve iade metinlerinde aynı paragraf
+const KAMPANYA = `Platforma bireysel olarak kaydolan ilk ${WELCOME_LIMIT} kullanıcıya, kayıt tarihinden itibaren ${WELCOME_MONTHS} ay ücretsiz Premium üyelik tanımlanır. Kampanya kart bilgisi istemez, otomatik ücretlendirme ya da yenileme yapılmaz; süre bitince hesap kendiliğinden ücretsiz plana döner. Kontenjan dolduğunda kampanya sona erer; bir satış sözleşmesi doğurmaz. [HUKUKÇU: kampanya koşullarının ilanı ve kontenjan bitiminin duyurulması netleşmeli.]`
 
 export const LEGAL: Record<string, LegalDoc> = {
   'mesafeli-satis': {
@@ -25,8 +29,9 @@ export const LEGAL: Record<string, LegalDoc> = {
       { h: '4. İfa', p: ['Hizmet, ödemenin ödeme kuruluşunca onaylanmasıyla derhal ALICI\'nın hesabında etkinleştirilir. Yeni dönem, varsa süren üyeliğin bitiş tarihinden itibaren eklenir.'] },
       { h: '5. Cayma hakkı', p: ['Cayma hakkı ve istisnaları İade ve İptal Koşulları\'nda açıklanmıştır. ALICI, ödeme sırasında dijital hizmetin hemen sunulmasına onay verdiğini ve bu durumda cayma hakkının Yönetmelik md. 15/1-(ğ) kapsamında sınırlanabileceğini bildiğini kabul eder. [HUKUKÇU: istisnanın uygulanıp uygulanmayacağı ve kullanılmamış süre için kısmi iade politikası netleşmeli.]'] },
       { h: '6. Ücretsiz deneme', p: [`Kartsız ${TRIAL_DAYS} günlük deneme ücretsizdir, kullanıcı başına bir kez verilir ve süre bitince kendiliğinden sona erer; bir satış sözleşmesi doğurmaz.`] },
-      { h: '7. Uyuşmazlık', p: ['Uyuşmazlıklarda, Ticaret Bakanlığınca ilan edilen parasal sınırlar dahilinde ALICI\'nın yerleşim yerindeki ya da işlemin yapıldığı yerdeki Tüketici Hakem Heyetleri, sınırları aşan durumlarda Tüketici Mahkemeleri yetkilidir.'] },
-      { h: '8. Yürürlük', p: ['ALICI, ödeme sayfasındaki onay kutusunu işaretleyip ödemeyi tamamladığında bu sözleşmenin tüm koşullarını kabul etmiş sayılır. Sözleşme elektronik ortamda saklanır ve ALICI\'ya e-postayla iletilir. [YAPILACAK: sözleşme ve fatura e-postası.]'] },
+      { h: '7. Kayıt kampanyası', p: [KAMPANYA] },
+      { h: '8. Uyuşmazlık', p: ['Uyuşmazlıklarda, Ticaret Bakanlığınca ilan edilen parasal sınırlar dahilinde ALICI\'nın yerleşim yerindeki ya da işlemin yapıldığı yerdeki Tüketici Hakem Heyetleri, sınırları aşan durumlarda Tüketici Mahkemeleri yetkilidir.'] },
+      { h: '9. Yürürlük', p: ['ALICI, ödeme sayfasındaki onay kutusunu işaretleyip ödemeyi tamamladığında bu sözleşmenin tüm koşullarını kabul etmiş sayılır. Sözleşme elektronik ortamda saklanır ve ALICI\'ya e-postayla iletilir. [YAPILACAK: sözleşme ve fatura e-postası.]'] },
     ],
   },
   'on-bilgilendirme': {
@@ -45,6 +50,7 @@ export const LEGAL: Record<string, LegalDoc> = {
     sections: [
       { h: 'Otomatik yenileme yok', p: ['Üyelikler ön ödemelidir. Süre bitince Premium kendiliğinden ücretsiz plana döner; iptal etmen gereken bir abonelik yoktur.'] },
       { h: 'Ücretsiz deneme', p: [`${TRIAL_DAYS} günlük deneme kart istemez ve hiçbir ücret doğurmaz.`] },
+      { h: 'Kayıt kampanyası', p: [KAMPANYA] },
       { h: 'Cayma hakkı', p: [
         'Satın alma tarihinden itibaren 14 gün içinde [DESTEK E-POSTASI] adresine yazarak cayma hakkını kullanabilirsin.',
         'Dijital hizmetin hemen sunulmasına onay verip hizmeti kullanmaya başladıysan cayma hakkı mevzuat gereği sınırlanabilir. [HUKUKÇU/İŞ KARARI: hiç kullanılmamış üyeliklerde tam iade; kullanılmışsa kalan süre için kısmi iade uygulanıp uygulanmayacağı.]',

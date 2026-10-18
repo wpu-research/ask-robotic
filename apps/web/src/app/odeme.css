@@ -115,6 +115,11 @@
 .ac-form { display: flex; gap: 10px; flex-wrap: wrap; }
 .ac-form input { flex: 1 1 220px; min-height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
 .ac-form input:focus { border-color: var(--v2-accent); outline: none; }
+.ac-pw { display: grid; gap: 6px; max-width: 420px; }
+.ac-pw label { font-weight: 700; font-size: .92rem; margin-top: 6px; }
+.ac-pw input { min-height: 44px; padding: 0 14px; border-radius: 12px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: inherit; }
+.ac-pw input:focus { border-color: var(--v2-accent); outline: none; }
+.ac-pw .ac-row { margin-top: 8px; }
 .ac-link { border: 0; background: none; color: var(--primary); font: inherit; font-weight: 700; cursor: pointer; padding: 4px 6px; }
 .ac-danger { border-color: #fecaca; }
 .ac-danger .v2-btn.danger { background: #dc2626; color: #fff; box-shadow: 0 4px 0 #991b1b; }

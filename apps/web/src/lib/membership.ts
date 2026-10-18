@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { hashPassword } from './auth/password'
 import { subscriptionActive, type PlanId, type SubscriptionStatus } from './entitlements'
 import { addMonths, isPaidPlan, type PaidPlanId } from './pricing'
+import type { TFunction } from '@/i18n'
 
 export const WELCOME_PROVIDER = 'hosgeldin'
 export const ADMIN_PROVIDER = 'admin'
@@ -37,6 +38,12 @@ export async function grantWelcome(tx: Tx, userId: string, now = new Date()): Pr
 export async function welcomeRemaining(db: Db) {
   const [{ n }] = await db.select({ n: sql<number>`count(*)::int` }).from(subscriptions).where(eq(subscriptions.provider, WELCOME_PROVIDER))
   return Math.max(0, WELCOME_LIMIT - n)
+}
+
+/** /kayit ve /fiyatlar kampanya notu; kontenjan dolunca null (gösterilmez). */
+export function welcomeNoticeText(t: TFunction, remaining: number): string | null {
+  if (remaining <= 0) return null
+  return t('pricing.welcome.notice', { limit: WELCOME_LIMIT, months: WELCOME_MONTHS, n: remaining })
 }
 
 // ---------------------------------------------------------------------------

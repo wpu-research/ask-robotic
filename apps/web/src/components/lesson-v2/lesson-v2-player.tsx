@@ -17,6 +17,8 @@ import { LESSON_CHIPS, TutorPanel } from './tutor'
 import { MAX_CHARS } from '@/lib/tutor/protocol'
 import { useClaimRobi } from '@/components/robi/presence'
 import { useVoice } from './voice'
+import { LessonVideo } from './lesson-video'
+import type { LessonVideo as VideoEntry } from '@/lib/lesson-videos'
 
 export interface V2Props {
   lesson: { id: number; title: string; steps: LessonStep[] }
@@ -31,6 +33,8 @@ export interface V2Props {
   classicHref: string
   /** Küçük bilgi notu (ör. arayüz İngilizce ama ders yalnız Türkçe). */
   notice?: string
+  /** Ders videosu (lib/lesson-videos.ts) ve sunucuda hazırlanmış metinleri; yoksa düğme de çıkmaz */
+  video?: VideoEntry & { heading: string; frameTitle: string; langNote?: string }
 }
 
 type Status = 'idle' | 'wrong' | 'correct' | 'revealed'
@@ -58,6 +62,7 @@ export function LessonV2Player(p: V2Props) {
   const [attempts, setAttempts] = useState(0)
   const [showWhy, setShowWhy] = useState(false)
   const [earned, setEarned] = useState(0)
+  const [videoOpen, setVideoOpen] = useState(false)
   const [firstTry, setFirstTry] = useState(0)
   const [finished, setFinished] = useState(false)
   const [syncError, setSyncError] = useState('')
@@ -155,9 +160,19 @@ export function LessonV2Player(p: V2Props) {
         {voice.supported && (
           <button type="button" className="v2-icon-btn" onClick={voice.toggle} aria-pressed={voice.on} aria-label={voice.on ? t('lesson.player.voiceOff') : t('lesson.player.voiceOn')} title={t('lesson.player.voiceTitle')}>{voice.on ? '🔊' : '🔈'}</button>
         )}
+        {p.video && (
+          <button type="button" className="v2-icon-btn" onClick={() => setVideoOpen((o) => !o)} aria-expanded={videoOpen} aria-controls="v2-video"
+            aria-label={videoOpen ? t('lesson.video.close') : t('lesson.video.open')} title={p.video.heading}>{videoOpen ? '✕' : '▶'}</button>
+        )}
         <span className="v2-xp" aria-label={t('lesson.player.xpLabel', { n: earned })}>✦ {earned}</span>
       </header>
       {p.notice && <p className="v2-notice" role="note" style={{ margin: '6px auto 0', maxWidth: 720, padding: '4px 12px', fontSize: '.85rem', textAlign: 'center', color: 'var(--muted)' }}>{p.notice}</p>}
+
+      {p.video && videoOpen && (
+        <div className="v2-video" id="v2-video">
+          <LessonVideo video={p.video} heading={p.video.heading} frameTitle={p.video.frameTitle} langNote={p.video.langNote} id="v2-video-h" />
+        </div>
+      )}
 
       <main className="v2-body" key={finished ? 'end' : i}>
         {finished ? (

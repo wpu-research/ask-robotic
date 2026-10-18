@@ -42,6 +42,10 @@ const EXACT: Record<string, MessageKey> = {
   'Çok sık istek': 'account.errors.tooFrequent',
   'Giriş yapılmamış': 'account.errors.notLoggedIn',
   'Geçersiz istek': 'account.errors.badRequest',
+  'Mevcut parolanı yaz': 'account.errors.currentRequired',
+  'Mevcut parola hatalı': 'account.errors.badCurrent',
+  'Yeni parola eskisiyle aynı olamaz': 'account.errors.samePassword',
+  'Bu hesap parolayla değil QR kart ya da resimle giriş yapıyor; parola değiştirilemez': 'account.errors.noPassword',
 }
 
 const PATTERNS: { re: RegExp; key: MessageKey; params: (m: RegExpMatchArray) => Record<string, string> }[] = [

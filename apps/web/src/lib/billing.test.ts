@@ -9,6 +9,7 @@ import { resolveAccess } from './entitlements'
 import { mockProvider } from './payments/mock'
 import { addMonths, priceOf } from './pricing'
 import { createTestDb } from './test-db'
+import { WELCOME_MONTHS, WELCOME_PROVIDER } from './membership'
 
 let db: Db
 const now = new Date('2026-10-14T10:00:00Z')
@@ -196,6 +197,20 @@ describe('hesap özeti', () => {
     const end = s!.periodEnd!
     expect((await loadAccountSummary(db, u.id, new Date(end.getTime() - 3 * gun)))?.renewalReminder).toBe(true)
     expect(await loadAccountSummary(db, u.id, new Date(end.getTime() + gun))).toMatchObject({ plan: 'free', status: 'expired', trialAvailable: false })
+  })
+  it('kayıt hediyesi kendi etkin Premium planı olarak, kaynağı welcome işaretiyle görünür', async () => {
+    const u = await yeni()
+    const end = addMonths(now, WELCOME_MONTHS)
+    await db.insert(subscriptions).values({ userId: u.id, planId: 'premium', status: 'active', provider: WELCOME_PROVIDER, providerRef: u.id, currentPeriodEnd: end })
+    expect(await loadAccountSummary(db, u.id, now)).toMatchObject({ plan: 'premium', status: 'active', source: 'own', grant: 'welcome', periodEnd: end, trialAvailable: false })
+    expect(await loadAccountSummary(db, u.id, new Date(end.getTime() + gun))).toMatchObject({ plan: 'free', grant: null })
+    expect((await loadAccountSummary(db, (await yeni()).id, now))?.grant).toBeNull()
+  })
+  it('parola özeti taşınmaz; yalnız var/yok bilgisi', async () => {
+    const qr = await yeni({ email: null, username: `qr-${crypto.randomUUID().slice(0, 8)}`, loginMode: 'qr' })
+    const pw = await yeni({ passwordHash: 'scrypt$x' })
+    expect((await loadAccountSummary(db, qr.id, now))?.user).toEqual({ id: qr.id, name: qr.name, email: null, username: qr.username, hasPassword: false })
+    expect((await loadAccountSummary(db, pw.id, now))?.user.hasPassword).toBe(true)
   })
   it('aile sahibi üyeleri, üye kaynağı görür', async () => {
     const o = await yeni()

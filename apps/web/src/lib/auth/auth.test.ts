@@ -9,7 +9,7 @@ import { hashPassword, verifyPassword } from './password'
 import { rateLimited } from './rate-limit'
 import { consents, eq } from '@ask/db'
 import { createQrCredentials, hashQrSecret, loginWithQr, QR_LIMIT, qrLoginUrl } from './qr'
-import { loginUser, mayBeUnder16, registerUser } from './service'
+import { changePassword, loginUser, mayBeUnder16, registerUser } from './service'
 import { createSession, deleteSession, getSessionUser, SESSION_TTL_MS } from './session'
 
 let db: Db
@@ -173,6 +173,40 @@ describe('oturum', () => {
   it('geçersiz ve boş token null döner', async () => {
     expect(await getSessionUser(db, 'uydurma')).toBeNull()
     expect(await getSessionUser(db, undefined)).toBeNull()
+  })
+})
+
+describe('parola değiştirme', () => {
+  const pw = { email: 'degis@example.com', password: 'eski-parola-123', name: 'Değiş', role: 'student', birthYear: 1995 }
+  it('mevcut parola doğruysa yenisini yazar; bu oturum kalır, diğerleri kapanır', async () => {
+    const r = await registerUser(db, pw, NOW)
+    if (!r.ok) throw new Error('kayıt olmadı')
+    const other = await createSession(db, r.user.id)
+    const res = await changePassword(db, r.user.id, { current: pw.password, next: 'yeni-parola-456' }, r.token)
+    expect(res).toEqual({ ok: true, signedOut: 1 })
+    expect((await getSessionUser(db, r.token))?.name).toBe('Değiş')
+    expect(await getSessionUser(db, other.token)).toBeNull()
+    expect(await loginUser(db, { login: pw.email, password: pw.password })).toMatchObject({ ok: false, code: 'bad_credentials' })
+    expect((await loginUser(db, { login: pw.email, password: 'yeni-parola-456' })).ok).toBe(true)
+  })
+  it('yanlış mevcut parola, kısa yeni parola ve aynı parola reddedilir; parola değişmez', async () => {
+    const [u] = await db.select().from(schema.users).where(eq(schema.users.email, pw.email))
+    expect(await changePassword(db, u.id, { current: 'yanlis-parola', next: 'baska-parola-789' })).toMatchObject({ ok: false, code: 'bad_current' })
+    expect(await changePassword(db, u.id, { current: 'yeni-parola-456', next: 'kisa' })).toMatchObject({ ok: false, code: 'invalid_input', message: 'Parola en az 10 karakter olmalı' })
+    expect(await changePassword(db, u.id, { current: 'yeni-parola-456', next: 'yeni-parola-456' })).toMatchObject({ ok: false, code: 'same_password' })
+    expect(await changePassword(db, u.id, null)).toMatchObject({ ok: false, code: 'invalid_input' })
+    expect((await loginUser(db, { login: pw.email, password: 'yeni-parola-456' })).ok).toBe(true)
+  })
+  it('parolasız (QR) hesap açık bir hatayla reddedilir; bilinmeyen kullanıcı bulunamaz', async () => {
+    const [u] = await db.insert(schema.users).values({ username: 'qr.parolasiz', name: 'QR', loginMode: 'qr', loginSecretHash: 'x' }).returning()
+    expect(await changePassword(db, u.id, { current: 'herhangi-bir', next: 'yeni-parola-456' })).toMatchObject({ ok: false, code: 'no_password' })
+    expect(await changePassword(db, '00000000-0000-0000-0000-000000000000', { current: 'a', next: 'yeni-parola-456' })).toMatchObject({ ok: false, code: 'not_found' })
+  })
+  it('jeton verilmezse tüm oturumlar kapanır', async () => {
+    const [u] = await db.select().from(schema.users).where(eq(schema.users.email, pw.email))
+    const a = await createSession(db, u.id)
+    expect(await changePassword(db, u.id, { current: 'yeni-parola-456', next: 'ucuncu-parola-0' })).toMatchObject({ ok: true })
+    expect(await getSessionUser(db, a.token)).toBeNull()
   })
 })
 

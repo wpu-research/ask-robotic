@@ -126,6 +126,9 @@ export const pricing: typeof Tr = {
     cancel: 'Cancel and go back',
     error: 'Something went wrong',
   },
+  welcome: {
+    notice: '{months} months of Premium free for the first {limit} sign-ups — {n|# spot|# spots} left',
+  },
   legal: {
     nav: 'Legal documents',
     distanceSales: 'Distance Sales Agreement',

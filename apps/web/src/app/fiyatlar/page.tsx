@@ -8,6 +8,7 @@ import { getLocale, getT } from '@/i18n/server'
 import { formatDate } from '@/i18n/format'
 import { PricingView } from '@/components/pricing/pricing-view'
 import { LegalLinks } from '@/components/pricing/legal-links'
+import { WelcomeOffer } from '@/components/pricing/welcome-offer'
 import '../odeme.css'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -33,6 +34,8 @@ export default async function Fiyatlar({ searchParams }: { searchParams: Promise
         <p className="v2-eyebrow">{t('pricing.page.eyebrow')}</p>
         <h1>{t('pricing.page.heading')}</h1>
         <p>{t('pricing.page.lead', { days: TRIAL_DAYS })}</p>
+        {/* Kampanya yalnız yeni kayıt içindir; giriş yapmış kullanıcıya gösterilmez */}
+        {!user && <WelcomeOffer className="pr-msg ok" />}
         {q.odeme === 'iptal' && <p className="pr-msg" role="status">{t('pricing.page.canceled')}</p>}
       </header>
 

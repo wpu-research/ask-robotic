@@ -13,6 +13,8 @@ import { paywallEnabled } from '@/lib/entitlements'
 import { getLocale, getT } from '@/i18n/server'
 import { moduleCallout, moduleTitle, weekTitle } from '@/lib/catalog-en'
 import { lessonTitle } from '@/lib/lesson-titles-en'
+import { lessonVideoFor } from '@/lib/lesson-videos'
+import { LessonVideo } from '@/components/lesson-v2/lesson-video'
 
 export const dynamic = 'force-dynamic'
 
@@ -63,6 +65,13 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
   // Klasik dersin İngilizcesi (content_en): arayüz İngilizceyse ve çeviri varsa
   const en = locale === 'en' ? ctx.lesson.contentEn ?? null : null
   const steps = english ? ctx.lesson.stepsEn : ctx.lesson.steps
+  // Ders videosu (lib/lesson-videos.ts); girdi yoksa null ve hiçbir şey çizilmez
+  const video = lessonVideoFor(key)
+  const videoText = video && {
+    heading: t('lesson.video.heading'),
+    frameTitle: t('lesson.video.frameTitle', { title: video.title ?? title }),
+    langNote: video.lang !== locale ? t(video.lang === 'en' ? 'lesson.video.inEnglish' : 'lesson.video.inTurkish') : undefined,
+  }
   if (steps?.length && !classic) {
     return (
       <LessonV2Player
@@ -76,6 +85,7 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
         activityKey={key}
         serverSync={!!user}
         classicHref={`/ders/${ctx.lesson.id}?klasik=1`}
+        video={video && videoText ? { ...video, ...videoText } : undefined}
       />
     )
   }
@@ -110,6 +120,7 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
         serverSync={!!user}
         serverDone={serverDone}
       />
+      {videoText && <LessonVideo video={video} {...videoText} />}
     </>
   )
 }

@@ -14,6 +14,7 @@ import {
   type BillingPeriod, type PaidPlanId,
 } from './pricing'
 import { subscriptionActive, type PlanId, type SubscriptionStatus } from './entitlements'
+import { ADMIN_PROVIDER, WELCOME_PROVIDER } from './membership'
 import type { PaymentProvider, VerifiedPayment } from './payments/provider'
 
 export const TRIAL_PROVIDER = 'trial'
@@ -254,12 +255,14 @@ export async function removeFamilyMember(db: Db, ownerId: string, memberId: stri
 // ---------------------------------------------------------------------------
 
 export interface AccountSummary {
-  user: { id: string; name: string; email: string | null; username: string | null }
+  user: { id: string; name: string; email: string | null; username: string | null; hasPassword: boolean }
   /** En yüksek etkin plan (aile üyeliği dahil) */
   plan: 'free' | 'premium' | 'family'
   status: 'none' | 'trialing' | 'active' | 'expired'
   periodEnd: Date | null
   source: 'own' | 'family_member' | null
+  /** Etkin plan ödemesiz verildiyse: kayıt hediyesi (membership.ts WELCOME_PROVIDER) ya da admin */
+  grant: 'welcome' | 'admin' | null
   renewalReminder: boolean
   trialAvailable: boolean
   payments: { id: string; planId: string; period: string; amount: number; status: string; provider: string; createdAt: Date }[]
@@ -267,8 +270,12 @@ export interface AccountSummary {
 }
 
 export async function loadAccountSummary(db: Db, userId: string, now = new Date()): Promise<AccountSummary | null> {
-  const [user] = await db.select({ id: users.id, name: users.name, email: users.email, username: users.username }).from(users).where(eq(users.id, userId))
-  if (!user) return null
+  const [row] = await db.select({ id: users.id, name: users.name, email: users.email, username: users.username, passwordHash: users.passwordHash })
+    .from(users).where(eq(users.id, userId))
+  if (!row) return null
+  // Parola özeti sayfaya taşınmaz; yalnız var/yok (QR/resimli girişte parola yok)
+  const { passwordHash, ...rest } = row
+  const user = { ...rest, hasPassword: !!passwordHash }
   const cols = { id: subscriptions.id, planId: subscriptions.planId, status: subscriptions.status, end: subscriptions.currentPeriodEnd, provider: subscriptions.provider }
   const [owned, shared, pays] = await Promise.all([
     db.select(cols).from(subscriptions).where(eq(subscriptions.userId, userId)),
@@ -280,13 +287,13 @@ export async function loadAccountSummary(db: Db, userId: string, now = new Date(
     }).from(payments).where(eq(payments.userId, userId)).orderBy(sql`${payments.createdAt} desc`).limit(50),
   ])
   const rank = { free: 0, premium: 1, family: 2 } as const
-  type Cand = { planId: 'premium' | 'family'; status: 'trialing' | 'active'; end: Date | null; source: 'own' | 'family_member' }
+  type Cand = { planId: 'premium' | 'family'; status: 'trialing' | 'active'; end: Date | null; source: 'own' | 'family_member'; provider: string | null }
   const cands: Cand[] = []
   for (const [list, source] of [[owned, 'own'], [shared, 'family_member']] as const) {
     for (const s of list) {
       if (!isPaidPlan(s.planId)) continue
       if (!subscriptionActive({ planId: s.planId, status: s.status as SubscriptionStatus, currentPeriodEnd: s.end }, now)) continue
-      cands.push({ planId: s.planId, status: s.status === 'trialing' ? 'trialing' : 'active', end: s.end, source })
+      cands.push({ planId: s.planId, status: s.status === 'trialing' ? 'trialing' : 'active', end: s.end, source, provider: s.provider })
     }
   }
   // En yüksek plan; eşitse en geç biten
@@ -311,6 +318,7 @@ export async function loadAccountSummary(db: Db, userId: string, now = new Date(
     status: best ? best.status : everPaid ? 'expired' : 'none',
     periodEnd,
     source: best?.source ?? null,
+    grant: best?.source !== 'own' ? null : best.provider === WELCOME_PROVIDER ? 'welcome' : best.provider === ADMIN_PROVIDER ? 'admin' : null,
     // Deneme: 5. gün hatırlatması (bitişe 2 gün); ücretli: bitişe RENEWAL_REMINDER_DAYS gün
     renewalReminder: !!best && best.source === 'own'
       && needsRenewalReminder(periodEnd, now, best.status === 'trialing' && periodEnd === best.end ? TRIAL_DAYS - TRIAL_REMINDER_DAY : undefined),
