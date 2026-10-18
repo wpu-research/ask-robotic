@@ -1,0 +1,27 @@
+/* Drone dersi: ESOF 323 (robotik.css) üstüne üç ayak kartları, ünite ayak etiketleri ve parça kataloğu. Aynı jetonlar. */
+.dr-pillars { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.dr-pillar { display: grid; gap: 6px; align-content: start; padding: 18px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); box-shadow: var(--shadow-sm); }
+.dr-pillar:hover { text-decoration: none; border-color: color-mix(in srgb, var(--eng) 45%, var(--border)); }
+.dr-pillar b { font-size: 1.05rem; }
+.dr-pillar span { color: var(--muted); font-size: .9rem; }
+.dr-pillar small { font-family: var(--mono); color: var(--eng); font-weight: 700; font-size: .8rem; }
+.dr-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.dr-meta { color: var(--muted); font-size: .9rem; margin: 6px 0 0; }
+
+/* Parça kataloğu */
+.dr-parts { display: grid; gap: 16px; }
+.dr-part { scroll-margin-top: calc(var(--topbar-h) + 16px); padding: 18px 20px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); box-shadow: var(--shadow-sm); min-width: 0; }
+.dr-part:target { border-color: var(--eng); box-shadow: 0 0 0 3px var(--eng-soft); }
+.dr-part h3 { margin: 0 0 2px; font-size: 1.15rem; }
+.dr-part-role { margin: 0 0 10px; color: var(--eng); font-weight: 700; font-size: .92rem; }
+.dr-part p { line-height: 1.65; }
+.dr-part-grid { display: grid; gap: 16px; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); }
+@media (max-width: 760px) { .dr-part-grid { grid-template-columns: minmax(0, 1fr); } }
+.dr-specs { display: grid; gap: 4px; font-size: .88rem; }
+.dr-specs li { font-family: var(--mono); font-size: .8rem; padding: 4px 8px; border-radius: 6px; background: var(--surface-2); overflow-wrap: anywhere; }
+.dr-choose { margin: 10px 0 0; padding: 10px 12px; border-left: 3px solid var(--eng); background: var(--eng-soft); border-radius: 0 8px 8px 0; font-size: .92rem; }
+.dr-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+.dr-links .eng-chip { padding: 6px 12px; }
+.dr-thumbs { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); margin-top: 12px; }
+.dr-thumbs a { display: grid; gap: 4px; font-size: .8rem; font-weight: 700; color: var(--text); }
+.dr-thumbs a:hover { text-decoration: none; color: var(--eng); }
