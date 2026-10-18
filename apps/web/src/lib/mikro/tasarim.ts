@@ -361,8 +361,8 @@ export function deriveDesign(d: RobotDesign): DerivedDesign {
   const loadRatio = stall ? loadNm / (stall * Math.max(0.3, vf)) : Infinity
   const w0 = mot.length ? mot.reduce((s, q) => s + q.rpmDeg, 0) / mot.length : 0
   const maxDegPerS = Math.max(0, Math.round(w0 * vf * (1 - Math.min(1, loadRatio))))
-  if (driveMotors && loadRatio > 0.5) err('agir', 'Robot motorlarına göre çok ağır: kıpırdayamaz. Güçlü motor ya da daha hafif parça seç.', 'The robot is too heavy for its motors: it cannot move. Pick stronger motors or lighter parts.')
-  else if (driveMotors && loadRatio > 0.25) warn('agir', 'Robot ağır: motorlar zorlanır, yavaşlar.', 'The robot is heavy: the motors strain and slow down.')
+  if (driveMotors && loadRatio > 0.35) err('agir', 'Robot motorlarına göre çok ağır: kıpırdayamaz. Güçlü motor ya da daha hafif parça seç.', 'The robot is too heavy for its motors: it cannot move. Pick stronger motors or lighter parts.')
+  else if (driveMotors && loadRatio > 0.2) warn('agir', 'Robot ağır: motorlar zorlanır, yavaşlar.', 'The robot is heavy: the motors strain and slow down.')
   const traction = wheel?.wheel?.traction ?? 1
   // hızlanma süresi: J·ω0/T (eşdeğer eylemsizlik m·r², toplam tork) + motorun kendi tepki süresi
   const tauS = Math.round((0.045 + (kg * wr * wr * ((w0 * vf * Math.PI) / 180)) / Math.max(1e-6, stall * Math.max(0.3, vf)) / traction) * 1000) / 1000
