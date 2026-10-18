@@ -61,6 +61,7 @@ export const NAV: NavGroup[] = [
       { href: '/arena', label: 'Robot arenası', key: 'shell.nav.arena', icon: 'arena', tab: true },
       { href: '/ai-atolyesi', label: 'AI atölyesi', key: 'shell.nav.ai', icon: 'ai' },
       { href: '/makine-ogrenmesi', label: 'Makine öğrenmesi', key: 'shell.nav.ml', icon: 'ai' },
+      { href: '/robotun-gozleri/demolar', label: 'Gerçek hayat demoları', key: 'shell.nav.cvDemos', icon: 'eye' },
       { href: '/muhendislik', label: 'Mühendislik yolu', key: 'shell.nav.engineering', icon: 'drone' },
       { href: '/muhendislik/robotik', label: 'Robotik dersi', key: 'shell.nav.robotics', icon: 'book' },
       { href: '/muhendislik/drone', label: 'Drone dersi', key: 'shell.nav.drone', icon: 'drone' },
@@ -86,5 +87,7 @@ export function isActive(href: string, pathname: string): boolean {
   if (href === '/konular') return pathname.startsWith('/konular') || pathname.startsWith('/moduller') || pathname.startsWith('/ders')
   // Robotik ve drone dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone'))) return false
+  // Gerçek hayat demoları (büyükler) kendi öğesinde işaretlenir, çocukların "Robotun Gözleri" öğesinde değil
+  if (href === '/robotun-gozleri' && pathname.startsWith('/robotun-gozleri/demolar')) return false
   return pathname === href || pathname.startsWith(`${href}/`)
 }

@@ -93,6 +93,7 @@ export const shell: typeof Tr = {
     robotics: 'Robotics course (ESOF 323)',
     drone: 'Drone course',
     ml: 'Machine learning',
+    cvDemos: 'Real-world demos',
   },
   navDesc: {
     blocks: 'Program your character with blocks',
@@ -109,6 +110,7 @@ export const shell: typeof Tr = {
     robotics: 'University course: 14 weeks, simulations',
     drone: 'Parts, simulation, software: 10 units',
     ml: 'From regression to neural networks, step by step',
+    cvDemos: 'Falls, intrusion, pulse, traffic: live with your camera',
     parts: 'Parts encyclopedia',
     tests: 'Mini quizzes and scores',
     progress: 'Your skill map',
