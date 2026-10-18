@@ -144,6 +144,7 @@ export const shell: typeof Tr = {
     startFree: 'Start for free',
     account: 'My profile / account',
     teacherPanel: 'Teacher dashboard',
+    adminPanel: 'Admin panel',
     logout: 'Log out',
     roles: {
       student: 'Student',

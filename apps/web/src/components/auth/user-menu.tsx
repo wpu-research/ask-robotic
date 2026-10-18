@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { signOut, useSession } from '@/lib/session'
 import { useLocale, useT } from '@/i18n/client'
 import type { MessageKey } from '@/i18n'
+import { firstName } from '@/lib/format'
 import './auth.css'
 
 export const ROLE_LABEL: Record<string, string> = { student: 'Öğrenci', parent: 'Veli', teacher: 'Öğretmen', admin: 'Yönetici' }
@@ -43,7 +44,7 @@ export function UserMenu({ variant = 'default' }: { variant?: 'default' | 'topba
     )
   }
 
-  const initial = (user.name.trim()[0] ?? '?').toLocaleUpperCase(locale)
+  const initial = (firstName(user.name)?.[0] ?? '?').toLocaleUpperCase(locale)
   const role = user.role in ROLE_LABEL ? t(`shell.user.roles.${user.role}` as MessageKey) : user.role
   const teacher = user.role === 'teacher' || user.role === 'admin'
   return (
@@ -58,6 +59,7 @@ export function UserMenu({ variant = 'default' }: { variant?: 'default' | 'topba
           <hr />
           <Link href="/hesap" role="menuitem">{t('shell.user.account')}</Link>
           {teacher && <Link href="/ogretmen" role="menuitem">{t('shell.user.teacherPanel')}</Link>}
+          {user.role === 'admin' && <Link href="/admin" role="menuitem">{t('shell.user.adminPanel')}</Link>}
           <hr />
           <button type="button" role="menuitem" onClick={() => void signOut()}>{t('shell.user.logout')}</button>
         </div>

@@ -1,4 +1,5 @@
 'use client'
+import { firstName } from '@/lib/format'
 import Link from 'next/link'
 import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { CatalogModule } from '@/lib/catalog'
@@ -211,7 +212,7 @@ export function Dashboard({ catalog: catalogTr, league }: { catalog: CatalogModu
   const catalog = useMemo(() => localizeCatalog(catalogTr, locale), [catalogTr, locale])
   const session = useSession()
   const soon = UPCOMING.filter((u) => !catalog.some((m) => m.slug === u.slug))
-  const first = session.user?.name?.split(' ')[0]
+  const first = firstName(session.user?.name)
   return (
     <div className="page dash">
       <header className="kid-hello">

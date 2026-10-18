@@ -146,6 +146,7 @@ export const shell = {
     startFree: 'Ücretsiz başla',
     account: 'Profilim / Hesabım',
     teacherPanel: 'Öğretmen paneli',
+    adminPanel: 'Yönetim paneli',
     logout: 'Çıkış yap',
     roles: {
       student: 'Öğrenci',
