@@ -69,7 +69,7 @@ export function simulate(o: Partial<SensorOpts> = {}): Series {
     if (d > 0 && d % 3 === 0 && hour >= 9 && hour < 9 + p.stepMin / 60) level = 22
     const hum = Math.max(20, Math.min(98, 92 - 2.1 * (tt - 18) + 4 * cloud))
     let temp = tt + 0.25 * p.noise * gauss(r)
-    let hm = hum + 1.2 * p.noise * gauss(r)
+    let hm = Math.min(100, hum + 1.2 * p.noise * gauss(r)) // DHT22 %100'ün üstünü bildirmez
     if (r() < p.spikes) temp = r() < 0.5 ? 85 : -40 // kablo temassızlığı ya da bozuk okuma: imkânsız değer
     if (r() < p.missing) { temp = NaN; hm = NaN } // DHT22 okunamadı (ikisi birlikte gelir)
     s.t.push(t); s.hour.push(r2(hour)); s.temp.push(Number.isNaN(temp) ? NaN : r2(temp)); s.hum.push(Number.isNaN(hm) ? NaN : r2(hm))

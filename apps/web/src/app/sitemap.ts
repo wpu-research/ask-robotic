@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { DEMOS } from '@/lib/cv-demolar'
 import { UNITS } from '@/lib/drone/course'
+import { IOT_UNITS } from '@/lib/iot/course'
+import { SML_UNITS } from '@/lib/sensor-ml/course'
 import { LESSONS } from '@/lib/ml/lessons'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
@@ -13,6 +15,8 @@ const PAGES = [
   '/makine-ogrenmesi', '/laboratuvar', '/parcalar', '/muhendislik', '/muhendislik/robotik',
   '/muhendislik/drone', '/muhendislik/drone/parcalar', '/muhendislik/drone/simulasyon', '/muhendislik/drone/proje',
   ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
+  '/muhendislik/iot', '/muhendislik/iot/simulasyon', '/muhendislik/iot/proje', ...IOT_UNITS.map((u) => `/muhendislik/iot/unite/${u.n}`),
+  '/muhendislik/sensor-ml', '/muhendislik/sensor-ml/simulasyon', '/muhendislik/sensor-ml/proje', ...SML_UNITS.map((u) => `/muhendislik/sensor-ml/unite/${u.n}`),
   ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
 ]
