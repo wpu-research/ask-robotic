@@ -182,7 +182,7 @@ export function seasonParts(subs: readonly SeasonSubMission[], pens: readonly Se
     ...subs.map((s) => ({ label: s.title, en: s.en.title, points: s.score(r, finishMs) })),
     ...pens.map((p) => {
       const n = p.count(r)
-      return { label: `${p.title} (${n} × ${p.points})`, en: `${p.en.title} (${n} × ${p.points})`, points: n * p.points }
+      return { label: `${p.title} (${n} × ${p.points})`, en: `${p.en.title} (${n} × ${p.points})`, points: n ? n * p.points : 0 }
     }),
   ]
 }

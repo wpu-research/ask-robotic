@@ -5,6 +5,10 @@ import { SKILL_BY_ID, runSkill, type ScorePart } from './mikro/beceri'
 import { validateProject } from './mikro/storage'
 import type { MikroProject } from './mikro/types'
 import { shortName } from './roster'
+import { SEASON_BY_FIELD } from './mikro/sezon'
+
+/** Sanal Beceri sahası ya da yarışma sezonu alanı. */
+export const challengeById = (id: string) => SKILL_BY_ID[id] ?? SEASON_BY_FIELD[id]?.field
 
 /** Gönderilen programın JSON boyutu sınırı (bayt). */
 export const MAX_SKILL_PROGRAM_BYTES = 200_000
@@ -14,7 +18,7 @@ export type SubmitResult =
   | { ok: false; error: string }
 
 export async function submitSkillRun(db: Db, userId: string, challengeId: string, raw: unknown): Promise<SubmitResult> {
-  const ch = SKILL_BY_ID[challengeId]
+  const ch = challengeById(challengeId)
   if (!ch) return { ok: false, error: 'Böyle bir beceri sahası yok' }
   if (JSON.stringify(raw ?? null).length > MAX_SKILL_PROGRAM_BYTES) return { ok: false, error: 'Program çok büyük' }
   const v = validateProject(raw)
