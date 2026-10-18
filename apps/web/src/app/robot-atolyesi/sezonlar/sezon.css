@@ -1,0 +1,39 @@
+/* Yarışma sezonları: hub, kurallar sayfası ve öğretmen görünümü */
+.sz { gap: 24px; }
+.sz-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.sz-card { display: grid; gap: 12px; }
+.sz-card h2 { margin: 0; font-size: 1.3rem; }
+.sz-card p { margin: 0; }
+.sz-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sz-phase { font-size: .78rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.sz-phase.acik { background: var(--ok-soft); color: var(--ok); }
+.sz-phase.yakinda { background: var(--warn-soft); color: var(--warn); }
+.sz-facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; margin: 0; }
+.sz-facts div { display: grid; gap: 2px; padding: 10px 12px; border-radius: var(--radius-xs); background: var(--surface-2); }
+.sz-facts dt { font-size: .76rem; color: var(--muted); }
+.sz-facts dd { margin: 0; font-weight: 800; }
+.sz-grid { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.sz-field { width: 100%; height: auto; display: block; border-radius: var(--radius-sm); background: var(--surface); }
+.sz-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin: 10px 0 0; padding: 0; list-style: none; font-size: .82rem; color: var(--muted); }
+.sz-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.sz-legend i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px dashed currentColor; }
+.sz-legend i.sq { border-radius: 3px; border-style: solid; }
+.sz-legend i.ln { height: 0; width: 16px; border-radius: 0; border-width: 2px 0 0; border-style: solid; }
+.sz-how ol { margin: 0; padding-left: 20px; display: grid; gap: 8px; }
+.sz-how h2 { margin-top: 0; font-size: 1.1rem; }
+.sz-table td.pts, .og-table td.num, .og-table th.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.sz-table td.pts b { color: var(--ok); }
+.sz-table td.pts.neg b { color: var(--warn); }
+.sz-league { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 20px; align-items: start; }
+.sz-league h3 { margin: 0 0 8px; font-size: 1rem; }
+.og-table tr.me td { background: var(--primary-soft); }
+.sz-team { display: grid; gap: 10px; }
+.sz-team h3 { margin: 0; }
+.sz-roster { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
+.sz-roster li { padding: 4px 10px; border-radius: 999px; background: var(--surface-2); font-size: .85rem; }
+.sz-roster li b { margin-left: 6px; }
+.sz-reg { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+.sz-reg .field { flex: 1 1 200px; margin: 0; }
+@media (max-width: 860px) {
+  .sz-grid, .sz-league { grid-template-columns: 1fr; }
+}

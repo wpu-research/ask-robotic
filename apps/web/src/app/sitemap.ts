@@ -5,6 +5,7 @@ import { UNITS as LLM_UNITS } from '@/lib/llm/course'
 import { LESSONS } from '@/lib/ml/lessons'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
+import { SEASONS } from '@/lib/mikro/sezon'
 import { LEGAL } from './yasal/metinler'
 
 // Herkese açık vitrin sayfaları; hesap/öğretmen/sınıf sayfaları robots.ts'te kapalı
@@ -18,6 +19,7 @@ const PAGES = [
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
   '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),
   '/programlar',
+  '/robot-atolyesi/sezonlar', ...SEASONS.map((s) => `/robot-atolyesi/sezonlar/${s.id}`),
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

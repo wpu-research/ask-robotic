@@ -7,7 +7,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: t('mikro.pages.robotTitle') }
 }
 
-export default async function RobotAtolyesi() {
+export default async function RobotAtolyesi({ searchParams }: { searchParams: Promise<{ saha?: string | string[] }> }) {
+  const saha = (await searchParams).saha
   const t = await getT()
   return (
     <div className="page page-tool">
@@ -17,7 +18,7 @@ export default async function RobotAtolyesi() {
         <p className="muted">{t('mikro.pages.robotIntro')}</p>
       </header>
       <div className="tool-body">
-        <RobotStudio />
+        <RobotStudio initialSkill={typeof saha === 'string' ? saha : undefined} />
       </div>
     </div>
   )

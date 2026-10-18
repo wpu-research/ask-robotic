@@ -99,3 +99,18 @@ describe('yarışma sezonları: puanlama', () => {
     expect(part(early, 'Acil çağrı')).toBe(15)
   })
 })
+
+describe('yarışma sezonları: menü, palet, site haritası', () => {
+  it('menüde, komut paletinde ve site haritasında yer alır; menüde yalnız kendi öğesi işaretlenir', async () => {
+    const { NAV, isActive } = await import('@/components/shell/nav-items')
+    const { STATIC_ITEMS } = await import('../command-palette')
+    const sitemap = (await import('@/app/sitemap')).default
+    expect(NAV.flatMap((g) => g.items.map((i) => i.href))).toContain('/robot-atolyesi/sezonlar')
+    expect(isActive('/robot-atolyesi/sezonlar', '/robot-atolyesi/sezonlar/akilli-sehir')).toBe(true)
+    expect(isActive('/robot-atolyesi', '/robot-atolyesi/sezonlar')).toBe(false)
+    expect(isActive('/robot-atolyesi', '/robot-atolyesi')).toBe(true)
+    expect(STATIC_ITEMS.some((i) => i.href === '/robot-atolyesi/sezonlar')).toBe(true)
+    const urls = sitemap().map((u) => u.url)
+    for (const s of SEASONS) expect(urls.some((u) => u.endsWith(`/robot-atolyesi/sezonlar/${s.id}`))).toBe(true)
+  })
+})

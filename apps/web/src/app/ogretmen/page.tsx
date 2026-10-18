@@ -42,6 +42,7 @@ export default async function Ogretmen() {
         </div>
         <span style={{ display: 'flex', gap: 8 }}>
           <Link className="btn btn-ghost" href="/ogretmen/kazanim">{t('teacher.matrix.link')}</Link>
+          <Link className="btn btn-ghost" href="/ogretmen/sezonlar">{t('season.title')}</Link>
           <Link className="btn btn-ghost" href="/ogretmen/okul">{t('teacher.schoolSettings')}</Link>
         </span>
       </div>

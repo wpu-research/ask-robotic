@@ -13,6 +13,9 @@ export const mikro = {
   studio: {
     missions: 'Görevler',
     skills: 'Sanal beceri',
+    seasons: 'Yarışma sezonu',
+    seasonSub: '{robot} · {s} sn · takım ligi',
+    seasonRules: 'Kurallar ve lig →',
     free: 'Serbest arena',
     done: 'tamamlandı',
     skillSub: '{robot} · {s} sn · puanlı',

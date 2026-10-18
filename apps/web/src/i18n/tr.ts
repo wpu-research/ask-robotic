@@ -23,6 +23,7 @@ import { content } from './tr/content'
 import { eng } from './tr/eng'
 import { consent } from './tr/consent'
 import { instructor } from './tr/instructor'
+import { season } from './tr/season'
 
 export const tr = {
   common,
@@ -49,6 +50,7 @@ export const tr = {
   eng,
   consent,
   instructor,
+  season,
 }
 
 export type Messages = typeof tr

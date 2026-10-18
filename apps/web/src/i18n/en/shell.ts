@@ -80,6 +80,7 @@ export const shell: typeof Tr = {
     games: 'Games',
     microCard: 'Micro Card workshop',
     robotStudio: 'Robot workshop',
+    seasons: 'Competition seasons',
     gameStudio: 'Game studio',
     stage: 'Stage workshop',
     ai: 'AI workshop',
@@ -100,6 +101,7 @@ export const shell: typeof Tr = {
   navDesc: {
     blocks: 'Program your character with blocks',
     robotStudio: 'Send your robot on missions with blocks',
+    seasons: 'Compete with your team in season missions',
     microCard: 'A virtual board with lights, sound and sensors',
     vision: 'How robots see, plus camera games',
     gameStudio: 'Design your own game',
