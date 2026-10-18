@@ -345,6 +345,14 @@
 .locale-switch[aria-busy="true"] { opacity: .6; }
 /* "Bu ders şimdilik yalnız Türkçe" notu (arayüz İngilizceyken) */
 .lesson-lang-note { max-width: 960px; margin: 12px auto 0; padding: 8px 14px; border-radius: var(--radius-xs); background: var(--warn-soft); color: var(--text); font-size: .88rem; }
+/* Ders videosu (lib/lesson-videos.ts): klasik derste sayfa altında, v2 oynatıcıda üst çubuktaki düğmeyle açılır */
+.lesson-video { max-width: 960px; margin: 24px auto; padding: 0 16px; display: grid; gap: 10px; }
+.lesson-video h2 { margin: 0; font-size: 1.2rem; }
+.lesson-video-note { margin: 0; font-size: .88rem; color: var(--muted); }
+.lesson-video-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; border-radius: var(--radius-xs); overflow: hidden; background: #000; }
+.lesson-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.v2-video { border-bottom: 1px solid var(--v2-line); max-height: 60vh; overflow-y: auto; }
+.v2-video .lesson-video { max-width: 760px; margin: 12px auto; }
 /* Üst çubuk sığdırma: misafir düğmeleri tek satır; dar masaüstünde ikincil öğeler küçülür */
 .um-guest { display: flex; align-items: center; gap: 10px; white-space: nowrap; }
 .um-guest .um-login { white-space: nowrap; font-weight: 700; }

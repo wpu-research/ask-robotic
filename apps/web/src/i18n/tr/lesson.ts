@@ -41,6 +41,14 @@ export const lesson = {
     praise5: 'Çok iyi gidiyorsun.',
     praise6: 'Süper.',
   },
+  video: {
+    heading: 'Video',
+    frameTitle: 'Ders videosu: {title}',
+    open: 'Ders videosunu aç',
+    close: 'Videoyu kapat',
+    inEnglish: 'Video İngilizce.',
+    inTurkish: 'Video Türkçe.',
+  },
   steps: {
     options: 'Seçenekler',
     yourAnswer: 'Cevabın',
