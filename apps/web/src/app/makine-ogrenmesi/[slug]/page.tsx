@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getLocale } from '@/i18n/server'
 import { LESSONS, lessonBySlug } from '@/lib/ml/lessons'
+import { SECTIONS } from '@/lib/ml/sections'
 import { ML_TEXT } from '@/lib/ml/text'
 import { MlPlayer } from '@/components/ml/ml-player'
 import { Icon } from '@/components/shell/icons'
@@ -24,13 +25,17 @@ export default async function MlDers({ params }: { params: Promise<{ slug: strin
   const T = ML_TEXT[lang]
   const i = LESSONS.indexOf(l)
   const prev = LESSONS[i - 1], next = LESSONS[i + 1]
+  const k = SECTIONS.findIndex((s) => s.id === l.section), sec = SECTIONS[k]
+  const unit = T.unit.replace('{n}', String(k + 1))
   return (
     <div className="page ml-page">
       <header className="page-title">
         <nav aria-label={lang === 'tr' ? 'Konum' : 'Breadcrumb'} className="crumbs">
-          <Link href="/makine-ogrenmesi">{T.course}</Link><Icon name="chevronRight" size={14} /><span aria-current="page">{T.part.replace('{n}', String(l.n))}</span>
+          <Link href="/makine-ogrenmesi">{T.course}</Link><Icon name="chevronRight" size={14} />
+          {sec && <><Link href={`/makine-ogrenmesi#bolum-${sec.id}`}>{sec.title[lang]}</Link><Icon name="chevronRight" size={14} /></>}
+          <span aria-current="page">{T.part.replace('{n}', String(l.n))}</span>
         </nav>
-        <p className="eyebrow">{T.course} · {T.part.replace('{n}', String(l.n))}</p>
+        <p className="eyebrow">{sec ? `${unit} · ${sec.title[lang]}` : T.course} · {T.part.replace('{n}', String(l.n))}</p>
         <h1>{l.title[lang]}</h1>
         <p className="lead">{l.sub[lang]}</p>
       </header>

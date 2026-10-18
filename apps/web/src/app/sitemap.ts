@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { UNITS } from '@/lib/drone/course'
+import { LESSONS } from '@/lib/ml/lessons'
 import { SITE_URL } from '@/lib/site'
 import { LEGAL } from './yasal/metinler'
 
@@ -8,7 +9,7 @@ const PAGES = [
   '', '/fiyatlar', '/okullar', '/konular', '/moduller', '/atolye', '/robot-atolyesi', '/robotun-gozleri',
   '/makine-ogrenmesi', '/laboratuvar', '/parcalar', '/muhendislik', '/muhendislik/robotik',
   '/muhendislik/drone', '/muhendislik/drone/parcalar', '/muhendislik/drone/simulasyon', '/muhendislik/drone/proje',
-  ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), '/oyunlar', '/ai-atolyesi',
+  ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`), '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
 ]
 

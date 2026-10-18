@@ -68,7 +68,7 @@ export function scaleBar(ctx: CanvasRenderingContext2D, v: View, meters: number,
 export function clear(ctx: CanvasRenderingContext2D, W: number, H: number, p: Pal) {
   ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, H)
 }
-const alpha = (hex: string, a: number) => {
+export const alpha = (hex: string, a: number) => {
   const m = /^#([0-9a-f]{6})$/i.exec(hex)
   if (!m) return hex
   const n = parseInt(m[1], 16)
@@ -119,7 +119,7 @@ export function inset(ctx: CanvasRenderingContext2D, x: number, y: number, w: nu
   if (opts.mark !== undefined) { ctx.strokeStyle = p.ink; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px(opts.mark), y + 18); ctx.lineTo(px(opts.mark), y + h - 6); ctx.stroke(); ctx.setLineDash([]) }
 }
 
-type Draw = (ctx: CanvasRenderingContext2D, W: number, H: number, f: Frame, p: Pal, lang: Lang) => void
+export type Draw = (ctx: CanvasRenderingContext2D, W: number, H: number, f: Frame, p: Pal, lang: Lang) => void
 
 function drawKMeans(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Frame, p: Pal, lang: Lang) {
   const f = f0 as KMeansFrame

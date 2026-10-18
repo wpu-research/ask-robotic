@@ -1,6 +1,13 @@
 /* Makine Öğrenmesi (sıfırdan): Macademia düzeni. Oynatıcı: solda sahne, sağda kod (dar ekranda alt alta), reel gibi koyu kod paneli. */
 .ml-page { --ml-c0: #c8414b; --ml-c1: #2c7bb6; --ml-c2: #d99a00; --ml-c3: #3f7d3a; --ml-c4: #8e5ea2; --ml-c5: #e07a2e; }
-.ml-page .hero-actions { margin-top: 22px; }
+.ml-page .hero-actions { margin-top: 22px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.ml-count-all { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; }
+.ml-parts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+.ml-parts a { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px 6px 6px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--ink); font-size: 14px; font-weight: 500; }
+.ml-parts a:hover { text-decoration: none; border-color: var(--brand); }
+.ml-parts b { display: grid; place-items: center; width: 24px; height: 24px; border-radius: 50%; background: var(--brand-soft); color: var(--brand); font-size: 12px; font-weight: 700; }
+.ml-section { scroll-margin-top: 88px; }
+.ml-section .section-head { margin-bottom: 20px; }
 .ml-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
 .ml-item { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); color: var(--ink); transition: box-shadow .2s, transform .2s; }
 .ml-item:hover { text-decoration: none; box-shadow: var(--shadow); transform: translateY(-2px); }

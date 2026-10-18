@@ -69,7 +69,10 @@ export type CodeLine = [code: string, tr?: string, en?: string]
 export interface ParamDef { key: string; label: Bi; min: number; max: number; step: number; value: number }
 export interface Lesson<F extends Frame = Frame> {
   slug: string
+  /** Kurs içindeki sıra numarası; lessons.ts bölüm sırasına göre yeniden verir. */
   n: number
+  /** Bölüm kimliği (lib/ml/sections.ts); lessons.ts doldurur. */
+  section?: string
   title: Bi
   /** Kartta ve başlıkta tek satır. */
   sub: Bi
