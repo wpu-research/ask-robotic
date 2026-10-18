@@ -26,15 +26,35 @@ function palette(host: HTMLElement): Pal {
   const g = (n: string) => cs.getPropertyValue(n).trim() || '#888'
   return { bg: g('--sim-bg'), grid: g('--sim-grid'), ink: g('--ink'), mute: g('--mute'), a: g('--sim-a'), gold: g('--gold'), red: g('--red'), green: g('--green'), sky: g('--sky'), line: g('--line') }
 }
+/** Küçük ekranda tuval küçülünce yazı da küçülür; bu çarpan yazı boyunu büyütüp okunur tutar (tuval başına). */
+const FS = new WeakMap<Ctx, number>()
+const fs = (ctx: Ctx) => FS.get(ctx) ?? 1
+/** Tuval: çizim mantıksal W×H biriminde yapılır; arka bellek kapsayıcı genişliği × devicePixelRatio'ya göre kurulur
+ *  (her ekranda keskin). Genişlik değişince yeniden kurulur ve `redraw` çağrılır (yalnız girdiyle çizen simler atar;
+ *  canlandırmalı simler zaten her karede çizer). */
 function canvas(host: HTMLElement, W = 640, H = 400) {
   const cv = el('canvas', { class: 'sim-canvas', role: 'img' })
-  const dpr = Math.min(2, window.devicePixelRatio || 1)
-  cv.width = W * dpr; cv.height = H * dpr; cv.style.aspectRatio = `${W} / ${H}`
+  cv.style.aspectRatio = `${W} / ${H}`
   const ctx = cv.getContext('2d')!
-  ctx.scale(dpr, dpr)
-  host.append(cv)
   const pos = (e: MouseEvent) => { const r = cv.getBoundingClientRect(); return { x: (e.clientX - r.left) * W / r.width, y: (e.clientY - r.top) * H / r.height } }
-  return { cv, ctx, W, H, pos }
+  const c = { cv, ctx, W, H, pos, redraw: () => {} }
+  let lastW = -1
+  const fit = () => {
+    const cssW = cv.clientWidth || W
+    if (cssW === lastW) return false
+    lastW = cssW
+    const dpr = Math.min(3, window.devicePixelRatio || 1), k = cssW / W
+    cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssW * H / W * dpr)
+    ctx.setTransform(k * dpr, 0, 0, k * dpr, 0, 0)
+    FS.set(ctx, Math.min(1.45, Math.max(1, 0.8 / k))) // telefonda (~320 px genişlik) yazılar ~1,45 kat
+    return true
+  }
+  host.append(cv); fit()
+  if (typeof ResizeObserver !== 'undefined') {
+    const ro = new ResizeObserver(() => { if (!cv.isConnected) { ro.disconnect(); return } if (fit()) c.redraw() })
+    ro.observe(cv)
+  }
+  return c
 }
 function controls(host: HTMLElement) { const c = el('div', { class: 'ctrl' }); host.append(c); return c }
 interface Ctl<T> { v: T }
@@ -71,12 +91,13 @@ function loop(fn: (dt: number) => void) {
   return () => { alive = false; cancelAnimationFrame(id) }
 }
 function txt(ctx: Ctx, s: string, x: number, y: number, col: string, size = 12, align: CanvasTextAlign = 'left', weight = 400) {
-  ctx.fillStyle = col; ctx.font = `${weight} ${size}px ${FONT}`; ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.fillText(s, x, y)
+  ctx.fillStyle = col; ctx.font = `${weight} ${size * fs(ctx)}px ${FONT}`; ctx.textAlign = align; ctx.textBaseline = 'alphabetic'; ctx.fillText(s, x, y)
 }
 function legend(ctx: Ctx, items: Array<[string, string]>, x: number, y: number, p: Pal) {
-  ctx.font = `12px ${FONT}`
+  ctx.font = `${12 * fs(ctx)}px ${FONT}`
   let cx = x
-  for (const [t, c] of items) { ctx.fillStyle = c; ctx.fillRect(cx, y - 5, 14, 3); ctx.fillStyle = p.ink; ctx.textAlign = 'left'; ctx.fillText(t, cx + 18, y); cx += ctx.measureText(t).width + 32 }
+  y -= (fs(ctx) - 1) * 10 // büyütülmüş yazıda eksen etiketinden uzaklaş
+  for (const [t, c] of items) { ctx.fillStyle = c; ctx.fillRect(cx, y - 5, 14, 3); ctx.fillStyle = p.ink; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(t, cx + 18, y); cx += ctx.measureText(t).width + 28 }
 }
 
 interface Box { x: number; y: number; w: number; h: number }
@@ -94,7 +115,7 @@ function plot(ctx: Ctx, b: Box, xr: [number, number], yr: [number, number], seri
   for (let i = 0; i <= 4; i++) txt(ctx, fmtY(yr[1] - i * (yr[1] - yr[0]) / 4), b.x - 6, b.y + i * b.h / 4 + 4, p.mute, 10, 'right')
   for (let i = 0; i <= 5; i++) txt(ctx, String(+(xr[0] + i * (xr[1] - xr[0]) / 5).toFixed(2)), b.x + i * b.w / 5, b.y + b.h + 14, p.mute, 10, 'center')
   txt(ctx, xl, b.x + b.w, b.y + b.h + 28, p.mute, 11, 'right')
-  txt(ctx, yl, b.x, b.y - 6, p.mute, 11, 'left')
+  txt(ctx, yl, b.x, b.y - 6 + (fs(ctx) - 1) * 7, p.mute, 11, 'left') // büyük yazıda göstergeyle çakışmasın
   ctx.save(); ctx.beginPath(); ctx.rect(b.x, b.y, b.w, b.h); ctx.clip()
   for (const s of series) {
     ctx.strokeStyle = s.color; ctx.lineWidth = s.width ?? 2; ctx.setLineDash(s.dash ?? []); ctx.beginPath()
@@ -121,7 +142,8 @@ type Mount = (stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang) => ()
 // ---------------------------------------------------------------- itki/ağırlık
 const twr: Mount = (stage, side, cfg, lang) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
-  const { ctx, W, H } = canvas(stage, 640, 360)
+  const cvs = canvas(stage, 640, 360), { ctx, W, H } = cvs
+  cvs.redraw = () => draw() // boyut değişince yeniden çiz
   const c = controls(side)
   const presets: Record<string, [number, number, number]> = { fpv: [0.65, 4, 1300], x500: [1.6, 4, 1000], hexa: [4, 6, 2000], heavy: [1.4, 4, 450] }
   const pr = select(c, t('Hazır ayar', 'Preset'), [['fpv', t('5" FPV freestyle', '5" FPV freestyle')], ['x500', 'X500 (10")'], ['hexa', t('Altı rotorlu yük drone\'u', 'Hexacopter for payload')], ['heavy', t('Ağır ve zayıf', 'Heavy and weak')]], cfg.preset ?? 'x500', () => { const [m, n, th] = presets[pr.v]; set(m, n, th) })
@@ -170,7 +192,8 @@ const twr: Mount = (stage, side, cfg, lang) => {
 // ---------------------------------------------------------------- uçuş süresi
 const flight: Mount = (stage, side, cfg, lang) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
-  const { ctx, W, H } = canvas(stage, 640, 380)
+  const cvs = canvas(stage, 640, 380), { ctx, W, H } = cvs
+  cvs.redraw = () => draw() // boyut değişince yeniden çiz
   const c = controls(side)
   const big = cfg.preset === 'fpv' ? false : true
   const dry = slider(c, t('Batarya hariç kütle (kg)', 'Mass without battery (kg)'), 0.2, 5, 0.05, big ? 1.1 : 0.5, f2, draw)
@@ -291,7 +314,8 @@ const roll: Mount = (stage, side, _cfg, lang) => {
 // ---------------------------------------------------------------- karıştırıcı
 const mixer: Mount = (stage, side, _cfg, lang) => {
   const t = T(lang), f2 = nf(lang, 2)
-  const { ctx, W, H } = canvas(stage, 640, 400)
+  const cvs = canvas(stage, 640, 400), { ctx, W, H } = cvs
+  cvs.redraw = () => draw() // boyut değişince yeniden çiz
   const c = controls(side)
   const th = slider(c, t('Gaz (0…1)', 'Throttle (0…1)'), 0, 1, 0.01, 0.5, f2, draw)
   const rl = slider(c, t('Yuvarlanma (roll, + sağa)', 'Roll (+ right)'), -0.6, 0.6, 0.01, 0, f2, draw)
@@ -322,7 +346,7 @@ const mixer: Mount = (stage, side, _cfg, lang) => {
       const ea = cw ? -0.7 : -2.4, ex = q.x + 34 * Math.cos(ea), ey = q.y + 34 * Math.sin(ea), dir = cw ? 1 : -1
       ctx.fillStyle = p.sky; ctx.beginPath(); ctx.moveTo(ex, ey); ctx.lineTo(ex - 8 * dir, ey - 6); ctx.lineTo(ex - 2 * dir, ey + 8); ctx.closePath(); ctx.fill()
       txt(ctx, m.id, q.x, q.y - 2, p.ink, 15, 'center', 800)
-      txt(ctx, `${Math.round(u * 100)}% · ${cw ? 'CW' : 'CCW'}`, q.x, q.y + 16, p.ink, 11, 'center', 600)
+      txt(ctx, `${Math.round(u * 100)}% · ${cw ? 'CW' : 'CCW'}`, q.x, q.y + 16, p.ink, Math.min(11, 12.5 / fs(ctx)), 'center', 600) // daire içine sığsın: büyütme sınırlı
     })
     // sağ: çubuklar ve ESC değerleri
     const bx = 420, bw = 36, bh = 230, by = 60
@@ -330,12 +354,12 @@ const mixer: Mount = (stage, side, _cfg, lang) => {
       const x = bx + i * 52, u = r.motors[i]
       ctx.strokeStyle = p.line; ctx.strokeRect(x + 0.5, by + 0.5, bw, bh)
       ctx.fillStyle = u >= 0.999 || u <= 0.001 ? p.red : p.a; ctx.fillRect(x, by + bh * (1 - u), bw, bh * u)
-      txt(ctx, m.id, x + bw / 2, by + bh + 16, p.ink, 12, 'center', 700)
-      txt(ctx, `${Math.round(1000 + 1000 * u)}`, x + bw / 2, by + bh + 32, p.mute, 10, 'center')
-      txt(ctx, `${Math.round(48 + 1999 * u)}`, x + bw / 2, by + bh + 46, p.mute, 10, 'center')
+      txt(ctx, m.id, x + bw / 2, by + bh + 18, p.ink, 12, 'center', 700)
+      txt(ctx, `${Math.round(1000 + 1000 * u)}`, x + bw / 2, by + bh + 36, p.mute, 10, 'center')
+      txt(ctx, `${Math.round(48 + 1999 * u)}`, x + bw / 2, by + bh + 54, p.mute, 10, 'center')
     })
-    txt(ctx, t('PWM µs', 'PWM µs'), bx - 6, by + bh + 32, p.mute, 10, 'right')
-    txt(ctx, 'DShot', bx - 6, by + bh + 46, p.mute, 10, 'right')
+    txt(ctx, t('PWM µs', 'PWM µs'), bx - 6, by + bh + 36, p.mute, 10, 'right')
+    txt(ctx, 'DShot', bx - 6, by + bh + 54, p.mute, 10, 'right')
     txt(ctx, t('motor çıkışı', 'motor output'), bx, by - 12, p.mute, 11)
     const flags = [r.rpScaled ? t('yuvarlanma/yunuslama ölçeklendi', 'roll/pitch scaled down') : '', r.yawScale < 0.999 ? `${t('sapma kısıldı', 'yaw reduced')} → ${Math.round(r.yawScale * 100)}%` : '', Math.abs(r.thrustShift) > 1e-6 ? `${t('gaz kaydırıldı', 'throttle shifted')} ${r.thrustShift > 0 ? '+' : ''}${f2(r.thrustShift)}` : ''].filter(Boolean)
     ro.textContent = `M1..M4: ${r.motors.map((v) => Math.round(v * 100) + '%').join(' · ')}\n${t('Toplam (itki ∝ toplam)', 'Sum (thrust ∝ sum)')}: ${f2(r.motors.reduce((a, b) => a + b, 0))}\n${flags.length ? flags.join('\n') : t('Doyum yok: tüm komutlar uygulandı', 'No saturation: all commands applied')}`
@@ -347,7 +371,8 @@ const mixer: Mount = (stage, side, _cfg, lang) => {
 // ---------------------------------------------------------------- tamamlayıcı süzgeç
 const fusion: Mount = (stage, side, _cfg, lang) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
-  const { ctx, W, H } = canvas(stage, 640, 380)
+  const cvs = canvas(stage, 640, 380), { ctx, W, H } = cvs
+  cvs.redraw = () => draw() // boyut değişince yeniden çiz
   const c = controls(side)
   const tau = slider(c, t('Süzgeç zaman sabiti τ (s)', 'Filter time constant τ (s)'), 0.02, 5, 0.02, FUSION_DEFAULTS.tau, f2, run)
   const bias = slider(c, t('Jiroskop sapması (°/s)', 'Gyro bias (°/s)'), -5, 5, 0.1, FUSION_DEFAULTS.gyroBiasDps, f1, run)

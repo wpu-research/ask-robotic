@@ -64,7 +64,7 @@ export default async function DroneDersi() {
       <section aria-labelledby="dr-plan">
         <h2 id="dr-plan">{en ? 'Units' : 'Üniteler'}</h2>
         <div className="rb-scroll">
-          <table className="rb-table">
+          <table className="rb-table dr-units">
             <thead><tr><th>{en ? 'Unit' : 'Ünite'}</th><th>{en ? 'Topic' : 'Konu'}</th><th>{en ? 'Pillars' : 'Ayaklar'}</th><th>{en ? 'Simulations' : 'Simülasyonlar'}</th></tr></thead>
             <tbody>
               {UNITS.map((u) => (

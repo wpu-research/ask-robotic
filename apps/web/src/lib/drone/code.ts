@@ -227,7 +227,7 @@ class Navigator:
         # ${c('ivme → eğim açıları (küçük açı): pitch ≈ -ax/g, roll ≈ ay/g (gövde eksenine çevrilir)', 'acceleration → tilt (small angle): pitch ≈ -ax/g, roll ≈ ay/g (rotated into the body frame)')}
         return ax, ay`)
 
-export const mavsdkPy = (l: Lang) => block(l, 'MAVSDK-Python: görev yükle, uç, izle (PX4 SITL)', 'MAVSDK-Python: upload, fly and monitor a mission (PX4 SITL)', (c) => `# pip install mavsdk      ${c('(MAVSDK 2.x; eski sürümlerde vehicle_action alanı yok)', '(MAVSDK 2.x; older versions lack the vehicle_action field)')}
+export const mavsdkPy = (l: Lang) => block(l, 'MAVSDK-Python: görev yükle, uç, izle (PX4 SITL)', 'MAVSDK-Python: upload, fly and monitor a mission (PX4 SITL)', (c) => `# pip install "mavsdk>=2,<4"   ${c('(gRPC API\'si; 1.x\'te vehicle_action yok; v4 "mavsdk" adı farklı bir yerel API, aynı kod için mavsdk-grpc)', '(gRPC API; 1.x lacks vehicle_action; from v4 "mavsdk" is a different native API, use mavsdk-grpc for this code)')}
 import asyncio
 from mavsdk import System
 from mavsdk.mission import MissionItem, MissionPlan
@@ -298,7 +298,7 @@ make px4_sitl gz_x500                            # ${c('x500 quad Gazebo\'da; "p
 # ${c('2) QGroundControl: AppImage indir, çalıştır; UDP 14550\'den kendiliğinden bağlanır', '2) QGroundControl: download the AppImage and run it; it connects on UDP 14550 by itself')}
 
 # ${c('3) ROS 2 Jazzy (24.04) ya da Humble (22.04) kurulu olsun; ardından Micro XRCE-DDS Agent', '3) Have ROS 2 Jazzy (24.04) or Humble (22.04) installed; then the Micro XRCE-DDS Agent')}
-git clone https://github.com/eProsima/Micro-XRCE-DDS-Agent.git     # ${c('PX4 belgesindeki sürüm etiketini kullan', 'use the version tag from the PX4 docs')}
+git clone -b v2.4.3 https://github.com/eProsima/Micro-XRCE-DDS-Agent.git   # ${c('PX4 belgesindeki etiket (DDS v2)', 'tag from the PX4 docs (DDS v2)')}
 cd Micro-XRCE-DDS-Agent && mkdir build && cd build && cmake .. && make && sudo make install && sudo ldconfig /usr/local/lib/
 MicroXRCEAgent udp4 -p 8888                      # ${c('SITL istemcisi buna kendiliğinden bağlanır', 'the SITL client connects to it automatically')}
 
@@ -307,7 +307,7 @@ mkdir -p ~/px4_ws/src && cd ~/px4_ws/src
 git clone https://github.com/PX4/px4_msgs.git
 git clone https://github.com/PX4/px4_ros_com.git
 cd ~/px4_ws && colcon build && source install/setup.bash
-ros2 topic list | grep fmu                       # /fmu/out/vehicle_status ...`)
+ros2 topic list | grep fmu                       # /fmu/out/vehicle_status (v1.16+: vehicle_status_v1) ...`)
 
 export const offboardPy = (l: Lang) => block(l, 'ROS 2 (rclpy): offboard kipinde 5 m\'ye çık ve bekle', 'ROS 2 (rclpy): climb to 5 m in offboard mode and hold', (c) => `# ${c('PX4 v1.16+ bazı konu adlarına sürüm eki ekler (ör. vehicle_status_v1): "ros2 topic list" ile kontrol et.', 'PX4 v1.16+ adds a version suffix to some topic names (e.g. vehicle_status_v1): check with "ros2 topic list".')}
 import rclpy
