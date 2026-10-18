@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next'
 import { DEMOS } from '@/lib/cv-demolar'
 import { UNITS } from '@/lib/drone/course'
+import { UNITS as LLM_UNITS } from '@/lib/llm/course'
 import { LESSONS } from '@/lib/ml/lessons'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
@@ -15,6 +16,8 @@ const PAGES = [
   ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
   ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
+  '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),
+  '/programlar',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

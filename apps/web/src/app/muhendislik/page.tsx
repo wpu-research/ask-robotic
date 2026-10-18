@@ -51,6 +51,24 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/llm" className="eng-course" data-testid="eng-llm">
+        <span className="eng-course-code">LLM</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Large Language Model Applications' : 'Ders: Büyük Dil Modeli Uygulamaları'}</b>
+          <span className="eng-level-text">{en ? '10 units, 40 hours: tokens and embeddings, prompting patterns, JSON-schema output, RAG over course notes, tool-using agents, evaluation, safety and KVKK, cost and a streaming chat front-end. 10 teaching simulations in the browser.' : '10 ünite, 40 saat: token ve gömmeler, prompt kalıpları, JSON şemalı çıktı, ders notları üzerinde RAG, araç kullanan ajanlar, değerlendirme, güvenlik ve KVKK, maliyet ve akışlı sohbet arayüzü. Tarayıcıda 10 öğretim simülasyonu.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
+      <Link href="/programlar" className="eng-course" data-testid="eng-programs">
+        <span className="eng-course-code">{en ? 'PATHS' : 'YOLLAR'}</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Programmes: courses chained into a path' : 'Programlar: dersleri bir yola bağla'}</b>
+          <span className="eng-level-text">{en ? 'Six multi-course programmes with total hours, prerequisites, outcomes and a capstone: Robotics Programming, Embedded Systems, IoT and Data, AI Application Development, Image Processing, Autonomous Systems.' : 'Toplam saat, ön koşul, kazanım ve bitirme projesiyle altı çok dersli program: Robotik Programlama, Gömülü Sistemler, Nesnelerin İnterneti ve Veri, Yapay Zekâ Uygulama Geliştirme, Görüntü İşleme, Otonom Sistemler.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <InstructorCard slug="murat-arslan" labelKey="instructor.eyebrow" />
 
       <section aria-labelledby="eng-levels">
