@@ -2,6 +2,7 @@ import { consents, eq, sql, users, type Db } from '@ask/db'
 import { z } from 'zod'
 import { profileSchema } from '@/lib/profile-schema'
 import { DUMMY_HASH, hashPassword, verifyPassword } from './password'
+import { grantWelcome } from '../membership'
 import { createSession } from './session'
 
 const email = z.string().trim().toLowerCase().email().max(254)
@@ -60,6 +61,7 @@ export async function registerUser(db: Db, input: unknown, now = new Date()): Pr
     const user = await db.transaction(async (tx) => {
       const [u] = await tx.insert(users).values({ email, passwordHash, name, role, birthYear, loginMode: 'email', profile: profile ?? null }).returning()
       if (mayBeUnder16(birthYear, now)) await tx.insert(consents).values({ userId: u.id, kind: 'veli_acik_riza', granted: true })
+      await grantWelcome(tx, u.id, now)
       return u
     })
     const { token, expiresAt } = await createSession(db, user.id)

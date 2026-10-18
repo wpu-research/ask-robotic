@@ -1,0 +1,11 @@
+/* ---- Admin paneli (/admin) ---- */
+.ad { display: grid; gap: 18px; }
+.ad-form, .ad-grant, .ad-search { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.ad-form input, .ad-form select, .ad-grant select, .ad-grant input, .ad-search input {
+  min-height: 40px; padding: 0 12px; border-radius: 10px; border: 2px solid var(--border); background: var(--surface); color: var(--text); font: inherit;
+}
+.ad-form input { flex: 1 1 180px; }
+.ad-form .pr-msg { flex-basis: 100%; }
+.ad-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ad-ok { color: var(--v2-accent); }
+.ad-err { color: #b91c1c; }
