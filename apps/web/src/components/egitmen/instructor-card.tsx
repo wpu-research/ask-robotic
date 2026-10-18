@@ -26,7 +26,7 @@ export async function InstructorCard({ slug, labelKey = 'instructor.card.label' 
       <InstructorPhoto instructor={ins} size={160} alt="" />
       <span className="ins-card-body">
         <span className="ins-card-label">{t(labelKey)}</span>
-        <b>{ins.name}</b>
+        <b>{ins.name[lang]}</b>
         <span className="ins-card-role">{ins[lang].short}</span>
       </span>
       <span className="ins-card-go">{t('instructor.card.profile')}<Icon name="chevronRight" size={16} /></span>

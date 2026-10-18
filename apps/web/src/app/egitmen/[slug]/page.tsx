@@ -19,16 +19,16 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const t = ins[lang]
   const url = `${SITE_URL}${instructorHref(ins)}`
   return {
-    title: ins.name,
+    title: ins.name[lang],
     description: t.role,
     alternates: { canonical: url },
     openGraph: {
       type: 'profile', siteName: 'MacademiaX', url, locale: lang === 'en' ? 'en_US' : 'tr_TR',
-      title: `${ins.name} · MacademiaX`, description: t.role,
+      title: `${ins.name[lang]} · MacademiaX`, description: t.role,
       firstName: ins.given, lastName: ins.family,
-      images: [{ url: ins.photo.jpg480, width: 480, height: 480, alt: ins.name }],
+      images: [{ url: ins.photo.jpg480, width: 480, height: 480, alt: ins.name[lang] }],
     },
-    twitter: { card: 'summary', title: ins.name, description: t.role, images: [ins.photo.jpg480] },
+    twitter: { card: 'summary', title: ins.name[lang], description: t.role, images: [ins.photo.jpg480] },
   }
 }
 
@@ -44,14 +44,14 @@ export default async function EgitmenProfil({ params }: Params) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(personJsonLd(ins, lang)) }} />
       <nav aria-label={T('instructor.crumbs')} className="crumbs">
         <Link href="/">{T('instructor.home')}</Link><Icon name="chevronRight" size={14} />
-        <span aria-current="page">{ins.name}</span>
+        <span aria-current="page">{ins.name[lang]}</span>
       </nav>
 
       <header className="ins-hero">
-        <InstructorPhoto instructor={ins} size={480} alt={T('instructor.photoAlt', { name: ins.name })} />
+        <InstructorPhoto instructor={ins} size={480} alt={T('instructor.photoAlt', { name: ins.name[lang] })} />
         <div>
           <p className="eyebrow">{T('instructor.eyebrow')}</p>
-          <h1>{ins.name}</h1>
+          <h1>{ins.name[lang]}</h1>
           <p className="lead">{c.role}</p>
           <ul className="ins-tags" aria-label={T('instructor.expertise')}>
             {c.expertise.map((e) => <li key={e} className="chip chip-brand">{e}</li>)}

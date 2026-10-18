@@ -24,11 +24,12 @@ export interface InstructorText {
 
 export interface Instructor {
   slug: string
-  name: string
+  /** Unvanıyla ad, dile göre (TR: Dr. Öğr. Üyesi, EN: Asst. Prof. Dr.). */
+  name: { tr: string; en: string }
   /** Ad soyad (JSON-LD givenName/familyName). */
   given: string
   family: string
-  honorific: string
+  honorific: { tr: string; en: string }
   photo: { webp480: string; jpg480: string; webp160: string; jpg160: string }
   affiliation: { tr: string; en: string }
   alumni: { tr: string; en: string }
@@ -41,10 +42,10 @@ export interface Instructor {
 
 const MURAT: Instructor = {
   slug: 'murat-arslan',
-  name: 'Dr. Murat Arslan',
+  name: { tr: 'Dr. Öğr. Üyesi Murat Arslan', en: 'Asst. Prof. Dr. Murat ARSLAN' },
   given: 'Murat',
   family: 'Arslan',
-  honorific: 'Dr.',
+  honorific: { tr: 'Dr. Öğr. Üyesi', en: 'Asst. Prof. Dr.' },
   photo: {
     webp480: '/img/egitmen/murat-arslan-480.webp',
     jpg480: '/img/egitmen/murat-arslan-480.jpg',
@@ -111,14 +112,14 @@ export function personJsonLd(i: Instructor, lang: Lang) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Person',
-    name: i.name,
+    name: i.name[lang],
     givenName: i.given,
     familyName: i.family,
-    honorificPrefix: i.honorific,
+    honorificPrefix: i.honorific[lang],
     url: `${SITE_URL}${instructorHref(i)}`,
     image: `${SITE_URL}${i.photo.jpg480}`,
     description: t.role,
-    jobTitle: lang === 'en' ? 'Faculty member, Software Engineering' : 'Yazılım Mühendisliği öğretim üyesi',
+    jobTitle: lang === 'en' ? 'Assistant Professor, Software Engineering' : 'Yazılım Mühendisliği Dr. Öğretim Üyesi',
     worksFor: { '@type': 'CollegeOrUniversity', name: i.affiliation[lang] },
     alumniOf: { '@type': 'CollegeOrUniversity', name: i.alumni[lang] },
     knowsAbout: t.expertise,

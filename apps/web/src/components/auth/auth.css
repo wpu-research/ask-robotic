@@ -38,3 +38,8 @@
 .um-guest .v2-btn { min-width: 0; min-height: 40px; padding: 0 16px; font-size: .9rem; }
 .um-login { font-weight: 700; padding: 0 10px; color: var(--text); }
 @media (max-width: 640px) { .um-who, .um-guest .um-start { display: none; } }
+
+/* Yönetici için her sayfada görünen panel bağlantısı (ad düğmesinin solunda) */
+.um-admin { display: inline-flex; align-items: center; min-height: 28px; padding: 0 12px; margin-right: 8px; border-radius: 999px; background: var(--v2-accent, #b5651d); color: #fff !important; font-weight: 700; font-size: .82rem; text-decoration: none; white-space: nowrap; }
+.um-admin:hover { filter: brightness(1.08); }
+.um-topbar { display: inline-flex; align-items: center; }

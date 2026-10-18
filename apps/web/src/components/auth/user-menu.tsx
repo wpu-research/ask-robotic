@@ -49,6 +49,7 @@ export function UserMenu({ variant = 'default' }: { variant?: 'default' | 'topba
   const teacher = user.role === 'teacher' || user.role === 'admin'
   return (
     <div className={`um${variant === 'topbar' ? ' um-topbar' : ''}`} ref={box}>
+      {user.role === 'admin' && <Link href="/admin" className="um-admin">{t('shell.user.adminPanel')}</Link>}
       <button type="button" className="user-chip um-btn" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         <span className="avatar" aria-hidden="true">{initial}</span>
         <span className="um-who"><span className="user-name">{user.name}</span><span className="um-role">{role}</span></span>
