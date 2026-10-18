@@ -58,7 +58,7 @@ export const REGRESSION: Lesson<RegFrame> = {
     { tr: "PWM'i ölçekleriz (ortalaması 0, standart sapması 1): adımlar her yönde aynı büyüklükte olur.", en: 'We scale PWM (mean 0, standard deviation 1) so steps have the same size in every direction.' },
     { tr: 'Çizgi yatay başlar (w = 0, b = 0). Her dönemde tahmin, hata ve ortalama kare hata (kayıp) hesaplanır.', en: 'The line starts flat (w = 0, b = 0). Every epoch computes the prediction, the error and the mean squared error (the loss).' },
     { tr: "Kaybın w ve b'ye göre türevi, kaybın hangi yönde arttığını söyler; ters yönde, öğrenme oranı kadar adım atılır.", en: 'The derivative of the loss with respect to w and b says which way the loss grows; we step the other way by the learning rate.' },
-    { tr: "Öğrenme oranını 1'e yaklaştır: çizgi salınır. 1'i geçince ıraksar ve kayıp patlar.", en: 'Push the learning rate towards 1 and the line oscillates; above 1 it diverges and the loss explodes.' },
+    { tr: "Öğrenme oranını 1'e yaklaştır: çizgi salınır. 1'i geçince ıraksar ve kayıp patlar. Tersine 0,01'e indir: adımlar o kadar küçüktür ki son dönemde eğim hâlâ 0,150'dedir (doğrusu 0,213); model doğru yöne gider ama zamanı yetmez.", en: 'Push the learning rate towards 1 and the line oscillates; above 1 it diverges and the loss explodes. Lower it to 0.01 instead: the steps are so small that the slope is still 0.150 at the last epoch (the right value is 0.213); the model heads the right way but runs out of time.' },
   ],
   why: {
     tr: "Gradyan inişi, bugünkü bütün sinir ağlarını eğiten yöntemin ta kendisidir: milyarlarca ağırlık için de aynı iki satır çalışır. Robotikte sensör ve motor kalibrasyonu, ileri besleme (feedforward) terimi ve basit tahmin modelleri hep bu doğruyla başlar.",
@@ -67,7 +67,7 @@ export const REGRESSION: Lesson<RegFrame> = {
   file: 'regresyon.py',
   code: [
     ['import numpy as np'],
-    ['from motor import pwm, speed', '40 ölçüm: PWM, cm/s', '40 measurements: PWM, cm/s'],
+    ['pwm, speed = np.genfromtxt(\'motor-pwm.csv\', delimiter=\',\', skip_header=1, unpack=True)', '40 ölçüm: PWM, cm/s', '40 measurements: PWM, cm/s'],
     ['x = (pwm - pwm.mean()) / pwm.std()', 'ölçekle', 'scale'],
     ['w, b, lr = 0.0, 0.0, 0.1', 'yatay çizgiyle başla', 'start with a flat line'],
     ['for epoch in range(60):'],

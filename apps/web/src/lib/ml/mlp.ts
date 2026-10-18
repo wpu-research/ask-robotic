@@ -1,6 +1,6 @@
 // Ders 9: küçük sinir ağı. Robot arenadaki konumunun pistte mi dışında mı olduğunu öğrenir: iki iç içe hilal (doğrusal olarak
 // ayrılamaz). 2 → H (tanh) → 1 (sigmoid), tüm veriyle gradyan inişi ve geri yayılım. Perceptronun çizemediği eğri sınırı çizer.
-import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt } from './core'
+import { cap, fmt, gauss, rng, type Frame, type Lesson, type Pt, shifted } from './core'
 
 export interface Net { W1: number[][]; b1: number[]; W2: number[]; b2: number }
 export interface MlpFrame extends Frame {
@@ -12,6 +12,8 @@ export interface MlpFrame extends Frame {
   /** Hangi katman vurgulansın (ileri / geri). */
   phase?: 'fwd' | 'bwd'
   H: number
+  /** Veri kümesi: 0 hilal pist, 1 XOR (4 nokta), 2 dairesel bölge. */
+  ds?: number
 }
 
 /** İki hilal (scikit-learn make_moons benzeri), gürültülü. c = 1 pistte. */
@@ -27,6 +29,15 @@ export function moons(seed = 51, n = 200): Pt[] {
   }
   return X
 }
+
+/** XOR: iki dokunma sensörü aynıysa 0, farklıysa 1. Birler karşı köşelerde; hiçbir doğru ayıramaz. */
+export const xorData = (): Pt[] => [{ x: 0, y: 0, c: 0 }, { x: 0, y: 1, c: 1 }, { x: 1, y: 0, c: 1 }, { x: 1, y: 1, c: 0 }]
+/** Arenanın ortasında dairesel güvenli bölge (merkez 0,5; 0,25, yarıçap 0,68): içindeyse 1. */
+export function circleData(seed = 33, n = 200): Pt[] {
+  const r = rng(seed)
+  return Array.from({ length: n }, () => { const x = -0.6 + 2.2 * r(), y = -0.85 + 2.2 * r(); return { x, y, c: Math.hypot(x - 0.5, y - 0.25) < 0.68 ? 1 : 0 } })
+}
+export const DATASETS = [moons, xorData, circleData] as const
 
 const sig = (z: number) => 1 / (1 + Math.exp(-z))
 export function forward(net: Net, x: number, y: number) {
@@ -77,6 +88,7 @@ export const MLP: Lesson<MlpFrame> = {
     { tr: 'Kayıp (çapraz entropi), yanlış ve emin tahminleri ağır cezalandırır.', en: 'The loss (cross-entropy) punishes confident wrong predictions heavily.' },
     { tr: 'Geri yayılım, kaybın her ağırlığa göre türevini zincir kuralıyla çıkıştan girişe doğru hesaplar. Her ağırlık türevin tersine küçük bir adım atar.', en: 'Backpropagation computes the derivative of the loss with respect to every weight with the chain rule, from the output back to the input. Every weight takes a small step against its derivative.' },
     { tr: 'Sınır her adımda biraz daha kıvrılır. Gizli nöron sayısını 2’ye indir: sınır yeterince bükülemez.', en: 'The border curls a little more with every step. Drop the hidden neurons to 2 and the border cannot bend enough.' },
+    { tr: 'Şunu dene: veriyi 1 (XOR) yap. Dört nokta var; aynı girdiler 0, farklı girdiler 1 verir ve birler karşı köşelerde durur. Tek gizli nöronla ağ en fazla 3/4 doğru yapar. 2 nöron kâğıt üstünde yeter ama bu başlangıçla yerel bir çukura takılır ve 2/4’te kalır; 3 nöron 4/4’e ulaşır. Sonra veriyi 2 (daire) yap: 1 nöron daireyi çevreleyemez, 3 nöron üçgenle, 8 nöron neredeyse yuvarlak bir çitle çevreler.', en: 'Try this: set the data to 1 (XOR). There are four points; equal inputs give 0, different inputs give 1, and the ones sit in opposite corners. With one hidden neuron the network gets at most 3/4 right. Two neurons are enough on paper, but from this start they get stuck in a local dip at 2/4; three neurons reach 4/4. Then set the data to 2 (circle): one neuron cannot surround it, three make a triangle and eight build an almost round fence.' },
   ],
   why: {
     tr: 'Bu, derin öğrenmenin en küçük hâlidir. Görüntüden nesne tanıyan ağlar da, robot kolunu yöneten politikalar da, dil modelleri de aynı üç şeyi yapar: ileri hesap, kayıp, geri yayılım. Fark yalnız katman ve ağırlık sayısındadır.',
@@ -85,7 +97,8 @@ export const MLP: Lesson<MlpFrame> = {
   file: 'sinir_agi.py',
   code: [
     ['import numpy as np'],
-    ['from pist import X, y', '200 konum, y = 1 pistte', '200 positions, y = 1 on track'],
+    ['D = np.genfromtxt(\'pist-konum.csv\', delimiter=\',\', names=True)'],
+    ['X, y = np.c_[D[\'x\'], D[\'y\']], D[\'pistte\']', '200 konum, y = 1 pistte', '200 positions, y = 1 on track'],
     ['rng, lr, H = np.random.default_rng(0), 0.5, 8', 'H gizli nöron', 'H hidden neurons'],
     ['W1, b1 = rng.normal(size=(2, H)), np.zeros(H)'],
     ['W2, b2 = rng.normal(size=H), 0.0'],
@@ -101,23 +114,27 @@ export const MLP: Lesson<MlpFrame> = {
   params: [
     { key: 'H', label: { tr: 'Gizli nöron sayısı', en: 'Hidden neurons' }, min: 1, max: 16, step: 1, value: 8 },
     { key: 'lr', label: { tr: 'Öğrenme oranı', en: 'Learning rate' }, min: 0.05, max: 2, step: 0.05, value: 0.5 },
+    { key: 'veri', label: { tr: 'Veri: 0 hilal, 1 XOR, 2 daire', en: 'Data: 0 moons, 1 XOR, 2 circle' }, min: 0, max: 2, step: 1, value: 0 },
   ],
-  run({ H = 8, lr = 0.5 }) {
-    const X = moons()
+  run({ H = 8, lr = 0.5, veri = 0 }) {
+    const ds = Math.max(0, Math.min(2, Math.round(veri)))
+    const X = DATASETS[ds]()
     const snaps = train(X, H, lr, 3000, 75)
     const F: MlpFrame[] = []
     const stat = (s: { loss: number; acc: number }) => cap(`kayıp ${fmt(s.loss, 3, 'tr')} · doğruluk %${Math.round(s.acc * 100)}`, `loss ${s.loss.toFixed(3)} · accuracy ${Math.round(s.acc * 100)}%`)
-    F.push({ X, net: null, step: 0, loss: [], acc: [], H, line: 1, cap: cap('200 konum: pistte / dışında', '200 positions: on / off track'), stat: cap(`2 → ${H} → 1 nöron`, `2 → ${H} → 1 neurons`), hold: 1.8 })
+    F.push({ ds, X, net: null, step: 0, loss: [], acc: [], H, line: 1, cap: ds === 1 ? cap('XOR: 4 nokta, aynıysa 0 farklıysa 1', 'XOR: 4 points, 0 if equal, 1 if different') : ds === 2 ? cap('200 konum: güvenli dairenin içi / dışı', '200 positions: inside / outside the safe circle') : cap('200 konum: pistte / dışında', '200 positions: on / off track'), stat: cap(`2 → ${H} → 1 nöron`, `2 → ${H} → 1 neurons`), hold: 1.8 })
     const first = snaps[0]
-    F.push({ X, net: first.net, step: 0, loss: [first.loss], acc: [first.acc], H, line: 3, cap: cap('rastgele ağırlıklar', 'random weights'), stat: stat(first), hold: 1.4 })
+    F.push({ ds, X, net: first.net, step: 0, loss: [first.loss], acc: [first.acc], H, line: 3, cap: cap('rastgele ağırlıklar', 'random weights'), stat: stat(first), hold: 1.4 })
     const lines: Array<[number, 'fwd' | 'bwd']> = [[6, 'fwd'], [7, 'fwd'], [8, 'fwd'], [10, 'bwd'], [11, 'bwd'], [12, 'bwd']]
-    lines.forEach(([l, ph]) => F.push({ X, net: first.net, step: 0, loss: [first.loss], acc: [first.acc], H, phase: ph, line: l, cap: cap(ph === 'fwd' ? 'adım 0 · ileri hesap' : 'adım 0 · geri yayılım', ph === 'fwd' ? 'step 0 · forward pass' : 'step 0 · backpropagation'), stat: stat(first), hold: 0.9 }))
+    lines.forEach(([l, ph]) => F.push({ ds, X, net: first.net, step: 0, loss: [first.loss], acc: [first.acc], H, phase: ph, line: l, cap: cap(ph === 'fwd' ? 'adım 0 · ileri hesap' : 'adım 0 · geri yayılım', ph === 'fwd' ? 'step 0 · forward pass' : 'step 0 · backpropagation'), stat: stat(first), hold: 0.9 }))
     snaps.forEach((s, i) => {
       if (i === 0) return
-      F.push({ X, net: s.net, step: s.step, loss: snaps.slice(0, i + 1).map((q) => q.loss), acc: snaps.slice(0, i + 1).map((q) => q.acc), H, line: 12, cap: cap(`adım ${s.step}`, `step ${s.step}`), stat: stat(s), hold: i < 8 ? 0.7 : 0.35 })
+      F.push({ ds, X, net: s.net, step: s.step, loss: snaps.slice(0, i + 1).map((q) => q.loss), acc: snaps.slice(0, i + 1).map((q) => q.acc), H, line: 12, cap: cap(`adım ${s.step}`, `step ${s.step}`), stat: stat(s), hold: i < 8 ? 0.7 : 0.35 })
     })
     const last = snaps.at(-1)!
-    F.push({ X, net: last.net, step: last.step, loss: snaps.map((q) => q.loss), acc: snaps.map((q) => q.acc), H, line: 5, cap: cap(`${last.step} adım sonra`, `after ${last.step} steps`), stat: stat(last), hold: 3 })
+    F.push({ ds, X, net: last.net, step: last.step, loss: snaps.map((q) => q.loss), acc: snaps.map((q) => q.acc), H, line: 5, cap: cap(`${last.step} adım sonra`, `after ${last.step} steps`), stat: stat(last), hold: 3 })
     return F
   },
 }
+// Veri CSV'den açılınca 1. satırdan sonra 1 satır eklendi: vurgulanan satırlar kayar.
+MLP.run = shifted(MLP.run, 1, 1)

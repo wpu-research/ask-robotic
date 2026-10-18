@@ -5,7 +5,7 @@ import type { RegFrame } from '@/lib/ml/regression'
 import { polyval, type OverfitFrame } from '@/lib/ml/overfit'
 import { knnPredict, type KnnFrame } from '@/lib/ml/knn'
 import { nbPredict, type NBFrame, type NBModel } from '@/lib/ml/naive-bayes'
-import type { TreeFrame } from '@/lib/ml/tree'
+import { TREE_NAMES, type TreeFrame } from '@/lib/ml/tree'
 import type { PcaFrame } from '@/lib/ml/pca'
 import type { PerFrame } from '@/lib/ml/perceptron'
 import { forward, type MlpFrame } from '@/lib/ml/mlp'
@@ -68,7 +68,7 @@ export function scaleBar(ctx: CanvasRenderingContext2D, v: View, meters: number,
 export function clear(ctx: CanvasRenderingContext2D, W: number, H: number, p: Pal) {
   ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, H)
 }
-const alpha = (hex: string, a: number) => {
+export const alpha = (hex: string, a: number) => {
   const m = /^#([0-9a-f]{6})$/i.exec(hex)
   if (!m) return hex
   const n = parseInt(m[1], 16)
@@ -119,7 +119,7 @@ export function inset(ctx: CanvasRenderingContext2D, x: number, y: number, w: nu
   if (opts.mark !== undefined) { ctx.strokeStyle = p.ink; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.moveTo(px(opts.mark), y + 18); ctx.lineTo(px(opts.mark), y + h - 6); ctx.stroke(); ctx.setLineDash([]) }
 }
 
-type Draw = (ctx: CanvasRenderingContext2D, W: number, H: number, f: Frame, p: Pal, lang: Lang) => void
+export type Draw = (ctx: CanvasRenderingContext2D, W: number, H: number, f: Frame, p: Pal, lang: Lang) => void
 
 function drawKMeans(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Frame, p: Pal, lang: Lang) {
   const f = f0 as KMeansFrame
@@ -218,10 +218,12 @@ function drawOverfit(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Fr
   }
   // sağda: dereceye göre hata
   const x0 = W - 214
-  inset(ctx, x0, 20, 200, 200, [{ v: f.train, col: p.groups[1] }, { v: f.test, col: p.groups[2] }], lang === 'tr' ? 'hata (log) · derece 1–12' : 'error (log) · degree 1–12', p, { log: true, n: 12, mark: f.best ? f.best - 1 : undefined })
+  if (f.gd) inset(ctx, x0, 20, 200, 200, [{ v: f.gd.train, col: p.groups[1] }, { v: f.gd.test, col: p.groups[2] }], lang === 'tr' ? 'hata (log) · geçiş 25–20.000 (log)' : 'error (log) · pass 25–20,000 (log)', p, { log: true, n: f.gd.steps.length, mark: f.gd.best })
+  else inset(ctx, x0, 20, 200, 200, [{ v: f.train, col: p.groups[1] }, { v: f.test, col: p.groups[2] }], lang === 'tr' ? 'hata (log) · derece 1–12' : 'error (log) · degree 1–12', p, { log: true, n: 12, mark: f.best ? f.best - 1 : undefined })
   dot(ctx, x0 + 12, 236, 4, p.groups[1]); text(ctx, lang === 'tr' ? 'eğitim' : 'training', x0 + 22, 240, p.muted, 11)
   ctx.strokeStyle = p.groups[2]; ctx.lineWidth = 1.6; ctx.beginPath(); ctx.arc(x0 + 12, 254, 4, 0, Math.PI * 2); ctx.stroke(); text(ctx, lang === 'tr' ? 'doğrulama' : 'validation', x0 + 22, 258, p.muted, 11)
   if (f.deg) { text(ctx, `${lang === 'tr' ? 'derece' : 'degree'} ${f.deg}`, x0, 300, p.ink, 22, 'left', 700) }
+  if (f.gd) text(ctx, f.gd.best !== undefined ? (lang === 'tr' ? 'erken durdurma' : 'early stopping') : (lang === 'tr' ? 'gradyan inişi (Adam)' : 'gradient descent (Adam)'), x0, 324, p.brand, 13, 'left', 700)
 }
 
 const KNN_V = (W: number, H: number) => chart(W, H, 10, 90, 20, 95, { l: 56, r: 20, t: 20, b: 44 })
@@ -300,24 +302,43 @@ function drawNB(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Frame, 
 function drawTree(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Frame, p: Pal, lang: Lang) {
   const f = f0 as TreeFrame
   clear(ctx, W, H, p)
-  const v = chart(W, H, 0, 1023, 0, 1023, { l: 56, r: 20, t: 20, b: 44 })
-  const COL = [p.groups[0], p.groups[3], p.groups[1]] // sola kırmızı, düz yeşil, sağa mavi
+  const cr = f.ds === 1
+  const v = cr ? chart(W, H, 1000, 6000, -0.5, 5.5, { l: 56, r: f.rules ? 250 : 20, t: 20, b: 44 }) : chart(W, H, 0, 1023, 0, 1023, { l: 56, r: f.rules ? 250 : 20, t: 20, b: 44 })
+  // kredi verisinde "kaçan ≤ t" sınırı t + 0,5'te çizilir (tam sayılar arası); kutu kenarları da öyle
+  const ey = (y: number) => (cr && y > -0.5 && y < 5.5 ? y + 0.5 : y)
+  if (f.rules) {
+    // sağda: kurallar (Arduino'ya aktarılabilecek if-else)
+    const bx = W - 236, bw = 226, bh = Math.min(H - 40, 40 + f.rules.length * 19)
+    ctx.fillStyle = '#12161f'; ctx.beginPath(); if (ctx.roundRect) ctx.roundRect(bx, 20, bw, bh, 8); else ctx.rect(bx, 20, bw, bh); ctx.fill()
+    text(ctx, lang === 'tr' ? 'kurallar' : 'rules', bx + 12, 40, '#7d8799', 11, 'left', 700)
+    ctx.font = '12px ui-monospace, Menlo, Consolas, monospace'; ctx.textAlign = 'left'
+    f.rules.forEach((r, i) => { ctx.fillStyle = /^\s*(if|else)/.test(r[0]) ? '#d8dee9' : '#c3e88d'; ctx.fillText(r[lang === 'tr' ? 0 : 1], bx + 12, 62 + i * 19) })
+    if (f.trainAcc !== undefined && f.acc !== undefined) {
+      const tr = lang === 'tr', a = Math.round(f.trainAcc * 100), b = Math.round(f.acc * 100)
+      text(ctx, tr ? `eğitim %${a} · test %${b}` : `training ${a}% · test ${b}%`, bx + bw / 2, Math.min(H - 12, 20 + bh + 22), p.ink, 12, 'center', 700)
+    }
+  }
+  const COL = cr ? [p.groups[0], p.groups[3]] : [p.groups[0], p.groups[3], p.groups[1]] // sola/ödemedi kırmızı, düz/öder yeşil, sağa mavi
   const alphaHex = (c: string) => c + '26'
-  f.leaves.forEach(({ box, c }) => { ctx.fillStyle = alphaHex(COL[c]); ctx.fillRect(v.sx(box.x0), v.sy(box.y1), v.sx(box.x1) - v.sx(box.x0), v.sy(box.y0) - v.sy(box.y1)) })
-  axes(ctx, v, [0, 256, 512, 768, 1023], [0, 256, 512, 768, 1023], lang === 'tr' ? 'sol sensör' : 'left sensor', lang === 'tr' ? 'sağ sensör' : 'right sensor', p, W, H)
-  if (f.active) { const b = f.active; ctx.strokeStyle = p.brand; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.strokeRect(v.sx(b.x0), v.sy(b.y1), v.sx(b.x1) - v.sx(b.x0), v.sy(b.y0) - v.sy(b.y1)); ctx.setLineDash([]) }
-  f.X.forEach((q) => dot(ctx, v.sx(q.x), v.sy(q.y), 3.6, COL[q.c]))
+  const N = TREE_NAMES[cr ? 1 : 0], li = lang === 'tr' ? 0 : 1
+  const rect = (b: { x0: number; x1: number; y0: number; y1: number }): [number, number, number, number] => [v.sx(b.x0), v.sy(ey(b.y1)), v.sx(b.x1) - v.sx(b.x0), v.sy(ey(b.y0)) - v.sy(ey(b.y1))]
+  f.leaves.forEach(({ box, c }) => { ctx.fillStyle = alphaHex(COL[c]); ctx.fillRect(...rect(box)) })
+  if (cr) axes(ctx, v, [1000, 2000, 3000, 4000, 5000, 6000], [0, 1, 2, 3, 4, 5], lang === 'tr' ? 'aylık gelir' : 'monthly income', lang === 'tr' ? 'kaçan ödeme' : 'missed payments', p, W, H)
+  else axes(ctx, v, [0, 256, 512, 768, 1023], [0, 256, 512, 768, 1023], lang === 'tr' ? 'sol sensör' : 'left sensor', lang === 'tr' ? 'sağ sensör' : 'right sensor', p, W, H)
+  if (f.active) { ctx.strokeStyle = p.brand; ctx.lineWidth = 2; ctx.setLineDash([6, 4]); ctx.strokeRect(...rect(f.active)); ctx.setLineDash([]) }
+  // kredi: aynı tam sayıdaki müşteriler üst üste binmesin diye sabit, küçük dikey kaydırma
+  f.X.forEach((q, i) => dot(ctx, v.sx(q.x), v.sy(cr ? q.y + (((i * 0.618034) % 1) - 0.5) * 0.6 : q.y), cr ? 2.8 : 3.6, COL[q.c]))
   f.splits.forEach((s, i) => {
     ctx.strokeStyle = p.ink; ctx.lineWidth = Math.max(1, 3 - s.depth * 0.6)
     ctx.beginPath()
-    if (s.f === 0) { ctx.moveTo(v.sx(s.t), v.sy(s.box.y0)); ctx.lineTo(v.sx(s.t), v.sy(s.box.y1)) } else { ctx.moveTo(v.sx(s.box.x0), v.sy(s.t)); ctx.lineTo(v.sx(s.box.x1), v.sy(s.t)) }
+    if (s.f === 0) { ctx.moveTo(v.sx(s.t), v.sy(ey(s.box.y0))); ctx.lineTo(v.sx(s.t), v.sy(ey(s.box.y1))) } else { ctx.moveTo(v.sx(s.box.x0), v.sy(ey(s.t))); ctx.lineTo(v.sx(s.box.x1), v.sy(ey(s.t))) }
     ctx.stroke()
     if (i === f.splits.length - 1 && f.active) {
-      const lbl = `${s.f ? (lang === 'tr' ? 'sağ' : 'right') : lang === 'tr' ? 'sol' : 'left'} ≤ ${s.t}`
-      tag(ctx, lbl, s.f === 0 ? v.sx(s.t) + 6 : v.sx(s.box.x0) + 6, s.f === 0 ? v.sy(s.box.y1) + 6 : v.sy(s.t) - 28, p, p.brand)
+      const lbl = `${N.feat[s.f][li]} ≤ ${s.t}`
+      tag(ctx, lbl, s.f === 0 ? v.sx(s.t) + 6 : v.sx(s.box.x0) + 6, s.f === 0 ? v.sy(ey(s.box.y1)) + 6 : v.sy(ey(s.t)) - 28, p, p.brand)
     }
   })
-  const L = lang === 'tr' ? ['sola', 'düz', 'sağa'] : ['left', 'straight', 'right']
+  const L = N.cls.map((c) => c[li])
   let lx = v.sx(0) + 8
   L.forEach((n, i) => { dot(ctx, lx + 4, H - 14, 4, COL[i]); text(ctx, n, lx + 12, H - 10, p.muted, 11); lx += ctx.measureText(n).width + 34 })
 }
@@ -397,8 +418,12 @@ function drawMlp(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Frame,
     }
     ctx.globalAlpha = 1
   }
-  axes(ctx, v, [-1, 0, 1, 2], [-1, 0, 1], 'x (m)', 'y (m)', p, W, H)
-  f.X.forEach((q) => dot(ctx, v.sx(q.x), v.sy(q.y), 3.6, q.c ? p.groups[3] : p.groups[0]))
+  axes(ctx, v, [-1, 0, 1, 2], [-1, 0, 1], f.ds === 1 ? (lang === 'tr' ? 'sensör 1' : 'sensor 1') : 'x (m)', f.ds === 1 ? (lang === 'tr' ? 'sensör 2' : 'sensor 2') : 'y (m)', p, W, H)
+  const big = f.ds === 1
+  f.X.forEach((q) => {
+    dot(ctx, v.sx(q.x), v.sy(q.y), big ? 10 : 3.6, q.c ? p.groups[3] : p.groups[0])
+    if (big) { text(ctx, `${q.x},${q.y} → ${q.c}`, v.sx(q.x), v.sy(q.y) - 16, p.ink, 12, 'center', 700) }
+  })
   // sağda ağ şeması
   const x0 = W - 196
   const layers = [2, Math.min(f.H, 10), 1]
@@ -413,7 +438,7 @@ function drawMlp(ctx: CanvasRenderingContext2D, W: number, H: number, f0: Frame,
   text(ctx, lang === 'tr' ? `2 → ${f.H} → 1` : `2 → ${f.H} → 1`, x0 + 88, 228, p.muted, 11, 'center', 600)
   if (f.phase) text(ctx, f.phase === 'fwd' ? (lang === 'tr' ? 'ileri →' : 'forward →') : (lang === 'tr' ? '← geri yayılım' : '← backprop'), x0 + 88, 30, p.brand, 11, 'center', 700)
   if (f.loss.length > 1) inset(ctx, x0 - 8, 250, 196, 110, [{ v: f.loss, col: p.groups[0] }], lang === 'tr' ? 'kayıp (log)' : 'loss (log)', p, { log: true, n: 41 })
-  const L = lang === 'tr' ? ['pistte', 'dışında'] : ['on track', 'off track']
+  const L = f.ds === 1 ? (lang === 'tr' ? ['1: farklı', '0: aynı'] : ['1: different', '0: equal']) : f.ds === 2 ? (lang === 'tr' ? ['güvenli bölge', 'dışı'] : ['safe zone', 'outside']) : lang === 'tr' ? ['pistte', 'dışında'] : ['on track', 'off track']
   let lxx = v.sx(-1.6) + 8
   ;[3, 0].forEach((c, i) => { dot(ctx, lxx + 4, H - 14, 4, p.groups[c]); text(ctx, L[i], lxx + 12, H - 10, p.muted, 11); lxx += ctx.measureText(L[i]).width + 34 })
 }

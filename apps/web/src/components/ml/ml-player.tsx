@@ -6,13 +6,14 @@ import { useLocale } from '@/i18n/client'
 import type { Lang } from '@/lib/ml/core'
 import { LESSONS } from '@/lib/ml/lessons'
 import { DRAW, readPal } from './draw'
+import { SCENES } from './scenes'
 
 const W = 720, H = 460
 const BASE_MS = 700
 const SPEEDS = [0.5, 1, 2, 4]
 
 /** Çok küçük Python renklendirici: yorum, metin, sayı, anahtar sözcük. */
-function Py({ src }: { src: string }) {
+export function Py({ src }: { src: string }) {
   const hash = src.indexOf('#')
   const code = hash >= 0 ? src.slice(0, hash) : src
   const comment = hash >= 0 ? src.slice(hash) : ''
@@ -59,7 +60,8 @@ export function MlPlayer({ slug }: { slug: string }) {
     if (c.width !== W * dpr) { c.width = W * dpr; c.height = H * dpr }
     const ctx = c.getContext('2d')!
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-    DRAW[lesson.slug]?.(ctx, W, H, f, readPal(host.current), lang)
+    const draw = DRAW[lesson.slug] ?? SCENES[lesson.slug]
+    draw?.(ctx, W, H, f, readPal(host.current), lang)
   }, [f, lesson, lang])
   // vurgulanan satırı görünür tut (yalnız kod kutusunun içinde kaydır)
   useEffect(() => {
