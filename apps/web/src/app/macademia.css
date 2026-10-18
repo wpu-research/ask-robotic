@@ -299,3 +299,11 @@ h1, h2, h3, h4 { text-wrap: balance; letter-spacing: -.01em; }
   .steps, .mx-cards, .mx-cards.three { grid-template-columns: 1fr; }
   .site-footer .cols { grid-template-columns: 1fr; }
 }
+
+/* Alt bilgide kurucu: fotoğraf + ad, eğitmen profiline bağlanır */
+.site-footer a.foot-founder { display: inline-flex; align-items: center; gap: 10px; margin-top: 16px; padding: 6px 14px 6px 6px; border-radius: 999px; background: rgba(255,255,255,.06); }
+.foot-founder img { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+.foot-founder span { display: grid; line-height: 1.2; }
+.foot-founder small { font-size: 12px; color: var(--on-deep-muted); }
+.foot-founder b { color: var(--on-deep); font-size: 14px; }
+.home-founder { padding-top: 0; }

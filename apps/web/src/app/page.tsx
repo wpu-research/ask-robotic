@@ -8,6 +8,7 @@ import { getCatalog } from '@/lib/catalog'
 import { getDb } from '@/lib/db'
 import { authEnabled } from '@/lib/flags'
 import { getLocale, getT } from '@/i18n/server'
+import { InstructorCard } from '@/components/egitmen/instructor-card'
 
 export const dynamic = 'force-dynamic'
 
@@ -20,6 +21,8 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Home() {
   const catalog = await getCatalog(getDb()).catch(() => [])
   const user = authEnabled() ? await getCurrentUser().catch(() => null) : null
-  if (user || !authEnabled()) return <Dashboard catalog={catalog} league={user ? <LeagueCard /> : null} />
-  return <Landing catalog={catalog} parts={allComponents.length} locale={await getLocale()} />
+  // Sayfanın sonunda kurucu kartı (eğitmen profiline bağlanır)
+  const founder = <div className="page home-founder"><InstructorCard slug="murat-arslan" labelKey="instructor.founder" /></div>
+  if (user || !authEnabled()) return <><Dashboard catalog={catalog} league={user ? <LeagueCard /> : null} />{founder}</>
+  return <><Landing catalog={catalog} parts={allComponents.length} locale={await getLocale()} />{founder}</>
 }

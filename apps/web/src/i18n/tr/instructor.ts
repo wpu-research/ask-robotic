@@ -14,6 +14,7 @@ export const instructor = {
   conference: 'Konferans',
   youtube: 'YouTube kanalı',
   youtubeSoon: 'Ders videolarının yer alacağı YouTube kanalı yakında açılıyor.',
+  founder: 'Kurucu',
   card: {
     label: 'Dersin eğitmeni',
     profile: 'Profili gör',

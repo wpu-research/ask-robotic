@@ -12,7 +12,8 @@ import { Mascot } from '../lesson-v2/mascot'
 import { UserMenu } from '../auth/user-menu'
 import { SessionSync } from '../auth/session-sync'
 import { LocaleSwitcher } from './locale-switcher'
-import { useT } from '@/i18n/client'
+import { useLocale, useT } from '@/i18n/client'
+import { instructorBySlug, instructorHref } from '@/lib/egitmen/egitmenler'
 import { RobiDock } from '../robi/robi-dock'
 import { VoiceProvider } from '../lesson-v2/voice'
 
@@ -23,6 +24,9 @@ import { VoiceProvider } from '../lesson-v2/voice'
 export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { children: ReactNode; authOn: boolean; robiOn?: boolean; ttsOn?: boolean }) {
   const pathname = usePathname()
   const t = useT()
+  const locale = useLocale()
+  // Alt bilgide her sayfada kurucu (eğitmen profiline bağlanır)
+  const founder = instructorBySlug('murat-arslan')
   const [menu, setMenu] = useState(false)
   const [palette, setPalette] = useState(false)
   const [mac, setMac] = useState(false)
@@ -91,6 +95,12 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
             <div>
               <h4 className="foot-brand"><NutLogo size={34} /><Wordmark /></h4>
               <p>{t('shell.foot.desc')}</p>
+              {founder && (
+                <Link href={instructorHref(founder)} className="foot-founder">
+                  <img src={founder.photo.jpg160} alt="" width={44} height={44} loading="lazy" />
+                  <span><small>{t('instructor.founder')}</small><b>{founder.name[locale]}</b></span>
+                </Link>
+              )}
             </div>
             <div>
               <h4>{t('shell.groups.kids')}</h4>

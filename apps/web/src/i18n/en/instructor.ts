@@ -16,6 +16,7 @@ export const instructor: typeof Tr = {
   conference: 'Conference',
   youtube: 'YouTube channel',
   youtubeSoon: 'A YouTube channel with course videos is coming soon.',
+  founder: 'Founder',
   card: {
     label: 'Course instructor',
     profile: 'View profile',
