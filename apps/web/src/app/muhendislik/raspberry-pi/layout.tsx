@@ -4,5 +4,5 @@ import '../drone/drone.css'
 import '../gomulu.css'
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  return <div className="dr-root">{children}</div>
+  return <div className="dr-root gm-root">{children}</div>
 }

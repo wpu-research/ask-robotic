@@ -54,7 +54,7 @@ export function CourseOverview({ c, lang }: { c: AnyCourse; lang: Lang }) {
         </p>
       </header>
 
-      <div className="rb-two">
+      <div className="rb-two gm-two">
         <section className="panel" aria-labelledby="gm-who">
           <h2 id="gm-who" className="panel-title">{en ? 'Who is it for' : 'Kimler için'}</h2>
           <dl className="value-list gm-facts">
@@ -89,7 +89,7 @@ export function CourseOverview({ c, lang }: { c: AnyCourse; lang: Lang }) {
         </div>
       </section>
 
-      <div className="rb-two">
+      <div className="rb-two gm-two">
         <section className="panel" aria-labelledby="gm-cap">
           <h2 id="gm-cap" className="panel-title">{en ? 'Capstone project' : 'Bitirme projesi'}</h2>
           <p><b>{c.capstone[lang].title}</b></p>

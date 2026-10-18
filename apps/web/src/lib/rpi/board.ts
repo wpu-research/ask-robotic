@@ -19,7 +19,7 @@ export const BOARDS: Record<Board, { name: string; tr: string; en: string }> = {
   zero2: { name: 'Raspberry Pi Zero 2 W', tr: 'Küçük ve az güç çeken Linux kartı', en: 'Small, low-power Linux board' },
   pico: { name: 'Raspberry Pi Pico (RP2040)', tr: 'Mikrodenetleyici, MicroPython/C', en: 'Microcontroller, MicroPython/C' },
   stm32: { name: 'STM32 (Cortex-M)', tr: 'Mikrodenetleyici, C ve gerçek zamanlı', en: 'Microcontroller, C and real-time' },
-  combo: { name: 'Pi + mikrodenetleyici', tr: 'Pi düşünür, MCU zamanlamayı tutar (UART/I²C ile)', en: 'Pi thinks, MCU keeps the timing (over UART/I²C)' },
+  combo: { name: 'Pi + MCU', tr: 'Pi düşünür, MCU zamanlamayı tutar (UART/I²C ile)', en: 'Pi thinks, MCU keeps the timing (over UART/I²C)' },
 }
 const SCORE: Record<Need, Record<Board, number>> = {
   vision: { pi5: 3, zero2: 1, pico: -3, stm32: -3, combo: 3 },

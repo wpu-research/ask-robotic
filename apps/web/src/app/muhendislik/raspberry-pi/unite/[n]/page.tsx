@@ -8,7 +8,8 @@ export const dynamicParams = false
 export const generateStaticParams = () => RPI_COURSE.units.map((u) => ({ n: String(u.n) }))
 
 export async function generateMetadata({ params }: { params: Promise<{ n: string }> }): Promise<Metadata> {
-  const u = RPI_COURSE.units.find((x) => x.n === Number((await params).n))
+  const n = Number((await params).n)
+  const u = RPI_COURSE.units.find((x) => x.n === n)
   const lang = await getLocale()
   return { title: u ? `${RPI_COURSE.text[lang].title} · ${u[lang].title}` : RPI_COURSE.text[lang].title, description: u?.[lang].summary }
 }

@@ -111,3 +111,5 @@
 .gm-spin { animation: gm-spin 1s linear infinite; }
 .gm-rev { animation-direction: reverse; }
 @media (prefers-reduced-motion: reduce) { .gm-spin { animation: none; } .gm-steer span { transition: none; } }
+.gm-two > .panel { margin-top: 0; }
+.gm-root .rb-prose .eq { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }

@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
 import { DEMOS } from '@/lib/cv-demolar'
 import { UNITS } from '@/lib/drone/course'
+import { RPI_COURSE } from '@/lib/rpi/course'
+import { STM32_COURSE } from '@/lib/stm32/course'
 import { LESSONS } from '@/lib/ml/lessons'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
@@ -12,7 +14,8 @@ const PAGES = [
   '/robotun-gozleri/demolar', ...DEMOS.map((d) => `/robotun-gozleri/demolar/${d.slug}`),
   '/makine-ogrenmesi', '/laboratuvar', '/parcalar', '/muhendislik', '/muhendislik/robotik',
   '/muhendislik/drone', '/muhendislik/drone/parcalar', '/muhendislik/drone/simulasyon', '/muhendislik/drone/proje',
-  ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
+  ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`),
+  ...[RPI_COURSE, STM32_COURSE].flatMap((c) => [`/muhendislik/${c.slug}`, `/muhendislik/${c.slug}/simulasyon`, `/muhendislik/${c.slug}/proje`, ...c.units.map((u) => `/muhendislik/${c.slug}/unite/${u.n}`)]), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
   ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
 ]

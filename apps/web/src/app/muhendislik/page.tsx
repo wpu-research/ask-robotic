@@ -51,6 +51,24 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/raspberry-pi" className="eng-course" data-testid="eng-rpi">
+        <span className="eng-course-code">RPI</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Robotics Programming with Raspberry Pi' : 'Ders: Raspberry Pi ile Robotik Programlama'}</b>
+          <span className="eng-level-text">{en ? '10 units for ages 16+: Linux and the terminal, Python, GPIO, I²C/SPI/1-Wire sensors, camera and OpenCV, motors and encoders, differential drive, a Flask panel, ROS 2 and systemd. 9 in-browser simulations and a camera exploration robot capstone.' : '16 yaş üstü için 10 ünite: Linux ve terminal, Python, GPIO, I²C/SPI/1-Wire sensörler, kamera ve OpenCV, motor ve enkoder, diferansiyel sürüş, Flask paneli, ROS 2 ve systemd. Tarayıcıda 9 simülasyon ve kameralı keşif robotu bitirme projesi.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
+      <Link href="/muhendislik/arm-stm32" className="eng-course" data-testid="eng-stm32">
+        <span className="eng-course-code">STM32</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Embedded Programming with ARM (STM32)' : 'Ders: ARM (STM32) ile Gömülü Programlama'}</b>
+          <span className="eng-level-text">{en ? '11 units for ages 16+: Cortex-M and the memory map, registers and HAL, clock tree, timers and PWM, interrupts and NVIC, UART, ADC and DMA, I²C/SPI, low power and FreeRTOS. 11 in-browser simulations and a PWM motor driver with a UART command interface.' : '16 yaş üstü için 11 ünite: Cortex-M ve bellek haritası, yazmaçlar ve HAL, saat ağacı, zamanlayıcı ve PWM, kesmeler ve NVIC, UART, ADC ve DMA, I²C/SPI, düşük güç ve FreeRTOS. Tarayıcıda 11 simülasyon ve UART komutlu PWM motor sürücü projesi.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <InstructorCard slug="murat-arslan" labelKey="instructor.eyebrow" />
 
       <section aria-labelledby="eng-levels">
