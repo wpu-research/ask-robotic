@@ -75,15 +75,16 @@ export function skeleton(ctx: C, lm: Pt[], edges: Array<[number, number]>, color
   ctx.restore()
 }
 
-/** Üstte uyarı bandı; `blink` açıksa yanıp söner (hareket azaltmada sabit). */
+/** Uyarı bandı (alt ortada) ve kırmızı çerçeve; `blink` açıksa yanıp söner (hareket azaltmada sabit). */
 export function banner(ctx: C, text: string, color: string, t: number, blink = true) {
   const W = ctx.canvas.width, on = !blink || Math.floor(t * 3) % 2 === 0
   ctx.save()
   ctx.strokeStyle = color; ctx.lineWidth = on ? 8 : 4; ctx.strokeRect(4, 4, W - 8, ctx.canvas.height - 8)
   ctx.font = '800 20px ui-monospace, Menlo, Consolas, monospace'
   const w = ctx.measureText(text).width + 28
-  ctx.fillStyle = color; ctx.globalAlpha = on ? 0.95 : 0.75; ctx.fillRect((W - w) / 2, 40, w, 34)
-  ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, W / 2, 58)
+  const y = ctx.canvas.height - 72 // altta, FPS rozetinin üstünde (üstteki bilgi panellerini örtmesin)
+  ctx.fillStyle = color; ctx.globalAlpha = on ? 0.95 : 0.75; ctx.fillRect((W - w) / 2, y, w, 34)
+  ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(text, W / 2, y + 18)
   ctx.restore()
 }
 
@@ -92,7 +93,7 @@ export function spark(ctx: C, x: number, y: number, w: number, h: number, vs: nu
   ctx.save()
   ctx.fillStyle = COL.panel; ctx.fillRect(x, y, w, h)
   const Y = (v: number) => y + h - 4 - ((Math.min(hi, Math.max(lo, v)) - lo) / (hi - lo || 1)) * (h - 8)
-  if (th !== undefined) { ctx.strokeStyle = 'rgba(239,68,68,.8)'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, Y(th)); ctx.lineTo(x + w, Y(th)); ctx.stroke(); ctx.setLineDash([]) }
+  if (th !== undefined) { ctx.lineWidth = 1.2; ctx.strokeStyle = 'rgba(239,68,68,.8)'; ctx.setLineDash([4, 4]); ctx.beginPath(); ctx.moveTo(x, Y(th)); ctx.lineTo(x + w, Y(th)); ctx.stroke(); ctx.setLineDash([]) }
   ctx.strokeStyle = color; ctx.lineWidth = 1.6; ctx.beginPath()
   vs.forEach((v, i) => { const xx = x + (i / Math.max(1, vs.length - 1)) * w; if (i) ctx.lineTo(xx, Y(v)); else ctx.moveTo(xx, Y(v)) })
   ctx.stroke()

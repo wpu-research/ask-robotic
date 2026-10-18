@@ -127,8 +127,8 @@ export const fatigueDemo: DemoImpl<FatS> = {
     ctx.fillStyle = '#334155'; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(90, 0); ctx.lineTo(40, 480); ctx.lineTo(0, 480); ctx.fill()
     ctx.beginPath(); ctx.moveTo(640, 0); ctx.lineTo(550, 0); ctx.lineTo(600, 480); ctx.lineTo(640, 480); ctx.fill()
     ctx.fillStyle = '#475569'; ctx.fillRect(140, 400, 360, 80)
-    const { eye, mouth } = driverScene(c.t), fw = 200
-    const lm = makeFace({ cx: 320 + 4 * Math.sin(c.t * 0.5), cy: 220, fw, eye, mouth })
+    const { eye, mouth } = driverScene(c.t), fw = 240
+    const lm = makeFace({ cx: 320 + 4 * Math.sin(c.t * 0.5), cy: 225, fw, eye, mouth })
     faceScene(ctx, lm, fw, '#d6a585', eye)
     ctx.fillStyle = '#0f172a'; ctx.fillRect(220, 410, 200, 70)
     return lm
@@ -257,8 +257,10 @@ export const trafficDemo: DemoImpl<TrafS> = {
       bracketBox(ctx, b.x0 * k - 3, b.y0 * k - 3, b.x1 * k + 3, b.y1 * k + 3, col, `#${tr.id}${tr.speed !== null ? ` ${tr.speed.toFixed(0)}` : ''}`)
     }
     if (c.mode === 'sample') for (const car of s.cars) if (car.y > 0 && car.y < c.H) {
-      const x = car.lane < 2 ? 160 : 412
-      ctx.save(); ctx.font = '600 11px ui-monospace, Menlo, monospace'; ctx.fillStyle = 'rgba(255,255,255,.85)'; ctx.textBaseline = 'middle'; ctx.fillText(`${tx(c.lang, 'gerçek', 'true')} ${car.kmh}`, x, car.y); ctx.restore()
+      // sahnenin gerçek hızı, yolun kenarında (karşılaştırma için; ölçüm bundan habersizdir)
+      const left = car.lane < 2
+      ctx.save(); ctx.font = '600 11px ui-monospace, Menlo, monospace'; ctx.fillStyle = 'rgba(255,255,255,.9)'; ctx.textBaseline = 'middle'; ctx.textAlign = left ? 'right' : 'left'
+      ctx.fillText(`${tx(c.lang, 'gerçek', 'true')} ${car.kmh}`, left ? 234 : 406, car.y); ctx.restore()
     }
     const avg = s.speeds.length ? s.speeds.reduce((a, b) => a + b, 0) / s.speeds.length : 0
     panel(ctx, 10, 10, [
@@ -267,7 +269,7 @@ export const trafficDemo: DemoImpl<TrafS> = {
       [tx(c.lang, `> ${c.params.limit} km/h`, `> ${c.params.limit} km/h`), String(s.over), s.over ? COL.alert : undefined],
       [tx(c.lang, 'ön plan', 'foreground'), `${(s.fg * 100).toFixed(1)}%`],
       ...s.log.map((e) => ['', e] as [string, string]),
-    ], 200)
+    ], 166)
     if (s.thumb) {
       ctx.save(); ctx.globalAlpha = 0.9; ctx.drawImage(s.thumb, 10, c.H - 130, 160, 120); ctx.restore()
       ctx.strokeStyle = 'rgba(148,163,184,.6)'; ctx.strokeRect(10.5, c.H - 129.5, 159, 119)

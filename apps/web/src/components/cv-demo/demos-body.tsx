@@ -37,11 +37,11 @@ function fallScene(t: number) {
   if (k < 4.5) return { ...base, cx: 300, crouch: (k - 3) / 1.5 }
   if (k < 6) return { ...base, cx: 300, crouch: 1 }
   if (k < 7.5) return { ...base, cx: 300, crouch: 1 - (k - 6) / 1.5 }
-  if (k < 9) return { ...base, cx: lerp(300, 380, (k - 7.5) / 1.5), phase: k * 7, stride: 0.1 }
-  if (k < 9.6) return { ...base, cx: 380, lean: (Math.PI / 2) * ease((k - 9) / 0.6) }
-  if (k < 13) return { ...base, cx: 380, lean: Math.PI / 2 }
-  if (k < 14.5) return { ...base, cx: 380, lean: (Math.PI / 2) * (1 - (k - 13) / 1.5) }
-  return { ...base, cx: 380 }
+  if (k < 9) return { ...base, cx: lerp(300, 200, (k - 7.5) / 1.5), phase: k * 7, stride: 0.1 }
+  if (k < 9.6) return { ...base, cx: 200, lean: (Math.PI / 2) * ease((k - 9) / 0.6) }
+  if (k < 13) return { ...base, cx: 200, lean: Math.PI / 2 }
+  if (k < 14.5) return { ...base, cx: 200, lean: (Math.PI / 2) * (1 - (k - 13) / 1.5) }
+  return { ...base, cx: lerp(200, 110, (k - 14.5) / 1.5), phase: k * 7, stride: 0.1 }
 }
 export const fallDemo: DemoImpl<FallS> = {
   init: () => ({ f: fallInit(), lm: null, falls: 0, vs: [], as: [] }),
@@ -69,14 +69,14 @@ export const fallDemo: DemoImpl<FallS> = {
       ctx.save(); ctx.strokeStyle = '#facc15'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(sm.x, sm.y); ctx.lineTo(hm.x, hm.y); ctx.stroke(); ctx.restore()
       cross(ctx, hm.x, hm.y, '#facc15')
     }
-    panel(ctx, 10, 10, [
+    panel(ctx, 400, 10, [
       [tx(c.lang, 'evre', 'phase'), ph.toUpperCase(), col],
       [tx(c.lang, 'gövde açısı', 'torso angle'), `${s.f.angle.toFixed(0)}° / ${c.params.angle}°`],
       [tx(c.lang, 'düşüş hızı', 'drop speed'), `${s.f.v.toFixed(2)} / ${c.params.speed}`],
       [tx(c.lang, 'onay', 'confirm'), `${s.f.frames} / ${c.params.frames}`],
     ], 230)
-    spark(ctx, 10, 96, 230, 46, s.vs, -1, 4, '#38bdf8', c.params.speed, tx(c.lang, 'hız (gövde/sn)', 'speed (torsos/s)'))
-    spark(ctx, 10, 146, 230, 46, s.as, 0, 100, '#facc15', c.params.angle, tx(c.lang, 'açı (°)', 'angle (°)'))
+    spark(ctx, 400, 96, 230, 46, s.vs, -1, 4, '#38bdf8', c.params.speed, tx(c.lang, 'hız (gövde/sn)', 'speed (torsos/s)'))
+    spark(ctx, 400, 146, 230, 46, s.as, 0, 100, '#facc15', c.params.angle, tx(c.lang, 'açı (°)', 'angle (°)'))
     if (ph === 'fall') banner(ctx, tx(c.lang, '⚠ DÜŞME ALGILANDI', '⚠ FALL DETECTED'), COL.alert, c.t, !c.reduced)
   },
   hud(s, c): Hud {
