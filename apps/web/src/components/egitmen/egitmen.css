@@ -1,0 +1,64 @@
+/* Eğitmen kartı ve profil sayfası (/egitmen/[slug]): Macademia jetonları (--brand, --line, --bg-soft), köşeli kart düzeni,
+   fotoğraf her yerde daire. */
+.ins-photo { display: block; flex: none; border-radius: 50%; overflow: hidden; background: var(--bg-soft); border: 3px solid var(--surface); box-shadow: 0 0 0 1px var(--line); }
+.ins-photo img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+/* Kart */
+.ins-card { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 14px 18px 14px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); color: var(--text); transition: box-shadow .15s ease, border-color .15s ease; }
+.ins-card:hover { text-decoration: none; box-shadow: var(--shadow); border-color: color-mix(in srgb, var(--brand) 40%, var(--line)); }
+.ins-card .ins-photo { width: 64px; height: 64px; }
+.ins-card-body { display: grid; gap: 2px; min-width: 0; }
+.ins-card-label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
+.ins-card-body b { font-size: 1.05rem; font-weight: 600; }
+.ins-card-role { font-size: .88rem; color: var(--muted); }
+.ins-card-go { display: inline-flex; align-items: center; gap: 4px; font-size: .9rem; font-weight: 600; color: var(--brand); white-space: nowrap; }
+@media (max-width: 560px) {
+  .ins-card { grid-template-columns: auto minmax(0, 1fr); }
+  .ins-card-go { grid-column: 2; }
+}
+
+/* Profil sayfası */
+.ins-hero { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 32px; align-items: center; }
+.ins-hero .ins-photo { width: clamp(140px, 22vw, 220px); height: clamp(140px, 22vw, 220px); border-width: 5px; box-shadow: 0 0 0 1px var(--line), var(--shadow); }
+.ins-hero h1 { font-size: clamp(30px, 4vw, 44px); font-weight: 700; letter-spacing: -.01em; margin: 8px 0 10px; }
+.ins-hero .lead { font-size: 17px; color: var(--muted); max-width: 62ch; margin: 0; }
+.ins-tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 0; padding: 0; list-style: none; }
+.ins-tags .chip { font-size: 13px; padding: 4px 12px; }
+@media (max-width: 640px) {
+  .ins-hero { grid-template-columns: minmax(0, 1fr); justify-items: start; gap: 20px; }
+}
+
+.ins-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 36px; align-items: start; }
+@media (max-width: 900px) { .ins-grid { grid-template-columns: minmax(0, 1fr); } }
+.ins-bio p { margin: 0 0 14px; line-height: 1.7; max-width: 68ch; }
+.ins-bio p:last-child { margin-bottom: 0; }
+.ins-side { display: grid; gap: 20px; }
+.ins-side h2, .ins-sec h2 { font-size: clamp(20px, 2.2vw, 26px); font-weight: 700; margin: 0 0 14px; }
+
+.ins-courses { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.ins-courses a { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--text); font-weight: 600; }
+.ins-courses a:hover { color: var(--brand); text-decoration: none; }
+.ins-courses .code { font-size: 12px; font-weight: 700; letter-spacing: .04em; color: var(--brand); margin-right: 8px; }
+
+.ins-yt { display: flex; gap: 12px; align-items: flex-start; padding: 16px; border: 1px dashed var(--line); border-radius: var(--radius); background: var(--bg-soft); }
+.ins-yt-icon { display: grid; place-items: center; width: 40px; height: 40px; flex: none; border-radius: 50%; background: var(--surface); color: var(--brand); border: 1px solid var(--line); }
+.ins-yt b { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.ins-yt p { margin: 4px 0 0; font-size: .9rem; color: var(--muted); }
+
+.ins-pubs { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.ins-pubs li { display: grid; grid-template-columns: 56px minmax(0, 1fr) auto; gap: 16px; align-items: baseline; padding: 14px 0; border-bottom: 1px solid var(--line); }
+.ins-pubs li:first-child { border-top: 1px solid var(--line); }
+.ins-pub-year { font-weight: 700; color: var(--brand); font-variant-numeric: tabular-nums; }
+.ins-pub-title { display: grid; gap: 2px; }
+.ins-pub-title b { font-weight: 600; }
+.ins-pub-title span { font-size: .9rem; color: var(--muted); font-style: italic; }
+@media (max-width: 560px) {
+  .ins-pubs li { grid-template-columns: 44px minmax(0, 1fr); }
+  .ins-pubs li .chip { grid-column: 2; justify-self: start; }
+}
+.ins-note { margin: -6px 0 14px; font-size: .9rem; color: var(--muted); }
+
+.ins-theses { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.ins-theses li { padding-left: 16px; border-left: 2px solid var(--brand); }
+.ins-theses b { display: block; font-weight: 600; }
+.ins-theses span { font-size: .9rem; color: var(--muted); }

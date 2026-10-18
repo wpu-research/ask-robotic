@@ -6,7 +6,7 @@ import { LEGAL } from './yasal/metinler'
 const PAGES = [
   '', '/fiyatlar', '/okullar', '/konular', '/moduller', '/atolye', '/robot-atolyesi', '/robotun-gozleri',
   '/makine-ogrenmesi', '/laboratuvar', '/parcalar', '/muhendislik', '/muhendislik/robotik', '/oyunlar', '/ai-atolyesi',
-  '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena',
+  '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
