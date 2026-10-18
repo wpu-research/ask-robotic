@@ -170,3 +170,23 @@ export function Gauge({ value, min, max, warn, label, unit, lang, d = 1 }: { val
     </svg>
   )
 }
+
+/** Simülasyon kutusu: başlık + açıklama + gövde (ESOF 323 .rb-sim görünümü). */
+export function SimFrame({ id, title, desc, testid, children }: { id: string; title: string; desc: string; testid: string; children: ReactNode }) {
+  return (
+    <section className="rb-sim" id={`sim-${id}`} data-testid={testid}>
+      <div className="rb-sim-head"><h3>{title}</h3><p>{desc}</p></div>
+      {children}
+    </section>
+  )
+}
+
+/** Mesaj akışı listesi: [zaman, metin, sınıf]. */
+export function Flow({ rows, empty }: { rows: Array<{ t: string; text: ReactNode; cls?: string }>; empty: string }) {
+  return (
+    <ol className="ks-flow" aria-live="polite">
+      {rows.length === 0 ? <li><span className="t">–</span><span className="dim">{empty}</span></li>
+        : rows.map((r, i) => <li key={i}><span className="t">{r.t}</span><span className={r.cls}>{r.text}</span></li>)}
+    </ol>
+  )
+}

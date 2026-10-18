@@ -64,3 +64,18 @@
   .ks-units th:nth-child(3), .ks-units td:nth-child(3) { display: none; }
   .rb-sim { padding: 14px; }
 }
+ol.ks-flow { list-style: none; margin: 0; }
+.ks-pins td, .ks-pins th { vertical-align: top; }
+.ks-pins select { min-height: 36px; }
+.ks-pins .err { color: var(--red); }
+.ks-pins .warn { color: var(--gold); }
+.ks-pins .ok { color: var(--green); }
+.ks-strip { display: flex; height: 22px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+.ks-strip span { flex: 1 1 0; min-width: 0; }
+.ks-legend { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: .78rem; color: var(--muted); margin: 0; padding: 0; list-style: none; }
+.ks-legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+.ks-slots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ks-slot { border: 2px solid var(--border); border-radius: 10px; padding: 10px 12px; background: var(--sim-bg); font-size: .84rem; }
+.ks-slot.run { border-color: var(--sim-a); }
+.ks-slot b { display: block; font-size: 1rem; }
+.rb-sim textarea.ks-in { min-height: 150px; }
