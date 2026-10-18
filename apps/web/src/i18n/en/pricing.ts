@@ -39,6 +39,8 @@ export const pricing: typeof Tr = {
     periodGroup: 'Billing period',
     savePercent: 'Save {n}%',
     trialBadge: '7 days free',
+    welcomeBadge: '{n} months free',
+    welcomeCta: 'Sign up free: {n} months of Premium',
     perMonth: '/ month',
     yearlyOnce: 'One payment per year: {price}',
     monthlyNote: 'Pay each month, stop any time',

@@ -38,6 +38,8 @@ export const pricing = {
     periodGroup: 'Ödeme dönemi',
     savePercent: '%{n} tasarruf',
     trialBadge: '7 gün ücretsiz',
+    welcomeBadge: '{n} ay ücretsiz',
+    welcomeCta: 'Ücretsiz kayıt ol: {n} ay Premium',
     perMonth: '/ ay',
     yearlyOnce: 'Yılda tek ödeme: {price}',
     monthlyNote: 'Her ay ayrı ödeme, istediğin zaman bırak',

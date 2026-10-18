@@ -29,7 +29,8 @@ const BENEFITS: MessageKey[] = ['pricing.benefits.unlimited', 'pricing.benefits.
 const FAMILY_EXTRA: MessageKey[] = ['pricing.familyExtra.all', 'pricing.familyExtra.onePayment', 'pricing.familyExtra.manage']
 
 /** Aylık/yıllık geçişli plan kartları. Yıllık varsayılan (Brilliant'taki gibi). */
-export function PricingView({ loggedIn, trialAvailable, currentPlan }: { loggedIn: boolean; trialAvailable: boolean; currentPlan: 'free' | 'premium' | 'family' | null }) {
+/** welcomeMonths: kayıt kampanyası açıkken (misafir) 7 günlük deneme yerine kampanya gösterilir; kayıt zaten o kadar Premium verir. */
+export function PricingView({ loggedIn, trialAvailable, currentPlan, welcomeMonths }: { loggedIn: boolean; trialAvailable: boolean; currentPlan: 'free' | 'premium' | 'family' | null; welcomeMonths?: number }) {
   const [period, setPeriod] = useState<BillingPeriod>('yearly')
   const t = useT()
   const locale = useLocale()
@@ -62,7 +63,7 @@ export function PricingView({ loggedIn, trialAvailable, currentPlan }: { loggedI
             <section key={plan} className={`pr-card${featured ? ' featured' : ''}`} aria-labelledby={`plan-${plan}`}>
               <h2 id={`plan-${plan}`}>
                 {title}
-                {featured && <span className="pr-badge">{t('pricing.view.trialBadge')}</span>}
+                {featured && <span className="pr-badge">{welcomeMonths ? t('pricing.view.welcomeBadge', { n: welcomeMonths }) : t('pricing.view.trialBadge')}</span>}
               </h2>
               <p>{t(`pricing.plans.${plan}.tagline`, { n: FAMILY_SIZE })}</p>
               <div className="pr-price">
@@ -74,10 +75,12 @@ export function PricingView({ loggedIn, trialAvailable, currentPlan }: { loggedI
               <div className="pr-actions">
                 {mine ? (
                   <Link className="v2-btn ghost" href="/hesap">{t('pricing.view.yourPlan')}</Link>
+                ) : featured && welcomeMonths ? (
+                  <Link className="v2-btn accent" href="/kayit">{t('pricing.view.welcomeCta', { n: welcomeMonths })}</Link>
                 ) : featured && trialAvailable ? (
                   <TrialButton next="/hesap?deneme=basladi" />
                 ) : null}
-                {!mine && <Link className={`v2-btn${featured && trialAvailable ? ' ghost' : ' accent'}`} href={buyHref(plan)}>{t('pricing.view.buy', { plan: title })}</Link>}
+                {!mine && <Link className={`v2-btn${featured && (trialAvailable || welcomeMonths) ? ' ghost' : ' accent'}`} href={buyHref(plan)}>{t('pricing.view.buy', { plan: title })}</Link>}
                 {mine && <Link className="v2-btn accent" href={buyHref(plan)}>{t('pricing.view.add', { months: t(period === 'yearly' ? 'pricing.period.months12' : 'pricing.period.months1') })}</Link>}
               </div>
               <ul className="pr-checks">{(plan === 'family' ? FAMILY_EXTRA : BENEFITS).map((b) => <li key={b}>{t(b)}</li>)}</ul>

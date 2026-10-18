@@ -9,6 +9,7 @@ import { formatDate } from '@/i18n/format'
 import { PricingView } from '@/components/pricing/pricing-view'
 import { LegalLinks } from '@/components/pricing/legal-links'
 import { WelcomeOffer } from '@/components/pricing/welcome-offer'
+import { WELCOME_MONTHS, welcomeRemaining } from '@/lib/membership'
 import '../odeme.css'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -24,6 +25,8 @@ export default async function Fiyatlar({ searchParams }: { searchParams: Promise
   const user = await getCurrentUser().catch(() => null)
   const summary = user ? await loadAccountSummary(getDb(), user.id).catch(() => null) : null
   const tl = trialTimeline(new Date())
+  // Misafire kampanya açıksa deneme yerine kampanya (kayıt zaten WELCOME_MONTHS ay Premium verir)
+  const welcomeOpen = !user && (await (async () => welcomeRemaining(getDb()))().catch(() => 0)) > 0
   const t = await getT()
   const locale = await getLocale()
   const date = (d: Date) => formatDate(locale, d)
@@ -43,6 +46,7 @@ export default async function Fiyatlar({ searchParams }: { searchParams: Promise
         loggedIn={!!user}
         trialAvailable={!user || !!summary?.trialAvailable}
         currentPlan={summary ? summary.plan : null}
+        welcomeMonths={welcomeOpen ? WELCOME_MONTHS : undefined}
       />
 
       <section aria-labelledby="deneme">
