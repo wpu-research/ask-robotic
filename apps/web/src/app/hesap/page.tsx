@@ -5,6 +5,7 @@ import { getCurrentUser } from '@/lib/auth/current'
 import { loadAccountSummary, type AccountSummary } from '@/lib/billing'
 import { DELETE_CONFIRM_PHRASE } from '@/lib/account-data'
 import { formatPrice, isPaidPlan, isPeriod } from '@/lib/pricing'
+import { WELCOME_LIMIT, WELCOME_MONTHS } from '@/lib/membership'
 import { getLocale, getT } from '@/i18n/server'
 import { formatDate } from '@/i18n/format'
 import type { MessageKey, TFunction } from '@/i18n'
@@ -32,7 +33,8 @@ function planLine(s: AccountSummary, t: TFunction) {
   if (s.plan === 'free') return { name: t('account.plan.free'), pill: s.status === 'expired' ? { cls: 'warn', text: t('account.plan.expired') } : null }
   const name = t(s.plan === 'family' ? 'account.plan.family' : 'account.plan.premium')
   if (s.status === 'trialing') return { name, pill: { cls: 'trial', text: t('account.plan.trial') } }
-  return { name, pill: { cls: 'ok', text: t(s.source === 'family_member' ? 'account.plan.familyMember' : 'account.plan.active') } }
+  const pill: MessageKey = s.source === 'family_member' ? 'account.plan.familyMember' : s.grant === 'welcome' ? 'account.plan.welcome' : 'account.plan.active'
+  return { name, pill: { cls: 'ok', text: t(pill) } }
 }
 
 export default async function Hesap({ searchParams }: { searchParams: Promise<{ odeme?: string; deneme?: string }> }) {
@@ -85,6 +87,7 @@ export default async function Hesap({ searchParams }: { searchParams: Promise<{ 
           </div>
           {s.periodEnd && <p>{t(s.status === 'trialing' ? 'account.planCard.trialEnd' : 'account.planCard.premiumEnd')}: <b>{date(s.periodEnd)}</b></p>}
           {s.source === 'family_member' && <p className="muted">{t('account.planCard.memberOf')}</p>}
+          {s.grant === 'welcome' && <p className="muted">{t('account.planCard.welcomeNote', { limit: WELCOME_LIMIT, months: WELCOME_MONTHS })}</p>}
           {s.renewalReminder && (
             <p className="pr-msg" role="status">
               {t(s.status === 'trialing' ? 'account.planCard.trialEnding' : 'account.planCard.premiumEnding')}

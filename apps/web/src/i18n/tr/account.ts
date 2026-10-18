@@ -24,6 +24,7 @@ export const account = {
     premium: 'Premium',
     expired: 'Süresi doldu',
     trial: 'Deneme',
+    welcome: 'Hoş geldin hediyesi',
     familyMember: 'Aile üyesi',
     active: 'Etkin',
   },
@@ -36,6 +37,7 @@ export const account = {
   planCard: {
     title: 'Plan',
     trialEnd: 'Deneme bitişi',
+    welcomeNote: 'İlk {limit} kayda özel {months} ay ücretsiz Premium. Otomatik ücretlendirme yok; süre bitince ücretsiz plana dönersin.',
     premiumEnd: 'Premium bitişi',
     memberOf: 'Bir aile planının üyesisin.',
     trialEnding: "Denemen bitmek üzere. Premium'da kalmak için bir plan seç.",

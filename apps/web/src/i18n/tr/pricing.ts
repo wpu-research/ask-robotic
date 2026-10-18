@@ -125,6 +125,9 @@ export const pricing = {
     cancel: 'Vazgeç ve geri dön',
     error: 'Bir hata oluştu',
   },
+  welcome: {
+    notice: 'İlk {limit} kayda {months} ay Premium ücretsiz — kalan: {n}',
+  },
   legal: {
     nav: 'Yasal metinler',
     distanceSales: 'Mesafeli Satış Sözleşmesi',

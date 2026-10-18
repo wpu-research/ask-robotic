@@ -25,6 +25,7 @@ export const account: typeof Tr = {
     premium: 'Premium',
     expired: 'Expired',
     trial: 'Trial',
+    welcome: 'Welcome gift',
     familyMember: 'Family member',
     active: 'Active',
   },
@@ -37,6 +38,7 @@ export const account: typeof Tr = {
   planCard: {
     title: 'Plan',
     trialEnd: 'Trial ends',
+    welcomeNote: '{months} months of free Premium for the first {limit} sign-ups. No automatic charges; when it ends you go back to the free plan.',
     premiumEnd: 'Premium ends',
     memberOf: "You're a member of a Family plan.",
     trialEnding: 'Your trial is about to end. Choose a plan to stay on Premium.',
