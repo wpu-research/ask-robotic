@@ -10,7 +10,7 @@ import { ZONE_EN } from '@/lib/mikro/en'
 import { useLocale } from '@/i18n/client'
 
 const LIGHT_CSS: Record<LightColor, string | null> = { kapali: null, kirmizi: '#ef4444', yesil: '#22c55e', mavi: '#3b82f6', sari: '#facc15', beyaz: '#ffffff' }
-const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1' } as const
+const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1', penalty: '#dc2626' } as const
 
 const floorSpec = (r: DriveBase, en = false): FloorSpec => ({
   w: r.scene.width, h: r.scene.height, lines: r.scene.lines, lineWidth: r.scene.lineWidth ?? 0.02,
