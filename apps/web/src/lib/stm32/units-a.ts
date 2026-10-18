@@ -104,7 +104,7 @@ export const UNITS_A: CourseUnit<StmSimId>[] = [
     },
   },
   {
-    n: 3, hours: 5, sims: ['regs'], hyvex: ['stm32', 'led', 'buton-anahtar', 'direnc'], esofWeek: 2,
+    n: 3, hours: 5, sims: ['regs', 'board3d'], hyvex: ['stm32', 'led', 'buton-anahtar', 'direnc'], esofWeek: 2,
     wokwi: wokwi(
       ['Wokwi\'de yeni bir proje aç ve kart olarak Nucleo-C031C6\'yı seç (STM32C0 de MODER/ODR/IDR düzenini kullanır; taban adresleri farklıdır).', 'LED\'i ve butonu bağla; önce HAL_GPIO_WritePin ile, sonra BSRR yazmacıyla yak.', 'Blue Pill (STM32F103) seçersen GPIO\'nun CRL/CRH yazmaçlarıyla ayarlandığını gör: aileler arasındaki farkın canlı örneği.'],
       ['Open a new project on Wokwi and pick the Nucleo-C031C6 board (STM32C0 uses the same MODER/ODR/IDR layout; base addresses differ).', 'Wire an LED and a button; light it first with HAL_GPIO_WritePin, then with the BSRR register.', 'If you pick the Blue Pill (STM32F103), see that GPIO is configured with the CRL/CRH registers: a live example of family differences.'],
@@ -212,7 +212,7 @@ export const UNITS_A: CourseUnit<StmSimId>[] = [
     },
   },
   {
-    n: 5, hours: 5, sims: ['pwm'], hyvex: ['stm32', 'sg90', 'metal-disli-dc-motor', 'drv8833', 'logic-analyzer'], esofWeek: 3,
+    n: 5, hours: 5, sims: ['pwm', 'board3d'], hyvex: ['stm32', 'sg90', 'metal-disli-dc-motor', 'drv8833', 'logic-analyzer'], esofWeek: 3,
     wokwi: wokwi(
       ['Wokwi\'de STM32 kartına bir servo bağla ve 50 Hz PWM üret: PSC = f_tim(MHz) − 1, ARR = 19999 ile CCR doğrudan mikrosaniye olur.', 'Wokwi\'nin mantık analizörü parçasını PWM pinine bağlayıp görev oranını ölç.'],
       ['Connect a servo to the STM32 board on Wokwi and generate 50 Hz PWM: with PSC = f_tim(MHz) − 1 and ARR = 19999, CCR is directly in microseconds.', 'Attach Wokwi\'s logic analyser part to the PWM pin and measure the duty cycle.'],

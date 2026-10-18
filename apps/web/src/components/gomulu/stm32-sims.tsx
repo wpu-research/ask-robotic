@@ -1,7 +1,10 @@
 'use client'
 // ARM (STM32) dersinin tarayıcı simülasyonları. Hesap lib/stm32 altındaki saf fonksiyonlarda (testli); burada yalnız
 // girdi toplama ve SVG çizimi var.
-import { useState } from 'react'
+import dynamic from 'next/dynamic'
+import { useEffect, useRef, useState } from 'react'
+import { boardView } from '@/lib/stm32/board3d'
+import type { StmLive } from './scene3d-stm32'
 import { command, newMotor } from '@/lib/stm32/cmd'
 import {
   ADDR, F407, F411, GPIO_OFFSETS, MEMORY_MAP, clockTree, computeIDR, contention, flashWaitStates, hex32, memoryUse, modeOf, openDrain, peripheralAt, pinLevel,
@@ -648,6 +651,49 @@ function RtosSim({ lang }: { lang: Lang }) {
   )
 }
 
+// ---------- 12. 3B geliştirme kartı ----------
+const StmBoard3D = dynamic(() => import('./scene3d-stm32'), { ssr: false, loading: () => <div className="gm-3d" /> })
+function Board3DSim({ lang }: { lang: Lang }) {
+  const t = tx(lang)
+  const live = useRef<StmLive>({ input: { regs: resetRegs(), clockOn: false, psc: 0, arr: 4199, ccr: 2100, fTim: 84e6, pwmOn: false, dirFwd: true }, motor: { rpm: 0, angle: 0 } })
+  const [inp, setInp] = useState(live.current.input)
+  const [rpm, setRpm] = useState(0)
+  useEffect(() => { live.current.input = inp }, [inp])
+  useEffect(() => { const id = setInterval(() => setRpm(live.current.motor.rpm), 200); return () => clearInterval(id) }, [])
+  const v = boardView(inp)
+  const regs = (f: (g: GpioRegs) => GpioRegs) => setInp((x) => (x.clockOn ? { ...x, regs: f(x.regs) } : x))
+  const code = registerCode('A', 5, inp.regs)
+  return (
+    <Body
+      stage={
+        <>
+          <StmBoard3D live={live} label={t('3B STM32 kartı: sürükleyerek döndür, iki parmakla yakınlaştır', '3D STM32 board: drag to orbit, pinch to zoom')} />
+          <Readout live>
+            GPIOA MODER {hex32(inp.regs.MODER)} · ODR {hex32(inp.regs.ODR)}{inp.clockOn ? '' : ` (${t('saat kapalı', 'clock off')})`}{'\n'}
+            PA5 = {String(v.levels[5])} → LD2 {v.led ? t('yanık', 'on') : t('sönük', 'off')}{'\n'}
+            TIM3 CH1: {hz(lang, v.freq)} · {t('görev', 'duty')} {nf(lang, 1)(v.duty * 100)}% → {nf(lang, 2)(v.volts)} V → {nf(lang, 0)(rpm)} rpm{v.audible ? ` · ${t('duyulur aralıkta: motor öter', 'audible range: the motor whines')}` : ''}
+          </Readout>
+          <pre className="gm-code">{code.reg.join('\n')}</pre>
+        </>
+      }
+      side={
+        <>
+          <Check label="RCC->AHB1ENR: GPIOAEN" checked={inp.clockOn} onChange={(c) => setInp((x) => ({ ...x, clockOn: c }))} />
+          <Select label={t('PA5 kipi (MODER)', 'PA5 mode (MODER)')} value={modeOf(inp.regs, 5)} options={[['input', '00 input'], ['output', '01 output'], ['af', '10 AF'], ['analog', '11 analog']]} onChange={(m) => regs((g) => setMode(g, 5, m))} />
+          <div className="row">
+            <Btn ghost onClick={() => regs((g) => writeBSRR(g, 1 << 5))} testId="stm-board3d-set">BSRR = 1&lt;&lt;5</Btn>
+            <Btn ghost onClick={() => regs((g) => writeBSRR(g, 1 << 21))}>BSRR = 1&lt;&lt;21</Btn>
+          </div>
+          <Check label={t('TIM3 PWM çalışsın (PA6)', 'Run TIM3 PWM (PA6)')} checked={inp.pwmOn} onChange={(c) => setInp((x) => ({ ...x, pwmOn: c }))} />
+          <Select label={t('Frekans', 'Frequency')} value={`${inp.psc}:${inp.arr}`} options={[['0:4199', '20 kHz (PSC 0, ARR 4199)'], ['83:999', '1 kHz (PSC 83, ARR 999)'], ['8399:99', '100 Hz (PSC 8399, ARR 99)']]} onChange={(k) => { const [psc, arr] = k.split(':').map(Number); setInp((x) => ({ ...x, psc, arr, ccr: Math.round(pwmDuty({ arr: x.arr, ccr: x.ccr }) * (arr + 1)) })) }} />
+          <Slider label="CCR" value={inp.ccr} min={0} max={inp.arr + 1} onChange={(c) => setInp((x) => ({ ...x, ccr: c }))} fmt={(c) => `${c} (${Math.round((c / (inp.arr + 1)) * 100)}%)`} />
+          <Check label={t('Yön ileri (sürücü IN1)', 'Direction forward (driver IN1)')} checked={inp.dirFwd} onChange={(c) => setInp((x) => ({ ...x, dirFwd: c }))} />
+        </>
+      }
+    />
+  )
+}
+
 export function StmSim({ id, lang }: { id: StmSimId; lang: Lang; cfg: Cfg }) {
   switch (id) {
     case 'memmap': return <MemmapSim lang={lang} />
@@ -661,5 +707,6 @@ export function StmSim({ id, lang }: { id: StmSimId; lang: Lang; cfg: Cfg }) {
     case 'bus': return <BusSim lang={lang} />
     case 'power': return <PowerSim lang={lang} />
     case 'rtos': return <RtosSim lang={lang} />
+    case 'board3d': return <Board3DSim lang={lang} />
   }
 }

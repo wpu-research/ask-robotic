@@ -113,3 +113,8 @@
 @media (prefers-reduced-motion: reduce) { .gm-spin { animation: none; } .gm-steer span { transition: none; } }
 .gm-two > .panel { margin-top: 0; }
 .gm-root .rb-prose .eq { white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+
+/* 3B sahneler (three.js, yalnız istemcide): yükseklik sabit oran; dokunmatikte sürükle/kıstır OrbitControls'e gider */
+.gm-3d-wrap { display: grid; gap: 6px; }
+.gm-3d { width: 100%; aspect-ratio: 4 / 3; max-height: 62vh; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; background: var(--sim-bg); touch-action: none; }
+@media (max-width: 600px) { .gm-3d { aspect-ratio: 1 / 1; } }

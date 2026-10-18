@@ -101,7 +101,7 @@ export const UNITS_B: CourseUnit<RpiSimId>[] = [
     },
   },
   {
-    n: 8, hours: 4, sims: ['robot'], hyvex: ['l298n', 'bo-motor-sari', 'hc-sr04', 'mpu6050'], esofWeek: 7,
+    n: 8, hours: 4, sims: ['robot', 'robot3d'], hyvex: ['l298n', 'bo-motor-sari', 'hc-sr04', 'mpu6050'], esofWeek: 7,
     tr: {
       title: 'Diferansiyel sürüşlü robot ve odometri',
       summary: 'İki tekerlekten gövde hızına, (v, ω) komutları, enkoderle konum kestirimi ve hatanın nereden geldiği.',

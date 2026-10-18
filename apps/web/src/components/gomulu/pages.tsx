@@ -223,6 +223,10 @@ export function ProjectView({ c, lang }: { c: AnyCourse; lang: Lang }) {
       <div className="part-layout">
         <div className="part-main">
           <section aria-labelledby="gp-sc"><h2 id="gp-sc">{en ? 'Scenario' : 'Senaryo'}</h2><p>{t.scenario}</p></section>
+          <section aria-labelledby="gp-sim">
+            <h2 id="gp-sim">{en ? 'Try the system in simulation' : 'Sistemi simülasyonda dene'}</h2>
+            <div className="rb-sims">{(c.capstoneSims as string[]).map((id) => <GomuluSim key={id} kit={c.kit} id={id} lang={lang} title={c.sims[id][lang].title} desc={c.sims[id][lang].desc} />)}</div>
+          </section>
           <section aria-labelledby="gp-req"><h2 id="gp-req">{en ? 'Requirements (testable)' : 'Gereksinimler (test edilebilir)'}</h2><ul className="eng-list">{t.requirements.map((r) => <li key={r}>{r}</li>)}</ul></section>
           <section aria-labelledby="gp-arch"><h2 id="gp-arch">{en ? 'Architecture' : 'Mimari'}</h2><ul className="eng-list">{t.architecture.map((r) => <li key={r}>{r}</li>)}</ul></section>
           <section aria-labelledby="gp-test"><h2 id="gp-test">{en ? 'Verification' : 'Doğrulama'}</h2><ul className="eng-list">{t.tests.map((r) => <li key={r}>{r}</li>)}</ul></section>

@@ -1,7 +1,10 @@
 'use client'
 // Raspberry Pi dersinin tarayıcı simülasyonları. Hesap lib/rpi altındaki saf fonksiyonlarda (testli); burada yalnız
 // girdi toplama, çizim (SVG/tuval) ve canlandırma var.
+import dynamic from 'next/dynamic'
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react'
+import { commandToPins, newRobot3D, pinsToWheels, seeBall, type MotorPins } from '@/lib/rpi/robot3d'
+import type { RpiLive } from './scene3d-rpi'
 import { BOARDS, NEEDS, recommend, scoreOf, type Board, type Need } from '@/lib/rpi/board'
 import { HEADER, checkWiring, ledCurrent, newMem, programSource, stepProgram, type Device, type Program } from '@/lib/rpi/gpio'
 import { arcade, integrate, l298n, motorStep, piStep, quadState, quadStep, wheelSpeeds, type Pose } from '@/lib/rpi/motion'
@@ -652,6 +655,57 @@ function RosSim({ lang }: { lang: Lang }) {
   )
 }
 
+// ---------- 10. 3B keşif robotu ----------
+const RpiRobot3D = dynamic(() => import('./scene3d-rpi'), { ssr: false, loading: () => <div className="gm-3d" /> })
+const STOP_PINS: MotorPins = { in1: false, in2: false, ena: 0, in3: false, in4: false, enb: 0 }
+function Robot3DSim({ lang }: { lang: Lang }) {
+  const t = tx(lang)
+  const live = useRef<RpiLive>({ robot: newRobot3D(), pins: STOP_PINS, follow: false, wheelAngle: [0, 0] })
+  const [snap, setSnap] = useState({ pins: STOP_PINS, pose: live.current.robot.pose, bumped: false, follow: false })
+  useEffect(() => {
+    const id = setInterval(() => { const L = live.current; setSnap({ pins: L.pins, pose: L.robot.pose, bumped: L.robot.bumped, follow: L.follow }) }, 150)
+    return () => clearInterval(id)
+  }, [])
+  const setPins = (p: Partial<MotorPins>) => { live.current.follow = false; live.current.pins = { ...live.current.pins, ...p } }
+  const hold = (f: number, r: number) => ({
+    onPointerDown: () => { live.current.follow = false; live.current.pins = commandToPins(f, r) },
+    onPointerUp: () => { live.current.pins = STOP_PINS },
+    onPointerLeave: () => { if (!live.current.follow) live.current.pins = STOP_PINS },
+  })
+  const p = snap.pins, w = pinsToWheels(p), v = seeBall(snap.pose)
+  const pin = (k: 'in1' | 'in2' | 'in3' | 'in4', bcm: number) => <Check key={k} label={`${k.toUpperCase()} (GPIO${bcm})`} checked={p[k]} onChange={(x) => setPins({ [k]: x })} />
+  return (
+    <Body
+      stage={
+        <>
+          <RpiRobot3D live={live} label={t('3B keşif robotu sahnesi: sürükleyerek döndür, iki parmakla yakınlaştır', '3D exploration robot scene: drag to orbit, pinch to zoom')} />
+          <Readout live>
+            {`gpiozero Robot(left=(5, 6), right=(13, 19))  ENA=GPIO12  ENB=GPIO18\n`}
+            IN1 {+p.in1} IN2 {+p.in2} ENA {Math.round(p.ena * 100)}% · IN3 {+p.in3} IN4 {+p.in4} ENB {Math.round(p.enb * 100)}%{'\n'}
+            v_L {nf(lang, 2)(w.vl)} m/s · v_R {nf(lang, 2)(w.vr)} m/s · x {nf(lang, 2)(snap.pose.x)} y {nf(lang, 2)(snap.pose.y)} θ {nf(lang, 0)((snap.pose.th * 180) / Math.PI)}°{'\n'}
+            {t('kamera', 'camera')}: {v.seen ? `${t('top görünüyor', 'ball in view')} · ${nf(lang, 2)(v.dist)} m · x = ${nf(lang, 2)(v.x)}` : t('top görüş konisinde değil', 'ball not in the view cone')}{snap.bumped ? ` · ${t('TAMPON: engel', 'BUMPER: obstacle')}` : ''}
+          </Readout>
+        </>
+      }
+      side={
+        <>
+          <div className="gm-pad">
+            <span /><button type="button" className="sbtn ghost" {...hold(0.8, 0)} aria-label={t('İleri', 'Forward')}>▲</button><span />
+            <button type="button" className="sbtn ghost" {...hold(0, -0.5)} aria-label={t('Sol', 'Left')}>◀</button><button type="button" className="sbtn ghost" {...hold(-0.6, 0)} aria-label={t('Geri', 'Back')}>▼</button><button type="button" className="sbtn ghost" {...hold(0, 0.5)} aria-label={t('Sağ', 'Right')}>▶</button>
+          </div>
+          <Btn onClick={() => { live.current.follow = !live.current.follow; if (!live.current.follow) live.current.pins = STOP_PINS }} pressed={snap.follow} testId="rpi-robot3d-follow">{snap.follow ? t('İzlemeyi durdur', 'Stop following') : t('İzle kipi: topu bul', 'Follow mode: find the ball')}</Btn>
+          <p className="gm-hint">{t('Ya da pinleri elle sür (L298N):', 'Or drive the pins by hand (L298N):')}</p>
+          <div className="row">{pin('in1', 5)}{pin('in2', 6)}</div>
+          <Slider label="ENA (PWM)" value={p.ena} min={0} max={1} step={0.05} onChange={(x) => setPins({ ena: x })} fmt={(x) => `${Math.round(x * 100)}%`} />
+          <div className="row">{pin('in3', 13)}{pin('in4', 19)}</div>
+          <Slider label="ENB (PWM)" value={p.enb} min={0} max={1} step={0.05} onChange={(x) => setPins({ enb: x })} fmt={(x) => `${Math.round(x * 100)}%`} />
+          <Btn ghost onClick={() => { live.current = { robot: newRobot3D(), pins: STOP_PINS, follow: false, wheelAngle: [0, 0] } }}>{t('Başa al', 'Reset')}</Btn>
+        </>
+      }
+    />
+  )
+}
+
 export function RpiSim({ id, lang, cfg }: { id: RpiSimId; lang: Lang; cfg: Cfg }) {
   switch (id) {
     case 'board': return <BoardSim lang={lang} />
@@ -663,6 +717,7 @@ export function RpiSim({ id, lang, cfg }: { id: RpiSimId; lang: Lang; cfg: Cfg }
     case 'robot': return <RobotSim lang={lang} />
     case 'flask': return <FlaskSim lang={lang} />
     case 'ros': return <RosSim lang={lang} />
+    case 'robot3d': return <Robot3DSim lang={lang} />
   }
 }
 export type { Board }

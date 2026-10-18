@@ -91,4 +91,6 @@ export interface CourseDef<S extends string> {
   /** Bitirme projesinin başlangıç kodu. */
   starter: (lang: Lang) => CodeBlock[]
   related: Array<{ href: string; tr: string; en: string }>
+  /** Bitirme projesi sayfasında gösterilen simülasyonlar (ör. 3B sahne). */
+  capstoneSims: S[]
 }

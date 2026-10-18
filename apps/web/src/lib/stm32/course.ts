@@ -109,6 +109,7 @@ export const STM32_COURSE: CourseDef<StmSimId> = {
   sims: STM_SIMS,
   capstone: CAPSTONE,
   starter: (l) => [capstoneParser(l), unityTest(l)],
+  capstoneSims: ['board3d', 'uart'],
   related: [
     { href: '/muhendislik/raspberry-pi', tr: 'Raspberry Pi ile Robotik Programlama: Pi + MCU mimarisinin Pi tarafı', en: 'Robotics Programming with Raspberry Pi: the Pi side of a Pi + MCU architecture' },
     { href: '/muhendislik/robotik/hafta/3', tr: 'ESOF 323, 3. hafta: kesmeler, zamanlayıcılar ve veri yolları', en: 'ESOF 323, week 3: interrupts, timers and buses' },

@@ -1,7 +1,7 @@
 // ARM (STM32) dersinin tarayıcı simülasyonları: başlık ve açıklamalar (TR/EN). Bileşenler components/gomulu/stm32-sims.tsx.
 import type { SimMeta } from '@/lib/gomulu/types'
 
-export type StmSimId = 'memmap' | 'linker' | 'regs' | 'clock' | 'pwm' | 'nvic' | 'uart' | 'dma' | 'bus' | 'power' | 'rtos'
+export type StmSimId = 'memmap' | 'linker' | 'regs' | 'clock' | 'pwm' | 'nvic' | 'uart' | 'dma' | 'bus' | 'power' | 'rtos' | 'board3d'
 
 export const STM_SIMS: SimMeta<StmSimId> = {
   memmap: {
@@ -47,5 +47,9 @@ export const STM_SIMS: SimMeta<StmSimId> = {
   rtos: {
     tr: { title: 'FreeRTOS zamanlayıcı görselleştirici', desc: 'Görevlerin önceliğini, periyodunu ve süresini ayarla; tick tick hangi görevin çalıştığını, kesintiyi, eşit öncelikte zaman dilimlemeyi ve kaçan son tarihleri gör. Paylaşılan mutex ile öncelik tersine dönmesini ve öncelik kalıtımını dene.' },
     en: { title: 'FreeRTOS scheduler visualiser', desc: 'Set each task\'s priority, period and run time; see tick by tick which task runs, preemption, time slicing at equal priority and missed deadlines. Try priority inversion with a shared mutex and priority inheritance.' },
+  },
+  board3d: {
+    tr: { title: '3B STM32 geliştirme kartı', desc: 'Nucleo benzeri kart 3B masada: GPIOA saatini aç, PA5\'i MODER ile çıkış yap ve BSRR yaz; başlık pinleri ve LD2 anında değişir. TIM3 PWM\'i açınca motor görev oranına göre döner, kartın üstünde zamanlayıcı dalgası görünür. Sürükleyerek döndür, iki parmakla yakınlaştır. Durum testli saf mantıktan gelir.' },
+    en: { title: '3D STM32 development board', desc: 'A Nucleo-like board on a 3D desk: enable the GPIOA clock, make PA5 an output with MODER and write BSRR; the header pins and LD2 change at once. Turn on TIM3 PWM and the motor spins with the duty cycle while the timer waveform floats above the board. Drag to orbit, pinch to zoom. The state comes from tested pure logic.' },
   },
 }

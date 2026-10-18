@@ -75,6 +75,10 @@ describe.each(COURSES)('%s kursu', (_k, c, count) => {
     expect(c.capstone.grading.tr.length).toBe(c.capstone.grading.en.length)
     c.starter('tr').forEach((b, i) => expect(b.src.split('\n').length).toBe(c.starter('en')[i].src.split('\n').length))
   })
+  it('bitirme projesi simülasyonları tanımlı ve 3B sahne içeriyor', () => {
+    for (const s of c.capstoneSims) expect(c.sims[s], s).toBeTruthy()
+    expect(c.capstoneSims.some((s: string) => s.endsWith('3d'))).toBe(true)
+  })
   it('site kayıtları: menü, komut paleti, site haritası', () => {
     const href = `/muhendislik/${c.slug}`
     expect(NAV.find((g) => g.key === 'shell.groups.adults')?.items.some((i) => i.href === href)).toBe(true)

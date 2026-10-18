@@ -109,6 +109,7 @@ export const RPI_COURSE: CourseDef<RpiSimId> = {
   sims: RPI_SIMS,
   capstone: CAPSTONE,
   starter: (l) => [capstoneMain(l)],
+  capstoneSims: ['robot3d', 'flask'],
   related: [
     { href: '/muhendislik/arm-stm32', tr: 'ARM (STM32) ile Gömülü Programlama: Pi + MCU mimarisinin MCU tarafı', en: 'Embedded Programming with ARM (STM32): the MCU side of a Pi + MCU architecture' },
     { href: '/muhendislik/robotik/hafta/12', tr: 'ESOF 323, 12. hafta: ROS 2 ve simülasyon', en: 'ESOF 323, week 12: ROS 2 and simulation' },

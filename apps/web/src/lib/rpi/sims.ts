@@ -1,7 +1,7 @@
 // Raspberry Pi dersinin tarayıcı simülasyonları: başlık ve açıklamalar (TR/EN). Bileşenler components/gomulu/rpi-sims.tsx.
 import type { SimMeta } from '@/lib/gomulu/types'
 
-export type RpiSimId = 'board' | 'terminal' | 'gpio' | 'bus' | 'vision' | 'motor' | 'robot' | 'flask' | 'ros'
+export type RpiSimId = 'board' | 'terminal' | 'gpio' | 'bus' | 'vision' | 'motor' | 'robot' | 'flask' | 'ros' | 'robot3d'
 
 export const RPI_SIMS: SimMeta<RpiSimId> = {
   board: {
@@ -39,5 +39,9 @@ export const RPI_SIMS: SimMeta<RpiSimId> = {
   ros: {
     tr: { title: 'ROS 2 düğüm ve konu grafiği', desc: 'Keşif robotunun düğümlerini aç/kapat; rqt_graph benzeri grafik, ros2 topic list çıktısı ve sorunlar (yayıncısız abonelik, /cmd_vel\'de iki yayıncı) anında güncellenir.' },
     en: { title: 'ROS 2 node and topic graph', desc: 'Switch the exploration robot\'s nodes on and off; an rqt_graph-like view, the ros2 topic list output and problems (subscription without publisher, two publishers on /cmd_vel) update instantly.' },
+  },
+  robot3d: {
+    tr: { title: '3B kameralı keşif robotu', desc: 'Diferansiyel sürüşlü robotu 3B sahada GPIO pinleriyle (L298N IN1–IN4, ENA/ENB) sür ya da izle kipini aç: kamera görüş konisi topu görünce yeşile döner, robot topa yaklaşır. Sahneyi sürükleyerek döndür, iki parmakla yakınlaştır. Sahne durumu testli saf mantıktan gelir; 3B yalnız görselleştirmedir.' },
+    en: { title: '3D camera exploration robot', desc: 'Drive the differential-drive robot in a 3D arena with GPIO pins (L298N IN1–IN4, ENA/ENB) or turn on follow mode: the camera view cone turns green when it sees the ball and the robot approaches it. Drag to orbit, pinch to zoom. The scene state comes from tested pure logic; 3D is only the visualisation.' },
   },
 }
