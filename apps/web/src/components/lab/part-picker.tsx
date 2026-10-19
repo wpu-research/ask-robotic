@@ -59,6 +59,9 @@ export function PartPicker({ types, disabled, onDrop, onAdd }: Props) {
 
   const groups = useMemo(() => pickerGroups(types, q, locale === 'tr' ? undefined : (ty) => `${partName(t, ty)} ${partShortName(t, ty)}`), [q, types, locale, t])
 
+  // Devre kurmayan derslerde (allowedParts: []) boş bir "Parça ekle" menüsü göstermeyiz.
+  if (types.length === 0) return null
+
   return (
     <div className="lab-picker" ref={root}>
       <button type="button" className="lab-addbtn" data-testid="lab-add" aria-expanded={open} aria-haspopup="dialog" disabled={disabled} onClick={() => setOpen((o) => !o)} title={t('lab.picker.add')}>
