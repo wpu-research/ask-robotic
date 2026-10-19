@@ -124,7 +124,7 @@ export const PROGRAMS: readonly Program[] = [
       outcomes: ['Process images with colour spaces, filters and thresholding', 'Extract edges, contours and features to find objects', 'Calibrate a camera and estimate pose with ArUco', 'Classify and detect objects with convolutional networks', 'Assess privacy and error rates in a real-time vision application'],
       capstone: 'A safety application that runs on the camera: zone intrusion or fall detection; with an accuracy, latency and privacy report.',
     },
-    courses: [C('/muhendislik/opencv', 40, ['OpenCV ile görüntü işleme', 'Süzgeçler, kontur, öznitelik, kalibrasyon ve ArUco; tarayıcıda canlı.'], ['Image processing with OpenCV', 'Filters, contours, features, calibration and ArUco; live in the browser.']), DEMOS, ML,
+    courses: [C('/muhendislik/opencv', 36, ['OpenCV ile görüntü işleme', 'Süzgeçler, kontur, öznitelik, kalibrasyon ve ArUco; tarayıcıda canlı.'], ['Image processing with OpenCV', 'Filters, contours, features, calibration and ArUco; live in the browser.']), DEMOS, ML,
       C('/muhendislik/pytorch', 40, ['PyTorch ile derin öğrenme', 'CNN, transfer öğrenme ve nesne algılama.'], ['Deep learning with PyTorch', 'CNNs, transfer learning and object detection.'])],
   },
   {
@@ -145,7 +145,7 @@ export const PROGRAMS: readonly Program[] = [
       outcomes: ['Apply sensor fusion and state estimation (complementary filter, Kalman)', 'Control a robot or drone with PID and kinematics', 'Build maps, path planning and a mission state machine', 'Run an end-to-end mission in simulation with ROS 2 and PX4 SITL', 'Verify an autonomous system with requirements, architecture, SIL tests and failsafe scenarios'],
       capstone: 'A simulated autonomous mission: take-off, waypoints and precision landing on ArUco, or mapping with a ground robot and driving to a goal; with SIL test evidence.',
     },
-    courses: [ESOF, DRONE, C('/muhendislik/opencv', 40, ['OpenCV ile görüntü işleme', 'Hassas iniş ve hedef takibi için görü temeli.'], ['Image processing with OpenCV', 'The vision basis for precision landing and target tracking.']), C('/muhendislik', 10, ['Mühendislik yolu: 128 gerçek parça', 'Sensör, sürücü ve güç parçalarını seviyelerle tanı; Hyvex kartları.'], ['Engineering path: 128 real parts', 'Get to know sensor, driver and power parts by level; Hyvex cards.'])],
+    courses: [ESOF, DRONE, C('/muhendislik/opencv', 36, ['OpenCV ile görüntü işleme', 'Hassas iniş ve hedef takibi için görü temeli.'], ['Image processing with OpenCV', 'The vision basis for precision landing and target tracking.']), C('/muhendislik', 10, ['Mühendislik yolu: 128 gerçek parça', 'Sensör, sürücü ve güç parçalarını seviyelerle tanı; Hyvex kartları.'], ['Engineering path: 128 real parts', 'Get to know sensor, driver and power parts by level; Hyvex cards.'])],
   },
 ]
 

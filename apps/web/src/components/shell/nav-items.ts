@@ -74,6 +74,8 @@ export const NAV: NavGroup[] = [
       { href: '/muhendislik/arm-stm32', label: 'STM32 dersi', key: 'shell.nav.stm32', icon: 'mikro' },
       { href: '/muhendislik/iot', label: 'IoT dersi (ESP32)', key: 'shell.nav.iot', icon: 'mikro' },
       { href: '/muhendislik/sensor-ml', label: 'Sensör verisinden ML', key: 'shell.nav.sensorMl', icon: 'ai' },
+      { href: '/muhendislik/opencv', label: 'OpenCV ile görüntü işleme', key: 'shell.nav.opencv', icon: 'eye' },
+      { href: '/muhendislik/pytorch', label: 'PyTorch ile derin öğrenme', key: 'shell.nav.pytorch', icon: 'ai' },
     ],
   },
   {
@@ -103,6 +105,7 @@ export function isActive(href: string, pathname: string): boolean {
   if (href === '/robot-atolyesi' && pathname.startsWith('/robot-atolyesi/tasarla')) return false
   // Robotik, drone, IoT ve sensör-ML dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/iot') || pathname.startsWith('/muhendislik/sensor-ml'))) return false
+  if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/opencv') || pathname.startsWith('/muhendislik/pytorch'))) return false
   // Gerçek hayat demoları (büyükler) kendi öğesinde işaretlenir, çocukların "Robotun Gözleri" öğesinde değil
   if (href === '/robotun-gozleri' && pathname.startsWith('/robotun-gozleri/demolar')) return false
   // Yarışma sezonları kendi öğesinde işaretlenir

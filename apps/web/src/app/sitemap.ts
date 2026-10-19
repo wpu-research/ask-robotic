@@ -7,6 +7,8 @@ import { STM32_COURSE } from '@/lib/stm32/course'
 import { IOT_UNITS } from '@/lib/iot/course'
 import { SML_UNITS } from '@/lib/sensor-ml/course'
 import { LESSONS } from '@/lib/ml/lessons'
+import { CV_UNITS } from '@/lib/opencv/course'
+import { PT_UNITS } from '@/lib/pytorch/course'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
 import { SEASONS } from '@/lib/mikro/sezon'
@@ -29,6 +31,8 @@ const PAGES = [
   '/programlar',
   '/robot-atolyesi/sezonlar', ...SEASONS.map((s) => `/robot-atolyesi/sezonlar/${s.id}`),
   '/robot-atolyesi/tasarla', '/muhendislik/insansi',
+  '/muhendislik/opencv', '/muhendislik/opencv/proje', ...CV_UNITS.map((u) => `/muhendislik/opencv/unite/${u.n}`),
+  '/muhendislik/pytorch', '/muhendislik/pytorch/proje', ...PT_UNITS.map((u) => `/muhendislik/pytorch/unite/${u.n}`),
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {
