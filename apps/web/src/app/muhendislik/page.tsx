@@ -55,7 +55,7 @@ export default async function Muhendislik() {
         <span className="eng-course-code">IOT</span>
         <span className="eng-level-body">
           <b>{en ? 'Course: Internet of Things with the ESP32' : 'Ders: ESP32 ile Nesnelerin İnterneti'}</b>
-          <span className="eng-level-text">{en ? '10 units: ESP32 vs Uno, Wi-Fi, REST and JSON, MQTT with QoS, retained messages and last will, sensors to the cloud, remote actuators, a live dashboard, deep sleep, OTA, TLS and BLE. 13 in-browser simulations and a smart greenhouse capstone with a rules engine.' : '10 ünite: ESP32 ile Uno, Wi-Fi, REST ve JSON, QoS, kalıcı mesaj ve son vasiyetle MQTT, sensörden buluta, uzaktan eyleyici, canlı pano, derin uyku, OTA, TLS ve BLE. Tarayıcıda 13 simülasyon ve kural motorlu akıllı sera bitirme projesi.'}</span>
+          <span className="eng-level-text">{en ? '10 units: ESP32 vs Uno, Wi-Fi, REST and JSON, MQTT with QoS, retained messages and last will, sensors to the cloud, remote actuators, a live dashboard, deep sleep, OTA, TLS and BLE. 14 in-browser simulations including a 3D smart greenhouse where MQTT packets fly between devices, and a capstone with a rules engine.' : '10 ünite: ESP32 ile Uno, Wi-Fi, REST ve JSON, QoS, kalıcı mesaj ve son vasiyetle MQTT, sensörden buluta, uzaktan eyleyici, canlı pano, derin uyku, OTA, TLS ve BLE. MQTT paketlerinin cihazlar arasında uçtuğu 3B akıllı sera dahil tarayıcıda 14 simülasyon ve kural motorlu bitirme projesi.'}</span>
         </span>
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
@@ -64,7 +64,7 @@ export default async function Muhendislik() {
         <span className="eng-course-code">SENSÖR-ML</span>
         <span className="eng-level-body">
           <b>{en ? 'Course: Machine learning forecasting from sensor data' : 'Ders: Sensör verisinden makine öğrenmesi tahmini'}</b>
-          <span className="eng-level-text">{en ? '8 units: logging a time series, cleaning outliers and gaps, the Kalman filter, embedded analysis and visualisation, feature engineering, honest evaluation, C code from trained weights and an anomaly alert. Python runs in the browser on the greenhouse dataset.' : '8 ünite: zaman serisi kaydı, aykırı değer ve boşluk temizleme, Kalman süzgeci, gömülü analiz ve görselleştirme, özellik mühendisliği, dürüst değerlendirme, eğitilmiş ağırlıklardan C kodu ve anomali uyarısı. Python, sera veri setiyle tarayıcıda çalışır.'}</span>
+          <span className="eng-level-text">{en ? '8 units: logging a time series, cleaning outliers and gaps, the Kalman filter, embedded analysis and visualisation, feature engineering, honest evaluation, C code from trained weights and an anomaly alert. Python runs in the browser on the greenhouse dataset; a 3D greenhouse shows forecast and anomaly.' : '8 ünite: zaman serisi kaydı, aykırı değer ve boşluk temizleme, Kalman süzgeci, gömülü analiz ve görselleştirme, özellik mühendisliği, dürüst değerlendirme, eğitilmiş ağırlıklardan C kodu ve anomali uyarısı. Python, sera veri setiyle tarayıcıda çalışır; 3B serada tahmin ve anomali görünür.'}</span>
         </span>
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>

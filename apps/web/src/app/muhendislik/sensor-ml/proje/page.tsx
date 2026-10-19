@@ -10,5 +10,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SensorMlProje() {
-  return <CourseProject v={SML_VIEW} lang={await getLocale()} sims={['anomali', 'yerlestirme']} />
+  return <CourseProject v={SML_VIEW} lang={await getLocale()} sims={['sera3b', 'anomali', 'yerlestirme']} />
 }

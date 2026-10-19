@@ -90,3 +90,11 @@ ol.ks-flow { list-style: none; margin: 0; }
   .ks-pins td { border: 0; padding: 0; }
   .ks-pins td:last-child { grid-column: 1 / -1; }
 }
+
+/* 3B sahne kutusu (three.js yalnız istemcide) */
+.ks-3d-wrap { display: grid; gap: 4px; min-width: 0; }
+.ks-3d { position: relative; width: 100%; aspect-ratio: 16 / 10; min-height: 260px; background: #e6eef2; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+.ks-3d canvas { position: absolute; inset: 0; }
+.ks-3d-msg { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; color: #334155; font-size: .9rem; padding: 16px; text-align: center; }
+.ks-3d-hint { margin: 0; font-size: .74rem; color: var(--muted); }
+@media (max-width: 600px) { .ks-3d { aspect-ratio: 4 / 3; } }

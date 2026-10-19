@@ -485,7 +485,7 @@ export const UNITS_A: CourseUnit<IotSimId>[] = [
     },
   },
   {
-    n: 4, sims: ['broker'], parts: ['esp32-esp32-wroom-devkit', 'dht22'], wokwi: true,
+    n: 4, sims: ['broker', 'sera3b'], parts: ['esp32-esp32-wroom-devkit', 'dht22'], wokwi: true,
     related: [
       { href: '/muhendislik/sensor-ml', tr: 'Sensör verisinden ML tahmini: MQTT ile toplanan veriyi modelle', en: 'ML forecasting from sensor data: model the data collected over MQTT' },
     ],

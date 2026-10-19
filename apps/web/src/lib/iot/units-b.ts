@@ -572,7 +572,7 @@ export const UNITS_B: CourseUnit<IotSimId>[] = [
     },
   },
   {
-    n: 10, sims: ['kurallar'], parts: ['esp32-esp32-wroom-devkit', 'dht22', 'bme280', 'ldr', 'irf540', 'sg90'], wokwi: true,
+    n: 10, sims: ['kurallar', 'sera3b'], parts: ['esp32-esp32-wroom-devkit', 'dht22', 'bme280', 'ldr', 'irf540', 'sg90'], wokwi: true,
     related: [
       { href: '/muhendislik/sensor-ml', tr: 'Sensör verisinden ML tahmini: kural yerine öğrenilmiş anomali uyarısı', en: 'ML forecasting from sensor data: a learned anomaly alert instead of a rule' },
       { href: '/makine-ogrenmesi', tr: 'Makine öğrenmesi dersi', en: 'Machine learning course' },

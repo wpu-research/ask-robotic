@@ -1,4 +1,4 @@
-// Sensör Verisinden Makine Öğrenmesi Tahmini (büyükler için, 16+): 8 ünite, 8 tarayıcı simülasyonu, Pyodide ile tarayıcıda
+// Sensör Verisinden Makine Öğrenmesi Tahmini (büyükler için, 16+): 8 ünite, 9 tarayıcı simülasyonu (biri 3B), Pyodide ile tarayıcıda
 // Python (ML dersinin çalıştırıcısı ve /veri/ml/sera-sensorleri.csv), bitirme projesi "sıcaklık tahmini ve anomali uyarısı".
 import type { SensorSimId } from '@/components/sensor-ml/sim-meta'
 import { D, type Capstone, type CodeBlock, type CourseMeta, type CourseUnit, type Lang } from '@/lib/kurs/types'

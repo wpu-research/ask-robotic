@@ -1,7 +1,7 @@
 'use client'
 // Sensör verisinden ML dersinin tarayıcı simülasyonları. Veri lib/sensor-ml/sensors.ts üretecinden gelir (aynı tohum =
 // /veri/ml/sera-sensorleri.csv ile aynı seri); temizleme, özellik, model, kod üretimi ve anomali mantığı lib/sensor-ml'de (testli).
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Bars, Body, Btn, Check, LineChart, Readout, Select, SimFrame, Slider, color, nf, type Lang } from '@/components/kurs/ui'
 import { ALARM_DEFAULTS, alarm, evaluate, pipeline } from '@/lib/sensor-ml/anomaly'
 import { dropMask, ema, ffill, hampel, interpLinear, iqrOutliers, kalman1d, medianFilter, movingAvg, rmseValid, steadyGain, zscoreOutliers } from '@/lib/sensor-ml/clean'
@@ -10,6 +10,9 @@ import { FEAT_DEFAULTS, buildTable, type FeatOpts } from '@/lib/sensor-ml/featur
 import { clsScore, fitLinear, fitStump, mae, pick, predictLinear, predictStump, r2, randomSplit, rmse, timeSplit, walkForward, type Split } from '@/lib/sensor-ml/model'
 import { FAULT_WINDOW, SENSOR_DEFAULTS, seriesCsv, simulate, type Series } from '@/lib/sensor-ml/sensors'
 import { corrMatrix, dailyProfile, histogram, pearson, welfordOf, welfordVar } from '@/lib/sensor-ml/stats'
+import { Scene3D } from '@/components/kurs/scene3d'
+import { frameAtPos, smlFrames } from '@/lib/sensor-ml/scene'
+import type { SmlSceneState } from './scene-sera'
 import { SENSOR_SIM_META, type SensorSimId } from './sim-meta'
 
 type P = { lang: Lang }
@@ -439,10 +442,65 @@ function AnomalySim({ lang }: P) {
   )
 }
 
+// --- 9. 3B sera -------------------------------------------------------------------------------------------------------------
+
+const loadSera = () => import('./scene-sera')
+
+function Greenhouse3DSim({ lang }: P) {
+  const en = lang === 'en'
+  const [reduced, setReduced] = useState(true)
+  const [horizon, setHorizon] = useState(3)
+  const [on, setOn] = useState(ALARM_DEFAULTS.on)
+  const frames = useMemo(() => smlFrames(DEFAULT, horizon, { ...ALARM_DEFAULTS, on }), [horizon, on])
+  const faultAt = frames.findIndex((f) => f.fault)
+  const [pos, setPos] = useState(Math.max(0, faultAt - 30))
+  const [playing, setPlaying] = useState(false)
+  const started = useRef(false)
+  useEffect(() => {
+    const r = !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    setReduced(r)
+    if (!r && !started.current) { started.current = true; setPlaying(true) }
+  }, [])
+  useEffect(() => {
+    if (!playing) return
+    const h = window.setInterval(() => setPos((p) => (p + 0.5) % frames.length), 100)
+    return () => window.clearInterval(h)
+  }, [playing, frames.length])
+  const f = frameAtPos(frames, pos)
+  const k = Math.floor(Math.min(pos, frames.length - 1))
+  const recent = frames.slice(Math.max(0, k - 11), k + 1)
+  const state: SmlSceneState = { frame: f, recent, on, reduced }
+  const alerts = frames.filter((x, i) => x.alarm && !frames[i - 1]?.alarm)
+  const hhmm = (h: number) => `${String(Math.floor(h)).padStart(2, '0')}:${String(Math.round((h % 1) * 60) % 60).padStart(2, '0')}`
+  return (
+    <Body
+      stage={
+        <>
+          <Scene3D load={loadSera} state={state} lang={lang} testid="sml-3d" />
+          <Readout testid="sml-3d-sum">{en
+            ? `Day ${f.day} ${hhmm(f.hour)} · actual ${nf(lang, 2)(f.actual)} °C, forecast (${horizon * 10} min ago) ${nf(lang, 2)(f.pred)} °C, z = ${nf(lang, 2)(f.z)}\nStatus: ${f.status === 'alert' ? 'ALERT' : f.status === 'watch' ? 'watch' : 'normal'}${f.fault ? ' · real heater fault (label)' : ''}`
+            : `${f.day}. gün ${hhmm(f.hour)} · gerçek ${nf(lang, 2)(f.actual)} °C, tahmin (${horizon * 10} dk önce) ${nf(lang, 2)(f.pred)} °C, z = ${nf(lang, 2)(f.z)}\nDurum: ${f.status === 'alert' ? 'UYARI' : f.status === 'watch' ? 'izle' : 'normal'}${f.fault ? ' · gerçek ısıtıcı arızası (etiket)' : ''}`}</Readout>
+        </>
+      }
+      side={
+        <>
+          <Btn onClick={() => setPlaying((p) => !p)} testid="sml-3d-play">{playing ? (en ? 'Pause' : 'Duraklat') : (en ? 'Play' : 'Oynat')}</Btn>
+          <Slider label={en ? 'Sample' : 'Örnek'} min={0} max={frames.length - 1} step={1} value={k} onChange={setPos} fmt={() => `${en ? 'day' : 'gün'} ${f.day} ${hhmm(f.hour)}`} />
+          <Select label={en ? 'Jump to day' : 'Güne git'} value={String(f.day)} options={[1, 2, 3, 4, 5, 6, 7].map((d) => [String(d), en ? `Day ${d}` : `${d}. gün`])} onChange={(v) => setPos(Math.max(0, frames.findIndex((x) => x.day === Number(v))))} />
+          <Btn ghost onClick={() => setPos(Math.max(0, faultAt - 6))}>{en ? 'Go to the fault' : 'Arızaya git'}</Btn>
+          <Select label={en ? 'Forecast horizon' : 'Tahmin ufku'} value={String(horizon)} options={[['1', en ? '10 min' : '10 dk'], ['3', en ? '30 min' : '30 dk'], ['6', en ? '1 hour' : '1 saat']]} onChange={(v) => setHorizon(Number(v))} />
+          <Slider label={en ? 'Alert threshold |z|' : 'Uyarı eşiği |z|'} min={1.5} max={8} step={0.25} value={on} onChange={setOn} fmt={nf(lang, 2)} />
+          <Readout>{en ? `Alerts in 7 days: ${alerts.map((a) => `day ${a.day} ${hhmm(a.hour)}`).join(', ') || 'none'}` : `7 günde uyarılar: ${alerts.map((a) => `${a.day}. gün ${hhmm(a.hour)}`).join(', ') || 'yok'}`}</Readout>
+        </>
+      }
+    />
+  )
+}
+
 // --- Kayıt ------------------------------------------------------------------------------------------------------------------
 
 const SIMS: Record<SensorSimId, (p: P) => React.ReactElement> = {
-  toplama: LoggerSim, temizleme: CleanSim, kalman: KalmanSim, gorsel: AnalysisSim, ozellik: FeatureSim, egitim: TrainSim, yerlestirme: DeploySim, anomali: AnomalySim,
+  toplama: LoggerSim, temizleme: CleanSim, kalman: KalmanSim, gorsel: AnalysisSim, ozellik: FeatureSim, egitim: TrainSim, yerlestirme: DeploySim, anomali: AnomalySim, sera3b: Greenhouse3DSim,
 }
 
 export function SensorSim({ id, lang }: { id: SensorSimId; lang: Lang }) {

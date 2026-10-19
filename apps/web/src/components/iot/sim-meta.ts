@@ -1,5 +1,5 @@
 // ESP32 ile Nesnelerin İnterneti dersi simülasyonlarının başlık ve açıklamaları (TR/EN). Kimlikler sims.tsx'teki anahtarlarla aynı.
-export type IotSimId = 'pinler' | 'wifi' | 'rest' | 'broker' | 'qos' | 'telemetri' | 'eyleyici' | 'pano' | 'guc' | 'ota' | 'guvenlik' | 'ble' | 'kurallar'
+export type IotSimId = 'pinler' | 'wifi' | 'rest' | 'broker' | 'qos' | 'telemetri' | 'eyleyici' | 'pano' | 'guc' | 'ota' | 'guvenlik' | 'ble' | 'kurallar' | 'sera3b'
 interface Text { title: string; desc: string }
 
 export const IOT_SIM_META: Record<IotSimId, { tr: Text; en: Text }> = {
@@ -54,5 +54,9 @@ export const IOT_SIM_META: Record<IotSimId, { tr: Text; en: Text }> = {
   kurallar: {
     tr: { title: 'Akıllı sera: kural motoru', desc: 'EĞER … İSE … kurallarıyla pencere, fan, ısıtıcı, sulama ve alarmı yönet. 24 saatlik sera gününü dış hava ve bulutlulukla benzet; konfor yüzdesi, aşırı sıcak/soğuk dakika, röle anahtarlama sayısı ve enerjiyle kurallarını puanla.' },
     en: { title: 'Smart greenhouse: rules engine', desc: 'Drive the window, fan, heater, pump and alarm with IF … THEN … rules. Simulate a 24-hour greenhouse day with outside weather and cloud cover; score your rules by comfort percentage, too hot/cold minutes, relay switch count and energy.' },
+  },
+  sera3b: {
+    tr: { title: '3B akıllı sera: cihazlar, broker ve MQTT paketleri', desc: 'Seranın 24 saatini kural motoruyla oynat. Sensör düğümü her 10 dakikada sıcaklık yayımlar, eyleyici düğümü durum değiştirince kalıcı durum mesajı yollar; her paket broker\'dan geçerek abonelerine uçar. Panodan elle komut gönder, pencere, fan, ısıtıcı ve sulamanın sahnede değiştiğini izle.' },
+    en: { title: '3D smart greenhouse: devices, broker and MQTT packets', desc: 'Play the greenhouse\'s 24 hours with the rules engine. The sensor node publishes the temperature every 10 minutes, the actuator node sends a retained state message when something changes; every packet flies through the broker to its subscribers. Send a manual command from the dashboard and watch the window, fan, heater and watering change in the scene.' },
   },
 }

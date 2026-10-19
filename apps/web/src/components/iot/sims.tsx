@@ -11,7 +11,10 @@ import { Broker, simulateQos, topicMatches, validFilter, validTopic, type Delive
 import { POWER_MODES, avgCurrentMa, batteryDays, otaInit, otaStep, type Ota, type OtaEvent, type PowerMode } from '@/lib/iot/power'
 import { ACT_NAME, DEFAULT_RULES, parseRules, simulateDay, type Actuator } from '@/lib/iot/rules'
 import { aclCheck, audit, parseAcl, type Finding, type Setup } from '@/lib/iot/security'
+import { Scene3D } from '@/components/kurs/scene3d'
+import { frameAt, messagesOfDay, packetsAt, type PacketKind } from '@/lib/iot/scene'
 import { IOT_SIM_META, type IotSimId } from './sim-meta'
+import type { IotSceneState } from './scene-sera'
 
 type P = { lang: Lang }
 
@@ -745,11 +748,78 @@ function RulesSim({ lang }: P) {
   )
 }
 
+// --- 14. 3B akıllı sera -----------------------------------------------------------------------------------------------------
+
+const loadSera = () => import('./scene-sera')
+const KIND_TEXT: Record<PacketKind, { tr: string; en: string; css: string }> = {
+  telemetry: { tr: 'telemetri', en: 'telemetry', css: '#0d9488' }, command: { tr: 'komut', en: 'command', css: '#f97316' }, state: { tr: 'durum (retained)', en: 'state (retained)', css: '#8b5cf6' },
+}
+
+/** Hareket azaltma tercihi (prefers-reduced-motion): açıksa otomatik oynatma yok. */
+function useReducedMotion() {
+  const [r, setR] = useState(true)
+  useEffect(() => { setR(!!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) }, [])
+  return r
+}
+
+function Greenhouse3DSim({ lang }: P) {
+  const en = lang === 'en'
+  const reduced = useReducedMotion()
+  const [minute, setMinute] = useState(11 * 60)
+  const [playing, setPlaying] = useState(false)
+  const [speed, setSpeed] = useState(20)
+  const [outMean, setOutMean] = useState(18)
+  const [cloud, setCloud] = useState(0.2)
+  const [manual, setManual] = useState<Array<{ minute: number; act: Actuator; value: 0 | 1 }>>([])
+  const started = useRef(false)
+  useEffect(() => { if (!reduced && !started.current) { started.current = true; setPlaying(true) } }, [reduced])
+  useEffect(() => {
+    if (!playing) return
+    const h = window.setInterval(() => setMinute((m) => (m + speed * 0.1) % 1440), 100)
+    return () => window.clearInterval(h)
+  }, [playing, speed])
+  const rules = useMemo(() => parseRules(DEFAULT_RULES[lang]).rules, [lang])
+  const day = useMemo(() => simulateDay(rules, { outMean, outAmp: 8, cloud }), [rules, outMean, cloud])
+  const msgs = useMemo(() => messagesOfDay(day, manual), [day, manual])
+  const frame = frameAt(day, minute, cloud)
+  const packets = packetsAt(msgs, minute)
+  const state: IotSceneState = { frame, packets, reduced }
+  const recent = msgs.filter((m) => m.minute <= minute && m.minute > minute - 40).slice(-8).reverse()
+  const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(Math.floor(m % 60)).padStart(2, '0')}`
+  const send = (act: Actuator) => setManual((ms) => [...ms, { minute: Math.floor(minute), act, value: frame.acts[act] ? 0 : 1 }])
+  return (
+    <Body
+      stage={
+        <>
+          <Scene3D load={loadSera} state={state} lang={lang} testid="iot-3d" />
+          <ul className="ks-legend">{(Object.keys(KIND_TEXT) as PacketKind[]).map((k) => <li key={k}><i style={{ background: KIND_TEXT[k].css, borderRadius: '50%' }} />{KIND_TEXT[k][lang]}</li>)}</ul>
+          <Readout testid="iot-3d-sum">{en
+            ? `${hhmm(minute)} · inside ${nf(lang, 1)(frame.temp)} °C, outside ${nf(lang, 1)(frame.out)} °C, soil ${Math.round(frame.soil)}%\nwindow ${frame.acts.window ? 'open' : 'closed'} · fan ${frame.acts.fan ? 'on' : 'off'} · heater ${frame.acts.heater ? 'on' : 'off'} · pump ${frame.acts.pump ? 'on' : 'off'} · ${packets.length} packets in flight`
+            : `${hhmm(minute)} · içeride ${nf(lang, 1)(frame.temp)} °C, dışarıda ${nf(lang, 1)(frame.out)} °C, toprak %${Math.round(frame.soil)}\npencere ${frame.acts.window ? 'açık' : 'kapalı'} · fan ${frame.acts.fan ? 'açık' : 'kapalı'} · ısıtıcı ${frame.acts.heater ? 'açık' : 'kapalı'} · sulama ${frame.acts.pump ? 'açık' : 'kapalı'} · havada ${packets.length} paket`}</Readout>
+          <Flow rows={recent.map((m) => ({ t: hhmm(m.minute), text: <><code>{m.topic}</code> {m.payload} <span className="dim">{m.from} → broker → {m.to.join(', ')}</span></> }))} empty={en ? 'No messages in the last 40 minutes.' : 'Son 40 dakikada mesaj yok.'} />
+        </>
+      }
+      side={
+        <>
+          <Btn onClick={() => setPlaying((p) => !p)} testid="iot-3d-play">{playing ? (en ? 'Pause' : 'Duraklat') : (en ? 'Play the day' : 'Günü oynat')}</Btn>
+          <Slider label={en ? 'Time of day' : 'Günün saati'} min={0} max={1439} step={5} value={Math.floor(minute)} onChange={setMinute} fmt={hhmm} />
+          <Select label={en ? 'Speed' : 'Hız'} value={String(speed)} options={[['5', en ? '0.5 min/s' : '0,5 dk/s'], ['20', en ? '2 min/s' : '2 dk/s'], ['100', en ? '10 min/s' : '10 dk/s']]} onChange={(v) => setSpeed(Number(v))} />
+          <Slider label={en ? 'Outside mean' : 'Dış ortalama'} min={-5} max={30} step={1} value={outMean} onChange={setOutMean} fmt={(v) => `${v} °C`} />
+          <Slider label={en ? 'Cloud cover' : 'Bulutluluk'} min={0} max={1} step={0.1} value={cloud} onChange={setCloud} fmt={(v) => `${Math.round(v * 100)}%`} />
+          <span className="sl-h">{en ? 'Manual command from the dashboard' : 'Panodan elle komut'}</span>
+          <div className="ks-row">{(['fan', 'window', 'pump'] as Actuator[]).map((a) => <Btn key={a} ghost onClick={() => send(a)}>{ACT_NAME[a][lang]}</Btn>)}</div>
+          <Readout>{en ? 'The command packet flies dashboard → broker → actuator. The on-device rules decide again on the next change: think about who wins (unit 10).' : 'Komut paketi pano → broker → eyleyici yolunu izler. Cihazdaki kurallar bir sonraki değişimde yeniden karar verir: hangisi kazanmalı, düşün (10. ünite).'}</Readout>
+        </>
+      }
+    />
+  )
+}
+
 // --- Kayıt ------------------------------------------------------------------------------------------------------------------
 
 const SIMS: Record<IotSimId, (p: P) => React.ReactElement> = {
   pinler: PinSim, wifi: WifiSim, rest: RestSim, broker: BrokerSim, qos: QosSim, telemetri: TelemetrySim, eyleyici: ActuatorSim,
-  pano: DashboardSim, guc: PowerSim, ota: OtaSim, guvenlik: SecuritySim, ble: BleSim, kurallar: RulesSim,
+  pano: DashboardSim, guc: PowerSim, ota: OtaSim, guvenlik: SecuritySim, ble: BleSim, kurallar: RulesSim, sera3b: Greenhouse3DSim,
 }
 
 export function IotSim({ id, lang }: { id: IotSimId; lang: Lang }) {

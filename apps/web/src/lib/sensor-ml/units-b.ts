@@ -539,7 +539,7 @@ export const UNITS_B: CourseUnit<SensorSimId>[] = [
     },
   },
   {
-    n: 8, sims: ['anomali'], parts: ['esp32-esp32-wroom-devkit', 'dht22'], wokwi: true,
+    n: 8, sims: ['anomali', 'sera3b'], parts: ['esp32-esp32-wroom-devkit', 'dht22'], wokwi: true,
     related: [
       { href: '/muhendislik/iot', tr: 'ESP32 ile Nesnelerin İnterneti: MQTT ile uyarı göndermek', en: 'Internet of Things with the ESP32: sending alerts over MQTT' },
       { href: '/makine-ogrenmesi/kesinlik-duyarlilik', tr: 'ML dersi: kesinlik ve duyarlılık', en: 'ML course: precision and recall' },

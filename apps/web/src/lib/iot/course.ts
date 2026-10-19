@@ -1,4 +1,4 @@
-// ESP32 ile Nesnelerin İnterneti (büyükler için, 16+): 10 ünite, 13 tarayıcı simülasyonu, bitirme projesi "akıllı sera".
+// ESP32 ile Nesnelerin İnterneti (büyükler için, 16+): 10 ünite, 14 tarayıcı simülasyonu (biri 3B), bitirme projesi "akıllı sera".
 // Yapı Drone dersiyle aynı (ünite = notlar + simülasyon + kod + kendin dene + quiz); sayfalar components/kurs ortak çatısında.
 import type { IotSimId } from '@/components/iot/sim-meta'
 import { D, type Capstone, type CodeBlock, type CourseMeta, type CourseUnit, type Lang } from '@/lib/kurs/types'

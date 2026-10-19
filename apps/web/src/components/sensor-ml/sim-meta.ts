@@ -1,5 +1,5 @@
 // Sensör verisinden ML dersi simülasyonlarının başlık ve açıklamaları (TR/EN). Kimlikler sims.tsx'teki SIMS anahtarlarıyla aynı.
-export type SensorSimId = 'toplama' | 'temizleme' | 'kalman' | 'gorsel' | 'ozellik' | 'egitim' | 'yerlestirme' | 'anomali'
+export type SensorSimId = 'toplama' | 'temizleme' | 'kalman' | 'gorsel' | 'ozellik' | 'egitim' | 'yerlestirme' | 'anomali' | 'sera3b'
 interface Text { title: string; desc: string }
 
 export const SENSOR_SIM_META: Record<SensorSimId, { tr: Text; en: Text }> = {
@@ -34,5 +34,9 @@ export const SENSOR_SIM_META: Record<SensorSimId, { tr: Text; en: Text }> = {
   anomali: {
     tr: { title: 'Sıcaklık tahmini ve anomali uyarısı', desc: 'Model ilk dört günde (arızasız) eğitilir, sonra her örnekte tahmin artığının z-skoru hesaplanır. Açma ve kapama eşiği (histerezis), ardışık örnek sayısı ve bekleme süresiyle uyarıyı ayarla: 5. gündeki ısıtıcı arızasını yakala, yanlış alarmı az tut.' },
     en: { title: 'Temperature forecast and anomaly alert', desc: 'The model is trained on the first four days (no fault), then the z-score of the forecast residual is computed at every sample. Tune the alert with on and off thresholds (hysteresis), consecutive samples and a cooldown: catch the heater fault on day 5 and keep false alarms low.' },
+  },
+  sera3b: {
+    tr: { title: '3B sera: ölçüm, tahmin ve anomali', desc: 'Yedi günlük sera verisini 3B serada oynat. Yatakların rengi sıcaklığı, direkteki etiket gerçek ve tahmin değerini, öndeki sütunlar son iki saatin tahmin artığını gösterir. 5. günde ısıtıcı takılınca artık büyür, fener sarıdan kırmızıya döner.' },
+    en: { title: '3D greenhouse: measurement, forecast and anomaly', desc: 'Play seven days of greenhouse data in a 3D greenhouse. The bed colours show the temperature, the label on the post shows the actual and forecast values, the columns in front show the forecast residual of the last two hours. When the heater sticks on day 5 the residual grows and the beacon turns from amber to red.' },
   },
 }

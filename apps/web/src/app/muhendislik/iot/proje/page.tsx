@@ -10,5 +10,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function IotProje() {
-  return <CourseProject v={IOT_VIEW} lang={await getLocale()} sims={['kurallar', 'broker']} />
+  return <CourseProject v={IOT_VIEW} lang={await getLocale()} sims={['sera3b', 'kurallar']} />
 }

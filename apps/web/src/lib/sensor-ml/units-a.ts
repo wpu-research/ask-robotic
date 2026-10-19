@@ -323,7 +323,7 @@ const py4: CodeLine[] = [
 
 export const UNITS_A: CourseUnit<SensorSimId>[] = [
   {
-    n: 1, sims: ['toplama'], parts: ['dht22', 'bme280', 'ldr', 'hc-sr04', 'esp32-esp32-wroom-devkit'], wokwi: true,
+    n: 1, sims: ['toplama', 'sera3b'], parts: ['dht22', 'bme280', 'ldr', 'hc-sr04', 'esp32-esp32-wroom-devkit'], wokwi: true,
     related: [
       { href: '/makine-ogrenmesi/veri-setleri', tr: 'ML veri setleri: sera-sensorleri.csv ve öbürleri', en: 'ML datasets: sera-sensorleri.csv and the rest' },
       { href: '/muhendislik/iot', tr: 'ESP32 ile Nesnelerin İnterneti: veriyi buluta göndermek', en: 'IoT with the ESP32: sending the data to the cloud' },
