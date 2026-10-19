@@ -71,3 +71,13 @@
 /* Ders sayfaları */
 .lm-teach { margin: 10px 0 0; padding: 10px 12px; border-left: 3px solid var(--gold); background: color-mix(in srgb, var(--gold) 10%, transparent); border-radius: 0 8px 8px 0; font-size: .9rem; }
 .lm-root .rb-sim input[type=text] { min-height: 44px; }
+
+/* 3B sahneler (sims3d.ts): tuval kutusu, adım listesi */
+.lm-3d { position: relative; width: 100%; height: clamp(300px, 52vw, 460px); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); background: #0f1726; touch-action: none; }
+.lm-3d canvas { display: block; }
+.lm-3d-msg { position: absolute; inset: 0; margin: 0; display: grid; place-items: center; padding: 16px; text-align: center; color: #cbd5e1; font-size: .9rem; }
+.lm-3d-hint { margin: -6px 0 0; font-size: .76rem; color: var(--muted); }
+.lm-steps3d { margin: 0; padding-left: 1.6em; display: grid; gap: 3px; font-size: .86rem; color: var(--muted); }
+.lm-steps3d li.done { color: var(--text); }
+.lm-steps3d li.on { color: var(--text); font-weight: 700; }
+.lm-steps3d li.on::marker { color: var(--gold); }

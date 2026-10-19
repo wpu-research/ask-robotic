@@ -1,6 +1,6 @@
 // LLM dersi simülasyonlarının başlık ve açıklamaları (TR/EN). Kimlikler sim-box.tsx'teki bileşen eşlemesiyle aynı.
 // Hepsi öğretim modelidir: tarayıcıda, deterministik, dış servis yok.
-export type LlmSimId = 'bpe' | 'embed' | 'prompt' | 'schema' | 'rag' | 'agent' | 'eval' | 'guard' | 'cost' | 'stream'
+export type LlmSimId = 'bpe' | 'embed' | 'prompt' | 'schema' | 'rag' | 'agent' | 'eval' | 'guard' | 'cost' | 'stream' | 'space3d' | 'rag3d' | 'attn3d'
 interface Text { title: string; desc: string }
 
 export const LLM_SIM_META: Record<LlmSimId, { tr: Text; en: Text }> = {
@@ -43,5 +43,17 @@ export const LLM_SIM_META: Record<LlmSimId, { tr: Text; en: Text }> = {
   stream: {
     tr: { title: 'Akışlı sohbet arayüzü: SSE olaylarından ekrandaki metne', desc: 'Bir soru seç ve gönder: sahte sunucu cevabı Server-Sent Events olayları (message_start, content_block_delta, message_stop) olarak parça parça yollar; parçalar rastgele bayt sınırlarından kesilir. İstemci ayrıştırıcısı tamponlar, olayları çözer ve metni ekrana akıtır. Hızı değiştir, yarıda durdur, ham olay günlüğüne bak.' },
     en: { title: 'Streaming chat front-end: from SSE events to text on screen', desc: 'Pick a question and send it: a fake server sends the answer piece by piece as Server-Sent Events (message_start, content_block_delta, message_stop); the pieces are cut at random byte boundaries. The client parser buffers, decodes the events and streams the text onto the screen. Change the speed, stop halfway, look at the raw event log.' },
+  },
+  space3d: {
+    tr: { title: '3B gömme uzayı: 64 boyuttan üç eksene', desc: 'Aynı öğretim gömmesi bu kez PCA ile üç eksene izdüşürülür; her nokta bir ders notu cümlesi, renk notun konusudur. Sorunu yaz: sorgu noktası uzayda yerine kayar, en yakın k cümleye kosinüs puanlı çizgiler uzanır. Sürükleyerek döndür, iki parmakla yakınlaş; 2B düğmesi üçüncü ekseni bastırıp 2B görüntüleyicinin düzlemine iner.' },
+    en: { title: '3D embedding space: from 64 dimensions to three axes', desc: 'The same teaching embedding, this time projected onto three axes with PCA; each point is a sentence from the course notes, the colour is its topic. Type your question: the query point glides to its place and lines with cosine scores reach the nearest k sentences. Drag to orbit, pinch to zoom; the 2D button flattens the third axis down to the plane of the 2D viewer.' },
+  },
+  rag3d: {
+    tr: { title: 'RAG\'ı 3B izle: sorgu → komşular → yeniden sıralama → cevap', desc: 'Mini RAG\'ın parçaları 3B gömme uzayında. Oynat\'a bas: sorgu merkezden yerine uçar, vektör arama 2k adayı bulur, en yakın k parça seçilir, hibrit yeniden sıralama sırayı değiştirir, eşiği geçen parçalar yeşile döner ve kaynaklı cevap kurulur. k, eşik ve yeniden sıralamayı değiştir; Adım düğmesiyle tek tek ilerle.' },
+    en: { title: 'Watch RAG in 3D: query → neighbours → rerank → answer', desc: 'The chunks of the mini RAG in the 3D embedding space. Press Play: the query flies from the centre to its place, vector search finds 2k candidates, the nearest k chunks are picked, hybrid reranking changes the order, chunks above the threshold turn green and an answer with sources is built. Change k, the threshold and reranking; step through with the Step button.' },
+  },
+  attn3d: {
+    tr: { title: 'Dikkat yayları 3B: "o" kime bakıyor?', desc: 'Altı tokenlık bir cümlede seçilen sorgu tokenından her tokena bir yay uzanır; yayın yüksekliği ve kalınlığı dikkat ağırlığıdır (softmax, toplamı 1). Son kelimeyi "güçlüydü" yap, dikkat kutudan robota kayar; τ\'yu büyüt, yaylar eşitlenir. Bir tokena dokunarak onu sorgu yap.' },
+    en: { title: 'Attention arcs in 3D: who does "it" look at?', desc: 'In a six-token sentence an arc runs from the chosen query token to every token; the height and thickness of the arc is the attention weight (softmax, adds up to 1). Switch the last word to "was strong" and attention moves from the box to the robot; raise τ and the arcs even out. Tap a token to make it the query.' },
   },
 }

@@ -13,58 +13,8 @@ import { RAG_DEFAULTS, buildIndex, runRag } from '@/lib/llm/rag'
 import { LAB_SCHEMA, extractJson, repairMessage, samplesFor, validate, type SampleId } from '@/lib/llm/schema'
 import { SseParser, chunkBytes, eventsFor, serializeSse, splitsChar } from '@/lib/llm/stream'
 import type { LlmSimId } from './sim-meta'
-
-type Lang = 'tr' | 'en'
-type Cfg = Record<string, string>
-type Mount = (stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang) => () => void
-
-const T = (lang: Lang) => (tr: string, en: string) => (lang === 'en' ? en : tr)
-const nf = (lang: Lang, d = 2) => (v: number) => v.toLocaleString(lang === 'en' ? 'en-GB' : 'tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d })
-
-function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string, string> = {}, ...kids: Array<Node | string>): HTMLElementTagNameMap[K] {
-  const e = document.createElement(tag)
-  for (const [k, v] of Object.entries(attrs)) { if (k === 'class') e.className = v; else e.setAttribute(k, v) }
-  e.append(...kids)
-  return e
-}
-function controls(host: HTMLElement) { const c = el('div', { class: 'ctrl' }); host.append(c); return c }
-interface Ctl<T> { v: T }
-function slider(p: HTMLElement, label: string, min: number, max: number, step: number, val: number, fmt: (v: number) => string, on: () => void): Ctl<number> {
-  const out = el('output', {}, fmt(val))
-  const inp = el('input', { type: 'range', min: String(min), max: String(max), step: String(step), value: String(val), 'aria-label': label })
-  const o = { v: +inp.value }
-  inp.addEventListener('input', () => { o.v = +inp.value; out.textContent = fmt(o.v); on() })
-  p.append(el('label', { class: 'sl' }, el('span', { class: 'sl-h' }, el('span', {}, label), out), inp))
-  return o
-}
-function select(p: HTMLElement, label: string, opts: Array<[string, string]>, val: string, on: () => void): Ctl<string> {
-  const s = el('select', { 'aria-label': label })
-  for (const [v, t] of opts) s.append(el('option', { value: v }, t))
-  s.value = val
-  const o = { v: s.value }
-  s.addEventListener('change', () => { o.v = s.value; on() })
-  p.append(el('label', { class: 'sl' }, el('span', { class: 'sl-h' }, label), s))
-  return o
-}
-function check(p: HTMLElement, label: string, val: boolean, on: () => void): Ctl<boolean> {
-  const i = el('input', { type: 'checkbox' }); i.checked = val
-  const o = { v: val }
-  i.addEventListener('change', () => { o.v = i.checked; on() })
-  p.append(el('label', { class: 'ck' }, i, label))
-  return o
-}
-function textInput(p: HTMLElement, label: string, val: string, on: () => void, rows = 0): Ctl<string> {
-  const i = rows > 0 ? el('textarea', { rows: String(rows), 'aria-label': label, class: 'lm-ta' }) : el('input', { type: 'text', 'aria-label': label, class: 'lm-in' })
-  i.value = val
-  const o = { v: val }
-  i.addEventListener('input', () => { o.v = i.value; on() })
-  p.append(el('label', { class: 'sl' }, el('span', { class: 'sl-h' }, label), i))
-  return o
-}
-function button(p: HTMLElement, label: string, fn: () => void, cls = '') { const b = el('button', { class: `sbtn ${cls}`, type: 'button' }, label); b.addEventListener('click', fn); p.append(b); return b }
-function readout(p: HTMLElement, cls = '') { const r = el('div', { class: `readout ${cls}`, 'aria-live': 'polite' }); p.append(r); return r }
-const box = (title: string, ...kids: Array<Node | string>) => el('div', { class: 'lm-box' }, el('h4', {}, title), ...kids)
-const pre = (s: string, cls = '') => el('pre', { class: `lm-pre ${cls}` }, s)
+import { attn3dSim, rag3dSim, space3dSim } from './sims3d'
+import { box, button, check, controls, el, nf, pre, readout, select, slider, T, textInput, type Cfg, type Ctl, type Lang, type Mount } from './dom'
 
 /* ---------------- 1. BPE ---------------- */
 const bpe: Mount = (stage, side, cfg, lang) => {
@@ -429,7 +379,7 @@ const streamSim: Mount = (stage, side, _cfg, lang) => {
   return () => cancelAnimationFrame(raf)
 }
 
-const SIMS: Record<LlmSimId, Mount> = { bpe, embed: embedSim, prompt: promptSim, schema: schemaSim, rag: ragSim, agent: agentSim, eval: evalSim, guard: guardSim, cost: costSim, stream: streamSim }
+const SIMS: Record<LlmSimId, Mount> = { bpe, embed: embedSim, prompt: promptSim, schema: schemaSim, rag: ragSim, agent: agentSim, eval: evalSim, guard: guardSim, cost: costSim, stream: streamSim, space3d: space3dSim, rag3d: rag3dSim, attn3d: attn3dSim }
 
 export function mountLlmSim(id: LlmSimId, stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang): () => void {
   return SIMS[id](stage, side, cfg, lang)
