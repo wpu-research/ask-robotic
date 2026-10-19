@@ -60,6 +60,15 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/insansi" className="eng-course" data-testid="eng-humanoid">
+        <span className="eng-course-code">{en ? 'BIPED' : 'İNSANSI'}</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Humanoid robot: kinematics, balance and walking' : 'İnsansı robot: kinematik, denge ve yürüyüş'}</b>
+          <span className="eng-level-text">{en ? 'A 3D 16-servo biped: forward and two-link inverse kinematics, center of mass and support polygon, an LIPM walking gait with joint charts, servo limits, a pose program in blocks or code, Python and C++.' : '16 servolu 3B iki ayaklı robot: ileri ve iki bağlı ters kinematik, ağırlık merkezi ve destek çokgeni, eklem grafikli LIPM yürüyüşü, servo sınırları, blok ya da kodla poz programı, Python ve C++.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <Link href="/programlar" className="eng-course" data-testid="eng-programs">
         <span className="eng-course-code">{en ? 'PATHS' : 'YOLLAR'}</span>
         <span className="eng-level-body">

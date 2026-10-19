@@ -18,6 +18,7 @@ const PAGES = [
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
   '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),
   '/programlar',
+  '/robot-atolyesi/tasarla', '/muhendislik/insansi',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

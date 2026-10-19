@@ -47,6 +47,7 @@ export const NAV: NavGroup[] = [
     items: [
       { href: '/atolye', label: 'Blok atölyesi', key: 'shell.nav.blocks', icon: 'atolye', tab: true },
       { href: '/robot-atolyesi', label: 'Robot atölyesi', key: 'shell.nav.robotStudio', icon: 'arena' },
+      { href: '/robot-atolyesi/tasarla', label: 'Robotunu Tasarla', key: 'shell.nav.robotDesign', icon: 'arena' },
       { href: '/mikro-kart', label: 'Mikro Kart atölyesi', key: 'shell.nav.microCard', icon: 'mikro' },
       { href: '/robotun-gozleri', label: 'Robotun Gözleri', key: 'shell.nav.vision', icon: 'eye' },
       { href: '/oyun-atolyesi', label: 'Oyun atölyesi', key: 'shell.nav.gameStudio', icon: 'oyun' },
@@ -66,6 +67,7 @@ export const NAV: NavGroup[] = [
       { href: '/muhendislik/robotik', label: 'Robotik dersi', key: 'shell.nav.robotics', icon: 'book' },
       { href: '/muhendislik/drone', label: 'Drone dersi', key: 'shell.nav.drone', icon: 'drone' },
       { href: '/muhendislik/llm', label: 'LLM uygulamaları', key: 'shell.nav.llm', icon: 'ai' },
+      { href: '/muhendislik/insansi', label: 'İnsansı robot', key: 'shell.nav.humanoid', icon: 'arena' },
       { href: '/programlar', label: 'Programlar', key: 'shell.nav.programs', icon: 'book' },
     ],
   },
@@ -90,6 +92,9 @@ export function isActive(href: string, pathname: string): boolean {
   // Robotik ve drone dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone'))) return false
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/llm')) return false
+  if (href === '/muhendislik' && pathname.startsWith('/muhendislik/insansi')) return false
+  // Robotunu Tasarla kendi öğesinde işaretlenir
+  if (href === '/robot-atolyesi' && pathname.startsWith('/robot-atolyesi/tasarla')) return false
   // Gerçek hayat demoları (büyükler) kendi öğesinde işaretlenir, çocukların "Robotun Gözleri" öğesinde değil
   if (href === '/robotun-gozleri' && pathname.startsWith('/robotun-gozleri/demolar')) return false
   return pathname === href || pathname.startsWith(`${href}/`)
