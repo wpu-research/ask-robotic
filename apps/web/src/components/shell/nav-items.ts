@@ -67,6 +67,8 @@ export const NAV: NavGroup[] = [
       { href: '/muhendislik/drone', label: 'Drone dersi', key: 'shell.nav.drone', icon: 'drone' },
       { href: '/muhendislik/llm', label: 'LLM uygulamaları', key: 'shell.nav.llm', icon: 'ai' },
       { href: '/programlar', label: 'Programlar', key: 'shell.nav.programs', icon: 'book' },
+      { href: '/muhendislik/raspberry-pi', label: 'Raspberry Pi dersi', key: 'shell.nav.rpi', icon: 'code' },
+      { href: '/muhendislik/arm-stm32', label: 'STM32 dersi', key: 'shell.nav.stm32', icon: 'mikro' },
     ],
   },
   {
@@ -90,6 +92,7 @@ export function isActive(href: string, pathname: string): boolean {
   // Robotik ve drone dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone'))) return false
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/llm')) return false
+  if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/raspberry-pi') || pathname.startsWith('/muhendislik/arm-stm32'))) return false
   // Gerçek hayat demoları (büyükler) kendi öğesinde işaretlenir, çocukların "Robotun Gözleri" öğesinde değil
   if (href === '/robotun-gozleri' && pathname.startsWith('/robotun-gozleri/demolar')) return false
   return pathname === href || pathname.startsWith(`${href}/`)
