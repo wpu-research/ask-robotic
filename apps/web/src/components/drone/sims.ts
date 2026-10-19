@@ -5,6 +5,7 @@ import {
   ALT_DEFAULTS, DEG, FUSION_DEFAULTS, MISSION_DEFAULTS, QUAD_X, ROLL_DEFAULTS, flightTime, missionInit, missionStep, mixQuadX,
   relThrust, rng, simulateAltitude, simulateFusion, simulateRoll, thrustToWeight, type FlightInput, type MissionParams, type Vec,
 } from '@/lib/drone/physics'
+import type { SimLink } from './link'
 import type { DroneSimId } from './sim-meta'
 
 type Lang = 'tr' | 'en'
@@ -137,10 +138,11 @@ function quadIcon(ctx: Ctx, x: number, y: number, ang: number, p: Pal, s = 1) {
 }
 const T = (lang: Lang) => (tr: string, en: string) => (lang === 'en' ? en : tr)
 
-type Mount = (stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang) => () => void
+/** link: 3B sahneye güncel parametreleri yazar. */
+type Mount = (stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang, link: SimLink) => () => void
 
 // ---------------------------------------------------------------- itki/ağırlık
-const twr: Mount = (stage, side, cfg, lang) => {
+const twr: Mount = (stage, side, cfg, lang, link) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
   const cvs = canvas(stage, 640, 360), { ctx, W, H } = cvs
   cvs.redraw = () => draw() // boyut değişince yeniden çiz
@@ -162,6 +164,7 @@ const twr: Mount = (stage, side, cfg, lang) => {
     if (!mass) return
     const p = palette(stage)
     const r = thrustToWeight({ massKg: mass.v, motors: +motors.v, maxThrustG: thr.v, thrustModel: fac.v })
+    link.set({ massKg: mass.v, motors: +motors.v, maxThrustG: thr.v, thrustModel: fac.v })
     ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, H)
     // sol: ağırlık ve itki çubukları
     const base = 320, top = 50, maxN = Math.max(r.weightN, r.maxThrustN) * 1.1, hh = (v: number) => (base - top) * v / maxN
@@ -227,7 +230,7 @@ const flight: Mount = (stage, side, cfg, lang) => {
 }
 
 // ---------------------------------------------------------------- irtifa PID
-const alt: Mount = (stage, side, _cfg, lang) => {
+const alt: Mount = (stage, side, _cfg, lang, link) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
   const { ctx, W, H } = canvas(stage, 640, 400)
   const c = controls(side)
@@ -240,6 +243,7 @@ const alt: Mount = (stage, side, _cfg, lang) => {
   let res = simulateAltitude(ALT_DEFAULTS), play = 0
   function run() {
     res = simulateAltitude({ ...ALT_DEFAULTS, kp: kp.v, ki: ki.v, kd: kd.v, payloadKg: pl.v, step: st.v })
+    link.set({ kp: kp.v, ki: ki.v, kd: kd.v, payloadKg: pl.v, step: st.v })
     play = 0
     const m = res.metrics
     ro.textContent = `${t('Aşım', 'Overshoot')}: ${f1(m.overshootPct)}%\n${t('Yükselme süresi (%10→%90)', 'Rise time (10→90%)')}: ${Number.isFinite(m.riseTime) ? f2(m.riseTime) + ' s' : '–'}\n${t('Oturma süresi (±%2)', 'Settling time (±2%)')}: ${Number.isFinite(m.settlingTime) ? f2(m.settlingTime) + ' s' : t('oturmadı', 'not settled')}\n${t('Kalıcı hata', 'Steady-state error')}: ${Math.round(m.steadyError * 100)} cm\n${t('İtki doyumda', 'Thrust saturated')}: ${f1(res.saturatedPct)}%`
@@ -272,7 +276,7 @@ const alt: Mount = (stage, side, _cfg, lang) => {
 }
 
 // ---------------------------------------------------------------- roll kaskad PID
-const roll: Mount = (stage, side, _cfg, lang) => {
+const roll: Mount = (stage, side, _cfg, lang, link) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2), f3 = nf(lang, 3)
   const { ctx, W, H } = canvas(stage, 640, 400)
   const c = controls(side)
@@ -287,6 +291,7 @@ const roll: Mount = (stage, side, _cfg, lang) => {
   let res = simulateRoll(ROLL_DEFAULTS), play = 0
   function run() {
     res = simulateRoll({ ...ROLL_DEFAULTS, angleP: ap.v, rateP: rp.v, rateI: ri.v, rateD: rd.v, gyroNoiseDps: nz.v, dCutoffHz: fc.v, disturbance: ds.v })
+    link.set({ angleP: ap.v, rateP: rp.v, rateI: ri.v, rateD: rd.v, gyroNoiseDps: nz.v, dCutoffHz: fc.v, disturbance: ds.v })
     play = 0
     const m = res.metrics
     ro.textContent = `${t('Aşım', 'Overshoot')}: ${f1(m.overshootPct)}%\n${t('Yükselme süresi', 'Rise time')}: ${Number.isFinite(m.riseTime) ? Math.round(m.riseTime * 1000) + ' ms' : '–'}\n${t('Oturma süresi (±%5)', 'Settling time (±5%)')}: ${Number.isFinite(m.settlingTime) ? Math.round(m.settlingTime * 1000) + ' ms' : t('oturmadı', 'not settled')}\n${t('Son açı hatası', 'Final angle error')}: ${f2(m.steadyError)}°\n${t('Tork komutu gürültüsü', 'Torque command noise')}: ${f3(res.torqueNoise)} N·m${res.torqueNoise > 0.03 ? t(' (motorlar ısınır!)', ' (motors get hot!)') : ''}`
@@ -312,7 +317,7 @@ const roll: Mount = (stage, side, _cfg, lang) => {
 }
 
 // ---------------------------------------------------------------- karıştırıcı
-const mixer: Mount = (stage, side, _cfg, lang) => {
+const mixer: Mount = (stage, side, _cfg, lang, link) => {
   const t = T(lang), f2 = nf(lang, 2)
   const cvs = canvas(stage, 640, 400), { ctx, W, H } = cvs
   cvs.redraw = () => draw() // boyut değişince yeniden çiz
@@ -326,6 +331,7 @@ const mixer: Mount = (stage, side, _cfg, lang) => {
   function draw() {
     const p = palette(stage)
     const r = mixQuadX({ thrust: th.v, roll: rl.v, pitch: pt.v, yaw: yw.v }, am.v)
+    link.set({ thrust: th.v, roll: rl.v, pitch: pt.v, yaw: yw.v, airmode: am.v })
     ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, H)
     // üstten görünüş: burun yukarıda; x ileri → ekranda yukarı, y sol → ekranda sola
     const cx = 210, cy = 205, arm = 115
@@ -369,7 +375,7 @@ const mixer: Mount = (stage, side, _cfg, lang) => {
 }
 
 // ---------------------------------------------------------------- tamamlayıcı süzgeç
-const fusion: Mount = (stage, side, _cfg, lang) => {
+const fusion: Mount = (stage, side, _cfg, lang, link) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
   const cvs = canvas(stage, 640, 380), { ctx, W, H } = cvs
   cvs.redraw = () => draw() // boyut değişince yeniden çiz
@@ -391,6 +397,7 @@ const fusion: Mount = (stage, side, _cfg, lang) => {
   function draw() {
     const p = palette(stage)
     ctx.fillStyle = p.bg; ctx.fillRect(0, 0, W, H)
+    link.set({ tau: tau.v, gyroBiasDps: bias.v, gyroNoiseDps: gn.v, accNoiseDeg: an.v, profile: pr.v, showGyro: sg.v, showAcc: sa.v })
     const s: Series[] = []
     if (sa.v) s.push({ x: res.t, y: res.acc, color: p.mute, width: 1 })
     if (sg.v) s.push({ x: res.t, y: res.gyro, color: p.sky, width: 2 })
@@ -403,7 +410,7 @@ const fusion: Mount = (stage, side, _cfg, lang) => {
 }
 
 // ---------------------------------------------------------------- ara nokta görevi
-const mission: Mount = (stage, side, cfg, lang) => {
+const mission: Mount = (stage, side, cfg, lang, link) => {
   const t = T(lang), f1 = nf(lang, 1), f2 = nf(lang, 2)
   const { cv, ctx, W, H, pos } = canvas(stage, 640, 420)
   const c = controls(side)
@@ -427,6 +434,7 @@ const mission: Mount = (stage, side, cfg, lang) => {
     seed++
     prm = { ...MISSION_DEFAULTS, waypoints: wps.length ? wps : [{ x: 0, y: 0 }], landing: land.v as 'gps' | 'vision', gpsSigma: gps.v, wind: { x: wind.v, y: 0 }, cruise: cruise.v, posP: kp.v, seed }
     st = missionInit(prm); r = rng(seed); acc = 0
+    link.set({ waypoints: prm.waypoints.map((w) => ({ ...w })), landing: prm.landing, gpsSigma: prm.gpsSigma, wind: { ...prm.wind }, cruise: prm.cruise, posP: prm.posP, seed })
   }
   const onClick = (e: MouseEvent) => { const q = pos(e); wps.push({ x: (q.x - ox) / S, y: (oy - q.y) / S }); reset() }
   cv.addEventListener('click', onClick)
@@ -480,6 +488,6 @@ const mission: Mount = (stage, side, cfg, lang) => {
 
 export const DRONE_SIMS: Record<DroneSimId, Mount> = { twr, flight, alt, roll, mixer, fusion, mission }
 
-export function mountDroneSim(id: DroneSimId, stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang): () => void {
-  return DRONE_SIMS[id](stage, side, cfg, lang)
+export function mountDroneSim(id: DroneSimId, stage: HTMLElement, side: HTMLElement, cfg: Cfg, lang: Lang, link: SimLink = { data: {}, rev: 0, set() {} }): () => void {
+  return DRONE_SIMS[id](stage, side, cfg, lang, link)
 }

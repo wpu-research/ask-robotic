@@ -2,6 +2,9 @@
 export type DroneSimId = 'twr' | 'flight' | 'alt' | 'roll' | 'mixer' | 'fusion' | 'mission'
 interface Text { title: string; desc: string }
 
+/** 3B uçuş sahnesi olan simler (components/drone/scene3d/scenes.ts). Uçuş süresi tahmini yalnız 2B'dir. */
+export const DRONE_3D: readonly DroneSimId[] = ['twr', 'mixer', 'alt', 'roll', 'fusion', 'mission']
+
 export const DRONE_SIM_META: Record<DroneSimId, { tr: Text; en: Text }> = {
   twr: {
     tr: { title: 'İtki/ağırlık oranı ve askıda kalma gazı', desc: 'Toplam kütleyi, motor sayısını ve motor başına azami itkiyi (itki tablosundan, gf) gir. İtki/ağırlık oranını ve drone\'un askıda kalmak için ne kadar gaz vermesi gerektiğini gör. Eğri, PX4\'ün THR_MDL_FAC itki modelidir: 0 doğrusal, 1 karesel.' },
@@ -12,8 +15,8 @@ export const DRONE_SIM_META: Record<DroneSimId, { tr: Text; en: Text }> = {
     en: { title: 'Flight-time estimator: motor, propeller, battery', desc: 'Hover power from momentum theory: P = T^1.5 / √(2ρA), divided by the propeller figure of merit and the motor × ESC efficiency. A bigger battery is also heavier; the curve shows why adding capacity buys less and less time.' },
   },
   alt: {
-    tr: { title: 'İrtifa tutma PID ayarı (1B)', desc: '1,2 kg\'lık drone t = 0,5 s\'de 0\'dan 2 m\'ye çıkmak ister. Kontrolcü m·g ileri beslemesini bilir; bilmediği ek yükü kalıcı hata olarak görürsün. Önce yalnız P ve D ile oyna, sonra yük ekle ve hatayı I ile kapat. Aşım, yükselme ve oturma süresi (±%2) altta.' },
-    en: { title: 'Altitude-hold PID tuner (1D)', desc: 'A 1.2 kg drone wants to climb from 0 to 2 m at t = 0.5 s. The controller knows the m·g feedforward; a payload it does not know shows up as steady-state error. Play with P and D first, then add a payload and close the error with I. Overshoot, rise time and settling time (±2%) are shown below.' },
+    tr: { title: 'İrtifa tutma PID ayarı', desc: '1,2 kg\'lık drone t = 0,5 s\'de 0\'dan 2 m\'ye çıkmak ister. Kontrolcü m·g ileri beslemesini bilir; bilmediği ek yükü kalıcı hata olarak görürsün. Önce yalnız P ve D ile oyna, sonra yük ekle ve hatayı I ile kapat. Aşım, yükselme ve oturma süresi (±%2) altta.' },
+    en: { title: 'Altitude-hold PID tuner', desc: 'A 1.2 kg drone wants to climb from 0 to 2 m at t = 0.5 s. The controller knows the m·g feedforward; a payload it does not know shows up as steady-state error. Play with P and D first, then add a payload and close the error with I. Overshoot, rise time and settling time (±2%) are shown below.' },
   },
   roll: {
     tr: { title: 'Yönelim (roll) kontrolü: kaskad açı + hız PID, gürültüyle', desc: 'Dış döngü açı hatasını hız hedefine çevirir (P), iç döngü jiroskopla açısal hızı tutar (PID). Jiroskop gürültüsünü ve türev kazancını artır: D terimi gürültüyü büyütür, motorlara titreşim olarak gider. D süzgecinin kesim frekansıyla bunu dengele.' },
@@ -28,7 +31,7 @@ export const DRONE_SIM_META: Record<DroneSimId, { tr: Text; en: Text }> = {
     en: { title: 'Complementary filter: gyro + accelerometer', desc: 'The gyro is clean in the short term but its bias accumulates; the accelerometer is right in the long term but noisy. A complementary filter trusts the gyro at high and the accelerometer at low frequencies. Change τ and see that the steady error is bias × τ.' },
   },
   mission: {
-    tr: { title: 'Ara nokta görevi ve hassas iniş (2B, GPS benzeri)', desc: 'Kalkış → ara noktalar → iniş pedine iniş. Kontrolcü yalnız kestirilen konumu bilir: GPS hatası yavaşça gezinir. İnişte ArUco kamerası açılınca hata santimetrelere düşer. Haritaya tıklayarak ara nokta ekle (sonuncusu ped), rüzgâr ve GPS hatasını değiştir.' },
-    en: { title: 'Waypoint mission and precision landing (2D, GPS-like)', desc: 'Take-off → waypoints → landing on the pad. The controller only knows its estimated position: the GPS error wanders slowly. When the ArUco camera takes over for landing the error drops to centimetres. Click the map to add waypoints (the last one is the pad), change wind and GPS error.' },
+    tr: { title: 'Ara nokta görevi ve hassas iniş (3B uçuş + 2B harita)', desc: 'Kalkış → ara noktalar → iniş pedine iniş. Kontrolcü yalnız kestirilen konumu bilir: GPS hatası yavaşça gezinir. İnişte ArUco kamerası açılınca hata santimetrelere düşer. Haritaya tıklayarak ara nokta ekle (sonuncusu ped), rüzgâr ve GPS hatasını değiştir.' },
+    en: { title: 'Waypoint mission and precision landing (3D flight + 2D map)', desc: 'Take-off → waypoints → landing on the pad. The controller only knows its estimated position: the GPS error wanders slowly. When the ArUco camera takes over for landing the error drops to centimetres. Click the map to add waypoints (the last one is the pad), change wind and GPS error.' },
   },
 }
