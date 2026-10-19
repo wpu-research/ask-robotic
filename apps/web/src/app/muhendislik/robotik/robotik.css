@@ -140,3 +140,8 @@
 .rb-why.bad { color: var(--warn); }
 .rb-score { display: flex; gap: 12px; align-items: center; margin: 16px 0 0; font-weight: 800; font-family: var(--mono); }
 .rb-score button { font: inherit; font-family: var(--font-sans, inherit); font-weight: 700; font-size: .85rem; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); cursor: pointer; }
+
+/* Dokunmatik / dar ekran: kod kutusundaki Kopyala düğmesi 44 px. */
+@media (max-width: 760px), (pointer: coarse) {
+  .rb-code figcaption button { min-height: 44px; min-width: 44px; }
+}

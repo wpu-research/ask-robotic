@@ -765,3 +765,9 @@ html.v3-lock, html.v3-lock body { overflow: hidden; }
 .arena-stage.is-full .arena-3d { flex: 1; aspect-ratio: auto; max-height: none; }
 .arena-stage.is-full .arena-svg { max-height: calc(100vh - 24px); margin: auto; }
 .arena-3d { max-height: 70vh; }
+
+/* Dokunmatik / dar ekran: 3B görünüm çubuğu düğmeleri en az 44 px dokunma hedefi. */
+@media (max-width: 760px), (pointer: coarse) {
+  .v3-seg button { min-height: 44px; min-width: 44px; }
+  .v3-full { min-height: 44px; }
+}

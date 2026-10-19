@@ -4,6 +4,12 @@
 @media (max-width: 900px) { .gm-sim .rb-sim-body { grid-template-columns: minmax(0, 1fr); } }
 .gm-stage { display: grid; gap: 12px; min-width: 0; }
 .gm-svg { touch-action: manipulation; user-select: none; }
+/* Yoğun diyagram (ROS grafiği): dar ekranda doğal boyutta kalır, kutu içinde yatay kaydırılır. */
+.gm-pan { min-width: 0; }
+@media (max-width: 600px) {
+  .gm-pan { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; }
+  .rb-sim .gm-pan > .sim-canvas { width: 620px; max-width: none; touch-action: pan-x pan-y; }
+}
 .gm-hint { margin: 0; font-size: .84rem; color: var(--muted); overflow-wrap: anywhere; }
 .gm-small { font-size: .85rem; }
 .gm-facts dd { font-weight: 400; }
@@ -118,3 +124,11 @@
 .gm-3d-wrap { display: grid; gap: 6px; }
 .gm-3d { width: 100%; aspect-ratio: 4 / 3; max-height: 62vh; border-radius: 10px; border: 1px solid var(--border); overflow: hidden; background: var(--sim-bg); touch-action: none; }
 @media (max-width: 600px) { .gm-3d { aspect-ratio: 1 / 1; } }
+
+/* Dokunmatik / dar ekran: hızlı komut çipleri, sekmeler ve giriş kutuları en az 44 px. */
+@media (max-width: 760px), (pointer: coarse) {
+  .gm-chip, .gm-tabs button, .gm-input { min-height: 44px; }
+  .gm-chip { min-width: 44px; }
+  .gm-term-in { align-items: center; }
+  .gm-term-in input { min-height: 44px; }
+}

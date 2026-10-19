@@ -129,3 +129,8 @@
 @media (max-width: 640px) { .rb-chap { grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px; } .rb-chap meter { min-width: 60px; } }
 /* Yarışma sezonu satırındaki kurallar bağlantısı */
 .rb-season-link { display: flex; align-items: center; padding: 0 8px; font-size: .85rem; font-weight: 700; white-space: nowrap; }
+
+/* Dokunmatik / dar ekran: açılır başlıklar (Puanlama kuralları, öğretmen notları) 44 px dokunma hedefi. */
+@media (max-width: 760px), (pointer: coarse) {
+  .sk-rules summary, .rb-notes summary { min-height: 44px; display: flex; align-items: center; }
+}

@@ -56,3 +56,10 @@
   .hm-3d { height: 340px; }
 }
 @media (max-width: 480px) { .hm-sl { grid-template-columns: minmax(0, 1fr) 4em; } .hm-sl input { grid-column: 1 / -1; grid-row: 2; } }
+
+/* Dokunmatik / dar ekran: sekmeler, poz düğmeleri ve eklem kaydırıcıları parmakla rahat. */
+@media (max-width: 760px), (pointer: coarse) {
+  .hm-tabs button { min-height: 44px; }
+  .hm-poses .mk-btn.small, .hm-row .mk-btn.small { min-height: 44px; }
+  .hm-sl input[type='range'] { min-height: 32px; }
+}

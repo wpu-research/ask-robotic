@@ -5,6 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { runSkill, type SkillChallenge, type SkillResult } from '@/lib/mikro/beceri'
 import type { MikroProject } from '@/lib/mikro/types'
 import { errorText } from '@/lib/mikro/en'
+import { SEASON_BY_FIELD } from '@/lib/mikro/sezon'
 import { useI18n } from '@/i18n/client'
 
 interface Row { name: string; score: number; finishMs: number | null; attempts: number; rank: number; me: boolean }
@@ -52,11 +53,16 @@ export function SkillPanel({ challenge, project }: { challenge: SkillChallenge; 
   }
 
   const best = data?.best?.[challenge.id]
+  // Sezon alanında üst satır "Sanal beceri" değil, sezon olsun (alan başlığı zaten sezonun tam adı: "Sezon 1: Akıllı Şehir").
+  const season = SEASON_BY_FIELD[challenge.id]
+  const eyebrow = season
+    ? t('mikro.skill.seasonEyebrow', { n: season.number, s: challenge.timeLimitS })
+    : t('mikro.skill.eyebrow', { s: challenge.timeLimitS })
   return (
-    <section className="sk-panel" aria-label={t('mikro.skill.aria')} data-testid="skill-panel">
+    <section className="sk-panel" aria-label={season ? t('mikro.skill.seasonAria') : t('mikro.skill.aria')} data-testid="skill-panel">
       <div className="sk-head">
         <div>
-          <p className="sk-eyebrow">{t('mikro.skill.eyebrow', { s: challenge.timeLimitS })}</p>
+          <p className="sk-eyebrow" data-testid="skill-eyebrow">{eyebrow}</p>
           <h2>{en ? challenge.en.title : challenge.title}</h2>
           <p className="sk-sum">{en ? challenge.en.summary : challenge.summary}</p>
         </div>

@@ -14,7 +14,7 @@ import { I2C_DEVICES, adc10, codeToVolts, i2cBus, makeW1Slave, mcp3008Decode, mc
 import type { RpiSimId } from '@/lib/rpi/sims'
 import { SERVICE_UNIT, TERM_TASKS, exec, getNode, i2cdetectLines, initialState, prompt, saveFile } from '@/lib/rpi/terminal'
 import { PRESETS, centroid, inRange, openMask, steer, synthFrame, type HsvRange } from '@/lib/rpi/vision'
-import { Badge, Body, Btn, Check, Readout, Select, Slider, Tabs, nf, tx, wavePath, type Lang } from './ui'
+import { Badge, Body, Btn, Check, Readout, Select, Slider, Tabs, nf, tx, useNarrow, wavePath, type Lang } from './ui'
 
 type Cfg = Record<string, string>
 const hex2 = (n: number) => `0x${n.toString(16).padStart(2, '0')}`
@@ -162,7 +162,10 @@ function GpioSim({ lang }: { lang: Lang }) {
   const checks = DEVICES.map((d) => ({ d, c: checkWiring(d, pins[d]) }))
   const ok = (d: Device) => checkWiring(d, pins[d]).severity !== 'error'
   const usedBy = (phys: number) => DEVICES.find((d) => pins[d] === phys)
-  const W = 560, H = 360
+  // Dar ekranda çizim daralır (cihazlar başlığa yakın, adları altta): telefonda ölçek ~1 olur, yazılar okunur kalır.
+  const narrow = useNarrow()
+  const W = narrow ? 290 : 560, H = 360
+  const DX = narrow ? 200 : 300
   return (
     <Body
       stage={
@@ -177,25 +180,27 @@ function GpioSim({ lang }: { lang: Lang }) {
                 <g key={p.phys} onClick={() => setPins((s) => ({ ...s, [sel]: p.phys }))} style={{ cursor: 'pointer' }}>
                   <title>{`${p.phys}: ${p.kind === 'gpio' ? `GPIO${p.bcm}` : p.kind.toUpperCase()}${p.alt ? ` (${p.alt})` : ''}`}</title>
                   <circle cx={x} cy={y} r={dev ? 7 : 5.5} fill={dev ? 'var(--sim-bg)' : PIN_COLOR[p.kind]} stroke={PIN_COLOR[p.kind]} strokeWidth={dev ? 3 : 1} />
-                  <text x={col ? x + 12 : x - 12} y={y + 3.5} fontSize="9" textAnchor={col ? 'start' : 'end'} fill="var(--mute)">{p.kind === 'gpio' ? p.bcm : p.kind === 'gnd' ? 'G' : p.kind === '3v3' ? '3V3' : p.kind === '5v' ? '5V' : 'ID'}</text>
+                  <text x={col ? x + 12 : x - 12} y={y + 3.5} fontSize={narrow ? 11 : 9} textAnchor={col ? 'start' : 'end'} fill="var(--mute)">{p.kind === 'gpio' ? p.bcm : p.kind === 'gnd' ? 'G' : p.kind === '3v3' ? '3V3' : p.kind === '5v' ? '5V' : 'ID'}</text>
                 </g>
               )
             })}
             {DEVICES.map((d, i) => {
               const p = pins[d], col = (p - 1) % 2, row = Math.floor((p - 1) / 2)
               const px = 46 + col * 40, py = 26 + row * 16.4
-              const dx = 300, dy = 40 + i * 80
+              const dx = DX, dy = 40 + i * 80
               const sev = checkWiring(d, p).severity
               const stroke = sev === 'error' ? 'var(--red)' : sev === 'warn' ? 'var(--gold)' : 'var(--sim-a)'
               const live = ok(d)
               return (
                 <g key={d}>
-                  <path d={`M${px},${py} C${180},${py} ${220},${dy} ${dx - 30},${dy}`} fill="none" stroke={stroke} strokeWidth={d === sel ? 3 : 2} strokeDasharray={sev === 'error' ? '6 4' : undefined} />
-                  <text x={dx + 150} y={dy + 4} fontSize="12" fill="var(--ink)">{DEV_TEXT[d][lang]}</text>
+                  <path d={`M${px},${py} C${narrow ? 150 : 180},${py} ${narrow ? 165 : 220},${dy} ${dx - 30},${dy}`} fill="none" stroke={stroke} strokeWidth={d === sel ? 3 : 2} strokeDasharray={sev === 'error' ? '6 4' : undefined} />
+                  {narrow
+                    ? <text x={dx} y={dy + 32} fontSize="12" textAnchor="middle" fill="var(--ink)">{DEV_TEXT[d][lang]}</text>
+                    : <text x={dx + 150} y={dy + 4} fontSize="12" fill="var(--ink)">{DEV_TEXT[d][lang]}</text>}
                   {d === 'led' && <><circle cx={dx} cy={dy} r="16" fill={live && out.led > 0 ? 'var(--red)' : 'var(--sim-grid)'} opacity={live ? 0.25 + 0.75 * out.led : 1} stroke="var(--red)" /><text x={dx + 26} y={dy + 4} fontSize="11" fill="var(--mute)">{live ? `${Math.round(out.led * 100)}%` : '—'}</text></>}
-                  {d === 'button' && <g onPointerDown={() => setPressed(true)} onPointerUp={() => setPressed(false)} onPointerLeave={() => setPressed(false)} style={{ cursor: 'pointer' }}><rect x={dx - 18} y={dy - 14} width="36" height="28" rx="6" fill={pressed ? 'var(--sim-a)' : 'var(--sim-grid)'} stroke="var(--ink)" /><text x={dx} y={dy + 4} fontSize="10" textAnchor="middle" fill={pressed ? 'var(--sim-bg)' : 'var(--ink)'}>{t('BAS', 'PRESS')}</text></g>}
+                  {d === 'button' && <g onPointerDown={() => setPressed(true)} onPointerUp={() => setPressed(false)} onPointerLeave={() => setPressed(false)} style={{ cursor: 'pointer' }}><rect x={dx - 18} y={dy - 14} width="36" height="28" rx="6" fill={pressed ? 'var(--sim-a)' : 'var(--sim-grid)'} stroke="var(--ink)" /><text x={dx} y={dy + 4} fontSize={narrow ? 11 : 10} textAnchor="middle" fill={pressed ? 'var(--sim-bg)' : 'var(--ink)'}>{t('BAS', 'PRESS')}</text></g>}
                   {d === 'buzzer' && <><circle cx={dx} cy={dy} r="14" fill="var(--ink)" /><text x={dx + 24} y={dy + 4} fontSize="16" fill="var(--gold)">{live && out.buzzer ? '♪ ♫' : ''}</text></>}
-                  {d === 'servo' && <><rect x={dx - 20} y={dy - 12} width="40" height="24" rx="4" fill="var(--sky)" opacity=".3" stroke="var(--sky)" /><line x1={dx} y1={dy} x2={dx + 28 * Math.cos(((out.servo ?? 0) - 90) * Math.PI / 180)} y2={dy + 28 * Math.sin(((out.servo ?? 0) - 90) * Math.PI / 180)} stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" /><text x={dx + 32} y={dy + 22} fontSize="11" fill="var(--mute)">{live && out.servo !== null ? `${out.servo}°` : '—'}</text></>}
+                  {d === 'servo' && <><rect x={dx - 20} y={dy - 12} width="40" height="24" rx="4" fill="var(--sky)" opacity=".3" stroke="var(--sky)" /><line x1={dx} y1={dy} x2={dx + 28 * Math.cos(((out.servo ?? 0) - 90) * Math.PI / 180)} y2={dy + 28 * Math.sin(((out.servo ?? 0) - 90) * Math.PI / 180)} stroke="var(--ink)" strokeWidth="4" strokeLinecap="round" /><text x={narrow ? dx + 34 : dx + 32} y={narrow ? dy + 4 : dy + 22} fontSize="11" fill="var(--mute)">{live && out.servo !== null ? `${out.servo}°` : '—'}</text></>}
                 </g>
               )
             })}
@@ -400,19 +405,25 @@ function MotorSim({ lang }: { lang: Lang }) {
     return () => cancelAnimationFrame(raf)
   }, [])
   const W = 560, H = 260, maxR = 200
+  // Dar ekranda çizim ~0,6 ölçeğe iner: eksen yazıları büyütülür, sola taşan sayılar için viewBox biraz sola açılır.
+  const narrow = useNarrow()
+  const fs = (n: number) => (narrow ? Math.round(n * 2.2) : n)
+  const X0 = narrow ? -26 : 0
+  // A/B kanal adları sağ uçta (sol uçta -200 eksen yazısıyla çakışmasın).
+  const XR = narrow ? 30 : 16
   const y = (r: number) => 110 - (r / maxR) * 95
   const poly = view.hist.map((r, i) => `${40 + (i / 240) * 500},${y(r)}`).join(' ')
   const A = view.ab.map((s) => (s >> 1) & 1), B = view.ab.map((s) => s & 1)
   return (
     <Body
       stage={
-        <svg viewBox={`0 0 ${W} ${H}`} className="sim-canvas gm-svg" role="img" aria-label={t('Motor hızı ve enkoder kanalları', 'Motor speed and encoder channels')} data-testid="rpi-motor-svg">
-          {[-200, -100, 0, 100, 200].map((r) => <g key={r}><line x1="40" x2="540" y1={y(r)} y2={y(r)} stroke="var(--sim-grid)" /><text x="34" y={y(r) + 4} fontSize="10" textAnchor="end" fill="var(--mute)">{r}</text></g>)}
+        <svg viewBox={`${X0} 0 ${W - X0 + XR} ${H}`} className="sim-canvas gm-svg" role="img" aria-label={t('Motor hızı ve enkoder kanalları', 'Motor speed and encoder channels')} data-testid="rpi-motor-svg">
+          {[-200, -100, 0, 100, 200].map((r) => <g key={r}><line x1="40" x2="540" y1={y(r)} y2={y(r)} stroke="var(--sim-grid)" /><text x="34" y={y(r) + (narrow ? 6 : 4)} fontSize={fs(10)} textAnchor="end" fill="var(--mute)">{r}</text></g>)}
           {pi && <line x1="40" x2="540" y1={y(target)} y2={y(target)} stroke="var(--gold)" strokeDasharray="5 4" />}
           <polyline points={poly} fill="none" stroke="var(--sim-a)" strokeWidth="2.5" />
-          <text x="44" y="14" fontSize="11" fill="var(--mute)">rpm</text>
-          <text x="10" y="196" fontSize="11" fill="var(--ink)">A</text><path d={wavePath(A, 40, 500, 184, 200)} fill="none" stroke="var(--sky)" strokeWidth="2" />
-          <text x="10" y="236" fontSize="11" fill="var(--ink)">B</text><path d={wavePath(B, 40, 500, 224, 240)} fill="none" stroke="var(--red)" strokeWidth="2" />
+          <text x="44" y={narrow ? 20 : 14} fontSize={fs(11)} fill="var(--mute)">rpm</text>
+          <text x="546" y="198" fontSize={fs(11)} fill="var(--ink)">A</text><path d={wavePath(A, 40, 500, 184, 200)} fill="none" stroke="var(--sky)" strokeWidth="2" />
+          <text x="546" y="238" fontSize={fs(11)} fill="var(--ink)">B</text><path d={wavePath(B, 40, 500, 224, 240)} fill="none" stroke="var(--red)" strokeWidth="2" />
         </svg>
       }
       side={
@@ -481,6 +492,9 @@ function RobotSim({ lang }: { lang: Lang }) {
     keys.current[m[0]] = down ? m[1] : 0
   }
   const S = 110, W = 560, H = 360, cx = W / 2, cy = H / 2
+  // Dar ekranda saha ~0,55 ölçeğe iner: yazılar iki katına çıkar, iki etiket alt alta.
+  const narrow = useNarrow()
+  const fs = (n: number) => (narrow ? n * 2 : n)
   const P = (x: number, y: number) => `${cx + x * S},${cy - y * S}`
   const robot = (p: Pose, color: string) => (
     <g transform={`translate(${cx + p.x * S},${cy - p.y * S}) rotate(${(-p.th * 180) / Math.PI})`}>
@@ -503,8 +517,8 @@ function RobotSim({ lang }: { lang: Lang }) {
             <polyline points={view.tt.map(([x, y]) => P(x, y)).join(' ')} fill="none" stroke="var(--green)" strokeWidth="2" />
             <polyline points={view.ot.map(([x, y]) => P(x, y)).join(' ')} fill="none" stroke="var(--gold)" strokeWidth="2" strokeDasharray="5 3" />
             {robot(view.odom, 'var(--gold)')}{robot(view.truth, 'var(--green)')}
-            <text x="10" y="18" fontSize="11" fill="var(--green)">{t('gerçek', 'true')}</text><text x="60" y="18" fontSize="11" fill="var(--gold)">{t('odometri', 'odometry')}</text>
-            <text x={W - 10} y={H - 8} fontSize="10" textAnchor="end" fill="var(--mute)">1 {t('kare', 'square')} = 1 m</text>
+            <text x="10" y={narrow ? 24 : 18} fontSize={fs(11)} fill="var(--green)">{t('gerçek', 'true')}</text><text x={narrow ? 10 : 60} y={narrow ? 54 : 18} fontSize={fs(11)} fill="var(--gold)">{t('odometri', 'odometry')}</text>
+            <text x={W - 10} y={H - 8} fontSize={fs(10)} textAnchor="end" fill="var(--mute)">1 {t('kare', 'square')} = 1 m</text>
           </svg>
         </div>
       }
@@ -621,6 +635,8 @@ function RosSim({ lang }: { lang: Lang }) {
     <Body
       stage={
         <>
+          {/* Dar ekranda grafik küçülüp okunmaz olmasın: doğal boyutta kalır, kutu içinde yatay kaydırılır. */}
+          <div className="gm-pan">
           <svg viewBox={`0 0 ${W} ${H}`} className="sim-canvas gm-svg" role="img" aria-label="rqt_graph" data-testid="rpi-ros-svg">
             <defs><marker id="gm-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--mute)" /></marker></defs>
             {g.topics.map((tp) => {
@@ -642,6 +658,7 @@ function RosSim({ lang }: { lang: Lang }) {
               </g>
             ))}
           </svg>
+          </div>
           <Readout log>{'$ ros2 topic list\n'}{topicList(active).join('\n')}{'\n\n'}{g.issues.length ? g.issues.map((i) => `! ${issueText(i.kind, i.topic)}`).join('\n') : t('Sorun yok.', 'No problems.')}</Readout>
         </>
       }

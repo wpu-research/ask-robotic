@@ -1,11 +1,25 @@
 'use client'
 // Gömülü kurs simülasyonlarının ortak denetimleri: ESOF 323 .rb-sim görünümünü (robotik.css) kullanır. SVG çizimleri
 // renkleri .rb-sim üzerindeki --sim-*, --ink, --mute, --line, --gold, --red, --green, --sky değişkenlerinden alır.
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 
 export type Lang = 'tr' | 'en'
 export const tx = (lang: Lang) => (tr: string, en: string) => (lang === 'en' ? en : tr)
 export const nf = (lang: Lang, d = 1) => (v: number) => Number.isFinite(v) ? v.toLocaleString(lang === 'en' ? 'en-GB' : 'tr-TR', { minimumFractionDigits: d, maximumFractionDigits: d }) : '∞'
+
+/** Dar ekran (telefon) mı? SVG çizimleri dar ekranda dikey düzene geçip yazıyı büyütür; sunucuda ve ilk çizimde `false`. */
+export function useNarrow(maxPx = 520): boolean {
+  const [narrow, setNarrow] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia?.(`(max-width: ${maxPx}px)`)
+    if (!mq) return
+    const on = () => setNarrow(mq.matches)
+    on()
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [maxPx])
+  return narrow
+}
 
 export function Body({ stage, side }: { stage: ReactNode; side: ReactNode }) {
   return (

@@ -13,7 +13,7 @@
 .mkb-ws .blocklyToolboxCategoryLabel { margin: 0 !important; padding: 0 !important; font-size: 11.5px; font-weight: 800; color: #575e75; line-height: 1.1; text-align: center; }
 .mkb-ws .blocklyToolboxCategory:has([class*='mkb-ic-']).blocklyToolboxSelected { background: color-mix(in srgb, var(--mkb-c, #4c97ff) 16%, #fff) !important; box-shadow: inset 0 0 0 2px var(--mkb-c, #4c97ff); }
 .mkb-ws .blocklyToolboxSelected .blocklyToolboxCategoryLabel { color: #1f2540 !important; }
-@media (max-width: 520px) { .mkb-ws .blocklyToolbox { width: 64px; } .mkb-ws [class*='mkb-ic-'] { width: 34px; height: 34px; } .mkb-ws .blocklyToolboxCategoryLabel { font-size: 10.5px; } }
+@media (max-width: 520px) { .mkb-ws .blocklyToolbox { width: 68px; } .mkb-ws [class*='mkb-ic-'] { width: 34px; height: 34px; } .mkb-ws .blocklyToolboxCategoryLabel { font-size: 11px; letter-spacing: -.01em; } }
 
 /* Yetim yığın soluk, çalışan başlık parlar, hata kırmızı */
 .mkb-ws .mkb-orphan { opacity: .62; }

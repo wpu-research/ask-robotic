@@ -50,6 +50,7 @@
 
 /* 3B uçuş sahnesi (Drone3D): simülasyon kutusunun üstünde; 2B grafik ve denetimler altında eşlik eden panel. */
 .dr-3d { margin: 0 0 16px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+.dr-3d-stage { position: relative; }
 .dr-3d-view { position: relative; width: 100%; aspect-ratio: 16 / 9; min-height: 240px; max-height: 70vh; background: #dfe9f3; overflow: hidden; }
 .dr-3d-view canvas { position: absolute; inset: 0; }
 .dr-3d-msg { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; color: #334155; font-size: .9rem; }
@@ -63,8 +64,9 @@
 .dr-3d-sel select { min-height: 44px; }
 .dr-3d-hint { color: var(--muted); font-size: .78rem; margin-left: auto; }
 @media (max-width: 600px) {
-  .dr-3d-view { aspect-ratio: 1 / 1.05; }
-  .dr-3d-hud { font-size: .58rem; line-height: 1.4; padding: 3px 6px; left: 6px; top: 6px; }
+  .dr-3d-view { aspect-ratio: 4 / 3.4; min-height: 0; }
+  /* Dar ekranda gösterge tuvalin altında tam genişlik şerit: drone ad etiketleri ve sahne açık kalır. */
+  .dr-3d-hud { position: static; width: auto; max-width: none; border-radius: 0; padding: 6px 10px; font-size: .72rem; line-height: 1.45; background: #0f172a; }
   .dr-3d-hint { display: none; }
   .dr-seg button { padding: 0 9px; }
 }

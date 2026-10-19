@@ -12,7 +12,12 @@ export function SeasonField({ scene, profile, en, label }: { scene: RobotScene; 
   const R = ROBOT_PROFILES[profile].radius * CM
   const { x, y, theta } = scene.pose
   const deg = (-theta * 180) / Math.PI
+  // Alan dar bir kutuda küçülünce bölge adları okunmaz olur: adların yerine numara, altında numaralı ad listesi (kap sorgusu seçer).
+  const named = scene.zones.filter((z) => z.label)
+  const num = (id: string) => named.findIndex((z) => z.id === id) + 1
+  const zoneName = (l: string) => (en ? ZONE_EN[l] ?? l : l)
   return (
+    <div className="sz-fieldbox">
     <svg viewBox={`-4 -4 ${W + 8} ${H + 8}`} role="img" aria-label={label} className="sz-field" data-testid="season-field">
       <rect x={0} y={0} width={W} height={H} className="rb-floor" />
       {scene.patches.map((q, i) => (
@@ -21,7 +26,8 @@ export function SeasonField({ scene, profile, en, label }: { scene: RobotScene; 
       {scene.zones.map((z) => (
         <g key={z.id} data-zone={z.id}>
           <circle cx={X(z.x)} cy={Y(z.y)} r={z.r * CM} fill={ZONE_CSS[z.kind]} fillOpacity={0.14} stroke={ZONE_CSS[z.kind]} strokeDasharray="4 3" />
-          {z.label && <text x={X(z.x)} y={Y(z.y) + 2} textAnchor="middle" className="rb-ztext">{en ? ZONE_EN[z.label] ?? z.label : z.label}</text>}
+          {z.label && <text x={X(z.x)} y={Y(z.y) + 2} textAnchor="middle" className="rb-ztext">{zoneName(z.label)}</text>}
+          {z.label && <text x={X(z.x)} y={Y(z.y) + 3} textAnchor="middle" className="rb-znum" fill={ZONE_CSS[z.kind]} aria-hidden="true">{num(z.id)}</text>}
         </g>
       ))}
       {scene.walls.map(([x1, y1, x2, y2], i) => <line key={i} x1={X(x1)} y1={Y(y1)} x2={X(x2)} y2={Y(y2)} className="rb-wall" />)}
@@ -34,5 +40,11 @@ export function SeasonField({ scene, profile, en, label }: { scene: RobotScene; 
         <path d={`M${R * 0.9} 0 L${-R * 0.3} ${-R * 0.5} L${-R * 0.3} ${R * 0.5} Z`} fill={ZONE_CSS.start} />
       </g>
     </svg>
+    {named.length > 0 && (
+      <ol className="sz-znames" aria-hidden="true">
+        {named.map((z) => <li key={z.id}><b style={{ color: ZONE_CSS[z.kind] }}>{num(z.id)}</b> {zoneName(z.label!)}</li>)}
+      </ol>
+    )}
+    </div>
   )
 }

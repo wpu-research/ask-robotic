@@ -121,7 +121,7 @@
 .shb-ws .blocklyFlyoutLabelText, .shb-ws .blocklyFlyoutLabel text { fill: #3a4258 !important; font-weight: 800; }
 .blocklyDropDownDiv, .blocklyWidgetDiv { z-index: 1000; }
 .shb-ws .blocklyHtmlInput { font-size: 16px; font-weight: 700; }
-@media (max-width: 520px) { .shb-ws .blocklyToolbox { width: 68px; } .shb-ws [class*='shb-ic-'] { width: 34px; height: 34px; } .shb-ws .blocklyToolboxCategoryLabel { font-size: 10.5px; } }
+@media (max-width: 520px) { .shb-ws .blocklyToolbox { width: 68px; } .shb-ws [class*='shb-ic-'] { width: 34px; height: 34px; } .shb-ws .blocklyToolboxCategoryLabel { font-size: 11px; letter-spacing: -.01em; } }
 
 /* Hedef kartı */
 .sh-goalcard { position: absolute; top: 10px; right: 14px; z-index: 30; width: min(340px, calc(100% - 100px)); background: var(--surface); border: 2px solid var(--primary); border-radius: 16px; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; overflow: hidden; }

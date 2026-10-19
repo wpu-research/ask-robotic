@@ -31,6 +31,8 @@ export const mikro: typeof Tr = {
   skill: {
     aria: 'Skill challenge',
     eyebrow: 'Skill challenge · {s} s',
+    seasonEyebrow: 'Competition season {n} · {s} s',
+    seasonAria: 'Competition season field',
     best: 'Your best',
     rules: 'Scoring rules',
     rulesNote: 'Your score comes from running the program from the start under fixed conditions; when you send it, the server does the same calculation again.',

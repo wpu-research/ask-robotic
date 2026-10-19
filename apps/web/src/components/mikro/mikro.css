@@ -166,3 +166,11 @@ i.mk-bar > i { display: block; height: 100%; background: #6366f1; }
 /* Sayfa kabı: geniş ekranda pencere yüksekliğini doldurur, dar ekranda içeriğe göre uzar. */
 .mk-page-body { height: max(680px, calc(100dvh - 230px)); }
 @media (max-width: 900px) { .mk-page-body { height: auto; } }
+
+/* Dokunmatik / dar ekran: editör düğmeleri, sekmeler ve çipler en az 44 px. */
+@media (max-width: 760px), (pointer: coarse) {
+  .mk-btn, .mk-btn.small { min-height: 44px; }
+  .mk-tabs [role='tab'] { min-height: 44px; }
+  .mk-chip { min-height: 44px; }
+  .mk-name { min-height: 44px; }
+}

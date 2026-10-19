@@ -1,5 +1,5 @@
 /* Robotunu Tasarla: palet, tezgâh, özellikler. Parça renkleri her iki temada aynı (gerçek parça boyası gibi). */
-.rt { display: grid; gap: 14px; min-width: 0; }
+.rt { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
 .rt-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
 .rt-bar label { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; font-size: .9rem; }
 .rt-bar input, .rt-bar select, .rt-targets select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); min-height: 36px; max-width: 100%; }
@@ -65,7 +65,8 @@
 .rt-try h2 { margin: 0; font-size: 1.15rem; }
 .rt-try > p { margin: 0; max-width: 75ch; }
 .rt-targets { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
-.rt-targets label { display: inline-flex; gap: 6px; align-items: center; font-weight: 600; }
+.rt-targets label { display: inline-flex; flex-wrap: wrap; gap: 6px; align-items: center; font-weight: 600; max-width: 100%; min-width: 0; }
+.rt-targets select { min-width: 0; }
 
 @media (max-width: 1180px) { .rt-main { grid-template-columns: 220px minmax(0, 1fr); } .rt-props { grid-column: 1 / -1; } }
 @media (max-width: 760px) {
@@ -76,4 +77,11 @@
   .rt-props { order: 3; }
   .rt-3d { height: 300px; }
   .rt-mode { margin-left: 0; }
+}
+
+/* Dokunmatik / dar ekran: ad, şasi, şablon, kip, araç ve dosya düğmeleri en az 44 px. */
+@media (max-width: 760px), (pointer: coarse) {
+  .rt-bar input, .rt-bar select, .rt-targets select, .rt-mode button, .rt-tool { min-height: 44px; }
+  .rt-sel .mk-btn.small, .rt-files .mk-btn.small { min-height: 44px; }
+  .rt-stage-bar label { min-height: 44px; display: inline-flex; align-items: center; gap: 6px; }
 }

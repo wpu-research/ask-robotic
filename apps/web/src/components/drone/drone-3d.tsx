@@ -57,10 +57,13 @@ export function Drone3D({ id, link, lang, cfg }: { id: string; link: SimLink; la
 
   return (
     <div className="dr-3d" data-testid={`drone-3d-${id}`} data-gl={gl}>
-      <div className="dr-3d-view" ref={host}>
-        {gl === 'wait' && <p className="dr-3d-msg">{t('3B sahne yükleniyor…', 'Loading the 3D scene…')}</p>}
-        {gl === 'none' && <p className="dr-3d-msg">{t('3B görünüm için WebGL gerekli; aşağıdaki 2B grafikler yine de çalışır.', '3D view needs WebGL; the 2D charts below still work.')}</p>}
-        {gl === 'ok' && <pre className="dr-3d-hud" ref={hudRef} aria-live="off" />}
+      {/* Gösterge tuvalin kardeşi: geniş ekranda tuvalin üstüne biner, dar ekranda tuvalin altına iner (drone etiketleri örtülmesin). */}
+      <div className="dr-3d-stage">
+        <div className="dr-3d-view" ref={host}>
+          {gl === 'wait' && <p className="dr-3d-msg">{t('3B sahne yükleniyor…', 'Loading the 3D scene…')}</p>}
+          {gl === 'none' && <p className="dr-3d-msg">{t('3B görünüm için WebGL gerekli; aşağıdaki 2B grafikler yine de çalışır.', '3D view needs WebGL; the 2D charts below still work.')}</p>}
+        </div>
+        {gl === 'ok' && <pre className="dr-3d-hud" ref={hudRef} aria-live="off" data-testid="drone-3d-hud" />}
       </div>
       {gl === 'ok' && scene && (
         <div className="dr-3d-bar">

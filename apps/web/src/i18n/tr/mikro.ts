@@ -30,6 +30,8 @@ export const mikro = {
   skill: {
     aria: 'Sanal beceri',
     eyebrow: 'Sanal beceri · {s} sn',
+    seasonEyebrow: 'Yarışma sezonu {n} · {s} sn',
+    seasonAria: 'Yarışma sezonu alanı',
     best: 'En iyin',
     rules: 'Puanlama kuralları',
     rulesNote: 'Puan, programın sabit koşullarda baştan çalıştırılmasıyla hesaplanır; gönderdiğinde sunucu aynı hesabı yeniden yapar.',
