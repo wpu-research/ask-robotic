@@ -63,6 +63,8 @@ export const lab = {
     aria: 'Circuit canvas. Drag parts to move them and drag from pins to draw wires. Move the selected part with the arrow keys, rotate with R, delete with Delete.',
     noWire: 'You can’t draw wires while the simulation is running. Press Stop first.',
     noDelete: 'You can’t delete while the simulation is running. Press Stop first.',
+    trash: 'Drag here to delete',
+    trashDrop: 'Release to delete the part',
     light: 'light {p}%',
     pct: '{p}%',
     wire: 'Wire from {a} {ap} to {b} {bp}',

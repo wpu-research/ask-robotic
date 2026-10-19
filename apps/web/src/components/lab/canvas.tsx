@@ -58,6 +58,10 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
   viewRef.current = view
   const [draft, setDraft] = useState<{ from: PinRef; x: number; y: number; target: PinRef | null } | null>(null)
   const [hoverPin, setHoverPin] = useState<PinRef | null>(null)
+  // Parça sürüklenirken çöp kutusu görünür; üstüne bırakılan parça silinir.
+  const [dragId, setDragId] = useState<string | null>(null)
+  const [overTrash, setOverTrash] = useState(false)
+  const trashRef = useRef<HTMLDivElement>(null)
   const gesture = useRef<Gesture | null>(null)
   const pointers = useRef(new Map<number, Pt>())
   const circuitRef = useRef(circuit)
@@ -125,6 +129,27 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     return el ? { part: el.dataset.pinPart!, pin: el.dataset.pinName! } : null
   }
 
+  const isOverTrash = (cx: number, cy: number) => {
+    const r = trashRef.current?.getBoundingClientRect()
+    return !!r && cx >= r.left && cx <= r.right && cy >= r.top && cy <= r.bottom
+  }
+
+  // Mıknatıs: kablo ucu bir pine yaklaşınca (≈20 px) en yakın pine yapışır; küçük ekranda ve dokunmatikte tam isabet gerekmez.
+  const nearestPin = (w: Pt, exclude: PinRef): PinRef | null => {
+    const maxD = 20 / viewRef.current.k
+    let best: PinRef | null = null, bestD = maxD
+    for (const p of circuitRef.current.parts) {
+      for (const pin of Object.keys(PART_DEFS[p.type].pins)) {
+        if (p.id === exclude.part && pin === exclude.pin) continue
+        const pt = pinWorld(p, pin)
+        if (!pt) continue
+        const d = Math.hypot(pt.x - w.x, pt.y - w.y)
+        if (d < bestD) { bestD = d; best = { part: p.id, pin } }
+      }
+    }
+    return best
+  }
+
   const onPointerDown = (e: React.PointerEvent<SVGSVGElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return
     const svg = svgRef.current!
@@ -190,10 +215,11 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
       const w = toWorld(e.clientX, e.clientY)!
       const nx = snap(w.x - g.offX), ny = snap(w.y - g.offY)
       const cur = circuitRef.current.parts.find((p) => p.id === g.id)
-      if (cur && (cur.x !== nx || cur.y !== ny)) { g.moved = true; onChange(movePart(circuitRef.current, g.id, nx, ny)) }
+      if (cur && (cur.x !== nx || cur.y !== ny)) { g.moved = true; setDragId(g.id); onChange(movePart(circuitRef.current, g.id, nx, ny)) }
+      if (g.moved) setOverTrash(isOverTrash(e.clientX, e.clientY))
     } else if (g.kind === 'wire') {
       const w = toWorld(e.clientX, e.clientY)!
-      setDraft({ from: g.from, x: w.x, y: w.y, target: pinAt(e.clientX, e.clientY) })
+      setDraft({ from: g.from, x: w.x, y: w.y, target: pinAt(e.clientX, e.clientY) ?? nearestPin(w, g.from) })
     }
   }
 
@@ -206,7 +232,8 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
     if (g.kind === 'wire') {
       setDraft(null)
       if (cancel) return
-      const to = pinAt(e.clientX, e.clientY)
+      const w = toWorld(e.clientX, e.clientY)
+      const to = pinAt(e.clientX, e.clientY) ?? (w ? nearestPin(w, g.from) : null)
       if (!to) return
       const chk = canAddWire(circuitRef.current, g.from, to)
       if (!chk.ok) { if (to.part !== g.from.part || to.pin !== g.from.pin) onNotice?.(tRef.current(`lab.canvas.wireErr.${chk.code}` as MessageKey)); return }
@@ -214,6 +241,10 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
       if (r) { onChange(r.circuit); onSelect({ kind: 'wire', id: r.wire.id }) }
     } else if (g.kind === 'press') {
       onPress(g.id, false)
+    } else if (g.kind === 'move') {
+      const drop = !cancel && g.moved && !editLocked && !lockedIds.has(g.id) && isOverTrash(e.clientX, e.clientY)
+      setDragId(null); setOverTrash(false)
+      if (drop) { onChange(removePart(circuitRef.current, g.id)); onSelect(null) }
     }
   }
 
@@ -359,7 +390,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
                   onPointerEnter={p.type === 'uno' ? () => setHoverPin({ part: p.id, pin }) : undefined}
                   onPointerLeave={p.type === 'uno' ? () => setHoverPin((h) => (h && h.part === p.id && h.pin === pin ? null : h)) : undefined}
                 >
-                  <circle r={9} fill="transparent" className="lab-pin-hit" />
+                  <circle r={12} fill="transparent" className="lab-pin-hit" />
                   <circle r={3.6} className="lab-pin-dot" />
                   {pl && <text x={pl.x - pt.x} y={pl.y - pt.y} textAnchor={pl.anchor} className="lab-pin-label" style={{ fontSize: labelFs }} pointerEvents="none">{pin}</text>}
                 </g>
@@ -401,6 +432,12 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
           })()}
         </g>
       </svg>
+      {dragId && (
+        <div ref={trashRef} className={`lab-trash${overTrash ? ' over' : ''}`} data-testid="lab-trash" aria-hidden="true">
+          <span className="lab-trash-ico">🗑</span>
+          <span>{t(overTrash ? 'lab.canvas.trashDrop' : 'lab.canvas.trash')}</span>
+        </div>
+      )}
       <div className="lab-zoom" role="group" aria-label={t('lab.canvas.zoom')}>
         <button type="button" className="lab-zbtn" onClick={() => zoomAt(1.25)} aria-label={t('lab.canvas.zoomIn')}>+</button>
         <button type="button" className="lab-zbtn" onClick={() => zoomAt(0.8)} aria-label={t('lab.canvas.zoomOut')}>−</button>

@@ -64,6 +64,8 @@ export const lab = {
     aria: 'Devre tuvali. Parçaları sürükleyip taşı, pinlerden kablo çek. Seçili parçayı ok tuşlarıyla taşı, R ile döndür, Delete ile sil.',
     noWire: 'Benzetim çalışırken kablo çizemezsin. Önce Dur\'a bas.',
     noDelete: 'Benzetim çalışırken silemezsin. Önce Dur\'a bas.',
+    trash: 'Silmek için buraya sürükle',
+    trashDrop: 'Bırak, parça silinsin',
     light: 'ışık %{p}',
     pct: '%{p}',
     wire: 'Kablo: {a} {ap} ile {b} {bp} arası',

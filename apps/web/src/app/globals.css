@@ -575,6 +575,11 @@ a.mcard:hover { text-decoration: none; transform: translateY(-2px); box-shadow: 
 .lab-pin.wired .lab-pin-dot { fill: #22c55e; stroke: #166534; }
 .lab-pin:hover .lab-pin-dot, .lab-pin.target .lab-pin-dot, .lab-pin.from .lab-pin-dot { r: 6.5; fill: var(--primary); stroke: #fff; stroke-width: 1.5; }
 .lab-pin-label { font-size: 9px; font-weight: 700; fill: var(--muted); paint-order: stroke; stroke: var(--surface); stroke-width: 2.5px; }
+.lab-trash { position: absolute; right: 10px; bottom: 10px; display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-radius: 14px; border: 2px dashed var(--border); background: var(--surface); color: var(--muted); font-size: 13px; font-weight: 700; pointer-events: none; box-shadow: var(--shadow); }
+.lab-trash-ico { font-size: 22px; }
+.lab-trash.over { border-style: solid; border-color: #dc2626; background: #fee2e2; color: #991b1b; transform: scale(1.06); }
+:root[data-theme='dark'] .lab-trash.over { background: #450a0a; color: #fecaca; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme='light']) .lab-trash.over { background: #450a0a; color: #fecaca; } }
 .lab-zoom { position: absolute; right: 8px; top: 8px; display: flex; flex-direction: column; gap: 4px; }
 .lab-zbtn { width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-size: 1.1rem; font-weight: 800; line-height: 1; cursor: pointer; padding: 0; box-shadow: var(--shadow); }
 .lab-zbtn:hover { background: var(--primary-soft); }
