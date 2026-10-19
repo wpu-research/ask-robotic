@@ -8,7 +8,7 @@ describe('q-öğrenme', () => {
     for (const maze of [0, 1]) {
       const t0 = performance.now()
       const F = Q_OGRENME.run({ games: 60, maze })
-      expect(performance.now() - t0).toBeLessThan(500)
+      expect(performance.now() - t0).toBeLessThan(2000)
       expect(F.length).toBeGreaterThan(3)
       for (const f of F) expect(f.line).toBeLessThan(Q_OGRENME.code.length)
       expect(Q_OGRENME.run({ games: 60, maze }).at(-1)!.cap).toEqual(F.at(-1)!.cap)

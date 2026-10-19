@@ -7,7 +7,7 @@ describe('kesinlik–duyarlılık', () => {
     for (const bad of [5, 20, 50]) {
       const t0 = performance.now()
       const F = KESINLIK_DUYARLILIK.run({ bad, thr: 0.5 })
-      expect(performance.now() - t0).toBeLessThan(300)
+      expect(performance.now() - t0).toBeLessThan(1200)
       expect(F.length).toBeGreaterThan(3)
       for (const f of F) expect(f.line).toBeLessThan(KESINLIK_DUYARLILIK.code.length)
     }

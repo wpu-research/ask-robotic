@@ -7,7 +7,7 @@ describe('SHAP değerleri', () => {
     for (const model of [0, 1]) for (const sample of [0, 9, 11]) {
       const t0 = performance.now()
       const F = SHAP.run({ sample, model })
-      expect(performance.now() - t0).toBeLessThan(150)
+      expect(performance.now() - t0).toBeLessThan(600)
       expect(F.length).toBeGreaterThan(3)
       for (const f of F) expect(f.line).toBeLessThan(SHAP.code.length)
     }

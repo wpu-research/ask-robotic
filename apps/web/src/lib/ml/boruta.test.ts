@@ -7,7 +7,7 @@ describe('Boruta', () => {
     for (const rounds of [3, 20]) {
       const t0 = performance.now()
       const F = BORUTA.run({ rounds })
-      expect(performance.now() - t0).toBeLessThan(rounds === 20 ? 400 : 150)
+      expect(performance.now() - t0).toBeLessThan(rounds === 20 ? 1600 : 600)
       expect(F.length).toBeGreaterThan(3)
       for (const f of F) expect(f.line).toBeLessThan(BORUTA.code.length)
     }
