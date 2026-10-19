@@ -4,6 +4,7 @@
 import dynamic from 'next/dynamic'
 import type { Device } from '@/lib/mikro/device'
 import { FLOOR_COLORS, type DriveBase, type LightColor } from '@/lib/mikro/robot'
+import { CHASSIS, PARTS, PITCH, cellXY, deriveDesign } from '@/lib/mikro/tasarim'
 import { useFullView, useView3D, ViewBar } from '../three/view-bar'
 import { FLOOR_EN, PROFILE_EN, SCENE_EN, ZONE_EN } from '@/lib/mikro/en'
 import { useI18n } from '@/i18n/client'
@@ -24,7 +25,7 @@ export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: 
   return (
     <figure className={`rb-arena${full ? ' rb-full' : ''}`} data-testid="robot-arena" data-tick={tick} data-view={v.is3d ? '3d' : '2d'}>
       <ViewBar v={v} full={full} onFull={setFull} />
-      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} en={en} label={t('mikro.arena.topView', { scene: en ? SCENE_EN[robot.scene.id] ?? robot.scene.title : robot.scene.title, robot: en ? PROFILE_EN[robot.profile.id].title : robot.profile.title })} />}
+      {v.is3d ? <RobotArena3D robot={robot} device={device} mode={v.mode} /> : <TopView robot={robot} en={en} label={t('mikro.arena.topView', { scene: en ? SCENE_EN[robot.scene.id] ?? robot.scene.title : robot.scene.title, robot: en && robot.profile.id !== 'ozel' ? PROFILE_EN[robot.profile.id].title : robot.profile.title })} />}
       <figcaption className="rb-readout" aria-live="off">
         {dist != null && <span>{t('mikro.arena.distance')} <b>{dist.toFixed(0)} cm</b></span>}
         {robot.has('color') && <span>{t('mikro.arena.color')} <b>{en ? FLOOR_EN[robot.color] : FLOOR_COLORS[robot.color].label}</b></span>}
@@ -70,8 +71,10 @@ function TopView({ robot, en, label }: { robot: DriveBase; en: boolean; label: s
         ))}
         <path d={trail} className="rb-trail" />
         <g transform={`translate(${X(robot.x)} ${Y(robot.y)}) rotate(${deg})`} data-testid="robot-body">
-          {dist != null && <line x1={R * 0.8} y1={0} x2={ray} y2={0} className="rb-ray" />}
-          {p.id === 'kiskac' ? (
+          {dist != null && (p.mounts?.distance
+            ? <line x1={p.mounts.distance.x * CM} y1={-p.mounts.distance.y * CM} x2={p.mounts.distance.x * CM + Math.cos(p.mounts.distance.rot ?? 0) * Math.min(dist, 250)} y2={-p.mounts.distance.y * CM - Math.sin(p.mounts.distance.rot ?? 0) * Math.min(dist, 250)} className="rb-ray" />
+            : <line x1={R * 0.8} y1={0} x2={ray} y2={0} className="rb-ray" />)}
+          {p.design ? <DesignTop robot={robot} light={light} /> : p.id === 'kiskac' ? (
             <>
               <rect x={-R * 0.9} y={-R * 0.85} width={R * 1.7} height={R * 1.7} rx={3} className="rb-body kiskac" />
               <rect x={-R * 0.55} y={-R - 1} width={R * 1.1} height={4} rx={1} className="rb-wheel" />
@@ -96,12 +99,40 @@ function TopView({ robot, en, label }: { robot: DriveBase; en: boolean; label: s
               <circle cx={R * 0.62} cy={R * 0.35} r={1.8} fill={light} className="rb-eye" />
             </>
           )}
-          {robot.has('color') && <circle cx={R * 0.5} cy={0} r={1.4} className="rb-sensor" fill={FLOOR_COLORS[robot.color].css} />}
-          {robot.has('line') && (['left', 'right'] as const).map((side) => (
+          {robot.has('color') && !p.design && <circle cx={R * 0.5} cy={0} r={1.4} className="rb-sensor" fill={FLOOR_COLORS[robot.color].css} />}
+          {robot.has('line') && !p.design && (['left', 'right'] as const).map((side) => (
             <circle key={side} cx={R * 0.6} cy={side === 'left' ? -1.5 : 1.5} r={0.9} className="rb-sensor" fill={robot.lineOn(side) ? '#f97316' : '#94a3b8'} />
           ))}
           <path d={`M${-R * 0.2} -3L${R * 0.25} 0L${-R * 0.2} 3`} className="rb-arrow" />
         </g>
       </svg>
+  )
+}
+
+/** Tasarlanan robotun üstten görünüşü (gövde koordinatı: ileri +x, svg'de aşağı = sağ). */
+function DesignTop({ robot, light }: { robot: DriveBase; light: string }) {
+  const p = robot.profile
+  const d = deriveDesign(p.design!)
+  const ch = CHASSIS[p.design!.chassis]
+  const L = ch.cols * PITCH * CM, W = ch.rows * PITCH * CM
+  const ox = -d.originX * CM
+  const wd = p.wheelDiameter * CM
+  const m = p.mounts ?? {}
+  return (
+    <>
+      <rect x={ox - L / 2} y={-W / 2} width={L} height={W} rx={2} className="rb-body blok" />
+      {[...d.left.wheels, ...d.right.wheels].map((w) => {
+        const [x] = cellXY(ch, w.c, w.r)
+        const len = (PARTS[w.type].wheel?.contact ?? 0) * CM || wd
+        return <rect key={w.id} x={x * CM + ox - len / 2} y={w.r === 0 ? -W / 2 - 3.5 : W / 2 - 0.5} width={len} height={4} rx={1} className="rb-wheel" />
+      })}
+      <rect x={-3} y={-3} width={6} height={6} rx={1.5} fill={light} className="rb-hub" />
+      {m.force && <rect x={m.force.x * CM - 1} y={-m.force.y * CM - 5} width={3} height={10} rx={1} className="rb-bumper" data-pressed={robot.pressed || undefined} />}
+      {m.gripper && [-1, 1].map((sd) => <rect key={sd} x={m.gripper!.x * CM - 1} y={-m.gripper!.y * CM + sd * (robot.gripClosed ? 3 : 4.8) - 1} width={5} height={2} rx={1} className="rb-jaw" />)}
+      {robot.has('color') && m.color && <circle cx={m.color.x * CM} cy={-m.color.y * CM} r={1.4} className="rb-sensor" fill={FLOOR_COLORS[robot.color].css} />}
+      {robot.has('line') && m.line && (['left', 'right'] as const).map((side) => (
+        <circle key={side} cx={m.line!.x * CM} cy={-m.line!.y * CM + (side === 'left' ? -1.5 : 1.5)} r={0.9} className="rb-sensor" fill={robot.lineOn(side) ? '#f97316' : '#94a3b8'} />
+      ))}
+    </>
   )
 }

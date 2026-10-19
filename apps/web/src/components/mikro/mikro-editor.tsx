@@ -18,7 +18,7 @@ import { SimPanel } from './sim-panel'
 import { RobotArena } from './robot-arena'
 import { DonusenStage } from './donusen-stage'
 import type { CraneLoad, DonusenModelId } from '@/lib/mikro/donusen'
-import { ROBOT_PROFILES, type RobotProfileId, type RobotScene } from '@/lib/mikro/robot'
+import { ROBOT_PROFILES, type RobotProfile, type RobotProfileId, type RobotScene } from '@/lib/mikro/robot'
 import { logEvent } from '@/lib/events'
 import { errorText } from '@/lib/mikro/en'
 import { useI18n } from '@/i18n/client'
@@ -41,7 +41,7 @@ export interface MikroEditorProps {
   onProjectChange?: (p: MikroProject) => void
 }
 
-export interface RobotSetup { profile: RobotProfileId; scene: () => RobotScene }
+export interface RobotSetup { profile: RobotProfileId | RobotProfile; scene: () => RobotScene }
 export interface DonusenSetup { model: DonusenModelId; loads?: CraneLoad[]; handScript?: (tMs: number) => number }
 
 const BlocklyPane = memo(BlocklyPaneRaw)
@@ -323,7 +323,7 @@ export function MikroEditor({ activity, storageKey, onGoalsChange, initialProjec
           <div className="mk-work">
             {/* Blockly sekme değişince yok edilmesin: gizlenir */}
             <div className="mk-pane" hidden={tab !== 'blocks'}>
-              <BlocklyPane workspace={project.workspace} onChange={onWorkspace} allowedBlocks={allowed} robot={robot ? ROBOT_PROFILES[robot.profile] : null} donusen={donusen?.model ?? null} resetKey={resetKey} activeHatIds={glowIds} errorBlockId={error?.blockId ?? null} />
+              <BlocklyPane workspace={project.workspace} onChange={onWorkspace} allowedBlocks={allowed} robot={robot ? (typeof robot.profile === 'string' ? ROBOT_PROFILES[robot.profile] : robot.profile) : null} donusen={donusen?.model ?? null} resetKey={resetKey} activeHatIds={glowIds} errorBlockId={error?.blockId ?? null} />
             </div>
             {tab === 'js' && <div className="mk-pane code"><CodeView code={js} lang="js" /></div>}
             {tab === 'py' && <div className="mk-pane code"><CodeView code={py} lang="py" /></div>}

@@ -23,6 +23,7 @@ const PAGES = [
   '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),
   '/programlar',
   '/robot-atolyesi/sezonlar', ...SEASONS.map((s) => `/robot-atolyesi/sezonlar/${s.id}`),
+  '/robot-atolyesi/tasarla', '/muhendislik/insansi',
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

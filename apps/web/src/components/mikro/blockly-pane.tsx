@@ -279,7 +279,7 @@ export function BlocklyPane({ workspace, onChange, allowedBlocks, resetKey, acti
   }, [workspace, resetKey, ready])
 
   // ---- palet ----
-  const allowSig = `${(allowedBlocks ?? ['*']).join(',')}|${robot?.id ?? ''}|${donusen ?? ''}`
+  const allowSig = `${(allowedBlocks ?? ['*']).join(',')}|${robot?.id ?? ''}:${robot?.sensors.join('+') ?? ''}|${donusen ?? ''}`
   useEffect(() => {
     if (!ready || !wsRef.current) return
     wsRef.current.updateToolbox(toolboxJson(cb.current.allowedBlocks, cb.current.robot, locale, cb.current.donusen) as unknown as BlocklyNS.utils.toolbox.ToolboxInfo)

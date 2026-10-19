@@ -98,12 +98,16 @@ export const shell = {
     stm32: 'STM32 dersi',
     ml: 'Makine öğrenmesi',
     cvDemos: 'Gerçek hayat demoları',
+    robotDesign: 'Robotunu Tasarla',
+    humanoid: 'İnsansı robot',
   },
   /** Atölyeler panelindeki tek satırlık açıklamalar. */
   navDesc: {
     blocks: 'Karakterini bloklarla programla',
     robotStudio: 'Robotunu bloklarla görevlere gönder',
     seasons: 'Takımınla sezon görevlerinde yarış',
+    robotDesign: 'Parçalardan robot kur, görevde dene',
+    humanoid: 'Kinematik, denge ve yürüyüş (3B)',
     microCard: 'Işık, ses ve sensörlü sanal kart',
     vision: 'Robotlar nasıl görür? Kamera oyunları',
     gameStudio: 'Kendi oyununu tasarla',

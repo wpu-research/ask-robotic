@@ -4,7 +4,7 @@ import type { ActivityEn, MikroActivity } from './activity'
 import { evaluateGoals, showsNumber, usesBlocks, type GoalCtx, type GoalStatus, type MikroGoal } from './goals'
 import { oval, rectWalls } from '../arena/geometry'
 import { b, changeVar, cmp, forever, getVar, ifThen, logicOp, onStart, project, repeat, setVar, whileLoop } from './program'
-import type { DriveBase, RobotProfileId, RobotScene } from './robot'
+import type { DriveBase, RobotProfile, RobotProfileId, RobotScene } from './robot'
 import type { Wall } from '@ask/sim'
 import { Simulation } from './sim'
 import type { MikroProject, PBlock } from './types'
@@ -732,9 +732,9 @@ export const freeScene = (): RobotScene => box('serbest', 'Serbest arena', 2, 1.
   pose: { x: 0.85, y: 0.4, theta: 0 },
 })
 
-/** Projeyi görevin sahnesinde başsız çalıştırır; program biter ve robot durursa erken bırakır. */
-export function runMission(m: RobotMission, p: MikroProject): Simulation {
-  const sim = new Simulation(p, { robot: { profile: m.profile, scene: m.scene() } })
+/** Projeyi görevin sahnesinde başsız çalıştırır; program biter ve robot durursa erken bırakır. `profile`: görevi başka gövdeyle (ör. tasarlanan robot) dene. */
+export function runMission(m: RobotMission, p: MikroProject, profile?: RobotProfile): Simulation {
+  const sim = new Simulation(p, { robot: { profile: profile ?? m.profile, scene: m.scene() } })
   sim.start()
   for (let t = 0; t < m.runMs; t += 100) {
     sim.advance(100)
@@ -743,8 +743,8 @@ export function runMission(m: RobotMission, p: MikroProject): Simulation {
   return sim
 }
 
-export function evaluateMission(m: RobotMission, p: MikroProject): { status: GoalStatus[]; done: boolean; error: string | null } {
-  const sim = runMission(m, p)
+export function evaluateMission(m: RobotMission, p: MikroProject, profile?: RobotProfile): { status: GoalStatus[]; done: boolean; error: string | null } {
+  const sim = runMission(m, p, profile)
   const { status } = evaluateGoals(m.goals, { sim, ws: p.workspace })
   return { status, done: status.every((s) => s.done), error: sim.error?.message ?? null }
 }

@@ -6,6 +6,7 @@ import type { Device } from '@/lib/mikro/device'
 import { FLOOR_COLORS, type DriveBase, type LightColor } from '@/lib/mikro/robot'
 import { applyCamera, createStage, fitShadow, makeFloor, makeTrail, makeWall, mesh, std, wallMaterial, type CamMode, type FloorSpec } from '../three/core'
 import { makeBlokRobot, makeGezginRobot, makeKiskacRobot, poseMobile, type MobileModel } from '../three/models'
+import { makeDesignModel } from '../three/design-model'
 import { ZONE_EN } from '@/lib/mikro/en'
 import { useLocale } from '@/i18n/client'
 
@@ -24,7 +25,8 @@ export function RobotArena3D({ robot, device, mode }: { robot: DriveBase; device
   const live = useRef({ robot, device, mode, en })
   live.current = { robot, device, mode, en }
   const sceneId = robot.scene.id
-  const profileId = robot.profile.id
+  // tasarlanan robotta model tasarımdan kurulur: tasarım değişince sahne yeniden kurulsun
+  const profileId = robot.profile.design ? `ozel:${JSON.stringify(robot.profile.design.parts)}:${robot.profile.design.chassis}` : robot.profile.id
 
   useEffect(() => {
     const stage = createStage(host.current!)
@@ -38,7 +40,7 @@ export function RobotArena3D({ robot, device, mode }: { robot: DriveBase; device
     const trail = makeTrail()
     stage.scene.add(trail.line)
     const p = r0.profile
-    const model: MobileModel = p.id === 'kiskac' ? makeKiskacRobot(p.wheelBase, p.wheelDiameter) : p.id === 'blok' ? makeBlokRobot(p.wheelBase, p.wheelDiameter) : makeGezginRobot(p.wheelBase, p.wheelDiameter)
+    const model: MobileModel = p.design ? makeDesignModel(p.design) : p.id === 'kiskac' ? makeKiskacRobot(p.wheelBase, p.wheelDiameter) : p.id === 'blok' ? makeBlokRobot(p.wheelBase, p.wheelDiameter) : makeGezginRobot(p.wheelBase, p.wheelDiameter)
     stage.scene.add(model.group)
     // taşınabilir küpler
     const cubes = r0.objects.map((o) => {
@@ -49,7 +51,8 @@ export function RobotArena3D({ robot, device, mode }: { robot: DriveBase; device
     const rayMat = new THREE.LineBasicMaterial({ color: 0xef4444 })
     const rayGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(1, 0, 0)])
     const ray = new THREE.Line(rayGeo, rayMat)
-    ray.position.set(p.radius * 0.8, p.wheelDiameter / 2 + 0.015, 0)
+    const dm = p.mounts?.distance
+    if (dm) { ray.position.set(dm.x, p.wheelDiameter / 2 + 0.018, -dm.y); ray.rotation.y = dm.rot ?? 0 } else ray.position.set(p.radius * 0.8, p.wheelDiameter / 2 + 0.015, 0)
     model.group.add(ray)
 
     let visitedN = -1, trailN = -1, lastMode: CamMode | null = null

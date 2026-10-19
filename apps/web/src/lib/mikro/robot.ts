@@ -6,12 +6,16 @@ import { distToSeg, rayDistance } from '../arena/geometry'
 
 export type RobotProfileId = 'blok' | 'gezgin' | 'kiskac'
 /** `gripper`: kıskaç (tutma/bırakma ve tutulan nesnenin rengini algılama); araç kutusu süzgeci için sensörlerle birlikte durur. */
-export type RobotSensor = 'distance' | 'color' | 'force' | 'line' | 'gripper'
+export type RobotSensor = 'distance' | 'color' | 'force' | 'line' | 'gripper' | 'light' | 'gyro'
 export type FloorColor = 'beyaz' | 'siyah' | 'kirmizi' | 'yesil' | 'mavi' | 'sari'
 export type LightColor = 'kapali' | 'kirmizi' | 'yesil' | 'mavi' | 'sari' | 'beyaz'
 
+/** Sensörün gövdedeki yeri (dönüş merkezine göre: ileri x, sola y, m) ve bakış yönü (radyan, sola +). */
+export interface SensorMount { x: number; y: number; rot?: number }
+
 export interface RobotProfile {
-  id: RobotProfileId
+  /** 'ozel': Robotunu Tasarla'da kurulan gövde. */
+  id: RobotProfileId | 'ozel'
   title: string
   summary: string
   /** Tekerlekler arası uzaklık ve tekerlek çapı (m). */
@@ -24,6 +28,19 @@ export interface RobotProfile {
   sensors: readonly RobotSensor[]
   /** Işıklar: tek durum ışığı ya da iki "göz" far. */
   lights: 'status' | 'eyes'
+  // ---- Robotunu Tasarla: tasarımdan türetilen ek fizik (yoksa hazır gövdelerin varsayılanları) ----
+  /** Motor tepki süresi (s): ağır robot ve zayıf motor daha geç hızlanır. */
+  tauS?: number
+  /** Dönüşte gerçekleşen oran (1 = kaymasız teker; palet ve dört teker kayar, < 1). Jiroskop yoksa dönüşler eksik kalır. */
+  turnSlip?: number
+  /** Tek sürüş motoru: iki teker ortak akstadır, robot dönemez (sol ve sağ gücün ortalaması uygulanır). */
+  coupled?: boolean
+  /** Mesafe sensörü menzili (cm). */
+  rangeCm?: number
+  /** Sensör yerleri; verilmeyen sensör hazır gövdelerdeki yerinde durur. */
+  mounts?: Partial<Record<'distance' | 'color' | 'line' | 'force' | 'gripper', SensorMount>>
+  /** 3B görünüm için tasarım (yalnız görüntü; fizik yukarıdaki alanlardan okunur). */
+  design?: import('./tasarim').RobotDesign
 }
 
 export const ROBOT_PROFILES: Record<RobotProfileId, RobotProfile> = {
@@ -140,6 +157,8 @@ export class DriveBase {
   gripClosed = false
   trail: Array<[number, number]> = []
   private cmd: Command | null = null
+  /** Tekerlek açılarından tahmin edilen yön (jiroskopsuz dönüş bunu kullanır). */
+  private encTheta: number
   private t = 0
   private trailT = 0
 
@@ -150,6 +169,7 @@ export class DriveBase {
     this.y = scene.pose.y
     this.theta = scene.pose.theta
     this.zeroTheta = this.theta
+    this.encTheta = this.theta
     this.objects = (scene.objects ?? []).map((o) => ({ id: o.id, x: o.x, y: o.y, color: o.color, half: (o.size ?? 0.04) / 2 }))
     this.trail.push([this.x, this.y])
   }
@@ -174,7 +194,7 @@ export class DriveBase {
   /** Sola (+) / sağa (-) `deg` derece yerinde dön; bitince fren yapar. */
   turn(deg: number) {
     const p = deg >= 0 ? this.speed : -this.speed
-    this.cmd = { kind: 'turn', deg: Math.abs(deg), startTheta: this.theta }
+    this.cmd = { kind: 'turn', deg: Math.abs(deg), startTheta: this.turnRef }
     this.powerL = -p; this.powerR = p
     if (deg === 0) this.stop()
   }
@@ -194,8 +214,8 @@ export class DriveBase {
   }
   /** Tutulan küp gövdenin önüne değecek yerde durur. */
   private holdPoint(half: number): [number, number] {
-    const d = this.profile.radius + half
-    return [this.x + Math.cos(this.theta) * d, this.y + Math.sin(this.theta) * d]
+    const m = this.profile.mounts?.gripper
+    return m ? this.bodyToWorld(m.x + half, m.y) : this.bodyToWorld(this.profile.radius + half, 0)
   }
   private carry() {
     const o = this.heldObject
@@ -207,6 +227,12 @@ export class DriveBase {
   /** Küpün altındaki zemin rengi. */
   objectFloor(id: string): FloorColor | null { const o = this.object(id); return o ? this.floorAtWorld(o.x, o.y) : null }
   get busy(): boolean { return this.cmd !== null }
+  /** Dönüş bloğunun ölçtüğü yön: jiroskop varsa gerçek yön, yoksa tekerlek açılarından tahmin (kayan gövdede eksik kalır). */
+  private get turnRef(): number { return this.has('gyro') || (this.profile.turnSlip ?? 1) === 1 ? this.theta : this.encTheta }
+  /** Gövdeye göre bir noktanın dünya konumu. */
+  private bodyToWorld(fx: number, fy: number): [number, number] {
+    return [this.x + Math.cos(this.theta) * fx - Math.sin(this.theta) * fy, this.y + Math.sin(this.theta) * fx + Math.cos(this.theta) * fy]
+  }
   resetAngles() { this.zeroL = this.degL; this.zeroR = this.degR; this.zeroTheta = this.theta }
 
   // ---------- sensörler ----------
@@ -219,11 +245,11 @@ export class DriveBase {
   get headingDeg(): number { return Math.round((this.theta - this.zeroTheta) * DEG) }
   /** Ön sensörden duvara uzaklık (cm, en çok 250). */
   get distanceCm(): number {
-    const ox = this.x + Math.cos(this.theta) * this.profile.radius * 0.8
-    const oy = this.y + Math.sin(this.theta) * this.profile.radius * 0.8
+    const m = this.profile.mounts?.distance
+    const [ox, oy] = m ? this.bodyToWorld(m.x, m.y) : this.bodyToWorld(this.profile.radius * 0.8, 0)
     const walls = this.objects.length ? [...this.scene.walls, ...this.objects.filter((o) => o.id !== this.held).flatMap(objWalls)] : this.scene.walls
-    const d = rayDistance(ox, oy, this.theta, walls) * 100
-    return Math.min(MAX_RANGE_CM, Math.round(d * 10) / 10)
+    const d = rayDistance(ox, oy, this.theta + (m?.rot ?? 0), walls) * 100
+    return Math.min(this.profile.rangeCm ?? MAX_RANGE_CM, Math.round(d * 10) / 10)
   }
   /** Gövdeye göre (ileri x, sola y) bir noktanın altındaki zemin rengi. */
   floorAt(fx: number, fy: number): FloorColor {
@@ -242,14 +268,17 @@ export class DriveBase {
     return 'beyaz'
   }
   /** Renk sensörü gövdenin ön altında. */
-  get color(): FloorColor { return this.floorAt(this.profile.radius * 0.5, 0) }
+  get color(): FloorColor { const m = this.profile.mounts?.color; return m ? this.floorAt(m.x, m.y) : this.floorAt(this.profile.radius * 0.5, 0) }
   get reflect(): number { return FLOOR_COLORS[this.color].reflect }
   /** Çizgi sensörleri: önde, ortanın 1,5 cm solu ve sağı. */
-  lineOn(side: 'left' | 'right'): boolean { return this.floorAt(this.profile.radius * 0.6, side === 'left' ? 0.015 : -0.015) === 'siyah' }
+  lineOn(side: 'left' | 'right'): boolean {
+    const m = this.profile.mounts?.line
+    return this.floorAt(m ? m.x : this.profile.radius * 0.6, (m?.y ?? 0) + (side === 'left' ? 0.015 : -0.015)) === 'siyah'
+  }
   /** Tampon: önünde 1 cm içinde duvar var mı. */
   get pressed(): boolean {
-    const fx = this.x + Math.cos(this.theta) * this.profile.radius
-    const fy = this.y + Math.sin(this.theta) * this.profile.radius
+    const m = this.profile.mounts?.force
+    const [fx, fy] = m ? this.bodyToWorld(Math.max(m.x, this.profile.radius), m.y) : this.bodyToWorld(this.profile.radius, 0)
     return this.scene.walls.some((w) => distToSeg(fx, fy, ...w) < 0.012)
   }
   inZone(id: string): boolean {
@@ -269,16 +298,23 @@ export class DriveBase {
   }
 
   private step(dt: number) {
-    const k = 1 - Math.exp(-dt / TAU_S)
-    this.wL += ((this.powerL / 100) * this.profile.maxDegPerS - this.wL) * k
-    this.wR += ((this.powerR / 100) * this.profile.maxDegPerS - this.wR) * k
+    const p = this.profile
+    const k = 1 - Math.exp(-dt / (p.tauS ?? TAU_S))
+    // tek motorlu gövdede iki teker ortak akstadır: ikisi de aynı gücü alır
+    const pL = p.coupled ? (this.powerL + this.powerR) / 2 : this.powerL
+    const pR = p.coupled ? pL : this.powerR
+    this.wL += ((pL / 100) * p.maxDegPerS - this.wL) * k
+    this.wR += ((pR / 100) * p.maxDegPerS - this.wR) * k
     const dL = this.wL * dt, dR = this.wR * dt
     this.degL += dL
     this.degR += dR
     const circ = Math.PI * this.profile.wheelDiameter
     const sL = (dL / 360) * circ, sR = (dR / 360) * circ
     const ds = (sL + sR) / 2
-    const dth = (sR - sL) / this.profile.wheelBase
+    const encDth = (sR - sL) / this.profile.wheelBase
+    // tekerlek açılarından hesaplanan dönüş (kodlayıcı); gerçek dönüş kayma yüzünden daha az olabilir
+    this.encTheta += encDth
+    const dth = encDth * (this.profile.turnSlip ?? 1)
     const nt = this.theta + dth
     const nx = this.x + ds * Math.cos(nt), ny = this.y + ds * Math.sin(nt)
     let blocked = this.scene.walls.some((w) => distToSeg(nx, ny, ...w) < this.profile.radius)
@@ -330,7 +366,7 @@ export class DriveBase {
     if (!c) return
     const done = c.kind === 'move'
       ? (Math.abs(this.degL - c.startL) + Math.abs(this.degR - c.startR)) / 2 >= c.wheelDeg
-      : Math.abs(this.theta - c.startTheta) * DEG >= c.deg
+      : Math.abs(this.turnRef - c.startTheta) * DEG >= c.deg
     if (done) this.stop()
   }
 }
