@@ -80,7 +80,8 @@ export class Sim {
     this.twi = new AVRTWI(this.cpu, twiConfig, CPU_HZ)
     this.i2c = new dev.I2CBus(this.twi)
     this.usart = new AVRUSART(this.cpu, usart0Config, CPU_HZ)
-    this.usart.onByteTransmit = (b) => { this.serial += String.fromCharCode(b) }
+    // Gerçek kartta Serial.begin() (TXEN) olmadan UDR'ye yazılan bayt hatta çıkmaz; avr8js bunu denetlemez.
+    this.usart.onByteTransmit = (b) => { if (this.usart.txEnable) this.serial += String.fromCharCode(b) }
     for (const letter of Object.keys(this.ports) as PortLetter[]) {
       const port = this.ports[letter]
       port.addListener(() => {

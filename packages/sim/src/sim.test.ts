@@ -25,6 +25,15 @@ describe('Sim (önceden derlenmiş hex)', () => {
     expect(Number(lines(sim.serial).at(-1))).toBeGreaterThanOrEqual(1022)
   })
 
+  it('Serial.begin() (TXEN) olmadan UDR yazımı seri çıktı üretmez', () => {
+    const sim = new Sim(BLINK_HEX)
+    sim.cpu.writeData(0xc6, 65) // UDR0, TXEN kapalı
+    expect(sim.serial).toBe('')
+    sim.cpu.writeData(0xc1, 1 << 3) // UCSR0B: TXEN0
+    sim.cpu.writeData(0xc6, 66)
+    expect(sim.serial).toBe('B')
+  })
+
   it('seri çıktı ve seri giriş', () => {
     const sim = new Sim(SERIAL_HEX)
     sim.run(100)
