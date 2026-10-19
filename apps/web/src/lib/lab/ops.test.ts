@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Circuit } from './contract'
-import { PART_DEFS, localToWorld, partBounds, pinDir, pinWorld, wireCurve } from './geometry'
+import { PART_DEFS, localToWorld, partBounds, pinDir, pinWorld, wireRoute, wireTrace } from './geometry'
 import { WIRE_BLACK, WIRE_COLORS, WIRE_RED, addPart, addWire, canAddWire, hasParts, isCircuit, normalizeCircuit, removePart, resistorBands, rotatePart, formatOhms } from './ops'
 
 const base = (): Circuit => ({ parts: [{ id: 'uno', type: 'uno', x: 0, y: 0, rotation: 0, props: {} }], wires: [] })
@@ -91,8 +91,19 @@ describe('döndürme ve pin koordinatı', () => {
     }
     expect(localToWorld({ type: 'led', x: 0, y: 0, rotation: 0 }, { x: 5, y: 5 })).toEqual({ x: 5, y: 5 })
   })
-  it('kablo eğrisi uçlardan geçer', () => {
-    expect(wireCurve({ x: 0, y: 0 }, { x: 0, y: -1 }, { x: 100, y: 40 }, { x: 0, y: 1 })).toMatch(/^M0 0 C.* 100 40$/)
+  it('kablo izi: uçlardan geçer, yalnız yatay/dikey parçalardan oluşur', () => {
+    const pins = [{ x: 0, y: -1 }, { x: 0, y: 1 }, { x: -1, y: 0 }, { x: 1, y: 0 }]
+    const a = { x: 100, y: 100 }
+    for (const da of pins) for (const db of pins) for (const b of [{ x: 300, y: 40 }, { x: 20, y: 220 }, { x: 100, y: 180 }]) {
+      const r = wireRoute(a, da, b, db, 8)
+      expect(r[0]).toEqual(a)
+      expect(r.at(-1)).toEqual(b)
+      for (let i = 1; i < r.length; i++) expect(r[i].x === r[i - 1].x || r[i].y === r[i - 1].y).toBe(true)
+    }
+    expect(wireTrace(a, { x: 0, y: -1 }, { x: 300, y: 40 }, { x: 0, y: 1 })).toMatch(/^M100 100 L.* L300 40$/)
+  })
+  it('kablo izi: serbest uç tek köşeli', () => {
+    expect(wireRoute({ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 100, y: 60 }, { x: 0, y: 0 })).toEqual([{ x: 0, y: 0 }, { x: 100, y: 0 }, { x: 100, y: 60 }])
   })
   it('pin çıkış yönü: kenara göre ve döndürmeyle', () => {
     expect(pinDir({ type: 'uno', rotation: 0 }, 'D13')).toEqual({ x: 0, y: -1 }) // üst başlık

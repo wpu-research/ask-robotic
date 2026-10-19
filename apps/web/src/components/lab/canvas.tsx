@@ -1,7 +1,7 @@
 'use client'
 import { useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState, type Ref } from 'react'
 import type { Circuit, LabState, PinRef } from '@/lib/lab/contract'
-import { PART_DEFS, WORLD, partBounds, pinDir, pinWorld, snap, wireCurve, wirePreview, type Pt } from '@/lib/lab/geometry'
+import { PART_DEFS, WORLD, partBounds, pinDir, pinWorld, snap, wirePreview, wireTrace, type Pt } from '@/lib/lab/geometry'
 import { addWire, canAddWire, formatOhms, movePart, removePart, removeWire, rotatePart, wireColor } from '@/lib/lab/ops'
 import { formatPinBalloon } from '@/lib/lab/measure'
 import { layoutCanvasLabels } from '@/lib/lab/label-layout'
@@ -325,7 +325,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
             {circuit.wires.map((w, i) => {
               const a = pinPos(w.a), b = pinPos(w.b)
               if (!a || !b) return null
-              const d = wireCurve(a, pinDirOf(w.a), b, pinDirOf(w.b), ((i % 3) - 1) * 8)
+              const d = wireTrace(a, pinDirOf(w.a), b, pinDirOf(w.b), ((i % 3) - 1) * 8)
               const sel = selection?.kind === 'wire' && selection.id === w.id
               const col = w.color ?? '#3b82f6'
               return (
@@ -422,7 +422,7 @@ export function LabCanvas({ circuit, onChange, lockedIds, editLocked, runtime, s
             const tp = draft.target ? pinPos(draft.target) : null
             const end = tp ?? { x: draft.x, y: draft.y }
             const col = draft.target ? wireColor(circuit, draft.from, draft.target) : 'var(--primary)'
-            const d = tp && draft.target ? wireCurve(a, pinDirOf(draft.from), tp, pinDirOf(draft.target)) : wirePreview(a, pinDirOf(draft.from), end)
+            const d = tp && draft.target ? wireTrace(a, pinDirOf(draft.from), tp, pinDirOf(draft.target)) : wirePreview(a, pinDirOf(draft.from), end)
             return (
               <g pointerEvents="none" data-draft>
                 <path d={d} fill="none" stroke={col} strokeOpacity={0.9} strokeWidth={3.6} strokeDasharray="1 7" strokeLinecap="round" />

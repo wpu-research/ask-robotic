@@ -192,17 +192,67 @@ export function pinDir(part: Pick<PartInstance, 'type' | 'rotation'>, pin: strin
   }
 }
 
-/** Kablo yolu: pin yönlerinde çıkan yumuşak eğri (kübik Bezier). `lane` paralel kabloları hafifçe ayırır. */
-export function wireCurve(a: Pt, da: Pt, b: Pt, db: Pt, lane = 0): string {
-  const dist = Math.hypot(b.x - a.x, b.y - a.y)
-  const L = Math.max(24, Math.min(140, dist * 0.45)) + Math.abs(lane)
-  const c1 = { x: a.x + da.x * L + (da.y !== 0 ? lane : 0), y: a.y + da.y * L + (da.x !== 0 ? lane : 0) }
-  const c2 = { x: b.x + db.x * L + (db.y !== 0 ? lane : 0), y: b.y + db.y * L + (db.x !== 0 ? lane : 0) }
-  return `M${a.x} ${a.y} C${c1.x} ${c1.y} ${c2.x} ${c2.y} ${b.x} ${b.y}`
+const TRACE_STUB = 14, TRACE_CHAMFER = 8
+
+/**
+ * Kablo rotası (baskı devre izi): pinden yönünde kısa bir bacak, sonra yalnız yatay/dikey parçalar.
+ * `db` sıfır vektörse (serbest uç, fare) bitiş bacağı yoktur. `lane` paralel izleri birbirinden ayırır.
+ */
+export function wireRoute(a: Pt, da: Pt, b: Pt, db: Pt, lane = 0): Pt[] {
+  const free = db.x === 0 && db.y === 0
+  const a1 = { x: a.x + da.x * TRACE_STUB, y: a.y + da.y * TRACE_STUB }
+  const b1 = free ? b : { x: b.x + db.x * TRACE_STUB, y: b.y + db.y * TRACE_STUB }
+  // İlk parça hep x ekseninde gitsin diye dikey çıkışlarda eksenleri takas et.
+  const horiz = da.x !== 0
+  const T = (p: Pt): Pt => (horiz ? p : { x: p.y, y: p.x })
+  const A = T(a1), B = T(b1), dB = T(db)
+  const dA = horiz ? da.x : da.y
+  let mid: Pt[]
+  if (free) mid = [{ x: B.x, y: A.y }]
+  else if (dB.x !== 0) {
+    if (dB.x === dA) {
+      const X = dA > 0 ? Math.max(A.x, B.x) + Math.abs(lane) : Math.min(A.x, B.x) - Math.abs(lane)
+      mid = [{ x: X, y: A.y }, { x: X, y: B.y }]
+    } else if ((B.x - A.x) * dA > 0) {
+      const X = (A.x + B.x) / 2 + lane
+      mid = [{ x: X, y: A.y }, { x: X, y: B.y }]
+    } else {
+      const Y = (A.y + B.y) / 2 + lane
+      mid = [{ x: A.x, y: Y }, { x: B.x, y: Y }]
+    }
+  } else mid = (B.x - A.x) * dA >= 0 ? [{ x: B.x, y: A.y }] : [{ x: A.x, y: B.y }]
+  const raw = [a, a1, ...mid.map(T), b1, b] // T kendi tersidir
+  const pts: Pt[] = []
+  for (const q of raw) {
+    const last = pts[pts.length - 1]
+    if (last && last.x === q.x && last.y === q.y) continue
+    pts.push(q)
+  }
+  // Aynı doğrultudaki ara noktaları at.
+  return pts.filter((q, i) => {
+    if (i === 0 || i === pts.length - 1) return true
+    const p = pts[i - 1], n = pts[i + 1]
+    return !((p.x === q.x && q.x === n.x) || (p.y === q.y && q.y === n.y))
+  })
 }
 
-/** Serbest uca (fare) giden önizleme eğrisi. */
-export const wirePreview = (a: Pt, da: Pt, b: Pt) => wireCurve(a, da, b, { x: 0, y: 0 })
+/** Kablo yolu: baskı devre izi gibi dik açılı, köşeleri 45° kesilmiş SVG yolu. */
+export function wireTrace(a: Pt, da: Pt, b: Pt, db: Pt, lane = 0): string {
+  const pts = wireRoute(a, da, b, db, lane)
+  let d = `M${pts[0].x} ${pts[0].y}`
+  for (let i = 1; i < pts.length; i++) {
+    const p = pts[i - 1], q = pts[i], n = pts[i + 1]
+    if (!n) { d += ` L${q.x} ${q.y}`; continue }
+    const l1 = Math.hypot(q.x - p.x, q.y - p.y), l2 = Math.hypot(n.x - q.x, n.y - q.y)
+    const c = Math.min(TRACE_CHAMFER, l1 / 2, l2 / 2)
+    const u1 = { x: (q.x - p.x) / l1, y: (q.y - p.y) / l1 }, u2 = { x: (n.x - q.x) / l2, y: (n.y - q.y) / l2 }
+    d += ` L${q.x - u1.x * c} ${q.y - u1.y * c} L${q.x + u2.x * c} ${q.y + u2.y * c}`
+  }
+  return d
+}
+
+/** Serbest uca (fare) giden önizleme izi. */
+export const wirePreview = (a: Pt, da: Pt, b: Pt) => wireTrace(a, da, b, { x: 0, y: 0 })
 
 export const WORLD = { w: 1200, h: 760 }
 export const GRID = 10
