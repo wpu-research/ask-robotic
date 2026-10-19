@@ -1,10 +1,11 @@
 /* Yarışma sezonları: hub, kurallar sayfası ve öğretmen görünümü */
 .sz { gap: 24px; }
-.sz-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.sz-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr)); gap: 16px; }
 .sz-card { display: grid; gap: 12px; }
 .sz-card h2 { margin: 0; font-size: 1.3rem; }
 .sz-card p { margin: 0; }
 .sz-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sz-actions > a { white-space: nowrap; }
 .sz-phase { font-size: .78rem; font-weight: 800; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
 .sz-phase.acik { background: var(--ok-soft); color: var(--ok); }
 .sz-phase.yakinda { background: var(--warn-soft); color: var(--warn); }
@@ -36,4 +37,14 @@
 .sz-reg .field { flex: 1 1 200px; margin: 0; }
 @media (max-width: 860px) {
   .sz-grid, .sz-league { grid-template-columns: 1fr; }
+}
+.sz-field .rb-ztext { font-size: 4px; }
+.sz-grid > .panel { margin: 0; }
+/* Dar ekranda puan tablosu: görev + puan üstte, açıklama altta */
+@media (max-width: 640px) {
+  .sz-table thead, .sz-table td.idx { display: none; }
+  .sz-table tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; border-bottom: 1px solid var(--border); }
+  .sz-table tbody tr:last-child { border-bottom: 0; }
+  .sz-table td { border-bottom: 0 !important; }
+  .sz-table td.how { grid-column: 1 / -1; grid-row: 2; padding-top: 0; color: var(--muted); }
 }

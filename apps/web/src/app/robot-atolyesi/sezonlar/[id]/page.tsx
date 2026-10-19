@@ -30,7 +30,8 @@ export default async function SezonKurallari({ params }: Props) {
   const en = locale === 'en'
   const phase = seasonPhase(s)
   // Lig DB'den gelir; DB yoksa kurallar yine gösterilir.
-  const league: SeasonLeague = await seasonLeague(getDb(), s).catch(() => ({ teams: [], schools: [] }))
+  let league: SeasonLeague = { teams: [], schools: [] }
+  try { league = await seasonLeague(getDb(), s) } catch { /* DB yok: boş lig */ }
   const title = en ? s.en.title : s.title
   const robot = en ? PROFILE_EN[s.field.profile].title : ROBOT_PROFILES[s.field.profile].title
   return (
@@ -88,9 +89,9 @@ export default async function SezonKurallari({ params }: Props) {
             <tbody>
               {s.subMissions.map((m, i) => (
                 <tr key={m.id}>
-                  <td>{i + 1}</td>
+                  <td className="idx">{i + 1}</td>
                   <td><b>{en ? m.en.title : m.title}</b></td>
-                  <td>{en ? m.en.how : m.how}</td>
+                  <td className="how">{en ? m.en.how : m.how}</td>
                   <td className="pts"><b>{en ? m.points.replace('sn', 's') : m.points}</b></td>
                 </tr>
               ))}
@@ -108,7 +109,7 @@ export default async function SezonKurallari({ params }: Props) {
               {s.penalties.map((p) => (
                 <tr key={p.id}>
                   <td><b>{en ? p.en.title : p.title}</b></td>
-                  <td>{en ? p.en.how : p.how}</td>
+                  <td className="how">{en ? p.en.how : p.how}</td>
                   <td className="pts neg"><b>{p.points}</b> <small className="muted">{t(p.per === 'each' ? 'season.each' : 'season.once')}</small></td>
                 </tr>
               ))}
