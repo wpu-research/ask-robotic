@@ -33,7 +33,8 @@ describe('ML veri setleri', () => {
     const slugs = [...LESSONS.map((l) => l.slug), ...PROJECTS.map((p) => p.slug)]
     expect(Object.keys(LESSON_DATA).sort()).toEqual([...slugs].sort())
     for (const s of slugs) expect(datasetsFor(s).length, s).toBe(LESSON_DATA[s].length)
-    for (const d of DATASETS) expect(usersOf(d.id).length, d.id).toBeGreaterThan(0)
+    // ML dersinde ya da başka bir kursta (courses) en az bir kullanıcı
+    for (const d of DATASETS) expect(usersOf(d.id).length + (d.courses?.length ?? 0), d.id).toBeGreaterThan(0)
   })
   it('CSV açan her kod, eşlemedeki ilk seti açıyor; kurgusal veri modülü kalmadı', () => {
     let opened = 0

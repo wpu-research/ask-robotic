@@ -4,6 +4,8 @@ import { UNITS } from '@/lib/drone/course'
 import { UNITS as LLM_UNITS } from '@/lib/llm/course'
 import { RPI_COURSE } from '@/lib/rpi/course'
 import { STM32_COURSE } from '@/lib/stm32/course'
+import { IOT_UNITS } from '@/lib/iot/course'
+import { SML_UNITS } from '@/lib/sensor-ml/course'
 import { LESSONS } from '@/lib/ml/lessons'
 import { PROJECTS } from '@/lib/ml/projeler'
 import { SITE_URL } from '@/lib/site'
@@ -18,6 +20,9 @@ const PAGES = [
   '/muhendislik/drone', '/muhendislik/drone/parcalar', '/muhendislik/drone/simulasyon', '/muhendislik/drone/proje',
   ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`),
   ...[RPI_COURSE, STM32_COURSE].flatMap((c) => [`/muhendislik/${c.slug}`, `/muhendislik/${c.slug}/simulasyon`, `/muhendislik/${c.slug}/proje`, ...c.units.map((u) => `/muhendislik/${c.slug}/unite/${u.n}`)]), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
+  ...UNITS.map((u) => `/muhendislik/drone/unite/${u.n}`), ...LESSONS.map((l) => `/makine-ogrenmesi/${l.slug}`),
+  '/muhendislik/iot', '/muhendislik/iot/simulasyon', '/muhendislik/iot/proje', ...IOT_UNITS.map((u) => `/muhendislik/iot/unite/${u.n}`),
+  '/muhendislik/sensor-ml', '/muhendislik/sensor-ml/simulasyon', '/muhendislik/sensor-ml/proje', ...SML_UNITS.map((u) => `/muhendislik/sensor-ml/unite/${u.n}`),
   ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
   '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),

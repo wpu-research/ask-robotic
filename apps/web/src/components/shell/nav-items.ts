@@ -72,6 +72,8 @@ export const NAV: NavGroup[] = [
       { href: '/programlar', label: 'Programlar', key: 'shell.nav.programs', icon: 'book' },
       { href: '/muhendislik/raspberry-pi', label: 'Raspberry Pi dersi', key: 'shell.nav.rpi', icon: 'code' },
       { href: '/muhendislik/arm-stm32', label: 'STM32 dersi', key: 'shell.nav.stm32', icon: 'mikro' },
+      { href: '/muhendislik/iot', label: 'IoT dersi (ESP32)', key: 'shell.nav.iot', icon: 'mikro' },
+      { href: '/muhendislik/sensor-ml', label: 'Sensör verisinden ML', key: 'shell.nav.sensorMl', icon: 'ai' },
     ],
   },
   {
@@ -99,6 +101,8 @@ export function isActive(href: string, pathname: string): boolean {
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/insansi')) return false
   // Robotunu Tasarla kendi öğesinde işaretlenir
   if (href === '/robot-atolyesi' && pathname.startsWith('/robot-atolyesi/tasarla')) return false
+  // Robotik, drone, IoT ve sensör-ML dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
+  if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/iot') || pathname.startsWith('/muhendislik/sensor-ml'))) return false
   // Gerçek hayat demoları (büyükler) kendi öğesinde işaretlenir, çocukların "Robotun Gözleri" öğesinde değil
   if (href === '/robotun-gozleri' && pathname.startsWith('/robotun-gozleri/demolar')) return false
   // Yarışma sezonları kendi öğesinde işaretlenir

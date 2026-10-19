@@ -60,6 +60,15 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/iot" className="eng-course" data-testid="eng-iot">
+        <span className="eng-course-code">IOT</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Internet of Things with the ESP32' : 'Ders: ESP32 ile Nesnelerin İnterneti'}</b>
+          <span className="eng-level-text">{en ? '10 units: ESP32 vs Uno, Wi-Fi, REST and JSON, MQTT with QoS, retained messages and last will, sensors to the cloud, remote actuators, a live dashboard, deep sleep, OTA, TLS and BLE. 14 in-browser simulations including a 3D smart greenhouse where MQTT packets fly between devices, and a capstone with a rules engine.' : '10 ünite: ESP32 ile Uno, Wi-Fi, REST ve JSON, QoS, kalıcı mesaj ve son vasiyetle MQTT, sensörden buluta, uzaktan eyleyici, canlı pano, derin uyku, OTA, TLS ve BLE. MQTT paketlerinin cihazlar arasında uçtuğu 3B akıllı sera dahil tarayıcıda 14 simülasyon ve kural motorlu bitirme projesi.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <Link href="/muhendislik/raspberry-pi" className="eng-course" data-testid="eng-rpi">
         <span className="eng-course-code">RPI</span>
         <span className="eng-level-body">
@@ -92,6 +101,15 @@ export default async function Muhendislik() {
         <span className="eng-level-body">
           <b>{en ? 'Course: Embedded Programming with ARM (STM32)' : 'Ders: ARM (STM32) ile Gömülü Programlama'}</b>
           <span className="eng-level-text">{en ? '11 units for ages 16+: Cortex-M and the memory map, registers and HAL, clock tree, timers and PWM, interrupts and NVIC, UART, ADC and DMA, I²C/SPI, low power and FreeRTOS. 11 in-browser simulations and a PWM motor driver with a UART command interface.' : '16 yaş üstü için 11 ünite: Cortex-M ve bellek haritası, yazmaçlar ve HAL, saat ağacı, zamanlayıcı ve PWM, kesmeler ve NVIC, UART, ADC ve DMA, I²C/SPI, düşük güç ve FreeRTOS. Tarayıcıda 11 simülasyon ve UART komutlu PWM motor sürücü projesi.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
+      <Link href="/muhendislik/sensor-ml" className="eng-course" data-testid="eng-sensor-ml">
+        <span className="eng-course-code">SENSÖR-ML</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Machine learning forecasting from sensor data' : 'Ders: Sensör verisinden makine öğrenmesi tahmini'}</b>
+          <span className="eng-level-text">{en ? '8 units: logging a time series, cleaning outliers and gaps, the Kalman filter, embedded analysis and visualisation, feature engineering, honest evaluation, C code from trained weights and an anomaly alert. Python runs in the browser on the greenhouse dataset; a 3D greenhouse shows forecast and anomaly.' : '8 ünite: zaman serisi kaydı, aykırı değer ve boşluk temizleme, Kalman süzgeci, gömülü analiz ve görselleştirme, özellik mühendisliği, dürüst değerlendirme, eğitilmiş ağırlıklardan C kodu ve anomali uyarısı. Python, sera veri setiyle tarayıcıda çalışır; 3B serada tahmin ve anomali görünür.'}</span>
         </span>
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>

@@ -53,6 +53,7 @@ export default async function VeriSetleri() {
               <p className="vs-load"><b>{T.dataLoad}:</b> <code>{load}</code></p>
               <p className="vs-used"><b>{T.dataUsed}:</b>{' '}
                 {usersOf(d.id).map((s, k) => <span key={s}>{k > 0 && ' · '}<Link href={`/makine-ogrenmesi/${s}`}>{titleOf(s)}</Link></span>)}
+                {(d.courses ?? []).map((c, k) => <span key={c.href}>{(k > 0 || usersOf(d.id).length > 0) && ' · '}<Link href={c.href}>{c.title[lang]}</Link></span>)}
               </p>
             </li>
           )

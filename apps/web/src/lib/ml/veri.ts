@@ -15,6 +15,7 @@ import { WORDS, inbox } from './spam-filtresi'
 import { makeItems } from './projeler/depo-siniflandirma'
 import { lidarCloud } from './projeler/nokta-bulutu'
 import { castRay, roadIndex, track } from './projeler/otonom-arac'
+import { datasetRows as seraRows } from '@/lib/sensor-ml/sensors'
 
 export interface DataCol { name: string; desc: Bi }
 export interface DataSet {
@@ -25,6 +26,8 @@ export interface DataSet {
   desc: Bi
   cols: DataCol[]
   rows(): Array<Array<number | string>>
+  /** Bu seti kullanan öbür kurslar (ML dersi dışındaki ünite sayfaları). */
+  courses?: Array<{ href: string; title: Bi }>
 }
 
 export const VERI_DIZIN = '/veri/ml'
@@ -180,6 +183,22 @@ export const DATASETS: DataSet[] = [
       const M = [[5.0, 3.4, 1.5, 0.25], [5.9, 2.8, 4.3, 1.3], [6.6, 3.0, 5.5, 2.0]], S = [[0.35, 0.38, 0.17, 0.1], [0.5, 0.31, 0.47, 0.2], [0.63, 0.32, 0.55, 0.27]]
       return [0, 1, 2].flatMap((t) => Array.from({ length: 50 }, () => [...M[t].map((m, j) => Math.max(0.1, Math.round((m + S[t][j] * gauss(r)) * 10) / 10)), t]))
     },
+  },
+  {
+    id: 'sera-sensorleri', file: 'sera-sensorleri.csv',
+    title: { tr: 'Sera sensörleri (zaman serisi)', en: 'Greenhouse sensors (time series)' },
+    desc: {
+      tr: '7 gün, 10 dakikada bir: DHT22 sıcaklık ve nem, BME280 basınç, LDR ışık, HC-SR04 su deposu mesafesi. Gerçek sensör kusurlarıyla: gürültü, okunamayan örnekler (NaN), ani sıçramalar (85 °C, −40 °C) ve 5. gün öğleden sonra takılı kalan ısıtıcı (ariza = 1).',
+      en: '7 days, every 10 minutes: DHT22 temperature and humidity, BME280 pressure, LDR light, HC-SR04 water tank distance. With real sensor faults: noise, failed reads (NaN), spikes (85 °C, −40 °C) and a heater stuck on in the afternoon of day 5 (ariza = 1).',
+    },
+    cols: [
+      c('dakika', 'başlangıçtan geçen dakika', 'minutes since start'), c('saat', 'günün saati (0–24)', 'hour of day (0–24)'),
+      c('sicaklik', 'DHT22 sıcaklık, °C (NaN: okunamadı)', 'DHT22 temperature, °C (NaN: failed read)'), c('nem', 'DHT22 bağıl nem, %', 'DHT22 relative humidity, %'),
+      c('basinc', 'BME280 basınç, hPa', 'BME280 pressure, hPa'), c('isik', 'LDR analog okuma (0–1023)', 'LDR analog reading (0–1023)'),
+      c('mesafe', 'HC-SR04 sensörden su yüzeyine, cm', 'HC-SR04 sensor to water surface, cm'), c('ariza', '1: ısıtıcı arızası penceresi', '1: heater fault window'),
+    ],
+    rows: () => seraRows(),
+    courses: [{ href: '/muhendislik/sensor-ml', title: { tr: 'Sensör verisinden ML tahmini', en: 'ML forecasting from sensor data' } }],
   },
 ]
 
