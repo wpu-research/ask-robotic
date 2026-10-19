@@ -109,7 +109,7 @@ export function Cnn3DViz({ lang }: { lang: L }) {
       <Readout testId="pt-cnn3d">{!W ? tx(lang, 'Ağırlıklar yükleniyor…', 'Loading weights…') : tr ? `${tx(lang, 'tahmin', 'prediction')}: ${tr.pred}\n${tx(lang, 'katmanlar', 'layers')}: 1×28² → 8×28² → 8×14² → 16×14² → 16×7² → 10` : tx(lang, 'Bir rakam çiz; katmanlar 3B sahnede belirir.', 'Draw a digit; the layers appear in the 3D scene.')}</Readout>
       {tr && <Probs probs={tr.probs} lang={lang} />}
     </>}>
-      <Stage3DHost lang={lang} mount={mountCnn} state={tr} view={{ pos: [4.2, 2.6, 2.4], target: [0, 1, -3.2] }} label={tx(lang, 'Girdi, conv1, pool1, conv2, pool2: her düzlem bir öznitelik haritası', 'Input, conv1, pool1, conv2, pool2: each plane is a feature map')} height={360} testId="pt-3d-cnn" />
+      <Stage3DHost lang={lang} mount={mountCnn} state={tr} view={{ pos: [5.2, 3.2, 3.4], target: [0, 1, -4.8] }} label={tx(lang, 'Girdi, conv1, pool1, conv2, pool2: her düzlem bir öznitelik haritası', 'Input, conv1, pool1, conv2, pool2: each plane is a feature map')} height={360} testId="pt-3d-cnn" />
     </Stage>
   )
 }

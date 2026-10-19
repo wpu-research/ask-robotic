@@ -40,7 +40,7 @@ export function cnnLayout(t: CnnTrace): Plane[] {
     const cols = fm.c === 1 ? 1 : fm.c <= 8 ? 4 : 4, rows = Math.ceil(fm.c / cols), gap = size * 1.12
     for (let c = 0; c < fm.c; c++) {
       const col = c % cols, row = Math.floor(c / cols)
-      out.push({ key, layer: L, ch: c, fm, size, pos: [(col - (cols - 1) / 2) * gap, (rows - 1) / 2 * gap - row * gap + 1.2, -L * 1.6] })
+      out.push({ key, layer: L, ch: c, fm, size, pos: [(col - (cols - 1) / 2) * gap, (rows - 1) / 2 * gap - row * gap + 1.2, -L * 2.4] })
     }
   })
   return out
