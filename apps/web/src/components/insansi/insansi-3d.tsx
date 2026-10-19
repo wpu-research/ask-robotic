@@ -36,8 +36,8 @@ export function Insansi3D({ frame, onTargetDrag, label }: { frame: () => Humanoi
     const sc = stage.sun.shadow.camera
     sc.left = -0.6; sc.right = 0.6; sc.top = 0.6; sc.bottom = -0.6; sc.near = 0.1; sc.far = 5
     sc.updateProjectionMatrix()
-    stage.camera.position.set(0.55, 0.42, 0.65)
-    stage.controls.target.set(0, 0.25, 0)
+    stage.camera.position.set(0.72, 0.5, 0.9)
+    stage.controls.target.set(0, 0.26, 0)
     stage.controls.minDistance = 0.3
     stage.controls.maxDistance = 3
 
@@ -84,7 +84,8 @@ export function Insansi3D({ frame, onTargetDrag, label }: { frame: () => Humanoi
     stage.scene.add(poly)
     const zmp = mesh(new THREE.CylinderGeometry(0.01, 0.01, 0.003, 4), new THREE.MeshBasicMaterial({ color: 0xdc2626 }))
     stage.scene.add(zmp)
-    const target = mesh(new THREE.SphereGeometry(0.018, 20, 14), new THREE.MeshStandardMaterial({ color: 0xdb2777, transparent: true, opacity: 0.85 }))
+    const target = new THREE.Mesh(new THREE.SphereGeometry(0.022, 20, 14), new THREE.MeshBasicMaterial({ color: 0xdb2777, transparent: true, opacity: 0.8, depthTest: false }))
+    target.renderOrder = 6
     stage.scene.add(target)
 
     stage.onFrame = () => {
