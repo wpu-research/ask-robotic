@@ -127,3 +127,5 @@
 .dn-handctl label { display: flex; gap: 8px; align-items: center; }
 @media (max-width: 760px) { .dn-panel { grid-template-columns: 1fr; } }
 @media (max-width: 640px) { .rb-chap { grid-template-columns: auto auto 1fr auto; align-items: center; gap: 8px; } .rb-chap meter { min-width: 60px; } }
+/* Yarışma sezonu satırındaki kurallar bağlantısı */
+.rb-season-link { display: flex; align-items: center; padding: 0 8px; font-size: .85rem; font-weight: 700; white-space: nowrap; }

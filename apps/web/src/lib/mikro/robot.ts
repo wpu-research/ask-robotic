@@ -68,7 +68,7 @@ export interface Patch { x1: number; y1: number; x2: number; y2: number; color: 
 export interface SceneObject { id: string; x: number; y: number; color: FloorColor; /** Kenar uzunluğu (m), varsayılan 0,04. */ size?: number }
 /** Benzetimdeki küp durumu. */
 export interface LiveObject { id: string; x: number; y: number; color: FloorColor; half: number }
-export interface RobotZone { id: string; label?: string; kind: 'start' | 'goal' | 'checkpoint'; x: number; y: number; r: number }
+export interface RobotZone { id: string; label?: string; kind: 'start' | 'goal' | 'checkpoint' | 'penalty'; x: number; y: number; r: number }
 
 export interface RobotScene {
   id: string

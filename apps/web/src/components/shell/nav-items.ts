@@ -47,6 +47,7 @@ export const NAV: NavGroup[] = [
     items: [
       { href: '/atolye', label: 'Blok atölyesi', key: 'shell.nav.blocks', icon: 'atolye', tab: true },
       { href: '/robot-atolyesi', label: 'Robot atölyesi', key: 'shell.nav.robotStudio', icon: 'arena' },
+      { href: '/robot-atolyesi/sezonlar', label: 'Yarışma sezonları', key: 'shell.nav.seasons', icon: 'target' },
       { href: '/mikro-kart', label: 'Mikro Kart atölyesi', key: 'shell.nav.microCard', icon: 'mikro' },
       { href: '/robotun-gozleri', label: 'Robotun Gözleri', key: 'shell.nav.vision', icon: 'eye' },
       { href: '/oyun-atolyesi', label: 'Oyun atölyesi', key: 'shell.nav.gameStudio', icon: 'oyun' },
@@ -95,5 +96,7 @@ export function isActive(href: string, pathname: string): boolean {
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/raspberry-pi') || pathname.startsWith('/muhendislik/arm-stm32'))) return false
   // Gerçek hayat demoları (büyükler) kendi öğesinde işaretlenir, çocukların "Robotun Gözleri" öğesinde değil
   if (href === '/robotun-gozleri' && pathname.startsWith('/robotun-gozleri/demolar')) return false
+  // Yarışma sezonları kendi öğesinde işaretlenir
+  if (href === '/robot-atolyesi' && pathname.startsWith('/robot-atolyesi/sezonlar')) return false
   return pathname === href || pathname.startsWith(`${href}/`)
 }

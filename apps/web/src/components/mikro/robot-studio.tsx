@@ -6,6 +6,8 @@ import { MISSION_CHAPTERS, ROBOT_MISSIONS, chapterProgress, freeScene, type Robo
 import { ROBOT_PROFILES, type RobotProfileId } from '@/lib/mikro/robot'
 import { onStart, project } from '@/lib/mikro/program'
 import { SKILL_CHALLENGES } from '@/lib/mikro/beceri'
+import { SEASONS, SEASON_FIELDS } from '@/lib/mikro/sezon'
+import Link from 'next/link'
 import type { MikroProject } from '@/lib/mikro/types'
 import { SkillPanel } from './skill-panel'
 import { BuildSteps } from './donusen-stage'
@@ -21,22 +23,25 @@ const SENSOR_KEY = { blok: 'mikro.studio.sensorsBlok', gezgin: 'mikro.studio.sen
 type Pick = { kind: 'mission'; id: string } | { kind: 'free'; profile: RobotProfileId } | { kind: 'skill'; id: string } | { kind: 'donusen'; model: DonusenModelId; id: string }
 /** Dönüşen Robot görevlerinin tamamlandı kaydı (robot görev kimlikleriyle karışmasın diye önekli). */
 const dnKey = (id: string) => `d:${id}`
+/** Sanal Beceri sahaları + yarışma sezonu alanları (ikisi de SkillPanel ile puanlanır). */
+const ALL_SKILLS = [...SKILL_CHALLENGES, ...SEASON_FIELDS]
 
 function loadDone(): Set<string> {
   try { return new Set(JSON.parse(localStorage.getItem(DONE_KEY) ?? '[]') as string[]) } catch { return new Set() }
 }
 
-export function RobotStudio() {
+/** `initialSkill`: açılışta seçilecek beceri sahası ya da sezon alanı (ör. /robot-atolyesi?saha=sezon-1-akilli-sehir). */
+export function RobotStudio({ initialSkill }: { initialSkill?: string } = {}) {
   const { locale, t } = useI18n()
   const en = locale === 'en'
   const robotTitle = (p: RobotProfileId) => (en ? PROFILE_EN[p].title : ROBOT_PROFILES[p].title)
-  const [pick, setPick] = useState<Pick>({ kind: 'mission', id: ROBOT_MISSIONS[0].id })
+  const [pick, setPick] = useState<Pick>(() => (initialSkill && ALL_SKILLS.some((c) => c.id === initialSkill) ? { kind: 'skill', id: initialSkill } : { kind: 'mission', id: ROBOT_MISSIONS[0].id }))
   const [done, setDone] = useState<Set<string>>(new Set())
   useEffect(() => { setDone(loadDone()) }, [])
 
   const [current, setCurrent] = useState<MikroProject | null>(null)
   const mission: RobotMission | null = pick.kind === 'mission' ? ROBOT_MISSIONS.find((m) => m.id === pick.id) ?? null : null
-  const skill = pick.kind === 'skill' ? SKILL_CHALLENGES.find((c) => c.id === pick.id) ?? null : null
+  const skill = pick.kind === 'skill' ? ALL_SKILLS.find((c) => c.id === pick.id) ?? null : null
   const profile: RobotProfileId = mission ? mission.profile : skill ? skill.profile : pick.kind === 'free' ? pick.profile : 'blok'
   const robot = useMemo(() => ({ profile, scene: mission ? mission.scene : skill ? skill.scene : freeScene }), [profile, mission, skill])
   const dnMission: DonusenMission | null = pick.kind === 'donusen' ? DONUSEN_MISSIONS.find((m) => m.id === pick.id) ?? null : null
@@ -96,6 +101,11 @@ export function RobotStudio() {
         <div className="rb-row">
           <h2>{t('mikro.studio.skills')}</h2>
           <ul>{SKILL_CHALLENGES.map((c) => card(c.id, en ? c.en.title : c.title, t('mikro.studio.skillSub', { robot: robotTitle(c.profile), s: c.timeLimitS }), pick.kind === 'skill' && pick.id === c.id, () => setPick({ kind: 'skill', id: c.id }), `robot-skill-${c.id}`))}</ul>
+        </div>
+        <div className="rb-row" data-testid="robot-season-row">
+          <h2>{t('mikro.studio.seasons')}</h2>
+          <ul>{SEASONS.map((s) => card(s.field.id, en ? s.en.title : s.title, t('mikro.studio.seasonSub', { robot: robotTitle(s.field.profile), s: s.field.timeLimitS }), pick.kind === 'skill' && pick.id === s.field.id, () => setPick({ kind: 'skill', id: s.field.id }), `robot-season-${s.id}`))}
+            <li className="rb-season-link"><Link href="/robot-atolyesi/sezonlar">{t('mikro.studio.seasonRules')}</Link></li></ul>
         </div>
         <div className="rb-row">
           <h2>{t('mikro.studio.free')}</h2>

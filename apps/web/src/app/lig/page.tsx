@@ -55,6 +55,7 @@ export default async function Lig() {
           </ol>
         </section>
       ))}
+      <p><Link href="/robot-atolyesi/sezonlar">{t('season.league')}: {t('season.title')} →</Link></p>
       <p className="muted" style={{ fontSize: '.85rem' }}>{t('league.tiersSoon', { tiers: tiers.join(' → ') })}</p>
     </div>
   )

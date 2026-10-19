@@ -14,6 +14,9 @@ export const mikro: typeof Tr = {
   studio: {
     missions: 'Missions',
     skills: 'Skill challenges',
+    seasons: 'Competition season',
+    seasonSub: '{robot} · {s} s · team league',
+    seasonRules: 'Rules and league →',
     free: 'Free arena',
     done: 'completed',
     skillSub: '{robot} · {s} s · scored',

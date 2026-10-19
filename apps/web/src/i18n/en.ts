@@ -24,6 +24,7 @@ import { content } from './en/content'
 import { eng } from './en/eng'
 import { consent } from './en/consent'
 import { instructor } from './en/instructor'
+import { season } from './en/season'
 
 export const en: Messages = {
   common,
@@ -50,4 +51,5 @@ export const en: Messages = {
   eng,
   consent,
   instructor,
+  season,
 }

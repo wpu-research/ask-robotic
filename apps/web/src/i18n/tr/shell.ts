@@ -79,6 +79,7 @@ export const shell = {
     games: 'Oyunlar',
     microCard: 'Mikro Kart atölyesi',
     robotStudio: 'Robot atölyesi',
+    seasons: 'Yarışma sezonları',
     gameStudio: 'Oyun atölyesi',
     stage: 'Sahne atölyesi',
     ai: 'AI atölyesi',
@@ -102,6 +103,7 @@ export const shell = {
   navDesc: {
     blocks: 'Karakterini bloklarla programla',
     robotStudio: 'Robotunu bloklarla görevlere gönder',
+    seasons: 'Takımınla sezon görevlerinde yarış',
     microCard: 'Işık, ses ve sensörlü sanal kart',
     vision: 'Robotlar nasıl görür? Kamera oyunları',
     gameStudio: 'Kendi oyununu tasarla',

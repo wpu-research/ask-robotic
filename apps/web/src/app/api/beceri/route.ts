@@ -3,8 +3,9 @@ import { getDb } from '@/lib/db'
 import { getCurrentUser } from '@/lib/auth/current'
 import { rateLimited } from '@/lib/auth/rate-limit'
 import { isJson } from '@/lib/auth/http'
-import { MAX_SKILL_PROGRAM_BYTES, myBest, myBoards, submitSkillRun } from '@/lib/beceri-server'
-import { SKILL_BY_ID, SKILL_CHALLENGES } from '@/lib/mikro/beceri'
+import { challengeById, MAX_SKILL_PROGRAM_BYTES, myBest, myBoards, submitSkillRun } from '@/lib/beceri-server'
+import { SKILL_CHALLENGES } from '@/lib/mikro/beceri'
+import { SEASON_FIELDS } from '@/lib/mikro/sezon'
 
 export const dynamic = 'force-dynamic'
 
@@ -25,11 +26,11 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   const challengeId = new URL(req.url).searchParams.get('challengeId') ?? ''
-  if (!SKILL_BY_ID[challengeId]) return Response.json({ error: 'Böyle bir beceri sahası yok' }, { status: 404 })
+  if (!challengeById(challengeId)) return Response.json({ error: 'Böyle bir beceri sahası yok' }, { status: 404 })
   const user = await getCurrentUser().catch(() => null)
   if (!user) return Response.json({ signedIn: false, best: {}, boards: [] })
   const db = getDb()
-  const [best, boards] = await Promise.all([myBest(db, user.id, SKILL_CHALLENGES.map((c) => c.id)), myBoards(db, user.id, challengeId)])
+  const [best, boards] = await Promise.all([myBest(db, user.id, [...SKILL_CHALLENGES, ...SEASON_FIELDS].map((c) => c.id)), myBoards(db, user.id, challengeId)])
   return Response.json({
     signedIn: true,
     me: user.id,

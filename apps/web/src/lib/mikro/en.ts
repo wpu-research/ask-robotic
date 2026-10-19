@@ -254,6 +254,8 @@ export const SCENE_EN: Record<string, string> = {
   labirent: 'Escape the corridor', serbest: 'Free arena', 'kontrol-turu': 'Checkpoint tour', 'renk-avcisi': 'Color hunter',
   'park-et': 'Park it', merdiven: 'Climb the stairs', slalom: 'Slalom', 'engelden-don': 'Bump and come back', 'renk-sirasi': 'Color order',
   'kavsak-say': 'Count the crossings', 'sag-el': 'Maze', 'nesne-tasi': 'Carry the cube', 'hizli-tur': 'Fast lap', sumo: 'Sumo ring', 'renge-gore-ayir': 'Sort by color',
+  'sezon-1-akilli-sehir': 'Season 1: Smart City',
 }
 /** Arenadaki bölge yazıları (Türkçe yazı → İngilizce). */
-export const ZONE_EN: Record<string, string> = { hedef: 'target', 'başlangıç': 'start', 'çıkış': 'exit', 'bitiş': 'finish', park: 'parking', ev: 'home', zirve: 'top' }
+export const ZONE_EN: Record<string, string> = { hedef: 'target', 'başlangıç': 'start', 'çıkış': 'exit', 'bitiş': 'finish', park: 'parking', ev: 'home', zirve: 'top',
+  hastane: 'hospital', okul: 'school', 'kütüphane': 'library', santral: 'solar plant', 'yeşil alan': 'green space', otopark: 'car park' }

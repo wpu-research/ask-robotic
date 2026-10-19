@@ -12,7 +12,7 @@ const RobotArena3D = dynamic(() => import('./robot-arena-3d').then((m) => m.Robo
 
 const CM = 100
 const LIGHT_CSS: Record<LightColor, string> = { kapali: '#475569', kirmizi: '#ef4444', yesil: '#22c55e', mavi: '#3b82f6', sari: '#facc15', beyaz: '#ffffff' }
-const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1' } as const
+const ZONE_CSS = { goal: '#16a34a', checkpoint: '#d97706', start: '#6366f1', penalty: '#dc2626' } as const
 
 export function RobotArena({ robot, device, tick }: { robot: DriveBase; device: Device; tick: number }) {
   const v = useView3D()
