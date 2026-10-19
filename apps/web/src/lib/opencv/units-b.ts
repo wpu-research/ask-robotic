@@ -106,7 +106,7 @@ export const UNITS_B: KursUnit<CvToolId>[] = [
     },
   },
   {
-    n: 9, tools: ['warp', 'perspective'],
+    n: 9, tools: ['warp', 'perspective', 'camera3d'],
     tr: {
       title: 'Geometrik ve perspektif dönüşümler: döndür, ölçekle, düzle',
       summary: 'Afin matris (2×3), getRotationMatrix2D, ara değerleme; homografi (3×3), dört nokta çifti ve belge düzleme.',

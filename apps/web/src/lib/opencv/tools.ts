@@ -2,7 +2,7 @@
 // görüntü işleme mantığı lib/opencv/ops.ts, contours.ts, geom.ts, features.ts'te (saf, testli).
 export type CvToolId =
   | 'channels' | 'point' | 'threshold' | 'filter' | 'edges' | 'morph' | 'contours' | 'color'
-  | 'warp' | 'perspective' | 'features' | 'haar' | 'facecam' | 'bgsub' | 'scanner'
+  | 'warp' | 'perspective' | 'camera3d' | 'features' | 'haar' | 'facecam' | 'bgsub' | 'scanner'
 
 interface Text { title: string; desc: string }
 
@@ -46,6 +46,10 @@ export const CV_TOOL_META: Record<CvToolId, { tr: Text; en: Text }> = {
   perspective: {
     tr: { title: 'Perspektif düzeltme (belge)', desc: 'Belgenin dört köşesini sürükle ya da "Köşeleri bul" ile otomatik bulmasını iste. 3×3 homografi dört nokta çiftinden çözülür ve belge yukarıdan çekilmiş gibi düzlenir.' },
     en: { title: 'Perspective correction (document)', desc: 'Drag the four corners of the document or let "Find corners" detect them. A 3×3 homography is solved from the four point pairs and the document is flattened as if shot from above.' },
+  },
+  camera3d: {
+    tr: { title: '3B masa ve sanal kamera', desc: 'Masada A4 bir belge ve iğne deliği modeliyle bir kamera. Kamerayı yükselt, döndür, yaklaştır: görüntü bu kameradan gerçekten üretilir (her pikselin ışını masa düzlemiyle kesiştirilir). Sonra köşe bulma ve perspektif düzeltme aynı görüntüye uygulanır; gerçek köşelerle karşılaştırılır.' },
+    en: { title: '3D desk and virtual camera', desc: 'An A4 document on a desk and a camera with the pinhole model. Raise, turn and move the camera: the image is really produced from this camera (each pixel\'s ray is intersected with the desk plane). Then corner finding and perspective correction are applied to the same image and compared with the true corners.' },
   },
   features: {
     tr: { title: 'Köşeler ve öznitelik eşleştirme', desc: 'Harris yanıtı köşelerde büyüktür. Sağdaki görüntü soldakinin döndürülmüş ve ölçeklenmiş kopyası; her köşe için ikili (BRIEF benzeri) betimleyici çıkarılır, Hamming uzaklığı ve oran testiyle eşleştirilir.' },

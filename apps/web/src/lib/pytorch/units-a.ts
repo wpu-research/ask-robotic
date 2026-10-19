@@ -163,7 +163,7 @@ export const UNITS_A: KursUnit<PtVizId>[] = [
     },
   },
   {
-    n: 4, tools: ['optim'], notebook: '04-kayip-optimizasyon',
+    n: 4, tools: ['optim', 'loss3d'], notebook: '04-kayip-optimizasyon',
     tr: {
       title: 'Kayıp fonksiyonları ve optimize ediciler',
       summary: 'MSE, ikili ve çok sınıflı çapraz entropi, logit; SGD, momentum, RMSprop, Adam; öğrenme oranı ve zamanlayıcılar.',

@@ -60,3 +60,9 @@
   .kurs .cv-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .kurs .pt-maps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* 3B sahneler (three.js, istemcide dinamik yüklenir) */
+.kurs .kurs-3d { margin: 0; min-width: 0; }
+.kurs .kurs-3d-host { width: 100%; border-radius: 8px; border: 1px solid var(--border); overflow: hidden; background: #e8edf3; touch-action: none; }
+.kurs .kurs-3d figcaption { font-size: .78rem; color: var(--muted); margin-top: 4px; }
+@media (max-width: 760px) { .kurs .kurs-3d-host { height: 280px !important; } }

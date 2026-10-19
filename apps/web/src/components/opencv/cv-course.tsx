@@ -24,7 +24,7 @@ export const CV_CONFIG: KursConfig<CvToolId> = {
   toolTitle: (id, lang) => CV_TOOL_META[id][lang].title,
   renderTool: (id, lang) => <CvToolBox id={id} lang={lang} />,
   renderCode: (k, lang, u) => <CvCode block={k} lang={lang} sampleId={RUN_SAMPLE[u.n] ?? 'shapes'} />,
-  capstoneTool: (lang) => <CvToolBox id="scanner" lang={lang} />,
+  capstoneTool: (lang) => <div className="rb-sims"><CvToolBox id="scanner" lang={lang} /><CvToolBox id="camera3d" lang={lang} scan /></div>,
   capstoneCode: (lang) => [scannerPy(lang)],
   extra: (lang) => (
     <section className="panel" aria-labelledby="cv-how">

@@ -1,7 +1,7 @@
 // PyTorch dersi tarayıcı görselleştiricilerinin kimlikleri, başlık ve açıklamaları (TR/EN). PyTorch tarayıcıda çalışmaz;
 // görselleştiriciler aynı matematiği TypeScript'te dürüstçe yapar (lib/pytorch, saf ve testli), gerçek kod Colab defterinde.
 export type PtVizId =
-  | 'tensor' | 'autograd' | 'layers' | 'optim' | 'train' | 'loader' | 'conv' | 'featuremaps'
+  | 'tensor' | 'autograd' | 'layers' | 'optim' | 'loss3d' | 'train' | 'loader' | 'conv' | 'featuremaps' | 'cnn3d'
   | 'regul' | 'lstm' | 'attention' | 'deploy' | 'digits'
 
 interface Text { title: string; desc: string }
@@ -23,6 +23,10 @@ export const PT_VIZ_META: Record<PtVizId, { tr: Text; en: Text }> = {
     tr: { title: 'Optimize ediciler yarışı: SGD, Momentum, RMSprop, Adam', desc: 'Uzun, dar bir vadide (ve Rosenbrock\'ta) dört optimize edici aynı noktadan başlar. Öğrenme oranını değiştir: SGD zikzak yapar, momentum hız kazanır, Adam her parametrenin adımını kendi ölçeğine göre ayarlar.' },
     en: { title: 'Optimiser race: SGD, Momentum, RMSprop, Adam', desc: 'In a long, narrow valley (and on Rosenbrock) four optimisers start from the same point. Change the learning rate: SGD zigzags, momentum builds up speed, Adam scales each parameter\'s step to its own size.' },
   },
+  loss3d: {
+    tr: { title: '3B kayıp yüzeyi ve yörüngeler', desc: 'Aynı optimize ediciler, bu kez kayıp yüzeyinin üstünde 3B: yükseklik log(1 + f). Yüzeyi döndür, vadinin ne kadar dar olduğunu yandan gör; toplar her optimize edicinin adımlarını sırayla izler.' },
+    en: { title: '3D loss surface and trajectories', desc: 'The same optimisers, this time on top of the loss surface in 3D: height log(1 + f). Rotate the surface and see from the side how narrow the valley is; the balls follow each optimiser\'s steps in turn.' },
+  },
   train: {
     tr: { title: 'Eğitim döngüsü: tarayıcıda gerçek bir küçük ağ', desc: 'İki ay veri kümesinde 2-16-16-1 ağ, eğitim ve doğrulama ayrımıyla gerçekten eğitilir (Adam, ikili çapraz entropi). Her turda iki kayıp eğrisi ve doğruluk; karar sınırı arkada. Gizli katman ve öğrenme oranı senin.' },
     en: { title: 'Training loop: a real small network in the browser', desc: 'A 2-16-16-1 network is really trained on the two-moons data with a train/validation split (Adam, binary cross-entropy). Two loss curves and accuracy each epoch; the decision boundary behind. Hidden size and learning rate are yours.' },
@@ -38,6 +42,10 @@ export const PT_VIZ_META: Record<PtVizId, { tr: Text; en: Text }> = {
   featuremaps: {
     tr: { title: 'Öznitelik haritaları: eğitilmiş CNN\'in içi', desc: 'Bir rakam çiz. MNIST\'te eğitilmiş küçük CNN\'in (bitirme defteriyle eğitildi) ilk evrişim katmanının 8 çekirdeği, 8 öznitelik haritası ve havuzlamadan sonraki 16 harita gösterilir. Hesap tarayıcıda, aynı ağırlıklarla.' },
     en: { title: 'Feature maps: inside a trained CNN', desc: 'Draw a digit. The 8 kernels and 8 feature maps of the first convolution layer of a small CNN trained on MNIST (with the capstone notebook) are shown, then the 16 maps after pooling. Computed in the browser with the same weights.' },
+  },
+  cnn3d: {
+    tr: { title: 'CNN katmanları 3B', desc: 'Bir rakam çiz: girdi, conv1 (8 harita), pool1, conv2 (16 harita) ve pool2 derinlik boyunca art arda dizilir. Haritalar küçülürken sayıları artar; ağ uzamsal bilgiyi kanallara taşır. Hesap tarayıcıda, eğitilmiş ağırlıklarla.' },
+    en: { title: 'CNN layers in 3D', desc: 'Draw a digit: the input, conv1 (8 maps), pool1, conv2 (16 maps) and pool2 are lined up in depth. As the maps shrink their number grows; the network moves spatial information into channels. Computed in the browser with the trained weights.' },
   },
   regul: {
     tr: { title: 'Aşırı öğrenme ve düzenlileştirme deneyi', desc: 'Az ve gürültülü veride büyük bir ağ ezberler: eğitim kaybı düşer, doğrulama kaybı yükselir. Dropout, ağırlık sönümü (weight decay) ve erken durdurmayı aç; aynı tohumla iki eğrinin arasındaki farkın nasıl kapandığını gör.' },

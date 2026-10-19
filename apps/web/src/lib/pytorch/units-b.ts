@@ -59,7 +59,7 @@ export const UNITS_B: KursUnit<PtVizId>[] = [
     },
   },
   {
-    n: 7, tools: ['conv', 'featuremaps'], notebook: '07-cnn',
+    n: 7, tools: ['conv', 'featuremaps', 'cnn3d'], notebook: '07-cnn',
     tr: {
       title: 'Evrişimli sinir ağları (CNN)',
       summary: 'Evrişim katmanı, çekirdek, adım, dolgu, genişleme; havuzlama; alıcı alan; öznitelik haritaları; küçük bir MNIST CNN\'i.',

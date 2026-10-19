@@ -159,7 +159,7 @@ export function useCnn(): CnnWeights | null {
   return w
 }
 /** Siyah zeminde beyaz kalemle 280×280 çizim alanı; her vuruştan sonra 28×28 MNIST görüntüsünü bildirir. */
-function DrawPad({ lang, onDigit }: { lang: L; onDigit: (px: Uint8ClampedArray | null) => void }) {
+export function DrawPad({ lang, onDigit }: { lang: L; onDigit: (px: Uint8ClampedArray | null) => void }) {
   const ref = useRef<HTMLCanvasElement>(null), last = useRef<{ x: number; y: number } | null>(null)
   const clear = useCallback(() => { const c = ref.current!; const ctx = c.getContext('2d')!; ctx.fillStyle = '#000'; ctx.fillRect(0, 0, 280, 280); onDigit(null) }, [onDigit])
   useEffect(() => { const c = ref.current!; c.width = 280; c.height = 280; clear() }, [clear])
@@ -187,7 +187,7 @@ function MapCanvas({ fm, ch, label }: { fm: Fm; ch: number; label: string }) {
   }, [fm, ch])
   return <canvas ref={ref} title={label} aria-label={label} />
 }
-function Probs({ probs, lang }: { probs: number[]; lang: L }) {
+export function Probs({ probs, lang }: { probs: number[]; lang: L }) {
   const best = probs.indexOf(Math.max(...probs))
   return <div className="pt-bars" aria-label={tx(lang, 'Sınıf olasılıkları', 'Class probabilities')}>{probs.map((p, i) => <div key={i} className={`pt-bar${i === best ? ' top' : ''}`}><b>{i}</b><i style={{ width: `${Math.max(1, p * 100)}%` }} /><span>{(p * 100).toFixed(1)}%</span></div>)}</div>
 }
