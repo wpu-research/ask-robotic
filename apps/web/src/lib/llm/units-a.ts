@@ -4,7 +4,7 @@ import type { Unit } from './course'
 
 export const UNITS_A: Unit[] = [
   {
-    n: 1, sims: ['bpe'],
+    n: 1, sims: ['bpe', 'attn3d'],
     related: [
       { href: '/ai-atolyesi', tr: 'AI atölyesi: tokenlaştırıcı ve bağlam penceresi aracı', en: 'AI workshop: tokenizer and context window tool' },
       { href: '/makine-ogrenmesi/mini-dil-modeli', tr: 'Makine öğrenmesi: mini dil modeli', en: 'Machine learning: mini language model' },
@@ -60,7 +60,7 @@ export const UNITS_A: Unit[] = [
     },
   },
   {
-    n: 2, sims: ['embed'],
+    n: 2, sims: ['embed', 'space3d'],
     related: [
       { href: '/makine-ogrenmesi/kelime-vektorleri', tr: 'Makine öğrenmesi: kelime vektörleri', en: 'Machine learning: word vectors' },
       { href: '/makine-ogrenmesi/pca', tr: 'Makine öğrenmesi: temel bileşen analizi (PCA)', en: 'Machine learning: principal component analysis (PCA)' },
@@ -228,7 +228,7 @@ export const UNITS_A: Unit[] = [
     },
   },
   {
-    n: 5, sims: ['rag'],
+    n: 5, sims: ['rag', 'rag3d'],
     related: [
       { href: '/makine-ogrenmesi/rag', tr: 'Makine öğrenmesi: RAG dersi', en: 'Machine learning: the RAG lesson' },
       { href: '/ai-atolyesi', tr: 'AI atölyesi: RAG aracı', en: 'AI workshop: RAG tool' },

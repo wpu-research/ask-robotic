@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { LlmSimBox } from '@/components/llm/llm-sim-box'
 import { CodeBlock } from '@/components/robotik/code-block'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
@@ -32,6 +33,13 @@ export default async function LlmProje() {
           <section aria-labelledby="lp-req"><h2 id="lp-req">{en ? 'Requirements (testable)' : 'Gereksinimler (test edilebilir)'}</h2><ul className="eng-list">{t.requirements.map((r) => <li key={r}>{r}</li>)}</ul></section>
           <section aria-labelledby="lp-arch"><h2 id="lp-arch">{en ? 'Architecture' : 'Mimari'}</h2><ul className="eng-list">{t.architecture.map((r) => <li key={r}>{r}</li>)}</ul></section>
           <section aria-labelledby="lp-test"><h2 id="lp-test">{en ? 'Verification: from unit tests to the evaluation set' : 'Doğrulama: birim testinden değerlendirme kümesine'}</h2><ul className="eng-list">{t.tests.map((r) => <li key={r}>{r}</li>)}</ul></section>
+          <section aria-labelledby="lp-3d">
+            <h2 id="lp-3d">{en ? 'See the pipeline in 3D' : 'Hattı 3B izle'}</h2>
+            <p>{en
+              ? 'Before you build your own retrieval step, watch the course one at work: the query lands in the embedding space, the nearest chunks are found, reranked, filtered by the threshold and turned into an answer with sources. Your system should be able to explain every one of these steps in its logs.'
+              : 'Kendi geri getirme adımını kurmadan önce dersinkini çalışırken izle: sorgu gömme uzayına düşer, en yakın parçalar bulunur, yeniden sıralanır, eşikle süzülür ve kaynaklı bir cevaba dönüşür. Senin sistemin de bu adımların her birini kayıtlarında açıklayabilmeli.'}</p>
+            <div className="rb-sims"><LlmSimBox id="rag3d" lang={lang} cfg={{ q: '1' }} /></div>
+          </section>
           <section aria-labelledby="lp-code">
             <h2 id="lp-code">{en ? 'Starter code' : 'Başlangıç kodu'}</h2>
             <CodeBlock {...ragPy(lang)} lang={lang} />
