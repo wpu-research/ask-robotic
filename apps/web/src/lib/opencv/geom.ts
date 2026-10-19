@@ -102,7 +102,7 @@ export interface DocSteps { gray: Gray; edges: Gray; closed: Gray; quad: P[] | n
 /** Belge köşeleri: en büyük, görüntünün en az %minFrac'ı kadar, dört köşeye yaklaşan dışbükey kontur. */
 export function findDocument(src: Rgba, lo = 50, hi = 150, minFrac = 0.1): DocSteps {
   const g = toGray(src), edges = canny(g, lo, hi, 5, 0).edges
-  const closed = morphology(edges, 'dilate', 'rect', 3, 2)
+  const closed = morphology(edges, 'close', 'rect', 3, 2)
   const cs = findContours(closed, 50)
   let best: P[] | null = null, bestA = minFrac * src.w * src.h, cand = 0
   for (const c of cs) {

@@ -25,12 +25,12 @@ describe('sanal kamera (OpenCV 3B)', () => {
     const r = docCorners(0).map((X) => project(tilt, pt, X)!)
     expect(r[1].x - r[0].x).toBeLessThan(r[2].x - r[3].x) // uzak kenar kısa
   })
-  it('sanal kameranın ürettiği görüntüde 9. ünitenin köşe bulucusu gerçek köşeleri 6 px içinde bulur', () => {
+  it('sanal kameranın ürettiği görüntüde 9. ünitenin köşe bulucusu gerçek köşeleri 4 px içinde bulur', () => {
     for (const p of [CAM_DEFAULT, { ...CAM_DEFAULT, elev: 70, azim: -25, docYaw: -15 }]) {
       const { img, corners } = renderPhoto(p)
       const r = findDocument(img)
       expect(r.quad).not.toBeNull()
-      orderCorners(corners as Array<{ x: number; y: number }>).forEach((t, i) => expect(Math.hypot(t.x - r.quad![i].x, t.y - r.quad![i].y)).toBeLessThan(6))
+      orderCorners(corners as Array<{ x: number; y: number }>).forEach((t, i) => expect(Math.hypot(t.x - r.quad![i].x, t.y - r.quad![i].y)).toBeLessThan(4))
     }
   })
   it('frustum köşeleri kameradan ileri yönde', () => {
