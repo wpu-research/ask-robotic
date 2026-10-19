@@ -47,3 +47,24 @@
 .dr-root .rb-sim .sbtn { min-height: 44px; padding: 10px 18px; }
 .dr-root .rb-sim .ctrl { gap: 6px; }
 .dr-root .rb-sim .sl { gap: 0; }
+
+/* 3B uçuş sahnesi (Drone3D): simülasyon kutusunun üstünde; 2B grafik ve denetimler altında eşlik eden panel. */
+.dr-3d { margin: 0 0 16px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; background: var(--surface-2); }
+.dr-3d-view { position: relative; width: 100%; aspect-ratio: 16 / 9; min-height: 240px; max-height: 70vh; background: #dfe9f3; overflow: hidden; }
+.dr-3d-view canvas { position: absolute; inset: 0; }
+.dr-3d-msg { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 16px; text-align: center; color: #334155; font-size: .9rem; }
+.dr-3d-hud { position: absolute; left: 8px; top: 8px; margin: 0; width: fit-content; max-width: calc(100% - 16px); padding: 6px 9px; border-radius: 8px; background: rgba(15, 23, 42, .72); color: #f8fafc; font: 600 .74rem/1.5 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; white-space: pre-wrap; pointer-events: none; font-variant-numeric: tabular-nums; }
+.dr-3d-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 10px; border-top: 1px solid var(--border); }
+.dr-seg { display: inline-flex; border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; }
+.dr-seg button { font: inherit; font-size: .82rem; font-weight: 700; min-height: 44px; min-width: 44px; padding: 0 12px; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+.dr-seg button + button { border-left: 1px solid var(--border); }
+.dr-seg button[aria-pressed='true'] { background: var(--primary); color: var(--primary-ink); }
+.dr-3d-sel { display: inline-flex; gap: 6px; align-items: center; font-size: .84rem; color: var(--muted); }
+.dr-3d-sel select { min-height: 44px; }
+.dr-3d-hint { color: var(--muted); font-size: .78rem; margin-left: auto; }
+@media (max-width: 600px) {
+  .dr-3d-view { aspect-ratio: 1 / 1.05; }
+  .dr-3d-hud { font-size: .58rem; line-height: 1.4; padding: 3px 6px; left: 6px; top: 6px; }
+  .dr-3d-hint { display: none; }
+  .dr-seg button { padding: 0 9px; }
+}

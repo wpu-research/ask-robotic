@@ -5,6 +5,7 @@ import * as THREE from 'three'
 import type { ProjectRun } from '@/lib/ml/projeler/core'
 import { THROTTLE, type View } from '@/lib/ml/projeler/drone-inis'
 import type { MountScene } from '../stage3d'
+import { makeQuadModel } from './drone-model'
 
 const std = (color: number, o: THREE.MeshStandardMaterialParameters = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.6, ...o })
 function mesh(g: THREE.BufferGeometry, m: THREE.Material, pos: [number, number, number] = [0, 0, 0], shadow = true) {
@@ -54,31 +55,8 @@ export const mount: MountScene = (s) => {
   shadow.position.y = 0.075
   root.add(shadow)
 
-  // drone: gövde, çapraz kollar, dört pervane, ön ışıklar
-  const drone = new THREE.Group()
-  const body = std(0x1e293b, { roughness: 0.4, metalness: 0.2 })
-  drone.add(mesh(new THREE.BoxGeometry(0.5, 0.16, 0.36), body, [0, 0.14, 0]))
-  drone.add(mesh(new THREE.BoxGeometry(0.3, 0.05, 0.22), std(0xf97316, { roughness: 0.4 }), [0, 0.245, 0]))
-  const armGeo = new THREE.BoxGeometry(1.25, 0.05, 0.07), armMat = std(0x475569)
-  for (const a of [Math.PI / 4, -Math.PI / 4]) { const arm = mesh(armGeo, armMat, [0, 0.16, 0]); arm.rotation.y = a; drone.add(arm) }
-  for (const z of [-0.12, 0.12]) drone.add(mesh(new THREE.BoxGeometry(0.04, 0.12, 0.04), armMat, [0.05, 0.04, z * 1.6]))
-  drone.add(mesh(new THREE.BoxGeometry(0.5, 0.025, 0.025), armMat, [0.05, -0.02, 0.19]))
-  drone.add(mesh(new THREE.BoxGeometry(0.5, 0.025, 0.025), armMat, [0.05, -0.02, -0.19]))
-  const rotors: THREE.Group[] = []
-  const bladeGeo = new THREE.BoxGeometry(0.55, 0.012, 0.06), bladeMat = std(0xe2e8f0, { roughness: 0.3, transparent: true, opacity: 0.9 })
-  const hubGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.08, 12)
-  const d = 0.44
-  for (const [x, z] of [[d, d], [d, -d], [-d, d], [-d, -d]] as Array<[number, number]>) {
-    drone.add(mesh(hubGeo, armMat, [x, 0.2, z]))
-    const r = new THREE.Group()
-    r.position.set(x, 0.25, z)
-    r.add(mesh(bladeGeo, bladeMat, [0, 0, 0], false))
-    const b2 = mesh(bladeGeo, bladeMat, [0, 0, 0], false); b2.rotation.y = Math.PI / 2; r.add(b2)
-    drone.add(r)
-    rotors.push(r)
-  }
-  const ledMat = std(0x22c55e, { emissive: new THREE.Color(0x22c55e), emissiveIntensity: 1 })
-  for (const z of [-0.1, 0.1]) drone.add(mesh(new THREE.SphereGeometry(0.03, 8, 8), ledMat, [0.26, 0.14, z], false))
+  // drone: gövde, çapraz kollar, dört pervane, ön ışıklar (ortak model)
+  const { group: drone, rotors, ledMat } = makeQuadModel()
   drone.scale.setScalar(1.3)
   root.add(drone)
 
