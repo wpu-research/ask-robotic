@@ -61,8 +61,8 @@ export const PROGRAMS: readonly Program[] = [
       outcomes: ['Use GPIO, timers, interrupts and the ADC on a microcontroller at register level', 'Drive sensors and modules over UART, I2C and SPI', 'Configure peripherals on an STM32 with HAL', 'Write applications on a Raspberry Pi with Linux, Python and GPIO', 'Verify embedded software with unit tests and hardware-free simulation'],
       capstone: 'A two-layer system that reads sensors on an ARM board, drives a motor with PID and passes its data to a Raspberry Pi; with an architecture document and a test report.',
     },
-    courses: [ARDUINO, C('/muhendislik/arm-stm32', 40, ['ARM ve STM32 ile gömülü programlama', 'Cortex-M mimarisi, HAL, kesmeler, DMA ve haberleşme; kartsız STM32 çalışması.'], ['Embedded programming with ARM and STM32', 'Cortex-M architecture, HAL, interrupts, DMA and communication; STM32 work without a board.']),
-      C('/muhendislik/raspberry-pi', 30, ['Raspberry Pi ile robotik', 'Linux, Python, GPIO ve kamera; kart olmadan pratik.'], ['Robotics with Raspberry Pi', 'Linux, Python, GPIO and the camera; practice without a board.']), ESOF],
+    courses: [ARDUINO, C('/muhendislik/arm-stm32', 47, ['ARM ve STM32 ile gömülü programlama', 'Cortex-M mimarisi, HAL, kesmeler, DMA ve haberleşme; kartsız STM32 çalışması.'], ['Embedded programming with ARM and STM32', 'Cortex-M architecture, HAL, interrupts, DMA and communication; STM32 work without a board.']),
+      C('/muhendislik/raspberry-pi', 45, ['Raspberry Pi ile robotik', 'Linux, Python, GPIO ve kamera; kart olmadan pratik.'], ['Robotics with Raspberry Pi', 'Linux, Python, GPIO and the camera; practice without a board.']), ESOF],
   },
   {
     slug: 'iot-ve-veri', tone: 'iot',
@@ -83,7 +83,7 @@ export const PROGRAMS: readonly Program[] = [
       capstone: 'Smart room: a system that collects data from temperature, humidity and motion sensors, shows it on a cloud dashboard and predicts occupancy.',
     },
     courses: [ARDUINO, SENSORS, C('/muhendislik/iot', 40, ['ESP32 ile Nesnelerin İnterneti', 'Wi-Fi, MQTT, bulut panosu ve OTA güncelleme; sanal ESP32 ile.'], ['Internet of Things with ESP32', 'Wi-Fi, MQTT, a cloud dashboard and OTA updates; with a virtual ESP32.']),
-      C('/muhendislik/sensor-ml', 24, ['Sensör verisinden makine öğrenmesi', 'Zaman serisi öznitelikleri, sınıflandırma ve cihaz üstü çıkarım.'], ['Machine learning on sensor data', 'Time-series features, classification and on-device inference.']), ML],
+      C('/muhendislik/sensor-ml', 32, ['Sensör verisinden makine öğrenmesi', 'Zaman serisi öznitelikleri, sınıflandırma ve cihaz üstü çıkarım.'], ['Machine learning on sensor data', 'Time-series features, classification and on-device inference.']), ML],
   },
   {
     slug: 'yapay-zeka-uygulama', tone: 'ai',
