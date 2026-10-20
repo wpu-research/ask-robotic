@@ -8,14 +8,14 @@ import type { TFunction } from '@/i18n'
 import { apiErrorText } from '@/lib/api-errors'
 
 /** Hata yoksa null; varsa arayüz dilinde mesaj (sunucu metni lib/api-errors.ts ile çevrilir). */
-async function post(t: TFunction, url: string, body: unknown): Promise<string | null> {
+export async function post(t: TFunction, url: string, body: unknown): Promise<string | null> {
   const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).catch(() => null)
   if (res?.ok) return null
   if (!res) return t('auth.errors.network')
   return apiErrorText(t, (await res.json().catch(() => null))?.error, 'auth.errors.generic')
 }
 
-export function LoginForm({ next }: { next: string }) {
+export function LoginForm({ next, resetEnabled = false }: { next: string; resetEnabled?: boolean }) {
   const t = useT()
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -39,6 +39,7 @@ export function LoginForm({ next }: { next: string }) {
       </label>
       {error && <p role="alert" className="au-error">{error}</p>}
       <button className="v2-btn" disabled={busy}>{busy ? t('auth.login.busy') : t('auth.login.submit')}</button>
+      {resetEnabled && <p className="au-alt"><Link href="/sifremi-unuttum">{t('auth.login.forgot')}</Link></p>}
       <p className="au-small">{t('auth.login.qrHint')}</p>
       <div className="au-or">{t('auth.login.or')}</div>
       <p className="au-alt">{t('auth.login.noAccount')} <Link href="/kayit">{t('auth.login.createFree')}</Link></p>

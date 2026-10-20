@@ -5,7 +5,7 @@ import * as schema from './schema'
 
 export * from './schema'
 // Tek drizzle-orm kopyası: web tarafı operatörleri buradan almalı (pnpm iki kopya kurabiliyor)
-export { and, asc, eq, gt, inArray, sql } from 'drizzle-orm'
+export { and, asc, eq, gt, inArray, isNull, sql } from 'drizzle-orm'
 export { seedContent } from './seed-content'
 export { allModules, allComponents } from './content'
 export type { ModuleContent, WeekContent, LessonContent, Concept, QuizQuestion, QuizKind, ComponentGuide, LessonStep, WidgetSpec, WidgetGoal } from './content'

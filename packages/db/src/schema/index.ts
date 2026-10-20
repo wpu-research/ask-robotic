@@ -32,6 +32,8 @@ export const users = pgTable('users', {
   game: jsonb('game').$type<Record<string, unknown>>(),
   // 16 yaş altı için ebeveyn hesabına bağlanır (KVKK). Yeni bağlar guardian_links'te tutulur.
   parentId: uuid('parent_id'),
+  // E-posta doğrulama bağlantısı kullanıldığında dolar; null = doğrulanmadı (doğrulama zorunlu değildir)
+  emailVerifiedAt: timestamp('email_verified_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [check('users_kimlik', sql`${t.email} IS NOT NULL OR ${t.username} IS NOT NULL`)])
 
@@ -100,6 +102,20 @@ export const sessions = pgTable('sessions', {
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 })
+
+// E-posta doğrulama ve parola sıfırlama belirteçleri: tek kullanımlık, süreli; ham belirteç tutulmaz (SHA-256 özeti)
+export const authTokens = pgTable('auth_tokens', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  kind: text('kind').notNull(),
+  tokenHash: text('token_hash').notNull().unique(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  usedAt: timestamp('used_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  index('auth_tokens_user_kind').on(t.userId, t.kind),
+  check('auth_tokens_kind', sql`${t.kind} IN ('verify_email', 'reset_password')`),
+])
 
 // Ölçme verisi: anonim cihaz kimliğiyle olay günlüğü. Kişisel veri (ad, e-posta, IP) TUTULMAZ.
 // Taslak/pilot: yalnız kullanıcı açık onay verdiyse tarayıcı gönderir (docs/ogrenme-platformu-kapsam.md, KVKK bölümü).
