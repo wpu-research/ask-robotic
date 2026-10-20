@@ -71,6 +71,13 @@
       "when": 1792153939934,
       "tag": "0009_ders_ingilizce_klasik",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792496174131,
+      "tag": "0010_eposta_dogrulama_sifirlama",
+      "breakpoints": true
     }
   ]
 }

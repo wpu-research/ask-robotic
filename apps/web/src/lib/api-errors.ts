@@ -22,6 +22,7 @@ const EXACT: Record<string, MessageKey> = {
   'Çok fazla deneme. Biraz bekleyip öğretmenine haber ver.': 'auth.errors.qrRateLimited',
   'Bu QR kart geçerli değil. Öğretmeninden yeni kart iste.': 'auth.errors.qrInvalid',
   'JSON bekleniyor': 'auth.errors.expectJson',
+  'Bağlantı geçersiz ya da süresi dolmuş': 'auth.errors.linkInvalid',
   // Ödeme
   'Ödeme şu an kapalı': 'pricing.errors.closed',
   'Satın almak için giriş yap': 'pricing.errors.loginToBuy',

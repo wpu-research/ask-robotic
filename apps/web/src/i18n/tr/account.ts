@@ -28,6 +28,12 @@ export const account = {
     familyMember: 'Aile üyesi',
     active: 'Etkin',
   },
+  emailVerify: {
+    verified: 'E-postan doğrulandı',
+    unverified: 'E-postan henüz doğrulanmadı',
+    resend: 'Doğrulama e-postası gönder',
+    sent: 'Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.',
+  },
   profile: {
     title: 'Profil',
     name: 'Ad',

@@ -29,6 +29,12 @@ export const account: typeof Tr = {
     familyMember: 'Family member',
     active: 'Active',
   },
+  emailVerify: {
+    verified: 'Your email is verified',
+    unverified: 'Your email is not verified yet',
+    resend: 'Send verification email',
+    sent: 'Verification email sent. Check your inbox.',
+  },
   profile: {
     title: 'Profile',
     name: 'Name',

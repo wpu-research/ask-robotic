@@ -1,6 +1,9 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getDb } from '@/lib/db'
+import { eq, users } from '@ask/db'
+import { mailEnabled } from '@/lib/mail/config'
+import { ResendVerification } from '@/components/account/verify-email'
 import { getCurrentUser } from '@/lib/auth/current'
 import { loadAccountSummary, type AccountSummary } from '@/lib/billing'
 import { DELETE_CONFIRM_PHRASE } from '@/lib/account-data'
@@ -57,6 +60,11 @@ export default async function Hesap({ searchParams }: { searchParams: Promise<{ 
   const s = await loadAccountSummary(getDb(), user.id)
   if (!s) return null
   const line = planLine(s, t)
+  // E-posta doğrulama durumu yalnız SMTP ayarlıysa gösterilir
+  const verifyShown = mailEnabled() && !!s.user.email
+  const verified = verifyShown
+    ? !!(await getDb().select({ v: users.emailVerifiedAt }).from(users).where(eq(users.id, user.id)).limit(1))[0]?.v
+    : false
   const b = q.odeme ? BANNER[q.odeme] : q.deneme === 'basladi' ? { ok: true, key: 'account.banner.trialStarted' as MessageKey } : null
   const banner = b ? { ok: b.ok, text: t(b.key) } : null
 
@@ -77,6 +85,7 @@ export default async function Hesap({ searchParams }: { searchParams: Promise<{ 
             {s.user.email && <><dt>{t('account.profile.email')}</dt><dd>{s.user.email}</dd></>}
             {s.user.username && <><dt>{t('account.profile.username')}</dt><dd>{s.user.username}</dd></>}
           </dl>
+          {verifyShown && (verified ? <p className="muted">{t('account.emailVerify.verified')}</p> : <><p className="muted">{t('account.emailVerify.unverified')}</p><ResendVerification /></>)}
         </section>
 
         <section className="ac-card" aria-labelledby="ac-plan">

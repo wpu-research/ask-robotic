@@ -7,7 +7,7 @@ import { createSession, deleteOtherSessions } from './session'
 
 const email = z.string().trim().toLowerCase().email().max(254)
 // Kayıt ve parola değiştirmede aynı kural
-const newPassword = z.string().min(10, 'Parola en az 10 karakter olmalı').max(200)
+export const newPassword = z.string().min(10, 'Parola en az 10 karakter olmalı').max(200)
 
 /** Yalnız doğum yılı tutulduğu için yıl farkı ≤ 16 ise kişi 16 yaşından küçük olabilir: veli onayı istenir. */
 export const mayBeUnder16 = (birthYear: number, now = new Date()) => now.getFullYear() - birthYear <= 16
