@@ -68,6 +68,7 @@ export const NAV: NavGroup[] = [
       { href: '/muhendislik/robotik', label: 'Robotik dersi', key: 'shell.nav.robotics', icon: 'book' },
       { href: '/muhendislik/drone', label: 'Drone dersi', key: 'shell.nav.drone', icon: 'drone' },
       { href: '/muhendislik/llm', label: 'LLM uygulamaları', key: 'shell.nav.llm', icon: 'ai' },
+      { href: '/muhendislik/robot-kolu', label: 'Robot kolu dersi', key: 'shell.nav.robotArm', icon: 'arena' },
       { href: '/muhendislik/insansi', label: 'İnsansı robot', key: 'shell.nav.humanoid', icon: 'arena' },
       { href: '/programlar', label: 'Programlar', key: 'shell.nav.programs', icon: 'book' },
       { href: '/muhendislik/raspberry-pi', label: 'Raspberry Pi dersi', key: 'shell.nav.rpi', icon: 'code' },
@@ -99,6 +100,7 @@ export function isActive(href: string, pathname: string): boolean {
   // Robotik ve drone dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone'))) return false
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/llm')) return false
+  if (href === '/muhendislik' && pathname.startsWith('/muhendislik/robot-kolu')) return false
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/raspberry-pi') || pathname.startsWith('/muhendislik/arm-stm32'))) return false
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/insansi')) return false
   // Robotunu Tasarla kendi öğesinde işaretlenir

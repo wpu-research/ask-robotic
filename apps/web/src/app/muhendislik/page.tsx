@@ -60,6 +60,15 @@ export default async function Muhendislik() {
         <Icon name="chevronRight" size={18} className="eng-level-go" />
       </Link>
 
+      <Link href="/muhendislik/robot-kolu" className="eng-course" data-testid="eng-robot-kolu">
+        <span className="eng-course-code">ARM</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Course: Robot Arm Engineering' : 'Ders: Robot Kolu Mühendisliği'}</b>
+          <span className="eng-level-text">{en ? '10 units, 40 hours, 16+: a virtual six-axis arm in a 3D scene, forward and inverse kinematics, joint-space and Cartesian motion, a gripper and pick-and-place, collision-free planning with RRT and simple cell safety. You program it in ArmScript, the platform\'s own language, run by an isolated interpreter in the browser. Builds on ESOF 323 week 7.' : '10 ünite, 40 saat, 16+: 3B sahnede sanal altı eksenli kol, ileri ve ters kinematik, eklem uzayı ve kartezyen hareket, tutucu ve al-bırak, RRT ile çarpışmasız planlama ve basit hücre güvenliği. Platformun kendi dili ArmScript ile programlarsın; program tarayıcıda yalıtılmış bir yorumlayıcıda koşar. ESOF 323 7. haftanın üstüne kurulur.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <Link href="/muhendislik/opencv" className="eng-course" data-testid="eng-opencv">
         <span className="eng-course-code">OPENCV</span>
         <span className="eng-level-body">

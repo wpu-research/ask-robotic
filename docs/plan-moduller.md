@@ -31,7 +31,7 @@ Bu ilkenin sonuçları:
 ### Modül 8 — Endüstriyel robot kolu (KUKA tarzı)
 - Sanal 6 eksenli robot kolu hücresi: eklem uzayı / kartezyen hareket, ileri-ters kinematik, tutucu, al-bırak, yol planlama, çarpışmasız yörünge, basit hücre güvenliği.
 - Robot programlama dili: KUKA'nın KRL'sine benzeyen, **platformun kendi** yorumlayıcılı bir dil. 
-- **Dikkat:** KUKA bir ticari markadır; KRL, KUKA.Sim/WorkVisual yazılımlarının içeriği tescillidir. Resmî KUKA içeriği kopyalanmaz, "resmî KUKA eğitimi" izlenimi verilmez. Modül adı konusunda (ör. "Endüstriyel robot kolu: KUKA tarzı programlama" yerine nötr ad) karar bekleniyor.
+- **Dikkat:** KUKA bir ticari markadır; KRL, KUKA.Sim/WorkVisual yazılımlarının içeriği tescillidir. Resmî KUKA içeriği kopyalanmaz, "resmî KUKA eğitimi" izlenimi verilmez. Karar: ders adı nötr, "Robot Kolu Mühendisliği" (`/muhendislik/robot-kolu`); dil "ArmScript" (uygulandı, 2026-10-20).
 - Ön koşul: Modül 5'in robot kol ve ters kinematik dersleri (108-109).
 
 ### Modül 9 — Drone

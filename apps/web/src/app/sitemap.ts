@@ -2,6 +2,7 @@ import type { MetadataRoute } from 'next'
 import { DEMOS } from '@/lib/cv-demolar'
 import { UNITS } from '@/lib/drone/course'
 import { UNITS as LLM_UNITS } from '@/lib/llm/course'
+import { UNITS as ROBOT_UNITS } from '@/lib/robot-kolu/course'
 import { RPI_COURSE } from '@/lib/rpi/course'
 import { STM32_COURSE } from '@/lib/stm32/course'
 import { IOT_UNITS } from '@/lib/iot/course'
@@ -28,6 +29,7 @@ const PAGES = [
   ...PROJECTS.map((p) => `/makine-ogrenmesi/${p.slug}`), '/makine-ogrenmesi/veri-setleri', '/oyunlar', '/ai-atolyesi',
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
   '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),
+  '/muhendislik/robot-kolu', '/muhendislik/robot-kolu/simulasyon', '/muhendislik/robot-kolu/proje', ...ROBOT_UNITS.map((u) => `/muhendislik/robot-kolu/unite/${u.n}`),
   '/programlar',
   '/robot-atolyesi/sezonlar', ...SEASONS.map((s) => `/robot-atolyesi/sezonlar/${s.id}`),
   '/robot-atolyesi/tasarla', '/muhendislik/insansi',

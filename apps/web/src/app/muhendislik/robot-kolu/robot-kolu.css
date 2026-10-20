@@ -1,0 +1,21 @@
+/* Robot Kolu dersi: ESOF 323 (robotik.css), Drone ve LLM derslerinin üstüne 3B sahne kutusu, oynatıcı çubuğu, kod ve konsol. Aynı jetonlar. */
+.rk-3d { height: clamp(300px, 56vw, 480px); background: #e8edf3; }
+.rk-3d .lm-3d-msg { color: #334155; }
+.rk-player { display: grid; gap: 8px; min-width: 0; }
+.rk-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.rk-bar select { min-height: 44px; }
+.rk-scrub-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; }
+.rk-scrub { width: 100%; min-height: 44px; }
+.rk-clock { font-variant-numeric: tabular-nums; font-size: .84rem; color: var(--muted); white-space: nowrap; }
+.rk-code { max-height: 340px; }
+.rk-ta { font: .8rem/1.55 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; min-height: 220px; tab-size: 2; white-space: pre; overflow: auto; }
+.rk-root .rb-sim .readout.log.rk-err { border-color: var(--red); color: var(--red); }
+.rk-root .rb-sim .sbtn, .rk-root .rb-sim .rk-bar select, .rk-root .rb-sim .sl select { min-height: 44px; }
+.rk-root .rb-sim input[type=range] { min-height: 32px; }
+.rk-note { margin: 10px 0 0; padding: 10px 12px; border-left: 3px solid var(--eng); background: var(--eng-soft); border-radius: 0 8px 8px 0; font-size: .9rem; }
+.rk-prereq { display: grid; gap: 8px; }
+.rk-prereq li { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .rk-3d { height: clamp(260px, 78vw, 360px); }
+  .rk-scrub-row { grid-template-columns: minmax(0, 1fr); }
+}
