@@ -20,6 +20,7 @@ const ESOF = C('/muhendislik/robotik', 56, ['Üniversite dersi: Robotik (ESOF 32
 const DRONE = C('/muhendislik/drone', 40, ['Drone mühendisliği', 'Parça, simülasyon ve yazılım; PX4, MAVLink, ROS 2; hassas inişli bitirme görevi.'], ['Drone engineering', 'Parts, simulation and software; PX4, MAVLink, ROS 2; a capstone mission with precision landing.'])
 const ML = C('/makine-ogrenmesi', 60, ['Makine öğrenmesi', 'Regresyondan sinir ağına ve dikkate; algoritmalar sıfırdan, kod tarayıcıda çalışır.'], ['Machine learning', 'From regression to neural networks and attention; algorithms from scratch, code runs in the browser.'])
 const LLM = C('/muhendislik/llm', 40, ['Büyük Dil Modeli Uygulamaları', 'Token, gömme, prompt, JSON çıktı, RAG, ajan, değerlendirme, güvenlik, maliyet, akışlı arayüz.'], ['Large Language Model Applications', 'Tokens, embeddings, prompts, JSON output, RAG, agents, evaluation, safety, cost, streaming front-end.'])
+const ROBOT_ARM = C('/muhendislik/robot-kolu', 40, ['Robot Kolu Mühendisliği', 'Sanal 6 eksenli kol: kinematik, tutucu, ArmScript, çarpışmasız planlama, hücre güvenliği.'], ['Robot Arm Engineering', 'A virtual 6-axis arm: kinematics, gripper, ArmScript, collision-free planning, cell safety.'])
 const DEMOS = C('/robotun-gozleri/demolar', 6, ['Gerçek hayat demoları', 'Düşme, bölge ihlali, nabız, trafik: kamerayla canlı görü uygulamaları.'], ['Real-life demos', 'Falls, zone intrusion, pulse, traffic: live vision applications with the camera.'])
 
 export const PROGRAMS: readonly Program[] = [
@@ -134,7 +135,7 @@ export const PROGRAMS: readonly Program[] = [
       summary: 'Algıla, kestir, planla, denetle: üniversite düzeyi robotik, drone mühendisliği ve ROS 2 ile simülasyonda otonom görevler.',
       level: 'İleri',
       prereq: 'Ön koşul: temel Python ya da C++, lise fiziği. Robotik Programlama ya da Gömülü Sistemler programı önerilir.',
-      outcomes: ['Sensör füzyonu ve durum kestirimi (tamamlayıcı süzgeç, Kalman) uygulamak', 'PID ve kinematikle bir robot ya da drone denetlemek', 'Harita, yol planlama ve görev durum makinesi kurmak', 'ROS 2 ve PX4 SITL ile simülasyonda uçtan uca görev çalıştırmak', 'Otonom bir sistemi gereksinim, mimari, SIL testi ve failsafe senaryolarıyla doğrulamak'],
+      outcomes: ['Sensör füzyonu ve durum kestirimi (tamamlayıcı süzgeç, Kalman) uygulamak', 'PID ve kinematikle bir robot ya da drone denetlemek', 'Harita, yol planlama ve görev durum makinesi kurmak', 'ROS 2 ve PX4 SITL ile simülasyonda uçtan uca görev çalıştırmak', 'Otonom bir sistemi gereksinim, mimari, SIL testi ve failsafe senaryolarıyla doğrulamak', 'Altı eksenli bir robot kolunu kinematik, çarpışmasız planlama ve hücre güvenliğiyle programlamak'],
       capstone: 'Simüle otonom görev: kalkış, ara noktalar ve ArUco ile hassas iniş ya da yer robotuyla harita çıkarıp hedefe gitme; SIL test kanıtlarıyla.',
     },
     en: {
@@ -142,10 +143,10 @@ export const PROGRAMS: readonly Program[] = [
       summary: 'Sense, estimate, plan, control: university-level robotics, drone engineering and autonomous missions in simulation with ROS 2.',
       level: 'Advanced',
       prereq: 'Prerequisite: basic Python or C++, high-school physics. The Robotics Programming or Embedded Systems programme is recommended.',
-      outcomes: ['Apply sensor fusion and state estimation (complementary filter, Kalman)', 'Control a robot or drone with PID and kinematics', 'Build maps, path planning and a mission state machine', 'Run an end-to-end mission in simulation with ROS 2 and PX4 SITL', 'Verify an autonomous system with requirements, architecture, SIL tests and failsafe scenarios'],
+      outcomes: ['Apply sensor fusion and state estimation (complementary filter, Kalman)', 'Control a robot or drone with PID and kinematics', 'Build maps, path planning and a mission state machine', 'Run an end-to-end mission in simulation with ROS 2 and PX4 SITL', 'Verify an autonomous system with requirements, architecture, SIL tests and failsafe scenarios', 'Program a six-axis robot arm with kinematics, collision-free planning and cell safety'],
       capstone: 'A simulated autonomous mission: take-off, waypoints and precision landing on ArUco, or mapping with a ground robot and driving to a goal; with SIL test evidence.',
     },
-    courses: [ESOF, DRONE, C('/muhendislik/opencv', 36, ['OpenCV ile görüntü işleme', 'Hassas iniş ve hedef takibi için görü temeli.'], ['Image processing with OpenCV', 'The vision basis for precision landing and target tracking.']), C('/muhendislik', 10, ['Mühendislik yolu: 128 gerçek parça', 'Sensör, sürücü ve güç parçalarını seviyelerle tanı; Hyvex kartları.'], ['Engineering path: 128 real parts', 'Get to know sensor, driver and power parts by level; Hyvex cards.'])],
+    courses: [ESOF, DRONE, ROBOT_ARM, C('/muhendislik/opencv', 36, ['OpenCV ile görüntü işleme', 'Hassas iniş ve hedef takibi için görü temeli.'], ['Image processing with OpenCV', 'The vision basis for precision landing and target tracking.']), C('/muhendislik', 10, ['Mühendislik yolu: 128 gerçek parça', 'Sensör, sürücü ve güç parçalarını seviyelerle tanı; Hyvex kartları.'], ['Engineering path: 128 real parts', 'Get to know sensor, driver and power parts by level; Hyvex cards.'])],
   },
 ]
 
