@@ -60,6 +60,15 @@ export default async function Muhendislik() {
 
       <h2 className="eng-sec-title">{en ? 'Courses' : 'Dersler'}</h2>
 
+      <Link href="/yol-haritasi" className="eng-course" data-testid="eng-roadmap">
+        <span className="eng-course-code">{en ? 'GOAL' : 'HEDEF'}</span>
+        <span className="eng-level-body">
+          <b>{en ? 'Roadmap: what do you want to become?' : 'Yol haritası: ne olmak istiyorsun?'}</b>
+          <span className="eng-level-text">{en ? 'Robotics software, embedded, drones, IoT, vision, ML, AI apps, industrial robots, autonomous vehicles or research: pick a goal and see which courses to finish, in order.' : 'Robotik yazılım, gömülü, drone, IoT, görü, makine öğrenmesi, yapay zekâ, endüstriyel robot, otonom araç ya da araştırma: hedefini seç, hangi dersleri sırayla bitireceğini gör.'}</span>
+        </span>
+        <Icon name="chevronRight" size={18} className="eng-level-go" />
+      </Link>
+
       <Link href="/muhendislik/robotik" className="eng-course" data-testid="eng-course">
         <span className="eng-course-code">ESOF 323</span>
         <span className="eng-level-body">

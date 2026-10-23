@@ -71,6 +71,7 @@ export const NAV: NavGroup[] = [
       { href: '/muhendislik/llm', label: 'LLM uygulamaları', key: 'shell.nav.llm', icon: 'ai' },
       { href: '/muhendislik/robot-kolu', label: 'Robot kolu dersi', key: 'shell.nav.robotArm', icon: 'arena' },
       { href: '/muhendislik/insansi', label: 'İnsansı robot', key: 'shell.nav.humanoid', icon: 'arena' },
+      { href: '/yol-haritasi', label: 'Yol haritası', key: 'shell.nav.roadmap', icon: 'target' },
       { href: '/programlar', label: 'Programlar', key: 'shell.nav.programs', icon: 'book' },
       { href: '/muhendislik/raspberry-pi', label: 'Raspberry Pi dersi', key: 'shell.nav.rpi', icon: 'code' },
       { href: '/muhendislik/arm-stm32', label: 'STM32 dersi', key: 'shell.nav.stm32', icon: 'mikro' },

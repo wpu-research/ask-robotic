@@ -1,0 +1,24 @@
+/* Yol haritası: hedef seçici ve dört aşamalı konu haritası. */
+.yh-picker { display: grid; gap: 16px; }
+.yh-goals { display: flex; flex-wrap: wrap; gap: 8px; }
+.yh-goal { min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font: inherit; font-weight: 700; font-size: .9rem; cursor: pointer; }
+.yh-goal:hover { border-color: var(--eng); }
+.yh-goal[aria-checked="true"] { background: var(--eng); border-color: var(--eng); color: #fff; }
+.yh-plan { border: 1px solid var(--border); border-top: 4px solid var(--eng); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow-sm); padding: 20px 22px; display: grid; gap: 12px; min-width: 0; }
+.yh-plan h3 { margin: 0; font-size: 1.35rem; }
+.yh-plan h4 { margin: 4px 0 0; font-size: 1rem; }
+.yh-plan .lead { margin: 0; }
+.yh-extra { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.yh-map-sec { margin-top: 12px; }
+.yh-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); }
+.yh-stage { border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); padding: 16px 18px; display: grid; gap: 8px; align-content: start; border-top: 4px solid var(--st, var(--eng)); min-width: 0; }
+.yh-stage.s-temel { --st: #0f766e; } .yh-stage.s-gomulu { --st: #b7791f; } .yh-stage.s-robotik { --st: #c43d36; } .yh-stage.s-yz { --st: #7c3aed; }
+.yh-stage h3 { margin: 0; font-size: 1.05rem; }
+.yh-stage .muted { margin: 0; font-size: .88rem; }
+.yh-stage-n { margin: 0; font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; font-weight: 700; color: var(--st); }
+.yh-courses { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.yh-courses a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 8px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); min-height: 44px; }
+.yh-courses a:hover { text-decoration: none; border-color: var(--st); }
+.yh-courses b { font-size: .9rem; }
+.yh-courses .h { font-family: var(--mono); font-size: .8rem; color: var(--muted); white-space: nowrap; }
+.yh-courses small { grid-column: 1 / -1; color: var(--muted); font-size: .8rem; }
