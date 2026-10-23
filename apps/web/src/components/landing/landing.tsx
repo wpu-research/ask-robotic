@@ -6,7 +6,7 @@ import { dictionaries, type Locale } from '@/i18n'
 import { ContinueLink, HeroDemo, MeetTabs } from './landing-client'
 import { HeroScene } from './hero-scene'
 import { ProgramArt } from './program-art'
-import { CareerArt } from './career-art'
+import { CAREER_PHOTOS } from '@/lib/career-photos'
 import { CAREERS, careerHours } from '@/lib/kariyer'
 import { WorkshopCards } from '@/components/kids/workshop-cards'
 import { WORKSHOPS } from '@/components/kids/workshops'
@@ -97,14 +97,21 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
             <h3>{X.programs.careersTitle}</h3>
             <span className="mx-careers-links"><Link href="/yol-haritasi/anket">{X.programs.careersSurvey} →</Link><Link href="/yol-haritasi">{X.programs.careersLink} →</Link></span>
           </div>
-          <div className="mx-cards mx-feature" data-testid="home-careers">
+          <div className="mx-cards mx-feature mx-adult" data-testid="home-careers">
             {CAREERS.map((c) => (
               <Link key={c.slug} href={`/yol-haritasi#hedef-${c.slug}`} className="mx-card">
-                <span className="mx-card-img"><CareerArt slug={c.slug} /></span>
+                <span className="mx-card-img"><img src={CAREER_PHOTOS[c.slug].file} alt={CAREER_PHOTOS[c.slug].alt[locale]} width={800} height={500} loading="lazy" /><span className="mx-adult-tag">{X.programs.careersTag}</span></span>
                 <span className="mx-card-body"><h3>{c[locale].title}</h3><span className="mx-card-meta">{X.programs.careersMeta.replace('{n}', String(c.core.length)).replace('{h}', String(careerHours(c)))}</span><p>{c[locale].summary}</p></span>
               </Link>
             ))}
           </div>
+          <details className="mx-photo-credits">
+            <summary>{X.programs.careersCredits}</summary>
+            <ul>
+              {CAREERS.map((c) => { const p = CAREER_PHOTOS[c.slug]; return <li key={c.slug}><a href={p.source} rel="noopener">{p.title}</a> · {p.creator} · <a href={p.licenseUrl} rel="license noopener">{p.license}</a></li> })}
+            </ul>
+            <p>{X.programs.careersCreditsNote}</p>
+          </details>
           <h3 className="mx-subhead">{H.kids.workshops}</h3>
           <WorkshopCards items={WORKSHOPS} />
         </div>

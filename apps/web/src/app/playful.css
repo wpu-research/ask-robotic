@@ -262,15 +262,18 @@
 @media (prefers-reduced-motion: reduce) { .program-art * { animation: none !important; } }
 @media (max-width: 1180px) and (min-width: 601px) { .mx-cards.mx-feature { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-/* ---------- "Ne olmak istiyorsun?" kart çizimleri (components/landing/career-art.tsx) ---------- */
-.ca-sun .pa-bg { fill: var(--sun-soft); } .ca-sun .pa-dot { fill: var(--sun); }
-.ca-sky .pa-bg { fill: var(--sky-soft); } .ca-sky .pa-dot { fill: var(--sky); }
-.ca-sprout .pa-bg { fill: var(--sprout-soft); } .ca-sprout .pa-dot { fill: var(--sprout); }
-.ca-coral .pa-bg { fill: var(--coral-soft); } .ca-coral .pa-dot { fill: var(--coral); }
-.ca-grape .pa-bg { fill: var(--grape-soft); } .ca-grape .pa-dot { fill: var(--grape); }
-.ca-road { fill: none; stroke: #d9cbbb; stroke-width: 14; stroke-linecap: round; }
-.ca-road-dash { fill: none; stroke: #ffffff; stroke-width: 2.5; stroke-dasharray: 8 8; stroke-linecap: round; }
+/* ---------- "Ne olmak istiyorsun?" kartları: büyükler için gerçek fotoğraf (lib/career-photos.ts) ---------- */
+.mx-adult .mx-card-img { position: relative; background: #1d1611; }
+.mx-adult .mx-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s; }
+.mx-adult .mx-card:hover .mx-card-img img { transform: scale(1.04); }
+.mx-adult-tag { position: absolute; left: 12px; top: 12px; padding: 4px 10px; border-radius: 999px; background: rgba(29, 22, 17, .78); color: #fff; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.mx-photo-credits { margin: 14px 0 0; font-size: 12px; color: var(--muted, #6b5d52); }
+.mx-photo-credits summary { cursor: pointer; font-weight: 600; }
+.mx-photo-credits ul { margin: 10px 0 6px; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 4px 24px; }
+.mx-photo-credits li { overflow-wrap: anywhere; }
+.mx-photo-credits p { margin: 0; }
+@media (prefers-reduced-motion: reduce) { .mx-adult .mx-card-img img { transition: none; } }
 .mx-careers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
 .mx-careers-head h3 { margin: 0; font-size: inherit; }
 .mx-careers-head a { font-weight: 700; }
-.mx-careers-links { display: flex; flex-wrap: wrap; gap: 8px 20px; }
+.mx-careers-links { display: flex; flex-wrap: wrap; gap: 8px 20px; font-size: 15px; }
