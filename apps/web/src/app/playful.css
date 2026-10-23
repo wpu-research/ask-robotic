@@ -273,3 +273,4 @@
 .mx-careers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
 .mx-careers-head h3 { margin: 0; font-size: inherit; }
 .mx-careers-head a { font-weight: 700; }
+.mx-careers-links { display: flex; flex-wrap: wrap; gap: 8px 20px; }

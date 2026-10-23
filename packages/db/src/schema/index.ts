@@ -344,3 +344,23 @@ export const skillRuns = pgTable('skill_runs', {
   program: jsonb('program').$type<Record<string, unknown>>().notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 }, (t) => [index('skill_runs_challenge_user').on(t.challengeId, t.userId), index('skill_runs_user_at').on(t.userId, t.createdAt)])
+
+// Kariyer anketi (/yol-haritasi/anket): "ne olmak istediğini bilmeyenler" için. Ad ve e-posta sonuçtan önce istenir;
+// KVKK aydınlatma onayı zorunlu, iletişim izni ayrı ve isteğe bağlı. Cevaplar soru kimliği → seçenek kimliği.
+export const careerSurveys = pgTable('career_surveys', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: text('name').notNull(),
+  email: text('email').notNull(),
+  answers: jsonb('answers').$type<Record<string, string>>().notNull(),
+  // Sunucuda hesaplanan sıralama: en uygun 3 hedef ve yüzdeleri
+  result: jsonb('result').$type<{ slug: string; pct: number }[]>().notNull(),
+  locale: text('locale').notNull().default('tr'),
+  consentKvkk: boolean('consent_kvkk').notNull(),
+  consentContact: boolean('consent_contact').notNull().default(false),
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  index('career_surveys_created').on(t.createdAt),
+  index('career_surveys_email').on(t.email),
+  check('career_surveys_kvkk', sql`${t.consentKvkk}`),
+])

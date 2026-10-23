@@ -4,6 +4,9 @@ import { getDb } from '@/lib/db'
 import { getAdminUser } from '@/lib/auth/admin'
 import { listUsers, welcomeRemaining, WELCOME_LIMIT, WELCOME_MONTHS, ADMIN_PROVIDER, WELCOME_PROVIDER } from '@/lib/membership'
 import { CreateUserForm, EditUserForm, GrantForm } from '@/components/admin/admin-forms'
+import { careerOf } from '@/lib/kariyer'
+import { QUESTIONS } from '@/lib/kariyer-anket'
+import { listSurveys } from '@/lib/kariyer-anket-server'
 import '../odeme.css'
 import './admin.css'
 
@@ -20,7 +23,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   if (!admin) notFound()
   const q = (await searchParams).q ?? ''
   const db = getDb()
-  const [rows, remaining] = await Promise.all([listUsers(db, q), welcomeRemaining(db)])
+  const [rows, remaining, surveys] = await Promise.all([listUsers(db, q), welcomeRemaining(db), listSurveys(db, 200).catch(() => [])])
   const members = rows.filter((r) => r.plan).length
 
   return (
@@ -64,6 +67,29 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                       : <span className="muted">Yok</span>}
                   </td>
                   <td><GrantForm userId={r.id} hasPlan={!!r.plan} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="ac-card" id="kariyer-anketi">
+        <div className="ad-head">
+          <h2>Kariyer anketi <small className="muted">son {surveys.length} cevap · {surveys.filter((s) => s.consentContact).length} iletişim izni</small></h2>
+          <a className="v2-btn ghost" href="/api/admin/kariyer-anketi" download>CSV indir (tümü)</a>
+        </div>
+        <div className="ac-table-wrap">
+          <table className="ac-table">
+            <thead><tr><th>Kişi</th><th>Tarih</th><th>Önerilen yollar</th><th>İletişim</th><th>Cevaplar</th></tr></thead>
+            <tbody>
+              {surveys.map((s) => (
+                <tr key={s.id}>
+                  <td><b>{s.name}</b><br /><small className="muted">{s.email}</small></td>
+                  <td>{date(s.createdAt)}</td>
+                  <td>{s.result.map((m) => `${careerOf(m.slug)?.tr.title ?? m.slug} %${m.pct}`).join(' · ')}</td>
+                  <td>{s.consentContact ? 'İzin var' : <span className="muted">Yok</span>}</td>
+                  <td><small className="muted">{QUESTIONS.map((qq) => qq.opts.find((o) => o.id === s.answers[qq.id])?.tr).filter(Boolean).join(' · ')}</small></td>
                 </tr>
               ))}
             </tbody>

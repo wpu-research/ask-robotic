@@ -33,6 +33,10 @@ export default async function YolHaritasi() {
 
       <section aria-labelledby="yh-goal">
         <h2 id="yh-goal">{en ? 'Pick your goal' : 'Hedefini seç'}</h2>
+        <div className="yh-survey-cta">
+          <p>{en ? 'Not sure yet? Answer 9 short questions and we will suggest three paths.' : 'Henüz emin değil misin? 9 kısa soruyu cevapla, sana üç yol önerelim.'}</p>
+          <Link href="/yol-haritasi/anket" className="btn btn-primary" data-testid="roadmap-survey">{en ? 'Take the career survey' : 'Kariyer anketini çöz'}</Link>
+        </div>
         <CareerPicker />
       </section>
 

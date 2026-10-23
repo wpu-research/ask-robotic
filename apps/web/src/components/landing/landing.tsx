@@ -95,7 +95,7 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
           </div>
           <div className="mx-subhead mx-careers-head" id="hedefler">
             <h3>{X.programs.careersTitle}</h3>
-            <Link href="/yol-haritasi">{X.programs.careersLink} →</Link>
+            <span className="mx-careers-links"><Link href="/yol-haritasi/anket">{X.programs.careersSurvey} →</Link><Link href="/yol-haritasi">{X.programs.careersLink} →</Link></span>
           </div>
           <div className="mx-cards mx-feature" data-testid="home-careers">
             {CAREERS.map((c) => (

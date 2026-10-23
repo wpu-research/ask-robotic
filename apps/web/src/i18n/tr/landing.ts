@@ -40,6 +40,7 @@ export const landing = {
       allTopics: 'Tüm konular',
       careersTitle: 'Ne olmak istiyorsun?',
       careersLink: 'Yol haritasının tamamı',
+      careersSurvey: 'Bilmiyorum, anketle bul',
       careersMeta: '{n} ders · {h} saat',
     },
     demo: { eyebrow: 'Hemen dene', title: 'Bir adımı şimdi çöz', lead: 'Derslerdeki yüzlerce adımdan biri: direnci seç, LED yansın ama bozulmasın.' },

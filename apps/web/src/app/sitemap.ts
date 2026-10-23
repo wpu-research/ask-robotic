@@ -30,7 +30,7 @@ const PAGES = [
   '/oyun-atolyesi', '/sahne-atolyesi', '/mikro-kart', '/arena', '/egitmen/murat-arslan',
   '/muhendislik/llm', '/muhendislik/llm/simulasyon', '/muhendislik/llm/proje', ...LLM_UNITS.map((u) => `/muhendislik/llm/unite/${u.n}`),
   '/muhendislik/robot-kolu', '/muhendislik/robot-kolu/simulasyon', '/muhendislik/robot-kolu/proje', ...ROBOT_UNITS.map((u) => `/muhendislik/robot-kolu/unite/${u.n}`),
-  '/programlar', '/yol-haritasi',
+  '/programlar', '/yol-haritasi', '/yol-haritasi/anket',
   '/robot-atolyesi/sezonlar', ...SEASONS.map((s) => `/robot-atolyesi/sezonlar/${s.id}`),
   '/robot-atolyesi/tasarla', '/muhendislik/insansi',
   '/muhendislik/opencv', '/muhendislik/opencv/proje', ...CV_UNITS.map((u) => `/muhendislik/opencv/unite/${u.n}`),

@@ -22,3 +22,39 @@
 .yh-courses b { font-size: .9rem; }
 .yh-courses .h { font-family: var(--mono); font-size: .8rem; color: var(--muted); white-space: nowrap; }
 .yh-courses small { grid-column: 1 / -1; color: var(--muted); font-size: .8rem; }
+
+/* Kariyer anketi (/yol-haritasi/anket) */
+.ks-page { max-width: 820px; }
+.ks, .ks-result { border: 1px solid var(--border); border-top: 4px solid var(--eng); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow-sm); padding: 20px 22px; display: grid; gap: 16px; min-width: 0; }
+.ks-progress { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.ks-progress span { display: block; height: 100%; background: var(--eng); border-radius: inherit; transition: width .3s; }
+.ks-q { border: 0; margin: 0; padding: 0; display: grid; gap: 14px; min-width: 0; }
+.ks-q legend { padding: 0; font-size: 1.25rem; font-weight: 700; line-height: 1.35; }
+.ks-n { display: block; margin-bottom: 4px; font-family: var(--mono); font-size: .8rem; font-weight: 700; color: var(--muted); }
+.ks-opts { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); }
+.ks-opt { min-height: 52px; padding: 12px 16px; text-align: left; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+.ks-opt:hover, .ks-opt:focus-visible { border-color: var(--eng); }
+.ks-opt[aria-pressed="true"] { border-color: var(--eng); background: var(--eng-soft); }
+.ks-back { justify-self: start; min-height: 44px; padding: 8px 4px; border: 0; background: none; color: var(--muted); font: inherit; font-weight: 600; cursor: pointer; }
+.ks-form { display: grid; gap: 14px; }
+.ks-form h2, .ks-result h2 { margin: 0; font-size: 1.3rem; }
+.ks-form > p, .ks-result > p { margin: 0; }
+.ks-form label { display: grid; gap: 6px; font-weight: 600; }
+.ks-form input:not([type="checkbox"]) { min-height: 44px; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font: inherit; }
+.ks-form .ks-check { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 10px; align-items: start; font-weight: 400; font-size: .92rem; }
+.ks-check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--eng); }
+.ks-error { margin: 0; color: var(--coral-ink, #8c2a1c); font-weight: 600; }
+.ks-actions { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.ks-top { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.ks-top a { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 14px; align-items: center; padding: 14px 16px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2); color: var(--text); }
+.ks-top a:hover { text-decoration: none; border-color: var(--eng); }
+.ks-top .first a { border: 2px solid var(--eng); background: var(--eng-soft); }
+.ks-pct { font-family: var(--mono); font-size: 1.5rem; font-weight: 800; color: var(--eng); text-align: center; }
+.ks-body { display: grid; gap: 4px; min-width: 0; }
+.ks-body small { color: var(--muted); font-size: .88rem; }
+.ks-meta { font-size: .82rem; font-weight: 700; color: var(--muted); }
+.ks-note { font-size: .9rem; }
+.ks-result > .v2-btn { justify-self: start; }
+.yh-survey-cta { margin-bottom: 16px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-radius: var(--radius); border: 1px dashed var(--eng); background: var(--eng-soft); }
+.yh-survey-cta p { margin: 0; font-weight: 600; }
+.ks-result h2 { scroll-margin-top: calc(var(--topbar-h, 64px) + 24px); outline: none; }

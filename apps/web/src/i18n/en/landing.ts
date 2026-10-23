@@ -41,6 +41,7 @@ export const landing: typeof Tr = {
       allTopics: 'All topics',
       careersTitle: 'What do you want to become?',
       careersLink: 'See the full roadmap',
+      careersSurvey: 'Not sure? Take the survey',
       careersMeta: '{n} courses · {h} h',
     },
     demo: { eyebrow: 'Try it now', title: 'Solve one step right now', lead: 'One of hundreds of steps in the lessons: pick the resistor so the LED lights up without burning out.' },
