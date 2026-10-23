@@ -125,3 +125,5 @@
 .eng-ds small { color: var(--muted); font-size: .78rem; }
 .eng-ds-kind { font: 800 .68rem var(--mono); letter-spacing: .04em; padding: 4px 7px; border-radius: 6px; background: var(--eng); color: var(--surface); }
 .eng-ds-kind.k-product, .eng-ds-kind.k-reference { background: var(--primary); }
+#parcalar { scroll-margin-top: 96px; }
+.eng-parts-sec > h2, .eng-sec-title { margin: 8px 0 12px; }

@@ -33,6 +33,33 @@ export default async function Muhendislik() {
         </dl>
       </header>
 
+      <section id="parcalar" className="eng-parts-sec" aria-labelledby="eng-levels">
+        <h2 id="eng-levels">{en ? 'Parts in 3D, in seven levels' : 'Parçalar: 3B modeller, yedi seviye'} <span className="muted eng-count">{ENG_PARTS.length}</span></h2>
+        <p className="muted eng-note">{en ? 'Open a level and pick a part: you can turn its 3D model, read how it works and open it in the lab.' : 'Bir seviye aç, parçayı seç: 3B modelini döndür, nasıl çalıştığını oku, laboratuvarda aç.'}</p>
+        <ol className="eng-path">
+          {LEVELS.map((l) => {
+            const parts = partsOfLevel(l.n)
+            const lab = parts.filter((p) => p.lab).length
+            const lt = levelText(l, lang)
+            return (
+              <li key={l.n}>
+                <Link href={`/muhendislik/seviye/${l.n}`} className="eng-level" data-testid={`eng-level-${l.n}`}>
+                  <span className="eng-level-n" aria-hidden="true">{pad(l.n)}</span>
+                  <span className="eng-level-body">
+                    <b>{lt.title}</b>
+                    <span className="eng-level-text">{lt.summary}</span>
+                    <span className="eng-level-meta">{en ? `${parts.length} parts · ${lab > 0 ? `${lab} in the lab` : 'overview'}` : `${parts.length} parça · ${lab > 0 ? `${lab} laboratuvarda` : 'tanıtım'}`}</span>
+                  </span>
+                  <Icon name="chevronRight" size={18} className="eng-level-go" />
+                </Link>
+              </li>
+            )
+          })}
+        </ol>
+      </section>
+
+      <h2 className="eng-sec-title">{en ? 'Courses' : 'Dersler'}</h2>
+
       <Link href="/muhendislik/robotik" className="eng-course" data-testid="eng-course">
         <span className="eng-course-code">ESOF 323</span>
         <span className="eng-level-body">
@@ -142,30 +169,6 @@ export default async function Muhendislik() {
       </Link>
 
       <InstructorCard slug="murat-arslan" labelKey="instructor.eyebrow" />
-
-      <section aria-labelledby="eng-levels">
-        <h2 id="eng-levels" className="sr-only">{en ? 'Levels' : 'Seviyeler'}</h2>
-        <ol className="eng-path">
-          {LEVELS.map((l) => {
-            const parts = partsOfLevel(l.n)
-            const lab = parts.filter((p) => p.lab).length
-            const lt = levelText(l, lang)
-            return (
-              <li key={l.n}>
-                <Link href={`/muhendislik/seviye/${l.n}`} className="eng-level" data-testid={`eng-level-${l.n}`}>
-                  <span className="eng-level-n" aria-hidden="true">{pad(l.n)}</span>
-                  <span className="eng-level-body">
-                    <b>{lt.title}</b>
-                    <span className="eng-level-text">{lt.summary}</span>
-                    <span className="eng-level-meta">{en ? `${parts.length} parts · ${lab > 0 ? `${lab} in the lab` : 'overview'}` : `${parts.length} parça · ${lab > 0 ? `${lab} laboratuvarda` : 'tanıtım'}`}</span>
-                  </span>
-                  <Icon name="chevronRight" size={18} className="eng-level-go" />
-                </Link>
-              </li>
-            )
-          })}
-        </ol>
-      </section>
 
       <section className="panel" aria-labelledby="eng-lab">
         <h2 id="eng-lab" className="panel-title">{en ? 'Open in the lab right away' : 'Laboratuvarda hemen aç'}</h2>
