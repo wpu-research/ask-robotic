@@ -261,3 +261,15 @@
 @keyframes pa-prop { from { transform: scaleX(1); } to { transform: scaleX(.4); } }
 @media (prefers-reduced-motion: reduce) { .program-art * { animation: none !important; } }
 @media (max-width: 1180px) and (min-width: 601px) { .mx-cards.mx-feature { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- "Ne olmak istiyorsun?" kart çizimleri (components/landing/career-art.tsx) ---------- */
+.ca-sun .pa-bg { fill: var(--sun-soft); } .ca-sun .pa-dot { fill: var(--sun); }
+.ca-sky .pa-bg { fill: var(--sky-soft); } .ca-sky .pa-dot { fill: var(--sky); }
+.ca-sprout .pa-bg { fill: var(--sprout-soft); } .ca-sprout .pa-dot { fill: var(--sprout); }
+.ca-coral .pa-bg { fill: var(--coral-soft); } .ca-coral .pa-dot { fill: var(--coral); }
+.ca-grape .pa-bg { fill: var(--grape-soft); } .ca-grape .pa-dot { fill: var(--grape); }
+.ca-road { fill: none; stroke: #d9cbbb; stroke-width: 14; stroke-linecap: round; }
+.ca-road-dash { fill: none; stroke: #ffffff; stroke-width: 2.5; stroke-dasharray: 8 8; stroke-linecap: round; }
+.mx-careers-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
+.mx-careers-head h3 { margin: 0; font-size: inherit; }
+.mx-careers-head a { font-weight: 700; }
