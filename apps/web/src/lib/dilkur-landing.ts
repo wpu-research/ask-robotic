@@ -34,6 +34,4 @@ export interface PhotoCredit { file: string; title: string; creator: string; lic
 
 export const PHOTO_CREDITS: readonly PhotoCredit[] = [
   { file: '/brand/dilkur/hero.jpg', title: 'VEX Robotics Competition Robot', creator: 'Noah Wulf', license: 'CC BY-SA 4.0', licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/', source: 'https://commons.wikimedia.org/wiki/File:VEX_Robotics_Competition_Robot.jpg' },
-  { file: '/brand/dilkur/robotik.jpg', title: 'Ozobot', creator: '-stk', license: 'CC0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:Ozobot.jpeg' },
-  { file: '/img/kariyer/drone-iha.jpg', title: 'Quadcopter camera drone in flight', creator: 'Josh Sorenson', license: 'CC0', licenseUrl: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'https://commons.wikimedia.org/wiki/File:Quadcopter_camera_drone_in_flight.jpg' },
 ]

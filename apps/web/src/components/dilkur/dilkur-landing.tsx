@@ -4,9 +4,24 @@ import { BRANDS } from '@/lib/brand'
 import { PHOTO_CREDITS, STAGES } from '@/lib/dilkur-landing'
 import { ENG_PARTS } from '@/lib/muhendislik/catalog'
 import { LeadForm } from './lead-form'
+import { WorkshopCards } from '@/components/kids/workshop-cards'
+import { WORKSHOPS } from '@/components/kids/workshops'
+import { CAREER_PHOTOS } from '@/lib/career-photos'
 import '@/app/dilkur.css'
 
 const TEACHER = ['classes', 'qr', 'assign', 'stuck', 'present', 'league'] as const
+/** Çocuklar için Robotik: MacademiaX'in çizimli atölye kartları, en küçüklere uygun olan önce (Blok atölyesi başta). */
+const KIDS_ORDER = ['/atolye', '/robot-atolyesi', '/oyunlar', '/mikro-kart', '/oyun-atolyesi', '/sahne-atolyesi', '/robotun-gozleri']
+const KIDS = KIDS_ORDER.map((h) => WORKSHOPS.find((w) => w.href === h)!).filter(Boolean)
+/** Mühendislik Yolu: büyükler için fotoğraflı kartlar (fotoğraflar kariyer kartlarıyla ortak, künyesi orada). */
+const ENG: Array<{ href: string; photo: string; tr: [string, string, string]; en: [string, string, string] }> = [
+  { href: '/laboratuvar', photo: 'gomulu-yazilim', tr: ['Sanal devre laboratuvarı', '72 parça · Arduino Uno', 'Devreyi kur, kodu yaz, çalıştır; kablolar ve ölçümler gerçek gibi.'], en: ['Virtual circuit lab', '72 parts · Arduino Uno', 'Build the circuit, write the code, run it; wires and measurements behave like the real thing.'] },
+  { href: '/muhendislik#parcalar', photo: 'iot', tr: ['Mühendislik parçaları (3B)', `${ENG_PARTS.length} parça · 7 seviye`, 'Sensör, sürücü ve kartları döndürülebilir 3B modelle tanı, laboratuvarda takılı aç.'], en: ['Engineering parts (3D)', `${ENG_PARTS.length} parts · 7 levels`, 'Get to know sensors, drivers and boards as rotatable 3D models and open them wired up in the lab.'] },
+  { href: '/muhendislik/robot-kolu', photo: 'endustriyel-robot', tr: ['Robot kolu mühendisliği', '6 eksen · 10 ünite', 'Kinematik, tutucu, çarpışmasız planlama ve hücre güvenliği; sanal kolla.'], en: ['Robot arm engineering', '6 axes · 10 units', 'Kinematics, grippers, collision-free planning and cell safety, with a virtual arm.'] },
+  { href: '/muhendislik/drone', photo: 'drone-iha', tr: ['Drone mühendisliği', '10 ünite · 7 simülasyon', 'Motor, ESC, PID, PX4 ve hassas inişli otonom görev.'], en: ['Drone engineering', '10 units · 7 simulations', 'Motors, ESCs, PID, PX4 and an autonomous mission with precision landing.'] },
+  { href: '/makine-ogrenmesi', photo: 'makine-ogrenmesi', tr: ['Yapay zekâ ve makine öğrenmesi', 'Kod tarayıcıda çalışır', 'Regresyondan sinir ağına; algoritmalar sıfırdan, adım adım.'], en: ['AI and machine learning', 'Code runs in the browser', 'From regression to neural networks; algorithms from scratch, step by step.'] },
+  { href: '/yol-haritasi/anket', photo: 'yapay-zeka-uygulama', tr: ['Kariyer anketi ve yol haritası', '10 meslek · 9 soru', 'Öğrenci hangi mühendisliğe yatkın, hangi dersleri sırayla bitirmeli?'], en: ['Career survey and roadmap', '10 careers · 9 questions', 'Which engineering suits the student, and which courses to finish in order?'] },
+]
 
 /**
  * Dilkur Akademi ana sayfası (dilkur.macademia.com.tr, giriş yapmamış ziyaretçi): dilkurakademi.com düzeninde — tam
@@ -39,25 +54,36 @@ export function DilkurLanding({ lessons, locale }: { lessons: number; locale: Lo
         <div><b>0</b><span>{en ? 'kits to buy' : 'kit masrafı'}</span></div>
       </section>
 
-      <section className="wrap dk-section" aria-labelledby="dk-kat">
-        <h2 id="dk-kat" className="dk-h2">{en ? 'Two paths' : 'İki yol'}</h2>
-        <div className="dk-cats">
-          <Link href="/robot-atolyesi" className="dk-cat" data-testid="dk-cat-robotik">
-            <img src="/brand/dilkur/robotik.jpg" alt={en ? 'A small robot following a line drawn on paper' : 'Kâğıda çizilmiş çizgiyi izleyen küçük bir robot'} width={800} height={500} loading="lazy" />
-            <span className="dk-cat-body">
-              <small>{en ? 'Kindergarten – middle school' : 'Anaokulu – ortaokul'}</small>
-              <b>{BRANDS.dilkur[locale].kidsGroup}</b>
-              <span>{en ? 'Robots programmed with blocks, missions, competition seasons and the Micro Board. Voice guidance for children who cannot read yet.' : 'Bloklarla programlanan robotlar, görevler, yarışma sezonları ve Mikro Kart. Okuma bilmeyenler için sesli anlatım.'}</span>
-            </span>
-          </Link>
-          <Link href="/muhendislik" className="dk-cat" data-testid="dk-cat-muhendislik">
-            <img src="/img/kariyer/drone-iha.jpg" alt={en ? 'A camera quadcopter in flight' : 'Havada uçan kameralı bir quadcopter'} width={800} height={500} loading="lazy" />
-            <span className="dk-cat-body">
-              <small>{en ? 'Middle school – high school' : 'Ortaokul – lise'}</small>
-              <b>{BRANDS.dilkur[locale].adultsGroup}</b>
-              <span>{en ? `Arduino, sensors, ${ENG_PARTS.length} real parts in 3D, robot arm, drones and AI; a virtual circuit lab where every part opens wired up.` : `Arduino, sensörler, ${ENG_PARTS.length} gerçek parça (3B), robot kolu, drone ve yapay zekâ; her parçanın takılı açıldığı sanal devre laboratuvarı.`}</span>
-            </span>
-          </Link>
+      <section className="dk-cat-sec dk-soft-kids" aria-labelledby="dk-robotik" id="robotik">
+        <div className="wrap dk-section">
+          <div className="dk-cat-head">
+            <p className="dk-tag">{en ? 'Kindergarten – middle school' : 'Anaokulu – ortaokul'}</p>
+            <h2 id="dk-robotik" className="dk-h2">{BRANDS.dilkur[locale].kidsGroup}</h2>
+            <p className="dk-sub">{en ? 'Workshops where children program robots and characters with blocks. Voice guidance for those who cannot read yet; no kit needed.' : 'Çocukların robotları ve karakterleri bloklarla programladığı atölyeler. Okuma bilmeyenler için sesli anlatım; kit gerekmez.'}</p>
+          </div>
+          <WorkshopCards items={KIDS} />
+        </div>
+      </section>
+
+      <section className="dk-cat-sec" aria-labelledby="dk-muhendislik" id="muhendislik">
+        <div className="wrap dk-section">
+          <div className="dk-cat-head">
+            <p className="dk-tag">{en ? 'Middle school – high school' : 'Ortaokul – lise'}</p>
+            <h2 id="dk-muhendislik" className="dk-h2">{BRANDS.dilkur[locale].adultsGroup}</h2>
+            <p className="dk-sub">{en ? 'Real circuits, real parts and real engineering problems, all in the browser.' : 'Gerçek devreler, gerçek parçalar ve gerçek mühendislik problemleri; hepsi tarayıcıda.'}</p>
+          </div>
+          <div className="mx-cards three mx-feature mx-adult" data-testid="dk-eng-cards">
+            {ENG.map((c) => {
+              const p = CAREER_PHOTOS[c.photo]
+              const [title, meta, text] = c[locale]
+              return (
+                <Link key={c.href} href={c.href} className="mx-card">
+                  <span className="mx-card-img"><img src={p.file} alt={p.alt[locale]} width={800} height={500} loading="lazy" /><span className="mx-adult-tag">{en ? 'Engineering' : 'Mühendislik'}</span></span>
+                  <span className="mx-card-body"><h3>{title}</h3><span className="mx-card-meta">{meta}</span><p>{text}</p></span>
+                </Link>
+              )
+            })}
+          </div>
         </div>
       </section>
 
@@ -111,7 +137,7 @@ export function DilkurLanding({ lessons, locale }: { lessons: number; locale: Lo
 
       <details className="wrap mx-photo-credits dk-credits">
         <summary>{en ? 'Photo credits' : 'Fotoğraf kaynakları'}</summary>
-        <ul>{PHOTO_CREDITS.map((p) => <li key={p.file}><a href={p.source} rel="noopener">{p.title}</a> · {p.creator} · <a href={p.licenseUrl} rel="license noopener">{p.license}</a></li>)}</ul>
+        <ul>{[...PHOTO_CREDITS, ...ENG.map((c) => CAREER_PHOTOS[c.photo])].map((p) => <li key={p.file}><a href={p.source} rel="noopener">{p.title}</a> · {p.creator} · <a href={p.licenseUrl} rel="license noopener">{p.license}</a></li>)}</ul>
         <p>{en ? 'Photos from Wikimedia Commons, cropped to fit.' : 'Fotoğraflar Wikimedia Commons\'tan; sayfaya sığması için kırpıldı.'}</p>
       </details>
     </div>

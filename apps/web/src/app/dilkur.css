@@ -22,14 +22,13 @@
 .dk-section { padding-block: 64px; }
 .dk-h2 { text-align: center; font-size: clamp(1.6rem, 3.2vw, 2.3rem); margin: 0 0 8px; }
 .dk-sub { text-align: center; color: var(--muted); margin: 0 auto 32px; max-width: 640px; }
-.dk-cats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 28px; }
-.dk-cat { display: grid; grid-template-rows: auto 1fr; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); color: var(--text); box-shadow: var(--shadow); transition: transform .2s; }
-.dk-cat:hover { text-decoration: none; transform: translateY(-3px); }
-.dk-cat img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; }
-.dk-cat-body { display: grid; gap: 6px; padding: 20px 22px 24px; }
-.dk-cat-body small { color: var(--brand); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; font-size: 12px; }
-.dk-cat-body b { font-size: 1.35rem; color: var(--dk-navy); }
-.dk-cat-body > span { color: var(--muted); }
+/* Kategori bölümleri: MacademiaX ana sayfasındaki gibi — çocuklar için çizimli atölye kartları (kc-grid), mühendislik
+   için fotoğraflı kartlar (mx-cards mx-adult). Başlık ortalı, üstte kademe etiketi. */
+.dk-cat-sec + .dk-cat-sec .dk-section { padding-top: 24px; }
+.dk-soft-kids { background: var(--bg-soft); }
+.dk-cat-head { text-align: center; margin-bottom: 28px; }
+.dk-cat-head .dk-sub { margin-bottom: 0; }
+.dk-tag { display: inline-block; margin: 0 0 10px; padding: 4px 12px; border-radius: 999px; background: var(--brand-soft); color: var(--brand); font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
 
 .dk-soft { background: var(--bg-soft); }
 .dk-stages { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; }
@@ -79,7 +78,7 @@
 
 @media (max-width: 1080px) { .dk-stages { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 820px) {
-  .dk-cats, .dk-navy-in, .dk-offer { grid-template-columns: minmax(0, 1fr); }
+  .dk-navy-in, .dk-offer { grid-template-columns: minmax(0, 1fr); }
   .dk-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .dk-stats > div:nth-child(2) { border-right: 0; }
   .dk-stats > div:nth-child(-n+2) { border-bottom: 1px solid var(--line); }
@@ -89,4 +88,3 @@
   .dk-hero { min-height: 480px; }
   .dk-hero::after { background: rgba(1, 34, 69, .82); }
 }
-@media (prefers-reduced-motion: reduce) { .dk-cat { transition: none; } .dk-cat:hover { transform: none; } }
