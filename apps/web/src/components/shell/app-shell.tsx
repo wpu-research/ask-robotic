@@ -95,7 +95,7 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
       <main id="icerik" tabIndex={-1}>{children}</main>
 
       <footer className="site-footer">
-        {!partner && <span className="foot-mac" aria-hidden="true"><Mascot size={84} mood="happy" /></span>}
+        <span className="foot-mac" aria-hidden="true"><Mascot size={84} mood="happy" /></span>
         <div className="wrap">
           <div className="cols">
             <div>
