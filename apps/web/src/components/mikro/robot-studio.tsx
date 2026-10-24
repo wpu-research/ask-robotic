@@ -106,11 +106,25 @@ export function RobotStudio({ initialSkill }: { initialSkill?: string } = {}) {
         })}
         </div>
         <details className="rb-notes" data-testid="robot-notes">
-          <summary>{t('mikro.studio.notesTitle')}</summary>
-          <p>{t('mikro.studio.notesIntro')}</p>
-          <dl>{MISSION_CHAPTERS.map((ch) => (
-            <div key={ch.id}><dt>{en ? ch.en.title : ch.title} <span>· {en ? ch.en.concept : ch.concept}</span></dt><dd>{en ? ch.en.note : ch.note}</dd></div>
-          ))}</dl>
+          <summary>
+            <span className="rb-notes-ic" aria-hidden="true">👩‍🏫</span>
+            <span className="rb-notes-head"><b>{t('mikro.studio.notesTitle')}</b><small>{t('mikro.studio.notesIntro')}</small></span>
+            <span className="rb-notes-chev" aria-hidden="true" />
+          </summary>
+          <ul className="rb-notes-grid">{MISSION_CHAPTERS.map((ch) => {
+            const look = CHAPTER_LOOK[ch.id] ?? { icon: '⭐', tone: 'sky' }
+            const concepts = (en ? ch.en.concept : ch.concept).split('·').map((c) => c.trim()).filter(Boolean)
+            return (
+              <li key={ch.id} className={`rb-note t-${look.tone}`}>
+                <div className="rb-note-head">
+                  <span className="rb-chap-ic" aria-hidden="true">{look.icon}</span>
+                  <b>{en ? ch.en.title : ch.title}</b>
+                </div>
+                <ul className="rb-note-tags" aria-label={en ? 'Concepts' : 'Kavramlar'}>{concepts.map((c) => <li key={c}>{c}</li>)}</ul>
+                <p>{en ? ch.en.note : ch.note}</p>
+              </li>
+            )
+          })}</ul>
         </details>
         <h2 className="rb-more-title">{en ? 'More to explore' : 'Daha fazlası'}</h2>
         <div className="rb-row" data-testid="robot-donusen-row">

@@ -24,7 +24,7 @@ export const mikro = {
     sensorsKiskac: 'mesafe · renk · kıskaç',
     chapterProgress: '{done}/{n} tamam',
     notesTitle: 'Öğretmen / veli notları',
-    notesIntro: 'Her bölümde çocuğun öğrendiği kavram:',
+    notesIntro: 'Her bölümde çocuğun öğrendiği kavram ve sınıfta ya da evde nasıl destekleyeceğiniz',
     freeName: '{robot} serbest',
   },
   skill: {

@@ -105,13 +105,30 @@
 .rb-ed .mk-box { height: max(700px, calc(100dvh - 110px)); }
 @media (max-width: 900px) { .rb-ed .mk-box { height: auto; } }
 /* Öğretmen/veli notları */
-.rb-notes { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); padding: 8px 14px; }
-.rb-notes summary { cursor: pointer; font-weight: 600; }
-.rb-notes p { margin: 6px 0; color: var(--muted); font-size: .88rem; }
-.rb-notes dl { margin: 0; display: grid; gap: 8px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.rb-notes dt { font-weight: 700; }
-.rb-notes dt span { font-weight: 400; color: var(--muted); }
-.rb-notes dd { margin: 2px 0 0; font-size: .88rem; }
+.rb-notes { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; }
+.rb-notes > summary { display: flex; align-items: center; gap: 12px; padding: 12px 14px; cursor: pointer; list-style: none; }
+.rb-notes > summary::-webkit-details-marker { display: none; }
+.rb-notes > summary:hover { background: var(--surface-2); }
+.rb-notes > summary:focus-visible { outline: 3px solid var(--focus, var(--brand)); outline-offset: -3px; }
+.rb-notes-ic { display: grid; place-items: center; flex: none; width: 40px; height: 40px; border-radius: 12px; background: var(--brand-soft); font-size: 20px; }
+.rb-notes-head { display: grid; gap: 1px; min-width: 0; flex: 1; }
+.rb-notes-head b { font-size: 1rem; }
+.rb-notes-head small { color: var(--muted); font-size: .84rem; }
+.rb-notes-chev { flex: none; width: 10px; height: 10px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); margin: 0 6px 4px; transition: transform .2s; }
+.rb-notes[open] .rb-notes-chev { transform: rotate(225deg); margin-bottom: -4px; }
+.rb-notes-grid { list-style: none; margin: 0; padding: 0 14px 14px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.rb-note { --rb-c: var(--sky, #4aa3df); --rb-soft: var(--sky-soft, #e2f1fb); --rb-ink: var(--sky-ink, #12507c); display: grid; gap: 8px; align-content: start; padding: 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); border-left: 4px solid var(--rb-c); background: var(--surface); min-width: 0; }
+.rb-note.t-sun { --rb-c: var(--sun, #f6b73c); --rb-soft: var(--sun-soft, #fdf0d3); --rb-ink: var(--sun-ink, #7a4f00); }
+.rb-note.t-grape { --rb-c: var(--grape, #8a6ad8); --rb-soft: var(--grape-soft, #ece6fa); --rb-ink: var(--grape-ink, #4a2f92); }
+.rb-note.t-coral { --rb-c: var(--coral, #ef6f5b); --rb-soft: var(--coral-soft, #fde6e1); --rb-ink: var(--coral-ink, #8c2a1c); }
+.rb-note-head { display: flex; align-items: center; gap: 10px; }
+.rb-note-head .rb-chap-ic { width: 34px; height: 34px; font-size: 18px; border-radius: 10px; }
+.rb-note-head b { color: var(--rb-ink); font-size: 1rem; }
+.rb-note-tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.rb-note-tags li { padding: 2px 10px; border-radius: 999px; background: var(--rb-soft); color: var(--rb-ink); font-size: .78rem; font-weight: 600; }
+.rb-note p { margin: 0; font-size: .9rem; line-height: 1.55; color: var(--text); }
+@media (max-width: 760px) { .rb-notes-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .rb-notes-chev { transition: none; } }
 /* Küpler ve kıskaç (2B) */
 .rb-cube { stroke: #0f172a; stroke-width: .6; }
 .rb-cube[data-held] { stroke-width: 1.2; stroke-dasharray: 2 1; }

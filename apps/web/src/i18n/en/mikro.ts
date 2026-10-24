@@ -25,7 +25,7 @@ export const mikro: typeof Tr = {
     sensorsKiskac: 'distance · color · gripper',
     chapterProgress: '{done}/{n} done',
     notesTitle: 'Notes for teachers and parents',
-    notesIntro: 'The concept your child learns in each chapter:',
+    notesIntro: 'What your child learns in each chapter and how to support it in class or at home',
     freeName: '{robot} free play',
   },
   skill: {
