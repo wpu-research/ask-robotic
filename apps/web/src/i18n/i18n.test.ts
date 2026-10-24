@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { tr } from './tr'
 import { en } from './en'
-import { createT, interpolate, parseAcceptLanguage, plural, resolveLocale, translate, type MessageKey } from './index'
+import { createT, interpolate, plural, resolveLocale, translate, type MessageKey } from './index'
 import { formatDuration, formatNumber, formatTimeAgo } from './format'
 import { hoursLabel, timeAgo } from '@/lib/format'
 
@@ -52,20 +52,12 @@ describe('çeviri ve ara değerler', () => {
 })
 
 describe('dil çözümü (öncelik)', () => {
-  it('çerez > kullanıcı > Accept-Language > tr', () => {
-    expect(resolveLocale({ cookie: 'en', userLocale: 'tr', acceptLanguage: 'tr' })).toBe('en')
-    expect(resolveLocale({ cookie: 'tr', userLocale: 'en', acceptLanguage: 'en' })).toBe('tr')
-    expect(resolveLocale({ cookie: 'fr', userLocale: 'en', acceptLanguage: 'tr' })).toBe('en')
-    expect(resolveLocale({ userLocale: 'de', acceptLanguage: 'en-GB,en;q=0.9' })).toBe('en')
-    expect(resolveLocale({ acceptLanguage: 'de-DE,fr;q=0.8' })).toBe('tr')
+  it('çerez > kullanıcı > tr; tarayıcı dili kullanılmaz', () => {
+    expect(resolveLocale({ cookie: 'en', userLocale: 'tr' })).toBe('en')
+    expect(resolveLocale({ cookie: 'tr', userLocale: 'en' })).toBe('tr')
+    expect(resolveLocale({ cookie: 'fr', userLocale: 'en' })).toBe('en')
+    expect(resolveLocale({ userLocale: 'de' })).toBe('tr')
     expect(resolveLocale({})).toBe('tr')
-  })
-  it('Accept-Language q değerine göre', () => {
-    expect(parseAcceptLanguage('de-DE, en;q=0.5, tr;q=0.8')).toBe('tr')
-    expect(parseAcceptLanguage('en-US,en;q=0.9,tr;q=0.8')).toBe('en')
-    expect(parseAcceptLanguage('tr;q=0, en;q=0.1')).toBe('en')
-    expect(parseAcceptLanguage('')).toBeNull()
-    expect(parseAcceptLanguage(null)).toBeNull()
   })
 })
 
@@ -85,11 +77,11 @@ describe('getLocale (sunucu)', () => {
     expect(await load()).toBe('en')
     expect(h.calls).toBe(0)
   })
-  it('çerez yoksa users.locale, o da yoksa Accept-Language', async () => {
+  it('çerez yoksa users.locale, o da yoksa Türkçe; İngilizce tarayıcı Türkçe görür', async () => {
     h.user = { locale: 'en' }; h.accept = 'tr-TR'
     expect(await load()).toBe('en')
     h.user = null; h.accept = 'en-US,en;q=0.9'
-    expect(await load()).toBe('en')
+    expect(await load()).toBe('tr')
     h.accept = null
     expect(await load()).toBe('tr')
   })

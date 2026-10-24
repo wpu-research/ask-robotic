@@ -71,23 +71,13 @@ export function createT(locale: Locale): TFunction {
   return (key, params) => translate(locale, key, params)
 }
 
-/** Accept-Language başlığından desteklenen ilk dil (q değerine göre). Yoksa null. */
-export function parseAcceptLanguage(header: string | null | undefined): Locale | null {
-  if (!header) return null
-  const items = header.split(',').map((part, i) => {
-    const [tag, ...ps] = part.trim().split(';')
-    const q = ps.map((p) => p.trim()).find((p) => p.startsWith('q='))
-    const qv = q ? Number(q.slice(2)) : 1
-    return { lang: tag.trim().toLowerCase().split('-')[0], q: Number.isFinite(qv) ? qv : 0, i }
-  })
-  items.sort((a, b) => b.q - a.q || a.i - b.i)
-  for (const it of items) if (it.q > 0 && isLocale(it.lang)) return it.lang
-  return null
-}
-
-/** Dil önceliği: çerez → giriş yapmış kullanıcının users.locale'i → Accept-Language → 'tr'. Saf işlev (test: i18n.test.ts). */
-export function resolveLocale(input: { cookie?: string | null; userLocale?: string | null; acceptLanguage?: string | null }): Locale {
+/**
+ * Dil önceliği: çerez (TR/EN düğmesi) → giriş yapmış kullanıcının users.locale'i → 'tr'. Tarayıcı dili bilerek
+ * kullanılmaz: site Türkiye'deki okullar için, İngilizce ayarlı bir tarayıcıda da Türkçe açılmalı; İngilizce yalnız
+ * kişi kendisi seçerse. Saf işlev (test: i18n.test.ts).
+ */
+export function resolveLocale(input: { cookie?: string | null; userLocale?: string | null }): Locale {
   if (isLocale(input.cookie)) return input.cookie
   if (isLocale(input.userLocale)) return input.userLocale
-  return parseAcceptLanguage(input.acceptLanguage) ?? DEFAULT_LOCALE
+  return DEFAULT_LOCALE
 }
