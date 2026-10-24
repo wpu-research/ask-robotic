@@ -23,6 +23,12 @@ const SENSOR_KEY = { blok: 'mikro.studio.sensorsBlok', gezgin: 'mikro.studio.sen
 type Pick = { kind: 'mission'; id: string } | { kind: 'free'; profile: RobotProfileId } | { kind: 'skill'; id: string } | { kind: 'donusen'; model: DonusenModelId; id: string }
 /** Dönüşen Robot görevlerinin tamamlandı kaydı (robot görev kimlikleriyle karışmasın diye önekli). */
 const dnKey = (id: string) => `d:${id}`
+/** Bölüm simgeleri ve renk tonları (robot.css: .rb-chapter.t-*). */
+const CHAPTER_LOOK: Record<string, { icon: string; tone: string }> = {
+  baslangic: { icon: '🚦', tone: 'sun' }, sensorler: { icon: '📡', tone: 'sky' }, algoritmalar: { icon: '🧩', tone: 'grape' }, yarisma: { icon: '🏆', tone: 'coral' },
+}
+/** Robot türü simgesi (görev kartının alt satırı). */
+const PROFILE_ICON: Record<RobotProfileId, string> = { blok: '🟨', gezgin: '🛞', kiskac: '🦾' }
 /** Sanal Beceri sahaları + yarışma sezonu alanları (ikisi de SkillPanel ile puanlanır). */
 const ALL_SKILLS = [...SKILL_CHALLENGES, ...SEASON_FIELDS]
 
@@ -61,31 +67,44 @@ export function RobotStudio({ initialSkill }: { initialSkill?: string } = {}) {
     })
   }, [mission, dnMission])
 
-  const card = (id: string, title: string, sub: string, active: boolean, onClick: () => void, testid: string, isDone = false) => (
+  // `mark`: kartın solundaki işaret (görevlerde sıra numarası, diğerlerinde simge); bitince ✓ olur
+  const card = (id: string, title: string, sub: string, active: boolean, onClick: () => void, testid: string, isDone = false, mark?: string) => (
     <li key={id}>
-      <button className="rb-card" aria-current={active} onClick={onClick} data-testid={testid}>
-        <b>{title}{isDone && <span className="rb-done" aria-label={t('mikro.studio.done')}> ✓</span>}</b>
-        <small>{sub}</small>
+      <button className="rb-card" aria-current={active} onClick={onClick} data-testid={testid} data-done={isDone || undefined}>
+        {mark !== undefined && <span className="rb-mark" aria-hidden="true">{isDone ? '✓' : mark}</span>}
+        <span className="rb-card-txt">
+          <b>{title}{isDone && <span className="sr-only"> ({t('mikro.studio.done')})</span>}</b>
+          <small>{sub}</small>
+        </span>
       </button>
     </li>
   )
 
   return (
     <div className="rb-studio">
-      <nav className="rb-pick" aria-label={t('mikro.studio.missions')}>        {MISSION_CHAPTERS.map((ch) => {
+      <nav className="rb-pick" aria-label={t('mikro.studio.missions')}>
+        <div className="rb-chapters">
+        {MISSION_CHAPTERS.map((ch) => {
           const pr = chapterProgress(ch.id, done)
+          const look = CHAPTER_LOOK[ch.id] ?? { icon: '⭐', tone: 'sky' }
           return (
-            <div className="rb-row" key={ch.id} data-testid={`robot-chapter-${ch.id}`}>
+            <section className={`rb-chapter t-${look.tone}`} key={ch.id} data-testid={`robot-chapter-${ch.id}`} aria-labelledby={`rb-ch-${ch.id}`}>
               <div className="rb-chap">
-                <h2>{en ? ch.en.title : ch.title}</h2>
-                <small>{en ? ch.en.concept : ch.concept}</small>
-                <meter min={0} max={pr.missions.length} value={pr.done} aria-label={t('mikro.studio.chapterProgress', { done: pr.done, n: pr.missions.length })} />
-                <small className="rb-prog">{t('mikro.studio.chapterProgress', { done: pr.done, n: pr.missions.length })}</small>
+                <span className="rb-chap-ic" aria-hidden="true">{look.icon}</span>
+                <span className="rb-chap-txt">
+                  <h2 id={`rb-ch-${ch.id}`}>{en ? ch.en.title : ch.title}</h2>
+                  <small>{en ? ch.en.concept : ch.concept}</small>
+                </span>
+                <span className="rb-chap-prog">
+                  <span className="rb-bar" aria-hidden="true"><span style={{ width: `${(100 * pr.done) / Math.max(1, pr.missions.length)}%` }} /></span>
+                  <small className="rb-prog">{t('mikro.studio.chapterProgress', { done: pr.done, n: pr.missions.length })}</small>
+                </span>
               </div>
-              <ul>{pr.missions.map((m) => card(m.id, en ? m.en.title : m.title, robotTitle(m.profile), pick.kind === 'mission' && pick.id === m.id, () => setPick({ kind: 'mission', id: m.id }), `robot-mission-${m.id}`, done.has(m.id)))}</ul>
-            </div>
+              <ul className="rb-steps">{pr.missions.map((m, i) => card(m.id, en ? m.en.title : m.title, `${PROFILE_ICON[m.profile]} ${robotTitle(m.profile)}`, pick.kind === 'mission' && pick.id === m.id, () => setPick({ kind: 'mission', id: m.id }), `robot-mission-${m.id}`, done.has(m.id), String(i + 1)))}</ul>
+            </section>
           )
         })}
+        </div>
         <details className="rb-notes" data-testid="robot-notes">
           <summary>{t('mikro.studio.notesTitle')}</summary>
           <p>{t('mikro.studio.notesIntro')}</p>
@@ -93,27 +112,28 @@ export function RobotStudio({ initialSkill }: { initialSkill?: string } = {}) {
             <div key={ch.id}><dt>{en ? ch.en.title : ch.title} <span>· {en ? ch.en.concept : ch.concept}</span></dt><dd>{en ? ch.en.note : ch.note}</dd></div>
           ))}</dl>
         </details>
+        <h2 className="rb-more-title">{en ? 'More to explore' : 'Daha fazlası'}</h2>
         <div className="rb-row" data-testid="robot-donusen-row">
           <h2>{t('mikro.donusen.row')}</h2>
           <ul>{DONUSEN_IDS.map((id) => card(id, en ? DONUSEN_MODELS[id].en.title : DONUSEN_MODELS[id].title, t('mikro.donusen.rowSub', { n: missionsOf(id).length }), dnModel === id,
-            () => setPick({ kind: 'donusen', model: id, id: missionsOf(id)[0].id }), `robot-donusen-${id}`, missionsOf(id).every((m) => done.has(dnKey(m.id)))))}</ul>
+            () => setPick({ kind: 'donusen', model: id, id: missionsOf(id)[0].id }), `robot-donusen-${id}`, missionsOf(id).every((m) => done.has(dnKey(m.id))), '🤖'))}</ul>
         </div>
         <div className="rb-row">
           <h2>{t('mikro.studio.skills')}</h2>
-          <ul>{SKILL_CHALLENGES.map((c) => card(c.id, en ? c.en.title : c.title, t('mikro.studio.skillSub', { robot: robotTitle(c.profile), s: c.timeLimitS }), pick.kind === 'skill' && pick.id === c.id, () => setPick({ kind: 'skill', id: c.id }), `robot-skill-${c.id}`))}</ul>
+          <ul>{SKILL_CHALLENGES.map((c) => card(c.id, en ? c.en.title : c.title, t('mikro.studio.skillSub', { robot: robotTitle(c.profile), s: c.timeLimitS }), pick.kind === 'skill' && pick.id === c.id, () => setPick({ kind: 'skill', id: c.id }), `robot-skill-${c.id}`, false, '⏱️'))}</ul>
         </div>
         <div className="rb-row" data-testid="robot-season-row">
           <h2>{t('mikro.studio.seasons')}</h2>
-          <ul>{SEASONS.map((s) => card(s.field.id, en ? s.en.title : s.title, t('mikro.studio.seasonSub', { robot: robotTitle(s.field.profile), s: s.field.timeLimitS }), pick.kind === 'skill' && pick.id === s.field.id, () => setPick({ kind: 'skill', id: s.field.id }), `robot-season-${s.id}`))}
+          <ul>{SEASONS.map((s) => card(s.field.id, en ? s.en.title : s.title, t('mikro.studio.seasonSub', { robot: robotTitle(s.field.profile), s: s.field.timeLimitS }), pick.kind === 'skill' && pick.id === s.field.id, () => setPick({ kind: 'skill', id: s.field.id }), `robot-season-${s.id}`, false, '🏁'))}
             <li className="rb-season-link"><Link href="/robot-atolyesi/sezonlar">{t('mikro.studio.seasonRules')}</Link></li></ul>
         </div>
         <div className="rb-row">
           <h2>{t('mikro.studio.free')}</h2>
-          <ul>{FREE_PROFILES.map((p) => card(p, robotTitle(p), t(SENSOR_KEY[p]), pick.kind === 'free' && pick.profile === p, () => setPick({ kind: 'free', profile: p }), `robot-free-${p}`))}</ul>
+          <ul>{FREE_PROFILES.map((p) => card(p, robotTitle(p), t(SENSOR_KEY[p]), pick.kind === 'free' && pick.profile === p, () => setPick({ kind: 'free', profile: p }), `robot-free-${p}`, false, PROFILE_ICON[p]))}</ul>
         </div>
         <div className="rb-row" data-testid="robot-design-row">
           <h2>{en ? 'Design' : 'Tasarla'}</h2>
-          <ul><li><Link className="rb-card" href="/robot-atolyesi/tasarla" data-testid="robot-design-link"><b>{en ? 'Design your robot' : 'Robotunu Tasarla'}</b><small>{en ? 'Wheels, motors, sensors: build it, then run missions' : 'Teker, motor, sensör: kur, sonra görevde dene'}</small></Link></li></ul>
+          <ul><li><Link className="rb-card" href="/robot-atolyesi/tasarla" data-testid="robot-design-link"><span className="rb-mark" aria-hidden="true">🛠️</span><span className="rb-card-txt"><b>{en ? 'Design your robot' : 'Robotunu Tasarla'}</b><small>{en ? 'Wheels, motors, sensors: build it, then run missions' : 'Teker, motor, sensör: kur, sonra görevde dene'}</small></span></Link></li></ul>
         </div>
       </nav>
       <div className="rb-ed">

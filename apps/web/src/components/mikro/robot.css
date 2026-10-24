@@ -22,21 +22,50 @@
 .rb-readout .bad { color: var(--warn); font-weight: 700; }
 
 .rb-studio { display: grid; gap: 14px; min-height: 0; }
-.rb-pick { display: grid; gap: 10px; }
-.rb-row { display: grid; grid-template-columns: 120px minmax(0, 1fr); align-items: center; gap: 10px; }
+.rb-pick { display: grid; gap: 12px; }
+
+/* Görev bölümleri: her biri kendi tonunda kart (başlık şeridi + numaralı adımlar). Ton: --rb-c / --rb-soft / --rb-ink */
+.rb-chapters { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.rb-chapter { --rb-c: var(--sky, #4aa3df); --rb-soft: var(--sky-soft, #e2f1fb); --rb-ink: var(--sky-ink, #12507c); border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); overflow: hidden; min-width: 0; display: grid; align-content: start; }
+.rb-chapter.t-sun { --rb-c: var(--sun, #f6b73c); --rb-soft: var(--sun-soft, #fdf0d3); --rb-ink: var(--sun-ink, #7a4f00); }
+.rb-chapter.t-grape { --rb-c: var(--grape, #8a6ad8); --rb-soft: var(--grape-soft, #ece6fa); --rb-ink: var(--grape-ink, #4a2f92); }
+.rb-chapter.t-coral { --rb-c: var(--coral, #ef6f5b); --rb-soft: var(--coral-soft, #fde6e1); --rb-ink: var(--coral-ink, #8c2a1c); }
+.rb-chap { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 12px 14px; background: var(--rb-soft); border-bottom: 1px solid var(--border); }
+.rb-chap-ic { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px; background: var(--surface); font-size: 22px; box-shadow: 0 0 0 2px var(--rb-c); }
+.rb-chap-txt { display: grid; min-width: 0; }
+.rb-chap h2 { margin: 0; font-size: 1.02rem; color: var(--rb-ink); letter-spacing: 0; text-transform: none; }
+.rb-chap small { color: var(--muted); font-size: .8rem; }
+.rb-chap-prog { display: grid; justify-items: end; gap: 4px; min-width: 88px; }
+.rb-bar { display: block; width: 88px; height: 8px; border-radius: 999px; background: var(--surface); overflow: hidden; box-shadow: inset 0 0 0 1px var(--border); }
+.rb-bar span { display: block; height: 100%; background: var(--rb-c); border-radius: inherit; transition: width .3s; }
+.rb-chap .rb-prog { font-variant-numeric: tabular-nums; color: var(--rb-ink); font-weight: 600; }
+.rb-steps { list-style: none; margin: 0; padding: 12px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 8px; }
+
+/* Kartlar: işaret (numara / simge / ✓) + başlık + alt satır. Seçili kart dolu renk değil, tonlu çerçeve. */
+.rb-card { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; min-height: 52px; padding: 8px 12px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font: inherit; transition: border-color .15s, background .15s; }
+.rb-card:hover { border-color: var(--rb-c, var(--brand)); text-decoration: none; }
+.rb-card:focus-visible { outline: 3px solid var(--focus, var(--brand)); outline-offset: 2px; }
+.rb-card-txt { display: grid; gap: 1px; min-width: 0; }
+.rb-card b { font-size: .92rem; line-height: 1.25; }
+.rb-card small { color: var(--muted); font-size: .76rem; }
+.rb-mark { display: grid; place-items: center; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--rb-soft, var(--brand-soft)); color: var(--rb-ink, var(--brand)); font-weight: 700; font-size: .85rem; }
+.rb-card[data-done] .rb-mark { background: var(--good, #3f7d3a); color: #fff; }
+.rb-card[aria-current='true'] { border-color: var(--rb-c, var(--brand)); background: var(--rb-soft, var(--brand-soft)); box-shadow: inset 0 0 0 1px var(--rb-c, var(--brand)); }
+.rb-card[aria-current='true'] .rb-mark { background: var(--rb-c, var(--brand)); color: #fff; }
+.rb-card[aria-current='true'] b { color: var(--rb-ink, var(--text)); }
+
+/* "Daha fazlası": dönüşen robot, beceri, sezon, serbest arena, tasarla */
+.rb-more-title { margin: 10px 0 0; font-size: 1rem; }
+.rb-row { display: grid; grid-template-columns: 130px minmax(0, 1fr); align-items: center; gap: 10px; }
 .rb-row h2 { font-size: .72rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0; }
 .rb-row ul { list-style: none; margin: 0; padding: 2px; display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x proximity; }
 .rb-row li { flex: none; scroll-snap-align: start; }
-.rb-card { display: grid; gap: 1px; text-align: left; min-width: 150px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; font: inherit; box-shadow: var(--shadow-sm); }
-.rb-card:hover { border-color: var(--border-strong); }
-.rb-card:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
-.rb-card[aria-current='true'] { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
-.rb-card[aria-current='true'] small { color: inherit; opacity: .85; }
-.rb-card small { color: var(--muted); font-size: .78rem; }
+.rb-row .rb-card { min-width: 180px; }
 .rb-done { color: var(--ok); font-weight: 800; }
-.rb-card[aria-current='true'] .rb-done { color: inherit; }
 .rb-ed { min-width: 0; min-height: 0; }
+@media (max-width: 900px) { .rb-chapters { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 640px) { .rb-row { grid-template-columns: 1fr; gap: 4px; } }
+@media (prefers-reduced-motion: reduce) { .rb-bar span, .rb-card { transition: none; } }
 /* Sanal beceri paneli */
 .rb-ed { display: grid; gap: 12px; align-content: start; }
 .sk-panel { display: grid; gap: 10px; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
@@ -75,11 +104,7 @@
 /* Robot sayfası: editör kendi yüksekliğinde (görev satırları ve puan paneli üstte kalır, altbilgiyle çakışmaz) */
 .rb-ed .mk-box { height: max(700px, calc(100dvh - 110px)); }
 @media (max-width: 900px) { .rb-ed .mk-box { height: auto; } }
-/* Görev bölümleri: başlık, kavram ve ilerleme; öğretmen/veli notları */
-.rb-chap { display: grid; gap: 2px; align-content: center; }
-.rb-chap small { color: var(--muted); font-size: .72rem; line-height: 1.2; }
-.rb-chap meter { width: 100%; height: 6px; }
-.rb-chap .rb-prog { font-variant-numeric: tabular-nums; }
+/* Öğretmen/veli notları */
 .rb-notes { border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); padding: 8px 14px; }
 .rb-notes summary { cursor: pointer; font-weight: 600; }
 .rb-notes p { margin: 6px 0; color: var(--muted); font-size: .88rem; }
@@ -134,3 +159,4 @@
 @media (max-width: 760px), (pointer: coarse) {
   .sk-rules summary, .rb-notes summary { min-height: 44px; display: flex; align-items: center; }
 }
+@media (max-width: 420px) { .rb-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 10px; } .rb-steps .rb-card { padding: 8px; gap: 8px; } .rb-steps .rb-mark { width: 26px; height: 26px; } }
