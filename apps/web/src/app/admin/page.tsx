@@ -7,6 +7,7 @@ import { CreateUserForm, EditUserForm, GrantForm } from '@/components/admin/admi
 import { careerOf } from '@/lib/kariyer'
 import { QUESTIONS } from '@/lib/kariyer-anket'
 import { listSurveys } from '@/lib/kariyer-anket-server'
+import { levelNames, listLeads } from '@/lib/okul-teklif-server'
 import '../odeme.css'
 import './admin.css'
 
@@ -24,6 +25,7 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
   const q = (await searchParams).q ?? ''
   const db = getDb()
   const [rows, remaining, surveys] = await Promise.all([listUsers(db, q), welcomeRemaining(db), listSurveys(db, 200).catch(() => [])])
+  const leads = await listLeads(db, 200).catch(() => [])
   const members = rows.filter((r) => r.plan).length
 
   return (
@@ -67,6 +69,30 @@ export default async function Admin({ searchParams }: { searchParams: Promise<{ 
                       : <span className="muted">Yok</span>}
                   </td>
                   <td><GrantForm userId={r.id} hasPlan={!!r.plan} /></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="ac-card" id="okul-teklif">
+        <div className="ad-head">
+          <h2>Okul teklif talepleri <small className="muted">son {leads.length} talep</small></h2>
+          <a className="v2-btn ghost" href="/api/admin/okul-teklif" download>CSV indir (tümü)</a>
+        </div>
+        <div className="ac-table-wrap">
+          <table className="ac-table">
+            <thead><tr><th>Okul</th><th>Tarih</th><th>Kademe</th><th>Yetkili</th><th>İletişim</th><th>Not</th></tr></thead>
+            <tbody>
+              {leads.map((l) => (
+                <tr key={l.id}>
+                  <td><b>{l.school}</b><br /><small className="muted">{l.city} · {l.brand}</small></td>
+                  <td>{date(l.createdAt)}</td>
+                  <td>{levelNames(l.levels)}{l.students ? <><br /><small className="muted">{l.students} öğrenci</small></> : null}</td>
+                  <td>{l.contactName}{l.contactRole ? <><br /><small className="muted">{l.contactRole}</small></> : null}</td>
+                  <td><a href={`tel:${l.phone.replace(/[^+\d]/g, '')}`}>{l.phone}</a><br /><a href={`mailto:${l.email}`}>{l.email}</a></td>
+                  <td><small className="muted">{l.note}</small></td>
                 </tr>
               ))}
             </tbody>

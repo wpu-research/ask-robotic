@@ -1,5 +1,7 @@
+'use client'
 import Link from 'next/link'
 import { useId } from 'react'
+import { useBrand } from './brand-context'
 
 /** Macademia fındık logosu (Akademi/public/index.html ile aynı çizim). `id` her örnekte benzersiz kırpma yolu için. */
 export function NutLogo({ size = 48 }: { size?: number }) {
@@ -28,10 +30,26 @@ export function Wordmark() {
 }
 
 export function Brand({ label }: { label: string }) {
+  const brand = useBrand()
+  if (brand.logo) {
+    // İş ortağı markası: yuvarlak rozet logo (Dilkur'un sitesindeki gibi başlıktan taşar)
+    return (
+      <Link href="/" className="logo logo-badge" aria-label={`${brand.tr.name} ana sayfa`}>
+        <img src={brand.logo.badge} alt={brand.tr.name} width={128} height={128} />
+      </Link>
+    )
+  }
   return (
     <Link href="/" className="logo" aria-label={label}>
       <NutLogo />
       <Wordmark />
     </Link>
   )
+}
+
+/** Alt bilgideki marka: iş ortağında beyaz logo, MacademiaX'te fındık + kelime markası. */
+export function FooterBrand() {
+  const brand = useBrand()
+  if (brand.logo) return <img className="foot-logo" src={brand.logo.footer} alt={brand.tr.name} width={196} height={78} loading="lazy" />
+  return <><NutLogo size={34} /><Wordmark /></>
 }

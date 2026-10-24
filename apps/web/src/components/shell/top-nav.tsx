@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { useGame } from '@/lib/gamification'
 import { streak } from '@/lib/gamification-core'
-import { useT } from '@/i18n/client'
+import { useLocale, useT } from '@/i18n/client'
+import { useBrand } from './brand-context'
 import { isActive, MACADEMIA_PROGRAMS, MAIN_NAV, NAV } from './nav-items'
 
 const Chevron = () => <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.6" /></svg>
@@ -15,6 +16,12 @@ const Chevron = () => <svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2 4l
  */
 export function MainNav({ pathname, open, actions }: { pathname: string; open: boolean; actions?: React.ReactNode }) {
   const t = useT()
+  const locale = useLocale()
+  const brand = useBrand()
+  const groupTitle = (key: string) => (key === 'shell.groups.kids' && brand[locale].kidsGroup) || (key === 'shell.groups.adults' && brand[locale].adultsGroup) || t(key as never)
+  // Hakkımızda ve İletişim markanın kendi adresine gider; Yöntemimiz yalnız Macademia'da var
+  const mainNav = MAIN_NAV.filter((it) => brand.id === 'macademiax' || it.key !== 'shell.mnav.method')
+    .map((it) => (it.key === 'shell.mnav.about' ? { ...it, href: brand.aboutHref } : it.key === 'shell.mnav.contact' ? { ...it, href: brand.contactHref, external: /^https?:/.test(brand.contactHref) } : it))
   const [mega, setMega] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => { setMega(false) }, [pathname])
@@ -31,7 +38,7 @@ export function MainNav({ pathname, open, actions }: { pathname: string; open: b
   const programsActive = groups.some((g) => g.items.some((i) => isActive(i.href, pathname))) || isActive('/konular', pathname)
   return (
     <nav className={`main-nav${open ? ' open' : ''}`} id="main-nav" aria-label={t('shell.mainMenu')}>
-      {MAIN_NAV.map((it) => {
+      {mainNav.map((it) => {
         if (it.drop) {
           return (
             <div key={it.key} className="nav-drop" ref={ref} onMouseEnter={() => wide() && setMega(true)} onMouseLeave={() => wide() && setMega(false)}>
@@ -49,14 +56,16 @@ export function MainNav({ pathname, open, actions }: { pathname: string; open: b
                 </div>
                 {groups.filter((g) => g.tone !== 'learning').map((g) => (
                   <div key={g.key}>
-                    <h4>{t(g.key)}</h4>
+                    <h4>{groupTitle(g.key)}</h4>
                     {g.items.map((i) => <Link key={i.href} href={i.href} aria-current={isActive(i.href, pathname) ? 'page' : undefined}>{t(i.key)}</Link>)}
                   </div>
                 ))}
-                <div>
-                  <h4>{t('shell.groups.macademia')}</h4>
-                  {MACADEMIA_PROGRAMS.map((p) => <a key={p.href} href={p.href}>{t(p.key)}</a>)}
-                </div>
+                {brand.macademiaPrograms && (
+                  <div>
+                    <h4>{t('shell.groups.macademia')}</h4>
+                    {MACADEMIA_PROGRAMS.map((p) => <a key={p.href} href={p.href}>{t(p.key)}</a>)}
+                  </div>
+                )}
               </div>
             </div>
           )

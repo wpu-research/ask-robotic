@@ -7,7 +7,8 @@ import { CommandPalette } from './command-palette'
 import { Icon } from './icons'
 import { MACADEMIA_URL, NAV } from './nav-items'
 import { MainNav, StreakPill } from './top-nav'
-import { Brand, NutLogo, Wordmark } from './brand'
+import { Brand, FooterBrand } from './brand'
+import { useBrand } from './brand-context'
 import { Mascot } from '../lesson-v2/mascot'
 import { UserMenu } from '../auth/user-menu'
 import { SessionSync } from '../auth/session-sync'
@@ -25,6 +26,9 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
   const pathname = usePathname()
   const t = useT()
   const locale = useLocale()
+  const brand = useBrand()
+  const bt = brand[locale]
+  const partner = brand.id !== 'macademiax'
   // Alt bilgide her sayfada kurucu (eğitmen profiline bağlanır)
   const founder = instructorBySlug('murat-arslan')
   const [menu, setMenu] = useState(false)
@@ -56,9 +60,11 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
       <a className="skip-link" href="#icerik">{t('shell.skipToContent')}</a>
       <div className="topbar">
         <div className="wrap">
-          <span className="topbar-text">{t('shell.topbarText')}</span>
+          <span className="topbar-text">{partner ? bt.topbar : t('shell.topbarText')}</span>
           <nav className="topbar-links" aria-label={t('shell.shortLinks')}>
-            <a href={`${MACADEMIA_URL}#iletisim`} className="tb-hide-sm">{t('shell.contactUs')}</a>
+            {partner && brand.contact
+              ? <><a href={brand.contact.phoneHref} className="tb-hide-sm">{brand.contact.phone}</a><a href={brand.contact.whatsapp} className="tb-hide-sm" rel="noopener">WhatsApp</a></>
+              : <a href={`${MACADEMIA_URL}#iletisim`} className="tb-hide-sm">{t('shell.contactUs')}</a>}
             <StreakPill />
             <LocaleSwitcher />
             <ThemeToggle />
@@ -89,13 +95,21 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
       <main id="icerik" tabIndex={-1}>{children}</main>
 
       <footer className="site-footer">
-        <span className="foot-mac" aria-hidden="true"><Mascot size={84} mood="happy" /></span>
+        {!partner && <span className="foot-mac" aria-hidden="true"><Mascot size={84} mood="happy" /></span>}
         <div className="wrap">
           <div className="cols">
             <div>
-              <h4 className="foot-brand"><NutLogo size={34} /><Wordmark /></h4>
-              <p>{t('shell.foot.desc')}</p>
-              {founder && (
+              <h4 className="foot-brand"><FooterBrand /></h4>
+              <p>{partner ? bt.footDesc : t('shell.foot.desc')}</p>
+              {partner && brand.contact && (
+                <address className="foot-contact">
+                  <a href={brand.contact.phoneHref}>{brand.contact.phone}</a>
+                  <a href={`mailto:${brand.contact.email}`}>{brand.contact.email}</a>
+                  <span>{brand.contact.address}</span>
+                  <span className="foot-social">{brand.contact.social.map((s) => <a key={s.href} href={s.href} rel="noopener">{s.label}</a>)}</span>
+                </address>
+              )}
+              {brand.founderCard && founder && (
                 <Link href={instructorHref(founder)} className="foot-founder">
                   <img src={founder.photo.jpg160} alt="" width={44} height={44} loading="lazy" />
                   <span><small>{t('instructor.founder')}</small><b>{founder.name[locale]}</b></span>
@@ -103,28 +117,30 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
               )}
             </div>
             <div>
-              <h4>{t('shell.groups.kids')}</h4>
+              <h4>{bt.kidsGroup || t('shell.groups.kids')}</h4>
               {kids.map((i) => <Link key={i.href} href={i.href}>{t(i.key)}</Link>)}
             </div>
             <div>
-              <h4>{t('shell.groups.adults')}</h4>
+              <h4>{bt.adultsGroup || t('shell.groups.adults')}</h4>
               {adults.map((i) => <Link key={i.href} href={i.href}>{t(i.key)}</Link>)}
               <Link href="/konular">{t('shell.nav.topics')}</Link>
             </div>
             <div>
               <h4>{t('shell.foot.support')}</h4>
-              <a href={`${MACADEMIA_URL}#hakkimizda`}>{t('shell.mnav.about')}</a>
-              <a href={`${MACADEMIA_URL}#yontem`}>{t('shell.mnav.method')}</a>
-              <Link href="/okullar">{t('shell.foot.corporate')}</Link>
-              <a href={`${MACADEMIA_URL}#iletisim`}>{t('shell.mnav.contact')}</a>
+              <a href={brand.aboutHref}>{t('shell.mnav.about')}</a>
+              {!partner && <a href={`${MACADEMIA_URL}#yontem`}>{t('shell.mnav.method')}</a>}
+              <Link href={partner ? '/#teklif' : '/okullar'}>{t('shell.foot.corporate')}</Link>
+              <a href={brand.contactHref}>{t('shell.mnav.contact')}</a>
               <Link href="/basla">{t('shell.foot.level')}</Link>
               <Link href="/fiyatlar">{t('shell.footerPricing')}</Link>
               <Link href="/yasal/kvkk-aydinlatma">{t('shell.footerKvkk')}</Link>
             </div>
           </div>
           <div className="bottom">
-            <span>{t('shell.foot.copy')}</span>
-            <a href={MACADEMIA_URL}>macademia.com.tr</a>
+            <span>{partner ? bt.copy : t('shell.foot.copy')}</span>
+            {partner
+              ? <span className="foot-powered">{locale === 'en' ? 'Powered by ' : ''}<a href={MACADEMIA_URL}>Macademia</a>{locale === 'en' ? '' : ' altyapısıyla'}</span>
+              : <a href={MACADEMIA_URL}>macademia.com.tr</a>}
           </div>
         </div>
       </footer>

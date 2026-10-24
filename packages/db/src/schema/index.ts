@@ -364,3 +364,24 @@ export const careerSurveys = pgTable('career_surveys', {
   index('career_surveys_email').on(t.email),
   check('career_surveys_kvkk', sql`${t.consentKvkk}`),
 ])
+
+// Okul teklif talepleri (iş ortağı sitelerinin ana sayfasındaki form; ör. dilkur.macademia.com.tr). brand: hangi
+// alan adından geldiği. Kademeler: anaokulu | ilkokul | ortaokul | lise. KVKK onayı zorunlu.
+export const schoolLeads = pgTable('school_leads', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  brand: text('brand').notNull(),
+  school: text('school').notNull(),
+  city: text('city').notNull(),
+  levels: jsonb('levels').$type<string[]>().notNull(),
+  students: integer('students'),
+  contactName: text('contact_name').notNull(),
+  contactRole: text('contact_role'),
+  phone: text('phone').notNull(),
+  email: text('email').notNull(),
+  note: text('note'),
+  consentKvkk: boolean('consent_kvkk').notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  index('school_leads_brand_created').on(t.brand, t.createdAt),
+  check('school_leads_kvkk', sql`${t.consentKvkk}`),
+])

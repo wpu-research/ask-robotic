@@ -1,0 +1,54 @@
+/* Dilkur Akademi markası (dilkur.macademia.com.tr): html[data-brand='dilkur']. dilkurakademi.com'un paleti — lacivert
+   #012245 (üst şerit, alt bilgi, başlıklar), turuncu #ff4f1e (düğmeler, vurgu), beyaz zemin; Poppins zaten ortak.
+   Yalnız marka değişkenlerini ve kabuğu değiştirir; ders, laboratuvar ve çocuk atölyelerinin yardımcı renkleri aynı kalır. */
+:root[data-brand='dilkur'] {
+  --brand: #ff4f1e; --brand-strong: #e03d0f; --brand-soft: #fff0eb; --on-brand: #ffffff;
+  --deep: #012245; --deep-2: #0d3460; --on-deep: #ffffff; --on-deep-muted: #c9d4e3; --deep-ink: #012245; --brand-on-deep: #ff8a66;
+  --ink: #201d1e; --line: #e3e8f0; --bg-soft: #f3f6fb;
+  --bg: #ffffff; --surface: #ffffff; --surface-2: #f3f6fb; --text: #201d1e; --muted: #4c5566; --border: #e3e8f0;
+  --dk-navy: #012245; --dk-orange: #ff4f1e;
+  --shadow: 0 1px 2px rgba(1, 34, 69, .06), 0 8px 24px rgba(1, 34, 69, .08);
+}
+:root[data-brand='dilkur'][data-theme='dark'] {
+  --brand: #ff6a3d; --brand-strong: #ff8a66; --brand-soft: #3a1d14; --on-brand: #160904;
+  --deep: #00152b; --deep-2: #0d3460; --on-deep: #eef3fa; --on-deep-muted: #a9b8cc; --deep-ink: #eef3fa;
+  --ink: #e9eef6; --line: #1f3350; --bg-soft: #0b1d33;
+  --bg: #061426; --surface: #0c1f37; --surface-2: #0b1d33; --text: #e9eef6; --muted: #a9b8cc; --border: #1f3350;
+  --dk-navy: #9fc1ea;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-brand='dilkur']:not([data-theme='light']) {
+    --brand: #ff6a3d; --brand-strong: #ff8a66; --brand-soft: #3a1d14; --on-brand: #160904;
+    --deep: #00152b; --deep-2: #0d3460; --on-deep: #eef3fa; --on-deep-muted: #a9b8cc; --deep-ink: #eef3fa;
+    --ink: #e9eef6; --line: #1f3350; --bg-soft: #0b1d33;
+    --bg: #061426; --surface: #0c1f37; --surface-2: #0b1d33; --text: #e9eef6; --muted: #a9b8cc; --border: #1f3350;
+    --dk-navy: #9fc1ea;
+  }
+}
+
+/* Logo rozeti: beyaz yuvarlak, başlıktan aşağı taşar (dilkurakademi.com gibi) */
+[data-brand='dilkur'] .logo-badge { position: relative; align-self: flex-start; width: 112px; height: 76px; }
+[data-brand='dilkur'] .logo-badge img { position: absolute; top: -34px; left: 0; width: 112px; height: 112px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 1px rgba(1, 34, 69, .18), 0 6px 18px rgba(1, 34, 69, .14); z-index: 2; }
+@media (max-width: 960px) {
+  [data-brand='dilkur'] .logo-badge { width: 72px; height: 64px; }
+  [data-brand='dilkur'] .logo-badge img { top: -10px; width: 76px; height: 76px; }
+}
+
+/* Üst şeritte yazı rozetin altında kalmasın: rozet genişliği kadar boşluk */
+[data-brand='dilkur'] .topbar .topbar-text { padding-left: 132px; }
+@media (max-width: 960px) { [data-brand='dilkur'] .topbar .topbar-text { padding-left: 88px; } }
+
+/* Başlıklar lacivert; eyebrow etiketi turuncu yazı, eğiklik yok (Dilkur daha sade) */
+[data-brand='dilkur'] h1, [data-brand='dilkur'] h2 { color: var(--dk-navy); }
+[data-brand='dilkur'] .eyebrow { transform: none; box-shadow: none; }
+
+/* Alt bilgi: beyaz logo, iletişim, "Macademia altyapısıyla" */
+[data-brand='dilkur'] .site-footer::before { display: none; }
+[data-brand='dilkur'] .site-footer { margin-top: 56px; }
+[data-brand='dilkur'] .foot-brand { margin-bottom: 18px; }
+[data-brand='dilkur'] .foot-logo { display: block; width: 196px; height: auto; }
+[data-brand='dilkur'] .foot-contact { font-style: normal; display: grid; gap: 2px; margin-top: 16px; }
+[data-brand='dilkur'] .foot-contact span { display: block; padding: 3px 0; }
+[data-brand='dilkur'] .foot-social { display: flex !important; flex-wrap: wrap; gap: 4px 14px; }
+[data-brand='dilkur'] .foot-powered { color: var(--on-deep-muted); }
+[data-brand='dilkur'] .foot-powered a { color: var(--on-deep); }
