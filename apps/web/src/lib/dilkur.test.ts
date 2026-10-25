@@ -8,7 +8,7 @@ import { MODULES_EN } from './catalog-en'
 import { PHOTO_CREDITS, STAGES } from './dilkur-landing'
 import { LEGAL } from '@/app/yasal/metinler'
 import { LEVELS, leadSchema } from './okul-teklif'
-import { leadsCsv, levelNames, storeLead, type LeadRow } from './okul-teklif-server'
+import { leadNotifyMail, leadNotifyTo, leadsCsv, levelNames, storeLead, type LeadRow } from './okul-teklif-server'
 
 const APP = join(__dirname, '..', 'app')
 const PUBLIC = join(__dirname, '..', '..', 'public')
@@ -93,5 +93,28 @@ describe('okul teklif formu', () => {
     expect(csv.startsWith('﻿Tarih;Kaynak;Okul')).toBe(true)
     expect(csv).toContain('"Okul; ""A"""')
     expect(csv).toContain(';İlkokul (1-4);120;')
+  })
+})
+
+describe('okul teklif bildirimi', () => {
+  it('alıcıları virgülle ayırır, geçersizleri atar', () => {
+    expect(leadNotifyTo({})).toEqual([])
+    expect(leadNotifyTo({ LEAD_NOTIFY_TO: ' a@b.com , yanlis, c@d.org ' })).toEqual(['a@b.com', 'c@d.org'])
+  })
+
+  it('e-posta tüm alanları içerir ve HTML kaçışlıdır', () => {
+    const lead = leadSchema.parse({
+      school: 'Okul <script>', city: 'Aksaray', levels: ['lise', 'anaokulu'], students: 300,
+      contactName: 'Ayşe Yılmaz', contactRole: 'Müdür', phone: '0546 689 86 66', email: 'X@Okul.k12.tr', consentKvkk: true,
+    })
+    const m = leadNotifyMail(lead, 'Dilkur Akademi', 'https://dilkur.macademia.com.tr/admin#okul-teklif')
+    expect(m.subject).toBe('Yeni okul teklif talebi: Okul <script> (Dilkur Akademi)')
+    expect(m.text).toContain('Kademeler: Anaokulu, Lise (9-12)')
+    expect(m.text).toContain('Yetkili: Ayşe Yılmaz (Müdür)')
+    expect(m.text).toContain('E-posta: x@okul.k12.tr')
+    expect(m.text).toContain('Not: —')
+    expect(m.html).not.toContain('<script>')
+    expect(m.html).toContain('Okul &lt;script&gt;')
+    expect(m.html).toContain('https://dilkur.macademia.com.tr/admin#okul-teklif')
   })
 })
