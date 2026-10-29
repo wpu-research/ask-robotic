@@ -107,6 +107,7 @@ export const shell = {
     ml: 'Makine öğrenmesi',
     cvDemos: 'Gerçek hayat demoları',
     robotDesign: 'Robotunu Tasarla',
+    talkingFace: 'Konuşan Yüz',
     humanoid: 'İnsansı robot',
   },
   /** Atölyeler panelindeki tek satırlık açıklamalar. */
@@ -115,6 +116,7 @@ export const shell = {
     robotStudio: 'Robotunu bloklarla görevlere gönder',
     seasons: 'Takımınla sezon görevlerinde yarış',
     robotDesign: 'Parçalardan robot kur, görevde dene',
+    talkingFace: '3B robot yüzü: duygu, göz, yazıdan sese dudak',
     humanoid: 'Kinematik, denge ve yürüyüş (3B)',
     microCard: 'Işık, ses ve sensörlü sanal kart',
     vision: 'Robotlar nasıl görür? Kamera oyunları',

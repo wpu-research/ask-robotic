@@ -49,6 +49,7 @@ export const NAV: NavGroup[] = [
       { href: '/robot-atolyesi', label: 'Robot atölyesi', key: 'shell.nav.robotStudio', icon: 'arena' },
       { href: '/robot-atolyesi/sezonlar', label: 'Yarışma sezonları', key: 'shell.nav.seasons', icon: 'target' },
       { href: '/robot-atolyesi/tasarla', label: 'Robotunu Tasarla', key: 'shell.nav.robotDesign', icon: 'arena' },
+      { href: '/robot-atolyesi/yuz', label: 'Konuşan Yüz', key: 'shell.nav.talkingFace', icon: 'ai' },
       { href: '/mikro-kart', label: 'Mikro Kart atölyesi', key: 'shell.nav.microCard', icon: 'mikro' },
       { href: '/robotun-gozleri', label: 'Robotun Gözleri', key: 'shell.nav.vision', icon: 'eye' },
       { href: '/oyun-atolyesi', label: 'Oyun atölyesi', key: 'shell.nav.gameStudio', icon: 'oyun' },
@@ -110,7 +111,7 @@ export function isActive(href: string, pathname: string): boolean {
   if (href === '/muhendislik#parcalar') return pathname.startsWith('/muhendislik/parca/') || pathname.startsWith('/muhendislik/seviye/')
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/parca/') || pathname.startsWith('/muhendislik/seviye/'))) return false
   // Robotunu Tasarla kendi öğesinde işaretlenir
-  if (href === '/robot-atolyesi' && pathname.startsWith('/robot-atolyesi/tasarla')) return false
+  if (href === '/robot-atolyesi' && (pathname.startsWith('/robot-atolyesi/tasarla') || pathname.startsWith('/robot-atolyesi/yuz'))) return false
   // Robotik, drone, IoT ve sensör-ML dersleri kendi menü öğelerinde işaretlenir, üst "Mühendislik yolu" değil
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/iot') || pathname.startsWith('/muhendislik/sensor-ml'))) return false
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/opencv') || pathname.startsWith('/muhendislik/pytorch'))) return false

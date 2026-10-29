@@ -60,3 +60,8 @@
   .jrb-main { align-self: stretch; }
   .jrb-ws { height: 100%; min-height: 560px; }
 }
+
+/* Blokların Python karşılığı paneli */
+.jrb-code { display: grid; gap: 8px; min-width: 0; }
+.jrb-code-pre { margin: 0; padding: 12px 14px; border-radius: 10px; background: #1e2433; color: #e6edf7; font: .82rem/1.6 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; overflow: auto; max-height: 280px; white-space: pre; tab-size: 4; }
+.jrb-code-note { margin: 0; font-size: .85rem; color: var(--muted); }

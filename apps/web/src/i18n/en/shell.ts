@@ -108,6 +108,7 @@ export const shell: typeof Tr = {
     ml: 'Machine learning',
     cvDemos: 'Real-world demos',
     robotDesign: 'Design your robot',
+    talkingFace: 'Talking Face',
     humanoid: 'Humanoid robot',
   },
   navDesc: {
@@ -115,6 +116,7 @@ export const shell: typeof Tr = {
     robotStudio: 'Send your robot on missions with blocks',
     seasons: 'Compete with your team in season missions',
     robotDesign: 'Build a robot from parts, run missions',
+    talkingFace: 'A 3D robot face: feelings, eyes, text-to-speech lips',
     humanoid: 'Kinematics, balance and walking (3D)',
     microCard: 'A virtual board with lights, sound and sensors',
     vision: 'How robots see, plus camera games',

@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { createStage, fitShadow, hasWebGL, type Stage } from '@/components/three/core'
 import { useLocale } from '@/i18n/client'
+import { MurokoBlocks } from './mujoco-blocks'
+import { Runner, type Op } from '@/lib/mujoco/program'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -92,6 +94,8 @@ export function MujocoLab() {
   const speedRef = useRef(1)
   const ctrlRef = useRef<number[]>([])
   const acc = useRef(0)
+  const programs = useRef<Op[][]>([])
+  const runners = useRef<Runner[]>([])
 
   const [sceneId, setSceneId] = useState(MJ_SCENES[0].id)
   const scene: MjScene = MJ_SCENES.find((s) => s.id === sceneId) ?? MJ_SCENES[0]
@@ -104,6 +108,7 @@ export function MujocoLab() {
   const [ctrlDefs, setCtrlDefs] = useState<Sim['ctrl']>([])
   const [ctrlVals, setCtrlVals] = useState<number[]>([])
   const [info, setInfo] = useState({ t: 0, ncon: 0 })
+  const [progRunning, setProgRunning] = useState(false)
   const [webgl] = useState(() => typeof document === 'undefined' || hasWebGL())
 
   const disposeSim = useCallback(() => {
@@ -140,6 +145,7 @@ export function MujocoLab() {
     stage.onFrame = (dt) => {
       const sim = simRef.current; if (!sim) return
       if (runRef.current) {
+        for (const r of runners.current) r.tick(sim.data.time)
         acc.current += dt * speedRef.current
         let n = 0
         while (acc.current >= sim.timestep && n < 80) {
@@ -175,6 +181,7 @@ export function MujocoLab() {
         const sim: Sim = { mj, model, data, meshes: buildMeshes(mj, model, groupRef.current), ctrl, timestep: model.opt.timestep }
         simRef.current = sim
         ctrlRef.current = ctrl.map(() => 0)
+        runners.current = []; setProgRunning(false)
         setCtrlDefs(ctrl); setCtrlVals(ctrl.map(() => 0))
         resetState()
         setErr(''); setStatus('ready')
@@ -197,6 +204,7 @@ export function MujocoLab() {
     const id = setInterval(() => {
       const sim = simRef.current; if (!sim) return
       setInfo({ t: sim.data.time, ncon: sim.data.ncon })
+      if (runners.current.length) { setCtrlVals([...ctrlRef.current]); if (runners.current.every((r) => r.done)) { runners.current = []; setProgRunning(false) } }
     }, 250)
     return () => clearInterval(id)
   }, [])
@@ -211,6 +219,16 @@ export function MujocoLab() {
     const v = sim.data.qvel
     for (let i = 0; i < v.length; i++) v[i] += (Math.random() - 0.5) * 3
   }
+  const startProgram = () => {
+    const sim = simRef.current; if (!sim) return
+    resetState()
+    runners.current = programs.current.map((p) => new Runner(p, (name, value) => {
+      const i = sim.ctrl.findIndex((c) => c.name === name)
+      if (i >= 0) ctrlRef.current[i] = Math.min(sim.ctrl[i].hi, Math.max(sim.ctrl[i].lo, value))
+    }))
+    runRef.current = true; setRunning(true); setProgRunning(runners.current.length > 0)
+  }
+  const stopProgram = () => { runners.current = []; setProgRunning(false) }
   const setCtrl = (i: number, v: number) => {
     ctrlRef.current[i] = v
     setCtrlVals((a) => a.map((x, k) => (k === i ? v : x)))
@@ -259,6 +277,18 @@ export function MujocoLab() {
           <p className="mj-hint">{en ? scene.en.hint : scene.tr.hint}</p>
         </aside>
       </div>
+
+      <section className="mj-prog" aria-label={L('Bloklarla sür', 'Drive with blocks')}>
+        <h3>{L('Bloklarla sür', 'Drive with blocks')}</h3>
+        <p className="muted">{L('Motor bloklarını sırala, Çalıştır\'a bas. Altta aynı programın Python\'u görünür.', 'Stack motor blocks and press Run. The same program appears as Python below.')}</p>
+        <MurokoBlocks actuators={ctrlDefs} en={en} onChange={(p) => { programs.current = p }} />
+        {ctrlDefs.length > 0 && (
+          <div className="mj-bar">
+            <button className="sbtn" onClick={startProgram} data-testid="mujoco-run">{L('Programı çalıştır', 'Run program')}</button>
+            <button className="sbtn ghost" onClick={stopProgram} disabled={!progRunning}>{L('Programı durdur', 'Stop program')}</button>
+          </div>
+        )}
+      </section>
 
       <details className="mj-xml" open>
         <summary>{L('Modeli düzenle (MJCF / XML)', 'Edit the model (MJCF / XML)')}</summary>

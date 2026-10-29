@@ -29,3 +29,10 @@
 .mj-learn li { margin: 4px 0; }
 @media (max-width: 900px) { .mj-body { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .mj-stage, .mj-overlay { height: clamp(260px, 78vw, 360px); } }
+
+.mj-prog { display: grid; gap: 8px; min-width: 0; }
+.mj-prog h3 { margin: 0; }
+.mj-blocks { display: grid; gap: 8px; min-width: 0; }
+.mj-blocks-ws { position: relative; height: 300px; border: 1px solid var(--border-strong); border-radius: 10px; overflow: hidden; }
+.mj-py summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+.mj-py-pre { margin: 0; padding: 12px 14px; border-radius: 10px; background: #1e2433; color: #e6edf7; font: .82rem/1.6 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; overflow: auto; max-height: 240px; white-space: pre; }

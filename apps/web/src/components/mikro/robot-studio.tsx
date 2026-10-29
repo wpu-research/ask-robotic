@@ -147,7 +147,7 @@ export function RobotStudio({ initialSkill }: { initialSkill?: string } = {}) {
         </div>
         <div className="rb-row" data-testid="robot-design-row">
           <h2>{en ? 'Design' : 'Tasarla'}</h2>
-          <ul><li><Link className="rb-card" href="/robot-atolyesi/tasarla" data-testid="robot-design-link"><span className="rb-mark" aria-hidden="true">🛠️</span><span className="rb-card-txt"><b>{en ? 'Design your robot' : 'Robotunu Tasarla'}</b><small>{en ? 'Wheels, motors, sensors: build it, then run missions' : 'Teker, motor, sensör: kur, sonra görevde dene'}</small></span></Link></li></ul>
+          <ul><li><Link className="rb-card" href="/robot-atolyesi/tasarla" data-testid="robot-design-link"><span className="rb-mark" aria-hidden="true">🛠️</span><span className="rb-card-txt"><b>{en ? 'Design your robot' : 'Robotunu Tasarla'}</b><small>{en ? 'Wheels, motors, sensors: build it, then run missions' : 'Teker, motor, sensör: kur, sonra görevde dene'}</small></span></Link></li><li><Link className="rb-card" href="/robot-atolyesi/yuz" data-testid="robot-face-link"><span className="rb-mark" aria-hidden="true">🤖</span><span className="rb-card-txt"><b>{en ? 'Talking Face' : 'Konuşan Yüz'}</b><small>{en ? 'A 3D face that blinks, follows you and speaks' : 'Göz kırpan, seni izleyen, konuşan 3B yüz'}</small></span></Link></li></ul>
         </div>
       </nav>
       <div className="rb-ed">

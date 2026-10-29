@@ -6,6 +6,7 @@ import { useLocale, useT } from '@/i18n/client'
 import { Engine } from '@/lib/jr/engine'
 import { addPageTo, addSpriteTo, editScripts, removePageAt, removeSpriteFrom, setBackground } from '@/lib/jr/project-edit'
 import { isMuted, playSound, setMuted } from '@/lib/jr/sound'
+import { spriteToPython } from '@/lib/jr/to-python'
 import type { Block, BlockType, EngineSnapshot, Project, Script } from '@/lib/jr/types'
 import { BlockWorkspace } from './blockly-workspace'
 import { GoalsPanel } from './goals-panel'
@@ -49,6 +50,7 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
   const [addOpen, setAddOpen] = useState(false)
   const [muted, setMutedState] = useState(false)
   const [loaded, setLoaded] = useState(!storageKey)
+  const [showCode, setShowCode] = useState(false)
   const t = useT()
   const locale = useLocale()
 
@@ -197,6 +199,17 @@ export function JrEditor({ initial, storageKey, allowedBlocks = ALL_BLOCK_TYPES,
           resetKey={`${page.id}:${sprite?.id ?? ''}`}
           glowIds={glow}
         />
+        <div className="jrb-code">
+          <button type="button" className="jr-btn small" aria-expanded={showCode} onClick={() => setShowCode((v) => !v)} data-testid="jr-code-toggle">
+            🐍 {showCode ? (locale === 'en' ? 'Hide the Python' : 'Python\'u gizle') : (locale === 'en' ? 'Show the Python' : 'Python\'u göster')}
+          </button>
+          {showCode && sprite && (
+            <>
+              <pre className="jrb-code-pre" data-testid="jr-code" aria-label={locale === 'en' ? 'Python version of your blocks' : 'Bloklarının Python karşılığı'}>{spriteToPython(sprite, locale === 'en' ? 'en' : 'tr')}</pre>
+              <p className="jrb-code-note">{locale === 'en' ? 'Every block is one line of code. Change the blocks and watch the code change.' : 'Her blok koddaki bir satırdır. Blokları değiştir, kodun değiştiğini izle.'}</p>
+            </>
+          )}
+        </div>
       </div>
 
       <div className="jrb-extras">

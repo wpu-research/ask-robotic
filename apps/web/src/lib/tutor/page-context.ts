@@ -49,6 +49,7 @@ export const SECTIONS = {
   parts: 'Parça ansiklopedisi: LED, direnç, sensör, motor gibi parçaların nasıl çalıştığı ve nasıl bağlandığı.',
   lab: 'Sanal elektronik laboratuvarı: Arduino, devre tahtası ve parçalarla devre kurma; Arduino kodu derlenip simülatörde çalışır.',
   arena: 'Robot arenası: sanal bir robotu kodla sürme; engelden kaçma, çizgi izleme, sensörler, enkoder ve PID.',
+  faceLab: 'Konuşan Yüz: 3B robot yüzü; duygu, göz, dudak senkronu, yazıyı sese çevirme. Çocuk yüze bir şey söyletir ya da Mac\'e soru sorar.',
   blocks: 'Blok atölyesi: Scratch benzeri bloklarla kodlama.',
   aiLab: 'Yapay zekâ atölyesi: token, olasılık, benzerlik, bilgi getirme (RAG), prompt ve değerlendirme etkinlikleri.',
   gameLab: 'Oyun atölyesi: bloklarla kendi oyununu yapma (olaylar, döngüler, değişkenler).',
@@ -68,7 +69,7 @@ export type SectionKey = keyof typeof SECTIONS
 
 const SECTION_PREFIX: [string, SectionKey][] = [
   ['/panel', 'home'], ['/konular', 'topics'], ['/moduller', 'courses'], ['/parcalar', 'parts'], ['/laboratuvar', 'lab'],
-  ['/arena', 'arena'], ['/atolye', 'blocks'], ['/ai-atolyesi', 'aiLab'], ['/oyun-atolyesi', 'gameLab'], ['/sahne-atolyesi', 'stageLab'],
+  ['/arena', 'arena'], ['/robot-atolyesi/yuz', 'faceLab'], ['/atolye', 'blocks'], ['/ai-atolyesi', 'aiLab'], ['/oyun-atolyesi', 'gameLab'], ['/sahne-atolyesi', 'stageLab'],
   ['/oyunlar', 'games'], ['/testler', 'tests'], ['/lig', 'league'], ['/ilerleme', 'progress'], ['/mikro-kart', 'microCard'],
   ['/basla', 'start'], ['/fiyatlar', 'pricing'], ['/okullar', 'schools'],
 ]
