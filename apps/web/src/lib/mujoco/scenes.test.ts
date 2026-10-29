@@ -1,9 +1,12 @@
 // Sahneler gerçek MuJoCo (WASM) ile derlenir; hedeflerin sensör kanalları var, başlangıç kodlarının mantığı hedefe ulaşır.
 // WASM yüklemesi birkaç saniye sürer (testler tek model üzerinde yeniden kurulur: bellek sızıntısı olmasın).
+import fs from 'node:fs'
+import zlib from 'node:zlib'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { MJ_SCENES } from './scenes'
 import { buildChannels, readAll, type Channel } from './sensors'
 import { GoalTracker } from './goals'
+import { unpack, writeToFs } from './pack'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let mj: any
@@ -12,12 +15,25 @@ beforeAll(async () => {
   mj = await (await import(/* @vite-ignore */ url)).default()
 }, 60_000)
 
+const packed = new Set<string>()
 function open(id: string) {
   const sc = MJ_SCENES.find((s) => s.id === id)!
-  mj.FS.writeFile('/m.xml', sc.xml)
-  const m = mj.MjModel.mj_loadXML('/m.xml')
+  let path = '/m.xml'
+  if (sc.pack) {
+    if (!packed.has(sc.pack)) {
+      const raw = zlib.gunzipSync(fs.readFileSync(new URL(`../../../public/mujoco/models/${sc.pack}.pack.gz`, import.meta.url)))
+      writeToFs(mj.FS, `/models/${sc.pack}`, unpack(new Uint8Array(raw)))
+      packed.add(sc.pack)
+    }
+    path = `/models/${sc.pack}/muroko_scene.xml`
+  }
+  mj.FS.writeFile(path, sc.xml)
+  const m = mj.MjModel.mj_loadXML(path)
   const d = new mj.MjData(m)
-  if (m.nkey > 0) mj.mj_resetDataKeyframe(m, d, 0)
+  // Uygulamayla aynı kural: `muroko` adlı anahtar kare varsa o, yoksa ilki
+  const kId = mj.mj_name2id(m, 24, 'muroko')
+  const key = kId >= 0 ? kId : m.nkey > 0 ? 0 : -1
+  if (key >= 0) mj.mj_resetDataKeyframe(m, d, key)
   mj.mj_forward(m, d)
   const names = Array.from({ length: m.nsensor }, (_: unknown, i: number) => mj.mj_id2name(m, 20, i))
   const chs: Channel[] = buildChannels(names, m.sensor_adr, m.sensor_dim, m.sensor_type)
@@ -96,6 +112,41 @@ describe('MuRoKo sahneleri', () => {
     for (let i = 0; i < 600; i++) { r.step(5); t.update(0.01, r.sensors()) }
     r.motor('taban_motoru', 0.5)
     for (let i = 0; i < 400; i++) { r.step(5); t.update(0.01, r.sensors()) }
+    expect(t.allDone).toBe(true)
+    r.done()
+  }, 60_000)
+
+  it('Franka Panda: şablon küpü tutup kaldırır', () => {
+    const r = open('franka-panda')
+    const t = new GoalTracker(r.sc.goals)
+    const pose = (j2: number, j4: number, j6: number) => { r.motor('actuator2', j2); r.motor('actuator4', j4); r.motor('actuator6', j6) }
+    const hold = (sec: number) => { for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(5); t.update(0.01, r.sensors()) } }
+    r.motor('actuator8', 255); pose(0.06, -2.36, 2.4); hold(2.5)
+    pose(0.46, -2.36, 2.8); hold(2.5)
+    r.motor('actuator8', 0); hold(1.5)
+    pose(-0.04, -2.36, 2.35); hold(3)
+    expect(r.sensors()['kup.z']).toBeGreaterThan(0.15)
+    expect(t.allDone).toBe(true)
+    r.done()
+  }, 60_000)
+
+  it('Unitree Go1: şablon çömelir ve yükselir, ayakta kalır', () => {
+    const r = open('unitree-go1')
+    const t = new GoalTracker(r.sc.goals)
+    const stance = (th: number, ca: number) => { for (const l of ['FR', 'FL', 'RR', 'RL']) { r.motor(`${l}_thigh`, th); r.motor(`${l}_calf`, ca) } }
+    const hold = (sec: number) => { for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(5); t.update(0.01, r.sensors()) } }
+    r.step(1500)
+    expect(r.sensors()['govde.z']).toBeGreaterThan(0.22)
+    for (const [th, ca, sec] of [[1.3, -2.4, 4], [1.1, -2.1, 2], [0.9, -1.8, 2], [0.75, -1.5, 2], [0.6, -1.2, 4]]) { stance(th, ca); hold(sec) }
+    expect(t.state.map((x) => `${x.id}:${x.done}:${x.held.toFixed(1)}`), `z=${r.sensors()['govde.z']}`).toEqual(t.state.map((x) => `${x.id}:true:${x.held.toFixed(1)}`))
+    r.done()
+  }, 90_000)
+
+  it('Shadow Hand: şablon yumruk yapar', () => {
+    const r = open('shadow-el')
+    const t = new GoalTracker(r.sc.goals)
+    for (const f of ['FF', 'MF', 'RF', 'LF']) { r.motor(`rh_A_${f}J3`, 1.5); r.motor(`rh_A_${f}J0`, 3.0) }
+    for (let i = 0; i < 300; i++) { r.step(5); t.update(0.01, r.sensors()) }
     expect(t.allDone).toBe(true)
     r.done()
   }, 60_000)

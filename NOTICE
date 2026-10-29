@@ -17,3 +17,11 @@ Bu proje üçüncü taraf yazılımlar kullanır ve bir eğitim yaklaşımından
    Copyright Google DeepMind. Apache License 2.0 ile lisanslıdır.
    MuRoKo fizik laboratuvarı, resmi WebAssembly sürümünü (`mujoco` npm paketi, 3.1.16) `apps/web/public/mujoco/` altında olduğu gibi sunar.
    Lisans metni: https://www.apache.org/licenses/LICENSE-2.0
+
+4. MuJoCo Menagerie robot modelleri (https://github.com/google-deepmind/mujoco_menagerie)
+   MuRoKo "Gerçek robot modelleri" bölümü, aşağıdaki modelleri ve mesh dosyalarını değiştirmeden sunar
+   (`apps/web/public/mujoco/models/`). Her modelin lisans metni aynı klasörde `<ad>.LICENSE.txt` olarak durur.
+   - Franka Emika Panda (franka_emika_panda): Apache License 2.0.
+   - Unitree Go1 (unitree_go1): BSD 3-Clause. Copyright (c) 2016-2022 HangZhou YuShu TECHNOLOGY CO.,LTD. ("Unitree Robotics").
+   - Shadow Dexterous Hand (shadow_hand): Apache License 2.0.
+   Modeller yalnız eğitim simülasyonunda kullanılır; üreticiler bu projeyi onaylamaz ya da desteklemez.

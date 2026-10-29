@@ -13,6 +13,7 @@ import { buildChannels, readAll, type Channel } from '@/lib/mujoco/sensors'
 import { GoalTracker } from '@/lib/mujoco/goals'
 import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
+import { unpack, writeToFs } from '@/lib/mujoco/pack'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Mj = any
@@ -30,6 +31,23 @@ function loadMujoco(): Promise<Mj> {
 
 const OBJ_ACTUATOR = 19
 const OBJ_SENSOR = 20
+const OBJ_KEY = 24
+
+const packs = new Map<string, Promise<void>>()
+/** Gerçek robot modeli paketi (gzip, tek dosya) bir kez indirilir ve sanal dosya sistemine açılır. */
+function ensurePack(mj: Mj, id: string): Promise<void> {
+  let p = packs.get(id)
+  if (!p) {
+    p = (async () => {
+      const res = await fetch(`/mujoco/models/${id}.pack.gz`)
+      if (!res.ok || !res.body) throw new Error(`Model paketi indirilemedi (${res.status})`)
+      const buf = new Uint8Array(await new Response(res.body.pipeThrough(new DecompressionStream('gzip'))).arrayBuffer())
+      writeToFs(mj.FS, `/models/${id}`, unpack(buf))
+    })().catch((e) => { packs.delete(id); throw e })
+    packs.set(id, p)
+  }
+  return p
+}
 
 interface Sim {
   mj: Mj; model: any; data: any
@@ -37,6 +55,8 @@ interface Sim {
   ctrl: { name: string; lo: number; hi: number }[]
   channels: Channel[]
   timestep: number
+  /** Başlangıç anahtar karesi: `muroko` adlıysa o, yoksa ilki (yoksa -1). */
+  keyId: number
 }
 
 function floorTexture() {
@@ -63,13 +83,29 @@ function skyTexture() {
   return t
 }
 
+/** Mesh geometrisi: modelin kendi köşe/yüz dizilerinden (geom çerçevesinde), mesh başına bir kez. */
+function meshGeometry(model: any, id: number): THREE.BufferGeometry {
+  const va = model.mesh_vertadr[id], vn = model.mesh_vertnum[id], fa = model.mesh_faceadr[id], fn = model.mesh_facenum[id]
+  const g = new THREE.BufferGeometry()
+  g.setAttribute('position', new THREE.BufferAttribute(Float32Array.from(model.mesh_vert.subarray(3 * va, 3 * (va + vn))), 3))
+  g.setIndex(new THREE.BufferAttribute(Uint32Array.from(model.mesh_face.subarray(3 * fa, 3 * (fa + fn))), 1))
+  g.computeVertexNormals()
+  return g
+}
+
 function buildMeshes(mj: Mj, model: any, group: THREE.Group): THREE.Mesh[] {
   const types = mj.mjtGeom, T = (k: string) => types[k].value
   const out: THREE.Mesh[] = []
+  const meshCache = new Map<number, THREE.BufferGeometry>()
   for (let i = 0; i < model.ngeom; i++) {
+    // Çarpışma geometrileri (grup 3 ve üstü) çizilmez: MuJoCo görüntüleyicisi de varsayılan olarak gizler
+    if (model.geom_group[i] >= 3) { out.push(new THREE.Mesh()); continue }
     const type = model.geom_type[i]
     const s = [model.geom_size[3 * i], model.geom_size[3 * i + 1], model.geom_size[3 * i + 2]]
-    const rgba = [0, 1, 2, 3].map((k) => model.geom_rgba[4 * i + k])
+    let rgba = [0, 1, 2, 3].map((k) => model.geom_rgba[4 * i + k])
+    // Malzemeli geom: geom rengi varsayılan gri (0,5 0,5 0,5 1) ise malzemenin rengi kullanılır
+    const mi = model.geom_matid[i]
+    if (mi >= 0 && Math.abs(rgba[0] - 0.5) < 1e-6 && Math.abs(rgba[1] - 0.5) < 1e-6 && Math.abs(rgba[2] - 0.5) < 1e-6 && rgba[3] === 1) rgba = [0, 1, 2, 3].map((k) => model.mat_rgba[4 * mi + k])
     let geo: THREE.BufferGeometry | null = null
     let scale: [number, number, number] | null = null
     if (type === T('mjGEOM_PLANE')) geo = new THREE.PlaneGeometry(24, 24)
@@ -78,9 +114,13 @@ function buildMeshes(mj: Mj, model: any, group: THREE.Group): THREE.Mesh[] {
     else if (type === T('mjGEOM_CYLINDER')) geo = new THREE.CylinderGeometry(s[0], s[0], 2 * s[1], 28).rotateX(Math.PI / 2)
     else if (type === T('mjGEOM_BOX')) geo = new THREE.BoxGeometry(2 * s[0], 2 * s[1], 2 * s[2])
     else if (type === T('mjGEOM_ELLIPSOID')) { geo = new THREE.SphereGeometry(1, 28, 16); scale = [s[0], s[1], s[2]] }
-    if (!geo) { out.push(new THREE.Mesh()); continue } // mesh/hfield bu sayfada çizilmez
+    else if (type === T('mjGEOM_MESH')) {
+      const id = model.geom_dataid[i]
+      if (id >= 0) { let g = meshCache.get(id); if (!g) { g = meshGeometry(model, id); meshCache.set(id, g) } geo = g }
+    }
+    if (!geo) { out.push(new THREE.Mesh()); continue } // yükseklik alanı vb. çizilmez
     const isPlane = type === T('mjGEOM_PLANE')
-    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(rgba[0], rgba[1], rgba[2]), roughness: 0.55, metalness: 0.05, transparent: rgba[3] < 1, opacity: rgba[3] })
+    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(rgba[0], rgba[1], rgba[2]), roughness: 0.5, metalness: type === T('mjGEOM_MESH') ? 0.15 : 0.05, transparent: rgba[3] < 1, opacity: rgba[3] })
     if (isPlane) { mat.map = floorTexture(); mat.color.set(0xffffff) }
     const mesh = new THREE.Mesh(geo, mat)
     if (scale) mesh.scale.set(...scale)
@@ -104,6 +144,15 @@ function syncMeshes(sim: Sim) {
   }
 }
 
+/** Açılışta hafif bir sahne: gerçek robot modelleri (birkaç MB) seçilince iner. */
+const DEFAULT_SCENE = MJ_SCENES.some((x) => x.id === 'kol') ? 'kol' : MJ_SCENES[0].id
+
+const GROUP_LABEL = {
+  gercek: { tr: 'Gerçek robot modelleri (MuJoCo Menagerie)', en: 'Real robot models (MuJoCo Menagerie)' },
+  robot: { tr: 'Basit robotlar', en: 'Simple robots' },
+  fizik: { tr: 'Fizik deneyleri', en: 'Physics experiments' },
+}
+
 export function MujocoLab() {
   const en = useLocale() === 'en'
   const L = (tr: string, e: string) => (en ? e : tr)
@@ -123,7 +172,7 @@ export function MujocoLab() {
   const lastTrace = useRef(0)
   const pyBridge = useRef<PyBridge | null>(null)
 
-  const [sceneId, setSceneId] = useState(MJ_SCENES[0].id)
+  const [sceneId, setSceneId] = useState(DEFAULT_SCENE)
   const scene: MjScene = MJ_SCENES.find((s) => s.id === sceneId) ?? MJ_SCENES[0]
   const sceneRef = useRef(scene); sceneRef.current = scene
   const [xml, setXml] = useState(scene.xml)
@@ -162,8 +211,11 @@ export function MujocoLab() {
   const resetState = useCallback(() => {
     const sim = simRef.current; if (!sim) return
     sim.mj.mj_resetData(sim.model, sim.data)
-    if (sim.model.nkey > 0) sim.mj.mj_resetDataKeyframe(sim.model, sim.data, 0)
+    if (sim.keyId >= 0) sim.mj.mj_resetDataKeyframe(sim.model, sim.data, sim.keyId)
     sim.mj.mj_forward(sim.model, sim.data)
+    // Anahtar kare motor hedeflerini de verir (ör. ayakta duran robot): kaydırıcılar oradan başlar
+    ctrlRef.current = sim.ctrl.map((_, i) => sim.data.ctrl[i])
+    setCtrlVals([...ctrlRef.current])
     acc.current = 0
     readings.current = readAll(sim.channels, sim.data.sensordata)
     tracker.current?.reset(); trace.current.clear(); lastTrace.current = 0
@@ -217,11 +269,14 @@ export function MujocoLab() {
     if (!webgl) return
     let dead = false
     setStatus((s) => (s === 'ready' ? s : 'loading'))
-    loadMujoco().then((mj) => {
+    loadMujoco().then(async (mj) => {
       if (dead || !groupRef.current) return
       try {
-        mj.FS.writeFile('/model.xml', applied)
-        const model = mj.MjModel.mj_loadXML('/model.xml')
+        const pack = sceneRef.current.pack
+        if (pack) { setStatus('loading'); await ensurePack(mj, pack); if (dead || !groupRef.current) return }
+        const path = pack ? `/models/${pack}/muroko_scene.xml` : '/model.xml'
+        mj.FS.writeFile(path, applied)
+        const model = mj.MjModel.mj_loadXML(path)
         const data = new mj.MjData(model)
         disposeSim()
         const ctrl = Array.from({ length: model.nu }, (_, i) => {
@@ -231,14 +286,15 @@ export function MujocoLab() {
         })
         const sNames = Array.from({ length: model.nsensor }, (_, i) => mj.mj_id2name(model, OBJ_SENSOR, i) || '')
         const channels = buildChannels(sNames, model.sensor_adr, model.sensor_dim, model.sensor_type)
-        const sim: Sim = { mj, model, data, meshes: buildMeshes(mj, model, groupRef.current), ctrl, channels, timestep: model.opt.timestep }
+        const kId = mj.mj_name2id(model, OBJ_KEY, 'muroko')
+        const keyId = kId >= 0 ? kId : model.nkey > 0 ? 0 : -1
+        const sim: Sim = { mj, model, data, meshes: buildMeshes(mj, model, groupRef.current), ctrl, channels, timestep: model.opt.timestep, keyId }
         simRef.current = sim
-        ctrlRef.current = ctrl.map(() => 0)
         const names = channels.map((c) => c.name)
         setChNames(names); setGraphSel(names.slice(0, 2))
         tracker.current = new GoalTracker(sceneRef.current.goals.filter((g) => names.includes(g.ch)))
         runners.current = []; setProgRunning(false)
-        setCtrlDefs(ctrl); setCtrlVals(ctrl.map(() => 0))
+        setCtrlDefs(ctrl)
         resetState()
         setErr(''); setStatus('ready')
       } catch (e) {
@@ -300,10 +356,10 @@ export function MujocoLab() {
 
   return (
     <section className="mj" data-testid="mujoco-lab">
-      {(['robot', 'fizik'] as const).map((k) => (
+      {(['gercek', 'robot', 'fizik'] as const).map((k) => (
         <div key={k} className="mj-group">
-          <span className="mj-group-label">{k === 'robot' ? L('Robotlar', 'Robots') : L('Fizik deneyleri', 'Physics experiments')}</span>
-          <div className="mj-tabs" role="tablist" aria-label={k === 'robot' ? L('Robotlar', 'Robots') : L('Fizik deneyleri', 'Physics experiments')}>
+          <span className="mj-group-label">{GROUP_LABEL[k][en ? 'en' : 'tr']}</span>
+          <div className="mj-tabs" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>
             {MJ_SCENES.filter((s) => s.kind === k).map((s) => (
               <button key={s.id} role="tab" aria-selected={s.id === sceneId} className={`mj-tab${s.id === sceneId ? ' on' : ''}`} onClick={() => pick(s.id)} data-testid={`mujoco-scene-${s.id}`}>
                 {en ? s.en.title : s.tr.title}
@@ -319,7 +375,8 @@ export function MujocoLab() {
           {webgl
             ? <div ref={host} className="mj-stage" data-testid="mujoco-stage" />
             : <div className="mj-stage mj-msg">{L('Bu tarayıcıda WebGL yok; 3B görüntü açılamıyor.', 'WebGL is not available in this browser.')}</div>}
-          {status === 'loading' && <div className="mj-overlay">{L('Fizik motoru yükleniyor (8 MB, ilk açılışta)…', 'Loading the physics engine (8 MB, first visit)…')}</div>}
+          {status === 'loading' && <div className="mj-overlay">{scene.pack ? L('Robot modeli indiriliyor (birkaç MB, bir kez)…', 'Downloading the robot model (a few MB, once)…') : L('Fizik motoru yükleniyor (8 MB, ilk açılışta)…', 'Loading the physics engine (8 MB, first visit)…')}</div>}
+          {scene.credit && <p className="mj-credit" data-testid="mujoco-model-credit">{L('Model', 'Model')}: <a href={scene.credit.url} target="_blank" rel="noreferrer">{scene.credit.name}</a> · {scene.credit.license} · MuJoCo Menagerie · <a href={`/mujoco/models/${scene.pack}.LICENSE.txt`} target="_blank" rel="noreferrer">{L('lisans metni', 'license text')}</a></p>}
           <div className="mj-bar">
             <button className="sbtn" onClick={toggle} data-testid="mujoco-toggle">{running ? L('Duraklat', 'Pause') : L('Başlat', 'Play')}</button>
             <button className="sbtn ghost" onClick={resetState}>{L('Sıfırla', 'Reset')}</button>
