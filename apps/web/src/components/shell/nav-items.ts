@@ -70,6 +70,7 @@ export const NAV: NavGroup[] = [
       { href: '/muhendislik/drone', label: 'Drone dersi', key: 'shell.nav.drone', icon: 'drone' },
       { href: '/muhendislik/llm', label: 'LLM uygulamaları', key: 'shell.nav.llm', icon: 'ai' },
       { href: '/muhendislik/robot-kolu', label: 'Robot kolu dersi', key: 'shell.nav.robotArm', icon: 'arena' },
+      { href: '/muhendislik/mujoco', label: 'MuRoKo fizik laboratuvarı', key: 'shell.nav.mujoco', icon: 'arena' },
       { href: '/muhendislik/insansi', label: 'İnsansı robot', key: 'shell.nav.humanoid', icon: 'arena' },
       { href: '/yol-haritasi', label: 'Yol haritası', key: 'shell.nav.roadmap', icon: 'target' },
       { href: '/programlar', label: 'Programlar', key: 'shell.nav.programs', icon: 'book' },
@@ -104,7 +105,7 @@ export function isActive(href: string, pathname: string): boolean {
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/llm')) return false
   if (href === '/muhendislik' && pathname.startsWith('/muhendislik/robot-kolu')) return false
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/robotik') || pathname.startsWith('/muhendislik/drone') || pathname.startsWith('/muhendislik/raspberry-pi') || pathname.startsWith('/muhendislik/arm-stm32'))) return false
-  if (href === '/muhendislik' && pathname.startsWith('/muhendislik/insansi')) return false
+  if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/insansi') || pathname.startsWith('/muhendislik/mujoco'))) return false
   // Parça ve seviye sayfaları "Parçalar (3B)" öğesinde işaretlenir
   if (href === '/muhendislik#parcalar') return pathname.startsWith('/muhendislik/parca/') || pathname.startsWith('/muhendislik/seviye/')
   if (href === '/muhendislik' && (pathname.startsWith('/muhendislik/parca/') || pathname.startsWith('/muhendislik/seviye/'))) return false

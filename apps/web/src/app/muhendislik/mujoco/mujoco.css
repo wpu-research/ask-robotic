@@ -1,0 +1,31 @@
+/* MuJoCo laboratuvarı: aynı jetonlar (--primary, --border, --muted); düğmeler .sbtn biçimi. */
+.mj { display: grid; gap: 12px; min-width: 0; }
+.mj-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.mj-tab { font: inherit; font-weight: 700; font-size: .9rem; min-height: 44px; padding: 8px 16px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-tab.on { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+.mj-desc { margin: 0; color: var(--muted); }
+.mj-body { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; align-items: start; }
+.mj-stage-wrap { position: relative; display: grid; gap: 8px; min-width: 0; }
+.mj-stage { height: clamp(300px, 52vw, 500px); border-radius: 12px; overflow: hidden; background: #dde5ef; touch-action: none; }
+.mj-msg { display: grid; place-items: center; padding: 16px; color: #334155; text-align: center; }
+.mj-overlay { position: absolute; inset: 0 0 auto 0; height: clamp(300px, 52vw, 500px); display: grid; place-items: center; background: rgba(221, 229, 239, .85); color: #334155; font-weight: 700; border-radius: 12px; pointer-events: none; }
+.mj-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mj .sbtn { font: inherit; font-weight: 700; font-size: .88rem; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--primary); background: var(--primary); color: var(--primary-ink); cursor: pointer; }
+.mj .sbtn.ghost { background: transparent; color: var(--text); border-color: var(--border-strong); }
+.mj-speed { display: flex; gap: 6px; align-items: center; font-size: .88rem; }
+.mj-speed select { min-height: 44px; }
+.mj-clock { font-variant-numeric: tabular-nums; font-size: .84rem; color: var(--muted); }
+.mj-side { display: grid; gap: 10px; min-width: 0; }
+.mj-side h3 { margin: 0; }
+.mj-sl { display: grid; gap: 2px; }
+.mj-sl span { display: flex; justify-content: space-between; font-size: .88rem; }
+.mj-sl input { width: 100%; min-height: 32px; }
+.mj-hint { margin: 0; padding: 10px 12px; border-left: 3px solid var(--eng); background: var(--eng-soft); border-radius: 0 8px 8px 0; font-size: .9rem; }
+.mj-xml summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+.mj-ta { width: 100%; min-height: 260px; margin: 6px 0 8px; font: .8rem/1.55 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; tab-size: 2; white-space: pre; overflow: auto; padding: 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); }
+.mj-err { margin: 8px 0 0; padding: 10px 12px; border: 1px solid var(--red); color: var(--red); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mj-credit { margin: 0; font-size: .85rem; color: var(--muted); }
+.mj-learn { margin-top: 24px; }
+.mj-learn li { margin: 4px 0; }
+@media (max-width: 900px) { .mj-body { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .mj-stage, .mj-overlay { height: clamp(260px, 78vw, 360px); } }

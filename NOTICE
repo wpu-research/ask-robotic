@@ -12,3 +12,8 @@ Bu proje üçüncü taraf yazılımlar kullanır ve bir eğitim yaklaşımından
    öğretim amacı ve seviye akışı Blockly Games'ten esinlenmiştir. Bu projedeki oyun motorları, seviye tasarımları,
    çizimler (SVG/CSS) ve metinler ASK Robotic'e özgüdür; Blockly Games'in kodu, görselleri veya sesleri kopyalanmamıştır.
    Oyun sayfalarının alt bilgisinde şu not yer alır: "Blockly Games (Google, Apache 2.0) esinlenmiştir."
+
+3. MuJoCo (https://github.com/google-deepmind/mujoco)
+   Copyright Google DeepMind. Apache License 2.0 ile lisanslıdır.
+   MuRoKo fizik laboratuvarı, resmi WebAssembly sürümünü (`mujoco` npm paketi, 3.1.16) `apps/web/public/mujoco/` altında olduğu gibi sunar.
+   Lisans metni: https://www.apache.org/licenses/LICENSE-2.0

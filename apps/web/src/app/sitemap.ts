@@ -32,7 +32,7 @@ const PAGES = [
   '/muhendislik/robot-kolu', '/muhendislik/robot-kolu/simulasyon', '/muhendislik/robot-kolu/proje', ...ROBOT_UNITS.map((u) => `/muhendislik/robot-kolu/unite/${u.n}`),
   '/programlar', '/yol-haritasi', '/yol-haritasi/anket',
   '/robot-atolyesi/sezonlar', ...SEASONS.map((s) => `/robot-atolyesi/sezonlar/${s.id}`),
-  '/robot-atolyesi/tasarla', '/muhendislik/insansi',
+  '/robot-atolyesi/tasarla', '/muhendislik/insansi', '/muhendislik/mujoco',
   '/muhendislik/opencv', '/muhendislik/opencv/proje', ...CV_UNITS.map((u) => `/muhendislik/opencv/unite/${u.n}`),
   '/muhendislik/pytorch', '/muhendislik/pytorch/proje', ...PT_UNITS.map((u) => `/muhendislik/pytorch/unite/${u.n}`),
 ]
