@@ -40,12 +40,26 @@ interface Sim {
 }
 
 function floorTexture() {
-  const c = document.createElement('canvas'); c.width = c.height = 64
+  // MuJoCo görüntüleyicisindeki mavi kareli zemin
+  const c = document.createElement('canvas'); c.width = c.height = 128
   const g = c.getContext('2d')!
-  g.fillStyle = '#e4e9f0'; g.fillRect(0, 0, 64, 64)
-  g.fillStyle = '#d3dae4'; g.fillRect(0, 0, 32, 32); g.fillRect(32, 32, 32, 32)
+  g.fillStyle = '#24467a'; g.fillRect(0, 0, 128, 128)
+  g.fillStyle = '#2f5a9a'; g.fillRect(0, 0, 64, 64); g.fillRect(64, 64, 64, 64)
+  g.strokeStyle = 'rgba(190,215,255,.35)'; g.lineWidth = 2; g.strokeRect(1, 1, 126, 126)
   const t = new THREE.CanvasTexture(c)
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(12, 12); t.colorSpace = THREE.SRGBColorSpace
+  t.anisotropy = 8
+  return t
+}
+
+/** Gökyüzü: üstte açık mavi, ufukta koyu lacivert (MuJoCo'nun varsayılan gökyüzü). */
+function skyTexture() {
+  const c = document.createElement('canvas'); c.width = 2; c.height = 256
+  const g = c.getContext('2d')!
+  const gr = g.createLinearGradient(0, 0, 0, 256)
+  gr.addColorStop(0, '#6f93c8'); gr.addColorStop(0.55, '#2c4a7c'); gr.addColorStop(1, '#14213a')
+  g.fillStyle = gr; g.fillRect(0, 0, 2, 256)
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace
   return t
 }
 
@@ -163,6 +177,7 @@ export function MujocoLab() {
     const group = new THREE.Group()
     group.rotation.x = -Math.PI / 2
     stage.scene.add(group)
+    stage.scene.background = skyTexture()
     fitShadow(stage, 0, 0, 5)
     stage.onFrame = (dt) => {
       const sim = simRef.current; if (!sim) return

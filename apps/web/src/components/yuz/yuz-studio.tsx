@@ -27,66 +27,109 @@ const SAMPLES = {
 }
 
 interface Rig {
+  /** Kabuk malzemesi (renk seçici bunu boyar) ve daha açık yüz plakası. */
   skin: THREE.MeshStandardMaterial
-  eyeL: THREE.Group; eyeR: THREE.Group
-  ball: THREE.Mesh[]; pupil: THREE.Mesh[]; led: THREE.Mesh[]
+  plate: THREE.MeshStandardMaterial
+  neck: THREE.Group
+  eyes: THREE.Group[]; ball: THREE.Mesh[]; led: THREE.Mesh[]; lids: THREE.Mesh[]
   browL: THREE.Mesh; browR: THREE.Mesh
-  lip: THREE.Mesh; mouth: THREE.Mesh
-  head: THREE.Group
+  /** Ağız: üst dudak (orta + iki yan parça), alt dudak, koyu boşluk. */
+  lipC: THREE.Mesh; lipL: THREE.Mesh; lipR: THREE.Mesh; jaw: THREE.Mesh; cavity: THREE.Mesh
+  glow: THREE.MeshStandardMaterial
 }
 
+/** Ohbot'tan esinli mekanik insansı kafa: metalik kabuk, koyu göz yuvaları, dönen gözler, hareketli göz kapakları, bölmeli ağız, boyun ve omuzlar. */
 function buildFace(scene: THREE.Scene): Rig {
-  const head = new THREE.Group(); scene.add(head)
-  const skin = new THREE.MeshStandardMaterial({ color: '#5b9bd5', roughness: 0.4, metalness: 0.1 })
-  const skull = new THREE.Mesh(new THREE.SphereGeometry(1, 48, 32), skin); skull.scale.set(1.12, 1, 0.98); skull.castShadow = true; head.add(skull)
-  const dark = new THREE.MeshStandardMaterial({ color: '#1b1f2a', roughness: 0.6 })
-  const white = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.25 })
-  const ledMat = new THREE.MeshStandardMaterial({ color: '#22d3ee', emissive: '#22d3ee', emissiveIntensity: 1.6 })
+  const shell = new THREE.MeshStandardMaterial({ color: '#4a7fc1', roughness: 0.28, metalness: 0.55 })
+  const plate = new THREE.MeshStandardMaterial({ color: '#6f9bd6', roughness: 0.3, metalness: 0.45 })
+  const steel = new THREE.MeshStandardMaterial({ color: '#8c97a8', roughness: 0.35, metalness: 0.85 })
+  const dark = new THREE.MeshStandardMaterial({ color: '#10131b', roughness: 0.55, metalness: 0.2 })
+  const white = new THREE.MeshStandardMaterial({ color: '#f4f6fa', roughness: 0.18 })
+  const iris = new THREE.MeshStandardMaterial({ color: '#2f80ed', roughness: 0.2, emissive: '#1b4f9a', emissiveIntensity: 0.5 })
+  const glow = new THREE.MeshStandardMaterial({ color: '#22d3ee', emissive: '#22d3ee', emissiveIntensity: 1.6 })
+  const mesh = <T extends THREE.BufferGeometry>(g: T, m: THREE.Material, pos: [number, number, number] = [0, 0, 0], cast = true) => {
+    const o = new THREE.Mesh(g, m); o.position.set(...pos); o.castShadow = cast; return o
+  }
 
-  const eyes: THREE.Group[] = [], ball: THREE.Mesh[] = [], pupil: THREE.Mesh[] = [], led: THREE.Mesh[] = []
+  // Gövde: omuzlar, göğüs plakası, boyun
+  const body = new THREE.Group(); scene.add(body)
+  const shoulders = mesh(new THREE.SphereGeometry(1, 40, 20), shell, [0, -2.15, -0.05]); shoulders.scale.set(2.1, 0.62, 0.85); body.add(shoulders)
+  body.add(mesh(new THREE.BoxGeometry(0.9, 0.45, 0.12), plate, [0, -2.0, 0.78]))
+  body.add(mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.03, 20).rotateX(Math.PI / 2), glow, [0, -2.0, 0.85], false))
+  const neckBase = mesh(new THREE.CylinderGeometry(0.34, 0.42, 0.5, 28), steel, [0, -1.55, 0]); body.add(neckBase)
+
+  // Boyun: kafa buradan döner (yaw/pitch)
+  const neck = new THREE.Group(); neck.position.set(0, -1.28, 0); body.add(neck)
+  for (const y of [0.05, 0.22]) neck.add(mesh(new THREE.TorusGeometry(0.33, 0.045, 10, 28).rotateX(Math.PI / 2), dark, [0, y, 0], false))
+  const head = new THREE.Group(); head.position.set(0, 1.35, 0); neck.add(head)
+
+  // Kafa kabuğu + yüz plakası
+  const skull = mesh(new THREE.SphereGeometry(1, 48, 32), shell); skull.scale.set(1.0, 1.18, 0.96); head.add(skull)
+  const face = mesh(new THREE.SphereGeometry(1, 40, 24), plate, [0, -0.02, 0.28]); face.scale.set(0.8, 1.0, 0.7); head.add(face)
+  head.add(mesh(new THREE.TorusGeometry(0.97, 0.03, 8, 48).rotateY(Math.PI / 2), steel, [0, 0.25, 0], false))
+  head.add(mesh(new THREE.SphereGeometry(0.06, 12, 8), glow, [0, 0.92, 0.5], false))
   for (const sx of [-1, 1]) {
-    const g = new THREE.Group(); g.position.set(0.4 * sx, 0.2, 0.8); head.add(g)
-    const b = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), white); b.scale.z = 0.7; g.add(b); ball.push(b)
-    const p = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 14), dark); p.position.z = 0.1; g.add(p); pupil.push(p)
-    const l = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.04, 28).rotateX(Math.PI / 2), ledMat); l.position.z = 0.12; l.visible = false; g.add(l); led.push(l)
-    eyes.push(g)
+    head.add(mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.16, 28).rotateZ(Math.PI / 2), steel, [1.0 * sx, 0.05, 0]))
+    head.add(mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.2, 20).rotateZ(Math.PI / 2), dark, [1.06 * sx, 0.05, 0], false))
   }
+
+  // Gözler: koyu yuva, dönen göz küresi (beyaz + iris + gözbebeği), LED alternatifi, üst göz kapağı
+  const eyes: THREE.Group[] = [], ball: THREE.Mesh[] = [], led: THREE.Mesh[] = [], lids: THREE.Mesh[] = []
+  for (const sx of [-1, 1]) {
+    const eye = new THREE.Group(); eye.position.set(0.37 * sx, 0.28, 0.72); head.add(eye)
+    eye.add(mesh(new THREE.CylinderGeometry(0.3, 0.3, 0.12, 32).rotateX(Math.PI / 2), dark, [0, 0, 0.02], false))
+    const ballG = new THREE.Group(); ballG.position.z = 0.1; eye.add(ballG)
+    const eb = mesh(new THREE.SphereGeometry(0.23, 32, 20), white); ballG.add(eb)
+    const ir = mesh(new THREE.CylinderGeometry(0.115, 0.115, 0.03, 28).rotateX(Math.PI / 2), iris, [0, 0, 0.215], false); ballG.add(ir)
+    const pu = mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.04, 20).rotateX(Math.PI / 2), dark, [0, 0, 0.225], false); ballG.add(pu)
+    ball.push(ballG as unknown as THREE.Mesh)
+    const l = mesh(new THREE.CylinderGeometry(0.22, 0.22, 0.05, 32).rotateX(Math.PI / 2), glow, [0, 0, 0.14], false); l.visible = false; eye.add(l); led.push(l)
+    const lid = mesh(new THREE.SphereGeometry(0.255, 28, 14, 0, Math.PI * 2, 0, Math.PI / 2), shell, [0, 0, 0.1]); eye.add(lid); lids.push(lid)
+    eyes.push(eye)
+  }
+  // Kaşlar: ince plakalar
   const brows: THREE.Mesh[] = []
-  for (const sx of [-1, 1]) {
-    const m = new THREE.Mesh(new THREE.CapsuleGeometry(0.04, 0.3, 6, 12).rotateZ(Math.PI / 2), dark)
-    m.position.set(0.4 * sx, 0.58, 0.82); head.add(m); brows.push(m)
-  }
-  const nose = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), dark); nose.position.set(0, -0.02, 0.98); head.add(nose)
-  const mouth = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), dark); mouth.position.set(0, -0.42, 0.9); mouth.scale.set(0.27, 0.01, 0.06); head.add(mouth)
-  const lip = new THREE.Mesh(new THREE.TorusGeometry(0.27, 0.032, 10, 32, Math.PI), new THREE.MeshStandardMaterial({ color: '#1b1f2a', side: THREE.DoubleSide }))
-  lip.position.set(0, -0.42, 0.92); head.add(lip)
-  // anten
-  const stem = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.3, 8), dark); stem.position.set(0, 1.12, 0); head.add(stem)
-  const tip = new THREE.Mesh(new THREE.SphereGeometry(0.08, 16, 12), ledMat); tip.position.set(0, 1.3, 0); head.add(tip)
-  // kulaklar
-  for (const sx of [-1, 1]) { const e = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.12, 24).rotateZ(Math.PI / 2), dark); e.position.set(1.12 * sx, 0, 0); head.add(e) }
-  return { skin, eyeL: eyes[0], eyeR: eyes[1], ball, pupil, led, browL: brows[0], browR: brows[1], lip, mouth, head }
+  for (const sx of [-1, 1]) { const m = mesh(new THREE.BoxGeometry(0.42, 0.06, 0.08), steel, [0.37 * sx, 0.72, 0.8]); head.add(m); brows.push(m) }
+  // Burun
+  const nose = mesh(new THREE.ConeGeometry(0.07, 0.2, 4), plate, [0, 0.0, 0.93]); nose.rotation.x = Math.PI / 2; head.add(nose)
+
+  // Ağız: üst dudak (3 parça), koyu boşluk, alt dudak (çene)
+  const lipMat = dark
+  const lipC = mesh(new THREE.BoxGeometry(0.3, 0.05, 0.07), lipMat, [0, -0.44, 0.85], false); head.add(lipC)
+  const lipL = mesh(new THREE.BoxGeometry(0.2, 0.05, 0.07), lipMat, [-0.23, -0.44, 0.83], false); head.add(lipL)
+  const lipR = mesh(new THREE.BoxGeometry(0.2, 0.05, 0.07), lipMat, [0.23, -0.44, 0.83], false); head.add(lipR)
+  const cavity = mesh(new THREE.BoxGeometry(0.52, 1, 0.06), dark, [0, -0.5, 0.83], false); cavity.scale.y = 0.001; head.add(cavity)
+  const jaw = mesh(new THREE.BoxGeometry(0.62, 0.08, 0.1), steel, [0, -0.5, 0.84]); head.add(jaw)
+
+  scene.add(new THREE.AmbientLight('#ffffff', 0.25))
+  return { skin: shell, plate, neck, eyes, ball, led, lids, browL: brows[0], browR: brows[1], lipC, lipL, lipR, jaw, cavity, glow }
 }
 
 function applyPose(r: Rig, p: Pose, blink: number, gaze: { x: number; y: number }, mouthOpen: number, ledEyes: boolean, t: number) {
   const lid = Math.min(1, Math.max(p.lid, blink))
-  for (const g of [r.eyeL, r.eyeR]) g.scale.set(p.eye, Math.max(0.06, p.eye * (1 - lid * 0.95)), p.eye)
-  r.ball.forEach((b) => { b.visible = !ledEyes }); r.pupil.forEach((b) => { b.visible = !ledEyes }); r.led.forEach((b) => { b.visible = ledEyes })
-  const gx = gaze.x * 0.09, gy = gaze.y * 0.07
-  r.pupil.forEach((m) => m.position.set(gx, gy, 0.1)); r.led.forEach((m) => m.position.set(gx * 1.3, gy * 1.3, 0.12))
-  r.browL.position.y = r.browR.position.y = 0.58 + p.browY
+  r.eyes.forEach((e) => e.scale.setScalar(p.eye))
+  // göz kapağı: -90° arkada gizli ... +90° önde tam kapalı
+  r.lids.forEach((l) => { l.rotation.x = -Math.PI / 2 + lid * Math.PI * 0.98 })
+  r.ball.forEach((b) => { b.visible = !ledEyes; (b as unknown as THREE.Group).rotation.set(-gaze.y * 0.45, gaze.x * 0.55, 0) })
+  r.led.forEach((m) => { m.visible = ledEyes; m.position.x = gaze.x * 0.07; m.position.y = gaze.y * 0.06 })
+  r.browL.position.y = r.browR.position.y = 0.72 + p.browY
   r.browL.rotation.z = -p.browTilt; r.browR.rotation.z = p.browTilt
+  // ağız: yan parçalar gülümsemeyle yukarı/aşağı eğilir, çene açıklıkla iner
   const open = Math.max(p.open, mouthOpen)
-  const sm = p.smile; const mag = Math.max(0.08, Math.abs(sm)) * (sm < 0 ? 1 : -1)
-  r.lip.scale.y = mag
-  const lipY = -0.42 + (sm > 0 ? -0.04 * sm : 0.04)
-  r.lip.position.y = lipY
-  // Açıklık, gülümseme yayının içinde kalır: yayın derinliği kadar iner, üstte düz bir çizgiyle kapanır
-  const depth = sm > 0 ? 0.27 * Math.abs(mag) : 0
-  const half = 0.005 + open * 0.11
-  r.mouth.scale.set(0.27 * (1 - open * 0.1) * (sm > 0 ? 0.92 : 1), Math.min(half, sm > 0 ? depth * 0.5 + open * 0.06 : half), 0.06)
-  r.mouth.position.y = lipY - (sm > 0 ? depth * 0.5 : 0) - open * 0.02
-  r.head.position.y = Math.sin(t * 1.4) * 0.02
+  const sm = p.smile
+  r.lipL.rotation.z = -sm * 0.5; r.lipR.rotation.z = sm * 0.5
+  r.lipL.position.y = r.lipR.position.y = -0.44 + sm * 0.035
+  r.lipC.position.y = -0.44 - sm * 0.01
+  const drop = open * 0.22
+  r.jaw.position.y = -0.5 - drop
+  r.jaw.rotation.x = open * 0.25
+  r.cavity.scale.y = Math.max(0.001, 0.06 + drop)
+  r.cavity.position.y = -0.47 - drop * 0.5
+  r.cavity.visible = open > 0.02
+  // boyun: bakışı izler; konuşurken hafif başını sallar
+  r.neck.rotation.y = gaze.x * 0.32
+  r.neck.rotation.x = -gaze.y * 0.16 + mouthOpen * 0.04
+  r.neck.rotation.z = Math.sin(t * 0.7) * 0.012
 }
 
 export function YuzStudio() {
@@ -123,9 +166,9 @@ export function YuzStudio() {
   useEffect(() => {
     if (!webgl || !host.current) return
     const stage = createStage(host.current)
-    stage.scene.background = new THREE.Color('#e8edf5')
-    stage.camera.position.set(0, 0.1, 4.4); stage.controls.target.set(0, 0.1, 0)
-    stage.controls.enablePan = false; stage.controls.minDistance = 2.5; stage.controls.maxDistance = 7
+    stage.scene.background = new THREE.Color('#dfe6f1')
+    stage.camera.position.set(0, 0.5, 5.2); stage.controls.target.set(0, -0.25, 0)
+    stage.controls.enablePan = false; stage.controls.minDistance = 3; stage.controls.maxDistance = 9
     stage.controls.maxPolarAngle = Math.PI * 0.75
     const r = buildFace(stage.scene); rig.current = r
     let t = 0
@@ -147,7 +190,7 @@ export function YuzStudio() {
   }, [webgl])
 
   useEffect(() => { ledRef.current = ledEyes }, [ledEyes])
-  useEffect(() => { rig.current?.skin.color.set(SKINS.find((s) => s.id === skin)!.color) }, [skin])
+  useEffect(() => { const r = rig.current; if (!r) return; const c = new THREE.Color(SKINS.find((x) => x.id === skin)!.color); r.skin.color.copy(c); r.plate.color.copy(c).lerp(new THREE.Color('#ffffff'), 0.22) }, [skin])
 
   const say = useCallback((raw: string) => {
     speaking.current?.stop()
