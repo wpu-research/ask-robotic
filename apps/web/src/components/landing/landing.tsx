@@ -10,6 +10,7 @@ import { CAREER_PHOTOS } from '@/lib/career-photos'
 import { CAREERS, careerHours } from '@/lib/kariyer'
 import { WorkshopCards } from '@/components/kids/workshop-cards'
 import { WORKSHOPS } from '@/components/kids/workshops'
+import { AgeLadder } from '@/components/kids/age-ladder'
 import { MACADEMIA_URL } from '@/components/shell/nav-items'
 import '@/app/landing.css'
 
@@ -112,6 +113,8 @@ export function Landing({ catalog, parts, locale }: { catalog: CatalogModule[]; 
             </ul>
             <p>{X.programs.careersCreditsNote}</p>
           </details>
+          <h3 className="mx-subhead">{locale === 'en' ? 'Where to start at your age' : 'Yaşına göre nereden başlamalı?'}</h3>
+          <AgeLadder />
           <h3 className="mx-subhead">{H.kids.workshops}</h3>
           <WorkshopCards items={WORKSHOPS} />
         </div>
