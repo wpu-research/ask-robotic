@@ -21,6 +21,25 @@ describe('compileWorkspace', () => {
   })
 })
 
+describe('eğer ve doğrusal denetim blokları', () => {
+  const iff = (S: string, C: string, V: number, thenB: unknown, elseB?: unknown) => ({ type: 'muroko_if', fields: { S, C, V }, inputs: { DO: { block: thenB }, ...(elseB ? { ELSE: { block: elseB } } : {}) } })
+  it('derlenir', () => {
+    const calc = { type: 'muroko_calc', fields: { U: 'itme', S: 'aci', K: 3, C: 0.5 } }
+    expect(compileWorkspace(state(iff('mesafe', 'lt', 0.3, set('a', 0), calc)))).toEqual([[
+      { op: 'if', ch: 'mesafe', cmp: 'lt', value: 0.3, then: [{ op: 'set', name: 'a', value: 0 }], else: [{ op: 'calc', name: 'itme', ch: 'aci', k: 3, c: 0.5 }] },
+    ]])
+  })
+  it('çalışırken sensör değerine göre dal seçer, calc doğrusal hesaplar', () => {
+    const sens = { m: 1 }
+    const log: string[] = []
+    const r = new Runner([{ op: 'forever', body: [
+      { op: 'if', ch: 'm', cmp: 'lt', value: 0.3, then: [{ op: 'set', name: 'sol', value: 0 }], else: [{ op: 'calc', name: 'sol', ch: 'm', k: 2, c: 1 }] },
+      { op: 'wait', seconds: 1 }] }], (n, v) => log.push(`${n}=${v}`), (ch) => (sens as Record<string, number>)[ch])
+    r.tick(0); sens.m = 0.1; r.tick(1.01)
+    expect(log).toEqual(['sol=3', 'sol=0'])
+  })
+})
+
 describe('Runner', () => {
   const run = (prog: Op[], times: number[]) => {
     const log: string[] = []

@@ -36,3 +36,27 @@
 .mj-blocks-ws { position: relative; height: 300px; border: 1px solid var(--border-strong); border-radius: 10px; overflow: hidden; }
 .mj-py summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
 .mj-py-pre { margin: 0; padding: 12px 14px; border-radius: 10px; background: #1e2433; color: #e6edf7; font: .82rem/1.6 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; overflow: auto; max-height: 240px; white-space: pre; }
+
+.mj-group { display: grid; gap: 4px; }
+.mj-group-label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.mj-extra { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
+.mj-card { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.mj-card h3 { margin: 0; }
+.mj-goals { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.mj-goals li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: start; }
+.mj-goals li.done .mj-goal-txt { color: var(--muted); text-decoration: line-through; }
+.mj-goal-txt { display: grid; gap: 4px; font-size: .92rem; }
+.mj-goal-txt progress { width: 100%; height: 8px; }
+.mj-win { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--primary-soft); font-weight: 700; }
+.mj-sens { width: 100%; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
+.mj-sens th { text-align: left; font-weight: 600; padding: 3px 8px 3px 0; overflow-wrap: anywhere; }
+.mj-sens td { text-align: right; padding: 3px 0; }
+.mj-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mj-chip { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; padding: 4px 12px; border: 1px solid var(--border-strong); border-radius: 999px; font-size: .85rem; cursor: pointer; }
+.mj-chip input { width: 16px; height: 16px; }
+.mj-chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+.mj-graph { width: 100%; height: 220px; display: block; }
+.mj-code { min-height: 220px; }
+.mj-out { margin: 0; padding: 10px 12px; border-radius: 8px; background: #1e2433; color: #e6edf7; font: .82rem/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; max-height: 200px; overflow: auto; }
+.mj-out.bad { color: #ffb4a8; }
+@media (max-width: 900px) { .mj-extra { grid-template-columns: minmax(0, 1fr); } }

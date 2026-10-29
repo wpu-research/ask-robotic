@@ -9,18 +9,23 @@ export interface Actuator { name: string; lo: number; hi: number }
 
 interface Props {
   actuators: Actuator[]
+  /** Sensör kanal adları (lib/mujoco/sensors.ts). */
+  sensors: string[]
   en: boolean
   /** Çalışma alanı değişince güncel program (boşsa []). */
   onChange: (programs: Op[][]) => void
+  /** Blokların Python karşılığı değişince (Python sekmesine aktarmak için). */
+  onPython?: (py: string) => void
 }
 
 const T = {
-  tr: { set: '%1 motorunu %2 yap', wait: '%1 saniye bekle', repeat: '%1 kez tekrarla %2', forever: 'sonsuza kadar %1', setTip: 'Bir motorun hedef değerini ayarlar', empty: 'Soldan blok sürükle', noMotor: 'Bu sahnede motor yok. "İki eksenli robot kol" ya da "Arabalı ters sarkaç" sahnesini seç.', python: 'Python karşılığı' },
-  en: { set: 'set motor %1 to %2', wait: 'wait %1 seconds', repeat: 'repeat %1 times %2', forever: 'forever %1', setTip: 'Sets the target value of a motor', empty: 'Drag blocks from the left', noMotor: 'This scene has no motors. Pick "Two-joint robot arm" or "Cart-pole".', python: 'Python version' },
+  tr: { set: '%1 motorunu %2 yap', wait: '%1 saniye bekle', repeat: '%1 kez tekrarla %2', forever: 'sonsuza kadar %1', setTip: 'Bir motorun hedef değerini ayarlar', empty: 'Soldan blok sürükle', if: 'eğer %1 %2 %3 ise %4 değilse %5', calc: '%1 motorunu %2 × %3 + %4 yap', lt: 'küçükse', gt: 'büyükse', noMotor: 'Bu sahnede motor yok. "İki eksenli robot kol" ya da "Arabalı ters sarkaç" sahnesini seç.', python: 'Python karşılığı' },
+  en: { set: 'set motor %1 to %2', wait: 'wait %1 seconds', repeat: 'repeat %1 times %2', forever: 'forever %1', setTip: 'Sets the target value of a motor', empty: 'Drag blocks from the left', if: 'if %1 %2 %3 then %4 else %5', calc: 'set motor %1 to %2 × %3 + %4', lt: 'is below', gt: 'is above', noMotor: 'This scene has no motors. Pick "Two-joint robot arm" or "Cart-pole".', python: 'Python version' },
 }
 
 let defined: 'tr' | 'en' | null = null
-function define(Blockly: B, lang: 'tr' | 'en', actsRef: { current: Actuator[] }) {
+const en2 = (l: 'tr' | 'en') => l === 'en'
+function define(Blockly: B, lang: 'tr' | 'en', actsRef: { current: Actuator[] }, sensRef: { current: string[] }) {
   if (defined === lang) return
   defined = lang
   const t = T[lang]
@@ -29,6 +34,23 @@ function define(Blockly: B, lang: 'tr' | 'en', actsRef: { current: Actuator[] })
     init(this: BlocklyNS.Block) {
       this.appendDummyInput().appendField(t.set.split('%1')[0]).appendField(new Blockly.FieldDropdown(opts), 'U').appendField(t.set.split('%1')[1].split('%2')[0]).appendField(new Blockly.FieldNumber(0, -100, 100, 0.01), 'V').appendField(t.set.split('%2')[1] ?? '')
       this.setPreviousStatement(true); this.setNextStatement(true); this.setStyle('muroko_motor'); this.setTooltip(t.setTip)
+    },
+  }
+  const sopts = () => (sensRef.current.length ? sensRef.current.map((n) => [n, n] as [string, string]) : [['—', '']] as [string, string][])
+  const cmpOpts = [[t.lt, 'lt'], [t.gt, 'gt']] as [string, string][]
+  Blockly.Blocks['muroko_if'] = {
+    init(this: BlocklyNS.Block) {
+      this.appendDummyInput().appendField(en2(lang) ? 'if' : 'eğer').appendField(new Blockly.FieldDropdown(sopts), 'S').appendField(new Blockly.FieldDropdown(cmpOpts), 'C').appendField(new Blockly.FieldNumber(0.3, -1000, 1000, 0.01), 'V').appendField(en2(lang) ? 'then' : 'ise')
+      this.appendStatementInput('DO')
+      this.appendDummyInput().appendField(en2(lang) ? 'else' : 'değilse')
+      this.appendStatementInput('ELSE')
+      this.setPreviousStatement(true); this.setNextStatement(true); this.setStyle('muroko_sensor')
+    },
+  }
+  Blockly.Blocks['muroko_calc'] = {
+    init(this: BlocklyNS.Block) {
+      this.appendDummyInput().appendField(new Blockly.FieldDropdown(opts), 'U').appendField(en2(lang) ? '=' : 'motoru =').appendField(new Blockly.FieldDropdown(sopts), 'S').appendField('×').appendField(new Blockly.FieldNumber(1, -1000, 1000, 0.01), 'K').appendField('+').appendField(new Blockly.FieldNumber(0, -1000, 1000, 0.01), 'C')
+      this.setPreviousStatement(true); this.setNextStatement(true); this.setStyle('muroko_sensor')
     },
   }
   Blockly.defineBlocksWithJsonArray([
@@ -43,8 +65,11 @@ function pythonOf(Blockly: B, py: { pythonGenerator: BlocklyNS.CodeGenerator }, 
   const fb = g.forBlock as Record<string, (b: BlocklyNS.Block, gen: BlocklyNS.CodeGenerator) => string>
   const body = (b: BlocklyNS.Block, gen: BlocklyNS.CodeGenerator) => gen.statementToCode(b, 'DO') || '    pass\n'
   const [set, wait] = lang === 'tr' ? ['motor', 'bekle'] : ['motor', 'wait']
+  const cmp = (c: string) => (c === 'gt' ? '>' : '<')
   fb['muroko_set'] = (b) => `${set}(${JSON.stringify(b.getFieldValue('U'))}, ${b.getFieldValue('V')})\n`
-  fb['muroko_wait'] = (b) => `${wait}(${b.getFieldValue('S')})\n`
+  fb['muroko_wait'] = (b) => `await ${wait}(${b.getFieldValue('S')})\n`
+  fb['muroko_if'] = (b, gen) => `if sensor(${JSON.stringify(b.getFieldValue('S'))}) ${cmp(b.getFieldValue('C'))} ${b.getFieldValue('V')}:\n${body(b, gen)}` + (gen.statementToCode(b, 'ELSE') ? `else:\n${gen.statementToCode(b, 'ELSE')}` : '')
+  fb['muroko_calc'] = (b) => `${set}(${JSON.stringify(b.getFieldValue('U'))}, sensor(${JSON.stringify(b.getFieldValue('S'))}) * ${b.getFieldValue('K')} + ${b.getFieldValue('C')})\n`
   fb['muroko_repeat'] = (b, gen) => `for _ in range(${b.getFieldValue('N')}):\n${body(b, gen)}`
   fb['muroko_forever'] = (b, gen) => `while True:\n${body(b, gen)}`
   void Blockly
@@ -52,10 +77,12 @@ function pythonOf(Blockly: B, py: { pythonGenerator: BlocklyNS.CodeGenerator }, 
   return code ? `from muroko import *\n\n${code}` : ''
 }
 
-export function MurokoBlocks({ actuators, en, onChange }: Props) {
+export function MurokoBlocks({ actuators, sensors, en, onChange, onPython }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const wsRef = useRef<BlocklyNS.WorkspaceSvg | null>(null)
   const acts = useRef(actuators); acts.current = actuators
+  const sens = useRef(sensors); sens.current = sensors
+  const pyCb = useRef(onPython); pyCb.current = onPython
   const cb = useRef(onChange); cb.current = onChange
   const [py, setPy] = useState('')
   const [failed, setFailed] = useState(false)
@@ -74,16 +101,16 @@ export function MurokoBlocks({ actuators, en, onChange }: Props) {
         const Msgs = await (en ? import('blockly/msg/en') : import('blockly/msg/tr')).catch(() => null)
         if (dead || !host.current) return
         if (Msgs) Blockly.setLocale(Msgs as unknown as Parameters<typeof Blockly.setLocale>[0])
-        define(Blockly, lang, acts)
+        define(Blockly, lang, acts, sens)
         const theme = Blockly.Theme.defineTheme('muroko', {
           name: 'muroko', base: Blockly.Themes.Classic,
-          blockStyles: { muroko_motor: { colourPrimary: '#2f80ed' }, muroko_ctl: { colourPrimary: '#f2994a' } },
+          blockStyles: { muroko_motor: { colourPrimary: '#2f80ed' }, muroko_ctl: { colourPrimary: '#f2994a' }, muroko_sensor: { colourPrimary: '#27ae60' } },
           componentStyles: { workspaceBackgroundColour: '#f3f6fc', flyoutBackgroundColour: '#e6edf7', flyoutOpacity: 1 },
           fontStyle: { family: 'system-ui, sans-serif', weight: '700', size: 15 },
         })
         ws = Blockly.inject(host.current, {
           renderer: 'zelos', theme, media: '/blockly/media/', sounds: false, trashcan: true, scrollbars: true,
-          toolbox: { kind: 'flyoutToolbox', contents: [{ kind: 'block', type: 'muroko_set' }, { kind: 'block', type: 'muroko_wait' }, { kind: 'block', type: 'muroko_repeat' }, { kind: 'block', type: 'muroko_forever' }] } as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: { kind: 'flyoutToolbox', contents: [{ kind: 'block', type: 'muroko_set' }, { kind: 'block', type: 'muroko_calc' }, { kind: 'block', type: 'muroko_if' }, { kind: 'block', type: 'muroko_wait' }, { kind: 'block', type: 'muroko_repeat' }, { kind: 'block', type: 'muroko_forever' }] } as BlocklyNS.utils.toolbox.ToolboxInfo,
           move: { scrollbars: true, drag: true, wheel: true }, zoom: { controls: true, startScale: 0.9, minScale: 0.5, maxScale: 1.6 },
         })
         wsRef.current = ws
@@ -91,17 +118,18 @@ export function MurokoBlocks({ actuators, en, onChange }: Props) {
         ;(host.current as HTMLDivElement & { __blocklyWs?: unknown }).__blocklyWs = ws // test/hata ayıklama için
         const emit = () => {
           cb.current(compileWorkspace(Blockly.serialization.workspaces.save(w)))
-          setPy(pythonOf(Blockly, pyMod as unknown as { pythonGenerator: BlocklyNS.CodeGenerator }, w, lang))
+          const code = pythonOf(Blockly, pyMod as unknown as { pythonGenerator: BlocklyNS.CodeGenerator }, w, lang)
+          setPy(code); pyCb.current?.(code)
         }
         w.addChangeListener((e) => { if (!e.isUiEvent) emit() })
         ro = new ResizeObserver(() => Blockly.svgResize(w)); ro.observe(host.current)
       } catch { if (!dead) setFailed(true) }
     })()
-    return () => { dead = true; ro?.disconnect(); ws?.dispose(); wsRef.current = null; cb.current([]); setPy('') }
+    return () => { dead = true; ro?.disconnect(); ws?.dispose(); wsRef.current = null; cb.current([]); setPy(''); pyCb.current?.('') }
   }, [en, lang, hasActs])
 
   // Sahne değişince eski motor adlı bloklar anlamsızlaşır: çalışma alanını temizle
-  useEffect(() => { wsRef.current?.clear() }, [actuators])
+  useEffect(() => { wsRef.current?.clear() }, [actuators, sensors])
 
   if (actuators.length === 0) return <p className="mj-hint" data-testid="mujoco-nomotor">{T[lang].noMotor}</p>
   return (

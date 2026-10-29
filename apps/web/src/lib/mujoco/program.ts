@@ -6,6 +6,9 @@ export type Op =
   | { op: 'wait'; seconds: number }
   | { op: 'repeat'; times: number; body: Op[] }
   | { op: 'forever'; body: Op[] }
+  | { op: 'if'; ch: string; cmp: 'lt' | 'gt'; value: number; then: Op[]; else: Op[] }
+  /** motor = sensör × k + c: oransal (P) denetimin en yalın hâli. */
+  | { op: 'calc'; name: string; ch: string; k: number; c: number }
 
 export const MAX_REPEAT = 100
 export const MAX_OPS = 400
@@ -23,6 +26,11 @@ function chain(first: BlkJson | undefined, budget: { n: number }): Op[] {
     else if (b.type === 'muroko_wait') out.push({ op: 'wait', seconds: Math.min(60, Math.max(0, num(f.S, 1))) })
     else if (b.type === 'muroko_repeat') out.push({ op: 'repeat', times: Math.min(MAX_REPEAT, Math.max(0, Math.floor(num(f.N, 3)))), body: chain(b.inputs?.DO?.block, budget) })
     else if (b.type === 'muroko_forever') out.push({ op: 'forever', body: chain(b.inputs?.DO?.block, budget) })
+    else if (b.type === 'muroko_if') {
+      if (typeof f.S === 'string' && f.S) out.push({ op: 'if', ch: f.S, cmp: f.C === 'gt' ? 'gt' : 'lt', value: num(f.V, 0), then: chain(b.inputs?.DO?.block, budget), else: chain(b.inputs?.ELSE?.block, budget) })
+    } else if (b.type === 'muroko_calc') {
+      if (typeof f.U === 'string' && f.U && typeof f.S === 'string' && f.S) out.push({ op: 'calc', name: f.U, ch: f.S, k: num(f.K, 1), c: num(f.C, 0) })
+    }
   }
   return out
 }
@@ -39,12 +47,14 @@ export class Runner {
   private it: Generator<number, void, void>
   private resumeAt = 0
   done = false
-  constructor(prog: Op[], private apply: (name: string, value: number) => void) { this.it = this.run(prog) }
+  constructor(prog: Op[], private apply: (name: string, value: number) => void, private read: (ch: string) => number = () => 0) { this.it = this.run(prog) }
 
   private *run(ops: Op[]): Generator<number, void, void> {
     for (const o of ops) {
       if (o.op === 'set') this.apply(o.name, o.value)
       else if (o.op === 'wait') yield o.seconds
+      else if (o.op === 'calc') this.apply(o.name, this.read(o.ch) * o.k + o.c)
+      else if (o.op === 'if') { const v = this.read(o.ch); yield* this.run((o.cmp === 'lt' ? v < o.value : v > o.value) ? o.then : o.else) }
       else if (o.op === 'repeat') for (let i = 0; i < o.times; i++) yield* this.run(o.body)
       else if (o.op === 'forever') {
         let spun = false

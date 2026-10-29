@@ -6,7 +6,12 @@ import * as THREE from 'three'
 import { createStage, fitShadow, hasWebGL, type Stage } from '@/components/three/core'
 import { useLocale } from '@/i18n/client'
 import { MurokoBlocks } from './mujoco-blocks'
+import { MurokoPython, type PyBridge } from './mujoco-py'
+import { TraceGraph, GRAPH_COLORS } from './trace-graph'
 import { Runner, type Op } from '@/lib/mujoco/program'
+import { buildChannels, readAll, type Channel } from '@/lib/mujoco/sensors'
+import { GoalTracker } from '@/lib/mujoco/goals'
+import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -24,11 +29,13 @@ function loadMujoco(): Promise<Mj> {
 }
 
 const OBJ_ACTUATOR = 19
+const OBJ_SENSOR = 20
 
 interface Sim {
   mj: Mj; model: any; data: any
   meshes: THREE.Mesh[]
   ctrl: { name: string; lo: number; hi: number }[]
+  channels: Channel[]
   timestep: number
 }
 
@@ -96,9 +103,15 @@ export function MujocoLab() {
   const acc = useRef(0)
   const programs = useRef<Op[][]>([])
   const runners = useRef<Runner[]>([])
+  const readings = useRef<Record<string, number>>({})
+  const tracker = useRef<GoalTracker | null>(null)
+  const trace = useRef(new Trace(10))
+  const lastTrace = useRef(0)
+  const pyBridge = useRef<PyBridge | null>(null)
 
   const [sceneId, setSceneId] = useState(MJ_SCENES[0].id)
   const scene: MjScene = MJ_SCENES.find((s) => s.id === sceneId) ?? MJ_SCENES[0]
+  const sceneRef = useRef(scene); sceneRef.current = scene
   const [xml, setXml] = useState(scene.xml)
   const [applied, setApplied] = useState(scene.xml)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
@@ -109,6 +122,13 @@ export function MujocoLab() {
   const [ctrlVals, setCtrlVals] = useState<number[]>([])
   const [info, setInfo] = useState({ t: 0, ncon: 0 })
   const [progRunning, setProgRunning] = useState(false)
+  const [progTab, setProgTab] = useState<'blocks' | 'python'>('blocks')
+  const [blockPy, setBlockPy] = useState('')
+  const [chNames, setChNames] = useState<string[]>([])
+  const [sens, setSens] = useState<Record<string, number>>({})
+  const [goalView, setGoalView] = useState<{ done: boolean; p: number }[]>([])
+  const [graphSel, setGraphSel] = useState<string[]>([])
+  const activeGoals = scene.goals.filter((g) => chNames.includes(g.ch))
   const [webgl] = useState(() => typeof document === 'undefined' || hasWebGL())
 
   const disposeSim = useCallback(() => {
@@ -131,6 +151,8 @@ export function MujocoLab() {
     if (sim.model.nkey > 0) sim.mj.mj_resetDataKeyframe(sim.model, sim.data, 0)
     sim.mj.mj_forward(sim.model, sim.data)
     acc.current = 0
+    readings.current = readAll(sim.channels, sim.data.sensordata)
+    tracker.current?.reset(); trace.current.clear(); lastTrace.current = 0
     syncMeshes(sim)
   }, [])
 
@@ -148,12 +170,26 @@ export function MujocoLab() {
         for (const r of runners.current) r.tick(sim.data.time)
         acc.current += dt * speedRef.current
         let n = 0
+        const t0 = sim.data.time
         while (acc.current >= sim.timestep && n < 80) {
           for (let i = 0; i < sim.ctrl.length; i++) sim.data.ctrl[i] = ctrlRef.current[i] ?? 0
           sim.mj.mj_step(sim.model, sim.data)
           acc.current -= sim.timestep; n++
         }
         if (n === 80) acc.current = 0
+        const adv = sim.data.time - t0
+        if (adv > 0) {
+          const rd = readAll(sim.channels, sim.data.sensordata)
+          readings.current = rd
+          tracker.current?.update(adv, rd)
+          if (sim.data.time - lastTrace.current >= 0.02 || sim.data.time < lastTrace.current) {
+            lastTrace.current = sim.data.time
+            const row: Record<string, number> = { ...rd }
+            sim.ctrl.forEach((c, i) => { row[`u:${c.name}`] = ctrlRef.current[i] ?? 0 })
+            trace.current.push(sim.data.time, row)
+          }
+          pyBridge.current?.tick(sim.data.time, rd)
+        }
       }
       syncMeshes(sim)
     }
@@ -178,9 +214,14 @@ export function MujocoLab() {
           if (!(hi > lo)) { lo = -1; hi = 1 }
           return { name: mj.mj_id2name(model, OBJ_ACTUATOR, i) || `u${i}`, lo, hi }
         })
-        const sim: Sim = { mj, model, data, meshes: buildMeshes(mj, model, groupRef.current), ctrl, timestep: model.opt.timestep }
+        const sNames = Array.from({ length: model.nsensor }, (_, i) => mj.mj_id2name(model, OBJ_SENSOR, i) || '')
+        const channels = buildChannels(sNames, model.sensor_adr, model.sensor_dim, model.sensor_type)
+        const sim: Sim = { mj, model, data, meshes: buildMeshes(mj, model, groupRef.current), ctrl, channels, timestep: model.opt.timestep }
         simRef.current = sim
         ctrlRef.current = ctrl.map(() => 0)
+        const names = channels.map((c) => c.name)
+        setChNames(names); setGraphSel(names.slice(0, 2))
+        tracker.current = new GoalTracker(sceneRef.current.goals.filter((g) => names.includes(g.ch)))
         runners.current = []; setProgRunning(false)
         setCtrlDefs(ctrl); setCtrlVals(ctrl.map(() => 0))
         resetState()
@@ -204,6 +245,9 @@ export function MujocoLab() {
     const id = setInterval(() => {
       const sim = simRef.current; if (!sim) return
       setInfo({ t: sim.data.time, ncon: sim.data.ncon })
+      setSens({ ...readings.current })
+      const tk = tracker.current
+      if (tk) setGoalView(tk.state.map((st, i) => ({ done: st.done, p: tk.progress(i) })))
       if (runners.current.length) { setCtrlVals([...ctrlRef.current]); if (runners.current.every((r) => r.done)) { runners.current = []; setProgRunning(false) } }
     }, 250)
     return () => clearInterval(id)
@@ -219,13 +263,18 @@ export function MujocoLab() {
     const v = sim.data.qvel
     for (let i = 0; i < v.length; i++) v[i] += (Math.random() - 0.5) * 3
   }
+  /** Motor hedefini sınırlar içinde yazar (bloklar ve Python ortak kullanır). */
+  const setMotor = (name: string, value: number) => {
+    const sim = simRef.current; if (!sim) return
+    const i = sim.ctrl.findIndex((c) => c.name === name)
+    if (i >= 0) ctrlRef.current[i] = Math.min(sim.ctrl[i].hi, Math.max(sim.ctrl[i].lo, value))
+  }
+  const startPython = () => { resetState(); runners.current = []; setProgRunning(false); runRef.current = false; setRunning(false) }
+  const resumeSim = () => { runRef.current = true; setRunning(true) }
   const startProgram = () => {
     const sim = simRef.current; if (!sim) return
     resetState()
-    runners.current = programs.current.map((p) => new Runner(p, (name, value) => {
-      const i = sim.ctrl.findIndex((c) => c.name === name)
-      if (i >= 0) ctrlRef.current[i] = Math.min(sim.ctrl[i].hi, Math.max(sim.ctrl[i].lo, value))
-    }))
+    runners.current = programs.current.map((p) => new Runner(p, setMotor, (ch) => readings.current[ch] ?? 0))
     runRef.current = true; setRunning(true); setProgRunning(runners.current.length > 0)
   }
   const stopProgram = () => { runners.current = []; setProgRunning(false) }
@@ -236,13 +285,18 @@ export function MujocoLab() {
 
   return (
     <section className="mj" data-testid="mujoco-lab">
-      <div className="mj-tabs" role="tablist" aria-label={L('Hazır sahneler', 'Preset scenes')}>
-        {MJ_SCENES.map((s) => (
-          <button key={s.id} role="tab" aria-selected={s.id === sceneId} className={`mj-tab${s.id === sceneId ? ' on' : ''}`} onClick={() => pick(s.id)}>
-            {en ? s.en.title : s.tr.title}
-          </button>
-        ))}
-      </div>
+      {(['robot', 'fizik'] as const).map((k) => (
+        <div key={k} className="mj-group">
+          <span className="mj-group-label">{k === 'robot' ? L('Robotlar', 'Robots') : L('Fizik deneyleri', 'Physics experiments')}</span>
+          <div className="mj-tabs" role="tablist" aria-label={k === 'robot' ? L('Robotlar', 'Robots') : L('Fizik deneyleri', 'Physics experiments')}>
+            {MJ_SCENES.filter((s) => s.kind === k).map((s) => (
+              <button key={s.id} role="tab" aria-selected={s.id === sceneId} className={`mj-tab${s.id === sceneId ? ' on' : ''}`} onClick={() => pick(s.id)} data-testid={`mujoco-scene-${s.id}`}>
+                {en ? s.en.title : s.tr.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
       <p className="mj-desc">{en ? scene.en.desc : scene.tr.desc}</p>
 
       <div className="mj-body">
@@ -278,15 +332,68 @@ export function MujocoLab() {
         </aside>
       </div>
 
-      <section className="mj-prog" aria-label={L('Bloklarla sür', 'Drive with blocks')}>
-        <h3>{L('Bloklarla sür', 'Drive with blocks')}</h3>
-        <p className="muted">{L('Motor bloklarını sırala, Çalıştır\'a bas. Altta aynı programın Python\'u görünür.', 'Stack motor blocks and press Run. The same program appears as Python below.')}</p>
-        <MurokoBlocks actuators={ctrlDefs} en={en} onChange={(p) => { programs.current = p }} />
-        {ctrlDefs.length > 0 && (
-          <div className="mj-bar">
-            <button className="sbtn" onClick={startProgram} data-testid="mujoco-run">{L('Programı çalıştır', 'Run program')}</button>
-            <button className="sbtn ghost" onClick={stopProgram} disabled={!progRunning}>{L('Programı durdur', 'Stop program')}</button>
-          </div>
+      <div className="mj-extra">
+        <section className="mj-card" aria-label={L('Hedefler', 'Goals')} data-testid="mujoco-goals">
+          <h3>{L('Hedefler', 'Goals')}</h3>
+          {activeGoals.length === 0
+            ? <p className="muted">{L('Bu sahne için hedef yok. Önce robot sahnelerinden birini seç.', 'No goals for this scene. Pick a robot scene first.')}</p>
+            : <ul className="mj-goals">
+              {activeGoals.map((g, i) => (
+                <li key={g.id} className={goalView[i]?.done ? 'done' : ''} data-testid={`mujoco-goal-${g.id}`} data-done={goalView[i]?.done ? '1' : '0'}>
+                  <span className="mj-goal-mark" aria-hidden="true">{goalView[i]?.done ? '✅' : '🎯'}</span>
+                  <span className="mj-goal-txt">{en ? g.en : g.tr}
+                    {g.hold > 0 && !goalView[i]?.done && <progress value={goalView[i]?.p ?? 0} max={1} aria-label={L('İlerleme', 'Progress')} />}
+                  </span>
+                </li>
+              ))}
+            </ul>}
+          {activeGoals.length > 0 && goalView.length > 0 && goalView.every((g) => g.done) && <p className="mj-win" role="status" data-testid="mujoco-win">🎉 {L('Tüm hedefler tamam!', 'All goals complete!')}</p>}
+        </section>
+        <section className="mj-card" aria-label={L('Sensörler', 'Sensors')} data-testid="mujoco-sensors">
+          <h3>{L('Sensörler', 'Sensors')}</h3>
+          {chNames.length === 0
+            ? <p className="muted">{L('Bu modelde <sensor> yok. XML\'e ekleyebilirsin.', 'This model has no <sensor>. You can add one in the XML.')}</p>
+            : <table className="mj-sens"><tbody>
+              {chNames.map((n) => <tr key={n}><th scope="row">{n}</th><td data-testid={`mujoco-sens-${n}`}>{(sens[n] ?? 0).toFixed(3)}</td></tr>)}
+            </tbody></table>}
+        </section>
+      </div>
+
+      <section className="mj-card mj-graph-card" aria-label={L('Grafik', 'Graph')}>
+        <h3>{L('Grafik (son 10 sn)', 'Graph (last 10 s)')}</h3>
+        <div className="mj-chips">
+          {[...chNames, ...ctrlDefs.map((c) => `u:${c.name}`)].map((n) => {
+            const k = graphSel.indexOf(n)
+            return (
+              <label key={n} className={`mj-chip${k >= 0 ? ' on' : ''}`} style={k >= 0 ? { borderColor: GRAPH_COLORS[k % GRAPH_COLORS.length] } : undefined}>
+                <input type="checkbox" checked={k >= 0} onChange={() => setGraphSel((a) => (a.includes(n) ? a.filter((x) => x !== n) : [...a, n].slice(-8)))} />
+                {k >= 0 && <i style={{ background: GRAPH_COLORS[k % GRAPH_COLORS.length] }} aria-hidden="true" />}{n.startsWith('u:') ? `${n.slice(2)} (${L('hedef', 'target')})` : n}
+              </label>
+            )
+          })}
+        </div>
+        <TraceGraph trace={trace} names={graphSel} label={L('Seçili sensör ve motor değerlerinin zaman grafiği', 'Time graph of the selected sensor and motor values')} />
+      </section>
+
+      <section className="mj-prog" aria-label={L('Programla', 'Program it')}>
+        <h3>{L('Robotu programla', 'Program the robot')}</h3>
+        <div className="mj-tabs" role="tablist" aria-label={L('Programlama yolu', 'Way of programming')}>
+          <button role="tab" aria-selected={progTab === 'blocks'} className={`mj-tab${progTab === 'blocks' ? ' on' : ''}`} onClick={() => setProgTab('blocks')} data-testid="mujoco-tab-blocks">{L('Bloklar', 'Blocks')}</button>
+          <button role="tab" aria-selected={progTab === 'python'} className={`mj-tab${progTab === 'python' ? ' on' : ''}`} onClick={() => setProgTab('python')} data-testid="mujoco-tab-python">🐍 Python</button>
+        </div>
+        <div hidden={progTab !== 'blocks'}>
+          <p className="muted">{L('Motor, sensör ve "eğer" bloklarını sırala, Çalıştır\'a bas. Altta aynı programın Python\'u görünür.', 'Stack motor, sensor and "if" blocks and press Run. The same program appears as Python below.')}</p>
+          <MurokoBlocks actuators={ctrlDefs} sensors={chNames} en={en} onChange={(p) => { programs.current = p }} onPython={setBlockPy} />
+          {ctrlDefs.length > 0 && (
+            <div className="mj-bar">
+              <button className="sbtn" onClick={startProgram} data-testid="mujoco-run">{L('Programı çalıştır', 'Run program')}</button>
+              <button className="sbtn ghost" onClick={stopProgram} disabled={!progRunning}>{L('Programı durdur', 'Stop program')}</button>
+            </div>
+          )}
+        </div>
+        {progTab === 'python' && (
+          <MurokoPython en={en} starter={en ? scene.python.en : scene.python.tr} fromBlocks={blockPy} motors={ctrlDefs.map((c) => c.name)} sensors={chNames}
+            setMotor={setMotor} onStart={startPython} onReady={resumeSim} getState={() => ({ t: simRef.current?.data.time ?? 0, sensors: readings.current })} onStop={() => { runners.current = [] }} bridge={pyBridge} resetKey={scene.id} />
         )}
       </section>
 
