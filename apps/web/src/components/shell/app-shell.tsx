@@ -112,7 +112,7 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
               {brand.founderCard && founder && (
                 <Link href={instructorHref(founder)} className="foot-founder">
                   <img src={founder.photo.jpg160} alt="" width={44} height={44} loading="lazy" />
-                  <span><small>{t('instructor.founder')}</small><b>{founder.name[locale]}</b></span>
+                  <span><b>Dr. {founder.given} {founder.family.toLocaleUpperCase(locale)}</b></span>
                 </Link>
               )}
             </div>
