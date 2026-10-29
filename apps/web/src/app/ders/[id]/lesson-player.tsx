@@ -28,6 +28,7 @@ import { logEvent, setEventLesson, startLessonTimer } from '@/lib/events'
 import type { Concept, QuizQuestion } from '@ask/db'
 import type { LessonKind } from '@/lib/module-meta'
 import { LessonMarkdown } from './lesson-markdown'
+import { GuestBar, useMemberGate } from '@/components/paywall/member-gate'
 
 interface Props {
   lesson: { id: number; title: string; durationMin: number; problem: string; contentMd: string; question: string; explainerMd?: string | null; concepts?: Concept[] | null; quiz?: QuizQuestion[] | null }
@@ -47,6 +48,10 @@ interface Props {
   activityKey?: string | null
   serverSync: boolean
   serverDone: number[]
+  /** Üye olmayan ziyaretçi: içeriği okur; etkinlik, test ve bitirme eylemlerinde "üye ol" penceresi çıkar. */
+  guest?: boolean
+  /** Kayıt kampanyası metni (kontenjan dolmadıysa). */
+  promo?: string | null
 }
 
 // Hyvex formatı: problem → kavram/etkinlik → soru → bitir. Öğrenme platformu katmanı: dersin anlatımı/testi varsa
@@ -57,6 +62,7 @@ const STEP_LABEL_EN: Record<StepId, string> = { merak: 'Wonder', anlatim: 'Expla
 
 export function LessonPlayer(p: Props) {
   const en = useLocale() === 'en'
+  const gate = useMemberGate(!!p.guest, `/ders/${p.lesson.id}?klasik=1`, p.promo)
   const hasExplainer = !!(p.lesson.explainerMd || p.lesson.concepts?.length)
   const hasQuiz = !!p.lesson.quiz?.length
   const STEPS = useMemo<StepId[]>(
@@ -120,6 +126,7 @@ export function LessonPlayer(p: Props) {
   }, [step, go])
 
   async function finish() {
+    if (p.guest) { gate.ask(); return }
     setError('')
     markDone(p.lesson.id)
     recordFinished(p.lesson.id)
@@ -142,6 +149,7 @@ export function LessonPlayer(p: Props) {
         <span aria-current="page" className="crumb-now">{p.lesson.title}</span>
       </nav>
 
+      {p.guest && <GuestBar next={`/ders/${p.lesson.id}?klasik=1`} promo={p.promo} />}
       <div className="lesson-layout">
         <div className="lesson-main">
           <header className="player-top">
@@ -173,7 +181,7 @@ export function LessonPlayer(p: Props) {
             {p.lesson.concepts && p.lesson.concepts.length > 0 && <ConceptCards concepts={p.lesson.concepts} />}
           </div>
         )}
-        {cur === 'test' && p.lesson.quiz && <QuizPlayer key={p.lesson.id} lessonId={p.lesson.id} questions={p.lesson.quiz} />}
+        {cur === 'test' && p.lesson.quiz && <div {...gate.capture}><QuizPlayer key={p.lesson.id} lessonId={p.lesson.id} questions={p.lesson.quiz} /></div>}
         {cur === 'etkinlik' && (
           <div className={activity ? 'lesson-split' : labActivity || arenaActivity || mikroActivity || oyunActivity || sahneActivity || aiActivity ? 'lesson-stack' : undefined}>
             <div>
@@ -186,7 +194,7 @@ export function LessonPlayer(p: Props) {
               <LessonMarkdown>{p.lesson.contentMd}</LessonMarkdown>
             </div>
             {labActivity && labStarter && (
-              <div className="lesson-lab" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+              <div className="lesson-lab" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }} {...gate.capture}>
                 {labActivity.intro && <p className="lesson-app-intro">{labActivity.intro}</p>}
                 <LabEditor
                   initial={labStarter.circuit}
@@ -199,7 +207,7 @@ export function LessonPlayer(p: Props) {
               </div>
             )}
             {arenaActivity && arenaCode !== undefined && (
-              <div className="lesson-lab lesson-arena" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+              <div className="lesson-lab lesson-arena" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }} {...gate.capture}>
                 {arenaActivity.intro && <p className="lesson-app-intro">{arenaActivity.intro}</p>}
                 <ArenaEditor
                   key={p.lesson.id}
@@ -213,7 +221,7 @@ export function LessonPlayer(p: Props) {
               </div>
             )}
             {mikroActivity && (
-              <div className="lesson-lab lesson-mikro" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+              <div className="lesson-lab lesson-mikro" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }} {...gate.capture}>
                 <div className="mk-page-body">
                   <MikroEditor
                     key={p.lesson.id}
@@ -225,7 +233,7 @@ export function LessonPlayer(p: Props) {
               </div>
             )}
             {oyunActivity && (
-              <div className="lesson-lab lesson-oyun" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+              <div className="lesson-lab lesson-oyun" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }} {...gate.capture}>
                 <div className="oy-tool-body">
                   <OyunEditor
                     key={p.lesson.id}
@@ -237,7 +245,7 @@ export function LessonPlayer(p: Props) {
               </div>
             )}
             {sahneActivity && (
-              <div className="lesson-lab lesson-sahne" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+              <div className="lesson-lab lesson-sahne" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }} {...gate.capture}>
                 <SahneEditor
                   key={p.lesson.id}
                   activity={sahneActivity}
@@ -247,7 +255,7 @@ export function LessonPlayer(p: Props) {
               </div>
             )}
             {aiActivity && (
-              <div className="lesson-lab lesson-ai" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }}>
+              <div className="lesson-lab lesson-ai" data-activity={p.activityKey} style={{ gridColumn: '1 / -1' }} {...gate.capture}>
                 <AiEditor
                   key={p.lesson.id}
                   activity={aiActivity}
@@ -257,7 +265,7 @@ export function LessonPlayer(p: Props) {
               </div>
             )}
             {activity && starter && (
-              <div className="lesson-app" data-activity={p.activityKey}>
+              <div className="lesson-app" data-activity={p.activityKey} {...gate.capture}>
                 {activity.intro && <p className="lesson-app-intro">{activity.intro}</p>}
                 <JrEditor
                   initial={starter}
@@ -343,6 +351,7 @@ export function LessonPlayer(p: Props) {
           </div>
         </aside>
       </div>
+      {gate.dialog}
     </div>
   )
 }

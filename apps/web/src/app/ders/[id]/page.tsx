@@ -11,6 +11,7 @@ import { Paywall } from '@/components/paywall/paywall'
 import { checkLessonAccess } from '@/lib/paywall'
 import { paywallEnabled } from '@/lib/entitlements'
 import { getLocale, getT } from '@/i18n/server'
+import { welcomeNoticeText, welcomeRemaining } from '@/lib/membership'
 import { moduleCallout, moduleTitle, weekTitle } from '@/lib/catalog-en'
 import { lessonTitle } from '@/lib/lesson-titles-en'
 import { lessonVideoFor } from '@/lib/lesson-videos'
@@ -44,6 +45,9 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
       return <Paywall reason={gate.decision.reason} loggedIn={!!user} trialAvailable={gate.trialAvailable} lessonTitle={lessonTitle(ctx.module.slug, ctx.week.position, ctx.lesson.position, ctx.lesson.title, await getLocale())} />
     }
   }
+  // Üye olmayan ziyaretçi dersi görür; bir şey yapmaya kalkınca "üye ol" penceresi çıkar (hesaplar kapalıysa kapı yok)
+  const guest = authEnabled() && !user
+  const promo = guest ? welcomeNoticeText(await getT(), await welcomeRemaining(db).catch(() => 0)) : null
   const tree = await getModuleTree(db, ctx.module.slug)
   const ids = tree?.weeks.flatMap((w) => w.lessons.map((l) => l.id)) ?? []
   let serverDone: number[] = []
@@ -84,6 +88,8 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
         nextTitle={titleOf(ctx.next)}
         activityKey={key}
         serverSync={!!user}
+        guest={guest}
+        promo={promo}
         classicHref={`/ders/${ctx.lesson.id}?klasik=1`}
         video={video && videoText ? { ...video, ...videoText } : undefined}
       />
@@ -118,6 +124,8 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
         activityKey={key}
         callout={moduleCallout(ctx.module.slug, locale)}
         serverSync={!!user}
+        guest={guest}
+        promo={promo}
         serverDone={serverDone}
       />
       {videoText && <LessonVideo video={video} {...videoText} />}

@@ -19,4 +19,11 @@ export const paywall = {
   noCard: 'Kart gerekmez · deneme bitince otomatik ücret alınmaz',
   opening: 'Açılıyor…',
   error: 'Bir hata oluştu',
+  memberTitle: 'Devam etmek için üye ol',
+  memberLead: 'Dersi okuyabilir ve içeriğe bakabilirsin. Soruları yanıtlamak, ilerlemeni kaydetmek ve Mac ile konuşmak için ücretsiz üye ol.',
+  memberCta: 'Ücretsiz üye ol',
+  memberLogin: 'Zaten üyeyim, giriş yap',
+  memberLater: 'Şimdilik sadece bak',
+  guestBar: 'Misafir olarak bakıyorsun.',
+  guestBarCta: 'Üye ol',
 }

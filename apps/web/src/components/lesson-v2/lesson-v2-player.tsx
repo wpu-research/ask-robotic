@@ -16,6 +16,7 @@ import { ActivityView, ChoiceView, CodeBlock, FillView, NumericView, OrderView, 
 import { LESSON_CHIPS, TutorPanel } from './tutor'
 import { MAX_CHARS } from '@/lib/tutor/protocol'
 import { useClaimRobi } from '@/components/robi/presence'
+import { GuestBar, useMemberGate } from '@/components/paywall/member-gate'
 import { useVoice } from './voice'
 import { LessonVideo } from './lesson-video'
 import type { LessonVideo as VideoEntry } from '@/lib/lesson-videos'
@@ -29,6 +30,10 @@ export interface V2Props {
   nextTitle: string | null
   activityKey: string | null
   serverSync: boolean
+  /** Üye olmayan ziyaretçi: dersi okuyabilir, yanıt/Mac/bitirme gibi eylemlerde "üye ol" penceresi çıkar. */
+  guest?: boolean
+  /** Kayıt kampanyası metni (kontenjan dolmadıysa); misafir şeridinde ve pencerede gösterilir. */
+  promo?: string | null
   /** Klasik görünüm bağlantısı (anlatım, kavram kartları, mini test). */
   classicHref: string
   /** Küçük bilgi notu (ör. arayüz İngilizce ama ders yalnız Türkçe). */
@@ -71,6 +76,7 @@ export function LessonV2Player(p: V2Props) {
   const [tutorOpen, setTutorOpen] = useState(false)
   const [snapshot, setSnapshot] = useState('')
   const voice = useVoice()
+  const gate = useMemberGate(!!p.guest, `/ders/${p.lesson.id}`, p.promo)
   useClaimRobi()
   const t = useT()
   const { state: game, today } = useGame()
@@ -96,6 +102,7 @@ export function LessonV2Player(p: V2Props) {
   const praise = useMemo(() => t(PRAISE[(i * 7 + p.lesson.id) % PRAISE.length]), [i, p.lesson.id, t])
 
   async function finish() {
+    if (p.guest) { gate.ask(); return }
     setFinished(true)
     markDone(p.lesson.id)
     recordFinished(p.lesson.id)
@@ -115,6 +122,7 @@ export function LessonV2Player(p: V2Props) {
   }
 
   function check() {
+    if (p.guest) { gate.ask(); return }
     if (!checker.current) return
     const ok = checker.current()
     const skills = 'skills' in step && step.skills ? step.skills.join(',') : ''
@@ -174,7 +182,8 @@ export function LessonV2Player(p: V2Props) {
         </div>
       )}
 
-      <main className="v2-body" key={finished ? 'end' : i}>
+      {p.guest && !finished && <GuestBar next={`/ders/${p.lesson.id}`} promo={p.promo} />}
+      <main className="v2-body" key={finished ? 'end' : i} {...(p.guest && (interactive || step.kind === 'reflect') ? gate.capture : {})}>
         {finished ? (
           <div className="v2-end">
             <Mascot mood="happy" size={96} />
@@ -235,10 +244,10 @@ export function LessonV2Player(p: V2Props) {
             )}
             {!finished && status === 'revealed' && <p className="v2-bubble">{t('lesson.player.revealed')}</p>}
             {!finished && status === 'wrong' && attempts >= 2 && !tutorOpen && (
-              <button type="button" className="tutor-offer" onClick={() => setTutorOpen(true)}>{t('lesson.player.proactiveOffer')}</button>
+              <button type="button" className="tutor-offer" onClick={gate.guard(() => setTutorOpen(true))}>{t('lesson.player.proactiveOffer')}</button>
             )}
             {!finished && (
-              <button type="button" className="tutor-open" onClick={() => setTutorOpen((o) => !o)} aria-expanded={tutorOpen} aria-label={t('lesson.player.askRobi')}>
+              <button type="button" className="tutor-open" onClick={gate.guard(() => setTutorOpen((o) => !o))} aria-expanded={tutorOpen} aria-label={t('lesson.player.askRobi')}>
                 <span aria-hidden="true">💬</span> {t('lesson.player.askRobi')}
               </button>
             )}
@@ -270,6 +279,7 @@ export function LessonV2Player(p: V2Props) {
         </div>
         {!finished && i === 0 && <p className="v2-classic"><Link href={p.classicHref}>{t('lesson.player.classic')}</Link></p>}
       </footer>
+      {gate.dialog}
       {!finished && (
         <TutorPanel
           open={tutorOpen} onClose={closeTutor} say={voice.say}

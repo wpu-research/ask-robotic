@@ -20,6 +20,13 @@ const props = {
 const html = (p = props) => renderToString(<LessonPlayer {...p} />).replaceAll('&quot;', '"').replaceAll('<!-- -->', '')
 
 describe('LessonPlayer', () => {
+  it('misafire şerit ve kampanya rozeti çıkar; üyeye çıkmaz', () => {
+    const g = html({ ...props, guest: true, promo: 'İlk 1000 kayda 6 ay Premium ücretsiz — kalan: 5' } as typeof props)
+    expect(g).toContain('data-testid="guest-bar"')
+    expect(g).toContain('İlk 1000 kayda 6 ay Premium ücretsiz')
+    expect(g).toContain('/kayit?next=%2Fders%2F1%3Fklasik%3D1')
+    expect(html()).not.toContain('guest-bar')
+  })
   it('ilk adımda başlığı, merak sorusunu ve 4 adımı gösterir', () => {
     const h = html()
     expect(h).toContain(l.title)

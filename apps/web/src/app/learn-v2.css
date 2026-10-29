@@ -358,3 +358,18 @@
 .um-guest .um-login { white-space: nowrap; font-weight: 700; }
 .um-guest .um-start { min-width: 0; min-height: 40px; padding: 0 18px; font-size: .92rem; white-space: nowrap; }
 @media (max-width: 1100px) { .um-guest .um-start { display: none; } .streak-pill { display: none; } }
+
+/* Misafir kapısı ("üye ol" penceresi), misafir şeridi ve "İlk 1000 üye ücretsiz" rozeti */
+.free-badge { display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 999px; background: var(--primary-soft); color: var(--primary); font-weight: 800; font-size: .82rem; white-space: nowrap; }
+.guest-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px 12px; margin: 0; padding: 6px 12px; background: var(--surface-2); border-bottom: 1px solid var(--border); font-size: .88rem; }
+.guest-bar a { font-weight: 800; min-height: 32px; display: inline-flex; align-items: center; }
+.v2-player > .guest-bar { flex: 0 0 auto; }
+.mg-back { position: fixed; inset: 0; z-index: 1200; display: grid; place-items: center; padding: 16px; background: rgba(20, 12, 8, .55); }
+.mg-card { width: min(440px, 100%); display: grid; gap: 10px; justify-items: center; text-align: center; padding: 22px 20px; border-radius: 20px; background: var(--surface); color: var(--text); box-shadow: 0 18px 50px rgba(0, 0, 0, .35); }
+.mg-card h2 { margin: 0; font-size: 1.3rem; }
+.mg-card p { margin: 0; color: var(--muted); }
+.mg-actions { display: grid; gap: 8px; width: 100%; margin-top: 4px; }
+.mg-actions .v2-btn { justify-content: center; text-align: center; }
+.mg-later { font: inherit; font-weight: 700; min-height: 44px; border: 0; background: transparent; color: var(--muted); cursor: pointer; text-decoration: underline; }
+.mg-note { font-size: .82rem; }
+
