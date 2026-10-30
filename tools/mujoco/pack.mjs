@@ -18,7 +18,7 @@ const MODELS = {
   iiwa: { dir: 'kuka_iiwa_14', xml: ['iiwa14.xml'] },
   // Lite6'nın motorları isimsizdir: sürücü ve Python adlarla çalışsın diye actuator1..6 adı verilir
   lite6: { dir: 'ufactory_lite6', xml: ['lite6.xml'], patch: { 'lite6.xml': (t) => t.replace(/<position joint="(joint\d)"/g, (_m, j) => `<position name="actuator${j.slice(5)}" joint="${j}"`) } },
-  so101: { dir: 'robotstudio_so101', xml: ['so101.xml'] },
+  so101: { dir: 'robotstudio_so101', xml: ['so101.xml'], simplify: true },
   crazyflie: { dir: 'bitcraze_crazyflie_2', xml: ['cf2.xml'] },
   x2: { dir: 'skydio_x2', xml: ['x2.xml'] },
   // OP3'ün STL'leri çok ayrıntılı (45 MB): sadeleştirilir
@@ -31,7 +31,7 @@ function walk(d, base = d) {
 
 // Büyük ikili STL'ler (ör. OP3: bir parça 9 MB) köşe kümelemesiyle sadeleştirilir: aynı ızgara hücresindeki köşeler birleşir,
 // çökmüş üçgenler atılır. Görünüm farkı gözle seçilmez, indirme boyutu birkaç kat küçülür.
-function simplifyStl(b, cells = 220) {
+function simplifyStl(b, cells = 180) {
   if (b.length < 1_000_000 || b.length !== 84 + b.readUInt32LE(80) * 50) return b
   const n = b.readUInt32LE(80)
   const v = (i, k) => [0, 1, 2].map((c) => b.readFloatLE(84 + i * 50 + 12 + k * 12 + c * 4))
