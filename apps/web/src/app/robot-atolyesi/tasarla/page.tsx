@@ -22,8 +22,8 @@ export default async function RobotTasarlaPage() {
         <h1>{en ? 'Design your robot' : 'Robotunu Tasarla'}</h1>
         <p className="muted">
           {en
-            ? 'Pick parts, click the chassis to place them and watch the center of mass, balance and battery change. When there are no red errors, run your robot in a mission with the same block programs.'
-            : 'Parça seç, şasiye tıklayıp yerleştir; ağırlık merkezinin, dengenin ve pilin nasıl değiştiğini izle. Kırmızı hata kalmayınca robotunu aynı blok programlarıyla bir görevde çalıştır.'}
+            ? 'Build your own robot: pick parts, place them on the grid and try it in a mission.'
+            : 'Kendi robotunu kur: parçaları seç, ızgaraya yerleştir ve bir görevde dene.'}
         </p>
       </header>
       <div className="tool-body">

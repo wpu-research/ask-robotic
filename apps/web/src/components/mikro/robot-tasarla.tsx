@@ -112,15 +112,18 @@ export function RobotTasarla() {
   const warns = dd.issues.filter((i) => i.level === 'uyari')
   const num = (v: number, d = 0) => (en ? v.toFixed(d) : v.toFixed(d).replace('.', ','))
 
+  const nowText = tool.kind === 'part'
+    ? `${L('Seçili parça', 'Selected part')}: ${en ? PARTS[tool.type].en : PARTS[tool.type].title}. ${en ? PARTS[tool.type].tipEn : PARTS[tool.type].tip} ${L('Yerleştirmek için sarı ızgarada boş bir kareye dokun.', 'Tap an empty square on the yellow grid to place it.')}`
+    : tool.kind === 'erase' ? L('Silmek için ızgaradaki bir parçaya dokun.', 'Tap a part on the grid to erase it.') : L('Bir parçaya dokunup seç; döndürebilir ya da çıkarabilirsin.', 'Tap a part to select it; then rotate or remove it.')
   const partBtn = (t: PartType) => {
     const s = PARTS[t]
     const on = tool.kind === 'part' && tool.type === t
     return (
       <li key={t}>
-        <button type="button" className="rt-part" aria-pressed={on} onClick={() => { setTool({ kind: 'part', type: t }); setSelected(null) }} data-testid={`rt-part-${t}`}>
+        <button type="button" className="rt-part" aria-pressed={on} title={en ? s.tipEn : s.tip} onClick={() => { setTool({ kind: 'part', type: t }); setSelected(null) }} data-testid={`rt-part-${t}`}>
           <span className="rt-sw" style={{ background: s.color }} aria-hidden="true" />
           <span className="rt-pt"><b>{en ? s.en : s.title}</b>
-            <small>{advanced ? partNumbers(t, en) : en ? s.tipEn : s.tip}</small>
+            {advanced && <small>{partNumbers(t, en)}</small>}
           </span>
         </button>
       </li>
@@ -129,34 +132,50 @@ export function RobotTasarla() {
 
   return (
     <div className="rt" data-testid="robot-tasarla">
-      <div className="rt-bar">
-        <label className="rt-name">{L('Adı', 'Name')} <input value={design.name} maxLength={40} onChange={(e) => setDesign({ ...design, name: e.target.value })} data-testid="rt-name" /></label>
-        <label>{L('Şasi', 'Chassis')} <select value={design.chassis} onChange={(e) => setDesign(setChassis(design, e.target.value as ChassisId))} data-testid="rt-chassis">
-          {CHASSIS_IDS.map((id) => <option key={id} value={id}>{en ? CHASSIS[id].en : CHASSIS[id].title} ({CHASSIS[id].cols * 2}×{CHASSIS[id].rows * 2} cm)</option>)}
-        </select></label>
-        <label>{L('Hazır', 'Template')} <select value="" onChange={(e) => { const t = TEMPLATES.find((x) => x.id === e.target.value); if (t) { setDesign(t.design); setSelected(null) } else if (e.target.value === 'bos') setDesign(emptyDesign(L('Benim robotum', 'My robot'), design.chassis)) }} data-testid="rt-template">
-          <option value="">{L('Seç…', 'Pick…')}</option>
-          {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{en ? t.en : t.design.name}</option>)}
-          <option value="bos">{L('Boş şasi', 'Empty chassis')}</option>
-        </select></label>
-        <div className="rt-mode" role="group" aria-label={L('Görünüm kipi', 'View mode')}>
-          <button type="button" aria-pressed={!advanced} onClick={() => setAdvanced(false)} data-testid="rt-simple">{L('Basit', 'Simple')}</button>
-          <button type="button" aria-pressed={advanced} onClick={() => setAdvanced(true)} data-testid="rt-advanced">{L('İleri (sayılar)', 'Advanced (numbers)')}</button>
-        </div>
+      <ol className="rt-steps" aria-label={L('Üç adım', 'Three steps')}>
+        <li><b>1</b> {L('Soldan bir parça seç', 'Pick a part on the left')}</li>
+        <li><b>2</b> {L('Sarı ızgarada boş bir kareye dokun', 'Tap an empty square on the yellow grid')}</li>
+        <li><b>3</b> {L('Hazır olunca aşağıdan dene', 'When ready, try it below')}</li>
+      </ol>
+      <div className="rt-starters" role="group" aria-label={L('Hazır robotlar', 'Ready-made robots')}>
+        <span className="rt-starters-label">{L('Hazır robotla başla:', 'Start from a ready robot:')}</span>
+        {TEMPLATES.map((t) => (
+          <button key={t.id} type="button" className="rt-chip" onClick={() => { setDesign(t.design); setSelected(null) }} data-testid={`rt-tpl-${t.id}`}>🤖 {en ? t.en : t.design.name}</button>
+        ))}
+        <button type="button" className="rt-chip" onClick={() => { setDesign(emptyDesign(L('Benim robotum', 'My robot'), design.chassis)); setSelected(null) }} data-testid="rt-tpl-bos">⬜ {L('Boş şasi', 'Empty chassis')}</button>
       </div>
+      <details className="rt-settings">
+        <summary>⚙️ {L('Ayarlar: ad, şasi boyu, ileri kip', 'Settings: name, chassis size, advanced mode')}</summary>
+        <div className="rt-bar">
+          <label className="rt-name">{L('Adı', 'Name')} <input value={design.name} maxLength={40} onChange={(e) => setDesign({ ...design, name: e.target.value })} data-testid="rt-name" /></label>
+          <label>{L('Şasi', 'Chassis')} <select value={design.chassis} onChange={(e) => setDesign(setChassis(design, e.target.value as ChassisId))} data-testid="rt-chassis">
+            {CHASSIS_IDS.map((id) => <option key={id} value={id}>{en ? CHASSIS[id].en : CHASSIS[id].title} ({CHASSIS[id].cols * 2}×{CHASSIS[id].rows * 2} cm)</option>)}
+          </select></label>
+          <label>{L('Hazır', 'Template')} <select value="" onChange={(e) => { const t = TEMPLATES.find((x) => x.id === e.target.value); if (t) { setDesign(t.design); setSelected(null) } else if (e.target.value === 'bos') setDesign(emptyDesign(L('Benim robotum', 'My robot'), design.chassis)) }} data-testid="rt-template">
+            <option value="">{L('Seç…', 'Pick…')}</option>
+            {TEMPLATES.map((t) => <option key={t.id} value={t.id}>{en ? t.en : t.design.name}</option>)}
+            <option value="bos">{L('Boş şasi', 'Empty chassis')}</option>
+          </select></label>
+          <div className="rt-mode" role="group" aria-label={L('Görünüm kipi', 'View mode')}>
+            <button type="button" aria-pressed={!advanced} onClick={() => setAdvanced(false)} data-testid="rt-simple">{L('Basit', 'Simple')}</button>
+            <button type="button" aria-pressed={advanced} onClick={() => setAdvanced(true)} data-testid="rt-advanced">{L('İleri (sayılar)', 'Advanced (numbers)')}</button>
+          </div>
+        </div>
+      </details>
 
       <div className="rt-main">
         <aside className="rt-palette" aria-label={L('Parçalar', 'Parts')}>
-          <div className="rt-tools">
-            <button type="button" className="rt-tool" aria-pressed={tool.kind === 'select'} onClick={() => setTool({ kind: 'select' })}>{L('Seç', 'Select')}</button>
-            <button type="button" className="rt-tool" aria-pressed={tool.kind === 'erase'} onClick={() => setTool({ kind: 'erase' })} data-testid="rt-erase">{L('Sil', 'Erase')}</button>
-          </div>
+          <p className="rt-now" data-testid="rt-now" role="status">{nowText}</p>
           {PART_GROUPS.map((g) => (
             <section key={g.id}>
-              <h3>{en ? g.en : g.title}</h3>
-              <ul>{PART_TYPES.filter((t) => PARTS[t].group === g.id).map(partBtn)}</ul>
+              <h3><span aria-hidden="true">{GROUP_ICON[g.id]}</span> {en ? g.en : g.title}</h3>
+              <ul className="rt-tiles">{PART_TYPES.filter((t) => PARTS[t].group === g.id).map(partBtn)}</ul>
             </section>
           ))}
+          <div className="rt-tools">
+            <button type="button" className="rt-tool" aria-pressed={tool.kind === 'select'} onClick={() => setTool({ kind: 'select' })}>👆 {L('Seç', 'Select')}</button>
+            <button type="button" className="rt-tool" aria-pressed={tool.kind === 'erase'} onClick={() => setTool({ kind: 'erase' })} data-testid="rt-erase">🗑️ {L('Sil', 'Erase')}</button>
+          </div>
         </aside>
 
         <section className="rt-stage" aria-label={L('Tasarım tezgâhı', 'Build bench')}>
@@ -242,7 +261,7 @@ export function RobotTasarla() {
             <optgroup label={L('Tasarım yarışmaları', 'Design challenges')}>{DESIGN_CHALLENGES.map((c) => <option key={c.id} value={`challenge:${c.id}`}>{en ? c.en.title : c.title}</option>)}</optgroup>
             <optgroup label={L('Görevler', 'Missions')}>{ROBOT_MISSIONS.map((m) => <option key={m.id} value={`mission:${m.id}`}>{en ? m.en.title : m.title}</option>)}</optgroup>
           </select></label>
-          <button type="button" className="mk-btn mk-btn-primary" disabled={!dd.ok} onClick={() => setTesting(true)} data-testid="rt-test">{testing ? L('Benzetim açık', 'Simulator open') : L('Benzetimde dene', 'Open simulator')}</button>
+          <button type="button" className="mk-btn mk-btn-primary" disabled={!dd.ok} onClick={() => setTesting(true)} data-testid="rt-test">{testing ? L('Benzetim açık', 'Simulator open') : `▶ ${L('Robotumu dene', 'Try my robot')}`}</button>
           {!dd.ok && <span className="sk-err">{L('Önce kırmızı hataları düzelt.', 'Fix the red errors first.')}</span>}
           <Link href="/robot-atolyesi" className="rt-link">{L('Robot Atölyesi görevleri', 'Robot Workshop missions')}</Link>
         </div>
@@ -291,6 +310,7 @@ function TopGrid({ design, selected, onCell, canDrop, en }: { design: RobotDesig
     </div>
   )
 }
+const GROUP_ICON: Record<string, string> = { teker: '⚫', motor: '⚙️', sensor: '👁️', eyleyici: '🦾', pil: '🔋' }
 const GLYPH: Record<string, string> = { teker: '●', motor: '⚙', sensor: '➤', eyleyici: '⊐', pil: '▮' }
 
 function DesignChallengePanel({ id, design, project: p, ok, en }: { id: string; design: RobotDesign; project: MikroProject | null; ok: boolean; en: boolean }) {
