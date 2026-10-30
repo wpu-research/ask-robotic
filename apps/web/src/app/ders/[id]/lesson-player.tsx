@@ -114,7 +114,8 @@ export function LessonPlayer(p: Props) {
   // Giriş açıkken sunucudaki ilerleme tarayıcıdakiyle birleştirilir
   useEffect(() => { p.serverDone.forEach(markDone) }, [p.serverDone])
 
-  const go = useCallback((n: number) => setStep(Math.max(0, Math.min(STEPS.length - 1, n))), [STEPS])
+  // Misafir yalnız ilk adımı (Merak) görür; adım değiştirmek de bir eylemdir
+  const go = useCallback((n: number) => { if (p.guest) { gate.ask(); return } setStep(Math.max(0, Math.min(STEPS.length - 1, n))) }, [STEPS, p.guest, gate.ask]) // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLElement && /INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return

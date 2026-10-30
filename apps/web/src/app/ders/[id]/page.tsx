@@ -79,19 +79,20 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
   if (steps?.length && !classic) {
     return (
       <LessonV2Player
-        lesson={{ id: ctx.lesson.id, title, steps }}
+        // Misafire yalnız ilk adım gönderilir: gerisi tarayıcıya hiç inmez
+        lesson={{ id: ctx.lesson.id, title, steps: guest ? steps.slice(0, 1) : steps }}
         notice={locale === 'en' && !english ? t('common.lessonOnlyTurkish') : undefined}
         moduleSlug={ctx.module.slug}
         moduleTitle={modTitle}
         weekLabel={t('common.weekLabel', { n: ctx.week.position, title: wkTitle })}
         nextLessonId={ctx.next?.id ?? null}
         nextTitle={titleOf(ctx.next)}
-        activityKey={key}
+        activityKey={guest ? null : key}
         serverSync={!!user}
         guest={guest}
         promo={promo}
         classicHref={`/ders/${ctx.lesson.id}?klasik=1`}
-        video={video && videoText ? { ...video, ...videoText } : undefined}
+        video={!guest && video && videoText ? { ...video, ...videoText } : undefined}
       />
     )
   }
@@ -105,11 +106,12 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
           title,
           durationMin: ctx.lesson.durationMin,
           problem: (en ?? ctx.lesson).problem ?? '',
-          contentMd: (en ?? ctx.lesson).contentMd ?? '',
-          question: (en ?? ctx.lesson).question ?? '',
-          explainerMd: en ? (en.explainerMd ?? null) : (ctx.lesson.explainerMd ?? null),
-          concepts: en ? (en.concepts ?? null) : (ctx.lesson.concepts ?? null),
-          quiz: en ? (en.quiz ?? null) : (ctx.lesson.quiz ?? null),
+          // Misafire yalnız Merak (problem) gönderilir; anlatım, etkinlik, soru ve test sunucuda kalır
+          contentMd: guest ? '' : (en ?? ctx.lesson).contentMd ?? '',
+          question: guest ? '' : (en ?? ctx.lesson).question ?? '',
+          explainerMd: guest ? null : en ? (en.explainerMd ?? null) : (ctx.lesson.explainerMd ?? null),
+          concepts: guest ? null : en ? (en.concepts ?? null) : (ctx.lesson.concepts ?? null),
+          quiz: guest ? null : en ? (en.quiz ?? null) : (ctx.lesson.quiz ?? null),
         }}
         moduleTitle={modTitle}
         moduleSlug={ctx.module.slug}
@@ -121,14 +123,14 @@ export default async function Ders({ params, searchParams }: { params: Promise<{
         prevTitle={titleOf(ctx.prev)}
         nextTitle={titleOf(ctx.next)}
         moduleLessonIds={ids}
-        activityKey={key}
-        callout={moduleCallout(ctx.module.slug, locale)}
+        activityKey={guest ? null : key}
+        callout={guest ? undefined : moduleCallout(ctx.module.slug, locale)}
         serverSync={!!user}
         guest={guest}
         promo={promo}
         serverDone={serverDone}
       />
-      {videoText && <LessonVideo video={video} {...videoText} />}
+      {!guest && videoText && <LessonVideo video={video} {...videoText} />}
     </>
   )
 }

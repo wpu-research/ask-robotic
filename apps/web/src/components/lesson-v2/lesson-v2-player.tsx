@@ -117,6 +117,8 @@ export function LessonV2Player(p: V2Props) {
   }
 
   function next() {
+    // Misafir yalnız ilk adımı görür; ilerlemek de bir eylemdir
+    if (p.guest) { gate.ask(); return }
     if (i + 1 >= steps.length) { void finish(); return }
     setI(i + 1); setStatus('idle'); setAttempts(0); setShowWhy(false); checker.current = null; setReady(false); setSnapshot('')
   }

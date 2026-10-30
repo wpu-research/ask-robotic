@@ -20,7 +20,7 @@ export const paywall: typeof Tr = {
   opening: 'Opening…',
   error: 'Something went wrong',
   memberTitle: 'Become a member to continue',
-  memberLead: 'You can read the lesson and look around. To answer questions, save your progress and talk to Mac, sign up for free.',
+  memberLead: 'You can look at the lesson page. To start the lesson, answer questions, save your progress and talk to Mac, sign up for free.',
   memberCta: 'Sign up for free',
   memberLogin: 'I am a member, log in',
   memberLater: 'Just look for now',
