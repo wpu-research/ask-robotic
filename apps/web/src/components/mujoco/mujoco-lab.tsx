@@ -166,6 +166,7 @@ export function MujocoLab() {
   const acc = useRef(0)
   const programs = useRef<Op[][]>([])
   const runners = useRef<Runner[]>([])
+  const nextTick = useRef(0)
   const readings = useRef<Record<string, number>>({})
   const tracker = useRef<GoalTracker | null>(null)
   const trace = useRef(new Trace(10))
@@ -185,7 +186,7 @@ export function MujocoLab() {
   const [ctrlVals, setCtrlVals] = useState<number[]>([])
   const [info, setInfo] = useState({ t: 0, ncon: 0 })
   const [progRunning, setProgRunning] = useState(false)
-  const [progTab, setProgTab] = useState<'blocks' | 'python'>('blocks')
+  const [progTab, setProgTab] = useState<'blocks' | 'python' | 'manual'>('blocks')
   const [blockPy, setBlockPy] = useState('')
   const [chNames, setChNames] = useState<string[]>([])
   const [sens, setSens] = useState<Record<string, number>>({})
@@ -234,11 +235,16 @@ export function MujocoLab() {
     stage.onFrame = (dt) => {
       const sim = simRef.current; if (!sim) return
       if (runRef.current) {
-        for (const r of runners.current) r.tick(sim.data.time)
         acc.current += dt * speedRef.current
         let n = 0
         const t0 = sim.data.time
         while (acc.current >= sim.timestep && n < 80) {
+          // Blok programı her 10 ms'lik benzetim adımında bir kez çalışır (kare hızından bağımsız): kontrol döngüleri tutarlı olur
+          if (runners.current.length && sim.data.time >= nextTick.current) {
+            readings.current = readAll(sim.channels, sim.data.sensordata) // taze sensör: kare başına bir kez okumak kontrolü geciktirip bozar
+            for (const r of runners.current) r.tick(sim.data.time)
+            nextTick.current = sim.data.time + 0.01
+          }
           for (let i = 0; i < sim.ctrl.length; i++) sim.data.ctrl[i] = ctrlRef.current[i] ?? 0
           sim.mj.mj_step(sim.model, sim.data)
           acc.current -= sim.timestep; n++
@@ -346,6 +352,7 @@ export function MujocoLab() {
     const sim = simRef.current; if (!sim) return
     resetState()
     runners.current = programs.current.map((p) => new Runner(p, setMotor, (ch) => readings.current[ch] ?? 0))
+    nextTick.current = 0
     runRef.current = true; setRunning(true); setProgRunning(runners.current.length > 0)
   }
   const stopProgram = () => { runners.current = []; setProgRunning(false) }
@@ -354,132 +361,150 @@ export function MujocoLab() {
     setCtrlVals((a) => a.map((x, k) => (k === i ? v : x)))
   }
 
+  const progTabs: { id: 'blocks' | 'python' | 'manual'; label: string; test: string }[] = [
+    { id: 'blocks', label: `🧩 ${L('Bloklar', 'Blocks')}`, test: 'mujoco-tab-blocks' },
+    { id: 'python', label: '🐍 Python', test: 'mujoco-tab-python' },
+    { id: 'manual', label: `🎛️ ${L('Elle sür', 'By hand')}`, test: 'mujoco-tab-manual' },
+  ]
+  const pickCard = (s: MjScene) => (
+    <button key={s.id} role="tab" aria-selected={s.id === sceneId} className={`mj-card-pick${s.id === sceneId ? ' on' : ''}`} onClick={() => pick(s.id)} data-testid={`mujoco-scene-${s.id}`}>
+      <span className="mj-pick-ico" aria-hidden="true">{s.icon}</span>
+      <span className="mj-pick-name">{en ? s.en.title : s.tr.title}</span>
+    </button>
+  )
+
   return (
     <section className="mj" data-testid="mujoco-lab">
-      {(['gercek', 'robot', 'fizik'] as const).map((k) => (
-        <div key={k} className="mj-group">
-          <span className="mj-group-label">{GROUP_LABEL[k][en ? 'en' : 'tr']}</span>
-          <div className="mj-tabs" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>
-            {MJ_SCENES.filter((s) => s.kind === k).map((s) => (
-              <button key={s.id} role="tab" aria-selected={s.id === sceneId} className={`mj-tab${s.id === sceneId ? ' on' : ''}`} onClick={() => pick(s.id)} data-testid={`mujoco-scene-${s.id}`}>
-                {en ? s.en.title : s.tr.title}
-              </button>
+      <div className="mj-picker">
+        {(['gercek', 'robot', 'fizik'] as const).map((k) => (
+          <div key={k} className="mj-group">
+            <span className="mj-group-label">{GROUP_LABEL[k][en ? 'en' : 'tr']}</span>
+            <div className="mj-picks" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>{MJ_SCENES.filter((s) => s.kind === k).map(pickCard)}</div>
+          </div>
+        ))}
+      </div>
+      <p className="mj-desc"><b>{en ? scene.en.title : scene.tr.title}</b> · {en ? scene.en.desc : scene.tr.desc}</p>
+
+      <div className="mj-work">
+        <div className="mj-sim">
+          <div className="mj-stage-wrap">
+            {webgl
+              ? <div ref={host} className="mj-stage" data-testid="mujoco-stage" />
+              : <div className="mj-stage mj-msg">{L('Bu tarayıcıda WebGL yok; 3B görüntü açılamıyor.', 'WebGL is not available in this browser.')}</div>}
+            {status === 'loading' && <div className="mj-overlay">{scene.pack ? L('Robot modeli indiriliyor (birkaç MB, bir kez)…', 'Downloading the robot model (a few MB, once)…') : L('Fizik motoru yükleniyor (8 MB, ilk açılışta)…', 'Loading the physics engine (8 MB, first visit)…')}</div>}
+            <div className="mj-bar mj-simbar">
+              <button className="sbtn ghost" onClick={toggle} data-testid="mujoco-toggle" aria-label={running ? L('Duraklat', 'Pause') : L('Başlat', 'Play')}>{running ? `⏸ ${L('Duraklat', 'Pause')}` : `▶ ${L('Başlat', 'Play')}`}</button>
+              <button className="sbtn ghost" onClick={resetState}>↺ {L('Başa al', 'Reset')}</button>
+              <label className="mj-speed">{L('Hız', 'Speed')}
+                <select value={speed} onChange={(e) => { const v = Number(e.target.value); setSpeed(v); speedRef.current = v }}>
+                  <option value={0.25}>0,25×</option><option value={0.5}>0,5×</option><option value={1}>1×</option><option value={2}>2×</option>
+                </select>
+              </label>
+              <span className="mj-clock" data-testid="mujoco-clock">{info.t.toFixed(1)} s</span>
+            </div>
+          </div>
+
+          <section className="mj-card" aria-label={L('Hedefler', 'Goals')} data-testid="mujoco-goals">
+            <h3>🎯 {L('Hedefler', 'Goals')}</h3>
+            {activeGoals.length === 0
+              ? <p className="muted">{L('Bu sahne için hedef yok. Bir robot seç.', 'No goals for this scene. Pick a robot.')}</p>
+              : <ul className="mj-goals">
+                {activeGoals.map((g, i) => (
+                  <li key={g.id} className={goalView[i]?.done ? 'done' : ''} data-testid={`mujoco-goal-${g.id}`} data-done={goalView[i]?.done ? '1' : '0'}>
+                    <span className="mj-goal-mark" aria-hidden="true">{goalView[i]?.done ? '✅' : '⬜'}</span>
+                    <span className="mj-goal-txt">{en ? g.en : g.tr}
+                      {g.hold > 0 && !goalView[i]?.done && (goalView[i]?.p ?? 0) > 0 && <progress value={goalView[i]?.p ?? 0} max={1} aria-label={L('İlerleme', 'Progress')} />}
+                    </span>
+                  </li>
+                ))}
+              </ul>}
+            {activeGoals.length > 0 && goalView.length > 0 && goalView.every((g) => g.done) && <p className="mj-win" role="status" data-testid="mujoco-win">🎉 {L('Tüm hedefler tamam!', 'All goals complete!')}</p>}
+          </section>
+          <p className="mj-hint">💡 {en ? scene.en.hint : scene.tr.hint}</p>
+        </div>
+
+        <div className="mj-code" aria-label={L('Robotu programla', 'Program the robot')}>
+          <div className="mj-tabs" role="tablist" aria-label={L('Programlama yolu', 'Way of programming')}>
+            {progTabs.map((t) => (
+              <button key={t.id} role="tab" aria-selected={progTab === t.id} className={`mj-tab${progTab === t.id ? ' on' : ''}`} onClick={() => setProgTab(t.id)} data-testid={t.test}>{t.label}</button>
             ))}
           </div>
-        </div>
-      ))}
-      <p className="mj-desc">{en ? scene.en.desc : scene.tr.desc}</p>
 
-      <div className="mj-body">
-        <div className="mj-stage-wrap">
-          {webgl
-            ? <div ref={host} className="mj-stage" data-testid="mujoco-stage" />
-            : <div className="mj-stage mj-msg">{L('Bu tarayıcıda WebGL yok; 3B görüntü açılamıyor.', 'WebGL is not available in this browser.')}</div>}
-          {status === 'loading' && <div className="mj-overlay">{scene.pack ? L('Robot modeli indiriliyor (birkaç MB, bir kez)…', 'Downloading the robot model (a few MB, once)…') : L('Fizik motoru yükleniyor (8 MB, ilk açılışta)…', 'Loading the physics engine (8 MB, first visit)…')}</div>}
-          {scene.credit && <p className="mj-credit" data-testid="mujoco-model-credit">{L('Model', 'Model')}: <a href={scene.credit.url} target="_blank" rel="noreferrer">{scene.credit.name}</a> · {scene.credit.license} · MuJoCo Menagerie · <a href={`/mujoco/models/${scene.pack}.LICENSE.txt`} target="_blank" rel="noreferrer">{L('lisans metni', 'license text')}</a></p>}
-          <div className="mj-bar">
-            <button className="sbtn" onClick={toggle} data-testid="mujoco-toggle">{running ? L('Duraklat', 'Pause') : L('Başlat', 'Play')}</button>
-            <button className="sbtn ghost" onClick={resetState}>{L('Sıfırla', 'Reset')}</button>
-            <button className="sbtn ghost" onClick={shake}>{L('Karıştır', 'Shake')}</button>
-            <label className="mj-speed">{L('Hız', 'Speed')}
-              <select value={speed} onChange={(e) => { const v = Number(e.target.value); setSpeed(v); speedRef.current = v }}>
-                <option value={0.1}>0,1×</option><option value={0.25}>0,25×</option><option value={0.5}>0,5×</option><option value={1}>1×</option><option value={2}>2×</option>
-              </select>
-            </label>
-            <span className="mj-clock" data-testid="mujoco-clock">t = {info.t.toFixed(2)} s · {L('temas', 'contacts')}: {info.ncon}</span>
+          <div hidden={progTab !== 'blocks'} className="mj-panel">
+            {ctrlDefs.length > 0 && (
+              <div className="mj-bar mj-runbar">
+                <button className="sbtn run" onClick={startProgram} data-testid="mujoco-run">▶ {L('Çalıştır', 'Run')}</button>
+                <button className="sbtn ghost" onClick={stopProgram} disabled={!progRunning}>■ {L('Dur', 'Stop')}</button>
+              </div>
+            )}
+            <MurokoBlocks actuators={ctrlDefs} sensors={chNames} en={en} example={scene.blocks ?? null} onChange={(p) => { programs.current = p }} onPython={setBlockPy} />
           </div>
-        </div>
 
-        <aside className="mj-side">
-          <h3>{L('Kontrol', 'Control')}</h3>
-          {ctrlDefs.length === 0
-            ? <p className="muted">{L('Bu sahnede motor yok: yalnız fizik çalışır. Fareyle döndür, tekerlekle yakınlaş.', 'No actuators here: physics only. Drag to orbit, scroll to zoom.')}</p>
-            : ctrlDefs.map((c, i) => (
-              <label key={c.name} className="mj-sl">
-                <span><b>{c.name}</b><output>{(ctrlVals[i] ?? 0).toFixed(2)}</output></span>
-                <input type="range" min={c.lo} max={c.hi} step={(c.hi - c.lo) / 200} value={ctrlVals[i] ?? 0} onChange={(e) => setCtrl(i, Number(e.target.value))} />
-              </label>
-            ))}
-          <p className="mj-hint">{en ? scene.en.hint : scene.tr.hint}</p>
-        </aside>
-      </div>
+          {progTab === 'python' && (
+            <div className="mj-panel">
+              <MurokoPython en={en} starter={en ? scene.python.en : scene.python.tr} fromBlocks={blockPy} motors={ctrlDefs.map((c) => c.name)} sensors={chNames}
+                setMotor={setMotor} onStart={startPython} onReady={resumeSim} getState={() => ({ t: simRef.current?.data.time ?? 0, sensors: readings.current })} onStop={() => { runners.current = [] }} bridge={pyBridge} resetKey={scene.id} />
+            </div>
+          )}
 
-      <div className="mj-extra">
-        <section className="mj-card" aria-label={L('Hedefler', 'Goals')} data-testid="mujoco-goals">
-          <h3>{L('Hedefler', 'Goals')}</h3>
-          {activeGoals.length === 0
-            ? <p className="muted">{L('Bu sahne için hedef yok. Önce robot sahnelerinden birini seç.', 'No goals for this scene. Pick a robot scene first.')}</p>
-            : <ul className="mj-goals">
-              {activeGoals.map((g, i) => (
-                <li key={g.id} className={goalView[i]?.done ? 'done' : ''} data-testid={`mujoco-goal-${g.id}`} data-done={goalView[i]?.done ? '1' : '0'}>
-                  <span className="mj-goal-mark" aria-hidden="true">{goalView[i]?.done ? '✅' : '🎯'}</span>
-                  <span className="mj-goal-txt">{en ? g.en : g.tr}
-                    {g.hold > 0 && !goalView[i]?.done && <progress value={goalView[i]?.p ?? 0} max={1} aria-label={L('İlerleme', 'Progress')} />}
-                  </span>
-                </li>
-              ))}
-            </ul>}
-          {activeGoals.length > 0 && goalView.length > 0 && goalView.every((g) => g.done) && <p className="mj-win" role="status" data-testid="mujoco-win">🎉 {L('Tüm hedefler tamam!', 'All goals complete!')}</p>}
-        </section>
-        <section className="mj-card" aria-label={L('Sensörler', 'Sensors')} data-testid="mujoco-sensors">
-          <h3>{L('Sensörler', 'Sensors')}</h3>
-          {chNames.length === 0
-            ? <p className="muted">{L('Bu modelde <sensor> yok. XML\'e ekleyebilirsin.', 'This model has no <sensor>. You can add one in the XML.')}</p>
-            : <table className="mj-sens"><tbody>
-              {chNames.map((n) => <tr key={n}><th scope="row">{n}</th><td data-testid={`mujoco-sens-${n}`}>{(sens[n] ?? 0).toFixed(3)}</td></tr>)}
-            </tbody></table>}
-        </section>
-      </div>
-
-      <section className="mj-card mj-graph-card" aria-label={L('Grafik', 'Graph')}>
-        <h3>{L('Grafik (son 10 sn)', 'Graph (last 10 s)')}</h3>
-        <div className="mj-chips">
-          {[...chNames, ...ctrlDefs.map((c) => `u:${c.name}`)].map((n) => {
-            const k = graphSel.indexOf(n)
-            return (
-              <label key={n} className={`mj-chip${k >= 0 ? ' on' : ''}`} style={k >= 0 ? { borderColor: GRAPH_COLORS[k % GRAPH_COLORS.length] } : undefined}>
-                <input type="checkbox" checked={k >= 0} onChange={() => setGraphSel((a) => (a.includes(n) ? a.filter((x) => x !== n) : [...a, n].slice(-8)))} />
-                {k >= 0 && <i style={{ background: GRAPH_COLORS[k % GRAPH_COLORS.length] }} aria-hidden="true" />}{n.startsWith('u:') ? `${n.slice(2)} (${L('hedef', 'target')})` : n}
-              </label>
-            )
-          })}
-        </div>
-        <TraceGraph trace={trace} names={graphSel} label={L('Seçili sensör ve motor değerlerinin zaman grafiği', 'Time graph of the selected sensor and motor values')} />
-      </section>
-
-      <section className="mj-prog" aria-label={L('Programla', 'Program it')}>
-        <h3>{L('Robotu programla', 'Program the robot')}</h3>
-        <div className="mj-tabs" role="tablist" aria-label={L('Programlama yolu', 'Way of programming')}>
-          <button role="tab" aria-selected={progTab === 'blocks'} className={`mj-tab${progTab === 'blocks' ? ' on' : ''}`} onClick={() => setProgTab('blocks')} data-testid="mujoco-tab-blocks">{L('Bloklar', 'Blocks')}</button>
-          <button role="tab" aria-selected={progTab === 'python'} className={`mj-tab${progTab === 'python' ? ' on' : ''}`} onClick={() => setProgTab('python')} data-testid="mujoco-tab-python">🐍 Python</button>
-        </div>
-        <div hidden={progTab !== 'blocks'}>
-          <p className="muted">{L('Motor, sensör ve "eğer" bloklarını sırala, Çalıştır\'a bas. Altta aynı programın Python\'u görünür.', 'Stack motor, sensor and "if" blocks and press Run. The same program appears as Python below.')}</p>
-          <MurokoBlocks actuators={ctrlDefs} sensors={chNames} en={en} onChange={(p) => { programs.current = p }} onPython={setBlockPy} />
-          {ctrlDefs.length > 0 && (
-            <div className="mj-bar">
-              <button className="sbtn" onClick={startProgram} data-testid="mujoco-run">{L('Programı çalıştır', 'Run program')}</button>
-              <button className="sbtn ghost" onClick={stopProgram} disabled={!progRunning}>{L('Programı durdur', 'Stop program')}</button>
+          {progTab === 'manual' && (
+            <div className="mj-panel">
+              {ctrlDefs.length === 0
+                ? <p className="muted">{L('Bu sahnede motor yok: yalnız fizik çalışır. Fareyle döndür, tekerlekle yakınlaş.', 'No actuators here: physics only. Drag to orbit, scroll to zoom.')}</p>
+                : <>
+                  <p className="muted">{L('Kaydırıcıları oynat, robot hemen hareket eder.', 'Move the sliders and the robot moves right away.')}</p>
+                  {ctrlDefs.map((c, i) => (
+                    <label key={c.name} className="mj-sl">
+                      <span><b>{c.name}</b><output>{(ctrlVals[i] ?? 0).toFixed(2)}</output></span>
+                      <input type="range" min={c.lo} max={c.hi} step={(c.hi - c.lo) / 200} value={ctrlVals[i] ?? 0} onChange={(e) => setCtrl(i, Number(e.target.value))} />
+                    </label>
+                  ))}
+                  <button className="sbtn ghost" onClick={shake}>🎲 {L('Karıştır', 'Shake')}</button>
+                </>}
             </div>
           )}
         </div>
-        {progTab === 'python' && (
-          <MurokoPython en={en} starter={en ? scene.python.en : scene.python.tr} fromBlocks={blockPy} motors={ctrlDefs.map((c) => c.name)} sensors={chNames}
-            setMotor={setMotor} onStart={startPython} onReady={resumeSim} getState={() => ({ t: simRef.current?.data.time ?? 0, sensors: readings.current })} onStop={() => { runners.current = [] }} bridge={pyBridge} resetKey={scene.id} />
-        )}
-      </section>
+      </div>
 
-      <details className="mj-xml" open>
-        <summary>{L('Modeli düzenle (MJCF / XML)', 'Edit the model (MJCF / XML)')}</summary>
+      <details className="mj-adv">
+        <summary>⚙️ {L('Gelişmiş: sensörler, grafik, model (XML)', 'Advanced: sensors, graph, model (XML)')}</summary>
+        <div className="mj-extra">
+          <section className="mj-card" aria-label={L('Sensörler', 'Sensors')} data-testid="mujoco-sensors">
+            <h3>{L('Sensörler', 'Sensors')}</h3>
+            {chNames.length === 0
+              ? <p className="muted">{L('Bu modelde <sensor> yok. XML\'e ekleyebilirsin.', 'This model has no <sensor>. You can add one in the XML.')}</p>
+              : <table className="mj-sens"><tbody>
+                {chNames.map((n) => <tr key={n}><th scope="row">{n}</th><td data-testid={`mujoco-sens-${n}`}>{(sens[n] ?? 0).toFixed(3)}</td></tr>)}
+              </tbody></table>}
+          </section>
+          <section className="mj-card mj-graph-card" aria-label={L('Grafik', 'Graph')}>
+            <h3>{L('Grafik (son 10 sn)', 'Graph (last 10 s)')}</h3>
+            <div className="mj-chips">
+              {[...chNames, ...ctrlDefs.map((c) => `u:${c.name}`)].map((n) => {
+                const k = graphSel.indexOf(n)
+                return (
+                  <label key={n} className={`mj-chip${k >= 0 ? ' on' : ''}`} style={k >= 0 ? { borderColor: GRAPH_COLORS[k % GRAPH_COLORS.length] } : undefined}>
+                    <input type="checkbox" checked={k >= 0} onChange={() => setGraphSel((a) => (a.includes(n) ? a.filter((x) => x !== n) : [...a, n].slice(-8)))} />
+                    {k >= 0 && <i style={{ background: GRAPH_COLORS[k % GRAPH_COLORS.length] }} aria-hidden="true" />}{n.startsWith('u:') ? `${n.slice(2)} (${L('hedef', 'target')})` : n}
+                  </label>
+                )
+              })}
+            </div>
+            <TraceGraph trace={trace} names={graphSel} label={L('Seçili sensör ve motor değerlerinin zaman grafiği', 'Time graph of the selected sensor and motor values')} />
+          </section>
+        </div>
+        <h3 className="mj-xml-h">{L('Modeli düzenle (MJCF / XML)', 'Edit the model (MJCF / XML)')}</h3>
         <textarea className="mj-ta" value={xml} spellCheck={false} onChange={(e) => setXml(e.target.value)} aria-label="MJCF" data-testid="mujoco-xml" />
         <div className="mj-bar">
           <button className="sbtn" onClick={() => setApplied(xml)} data-testid="mujoco-apply">{L('Modeli derle ve çalıştır', 'Compile and run')}</button>
           <button className="sbtn ghost" onClick={() => { setXml(scene.xml); setApplied(scene.xml) }}>{L('Hazır sahneye dön', 'Restore preset')}</button>
+          <span className="mj-clock">{L('temas', 'contacts')}: {info.ncon}</span>
         </div>
-        {status === 'error' && <pre className="mj-err" role="alert" data-testid="mujoco-error">{err}</pre>}
       </details>
+      {status === 'error' && <pre className="mj-err" role="alert" data-testid="mujoco-error">{err}</pre>}
 
       <p className="mj-credit">
+        {scene.credit && <><span data-testid="mujoco-model-credit">{L('Model', 'Model')}: <a href={scene.credit.url} target="_blank" rel="noreferrer">{scene.credit.name}</a> · {scene.credit.license} · MuJoCo Menagerie · <a href={`/mujoco/models/${scene.pack}.LICENSE.txt`} target="_blank" rel="noreferrer">{L('lisans metni', 'license text')}</a></span><br /></>}
         {L('Fizik motoru: ', 'Physics engine: ')}<a href={MJ_REPO} target="_blank" rel="noreferrer">MuJoCo</a> · Google DeepMind · Apache 2.0 · <a href={MJ_WASM_REPO} target="_blank" rel="noreferrer">{L('resmi WASM bağlayıcıları', 'official WASM bindings')}</a>
       </p>
     </section>

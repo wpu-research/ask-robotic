@@ -19,8 +19,8 @@ export default async function MujocoPage() {
       <header className="page-title">
         <h1>{L('MuRoKo fizik laboratuvarı', 'MuRoKo physics lab')}</h1>
         <p className="lead">{L(
-          'MuRoKo, MuJoCo fizik motoruyla çalışır: robotik araştırmacıların kullandığı gerçek motor, kurulum olmadan tarayıcında. Hazır sahneyi çalıştır, kaydırıcılarla motorları sür, sonra modelin XML\'ini değiştirip yeniden derle.',
-          'MuRoKo runs on MuJoCo, the physics engine robotics researchers use, in your browser with no install. Run a preset, drive the motors with sliders, then edit the model XML and recompile.')}</p>
+          'Bir robot seç, bloklarla ya da Python ile programla, hedefleri tamamla. Fizik tarayıcında gerçek zamanlı çalışır.',
+          'Pick a robot, program it with blocks or Python and complete the goals. The physics runs live in your browser.')}</p>
       </header>
       <MujocoLab />
       <section className="mj-learn">

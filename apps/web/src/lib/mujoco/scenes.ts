@@ -5,8 +5,23 @@ import type { Goal } from './goals'
 
 interface Text { title: string; desc: string; hint: string }
 
+/** Blockly serileştirme biçiminde örnek blok programı (mujoco-blocks.tsx yükler). */
+export interface BlockExample { blocks: { languageVersion: 0; blocks: unknown[] } }
+type Blk = { type: string; fields?: Record<string, unknown>; inputs?: Record<string, { block: Blk }>; next?: { block: Blk } }
+const seq = (...bs: Blk[]): Blk => bs.reduceRight<Blk | undefined>((acc, b) => (acc ? { ...b, next: { block: acc } } : b), undefined)!
+const set = (U: string, V: number): Blk => ({ type: 'muroko_set', fields: { U, V } })
+const wait = (S: number): Blk => ({ type: 'muroko_wait', fields: { S } })
+const forever = (body: Blk): Blk => ({ type: 'muroko_forever', inputs: { DO: { block: body } } })
+const iff = (S: string, C: 'lt' | 'gt', V: number, thenB: Blk, elseB: Blk): Blk => ({ type: 'muroko_if', fields: { S, C, V }, inputs: { DO: { block: thenB }, ELSE: { block: elseB } } })
+const calc = (U: string, S: string, K: number, C: number): Blk => ({ type: 'muroko_calc', fields: { U, S, K, C } })
+const example = (b: Blk): BlockExample => ({ blocks: { languageVersion: 0, blocks: [{ ...b, x: 16, y: 16 }] } })
+
 export interface MjScene {
   id: string
+  /** Robot seçici kartındaki simge. */
+  icon: string
+  /** Bloklar sekmesinde açılışta yüklenen örnek program (yoksa boş çalışma alanı). */
+  blocks?: BlockExample
   /** 'gercek': MuJoCo Menagerie'den gerçek robot modeli (mesh); 'robot': basit robot; 'fizik': yalnız fizik deneyi. */
   kind: 'gercek' | 'robot' | 'fizik'
   /** Gerçek model paketi: public/mujoco/models/<pack>.pack.gz (tools/mujoco/pack.mjs). XML bu paketteki dosyalara `<include>` eder. */
@@ -37,6 +52,8 @@ const FLOOR_Z = (z: number) => `<geom name="zemin" type="plane" size="6 6 .1" po
 export const MJ_MODEL_SCENES: MjScene[] = [
   {
     id: 'franka-panda',
+    icon: '🦾',
+    blocks: example(seq(set('actuator8', 255), set('actuator2', 0.06), set('actuator4', -2.36), set('actuator6', 2.4), wait(2.5), set('actuator2', 0.46), set('actuator6', 2.8), wait(2.5), set('actuator8', 0), wait(1.5), set('actuator2', -0.04), set('actuator6', 2.35))),
     kind: 'gercek',
     pack: 'panda',
     credit: { name: 'Franka Emika Panda', license: 'Apache-2.0', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/franka_emika_panda' },
@@ -105,6 +122,8 @@ pose(-0.04, -2.36, 2.35)     # lift
   },
   {
     id: 'unitree-go1',
+    icon: '🐕',
+    blocks: example(seq(set('FR_thigh', 1.3), set('FR_calf', -2.4), set('FL_thigh', 1.3), set('FL_calf', -2.4), set('RR_thigh', 1.3), set('RR_calf', -2.4), set('RL_thigh', 1.3), set('RL_calf', -2.4))),
     kind: 'gercek',
     pack: 'go1',
     credit: { name: 'Unitree Go1', license: 'BSD-3-Clause', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/unitree_go1' },
@@ -162,6 +181,8 @@ for thigh, calf, secs in [(1.3, -2.4, 4), (1.1, -2.1, 2), (0.9, -1.8, 2), (0.75,
   },
   {
     id: 'shadow-el',
+    icon: '✋',
+    blocks: example(seq(set('rh_A_FFJ3', 1.5), set('rh_A_FFJ0', 3), set('rh_A_MFJ3', 1.5), set('rh_A_MFJ0', 3), set('rh_A_RFJ3', 1.5), set('rh_A_RFJ0', 3), set('rh_A_LFJ3', 1.5), set('rh_A_LFJ0', 3))),
     kind: 'gercek',
     pack: 'shadow',
     credit: { name: 'Shadow Dexterous Hand', license: 'Apache-2.0', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/shadow_hand' },
@@ -231,6 +252,8 @@ export const MJ_SCENES: MjScene[] = [
   ...MJ_MODEL_SCENES,
   {
     id: 'kol',
+    icon: '🦾',
+    blocks: example(seq(set('omuz_motoru', 1.2), wait(1.5), set('dirsek_motoru', -1.2), wait(1.5), set('omuz_motoru', 0), set('dirsek_motoru', 0))),
     kind: 'robot',
     tr: { title: 'İki eksenli robot kol', desc: 'Omuz ve dirsek eklemleri konum motoruyla sürülüyor. Kaydırıcılar hedef açıdır (radyan).', hint: 'Uçtaki kürenin yüksekliğini sensörden (uc.z) izle: ters kinematiği elle çözüyorsun.' },
     en: { title: 'Two-joint robot arm', desc: 'Shoulder and elbow are driven by position actuators. The sliders are target angles (radians).', hint: 'Watch the height of the end sphere on the sensor (uc.z): you are solving inverse kinematics by hand.' },
@@ -298,6 +321,8 @@ while True:
   },
   {
     id: 'arabali-sarkac',
+    icon: '🛒',
+    blocks: example(forever(seq(calc('itme', 'aci', 4, 0), wait(0.01)))),
     kind: 'robot',
     tr: { title: 'Arabalı ters sarkaç', desc: 'Klasik kontrol problemi: arabayı iterek dik sarkacı ayakta tutmaya çalış.', hint: 'Sarkaç hangi yana devriliyorsa o yana it. Dengeyi bloklarla ya da Python PD denetleyicisiyle kurmayı dene.' },
     en: { title: 'Cart-pole', desc: 'The classic control problem: push the cart to keep the upright pole from falling.', hint: 'Push toward the side the pole leans. Try balancing with blocks or a Python PD controller.' },
@@ -360,6 +385,8 @@ while True:
   },
   {
     id: 'tekerlekli',
+    icon: '🚗',
+    blocks: example(forever(seq(iff('mesafe', 'lt', 0.3, seq(set('sol_motor', 0), set('sag_motor', 0)), seq(set('sol_motor', 8), set('sag_motor', 8))), wait(0.05)))),
     kind: 'robot',
     tr: { title: 'Tekerlekli robot', desc: 'İki tekerlekli, öne bakan mesafe sensörlü ve tamponlu robot. Tekerlek hızlarını farklı ver, dönsün.', hint: 'Mesafe sensörü duvara yaklaşınca küçülür. "Eğer mesafe < 0,3 ise motorları 0 yap" bloğuyla durdur.' },
     en: { title: 'Wheeled robot', desc: 'A two-wheeled robot with a forward distance sensor and a bumper. Give the wheels different speeds to turn.', hint: 'The distance sensor shrinks near the wall. Stop with "if distance < 0.3 then set motors to 0".' },
@@ -436,6 +463,8 @@ while True:
   },
   {
     id: 'kol-pence',
+    icon: '🤖',
+    blocks: example(seq(set('parmak_sol_motoru', 0.05), set('parmak_sag_motoru', 0.05), set('omuz_motoru', 1.3), set('dirsek_motoru', 0.4), wait(3), set('taban_motoru', 0.5))),
     kind: 'robot',
     tr: { title: 'Pençeli robot kol', desc: 'Dönen tabanlı, omuz-dirsek eklemli ve iki parmaklı kol. Masadaki küpe uzan, tabanı çevirip küpü it.', hint: 'Taban motoru kolu sağa sola çevirir. Parmakları 0 (kapalı) ile 0,05 (açık) arasında sür.' },
     en: { title: 'Gripper robot arm', desc: 'A rotating base, shoulder and elbow joints and two fingers. Reach the cube on the table and swing the base to push it.', hint: 'The base motor swings the arm. Drive the fingers between 0 (closed) and 0.05 (open).' },
@@ -522,6 +551,8 @@ motor("taban_motoru", 0.5)
   },
   {
     id: 'dort-bacak',
+    icon: '🐕',
+    blocks: example(seq(set('on_sol_kalca', 0.7), set('on_sol_diz', -1.3), set('on_sag_kalca', 0.7), set('on_sag_diz', -1.3), set('arka_sol_kalca', 0.7), set('arka_sol_diz', -1.3), set('arka_sag_kalca', 0.7), set('arka_sag_diz', -1.3))),
     kind: 'robot',
     tr: { title: 'Dört bacaklı robot', desc: 'Dört bacağı (kalça + diz) olan robot. Sekiz motoru oynatarak ayakta durdur, eğil, kaldır.', hint: 'Bacakları hizalı tutarsan ayakta kalır. Gövde yüksekliğini sensörden (govde.z) izle.' },
     en: { title: 'Four-legged robot', desc: 'A robot with four legs (hip + knee). Use the eight motors to stand, crouch and lift.', hint: 'It stands if the legs are aligned. Watch the body height on the sensor (govde.z).' },
@@ -613,6 +644,7 @@ for name in ["on_sol", "on_sag", "arka_sol", "arka_sag"]:
   },
   {
     id: 'cift-sarkac',
+    icon: '🎢',
     kind: 'fizik',
     tr: { title: 'Çift sarkaç', desc: 'İki bağlantılı sarkaç: başlangıç açısını 0,001 rad değiştirince hareket tamamen farklılaşır (kaos).', hint: 'Sıfırla\'ya basıp XML\'deki <key qpos> değerini azıcık değiştir, iki koşuyu grafikte karşılaştır.' },
     en: { title: 'Double pendulum', desc: 'A two-link pendulum: change the start angle by 0.001 rad and the motion diverges completely (chaos).', hint: 'Press Reset, change the <key qpos> value in the XML slightly and compare the two runs on the graph.' },
@@ -664,6 +696,7 @@ for i in range(10):
   },
   {
     id: 'duserken',
+    icon: '🧊',
     kind: 'fizik',
     tr: { title: 'Düşen cisimler', desc: 'Küre, kutu, silindir ve kapsül bir rampaya düşüyor: çarpışma, sürtünme ve zıplama.', hint: 'Karıştır düğmesi cisimlere rastgele hız verir. XML\'de friction değerini 0,1 ile 1 arasında dene.' },
     en: { title: 'Falling objects', desc: 'A sphere, box, cylinder and capsule drop onto a ramp: collision, friction and bounce.', hint: 'The Shake button gives the objects random velocities. Try friction between 0.1 and 1 in the XML.' },

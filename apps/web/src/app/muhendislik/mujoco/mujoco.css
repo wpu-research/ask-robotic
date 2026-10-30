@@ -60,3 +60,38 @@
 .mj-out { margin: 0; padding: 10px 12px; border-radius: 8px; background: #1e2433; color: #e6edf7; font: .82rem/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; max-height: 200px; overflow: auto; }
 .mj-out.bad { color: #ffb4a8; }
 @media (max-width: 900px) { .mj-extra { grid-template-columns: minmax(0, 1fr); } }
+
+
+/* ---- Sade düzen: robot kartları · solda simülasyon + hedefler · sağda kod · gelişmiş katlanmış ---- */
+.mj-picker { display: grid; gap: 8px; }
+.mj-picks { display: flex; flex-wrap: wrap; gap: 8px; }
+.mj-card-pick { font: inherit; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; text-align: left; }
+.mj-card-pick:hover { border-color: var(--border-strong); }
+.mj-card-pick.on { border-color: var(--primary); background: var(--primary-soft); }
+.mj-pick-ico { font-size: 1.5rem; line-height: 1; }
+.mj-pick-name { font-weight: 700; font-size: .9rem; }
+.mj-desc { margin: 0; font-size: 1rem; }
+.mj-work { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.mj-sim { display: grid; gap: 12px; min-width: 0; position: sticky; top: 76px; }
+.mj-sim .mj-stage, .mj-sim .mj-overlay { height: clamp(260px, 34vw, 430px); }
+.mj-simbar { gap: 6px; }
+.mj-code { display: grid; gap: 10px; min-width: 0; }
+.mj-panel { display: grid; gap: 10px; min-width: 0; }
+.mj-panel[hidden] { display: none; }
+.mj .sbtn.run { background: #1f9d55; border-color: #1f9d55; color: #fff; font-size: 1rem; padding: 10px 22px; }
+.mj-runbar { align-items: center; }
+.mj-blocks-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.mj-blocks-hint { flex: 1 1 200px; font-size: .88rem; color: var(--muted); }
+.mj-mini { font: inherit; font-size: .82rem; font-weight: 700; min-height: 36px; padding: 4px 12px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-blocks-ws { height: 400px; }
+.mj-py-pre { max-height: 180px; }
+.mj-code .mj-ta { min-height: 280px; }
+.mj-hint { margin: 0; }
+.mj-adv { border: 1px solid var(--border); border-radius: 14px; padding: 4px 14px 14px; }
+.mj-adv > summary { cursor: pointer; font-weight: 700; min-height: 48px; display: flex; align-items: center; }
+.mj-xml-h { margin: 14px 0 0; font-size: 1rem; }
+@media (max-width: 960px) {
+  .mj-work { grid-template-columns: minmax(0, 1fr); }
+  .mj-sim { position: static; }
+  .mj-blocks-ws { height: 340px; }
+}

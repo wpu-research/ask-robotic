@@ -1,8 +1,9 @@
 'use client'
 // MuRoKo blok paneli: Blockly ile motor blokları, canlı Python karşılığı. Yalnız istemcide, dinamik import ile yüklenir.
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type * as BlocklyNS from 'blockly'
 import { compileWorkspace, type Op } from '@/lib/mujoco/program'
+import type { BlockExample } from '@/lib/mujoco/scenes'
 
 type B = typeof BlocklyNS
 export interface Actuator { name: string; lo: number; hi: number }
@@ -16,11 +17,15 @@ interface Props {
   onChange: (programs: Op[][]) => void
   /** Blokların Python karşılığı değişince (Python sekmesine aktarmak için). */
   onPython?: (py: string) => void
+  /** Açılışta ve "Örnek" düğmesinde yüklenen örnek program. */
+  example?: BlockExample | null
 }
 
 const T = {
-  tr: { set: '%1 motorunu %2 yap', wait: '%1 saniye bekle', repeat: '%1 kez tekrarla %2', forever: 'sonsuza kadar %1', setTip: 'Bir motorun hedef değerini ayarlar', empty: 'Soldan blok sürükle', if: 'eğer %1 %2 %3 ise %4 değilse %5', calc: '%1 motorunu %2 × %3 + %4 yap', lt: 'küçükse', gt: 'büyükse', noMotor: 'Bu sahnede motor yok. "İki eksenli robot kol" ya da "Arabalı ters sarkaç" sahnesini seç.', python: 'Python karşılığı' },
-  en: { set: 'set motor %1 to %2', wait: 'wait %1 seconds', repeat: 'repeat %1 times %2', forever: 'forever %1', setTip: 'Sets the target value of a motor', empty: 'Drag blocks from the left', if: 'if %1 %2 %3 then %4 else %5', calc: 'set motor %1 to %2 × %3 + %4', lt: 'is below', gt: 'is above', noMotor: 'This scene has no motors. Pick "Two-joint robot arm" or "Cart-pole".', python: 'Python version' },
+  tr: { set: '%1 motorunu %2 yap', wait: '%1 saniye bekle', repeat: '%1 kez tekrarla %2', forever: 'sonsuza kadar %1', setTip: 'Bir motorun hedef değerini ayarlar', empty: 'Soldan blok sürükle',
+    exampleBtn: 'Örnek program', clearBtn: 'Temizle', catMotor: 'Motor', catSense: 'Sensör', catControl: 'Kontrol', hint: 'Blokları soldan sürükle ve alt alta birleştir.', if: 'eğer %1 %2 %3 ise %4 değilse %5', calc: '%1 motorunu %2 × %3 + %4 yap', lt: 'küçükse', gt: 'büyükse', noMotor: 'Bu sahnede motor yok. "İki eksenli robot kol" ya da "Arabalı ters sarkaç" sahnesini seç.', python: 'Python karşılığı' },
+  en: { set: 'set motor %1 to %2', wait: 'wait %1 seconds', repeat: 'repeat %1 times %2', forever: 'forever %1', setTip: 'Sets the target value of a motor', empty: 'Drag blocks from the left',
+    exampleBtn: 'Example program', clearBtn: 'Clear', catMotor: 'Motor', catSense: 'Sensor', catControl: 'Control', hint: 'Drag blocks from the left and snap them together.', if: 'if %1 %2 %3 then %4 else %5', calc: 'set motor %1 to %2 × %3 + %4', lt: 'is below', gt: 'is above', noMotor: 'This scene has no motors. Pick "Two-joint robot arm" or "Cart-pole".', python: 'Python version' },
 }
 
 let defined: 'tr' | 'en' | null = null
@@ -32,7 +37,7 @@ function define(Blockly: B, lang: 'tr' | 'en', actsRef: { current: Actuator[] },
   const opts = () => (actsRef.current.length ? actsRef.current.map((a) => [a.name, a.name] as [string, string]) : [['—', '']] as [string, string][])
   Blockly.Blocks['muroko_set'] = {
     init(this: BlocklyNS.Block) {
-      this.appendDummyInput().appendField(t.set.split('%1')[0]).appendField(new Blockly.FieldDropdown(opts), 'U').appendField(t.set.split('%1')[1].split('%2')[0]).appendField(new Blockly.FieldNumber(0, -100, 100, 0.01), 'V').appendField(t.set.split('%2')[1] ?? '')
+      this.appendDummyInput().appendField(t.set.split('%1')[0]).appendField(new Blockly.FieldDropdown(opts), 'U').appendField(t.set.split('%1')[1].split('%2')[0]).appendField(new Blockly.FieldNumber(0, -1000, 1000, 0.01), 'V').appendField(t.set.split('%2')[1] ?? '')
       this.setPreviousStatement(true); this.setNextStatement(true); this.setStyle('muroko_motor'); this.setTooltip(t.setTip)
     },
   }
@@ -54,7 +59,7 @@ function define(Blockly: B, lang: 'tr' | 'en', actsRef: { current: Actuator[] },
     },
   }
   Blockly.defineBlocksWithJsonArray([
-    { type: 'muroko_wait', message0: t.wait, args0: [{ type: 'field_number', name: 'S', value: 1, min: 0, max: 60, precision: 0.1 }], previousStatement: null, nextStatement: null, style: 'muroko_ctl' },
+    { type: 'muroko_wait', message0: t.wait, args0: [{ type: 'field_number', name: 'S', value: 1, min: 0, max: 60, precision: 0.01 }], previousStatement: null, nextStatement: null, style: 'muroko_ctl' },
     { type: 'muroko_repeat', message0: t.repeat, args0: [{ type: 'field_number', name: 'N', value: 3, min: 1, max: 100, precision: 1 }, { type: 'input_statement', name: 'DO' }], previousStatement: null, nextStatement: null, style: 'muroko_ctl' },
     { type: 'muroko_forever', message0: t.forever, args0: [{ type: 'input_statement', name: 'DO' }], previousStatement: null, style: 'muroko_ctl' },
   ])
@@ -77,12 +82,14 @@ function pythonOf(Blockly: B, py: { pythonGenerator: BlocklyNS.CodeGenerator }, 
   return code ? `from muroko import *\n\n${code}` : ''
 }
 
-export function MurokoBlocks({ actuators, sensors, en, onChange, onPython }: Props) {
+export function MurokoBlocks({ actuators, sensors, en, onChange, onPython, example }: Props) {
   const host = useRef<HTMLDivElement>(null)
   const wsRef = useRef<BlocklyNS.WorkspaceSvg | null>(null)
   const acts = useRef(actuators); acts.current = actuators
   const sens = useRef(sensors); sens.current = sensors
   const pyCb = useRef(onPython); pyCb.current = onPython
+  const exRef = useRef(example); exRef.current = example
+  const blocklyRef = useRef<B | null>(null)
   const cb = useRef(onChange); cb.current = onChange
   const [py, setPy] = useState('')
   const [failed, setFailed] = useState(false)
@@ -110,10 +117,17 @@ export function MurokoBlocks({ actuators, sensors, en, onChange, onPython }: Pro
         })
         ws = Blockly.inject(host.current, {
           renderer: 'zelos', theme, media: '/blockly/media/', sounds: false, trashcan: true, scrollbars: true,
-          toolbox: { kind: 'flyoutToolbox', contents: [{ kind: 'block', type: 'muroko_set' }, { kind: 'block', type: 'muroko_calc' }, { kind: 'block', type: 'muroko_if' }, { kind: 'block', type: 'muroko_wait' }, { kind: 'block', type: 'muroko_repeat' }, { kind: 'block', type: 'muroko_forever' }] } as BlocklyNS.utils.toolbox.ToolboxInfo,
+          toolbox: {
+            kind: 'categoryToolbox',
+            contents: [
+              { kind: 'category', name: T[lang].catMotor, colour: '#2f80ed', contents: [{ kind: 'block', type: 'muroko_set' }, { kind: 'block', type: 'muroko_calc' }] },
+              { kind: 'category', name: T[lang].catSense, colour: '#27ae60', contents: [{ kind: 'block', type: 'muroko_if' }] },
+              { kind: 'category', name: T[lang].catControl, colour: '#f2994a', contents: [{ kind: 'block', type: 'muroko_wait' }, { kind: 'block', type: 'muroko_repeat' }, { kind: 'block', type: 'muroko_forever' }] },
+            ],
+          } as BlocklyNS.utils.toolbox.ToolboxInfo,
           move: { scrollbars: true, drag: true, wheel: true }, zoom: { controls: true, startScale: 0.9, minScale: 0.5, maxScale: 1.6 },
         })
-        wsRef.current = ws
+        wsRef.current = ws; blocklyRef.current = Blockly
         const w = ws
         ;(host.current as HTMLDivElement & { __blocklyWs?: unknown }).__blocklyWs = ws // test/hata ayıklama için
         const emit = () => {
@@ -122,6 +136,7 @@ export function MurokoBlocks({ actuators, sensors, en, onChange, onPython }: Pro
           setPy(code); pyCb.current?.(code)
         }
         w.addChangeListener((e) => { if (!e.isUiEvent) emit() })
+        if (exRef.current) Blockly.serialization.workspaces.load(exRef.current as object, w)
         ro = new ResizeObserver(() => Blockly.svgResize(w)); ro.observe(host.current)
       } catch { if (!dead) setFailed(true) }
     })()
@@ -129,11 +144,23 @@ export function MurokoBlocks({ actuators, sensors, en, onChange, onPython }: Pro
   }, [en, lang, hasActs])
 
   // Sahne değişince eski motor adlı bloklar anlamsızlaşır: çalışma alanını temizle
-  useEffect(() => { wsRef.current?.clear() }, [actuators, sensors])
+  // Sahne (motor ve sensör listesi) değişince çalışma alanı temizlenir ve o sahnenin örneği yüklenir
+  const loadExample = useCallback(() => {
+    const w = wsRef.current, Bk = blocklyRef.current
+    if (!w || !Bk) return
+    w.clear()
+    if (exRef.current) Bk.serialization.workspaces.load(exRef.current as object, w)
+  }, [])
+  useEffect(() => { loadExample() }, [actuators, sensors, loadExample])
 
   if (actuators.length === 0) return <p className="mj-hint" data-testid="mujoco-nomotor">{T[lang].noMotor}</p>
   return (
     <div className="mj-blocks">
+      <div className="mj-blocks-bar">
+        <span className="mj-blocks-hint">{T[lang].hint}</span>
+        <button type="button" className="mj-mini" onClick={loadExample} data-testid="mujoco-example">{T[lang].exampleBtn}</button>
+        <button type="button" className="mj-mini" onClick={() => wsRef.current?.clear()} data-testid="mujoco-clear">{T[lang].clearBtn}</button>
+      </div>
       <div ref={host} className="mj-blocks-ws" data-testid="mujoco-blocks" />
       {failed && <p className="mj-err" role="alert">{en ? 'The block editor could not load.' : 'Blok editörü yüklenemedi.'}</p>}
       <details className="mj-py" open>
