@@ -132,7 +132,7 @@ export const shell = {
     drone: 'Parça, simülasyon, yazılım: 10 ünite',
     llm: 'RAG, ajan, değerlendirme, güvenlik: 10 ünite',
     robotArm: 'Sanal 6 eksenli kol, kinematik, ArmScript: 10 ünite',
-    mujoco: 'Tarayıcıda gerçek fizik motoru: sarkaç, kol, çarpışma, XML ile model',
+    mujoco: 'Tarayıcıda gerçek robotlar: Panda kol, dört bacaklı, robot el; blok ve Python',
     programs: 'Dersleri bir yola bağlayan 6 program',
     roadmap: '10 hedef, hangi dersleri sırayla bitireceğin',
     rpi: 'Linux, GPIO, OpenCV, ROS 2: 10 ünite',

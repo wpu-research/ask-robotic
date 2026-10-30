@@ -27,8 +27,8 @@ export default async function MujocoPage() {
         <h2>{L('Burada ne öğrenirsin?', 'What will you learn here?')}</h2>
         <ul>
           <li>{L('Bir robotun gövde, eklem ve motor ağacı olarak tarif edilmesi (MJCF).', 'Describing a robot as a tree of bodies, joints and actuators (MJCF).')}</li>
-          <li>{L('Konum motoru ile kuvvet motoru arasındaki fark: kol ve arabalı sarkaç.', 'Position vs. force actuators: the arm and the cart-pole.')}</li>
-          <li>{L('Kaos, sürtünme ve çarpışma: küçük bir değişiklik neden her şeyi değiştirir?', 'Chaos, friction and contact: why a tiny change alters everything.')}</li>
+          <li>{L('Gerçek robotların (kol, dört bacaklı, el) eklem ve motor yapısı; sensörlerden okuyup motoru sürmek.', 'The joint and motor structure of real robots (arm, quadruped, hand); reading sensors to drive the motors.')}</li>
+          <li>{L('Hedefleri tamamlamak için bloklarla ya da Python ile geri beslemeli (sensörden okuyup tepki veren) kontrol yazmak.', 'Writing feedback control (read a sensor, react) with blocks or Python to complete the goals.')}</li>
           <li>{L('Simülasyonda denenen kontrolün gerçek robota taşınması (sim-to-real) fikri.', 'The sim-to-real idea: test control in simulation before real hardware.')}</li>
         </ul>
       </section>

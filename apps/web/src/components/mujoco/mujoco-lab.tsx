@@ -145,11 +145,11 @@ function syncMeshes(sim: Sim) {
   }
 }
 
-/** Açılışta hafif bir sahne: gerçek robot modelleri (birkaç MB) seçilince iner. */
+/** Açılışta ilk robot (model paketi birkaç MB, bir kez iner). */
 /** İngilizce arayüzde model/sensör/motor adları da İngilizce (lib/mujoco/names-en.ts). */
 const EN_SCENES = MJ_SCENES.map(localizeScene)
 
-const DEFAULT_SCENE = MJ_SCENES.some((x) => x.id === 'kol') ? 'kol' : MJ_SCENES[0].id
+const DEFAULT_SCENE = MJ_SCENES[0].id
 
 const GROUP_LABEL = {
   gercek: { tr: 'Gerçek robot modelleri (MuJoCo Menagerie)', en: 'Real robot models (MuJoCo Menagerie)' },
@@ -381,7 +381,7 @@ export function MujocoLab() {
   return (
     <section className="mj" data-testid="mujoco-lab">
       <div className="mj-picker">
-        {(['gercek', 'robot', 'fizik'] as const).map((k) => (
+        {(['gercek', 'robot', 'fizik'] as const).filter((k) => SCENES.some((x) => x.kind === k)).map((k) => (
           <div key={k} className="mj-group">
             <span className="mj-group-label">{GROUP_LABEL[k][en ? 'en' : 'tr']}</span>
             <div className="mj-picks" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>{SCENES.filter((s) => s.kind === k).map(pickCard)}</div>

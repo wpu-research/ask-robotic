@@ -132,7 +132,7 @@ export const shell: typeof Tr = {
     drone: 'Parts, simulation, software: 10 units',
     llm: 'RAG, agents, evaluation, safety: 10 units',
     robotArm: 'Virtual 6-axis arm, kinematics, ArmScript: 10 units',
-    mujoco: 'A real physics engine in the browser: pendulum, arm, collisions, edit the model in XML',
+    mujoco: 'Real robots in the browser: Panda arm, quadruped, robot hand; blocks and Python',
     programs: '6 programmes that chain courses into a path',
     roadmap: '10 goals and the courses to finish, in order',
     rpi: 'Linux, GPIO, OpenCV, ROS 2: 10 units',
