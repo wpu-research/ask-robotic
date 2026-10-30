@@ -22,7 +22,7 @@ export interface MjScene {
   /** 'gercek': MuJoCo Menagerie'den gerçek robot modeli (mesh); 'robot': basit robot; 'fizik': yalnız fizik deneyi. */
   kind: 'gercek' | 'robot' | 'fizik'
   /** Gerçek model paketi: public/mujoco/models/<pack>.pack.gz (tools/mujoco/pack.mjs). XML bu paketteki dosyalara `<include>` eder. */
-  pack?: 'panda' | 'go1' | 'shadow' | 'iiwa' | 'lite6' | 'so101' | 'crazyflie' | 'x2' | 'op3'
+  pack?: 'panda' | 'go1' | 'shadow' | 'iiwa' | 'lite6' | 'so101' | 'crazyflie' | 'x2' | 'op3' | 'spot' | 'anymal'
   /** Model kaynağı ve lisansı (ekranda gösterilir). */
   credit?: { name: string; license: string; url: string }
   tr: Text
@@ -603,7 +603,128 @@ await wait(2)
   },
 ]
 
-export const MJ_SCENES: MjScene[] = [...MJ_MODEL_SCENES, ...MODEL_SCENES_2, ...MODEL_SCENES_3]
+const MODEL_SCENES_4: MjScene[] = [
+  {
+    id: 'boston-spot',
+    icon: '🐕',
+    kind: 'gercek',
+    pack: 'spot',
+    credit: { name: 'Boston Dynamics Spot', license: 'BSD-3-Clause', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/boston_dynamics_spot' },
+    tr: { title: 'Boston Dynamics Spot', desc: 'Fabrikalarda ve inşaat sahalarında devriye gezen ünlü dört bacaklı robot. Her bacakta kalça ve diz motoru var; çömel ve yüksel.', hint: 'Her bacak: _hx (yana), _hy (kalça), _kn (diz). fl/fr ön, hl/hr arka bacaklardır. "govde.z" gövdenin yüksekliğidir (metre).' },
+    en: { title: 'Boston Dynamics Spot', desc: 'The famous four-legged robot that patrols factories and construction sites. Each leg has hip and knee motors; crouch and rise.', hint: 'Each leg: _hx (sideways), _hy (hip), _kn (knee). fl/fr are front, hl/hr hind legs. "govde.z" is the body height (metres).' },
+    cam: [1.6, -1.8, 0.8], look: [0, 0, 0.35],
+    xml: `<mujoco model="boston-spot-sahne">
+  <include file="spot.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <framepos name="govde" objtype="body" objname="body"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('comel', 'Çömel: gövdeyi 20–30 cm arasına indir ve 2 sn tut', 'Crouch: lower the body to 20–30 cm and hold 2 s', 'govde.z', 'between', 0.2, 2, 0.3),
+      goal('yuksel', 'Yüksel: gövdeyi 55 cm üstüne çıkar ve 2 sn tut', 'Stand tall: raise the body above 55 cm and hold 2 s', 'govde.z', 'ge', 0.55, 2),
+    ],
+    python: {
+      tr: `# Spot'u çömelt, sonra yükselt: dört bacağa aynı açıları ver.
+# Duruşu ani değiştirme, robot devrilir: basamak basamak geç.
+from muroko import *
+
+bacaklar = ["fl", "fr", "hl", "hr"]
+
+def durus(kalca, diz):
+    for b in bacaklar:
+        motor(b + "_hy", kalca)
+        motor(b + "_kn", diz)
+
+for kalca, diz, sure in [(1.2, -2.1, 1.5), (1.4, -2.4, 3), (1.04, -1.8, 1.5), (0.9, -1.5, 1.5), (0.8, -1.3, 1.5), (0.7, -1.1, 3)]:
+    durus(kalca, diz)
+    await bekle(sure)
+`,
+      en: `# Crouch Spot, then raise it: give all four legs the same angles.
+# Do not change the stance abruptly or the robot falls: go step by step.
+from muroko import *
+
+legs = ["fl", "fr", "hl", "hr"]
+
+def stance(hip, knee):
+    for leg in legs:
+        motor(leg + "_hy", hip)
+        motor(leg + "_kn", knee)
+
+for hip, knee, secs in [(1.2, -2.1, 1.5), (1.4, -2.4, 3), (1.04, -1.8, 1.5), (0.9, -1.5, 1.5), (0.8, -1.3, 1.5), (0.7, -1.1, 3)]:
+    stance(hip, knee)
+    await wait(secs)
+`,
+    },
+    blocks: example(seq(set('fl_hy', 1.2), set('fl_kn', -2.1), set('fr_hy', 1.2), set('fr_kn', -2.1), set('hl_hy', 1.2), set('hl_kn', -2.1), set('hr_hy', 1.2), set('hr_kn', -2.1), wait(1.5), set('fl_hy', 1.4), set('fl_kn', -2.4), set('fr_hy', 1.4), set('fr_kn', -2.4), set('hl_hy', 1.4), set('hl_kn', -2.4), set('hr_hy', 1.4), set('hr_kn', -2.4), wait(3), set('fl_hy', 1.04), set('fl_kn', -1.8), set('fr_hy', 1.04), set('fr_kn', -1.8), set('hl_hy', 1.04), set('hl_kn', -1.8), set('hr_hy', 1.04), set('hr_kn', -1.8), wait(1.5), set('fl_hy', 0.9), set('fl_kn', -1.5), set('fr_hy', 0.9), set('fr_kn', -1.5), set('hl_hy', 0.9), set('hl_kn', -1.5), set('hr_hy', 0.9), set('hr_kn', -1.5), wait(1.5), set('fl_hy', 0.8), set('fl_kn', -1.3), set('fr_hy', 0.8), set('fr_kn', -1.3), set('hl_hy', 0.8), set('hl_kn', -1.3), set('hr_hy', 0.8), set('hr_kn', -1.3), wait(1.5), set('fl_hy', 0.7), set('fl_kn', -1.1), set('fr_hy', 0.7), set('fr_kn', -1.1), set('hl_hy', 0.7), set('hl_kn', -1.1), set('hr_hy', 0.7), set('hr_kn', -1.1), wait(3))),
+  },
+  {
+    id: 'anymal-c',
+    icon: '🐕',
+    kind: 'gercek',
+    pack: 'anymal',
+    credit: { name: 'ANYbotics ANYmal C', license: 'BSD-3-Clause', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/anybotics_anymal_c' },
+    tr: { title: 'ANYmal C', desc: 'ANYbotics firmasının petrol platformlarında ve madenlerde çalışan, yük taşıyan büyük dört bacaklı robotu. Bacaklarını bükerek çömel.', hint: 'Her bacak: _HAA (yana), _HFE (kalça), _KFE (diz). LF/RF ön, LH/RH arka bacaklardır. Önde ve arkada bükme yönü terstir. "govde.z" gövdenin yüksekliğidir (metre).' },
+    en: { title: 'ANYmal C', desc: 'The large load-carrying four-legged robot that ANYbotics deploys on oil rigs and in mines. Bend its legs to crouch.', hint: 'Each leg: _HAA (sideways), _HFE (hip), _KFE (knee). LF/RF are front, LH/RH hind legs. Front and hind legs bend in opposite directions. "govde.z" is the body height (metres).' },
+    cam: [1.6, -1.8, 0.8], look: [0, 0, 0.35],
+    xml: `<mujoco model="anymal-c-sahne">
+  <include file="anymal_c.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <framepos name="govde" objtype="body" objname="base"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('comel', 'Çömel: gövdeyi 30 cm altına indir ve 2 sn tut', 'Crouch: lower the body below 30 cm and hold 2 s', 'govde.z', 'le', 0.3, 2),
+      goal('derin', 'Derin çömel: gövdeyi 23 cm altına indir ve 2 sn tut', 'Deep crouch: lower the body below 23 cm and hold 2 s', 'govde.z', 'le', 0.23, 2),
+    ],
+    python: {
+      tr: `# ANYmal'i çömelt: ön bacaklar bir yöne, arka bacaklar ters yöne bükülür.
+# Duruşu ani değiştirme, robot devrilir: basamak basamak geç.
+from muroko import *
+
+def comel(a):
+    for b in ["LF", "RF"]:
+        motor(b + "_HFE", a)
+        motor(b + "_KFE", -2 * a)
+    for b in ["LH", "RH"]:
+        motor(b + "_HFE", -a)
+        motor(b + "_KFE", 2 * a)
+
+for a, sure in [(0.5, 1.5), (0.7, 1.5), (0.9, 3), (1.1, 3)]:
+    comel(a)
+    await bekle(sure)
+`,
+      en: `# Crouch ANYmal: the front legs bend one way, the hind legs the opposite way.
+# Do not change the stance abruptly or the robot falls: go step by step.
+from muroko import *
+
+def crouch(a):
+    for leg in ["LF", "RF"]:
+        motor(leg + "_HFE", a)
+        motor(leg + "_KFE", -2 * a)
+    for leg in ["LH", "RH"]:
+        motor(leg + "_HFE", -a)
+        motor(leg + "_KFE", 2 * a)
+
+for a, secs in [(0.5, 1.5), (0.7, 1.5), (0.9, 3), (1.1, 3)]:
+    crouch(a)
+    await wait(secs)
+`,
+    },
+    blocks: example(seq(set('LF_HFE', 0.5), set('LF_KFE', -1.0), set('RF_HFE', 0.5), set('RF_KFE', -1.0), set('LH_HFE', -0.5), set('LH_KFE', 1.0), set('RH_HFE', -0.5), set('RH_KFE', 1.0), wait(1.5), set('LF_HFE', 0.7), set('LF_KFE', -1.4), set('RF_HFE', 0.7), set('RF_KFE', -1.4), set('LH_HFE', -0.7), set('LH_KFE', 1.4), set('RH_HFE', -0.7), set('RH_KFE', 1.4), wait(1.5), set('LF_HFE', 0.9), set('LF_KFE', -1.8), set('RF_HFE', 0.9), set('RF_KFE', -1.8), set('LH_HFE', -0.9), set('LH_KFE', 1.8), set('RH_HFE', -0.9), set('RH_KFE', 1.8), wait(3), set('LF_HFE', 1.1), set('LF_KFE', -2.2), set('RF_HFE', 1.1), set('RF_KFE', -2.2), set('LH_HFE', -1.1), set('LH_KFE', 2.2), set('RH_HFE', -1.1), set('RH_KFE', 2.2), wait(3))),
+  },
+]
+
+export const MJ_SCENES: MjScene[] = [...MJ_MODEL_SCENES, ...MODEL_SCENES_2, ...MODEL_SCENES_3, ...MODEL_SCENES_4]
 
 export const MJ_REPO = 'https://github.com/google-deepmind/mujoco'
 export const MJ_WASM_REPO = 'https://github.com/google-deepmind/mujoco/tree/main/wasm'

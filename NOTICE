@@ -30,4 +30,6 @@ Bu proje üçüncü taraf yazılımlar kullanır ve bir eğitim yaklaşımından
    - Bitcraze Crazyflie 2 (bitcraze_crazyflie_2): MIT License.
    - Skydio X2 (skydio_x2): Apache License 2.0.
    - ROBOTIS OP3 (robotis_op3): Apache License 2.0.
+   - Boston Dynamics Spot (boston_dynamics_spot): BSD 3-Clause. Copyright (c) 2021, Clearpath Robotics Inc.
+   - ANYbotics ANYmal C (anybotics_anymal_c): BSD 3-Clause. Copyright 2020, ANYbotics AG.
    Modeller yalnız eğitim simülasyonunda kullanılır; üreticiler bu projeyi onaylamaz ya da desteklemez.

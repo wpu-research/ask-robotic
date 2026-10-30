@@ -21,6 +21,8 @@ const MODELS = {
   so101: { dir: 'robotstudio_so101', xml: ['so101.xml'], simplify: true },
   crazyflie: { dir: 'bitcraze_crazyflie_2', xml: ['cf2.xml'] },
   x2: { dir: 'skydio_x2', xml: ['x2.xml'] },
+  spot: { dir: 'boston_dynamics_spot', xml: ['spot.xml'], simplify: true },
+  anymal: { dir: 'anybotics_anymal_c', xml: ['anymal_c.xml'], simplify: true },
   // OP3'ün STL'leri çok ayrıntılı (45 MB): sadeleştirilir
   op3: { dir: 'robotis_op3', xml: ['op3.xml'], simplify: true },
 }
@@ -59,12 +61,34 @@ function simplifyStl(b, cells = 180) {
   return out
 }
 
+// OBJ: yinelenen köşeler birleşir, normal/doku koordinatları atılır (MuJoCo normalleri kendi hesaplar), ince ızgarada kümelenir.
+function simplifyObj(b, cells = 300) {
+  if (b.length < 200_000) return b
+  const vs = [], faces = []
+  for (const line of b.toString('latin1').split('\n')) {
+    if (line.startsWith('v ')) vs.push(line.trim().split(/\s+/).slice(1, 4).map(Number))
+    else if (line.startsWith('f ')) faces.push(line.trim().split(/\s+/).slice(1).map((t) => parseInt(t, 10) - 1))
+  }
+  if (!vs.length || !faces.length) return b
+  const lo = [0, 1, 2].map((c) => Math.min(...vs.map((v) => v[c]))), hi = [0, 1, 2].map((c) => Math.max(...vs.map((v) => v[c])))
+  const cell = Math.max(hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]) / cells
+  const cellOf = vs.map((v) => v.map((x, c) => Math.round((x - lo[c]) / cell)).join(','))
+  const id = new Map(), pos = []
+  const idx = (i) => { const k = cellOf[i]; if (!id.has(k)) { id.set(k, pos.length); pos.push(vs[i]) } return id.get(k) }
+  const out = []
+  for (const f of faces) for (let i = 1; i + 1 < f.length; i++) { const t = [idx(f[0]), idx(f[i]), idx(f[i + 1])]; if (t[0] !== t[1] && t[1] !== t[2] && t[0] !== t[2]) out.push(t) }
+  return Buffer.from(pos.map((v) => `v ${v.map((x) => +x.toFixed(6)).join(' ')}`).join('\n') + '\n' + out.map((t) => `f ${t.map((x) => x + 1).join(' ')}`).join('\n') + '\n')
+}
+
+// Tarayıcı görünümü doku kullanmaz (renk `rgba` ile gelir); büyük PNG dokular 1×1 PNG ile değiştirilir, MuJoCo yine derler.
+const PIXEL_PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==', 'base64')
+
 const only = process.argv[3]?.split(',')
 for (const [id, m] of Object.entries(MODELS)) {
   if (only && !only.includes(id)) continue
   const root = path.join(src, m.dir)
   const files = [...m.xml.filter((f) => fs.existsSync(path.join(root, f))), ...(fs.existsSync(path.join(root, 'assets')) ? walk(path.join(root, 'assets'), root) : []), 'LICENSE']
-  const bufs = files.map((f) => { let b = fs.readFileSync(path.join(root, f)); if (f.endsWith('.stl')) b = m.simplify ? simplifyStl(b) : b; const fix = m.patch?.[f]; return fix ? Buffer.from(fix(b.toString('utf8'))) : b })
+  const bufs = files.map((f) => { let b = fs.readFileSync(path.join(root, f)); if (f.endsWith('.stl')) b = m.simplify ? simplifyStl(b) : b; else if (m.simplify && f.endsWith('.obj')) b = simplifyObj(b); else if (m.simplify && f.endsWith('.png') && b.length > 100_000) b = PIXEL_PNG; const fix = m.patch?.[f]; return fix ? Buffer.from(fix(b.toString('utf8'))) : b })
   const header = Buffer.from(JSON.stringify({ files: files.map((p, i) => ({ p, n: bufs[i].length })) }))
   const len = Buffer.alloc(4); len.writeUInt32LE(header.length)
   const gz = zlib.gzipSync(Buffer.concat([len, header, ...bufs]), { level: 9 })

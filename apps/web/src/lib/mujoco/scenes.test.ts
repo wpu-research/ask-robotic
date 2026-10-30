@@ -160,6 +160,29 @@ describe('MuRoKo sahneleri', () => {
     r.done()
   })
 
+  it('Boston Dynamics Spot: şablon çömelir ve yükselir, ayakta kalır', () => {
+    const r = open('boston-spot')
+    const t = new GoalTracker(r.sc.goals)
+    for (const [hy, kn, sec] of [[1.2, -2.1, 1.5], [1.4, -2.4, 3], [1.04, -1.8, 1.5], [0.9, -1.5, 1.5], [0.8, -1.3, 1.5], [0.7, -1.1, 3]]) {
+      for (const l of ['fl', 'fr', 'hl', 'hr']) { r.motor(`${l}_hy`, hy); r.motor(`${l}_kn`, kn) }
+      for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(per(r)); t.update(0.01, r.sensors()) }
+    }
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
+  it('ANYmal C: şablon çömelir, devrilmez', () => {
+    const r = open('anymal-c')
+    const t = new GoalTracker(r.sc.goals)
+    for (const [a, sec] of [[0.5, 1.5], [0.7, 1.5], [0.9, 3], [1.1, 3]]) {
+      for (const l of ['LF', 'RF']) { r.motor(`${l}_HFE`, a); r.motor(`${l}_KFE`, -2 * a) }
+      for (const l of ['LH', 'RH']) { r.motor(`${l}_HFE`, -a); r.motor(`${l}_KFE`, 2 * a) }
+      for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(per(r)); t.update(0.01, r.sensors()) }
+    }
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
   it('Unitree Go1: şablon çömelir ve yükselir, ayakta kalır', () => {
     const r = open('unitree-go1')
     const t = new GoalTracker(r.sc.goals)
