@@ -9,6 +9,8 @@ import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { SRC } from '../sim/lessons.mjs'
 import { validateConcepts, validateQuiz } from './ek.mjs'
+import { makeLocalizer, DICT } from './code-localize.mjs'
+import { localizeCode, segments } from './code-i18n.mjs'
 
 const pad = (n) => String(n).padStart(2, '0')
 const TR_CHARS = /[çğıöşüÇĞİÖŞÜ]/
@@ -43,12 +45,22 @@ export function parseLessonEn(text, file) {
 
 /** Dil etiketli bloklar (```cpp, ```python…) program kodudur: birebir aynı kalır. Etiketsiz ve ```text/```md bloklar (formül, şablon, çıktı örneği) çevrilebilir. */
 const tagged = (block) => /^```(?!(?:text|txt|md|markdown|plaintext)\b)[A-Za-z0-9+#-]+/.test(block)
+/** Yorumlar çıkarılmış kod (tanımlayıcılar + string'ler): yerelleştirme farkını görmezden gelmek için. */
+const bare = (block) => segments(block, /^```(?:python|py)\b/.test(block) ? 'py' : 'c').filter((g) => g.t === 'code' || g.t === 'str').map((g) => g.s).join('')
+/** İngilizce blok, Türkçe bloğun kendisi ya da yerelleştirilmiş hâli mi: yorumlar yok sayılır; adlar ya hiç değişmemiş ya da sözlükle değişmiş olmalı. */
+export function sameOrLocalized(trBlock, enBlock) {
+  if (trBlock === enBlock) return true
+  const lang = /^```(?:python|py)\b/.test(trBlock) ? 'py' : 'c'
+  const en = bare(enBlock)
+  return en === bare(trBlock) || en === bare(localizeCode(trBlock, DICT, lang, { rename: true }))
+}
 function sameCode(tr, en, where) {
   const a = codeBlocks(tr), b = codeBlocks(en)
   if (a.length !== b.length) throw new Error(`${where}: ${a.length} kod bloğu olmalı (${b.length} var)`)
   a.forEach((c, i) => {
     if (c.split('\n')[0] !== b[i].split('\n')[0]) throw new Error(`${where}: ${i + 1}. kod bloğunun dil etiketi aynı olmalı`)
-    if (tagged(c) && c !== b[i]) throw new Error(`${where}: ${i + 1}. kod bloğu (${c.split('\n')[0]}) Türkçe sürümle birebir aynı olmalı`)
+    // Kaynak İngilizce dosyada kod Türkçeyle birebir aynıdır; derleme çıktısında yerelleştirilmiş olabilir (aynı kod, çevrilmiş ad ve yorum).
+    if (tagged(c) && !sameOrLocalized(c, b[i])) throw new Error(`${where}: ${i + 1}. kod bloğu (${c.split('\n')[0]}) Türkçe sürümle birebir aynı olmalı`)
   })
 }
 function noTurkish(text, where) {
@@ -109,7 +121,17 @@ export function loadLessonEn(moduleDir, weekDir, number, tr, skillIds) {
       out.quiz = q
     }
   }
-  return out
+  return localizeLesson(out)
+}
+
+/** Ders çıktısındaki program kodunu (blok ve satır içi) İngilizceye çevirir: tanımlayıcılar + yorumlar. Kaynak dosyalar Türkçeyle birebir aynı kalır. */
+function localizeLesson(out) {
+  const texts = []
+  const collect = (o) => { if (typeof o === 'string') texts.push(o); else if (Array.isArray(o)) o.forEach(collect); else if (o && typeof o === 'object') Object.values(o).forEach(collect) }
+  collect(out)
+  const L = makeLocalizer(texts)
+  const map = (o) => (typeof o === 'string' ? L.md(o) : Array.isArray(o) ? o.map(map) : o && typeof o === 'object' ? Object.fromEntries(Object.entries(o).map(([k, v]) => [k, map(v)])) : o)
+  return map(out)
 }
 
 export function loadWeekGuideEn(moduleDir, weekDir, trGuide) {
@@ -120,5 +142,5 @@ export function loadWeekGuideEn(moduleDir, weekDir, trGuide) {
   if (!t) throw new Error(`${where} boş`)
   if (trGuide) sameCode(trGuide, t, where)
   noTurkish(t, where)
-  return t
+  return makeLocalizer([t]).md(t)
 }

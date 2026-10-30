@@ -18,6 +18,8 @@ import { useSceneText } from './scene-text'
 import { dec, percent } from '@/lib/lab/text'
 import type { MessageKey } from '@/i18n'
 import { useLocale, useT } from '@/i18n/client'
+import { canonicalCode, localizeCode } from '@/lib/code-i18n'
+import { ARENA_CODE_EN } from '@/lib/arena/code-en'
 
 export interface ArenaEditorProps {
   scene: ArenaScene
@@ -58,8 +60,12 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
   const free = !!scenes?.length
   const [sceneId, setSceneId] = useState(sceneProp.id)
   const scene = useMemo(() => (free ? scenes!.find((s) => s.id === sceneId) ?? sceneProp : sceneProp), [free, scenes, sceneId, sceneProp])
-  const [codes, setCodes] = useState<Record<string, string>>(() => ({ ...(starters ?? {}), [sceneProp.id]: starters?.[sceneProp.id] ?? initialCode }))
-  const code = codes[scene.id] ?? starters?.[scene.id] ?? initialCode
+  // İngilizce arayüzde örnek kodun değişken adları ve yorumları İngilizce gelir (lib/code-i18n.ts). Hedef denetimleri kodun kanonik (Türkçe) hâline bakar.
+  const en = locale === 'en'
+  const loc = useCallback((c: string) => (en ? localizeCode(c, ARENA_CODE_EN) : c), [en])
+  const canon = useCallback((c: string) => (en ? canonicalCode(c, ARENA_CODE_EN) : c), [en])
+  const [codes, setCodes] = useState<Record<string, string>>(() => ({ ...Object.fromEntries(Object.entries(starters ?? {}).map(([k, v]) => [k, loc(v)])), [sceneProp.id]: loc(starters?.[sceneProp.id] ?? initialCode) }))
+  const code = codes[scene.id] ?? loc(starters?.[scene.id] ?? initialCode)
   const setCode = useCallback((v: string) => setCodes((c) => ({ ...c, [scene.id]: v })), [scene.id])
 
   const tracker = useMemo(() => new GoalTracker(goals ?? []), [goals])
@@ -126,9 +132,9 @@ function ArenaEditorBase({ scene: sceneProp, scenes, starters, initialCode, goal
   const evalGoals = useCallback(() => {
     if (!goals?.length) return
     const started = rtRef.current !== null && !staleRef.current
-    const res = tracker.evaluate({ snap: snapRef.current, started, code: codeRef.current, scene: sceneRef.current })
+    const res = tracker.evaluate({ snap: snapRef.current, started, code: canon(codeRef.current), scene: sceneRef.current })
     setGoalStatus((prev) => (prev.length === res.length && prev.every((p, i) => p.done === res[i].done) ? prev : res))
-  }, [goals, tracker])
+  }, [goals, tracker, canon])
   useEffect(() => { // kod değişince: eski çalışmanın sonucu artık geçerli değil
     if (rtRef.current) { setStale(true); staleRef.current = true }
     tracker.reset()

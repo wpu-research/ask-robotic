@@ -14,6 +14,7 @@ import { GoalTracker } from '@/lib/mujoco/goals'
 import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 import { unpack, writeToFs } from '@/lib/mujoco/pack'
+import { localizeScene } from '@/lib/mujoco/names-en'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Mj = any
@@ -145,6 +146,9 @@ function syncMeshes(sim: Sim) {
 }
 
 /** Açılışta hafif bir sahne: gerçek robot modelleri (birkaç MB) seçilince iner. */
+/** İngilizce arayüzde model/sensör/motor adları da İngilizce (lib/mujoco/names-en.ts). */
+const EN_SCENES = MJ_SCENES.map(localizeScene)
+
 const DEFAULT_SCENE = MJ_SCENES.some((x) => x.id === 'kol') ? 'kol' : MJ_SCENES[0].id
 
 const GROUP_LABEL = {
@@ -174,7 +178,8 @@ export function MujocoLab() {
   const pyBridge = useRef<PyBridge | null>(null)
 
   const [sceneId, setSceneId] = useState(DEFAULT_SCENE)
-  const scene: MjScene = MJ_SCENES.find((s) => s.id === sceneId) ?? MJ_SCENES[0]
+  const SCENES = en ? EN_SCENES : MJ_SCENES
+  const scene: MjScene = SCENES.find((s) => s.id === sceneId) ?? SCENES[0]
   const sceneRef = useRef(scene); sceneRef.current = scene
   const [xml, setXml] = useState(scene.xml)
   const [applied, setApplied] = useState(scene.xml)
@@ -331,7 +336,7 @@ export function MujocoLab() {
   }, [])
 
   const pick = (id: string) => {
-    const s = MJ_SCENES.find((x) => x.id === id)!
+    const s = SCENES.find((x) => x.id === id)!
     setSceneId(id); setXml(s.xml); setApplied(s.xml)
   }
   const toggle = () => { runRef.current = !runRef.current; setRunning(runRef.current) }
@@ -379,7 +384,7 @@ export function MujocoLab() {
         {(['gercek', 'robot', 'fizik'] as const).map((k) => (
           <div key={k} className="mj-group">
             <span className="mj-group-label">{GROUP_LABEL[k][en ? 'en' : 'tr']}</span>
-            <div className="mj-picks" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>{MJ_SCENES.filter((s) => s.kind === k).map(pickCard)}</div>
+            <div className="mj-picks" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>{SCENES.filter((s) => s.kind === k).map(pickCard)}</div>
           </div>
         ))}
       </div>

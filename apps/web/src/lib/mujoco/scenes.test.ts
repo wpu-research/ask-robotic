@@ -6,6 +6,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { MJ_SCENES } from './scenes'
 import { buildChannels, readAll, type Channel } from './sensors'
 import { GoalTracker } from './goals'
+import { localizeScene, NAMES_EN } from './names-en'
 import { unpack, writeToFs } from './pack'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -150,4 +151,42 @@ describe('MuRoKo sahneleri', () => {
     expect(t.allDone).toBe(true)
     r.done()
   }, 60_000)
+})
+
+describe('İngilizce adlar (localizeScene)', () => {
+  for (const base of MJ_SCENES) {
+    const sc = localizeScene(base)
+    it(`${sc.id}: İngilizce sahne derlenir; hedef kanalları, Python ve örnek blok adları modelde var`, () => {
+      const open2 = (x: typeof sc) => {
+        let path = '/m.xml'
+        if (x.pack) { open(x.id); path = `/models/${x.pack}/muroko_scene.xml` }  // paketi yükler
+        mj.FS.writeFile(path, x.xml)
+        const m = mj.MjModel.mj_loadXML(path)
+        const names: string[] = Array.from({ length: m.nsensor }, (_: unknown, i: number) => mj.mj_id2name(m, 20, i))
+        const chs = buildChannels(names, m.sensor_adr, m.sensor_dim, m.sensor_type).map((c) => c.name)
+        const acts: string[] = Array.from({ length: m.nu }, (_: unknown, i: number) => mj.mj_id2name(m, 19, i))
+        m.delete()
+        return { chs, acts }
+      }
+      const { chs, acts } = open2(sc)
+      for (const g of sc.goals) expect(chs, `${sc.id} hedef ${g.id}`).toContain(g.ch)
+      // Python şablonunda geçen motor/sensör adları (dize birleştirme ile kurulanlar hariç)
+      for (const m of sc.python.en.matchAll(/(motor|sensor)\(\s*"([^"]+)"\s*[,)]/g)) expect(m[1] === 'motor' ? acts : chs, `${sc.id} python ${m[0]}`).toContain(m[2])
+      const walk = (o: unknown): void => {
+        if (Array.isArray(o)) o.forEach(walk)
+        else if (o && typeof o === 'object') {
+          const b = o as { type?: string; fields?: Record<string, unknown> }
+          if (b.type === 'muroko_set' || b.type === 'muroko_calc') expect(acts, `${sc.id} blok motoru ${String(b.fields?.U)}`).toContain(String(b.fields?.U))
+          if (b.type === 'muroko_if' || b.type === 'muroko_calc') expect(chs, `${sc.id} blok sensörü ${String(b.fields?.S)}`).toContain(String(b.fields?.S))
+          Object.values(o).forEach(walk)
+        }
+      }
+      walk(sc.blocks)
+    })
+  }
+  it('adlar Türkçe harf içermez ve eşleme birebir', () => {
+    const vals = Object.values(NAMES_EN)
+    expect(new Set(vals).size).toBe(vals.length)
+    for (const base of MJ_SCENES) expect(localizeScene(base).xml).not.toMatch(/\b(omuz|dirsek|sasi|govde|kup|konum)\b/)
+  })
 })

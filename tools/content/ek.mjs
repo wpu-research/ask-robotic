@@ -1,6 +1,7 @@
 // Öğrenme platformu katmanları: ders ekleri (anlatım, kavram kartları, mini test), hafta rehberi ve parça ansiklopedisi.
 // build.mjs kullanır; kurallar docs/ogrenme-platformu-kapsam.md ve content-src/modul-3/YAZAR-REHBERI.md'de.
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { localizeSteps } from './code-localize.mjs'
 import { join } from 'node:path'
 import { SRC } from '../sim/lessons.mjs'
 
@@ -40,6 +41,7 @@ export function loadLessonExtras(moduleDir, weekDir, number, skillIds) {
     try { j = JSON.parse(readFileSync(stEn, 'utf8')) } catch (e) { throw new Error(`${where}.adimlar.en.json geçersiz JSON: ${e.message}`) }
     out.stepsEn = validateSteps(j, `${where}.adimlar.en.json`, skillIds)
     mirrorSteps(out.steps, out.stepsEn, `${where}.adimlar.en.json`)
+    out.stepsEn = localizeSteps(out.stepsEn) // kodun değişken adları ve yorumları İngilizce (kaynak Türkçeyle aynı kalır)
   }
   return out
 }

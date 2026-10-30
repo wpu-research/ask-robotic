@@ -2,6 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { CodeBlock } from '@/components/robotik/code-block'
+import { CODE_DICT_EN } from '@/lib/code-dict'
+import { localizeCode } from '@/lib/code-i18n'
 import { Icon } from '@/components/shell/icons'
 import { getLocale } from '@/i18n/server'
 import { partBySlug, partText, type EngPart } from '@/lib/muhendislik/catalog'
@@ -38,7 +40,7 @@ export default async function Proje({ params }: { params: Promise<{ slug: string
           <section aria-labelledby="pj-sc"><h2 id="pj-sc">{en ? 'Scenario' : 'Senaryo'}</h2><p>{t.scenario}</p></section>
           <section aria-labelledby="pj-ac"><h2 id="pj-ac">{en ? 'Acceptance criteria' : 'Kabul ölçütleri'}</h2><ul className="eng-list">{t.acceptance.map((a) => <li key={a}>{a}</li>)}</ul></section>
           <section aria-labelledby="pj-su"><h2 id="pj-su">{en ? 'Setting up the simulation' : 'Simülasyonu kurmak'}</h2><ol className="rb-steps">{t.setup.map((s) => <li key={s}>{s}</li>)}</ol></section>
-          <section aria-labelledby="pj-st"><h2 id="pj-st">{en ? 'Starter code' : 'Başlangıç kodu'}</h2><CodeBlock title={en ? p.starter.titleEn : p.starter.title} src={p.starter.src} lang={lang} /></section>
+          <section aria-labelledby="pj-st"><h2 id="pj-st">{en ? 'Starter code' : 'Başlangıç kodu'}</h2><CodeBlock title={en ? p.starter.titleEn : p.starter.title} src={en ? localizeCode(p.starter.src, CODE_DICT_EN, 'py') : p.starter.src} lang={lang} /></section>
           <section aria-labelledby="pj-ms">
             <h2 id="pj-ms">{en ? 'Milestones' : 'Ara teslimler'}</h2>
             <ol className="rb-milestones">

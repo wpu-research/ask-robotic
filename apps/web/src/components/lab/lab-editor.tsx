@@ -12,6 +12,8 @@ import { warningMeta, warningMessage, warningTitle } from '@/lib/lab/warnings'
 import { percent } from '@/lib/lab/text'
 import type { MessageKey } from '@/i18n'
 import { useLocale, useT } from '@/i18n/client'
+import { canonicalCode, localizeCode } from '@/lib/code-i18n'
+import { CODE_DICT_EN } from '@/lib/code-dict'
 import { StatsTracker } from '@/lib/lab/stats'
 import { analyze, createRuntime } from '@/lib/lab/runtime'
 import { isBuzzerMuted, setBuzzer, setBuzzerMuted, unlockAudio } from '@/lib/lab/sound'
@@ -55,7 +57,9 @@ export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PAR
   const pct = (n: number, max: number) => percent(t, locale, (n / max) * 100)
   const locked = useMemo(() => new Set(lockedPartIds ?? initial.parts.filter((p) => p.type === 'uno').map((p) => p.id)), [lockedPartIds, initial])
   const [circuit, setCircuit] = useState<Circuit>(initial)
-  const [code, setCode] = useState(initialCode)
+  // İngilizce arayüzde örnek kodun değişken adları ve yorumları İngilizce gelir; hedef denetimleri kodun kanonik (Türkçe) hâline bakar (lib/code-i18n.ts)
+  const en = locale === 'en'
+  const [code, setCode] = useState(() => (en ? localizeCode(initialCode, CODE_DICT_EN) : initialCode))
   const [selection, setSelection] = useState<Selection>(null)
   const [running, setRunning] = useState(false)
   const [, setFrame] = useState(0)
@@ -118,13 +122,13 @@ export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PAR
   const evalGoals = useCallback(() => {
     if (!goals?.length) return
     const a = analyze(circuitRef.current)
-    const res = evaluateLabGoals(goals, { circuit: circuitRef.current, analysis: a, lab: lab.current?.state ?? null, code: codeRef.current, stats: tracker.current.get() })
+    const res = evaluateLabGoals(goals, { circuit: circuitRef.current, analysis: a, lab: lab.current?.state ?? null, code: en ? canonicalCode(codeRef.current, CODE_DICT_EN) : codeRef.current, stats: tracker.current.get() })
     const out = res.map((r, i) => {
       if (goals[i].behavior) { if (r.done) behaviorDone.current.add(r.id); return { ...r, done: r.done || behaviorDone.current.has(r.id) } }
       return r
     })
     setGoalStatus((prev) => (prev.length === out.length && prev.every((p, i) => p.done === out[i].done) ? prev : out))
-  }, [goals])
+  }, [goals, en])
   // Devre/kod değişince davranış hedefleri sıfırlanır
   useEffect(() => { behaviorDone.current.clear() }, [circuit.wires, circuit.parts.length, code])
   useEffect(() => { evalGoals() }, [evalGoals, circuit, code, running])
