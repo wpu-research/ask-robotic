@@ -11,6 +11,7 @@ export const NAMES_EN: Record<string, string> = {
   nesne: 'object', isaret: 'index', orta: 'middle', yuzuk: 'ring', serce: 'little',
   // Kollar ve dronlar
   uc: 'tip', taban: 'base', omuz: 'shoulder', dirsek: 'elbow', konum: 'position', hiz: 'speed',
+  kol: 'arm',
   // anahtar kareler
   baslangic: 'start',
 }

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { unpack, writeToFs } from './pack'
+import { removeFromFs, unpack, writeToFs } from './pack'
 
 const make = (files: { p: string; d: string }[]) => {
   const bodies = files.map((f) => new TextEncoder().encode(f.d))
@@ -28,5 +28,24 @@ describe('pack', () => {
     writeToFs({ mkdir: (p) => dirs.push(p), writeFile: (p) => wrote.push(p) }, '/models/panda', unpack(make([{ p: 'panda.xml', d: '1' }, { p: 'assets/link0.obj', d: '2' }])))
     expect(dirs).toEqual(['/models', '/models/panda', '/models/panda/assets'])
     expect(wrote).toEqual(['/models/panda/panda.xml', '/models/panda/assets/link0.obj'])
+  })
+})
+
+describe('removeFromFs', () => {
+  it('klasörü alt klasörleriyle siler, olmayan klasörde hata vermez', () => {
+    // Sanal dosya sistemi: yol → dosya/klasör
+    const dirs = new Set<string>(['/m'])
+    const files = new Set<string>()
+    const fs = {
+      readdir: (p: string) => { if (!dirs.has(p)) throw new Error('yok'); return ['.', '..', ...[...dirs, ...files].filter((x) => x.startsWith(p + '/') && !x.slice(p.length + 1).includes('/')).map((x) => x.slice(p.length + 1))] },
+      stat: (p: string) => ({ mode: dirs.has(p) ? 1 : 0 }),
+      isDir: (m: number) => m === 1,
+      unlink: (p: string) => { files.delete(p) },
+      rmdir: (p: string) => { dirs.delete(p) },
+    }
+    dirs.add('/m/assets'); files.add('/m/a.xml'); files.add('/m/assets/x.stl')
+    removeFromFs(fs, '/m')
+    expect(dirs.size + files.size).toBe(0)
+    expect(() => removeFromFs(fs, '/yok')).not.toThrow()
   })
 })

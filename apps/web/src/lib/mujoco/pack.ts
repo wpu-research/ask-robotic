@@ -35,3 +35,18 @@ export function writeToFs(fs: { mkdir: (p: string) => void; writeFile: (p: strin
     fs.writeFile(full, f.bytes)
   }
 }
+
+type RmFs = { readdir: (p: string) => string[]; unlink: (p: string) => void; rmdir: (p: string) => void; isDir: (m: number) => boolean; stat: (p: string) => { mode: number } }
+
+/** Bir paketin açıldığı klasörü siler (wasm belleği büyük modellerle dolmasın). Klasör yoksa sessizce geçer. */
+export function removeFromFs(fs: RmFs, root: string) {
+  let names: string[]
+  try { names = fs.readdir(root) } catch { return }
+  for (const n of names) {
+    if (n === '.' || n === '..') continue
+    const full = `${root}/${n}`
+    if (fs.isDir(fs.stat(full).mode)) removeFromFs(fs, full)
+    else fs.unlink(full)
+  }
+  fs.rmdir(root)
+}

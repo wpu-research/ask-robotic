@@ -13,7 +13,7 @@ import { buildChannels, readAll, type Channel } from '@/lib/mujoco/sensors'
 import { GoalTracker } from '@/lib/mujoco/goals'
 import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
-import { unpack, writeToFs } from '@/lib/mujoco/pack'
+import { removeFromFs, unpack, writeToFs } from '@/lib/mujoco/pack'
 import { localizeScene } from '@/lib/mujoco/names-en'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -37,6 +37,10 @@ const OBJ_KEY = 24
 const packs = new Map<string, Promise<void>>()
 /** Gerçek robot modeli paketi (gzip, tek dosya) bir kez indirilir ve sanal dosya sistemine açılır. */
 function ensurePack(mj: Mj, id: string): Promise<void> {
+  // Başka robotun paketi sanal dosya sisteminde yer tutmasın: yüklü model derlenmiştir, dosyalar artık gerekmez.
+  for (const other of [...packs.keys()]) {
+    if (other !== id) { removeFromFs(mj.FS, `/models/${other}`); packs.delete(other) }
+  }
   let p = packs.get(id)
   if (!p) {
     p = (async () => {

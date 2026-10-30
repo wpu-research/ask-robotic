@@ -7,7 +7,7 @@ import { MJ_SCENES } from './scenes'
 import { buildChannels, readAll, type Channel } from './sensors'
 import { GoalTracker } from './goals'
 import { localizeScene, NAMES_EN } from './names-en'
-import { unpack, writeToFs } from './pack'
+import { removeFromFs, unpack, writeToFs } from './pack'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 let mj: any
@@ -22,6 +22,7 @@ function open(id: string) {
   let path = '/m.xml'
   if (sc.pack) {
     if (!packed.has(sc.pack)) {
+      for (const o of [...packed]) { removeFromFs(mj.FS, `/models/${o}`); packed.delete(o) }
       const raw = zlib.gunzipSync(fs.readFileSync(new URL(`../../../public/mujoco/models/${sc.pack}.pack.gz`, import.meta.url)))
       writeToFs(mj.FS, `/models/${sc.pack}`, unpack(new Uint8Array(raw)))
       packed.add(sc.pack)
@@ -142,6 +143,23 @@ describe('MuRoKo sahneleri', () => {
     r.done()
   })
 
+  it('ROBOTIS OP3: şablon çömelir, kollarını kaldırır, devrilmez', () => {
+    const r = open('robotis-op3')
+    const t = new GoalTracker(r.sc.goals)
+    const tick = (sec: number) => { for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(per(r)); t.update(0.01, r.sensors()) } }
+    tick(1)
+    for (const a of [0.2, 0.4, 0.6, 0.8, 1.0]) {
+      r.motor('l_hip_pitch_act', -a); r.motor('r_hip_pitch_act', a); r.motor('l_knee_act', 2 * a); r.motor('r_knee_act', -2 * a); r.motor('l_ank_pitch_act', a); r.motor('r_ank_pitch_act', -a)
+      tick(1)
+    }
+    tick(2)
+    r.motor('l_sho_pitch_act', -1.5); r.motor('r_sho_pitch_act', 1.5)
+    tick(2)
+    expect(r.sensors()['govde.z']).toBeGreaterThan(0.2)
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
   it('Unitree Go1: şablon çömelir ve yükselir, ayakta kalır', () => {
     const r = open('unitree-go1')
     const t = new GoalTracker(r.sc.goals)
@@ -170,7 +188,7 @@ describe('İngilizce adlar (localizeScene)', () => {
     it(`${sc.id}: İngilizce sahne derlenir; hedef kanalları, Python ve örnek blok adları modelde var`, () => {
       const open2 = (x: typeof sc) => {
         let path = '/m.xml'
-        if (x.pack) { open(x.id); path = `/models/${x.pack}/muroko_scene.xml` }  // paketi yükler
+        if (x.pack) { open(x.id).done(); path = `/models/${x.pack}/muroko_scene.xml` }  // paketi yükler
         mj.FS.writeFile(path, x.xml)
         const m = mj.MjModel.mj_loadXML(path)
         const names: string[] = Array.from({ length: m.nsensor }, (_: unknown, i: number) => mj.mj_id2name(m, 20, i))

@@ -21,6 +21,7 @@ const MODELS = {
   so101: { dir: 'robotstudio_so101', xml: ['so101.xml'] },
   crazyflie: { dir: 'bitcraze_crazyflie_2', xml: ['cf2.xml'] },
   x2: { dir: 'skydio_x2', xml: ['x2.xml'] },
+  op3: { dir: 'robotis_op3', xml: ['op3.xml'] },
 }
 
 function walk(d, base = d) {

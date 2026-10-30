@@ -22,7 +22,7 @@ export interface MjScene {
   /** 'gercek': MuJoCo Menagerie'den gerçek robot modeli (mesh); 'robot': basit robot; 'fizik': yalnız fizik deneyi. */
   kind: 'gercek' | 'robot' | 'fizik'
   /** Gerçek model paketi: public/mujoco/models/<pack>.pack.gz (tools/mujoco/pack.mjs). XML bu paketteki dosyalara `<include>` eder. */
-  pack?: 'panda' | 'go1' | 'shadow' | 'iiwa' | 'lite6' | 'so101' | 'crazyflie' | 'x2'
+  pack?: 'panda' | 'go1' | 'shadow' | 'iiwa' | 'lite6' | 'so101' | 'crazyflie' | 'x2' | 'op3'
   /** Model kaynağı ve lisansı (ekranda gösterilir). */
   credit?: { name: string; license: string; url: string }
   tr: Text
@@ -528,7 +528,82 @@ await wait(3)
   },
 ]
 
-export const MJ_SCENES: MjScene[] = [...MJ_MODEL_SCENES, ...MODEL_SCENES_2]
+const MODEL_SCENES_3: MjScene[] = [
+  {
+    id: 'robotis-op3',
+    icon: '🤖',
+    kind: 'gercek',
+    pack: 'op3',
+    credit: { name: 'ROBOTIS OP3', license: 'Apache-2.0', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/robotis_op3' },
+    tr: { title: 'ROBOTIS OP3 (iki ayaklı robot)', desc: 'Robot yarışmalarında futbol oynayan, 20 eklemli küçük iki ayaklı robot. Dizlerini bükerek çömel, dengeni koru.', hint: 'Eklemler açı motorudur (radyan). Her ayağa (l_ ve r_) aynı açıyı vermezsen devrilir. "govde.z" gövdenin yüksekliğidir (metre).' },
+    en: { title: 'ROBOTIS OP3 (biped robot)', desc: 'A small 20-joint biped that plays soccer in robot contests. Bend its knees to crouch and keep your balance.', hint: 'Joints are angle motors (radians). If the l_ and r_ legs do not get the same angle it falls. "govde.z" is the body height (metres).' },
+    cam: [0.9, -0.9, 0.45], look: [0, 0, 0.22],
+    xml: `<mujoco model="op3-sahne">
+  <include file="op3.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <framepos name="govde" objtype="body" objname="body_link"/>
+    <gyro name="jiro" site="torso"/>
+    <jointpos name="kol" joint="l_sho_pitch"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('comel', 'Çömel: gövdeyi 22–28 cm arasına indir ve 2 sn tut', 'Crouch: lower the body to 22–28 cm and hold 2 s', 'govde.z', 'between', 0.22, 2, 0.28),
+      goal('kol', 'Kolunu kaldır: sol omuz açısı 1,2 radyanı geçsin ve 1 sn tut', 'Raise your arm: left shoulder angle beyond 1.2 rad, hold 1 s', 'kol', 'abs_ge', 1.2, 1),
+    ],
+    python: {
+      tr: `# Çömel ve kollarını kaldır. Duruşu ani değiştirme, robot devrilir: basamak basamak geç.
+# Sol ve sağ bacağın eksenleri ters yönlüdür: sağ bacağa sol bacağın eksi işaretlisini ver.
+from muroko import *
+
+def comel(a):
+    motor("l_hip_pitch_act", -a)
+    motor("r_hip_pitch_act", a)
+    motor("l_knee_act", 2 * a)
+    motor("r_knee_act", -2 * a)
+    motor("l_ank_pitch_act", a)
+    motor("r_ank_pitch_act", -a)
+
+for a in [0.2, 0.4, 0.6, 0.8, 1.0]:
+    comel(a)
+    await bekle(1)
+
+await bekle(2)                      # çömelmiş hâlde 2 sn dur
+motor("l_sho_pitch_act", -1.5)      # kollar yukarı
+motor("r_sho_pitch_act", 1.5)
+await bekle(2)
+`,
+      en: `# Crouch and raise your arms. Do not change the stance abruptly or the robot falls: go step by step.
+# The left and right leg axes point in opposite directions: give the right leg the negative of the left leg.
+from muroko import *
+
+def crouch(a):
+    motor("l_hip_pitch_act", -a)
+    motor("r_hip_pitch_act", a)
+    motor("l_knee_act", 2 * a)
+    motor("r_knee_act", -2 * a)
+    motor("l_ank_pitch_act", a)
+    motor("r_ank_pitch_act", -a)
+
+for a in [0.2, 0.4, 0.6, 0.8, 1.0]:
+    crouch(a)
+    await wait(1)
+
+await wait(2)                       # hold the crouch for 2 s
+motor("l_sho_pitch_act", -1.5)      # arms up
+motor("r_sho_pitch_act", 1.5)
+await wait(2)
+`,
+    },
+    blocks: example(seq(set('l_hip_pitch_act', -0.4), set('r_hip_pitch_act', 0.4), set('l_knee_act', 0.8), set('r_knee_act', -0.8), set('l_ank_pitch_act', 0.4), set('r_ank_pitch_act', -0.4), wait(1.5), set('l_hip_pitch_act', -0.8), set('r_hip_pitch_act', 0.8), set('l_knee_act', 1.6), set('r_knee_act', -1.6), set('l_ank_pitch_act', 0.8), set('r_ank_pitch_act', -0.8), wait(1.5), set('l_hip_pitch_act', -1.0), set('r_hip_pitch_act', 1.0), set('l_knee_act', 2.0), set('r_knee_act', -2.0), set('l_ank_pitch_act', 1.0), set('r_ank_pitch_act', -1.0), wait(1.5), set('l_sho_pitch_act', -1.5), set('r_sho_pitch_act', 1.5))),
+  },
+]
+
+export const MJ_SCENES: MjScene[] = [...MJ_MODEL_SCENES, ...MODEL_SCENES_2, ...MODEL_SCENES_3]
 
 export const MJ_REPO = 'https://github.com/google-deepmind/mujoco'
 export const MJ_WASM_REPO = 'https://github.com/google-deepmind/mujoco/tree/main/wasm'
