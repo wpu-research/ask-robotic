@@ -95,7 +95,7 @@ export default async function Laboratuvar({ searchParams }: { searchParams: Sear
         <p className="muted">{t('lab.page.intro')}</p>
       </header>
       <div className="tool-body">
-        <LabEditor initial={START} initialCode={BLINK} storageKey="ask:lab:sandbox" />
+        <LabEditor ai initial={START} initialCode={BLINK} storageKey="ask:lab:sandbox" />
       </div>
     </div>
   )

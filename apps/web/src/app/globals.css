@@ -776,3 +776,22 @@ html.v3-lock, html.v3-lock body { overflow: hidden; }
   .v3-seg button { min-height: 44px; min-width: 44px; }
   .v3-full { min-height: 44px; }
 }
+
+
+/* Laboratuvar: yapay zekâyla devre kur paneli */
+.lab-ai { margin: 0 0 12px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.lab-ai-toggle { width: 100%; display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 48px; padding: 8px 16px; border: 0; background: transparent; color: var(--text); font: inherit; font-weight: 800; cursor: pointer; text-align: left; }
+.lab-ai-body { display: grid; gap: 10px; padding: 0 16px 16px; }
+.lab-ai-field { display: grid; gap: 4px; font-size: .9rem; }
+.lab-ai-field textarea { font: inherit; padding: 10px; border-radius: 10px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); width: 100%; resize: vertical; min-height: 56px; }
+.lab-ai-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.lab-ai-chip { font: inherit; font-size: .85rem; min-height: 44px; padding: 6px 14px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.lab-ai-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.lab-ai-go { font: inherit; font-weight: 800; min-height: 48px; padding: 10px 22px; border-radius: 999px; border: 0; background: var(--primary); color: var(--primary-ink); cursor: pointer; }
+.lab-ai-go:disabled { opacity: .55; cursor: default; }
+.lab-ai-undo { font: inherit; font-weight: 700; min-height: 44px; padding: 6px 16px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.lab-ai-hint { font-size: .82rem; color: var(--muted); }
+.lab-ai-err { margin: 0; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--red, #c0392b); color: var(--red, #c0392b); }
+.lab-ai-done { padding: 10px 12px; border-radius: 10px; background: var(--primary-soft); }
+.lab-ai-done p { margin: 0 0 4px; }
+.lab-ai-note { color: var(--muted); }

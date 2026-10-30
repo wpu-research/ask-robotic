@@ -7,6 +7,7 @@ import { PART_DEFS } from '@/lib/lab/geometry'
 import { evaluateLabGoals, type LabGoal, type LabGoalResult } from '@/lib/lab/goals'
 import { addPart, hasParts, isCircuit, normalizeCircuit, removePart, removeWire, rotatePart, setProp } from '@/lib/lab/ops'
 import { DEFAULT_PARTS, STAGE_A_PARTS, STAGE_B_PARTS } from '@/lib/lab/parts'
+import { LabAiPanel, type AiResult } from './ai-panel'
 import { warningMeta, warningMessage, warningTitle } from '@/lib/lab/warnings'
 import { percent } from '@/lib/lab/text'
 import type { MessageKey } from '@/i18n'
@@ -24,6 +25,8 @@ import { SerialMonitor } from './serial-monitor'
 export { STAGE_A_PARTS, STAGE_B_PARTS, DEFAULT_PARTS }
 
 export interface LabEditorProps {
+  /** Yapay zekâyla devre kurma paneli (yalnız serbest laboratuvarda). */
+  ai?: boolean
   initial: Circuit
   initialCode: string
   allowedParts?: PartType[]
@@ -45,7 +48,7 @@ type CompileView =
 
 const FLASH_MAX = 32256, RAM_MAX = 2048
 
-export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact }: LabEditorProps) {
+export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact }: LabEditorProps) {
   const t = useT()
   const locale = useLocale()
   const tRef = useRef(t); tRef.current = t
@@ -67,6 +70,7 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
   const [fitKey, setFitKey] = useState(0)
   const [paused, setPaused] = useState(false)
   const [serialOpen, setSerialOpen] = useState(false)
+  const [aiUndo, setAiUndo] = useState<{ circuit: Circuit; code: string } | null>(null)
 
   const lab = useRef<LabApi | null>(null)
   const canvasApi = useRef<CanvasApi>(null)
@@ -291,8 +295,22 @@ export function LabEditor({ initial, initialCode, allowedParts = DEFAULT_PARTS, 
   }
   const statusText = compile.status === 'compiling' ? t('lab.editor.compiling') : running ? (paused ? t('lab.editor.status.paused') : t('lab.editor.status.running')) : t('lab.editor.status.stopped')
 
+  const applyAi = (r: AiResult) => {
+    stopRun()
+    setAiUndo({ circuit, code })
+    setCircuit(normalizeCircuit(r.circuit))
+    if (r.code) setCode(r.code)
+    setSelection(null); setFitKey((k) => k + 1)
+  }
+  const undoAi = () => {
+    if (!aiUndo) return
+    stopRun()
+    setCircuit(aiUndo.circuit); setCode(aiUndo.code); setAiUndo(null); setSelection(null); setFitKey((k) => k + 1)
+  }
+
   return (
     <div className="jr-host lab-host">
+      {ai && <LabAiPanel circuit={circuit} onApply={applyAi} onUndo={undoAi} canUndo={!!aiUndo} disabled={!editable} />}
       <div className={`lab${compact ? ' compact' : ''}`} data-running={running ? 'true' : 'false'}>
         {/* Sol: kod düzenleyici (Wokwi gibi) */}
         <div className="lab-left">
