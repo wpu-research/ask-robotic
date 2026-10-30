@@ -9,6 +9,8 @@ export const NAMES_EN: Record<string, string> = {
   govde: 'body', jiro: 'gyro',
   // Shadow Hand sahnesi
   nesne: 'object', isaret: 'index', orta: 'middle', yuzuk: 'ring', serce: 'little',
+  // Kollar ve dronlar
+  uc: 'tip', taban: 'base', omuz: 'shoulder', dirsek: 'elbow', konum: 'position', hiz: 'speed',
   // anahtar kareler
   baslangic: 'start',
 }

@@ -46,6 +46,9 @@ function open(id: string) {
   return { sc, m, d, chs, sensors, motor, step, done: () => { d.delete(); m.delete() } }
 }
 
+// Gerçek zaman: bir tur 10 ms'dir; modelin adımı farklı olabilir (ör. 2 ms).
+const per = (r: { m: any }) => Math.max(1, Math.round(0.01 / r.m.opt.timestep))
+
 describe('MuRoKo sahneleri', () => {
   it.each(MJ_SCENES.map((s) => s.id))('%s: derlenir, 2 sn kararlı, hedef kanalları var', (id) => {
     const r = open(id)
@@ -80,6 +83,64 @@ describe('MuRoKo sahneleri', () => {
     expect(t.allDone).toBe(true)
     r.done()
   }, 60_000)
+
+  const run = (id: string, steps: [Record<string, number>, number][]) => {
+    const r = open(id)
+    const t = new GoalTracker(r.sc.goals)
+    for (const [m, sec] of steps) {
+      for (const [k, v] of Object.entries(m)) r.motor(k, v)
+      for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(per(r)); t.update(0.01, r.sensors()) }
+    }
+    return { r, t }
+  }
+
+  it('KUKA iiwa: şablon yükselir ve uzanır', () => {
+    const { r, t } = run('kuka-iiwa', [[{ actuator2: 0.2, actuator4: -0.6 }, 3], [{ actuator2: 1.5, actuator4: 0 }, 3]])
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
+  it('UFactory Lite 6: şablon kaldırır ve döner', () => {
+    const { r, t } = run('ufactory-lite6', [[{ actuator3: 2.5 }, 3], [{ actuator3: 1.57, actuator1: 1 }, 3]])
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
+  it('SO-101: şablon kaldırır, döner ve indirir', () => {
+    const { r, t } = run('so101', [[{ shoulder_lift: -1 }, 2.5], [{ shoulder_pan: 1 }, 2.5], [{ shoulder_lift: 1 }, 3]])
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
+  // Dron şablonları: yüksekliği sensörden okuyup itkiyi ayarlar (Python şablonundaki P kontrolün aynısı).
+  const fly = (id: string, hover: number, gain: [number, number], target: number, motors: string[], lo: number, hi: number) => {
+    const r = open(id)
+    const t = new GoalTracker(r.sc.goals)
+    const set = (v: number) => motors.forEach((m) => r.motor(m, v))
+    for (let i = 0; i < 200; i++) {
+      const s = r.sensors()
+      set(Math.min(hi, Math.max(lo, hover + gain[0] * (target - s['konum.z']) - gain[1] * s['hiz.z'])))
+      r.step(5 * per(r)); t.update(0.05, r.sensors())
+    }
+    const zHover = r.sensors()['konum.z']
+    set(0)
+    for (let i = 0; i < 300; i++) { r.step(per(r)); t.update(0.01, r.sensors()) }
+    return { r, t, zHover }
+  }
+
+  it('Crazyflie 2: şablon 60 cm\'de asılı kalır, sonra iner', () => {
+    const { r, t, zHover } = fly('crazyflie', 0.265, [1.0, 0.7], 0.6, ['body_thrust'], 0.2, 0.35)
+    expect(Math.abs(zHover - 0.6)).toBeLessThan(0.08)
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
+
+  it('Skydio X2: şablon 1,2 m\'de asılı kalır, sonra iner', () => {
+    const { r, t, zHover } = fly('skydio-x2', 3.25, [2.0, 1.2], 1.2, ['thrust1', 'thrust2', 'thrust3', 'thrust4'], 0, 13)
+    expect(Math.abs(zHover - 1.2)).toBeLessThan(0.1)
+    expect(t.allDone).toBe(true)
+    r.done()
+  })
 
   it('Unitree Go1: şablon çömelir ve yükselir, ayakta kalır', () => {
     const r = open('unitree-go1')
@@ -138,5 +199,23 @@ describe('İngilizce adlar (localizeScene)', () => {
     const vals = Object.values(NAMES_EN)
     expect(new Set(vals).size).toBe(vals.length)
     for (const base of MJ_SCENES) expect(localizeScene(base).xml).not.toMatch(/\b(govde|kup|nesne|isaret|jiro)\b/)
+  })
+})
+
+describe('MuRoKo dron blok örnekleri', () => {
+  it('Skydio X2 blok örneği havalanır ve iner; Crazyflie de', () => {
+    const sim = (id: string, steps: [Record<string, number>, number][]) => {
+      const r = open(id)
+      const t = new GoalTracker(r.sc.goals)
+      for (const [m, sec] of steps) {
+        for (const [k, v] of Object.entries(m)) r.motor(k, v)
+        for (let i = 0; i < Math.round(sec / 0.01); i++) { r.step(per(r)); t.update(0.01, r.sensors()) }
+      }
+      expect(t.allDone, id).toBe(true)
+      r.done()
+    }
+    const four = (v: number) => ({ thrust1: v, thrust2: v, thrust3: v, thrust4: v })
+    sim('skydio-x2', [[four(3.5), 3], [four(0), 5]])
+    sim('crazyflie', [[{ body_thrust: 0.3 }, 3], [{ body_thrust: 0 }, 4]])
   })
 })

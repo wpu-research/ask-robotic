@@ -24,4 +24,9 @@ Bu proje üçüncü taraf yazılımlar kullanır ve bir eğitim yaklaşımından
    - Franka Emika Panda (franka_emika_panda): Apache License 2.0.
    - Unitree Go1 (unitree_go1): BSD 3-Clause. Copyright (c) 2016-2022 HangZhou YuShu TECHNOLOGY CO.,LTD. ("Unitree Robotics").
    - Shadow Dexterous Hand (shadow_hand): Apache License 2.0.
+   - KUKA iiwa 14 (kuka_iiwa_14): BSD 3-Clause (Drake).
+   - UFactory Lite 6 (ufactory_lite6): BSD 3-Clause. Copyright (c) 2018, UFACTORY Inc.
+   - SO-101 (robotstudio_so101): Apache License 2.0.
+   - Bitcraze Crazyflie 2 (bitcraze_crazyflie_2): MIT License.
+   - Skydio X2 (skydio_x2): Apache License 2.0.
    Modeller yalnız eğitim simülasyonunda kullanılır; üreticiler bu projeyi onaylamaz ya da desteklemez.

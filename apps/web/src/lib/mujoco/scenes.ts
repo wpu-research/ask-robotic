@@ -22,7 +22,7 @@ export interface MjScene {
   /** 'gercek': MuJoCo Menagerie'den gerçek robot modeli (mesh); 'robot': basit robot; 'fizik': yalnız fizik deneyi. */
   kind: 'gercek' | 'robot' | 'fizik'
   /** Gerçek model paketi: public/mujoco/models/<pack>.pack.gz (tools/mujoco/pack.mjs). XML bu paketteki dosyalara `<include>` eder. */
-  pack?: 'panda' | 'go1' | 'shadow'
+  pack?: 'panda' | 'go1' | 'shadow' | 'iiwa' | 'lite6' | 'so101' | 'crazyflie' | 'x2'
   /** Model kaynağı ve lisansı (ekranda gösterilir). */
   credit?: { name: string; license: string; url: string }
   tr: Text
@@ -241,7 +241,294 @@ for f in fingers:
   },
 ]
 
-export const MJ_SCENES: MjScene[] = MJ_MODEL_SCENES
+
+const MODEL_SCENES_2: MjScene[] = [
+  {
+    id: 'kuka-iiwa',
+    icon: '🦾',
+    kind: 'gercek',
+    pack: 'iiwa',
+    credit: { name: 'KUKA iiwa 14', license: 'BSD-3-Clause', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/kuka_iiwa_14' },
+    tr: { title: 'KUKA iiwa 14 (7 eksenli)', desc: 'Fabrikalarda ve laboratuvarlarda kullanılan 7 eksenli endüstriyel kol. Eklem motorlarını sür, ucu istediğin yere götür.', hint: 'actuator1–7 eklem açılarıdır (radyan). "uc" sensörü kolun ucunun konumudur (metre).' },
+    en: { title: 'KUKA iiwa 14 (7-axis)', desc: 'A 7-axis industrial arm used in factories and labs. Drive the joint motors and bring the tip where you want it.', hint: 'actuator1–7 are the joint angles (radians). The "uc" sensor is the position of the arm tip (metres).' },
+    cam: [1.6, -1.6, 1.1], look: [0, 0, 0.6],
+    xml: `<mujoco model="iiwa-sahne">
+  <include file="iiwa14.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 2.5" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <jointpos name="eklem1" joint="joint1"/>
+    <jointpos name="eklem2" joint="joint2"/>
+    <jointpos name="eklem4" joint="joint4"/>
+    <framepos name="uc" objtype="site" objname="attachment_site"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('yuksel', 'Yüksel: kolun ucunu 90 cm üstüne çıkar ve 1 sn tut', 'Reach up: raise the arm tip above 90 cm and hold 1 s', 'uc.z', 'ge', 0.9, 1),
+      goal('uzan', 'Uzan: kolun ucunu ileri 90 cm ötesine götür ve 1 sn tut', 'Reach out: move the arm tip more than 90 cm forward and hold 1 s', 'uc.x', 'ge', 0.9, 1),
+    ],
+    python: {
+      tr: `# Önce yukarı uzan, sonra ileri uzan: eklem açıları radyandır.
+from muroko import *
+
+motor("actuator2", 0.2)
+motor("actuator4", -0.6)
+await bekle(3)
+
+motor("actuator2", 1.5)
+motor("actuator4", 0)
+await bekle(3)
+`,
+      en: `# Reach up first, then reach forward: joint angles are in radians.
+from muroko import *
+
+motor("actuator2", 0.2)
+motor("actuator4", -0.6)
+await wait(3)
+
+motor("actuator2", 1.5)
+motor("actuator4", 0)
+await wait(3)
+`,
+    },
+    blocks: example(seq(set('actuator2', 0.2), set('actuator4', -0.6), wait(3), set('actuator2', 1.5), set('actuator4', 0))),
+  },
+  {
+    id: 'ufactory-lite6',
+    icon: '🦾',
+    kind: 'gercek',
+    pack: 'lite6',
+    credit: { name: 'UFactory Lite 6', license: 'BSD-3-Clause', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/ufactory_lite6' },
+    tr: { title: 'UFactory Lite 6 (masaüstü kol)', desc: 'Okullarda ve atölyelerde kullanılan 6 eksenli küçük masaüstü robot kol.', hint: 'actuator1–6 eklem açılarıdır (radyan). "uc" sensörü kolun ucunun konumudur (metre).' },
+    en: { title: 'UFactory Lite 6 (desktop arm)', desc: 'A small 6-axis desktop robot arm used in schools and workshops.', hint: 'actuator1–6 are the joint angles (radians). The "uc" sensor is the position of the arm tip (metres).' },
+    cam: [0.9, -0.9, 0.6], look: [0, 0, 0.3],
+    xml: `<mujoco model="lite6-sahne">
+  <include file="lite6.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <jointpos name="eklem1" joint="joint1"/>
+    <jointpos name="eklem2" joint="joint2"/>
+    <jointpos name="eklem3" joint="joint3"/>
+    <framepos name="uc" objtype="site" objname="attachment_site"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('kalk', 'Kaldır: kolun ucunu 60 cm üstüne çıkar ve 1 sn tut', 'Lift: raise the arm tip above 60 cm and hold 1 s', 'uc.z', 'ge', 0.6, 1),
+      goal('don', 'Dön: kolun ucunu yana 15 cm götür ve 1 sn tut', 'Turn: swing the arm tip 15 cm to the side and hold 1 s', 'uc.y', 'ge', 0.15, 1),
+    ],
+    python: {
+      tr: `# Kolu kaldır, sonra dirseği eski haline getirip tabanından döndür.
+from muroko import *
+
+motor("actuator3", 2.5)
+await bekle(3)
+
+motor("actuator3", 1.57)
+motor("actuator1", 1.0)
+await bekle(3)
+`,
+      en: `# Lift the arm, then bring the elbow back and turn it on its base.
+from muroko import *
+
+motor("actuator3", 2.5)
+await wait(3)
+
+motor("actuator3", 1.57)
+motor("actuator1", 1.0)
+await wait(3)
+`,
+    },
+    blocks: example(seq(set('actuator3', 2.5), wait(3), set('actuator3', 1.57), set('actuator1', 1))),
+  },
+  {
+    id: 'so101',
+    icon: '🤖',
+    kind: 'gercek',
+    pack: 'so101',
+    credit: { name: 'SO-101 (RobotStudio / TheRobotStudio)', license: 'Apache-2.0', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/robotstudio_so101' },
+    tr: { title: 'SO-101 (açık kaynak kol)', desc: 'Açık kaynaklı, ucuz 3B yazıcıyla yapılabilen 6 motorlu kol. Gerçek donanımı kendin kurabilirsin.', hint: 'shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll ve gripper motorları. "uc" sensörü tutucunun konumudur (metre).' },
+    en: { title: 'SO-101 (open-source arm)', desc: 'An open-source, low-cost 6-motor arm you can 3D-print. You can build the real hardware yourself.', hint: 'Motors: shoulder_pan, shoulder_lift, elbow_flex, wrist_flex, wrist_roll and gripper. The "uc" sensor is the gripper position (metres).' },
+    cam: [0.7, -0.7, 0.4], look: [0, 0, 0.15],
+    xml: `<mujoco model="so101-sahne">
+  <include file="so101.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <jointpos name="taban" joint="shoulder_pan"/>
+    <jointpos name="omuz" joint="shoulder_lift"/>
+    <jointpos name="dirsek" joint="elbow_flex"/>
+    <framepos name="uc" objtype="site" objname="gripperframe"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('kalk', 'Kaldır: tutucuyu 40 cm üstüne çıkar ve 1 sn tut', 'Lift: raise the gripper above 40 cm and hold 1 s', 'uc.z', 'ge', 0.4, 1),
+      goal('don', 'Dön: tutucuyu yana 25 cm götür ve 1 sn tut', 'Turn: swing the gripper 25 cm to the side and hold 1 s', 'uc.y', 'le', -0.25, 1),
+      goal('indir', 'İndir: tutucuyu masaya 5 cm kadar yaklaştır ve 1 sn tut', 'Lower: bring the gripper within 5 cm of the table and hold 1 s', 'uc.z', 'le', 0.05, 1),
+    ],
+    python: {
+      tr: `# Kolu kaldır, yana döndür, sonra masaya indir.
+from muroko import *
+
+motor("shoulder_lift", -1)
+await bekle(2.5)
+
+motor("shoulder_pan", 1)
+await bekle(2.5)
+
+motor("shoulder_lift", 1)
+await bekle(3)
+`,
+      en: `# Lift the arm, swing it sideways, then lower it to the table.
+from muroko import *
+
+motor("shoulder_lift", -1)
+await wait(2.5)
+
+motor("shoulder_pan", 1)
+await wait(2.5)
+
+motor("shoulder_lift", 1)
+await wait(3)
+`,
+    },
+    blocks: example(seq(set('shoulder_lift', -1), wait(2.5), set('shoulder_pan', 1), wait(2.5), set('shoulder_lift', 1))),
+  },
+  {
+    id: 'crazyflie',
+    icon: '🚁',
+    kind: 'gercek',
+    pack: 'crazyflie',
+    credit: { name: 'Bitcraze Crazyflie 2', license: 'MIT', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/bitcraze_crazyflie_2' },
+    tr: { title: 'Crazyflie 2 (mini drone)', desc: '27 gramlık mini drone. Tek bir itki motoruyla (body_thrust) havalanır; yüksekliği sen tutarsın.', hint: 'body_thrust yukarı itkidir (N). 0,265 N havada asılı tutar; daha fazlası yükseltir. "konum.z" yüksekliktir.' },
+    en: { title: 'Crazyflie 2 (mini drone)', desc: 'A 27-gram mini drone. It lifts off with one thrust motor (body_thrust); you hold the altitude.', hint: 'body_thrust is upward thrust (N). 0.265 N holds it in the air; more lifts it. "konum.z" is the height.' },
+    cam: [1.2, -1.2, 0.8], look: [0, 0, 0.4],
+    xml: `<mujoco model="crazyflie-sahne">
+  <include file="cf2.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 3" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <framepos name="konum" objtype="body" objname="cf2"/>
+    <framelinvel name="hiz" objtype="body" objname="cf2"/>
+  </sensor>
+</mujoco>`,
+    goals: [
+      goal('havalan', 'Havalan: dronu 50 cm üstüne çıkar ve 2 sn tut', 'Take off: raise the drone above 50 cm and hold 2 s', 'konum.z', 'ge', 0.5, 2),
+      goal('in', 'İn: dronu yere indir (5 cm altı) ve 1 sn tut', 'Land: bring the drone down (below 5 cm) and hold 1 s', 'konum.z', 'le', 0.05, 1),
+    ],
+    python: {
+      tr: `# Yüksekliği sensörle ölç, itkiyi ona göre ayarla (P kontrol): drone 60 cm'de asılı kalır.
+from muroko import *
+
+hedef = 0.6
+for i in range(200):          # 10 sn havada kal
+    z = sensor("konum.z")
+    hiz = sensor("hiz.z")
+    itki = 0.265 + 1.0 * (hedef - z) - 0.7 * hiz
+    motor("body_thrust", min(0.35, max(0.2, itki)))
+    await bekle(0.05)
+
+motor("body_thrust", 0.0)     # motoru kapat: drone iner
+await bekle(3)
+`,
+      en: `# Measure the height with the sensor and adjust thrust (P control): the drone hovers at 60 cm.
+from muroko import *
+
+target = 0.6
+for i in range(200):          # stay airborne for 10 s
+    z = sensor("konum.z")
+    speed = sensor("hiz.z")
+    thrust = 0.265 + 1.0 * (target - z) - 0.7 * speed
+    motor("body_thrust", min(0.35, max(0.2, thrust)))
+    await wait(0.05)
+
+motor("body_thrust", 0.0)     # motor off: the drone lands
+await wait(3)
+`,
+    },
+    blocks: example(seq(set('body_thrust', 0.3), wait(3), set('body_thrust', 0), wait(4))),
+  },
+  {
+    id: 'skydio-x2',
+    icon: '🚁',
+    kind: 'gercek',
+    pack: 'x2',
+    credit: { name: 'Skydio X2', license: 'Apache-2.0', url: 'https://github.com/google-deepmind/mujoco_menagerie/tree/main/skydio_x2' },
+    tr: { title: 'Skydio X2 (quadrotor)', desc: 'Dört pervaneli gerçek bir drone. Dört itki motorunu (thrust1–4) birlikte ayarlayıp havalan ve yüksekliği tut.', hint: 'Her motor 0–13 N itki verir. Hepsi eşitse düz yükselir; fark verirsen yatar. "konum.z" yüksekliktir.' },
+    en: { title: 'Skydio X2 (quadrotor)', desc: 'A real four-propeller drone. Set the four thrust motors (thrust1–4) together to lift off and hold altitude.', hint: 'Each motor gives 0–13 N. If all are equal it rises straight; a difference tilts it. "konum.z" is the height.' },
+    cam: [2.5, -2.5, 1.6], look: [0, 0, 0.8],
+    xml: `<mujoco model="x2-sahne">
+  <include file="x2.xml"/>
+  <compiler usethread="false"/>
+  <worldbody>
+    <light pos="0 0 4" dir="0 0 -1" directional="true"/>
+    ${FLOOR_Z(0)}
+  </worldbody>
+  <sensor>
+    <framepos name="konum" objtype="body" objname="x2"/>
+    <framelinvel name="hiz" objtype="body" objname="x2"/>
+  </sensor>
+  <keyframe>
+    <key name="muroko" qpos="0 0 0.1 1 0 0 0" ctrl="0 0 0 0"/>
+  </keyframe>
+</mujoco>`,
+    goals: [
+      goal('havalan', 'Havalan: dronu 1 m üstüne çıkar ve 2 sn tut', 'Take off: raise the drone above 1 m and hold 2 s', 'konum.z', 'ge', 1, 2),
+      goal('in', 'İn: dronu yere indir (10 cm altı) ve 1 sn tut', 'Land: bring the drone down (below 10 cm) and hold 1 s', 'konum.z', 'le', 0.1, 1),
+    ],
+    python: {
+      tr: `# Dört motora aynı itkiyi ver; yüksekliği sensörle ölç ve itkiyi ayarla: drone 1,2 m'de asılı kalır.
+from muroko import *
+
+hedef = 1.2
+for i in range(200):          # 10 sn havada kal
+    z = sensor("konum.z")
+    hiz = sensor("hiz.z")
+    itki = 3.25 + 2.0 * (hedef - z) - 1.2 * hiz
+    itki = min(13, max(0, itki))
+    for m in ["thrust1", "thrust2", "thrust3", "thrust4"]:
+        motor(m, itki)
+    await bekle(0.05)
+
+for m in ["thrust1", "thrust2", "thrust3", "thrust4"]:
+    motor(m, 0)               # motorları kapat: drone iner
+await bekle(3)
+`,
+      en: `# Give all four motors the same thrust; measure the height and adjust it: the drone hovers at 1.2 m.
+from muroko import *
+
+target = 1.2
+for i in range(200):          # stay airborne for 10 s
+    z = sensor("konum.z")
+    speed = sensor("hiz.z")
+    thrust = 3.25 + 2.0 * (target - z) - 1.2 * speed
+    thrust = min(13, max(0, thrust))
+    for m in ["thrust1", "thrust2", "thrust3", "thrust4"]:
+        motor(m, thrust)
+    await wait(0.05)
+
+for m in ["thrust1", "thrust2", "thrust3", "thrust4"]:
+    motor(m, 0)               # motors off: the drone lands
+await wait(3)
+`,
+    },
+    blocks: example(seq(set('thrust1', 3.5), set('thrust2', 3.5), set('thrust3', 3.5), set('thrust4', 3.5), wait(3), set('thrust1', 0), set('thrust2', 0), set('thrust3', 0), set('thrust4', 0), wait(5))),
+  },
+]
+
+export const MJ_SCENES: MjScene[] = [...MJ_MODEL_SCENES, ...MODEL_SCENES_2]
 
 export const MJ_REPO = 'https://github.com/google-deepmind/mujoco'
 export const MJ_WASM_REPO = 'https://github.com/google-deepmind/mujoco/tree/main/wasm'
