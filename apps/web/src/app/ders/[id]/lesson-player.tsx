@@ -157,7 +157,7 @@ export function LessonPlayer(p: Props) {
             <h1>{p.lesson.title}</h1>
             <div className="meta">
               <LessonKindBadge kind={kind} />
-              <span className="meta-i"><Icon name="clock" size={16} />~{p.lesson.durationMin} dakika</span>
+              <span className="meta-i"><Icon name="clock" size={16} />{en ? `~${p.lesson.durationMin} min` : `~${p.lesson.durationMin} dakika`}</span>
               <span>Ders {p.position.index} / {p.position.total}</span>
               {done && <span className="chip chip-ok">{en ? 'Completed' : 'Tamamlandı'}</span>}
             </div>
