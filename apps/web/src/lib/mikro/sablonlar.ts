@@ -17,7 +17,7 @@ export interface Sablon {
 }
 
 /** Blok kısaltması: merkez (m) ve yarı boyut (m). */
-const blk = (id: string, pos: [number, number, number], size: [number, number, number], color = '#db3c8c', shape: Govde['blocks'][number]['shape'] = 'kutu') =>
+const blk = (id: string, pos: [number, number, number], size: [number, number, number], color = '#c2410c', shape: Govde['blocks'][number]['shape'] = 'kutu') =>
   ({ id, shape, pos, size, yaw: 0, color })
 
 function base(name: string, chassis: ChassisId, govde: Govde): RobotDesign {
@@ -65,7 +65,7 @@ function engeldenKacan(): RobotDesign {
     blocks: [
       blk('b1', [0, 0, 0], [(ch.cols * 0.02) / 2, (ch.rows * 0.02) / 2, 0.002]),
       // Sensör kulesi: ultrasonik göz yukarıdan baksın
-      blk('b2', [(ch.cols * 0.02) / 2 - 0.01, 0, 0.015], [0.012, 0.02, 0.013], '#2563eb'),
+      blk('b2', [(ch.cols * 0.02) / 2 - 0.01, 0, 0.015], [0.012, 0.02, 0.013], '#7c3aed'),
     ],
   })
   d = placePart(d, 'teker-buyuk', 2, 0)
@@ -83,7 +83,7 @@ function cizgiIzleyen(): RobotDesign {
   const ch = CHASSIS.kucuk
   let d = base('Çizgi izleyen', 'kucuk', {
     v: 1,
-    blocks: [blk('b1', [0, 0, 0], [(ch.cols * 0.02) / 2, (ch.rows * 0.02) / 2, 0.002], '#16a34a')],
+    blocks: [blk('b1', [0, 0, 0], [(ch.cols * 0.02) / 2, (ch.rows * 0.02) / 2, 0.002], '#0f766e')],
   })
   d = placePart(d, 'teker-kucuk', 2, 0)
   d = placePart(d, 'teker-kucuk', 2, ch.rows - 1)
@@ -103,10 +103,10 @@ function delikliHafif(): RobotDesign {
     v: 1,
     blocks: [
       blk('b1', [0, 0, 0], [hx, hy, 0.003]),
-      { ...blk('c1', [0.02, 0.02, 0], [0.012, 0.012, 0.02], '#111827'), cut: true },
-      { ...blk('c2', [0.02, -0.02, 0], [0.012, 0.012, 0.02], '#111827'), cut: true },
-      { ...blk('c3', [-0.02, 0.02, 0], [0.012, 0.012, 0.02], '#111827'), cut: true },
-      { ...blk('c4', [-0.02, -0.02, 0], [0.012, 0.012, 0.02], '#111827'), cut: true },
+      { ...blk('c1', [0.02, 0.02, 0], [0.012, 0.012, 0.02], '#5b3a24'), cut: true },
+      { ...blk('c2', [0.02, -0.02, 0], [0.012, 0.012, 0.02], '#5b3a24'), cut: true },
+      { ...blk('c3', [-0.02, 0.02, 0], [0.012, 0.012, 0.02], '#5b3a24'), cut: true },
+      { ...blk('c4', [-0.02, -0.02, 0], [0.012, 0.012, 0.02], '#5b3a24'), cut: true },
     ],
   })
   d = placePart(d, 'teker-buyuk', 2, 0)

@@ -232,7 +232,7 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
 ${assets.length ? `  <asset>\n    ${assets.join('\n    ')}\n  </asset>` : ''}
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
-    <geom name="zemin" type="plane" size="4 4 .1" pos="0 0 0" rgba=".29 .42 .66 1" friction="1 .005 .0001"/>
+    <geom name="zemin" type="plane" size="4 4 .1" pos="0 0 0" rgba=".95 .91 .86 1" friction="1 .005 .0001"/>
     <body name="govde" pos="${v3(0, 0, deckZ)}">
       <freejoint name="serbest"/>
       ${geoms.join('\n      ')}

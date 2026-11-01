@@ -107,7 +107,7 @@ export function defaultGovde(chassis: ChassisId): Govde {
       id: 'b1', shape: 'kutu',
       pos: [0, 0, 0],
       size: [(ch.cols * PITCH) / 2, (ch.rows * PITCH) / 2, 0.002],
-      yaw: 0, color: '#db3c8c',
+      yaw: 0, color: '#c2410c',
     }],
   }
 }
@@ -147,7 +147,7 @@ export function addBlock(g: Govde, shape: BlockShape): Govde {
       id, shape,
       pos: [frontX + 0.02, 0, 0],
       size: shape === 'kure' ? [0.015, 0.015, 0.015] : [0.02, 0.02, 0.008],
-      yaw: 0, color: '#db3c8c',
+      yaw: 0, color: '#c2410c',
     })],
   }
 }

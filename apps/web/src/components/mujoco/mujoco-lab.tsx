@@ -20,7 +20,7 @@ import { createCadGizmo, type CadGizmo, type GizmoMode } from './cad-gizmo'
 import { defaultGovde, normalizeGovde, updateBlock } from '@/lib/mikro/govde'
 import { canRedo, canUndo, initHistory, present, push, redo, replace, undo } from '@/lib/mikro/history'
 import type { RobotDesign } from '@/lib/mikro/tasarim'
-import { buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
+import { applyTheme, buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
 import { MurokoElec, starterCircuit } from './mujoco-elec'
 import { EMPTY_PLAN, pumpWiring, type WiringPlan } from '@/lib/mujoco/wiring'
 import { compileCode, type CompileError } from '@/lib/lab/compile-client'
@@ -236,12 +236,16 @@ export function MujocoLab() {
       }
       syncMeshes(sim)
     }
+    // Tema değişince sahne de dönsün (üst çubuktaki açık/koyu düğmesi)
+    const themeWatch = new MutationObserver(() => applyTheme(stage.scene, group))
+    themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     stageRef.current = stage; groupRef.current = group
     gizmoRef.current = createCadGizmo(stage, group, (id, patch) => {
       const g = normalizeGovde(designRef.current.govde) ?? defaultGovde(designRef.current.chassis)
       changeDesignRef.current({ ...designRef.current, govde: updateBlock(g, id, patch) })
     })
     return () => {
+      themeWatch.disconnect()
       gizmoRef.current?.dispose(); gizmoRef.current = null
       disposeSim(); stage.dispose(); stageRef.current = null; groupRef.current = null
     }

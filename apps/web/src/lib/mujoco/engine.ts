@@ -58,13 +58,22 @@ export interface Sim {
   keyId: number
 }
 
+/** Arayüz koyu temada mı (Macademia teması `data-theme` ile seçilir). */
+function isDark(): boolean {
+  const t = document.documentElement.dataset.theme
+  if (t === 'dark') return true
+  if (t === 'light') return false
+  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false
+}
+
 function floorTexture() {
-  // MuJoCo görüntüleyicisindeki mavi kareli zemin
+  // Macademia zemini: sıcak krem kareler, açık kahve çizgi
+  const dark = isDark()
   const c = document.createElement('canvas'); c.width = c.height = 128
   const g = c.getContext('2d')!
-  g.fillStyle = '#24467a'; g.fillRect(0, 0, 128, 128)
-  g.fillStyle = '#2f5a9a'; g.fillRect(0, 0, 64, 64); g.fillRect(64, 64, 64, 64)
-  g.strokeStyle = 'rgba(190,215,255,.35)'; g.lineWidth = 2; g.strokeRect(1, 1, 126, 126)
+  g.fillStyle = dark ? '#2e2018' : '#f3e9db'; g.fillRect(0, 0, 128, 128)
+  g.fillStyle = dark ? '#3a2a20' : '#eaddc9'; g.fillRect(0, 0, 64, 64); g.fillRect(64, 64, 64, 64)
+  g.strokeStyle = dark ? 'rgba(224,170,118,.22)' : 'rgba(122,68,38,.18)'; g.lineWidth = 2; g.strokeRect(1, 1, 126, 126)
   const t = new THREE.CanvasTexture(c)
   t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(12, 12); t.colorSpace = THREE.SRGBColorSpace
   t.anisotropy = 8
@@ -80,6 +89,25 @@ export function skyTexture() {
   g.fillStyle = gr; g.fillRect(0, 0, 2, 256)
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace
   return t
+}
+
+/**
+ * Tema değişince gökyüzünü ve zemini yeniden üretir: kullanıcı açık/koyu arasında
+ * geçtiğinde 3B sahne de Macademia'nın o temadaki renklerine döner.
+ * Eski dokular serbest bırakılır.
+ */
+export function applyTheme(scene: THREE.Scene, group: THREE.Group): void {
+  const old = scene.background
+  scene.background = skyTexture()
+  if (old && (old as THREE.Texture).isTexture) (old as THREE.Texture).dispose()
+  for (const o of group.children) {
+    const m = o as THREE.Mesh
+    const mat = m.material as THREE.MeshStandardMaterial | undefined
+    if (!mat?.map) continue // yalnız zemin dokuludur
+    mat.map.dispose()
+    mat.map = floorTexture()
+    mat.needsUpdate = true
+  }
 }
 
 /** Mesh geometrisi: modelin kendi köşe/yüz dizilerinden (geom çerçevesinde), mesh başına bir kez. */

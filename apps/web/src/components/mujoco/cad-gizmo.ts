@@ -108,9 +108,9 @@ export function createCadGizmo(
     const c = document.createElement('canvas')
     c.width = 128; c.height = 48
     const g = c.getContext('2d')!
-    g.fillStyle = 'rgba(12,20,38,.82)'
+    g.fillStyle = 'rgba(42,26,18,.86)'
     g.beginPath(); g.roundRect(0, 0, 128, 48, 10); g.fill()
-    g.fillStyle = '#eaf2ff'; g.font = 'bold 26px system-ui, sans-serif'
+    g.fillStyle = '#f6ece2'; g.font = 'bold 26px system-ui, sans-serif'
     g.textAlign = 'center'; g.textBaseline = 'middle'
     g.fillText(text, 64, 25)
     const t = new THREE.CanvasTexture(c)
@@ -142,7 +142,7 @@ export function createCadGizmo(
       [new THREE.Vector3(px + sx, py - sy, pz - sz), new THREE.Vector3(px + sx, py + sy, pz - sz), 2 * sy, 1],
       [new THREE.Vector3(px + sx, py - sy, pz - sz), new THREE.Vector3(px + sx, py - sy, pz + sz), 2 * sz, 2],
     ]
-    const colors = [0xef4444, 0x22c55e, 0x3b82f6]
+    const colors = [0xc2410c, 0x0f766e, 0x7c3aed] // marka: robot, devre, blok
     for (const [a, c, len, i] of axes) {
       const geo = new THREE.BufferGeometry().setFromPoints([a, c])
       const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: colors[i], depthTest: false }))
@@ -179,14 +179,14 @@ export function createCadGizmo(
         m?.geometry.dispose()
         if (m) layer.remove(m)
         m = new THREE.Mesh(proxyGeometry(b), new THREE.MeshBasicMaterial({
-          color: b.cut ? 0xef4444 : 0x38bdf8, wireframe: true, transparent: true, opacity: 0.55, depthTest: false,
+          color: b.cut ? 0x9f1239 : 0xa0866f, wireframe: true, transparent: true, opacity: 0.55, depthTest: false,
         }))
         m.renderOrder = 999
         layer.add(m)
         proxies.set(b.id, m)
       }
       const mat = m.material as THREE.MeshBasicMaterial
-      mat.color.set(b.cut ? 0xef4444 : b.id === selected ? 0xfbbf24 : 0x38bdf8)
+      mat.color.set(b.cut ? 0x9f1239 : b.id === selected ? 0xc2410c : 0xa0866f)
       mat.opacity = b.id === selected ? 0.9 : 0.35
       // Sürüklenirken vekilin kendi dönüşümü kullanılır, üstüne yazılmaz
       if (!(drag && b.id === selected)) {

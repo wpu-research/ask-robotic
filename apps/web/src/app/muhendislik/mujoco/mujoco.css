@@ -6,9 +6,9 @@
 .mj-desc { margin: 0; color: var(--muted); }
 .mj-body { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 20px; align-items: start; }
 .mj-stage-wrap { position: relative; display: grid; gap: 8px; min-width: 0; }
-.mj-stage { height: clamp(300px, 52vw, 500px); border-radius: 12px; overflow: hidden; background: #14213a; touch-action: none; }
+.mj-stage { height: clamp(300px, 52vw, 500px); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface-3); touch-action: none; }
 .mj-msg { display: grid; place-items: center; padding: 16px; color: #334155; text-align: center; }
-.mj-overlay { position: absolute; inset: 0 0 auto 0; height: clamp(300px, 52vw, 500px); display: grid; place-items: center; background: rgba(221, 229, 239, .85); color: #334155; font-weight: 700; border-radius: 12px; pointer-events: none; }
+.mj-overlay { position: absolute; inset: 0 0 auto 0; height: clamp(300px, 52vw, 500px); display: grid; place-items: center; background: rgb(255 253 249 / .88); color: var(--text); font-weight: 700; border-radius: var(--radius-sm); pointer-events: none; }
 .mj-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .mj .sbtn { font: inherit; font-weight: 700; font-size: .88rem; min-height: 44px; padding: 8px 14px; border-radius: 999px; border: 1px solid var(--primary); background: var(--primary); color: var(--primary-ink); cursor: pointer; }
 .mj .sbtn.ghost { background: transparent; color: var(--text); border-color: var(--border-strong); }
@@ -22,8 +22,8 @@
 .mj-sl input { width: 100%; min-height: 32px; }
 .mj-hint { margin: 0; padding: 10px 12px; border-left: 3px solid var(--eng); background: var(--eng-soft); border-radius: 0 8px 8px 0; font-size: .9rem; }
 .mj-xml summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
-.mj-ta { width: 100%; min-height: 260px; margin: 6px 0 8px; font: .8rem/1.55 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; tab-size: 2; white-space: pre; overflow: auto; padding: 10px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); }
-.mj-err { margin: 8px 0 0; padding: 10px 12px; border: 1px solid var(--red); color: var(--red); border-radius: 8px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.mj-ta { width: 100%; min-height: 260px; margin: 6px 0 8px; font: .8rem/1.55 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; tab-size: 2; white-space: pre; overflow: auto; padding: 10px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); }
+.mj-err { margin: 8px 0 0; padding: 10px 12px; border: 1px solid var(--red); color: var(--red); border-radius: var(--radius-xs); white-space: pre-wrap; overflow-wrap: anywhere; }
 .mj-credit { margin: 0; font-size: .85rem; color: var(--muted); }
 .mj-learn { margin-top: 24px; }
 .mj-learn li { margin: 4px 0; }
@@ -33,21 +33,21 @@
 .mj-prog { display: grid; gap: 8px; min-width: 0; }
 .mj-prog h3 { margin: 0; }
 .mj-blocks { display: grid; gap: 8px; min-width: 0; }
-.mj-blocks-ws { position: relative; height: 300px; border: 1px solid var(--border-strong); border-radius: 10px; overflow: hidden; }
+.mj-blocks-ws { position: relative; height: 300px; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; }
 .mj-py summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
-.mj-py-pre { margin: 0; padding: 12px 14px; border-radius: 10px; background: #1e2433; color: #e6edf7; font: .82rem/1.6 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; overflow: auto; max-height: 240px; white-space: pre; }
+.mj-py-pre { margin: 0; padding: 12px 14px; border-radius: var(--radius-sm); background: var(--code-bg); color: var(--code-text); font: .82rem/1.6 ui-monospace, 'JetBrains Mono', Menlo, Consolas, monospace; overflow: auto; max-height: 240px; white-space: pre; }
 
 .mj-group { display: grid; gap: 4px; }
 .mj-group-label { font-size: .78rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .mj-extra { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
-.mj-card { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+.mj-card { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
 .mj-card h3 { margin: 0; }
 .mj-goals { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .mj-goals li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px; align-items: start; }
 .mj-goals li.done .mj-goal-txt { color: var(--muted); text-decoration: line-through; }
 .mj-goal-txt { display: grid; gap: 4px; font-size: .92rem; }
 .mj-goal-txt progress { width: 100%; height: 8px; }
-.mj-win { margin: 0; padding: 8px 12px; border-radius: 10px; background: var(--primary-soft); font-weight: 700; }
+.mj-win { margin: 0; padding: 8px 12px; border-radius: var(--radius-sm); background: var(--primary-soft); font-weight: 700; }
 .mj-sens { width: 100%; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
 .mj-sens th { text-align: left; font-weight: 600; padding: 3px 8px 3px 0; overflow-wrap: anywhere; }
 .mj-sens td { text-align: right; padding: 3px 0; }
@@ -57,7 +57,7 @@
 .mj-chip i { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
 .mj-graph { width: 100%; height: 220px; display: block; }
 .mj-code { min-height: 220px; }
-.mj-out { margin: 0; padding: 10px 12px; border-radius: 8px; background: #1e2433; color: #e6edf7; font: .82rem/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; max-height: 200px; overflow: auto; }
+.mj-out { margin: 0; padding: 10px 12px; border-radius: var(--radius-xs); background: var(--code-bg); color: var(--code-text); font: .82rem/1.5 ui-monospace, Menlo, Consolas, monospace; white-space: pre-wrap; max-height: 200px; overflow: auto; }
 .mj-out.bad { color: #ffb4a8; }
 @media (max-width: 900px) { .mj-extra { grid-template-columns: minmax(0, 1fr); } }
 
@@ -65,7 +65,7 @@
 /* ---- Sade düzen: robot kartları · solda simülasyon + hedefler · sağda kod · gelişmiş katlanmış ---- */
 .mj-picker { display: grid; gap: 8px; }
 .mj-picks { display: flex; flex-wrap: wrap; gap: 8px; }
-.mj-card-pick { font: inherit; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: 14px; border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; text-align: left; }
+.mj-card-pick { font: inherit; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 14px 6px 10px; border-radius: var(--radius); border: 2px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; text-align: left; }
 .mj-card-pick:hover { border-color: var(--border-strong); }
 .mj-card-pick.on { border-color: var(--primary); background: var(--primary-soft); }
 .mj-pick-ico { font-size: 1.5rem; line-height: 1; }
@@ -87,7 +87,7 @@
 .mj-py-pre { max-height: 180px; }
 .mj-code .mj-ta { min-height: 280px; }
 .mj-hint { margin: 0; }
-.mj-adv { border: 1px solid var(--border); border-radius: 14px; padding: 4px 14px 14px; }
+.mj-adv { border: 1px solid var(--border); border-radius: var(--radius); padding: 4px 14px 14px; }
 .mj-adv > summary { cursor: pointer; font-weight: 700; min-height: 48px; display: flex; align-items: center; }
 .mj-xml-h { margin: 14px 0 0; font-size: 1rem; }
 @media (max-width: 960px) {
@@ -101,39 +101,39 @@
    Tezgâh düzeni: sahne tüm alanı kaplar, paneller üstünde yüzer.
    Solda hızlı araçlar · sağda dikey ray + açılır panel · altta durum.
    ============================================================ */
-.mj-wb { position: relative; height: clamp(520px, 76vh, 820px); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: #14213a; isolation: isolate; }
+.mj-wb { position: relative; height: clamp(520px, 76vh, 820px); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: var(--surface-3); isolation: isolate; }
 .mj-wb .mj-stage { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 0; }
 .mj-wb .mj-overlay { inset: 0; height: 100%; border-radius: 0; }
 
 /* Yüzen pano ortak biçimi */
-.mj-float { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 28px rgb(0 0 0 / .18); }
+.mj-float { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
 
 /* --- Sol: hızlı araçlar --- */
-.mj-quick { position: absolute; left: 12px; top: 12px; z-index: 3; width: 196px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 28px rgb(0 0 0 / .18); overflow: hidden; }
+.mj-quick { position: absolute; left: 12px; top: 12px; z-index: 3; width: 196px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
 .mj-quick.mini { width: auto; }
 .mj-quick-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 8px 8px 12px; font-size: .82rem; font-weight: 700; border-bottom: 1px solid var(--border); }
 .mj-quick.mini .mj-quick-head { border-bottom: 0; }
 .mj-quick-body { display: grid; gap: 6px; padding: 10px; }
-.mj-qbtn { font: inherit; font-size: .85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 10px; border-radius: 10px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; text-align: left; }
+.mj-qbtn { font: inherit; font-size: .85rem; font-weight: 600; display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; text-align: left; }
 .mj-qbtn:hover { background: var(--surface-2); }
 .mj-qbtn.on { border-color: var(--primary); background: var(--primary-soft); }
 .mj-qbtn b { font-size: 1rem; line-height: 1; }
 .mj-qspeed { display: flex; align-items: center; justify-content: space-between; gap: 6px; font-size: .82rem; font-weight: 600; }
 .mj-qspeed select { min-height: 34px; font: inherit; font-size: .82rem; }
-.mj-qhint { margin: 2px 0 0; padding: 8px 10px; border-radius: 10px; background: var(--eng-soft); font-size: .78rem; line-height: 1.45; }
-.mj-x { font: inherit; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; border: 0; background: transparent; color: var(--muted); cursor: pointer; }
+.mj-qhint { margin: 2px 0 0; padding: 8px 10px; border-radius: var(--radius-sm); background: var(--eng-soft); font-size: .78rem; line-height: 1.45; }
+.mj-x { font: inherit; display: grid; place-items: center; width: 28px; height: 28px; border-radius: var(--radius-xs); border: 0; background: transparent; color: var(--muted); cursor: pointer; }
 .mj-x:hover { background: var(--surface-2); color: var(--text); }
 
 /* --- Sağ: dikey sekme rayı --- */
-.mj-rail { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 4; display: grid; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 28px rgb(0 0 0 / .18); }
-.mj-rail-btn { font: inherit; display: grid; justify-items: center; gap: 2px; width: 62px; padding: 8px 4px; border: 0; border-radius: 10px; background: transparent; color: var(--text); cursor: pointer; }
+.mj-rail { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); z-index: 4; display: grid; gap: 4px; padding: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.mj-rail-btn { font: inherit; display: grid; justify-items: center; gap: 2px; width: 62px; padding: 8px 4px; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text); cursor: pointer; }
 .mj-rail-btn b { font-size: 1.1rem; line-height: 1.1; }
 .mj-rail-btn span { font-size: .62rem; font-weight: 700; letter-spacing: .04em; }
 .mj-rail-btn:hover { background: var(--surface-2); }
 .mj-rail-btn.on { background: var(--primary); color: var(--primary-ink); }
 
 /* --- Rayın solunda açılan panel --- */
-.mj-dock { position: absolute; right: 88px; top: 12px; bottom: 44px; z-index: 3; width: min(440px, 48vw); display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 8px 28px rgb(0 0 0 / .18); overflow: hidden; }
+.mj-dock { position: absolute; right: 88px; top: 12px; bottom: 44px; z-index: 3; width: min(440px, 48vw); display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
 .mj-dock[hidden] { display: none; }
 .mj-dock-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 8px 10px 14px; border-bottom: 1px solid var(--border); font-size: .92rem; }
 .mj-dock-body { display: grid; gap: 10px; align-content: start; padding: 12px 14px 16px; overflow: auto; flex: 1; min-height: 0; }
@@ -148,10 +148,10 @@
 .mj-dock .mj-chip { min-height: 32px; padding: 2px 10px; font-size: .78rem; }
 
 /* --- Alt durum çubuğu --- */
-.mj-status { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 6px 14px; background: rgb(12 20 38 / .78); color: #cfdcf2; font-size: .76rem; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); }
+.mj-status { position: absolute; left: 0; right: 0; bottom: 0; z-index: 2; display: flex; flex-wrap: wrap; align-items: center; gap: 14px; padding: 6px 14px; background: rgb(42 26 18 / .8); color: #f6ece2; font-size: .76rem; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); }
 .mj-status b { color: #fff; }
 .mj-status-r { margin-left: auto; }
-.mj-live { color: #86efac; font-weight: 700; }
+.mj-live { color: #5fd3a0; font-weight: 700; }
 
 /* --- Dar ekran: ray yatay, panel sahnenin altında --- */
 @media (max-width: 900px) {
@@ -169,16 +169,16 @@
 /* --- Ortam seçimi (yerçekimi) --- */
 .mj-envs { display: grid; gap: 4px; margin-top: 2px; }
 .mj-env-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-.mj-env { font: inherit; font-size: .76rem; font-weight: 600; display: flex; align-items: center; gap: 5px; min-height: 34px; padding: 4px 7px; border-radius: 9px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-env { font: inherit; font-size: .76rem; font-weight: 600; display: flex; align-items: center; gap: 5px; min-height: 34px; padding: 4px 7px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
 .mj-env:hover { background: var(--surface-2); }
 .mj-env.on { border-color: var(--primary); background: var(--primary-soft); }
 .mj-env b { font-size: .95rem; line-height: 1; }
 
 /* --- Sahne üstü fizik göstergesi --- */
-.mj-hud { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: min(540px, 60%); padding: 6px 14px; border-radius: 999px; background: rgb(12 20 38 / .66); color: #dce7f8; font-size: .76rem; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); pointer-events: none; }
-.mj-hud b { color: #9fb6d8; font-weight: 600; }
+.mj-hud { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); z-index: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; max-width: min(540px, 60%); padding: 6px 14px; border-radius: 999px; background: rgb(42 26 18 / .7); color: #f6ece2; font-size: .76rem; font-variant-numeric: tabular-nums; backdrop-filter: blur(6px); pointer-events: none; }
+.mj-hud b { color: #d8bda2; font-weight: 600; }
 .mj-hud i { font-style: normal; }
-.mj-hud-hi { color: #fde68a; font-weight: 700; }
+.mj-hud-hi { color: #f2c078; font-weight: 700; }
 
 /* --- Canlı motor çubukları --- */
 .mj-motors { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -195,7 +195,7 @@
 
 
 /* --- ELEK rafı: devre tuvali ve bağlantı eşlemesi --- */
-.mj-elec-canvas { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.mj-elec-canvas { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 .mj-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: 6px; padding: 0 5px; border-radius: 999px; background: var(--primary); color: var(--primary-ink); font-size: .68rem; font-weight: 700; }
 .mj-tab.on .mj-badge { background: var(--primary-ink); color: var(--primary); }
 .mj-link-h { margin: 6px 0 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
@@ -203,25 +203,25 @@
 .mj-links li { display: grid; grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .8rem; }
 .mj-link-n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
 .mj-links select { min-height: 34px; font: inherit; font-size: .78rem; min-width: 0; }
-.mj-inv { font: inherit; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-inv { font: inherit; width: 34px; height: 34px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
 .mj-inv.on { border-color: var(--primary); background: var(--primary-soft); }
 .mj-inv:disabled { opacity: .4; cursor: not-allowed; }
-.mj-warns { list-style: none; margin: 0; padding: 8px 10px; display: grid; gap: 4px; border-radius: 10px; background: var(--eng-soft); font-size: .78rem; }
+.mj-warns { list-style: none; margin: 0; padding: 8px 10px; display: grid; gap: 4px; border-radius: var(--radius-sm); background: var(--eng-soft); font-size: .78rem; }
 .mj-note { margin: 0; padding: 8px 11px; border-left: 3px solid var(--primary); background: var(--primary-soft); border-radius: 0 8px 8px 0; font-size: .8rem; }
 
 
 /* --- CAD rafı: robotu tezgâhın içinde tasarla --- */
 .mj-cad-chassis { display: flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 600; }
 .mj-cad-chassis select { min-height: 34px; font: inherit; font-size: .8rem; }
-.mj-cad-name { flex: 1; min-width: 7rem; min-height: 34px; padding: 4px 10px; border-radius: 9px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); font: inherit; font-size: .82rem; }
-.mj-cad-stage { height: 240px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.mj-cad-name { flex: 1; min-width: 7rem; min-height: 34px; padding: 4px 10px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); font: inherit; font-size: .82rem; }
+.mj-cad-stage { height: 240px; border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; }
 .mj-cad-stage > div { height: 100%; }
 .mj-cad-parts { display: flex; flex-wrap: wrap; gap: 5px; }
 .mj-cad-part { font: inherit; font-size: .75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
 .mj-cad-part:hover { background: var(--surface-2); }
 .mj-cad-part.on { border-color: var(--primary); background: var(--primary-soft); }
 .mj-cad-part i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-.mj-cad-sel { padding: 7px 10px; border-radius: 10px; background: var(--primary-soft); font-size: .82rem; }
+.mj-cad-sel { padding: 7px 10px; border-radius: var(--radius-sm); background: var(--primary-soft); font-size: .82rem; }
 .mj-cad-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: .8rem; }
 .mj-cad-stats li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--border); }
 .mj-cad-stats span { color: var(--muted); }
@@ -232,11 +232,11 @@
 .mj-cad-bsel { font: inherit; font-size: .76rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
 .mj-cad-blocks li.on .mj-cad-bsel { border-color: var(--primary); background: var(--primary-soft); }
 .mj-cad-bsel i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-.mj-cad-block-edit { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.mj-cad-block-edit { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-2); }
 .mj-cad-nums { display: flex; flex-wrap: wrap; gap: 6px; }
 .mj-cad-num { display: grid; gap: 2px; font-size: .72rem; color: var(--muted); }
-.mj-cad-num input { width: 5.2rem; min-height: 32px; padding: 3px 8px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: .8rem; }
-.mj-cad-block-edit input[type="color"] { width: 40px; height: 34px; padding: 2px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); cursor: pointer; }
+.mj-cad-num input { width: 5.2rem; min-height: 32px; padding: 3px 8px; border-radius: var(--radius-xs); border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: .8rem; }
+.mj-cad-block-edit input[type="color"] { width: 40px; height: 34px; padding: 2px; border: 1px solid var(--border-strong); border-radius: var(--radius-xs); background: var(--surface); cursor: pointer; }
 .mj-cad-bsel.cut { border-style: dashed; }
 .mj-cad-bsel.cut i { border-radius: 50%; }
 
@@ -244,7 +244,7 @@
 /* --- CAD başlığı, şablon kartları, varlık listesi --- */
 .mj-cad-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
 .mj-cad-undo { display: flex; gap: 4px; }
-.mj-cad-sablon { font: inherit; display: grid; gap: 2px; justify-items: start; text-align: left; width: calc(50% - 3px); padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-cad-sablon { font: inherit; display: grid; gap: 2px; justify-items: start; text-align: left; width: calc(50% - 3px); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
 .mj-cad-sablon:hover { border-color: var(--primary); background: var(--primary-soft); }
 .mj-cad-sablon b { font-size: 1.3rem; line-height: 1; }
 .mj-cad-sablon span { font-size: .82rem; font-weight: 700; }
@@ -254,8 +254,8 @@
 .mj-cad-x:hover { background: var(--surface-2); color: var(--red, #dc2626); }
 
 /* --- Görünüm anahtarı (sağ üstte) --- */
-.mj-views { position: absolute; right: 88px; top: 12px; z-index: 2; display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgb(12 20 38 / .7); backdrop-filter: blur(6px); }
-.mj-views button { font: inherit; font-size: .72rem; font-weight: 600; min-height: 28px; padding: 3px 9px; border: 0; border-radius: 7px; background: transparent; color: #dce7f8; cursor: pointer; }
+.mj-views { position: absolute; right: 88px; top: 12px; z-index: 2; display: flex; gap: 2px; padding: 3px; border-radius: var(--radius-sm); background: rgb(42 26 18 / .72); backdrop-filter: blur(6px); }
+.mj-views button { font: inherit; font-size: .72rem; font-weight: 600; min-height: 28px; padding: 3px 9px; border: 0; border-radius: 7px; background: transparent; color: #f6ece2; cursor: pointer; }
 .mj-views button:hover { background: rgb(255 255 255 / .14); }
 .mj-wb[data-dock="cad"] .mj-views, .mj-wb[data-dock="elec"] .mj-views, .mj-wb[data-dock="code"] .mj-views,
 .mj-wb[data-dock="goals"] .mj-views, .mj-wb[data-dock="data"] .mj-views, .mj-wb[data-dock="model"] .mj-views { right: auto; left: 50%; transform: translateX(-50%); top: 52px; }
