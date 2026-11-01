@@ -296,6 +296,43 @@ describe('tasarım → MJCF', () => {
     expect(mk('standart')).not.toContain('<material')
   })
 
+  it('içe aktarılan özel model (ozel) MuJoCo tarafından derlenir', () => {
+    // Basit bir dörtyüzlü: içe aktarma sonrası saklanan biçimin aynısı
+    const mesh = [1, 1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1]
+    const d = {
+      ...rover(),
+      govde: { v: 1, blocks: [
+        { id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.003], yaw: 0, color: '#db3c8c' },
+        { id: 'b2', shape: 'ozel', pos: [0.05, 0, 0.015], size: [0.02, 0.02, 0.02], yaw: 0, color: '#7c8aa5', mesh, meshVol: 8 / 3, meshName: 'parca.stl' },
+      ] },
+    } as RobotDesign
+    const res = designToMjcf(d)
+    expect(res.xml).toContain('type="mesh"')
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
+  it('özel modelin köşeleri yarı boyutlarla ölçeklenir', () => {
+    const mesh = [1, 1, 1, 1, -1, -1, -1, 1, -1, -1, -1, 1]
+    const d = {
+      ...rover(),
+      govde: { v: 1, blocks: [{ id: 'b1', shape: 'ozel', pos: [0, 0, 0], size: [0.02, 0.03, 0.04], yaw: 0, color: '#7c8aa5', mesh, meshVol: 8 / 3 }] },
+    } as RobotDesign
+    const xml = designToMjcf(d).xml
+    expect(xml).toContain('vertex="0.02 0.03 0.04')
+  })
+
+  it('bozuk örgü kutuya düşer, model yine derlenir', () => {
+    const d = {
+      ...rover(),
+      govde: { v: 1, blocks: [{ id: 'b1', shape: 'ozel', pos: [0, 0, 0], size: [0.05, 0.05, 0.01], yaw: 0, color: '#7c8aa5', mesh: [1, 2] }] },
+    } as RobotDesign
+    const res = designToMjcf(d)
+    expect(res.xml).not.toContain('type="mesh"')
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
   it('zemine bakan sensör için yaklaşık karşılandığı not edilir', () => {
     let d = rover()
     const before = d.parts.length

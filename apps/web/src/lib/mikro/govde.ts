@@ -12,7 +12,7 @@ import { unitVolume, type MeshShape } from './sekiller'
 
 /** Yerleşik MuJoCo ilkelleri + örgü olarak verilen dışbükey çokyüzlüler. */
 export type PrimitiveShape = 'kutu' | 'silindir' | 'kure' | 'kapsul' | 'elipsoid'
-export type BlockShape = PrimitiveShape | MeshShape
+export type BlockShape = PrimitiveShape | MeshShape | 'ozel'
 
 /** Yüzey görünümü: mat plastik, parlak metal, yarı saydam. */
 export type BlockMaterial = 'standart' | 'metalik' | 'saydam'
@@ -42,6 +42,12 @@ export interface Block {
   cut?: boolean
   /** Yüzey görünümü. Fiziği değiştirmez; yalnız görüntüdür. */
   material?: BlockMaterial
+  /** shape === 'ozel': içe aktarılan modelin dışbükey örtü köşeleri, [-1,1] kutusunda (x,y,z sırayla). */
+  mesh?: number[]
+  /** shape === 'ozel': birim kutudaki örtü hacmi; ölçekli hacim bununla sx·sy·sz çarpımıdır. */
+  meshVol?: number
+  /** İçe aktarılan dosyanın adı (arayüzde gösterilir). */
+  meshName?: string
 }
 
 export interface Govde {
@@ -74,6 +80,8 @@ export function blockVolume(b: Block): number {
     // Kapsül: silindir gövde + iki yarım küre uç (MuJoCo'da size = yarıçap, yarı gövde boyu)
     case 'kapsul': return Math.PI * x * x * 2 * z + (4 / 3) * Math.PI * x * x * x
     case 'elipsoid': return (4 / 3) * Math.PI * x * y * z
+    // İçe aktarılan model: örtü hacmi içe aktarma anında hesaplanıp saklanır
+    case 'ozel': return (b.meshVol ?? 1) * x * y * z
     default: return unitVolume(b.shape) * x * y * z
   }
 }
@@ -106,8 +114,13 @@ export function defaultGovde(chassis: ChassisId): Govde {
 
 /** Bloğu sınırlara oturtur: sonsuz/NaN değerler ve saçma boyutlar modele sızmasın. */
 export function normalizeBlock(b: Block): Block {
+  const mesh = Array.isArray(b.mesh) && b.mesh.length >= 12 && b.mesh.length % 3 === 0 && b.mesh.every(Number.isFinite)
+    ? b.mesh
+    : undefined
   return {
     ...b,
+    ...(b.shape === 'ozel' && !mesh ? { shape: 'kutu' as BlockShape } : {}), // bozuk örgü kutuya düşer
+    mesh,
     pos: b.pos.map((v) => clamp(finite(v), -0.5, 0.5)) as [number, number, number],
     size: b.size.map((v) => clamp(finite(v, MIN_HALF), MIN_HALF, MAX_HALF)) as [number, number, number],
     yaw: ((finite(b.yaw) % 360) + 360) % 360,

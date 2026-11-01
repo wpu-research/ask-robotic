@@ -261,3 +261,4 @@
 .mj-wb[data-dock="goals"] .mj-views, .mj-wb[data-dock="data"] .mj-views, .mj-wb[data-dock="model"] .mj-views { right: auto; left: 50%; transform: translateX(-50%); top: 52px; }
 .mj-cad-tools { gap: 4px; }
 .mj-cad-tools .mj-qbtn { font-size: .74rem; min-height: 32px; padding: 4px 8px; }
+.mj-cad-file { display: inline-flex; align-items: center; cursor: pointer; }

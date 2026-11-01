@@ -14,10 +14,11 @@ import {
 import {
   addBlock, defaultGovde, duplicateBlock, govdeIssues, govdeMassG, normalizeGovde,
   removeBlock, updateBlock, type BlockShape, type Govde,
-  mirrorBlock, patternBlock, type BlockMaterial,
+  mirrorBlock, patternBlock, uniqueBlockId, type BlockMaterial,
 } from '@/lib/mikro/govde'
 import { SABLONLAR } from '@/lib/mikro/sablonlar'
 import type { GizmoMode } from './cad-gizmo'
+import { importModel } from './cad-import'
 import { deleteAsset, insertAsset, listAssets, saveAsset, type Varlik } from '@/lib/mikro/varliklar'
 
 interface Props {
@@ -61,6 +62,8 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
   const [tool, setTool] = useState<PartType | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [assetName, setAssetName] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [importNotes, setImportNotes] = useState<{ tr: string; en: string }[]>([])
   const [assets, setAssets] = useState<Varlik[]>([])
   useEffect(() => { setAssets(listAssets()) }, [])
 
@@ -158,6 +161,22 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
               {SHAPES.map((s) => <option key={s.id} value={s.id}>{en ? s.en : s.tr}</option>)}
             </select>
           </label>
+          <label className="sbtn ghost mj-cad-file" data-testid="mujoco-cad-import">
+            📥 {L('Model yükle', 'Import model')}
+            <input type="file" accept=".stl,.obj,.glb,.gltf" hidden onChange={async (e) => {
+              const file = e.target.files?.[0]; e.target.value = ''
+              if (!file) return
+              setImporting(true); setImportNotes([])
+              const out = await importModel(file)
+              setImporting(false)
+              if (!out.ok) { setImportNotes([{ tr: out.tr, en: out.en }]); return }
+              const id = uniqueBlockId(govde.blocks.map((b) => b.id))
+              const frontX = govde.blocks.reduce((m, b) => Math.max(m, b.pos[0] + b.size[0]), 0)
+              setGovde({ ...govde, blocks: [...govde.blocks, { ...out.block, id, pos: [frontX + out.block.size[0] + 0.005, 0, 0] }] })
+              onBlock(id)
+              setImportNotes(out.notes)
+            }} />
+          </label>
           <button className="sbtn ghost" data-testid="mujoco-cad-add-hole"
             onClick={() => {
               const g = addBlock(govde, 'kutu')
@@ -172,7 +191,7 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
             <li key={b.id} className={b.id === block ? 'on' : ''}>
               <button className={`mj-cad-bsel${b.cut ? ' cut' : ''}`} onClick={() => onBlock(b.id === block ? null : b.id)} data-testid={`mujoco-cad-block-${b.id}`}>
                 <i style={{ background: b.color }} aria-hidden="true" />
-                {b.id} · {b.cut ? L('delik', 'hole') : b.shape === 'kutu' ? L('kutu', 'box') : b.shape === 'silindir' ? L('silindir', 'cylinder') : L('küre', 'sphere')}
+                {b.id} · {b.meshName ? b.meshName : b.cut ? L('delik', 'hole') : b.shape === 'kutu' ? L('kutu', 'box') : b.shape === 'silindir' ? L('silindir', 'cylinder') : L('küre', 'sphere')}
               </button>
             </li>
           ))}
@@ -250,6 +269,13 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
           <li><span>{L('Blok', 'Blocks')}</span><b>{govde.blocks.length}</b></li>
           <li><span>{L('Gövde kütlesi', 'Body mass')}</span><b>{govdeMassG(govde)} g</b></li>
         </ul>
+
+        {importing && <p className="mj-note">{L('Model okunuyor…', 'Reading the model…')}</p>}
+        {importNotes.length > 0 && (
+          <ul className="mj-warns" data-testid="mujoco-cad-import-notes">
+            {importNotes.map((n, k) => <li key={k}>ℹ {en ? n.en : n.tr}</li>)}
+          </ul>
+        )}
 
         {gIssues.length > 0 && (
           <ul className="mj-warns" data-testid="mujoco-cad-body-issues">

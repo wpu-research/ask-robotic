@@ -97,7 +97,10 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
       let meshName: string | undefined
       if (!PRIMITIVES.includes(b.shape)) {
         meshName = `m_govde_${i}`
-        assets.push(`<mesh name="${meshName}" vertex="${meshVertexAttr(b.shape as MeshShape, b.size)}"/>`)
+        const verts = b.shape === 'ozel'
+          ? customVertexAttr(b.mesh ?? [], b.size)
+          : meshVertexAttr(b.shape as MeshShape, b.size)
+        assets.push(`<mesh name="${meshName}" vertex="${verts}"/>`)
       }
       // Malzeme yalnız görüntüdür: parlaklık ve saydamlık MJCF materyaliyle taşınır
       const mt = MATERIAL_SPEC[b.material ?? 'standart']
@@ -248,6 +251,15 @@ function blockGeom(b: Block, meshName?: string): string {
     // şekil dışbükey olduğu için örtü tam olarak şeklin kendisidir.
     default: return `type="mesh" mesh="${meshName}" pos="${pos}" quat="${quat}"`
   }
+}
+
+/** İçe aktarılan modelin köşeleri: birim kutudan gerçek yarı boyutlara ölçeklenir. */
+function customVertexAttr(mesh: number[], size: [number, number, number]): string {
+  const out: string[] = []
+  for (let i = 0; i + 2 < mesh.length; i += 3) {
+    out.push(`${f(mesh[i] * size[0])} ${f(mesh[i + 1] * size[1])} ${f(mesh[i + 2] * size[2])}`)
+  }
+  return out.join(' ')
 }
 
 /** '#rrggbb' → MJCF rgba ('r g b a', 0-1). */
