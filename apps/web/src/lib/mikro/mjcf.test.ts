@@ -1,0 +1,146 @@
+// Üretilen MJCF'i varsaymıyoruz: gerçek MuJoCo WASM'ı ile derleyip modelin içine bakıyoruz.
+// Derlenmeyen bir model sessizce geçmesin diye her tasarım fiilen yükleniyor.
+import { beforeAll, describe, expect, it } from 'vitest'
+import { designToMjcf } from './mjcf'
+import { CHASSIS, placePart, type RobotDesign } from './tasarim'
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+let mj: any
+const MJ_DIR = new URL('../../../public/mujoco/', import.meta.url).pathname
+
+beforeAll(async () => {
+  const mod = await import(/* @vite-ignore */ `${MJ_DIR}mujoco.js`)
+  mj = await mod.default({ locateFile: (p: string) => `${MJ_DIR}${p}` })
+}, 120_000)
+
+/** XML'i derler ve modelden ad listeleri çıkarır. */
+function compile(xml: string) {
+  const path = `/t${Math.random().toString(36).slice(2)}.xml`
+  mj.FS.writeFile(path, xml)
+  const model = mj.MjModel.mj_loadXML(path)
+  const data = new mj.MjData(model)
+  const names = (objType: number, n: number) =>
+    Array.from({ length: n }, (_, i) => mj.mj_id2name(model, objType, i) || '')
+  const out = {
+    nu: model.nu,
+    nsensor: model.nsensor,
+    actuators: names(19, model.nu),
+    sensors: names(20, model.nsensor),
+    ctrlrange: Array.from({ length: model.nu }, (_, i) => [model.actuator_ctrlrange[2 * i], model.actuator_ctrlrange[2 * i + 1]] as const),
+    step: (n: number) => { for (let i = 0; i < n; i++) mj.mj_step(model, data) },
+    z: () => data.qpos[2],
+    x: () => data.qpos[0],
+    setCtrl: (i: number, v: number) => { data.ctrl[i] = v },
+    reset: () => { mj.mj_resetData(model, data); mj.mj_forward(model, data) },
+    dispose: () => { data.delete(); model.delete() },
+  }
+  out.reset()
+  return out
+}
+
+/** İki tekerli, mesafe sensörlü, pilli küçük bir robot. */
+function rover(): RobotDesign {
+  let d: RobotDesign = { v: 1, name: 'Gezgin', chassis: 'orta', parts: [] }
+  const ch = CHASSIS.orta
+  d = placePart(d, 'teker-buyuk', 2, 0)
+  d = placePart(d, 'teker-buyuk', 2, ch.rows - 1)
+  d = placePart(d, 'motor-std', 1, 1)
+  d = placePart(d, 'motor-std', 1, ch.rows - 2)
+  d = placePart(d, 'sarhos', ch.cols - 1, Math.floor(ch.rows / 2))
+  d = placePart(d, 'ultrasonik', ch.cols - 1, 1)
+  d = placePart(d, 'pil-4aa', 0, Math.floor(ch.rows / 2))
+  return d
+}
+
+describe('tasarım → MJCF', () => {
+  it('üretilen model MuJoCo tarafından derlenir', () => {
+    const { xml } = designToMjcf(rover())
+    const m = compile(xml)
+    try {
+      expect(m.nu).toBeGreaterThan(0)
+      expect(m.nsensor).toBeGreaterThan(0)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('bildirilen motor ve sensör adları modelde gerçekten vardır', () => {
+    const res = designToMjcf(rover())
+    const m = compile(res.xml)
+    try {
+      for (const a of res.actuators) expect(m.actuators).toContain(a)
+      for (const s of res.sensors) expect(m.sensors).toContain(s)
+      expect(m.actuators.length).toBe(res.actuators.length)
+      expect(m.sensors.length).toBe(res.sensors.length)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('her teker için bir motor üretilir', () => {
+    const res = designToMjcf(rover())
+    expect(res.actuators).toHaveLength(2)
+  })
+
+  it('motorun hız sınırı tasarımdaki devirden gelir', () => {
+    // Standart motor 840 °/s → 14,66 rad/s
+    const res = designToMjcf(rover())
+    const m = compile(res.xml)
+    try {
+      const [lo, hi] = m.ctrlrange[0]
+      expect(hi).toBeCloseTo((840 * Math.PI) / 180, 2)
+      expect(lo).toBeCloseTo(-hi, 6)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('robot zemine düşmeden durur: yerçekimi altında batmaz', () => {
+    const { xml } = designToMjcf(rover())
+    const m = compile(xml)
+    try {
+      const z0 = m.z()
+      m.step(500) // 1 sn
+      expect(m.z()).toBeGreaterThan(z0 - 0.02)
+      expect(m.z()).toBeLessThan(z0 + 0.02)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('iki motor da ileri sürülünce robot ilerler', () => {
+    const { xml } = designToMjcf(rover())
+    const m = compile(xml)
+    try {
+      m.step(200) // otursun
+      const x0 = m.x()
+      m.setCtrl(0, 10); m.setCtrl(1, 10)
+      m.step(1000) // 2 sn
+      expect(Math.abs(m.x() - x0)).toBeGreaterThan(0.02)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('tekersiz tasarım da derlenir ve dürüstçe not düşer', () => {
+    const d: RobotDesign = { v: 1, name: 'Durgun', chassis: 'kucuk', parts: [] }
+    const res = designToMjcf(d)
+    expect(res.actuators).toHaveLength(0)
+    expect(res.notes.some((n) => /teker yok/i.test(n.tr))).toBe(true)
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(0) } finally { m.dispose() }
+  }, 60_000)
+
+  it('her şasi boyu derlenir', () => {
+    for (const chassis of ['kucuk', 'orta', 'buyuk'] as const) {
+      const d: RobotDesign = { ...rover(), chassis }
+      const m = compile(designToMjcf(d).xml)
+      try { expect(m.nu).toBeGreaterThanOrEqual(0) } finally { m.dispose() }
+    }
+  }, 120_000)
+
+  it('Türkçe harfli ve tırnaklı robot adı geçerli XML üretir', () => {
+    const d: RobotDesign = { ...rover(), name: 'Çılgın "Şahin" & <Kaplan>' }
+    const m = compile(designToMjcf(d).xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
+  it('zemine bakan sensör için yaklaşık karşılandığı not edilir', () => {
+    let d = rover()
+    const before = d.parts.length
+    d = placePart(d, 'cizgi', 4, 1) // kart hücrelerinin (2-3, 1-2) dışında boş bir yer
+    expect(d.parts.length).toBe(before + 1) // yerleşmediyse test boşa geçmesin
+    const res = designToMjcf(d)
+    expect(res.notes.some((n) => /zemin rengi okunamaz/i.test(n.tr))).toBe(true)
+  })
+})

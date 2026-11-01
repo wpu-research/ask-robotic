@@ -1,7 +1,7 @@
 'use client'
 // MuJoCo (Google DeepMind, Apache 2.0) resmi WebAssembly sürümü tarayıcıda çalışır; fizik burada, görüntü three.js'te.
 // MuJoCo koordinatı Z-yukarı; sahne grubu -90° döndürülerek three.js'in Y-yukarısına oturur.
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { createStage, fitShadow, hasWebGL, type Stage } from '@/components/three/core'
 import { useLocale } from '@/i18n/client'
@@ -14,6 +14,7 @@ import { GoalTracker } from '@/lib/mujoco/goals'
 import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 import { localizeScene } from '@/lib/mujoco/names-en'
+import { designScene, loadDesign } from '@/lib/mujoco/design-scene'
 import { buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
 import { MurokoElec, starterCircuit } from './mujoco-elec'
 import { EMPTY_PLAN, pumpWiring, type WiringPlan } from '@/lib/mujoco/wiring'
@@ -38,7 +39,7 @@ const DEFAULT_SCENE = MJ_SCENES[0].id
 
 const GROUP_LABEL = {
   gercek: { tr: 'Gerçek robot modelleri (MuJoCo Menagerie)', en: 'Real robot models (MuJoCo Menagerie)' },
-  robot: { tr: 'Basit robotlar', en: 'Simple robots' },
+  robot: { tr: 'Senin tasarımın', en: 'Your design' },
   fizik: { tr: 'Fizik deneyleri', en: 'Physics experiments' },
 }
 
@@ -79,7 +80,16 @@ export function MujocoLab() {
   const pyBridge = useRef<PyBridge | null>(null)
 
   const [sceneId, setSceneId] = useState(DEFAULT_SCENE)
-  const SCENES = en ? EN_SCENES : MJ_SCENES
+  // Tasarım tezgâhında kurulmuş robot varsa listeye en başa eklenir (tarayıcıda saklanır).
+  const [designed, setDesigned] = useState<ReturnType<typeof designScene>>(null)
+  useEffect(() => {
+    const d = loadDesign()
+    setDesigned(d ? designScene(d) : null)
+  }, [])
+  const SCENES = useMemo(
+    () => (designed ? [designed, ...(en ? EN_SCENES : MJ_SCENES)] : en ? EN_SCENES : MJ_SCENES),
+    [designed, en],
+  )
   const scene: MjScene = SCENES.find((s) => s.id === sceneId) ?? SCENES[0]
   const sceneRef = useRef(scene); sceneRef.current = scene
   const [xml, setXml] = useState(scene.xml)
@@ -447,7 +457,7 @@ export function MujocoLab() {
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'robot'}>
-            {(['gercek', 'robot', 'fizik'] as const).filter((k) => SCENES.some((x) => x.kind === k)).map((k) => (
+            {(['robot', 'gercek', 'fizik'] as const).filter((k) => SCENES.some((x) => x.kind === k)).map((k) => (
               <div key={k} className="mj-group">
                 <span className="mj-group-label">{GROUP_LABEL[k][en ? 'en' : 'tr']}</span>
                 <div className="mj-picks" role="tablist" aria-label={GROUP_LABEL[k][en ? 'en' : 'tr']}>{SCENES.filter((s) => s.kind === k).map(pickCard)}</div>
