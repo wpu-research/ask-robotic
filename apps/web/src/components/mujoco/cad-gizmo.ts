@@ -81,6 +81,10 @@ export function createCadGizmo(
   group.add(layer)
 
   const proxies = new Map<string, THREE.Mesh>()
+  // Ölçü okları: seçili bloğun en/boy/yükseklik çizgileri ve mm etiketleri
+  const dims = new THREE.Group()
+  dims.visible = false
+  layer.add(dims)
   let blocks: Block[] = []
   let selected: string | null = null
   let opts: GizmoOptions = { snapM: 0.005, snapDeg: 15 }
@@ -98,6 +102,57 @@ export function createCadGizmo(
     stage.controls.enabled = !drag // sürüklerken kamera dönmesin
     if (!drag) commit()
   })
+
+  /** mm etiketi: tuvale yazılıp sprite olarak sahneye konur. */
+  function label(text: string): THREE.Sprite {
+    const c = document.createElement('canvas')
+    c.width = 128; c.height = 48
+    const g = c.getContext('2d')!
+    g.fillStyle = 'rgba(12,20,38,.82)'
+    g.beginPath(); g.roundRect(0, 0, 128, 48, 10); g.fill()
+    g.fillStyle = '#eaf2ff'; g.font = 'bold 26px system-ui, sans-serif'
+    g.textAlign = 'center'; g.textBaseline = 'middle'
+    g.fillText(text, 64, 25)
+    const t = new THREE.CanvasTexture(c)
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false, transparent: true }))
+    sp.scale.set(0.03, 0.011, 1)
+    sp.renderOrder = 1000
+    return sp
+  }
+
+  function clearDims() {
+    for (const o of [...dims.children]) {
+      dims.remove(o)
+      const any = o as THREE.Mesh & THREE.Sprite
+      any.geometry?.dispose?.()
+      const m = any.material as THREE.Material & { map?: THREE.Texture }
+      m?.map?.dispose?.(); m?.dispose?.()
+    }
+  }
+
+  /** Seçili blok için üç ölçü çizgisi ve mm etiketi çizer. */
+  function drawDims(b: Block | undefined) {
+    clearDims()
+    if (!b) { dims.visible = false; return }
+    dims.visible = true
+    const [sx, sy, sz] = b.size
+    const [px, py, pz] = b.pos
+    const axes: [THREE.Vector3, THREE.Vector3, number, number][] = [
+      [new THREE.Vector3(px - sx, py - sy, pz - sz), new THREE.Vector3(px + sx, py - sy, pz - sz), 2 * sx, 0],
+      [new THREE.Vector3(px + sx, py - sy, pz - sz), new THREE.Vector3(px + sx, py + sy, pz - sz), 2 * sy, 1],
+      [new THREE.Vector3(px + sx, py - sy, pz - sz), new THREE.Vector3(px + sx, py - sy, pz + sz), 2 * sz, 2],
+    ]
+    const colors = [0xef4444, 0x22c55e, 0x3b82f6]
+    for (const [a, c, len, i] of axes) {
+      const geo = new THREE.BufferGeometry().setFromPoints([a, c])
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({ color: colors[i], depthTest: false }))
+      line.renderOrder = 1000
+      dims.add(line)
+      const sp = label(`${Math.round(len * 1000)} mm`)
+      sp.position.copy(a.clone().add(c).multiplyScalar(0.5))
+      dims.add(sp)
+    }
+  }
 
   /** Vekilin durumunu bloğa yazar. Yuvarlak şekillerde en ve boy birlikte değişir. */
   function commit() {
@@ -154,6 +209,7 @@ export function createCadGizmo(
       rebuild(govde.blocks)
       const m = selId ? proxies.get(selId) : null
       if (m) { tc.attach(m); helper.visible = true } else { tc.detach(); helper.visible = false }
+      drawDims(selId ? govde.blocks.find((b) => b.id === selId) : undefined)
     },
     setMode(mode) {
       tc.setMode(mode)
@@ -169,6 +225,7 @@ export function createCadGizmo(
       tc.detach()
       tc.dispose()
       stage.scene.remove(helper)
+      clearDims()
       for (const m of proxies.values()) { m.geometry.dispose(); (m.material as THREE.Material).dispose() }
       proxies.clear()
       group.remove(layer)

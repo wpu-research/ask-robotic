@@ -14,7 +14,7 @@ import {
 import {
   addBlock, defaultGovde, duplicateBlock, govdeIssues, govdeMassG, normalizeGovde,
   removeBlock, updateBlock, type BlockShape, type Govde,
-  mirrorBlock, patternBlock,
+  mirrorBlock, patternBlock, type BlockMaterial,
 } from '@/lib/mikro/govde'
 import { SABLONLAR } from '@/lib/mikro/sablonlar'
 import type { GizmoMode } from './cad-gizmo'
@@ -201,6 +201,14 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
               <button className="sbtn ghost" onClick={() => setGovde(updateBlock(govde, bsel.id, { cut: !bsel.cut }))}
                 data-testid="mujoco-cad-toggle-cut">{bsel.cut ? `⬛ ${L('Katı yap', 'Make solid')}` : `✂ ${L('Delik yap', 'Make hole')}`}</button>
               <input type="color" value={bsel.color} aria-label={L('Renk', 'Colour')} onChange={(e) => setGovde(updateBlock(govde, bsel.id, { color: e.target.value }))} />
+              <label className="mj-cad-chassis">{L('Yüzey', 'Finish')}
+                <select value={bsel.material ?? 'standart'} data-testid="mujoco-cad-material"
+                  onChange={(e) => setGovde(updateBlock(govde, bsel.id, { material: e.target.value as BlockMaterial }))}>
+                  <option value="standart">{L('Mat plastik', 'Matte plastic')}</option>
+                  <option value="metalik">{L('Metalik', 'Metallic')}</option>
+                  <option value="saydam">{L('Saydam', 'Transparent')}</option>
+                </select>
+              </label>
               <button className="sbtn ghost" onClick={() => setGovde(duplicateBlock(govde, bsel.id))}>⧉ {L('Kopyala', 'Duplicate')}</button>
               <button className="sbtn ghost" onClick={() => setGovde(mirrorBlock(govde, bsel.id, 'y'))} data-testid="mujoco-cad-mirror">
                 ⇋ {L('Aynala', 'Mirror')}

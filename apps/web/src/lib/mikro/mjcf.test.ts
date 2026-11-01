@@ -272,6 +272,30 @@ describe('tasarım → MJCF', () => {
     expect(designToMjcf(d).xml).not.toContain('<asset>')
   })
 
+  it('malzeme MJCF materyali olarak yazılır ve derlenir', () => {
+    for (const material of ['metalik', 'saydam'] as const) {
+      const d = {
+        ...rover(),
+        govde: { v: 1, blocks: [{ id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.003], yaw: 0, color: '#db3c8c', material }] },
+      } as RobotDesign
+      const xml = designToMjcf(d).xml
+      expect(xml, material).toContain('<material name="mt_govde_0"')
+      expect(xml, material).toContain('material="mt_govde_0"')
+      const m = compile(xml)
+      try { expect(m.nu, material).toBe(2) } finally { m.dispose() }
+    }
+  }, 60_000)
+
+  it('saydam malzeme alfa değerini düşürür, metalik düşürmez', () => {
+    const mk = (material: 'standart' | 'metalik' | 'saydam') => designToMjcf({
+      ...rover(),
+      govde: { v: 1, blocks: [{ id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.003], yaw: 0, color: '#ffffff', material }] },
+    } as RobotDesign).xml
+    expect(mk('saydam')).toMatch(/rgba="1 1 1 0\.45"/)
+    expect(mk('metalik')).toMatch(/rgba="1 1 1 1"/)
+    expect(mk('standart')).not.toContain('<material')
+  })
+
   it('zemine bakan sensör için yaklaşık karşılandığı not edilir', () => {
     let d = rover()
     const before = d.parts.length

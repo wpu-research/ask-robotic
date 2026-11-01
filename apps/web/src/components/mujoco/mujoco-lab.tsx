@@ -355,6 +355,23 @@ export function MujocoLab() {
     if (s) { setXml(s.xml); setApplied(s.xml) }
   }
   const changeDesignRef = useRef(changeDesign); changeDesignRef.current = changeDesign
+  /** Görünüm: kamerayı sabit bir açıya oturtur (üst, ön, yan, serbest). */
+  const setView = (v: 'ust' | 'on' | 'yan' | 'serbest') => {
+    const st = stageRef.current; if (!st) return
+    const [lx, ly, lz] = scene.look
+    const d = Math.max(0.3, Math.hypot(...scene.cam))
+    const p: Record<typeof v, [number, number, number]> = {
+      ust: [lx, ly + 0.001, lz + d],
+      on: [lx + d, ly, lz + d * 0.15],
+      yan: [lx, ly - d, lz + d * 0.15],
+      serbest: scene.cam,
+    }
+    const [cx, cy, cz] = p[v]
+    st.camera.position.set(cx, cz, -cy)
+    st.controls.target.set(lx, lz, -ly)
+    st.controls.update()
+  }
+
   const doUndo = () => applyHist(undo(hist))
   const doRedo = () => applyHist(redo(hist))
 
@@ -499,6 +516,13 @@ export function MujocoLab() {
               <p className="mj-qhint">💡 {en ? scene.en.hint : scene.tr.hint}</p>
             </div>
           )}
+        </div>
+
+        {/* Görünüm anahtarı (Constructa'daki görünüm küpünün karşılığı) */}
+        <div className="mj-views" role="group" aria-label={L('Görünüm', 'View')}>
+          {([['serbest', L('Serbest', 'Free')], ['ust', L('Üst', 'Top')], ['on', L('Ön', 'Front')], ['yan', L('Yan', 'Side')]] as const).map(([v, lbl]) => (
+            <button key={v} onClick={() => setView(v)} data-testid={`mujoco-view-${v}`}>{lbl}</button>
+          ))}
         </div>
 
         {/* Sağda dikey sekme rayı */}

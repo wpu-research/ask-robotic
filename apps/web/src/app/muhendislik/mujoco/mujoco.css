@@ -252,3 +252,12 @@
 .mj-cad-blocks li { display: inline-flex; align-items: center; gap: 2px; }
 .mj-cad-x { font: inherit; display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; }
 .mj-cad-x:hover { background: var(--surface-2); color: var(--red, #dc2626); }
+
+/* --- Görünüm anahtarı (sağ üstte) --- */
+.mj-views { position: absolute; right: 88px; top: 12px; z-index: 2; display: flex; gap: 2px; padding: 3px; border-radius: 10px; background: rgb(12 20 38 / .7); backdrop-filter: blur(6px); }
+.mj-views button { font: inherit; font-size: .72rem; font-weight: 600; min-height: 28px; padding: 3px 9px; border: 0; border-radius: 7px; background: transparent; color: #dce7f8; cursor: pointer; }
+.mj-views button:hover { background: rgb(255 255 255 / .14); }
+.mj-wb[data-dock="cad"] .mj-views, .mj-wb[data-dock="elec"] .mj-views, .mj-wb[data-dock="code"] .mj-views,
+.mj-wb[data-dock="goals"] .mj-views, .mj-wb[data-dock="data"] .mj-views, .mj-wb[data-dock="model"] .mj-views { right: auto; left: 50%; transform: translateX(-50%); top: 52px; }
+.mj-cad-tools { gap: 4px; }
+.mj-cad-tools .mj-qbtn { font-size: .74rem; min-height: 32px; padding: 4px 8px; }

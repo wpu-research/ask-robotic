@@ -119,7 +119,16 @@ export function buildMeshes(mj: Mj, model: any, group: THREE.Group): THREE.Mesh[
     }
     if (!geo) { out.push(new THREE.Mesh()); continue } // yükseklik alanı vb. çizilmez
     const isPlane = type === T('mjGEOM_PLANE')
-    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(rgba[0], rgba[1], rgba[2]), roughness: 0.5, metalness: type === T('mjGEOM_MESH') ? 0.15 : 0.05, transparent: rgba[3] < 1, opacity: rgba[3] })
+    // Malzeme verilmişse parlaklık ve yansıma ondan okunur (metalik/saydam görünüm)
+    let rough = 0.5
+    let metal = type === T('mjGEOM_MESH') ? 0.15 : 0.05
+    if (mi >= 0) {
+      const shine = model.mat_shininess?.[mi]
+      const refl = model.mat_reflectance?.[mi]
+      if (typeof shine === 'number') rough = Math.max(0.05, 1 - shine)
+      if (typeof refl === 'number') metal = Math.min(1, Math.max(metal, refl * 1.6))
+    }
+    const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(rgba[0], rgba[1], rgba[2]), roughness: rough, metalness: metal, transparent: rgba[3] < 1, opacity: rgba[3] })
     if (isPlane) { mat.map = floorTexture(); mat.color.set(0xffffff) }
     const mesh = new THREE.Mesh(geo, mat)
     if (scale) mesh.scale.set(...scale)

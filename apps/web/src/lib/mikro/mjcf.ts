@@ -7,7 +7,7 @@
 //
 // Eksenler: tasarımda ileri +x, sola +y (MuJoCo ile aynı); z yukarı.
 import { CARD, CHASSIS, PARTS, PITCH, cardCells, cellXY, deriveDesign, type ChassisSpec, type PlacedPart, type RobotDesign } from './tasarim'
-import { blockVolume, govdeMassG, normalizeGovde, resolveSolids, type Block, type PrimitiveShape } from './govde'
+import { MATERIAL_SPEC, blockVolume, govdeMassG, normalizeGovde, resolveSolids, type Block, type PrimitiveShape } from './govde'
 import { meshVertexAttr, type MeshShape } from './sekiller'
 
 /** MuJoCo'da yerleşik olan şekiller; kalanlar örgü olarak verilir. */
@@ -99,7 +99,15 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
         meshName = `m_govde_${i}`
         assets.push(`<mesh name="${meshName}" vertex="${meshVertexAttr(b.shape as MeshShape, b.size)}"/>`)
       }
-      geoms.push(`<geom name="govde_${i}" ${blockGeom(b, meshName)} mass="${f(m)}" rgba="${hexRgba(p.color)}"/>`)
+      // Malzeme yalnız görüntüdür: parlaklık ve saydamlık MJCF materyaliyle taşınır
+      const mt = MATERIAL_SPEC[b.material ?? 'standart']
+      let matName = ''
+      if (b.material && b.material !== 'standart') {
+        matName = `mt_govde_${i}`
+        assets.push(`<material name="${matName}" rgba="${hexRgba(p.color, mt.alpha)}" specular="${f(mt.specular)}" shininess="${f(mt.shininess)}" reflectance="${f(mt.reflectance)}"/>`)
+      }
+      const look = matName ? `material="${matName}"` : `rgba="${hexRgba(p.color)}"`
+      geoms.push(`<geom name="govde_${i}" ${blockGeom(b, meshName)} mass="${f(m)}" ${look}/>`)
     })
     if (!pieces.length) {
       notes.push({ tr: 'Gövdenin tamamı delinmiş: geriye katı kalmadı.', en: 'The body is cut away entirely: no solid remains.' })
@@ -243,9 +251,9 @@ function blockGeom(b: Block, meshName?: string): string {
 }
 
 /** '#rrggbb' → MJCF rgba ('r g b a', 0-1). */
-function hexRgba(hex: string): string {
+function hexRgba(hex: string, alpha = 1): string {
   const m = /^#?([0-9a-f]{6})$/i.exec(hex.trim())
-  if (!m) return '.5 .5 .5 1'
+  if (!m) return `.5 .5 .5 ${f(alpha)}`
   const n = parseInt(m[1], 16)
-  return `${f(((n >> 16) & 255) / 255)} ${f(((n >> 8) & 255) / 255)} ${f((n & 255) / 255)} 1`
+  return `${f(((n >> 16) & 255) / 255)} ${f(((n >> 8) & 255) / 255)} ${f((n & 255) / 255)} ${f(alpha)}`
 }

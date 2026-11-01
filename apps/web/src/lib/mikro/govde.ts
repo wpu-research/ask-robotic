@@ -14,6 +14,17 @@ import { unitVolume, type MeshShape } from './sekiller'
 export type PrimitiveShape = 'kutu' | 'silindir' | 'kure' | 'kapsul' | 'elipsoid'
 export type BlockShape = PrimitiveShape | MeshShape
 
+/** Yüzey görünümü: mat plastik, parlak metal, yarı saydam. */
+export type BlockMaterial = 'standart' | 'metalik' | 'saydam'
+export const MATERIALS: BlockMaterial[] = ['standart', 'metalik', 'saydam']
+
+/** MJCF malzeme değerleri; `alpha` rgba'nın son bileşenidir. */
+export const MATERIAL_SPEC: Record<BlockMaterial, { specular: number; shininess: number; reflectance: number; alpha: number }> = {
+  standart: { specular: 0.2, shininess: 0.2, reflectance: 0, alpha: 1 },
+  metalik: { specular: 0.9, shininess: 0.85, reflectance: 0.5, alpha: 1 },
+  saydam: { specular: 0.4, shininess: 0.5, reflectance: 0, alpha: 0.45 },
+}
+
 /** Yarıçapı tek sayıyla belirlenen şekiller (en ve boy ayrı ayrı verilmez). */
 export const ROUND_SHAPES: BlockShape[] = ['kure', 'silindir', 'kapsul', 'koni']
 
@@ -29,6 +40,8 @@ export interface Block {
   color: string
   /** true ise bu blok katı değil kesicidir: katı bloklardan hacmini çıkarır (delik açar). */
   cut?: boolean
+  /** Yüzey görünümü. Fiziği değiştirmez; yalnız görüntüdür. */
+  material?: BlockMaterial
 }
 
 export interface Govde {
@@ -221,10 +234,11 @@ export interface SolidPiece {
   size: [number, number, number]
   yaw: number
   color: string
+  material?: BlockMaterial
 }
 
 const aabbToPiece = (a: Aabb, src: Block): SolidPiece => ({
-  from: src.id, shape: 'kutu', color: src.color, yaw: 0,
+  from: src.id, shape: 'kutu', color: src.color, material: src.material, yaw: 0,
   pos: [(a[0] + a[3]) / 2, (a[1] + a[4]) / 2, (a[2] + a[5]) / 2],
   size: [(a[3] - a[0]) / 2, (a[4] - a[1]) / 2, (a[5] - a[2]) / 2],
 })
