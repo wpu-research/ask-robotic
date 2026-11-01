@@ -58,6 +58,8 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
   const der = deriveDesign(d)
   const notes: MjcfResult['notes'] = []
   const actuators: string[] = []
+  /** Şafta tutturulmuş tekerler: ızgara görünümünde iki kez çizilmesin diye. */
+  const shaftUsed = new Set<string>()
   const sensors: string[] = []
 
   const r = wheelRadius(d)
@@ -132,14 +134,34 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
     const name = idOf(spec.en, i)
 
     if (spec.wheel) {
+      // Şafta tutturulmuşsa teker, kendi hücresinde değil motorun milinde durur:
+      // mil boyunca (yanlamasına) uç / orta / dip konumlarından birine oturur.
+      let wx = px, wy = py
+      const att = p.attach
+      if (att) {
+        const motor = d.parts.find((q) => q.id === att.motorId && PARTS[q.type].motor)
+        if (motor) {
+          const [mx, my] = partXY(ch, motor)
+          const dir = my >= 0 ? 1 : -1
+          const reach = { dip: 0.004, orta: 0.012, uc: 0.02 }[att.snap]
+          wx = mx
+          wy = my + dir * reach
+          shaftUsed.add(p.id)
+        } else {
+          notes.push({
+            tr: `${spec.title}: tutturulduğu motor tasarımda yok, kendi yerinde bırakıldı.`,
+            en: `${spec.en}: the motor it was attached to is missing, left in its own cell.`,
+          })
+        }
+      }
       // Teker: kendi gövdesi, y ekseni etrafında döner. Sağ/sol, konumundan belli olur.
-      const side = py >= 0 ? 'sol' : 'sag'
+      const side = wy >= 0 ? 'sol' : 'sag'
       const wname = `${side}_teker_${i}`
       const jname = `${side}_eklem_${i}`
       const ww = spec.wheel.w
-      const yOut = py + Math.sign(py || 1) * (ww / 2)
+      const yOut = wy + Math.sign(wy || 1) * (ww / 2)
       bodies.push(
-        `<body name="${wname}" pos="${v3(px, yOut, 0)}">
+        `<body name="${wname}" pos="${v3(wx, yOut, 0)}">
         <joint name="${jname}" type="hinge" axis="0 1 0"/>
         <geom type="cylinder" size="${f(spec.wheel.d / 2)} ${f(ww / 2)}" quat="0.7071068 0.7071068 0 0" mass="${f(spec.massG / 1000)}" rgba=".09 .11 .16 1" friction="${f(spec.wheel.traction)} .005 .0001"/>
       </body>`)

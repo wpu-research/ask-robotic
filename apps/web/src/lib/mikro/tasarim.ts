@@ -96,7 +96,14 @@ export const PART_GROUPS: Array<{ id: PartGroup; title: string; en: string }> = 
 export const CARD = { massG: 15, mA: 40, motorPorts: 4, sensorPorts: 4, h: 0.006 }
 
 /** Parça: hücre (c: arkadan öne sütun, r: soldan sağa satır) ve dönüş (0-3, çeyrek tur sola). */
-export interface PlacedPart { id: string; type: PartType; c: number; r: number; rot?: number }
+/** Parçanın bir motorun şaftına tutturulması: teker motorun miline geçer. */
+export interface ShaftAttach {
+  /** Şaftına geçilen motor parçasının kimliği. */
+  motorId: string
+  /** Mil üzerinde yer: uç, orta ya da dip. */
+  snap: 'uc' | 'orta' | 'dip'
+}
+export interface PlacedPart { id: string; type: PartType; c: number; r: number; rot?: number; attach?: ShaftAttach }
 /** : serbest çizilmiş gövde blokları (lib/mikro/govde.ts). Yoksa şasi tek levhadır. */
 export interface RobotDesign { v: 1; name: string; chassis: ChassisId; parts: PlacedPart[]; govde?: { v: 1; blocks: unknown[] } }
 

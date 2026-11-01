@@ -14,7 +14,7 @@ import {
 import {
   addBlock, defaultGovde, duplicateBlock, govdeIssues, govdeMassG, normalizeGovde,
   removeBlock, updateBlock, type BlockShape, type Govde,
-  mirrorBlock, patternBlock, uniqueBlockId, type BlockMaterial,
+  mirrorBlock, patternBlock, snapToSurface, extrudeBlock, sliceBlock, uniqueBlockId, type BlockMaterial,
 } from '@/lib/mikro/govde'
 import { SABLONLAR } from '@/lib/mikro/sablonlar'
 import type { GizmoMode } from './cad-gizmo'
@@ -239,6 +239,19 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
               <button className="sbtn ghost" disabled={govde.blocks.length <= 1}
                 onClick={() => { setGovde(removeBlock(govde, bsel.id)); onBlock(null) }}>🗑 {L('Sil', 'Delete')}</button>
             </div>
+            <span className="mj-group-label">{L('Yüzey işlemleri', 'Surface tools')}</span>
+            <div className="mj-bar">
+              <button className="sbtn ghost" onClick={() => setGovde(snapToSurface(govde, bsel.id, 'x'))} data-testid="mujoco-cad-snap-surface">
+                🧲 {L('Yüzeye yapıştır', 'Snap to surface')}
+              </button>
+              <button className="sbtn ghost" onClick={() => setGovde(extrudeBlock(govde, bsel.id, 'x', 0.01))} data-testid="mujoco-cad-extrude">
+                ⇥ {L('Uzat 10 mm', 'Extrude 10 mm')}
+              </button>
+              <button className="sbtn ghost" disabled={bsel.shape !== 'kutu'}
+                onClick={() => setGovde(sliceBlock(govde, bsel.id, 'x', 0))} data-testid="mujoco-cad-slice">
+                ✂ {L('Ortadan böl', 'Slice in half')}
+              </button>
+            </div>
           </div>
         )}
 
@@ -324,6 +337,33 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
           </div>
         </div>
       ))}
+
+      {sel && PARTS[sel.type].wheel && (
+        <div className="mj-cad-block-edit">
+          <span className="mj-group-label">{L('Motor şaftına tuttur', 'Attach to motor shaft')}</span>
+          <div className="mj-bar">
+            <select value={sel.attach?.motorId ?? ''} data-testid="mujoco-cad-shaft-motor"
+              onChange={(e) => onDesign({ ...design, parts: design.parts.map((p) => (p.id === sel.id
+                ? { ...p, attach: e.target.value ? { motorId: e.target.value, snap: p.attach?.snap ?? 'orta' } : undefined }
+                : p)) })}>
+              <option value="">— {L('tutturulmamış', 'not attached')} —</option>
+              {design.parts.filter((p) => PARTS[p.type].motor).map((m) => (
+                <option key={m.id} value={m.id}>{en ? PARTS[m.type].en : PARTS[m.type].title} ({m.c},{m.r})</option>
+              ))}
+            </select>
+            {sel.attach && ([['uc', L('Uç', 'Tip')], ['orta', L('Orta', 'Mid')], ['dip', L('Dip', 'Base')]] as const).map(([k, lbl]) => (
+              <button key={k} className={`mj-qbtn${sel.attach?.snap === k ? ' on' : ''}`} aria-pressed={sel.attach?.snap === k}
+                data-testid={`mujoco-cad-shaft-${k}`}
+                onClick={() => onDesign({ ...design, parts: design.parts.map((p) => (p.id === sel.id && p.attach ? { ...p, attach: { ...p.attach, snap: k } } : p)) })}>
+                {lbl}
+              </button>
+            ))}
+          </div>
+          <p className="muted">{L(
+            'Tekerleği bir motorun miline geçirir: teker artık kendi hücresinde değil, o motorun yanında durur.',
+            'Fits the wheel onto a motor shaft: the wheel now sits next to that motor instead of in its own cell.')}</p>
+        </div>
+      )}
 
       {sel && (
         <div className="mj-bar mj-cad-sel">

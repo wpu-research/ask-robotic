@@ -401,3 +401,81 @@ export function patternBlock(g: Govde, id: string, axis: 'x' | 'y' | 'z', count:
   }
   return { ...g, blocks: [...g.blocks, ...added] }
 }
+
+// ---- Yüzey işlemleri: yapıştır, uzat, böl -----------------------------------
+
+export type Axis = 'x' | 'y' | 'z'
+const AXIS_I: Record<Axis, 0 | 1 | 2> = { x: 0, y: 1, z: 2 }
+
+/**
+ * Bloğu, seçilen eksende en yakın komşusunun yüzeyine yapıştırır (yüzeye tutturma).
+ * Komşu yoksa ya da zaten değiyorsa bir şey değişmez.
+ */
+export function snapToSurface(g: Govde, id: string, axis: Axis): Govde {
+  const b = g.blocks.find((x) => x.id === id)
+  if (!b) return g
+  const i = AXIS_I[axis]
+  const others = g.blocks.filter((x) => x.id !== id && !x.cut)
+  if (!others.length) return g
+
+  // Diğer eksenlerde örtüşen komşular aday: yan yana durabilecek olanlar
+  const cand = others.filter((o) => [0, 1, 2].every((k) => k === i || Math.abs(o.pos[k] - b.pos[k]) < o.size[k] + b.size[k]))
+  if (!cand.length) return g
+
+  let best: number | null = null
+  for (const o of cand) {
+    for (const side of [-1, 1] as const) {
+      // Bloğun merkezi, komşunun o yüzüne tam değecek konum
+      const target = o.pos[i] + side * (o.size[i] + b.size[i])
+      if (best === null || Math.abs(target - b.pos[i]) < Math.abs(best - b.pos[i])) best = target
+    }
+  }
+  if (best === null || Math.abs(best - b.pos[i]) < 1e-9) return g
+  const pos: [number, number, number] = [...b.pos]
+  pos[i] = best
+  return updateBlock(g, id, { pos })
+}
+
+/**
+ * Bloğu tek yönde uzatır (karşı yüz yerinde kalır) — extrude'un karşılığı.
+ * `deltaM` pozitifse eksenin artı yönüne, negatifse eksi yönüne büyütür.
+ */
+export function extrudeBlock(g: Govde, id: string, axis: Axis, deltaM: number): Govde {
+  const b = g.blocks.find((x) => x.id === id)
+  if (!b || !Number.isFinite(deltaM) || Math.abs(deltaM) < 1e-9) return g
+  const i = AXIS_I[axis]
+  const size: [number, number, number] = [...b.size]
+  const pos: [number, number, number] = [...b.pos]
+  const half = deltaM / 2
+  size[i] = b.size[i] + Math.abs(half)
+  // Karşı yüz sabit kalsın diye merkez yarısı kadar kayar
+  pos[i] = b.pos[i] + (deltaM > 0 ? Math.abs(half) : -Math.abs(half))
+  return updateBlock(g, id, { pos, size })
+}
+
+/**
+ * Kutuyu verilen eksende ikiye böler (slice). Bölme yeri blok merkezine göre
+ * `offsetM`; kutunun dışındaysa bölme yapılmaz. Yalnız kutular bölünür —
+ * yuvarlak ve örgü şekillerin düzlemle kesiti dışbükey kutularla anlatılamaz.
+ */
+export function sliceBlock(g: Govde, id: string, axis: Axis, offsetM = 0): Govde {
+  const b = g.blocks.find((x) => x.id === id)
+  if (!b || b.shape !== 'kutu') return g
+  const i = AXIS_I[axis]
+  const s = b.size[i]
+  if (Math.abs(offsetM) >= s - MIN_HALF) return g // kenara çok yakın: anlamlı parça çıkmaz
+
+  const loHalf = (s + offsetM) / 2
+  const hiHalf = (s - offsetM) / 2
+  const mk = (center: number, half: number, id2: string): Block => {
+    const pos: [number, number, number] = [...b.pos]
+    const size: [number, number, number] = [...b.size]
+    pos[i] = center
+    size[i] = half
+    return normalizeBlock({ ...b, id: id2, pos, size })
+  }
+  const nid = uniqueBlockId(g.blocks.map((x) => x.id))
+  const lo = mk(b.pos[i] - s + loHalf, loHalf, b.id)
+  const hi = mk(b.pos[i] + s - hiHalf, hiHalf, nid)
+  return { ...g, blocks: [...g.blocks.map((x) => (x.id === id ? lo : x)), hi] }
+}

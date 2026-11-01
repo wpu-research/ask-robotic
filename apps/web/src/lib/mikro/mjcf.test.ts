@@ -333,6 +333,45 @@ describe('tasarım → MJCF', () => {
     try { expect(m.nu).toBe(2) } finally { m.dispose() }
   }, 60_000)
 
+  it('motor şaftına tutturulan teker motorun yanında konumlanır', () => {
+    const d = rover()
+    const motor = d.parts.find((p) => p.type === 'motor-std')!
+    const wheel = d.parts.find((p) => p.type === 'teker-buyuk')!
+    const attached: RobotDesign = {
+      ...d,
+      parts: d.parts.map((p) => (p.id === wheel.id ? { ...p, attach: { motorId: motor.id, snap: 'uc' as const } } : p)),
+    }
+    // Tutturulmamış hâlde teker kendi hücresinde, tutturulunca motorun hücresinde
+    const serbest = designToMjcf(d).xml
+    const takili = designToMjcf(attached).xml
+    expect(takili).not.toBe(serbest)
+    const m = compile(takili)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
+  it('uç / orta / dip farklı konum verir', () => {
+    const d = rover()
+    const motor = d.parts.find((p) => p.type === 'motor-std')!
+    const wheel = d.parts.find((p) => p.type === 'teker-buyuk')!
+    const mk = (snap: 'uc' | 'orta' | 'dip') => designToMjcf({
+      ...d,
+      parts: d.parts.map((p) => (p.id === wheel.id ? { ...p, attach: { motorId: motor.id, snap } } : p)),
+    }).xml
+    expect(new Set([mk('uc'), mk('orta'), mk('dip')]).size).toBe(3)
+  })
+
+  it('tutturulduğu motor yoksa teker yerinde kalır ve dürüstçe not düşülür', () => {
+    const d = rover()
+    const wheel = d.parts.find((p) => p.type === 'teker-buyuk')!
+    const res = designToMjcf({
+      ...d,
+      parts: d.parts.map((p) => (p.id === wheel.id ? { ...p, attach: { motorId: 'olmayan', snap: 'uc' as const } } : p)),
+    })
+    expect(res.notes.some((n) => /motor tasarımda yok/i.test(n.tr))).toBe(true)
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
   it('zemine bakan sensör için yaklaşık karşılandığı not edilir', () => {
     let d = rover()
     const before = d.parts.length

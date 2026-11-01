@@ -305,3 +305,98 @@ describe('dizi (pattern)', () => {
     expect(patternBlock(g, 'yok', 'x', 3, 0.03)).toBe(g)
   })
 })
+
+// ---- Yüzey işlemleri ----
+
+import { extrudeBlock, sliceBlock, snapToSurface } from './govde'
+
+describe('yüzeye yapıştır', () => {
+  const plate = B({ id: 'p', pos: [0, 0, 0], size: [0.05, 0.05, 0.01] })
+
+  it('bloğu komşunun yüzüne tam değdirir', () => {
+    const g: Govde = { v: 1, blocks: [plate, B({ id: 'b', pos: [0.2, 0, 0], size: [0.01, 0.01, 0.01] })] }
+    const out = snapToSurface(g, 'b', 'x')
+    const b = out.blocks.find((x) => x.id === 'b')!
+    expect(b.pos[0]).toBeCloseTo(0.06, 9) // 0.05 + 0.01
+  })
+
+  it('en yakın yüz seçilir (eksi taraf)', () => {
+    const g: Govde = { v: 1, blocks: [plate, B({ id: 'b', pos: [-0.2, 0, 0], size: [0.01, 0.01, 0.01] })] }
+    expect(snapToSurface(g, 'b', 'x').blocks.find((x) => x.id === 'b')!.pos[0]).toBeCloseTo(-0.06, 9)
+  })
+
+  it('tek blok varsa bir şey değişmez', () => {
+    const g: Govde = { v: 1, blocks: [plate] }
+    expect(snapToSurface(g, 'p', 'x')).toBe(g)
+  })
+
+  it('diğer eksenlerde hiç örtüşmeyen komşuya yapışılmaz', () => {
+    const g: Govde = { v: 1, blocks: [plate, B({ id: 'b', pos: [0.2, 0.5, 0], size: [0.01, 0.01, 0.01] })] }
+    expect(snapToSurface(g, 'b', 'x')).toBe(g)
+  })
+
+  it('olmayan blok yapıştırılmaz', () => {
+    const g: Govde = { v: 1, blocks: [plate] }
+    expect(snapToSurface(g, 'yok', 'x')).toBe(g)
+  })
+})
+
+describe('uzat (extrude)', () => {
+  const g: Govde = { v: 1, blocks: [B({ id: 'b', pos: [0, 0, 0], size: [0.02, 0.02, 0.01] })] }
+
+  it('artı yönde uzatınca karşı yüz yerinde kalır', () => {
+    const out = extrudeBlock(g, 'b', 'x', 0.02).blocks[0]
+    expect(out.pos[0] - out.size[0]).toBeCloseTo(-0.02, 9) // sol yüz sabit
+    expect(out.pos[0] + out.size[0]).toBeCloseTo(0.04, 9)  // sağ yüz uzadı
+  })
+
+  it('eksi yönde uzatınca sağ yüz yerinde kalır', () => {
+    const out = extrudeBlock(g, 'b', 'x', -0.02).blocks[0]
+    expect(out.pos[0] + out.size[0]).toBeCloseTo(0.02, 9)
+    expect(out.pos[0] - out.size[0]).toBeCloseTo(-0.04, 9)
+  })
+
+  it('sıfır uzatma bir şey değiştirmez', () => {
+    expect(extrudeBlock(g, 'b', 'x', 0)).toBe(g)
+  })
+
+  it('NaN uzatma yok sayılır', () => {
+    expect(extrudeBlock(g, 'b', 'x', NaN)).toBe(g)
+  })
+})
+
+describe('böl (slice)', () => {
+  const g: Govde = { v: 1, blocks: [B({ id: 'b', pos: [0, 0, 0], size: [0.04, 0.02, 0.01] })] }
+
+  it('ortadan bölünce iki eşit parça olur', () => {
+    const out = sliceBlock(g, 'b', 'x', 0)
+    expect(out.blocks).toHaveLength(2)
+    expect(out.blocks[0].size[0]).toBeCloseTo(0.02, 9)
+    expect(out.blocks[1].size[0]).toBeCloseTo(0.02, 9)
+  })
+
+  it('toplam hacim korunur', () => {
+    const before = blockVolume(g.blocks[0])
+    const after = sliceBlock(g, 'b', 'x', 0.01).blocks.reduce((s, b) => s + blockVolume(b), 0)
+    expect(after).toBeCloseTo(before, 12)
+  })
+
+  it('parçalar birbirine değer, boşluk kalmaz', () => {
+    const [a, b] = sliceBlock(g, 'b', 'x', 0.01).blocks
+    expect(a.pos[0] + a.size[0]).toBeCloseTo(b.pos[0] - b.size[0], 9)
+  })
+
+  it('kenara çok yakın bölme yapılmaz', () => {
+    expect(sliceBlock(g, 'b', 'x', 0.039)).toBe(g)
+  })
+
+  it('kutu olmayan şekil bölünmez', () => {
+    const s: Govde = { v: 1, blocks: [B({ id: 'b', shape: 'kure' })] }
+    expect(sliceBlock(s, 'b', 'x', 0)).toBe(s)
+  })
+
+  it('y ve z eksenlerinde de bölünür', () => {
+    expect(sliceBlock(g, 'b', 'y', 0).blocks).toHaveLength(2)
+    expect(sliceBlock(g, 'b', 'z', 0).blocks).toHaveLength(2)
+  })
+})
