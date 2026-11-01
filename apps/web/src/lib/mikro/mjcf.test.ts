@@ -236,6 +236,42 @@ describe('tasarım → MJCF', () => {
     try { expect(m.nu).toBe(2) } finally { m.dispose() }
   }, 60_000)
 
+  it('bütün gövde şekilleri MuJoCo tarafından derlenir', () => {
+    const SHAPES = ['kutu', 'silindir', 'kure', 'kapsul', 'elipsoid',
+      'koni', 'ucgen-prizma', 'alti-prizma', 'kare-piramit', 'besgen-piramit',
+      'dortyuzlu', 'sekizyuzlu', 'onikiyuzlu'] as const
+    for (const shape of SHAPES) {
+      const d = {
+        ...rover(),
+        govde: { v: 1, blocks: [
+          { id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.003], yaw: 0, color: '#db3c8c' },
+          { id: 'b2', shape, pos: [0.05, 0, 0.015], size: [0.015, 0.015, 0.012], yaw: 20, color: '#2563eb' },
+        ] },
+      } as RobotDesign
+      const m = compile(designToMjcf(d).xml)
+      try { expect(m.nu, shape).toBe(2) } finally { m.dispose() }
+    }
+  }, 120_000)
+
+  it('çokyüzlü şekil örgü varlığı olarak yazılır', () => {
+    const d = {
+      ...rover(),
+      govde: { v: 1, blocks: [{ id: 'b1', shape: 'onikiyuzlu', pos: [0, 0, 0], size: [0.05, 0.05, 0.01], yaw: 0, color: '#db3c8c' }] },
+    } as RobotDesign
+    const xml = designToMjcf(d).xml
+    expect(xml).toContain('<asset>')
+    expect(xml).toContain('<mesh name="m_govde_0"')
+    expect(xml).toContain('type="mesh"')
+  })
+
+  it('yerleşik ilkeller için örgü varlığı yazılmaz', () => {
+    const d = {
+      ...rover(),
+      govde: { v: 1, blocks: [{ id: 'b1', shape: 'kapsul', pos: [0, 0, 0], size: [0.03, 0.03, 0.02], yaw: 0, color: '#db3c8c' }] },
+    } as RobotDesign
+    expect(designToMjcf(d).xml).not.toContain('<asset>')
+  })
+
   it('zemine bakan sensör için yaklaşık karşılandığı not edilir', () => {
     let d = rover()
     const before = d.parts.length

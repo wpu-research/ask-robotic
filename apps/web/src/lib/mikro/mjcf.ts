@@ -7,7 +7,11 @@
 //
 // Eksenler: tasarımda ileri +x, sola +y (MuJoCo ile aynı); z yukarı.
 import { CARD, CHASSIS, PARTS, PITCH, cardCells, cellXY, deriveDesign, type ChassisSpec, type PlacedPart, type RobotDesign } from './tasarim'
-import { blockVolume, govdeMassG, normalizeGovde, resolveSolids, type Block } from './govde'
+import { blockVolume, govdeMassG, normalizeGovde, resolveSolids, type Block, type PrimitiveShape } from './govde'
+import { meshVertexAttr, type MeshShape } from './sekiller'
+
+/** MuJoCo'da yerleşik olan şekiller; kalanlar örgü olarak verilir. */
+const PRIMITIVES: string[] = ['kutu', 'silindir', 'kure', 'kapsul', 'elipsoid'] satisfies PrimitiveShape[]
 
 /** Şasi levhasının kalınlığı (m). */
 const DECK = 0.004
@@ -75,6 +79,7 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
   const deckMass = Math.max(0.02, deckMassG / 1000)
 
   const geoms: string[] = []
+  const assets: string[] = []
   const bodies: string[] = []
   const sites: string[] = []
   const sensorXml: string[] = []
@@ -89,7 +94,12 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
     pieces.forEach((p, i) => {
       const b: Block = { ...p, id: p.from }
       const m = (deckMass * blockVolume(b)) / totalV
-      geoms.push(`<geom name="govde_${i}" ${blockGeom(b)} mass="${f(m)}" rgba="${hexRgba(p.color)}"/>`)
+      let meshName: string | undefined
+      if (!PRIMITIVES.includes(b.shape)) {
+        meshName = `m_govde_${i}`
+        assets.push(`<mesh name="${meshName}" vertex="${meshVertexAttr(b.shape as MeshShape, b.size)}"/>`)
+      }
+      geoms.push(`<geom name="govde_${i}" ${blockGeom(b, meshName)} mass="${f(m)}" rgba="${hexRgba(p.color)}"/>`)
     })
     if (!pieces.length) {
       notes.push({ tr: 'Gövdenin tamamı delinmiş: geriye katı kalmadı.', en: 'The body is cut away entirely: no solid remains.' })
@@ -186,6 +196,7 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
   const xml = `<mujoco model="${esc(idOf(d.name || 'robot', 0))}">
   <compiler angle="radian" usethread="false"/>
   <option timestep="0.002" integrator="implicitfast"/>
+${assets.length ? `  <asset>\n    ${assets.join('\n    ')}\n  </asset>` : ''}
   <worldbody>
     <light pos="0 0 1.5" dir="0 0 -1" directional="true"/>
     <geom name="zemin" type="plane" size="4 4 .1" pos="0 0 0" rgba=".29 .42 .66 1" friction="1 .005 .0001"/>
@@ -214,7 +225,7 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
  * Bir gövde bloğunun MJCF geom niteliklerini üretir. Her blok dışbükeydir, bu yüzden
  * doğrudan çarpışma geometrisi olarak kullanılabilir; ayrıştırmaya gerek yoktur.
  */
-function blockGeom(b: Block): string {
+function blockGeom(b: Block, meshName?: string): string {
   const [sx, sy, sz] = b.size
   const yaw = (b.yaw * Math.PI) / 180
   const quat = `${f(Math.cos(yaw / 2))} 0 0 ${f(Math.sin(yaw / 2))}`
@@ -222,7 +233,12 @@ function blockGeom(b: Block): string {
   switch (b.shape) {
     case 'silindir': return `type="cylinder" size="${f(sx)} ${f(sz)}" pos="${pos}" quat="${quat}"`
     case 'kure': return `type="sphere" size="${f(sx)}" pos="${pos}"`
-    default: return `type="box" size="${v3(sx, sy, sz)}" pos="${pos}" quat="${quat}"`
+    case 'kapsul': return `type="capsule" size="${f(sx)} ${f(sz)}" pos="${pos}" quat="${quat}"`
+    case 'elipsoid': return `type="ellipsoid" size="${v3(sx, sy, sz)}" pos="${pos}" quat="${quat}"`
+    case 'kutu': return `type="box" size="${v3(sx, sy, sz)}" pos="${pos}" quat="${quat}"`
+    // Dışbükey çokyüzlü: köşe listesi verilir, MuJoCo dışbükey örtüyü alır —
+    // şekil dışbükey olduğu için örtü tam olarak şeklin kendisidir.
+    default: return `type="mesh" mesh="${meshName}" pos="${pos}" quat="${quat}"`
   }
 }
 

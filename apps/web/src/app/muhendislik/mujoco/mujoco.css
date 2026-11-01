@@ -239,3 +239,16 @@
 .mj-cad-block-edit input[type="color"] { width: 40px; height: 34px; padding: 2px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); cursor: pointer; }
 .mj-cad-bsel.cut { border-style: dashed; }
 .mj-cad-bsel.cut i { border-radius: 50%; }
+
+
+/* --- CAD başlığı, şablon kartları, varlık listesi --- */
+.mj-cad-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.mj-cad-undo { display: flex; gap: 4px; }
+.mj-cad-sablon { font: inherit; display: grid; gap: 2px; justify-items: start; text-align: left; width: calc(50% - 3px); padding: 8px 10px; border-radius: 12px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-cad-sablon:hover { border-color: var(--primary); background: var(--primary-soft); }
+.mj-cad-sablon b { font-size: 1.3rem; line-height: 1; }
+.mj-cad-sablon span { font-size: .82rem; font-weight: 700; }
+.mj-cad-sablon small { font-size: .7rem; color: var(--muted); line-height: 1.35; }
+.mj-cad-blocks li { display: inline-flex; align-items: center; gap: 2px; }
+.mj-cad-x { font: inherit; display: grid; place-items: center; width: 24px; height: 24px; border: 0; border-radius: 6px; background: transparent; color: var(--muted); cursor: pointer; }
+.mj-cad-x:hover { background: var(--surface-2); color: var(--red, #dc2626); }

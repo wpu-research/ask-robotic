@@ -8,8 +8,14 @@
 //
 // Eksenler tasarımla aynı: ileri +x, sola +y, yukarı +z; birim metre.
 import { CHASSIS, PITCH, type ChassisId } from './tasarim'
+import { unitVolume, type MeshShape } from './sekiller'
 
-export type BlockShape = 'kutu' | 'silindir' | 'kure'
+/** Yerleşik MuJoCo ilkelleri + örgü olarak verilen dışbükey çokyüzlüler. */
+export type PrimitiveShape = 'kutu' | 'silindir' | 'kure' | 'kapsul' | 'elipsoid'
+export type BlockShape = PrimitiveShape | MeshShape
+
+/** Yarıçapı tek sayıyla belirlenen şekiller (en ve boy ayrı ayrı verilmez). */
+export const ROUND_SHAPES: BlockShape[] = ['kure', 'silindir', 'kapsul', 'koni']
 
 export interface Block {
   id: string
@@ -52,6 +58,10 @@ export function blockVolume(b: Block): number {
     case 'kutu': return 8 * x * y * z
     case 'silindir': return Math.PI * x * x * 2 * z
     case 'kure': return (4 / 3) * Math.PI * x * x * x
+    // Kapsül: silindir gövde + iki yarım küre uç (MuJoCo'da size = yarıçap, yarı gövde boyu)
+    case 'kapsul': return Math.PI * x * x * 2 * z + (4 / 3) * Math.PI * x * x * x
+    case 'elipsoid': return (4 / 3) * Math.PI * x * y * z
+    default: return unitVolume(b.shape) * x * y * z
   }
 }
 

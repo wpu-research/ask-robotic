@@ -5,7 +5,7 @@
 // Izgara görünümü ve yerleştirme kuralları var olan tasarım tezgâhından gelir
 // (components/mikro/tasarim-3d.tsx, lib/mikro/tasarim.ts); burada yalnız tezgâha
 // sığacak derli toplu bir arayüz kurulur.
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Tasarim3D } from '@/components/mikro/tasarim-3d'
 import {
   CHASSIS, CHASSIS_IDS, PARTS, PART_GROUPS, canPlace, deriveDesign, placePart,
@@ -14,27 +14,82 @@ import {
 import {
   addBlock, defaultGovde, duplicateBlock, govdeIssues, govdeMassG, normalizeGovde,
   removeBlock, updateBlock, type BlockShape, type Govde,
+  mirrorBlock, patternBlock,
 } from '@/lib/mikro/govde'
+import { SABLONLAR } from '@/lib/mikro/sablonlar'
+import { deleteAsset, insertAsset, listAssets, saveAsset, type Varlik } from '@/lib/mikro/varliklar'
 
 interface Props {
   design: RobotDesign
-  onDesign: (d: RobotDesign) => void
+  /** `coalesce`: sayı kutusunda her tuşa basış ayrı bir geri-al adımı açmaz. */
+  onDesign: (d: RobotDesign, coalesce?: boolean) => void
   en: boolean
+  onUndo: () => void
+  onRedo: () => void
+  canUndo: boolean
+  canRedo: boolean
 }
 
-export function MurokoCad({ design, onDesign, en }: Props) {
+/** Gövdeye eklenebilen şekiller; MuJoCo'da yerleşik olanlar ve dışbükey çokyüzlüler. */
+const SHAPES: { id: BlockShape; tr: string; en: string }[] = [
+  { id: 'kutu', tr: 'Kutu', en: 'Box' },
+  { id: 'silindir', tr: 'Silindir', en: 'Cylinder' },
+  { id: 'kure', tr: 'Küre', en: 'Sphere' },
+  { id: 'kapsul', tr: 'Kapsül', en: 'Capsule' },
+  { id: 'elipsoid', tr: 'Elipsoid', en: 'Ellipsoid' },
+  { id: 'koni', tr: 'Koni', en: 'Cone' },
+  { id: 'ucgen-prizma', tr: 'Üçgen prizma', en: 'Tri prism' },
+  { id: 'alti-prizma', tr: 'Altıgen prizma', en: 'Hex prism' },
+  { id: 'kare-piramit', tr: 'Kare piramit', en: 'Sq pyramid' },
+  { id: 'besgen-piramit', tr: 'Beşgen piramit', en: 'Pent pyramid' },
+  { id: 'dortyuzlu', tr: 'Dörtyüzlü', en: 'Tetrahedron' },
+  { id: 'sekizyuzlu', tr: 'Sekizyüzlü', en: 'Octahedron' },
+  { id: 'onikiyuzlu', tr: 'Onikiyüzlü', en: 'Dodecahedron' },
+]
+
+export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo }: Props) {
   const L = (tr: string, e: string) => (en ? e : tr)
-  const [tab, setTab] = useState<'govde' | 'parca'>('govde')
+  const [tab, setTab] = useState<'govde' | 'parca' | 'sablon'>('govde')
   const [tool, setTool] = useState<PartType | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [block, setBlock] = useState<string | null>(null)
+  const [assetName, setAssetName] = useState('')
+  const [assets, setAssets] = useState<Varlik[]>([])
+  useEffect(() => { setAssets(listAssets()) }, [])
 
   const cadTabs = (
-    <div className="mj-tabs" role="tablist" aria-label={L('Tasarım', 'Design')}>
-      <button role="tab" aria-selected={tab === 'govde'} className={`mj-tab${tab === 'govde' ? ' on' : ''}`} onClick={() => setTab('govde')} data-testid="mujoco-cad-tab-body">{L('Gövde', 'Body')}</button>
-      <button role="tab" aria-selected={tab === 'parca'} className={`mj-tab${tab === 'parca' ? ' on' : ''}`} onClick={() => setTab('parca')} data-testid="mujoco-cad-tab-parts">{L('Parçalar', 'Parts')}</button>
+    <div className="mj-cad-head">
+      <div className="mj-tabs" role="tablist" aria-label={L('Tasarım', 'Design')}>
+        <button role="tab" aria-selected={tab === 'govde'} className={`mj-tab${tab === 'govde' ? ' on' : ''}`} onClick={() => setTab('govde')} data-testid="mujoco-cad-tab-body">{L('Gövde', 'Body')}</button>
+        <button role="tab" aria-selected={tab === 'parca'} className={`mj-tab${tab === 'parca' ? ' on' : ''}`} onClick={() => setTab('parca')} data-testid="mujoco-cad-tab-parts">{L('Parçalar', 'Parts')}</button>
+        <button role="tab" aria-selected={tab === 'sablon'} className={`mj-tab${tab === 'sablon' ? ' on' : ''}`} onClick={() => setTab('sablon')} data-testid="mujoco-cad-tab-presets">{L('Şablonlar', 'Presets')}</button>
+      </div>
+      <div className="mj-cad-undo">
+        <button className="mj-inv" onClick={onUndo} disabled={!canUndo} title={L('Geri al', 'Undo')} aria-label={L('Geri al', 'Undo')} data-testid="mujoco-cad-undo">↶</button>
+        <button className="mj-inv" onClick={onRedo} disabled={!canRedo} title={L('Yinele', 'Redo')} aria-label={L('Yinele', 'Redo')} data-testid="mujoco-cad-redo">↷</button>
+      </div>
     </div>
   )
+
+  if (tab === 'sablon') {
+    return (
+      <>
+        {cadTabs}
+        <p className="muted">{L(
+          'Boş ekrandan başlamak zorunda değilsin: çalışan bir robot seç, sonra üstünde oyna. Seçmek şu anki tasarımın yerine geçer.',
+          'You do not have to start from an empty bench: pick a working robot and then change it. Picking one replaces your current design.')}</p>
+        <div className="mj-cad-parts">
+          {SABLONLAR.map((t) => (
+            <button key={t.id} className="mj-cad-sablon" onClick={() => { onDesign(t.build()); setTab('govde') }} data-testid={`mujoco-cad-preset-${t.id}`}>
+              <b aria-hidden="true">{t.icon}</b>
+              <span>{en ? t.en : t.tr}</span>
+              <small>{en ? t.enDesc : t.trDesc}</small>
+            </button>
+          ))}
+        </div>
+      </>
+    )
+  }
   const der = useMemo(() => deriveDesign(design), [design])
   const errors = der.issues.filter((i) => i.level === 'hata')
   const warns = der.issues.filter((i) => i.level === 'uyari')
@@ -54,7 +109,7 @@ export function MurokoCad({ design, onDesign, en }: Props) {
 
   const govde = useMemo(() => normalizeGovde(design.govde) ?? defaultGovde(design.chassis), [design.govde, design.chassis])
   const gIssues = useMemo(() => govdeIssues(govde), [govde])
-  const setGovde = (g: Govde) => onDesign({ ...design, govde: g })
+  const setGovde = (g: Govde, coalesce = false) => onDesign({ ...design, govde: g }, coalesce)
   const bsel = govde.blocks.find((b) => b.id === block) ?? null
 
   /** Sayısal alan: milimetre girilir, metre saklanır — çocuk için mm daha okunur. */
@@ -80,11 +135,13 @@ export function MurokoCad({ design, onDesign, en }: Props) {
           'A hole is a box subtracted from a solid box. The remainder splits into at most 6 boxes exactly, so the hole is real in physics too: the body gets lighter and things pass through it. Only axis-aligned boxes can cut.')}</p>
 
         <div className="mj-bar">
-          {(['kutu', 'silindir', 'kure'] as BlockShape[]).map((s) => (
-            <button key={s} className="sbtn ghost" onClick={() => setGovde(addBlock(govde, s))} data-testid={`mujoco-cad-add-${s}`}>
-              + {s === 'kutu' ? L('Kutu', 'Box') : s === 'silindir' ? L('Silindir', 'Cylinder') : L('Küre', 'Sphere')}
-            </button>
-          ))}
+          <label className="mj-cad-chassis">{L('Şekil ekle', 'Add shape')}
+            <select value="" data-testid="mujoco-cad-add-shape"
+              onChange={(e) => { if (!e.target.value) return; const g = addBlock(govde, e.target.value as BlockShape); setGovde(g); setBlock(g.blocks[g.blocks.length - 1].id); e.target.value = '' }}>
+              <option value="">— {L('seç', 'pick')} —</option>
+              {SHAPES.map((s) => <option key={s.id} value={s.id}>{en ? s.en : s.tr}</option>)}
+            </select>
+          </label>
           <button className="sbtn ghost" data-testid="mujoco-cad-add-hole"
             onClick={() => {
               const g = addBlock(govde, 'kutu')
@@ -129,11 +186,41 @@ export function MurokoCad({ design, onDesign, en }: Props) {
                 data-testid="mujoco-cad-toggle-cut">{bsel.cut ? `⬛ ${L('Katı yap', 'Make solid')}` : `✂ ${L('Delik yap', 'Make hole')}`}</button>
               <input type="color" value={bsel.color} aria-label={L('Renk', 'Colour')} onChange={(e) => setGovde(updateBlock(govde, bsel.id, { color: e.target.value }))} />
               <button className="sbtn ghost" onClick={() => setGovde(duplicateBlock(govde, bsel.id))}>⧉ {L('Kopyala', 'Duplicate')}</button>
+              <button className="sbtn ghost" onClick={() => setGovde(mirrorBlock(govde, bsel.id, 'y'))} data-testid="mujoco-cad-mirror">
+                ⇋ {L('Aynala', 'Mirror')}
+              </button>
+              <button className="sbtn ghost" data-testid="mujoco-cad-pattern"
+                onClick={() => setGovde(patternBlock(govde, bsel.id, 'x', 3, 2 * bsel.size[0] + 0.006))}>
+                ⋯ {L('Dizi (3)', 'Pattern (3)')}
+              </button>
               <button className="sbtn ghost" disabled={govde.blocks.length <= 1}
                 onClick={() => { setGovde(removeBlock(govde, bsel.id)); setBlock(null) }}>🗑 {L('Sil', 'Delete')}</button>
             </div>
           </div>
         )}
+
+        {/* Kendi parça kütüphanen */}
+        <h4 className="mj-link-h">{L('Parça kütüphanem', 'My parts')}</h4>
+        <div className="mj-bar">
+          <input className="mj-cad-name" value={assetName} maxLength={40} placeholder={L('Parçaya ad ver', 'Name this part')}
+            aria-label={L('Parça adı', 'Part name')} onChange={(e) => setAssetName(e.target.value)} />
+          <button className="sbtn ghost" disabled={!bsel} data-testid="mujoco-cad-save-asset"
+            onClick={() => { if (!bsel) return; setAssets(saveAsset(assetName, [bsel])); setAssetName('') }}>
+            💾 {L('Seçili bloğu kaydet', 'Save selected block')}
+          </button>
+        </div>
+        {assets.length === 0
+          ? <p className="muted">{L('Henüz kayıtlı parçan yok. Bir blok seçip kaydet, sonra başka tasarımlarda kullan.', 'No saved parts yet. Select a block and save it, then reuse it in other designs.')}</p>
+          : <ul className="mj-cad-blocks">
+            {assets.map((a) => (
+              <li key={a.id}>
+                <button className="mj-cad-bsel" onClick={() => setGovde(insertAsset(govde, a))} data-testid={`mujoco-cad-asset-${a.id}`}>
+                  📦 {a.name}
+                </button>
+                <button className="mj-cad-x" aria-label={L('Sil', 'Delete')} onClick={() => setAssets(deleteAsset(a.id))}>✕</button>
+              </li>
+            ))}
+          </ul>}
 
         <ul className="mj-cad-stats">
           <li><span>{L('Blok', 'Blocks')}</span><b>{govde.blocks.length}</b></li>

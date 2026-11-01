@@ -16,6 +16,7 @@ import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/sce
 import { localizeScene } from '@/lib/mujoco/names-en'
 import { DESIGN_SCENE_ID, designScene, emptyDesign, loadDesign, saveDesign } from '@/lib/mujoco/design-scene'
 import { MurokoCad } from './mujoco-cad'
+import { canRedo, canUndo, initHistory, present, push, redo, replace, undo } from '@/lib/mikro/history'
 import type { RobotDesign } from '@/lib/mikro/tasarim'
 import { buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
 import { MurokoElec, starterCircuit } from './mujoco-elec'
@@ -82,11 +83,13 @@ export function MujocoLab() {
 
   const [sceneId, setSceneId] = useState<string>(DESIGN_SCENE_ID)
   // Tasarım tezgâhında kurulmuş robot varsa listeye en başa eklenir (tarayıcıda saklanır).
-  const [design, setDesign] = useState<RobotDesign>(() => emptyDesign())
+  // Tasarım geçmişi: yanlış silinen bloğun dönüşü olsun
+  const [hist, setHist] = useState(() => initHistory<RobotDesign>(emptyDesign()))
+  const design = present(hist)
   // Kayıtlı tasarım varsa onunla başla: açılışta öğrencinin kendi robotu sahnede olsun
   useEffect(() => {
     const d = loadDesign(); if (!d) return
-    setDesign(d)
+    setHist(initHistory(d))
     const s = designScene(d)
     if (s && sceneRef.current.id === DESIGN_SCENE_ID) { setXml(s.xml); setApplied(s.xml) }
   }, [])
@@ -308,13 +311,27 @@ export function MujocoLab() {
    * CAD'de bir parça eklenip çıkarıldığında robot aynı ekranda yeniden kurulur.
    * Tasarım ayrıca tarayıcıya yazılır: tasarım tezgâhı sayfasıyla aynı robot görülür.
    */
-  const changeDesign = (d: RobotDesign) => {
-    setDesign(d)
+  /** Tasarımı uygular. `coalesce`: sayı kutusu gibi sürekli değişen alanlarda
+   *  her tuşa basış ayrı bir geri-al adımı açmaz. */
+  const changeDesign = (d: RobotDesign, coalesce = false) => {
+    setHist((h) => (coalesce ? replace(h, d) : push(h, d)))
     saveDesign(d)
     if (sceneRef.current.id !== DESIGN_SCENE_ID) return // başka robota bakılıyorsa sahneyi değiştirme
     const s = designScene(d)
     if (s) { setXml(s.xml); setApplied(s.xml) }
   }
+  /** Geçmişte gezdikten sonra sahneyi o tasarıma getirir. */
+  const applyHist = (next: typeof hist) => {
+    setHist(next)
+    const d = present(next)
+    saveDesign(d)
+    if (sceneRef.current.id !== DESIGN_SCENE_ID) return
+    const s = designScene(d)
+    if (s) { setXml(s.xml); setApplied(s.xml) }
+  }
+  const doUndo = () => applyHist(undo(hist))
+  const doRedo = () => applyHist(redo(hist))
+
   const toggle = () => { runRef.current = !runRef.current; setRunning(runRef.current) }
   const shake = () => {
     const sim = simRef.current; if (!sim) return
@@ -486,7 +503,8 @@ export function MujocoLab() {
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'cad'}>
-            <MurokoCad design={design} onDesign={changeDesign} en={en} />
+            <MurokoCad design={design} onDesign={changeDesign} en={en}
+              onUndo={doUndo} onRedo={doRedo} canUndo={canUndo(hist)} canRedo={canRedo(hist)} />
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'elec'}>
