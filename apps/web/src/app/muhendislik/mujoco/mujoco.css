@@ -192,3 +192,19 @@
 @media (max-width: 900px) {
   .mj-hud { position: static; transform: none; max-width: none; border-radius: 0; justify-content: flex-start; }
 }
+
+
+/* --- ELEK rafı: devre tuvali ve bağlantı eşlemesi --- */
+.mj-elec-canvas { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.mj-badge { display: inline-grid; place-items: center; min-width: 18px; height: 18px; margin-left: 6px; padding: 0 5px; border-radius: 999px; background: var(--primary); color: var(--primary-ink); font-size: .68rem; font-weight: 700; }
+.mj-tab.on .mj-badge { background: var(--primary-ink); color: var(--primary); }
+.mj-link-h { margin: 6px 0 0; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.mj-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.mj-links li { display: grid; grid-template-columns: minmax(0, 6.5rem) minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .8rem; }
+.mj-link-n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.mj-links select { min-height: 34px; font: inherit; font-size: .78rem; min-width: 0; }
+.mj-inv { font: inherit; width: 34px; height: 34px; border-radius: 9px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-inv.on { border-color: var(--primary); background: var(--primary-soft); }
+.mj-inv:disabled { opacity: .4; cursor: not-allowed; }
+.mj-warns { list-style: none; margin: 0; padding: 8px 10px; display: grid; gap: 4px; border-radius: 10px; background: var(--eng-soft); font-size: .78rem; }
+.mj-note { margin: 0; padding: 8px 11px; border-left: 3px solid var(--primary); background: var(--primary-soft); border-radius: 0 8px 8px 0; font-size: .8rem; }

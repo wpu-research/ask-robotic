@@ -15,6 +15,19 @@ import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 import { removeFromFs, unpack, writeToFs } from '@/lib/mujoco/pack'
 import { localizeScene } from '@/lib/mujoco/names-en'
+import { MurokoElec, starterCircuit } from './mujoco-elec'
+import { EMPTY_PLAN, pumpWiring, type WiringPlan } from '@/lib/mujoco/wiring'
+import { compileCode, type CompileError } from '@/lib/lab/compile-client'
+import { createRuntime } from '@/lib/lab/runtime'
+import type { Circuit, LabApi, LabState } from '@/lib/lab/contract'
+
+/** Devre çalıştırma durumu: derleniyor → çalışıyor, ya da hata. */
+type ElecRun =
+  | { status: 'idle' }
+  | { status: 'compiling' }
+  | { status: 'running' }
+  | { status: 'errors'; errors: CompileError[] }
+  | { status: 'failed'; message: string }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Mj = any
@@ -162,7 +175,10 @@ const GROUP_LABEL = {
 }
 
 /** Sağ raydaki bölümler; `null` = panel kapalı, sahne tüm tezgâhı görür. */
-type Dock = 'robot' | 'code' | 'goals' | 'data' | 'model'
+type Dock = 'robot' | 'elec' | 'code' | 'goals' | 'data' | 'model'
+
+/** Robotu sürmenin yolları; 'arduino' devre üzerinden gider, diğerleri doğrudan motora yazar. */
+type ProgTab = 'blocks' | 'python' | 'manual' | 'arduino'
 
 /** Ortam: aynı robotu farklı yerçekiminde denemek (model.opt.gravity yazılabilir bir bellek görünümüdür). */
 const ENVS = [
@@ -187,6 +203,7 @@ export function MujocoLab() {
   const programs = useRef<Op[][]>([])
   const runners = useRef<Runner[]>([])
   const nextTick = useRef(0)
+  const nextLabTick = useRef(0)
   const readings = useRef<Record<string, number>>({})
   const tracker = useRef<GoalTracker | null>(null)
   const trace = useRef(new Trace(10))
@@ -207,10 +224,19 @@ export function MujocoLab() {
   const [ctrlVals, setCtrlVals] = useState<number[]>([])
   const [info, setInfo] = useState({ t: 0, ncon: 0 })
   const [progRunning, setProgRunning] = useState(false)
-  const [progTab, setProgTab] = useState<'blocks' | 'python' | 'manual'>('blocks')
+  const [progTab, setProgTab] = useState<ProgTab>('blocks')
   const [dock, setDock] = useState<Dock | null>('robot')
   const [dataTab, setDataTab] = useState<'sens' | 'motors' | 'graph'>('sens')
   const [quickOpen, setQuickOpen] = useState(true)
+  const [circuit, setCircuit] = useState<Circuit>(starterCircuit)
+  const circuitRef = useRef(circuit); circuitRef.current = circuit
+  const [plan, setPlan] = useState<WiringPlan>(EMPTY_PLAN)
+  const planRef = useRef(plan); planRef.current = plan
+  const labRef = useRef<LabApi | null>(null)
+  const [labState, setLabState] = useState<LabState | null>(null)
+  const [arduino, setArduino] = useState('')
+  const arduinoRef = useRef(arduino); arduinoRef.current = arduino
+  const [elecRun, setElecRun] = useState<ElecRun>({ status: 'idle' })
   const [env, setEnv] = useState<EnvId>('earth')
   const envRef = useRef<EnvId>('earth'); envRef.current = env
   const envDef = ENVS.find((e) => e.id === env)!
@@ -278,6 +304,22 @@ export function MujocoLab() {
             readings.current = readAll(sim.channels, sim.data.sensordata) // taze sensör: kare başına bir kez okumak kontrolü geciktirip bozar
             for (const r of runners.current) r.tick(sim.data.time)
             nextTick.current = sim.data.time + 0.01
+          }
+          // Arduino, benzetim saatiyle kilitli ilerler: 10 ms benzetim = 10 ms mikrodenetleyici.
+          // Böylece hız kaydırıcısı karta da işler (ağır çekimde kart da ağır çeker) ve kablolama
+          // her 10 ms'de bir iki yönü de taşır.
+          const lab = labRef.current
+          if (lab && sim.data.time >= nextLabTick.current) {
+            readings.current = readAll(sim.channels, sim.data.sensordata)
+            try {
+              for (let k = 0; k < 2; k++) lab.advance(5) // ince dilim: pin kenarları kaçmasın
+              pumpWiring({ lab, plan: planRef.current, ranges: sim.ctrl, ctrl: ctrlRef.current, readings: readings.current })
+            } catch (e) {
+              console.error(e)
+              labRef.current = null; lab.dispose()
+              setElecRun({ status: 'failed', message: String((e as Error)?.message ?? e) })
+            }
+            nextLabTick.current = sim.data.time + 0.01
           }
           for (let i = 0; i < sim.ctrl.length; i++) sim.data.ctrl[i] = ctrlRef.current[i] ?? 0
           sim.mj.mj_step(sim.model, sim.data)
@@ -365,10 +407,14 @@ export function MujocoLab() {
       if (tk) setGoalView(tk.state.map((st, i) => ({ done: st.done, p: tk.progress(i) })))
       // Motor çubukları blok, Python ve elle sürüşte aynı şekilde canlı kalsın diye her turda tazelenir
       setCtrlVals([...ctrlRef.current])
+      if (labRef.current) setLabState({ ...labRef.current.state })
       if (runners.current.length && runners.current.every((r) => r.done)) { runners.current = []; setProgRunning(false) }
     }, 250)
     return () => clearInterval(id)
   }, [])
+
+  // Sayfadan çıkarken AVR emülatörü arkada kalmasın
+  useEffect(() => () => { labRef.current?.dispose(); labRef.current = null }, [])
 
   const pick = (id: string) => {
     const s = SCENES.find((x) => x.id === id)!
@@ -396,15 +442,46 @@ export function MujocoLab() {
     runRef.current = true; setRunning(true); setProgRunning(runners.current.length > 0)
   }
   const stopProgram = () => { runners.current = []; setProgRunning(false) }
+
+  /** Devreyi durdurur; motor hedefleri olduğu yerde kalır (gerçek kartın gücü kesilmiş gibi). */
+  const stopElec = useCallback(() => {
+    labRef.current?.dispose()
+    labRef.current = null
+    setLabState(null)
+    setElecRun({ status: 'idle' })
+  }, [])
+
+  /** Arduino kodunu gerçekten derler (avr-gcc), hex'i AVR emülatöründe başlatır ve köprüyü kurar. */
+  const runElec = async () => {
+    stopElec()
+    setElecRun({ status: 'compiling' })
+    const out = await compileCode(arduinoRef.current)
+    if (!out.ok) {
+      setElecRun(out.errors.length
+        ? { status: 'errors', errors: out.errors }
+        : { status: 'failed', message: out.message ?? L('Derleme başarısız.', 'Compilation failed.') })
+      return
+    }
+    try {
+      labRef.current = createRuntime(circuitRef.current, out.hex)
+      nextLabTick.current = 0
+      resetState()
+      runRef.current = true; setRunning(true)
+      setElecRun({ status: 'running' })
+    } catch (e) {
+      setElecRun({ status: 'failed', message: String((e as Error)?.message ?? e) })
+    }
+  }
   const setCtrl = (i: number, v: number) => {
     ctrlRef.current[i] = v
     setCtrlVals((a) => a.map((x, k) => (k === i ? v : x)))
   }
 
-  const progTabs: { id: 'blocks' | 'python' | 'manual'; label: string; test: string }[] = [
+  const progTabs: { id: ProgTab; label: string; test: string }[] = [
     { id: 'blocks', label: `🧩 ${L('Bloklar', 'Blocks')}`, test: 'mujoco-tab-blocks' },
     { id: 'python', label: '🐍 Python', test: 'mujoco-tab-python' },
     { id: 'manual', label: `🎛️ ${L('Elle sür', 'By hand')}`, test: 'mujoco-tab-manual' },
+    { id: 'arduino', label: `⚡ ${L('Arduino C++', 'Arduino C++')}`, test: 'mujoco-tab-arduino' },
   ]
   const pickCard = (s: MjScene) => (
     <button key={s.id} role="tab" aria-selected={s.id === sceneId} className={`mj-card-pick${s.id === sceneId ? ' on' : ''}`} onClick={() => pick(s.id)} data-testid={`mujoco-scene-${s.id}`}>
@@ -416,6 +493,7 @@ export function MujocoLab() {
 
   const railItems: { id: Dock; ico: string; label: string }[] = [
     { id: 'robot', ico: '🤖', label: L('ROBOT', 'ROBOT') },
+    { id: 'elec', ico: '⚡', label: L('ELEK', 'ELEC') },
     { id: 'code', ico: '{ }', label: L('KOD', 'CODE') },
     { id: 'goals', ico: '🎯', label: L('HEDEF', 'GOALS') },
     { id: 'data', ico: '📈', label: L('VERİ', 'DATA') },
@@ -423,6 +501,7 @@ export function MujocoLab() {
   ]
   const dockTitle: Record<Dock, string> = {
     robot: L('Robot seç', 'Pick a robot'),
+    elec: L('Elektronik ve kablolama', 'Electronics and wiring'),
     code: L('Robotu programla', 'Program the robot'),
     goals: L('Hedefler', 'Goals'),
     data: L('Sensör ve grafik', 'Sensors and graph'),
@@ -509,6 +588,11 @@ export function MujocoLab() {
             <p className="mj-desc"><b>{en ? scene.en.title : scene.tr.title}</b> · {en ? scene.en.desc : scene.tr.desc}</p>
           </div>
 
+          <div className="mj-dock-body" hidden={dock !== 'elec'}>
+            <MurokoElec circuit={circuit} onCircuit={setCircuit} plan={plan} onPlan={setPlan}
+              ranges={ctrlDefs} channels={chNames} labState={labState} editLocked={elecRun.status === 'running'} en={en} />
+          </div>
+
           <div className="mj-dock-body" hidden={dock !== 'code'}>
             <div className="mj-tabs" role="tablist" aria-label={L('Programlama yolu', 'Way of programming')}>
               {progTabs.map((t) => (
@@ -530,6 +614,38 @@ export function MujocoLab() {
               <div className="mj-panel">
                 <MurokoPython en={en} starter={en ? scene.python.en : scene.python.tr} fromBlocks={blockPy} motors={ctrlDefs.map((c) => c.name)} sensors={chNames}
                   setMotor={setMotor} onStart={startPython} onReady={resumeSim} getState={() => ({ t: simRef.current?.data.time ?? 0, sensors: readings.current })} onStop={() => { runners.current = [] }} bridge={pyBridge} resetKey={scene.id} />
+              </div>
+            )}
+
+            {progTab === 'arduino' && (
+              <div className="mj-panel" data-testid="mujoco-arduino">
+                {plan.motors.length === 0 && (
+                  <p className="mj-note">{L(
+                    'Henüz hiçbir motor devreye bağlı değil. ELEK → Bağlantı bölümünden bağla, yoksa kod çalışsa da robot kımıldamaz.',
+                    'No motor is linked to the circuit yet. Link one under ELEC → Link, otherwise the code runs but the robot stays still.')}</p>
+                )}
+                <div className="mj-bar">
+                  <button className="sbtn run" onClick={runElec} disabled={elecRun.status === 'compiling'} data-testid="mujoco-elec-run">
+                    {elecRun.status === 'compiling' ? `⏳ ${L('Derleniyor…', 'Compiling…')}` : `▶ ${L('Derle ve yükle', 'Compile and upload')}`}
+                  </button>
+                  <button className="sbtn ghost" onClick={stopElec} disabled={elecRun.status !== 'running'}>■ {L('Gücü kes', 'Power off')}</button>
+                  {elecRun.status === 'running' && <span className="mj-live">● {L('kart çalışıyor', 'board running')}</span>}
+                </div>
+                <textarea className="mj-ta" value={arduino} spellCheck={false} onChange={(e) => setArduino(e.target.value)}
+                  aria-label="Arduino C++" data-testid="mujoco-arduino-code"
+                  placeholder={'#include <Servo.h>\n\nServo s;\n\nvoid setup() {\n  s.attach(9);\n}\n\nvoid loop() {\n  s.write(0);\n  delay(500);\n  s.write(180);\n  delay(500);\n}'} />
+                {elecRun.status === 'errors' && (
+                  <ul className="mj-warns" data-testid="mujoco-arduino-errors">
+                    {elecRun.errors.slice(0, 6).map((e, i) => <li key={i}>{L('satır', 'line')} {e.line}: {e.message}</li>)}
+                  </ul>
+                )}
+                {elecRun.status === 'failed' && <p className="mj-warns" role="alert">{elecRun.message}</p>}
+                {labState && labState.serial.length > 0 && (
+                  <pre className="mj-out" data-testid="mujoco-serial">{labState.serial.slice(-1200)}</pre>
+                )}
+                <p className="muted">{L(
+                  'Kod gerçekten avr-gcc ile derlenir ve çıkan hex komut komut çalıştırılır. Kart, benzetim saatiyle kilitli ilerler: ağır çekimde kart da ağır çeker.',
+                  'The code really is compiled with avr-gcc and the resulting hex runs instruction by instruction. The board is locked to simulation time: in slow motion the board slows down too.')}</p>
               </div>
             )}
 
@@ -649,6 +765,7 @@ export function MujocoLab() {
           <span>{L('ortam', 'environment')}: {en ? envDef.en : envDef.tr}</span>
           <span>{L('temas', 'contacts')}: {info.ncon}</span>
           {progRunning && <span className="mj-live">● {L('program çalışıyor', 'program running')}</span>}
+          {elecRun.status === 'running' && <span className="mj-live" data-testid="mujoco-board-live">⚡ {L('kart çalışıyor', 'board running')} · {plan.motors.length} {L('motor bağlı', 'motors linked')}</span>}
           <span className="mj-status-r" data-testid="mujoco-clock">{info.t.toFixed(1)} s · {running ? L('çalışıyor', 'running') : L('duraklatıldı', 'paused')}</span>
         </div>
       </div>
