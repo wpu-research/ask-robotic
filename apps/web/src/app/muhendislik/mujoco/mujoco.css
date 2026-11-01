@@ -237,3 +237,5 @@
 .mj-cad-num { display: grid; gap: 2px; font-size: .72rem; color: var(--muted); }
 .mj-cad-num input { width: 5.2rem; min-height: 32px; padding: 3px 8px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: .8rem; }
 .mj-cad-block-edit input[type="color"] { width: 40px; height: 34px; padding: 2px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); cursor: pointer; }
+.mj-cad-bsel.cut { border-style: dashed; }
+.mj-cad-bsel.cut i { border-radius: 50%; }

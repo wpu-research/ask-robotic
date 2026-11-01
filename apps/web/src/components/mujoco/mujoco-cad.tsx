@@ -75,6 +75,9 @@ export function MurokoCad({ design, onDesign, en }: Props) {
         <p className="muted">{L(
           'Gövde blokların birleşimidir. MuJoCo çarpışma geometrisi dışbükey olmak zorunda olduğundan, delikli ya da L biçimli bir gövde birden çok blokla kurulur — fizik de tam olarak çizdiğin şekle göre çalışır.',
           'The body is a union of blocks. MuJoCo collision geometry must be convex, so a hollow or L-shaped body is built from several blocks — and the physics matches exactly what you drew.')}</p>
+        <p className="muted">{L(
+          'Delik, katı kutudan çıkarılan bir kutudur. Kalan hacim tam olarak en çok 6 kutuya bölünür, yani delik fizikte de vardır: gövde hafifler ve delikten geçilir. Yalnız eksen hizalı kutular delik açabilir.',
+          'A hole is a box subtracted from a solid box. The remainder splits into at most 6 boxes exactly, so the hole is real in physics too: the body gets lighter and things pass through it. Only axis-aligned boxes can cut.')}</p>
 
         <div className="mj-bar">
           {(['kutu', 'silindir', 'kure'] as BlockShape[]).map((s) => (
@@ -82,14 +85,21 @@ export function MurokoCad({ design, onDesign, en }: Props) {
               + {s === 'kutu' ? L('Kutu', 'Box') : s === 'silindir' ? L('Silindir', 'Cylinder') : L('Küre', 'Sphere')}
             </button>
           ))}
+          <button className="sbtn ghost" data-testid="mujoco-cad-add-hole"
+            onClick={() => {
+              const g = addBlock(govde, 'kutu')
+              const nid = g.blocks[g.blocks.length - 1].id
+              setGovde(updateBlock(g, nid, { cut: true, color: '#111827', pos: [0, 0, 0] }))
+              setBlock(nid)
+            }}>✂ {L('Delik', 'Hole')}</button>
         </div>
 
         <ul className="mj-cad-blocks">
           {govde.blocks.map((b) => (
             <li key={b.id} className={b.id === block ? 'on' : ''}>
-              <button className="mj-cad-bsel" onClick={() => setBlock(b.id === block ? null : b.id)} data-testid={`mujoco-cad-block-${b.id}`}>
+              <button className={`mj-cad-bsel${b.cut ? ' cut' : ''}`} onClick={() => setBlock(b.id === block ? null : b.id)} data-testid={`mujoco-cad-block-${b.id}`}>
                 <i style={{ background: b.color }} aria-hidden="true" />
-                {b.id} · {b.shape === 'kutu' ? L('kutu', 'box') : b.shape === 'silindir' ? L('silindir', 'cylinder') : L('küre', 'sphere')}
+                {b.id} · {b.cut ? L('delik', 'hole') : b.shape === 'kutu' ? L('kutu', 'box') : b.shape === 'silindir' ? L('silindir', 'cylinder') : L('küre', 'sphere')}
               </button>
             </li>
           ))}
@@ -115,6 +125,8 @@ export function MurokoCad({ design, onDesign, en }: Props) {
                   <input type="number" value={Math.round(bsel.yaw)} step={15} onChange={(e) => setGovde(updateBlock(govde, bsel.id, { yaw: Number(e.target.value) }))} />
                 </label>
               )}
+              <button className="sbtn ghost" onClick={() => setGovde(updateBlock(govde, bsel.id, { cut: !bsel.cut }))}
+                data-testid="mujoco-cad-toggle-cut">{bsel.cut ? `⬛ ${L('Katı yap', 'Make solid')}` : `✂ ${L('Delik yap', 'Make hole')}`}</button>
               <input type="color" value={bsel.color} aria-label={L('Renk', 'Colour')} onChange={(e) => setGovde(updateBlock(govde, bsel.id, { color: e.target.value }))} />
               <button className="sbtn ghost" onClick={() => setGovde(duplicateBlock(govde, bsel.id))}>⧉ {L('Kopyala', 'Duplicate')}</button>
               <button className="sbtn ghost" disabled={govde.blocks.length <= 1}

@@ -6,8 +6,8 @@
 // ağacına yazmaktır — yeni fizik uydurulmaz.
 //
 // Eksenler: tasarımda ileri +x, sola +y (MuJoCo ile aynı); z yukarı.
-import { CHASSIS, PARTS, PITCH, cardCells, cellXY, deriveDesign, type ChassisSpec, type PlacedPart, type RobotDesign } from './tasarim'
-import { blockVolume, govdeVolume, normalizeGovde, type Block } from './govde'
+import { CARD, CHASSIS, PARTS, PITCH, cardCells, cellXY, deriveDesign, type ChassisSpec, type PlacedPart, type RobotDesign } from './tasarim'
+import { blockVolume, govdeMassG, normalizeGovde, resolveSolids, type Block } from './govde'
 
 /** Şasi levhasının kalınlığı (m). */
 const DECK = 0.004
@@ -63,25 +63,38 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
 
   // Şasi + kart + sürücü olmayan parçaların kütlesi levhaya yazılır (kg)
   const wheelParts = d.parts.filter((p) => PARTS[p.type].wheel)
-  const deckMassG = der.massG - wheelParts.reduce((s, p) => s + PARTS[p.type].massG, 0)
+  /** Serbest çizilmiş gövde varsa onun blokları, yoksa tek levha. */
+  const govde = d.govde ? normalizeGovde(d.govde) : null
+
+  // Gövde çizilmişse kütlesi çizimden gelir (delik açmak gerçekten hafifletir);
+  // çizilmemişse şasi tablosundaki kütle kullanılır.
+  const partsMassG = d.parts.filter((p) => !PARTS[p.type].wheel).reduce((s, p) => s + PARTS[p.type].massG, 0)
+  const deckMassG = govde
+    ? govdeMassG(govde) + partsMassG + CARD.massG
+    : der.massG - wheelParts.reduce((s, p) => s + PARTS[p.type].massG, 0)
   const deckMass = Math.max(0.02, deckMassG / 1000)
 
   const geoms: string[] = []
-  /** Serbest çizilmiş gövde varsa onun blokları, yoksa tek levha. */
-  const govde = d.govde ? normalizeGovde(d.govde) : null
   const bodies: string[] = []
   const sites: string[] = []
   const sensorXml: string[] = []
   const actXml: string[] = []
 
   if (govde) {
-    // Çizilen her blok ayrı bir dışbükey geom olur: içbükey gövde MuJoCo'da böyle kurulur.
-    // Kütle hacimle paylaştırılır ki toplam, tasarımın söylediği kütleyle aynı kalsın.
-    const totalV = govdeVolume(govde) || 1
-    govde.blocks.forEach((b, i) => {
+    // Çizilen gövde, delikler düşüldükten sonra dışbükey parçalara ayrılır: içbükey
+    // gövde MuJoCo'da böyle kurulur. Delik gerçektir, fizik de deliği görür.
+    const { pieces, notes: cutNotes } = resolveSolids(govde)
+    for (const n of cutNotes) notes.push({ tr: n.tr, en: n.en })
+    const totalV = pieces.reduce((s, p) => s + blockVolume({ ...p, id: p.from } as Block), 0) || 1
+    pieces.forEach((p, i) => {
+      const b: Block = { ...p, id: p.from }
       const m = (deckMass * blockVolume(b)) / totalV
-      geoms.push(`<geom name="govde_${i}" ${blockGeom(b)} mass="${f(m)}" rgba="${hexRgba(b.color)}"/>`)
+      geoms.push(`<geom name="govde_${i}" ${blockGeom(b)} mass="${f(m)}" rgba="${hexRgba(p.color)}"/>`)
     })
+    if (!pieces.length) {
+      notes.push({ tr: 'Gövdenin tamamı delinmiş: geriye katı kalmadı.', en: 'The body is cut away entirely: no solid remains.' })
+      geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".86 .24 .55 1"/>`)
+    }
   } else {
     geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".86 .24 .55 1"/>`)
   }

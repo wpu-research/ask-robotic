@@ -21,6 +21,8 @@ export interface Block {
   /** z ekseni etrafında dönüş (derece). */
   yaw: number
   color: string
+  /** true ise bu blok katı değil kesicidir: katı bloklardan hacmini çıkarır (delik açar). */
+  cut?: boolean
 }
 
 export interface Govde {
@@ -57,9 +59,12 @@ export function govdeVolume(g: Govde): number {
   return g.blocks.reduce((s, b) => s + blockVolume(b), 0)
 }
 
-/** Gövdenin kütlesi (g). Bloklar üst üste binerse hacim iki kez sayılır; tezgâh bunu uyarır. */
+/**
+ * Gövdenin kütlesi (g): delikler düşülmüş gerçek hacimden. Katı bloklar üst üste
+ * binerse binen hacim iki kez sayılır; tezgâh bunu uyarır.
+ */
 export function govdeMassG(g: Govde): number {
-  return Math.round(govdeVolume(g) * DENSITY * 1000)
+  return Math.round(solidVolume(g) * DENSITY * 1000)
 }
 
 /** Şasi boyundan tek bloklu başlangıç gövdesi: eski davranışın aynısı. */
@@ -117,7 +122,8 @@ export function updateBlock(g: Govde, id: string, patch: Partial<Block>): Govde 
 
 /** Son blok silinmez: gövdesiz robot olmaz. */
 export function removeBlock(g: Govde, id: string): Govde {
-  if (g.blocks.length <= 1) return g
+  const target = g.blocks.find((b) => b.id === id)
+  if (target && !target.cut && g.blocks.filter((b) => !b.cut).length <= 1) return g
   return { ...g, blocks: g.blocks.filter((b) => b.id !== id) }
 }
 
@@ -143,19 +149,145 @@ export function govdeBounds(g: Govde): [number, number, number, number, number, 
   return [x0, y0, z0, x1, y1, z1]
 }
 
+// ---- Çıkarma (delik açma) -------------------------------------------------
+//
+// Kutudan kutu çıkarmanın sonucu TAM OLARAK en çok 6 kutuyla ifade edilir: x'te
+// solda ve sağda kalan dilimler, ortada y'de önde ve arkada kalanlar, ortada
+// z'de altta ve üstte kalanlar. Dilimler örtüşmez, toplamları kalanın tamamıdır.
+// Hepsi dışbükey olduğu için MuJoCo'ya olduğu gibi girer: delik gerçekten vardır,
+// fizik de deliği görür. Yaklaşık dışbükey ayrıştırma yapılmaz.
+
+/** Eksen hizalı kutu: [x0, y0, z0, x1, y1, z1] (m). */
+export type Aabb = [number, number, number, number, number, number]
+
+/** En küçük anlamlı kalınlık (m): bundan ince dilimler atılır. */
+const EPS = 1e-4
+
+/** Bloğun eksen hizalı kutusu; yalnız 90°'nin katlarında geçerlidir. */
+export function blockAabb(b: Block): Aabb {
+  const swap = Math.round(b.yaw / 90) % 2 !== 0
+  const sx = swap ? b.size[1] : b.size[0]
+  const sy = swap ? b.size[0] : b.size[1]
+  return [b.pos[0] - sx, b.pos[1] - sy, b.pos[2] - b.size[2], b.pos[0] + sx, b.pos[1] + sy, b.pos[2] + b.size[2]]
+}
+
+export function aabbVolume(a: Aabb): number {
+  return Math.max(0, a[3] - a[0]) * Math.max(0, a[4] - a[1]) * Math.max(0, a[5] - a[2])
+}
+
+/** Blok eksen hizalı mı (çıkarma için şart)? */
+export function isAxisAligned(b: Block): boolean {
+  return Math.abs(b.yaw % 90) < 1e-6
+}
+
+/**
+ * s \ c: kalan hacmi örtüşmeyen kutulara böler (en çok 6). Kesişim yoksa [s],
+ * c tamamen kaplıyorsa [] döner. Sonuç kesindir, yaklaşık değildir.
+ */
+export function subtractBox(s: Aabb, c: Aabb): Aabb[] {
+  // Kesiciyi katı kutuyla kırp: dışarıda kalan kısmı bir şey kesmez
+  const k: Aabb = [
+    Math.max(s[0], c[0]), Math.max(s[1], c[1]), Math.max(s[2], c[2]),
+    Math.min(s[3], c[3]), Math.min(s[4], c[4]), Math.min(s[5], c[5]),
+  ]
+  if (k[3] - k[0] <= EPS || k[4] - k[1] <= EPS || k[5] - k[2] <= EPS) return [s] // değmiyor
+  const out: Aabb[] = []
+  const push = (a: Aabb) => { if (a[3] - a[0] > EPS && a[4] - a[1] > EPS && a[5] - a[2] > EPS) out.push(a) }
+  push([s[0], s[1], s[2], k[0], s[4], s[5]])          // x'te solda kalan
+  push([k[3], s[1], s[2], s[3], s[4], s[5]])          // x'te sağda kalan
+  push([k[0], s[1], s[2], k[3], k[1], s[5]])          // ortada, y'de önde kalan
+  push([k[0], k[4], s[2], k[3], s[4], s[5]])          // ortada, y'de arkada kalan
+  push([k[0], k[1], s[2], k[3], k[4], k[2]])          // ortada, z'de altta kalan
+  push([k[0], k[1], k[5], k[3], k[4], s[5]])          // ortada, z'de üstte kalan
+  return out
+}
+
+/** Çıkarma sonrası gövde: fizikte ve görüntüde kullanılan gerçek katı parçalar. */
+export interface SolidPiece {
+  /** Kaynak bloğun kimliği (renk ve seçim için). */
+  from: string
+  shape: BlockShape
+  pos: [number, number, number]
+  size: [number, number, number]
+  yaw: number
+  color: string
+}
+
+const aabbToPiece = (a: Aabb, src: Block): SolidPiece => ({
+  from: src.id, shape: 'kutu', color: src.color, yaw: 0,
+  pos: [(a[0] + a[3]) / 2, (a[1] + a[4]) / 2, (a[2] + a[5]) / 2],
+  size: [(a[3] - a[0]) / 2, (a[4] - a[1]) / 2, (a[5] - a[2]) / 2],
+})
+
+/**
+ * Katı blokları kesicilerle işler ve fizikte kullanılacak parçaları üretir.
+ * Kesilemeyen durumlar (silindir/küre katı, eğik blok) dokunulmadan geçer ve
+ * `notes` ile dürüstçe bildirilir — sessizce yok sayılmaz.
+ */
+export function resolveSolids(g: Govde): { pieces: SolidPiece[]; notes: GovdeIssue[] } {
+  const cutters = g.blocks.filter((b) => b.cut)
+  const solids = g.blocks.filter((b) => !b.cut)
+  const notes: GovdeIssue[] = []
+  const pieces: SolidPiece[] = []
+
+  const badCutters = cutters.filter((c) => c.shape !== 'kutu' || !isAxisAligned(c))
+  for (const c of badCutters) {
+    notes.push({
+      level: 'uyari', blockId: c.id,
+      tr: `${c.id} kesici olarak kullanılamıyor: yalnız eksen hizalı (açı 0/90/180/270) kutu delik açabilir. Bu blok yok sayıldı.`,
+      en: `${c.id} cannot cut: only an axis-aligned box (yaw 0/90/180/270) can make a hole. This block was ignored.`,
+    })
+  }
+  const useful = cutters.filter((c) => c.shape === 'kutu' && isAxisAligned(c))
+
+  for (const s of solids) {
+    if (!useful.length) { pieces.push({ ...s, from: s.id }); continue }
+    if (s.shape !== 'kutu' || !isAxisAligned(s)) {
+      pieces.push({ ...s, from: s.id })
+      if (useful.some((c) => aabbVolume(intersect(blockAabb(s), blockAabb(c))) > 0)) {
+        notes.push({
+          level: 'uyari', blockId: s.id,
+          tr: `${s.id} delinmedi: yalnız eksen hizalı kutudan delik açılabilir (silindir, küre ve eğik bloklar kesilmez).`,
+          en: `${s.id} was not cut: only an axis-aligned box can be hollowed (cylinders, spheres and rotated blocks are left whole).`,
+        })
+      }
+      continue
+    }
+    // Her kesici sırayla uygulanır; kalan parçalar bir sonrakine girer
+    let parts: Aabb[] = [blockAabb(s)]
+    for (const c of useful) {
+      const ca = blockAabb(c)
+      parts = parts.flatMap((p) => subtractBox(p, ca))
+    }
+    for (const p of parts) pieces.push(aabbToPiece(p, s))
+  }
+  return { pieces, notes }
+}
+
+function intersect(a: Aabb, b: Aabb): Aabb {
+  return [Math.max(a[0], b[0]), Math.max(a[1], b[1]), Math.max(a[2], b[2]), Math.min(a[3], b[3]), Math.min(a[4], b[4]), Math.min(a[5], b[5])]
+}
+
+/** Çıkarma sonrası gerçek hacim (m³): delikler düşülmüş hâli. */
+export function solidVolume(g: Govde): number {
+  const { pieces } = resolveSolids(g)
+  return pieces.reduce((s, p) => s + blockVolume({ ...p, id: p.from } as Block), 0)
+}
+
 export interface GovdeIssue { level: 'hata' | 'uyari'; tr: string; en: string; blockId?: string }
 
 /** Tezgâhın dürüst uyarıları: üst üste binme, havada duran blok, aşırı kütle. */
 export function govdeIssues(g: Govde): GovdeIssue[] {
-  const out: GovdeIssue[] = []
+  const out: GovdeIssue[] = [...resolveSolids(g).notes]
   const massG = govdeMassG(g)
   if (massG > 2000) {
     out.push({ level: 'uyari', tr: `Gövde çok ağır (${massG} g): motorlar zorlanır.`, en: `The body is very heavy (${massG} g): the motors will struggle.` })
   }
   // Blok çiftlerinde kaba kesişim denetimi (eksen hizalı kutu yaklaşımı)
-  for (let i = 0; i < g.blocks.length; i++) {
-    for (let j = i + 1; j < g.blocks.length; j++) {
-      const a = g.blocks[i], b = g.blocks[j]
+  const solidBlocks = g.blocks.filter((b) => !b.cut)
+  for (let i = 0; i < solidBlocks.length; i++) {
+    for (let j = i + 1; j < solidBlocks.length; j++) {
+      const a = solidBlocks[i], b = solidBlocks[j]
       const overlaps = [0, 1, 2].every((k) => Math.abs(a.pos[k] - b.pos[k]) < a.size[k] + b.size[k] - 1e-6)
       if (overlaps) {
         out.push({
@@ -167,21 +299,21 @@ export function govdeIssues(g: Govde): GovdeIssue[] {
     }
   }
   // Birbirine değmeyen blok: gövde tek parça değilse robot ikiye ayrılmış gibi görünür
-  if (g.blocks.length > 1) {
-    const linked = new Set<string>([g.blocks[0].id])
+  if (solidBlocks.length > 1) {
+    const linked = new Set<string>([solidBlocks[0].id])
     let grew = true
     while (grew) {
       grew = false
-      for (const a of g.blocks) {
+      for (const a of solidBlocks) {
         if (!linked.has(a.id)) continue
-        for (const b of g.blocks) {
+        for (const b of solidBlocks) {
           if (linked.has(b.id)) continue
           const touches = [0, 1, 2].every((k) => Math.abs(a.pos[k] - b.pos[k]) <= a.size[k] + b.size[k] + 1e-4)
           if (touches) { linked.add(b.id); grew = true }
         }
       }
     }
-    for (const b of g.blocks) {
+    for (const b of solidBlocks) {
       if (!linked.has(b.id)) {
         out.push({ level: 'hata', blockId: b.id, tr: `${b.id} gövdeye değmiyor: havada ayrı duruyor.`, en: `${b.id} does not touch the body: it floats separately.` })
       }

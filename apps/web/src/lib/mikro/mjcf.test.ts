@@ -26,6 +26,8 @@ function compile(xml: string) {
     nsensor: model.nsensor,
     actuators: names(19, model.nu),
     sensors: names(20, model.nsensor),
+    ngeom: model.ngeom,
+    bodyMass: () => { let t = 0; for (let i = 0; i < model.nbody; i++) t += model.body_mass[i]; return t },
     ctrlrange: Array.from({ length: model.nu }, (_, i) => [model.actuator_ctrlrange[2 * i], model.actuator_ctrlrange[2 * i + 1]] as const),
     step: (n: number) => { for (let i = 0; i < n; i++) mj.mj_step(model, data) },
     z: () => data.qpos[2],
@@ -185,6 +187,51 @@ describe('tasarım → MJCF', () => {
     const d = { ...rover(), govde: { v: 1, blocks: [] } } as RobotDesign
     const res = designToMjcf(d)
     expect(res.xml).toContain('name="govde"')
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
+  it('delik fizikte gerçekten var: geom sayısı artar, kütle düşer', () => {
+    const plate = { id: 'b1', shape: 'kutu' as const, pos: [0, 0, 0] as [number, number, number], size: [0.07, 0.05, 0.004] as [number, number, number], yaw: 0, color: '#db3c8c' }
+    const hole = { id: 'c1', shape: 'kutu' as const, pos: [0, 0, 0] as [number, number, number], size: [0.02, 0.02, 0.02] as [number, number, number], yaw: 0, color: '#000000', cut: true }
+
+    const dolu = compile(designToMjcf({ ...rover(), govde: { v: 1, blocks: [plate] } }).xml)
+    const delikli = compile(designToMjcf({ ...rover(), govde: { v: 1, blocks: [plate, hole] } }).xml)
+    try {
+      // Delik, levhayı dört dilime böler: daha çok geom
+      expect(delikli.ngeom).toBeGreaterThan(dolu.ngeom)
+      // Ve gövde gerçekten hafifler
+      expect(delikli.bodyMass()).toBeLessThan(dolu.bodyMass())
+    } finally { dolu.dispose(); delikli.dispose() }
+  }, 60_000)
+
+  it('delinmiş gövdeyle robot hâlâ yürür', () => {
+    const d: RobotDesign = {
+      ...rover(),
+      govde: { v: 1, blocks: [
+        { id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.004], yaw: 0, color: '#db3c8c' },
+        { id: 'c1', shape: 'kutu', pos: [0, 0, 0], size: [0.02, 0.02, 0.02], yaw: 0, color: '#000', cut: true },
+      ] },
+    }
+    const m = compile(designToMjcf(d).xml)
+    try {
+      m.step(200)
+      const x0 = m.x()
+      m.setCtrl(0, 10); m.setCtrl(1, 10)
+      m.step(1000)
+      expect(Math.abs(m.x() - x0)).toBeGreaterThan(0.02)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('tamamen delinmiş gövde dürüstçe bildirilir ve model yine derlenir', () => {
+    const res = designToMjcf({
+      ...rover(),
+      govde: { v: 1, blocks: [
+        { id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.02, 0.02, 0.01], yaw: 0, color: '#db3c8c' },
+        { id: 'c1', shape: 'kutu', pos: [0, 0, 0], size: [0.1, 0.1, 0.1], yaw: 0, color: '#000', cut: true },
+      ] },
+    })
+    expect(res.notes.some((n) => /tamamı delinmiş/i.test(n.tr))).toBe(true)
     const m = compile(res.xml)
     try { expect(m.nu).toBe(2) } finally { m.dispose() }
   }, 60_000)
