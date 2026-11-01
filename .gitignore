@@ -1,9 +1,11 @@
-node_modules
-.next
+.claude
+.dev
 dist
-.turbo
 .env
 .env.*
 !.env.example
+.next
+node_modules
 *.tsbuildinfo
-.dev
+.turbo
+_vault
