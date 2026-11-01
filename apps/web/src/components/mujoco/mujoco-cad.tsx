@@ -17,6 +17,7 @@ import {
   mirrorBlock, patternBlock,
 } from '@/lib/mikro/govde'
 import { SABLONLAR } from '@/lib/mikro/sablonlar'
+import type { GizmoMode } from './cad-gizmo'
 import { deleteAsset, insertAsset, listAssets, saveAsset, type Varlik } from '@/lib/mikro/varliklar'
 
 interface Props {
@@ -28,6 +29,13 @@ interface Props {
   onRedo: () => void
   canUndo: boolean
   canRedo: boolean
+  /** Seçili blok tezgâhla paylaşılır: tutamaçlar sahnede o bloğa takılır. */
+  block: string | null
+  onBlock: (id: string | null) => void
+  gizmoMode: GizmoMode
+  onGizmoMode: (m: GizmoMode) => void
+  snap: boolean
+  onSnap: (v: boolean) => void
 }
 
 /** Gövdeye eklenebilen şekiller; MuJoCo'da yerleşik olanlar ve dışbükey çokyüzlüler. */
@@ -47,12 +55,11 @@ const SHAPES: { id: BlockShape; tr: string; en: string }[] = [
   { id: 'onikiyuzlu', tr: 'Onikiyüzlü', en: 'Dodecahedron' },
 ]
 
-export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo }: Props) {
+export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo, block, onBlock, gizmoMode, onGizmoMode, snap, onSnap }: Props) {
   const L = (tr: string, e: string) => (en ? e : tr)
   const [tab, setTab] = useState<'govde' | 'parca' | 'sablon'>('govde')
   const [tool, setTool] = useState<PartType | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
-  const [block, setBlock] = useState<string | null>(null)
   const [assetName, setAssetName] = useState('')
   const [assets, setAssets] = useState<Varlik[]>([])
   useEffect(() => { setAssets(listAssets()) }, [])
@@ -124,6 +131,15 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
     return (
       <>
         {cadTabs}
+        <div className="mj-bar mj-cad-tools" role="group" aria-label={L('Tutamaç', 'Gizmo')}>
+          {([['translate', '✥', L('Taşı', 'Move')], ['rotate', '⟳', L('Döndür', 'Rotate')], ['scale', '⤢', L('Boyutlandır', 'Scale')]] as const).map(([m, ico, lbl]) => (
+            <button key={m} className={`mj-qbtn${gizmoMode === m ? ' on' : ''}`} aria-pressed={gizmoMode === m}
+              onClick={() => onGizmoMode(m)} data-testid={`mujoco-cad-gizmo-${m}`}><b aria-hidden="true">{ico}</b>{lbl}</button>
+          ))}
+          <button className={`mj-qbtn${snap ? ' on' : ''}`} aria-pressed={snap} onClick={() => onSnap(!snap)} data-testid="mujoco-cad-snap">
+            <b aria-hidden="true">⌗</b>{L('Kilit 5 mm / 15°', 'Snap 5 mm / 15°')}
+          </button>
+        </div>
         <p className="mj-note">{L(
           'Gövdeyi tezgâhın kendisinde görüyorsun: blok ekleyip ölçü değiştirdiğinde robot anında yeniden kurulur.',
           'You see the body on the bench itself: add a block or change a size and the robot is rebuilt at once.')}</p>
@@ -137,7 +153,7 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
         <div className="mj-bar">
           <label className="mj-cad-chassis">{L('Şekil ekle', 'Add shape')}
             <select value="" data-testid="mujoco-cad-add-shape"
-              onChange={(e) => { if (!e.target.value) return; const g = addBlock(govde, e.target.value as BlockShape); setGovde(g); setBlock(g.blocks[g.blocks.length - 1].id); e.target.value = '' }}>
+              onChange={(e) => { if (!e.target.value) return; const g = addBlock(govde, e.target.value as BlockShape); setGovde(g); onBlock(g.blocks[g.blocks.length - 1].id); e.target.value = '' }}>
               <option value="">— {L('seç', 'pick')} —</option>
               {SHAPES.map((s) => <option key={s.id} value={s.id}>{en ? s.en : s.tr}</option>)}
             </select>
@@ -147,14 +163,14 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
               const g = addBlock(govde, 'kutu')
               const nid = g.blocks[g.blocks.length - 1].id
               setGovde(updateBlock(g, nid, { cut: true, color: '#111827', pos: [0, 0, 0] }))
-              setBlock(nid)
+              onBlock(nid)
             }}>✂ {L('Delik', 'Hole')}</button>
         </div>
 
         <ul className="mj-cad-blocks">
           {govde.blocks.map((b) => (
             <li key={b.id} className={b.id === block ? 'on' : ''}>
-              <button className={`mj-cad-bsel${b.cut ? ' cut' : ''}`} onClick={() => setBlock(b.id === block ? null : b.id)} data-testid={`mujoco-cad-block-${b.id}`}>
+              <button className={`mj-cad-bsel${b.cut ? ' cut' : ''}`} onClick={() => onBlock(b.id === block ? null : b.id)} data-testid={`mujoco-cad-block-${b.id}`}>
                 <i style={{ background: b.color }} aria-hidden="true" />
                 {b.id} · {b.cut ? L('delik', 'hole') : b.shape === 'kutu' ? L('kutu', 'box') : b.shape === 'silindir' ? L('silindir', 'cylinder') : L('küre', 'sphere')}
               </button>
@@ -194,7 +210,7 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
                 ⋯ {L('Dizi (3)', 'Pattern (3)')}
               </button>
               <button className="sbtn ghost" disabled={govde.blocks.length <= 1}
-                onClick={() => { setGovde(removeBlock(govde, bsel.id)); setBlock(null) }}>🗑 {L('Sil', 'Delete')}</button>
+                onClick={() => { setGovde(removeBlock(govde, bsel.id)); onBlock(null) }}>🗑 {L('Sil', 'Delete')}</button>
             </div>
           </div>
         )}

@@ -16,6 +16,8 @@ import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/sce
 import { localizeScene } from '@/lib/mujoco/names-en'
 import { DESIGN_SCENE_ID, designScene, emptyDesign, loadDesign, saveDesign } from '@/lib/mujoco/design-scene'
 import { MurokoCad } from './mujoco-cad'
+import { createCadGizmo, type CadGizmo, type GizmoMode } from './cad-gizmo'
+import { defaultGovde, normalizeGovde, updateBlock } from '@/lib/mikro/govde'
 import { canRedo, canUndo, initHistory, present, push, redo, replace, undo } from '@/lib/mikro/history'
 import type { RobotDesign } from '@/lib/mikro/tasarim'
 import { buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
@@ -86,6 +88,8 @@ export function MujocoLab() {
   // Tasarım geçmişi: yanlış silinen bloğun dönüşü olsun
   const [hist, setHist] = useState(() => initHistory<RobotDesign>(emptyDesign()))
   const design = present(hist)
+  // Tutamaç geri çağrısı sahne kurulumunda bir kez bağlanır; güncel tasarıma ref'le erişir
+  const designRef = useRef(design); designRef.current = design
   // Kayıtlı tasarım varsa onunla başla: açılışta öğrencinin kendi robotu sahnede olsun
   useEffect(() => {
     const d = loadDesign(); if (!d) return
@@ -113,6 +117,10 @@ export function MujocoLab() {
   const [progTab, setProgTab] = useState<ProgTab>('blocks')
   const [dock, setDock] = useState<Dock | null>('cad')
   const [dataTab, setDataTab] = useState<'sens' | 'motors' | 'graph'>('sens')
+  const [cadBlock, setCadBlock] = useState<string | null>(null)
+  const [gizmoMode, setGizmoMode] = useState<GizmoMode>('translate')
+  const [snapOn, setSnapOn] = useState(true)
+  const gizmoRef = useRef<CadGizmo | null>(null)
   const [quickOpen, setQuickOpen] = useState(true)
   const [circuit, setCircuit] = useState<Circuit>(starterCircuit)
   const circuitRef = useRef(circuit); circuitRef.current = circuit
@@ -229,7 +237,14 @@ export function MujocoLab() {
       syncMeshes(sim)
     }
     stageRef.current = stage; groupRef.current = group
-    return () => { disposeSim(); stage.dispose(); stageRef.current = null; groupRef.current = null }
+    gizmoRef.current = createCadGizmo(stage, group, (id, patch) => {
+      const g = normalizeGovde(designRef.current.govde) ?? defaultGovde(designRef.current.chassis)
+      changeDesignRef.current({ ...designRef.current, govde: updateBlock(g, id, patch) })
+    })
+    return () => {
+      gizmoRef.current?.dispose(); gizmoRef.current = null
+      disposeSim(); stage.dispose(); stageRef.current = null; groupRef.current = null
+    }
   }, [webgl, disposeSim])
 
   // XML değişince modeli derle
@@ -275,6 +290,16 @@ export function MujocoLab() {
 
   // Ortam değişince yerçekimi anında uygulanır: robot düşerken bile Ay'a geçilebilir
   useEffect(() => { applyGravity() }, [env, applyGravity])
+
+  // Tutamaçlar: yalnız CAD rafı açıkken ve kendi robotuna bakarken görünür
+  useEffect(() => {
+    const g = gizmoRef.current; if (!g) return
+    const active = dock === 'cad' && scene.id === DESIGN_SCENE_ID
+    const body = normalizeGovde(design.govde) ?? defaultGovde(design.chassis)
+    g.update(active ? body : { v: 1, blocks: [] }, active ? cadBlock : null)
+    g.setMode(gizmoMode)
+    g.setOptions({ snapM: snapOn ? 0.005 : 0, snapDeg: snapOn ? 15 : 0 })
+  }, [dock, scene.id, design, cadBlock, gizmoMode, snapOn])
 
   // Kamera, sahne değişince
   useEffect(() => {
@@ -329,6 +354,7 @@ export function MujocoLab() {
     const s = designScene(d)
     if (s) { setXml(s.xml); setApplied(s.xml) }
   }
+  const changeDesignRef = useRef(changeDesign); changeDesignRef.current = changeDesign
   const doUndo = () => applyHist(undo(hist))
   const doRedo = () => applyHist(redo(hist))
 
@@ -504,7 +530,9 @@ export function MujocoLab() {
 
           <div className="mj-dock-body" hidden={dock !== 'cad'}>
             <MurokoCad design={design} onDesign={changeDesign} en={en}
-              onUndo={doUndo} onRedo={doRedo} canUndo={canUndo(hist)} canRedo={canRedo(hist)} />
+              onUndo={doUndo} onRedo={doRedo} canUndo={canUndo(hist)} canRedo={canRedo(hist)}
+              block={cadBlock} onBlock={setCadBlock}
+              gizmoMode={gizmoMode} onGizmoMode={setGizmoMode} snap={snapOn} onSnap={setSnapOn} />
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'elec'}>
