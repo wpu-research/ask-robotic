@@ -66,6 +66,18 @@ export function MujocoLab() {
   const en = useLocale() === 'en'
   const L = (tr: string, e: string) => (en ? e : tr)
   const host = useRef<HTMLDivElement>(null)
+  // Tam ekran: tezgâh kendi başına tarayıcıyı kaplar (Constructa'daki gibi); site başlığı/alt bilgi gizlenir.
+  const wbRef = useRef<HTMLDivElement>(null)
+  const [fullscreen, setFullscreen] = useState(false)
+  useEffect(() => {
+    const onChange = () => setFullscreen(document.fullscreenElement === wbRef.current)
+    document.addEventListener('fullscreenchange', onChange)
+    return () => document.removeEventListener('fullscreenchange', onChange)
+  }, [])
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
+    else wbRef.current?.requestFullscreen?.().catch(() => {})
+  }, [])
   const stageRef = useRef<Stage | null>(null)
   const groupRef = useRef<THREE.Group | null>(null)
   const simRef = useRef<Sim | null>(null)
@@ -88,6 +100,16 @@ export function MujocoLab() {
   // Tasarım geçmişi: yanlış silinen bloğun dönüşü olsun
   const [hist, setHist] = useState(() => initHistory<RobotDesign>(emptyDesign()))
   const design = present(hist)
+  // Kayıt geri bildirimi: her değişiklikte tarayıcıya zaten yazılır (saveDesign); bu yalnız
+  // "Kaydediliyor… / Kaydedildi" rozetini kısaca gösterir, öğrenci kaydın gittiğini görsün.
+  const [saveState, setSaveState] = useState<'saving' | 'saved'>('saved')
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const flashSaving = useCallback(() => {
+    setSaveState('saving')
+    if (saveTimer.current) clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => setSaveState('saved'), 500)
+  }, [])
+  useEffect(() => () => { if (saveTimer.current) clearTimeout(saveTimer.current) }, [])
   // Tutamaç geri çağrısı sahne kurulumunda bir kez bağlanır; güncel tasarıma ref'le erişir
   const designRef = useRef(design); designRef.current = design
   // Kayıtlı tasarım varsa onunla başla: açılışta öğrencinin kendi robotu sahnede olsun
@@ -345,6 +367,7 @@ export function MujocoLab() {
   const changeDesign = (d: RobotDesign, coalesce = false) => {
     setHist((h) => (coalesce ? replace(h, d) : push(h, d)))
     saveDesign(d)
+    flashSaving()
     if (sceneRef.current.id !== DESIGN_SCENE_ID) return // başka robota bakılıyorsa sahneyi değiştirme
     const s = designScene(d)
     if (s) { setXml(s.xml); setApplied(s.xml) }
@@ -354,6 +377,7 @@ export function MujocoLab() {
     setHist(next)
     const d = present(next)
     saveDesign(d)
+    flashSaving()
     if (sceneRef.current.id !== DESIGN_SCENE_ID) return
     const s = designScene(d)
     if (s) { setXml(s.xml); setApplied(s.xml) }
@@ -471,7 +495,7 @@ export function MujocoLab() {
 
   return (
     <section className="mj" data-testid="mujoco-lab">
-      <div className="mj-wb" data-dock={dock ?? 'none'}>
+      <div className="mj-wb" data-dock={dock ?? 'none'} ref={wbRef}>
         {/* Sahne: tüm tezgâhı kaplar, paneller üstünde yüzer */}
         {webgl
           ? <div ref={host} className="mj-stage" data-testid="mujoco-stage" />
@@ -486,6 +510,10 @@ export function MujocoLab() {
           <span><b>{L('temas', 'contacts')}</b> {info.ncon}</span>
           {speed !== 1 && <span className="mj-hud-hi">{String(speed).replace('.', en ? '.' : ',')}×</span>}
           {!running && <span className="mj-hud-hi">⏸ {L('duraklatıldı', 'paused')}</span>}
+          <button className="mj-fs" onClick={toggleFullscreen} aria-pressed={fullscreen}
+            title={fullscreen ? L('Tam ekrandan çık', 'Exit fullscreen') : L('Tam ekran', 'Fullscreen')}
+            aria-label={fullscreen ? L('Tam ekrandan çık', 'Exit fullscreen') : L('Tam ekran', 'Fullscreen')}
+            data-testid="mujoco-fullscreen">{fullscreen ? '⤡' : '⤢'}</button>
         </div>
 
         {/* Sol üstte yüzen hızlı araçlar */}
@@ -560,7 +588,7 @@ export function MujocoLab() {
             <MurokoCad design={design} onDesign={changeDesign} en={en}
               onUndo={doUndo} onRedo={doRedo} canUndo={canUndo(hist)} canRedo={canRedo(hist)}
               block={cadBlock} onBlock={setCadBlock}
-              gizmoMode={gizmoMode} onGizmoMode={setGizmoMode} snap={snapOn} onSnap={setSnapOn} />
+              gizmoMode={gizmoMode} onGizmoMode={setGizmoMode} snap={snapOn} onSnap={setSnapOn} saveState={saveState} />
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'elec'}>

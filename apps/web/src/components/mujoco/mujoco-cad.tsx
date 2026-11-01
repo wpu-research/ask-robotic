@@ -37,6 +37,8 @@ interface Props {
   onGizmoMode: (m: GizmoMode) => void
   snap: boolean
   onSnap: (v: boolean) => void
+  /** Tasarım değişince kısaca 'saving', sonra 'saved' (tarayıcıya zaten her değişiklikte yazılır; bu yalnız geri bildirimdir). */
+  saveState: 'saving' | 'saved'
 }
 
 /** Gövdeye eklenebilen şekiller; MuJoCo'da yerleşik olanlar ve dışbükey çokyüzlüler. */
@@ -56,7 +58,7 @@ const SHAPES: { id: BlockShape; tr: string; en: string }[] = [
   { id: 'onikiyuzlu', tr: 'Onikiyüzlü', en: 'Dodecahedron' },
 ]
 
-export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo, block, onBlock, gizmoMode, onGizmoMode, snap, onSnap }: Props) {
+export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo, block, onBlock, gizmoMode, onGizmoMode, snap, onSnap, saveState }: Props) {
   const L = (tr: string, e: string) => (en ? e : tr)
   const [tab, setTab] = useState<'govde' | 'parca' | 'sablon'>('govde')
   const [tool, setTool] = useState<PartType | null>(null)
@@ -75,6 +77,9 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
         <button role="tab" aria-selected={tab === 'sablon'} className={`mj-tab${tab === 'sablon' ? ' on' : ''}`} onClick={() => setTab('sablon')} data-testid="mujoco-cad-tab-presets">{L('Şablonlar', 'Presets')}</button>
       </div>
       <div className="mj-cad-undo">
+        <span className={`mj-save${saveState === 'saving' ? ' busy' : ''}`} role="status" aria-live="polite" data-testid="mujoco-cad-save">
+          {saveState === 'saving' ? L('Kaydediliyor…', 'Saving…') : L('Kaydedildi', 'Saved')}
+        </span>
         <button className="mj-inv" onClick={onUndo} disabled={!canUndo} title={L('Geri al', 'Undo')} aria-label={L('Geri al', 'Undo')} data-testid="mujoco-cad-undo">↶</button>
         <button className="mj-inv" onClick={onRedo} disabled={!canRedo} title={L('Yinele', 'Redo')} aria-label={L('Yinele', 'Redo')} data-testid="mujoco-cad-redo">↷</button>
       </div>

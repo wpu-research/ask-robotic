@@ -179,6 +179,16 @@
 .mj-hud b { color: #d8bda2; font-weight: 600; }
 .mj-hud i { font-style: normal; }
 .mj-hud-hi { color: #f2c078; font-weight: 700; }
+/* .mj-hud'un kendisi tıklanmaz (pointer-events: none); bu düğme kendi üstünde yeniden açar. */
+.mj-fs { pointer-events: auto; min-height: 0; min-width: 0; width: 20px; height: 20px; padding: 0; line-height: 1; border: 0; border-radius: 50%; background: rgb(255 255 255 / .15); color: inherit; font-size: .8rem; cursor: pointer; display: grid; place-items: center; }
+.mj-fs:hover { background: rgb(255 255 255 / .28); }
+
+/* Tam ekran: tezgâh tarayıcıyı kaplar, köşeler ve kenarlık kalkar */
+.mj-wb:fullscreen, .mj-wb:-webkit-full-screen { height: 100vh; border: 0; border-radius: 0; }
+
+/* Kayıt rozeti (CAD panelinde, geri al/yinele yanında) */
+.mj-save { font-size: .74rem; color: var(--text-muted, var(--muted)); margin-right: 6px; white-space: nowrap; }
+.mj-save.busy { color: var(--primary); }
 
 /* --- Canlı motor çubukları --- */
 .mj-motors { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
@@ -243,7 +253,7 @@
 
 /* --- CAD başlığı, şablon kartları, varlık listesi --- */
 .mj-cad-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
-.mj-cad-undo { display: flex; gap: 4px; }
+.mj-cad-undo { display: flex; align-items: center; gap: 4px; }
 .mj-cad-sablon { font: inherit; display: grid; gap: 2px; justify-items: start; text-align: left; width: calc(50% - 3px); padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
 .mj-cad-sablon:hover { border-color: var(--primary); background: var(--primary-soft); }
 .mj-cad-sablon b { font-size: 1.3rem; line-height: 1; }
