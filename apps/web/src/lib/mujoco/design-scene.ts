@@ -9,6 +9,20 @@ import type { MjScene } from './scenes'
 export const DESIGN_KEY = 'ask:tasarim:current:v1'
 export const DESIGN_SCENE_ID = 'tasarimim'
 
+/** Boş başlangıç tasarımı: orta şasi, parçasız. Öğrenci üstüne kurar. */
+export function emptyDesign(): RobotDesign {
+  return { v: 1, name: 'Robotum', chassis: 'orta', parts: [] }
+}
+
+/** Tasarımı tarayıcıya yazar; tasarım tezgâhı sayfası da aynı robotu görür. */
+export function saveDesign(d: RobotDesign): void {
+  try {
+    localStorage.setItem(DESIGN_KEY, JSON.stringify(d))
+  } catch {
+    // gizli pencere ya da dolu depo: tasarım bu oturumda yaşar, kaydedilmez
+  }
+}
+
 /** Kayıtlı tasarımı okur; yoksa ya da bozuksa null. */
 export function loadDesign(): RobotDesign | null {
   try {

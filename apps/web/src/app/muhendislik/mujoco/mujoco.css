@@ -208,3 +208,20 @@
 .mj-inv:disabled { opacity: .4; cursor: not-allowed; }
 .mj-warns { list-style: none; margin: 0; padding: 8px 10px; display: grid; gap: 4px; border-radius: 10px; background: var(--eng-soft); font-size: .78rem; }
 .mj-note { margin: 0; padding: 8px 11px; border-left: 3px solid var(--primary); background: var(--primary-soft); border-radius: 0 8px 8px 0; font-size: .8rem; }
+
+
+/* --- CAD rafı: robotu tezgâhın içinde tasarla --- */
+.mj-cad-chassis { display: flex; align-items: center; gap: 6px; font-size: .82rem; font-weight: 600; }
+.mj-cad-chassis select { min-height: 34px; font: inherit; font-size: .8rem; }
+.mj-cad-name { flex: 1; min-width: 7rem; min-height: 34px; padding: 4px 10px; border-radius: 9px; border: 1px solid var(--border-strong); background: var(--surface-2); color: var(--text); font: inherit; font-size: .82rem; }
+.mj-cad-stage { height: 240px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.mj-cad-stage > div { height: 100%; }
+.mj-cad-parts { display: flex; flex-wrap: wrap; gap: 5px; }
+.mj-cad-part { font: inherit; font-size: .75rem; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; min-height: 32px; padding: 3px 9px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-cad-part:hover { background: var(--surface-2); }
+.mj-cad-part.on { border-color: var(--primary); background: var(--primary-soft); }
+.mj-cad-part i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.mj-cad-sel { padding: 7px 10px; border-radius: 10px; background: var(--primary-soft); font-size: .82rem; }
+.mj-cad-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: .8rem; }
+.mj-cad-stats li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--border); }
+.mj-cad-stats span { color: var(--muted); }

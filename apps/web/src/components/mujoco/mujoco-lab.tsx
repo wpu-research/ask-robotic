@@ -14,7 +14,9 @@ import { GoalTracker } from '@/lib/mujoco/goals'
 import { Trace } from '@/lib/mujoco/trace'
 import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 import { localizeScene } from '@/lib/mujoco/names-en'
-import { designScene, loadDesign } from '@/lib/mujoco/design-scene'
+import { DESIGN_SCENE_ID, designScene, emptyDesign, loadDesign, saveDesign } from '@/lib/mujoco/design-scene'
+import { MurokoCad } from './mujoco-cad'
+import type { RobotDesign } from '@/lib/mikro/tasarim'
 import { buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
 import { MurokoElec, starterCircuit } from './mujoco-elec'
 import { EMPTY_PLAN, pumpWiring, type WiringPlan } from '@/lib/mujoco/wiring'
@@ -35,7 +37,6 @@ type ElecRun =
 /** İngilizce arayüzde model/sensör/motor adları da İngilizce (lib/mujoco/names-en.ts). */
 const EN_SCENES = MJ_SCENES.map(localizeScene)
 
-const DEFAULT_SCENE = MJ_SCENES[0].id
 
 const GROUP_LABEL = {
   gercek: { tr: 'Gerçek robot modelleri (MuJoCo Menagerie)', en: 'Real robot models (MuJoCo Menagerie)' },
@@ -44,7 +45,7 @@ const GROUP_LABEL = {
 }
 
 /** Sağ raydaki bölümler; `null` = panel kapalı, sahne tüm tezgâhı görür. */
-type Dock = 'robot' | 'elec' | 'code' | 'goals' | 'data' | 'model'
+type Dock = 'cad' | 'robot' | 'elec' | 'code' | 'goals' | 'data' | 'model'
 
 /** Robotu sürmenin yolları; 'arduino' devre üzerinden gider, diğerleri doğrudan motora yazar. */
 type ProgTab = 'blocks' | 'python' | 'manual' | 'arduino'
@@ -79,13 +80,17 @@ export function MujocoLab() {
   const lastTrace = useRef(0)
   const pyBridge = useRef<PyBridge | null>(null)
 
-  const [sceneId, setSceneId] = useState(DEFAULT_SCENE)
+  const [sceneId, setSceneId] = useState<string>(DESIGN_SCENE_ID)
   // Tasarım tezgâhında kurulmuş robot varsa listeye en başa eklenir (tarayıcıda saklanır).
-  const [designed, setDesigned] = useState<ReturnType<typeof designScene>>(null)
+  const [design, setDesign] = useState<RobotDesign>(() => emptyDesign())
+  // Kayıtlı tasarım varsa onunla başla: açılışta öğrencinin kendi robotu sahnede olsun
   useEffect(() => {
-    const d = loadDesign()
-    setDesigned(d ? designScene(d) : null)
+    const d = loadDesign(); if (!d) return
+    setDesign(d)
+    const s = designScene(d)
+    if (s && sceneRef.current.id === DESIGN_SCENE_ID) { setXml(s.xml); setApplied(s.xml) }
   }, [])
+  const designed = useMemo(() => designScene(design), [design])
   const SCENES = useMemo(
     () => (designed ? [designed, ...(en ? EN_SCENES : MJ_SCENES)] : en ? EN_SCENES : MJ_SCENES),
     [designed, en],
@@ -103,7 +108,7 @@ export function MujocoLab() {
   const [info, setInfo] = useState({ t: 0, ncon: 0 })
   const [progRunning, setProgRunning] = useState(false)
   const [progTab, setProgTab] = useState<ProgTab>('blocks')
-  const [dock, setDock] = useState<Dock | null>('robot')
+  const [dock, setDock] = useState<Dock | null>('cad')
   const [dataTab, setDataTab] = useState<'sens' | 'motors' | 'graph'>('sens')
   const [quickOpen, setQuickOpen] = useState(true)
   const [circuit, setCircuit] = useState<Circuit>(starterCircuit)
@@ -298,6 +303,18 @@ export function MujocoLab() {
     const s = SCENES.find((x) => x.id === id)!
     setSceneId(id); setXml(s.xml); setApplied(s.xml)
   }
+
+  /**
+   * CAD'de bir parça eklenip çıkarıldığında robot aynı ekranda yeniden kurulur.
+   * Tasarım ayrıca tarayıcıya yazılır: tasarım tezgâhı sayfasıyla aynı robot görülür.
+   */
+  const changeDesign = (d: RobotDesign) => {
+    setDesign(d)
+    saveDesign(d)
+    if (sceneRef.current.id !== DESIGN_SCENE_ID) return // başka robota bakılıyorsa sahneyi değiştirme
+    const s = designScene(d)
+    if (s) { setXml(s.xml); setApplied(s.xml) }
+  }
   const toggle = () => { runRef.current = !runRef.current; setRunning(runRef.current) }
   const shake = () => {
     const sim = simRef.current; if (!sim) return
@@ -370,6 +387,7 @@ export function MujocoLab() {
 
 
   const railItems: { id: Dock; ico: string; label: string }[] = [
+    { id: 'cad', ico: '📐', label: L('TASARIM', 'CAD') },
     { id: 'robot', ico: '🤖', label: L('ROBOT', 'ROBOT') },
     { id: 'elec', ico: '⚡', label: L('ELEK', 'ELEC') },
     { id: 'code', ico: '{ }', label: L('KOD', 'CODE') },
@@ -378,6 +396,7 @@ export function MujocoLab() {
     { id: 'model', ico: '⚙️', label: L('MODEL', 'MODEL') },
   ]
   const dockTitle: Record<Dock, string> = {
+    cad: L('Robotunu tasarla', 'Design your robot'),
     robot: L('Robot seç', 'Pick a robot'),
     elec: L('Elektronik ve kablolama', 'Electronics and wiring'),
     code: L('Robotu programla', 'Program the robot'),
@@ -464,6 +483,10 @@ export function MujocoLab() {
               </div>
             ))}
             <p className="mj-desc"><b>{en ? scene.en.title : scene.tr.title}</b> · {en ? scene.en.desc : scene.tr.desc}</p>
+          </div>
+
+          <div className="mj-dock-body" hidden={dock !== 'cad'}>
+            <MurokoCad design={design} onDesign={changeDesign} en={en} />
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'elec'}>
