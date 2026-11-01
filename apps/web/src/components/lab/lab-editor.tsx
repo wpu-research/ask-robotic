@@ -21,6 +21,7 @@ import { LabCanvas, type CanvasApi, type Selection } from './canvas'
 import { CodePane, type CodePaneApi } from './code-pane'
 import { LabGoals } from './lab-goals'
 import { PartPicker } from './part-picker'
+import { LabRobot } from './lab-robot'
 import { PropsPanel } from './props-panel'
 import { SerialMonitor } from './serial-monitor'
 
@@ -60,6 +61,7 @@ export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PAR
   // İngilizce arayüzde örnek kodun değişken adları ve yorumları İngilizce gelir; hedef denetimleri kodun kanonik (Türkçe) hâline bakar (lib/code-i18n.ts)
   const en = locale === 'en'
   const [code, setCode] = useState(() => (en ? localizeCode(initialCode, CODE_DICT_EN) : initialCode))
+  const [robotOpen, setRobotOpen] = useState(false)
   const [selection, setSelection] = useState<Selection>(null)
   const [running, setRunning] = useState(false)
   const [, setFrame] = useState(0)
@@ -400,6 +402,11 @@ export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PAR
             onDelete={deleteSelection}
             onPhoneSend={(s) => selectedPart && lab.current?.phoneSend(selectedPart.id, s)}
           />
+          {/* Fizik motoru 8 MB; açılmadıkça indirilmez. */}
+          <details className="lab-robot-wrap" onToggle={(e) => setRobotOpen((e.currentTarget as HTMLDetailsElement).open)}>
+            <summary>🤖 {en ? '3D robot — drive a real robot with your circuit' : '3B robot — devrenle gerçek bir robotu sür'}</summary>
+            {robotOpen && <LabRobot circuit={circuit} getLab={() => lab.current} en={en} />}
+          </details>
         </div>
 
         <div className="lab-bottom">

@@ -795,3 +795,15 @@ html.v3-lock, html.v3-lock body { overflow: hidden; }
 .lab-ai-done { padding: 10px 12px; border-radius: 10px; background: var(--primary-soft); }
 .lab-ai-done p { margin: 0 0 4px; }
 .lab-ai-note { color: var(--muted); }
+
+
+/* ---- Devre laboratuvarındaki 3B robot görüntüsü (katlanır; MuJoCo açılmadıkça inmez) ---- */
+.lab-robot-wrap { margin-top: 10px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; }
+.lab-robot-wrap > summary { cursor: pointer; font-weight: 700; font-size: .9rem; min-height: 44px; display: flex; align-items: center; padding: 0 14px; }
+.lab-robot { display: grid; gap: 10px; padding: 0 14px 14px; }
+.lab-robot-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: .85rem; }
+.lab-robot-bar label { display: flex; gap: 6px; align-items: center; }
+.lab-robot-bar select { min-height: 36px; font: inherit; font-size: .82rem; }
+.lab-robot-stage-wrap { position: relative; }
+.lab-robot-stage { height: clamp(220px, 32vw, 340px); border-radius: 10px; overflow: hidden; background: #14213a; touch-action: none; }
+.lab-robot-overlay { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 10px; background: rgba(221, 229, 239, .85); color: #334155; font-weight: 700; pointer-events: none; }
