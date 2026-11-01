@@ -235,3 +235,73 @@ describe('resolveSolids', () => {
     expect(removeBlock(g, 'c').blocks).toHaveLength(1)
   })
 })
+
+// ---- Aynalama ve dizi ----
+
+import { mirrorBlock, patternBlock } from './govde'
+
+describe('aynalama', () => {
+  const g: Govde = { v: 1, blocks: [B({ id: 'b1', pos: [0, 0.03, 0] })] }
+
+  it('y ekseninde aynalanan blok karşı tarafa geçer', () => {
+    const out = mirrorBlock(g, 'b1', 'y')
+    expect(out.blocks).toHaveLength(2)
+    expect(out.blocks[1].pos[1]).toBeCloseTo(-0.03, 9)
+  })
+
+  it('x ekseninde aynalanır', () => {
+    const out = mirrorBlock({ v: 1, blocks: [B({ id: 'b1', pos: [0.05, 0, 0] })] }, 'b1', 'x')
+    expect(out.blocks[1].pos[0]).toBeCloseTo(-0.05, 9)
+  })
+
+  it('eksen üstündeki blok aynalanmaz: kendi üstüne binerdi', () => {
+    const mid: Govde = { v: 1, blocks: [B({ id: 'b1', pos: [0, 0, 0] })] }
+    expect(mirrorBlock(mid, 'b1', 'y')).toBe(mid)
+  })
+
+  it('olmayan blok aynalanmaz', () => {
+    expect(mirrorBlock(g, 'yok', 'y')).toBe(g)
+  })
+
+  it('açılı blok aynalanınca açısı da yansır', () => {
+    const out = mirrorBlock({ v: 1, blocks: [B({ id: 'b1', pos: [0, 0.03, 0], yaw: 30 })] }, 'b1', 'y')
+    expect(out.blocks[1].yaw).toBe(330)
+  })
+})
+
+describe('dizi (pattern)', () => {
+  const g: Govde = { v: 1, blocks: [B({ id: 'b1', pos: [0, 0, 0] })] }
+
+  it('verilen sayıda kopya üretir (kendisi dahil)', () => {
+    expect(patternBlock(g, 'b1', 'x', 4, 0.03).blocks).toHaveLength(4)
+  })
+
+  it('kopyalar eşit aralıklı', () => {
+    const out = patternBlock(g, 'b1', 'x', 3, 0.03)
+    expect(out.blocks[1].pos[0]).toBeCloseTo(0.03, 9)
+    expect(out.blocks[2].pos[0]).toBeCloseTo(0.06, 9)
+  })
+
+  it('negatif aralık ters yöne dizer', () => {
+    expect(patternBlock(g, 'b1', 'y', 2, -0.03).blocks[1].pos[1]).toBeCloseTo(-0.03, 9)
+  })
+
+  it('sıfır aralıkta dizi yapılmaz: hepsi üst üste binerdi', () => {
+    expect(patternBlock(g, 'b1', 'x', 4, 0)).toBe(g)
+  })
+
+  it('sayı en az 2, en çok 24', () => {
+    expect(patternBlock(g, 'b1', 'x', 1, 0.03).blocks).toHaveLength(2)
+    expect(patternBlock(g, 'b1', 'x', 999, 0.03).blocks).toHaveLength(24)
+  })
+
+  it('delik de dizilebilir: havalandırma deliği sırası', () => {
+    const d: Govde = { v: 1, blocks: [B({ id: 's' }), B({ id: 'c', cut: true, pos: [0, 0, 0] })] }
+    const out = patternBlock(d, 'c', 'x', 3, 0.03)
+    expect(out.blocks.filter((b) => b.cut)).toHaveLength(3)
+  })
+
+  it('olmayan blok dizilmez', () => {
+    expect(patternBlock(g, 'yok', 'x', 3, 0.03)).toBe(g)
+  })
+})

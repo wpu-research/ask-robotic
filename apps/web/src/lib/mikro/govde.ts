@@ -321,3 +321,46 @@ export function govdeIssues(g: Govde): GovdeIssue[] {
   }
   return out
 }
+
+// ---- Aynalama ve dizi (pattern) -------------------------------------------
+
+export type MirrorAxis = 'x' | 'y'
+
+/**
+ * Bloğu seçilen eksende aynalar ve kopyasını ekler. Robot gövdeleri çoğunlukla
+ * simetriktir: sol tarafı çizip aynalamak en sık yapılan iş.
+ */
+export function mirrorBlock(g: Govde, id: string, axis: MirrorAxis): Govde {
+  const src = g.blocks.find((b) => b.id === id)
+  if (!src) return g
+  const i = axis === 'x' ? 0 : 1
+  const pos: [number, number, number] = [...src.pos]
+  pos[i] = -pos[i]
+  // Eksen üstündeki blok aynalanınca kendi üstüne biner: anlamsız kopya açılmaz
+  if (Math.abs(src.pos[i]) < 1e-6) return g
+  const nid = uniqueBlockId(g.blocks.map((b) => b.id))
+  const yaw = axis === 'y' ? (360 - src.yaw) % 360 : (180 - src.yaw + 360) % 360
+  return { ...g, blocks: [...g.blocks, normalizeBlock({ ...src, id: nid, pos, yaw })] }
+}
+
+/**
+ * Bloğu verilen aralıkla `count` kez çoğaltır (kendisi dahil sayılır).
+ * Delik sırası, havalandırma deliği, tekrarlı destek için.
+ */
+export function patternBlock(g: Govde, id: string, axis: 'x' | 'y' | 'z', count: number, stepM: number): Govde {
+  const src = g.blocks.find((b) => b.id === id)
+  if (!src) return g
+  const n = Math.max(2, Math.min(24, Math.floor(count)))
+  const step = Number.isFinite(stepM) ? stepM : 0
+  if (Math.abs(step) < 1e-6) return g
+  const i = axis === 'x' ? 0 : axis === 'y' ? 1 : 2
+  const taken = g.blocks.map((b) => b.id)
+  const added: Block[] = []
+  for (let k = 1; k < n; k++) {
+    const pos: [number, number, number] = [...src.pos]
+    pos[i] = src.pos[i] + k * step
+    const nid = uniqueBlockId([...taken, ...added.map((b) => b.id)])
+    added.push(normalizeBlock({ ...src, id: nid, pos }))
+  }
+  return { ...g, blocks: [...g.blocks, ...added] }
+}
