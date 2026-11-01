@@ -7,6 +7,7 @@
 //
 // Eksenler: tasarımda ileri +x, sola +y (MuJoCo ile aynı); z yukarı.
 import { CHASSIS, PARTS, PITCH, cardCells, cellXY, deriveDesign, type ChassisSpec, type PlacedPart, type RobotDesign } from './tasarim'
+import { blockVolume, govdeVolume, normalizeGovde, type Block } from './govde'
 
 /** Şasi levhasının kalınlığı (m). */
 const DECK = 0.004
@@ -66,12 +67,24 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
   const deckMass = Math.max(0.02, deckMassG / 1000)
 
   const geoms: string[] = []
+  /** Serbest çizilmiş gövde varsa onun blokları, yoksa tek levha. */
+  const govde = d.govde ? normalizeGovde(d.govde) : null
   const bodies: string[] = []
   const sites: string[] = []
   const sensorXml: string[] = []
   const actXml: string[] = []
 
-  geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".86 .24 .55 1"/>`)
+  if (govde) {
+    // Çizilen her blok ayrı bir dışbükey geom olur: içbükey gövde MuJoCo'da böyle kurulur.
+    // Kütle hacimle paylaştırılır ki toplam, tasarımın söylediği kütleyle aynı kalsın.
+    const totalV = govdeVolume(govde) || 1
+    govde.blocks.forEach((b, i) => {
+      const m = (deckMass * blockVolume(b)) / totalV
+      geoms.push(`<geom name="govde_${i}" ${blockGeom(b)} mass="${f(m)}" rgba="${hexRgba(b.color)}"/>`)
+    })
+  } else {
+    geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".86 .24 .55 1"/>`)
+  }
 
   // Mikro Kart: şasinin ortasında, görünür olsun diye ayrı kutu (kütlesi levhaya dahil)
   const cc = cardCells(ch)
@@ -182,6 +195,22 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
 </mujoco>`
 
   return { xml, actuators, sensors, notes }
+}
+
+/**
+ * Bir gövde bloğunun MJCF geom niteliklerini üretir. Her blok dışbükeydir, bu yüzden
+ * doğrudan çarpışma geometrisi olarak kullanılabilir; ayrıştırmaya gerek yoktur.
+ */
+function blockGeom(b: Block): string {
+  const [sx, sy, sz] = b.size
+  const yaw = (b.yaw * Math.PI) / 180
+  const quat = `${f(Math.cos(yaw / 2))} 0 0 ${f(Math.sin(yaw / 2))}`
+  const pos = v3(b.pos[0], b.pos[1], b.pos[2])
+  switch (b.shape) {
+    case 'silindir': return `type="cylinder" size="${f(sx)} ${f(sz)}" pos="${pos}" quat="${quat}"`
+    case 'kure': return `type="sphere" size="${f(sx)}" pos="${pos}"`
+    default: return `type="box" size="${v3(sx, sy, sz)}" pos="${pos}" quat="${quat}"`
+  }
 }
 
 /** '#rrggbb' → MJCF rgba ('r g b a', 0-1). */

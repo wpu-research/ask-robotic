@@ -135,6 +135,60 @@ describe('tasarım → MJCF', () => {
     try { expect(m.nu).toBe(2) } finally { m.dispose() }
   }, 60_000)
 
+  it('serbest çizilmiş gövde (blok birleşimi) derlenir ve her blok ayrı geom olur', () => {
+    // L biçimli içbükey gövde: MuJoCo'da tek dışbükey parçayla anlatılamaz,
+    // aynı gövdeye konan iki dışbükey kutuyla anlatılır.
+    const d: RobotDesign = {
+      ...rover(),
+      govde: { v: 1, blocks: [
+        { id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.002], yaw: 0, color: '#db3c8c' },
+        { id: 'b2', shape: 'kutu', pos: [0.07, 0.03, 0.01], size: [0.02, 0.02, 0.01], yaw: 0, color: '#2563eb' },
+      ] },
+    }
+    const res = designToMjcf(d)
+    expect(res.xml).toContain('govde_0')
+    expect(res.xml).toContain('govde_1')
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
+  it('çizilen gövdeyle robot hâlâ yürür', () => {
+    const d: RobotDesign = {
+      ...rover(),
+      govde: { v: 1, blocks: [
+        { id: 'b1', shape: 'kutu', pos: [0, 0, 0], size: [0.07, 0.05, 0.002], yaw: 0, color: '#db3c8c' },
+        { id: 'b2', shape: 'silindir', pos: [0.05, 0, 0.012], size: [0.02, 0.02, 0.01], yaw: 0, color: '#2563eb' },
+      ] },
+    }
+    const m = compile(designToMjcf(d).xml)
+    try {
+      m.step(200)
+      const x0 = m.x()
+      m.setCtrl(0, 10); m.setCtrl(1, 10)
+      m.step(1000)
+      expect(Math.abs(m.x() - x0)).toBeGreaterThan(0.02)
+    } finally { m.dispose() }
+  }, 60_000)
+
+  it('silindir ve küre bloklar da derlenir', () => {
+    for (const shape of ['silindir', 'kure'] as const) {
+      const d: RobotDesign = {
+        ...rover(),
+        govde: { v: 1, blocks: [{ id: 'b1', shape, pos: [0, 0, 0], size: [0.05, 0.05, 0.01], yaw: 30, color: '#db3c8c' }] },
+      }
+      const m = compile(designToMjcf(d).xml)
+      try { expect(m.nu).toBe(2) } finally { m.dispose() }
+    }
+  }, 60_000)
+
+  it('bozuk gövde kaydı yok sayılır, tek levhaya düşülür', () => {
+    const d = { ...rover(), govde: { v: 1, blocks: [] } } as RobotDesign
+    const res = designToMjcf(d)
+    expect(res.xml).toContain('name="govde"')
+    const m = compile(res.xml)
+    try { expect(m.nu).toBe(2) } finally { m.dispose() }
+  }, 60_000)
+
   it('zemine bakan sensör için yaklaşık karşılandığı not edilir', () => {
     let d = rover()
     const before = d.parts.length

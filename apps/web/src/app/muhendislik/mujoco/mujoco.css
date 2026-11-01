@@ -225,3 +225,15 @@
 .mj-cad-stats { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: .8rem; }
 .mj-cad-stats li { display: flex; justify-content: space-between; gap: 8px; padding: 3px 0; border-bottom: 1px solid var(--border); }
 .mj-cad-stats span { color: var(--muted); }
+
+
+/* --- Gövde çizimi: blok listesi ve ölçü alanları --- */
+.mj-cad-blocks { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 5px; }
+.mj-cad-bsel { font: inherit; font-size: .76rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; min-height: 32px; padding: 3px 10px; border-radius: 999px; border: 1px solid var(--border-strong); background: transparent; color: var(--text); cursor: pointer; }
+.mj-cad-blocks li.on .mj-cad-bsel { border-color: var(--primary); background: var(--primary-soft); }
+.mj-cad-bsel i { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+.mj-cad-block-edit { display: grid; gap: 6px; padding: 10px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface-2); }
+.mj-cad-nums { display: flex; flex-wrap: wrap; gap: 6px; }
+.mj-cad-num { display: grid; gap: 2px; font-size: .72rem; color: var(--muted); }
+.mj-cad-num input { width: 5.2rem; min-height: 32px; padding: 3px 8px; border-radius: 8px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text); font: inherit; font-size: .8rem; }
+.mj-cad-block-edit input[type="color"] { width: 40px; height: 34px; padding: 2px; border: 1px solid var(--border-strong); border-radius: 8px; background: var(--surface); cursor: pointer; }

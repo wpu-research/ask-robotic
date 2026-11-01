@@ -97,7 +97,8 @@ export const CARD = { massG: 15, mA: 40, motorPorts: 4, sensorPorts: 4, h: 0.006
 
 /** Parça: hücre (c: arkadan öne sütun, r: soldan sağa satır) ve dönüş (0-3, çeyrek tur sola). */
 export interface PlacedPart { id: string; type: PartType; c: number; r: number; rot?: number }
-export interface RobotDesign { v: 1; name: string; chassis: ChassisId; parts: PlacedPart[] }
+/** : serbest çizilmiş gövde blokları (lib/mikro/govde.ts). Yoksa şasi tek levhadır. */
+export interface RobotDesign { v: 1; name: string; chassis: ChassisId; parts: PlacedPart[]; govde?: { v: 1; blocks: unknown[] } }
 
 // ---------------- ızgara ----------------
 /** Hücre merkezi, şasi merkezine göre (ileri x, sola y; m). */
