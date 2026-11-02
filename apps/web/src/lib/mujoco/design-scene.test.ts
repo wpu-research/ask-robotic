@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { DESIGN_KEY, DESIGN_SCENE_ID, designScene, loadDesign } from './design-scene'
+import { DESIGN_KEY, DESIGN_SCENE_ID, designScene, loadDesign, saveDesign } from './design-scene'
 import { CHASSIS, placePart, type RobotDesign } from '@/lib/mikro/tasarim'
 
 /** Testte tarayıcı deposu taklidi; her testten sonra kaldırılır. */
@@ -49,6 +49,12 @@ describe('loadDesign', () => {
   })
   it('anahtar tasarım tezgâhıyla aynı', () => {
     expect(DESIGN_KEY).toBe('ask:tasarim:current:v1')
+  })
+  it('kayıt hatası başarı gibi gösterilmez', () => {
+    vi.stubGlobal('localStorage', { setItem: () => { throw new Error('full') } })
+    expect(saveDesign(rover())).toBe(false)
+    vi.stubGlobal('localStorage', { setItem: vi.fn() })
+    expect(saveDesign(rover())).toBe(true)
   })
 })
 

@@ -30,6 +30,8 @@ export const ROUND_SHAPES: BlockShape[] = ['kure', 'silindir', 'kapsul', 'koni']
 
 export interface Block {
   id: string
+  name?: string
+  hidden?: boolean
   shape: BlockShape
   /** Blok merkezi (m), şasi merkezine göre. */
   pos: [number, number, number]

@@ -9,6 +9,9 @@ import { type Circuit, type LabState, type PartType } from '@/lib/lab/contract'
 import { addPart } from '@/lib/lab/ops'
 import { type CtrlRange, type WiringPlan } from '@/lib/mujoco/wiring'
 import { WiringPanel } from './wiring-panel'
+import { RobotPartsLibrary } from './robot-parts-library'
+import { WorkbenchPortal, useSurfaceHeight } from './workbench-surface'
+import { PinConnections } from './pin-connections'
 
 /** Robot kurarken işe yarayan parçalar; tam katalog laboratuvarda. */
 export const ROBOT_PARTS: PartType[] = [
@@ -23,6 +26,11 @@ export function starterCircuit(): Circuit {
 }
 
 interface Props {
+  tab: 'parts' | 'circuit' | 'link'
+  onTab: (tab: 'parts' | 'circuit' | 'link') => void
+  workbenchHost: HTMLElement | null
+  onMechanics: () => void
+  onPress: (id: string, down: boolean) => void
   circuit: Circuit
   onCircuit: (c: Circuit) => void
   plan: WiringPlan
@@ -38,10 +46,11 @@ interface Props {
   en: boolean
 }
 
-export function MurokoElec({ circuit, onCircuit, plan, onPlan, ranges, channels, labState, editLocked, en }: Props) {
+export function MurokoElec({ circuit, onCircuit, plan, onPlan, ranges, channels, labState, editLocked, en, tab, onTab: setTab, workbenchHost, onMechanics, onPress }: Props) {
   const L = (tr: string, e: string) => (en ? e : tr)
-  const [tab, setTab] = useState<'circuit' | 'link'>('circuit')
   const [selection, setSelection] = useState<Selection>(null)
+  const [pinMode, setPinMode] = useState(false)
+  const { host, height } = useSurfaceHeight()
 
   const locked = useMemo(() => new Set(circuit.parts.filter((p) => p.type === 'uno').map((p) => p.id)), [circuit])
   const warnParts = useMemo(
@@ -55,20 +64,28 @@ export function MurokoElec({ circuit, onCircuit, plan, onPlan, ranges, channels,
   return (
     <>
       <div className="mj-tabs" role="tablist" aria-label={L('Elektronik', 'Electronics')}>
+        <button role="tab" aria-selected={tab === 'parts'} className={`mj-tab${tab === 'parts' ? ' on' : ''}`} onClick={() => setTab('parts')} data-testid="mujoco-elec-parts">{L('Elektronik', 'Electronics')}</button>
+        <button type="button" className="mj-tab" onClick={onMechanics} data-testid="mujoco-elec-mechanics">{L('Mekanik', 'Mechanics')}</button>
         <button role="tab" aria-selected={tab === 'circuit'} className={`mj-tab${tab === 'circuit' ? ' on' : ''}`} onClick={() => setTab('circuit')} data-testid="mujoco-elec-circuit">{L('Devre', 'Circuit')}</button>
         <button role="tab" aria-selected={tab === 'link'} className={`mj-tab${tab === 'link' ? ' on' : ''}`} onClick={() => setTab('link')} data-testid="mujoco-elec-link">
           {L('Bağlantı', 'Link')}{linked > 0 && <span className="mj-badge">{linked}</span>}
         </button>
       </div>
 
+      {tab === 'parts' && <RobotPartsLibrary types={ROBOT_PARTS} disabled={editLocked} onAdd={(type) => { add(type); setTab('circuit') }} en={en} />}
+
       {tab === 'circuit' && (
-        <div className="mj-panel">
+        <>
+        <div className="mj-bar"><button className={`mj-qbtn${!pinMode ? ' on' : ''}`} onClick={() => setPinMode(false)}>{L('Çalışma alanı', 'Workbench')}</button><button className={`mj-qbtn${pinMode ? ' on' : ''}`} onClick={() => setPinMode(true)}>{L('Pin seç', 'Pick a pin')}</button></div>
+        {pinMode ? <PinConnections circuit={circuit} onCircuit={onCircuit} disabled={editLocked} en={en} /> : <p className="muted">{L('Kartlar ve parçalar ana çalışma alanında gösterilir. Pinler arasında sürükleyerek kablo çek; parçaları sürükleyerek yerleştir.', 'Boards and parts appear in the main workspace. Drag between pins to wire them; drag parts to position them.')}</p>}
+        <WorkbenchPortal target={workbenchHost}>
+        <div className="mj-circuit-workspace">
           <PartPicker types={ROBOT_PARTS} disabled={editLocked} onAdd={add} onDrop={(type) => add(type)} />
-          <div className="mj-elec-canvas">
+          <div className="mj-elec-canvas" ref={host}>
             <LabCanvas
               circuit={circuit} onChange={onCircuit} lockedIds={locked} editLocked={editLocked}
               runtime={labState} selection={selection} onSelect={setSelection} warnParts={warnParts}
-              onPress={() => {}} height={300}
+              onPress={onPress} height={height}
             />
           </div>
           <p className="muted">{L(
@@ -80,6 +97,8 @@ export function MurokoElec({ circuit, onCircuit, plan, onPlan, ranges, channels,
             </ul>
           )}
         </div>
+        </WorkbenchPortal>
+        </>
       )}
 
       {tab === 'link' && (

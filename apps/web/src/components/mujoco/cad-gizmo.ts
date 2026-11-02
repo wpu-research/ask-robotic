@@ -27,6 +27,7 @@ export interface CadGizmo {
   update(govde: Govde, selectedId: string | null): void
   setMode(m: GizmoMode): void
   setOptions(o: GizmoOptions): void
+  setPose(position: ArrayLike<number>, quaternion: ArrayLike<number>): void
   /** Tutamaç sürüklenirken true: fizik döngüsü sahneyi sıfırlamasın diye. */
   dragging(): boolean
   dispose(): void
@@ -75,12 +76,15 @@ export function createCadGizmo(
   stage: Stage,
   group: THREE.Group,
   onChange: (id: string, patch: Partial<Block>) => void,
+  onSelect?: (id: string | null, additive?: boolean) => void,
 ): CadGizmo {
   const layer = new THREE.Group()
   layer.name = 'cad-proxies'
   group.add(layer)
 
   const proxies = new Map<string, THREE.Mesh>()
+  const raycaster = new THREE.Raycaster()
+  let pointerStart: { id: number; x: number; y: number } | null = null
   // Ölçü okları: seçili bloğun en/boy/yükseklik çizgileri ve mm etiketleri
   const dims = new THREE.Group()
   dims.visible = false
@@ -102,6 +106,23 @@ export function createCadGizmo(
     stage.controls.enabled = !drag // sürüklerken kamera dönmesin
     if (!drag) commit()
   })
+
+  const pointerDown = (event: PointerEvent) => {
+    pointerStart = event.button === 0 && event.isPrimary ? { id: event.pointerId, x: event.clientX, y: event.clientY } : null
+  }
+  const pointerUp = (event: PointerEvent) => {
+    const start = pointerStart
+    pointerStart = null
+    if (!start || start.id !== event.pointerId || !onSelect || drag || tc.axis !== null || Math.hypot(event.clientX - start.x, event.clientY - start.y) > 4) return
+    const bounds = stage.renderer.domElement.getBoundingClientRect()
+    raycaster.setFromCamera(new THREE.Vector2((event.clientX - bounds.left) / bounds.width * 2 - 1, -(event.clientY - bounds.top) / bounds.height * 2 + 1), stage.camera)
+    const hit = raycaster.intersectObjects([...proxies.values()], false)[0]
+    onSelect(hit ? hit.object.userData.blockId as string : null, event.shiftKey)
+  }
+  const pointerCancel = () => { pointerStart = null }
+  stage.renderer.domElement.addEventListener('pointerdown', pointerDown)
+  stage.renderer.domElement.addEventListener('pointerup', pointerUp)
+  stage.renderer.domElement.addEventListener('pointercancel', pointerCancel)
 
   /** mm etiketi: tuvale yazılıp sprite olarak sahneye konur. */
   function label(text: string): THREE.Sprite {
@@ -177,17 +198,19 @@ export function createCadGizmo(
       const old = blocks.find((x) => x.id === b.id)
       if (!m || old?.shape !== b.shape) {
         m?.geometry.dispose()
+        if (m) (m.material as THREE.Material).dispose()
         if (m) layer.remove(m)
         m = new THREE.Mesh(proxyGeometry(b), new THREE.MeshBasicMaterial({
           color: b.cut ? 0x9f1239 : 0xa0866f, wireframe: true, transparent: true, opacity: 0.55, depthTest: false,
         }))
         m.renderOrder = 999
+        m.userData.blockId = b.id
         layer.add(m)
         proxies.set(b.id, m)
       }
       const mat = m.material as THREE.MeshBasicMaterial
       mat.color.set(b.cut ? 0x9f1239 : b.id === selected ? 0xc2410c : 0xa0866f)
-      mat.opacity = b.id === selected ? 0.9 : 0.35
+      mat.opacity = b.id === selected ? 0.9 : b.cut ? 0.35 : 0
       // Sürüklenirken vekilin kendi dönüşümü kullanılır, üstüne yazılmaz
       if (!(drag && b.id === selected)) {
         m.position.set(b.pos[0], b.pos[1], b.pos[2])
@@ -220,8 +243,15 @@ export function createCadGizmo(
       tc.setRotationSnap(o.snapDeg > 0 ? (o.snapDeg * Math.PI) / 180 : null)
       tc.setScaleSnap(o.snapM > 0 ? o.snapM : null)
     },
+    setPose(position, quaternion) {
+      layer.position.set(position[0], position[1], position[2])
+      layer.quaternion.set(quaternion[1], quaternion[2], quaternion[3], quaternion[0])
+    },
     dragging: () => drag,
     dispose() {
+      stage.renderer.domElement.removeEventListener('pointerdown', pointerDown)
+      stage.renderer.domElement.removeEventListener('pointerup', pointerUp)
+      stage.renderer.domElement.removeEventListener('pointercancel', pointerCancel)
       tc.detach()
       tc.dispose()
       stage.scene.remove(helper)

@@ -20,8 +20,20 @@ import { SABLONLAR } from '@/lib/mikro/sablonlar'
 import type { GizmoMode } from './cad-gizmo'
 import { importModel } from './cad-import'
 import { deleteAsset, insertAsset, listAssets, saveAsset, type Varlik } from '@/lib/mikro/varliklar'
+import { AssemblyPanel } from './assembly-panel'
+import { CadLibrary } from './cad-library'
+import { CadBoolean } from './cad-boolean'
 
 interface Props {
+  secondBlock: string | null
+  onSecondBlock: (id: string | null) => void
+  assemblyRequest: number
+  assemblySelected: string | null
+  onAssemblySelect: (id: string | null) => void
+  onAssemblyExample: () => void
+  onAssemblyPreview: (id: string, degrees: number) => void
+  assemblyIssues: string[]
+  assemblyAngle: number
   design: RobotDesign
   /** `coalesce`: sayı kutusunda her tuşa basış ayrı bir geri-al adımı açmaz. */
   onDesign: (d: RobotDesign, coalesce?: boolean) => void
@@ -58,9 +70,13 @@ const SHAPES: { id: BlockShape; tr: string; en: string }[] = [
   { id: 'onikiyuzlu', tr: 'Onikiyüzlü', en: 'Dodecahedron' },
 ]
 
-export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo, block, onBlock, gizmoMode, onGizmoMode, snap, onSnap, saveState }: Props) {
+export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRedo, block, onBlock, gizmoMode, onGizmoMode, snap, onSnap, saveState, assemblySelected, onAssemblySelect, onAssemblyExample, onAssemblyPreview, assemblyIssues, assemblyAngle, assemblyRequest, secondBlock, onSecondBlock }: Props) {
   const L = (tr: string, e: string) => (en ? e : tr)
-  const [tab, setTab] = useState<'govde' | 'parca' | 'sablon'>('govde')
+  const [tab, setTab] = useState<'govde' | 'parca' | 'sablon' | 'assembly'>('govde')
+  const [cadMode, setCadMode] = useState<'library' | 'design' | 'boolean' | 'overview'>('library')
+  useEffect(() => { if (block) setCadMode((mode) => mode === 'boolean' ? mode : 'design') }, [block])
+  useEffect(() => { if (assemblySelected) setTab('assembly') }, [assemblySelected])
+  useEffect(() => { if (assemblyRequest) setTab('assembly') }, [assemblyRequest])
   const [tool, setTool] = useState<PartType | null>(null)
   const [selected, setSelected] = useState<string | null>(null)
   const [assetName, setAssetName] = useState('')
@@ -68,12 +84,18 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
   const [importNotes, setImportNotes] = useState<{ tr: string; en: string }[]>([])
   const [assets, setAssets] = useState<Varlik[]>([])
   useEffect(() => { setAssets(listAssets()) }, [])
+  const der = useMemo(() => deriveDesign(design), [design])
+  const govde = useMemo(() => normalizeGovde(design.govde) ?? defaultGovde(design.chassis), [design.govde, design.chassis])
+  const gIssues = useMemo(() => govdeIssues(govde), [govde])
 
   const cadTabs = (
     <div className="mj-cad-head">
-      <div className="mj-tabs" role="tablist" aria-label={L('Tasarım', 'Design')}>
-        <button role="tab" aria-selected={tab === 'govde'} className={`mj-tab${tab === 'govde' ? ' on' : ''}`} onClick={() => setTab('govde')} data-testid="mujoco-cad-tab-body">{L('Gövde', 'Body')}</button>
+      <div className="mj-tabs mj-cad-main-tabs" role="tablist" aria-label={L('CAD araçları', 'CAD tools')}>
+        {(['library', 'design', 'boolean', 'overview'] as const).map((mode, index) => <button type="button" role="tab" aria-selected={tab === 'govde' && cadMode === mode} className={`mj-tab${tab === 'govde' && cadMode === mode ? ' on' : ''}`} key={mode} onClick={() => { if (assemblySelected) onAssemblySelect(null); setTab('govde'); setCadMode(mode) }} data-testid={mode === 'design' ? 'mujoco-cad-tab-body' : `mujoco-cad-tab-${mode}`}>{(en ? ['Library', 'Design', 'Boolean', 'Overview'] : ['Kütüphane', 'Tasarım', 'Boolean', 'Genel bakış'])[index]}</button>)}
+      </div>
+      <div className="mj-tabs mj-cad-sub-tabs" role="tablist" aria-label={L('Robot parçaları', 'Robot parts')}>
         <button role="tab" aria-selected={tab === 'parca'} className={`mj-tab${tab === 'parca' ? ' on' : ''}`} onClick={() => setTab('parca')} data-testid="mujoco-cad-tab-parts">{L('Parçalar', 'Parts')}</button>
+        <button role="tab" aria-selected={tab === 'assembly'} className={`mj-tab${tab === 'assembly' ? ' on' : ''}`} onClick={() => setTab('assembly')} data-testid="mujoco-cad-tab-assembly">{L('Montaj', 'Assembly')}</button>
         <button role="tab" aria-selected={tab === 'sablon'} className={`mj-tab${tab === 'sablon' ? ' on' : ''}`} onClick={() => setTab('sablon')} data-testid="mujoco-cad-tab-presets">{L('Şablonlar', 'Presets')}</button>
       </div>
       <div className="mj-cad-undo">
@@ -86,6 +108,10 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
     </div>
   )
 
+  if (tab === 'assembly') {
+    return <>{cadTabs}<AssemblyPanel design={design} onDesign={onDesign} selected={assemblySelected} onSelect={onAssemblySelect} onExample={onAssemblyExample} onPreview={onAssemblyPreview} issues={assemblyIssues} angle={assemblyAngle} en={en} /></>
+  }
+
   if (tab === 'sablon') {
     return (
       <>
@@ -95,7 +121,7 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
           'You do not have to start from an empty bench: pick a working robot and then change it. Picking one replaces your current design.')}</p>
         <div className="mj-cad-parts">
           {SABLONLAR.map((t) => (
-            <button key={t.id} className="mj-cad-sablon" onClick={() => { onDesign(t.build()); setTab('govde') }} data-testid={`mujoco-cad-preset-${t.id}`}>
+            <button key={t.id} className="mj-cad-sablon" onClick={() => { onDesign(t.build()); setTab('govde'); setCadMode('design'); onAssemblySelect(null) }} data-testid={`mujoco-cad-preset-${t.id}`}>
               <b aria-hidden="true">{t.icon}</b>
               <span>{en ? t.en : t.tr}</span>
               <small>{en ? t.enDesc : t.trDesc}</small>
@@ -105,7 +131,6 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
       </>
     )
   }
-  const der = useMemo(() => deriveDesign(design), [design])
   const errors = der.issues.filter((i) => i.level === 'hata')
   const warns = der.issues.filter((i) => i.level === 'uyari')
 
@@ -122,8 +147,6 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
 
   const sel = design.parts.find((p) => p.id === selected) ?? null
 
-  const govde = useMemo(() => normalizeGovde(design.govde) ?? defaultGovde(design.chassis), [design.govde, design.chassis])
-  const gIssues = useMemo(() => govdeIssues(govde), [govde])
   const setGovde = (g: Govde, coalesce = false) => onDesign({ ...design, govde: g }, coalesce)
   const bsel = govde.blocks.find((b) => b.id === block) ?? null
 
@@ -134,6 +157,28 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
         onChange={(e) => on(Number(e.target.value) / 1000)} />
     </label>
   )
+
+  const importFile = async (file: File) => {
+    setImporting(true); setImportNotes([])
+    const out = await importModel(file)
+    setImporting(false)
+    if (!out.ok) { setImportNotes([{ tr: out.tr, en: out.en }]); return }
+    const id = uniqueBlockId(govde.blocks.map((item) => item.id))
+    const frontX = govde.blocks.reduce((maximum, item) => Math.max(maximum, item.pos[0] + item.size[0]), 0)
+    setGovde({ ...govde, blocks: [...govde.blocks, { ...out.block, id, pos: [frontX + out.block.size[0] + 0.005, 0, 0] }] })
+    onBlock(id); setCadMode('design'); setImportNotes(out.notes)
+  }
+
+  if (tab === 'govde' && cadMode === 'library') return <>{cadTabs}<CadLibrary shapes={SHAPES} en={en} importing={importing} onImport={importFile} onAdd={(shape) => { const next = addBlock(govde, shape); setGovde(next); onBlock(next.blocks.at(-1)!.id); setCadMode('design') }} />{importNotes.map((note, index) => <p className="mj-warns" role="status" key={index}>{en ? note.en : note.tr}</p>)}</>
+  if (tab === 'govde' && cadMode === 'boolean') return <>{cadTabs}<CadBoolean body={govde} first={block} second={secondBlock} onFirst={onBlock} onSecond={onSecondBlock} onChange={setGovde} en={en} /></>
+  if (tab === 'govde' && cadMode === 'overview') return <>{cadTabs}<p className="mj-cad-notice">{L('Sahnedeki nesneler. Seç, görünürlüğünü değiştir veya sil.', 'Scene objects. Select, change visibility or delete.')}</p><span className="mj-group-label">{L('NESNELER', 'OBJECTS')} · {govde.blocks.length + (design.assembly?.length ?? 0)}</span><div className="mj-object-list">
+    {govde.blocks.map((item) => <div className="mj-object-row" key={item.id}>
+      <i style={{ background: item.color }} aria-hidden="true" /><button type="button" onClick={() => { onBlock(item.id); setCadMode('design') }}>{item.name ?? item.meshName ?? item.id}{item.cut ? ` · ${L('kesici', 'cutter')}` : ''}</button>
+      <button type="button" aria-pressed={!item.hidden} aria-label={`${item.id} ${L('göster/gizle', 'show/hide')}`} onClick={() => setGovde(updateBlock(govde, item.id, { hidden: !item.hidden }))}>{item.hidden ? '◌' : '◉'}</button>
+      <button type="button" aria-label={`${item.id} ${L('sil', 'delete')}`} disabled={!item.cut && govde.blocks.filter((candidate) => !candidate.cut).length <= 1} onClick={() => { setGovde(removeBlock(govde, item.id)); if (block === item.id) onBlock(null) }}>×</button>
+    </div>)}
+    {design.assembly?.map((node) => <div className="mj-object-row" key={node.id}><i aria-hidden="true" /><button type="button" onClick={() => onAssemblySelect(node.id)}>{node.id} · {node.type}</button></div>)}
+  </div></>
 
   if (tab === 'govde') {
     return (
@@ -168,18 +213,10 @@ export function MurokoCad({ design, onDesign, en, onUndo, onRedo, canUndo, canRe
           </label>
           <label className="sbtn ghost mj-cad-file" data-testid="mujoco-cad-import">
             📥 {L('Model yükle', 'Import model')}
-            <input type="file" accept=".stl,.obj,.glb,.gltf" hidden onChange={async (e) => {
+            <input type="file" accept=".stl,.obj,.glb,.gltf" hidden onChange={(e) => {
               const file = e.target.files?.[0]; e.target.value = ''
               if (!file) return
-              setImporting(true); setImportNotes([])
-              const out = await importModel(file)
-              setImporting(false)
-              if (!out.ok) { setImportNotes([{ tr: out.tr, en: out.en }]); return }
-              const id = uniqueBlockId(govde.blocks.map((b) => b.id))
-              const frontX = govde.blocks.reduce((m, b) => Math.max(m, b.pos[0] + b.size[0]), 0)
-              setGovde({ ...govde, blocks: [...govde.blocks, { ...out.block, id, pos: [frontX + out.block.size[0] + 0.005, 0, 0] }] })
-              onBlock(id)
-              setImportNotes(out.notes)
+              void importFile(file)
             }} />
           </label>
           <button className="sbtn ghost" data-testid="mujoco-cad-add-hole"

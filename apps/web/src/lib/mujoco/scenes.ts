@@ -725,6 +725,7 @@ for a, secs in [(0.5, 1.5), (0.7, 1.5), (0.9, 3), (1.1, 3)]:
 ]
 
 export const MJ_SCENES: MjScene[] = [...MJ_MODEL_SCENES, ...MODEL_SCENES_2, ...MODEL_SCENES_3, ...MODEL_SCENES_4]
+export const MJ_WORKBENCH_SCENES = MJ_SCENES.filter((scene) => scene.kind !== 'gercek')
 
 export const MJ_REPO = 'https://github.com/google-deepmind/mujoco'
 export const MJ_WASM_REPO = 'https://github.com/google-deepmind/mujoco/tree/main/wasm'

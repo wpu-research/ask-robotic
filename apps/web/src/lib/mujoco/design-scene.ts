@@ -4,6 +4,7 @@
 import { designToMjcf } from '@/lib/mikro/mjcf'
 import { CHASSIS, type RobotDesign } from '@/lib/mikro/tasarim'
 import type { MjScene } from './scenes'
+import { isAssembly } from '@/lib/mikro/assembly'
 
 /** Tasarım tezgâhının tarayıcıdaki anahtarı (components/mikro/robot-tasarla.tsx ile aynı). */
 export const DESIGN_KEY = 'ask:tasarim:current:v1'
@@ -15,11 +16,12 @@ export function emptyDesign(): RobotDesign {
 }
 
 /** Tasarımı tarayıcıya yazar; tasarım tezgâhı sayfası da aynı robotu görür. */
-export function saveDesign(d: RobotDesign): void {
+export function saveDesign(d: RobotDesign): boolean {
   try {
     localStorage.setItem(DESIGN_KEY, JSON.stringify(d))
+    return true
   } catch {
-    // gizli pencere ya da dolu depo: tasarım bu oturumda yaşar, kaydedilmez
+    return false
   }
 }
 
@@ -30,6 +32,7 @@ export function loadDesign(): RobotDesign | null {
     if (!raw) return null
     const d = JSON.parse(raw) as RobotDesign
     if (!d || d.v !== 1 || !CHASSIS[d.chassis] || !Array.isArray(d.parts)) return null
+    if (d.assembly !== undefined && !isAssembly(d.assembly)) return null
     return d
   } catch {
     return null // gizli pencere ya da bozuk kayıt
@@ -50,6 +53,8 @@ export function designScene(d: RobotDesign): (MjScene & { notes: { tr: string; e
   const name = d.name?.trim() || 'Tasarımım'
   const ch = CHASSIS[d.chassis]
   const motors = built.actuators.length
+  const servos = d.assembly?.filter((node) => node.type === 'servo').length ?? 0
+  const count = d.parts.length + (d.assembly?.length ?? 0)
 
   return {
     id: DESIGN_SCENE_ID,
@@ -57,19 +62,19 @@ export function designScene(d: RobotDesign): (MjScene & { notes: { tr: string; e
     kind: 'robot',
     tr: {
       title: name,
-      desc: `Senin tasarladığın robot: ${ch.title.toLowerCase()}, ${motors} sürüş motoru, ${d.parts.length} parça.`,
+      desc: `Senin tasarladığın robot: ${ch.title.toLowerCase()}, ${motors - servos} sürüş motoru${servos ? `, ${servos} servo eklemi` : ''}, ${count} parça.`,
       hint: motors
         ? 'ELEK rafından devreni kur, motorları bağla ve Arduino ile sür. Ya da bloklarla doğrudan dene.'
-        : 'Bu tasarımda teker yok. Tasarım tezgâhına dönüp teker ve motor ekle.',
+        : 'Tasarım sekmesinden teker ve motor ekle veya Montaj sekmesinden servo ekle.',
     },
     en: {
       title: name,
-      desc: `The robot you designed: ${ch.en.toLowerCase()}, ${motors} drive motors, ${d.parts.length} parts.`,
+      desc: `The robot you designed: ${ch.en.toLowerCase()}, ${motors - servos} drive motors${servos ? `, ${servos} servo joints` : ''}, ${count} parts.`,
       hint: motors
         ? 'Build your circuit under ELEC, link the motors and drive it with Arduino. Or try it with blocks.'
-        : 'This design has no wheels. Go back to the design bench and add wheels and a motor.',
+        : 'Add wheels and a motor under Design, or add a servo under Assembly.',
     },
-    cam: [0.42, -0.42, 0.3],
+    cam: [0.22, -0.22, 0.18],
     look: [0, 0, 0.03],
     xml: built.xml,
     goals: [],

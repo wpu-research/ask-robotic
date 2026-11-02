@@ -9,6 +9,7 @@
 import { CARD, CHASSIS, PARTS, PITCH, cardCells, cellXY, deriveDesign, type ChassisSpec, type PlacedPart, type RobotDesign } from './tasarim'
 import { MATERIAL_SPEC, blockVolume, govdeMassG, normalizeGovde, resolveSolids, type Block, type PrimitiveShape } from './govde'
 import { meshVertexAttr, type MeshShape } from './sekiller'
+import { assemblyToMjcf } from './assembly-mjcf'
 
 /** MuJoCo'da yerleşik olan şekiller; kalanlar örgü olarak verilir. */
 const PRIMITIVES: string[] = ['kutu', 'silindir', 'kure', 'kapsul', 'elipsoid'] satisfies PrimitiveShape[]
@@ -112,21 +113,22 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
         assets.push(`<material name="${matName}" rgba="${hexRgba(p.color, mt.alpha)}" specular="${f(mt.specular)}" shininess="${f(mt.shininess)}" reflectance="${f(mt.reflectance)}"/>`)
       }
       const look = matName ? `material="${matName}"` : `rgba="${hexRgba(p.color)}"`
-      geoms.push(`<geom name="govde_${i}" ${blockGeom(b, meshName)} mass="${f(m)}" ${look}/>`)
+      const hidden = govde.blocks.find((block) => block.id === p.from)?.hidden === true
+      geoms.push(`<geom name="govde_${i}" group="${hidden ? 3 : 0}" ${blockGeom(b, meshName)} mass="${f(m)}" ${look}/>`)
     })
     if (!pieces.length) {
       notes.push({ tr: 'Gövdenin tamamı delinmiş: geriye katı kalmadı.', en: 'The body is cut away entirely: no solid remains.' })
-      geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".86 .24 .55 1"/>`)
+      geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".64 .32 .13 1"/>`)
     }
   } else {
-    geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".86 .24 .55 1"/>`)
+    geoms.push(`<geom name="govde" type="box" size="${v3(halfX, halfY, DECK / 2)}" pos="${v3(0, 0, 0)}" mass="${f(deckMass)}" rgba=".64 .32 .13 1"/>`)
   }
 
   // Mikro Kart: şasinin ortasında, görünür olsun diye ayrı kutu (kütlesi levhaya dahil)
   const cc = cardCells(ch)
   const [cx0, cy0] = cellXY(ch, cc[0][0], cc[0][1])
   const [cx1, cy1] = cellXY(ch, cc[3][0], cc[3][1])
-  geoms.push(`<geom name="kart" type="box" size="${v3(PITCH, PITCH, 0.003)}" pos="${v3((cx0 + cx1) / 2, (cy0 + cy1) / 2, DECK / 2 + 0.003)}" mass="0" rgba=".12 .35 .72 1" contype="0" conaffinity="0"/>`)
+  if (!d.assembly?.some((node) => node.type === 'uno')) geoms.push(`<geom name="kart" type="box" size="${v3(PITCH, PITCH, 0.003)}" pos="${v3((cx0 + cx1) / 2, (cy0 + cy1) / 2, DECK / 2 + 0.003)}" mass="0" rgba=".12 .35 .72 1" contype="0" conaffinity="0"/>`)
 
   d.parts.forEach((p, i) => {
     const spec = PARTS[p.type]
@@ -163,7 +165,7 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
       bodies.push(
         `<body name="${wname}" pos="${v3(wx, yOut, 0)}">
         <joint name="${jname}" type="hinge" axis="0 1 0"/>
-        <geom type="cylinder" size="${f(spec.wheel.d / 2)} ${f(ww / 2)}" quat="0.7071068 0.7071068 0 0" mass="${f(spec.massG / 1000)}" rgba=".09 .11 .16 1" friction="${f(spec.wheel.traction)} .005 .0001"/>
+        <geom name="${wname}_tire" type="cylinder" size="${f(spec.wheel.d / 2)} ${f(ww / 2)}" quat="0.7071068 0.7071068 0 0" mass="${f(spec.massG / 1000)}" rgba=".09 .11 .16 1" friction="${f(spec.wheel.traction)} .005 .0001"/>
       </body>`)
       // Sürüş motoru: tasarımdaki devir ve tork sınırı doğrudan aktarılır
       const motor = d.parts.map((q) => PARTS[q.type]).find((s) => s.motor)?.motor
@@ -225,6 +227,12 @@ export function designToMjcf(d: RobotDesign): MjcfResult {
 
   sensorXml.push(`<framepos name="konum" objtype="body" objname="govde"/>`)
   sensors.push('konum')
+  const assembly = assemblyToMjcf(d.assembly ?? [])
+  bodies.push(assembly.bodies)
+  actXml.push(...assembly.controls)
+  sensorXml.push(...assembly.sensors)
+  actuators.push(...assembly.actuators)
+  sensors.push(...assembly.channels)
 
   const xml = `<mujoco model="${esc(idOf(d.name || 'robot', 0))}">
   <compiler angle="radian" usethread="false"/>
@@ -247,7 +255,7 @@ ${assets.length ? `  <asset>\n    ${assets.join('\n    ')}\n  </asset>` : ''}
     ${sensorXml.join('\n    ')}
   </sensor>
   <keyframe>
-    <key name="muroko" qpos="${v3(0, 0, deckZ)} 1 0 0 0${wheelParts.map(() => ' 0').join('')}"/>
+    <key name="muroko" qpos="${v3(0, 0, deckZ)} 1 0 0 0${Array.from({ length: wheelParts.length + assembly.actuators.length }, () => ' 0').join('')}"/>
   </keyframe>
 </mujoco>`
 

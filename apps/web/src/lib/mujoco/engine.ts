@@ -9,6 +9,8 @@
 import * as THREE from 'three'
 import { removeFromFs, unpack, writeToFs } from '@/lib/mujoco/pack'
 import type { Channel } from '@/lib/mujoco/sensors'
+import { buildElectronicsModel } from './electronics-models'
+import { buildGearmotorModel, buildWheelModel } from './mechanical-models'
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type Mj = any
@@ -159,6 +161,22 @@ export function buildMeshes(mj: Mj, model: any, group: THREE.Group): THREE.Mesh[
     const mat = new THREE.MeshStandardMaterial({ color: new THREE.Color(rgba[0], rgba[1], rgba[2]), roughness: rough, metalness: metal, transparent: rgba[3] < 1, opacity: rgba[3] })
     if (isPlane) { mat.map = floorTexture(); mat.color.set(0xffffff) }
     const mesh = new THREE.Mesh(geo, mat)
+    const name = mj.mj_id2name(model, 5, i) || ''
+    const boardType = name.endsWith('_uno_board') ? 'uno' : name.endsWith('_esp32_board') ? 'esp32' : null
+    if (boardType) {
+      mat.visible = false
+      const board = buildElectronicsModel(boardType)
+      board.position.z = -0.0032
+      mesh.add(board)
+    }
+    if (/^(sol|sag)_teker_\d+_tire$/.test(name)) {
+      mat.visible = false
+      mesh.add(buildWheelModel(s[0], s[1]))
+    }
+    if (/^(mini|standard|strong)_motor_\d+$/i.test(name)) {
+      mat.visible = false
+      mesh.add(buildGearmotorModel(s as [number, number, number]))
+    }
     if (scale) mesh.scale.set(...scale)
     mesh.castShadow = !isPlane; mesh.receiveShadow = true
     mesh.matrixAutoUpdate = true

@@ -4,6 +4,7 @@
 // Böylece tasarlanan robot aynı blok programlarıyla görevlerde ve serbest arenada çalışır. Saf TypeScript; Node'da başsız çalışır.
 // Parçalar özgündür; hiçbir ürünün adı, görseli ya da kodu kullanılmaz.
 import type { RobotProfile, RobotSensor, SensorMount } from './robot'
+import { isAssembly, type AssemblyNode } from './assembly'
 
 /** Izgara adımı (m): her hücre 2 cm × 2 cm. */
 export const PITCH = 0.02
@@ -105,7 +106,7 @@ export interface ShaftAttach {
 }
 export interface PlacedPart { id: string; type: PartType; c: number; r: number; rot?: number; attach?: ShaftAttach }
 /** : serbest çizilmiş gövde blokları (lib/mikro/govde.ts). Yoksa şasi tek levhadır. */
-export interface RobotDesign { v: 1; name: string; chassis: ChassisId; parts: PlacedPart[]; govde?: { v: 1; blocks: unknown[] } }
+export interface RobotDesign { v: 1; name: string; chassis: ChassisId; parts: PlacedPart[]; govde?: { v: 1; blocks: unknown[] }; assembly?: AssemblyNode[] }
 
 // ---------------- ızgara ----------------
 /** Hücre merkezi, şasi merkezine göre (ileri x, sola y; m). */
@@ -457,7 +458,7 @@ export const DESIGN_FORMAT = 'macademiax.robot-tasarim'
 const MAX_PARTS = 80
 
 export function exportDesign(d: RobotDesign): string {
-  return JSON.stringify({ format: DESIGN_FORMAT, v: 1, name: d.name, chassis: d.chassis, parts: d.parts.map(({ id, type, c, r, rot }) => ({ id, type, c, r, ...(rot ? { rot } : {}) })) }, null, 2)
+  return JSON.stringify({ format: DESIGN_FORMAT, v: 1, name: d.name, chassis: d.chassis, parts: d.parts.map(({ id, type, c, r, rot }) => ({ id, type, c, r, ...(rot ? { rot } : {}) })), ...(d.assembly ? { assembly: d.assembly } : {}) }, null, 2)
 }
 
 /** JSON metnini ya da nesnesini doğrular; geçersiz parçaları atmaz, hatayı söyler. */
@@ -469,6 +470,7 @@ export function importDesign(raw: unknown): { ok: true; design: RobotDesign } | 
   if (x.format !== undefined && x.format !== DESIGN_FORMAT) return { ok: false, error: 'Bu bir robot tasarımı dosyası değil.' }
   if (typeof x.chassis !== 'string' || !(x.chassis in CHASSIS)) return { ok: false, error: 'Şasi türü tanınmadı.' }
   if (!Array.isArray(x.parts) || x.parts.length > MAX_PARTS) return { ok: false, error: 'Parça listesi geçersiz.' }
+  if (x.assembly !== undefined && !isAssembly(x.assembly)) return { ok: false, error: 'Montaj ağacı geçersiz.' }
   const ch = CHASSIS[x.chassis as ChassisId]
   let d: RobotDesign = { v: 1, name: typeof x.name === 'string' ? x.name.slice(0, 40) : 'Robot', chassis: x.chassis as ChassisId, parts: [] }
   for (const [i, q] of (x.parts as unknown[]).entries()) {
@@ -481,5 +483,5 @@ export function importDesign(raw: unknown): { ok: true; design: RobotDesign } | 
     const id = typeof p.id === 'string' && p.id.length <= 60 && !d.parts.some((z) => z.id === p.id) ? p.id : `${type}@${c},${r}`
     d = { ...d, parts: [...d.parts, { id, type, c, r, ...(rot && Number.isInteger(rot) ? { rot: ((rot % 4) + 4) % 4 } : {}) }] }
   }
-  return { ok: true, design: d }
+  return { ok: true, design: { ...d, ...(x.assembly ? { assembly: x.assembly as AssemblyNode[] } : {}) } }
 }

@@ -77,6 +77,7 @@ export function motorToCtrl(speed: number, r: CtrlRange, link?: Pick<MotorLink, 
 
 /** MuJoCo kanal okumasını parçanın özellik birimine çevirir ve sınırlarına kırpar. */
 export function channelToProp(value: number, link: SensorLink): number {
+  if (link.prop === 'distanceCm' && value < 0) return link.max ?? 400
   const v = finite(value) * (link.scale ?? 1) + (link.offset ?? 0)
   return clamp(finite(v), link.min ?? -Infinity, link.max ?? Infinity)
 }

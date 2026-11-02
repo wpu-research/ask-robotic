@@ -23,9 +23,9 @@ interface Props {
 
 const T = {
   tr: { set: '%1 motorunu %2 yap', wait: '%1 saniye bekle', repeat: '%1 kez tekrarla %2', forever: 'sonsuza kadar %1', setTip: 'Bir motorun hedef değerini ayarlar', empty: 'Soldan blok sürükle',
-    exampleBtn: 'Örnek program', clearBtn: 'Temizle', catMotor: 'Motor', catSense: 'Sensör', catControl: 'Kontrol', hint: 'Blokları soldan sürükle ve alt alta birleştir.', if: 'eğer %1 %2 %3 ise %4 değilse %5', calc: '%1 motorunu %2 × %3 + %4 yap', lt: 'küçükse', gt: 'büyükse', noMotor: 'Bu sahnede motor yok. "İki eksenli robot kol" ya da "Arabalı ters sarkaç" sahnesini seç.', python: 'Python karşılığı' },
+    exampleBtn: 'Örnek program', clearBtn: 'Temizle', catMotor: 'Motor', catSense: 'Sensör', catControl: 'Kontrol', hint: 'Blokları soldan sürükle ve alt alta birleştir.', if: 'eğer %1 %2 %3 ise %4 değilse %5', calc: '%1 motorunu %2 × %3 + %4 yap', lt: 'küçükse', gt: 'büyükse', noMotor: 'Bu tasarımda motor yok. CAD → Montaj bölümünden servo veya parça kütüphanesinden motorlu tekerlek ekle.', python: 'Python karşılığı' },
   en: { set: 'set motor %1 to %2', wait: 'wait %1 seconds', repeat: 'repeat %1 times %2', forever: 'forever %1', setTip: 'Sets the target value of a motor', empty: 'Drag blocks from the left',
-    exampleBtn: 'Example program', clearBtn: 'Clear', catMotor: 'Motor', catSense: 'Sensor', catControl: 'Control', hint: 'Drag blocks from the left and snap them together.', if: 'if %1 %2 %3 then %4 else %5', calc: 'set motor %1 to %2 × %3 + %4', lt: 'is below', gt: 'is above', noMotor: 'This scene has no motors. Pick "Two-joint robot arm" or "Cart-pole".', python: 'Python version' },
+    exampleBtn: 'Example program', clearBtn: 'Clear', catMotor: 'Motor', catSense: 'Sensor', catControl: 'Control', hint: 'Drag blocks from the left and snap them together.', if: 'if %1 %2 %3 then %4 else %5', calc: 'set motor %1 to %2 × %3 + %4', lt: 'is below', gt: 'is above', noMotor: 'This design has no motors. Add a servo under CAD → Assembly, or a motorized wheel from the parts library.', python: 'Python version' },
 }
 
 let defined: 'tr' | 'en' | null = null

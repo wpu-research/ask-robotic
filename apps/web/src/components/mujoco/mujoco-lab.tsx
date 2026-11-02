@@ -12,20 +12,27 @@ import { Runner, type Op } from '@/lib/mujoco/program'
 import { buildChannels, readAll, type Channel } from '@/lib/mujoco/sensors'
 import { GoalTracker } from '@/lib/mujoco/goals'
 import { Trace } from '@/lib/mujoco/trace'
-import { MJ_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
+import { MJ_WORKBENCH_SCENES, MJ_REPO, MJ_WASM_REPO, type MjScene } from '@/lib/mujoco/scenes'
 import { localizeScene } from '@/lib/mujoco/names-en'
 import { DESIGN_SCENE_ID, designScene, emptyDesign, loadDesign, saveDesign } from '@/lib/mujoco/design-scene'
 import { MurokoCad } from './mujoco-cad'
 import { createCadGizmo, type CadGizmo, type GizmoMode } from './cad-gizmo'
-import { defaultGovde, normalizeGovde, updateBlock } from '@/lib/mikro/govde'
+import { defaultGovde, normalizeGovde, updateBlock, snapToSurface, extrudeBlock, sliceBlock } from '@/lib/mikro/govde'
 import { canRedo, canUndo, initHistory, present, push, redo, replace, undo } from '@/lib/mikro/history'
 import type { RobotDesign } from '@/lib/mikro/tasarim'
-import { applyTheme, buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, skyTexture, syncMeshes, type Sim } from '@/lib/mujoco/engine'
+import { buildMeshes, ensurePack, loadMujoco, OBJ_ACTUATOR, OBJ_KEY, OBJ_SENSOR, syncMeshes, type Sim } from '@/lib/mujoco/engine'
+import { Icon, type IconName } from '@/components/shell/icons'
+import { ToolButton, ViewCube, type WorkbenchView } from './workbench-controls'
 import { MurokoElec, starterCircuit } from './mujoco-elec'
 import { EMPTY_PLAN, pumpWiring, type WiringPlan } from '@/lib/mujoco/wiring'
 import { compileCode, type CompileError } from '@/lib/lab/compile-client'
 import { createRuntime } from '@/lib/lab/runtime'
 import type { Circuit, LabApi, LabState } from '@/lib/lab/contract'
+import { ASSEMBLY_PARTS, assemblyActuator, updateAssembly } from '@/lib/mikro/assembly'
+import { assemblyConnectionIssues, assemblySketch, syncAssemblyCircuit } from '@/lib/mujoco/assembly-circuit'
+import { exportWorkbenchFile, importWorkbenchFile, loadWorkbenchProject, saveWorkbenchProject } from '@/lib/mujoco/workbench-project'
+import { WorkbenchCodeEditor, WorkbenchPortal } from './workbench-surface'
+import { ProjectToolbar } from './project-toolbar'
 
 /** Devre çalıştırma durumu: derleniyor → çalışıyor, ya da hata. */
 type ElecRun =
@@ -36,9 +43,8 @@ type ElecRun =
   | { status: 'failed'; message: string }
 
 
-/** Açılışta ilk robot (model paketi birkaç MB, bir kez iner). */
 /** İngilizce arayüzde model/sensör/motor adları da İngilizce (lib/mujoco/names-en.ts). */
-const EN_SCENES = MJ_SCENES.map(localizeScene)
+const EN_SCENES = MJ_WORKBENCH_SCENES.map(localizeScene)
 
 
 const GROUP_LABEL = {
@@ -48,7 +54,7 @@ const GROUP_LABEL = {
 }
 
 /** Sağ raydaki bölümler; `null` = panel kapalı, sahne tüm tezgâhı görür. */
-type Dock = 'cad' | 'robot' | 'elec' | 'code' | 'goals' | 'data' | 'model'
+type Dock = 'cad' | 'robot' | 'elec' | 'code' | 'goals' | 'data' | 'model' | 'simulate' | 'settings'
 
 /** Robotu sürmenin yolları; 'arduino' devre üzerinden gider, diğerleri doğrudan motora yazar. */
 type ProgTab = 'blocks' | 'python' | 'manual' | 'arduino'
@@ -67,7 +73,7 @@ export function MujocoLab() {
   const L = (tr: string, e: string) => (en ? e : tr)
   const host = useRef<HTMLDivElement>(null)
   // Tam ekran: tezgâh kendi başına tarayıcıyı kaplar (Constructa'daki gibi); site başlığı/alt bilgi gizlenir.
-  const wbRef = useRef<HTMLDivElement>(null)
+  const wbRef = useRef<HTMLElement>(null)
   const [fullscreen, setFullscreen] = useState(false)
   useEffect(() => {
     const onChange = () => setFullscreen(document.fullscreenElement === wbRef.current)
@@ -119,9 +125,9 @@ export function MujocoLab() {
     const s = designScene(d)
     if (s && sceneRef.current.id === DESIGN_SCENE_ID) { setXml(s.xml); setApplied(s.xml) }
   }, [])
-  const designed = useMemo(() => designScene(design), [design])
+  const designed = useMemo(() => designScene(design) ?? designScene(emptyDesign())!, [design])
   const SCENES = useMemo(
-    () => (designed ? [designed, ...(en ? EN_SCENES : MJ_SCENES)] : en ? EN_SCENES : MJ_SCENES),
+    () => [designed, ...(en ? EN_SCENES : MJ_WORKBENCH_SCENES)],
     [designed, en],
   )
   const scene: MjScene = SCENES.find((s) => s.id === sceneId) ?? SCENES[0]
@@ -137,11 +143,29 @@ export function MujocoLab() {
   const [info, setInfo] = useState({ t: 0, ncon: 0 })
   const [progRunning, setProgRunning] = useState(false)
   const [progTab, setProgTab] = useState<ProgTab>('blocks')
-  const [dock, setDock] = useState<Dock | null>('cad')
+  const [codeHost, setCodeHost] = useState<HTMLDivElement | null>(null)
+  const [circuitHost, setCircuitHost] = useState<HTMLDivElement | null>(null)
+  const [editorView, setEditorView] = useState<'full' | 'split'>('full')
+  const [elecTab, setElecTab] = useState<'parts' | 'circuit' | 'link'>('parts')
+  const [assemblyRequest, setAssemblyRequest] = useState(0)
+  const [dock, setDock] = useState<Dock | null>('elec')
+  const dockRef = useRef(dock); dockRef.current = dock
   const [dataTab, setDataTab] = useState<'sens' | 'motors' | 'graph'>('sens')
   const [cadBlock, setCadBlock] = useState<string | null>(null)
+  const cadBlockRef = useRef(cadBlock); cadBlockRef.current = cadBlock
+  const [secondBlock, setSecondBlock] = useState<string | null>(null)
+  const [assemblySelected, setAssemblySelected] = useState<string | null>(null)
+  const assemblySelectionRef = useRef(assemblySelected); assemblySelectionRef.current = assemblySelected
   const [gizmoMode, setGizmoMode] = useState<GizmoMode>('translate')
   const [snapOn, setSnapOn] = useState(true)
+  const [angleSnapOn, setAngleSnapOn] = useState(true)
+  const [gridOn, setGridOn] = useState(true)
+  const [axesOn, setAxesOn] = useState(true)
+  const [guidesOn, setGuidesOn] = useState(true)
+  const [view, setCameraView] = useState<WorkbenchView>('serbest')
+  const gridTextureRef = useRef<THREE.CanvasTexture | null>(null)
+  const gridOnRef = useRef(true)
+  const axesRef = useRef<THREE.AxesHelper | null>(null)
   const gizmoRef = useRef<CadGizmo | null>(null)
   const [quickOpen, setQuickOpen] = useState(true)
   const [circuit, setCircuit] = useState<Circuit>(starterCircuit)
@@ -153,6 +177,28 @@ export function MujocoLab() {
   const [arduino, setArduino] = useState('')
   const arduinoRef = useRef(arduino); arduinoRef.current = arduino
   const [elecRun, setElecRun] = useState<ElecRun>({ status: 'idle' })
+  const compileVersion = useRef(0)
+  const [projectLoaded, setProjectLoaded] = useState(false)
+  const [projectSaveFailed, setProjectSaveFailed] = useState(false)
+  const [designSaveFailed, setDesignSaveFailed] = useState(false)
+  useEffect(() => {
+    const project = loadWorkbenchProject()
+    if (project) { setCircuit(project.circuit); setPlan(project.plan); setArduino(project.arduino) }
+    setProjectLoaded(true)
+  }, [])
+  useEffect(() => {
+    if (!projectLoaded) return
+    const next = syncAssemblyCircuit(design.assembly ?? [], circuitRef.current, planRef.current)
+    setCircuit(next.circuit); setPlan(next.plan)
+  }, [design.assembly, projectLoaded])
+  useEffect(() => {
+    if (!projectLoaded) return
+    const timer = setTimeout(() => setProjectSaveFailed(!saveWorkbenchProject({ circuit, plan, arduino })), 200)
+    return () => clearTimeout(timer)
+  }, [projectLoaded, circuit, plan, arduino])
+  useEffect(() => {
+    if (assemblySelected && !design.assembly?.some((node) => node.id === assemblySelected)) setAssemblySelected(null)
+  }, [design.assembly, assemblySelected])
   const [env, setEnv] = useState<EnvId>('earth')
   const envRef = useRef<EnvId>('earth'); envRef.current = env
   const envDef = ENVS.find((e) => e.id === env)!
@@ -169,9 +215,14 @@ export function MujocoLab() {
     if (!sim) return
     const g = groupRef.current
     if (g) {
-      for (const m of [...g.children] as THREE.Mesh[]) {
-        m.geometry?.dispose(); const mat = m.material as THREE.MeshStandardMaterial | undefined
-        mat?.map?.dispose(); mat?.dispose(); g.remove(m)
+      for (const m of sim.meshes) {
+        m.traverse((object) => {
+          const mesh = object as THREE.Mesh
+          mesh.geometry?.dispose()
+          const materials = Array.isArray(mesh.material) ? mesh.material : mesh.material ? [mesh.material] : []
+          for (const material of materials) { (material as THREE.MeshStandardMaterial).map?.dispose(); material.dispose() }
+        })
+        g.remove(m)
       }
     }
     sim.data.delete(); sim.model.delete()
@@ -199,6 +250,39 @@ export function MujocoLab() {
     syncMeshes(sim)
   }, [])
 
+  const paintWorkbench = useCallback(() => {
+    const stage = stageRef.current
+    if (!stage) return
+    const styles = getComputedStyle(document.documentElement)
+    const background = styles.getPropertyValue('--bg').trim() || '#fffdf9'
+    stage.scene.background = new THREE.Color(background)
+    const canvas = document.createElement('canvas')
+    canvas.width = canvas.height = 64
+    const context = canvas.getContext('2d')!
+    context.fillStyle = background
+    context.fillRect(0, 0, 64, 64)
+    context.strokeStyle = styles.getPropertyValue('--border-strong').trim() || '#dccbb7'
+    context.lineWidth = 1
+    context.strokeRect(0.5, 0.5, 63, 63)
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.wrapS = texture.wrapT = THREE.RepeatWrapping
+    texture.repeat.set(1200, 1200)
+    texture.colorSpace = THREE.SRGBColorSpace
+    texture.anisotropy = 8
+    const previousTexture = gridTextureRef.current
+    gridTextureRef.current = texture
+    const sim = simRef.current
+    sim?.meshes.forEach((mesh, index) => {
+      if (sim.model.geom_type[index] !== sim.mj.mjtGeom.mjGEOM_PLANE.value) return
+      const material = mesh.material as THREE.MeshStandardMaterial
+      material.map?.dispose()
+      material.map = gridOnRef.current ? texture : null
+      material.color.set(gridOnRef.current ? '#ffffff' : background)
+      material.needsUpdate = true
+    })
+    previousTexture?.dispose()
+  }, [])
+
   // Sahneyi (three.js) bir kez kur
   useEffect(() => {
     if (!webgl || !host.current) return
@@ -206,11 +290,14 @@ export function MujocoLab() {
     const group = new THREE.Group()
     group.rotation.x = -Math.PI / 2
     stage.scene.add(group)
-    stage.scene.background = skyTexture()
+    const axes = new THREE.AxesHelper(0.16)
+    axes.position.y = 0.002
+    stage.scene.add(axes)
+    axesRef.current = axes
     fitShadow(stage, 0, 0, 5)
     stage.onFrame = (dt) => {
       const sim = simRef.current; if (!sim) return
-      if (runRef.current) {
+      if (runRef.current && !gizmoRef.current?.dragging()) {
         acc.current += dt * speedRef.current
         let n = 0
         const t0 = sim.data.time
@@ -257,21 +344,65 @@ export function MujocoLab() {
         }
       }
       syncMeshes(sim)
+      if (sceneRef.current.id === DESIGN_SCENE_ID) {
+        const node = designRef.current.assembly?.find((candidate) => candidate.id === assemblySelectionRef.current)
+        const parent = node?.parent ? sim.mj.mj_name2id(sim.model, 1, `${node.parent}_mount`) : 1
+        if (parent >= 0) gizmoRef.current?.setPose(sim.data.xpos.subarray(parent * 3, parent * 3 + 3), sim.data.xquat.subarray(parent * 4, parent * 4 + 4))
+      }
     }
     // Tema değişince sahne de dönsün (üst çubuktaki açık/koyu düğmesi)
-    const themeWatch = new MutationObserver(() => applyTheme(stage.scene, group))
+    const themeWatch = new MutationObserver(paintWorkbench)
     themeWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
     stageRef.current = stage; groupRef.current = group
+    paintWorkbench()
+    const colorScheme = window.matchMedia('(prefers-color-scheme: dark)')
+    colorScheme.addEventListener('change', paintWorkbench)
     gizmoRef.current = createCadGizmo(stage, group, (id, patch) => {
+      const node = designRef.current.assembly?.find((candidate) => candidate.id === id)
+      if (node) {
+        const height = ASSEMBLY_PARTS[node.type].size[2]
+        const pos = patch.pos ? [patch.pos[0], patch.pos[1], patch.pos[2] - height] as [number, number, number] : node.pos
+        changeDesignRef.current({ ...designRef.current, assembly: updateAssembly(designRef.current.assembly!, id, { pos, yaw: patch.yaw }) })
+        return
+      }
       const g = normalizeGovde(designRef.current.govde) ?? defaultGovde(designRef.current.chassis)
       changeDesignRef.current({ ...designRef.current, govde: updateBlock(g, id, patch) })
+    }, (id, additive) => {
+      if (additive && id && !id.startsWith('asm_') && cadBlockRef.current && cadBlockRef.current !== id) { setSecondBlock(id); return }
+      if (id?.startsWith('asm_')) { setAssemblySelected(id); setCadBlock(null) }
+      else { setCadBlock(id); setAssemblySelected(null) }
     })
+    const raycaster = new THREE.Raycaster()
+    let pointerStart: { id: number; x: number; y: number } | null = null
+    const down = (event: PointerEvent) => { pointerStart = event.button === 0 && event.isPrimary ? { id: event.pointerId, x: event.clientX, y: event.clientY } : null }
+    const up = (event: PointerEvent) => {
+      const start = pointerStart; pointerStart = null
+      const sim = simRef.current
+      if (!start || start.id !== event.pointerId || dockRef.current !== 'cad' || !sim || gizmoRef.current?.dragging() || Math.hypot(start.x - event.clientX, start.y - event.clientY) > 4) return
+      const bounds = stage.renderer.domElement.getBoundingClientRect()
+      raycaster.setFromCamera(new THREE.Vector2((event.clientX - bounds.left) / bounds.width * 2 - 1, 1 - (event.clientY - bounds.top) / bounds.height * 2), stage.camera)
+      const hit = raycaster.intersectObjects(sim.meshes, true)[0]
+      const id = hit?.object.userData.assemblyId as string | undefined
+      if (id) { setAssemblySelected(id); setCadBlock(null); setGizmoMode((mode) => mode === 'scale' ? 'translate' : mode) }
+    }
+    const cancel = () => { pointerStart = null }
+    stage.renderer.domElement.addEventListener('pointerdown', down)
+    stage.renderer.domElement.addEventListener('pointerup', up)
+    stage.renderer.domElement.addEventListener('pointercancel', cancel)
     return () => {
+      stage.renderer.domElement.removeEventListener('pointerdown', down)
+      stage.renderer.domElement.removeEventListener('pointerup', up)
+      stage.renderer.domElement.removeEventListener('pointercancel', cancel)
       themeWatch.disconnect()
+      colorScheme.removeEventListener('change', paintWorkbench)
       gizmoRef.current?.dispose(); gizmoRef.current = null
       disposeSim(); stage.dispose(); stageRef.current = null; groupRef.current = null
+      gridTextureRef.current?.dispose(); gridTextureRef.current = null; axesRef.current = null
     }
-  }, [webgl, disposeSim])
+  }, [webgl, disposeSim, paintWorkbench])
+
+  useEffect(() => { gridOnRef.current = gridOn; paintWorkbench() }, [gridOn, paintWorkbench])
+  useEffect(() => { if (axesRef.current) axesRef.current.visible = axesOn }, [axesOn])
 
   // XML değişince modeli derle
   useEffect(() => {
@@ -298,7 +429,13 @@ export function MujocoLab() {
         const kId = mj.mj_name2id(model, OBJ_KEY, 'muroko')
         const keyId = kId >= 0 ? kId : model.nkey > 0 ? 0 : -1
         const sim: Sim = { mj, model, data, meshes: buildMeshes(mj, model, groupRef.current), ctrl, channels, timestep: model.opt.timestep, keyId }
+        sim.meshes.forEach((mesh, index) => {
+          const name = mj.mj_id2name(model, 5, index) || ''
+          const id = /^(asm_\d+)_/.exec(name)?.[1]
+          if (id) mesh.traverse((object) => { object.userData.assemblyId = id })
+        })
         simRef.current = sim
+        paintWorkbench()
         const names = channels.map((c) => c.name)
         setChNames(names); setGraphSel(names.slice(0, 2))
         tracker.current = new GoalTracker(sceneRef.current.goals.filter((g) => names.includes(g.ch)))
@@ -312,7 +449,7 @@ export function MujocoLab() {
       }
     }).catch((e) => { if (!dead) { setErr(String((e as Error)?.message ?? e)); setStatus('error') } })
     return () => { dead = true }
-  }, [applied, webgl, disposeSim, resetState, applyGravity])
+  }, [applied, webgl, disposeSim, resetState, applyGravity, paintWorkbench])
 
   // Ortam değişince yerçekimi anında uygulanır: robot düşerken bile Ay'a geçilebilir
   useEffect(() => { applyGravity() }, [env, applyGravity])
@@ -322,10 +459,13 @@ export function MujocoLab() {
     const g = gizmoRef.current; if (!g) return
     const active = dock === 'cad' && scene.id === DESIGN_SCENE_ID
     const body = normalizeGovde(design.govde) ?? defaultGovde(design.chassis)
-    g.update(active ? body : { v: 1, blocks: [] }, active ? cadBlock : null)
-    g.setMode(gizmoMode)
-    g.setOptions({ snapM: snapOn ? 0.005 : 0, snapDeg: snapOn ? 15 : 0 })
-  }, [dock, scene.id, design, cadBlock, gizmoMode, snapOn])
+    const node = design.assembly?.find((candidate) => candidate.id === assemblySelected)
+    const size = node ? ASSEMBLY_PARTS[node.type].size : null
+    const proxy = node && size ? { id: node.id, shape: 'kutu' as const, pos: [node.pos[0], node.pos[1], node.pos[2] + size[2]] as [number, number, number], size, yaw: node.yaw, color: '#c2410c' } : null
+    g.update(active ? proxy ? { v: 1, blocks: [proxy] } : { ...body, blocks: body.blocks.filter((block) => !block.hidden) } : { v: 1, blocks: [] }, active ? proxy?.id ?? cadBlock : null)
+    g.setMode(node && gizmoMode === 'scale' ? 'translate' : gizmoMode)
+    g.setOptions({ snapM: snapOn ? 0.005 : 0, snapDeg: angleSnapOn ? 15 : 0 })
+  }, [dock, scene.id, design, cadBlock, assemblySelected, gizmoMode, snapOn, angleSnapOn])
 
   // Kamera, sahne değişince
   useEffect(() => {
@@ -366,7 +506,7 @@ export function MujocoLab() {
    *  her tuşa basış ayrı bir geri-al adımı açmaz. */
   const changeDesign = (d: RobotDesign, coalesce = false) => {
     setHist((h) => (coalesce ? replace(h, d) : push(h, d)))
-    saveDesign(d)
+    setDesignSaveFailed(!saveDesign(d))
     flashSaving()
     if (sceneRef.current.id !== DESIGN_SCENE_ID) return // başka robota bakılıyorsa sahneyi değiştirme
     const s = designScene(d)
@@ -376,7 +516,7 @@ export function MujocoLab() {
   const applyHist = (next: typeof hist) => {
     setHist(next)
     const d = present(next)
-    saveDesign(d)
+    setDesignSaveFailed(!saveDesign(d))
     flashSaving()
     if (sceneRef.current.id !== DESIGN_SCENE_ID) return
     const s = designScene(d)
@@ -385,6 +525,7 @@ export function MujocoLab() {
   const changeDesignRef = useRef(changeDesign); changeDesignRef.current = changeDesign
   /** Görünüm: kamerayı sabit bir açıya oturtur (üst, ön, yan, serbest). */
   const setView = (v: 'ust' | 'on' | 'yan' | 'serbest') => {
+    setCameraView(v)
     const st = stageRef.current; if (!st) return
     const [lx, ly, lz] = scene.look
     const d = Math.max(0.3, Math.hypot(...scene.cam))
@@ -428,17 +569,22 @@ export function MujocoLab() {
 
   /** Devreyi durdurur; motor hedefleri olduğu yerde kalır (gerçek kartın gücü kesilmiş gibi). */
   const stopElec = useCallback(() => {
+    compileVersion.current++
     labRef.current?.dispose()
     labRef.current = null
     setLabState(null)
     setElecRun({ status: 'idle' })
   }, [])
+  useEffect(() => { stopElec() }, [circuit, applied, stopElec])
 
   /** Arduino kodunu gerçekten derler (avr-gcc), hex'i AVR emülatöründe başlatır ve köprüyü kurar. */
   const runElec = async () => {
     stopElec()
+    const version = compileVersion.current
+    const currentCircuit = circuitRef.current
     setElecRun({ status: 'compiling' })
     const out = await compileCode(arduinoRef.current)
+    if (version !== compileVersion.current) return
     if (!out.ok) {
       setElecRun(out.errors.length
         ? { status: 'errors', errors: out.errors }
@@ -446,7 +592,7 @@ export function MujocoLab() {
       return
     }
     try {
-      labRef.current = createRuntime(circuitRef.current, out.hex)
+      labRef.current = createRuntime(currentCircuit, out.hex)
       nextLabTick.current = 0
       resetState()
       runRef.current = true; setRunning(true)
@@ -474,15 +620,49 @@ export function MujocoLab() {
   )
 
 
-  const railItems: { id: Dock; ico: string; label: string }[] = [
-    { id: 'cad', ico: '📐', label: L('TASARIM', 'CAD') },
-    { id: 'robot', ico: '🤖', label: L('ROBOT', 'ROBOT') },
-    { id: 'elec', ico: '⚡', label: L('ELEK', 'ELEC') },
-    { id: 'code', ico: '{ }', label: L('KOD', 'CODE') },
-    { id: 'goals', ico: '🎯', label: L('HEDEF', 'GOALS') },
-    { id: 'data', ico: '📈', label: L('VERİ', 'DATA') },
-    { id: 'model', ico: '⚙️', label: L('MODEL', 'MODEL') },
+  const railItems: { id: Dock; ico: IconName; label: string }[] = [
+    { id: 'cad', ico: 'parcalar', label: 'CAD' },
+    { id: 'elec', ico: 'laboratuvar', label: L('ELEK', 'ELEC') },
+    { id: 'code', ico: 'code', label: L('KOD', 'CODE') },
+    { id: 'simulate', ico: 'play', label: L('SİMÜLASYON', 'SIMULATE') },
+    { id: 'settings', ico: 'sun', label: L('AYARLAR', 'SETTINGS') },
   ]
+  const activeRail = dock === 'robot' || dock === 'goals' || dock === 'data' ? 'simulate' : dock === 'model' ? 'settings' : dock
+  const body = normalizeGovde(design.govde) ?? defaultGovde(design.chassis)
+  const selectedBlock = body.blocks.find((block) => block.id === cadBlock)
+  const editMode = (mode: GizmoMode) => { if (assemblySelected && mode === 'scale') return; setGizmoMode(mode); setDock('cad') }
+  const selectAssembly = (id: string | null) => { setAssemblySelected(id); setCadBlock(null); if (id && gizmoMode === 'scale') setGizmoMode('translate') }
+  const openAssemblyExample = () => {
+    const code = assemblySketch(design.assembly ?? [], circuit)
+    if (arduino.trim() && arduino !== code && !window.confirm(L('Mevcut Arduino kodu örnek kodla değiştirilsin mi?', 'Replace your current Arduino code with the example?'))) return
+    stopElec(); setArduino(code); setProgTab('arduino'); setDock('code')
+  }
+  const saveProject = () => {
+    setDesignSaveFailed(!saveDesign(design))
+    setProjectSaveFailed(!saveWorkbenchProject({ circuit, plan, arduino }))
+    flashSaving()
+  }
+  const downloadProject = () => {
+    const content = exportWorkbenchFile({ design, circuit, plan, arduino })
+    const url = URL.createObjectURL(new Blob([content], { type: 'application/json' }))
+    const anchor = document.createElement('a')
+    anchor.href = url; anchor.download = `${design.name.replace(/[^a-zA-Z0-9_-]/g, '_') || 'robot'}.muroko.json`; anchor.click()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
+  const importProject = async (file: File) => {
+    if (file.size > 4_000_000) { window.alert(L('Proje dosyası çok büyük (en fazla 4 MB).', 'Project file is too large (maximum 4 MB).')); return }
+    const loaded = importWorkbenchFile(await file.text())
+    if (!loaded) { window.alert(L('Geçerli bir MuRoKo proje dosyası seç.', 'Choose a valid MuRoKo project file.')); return }
+    if (!window.confirm(L('Mevcut proje bu dosyayla değiştirilsin mi?', 'Replace the current project with this file?'))) return
+    stopElec(); applyHist(initHistory(loaded.design)); setCircuit(loaded.circuit); setPlan(loaded.plan); setArduino(loaded.arduino); setCadBlock(null); setAssemblySelected(null); setSecondBlock(null)
+  }
+  const surfaceTool = (tool: 'surface' | 'extrude' | 'slice') => {
+    if (!selectedBlock || scene.id !== DESIGN_SCENE_ID) return
+    const operations = { surface: snapToSurface, extrude: extrudeBlock, slice: sliceBlock }
+    const next = operations[tool](body, selectedBlock.id, 'x', tool === 'extrude' ? 0.01 : 0)
+    changeDesign({ ...design, govde: next })
+    setDock('cad')
+  }
   const dockTitle: Record<Dock, string> = {
     cad: L('Robotunu tasarla', 'Design your robot'),
     robot: L('Robot seç', 'Pick a robot'),
@@ -491,16 +671,36 @@ export function MujocoLab() {
     goals: L('Hedefler', 'Goals'),
     data: L('Sensör ve grafik', 'Sensors and graph'),
     model: L('Model (MJCF)', 'Model (MJCF)'),
+    simulate: L('Simülasyon', 'Simulation'),
+    settings: L('Çalışma alanı ayarları', 'Workbench settings'),
   }
 
   return (
-    <section className="mj" data-testid="mujoco-lab">
-      <div className="mj-wb" data-dock={dock ?? 'none'} ref={wbRef}>
+    <section className="mj" data-testid="mujoco-lab" ref={wbRef}>
+      <ProjectToolbar name={design.name} onName={(name) => changeDesign({ ...design, name })} onSave={saveProject} onDownload={downloadProject} onImport={importProject} onUndo={doUndo} onRedo={doRedo} canUndo={canUndo(hist)} canRedo={canRedo(hist)} saveState={projectSaveFailed || designSaveFailed ? L('Kayıt başarısız', 'Save failed') : saveState === 'saving' ? L('Kaydediliyor…', 'Saving…') : L('Tarayıcıya kaydedildi', 'Saved in browser')} en={en} />
+      <div className="mj-wb" data-dock={dock ?? 'none'} data-workspace={dock === 'code' ? 'code' : dock === 'elec' && elecTab === 'circuit' ? 'circuit' : 'scene'} data-editor-view={editorView} data-guides={guidesOn ? 'on' : 'off'} tabIndex={0}
+        aria-label={L('Robot tasarım çalışma alanı', 'Robot design workbench')}
+        onKeyDown={(event) => {
+          if ((event.target as HTMLElement).closest('input, textarea, select, [contenteditable="true"]') || event.ctrlKey || event.metaKey || event.altKey) return
+          const modes: Record<string, GizmoMode> = { w: 'translate', e: 'rotate', r: 'scale' }
+          const key = event.key.toLowerCase()
+          if (modes[key]) { event.preventDefault(); editMode(modes[key]) }
+          if (key === 'f') { event.preventDefault(); setView('serbest') }
+        }}>
         {/* Sahne: tüm tezgâhı kaplar, paneller üstünde yüzer */}
         {webgl
           ? <div ref={host} className="mj-stage" data-testid="mujoco-stage" />
           : <div className="mj-stage mj-msg">{L('Bu tarayıcıda WebGL yok; 3B görüntü açılamıyor.', 'WebGL is not available in this browser.')}</div>}
         {status === 'loading' && <div className="mj-overlay">{scene.pack ? L('Robot modeli indiriliyor (birkaç MB, bir kez)…', 'Downloading the robot model (a few MB, once)…') : L('Fizik motoru yükleniyor (8 MB, ilk açılışta)…', 'Loading the physics engine (8 MB, first visit)…')}</div>}
+
+        <div className={`mj-main-workspace${editorView === 'split' ? ' split' : ''}`} hidden={dock !== 'code'} data-testid="mujoco-code-workspace">
+          <div className="mj-workspace-head"><strong>{progTabs.find((tab) => tab.id === progTab)?.label}</strong><span>Uno · AVR</span><button className="mj-qbtn" onClick={() => setDock('cad')}>{L('3B tasarıma dön', 'Back to 3D')}</button></div>
+          <div ref={setCodeHost} className="mj-workspace-content" />
+        </div>
+        <div className="mj-main-workspace" hidden={dock !== 'elec' || elecTab !== 'circuit'} data-testid="mujoco-circuit-workspace">
+          <div className="mj-workspace-head"><strong>{L('Devre çalışma alanı', 'Circuit workbench')}</strong><span>{circuit.parts.length} {L('parça', 'parts')} · {circuit.wires.length} {L('kablo', 'wires')}</span><button className="mj-qbtn" onClick={() => setElecTab('parts')}>{L('Bitti · 3B', 'Done · 3D')}</button></div>
+          <div ref={setCircuitHost} className="mj-workspace-content" />
+        </div>
 
         {/* Sahnenin üstünde fizik göstergesi */}
         <div className="mj-hud" aria-live="off" data-testid="mujoco-hud">
@@ -519,16 +719,71 @@ export function MujocoLab() {
         {/* Sol üstte yüzen hızlı araçlar */}
         <div className={`mj-quick${quickOpen ? '' : ' mini'}`}>
           <div className="mj-quick-head">
-            <span>🔧 {L('Hızlı araçlar', 'Quick Tools')}</span>
+            <span><Icon name="atolye" size={15} />{L('Hızlı araçlar', 'Quick Tools')}</span>
             <button className="mj-x" onClick={() => setQuickOpen((v) => !v)} aria-expanded={quickOpen} aria-label={quickOpen ? L('Küçült', 'Collapse') : L('Aç', 'Expand')}>{quickOpen ? '–' : '+'}</button>
           </div>
           {quickOpen && (
             <div className="mj-quick-body">
+              <div className="mj-tool-grid" role="group" aria-label={L('Dönüştürme araçları', 'Transform tools')}>
+                <ToolButton icon="move" label={L('Taşı', 'Move')} shortcut="W" active={gizmoMode === 'translate'} onClick={() => editMode('translate')} data-testid="mujoco-tool-move" />
+                <ToolButton icon="rotate" label={L('Döndür', 'Rotate')} shortcut="E" active={gizmoMode === 'rotate'} onClick={() => editMode('rotate')} data-testid="mujoco-tool-rotate" />
+                <ToolButton icon="scale" label={L('Ölçek', 'Scale')} shortcut="R" disabled={!!assemblySelected} active={gizmoMode === 'scale'} onClick={() => editMode('scale')} data-testid="mujoco-tool-scale" />
+                <ToolButton icon="surface" label={L('Yüzey', 'Surface')} disabled={!selectedBlock || scene.id !== DESIGN_SCENE_ID} onClick={() => surfaceTool('surface')} />
+                <ToolButton icon="extrude" label={L('Uzat', 'Extrude')} disabled={!selectedBlock || scene.id !== DESIGN_SCENE_ID} onClick={() => surfaceTool('extrude')} />
+                <ToolButton icon="slice" label={L('Böl', 'Slice')} disabled={!selectedBlock || selectedBlock.shape !== 'kutu' || scene.id !== DESIGN_SCENE_ID} onClick={() => surfaceTool('slice')} />
+              </div>
+              <div className="mj-tool-grid mj-tool-toggles" role="group" aria-label={L('Yerleştirme ve görünüm', 'Snapping and display')}>
+                <ToolButton icon="snap" label="5 mm" active={snapOn} onClick={() => setSnapOn((value) => !value)} />
+                <ToolButton icon="angle" label="15°" active={angleSnapOn} onClick={() => setAngleSnapOn((value) => !value)} />
+                <ToolButton icon="guides" label={L('İpuçları', 'Guides')} active={guidesOn} onClick={() => setGuidesOn((value) => !value)} />
+                <ToolButton icon="grid" label={L('Izgara', 'Grid')} active={gridOn} onClick={() => setGridOn((value) => !value)} data-testid="mujoco-grid" />
+                <ToolButton icon="axes" label={L('Eksen', 'Axes')} active={axesOn} onClick={() => setAxesOn((value) => !value)} data-testid="mujoco-axes" />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <ViewCube view={view} onView={setView} en={en} />
+        <p className="mj-stage-tip">{L('Seçmek için tıkla · Yakınlaşmak için kaydır · Döndürmek için sürükle', 'Click to select · Scroll to zoom · Drag to orbit')}</p>
+
+        <nav className="mj-rail" aria-label={L('Çalışma bölümleri', 'Workbench sections')}>
+          {railItems.map((item) => (
+            <button key={item.id} className={`mj-rail-btn${activeRail === item.id ? ' on' : ''}`} aria-pressed={activeRail === item.id}
+              onClick={() => setDock(dock === item.id ? null : item.id)} data-testid={`mujoco-rail-${item.id}`}>
+              <Icon name={item.ico} size={21} /><span>{item.label}</span>
+            </button>
+          ))}
+          <button className="mj-rail-btn mj-rail-fullscreen" onClick={toggleFullscreen} aria-pressed={fullscreen} aria-label={L('Tam ekran', 'Fullscreen')}>
+            <span aria-hidden="true">⛶</span><span>{L('TAM EKRAN', 'FULLSCREEN')}</span>
+          </button>
+        </nav>
+
+        <div className="mj-dock" hidden={dock === null} aria-label={dock ? dockTitle[dock] : undefined}>
+          {projectSaveFailed && <p className="mj-warns" role="alert">{L('Devre ve kod tarayıcıya kaydedilemedi. Tarayıcı depolama iznini kontrol et.', 'Circuit and code could not be saved. Check browser storage permissions.')}</p>}
+          <div className="mj-dock-head">
+            <strong><span className="mj-dock-symbol"><Icon name={railItems.find((item) => item.id === activeRail)?.ico ?? 'parcalar'} size={18} /></span>{dock ? dockTitle[dock] : ''}</strong>
+            <button className="mj-x" onClick={() => setDock(null)} aria-label={L('Paneli kapat', 'Close panel')}>✕</button>
+          </div>
+
+          <div className="mj-dock-body" hidden={dock !== 'simulate'}>
+            <span className="mj-group-label">{L('FİZİK KONTROLLERİ', 'PHYSICS CONTROLS')}</span>
+            <div className="mj-simulation-controls">
               <button className={`mj-qbtn${running ? ' on' : ''}`} onClick={toggle} data-testid="mujoco-toggle">
                 <b aria-hidden="true">{running ? '⏸' : '▶'}</b>{running ? L('Duraklat', 'Pause') : L('Başlat', 'Play')}
               </button>
               <button className="mj-qbtn" onClick={resetState}><b aria-hidden="true">↺</b>{L('Başa al', 'Reset')}</button>
               <button className="mj-qbtn" onClick={shake}><b aria-hidden="true">🎲</b>{L('Karıştır', 'Shake')}</button>
+            </div>
+            <div className="mj-section-links">
+              <button className="mj-qbtn" onClick={() => setDock('robot')}><Icon name="arena" />{L('Robot ve sahne seç', 'Choose robot and scene')}<Icon name="chevronRight" size={14} /></button>
+              <button className="mj-qbtn" onClick={() => setDock('goals')}><Icon name="target" />{L('Görev ve hedefler', 'Missions and goals')}<Icon name="chevronRight" size={14} /></button>
+              <button className="mj-qbtn" onClick={() => setDock('data')}><Icon name="ilerleme" />{L('Sensörler ve grafikler', 'Sensors and graphs')}<Icon name="chevronRight" size={14} /></button>
+            </div>
+            <p className="mj-qhint">{en ? scene.en.hint : scene.tr.hint}</p>
+          </div>
+
+          <div className="mj-dock-body" hidden={dock !== 'settings'}>
+              <span className="mj-group-label">{L('BENZETİM AYARLARI', 'SIMULATION SETTINGS')}</span>
               <label className="mj-qspeed">{L('Hız', 'Speed')}
                 <select value={speed} onChange={(e) => { const v = Number(e.target.value); setSpeed(v); speedRef.current = v }}>
                   <option value={0.25}>0,25×</option><option value={0.5}>0,5×</option><option value={1}>1×</option><option value={2}>2×</option>
@@ -545,33 +800,7 @@ export function MujocoLab() {
                   ))}
                 </div>
               </div>
-              <p className="mj-qhint">💡 {en ? scene.en.hint : scene.tr.hint}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Görünüm anahtarı (Constructa'daki görünüm küpünün karşılığı) */}
-        <div className="mj-views" role="group" aria-label={L('Görünüm', 'View')}>
-          {([['serbest', L('Serbest', 'Free')], ['ust', L('Üst', 'Top')], ['on', L('Ön', 'Front')], ['yan', L('Yan', 'Side')]] as const).map(([v, lbl]) => (
-            <button key={v} onClick={() => setView(v)} data-testid={`mujoco-view-${v}`}>{lbl}</button>
-          ))}
-        </div>
-
-        {/* Sağda dikey sekme rayı */}
-        <nav className="mj-rail" aria-label={L('Çalışma bölümleri', 'Workbench sections')}>
-          {railItems.map((r) => (
-            <button key={r.id} className={`mj-rail-btn${dock === r.id ? ' on' : ''}`} aria-pressed={dock === r.id}
-              onClick={() => setDock((d) => (d === r.id ? null : r.id))} data-testid={`mujoco-rail-${r.id}`}>
-              <b aria-hidden="true">{r.ico}</b><span>{r.label}</span>
-            </button>
-          ))}
-        </nav>
-
-        {/* Rayın solunda açılan panel — Blockly çalışma alanı korunsun diye hep bağlı kalır, gizlenir */}
-        <div className="mj-dock" hidden={dock === null} aria-label={dock ? dockTitle[dock] : undefined}>
-          <div className="mj-dock-head">
-            <strong>{dock ? dockTitle[dock] : ''}</strong>
-            <button className="mj-x" onClick={() => setDock(null)} aria-label={L('Paneli kapat', 'Close panel')}>✕</button>
+              <button className="mj-qbtn" onClick={() => setDock('model')}><Icon name="code" />{L('Model kaynağı (MJCF)', 'Model source (MJCF)')}</button>
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'robot'}>
@@ -586,13 +815,20 @@ export function MujocoLab() {
 
           <div className="mj-dock-body" hidden={dock !== 'cad'}>
             <MurokoCad design={design} onDesign={changeDesign} en={en}
+              secondBlock={secondBlock} onSecondBlock={setSecondBlock}
+              assemblyRequest={assemblyRequest}
+              assemblySelected={assemblySelected} onAssemblySelect={selectAssembly} onAssemblyExample={openAssemblyExample}
+              assemblyIssues={assemblyConnectionIssues(design.assembly ?? [], circuit)} assemblyAngle={(sens[`${assemblySelected}_angle`] ?? 0) * 180 / Math.PI}
+              onAssemblyPreview={(id, degrees) => { stopElec(); runners.current = []; setProgRunning(false); setMotor(assemblyActuator(id), degrees * Math.PI / 180); resumeSim() }}
               onUndo={doUndo} onRedo={doRedo} canUndo={canUndo(hist)} canRedo={canRedo(hist)}
-              block={cadBlock} onBlock={setCadBlock}
+              block={cadBlock} onBlock={(id) => { setCadBlock(id); setAssemblySelected(null) }}
               gizmoMode={gizmoMode} onGizmoMode={setGizmoMode} snap={snapOn} onSnap={setSnapOn} saveState={saveState} />
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'elec'}>
             <MurokoElec circuit={circuit} onCircuit={setCircuit} plan={plan} onPlan={setPlan}
+              tab={elecTab} onTab={setElecTab} workbenchHost={circuitHost} onPress={(id, down) => labRef.current?.setProp(id, 'pressed', down)}
+              onMechanics={() => { setAssemblyRequest((value) => value + 1); setDock('cad') }}
               ranges={ctrlDefs} channels={chNames} labState={labState} editLocked={elecRun.status === 'running'} en={en} />
           </div>
 
@@ -602,7 +838,9 @@ export function MujocoLab() {
                 <button key={t.id} role="tab" aria-selected={progTab === t.id} className={`mj-tab${progTab === t.id ? ' on' : ''}`} onClick={() => setProgTab(t.id)} data-testid={t.test}>{t.label}</button>
               ))}
             </div>
-
+            <p className="muted">{L('Kod ana çalışma alanında açılır. Tam düzenleyici kullan veya robotla yan yana çalış.', 'Code opens in the main workspace. Use the full editor or work beside your robot.')}</p>
+            <div className="mj-bar"><button className={`mj-qbtn${editorView === 'full' ? ' on' : ''}`} onClick={() => setEditorView('full')} data-testid="mujoco-editor-full">{L('Tam düzenleyici', 'Full editor')}</button><button className={`mj-qbtn${editorView === 'split' ? ' on' : ''}`} onClick={() => setEditorView('split')} data-testid="mujoco-editor-split">{L('3B ile böl', 'Split with 3D')}</button></div>
+            <WorkbenchPortal target={codeHost}>
             <div hidden={progTab !== 'blocks'} className="mj-panel">
               {ctrlDefs.length > 0 && (
                 <div className="mj-bar mj-runbar">
@@ -634,9 +872,7 @@ export function MujocoLab() {
                   <button className="sbtn ghost" onClick={stopElec} disabled={elecRun.status !== 'running'}>■ {L('Gücü kes', 'Power off')}</button>
                   {elecRun.status === 'running' && <span className="mj-live">● {L('kart çalışıyor', 'board running')}</span>}
                 </div>
-                <textarea className="mj-ta" value={arduino} spellCheck={false} onChange={(e) => setArduino(e.target.value)}
-                  aria-label="Arduino C++" data-testid="mujoco-arduino-code"
-                  placeholder={'#include <Servo.h>\n\nServo s;\n\nvoid setup() {\n  s.attach(9);\n}\n\nvoid loop() {\n  s.write(0);\n  delay(500);\n  s.write(180);\n  delay(500);\n}'} />
+                <WorkbenchCodeEditor value={arduino} onChange={setArduino} errorLines={elecRun.status === 'errors' ? elecRun.errors.map((error) => error.line) : []} />
                 {elecRun.status === 'errors' && (
                   <ul className="mj-warns" data-testid="mujoco-arduino-errors">
                     {elecRun.errors.slice(0, 6).map((e, i) => <li key={i}>{L('satır', 'line')} {e.line}: {e.message}</li>)}
@@ -667,6 +903,7 @@ export function MujocoLab() {
                   </>}
               </div>
             )}
+            </WorkbenchPortal>
           </div>
 
           <div className="mj-dock-body" hidden={dock !== 'goals'} data-testid="mujoco-goals">
@@ -763,6 +1000,8 @@ export function MujocoLab() {
 
         {/* Alt durum çubuğu */}
         <div className="mj-status">
+          <span>{L('Nesneler', 'Objects')}: {scene.id === DESIGN_SCENE_ID ? body.blocks.length + design.parts.length : simRef.current?.meshes.length ?? 0}</span>
+          <span className="mj-selection-status">{selectedBlock ? `${L('Seçili', 'Selected')}: ${selectedBlock.id}` : L('Seçim yok', 'No selection')}</span>
           <span><b>{en ? scene.en.title : scene.tr.title}</b></span>
           <span>{L('motor', 'motors')}: {ctrlDefs.length}</span>
           <span>{L('ortam', 'environment')}: {en ? envDef.en : envDef.tr}</span>
@@ -770,6 +1009,7 @@ export function MujocoLab() {
           {progRunning && <span className="mj-live">● {L('program çalışıyor', 'program running')}</span>}
           {elecRun.status === 'running' && <span className="mj-live" data-testid="mujoco-board-live">⚡ {L('kart çalışıyor', 'board running')} · {plan.motors.length} {L('motor bağlı', 'motors linked')}</span>}
           <span className="mj-status-r" data-testid="mujoco-clock">{info.t.toFixed(1)} s · {running ? L('çalışıyor', 'running') : L('duraklatıldı', 'paused')}</span>
+          <span className="mj-shortcuts">W/E/R · {L('taşı / döndür / ölçek', 'move / rotate / scale')} · F · {L('görünümü sıfırla', 'reset view')}</span>
         </div>
       </div>
 
