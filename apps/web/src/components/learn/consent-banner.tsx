@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { setConsent, useConsent, type ConsentMode } from '@/lib/consent'
 import { deleteMyData, useEvents } from '@/lib/events'
 import { useT } from '@/i18n/client'
@@ -25,8 +26,11 @@ function Choices({ onChoose }: { onChoose: (mode: ConsentMode, ack: boolean) => 
 
 /** Karar verilmemişse sayfanın altında görünen onay bandı. Karar verilene kadar hiçbir olay kaydedilmez. */
 export function ConsentBanner() {
+  const pathname = usePathname()
   const t = useT()
   const consent = useConsent()
+  // Sınav ekranında (öğretmen paneli hariç) gösterilmez: sınavın üstünü örtmesin
+  if (pathname === '/sinav' || (pathname?.startsWith('/sinav/') && !pathname.startsWith('/sinav/yonetim'))) return null
   if (consent !== null) return null // undefined: henüz okunmadı; nesne: karar verilmiş
   return (
     <aside className="consent-banner" role="region" aria-label={t('consent.bannerLabel')}>

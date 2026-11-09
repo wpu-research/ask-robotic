@@ -14,11 +14,17 @@ export type CompileResult =
   | { ok: false; reason: 'invalid' | 'compile'; errors: CompileDiagnostic[] }
   | { ok: false; reason: 'busy' | 'timeout' | 'internal'; errors: [] }
 
+function envInt(name: string, def: number, min: number, max: number) {
+  const n = Number(process.env[name])
+  return Number.isInteger(n) && n >= min && n <= max ? n : def
+}
+
 export const LIMITS = {
   timeoutMs: 60_000,
   maxBuffer: 1024 * 1024,
-  maxConcurrent: 2,
-  maxQueue: 10,
+  // Sınav günü gibi yoğun anlarda COMPILE_MAX_CONCURRENT / COMPILE_MAX_QUEUE ile artırılır
+  maxConcurrent: envInt('COMPILE_MAX_CONCURRENT', 2, 1, 16),
+  maxQueue: envInt('COMPILE_MAX_QUEUE', 10, 0, 200),
   cacheEntries: 200,
   maxErrors: 20,
   maxHexBytes: 1024 * 1024,

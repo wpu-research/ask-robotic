@@ -385,3 +385,54 @@ export const schoolLeads = pgTable('school_leads', {
   index('school_leads_brand_created').on(t.brand, t.createdAt),
   check('school_leads_kvkk', sql`${t.consentKvkk}`),
 ])
+
+// ESOF 323 çevrimiçi sınavı (/sinav). Oturum: öğretmenin açtığı sınav (öğrenciler `code` ile girer). Sorular ve 25 proje
+// kodda tanımlıdır (apps/web/src/lib/sinav); burada yalnız kimlikleri, cevaplar ve puanlar saklanır.
+export const examSessions = pgTable('exam_sessions', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  code: text('code').notNull(),
+  title: text('title').notNull(),
+  // draft: öğrenci giremez · open: giriş açık · closed: kaydetme/teslim kapalı (açık girişler otomatik teslim edilir)
+  status: text('status').notNull().default('draft'),
+  durationMin: integer('duration_min').notNull().default(90),
+  // { mcqCount, mcqPoints (soru başına), definitionPoints, projectPoints }
+  config: jsonb('config').$type<{ mcqCount: number; mcqPoints: number; definitionPoints: number; projectPoints: number }>().notNull(),
+  createdBy: uuid('created_by').references(() => users.id, { onDelete: 'set null' }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [uniqueIndex('exam_sessions_code').on(t.code)])
+
+export const examAttempts = pgTable('exam_attempts', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  sessionId: uuid('session_id').notNull().references(() => examSessions.id, { onDelete: 'cascade' }),
+  studentNo: text('student_no').notNull(),
+  studentName: text('student_name').notNull(),
+  // Öğrenci çerezindeki belirtecin sha256 özeti
+  tokenHash: text('token_hash').notNull(),
+  // Öğretmen "yeniden girişe izin ver" dediğinde true: bir sonraki giriş bu kaydı devralır
+  allowRelogin: boolean('allow_relogin').notNull().default(false),
+  projectId: text('project_id').notNull(),
+  // Öğrenciye gösterilen sorular: [{ id, order: seçeneklerin gösterim sırası (asıl indeksler) }]
+  mcq: jsonb('mcq').$type<{ id: string; order: number[] }[]>().notNull(),
+  definitionId: text('definition_id').notNull(),
+  // mcq: soru kimliği → asıl seçenek indeksi
+  answers: jsonb('answers').$type<{ mcq: Record<string, number>; definition: string }>().notNull(),
+  circuit: jsonb('circuit'),
+  code: text('code'),
+  startedAt: timestamp('started_at', { withTimezone: true }).notNull().defaultNow(),
+  deadlineAt: timestamp('deadline_at', { withTimezone: true }).notNull(),
+  savedAt: timestamp('saved_at', { withTimezone: true }),
+  submittedAt: timestamp('submitted_at', { withTimezone: true }),
+  // Sekme/pencere değiştirme sayısı vb.
+  flags: jsonb('flags').$type<{ blur: number; pastes: number }>().notNull(),
+  // pending | grading | done | error
+  gradeStatus: text('grade_status').notNull().default('pending'),
+  mcqScore: integer('mcq_score'),
+  projectScore: integer('project_score'),
+  projectGrade: jsonb('project_grade'),
+  definitionScore: integer('definition_score'),
+  teacherNote: text('teacher_note'),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (t) => [
+  uniqueIndex('exam_attempts_session_student').on(t.sessionId, t.studentNo),
+  index('exam_attempts_token').on(t.tokenHash),
+])

@@ -51,6 +51,11 @@ export function AppShell({ children, authOn, robiOn = false, ttsOn = false }: { 
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
+  // Sınav ekranı: menü, arama ve Robi (yapay zekâ) yok; öğretmen paneli (/sinav/yonetim) normal kabukta
+  if (pathname === '/sinav' || (pathname?.startsWith('/sinav/') && !pathname.startsWith('/sinav/yonetim'))) {
+    return <main id="icerik" tabIndex={-1} className="exam-bare">{children}</main>
+  }
+
   const kids = NAV.find((g) => g.tone === 'kids')?.items ?? []
   const adults = NAV.find((g) => g.tone === 'adults')?.items ?? []
 

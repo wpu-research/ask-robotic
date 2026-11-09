@@ -40,6 +40,8 @@ export interface LabEditorProps {
   storageKey?: string
   onGoalsComplete?: () => void
   compact?: boolean
+  /** Devre ya da kod her değiştiğinde (ör. sınavda sunucuya kaydetmek için). */
+  onChange?: (circuit: Circuit, code: string) => void
 }
 
 type CompileView =
@@ -51,7 +53,7 @@ type CompileView =
 
 const FLASH_MAX = 32256, RAM_MAX = 2048
 
-export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact }: LabEditorProps) {
+export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PARTS, lockedPartIds, goals, storageKey, onGoalsComplete, compact, onChange }: LabEditorProps) {
   const t = useT()
   const locale = useLocale()
   const tRef = useRef(t); tRef.current = t
@@ -118,6 +120,9 @@ export function LabEditor({ ai, initial, initialCode, allowedParts = DEFAULT_PAR
     const t = setTimeout(() => { try { localStorage.setItem(storageKey, JSON.stringify({ v: 1, circuit, code })) } catch { /* kota/gizli pencere */ } }, 300)
     return () => clearTimeout(t)
   }, [circuit, code, storageKey, loaded])
+
+  const changeCb = useRef(onChange); changeCb.current = onChange
+  useEffect(() => { changeCb.current?.(circuit, code) }, [circuit, code])
 
   // ---- hedefler ----
   const analysis = useMemo(() => analyze(circuit), [circuit])

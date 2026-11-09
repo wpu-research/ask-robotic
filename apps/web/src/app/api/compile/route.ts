@@ -1,4 +1,6 @@
 import { rateLimited } from '@/lib/auth/rate-limit'
+import { getDb } from '@/lib/db'
+import { attemptByToken } from '@/lib/sinav/service'
 import { compileSketch } from '@/lib/compile/compile'
 import { validateSource } from '@/lib/compile/validate'
 
@@ -9,6 +11,16 @@ export const maxDuration = 90
 export const MAX_BODY_BYTES = 40 * 1024
 const RATE_MAX = 20
 const RATE_WINDOW_MS = 60_000
+const EXAM_RATE_MAX = 12
+
+async function examAttemptOf(req: Request): Promise<string | null> {
+  const m = /(?:^|;\s*)ask_exam=([^;]+)/.exec(req.headers.get('cookie') ?? '')
+  if (!m) return null
+  try {
+    const a = await attemptByToken(getDb(), decodeURIComponent(m[1]))
+    return a && !a.submittedAt ? a.id : null
+  } catch { return null }
+}
 
 function json(body: unknown, status: number, headers?: Record<string, string>) {
   return Response.json(body, { status, headers: { 'Cache-Control': 'no-store', ...headers } })
@@ -49,7 +61,10 @@ export async function POST(req: Request) {
     return json({ error: 'JSON bekleniyor' }, 415)
   }
 
-  if (rateLimited(`compile:${clientIp(req)}`, RATE_MAX, RATE_WINDOW_MS)) {
+  // Sınavdaki öğrenciler: sınıftaki tüm dizüstüler aynı IP'den çıkabilir, kota giriş başına tutulur
+  const exam = await examAttemptOf(req)
+  const rateKey = exam ? `compile:exam:${exam}` : `compile:${clientIp(req)}`
+  if (rateLimited(rateKey, exam ? EXAM_RATE_MAX : RATE_MAX, RATE_WINDOW_MS)) {
     return json({ error: 'Çok fazla istek, biraz bekleyip tekrar dene' }, 429, { 'Retry-After': '60' })
   }
 
