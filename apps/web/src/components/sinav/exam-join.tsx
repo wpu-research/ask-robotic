@@ -46,7 +46,7 @@ export function ExamJoin({ resume }: { resume: { title: string; student: string 
           <button type="submit" className="btn btn-primary" disabled={busy}>{busy ? 'Starting…' : 'Start exam'}</button>
         </form>
         <ul className="exam-rules">
-          <li>The exam has three parts: multiple choice, one definition question and a circuit + Arduino project.</li>
+          <li>You get one robot project: build its circuit and write its Arduino code in the lab.</li>
           <li>Your answers are saved automatically. If your laptop restarts, open this page again on the same browser.</li>
           <li>Leaving the exam window is recorded and reported to the instructor.</li>
           <li>When time is up, your last saved answers are submitted automatically.</li>

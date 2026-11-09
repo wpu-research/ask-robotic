@@ -18,7 +18,7 @@ interface Session { id: string; code: string; title: string; status: string; dur
 export function ExamSessions() {
   const [sessions, setSessions] = useState<Session[]>([])
   const [err, setErr] = useState('')
-  const [f, setF] = useState({ title: 'ESOF 323 Midterm', durationMin: 90, mcqCount: 10, mcqPoints: 3, definitionPoints: 10, projectPoints: 60 })
+  const [f, setF] = useState({ title: 'ESOF 323 Midterm', durationMin: 90, mcqCount: 0, mcqPoints: 0, definitionPoints: 0, projectPoints: 100 })
   const load = useCallback(() => api('/api/sinav/yonetim').then((b) => setSessions(b.sessions)).catch((e) => setErr(e.message)), [])
   useEffect(() => { void load() }, [load])
   const total = f.mcqCount * f.mcqPoints + f.definitionPoints + f.projectPoints

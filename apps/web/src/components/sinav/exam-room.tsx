@@ -48,6 +48,7 @@ export function ExamRoom() {
       if (!r.ok) { setLoadError(b.error ?? 'Could not load the exam'); return }
       const v = b as StudentView
       setView(v); setMcq(v.answers.mcq ?? {}); setDefinition(v.answers.definition ?? '')
+      if (!v.mcq.length) setTab(v.session.config.definitionPoints > 0 ? 'definition' : 'project')
       if (v.submitted) { setSubmitted(true); done.current = true }
     }).catch(() => setLoadError('Network error. Reload the page.'))
   }, [router])
@@ -157,6 +158,8 @@ export function ExamRoom() {
   const answered = view.mcq.filter((q) => mcq[q.id] !== undefined).length
   const cfg = view.session.config
   const lowTime = left < 5 * 60_000
+  const hasMcq = view.mcq.length > 0
+  const hasDef = cfg.definitionPoints > 0
 
   return (
     <div className="exam-room" lang="en">
@@ -165,11 +168,13 @@ export function ExamRoom() {
           <b>{view.session.title}</b>
           <span>{view.student.no} · {view.student.name}</span>
         </div>
-        <nav className="exam-tabs" role="tablist">
-          <button role="tab" aria-selected={tab === 'mcq'} onClick={() => setTab('mcq')}>A · Multiple choice <small>{answered}/{view.mcq.length}</small></button>
-          <button role="tab" aria-selected={tab === 'definition'} onClick={() => setTab('definition')}>B · Definition <small>{definition.trim() ? '✓' : '–'}</small></button>
-          <button role="tab" aria-selected={tab === 'project'} onClick={() => setTab('project')}>C · Project <small>{cfg.projectPoints} pts</small></button>
-        </nav>
+        {(hasMcq || hasDef) && (
+          <nav className="exam-tabs" role="tablist">
+            {hasMcq && <button role="tab" aria-selected={tab === 'mcq'} onClick={() => setTab('mcq')}>A · Multiple choice <small>{answered}/{view.mcq.length}</small></button>}
+            {hasDef && <button role="tab" aria-selected={tab === 'definition'} onClick={() => setTab('definition')}>B · Definition <small>{definition.trim() ? '✓' : '–'}</small></button>}
+            <button role="tab" aria-selected={tab === 'project'} onClick={() => setTab('project')}>C · Project <small>{cfg.projectPoints} pts</small></button>
+          </nav>
+        )}
         <div className="exam-bar-right">
           <span className={`exam-save exam-save-${save.state}`} title={save.msg}>
             {save.state === 'saving' ? 'Saving…' : save.state === 'saved' ? `Saved ${save.at}` : save.state === 'error' ? save.msg : 'Autosave on'}
@@ -217,7 +222,7 @@ export function ExamRoom() {
         <section className="exam-section exam-project" hidden={tab !== 'project'}>
           <div className="exam-brief">
             <button className="exam-brief-toggle" onClick={() => setBriefOpen((o) => !o)} aria-expanded={briefOpen}>
-              <h2>Part C · {view.project.title}</h2><span>{briefOpen ? 'Hide task ▲' : 'Show task ▼'}</span>
+              <h2>{hasMcq || hasDef ? 'Part C · ' : ''}{view.project.title}</h2><span>{briefOpen ? 'Hide task ▲' : 'Show task ▼'}</span>
             </button>
             {briefOpen && (
               <div className="exam-brief-body">
@@ -242,8 +247,8 @@ export function ExamRoom() {
           <div className="exam-modal-card">
             <h2 id="exam-confirm-title">Submit the exam?</h2>
             <ul>
-              <li>Multiple choice: {answered} of {view.mcq.length} answered{answered < view.mcq.length ? ' ⚠' : ''}</li>
-              <li>Definition: {definition.trim() ? `${definition.trim().split(/\s+/).length} words` : 'empty ⚠'}</li>
+              {hasMcq && <li>Multiple choice: {answered} of {view.mcq.length} answered{answered < view.mcq.length ? ' ⚠' : ''}</li>}
+              {hasDef && <li>Definition: {definition.trim() ? `${definition.trim().split(/\s+/).length} words` : 'empty ⚠'}</li>}
               <li>Project: your current circuit and code will be graded.</li>
             </ul>
             <p>You cannot change your answers after submitting.</p>

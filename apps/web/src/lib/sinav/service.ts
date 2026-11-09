@@ -10,7 +10,8 @@ export type ExamSession = typeof examSessions.$inferSelect
 export type ExamAttempt = typeof examAttempts.$inferSelect
 export type ExamConfig = ExamSession['config']
 
-export const DEFAULT_CONFIG: ExamConfig = { mcqCount: 10, mcqPoints: 3, definitionPoints: 10, projectPoints: 60 }
+// Varsayılan: yalnız proje (çoktan seçmeli ve tanım bölümleri 0 ise öğrenciye gösterilmez)
+export const DEFAULT_CONFIG: ExamConfig = { mcqCount: 0, mcqPoints: 0, definitionPoints: 0, projectPoints: 100 }
 export const LIMITS = { code: 40_000, circuit: 200_000, definition: 6_000, graceMs: 90_000 }
 export const EXAM_COOKIE = 'ask_exam'
 

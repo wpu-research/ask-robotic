@@ -9,6 +9,7 @@ import {
 } from './service'
 
 let db: Db
+const FULL = { mcqCount: 10, mcqPoints: 3, definitionPoints: 10, projectPoints: 60 }
 beforeAll(async () => {
   db = await createTestDb()
   // Testte gerçek derleyici yok: proje puanı sabit 50
@@ -19,7 +20,7 @@ beforeAll(async () => {
 }, 60_000)
 
 const open = async () => {
-  const s = await createSession(db, { title: 'Test', durationMin: 60 })
+  const s = await createSession(db, { title: 'Test', durationMin: 60, config: FULL })
   await setSessionStatus(db, s.id, 'open')
   return s
 }
@@ -92,6 +93,15 @@ describe.skipIf(EXAM_PROJECTS.length === 0)('sınav servisi', () => {
     const b = (await getAttempt(db, r.attemptId))!
     expect(b.submittedAt).toBeNull()
     expect(b.deadlineAt.getTime()).toBeGreaterThan(Date.now())
+  })
+
+  it('varsayılan sınav yalnız projedir', async () => {
+    const s = await createSession(db, { title: 'Only project', durationMin: 60 })
+    await setSessionStatus(db, s.id, 'open')
+    const r = await startAttempt(db, { code: s.code, studentNo: 'P1', studentName: 'Proje Ogr' })
+    const a = (await getAttempt(db, r.attemptId))!
+    expect(a.mcq).toEqual([])
+    expect(studentView(a, s).session.config.projectPoints).toBe(100)
   })
 
   it('sınavı kapatmak açık girişleri teslim eder', async () => {
