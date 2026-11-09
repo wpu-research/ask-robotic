@@ -1,17 +1,16 @@
-// Öğrencinin devresinin görüntüsü (sınav kâğıdı PDF'i için). Laboratuvar tuvaliyle aynı parça çizimleri (PartArt),
-// kablo yolları (wireTrace) ve renkler; bağlı pinlerin adları yazılır. SVG → PNG (resvg, DejaVu fontlarıyla). Yalnız sunucu.
-import path from 'node:path'
+'use client'
+// Öğrencinin devresinin SVG'si (sınav kâğıdı PDF'i için), öğretmenin tarayıcısında üretilir: laboratuvarla aynı parça
+// çizimleri (PartArt istemci bileşeni olduğundan sunucuda çizilemez), kablo yolları ve renkler; bağlı pin adları yazılır.
 import { renderToStaticMarkup } from 'react-dom/server'
-import { Resvg } from '@resvg/resvg-js'
 import { PartArt } from '@/components/lab/part-art'
 import { I18nProvider } from '@/i18n/client'
-import { layoutCanvasLabels } from '@/lib/lab/label-layout'
 import type { Circuit, PinRef } from '@/lib/lab/contract'
 import { PART_DEFS, partBounds, pinDir, pinWorld, wireTrace } from '@/lib/lab/geometry'
+import { layoutCanvasLabels } from '@/lib/lab/label-layout'
 
 const PAD = 46
 
-export function circuitSvg(c: Circuit): { svg: string; w: number; h: number } | null {
+export function circuitSvg(c: Circuit): string | null {
   const parts = c.parts.filter((p) => PART_DEFS[p.type])
   if (!parts.length) return null
   const byId = new Map(parts.map((p) => [p.id, p]))
@@ -73,23 +72,24 @@ export function circuitSvg(c: Circuit): { svg: string; w: number; h: number } | 
     </svg>
     </I18nProvider>
   )
-  return { svg: renderToStaticMarkup(el), w, h }
+  return renderToStaticMarkup(el)
 }
 
-/** PNG (genişlik en çok 1600 px). Hata olursa null: PDF görüntüsüz devam eder. */
-export function circuitPng(c: Circuit): Uint8Array | null {
-  try {
-    const s = circuitSvg(c)
-    if (!s) return null
-    const dir = path.join(process.cwd(), 'public', 'sinav')
-    const r = new Resvg(s.svg, {
-      fitTo: { mode: 'width', value: Math.min(1600, Math.round(s.w * 2)) },
-      font: { loadSystemFonts: false, fontFiles: [path.join(dir, 'DejaVuSans.ttf'), path.join(dir, 'DejaVuSans-Bold.ttf')], defaultFontFamily: 'DejaVu Sans' },
-      background: '#ffffff',
-    })
-    return r.render().asPng()
-  } catch (e) {
-    console.error('[sinav] devre görüntüsü üretilemedi', e)
-    return null
+
+/** PDF isteği: {svgs: {girişKimliği: svg}} gönderip dosyayı indirir. */
+export async function downloadExamPdf(url: string, items: Array<{ id: string; circuit: unknown }>) {
+  const svgs: Record<string, string> = {}
+  for (const it of items) {
+    try {
+      const c = it.circuit as Circuit | null
+      const svg = c?.parts ? circuitSvg(c) : null
+      if (svg) svgs[it.id] = svg
+    } catch { /* bu öğrencinin görüntüsü olmadan devam */ }
   }
+  const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ svgs }) })
+  if (!r.ok) throw new Error((await r.json().catch(() => ({}))).error ?? `HTTP ${r.status}`)
+  const name = /filename="([^"]+)"/.exec(r.headers.get('content-disposition') ?? '')?.[1] ?? 'exam.pdf'
+  const href = URL.createObjectURL(await r.blob())
+  const a = document.createElement('a'); a.href = href; a.download = name; document.body.appendChild(a); a.click(); a.remove()
+  setTimeout(() => URL.revokeObjectURL(href), 10_000)
 }

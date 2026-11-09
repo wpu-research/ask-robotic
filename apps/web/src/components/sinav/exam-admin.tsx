@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { LabEditor } from '@/components/lab/lab-editor'
 import type { Circuit, PartType } from '@/lib/lab/contract'
+import { downloadExamPdf } from './circuit-svg'
 
 const api = async (url: string, init?: RequestInit & { json?: unknown }) => {
   const r = await fetch(url, { ...init, cache: 'no-store', headers: init?.json !== undefined ? { 'content-type': 'application/json' } : undefined, body: init?.json !== undefined ? JSON.stringify(init.json) : init?.body })
@@ -75,6 +76,7 @@ interface Row {
 
 export function ExamLive({ id, projectTitles }: { id: string; projectTitles: Record<string, string> }) {
   const [data, setData] = useState<{ session: Session; attempts: Row[]; now: string } | null>(null)
+  const [pdfBusy, setPdfBusy] = useState(false)
   const [err, setErr] = useState('')
   const load = useCallback(() => api(`/api/sinav/yonetim/${id}`).then((b) => { setData(b); setErr('') }).catch((e) => setErr(e.message)), [id])
   useEffect(() => { void load(); const t = setInterval(() => void load(), 5000); return () => clearInterval(t) }, [load])
@@ -85,6 +87,14 @@ export function ExamLive({ id, projectTitles }: { id: string; projectTitles: Rec
   }
   const status = (s: string, ask?: string) => act(() => api(`/api/sinav/yonetim/${id}`, { method: 'PATCH', json: { status: s } }), ask)
   const attempt = (aid: string, json: unknown, ask?: string) => act(() => api(`/api/sinav/yonetim/giris/${aid}`, { method: 'POST', json }), ask)
+
+  const pdfAll = async () => {
+    setPdfBusy(true)
+    try { const b = await api(`/api/sinav/yonetim/${id}/devreler`); await downloadExamPdf(`/api/sinav/yonetim/${id}/pdf`, b.items) } catch (e) { alert((e as Error).message) } finally { setPdfBusy(false) }
+  }
+  const pdfOne = async (aid: string) => {
+    try { const b = await api(`/api/sinav/yonetim/giris/${aid}`); await downloadExamPdf(`/api/sinav/yonetim/giris/${aid}/pdf`, [{ id: aid, circuit: b.attempt.circuit }]) } catch (e) { alert((e as Error).message) }
+  }
 
   if (!data) return <div className="exam-admin" lang="en">{err ? <p className="exam-error">{err}</p> : <p>Loading…</p>}</div>
   const { session: s, attempts } = data
@@ -106,7 +116,7 @@ export function ExamLive({ id, projectTitles }: { id: string; projectTitles: Rec
           {s.status !== 'open' && <button className="btn btn-primary" onClick={() => status('open', s.status === 'closed' ? 'Re-open this exam? Students who already submitted stay submitted.' : undefined)}>Open exam</button>}
           {s.status === 'open' && <button className="btn btn-secondary" onClick={() => status('closed', 'Close the exam? Every unsubmitted attempt is submitted with its last saved answers.')}>Close & submit all</button>}
           <a className="btn btn-secondary" href={`/api/sinav/yonetim/${id}/csv`}>Download CSV</a>
-          <a className="btn btn-secondary" href={`/api/sinav/yonetim/${id}/pdf`}>All exam sheets (PDF)</a>
+          <button className="btn btn-secondary" disabled={pdfBusy} onClick={() => void pdfAll()}>{pdfBusy ? 'Preparing PDF…' : 'All exam sheets (PDF)'}</button>
         </div>
       </div>
       {err && <p className="exam-error">{err}</p>}
@@ -130,7 +140,7 @@ export function ExamLive({ id, projectTitles }: { id: string; projectTitles: Rec
                   <td className="num"><b>{a.submittedAt ? `${a.total}/${a.max}` : '–'}</b></td>
                   <td className="exam-row-actions">
                     <Link href={`/sinav/yonetim/giris/${a.id}`}>Open</Link>
-                    <a className="exam-mini" href={`/api/sinav/yonetim/giris/${a.id}/pdf`}>PDF</a>
+                    <button className="exam-mini" onClick={() => void pdfOne(a.id)}>PDF</button>
                     <button className="exam-mini" title="Allow the student to log in again on another device" onClick={() => attempt(a.id, { action: 'relogin' })}>Relogin</button>
                     <button className="exam-mini" onClick={() => { const m = prompt('Extra minutes?', '10'); if (m) void attempt(a.id, { action: 'extend', minutes: Number(m) }) }}>+Time</button>
                     {!a.submittedAt && <button className="exam-mini" onClick={() => attempt(a.id, { action: 'submit' }, `Submit ${a.studentName}'s exam now?`)}>Submit</button>}
@@ -206,7 +216,7 @@ export function ExamAttemptDetail({ id }: { id: string }) {
       <div className="card">
         <div className="exam-actions" style={{ justifyContent: 'space-between' }}>
           <h2>Part C · {proj ? `${proj.id} ${proj.title}` : a.projectId}</h2>
-          <span className="exam-actions"><a className="btn btn-secondary" href={`/api/sinav/yonetim/giris/${id}/pdf`}>Exam sheet (PDF)</a>
+          <span className="exam-actions"><button className="btn btn-secondary" onClick={() => void downloadExamPdf(`/api/sinav/yonetim/giris/${id}/pdf`, [{ id, circuit: a.circuit }]).catch((e) => setMsg((e as Error).message))}>Exam sheet (PDF)</button>
           <button className="btn btn-secondary" onClick={() => void regrade()}>Regrade</button></span>
         </div>
         {g?.compileError && <p className="exam-error">{g.compileError}</p>}

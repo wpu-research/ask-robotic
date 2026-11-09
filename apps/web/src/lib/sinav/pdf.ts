@@ -10,7 +10,7 @@ import { examProject } from './projects'
 import { DEFINITION_BANK, MCQ_BANK } from './questions'
 import { totalScore, type ExamAttempt, type ExamSession } from './service'
 import type { ProjectGrade } from './types'
-import { circuitPng } from './circuit-image'
+import { svgToPng } from './circuit-image'
 
 const A4: [number, number] = [595.28, 841.89]
 const M = 50
@@ -199,7 +199,7 @@ function cover(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAttempt, cols:
 }
 
 // ---------------------------------------------------------------- tek öğrenci
-async function addAttempt(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAttempt) {
+async function addAttempt(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAttempt, svg?: string) {
   const p = examProject(a.projectId)
   const g = (a.projectGrade ?? null) as (ProjectGrade & { error?: string }) | null
   const cfg = s.config
@@ -245,7 +245,7 @@ async function addAttempt(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAtt
   }
 
   const circ = a.circuit as Circuit | null
-  const png = circ?.parts ? circuitPng(circ) : null
+  const png = circ?.parts && svg ? svgToPng(svg) : null
   if (png) {
     const img = await doc.embedPng(png)
     fl.need(Math.min(W / img.width, 470 / img.height) * img.height + 50) // başlık görüntüden ayrı sayfada kalmasın
@@ -303,20 +303,20 @@ async function addAttempt(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAtt
   }
 }
 
-export async function attemptPdf(s: ExamSession, a: ExamAttempt) {
+export async function attemptPdf(s: ExamSession, a: ExamAttempt, svg?: string) {
   const doc = await PDFDocument.create()
   doc.setTitle(`ESOF323 ${s.title} - ${a.studentNo} ${a.studentName}`)
   doc.setAuthor('MacademiaX exam system')
-  await addAttempt(doc, await embed(doc), s, a)
+  await addAttempt(doc, await embed(doc), s, a, svg)
   return doc.save()
 }
 
 /** Tüm öğrenciler tek dosyada (öğrenci numarasına göre). */
-export async function sessionPdf(s: ExamSession, attempts: ExamAttempt[]) {
+export async function sessionPdf(s: ExamSession, attempts: ExamAttempt[], svgs: Record<string, string> = {}) {
   const doc = await PDFDocument.create()
   doc.setTitle(`ESOF323 ${s.title} - all students`)
   const f = await embed(doc)
-  for (const a of [...attempts].sort((x, y) => x.studentNo.localeCompare(y.studentNo))) await addAttempt(doc, f, s, a)
+  for (const a of [...attempts].sort((x, y) => x.studentNo.localeCompare(y.studentNo))) await addAttempt(doc, f, s, a, svgs[a.id])
   if (!attempts.length) doc.addPage(A4).drawText('No students.', { x: M, y: A4[1] - M, size: 12, font: f.reg })
   return doc.save()
 }
