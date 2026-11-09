@@ -23,3 +23,14 @@ Derleme kotası sınavdaki öğrenci için IP değil giriş başınadır (dakika
 
 Kod: `apps/web/src/lib/sinav` (types, grade, service, grader, questions, projects/a|b|c), rotalar `app/api/sinav`, sayfalar `app/sinav`.
 Test: `cd apps/web && npx vitest run src/lib/sinav` (her projenin çözümü 100, boş başlangıç < 30).
+
+## Durum (2026-11-09)
+
+- Canlıda: öğrenci `/sinav`, öğretmen `/sinav/yonetim` (`admin@macademia.com.tr`). Varsayılan sınav yalnız proje (100 puan).
+- Lovable portalı (muratarslan.site/nisantasi) yalnız bağlantı verir; ESOF 323 sayfasındaki "Online Exam" kartı canlı.
+- Sınav kâğıdı PDF'i: kapaktaki Grade satırı bilerek boş (puan kalemle yazılır); panel ve CSV puanları gösterir.
+  Devre resmini PDF'i indiren öğretmenin tarayıcısı çizer, sunucu resvg ile PNG'ye çevirir; PDF'i paneldeki düğmelerle alın.
+- Ara sınav: 13 Kasım 2026 Cuma 12:00–13:30, C202. Başlıkta "Midterm" olsun, süre 90 dk.
+- Yapılacak: deneme sınavı `DENEME` hâlâ açık, asıl sınavdan önce kapat. Sınavdan sonra admin parolasını değiştir.
+- Yayın: `git archive HEAD` → geçici dizin → `railway up --service web --detach`; en yeni yayının tarihini doğrula
+  (başarısız yükleme eski SUCCESS'i üstte bırakır). Yerel modül ya da react-dom/server değişikliğinden önce `npx next build`.
