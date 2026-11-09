@@ -142,7 +142,8 @@ function cover(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAttempt, cols:
   const grid: Array<[string, string[]]> = [
     ['Question #', [...cols.map((c) => c.label), 'Total']],
     ['Points', [...cols.map((c) => num(c.points)), num(total.max)]],
-    ['Grade', [...cols.map((c) => (c.grade == null ? '' : num(c.grade))), a.submittedAt ? num(total.total) : '']],
+    // Grade satırı boş: öğretmen çıktıya puanı kalemle yazar (otomatik puan 2. sayfadaki gereksinim tablosunda)
+    ['Grade', cols.map(() => '').concat([''])],
     ['Corresponding C.O.', cols.map(() => '').concat([''])],
   ]
   grid.forEach(([head, vals], r) => {
