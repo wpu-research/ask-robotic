@@ -12,7 +12,7 @@ Sınav ekranında site menüsü, arama ve Robi (yapay zekâ) kapalıdır; pencer
 - **Close & submit all**: tüm açık girişleri son kayıtla teslim eder.
 - Öğrenci ayrıntısında: tanım cevabı + rubrik → puan gir; proje hedefleri (✓/✗), derleme hatası, seri çıktı; öğrencinin devresini
   ve kodunu çalıştırabilirsin; gerekirse proje puanını elle düzelt; **Regrade**.
-- **Download CSV**: Excel'e uygun not listesi.
+- **Download CSV**: Excel'e uygun not listesi. **All exam sheets (PDF)**: tüm öğrencilerin üniversite formatındaki sınav kâğıtları tek dosyada; satırdaki **PDF** tek öğrencinin kâğıdı.
 - `/sinav/yonetim/projeler`: 25 projenin görev metni, puanlanan gereksinimler ve örnek çözümü (laboratuvarda çalışır).
 
 Proje puanlaması sunucuda: öğrencinin kodu arduino-cli ile derlenir, öğrencinin KENDİ devresinde benzetim çalıştırılır, projenin

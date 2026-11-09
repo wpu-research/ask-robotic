@@ -106,6 +106,7 @@ export function ExamLive({ id, projectTitles }: { id: string; projectTitles: Rec
           {s.status !== 'open' && <button className="btn btn-primary" onClick={() => status('open', s.status === 'closed' ? 'Re-open this exam? Students who already submitted stay submitted.' : undefined)}>Open exam</button>}
           {s.status === 'open' && <button className="btn btn-secondary" onClick={() => status('closed', 'Close the exam? Every unsubmitted attempt is submitted with its last saved answers.')}>Close & submit all</button>}
           <a className="btn btn-secondary" href={`/api/sinav/yonetim/${id}/csv`}>Download CSV</a>
+          <a className="btn btn-secondary" href={`/api/sinav/yonetim/${id}/pdf`}>All exam sheets (PDF)</a>
         </div>
       </div>
       {err && <p className="exam-error">{err}</p>}
@@ -129,6 +130,7 @@ export function ExamLive({ id, projectTitles }: { id: string; projectTitles: Rec
                   <td className="num"><b>{a.submittedAt ? `${a.total}/${a.max}` : '–'}</b></td>
                   <td className="exam-row-actions">
                     <Link href={`/sinav/yonetim/giris/${a.id}`}>Open</Link>
+                    <a className="exam-mini" href={`/api/sinav/yonetim/giris/${a.id}/pdf`}>PDF</a>
                     <button className="exam-mini" title="Allow the student to log in again on another device" onClick={() => attempt(a.id, { action: 'relogin' })}>Relogin</button>
                     <button className="exam-mini" onClick={() => { const m = prompt('Extra minutes?', '10'); if (m) void attempt(a.id, { action: 'extend', minutes: Number(m) }) }}>+Time</button>
                     {!a.submittedAt && <button className="exam-mini" onClick={() => attempt(a.id, { action: 'submit' }, `Submit ${a.studentName}'s exam now?`)}>Submit</button>}
@@ -204,7 +206,8 @@ export function ExamAttemptDetail({ id }: { id: string }) {
       <div className="card">
         <div className="exam-actions" style={{ justifyContent: 'space-between' }}>
           <h2>Part C · {proj ? `${proj.id} ${proj.title}` : a.projectId}</h2>
-          <button className="btn btn-secondary" onClick={() => void regrade()}>Regrade</button>
+          <span className="exam-actions"><a className="btn btn-secondary" href={`/api/sinav/yonetim/giris/${id}/pdf`}>Exam sheet (PDF)</a>
+          <button className="btn btn-secondary" onClick={() => void regrade()}>Regrade</button></span>
         </div>
         {g?.compileError && <p className="exam-error">{g.compileError}</p>}
         {g?.error && <p className="exam-error">{g.error}</p>}
