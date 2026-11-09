@@ -10,6 +10,7 @@ import { examProject } from './projects'
 import { DEFINITION_BANK, MCQ_BANK } from './questions'
 import { totalScore, type ExamAttempt, type ExamSession } from './service'
 import type { ProjectGrade } from './types'
+import { circuitPng } from './circuit-image'
 
 const A4: [number, number] = [595.28, 841.89]
 const M = 50
@@ -87,6 +88,15 @@ class Flow {
       this.y -= lead
       this.page.drawText(line, { x, y: this.y + size * 0.28, size, font, color: o.color ?? BLACK })
     }
+  }
+  /** Görüntüyü genişliğe sığdırır (en çok maxH yükseklik); sığmazsa yeni sayfa. */
+  image(img: PDFImage, maxH: number) {
+    const k = Math.min(W / img.width, maxH / img.height)
+    const w = img.width * k, h = img.height * k
+    this.need(h + 6)
+    this.page.drawRectangle({ x: M + (W - w) / 2 - 1, y: this.y - h - 1, width: w + 2, height: h + 2, borderColor: GREY, borderWidth: 0.6 })
+    this.page.drawImage(img, { x: M + (W - w) / 2, y: this.y - h, width: w, height: h })
+    this.y -= h + 6
   }
   heading(t: string) { this.gap(8); this.need(40); this.text(t, { size: 12, font: this.f.bold }); this.gap(3) }
   /** Kenarlıklı tablo; ilk satır başlık. widths toplamı W. */
@@ -232,6 +242,16 @@ async function addAttempt(doc: PDFDocument, f: Fonts, s: ExamSession, a: ExamAtt
     fl.text(`Weighted project grade: ${t.project ?? '–'} / ${cfg.projectPoints}. Compiled: ${g ? (g.compiled ? 'yes' : 'no') : 'not graded yet'}.`, { size: 9 })
     if (g?.compileError) fl.text(g.compileError, { size: 8.5, font: f.mono, color: RED })
     if (g?.error) fl.text(g.error, { size: 8.5, color: RED })
+  }
+
+  const circ = a.circuit as Circuit | null
+  const png = circ?.parts ? circuitPng(circ) : null
+  if (png) {
+    const img = await doc.embedPng(png)
+    fl.need(Math.min(W / img.width, 470 / img.height) * img.height + 50) // başlık görüntüden ayrı sayfada kalmasın
+    fl.heading('Student circuit (Arduino connections)')
+    fl.image(img, 470)
+    fl.text('Pin names are shown next to each connected pin; wire colours are as drawn by the student.', { size: 8, color: GREY })
   }
 
   fl.heading('Exam record')
